@@ -1,0 +1,4 @@
+rootProject.name = 'jdbc-storage'
+
+include ':hsqldb'
+project(':hsqldb').projectDir = "$rootDir/hsqldb" as File
