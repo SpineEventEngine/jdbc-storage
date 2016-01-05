@@ -24,13 +24,8 @@ import com.google.protobuf.StringValue;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
-import org.spine3.server.storage.EntityStorage;
 import org.spine3.server.storage.EntityStorageShould;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-
-import static com.google.common.base.Throwables.propagate;
 import static org.spine3.server.storage.hsqldb.HsqlEntityStorage.*;
 
 /**
@@ -45,9 +40,6 @@ public class HsqlEntityStorageShould extends EntityStorageShould {
 
     private static final HsqlDb DATABASE = HsqlDb.newInstance(DB_URL);
 
-    private static final EntityStorage<String, StringValue> STORAGE =
-            HsqlEntityStorage.newInstance(DATABASE, StringValue.getDescriptor());
-
     private static final String CREATE_TABLE_SQL =
             "CREATE TABLE " + ENTITIES + '(' +
                 ID + " VARCHAR(999)," +
@@ -60,31 +52,26 @@ public class HsqlEntityStorageShould extends EntityStorageShould {
     private static final String SHUTDOWN_SQL = "SHUTDOWN";
 
     public HsqlEntityStorageShould() {
-        super(STORAGE);
+        super(newStorage());
+    }
+
+    private static HsqlEntityStorage<String, StringValue> newStorage() {
+        return HsqlEntityStorage.newInstance(DATABASE, StringValue.getDescriptor());
     }
 
     @Before
     public void setUpTest() {
-        execute(CREATE_TABLE_SQL);
+        DATABASE.execute(CREATE_TABLE_SQL);
     }
 
     @After
     public void tearDownTest() {
-        execute(DROP_TABLE_SQL);
+        DATABASE.execute(DROP_TABLE_SQL);
     }
 
     @AfterClass
     public static void tearDownClass() {
-        execute(SHUTDOWN_SQL);
-    }
-
-    static void execute(final String sql) {
-        //noinspection JDBCPrepareStatementWithNonConstantString
-        try (ConnectionWrapper connection = DATABASE.getConnection(true);
-             final PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.execute();
-        } catch (SQLException e) {
-            propagate(e);
-        }
+        DATABASE.execute(SHUTDOWN_SQL);
+        DATABASE.close();
     }
 }

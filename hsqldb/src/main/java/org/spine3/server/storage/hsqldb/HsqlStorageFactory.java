@@ -26,8 +26,6 @@ import org.spine3.server.Entity;
 import org.spine3.server.aggregate.Aggregate;
 import org.spine3.server.storage.*;
 
-import java.io.IOException;
-
 import static org.spine3.protobuf.Messages.getClassDescriptor;
 import static org.spine3.util.Classes.getGenericParameterType;
 
@@ -89,7 +87,7 @@ public class HsqlStorageFactory implements StorageFactory {
     }
 
     @Override
-    public void close() throws IOException {
-        // TODO:2016-01-05:alexander.litus: impl
+    public void close() {
+        database.close();
     }
 }

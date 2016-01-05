@@ -47,7 +47,7 @@ import static org.spine3.util.Identifiers.idToString;
  * @author Alexander Litus
  */
 @SuppressWarnings("DuplicateStringLiteralInspection")
-class HsqlEntityStorage<I, M extends Message> extends EntityStorage<I, M> {
+class HsqlEntityStorage<I, M extends Message> extends EntityStorage<I, M> implements AutoCloseable {
 
     // TODO:2016-01-04:alexander.litus: have a table per entity type
 
@@ -178,6 +178,11 @@ class HsqlEntityStorage<I, M extends Message> extends EntityStorage<I, M> {
                 propagate(e);
             }
         }
+    }
+
+    @Override
+    public void close() {
+        database.close();
     }
 
     private static void logTransactionError(String idString, SQLException e) {

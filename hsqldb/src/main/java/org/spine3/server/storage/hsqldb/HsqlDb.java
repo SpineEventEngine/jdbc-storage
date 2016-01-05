@@ -20,8 +20,11 @@
 
 package org.spine3.server.storage.hsqldb;
 
+import com.mchange.v2.c3p0.ComboPooledDataSource;
+
+import java.beans.PropertyVetoException;
 import java.sql.Connection;
-import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import static com.google.common.base.Throwables.propagate;
@@ -31,20 +34,18 @@ import static com.google.common.base.Throwables.propagate;
  *
  * @author Alexander Litus
  */
-class HsqlDb {
+class HsqlDb implements AutoCloseable {
 
     private static final String JDBC_DRIVER_NAME = "org.hsqldb.jdbc.JDBCDriver";
 
-    private final String dbUrl;
-    private final String username;
-    private final String password;
+    private final ComboPooledDataSource dataSource;
 
     /**
      * Creates a new instance.
      *
-     * @param dbUrl the database URL of the form {@code jdbc:subprotocol:subname},
-     *              e.g. {@code jdbc:hsqldb:hsql://localhost:9001/dbname;ifexists=true} or
-     *              {@code jdbc:hsqldb:mem:inmemorydb} for in-memory database
+     * @param dbUrl    the database URL of the form {@code jdbc:subprotocol:subname},
+     *                 e.g. {@code jdbc:hsqldb:hsql://localhost:9001/dbname;ifexists=true} or
+     *                 {@code jdbc:hsqldb:mem:inmemorydb} for in-memory database
      * @param username the user of the database on whose behalf the connections are being made
      * @param password the user's password
      */
@@ -63,38 +64,55 @@ class HsqlDb {
     }
 
     private HsqlDb(String dbUrl, String username, String password) {
-        this.dbUrl = dbUrl;
-        this.username = username;
-        this.password = password;
-    }
-
-    static {
-        loadJdbcDriver();
-    }
-
-    private static void loadJdbcDriver() {
+        dataSource = new ComboPooledDataSource();
         try {
-            Class.forName(JDBC_DRIVER_NAME);
-        } catch (ClassNotFoundException e) {
-            throw propagate(e);
+            dataSource.setDriverClass(JDBC_DRIVER_NAME);
+        } catch (PropertyVetoException e) {
+            propagate(e);
         }
+        dataSource.setJdbcUrl(dbUrl);
+        dataSource.setUser(username);
+        dataSource.setPassword(password);
+
+        dataSource.setMaxStatements(200);
     }
 
     /**
-     * Retrieves a connection with the given auto commit mode.
+     * Retrieves a wrapped connection with the given auto commit mode.
      *
      * @throws RuntimeException if a database access error occurs
      * @see Connection#setAutoCommit(boolean)
      */
     ConnectionWrapper getConnection(boolean autoCommit) {
         try {
-            // TODO:2016-01-05:alexander.litus: use DataSource, connection pool
-            final Connection connection = DriverManager.getConnection(dbUrl, username, password);
+            final Connection connection = dataSource.getConnection();
             connection.setAutoCommit(autoCommit);
             final ConnectionWrapper wrapper = ConnectionWrapper.wrap(connection);
             return wrapper;
         } catch (SQLException e) {
             throw propagate(e);
         }
+    }
+
+    /**
+     * Executes the SQL statement in {@link PreparedStatement} object.
+     *
+     * @param sql the SQL statement to execute
+     * @throws RuntimeException if a database access error occurs
+     * @see PreparedStatement#execute(String)
+     */
+    void execute(String sql) {
+        //noinspection JDBCPrepareStatementWithNonConstantString
+        try (ConnectionWrapper connection = getConnection(true);
+             final PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.execute();
+        } catch (SQLException e) {
+            propagate(e);
+        }
+    }
+
+    @Override
+    public void close() {
+        dataSource.close();
     }
 }
