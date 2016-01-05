@@ -1,6 +1,7 @@
 project.ext {
     PROTOBUF_VERSION = '3.0.0-beta-1'
     PROTOBUF_DEPENDENCY = "com.google.protobuf:protoc:${project.PROTOBUF_VERSION}"
+    SPINE_VERSION = '0.2'
 }
 
 buildscript {
@@ -44,10 +45,10 @@ subprojects {
     }
 
     dependencies {
-        // TODO:2015-11-16:alexander.litus: change Spine local dependency to Maven central repository dependency
+        // TODO:2015-11-16:alexander.litus: change Spine local dependencies to Maven central repository dependencies
         // when Spine can be used for evaluation in real projects.
         // Spine
-        compile group: 'org.spine3', name: 'core-java', version: '0.2', changing: true
+        compile group: 'org.spine3', name: 'core-java', version: project.SPINE_VERSION, changing: true
 
         // Guava
         compile group: 'com.google.guava', name: 'guava', version: '19.0'
