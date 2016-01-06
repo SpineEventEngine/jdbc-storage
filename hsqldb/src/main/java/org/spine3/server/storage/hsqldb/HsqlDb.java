@@ -20,9 +20,9 @@
 
 package org.spine3.server.storage.hsqldb;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 
-import java.beans.PropertyVetoException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -31,50 +31,28 @@ import static com.google.common.base.Throwables.propagate;
 
 /**
  * The facade for operations with HyperSQL Database.
+ * Uses <a href="https://github.com/brettwooldridge/HikariCP">HikariCP</a connection pool</a>.
  *
  * @author Alexander Litus
  */
 class HsqlDb implements AutoCloseable {
 
-    private static final String JDBC_DRIVER_NAME = "org.hsqldb.jdbc.JDBCDriver";
-
-    private final ComboPooledDataSource dataSource;
+    private final HikariDataSource dataSource;
 
     /**
-     * Creates a new instance.
+     * Creates a new instance with the specified configuration.
      *
-     * @param dbUrl    the database URL of the form {@code jdbc:subprotocol:subname},
-     *                 e.g. {@code jdbc:hsqldb:hsql://localhost:9001/dbname;ifexists=true} or
-     *                 {@code jdbc:hsqldb:mem:inmemorydb} for in-memory database
-     * @param username the user of the database on whose behalf the connections are being made
-     * @param password the user's password
+     * <p>Please see {@link HsqlStorageFactory#newInstance(HikariConfig)} for more info.
+     *
+     * @param config the config used to create {@link HikariDataSource}.
+     * @see
      */
-    static HsqlDb newInstance(String dbUrl, String username, String password) {
-        return new HsqlDb(dbUrl, username, password);
+    static HsqlDb newInstance(HikariConfig config) {
+        return new HsqlDb(config);
     }
 
-    /**
-     * Creates a new instance. Empty {@code username} and {@code password} are used.
-     * May be used for in-memory databases in tests.
-     *
-     * @param dbUrl the database URL of the form {@code jdbc:subprotocol:subname}, e.g. {@code jdbc:hsqldb:mem:inmemorydb}
-     */
-    static HsqlDb newInstance(String dbUrl) {
-        return new HsqlDb(dbUrl, "", "");
-    }
-
-    private HsqlDb(String dbUrl, String username, String password) {
-        dataSource = new ComboPooledDataSource();
-        try {
-            dataSource.setDriverClass(JDBC_DRIVER_NAME);
-        } catch (PropertyVetoException e) {
-            propagate(e);
-        }
-        dataSource.setJdbcUrl(dbUrl);
-        dataSource.setUser(username);
-        dataSource.setPassword(password);
-
-        dataSource.setMaxStatements(200);
+    private HsqlDb(HikariConfig config) {
+        dataSource = new HikariDataSource(config);
     }
 
     /**

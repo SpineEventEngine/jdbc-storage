@@ -22,6 +22,8 @@ package org.spine3.server.storage.hsqldb;
 
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.Message;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import org.spine3.server.Entity;
 import org.spine3.server.aggregate.Aggregate;
 import org.spine3.server.storage.*;
@@ -36,21 +38,36 @@ import static org.spine3.util.Classes.getGenericParameterType;
  */
 public class HsqlStorageFactory implements StorageFactory {
 
+    private static final String DATA_SOURCE_CLASS_NAME = "org.hsqldb.jdbc.JDBCDataSource";
+
     private static final int ENTITY_MESSAGE_TYPE_PARAMETER_INDEX = 1;
 
     private final HsqlDb database;
 
     /**
-     * Creates a new factory instance.
+     * Creates a new instance with the specified data source configuration.
      *
-     * @param database the database wrapper
+     * <p>Please see required and optional config properties list and other documentation:
+     * <ul>
+     *     <li><a href="https://github.com/brettwooldridge/HikariCP#essentials">HikariCP config properties</a></li>
+     *     <li><a href="https://github.com/brettwooldridge/HikariCP#initialization">HikariCP configuration sample</a></li>
+     * </ul>
+     * NOTE: {@code dataSourceClassName} config property is set automatically.
+     *
+     * <p>Examples of JDBC URL:
+     *
+     * <p>{@code jdbc:hsqldb:hsql://localhost:9001/dbname;ifexists=true}
+     * <p>{@code jdbc:hsqldb:mem:inmemorydb} (for in-memory database)
+     *
+     * @param config the config used to create {@link HikariDataSource}.
      */
-    public static HsqlStorageFactory newInstance(HsqlDb database) {
-        return new HsqlStorageFactory(database);
+    public static HsqlStorageFactory newInstance(HikariConfig config) {
+        return new HsqlStorageFactory(config);
     }
 
-    private HsqlStorageFactory(HsqlDb database) {
-        this.database = database;
+    private HsqlStorageFactory(HikariConfig config) {
+        config.setDataSourceClassName(DATA_SOURCE_CLASS_NAME);
+        this.database = HsqlDb.newInstance(config);
     }
 
     @Override

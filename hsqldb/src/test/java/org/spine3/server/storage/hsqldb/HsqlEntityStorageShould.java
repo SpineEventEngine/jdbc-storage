@@ -21,6 +21,7 @@
 package org.spine3.server.storage.hsqldb;
 
 import com.google.protobuf.StringValue;
+import com.zaxxer.hikari.HikariConfig;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -38,7 +39,7 @@ public class HsqlEntityStorageShould extends EntityStorageShould {
      */
     private static final String DB_URL = "jdbc:hsqldb:mem:entitytests";
 
-    private static final HsqlDb DATABASE = HsqlDb.newInstance(DB_URL);
+    private static final HsqlDb DATABASE = newHsqlDb();
 
     private static final String CREATE_TABLE_SQL =
             "CREATE TABLE " + ENTITIES + '(' +
@@ -57,6 +58,12 @@ public class HsqlEntityStorageShould extends EntityStorageShould {
 
     private static HsqlEntityStorage<String, StringValue> newStorage() {
         return HsqlEntityStorage.newInstance(DATABASE, StringValue.getDescriptor());
+    }
+
+    private static HsqlDb newHsqlDb() {
+        final HikariConfig config = new HikariConfig();
+        config.setJdbcUrl(DB_URL);
+        return HsqlDb.newInstance(config);
     }
 
     @Before
