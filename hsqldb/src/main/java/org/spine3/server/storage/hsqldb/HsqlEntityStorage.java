@@ -73,6 +73,11 @@ class HsqlEntityStorage<I, M extends Message> extends EntityStorage<I, M> implem
         this.typeName = TypeName.of(descriptor);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @throws RuntimeException if a database access error occurs
+     */
     @Nullable
     @Override
     public M read(I id) {
@@ -106,6 +111,11 @@ class HsqlEntityStorage<I, M extends Message> extends EntityStorage<I, M> implem
         return message;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @throws RuntimeException if a database access error occurs
+     */
     @Override
     public void write(I id, M message) {
         checkNotNull(id, "id");
@@ -145,7 +155,7 @@ class HsqlEntityStorage<I, M extends Message> extends EntityStorage<I, M> implem
                 statement.execute();
                 connection.commit();
             } catch (SQLException e) {
-                handleDbException(e, idString, connection);
+                throw handleDbException(e, idString, connection);
             }
         }
     }
@@ -156,7 +166,7 @@ class HsqlEntityStorage<I, M extends Message> extends EntityStorage<I, M> implem
                 statement.execute();
                 connection.commit();
             } catch (SQLException e) {
-                handleDbException(e, id, connection);
+                throw handleDbException(e, id, connection);
             }
         }
     }
@@ -197,10 +207,10 @@ class HsqlEntityStorage<I, M extends Message> extends EntityStorage<I, M> implem
         return statement;
     }
 
-    private static void handleDbException(SQLException e, String idString, ConnectionWrapper connection) {
+    private static RuntimeException handleDbException(SQLException e, String idString, ConnectionWrapper connection) {
         connection.rollback();
         logTransactionError(idString, e);
-        propagate(e);
+        throw propagate(e);
     }
 
     @Override
