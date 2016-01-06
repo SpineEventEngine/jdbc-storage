@@ -55,19 +55,6 @@ class HsqlEntityStorage<I, M extends Message> extends EntityStorage<I, M> implem
     static final String ENTITY = "entity";
     static final String ID = "id";
 
-    private static final String SELECT_ALL_BY_ID = "SELECT * FROM " + ENTITIES + " WHERE " + ID + " = ?;";
-
-    private static final String INSERT_ENTITY = "INSERT INTO " + ENTITIES +
-            " (" + ID + ", " + ENTITY + ") VALUES (?, ?);";
-
-    private static final String UPDATE_ENTITY = "UPDATE " + ENTITIES +
-            " SET " + ID + " = ?, " + ENTITY + " = ? " +
-            " WHERE " + ID + " = ?;";
-
-    private static final int ID_PARAM_INDEX = 1;
-    private static final int ENTITY_PARAM_INDEX = 2;
-    private static final int UPDATE_BY_ID_PARAM_INDEX = 3;
-
     private final HsqlDb database;
     private final TypeName typeName;
 
@@ -90,26 +77,33 @@ class HsqlEntityStorage<I, M extends Message> extends EntityStorage<I, M> implem
     @Override
     public M read(I id) {
         final String idString = idToString(id);
-
         try (ConnectionWrapper connection = database.getConnection(true);
-             PreparedStatement statement = connection.prepareStatement(SELECT_ALL_BY_ID)) {
-
-            statement.setString(ID_PARAM_INDEX, idString);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    final byte[] bytes = resultSet.getBytes(ENTITY);
-                    final Any.Builder builder = Any.newBuilder();
-                    builder.setTypeUrl(typeName.toTypeUrl());
-                    builder.setValue(ByteString.copyFrom(bytes));
-
-                    final M message = Messages.fromAny(builder.build());
-                    return message;
-                }
-            }
+             PreparedStatement statement = newSelectByIdStatement(connection, idString)) {
+            final M result = findById(statement);
+            return result;
         } catch (SQLException e) {
             logTransactionError(idString, e);
+            throw propagate(e);
         }
-        return null;
+    }
+
+    private M findById(PreparedStatement statement) throws SQLException {
+        try (ResultSet resultSet = statement.executeQuery()) {
+            if (!resultSet.next()) {
+                return null;
+            }
+            final byte[] bytes = resultSet.getBytes(ENTITY);
+            final M message = toMessage(bytes);
+            return message;
+        }
+    }
+
+    private M toMessage(byte[] bytes) {
+        final Any.Builder builder = Any.newBuilder();
+        builder.setTypeUrl(typeName.toTypeUrl());
+        builder.setValue(ByteString.copyFrom(bytes));
+        final M message = Messages.fromAny(builder.build());
+        return message;
     }
 
     @Override
@@ -126,11 +120,15 @@ class HsqlEntityStorage<I, M extends Message> extends EntityStorage<I, M> implem
         }
     }
 
+    private byte[] serialize(M message) {
+        final Any any = toAny(message);
+        final byte[] bytes = any.getValue().toByteArray();
+        return bytes;
+    }
+
     boolean contains(String id) {
         try (ConnectionWrapper connection = database.getConnection(true);
-             PreparedStatement statement = connection.prepareStatement(SELECT_ALL_BY_ID)) {
-            statement.setString(ID_PARAM_INDEX, id);
-
+             PreparedStatement statement = newSelectByIdStatement(connection, id)) {
             try (ResultSet resultSet = statement.executeQuery()) {
                 final boolean hasNext = resultSet.next();
                 return hasNext;
@@ -141,43 +139,68 @@ class HsqlEntityStorage<I, M extends Message> extends EntityStorage<I, M> implem
         }
     }
 
-    private byte[] serialize(M message) {
-        final Any any = toAny(message);
-        final byte[] bytes = any.getValue().toByteArray();
-        return bytes;
-    }
-
-    private void insert(String idString, byte[] serializedEntity) {
-        try (final ConnectionWrapper connection = database.getConnection(false)) {
-
-            try (final PreparedStatement statement = connection.prepareStatement(INSERT_ENTITY)) {
-                statement.setString(ID_PARAM_INDEX, idString);
-                statement.setBytes(ENTITY_PARAM_INDEX, serializedEntity);
-                statement.execute();
-                connection.commit();
-            } catch (SQLException e) {
-                connection.rollback();
-                logTransactionError(idString, e);
-                propagate(e);
-            }
-        }
-    }
-
     private void update(String idString, byte[] serializedEntity) {
-        try (final ConnectionWrapper connection = database.getConnection(false)) {
-
-            try (final PreparedStatement statement = connection.prepareStatement(UPDATE_ENTITY)) {
-                statement.setString(ID_PARAM_INDEX, idString);
-                statement.setBytes(ENTITY_PARAM_INDEX, serializedEntity);
-                statement.setString(UPDATE_BY_ID_PARAM_INDEX, idString);
+        try (ConnectionWrapper connection = database.getConnection(false)) {
+            try (PreparedStatement statement = newUpdateEntityStatement(connection, idString, serializedEntity)) {
                 statement.execute();
                 connection.commit();
             } catch (SQLException e) {
-                connection.rollback();
-                logTransactionError(idString, e);
-                propagate(e);
+                handleDbException(e, idString, connection);
             }
         }
+    }
+
+    private void insert(String id, byte[] serializedEntity) {
+        try (ConnectionWrapper connection = database.getConnection(false)) {
+            try (PreparedStatement statement = newInsertEntityStatement(connection, id, serializedEntity)) {
+                statement.execute();
+                connection.commit();
+            } catch (SQLException e) {
+                handleDbException(e, id, connection);
+            }
+        }
+    }
+
+    private static final String INSERT_ENTITY_SQL =
+            "INSERT INTO " + ENTITIES +
+            " (" + ID + ", " + ENTITY + ')' +
+            " VALUES (?, ?);";
+
+    private static PreparedStatement newInsertEntityStatement(ConnectionWrapper connection,
+                                                              String idString,
+                                                              byte[] serializedEntity) throws SQLException {
+        final PreparedStatement statement = connection.prepareStatement(INSERT_ENTITY_SQL);
+        statement.setString(1, idString);
+        statement.setBytes(2, serializedEntity);
+        return statement;
+    }
+
+    private static final String UPDATE_ENTITY_SQL =
+            "UPDATE " + ENTITIES +
+            " SET " + ENTITY + " = ? " +
+            " WHERE " + ID + " = ?;";
+
+    private static PreparedStatement newUpdateEntityStatement(ConnectionWrapper connection,
+                                                              String id,
+                                                              byte[] serializedEntity) throws SQLException {
+        final PreparedStatement statement = connection.prepareStatement(UPDATE_ENTITY_SQL);
+        statement.setBytes(1, serializedEntity);
+        statement.setString(2, id);
+        return statement;
+    }
+
+    private static final String SELECT_ALL_BY_ID_SQL = "SELECT * FROM " + ENTITIES + " WHERE " + ID + " = ?;";
+
+    private static PreparedStatement newSelectByIdStatement(ConnectionWrapper connection, String id) throws SQLException {
+        final PreparedStatement statement = connection.prepareStatement(SELECT_ALL_BY_ID_SQL);
+        statement.setString(1, id);
+        return statement;
+    }
+
+    private static void handleDbException(SQLException e, String idString, ConnectionWrapper connection) {
+        connection.rollback();
+        logTransactionError(idString, e);
+        propagate(e);
     }
 
     @Override
