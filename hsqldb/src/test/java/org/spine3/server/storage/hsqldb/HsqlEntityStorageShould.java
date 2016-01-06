@@ -25,13 +25,16 @@ import com.zaxxer.hikari.HikariConfig;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.Test;
 import org.spine3.server.storage.EntityStorageShould;
 
+import static org.junit.Assert.fail;
 import static org.spine3.server.storage.hsqldb.HsqlEntityStorage.*;
 
 /**
  * @author Alexander Litus
  */
+@SuppressWarnings("InstanceMethodNamingConvention")
 public class HsqlEntityStorageShould extends EntityStorageShould {
 
     /**
@@ -40,6 +43,8 @@ public class HsqlEntityStorageShould extends EntityStorageShould {
     private static final String DB_URL = "jdbc:hsqldb:mem:entitytests";
 
     private static final HsqlDb DATABASE = newHsqlDb();
+
+    private static final HsqlEntityStorage<String, StringValue> STORAGE = newStorage(DATABASE);
 
     private static final String CREATE_TABLE_SQL =
             "CREATE TABLE " + ENTITIES + '(' +
@@ -53,17 +58,17 @@ public class HsqlEntityStorageShould extends EntityStorageShould {
     private static final String SHUTDOWN_SQL = "SHUTDOWN";
 
     public HsqlEntityStorageShould() {
-        super(newStorage());
-    }
-
-    private static HsqlEntityStorage<String, StringValue> newStorage() {
-        return HsqlEntityStorage.newInstance(DATABASE, StringValue.getDescriptor());
+        super(STORAGE);
     }
 
     private static HsqlDb newHsqlDb() {
         final HikariConfig config = new HikariConfig();
         config.setJdbcUrl(DB_URL);
         return HsqlDb.newInstance(config);
+    }
+
+    private static HsqlEntityStorage<String, StringValue> newStorage(HsqlDb db) {
+        return HsqlEntityStorage.newInstance(db, StringValue.getDescriptor());
     }
 
     @Before
@@ -80,5 +85,18 @@ public class HsqlEntityStorageShould extends EntityStorageShould {
     public static void tearDownClass() {
         DATABASE.execute(SHUTDOWN_SQL);
         DATABASE.close();
+    }
+
+    @Test
+    public void close() {
+        final HsqlEntityStorage<String, StringValue> storage = newStorage(newHsqlDb());
+        storage.close();
+        try {
+            storage.read("any-id");
+        } catch (RuntimeException ignored) {
+            // is OK because storage is closed
+            return;
+        }
+        fail("Storage should close itself.");
     }
 }
