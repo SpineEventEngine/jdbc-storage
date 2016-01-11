@@ -18,18 +18,17 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.spine3.server.storage.hsqldb;
+package org.spine3.server.storage.rdbms;
 
 import com.google.protobuf.StringValue;
 import com.zaxxer.hikari.HikariConfig;
 import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.Test;
 import org.spine3.server.storage.EntityStorageShould;
 
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
-import static org.spine3.server.storage.hsqldb.HsqlEntityStorage.*;
 
 /**
  * @author Alexander Litus
@@ -46,17 +45,6 @@ public class HsqlEntityStorageShould extends EntityStorageShould {
 
     private static final HsqlEntityStorage<String, StringValue> STORAGE = newStorage(DATABASE);
 
-    private static final String CREATE_TABLE_SQL =
-            "CREATE TABLE " + ENTITIES + '(' +
-                ID + " VARCHAR(999)," +
-                ENTITY + " BLOB," +
-                "PRIMARY KEY(" + ID + ')' +
-            ");";
-
-    private static final String DROP_TABLE_SQL = "DROP TABLE " + ENTITIES;
-
-    private static final String SHUTDOWN_SQL = "SHUTDOWN";
-
     public HsqlEntityStorageShould() {
         super(STORAGE);
     }
@@ -71,32 +59,42 @@ public class HsqlEntityStorageShould extends EntityStorageShould {
         return HsqlEntityStorage.newInstance(db, StringValue.getDescriptor());
     }
 
-    @Before
-    public void setUpTest() {
-        DATABASE.execute(CREATE_TABLE_SQL);
-    }
-
     @After
     public void tearDownTest() {
-        DATABASE.execute(DROP_TABLE_SQL);
+        try {
+            STORAGE.clear();
+        } catch (DatabaseException e) {
+            // NOP
+        }
     }
 
     @AfterClass
     public static void tearDownClass() {
-        DATABASE.execute(SHUTDOWN_SQL);
-        DATABASE.close();
+        STORAGE.close();
     }
 
     @Test
-    public void close() {
+    public void close_itself() {
         final HsqlEntityStorage<String, StringValue> storage = newStorage(newHsqlDb());
         storage.close();
         try {
             storage.read("any-id");
-        } catch (RuntimeException ignored) {
-            // is OK because storage is closed
+        } catch (DatabaseException ignored) {
+            // is OK because the storage is closed
             return;
         }
         fail("Storage should close itself.");
+    }
+
+    @Test
+    public void clear_itself() {
+        final String id = "testid";
+        final StringValue entity = StringValue.newBuilder().setValue("testvalue").build();
+
+        STORAGE.write(id, entity);
+        STORAGE.clear();
+
+        final StringValue actual = STORAGE.read(id);
+        assertNull(actual);
     }
 }

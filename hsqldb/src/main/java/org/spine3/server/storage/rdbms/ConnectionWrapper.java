@@ -18,13 +18,11 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.spine3.server.storage.hsqldb;
+package org.spine3.server.storage.rdbms;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-
-import static com.google.common.base.Throwables.propagate;
 
 /**
  * The wrapper for {@link Connection} instances.
@@ -57,44 +55,56 @@ class ConnectionWrapper implements AutoCloseable {
 
     /**
      * Wraps {@link Connection#prepareStatement(String)} method.
+     *
+     * @throws DatabaseException if SQLException occurs
      */
-    PreparedStatement prepareStatement(String sql) throws SQLException {
-        //noinspection JDBCPrepareStatementWithNonConstantString
-        final PreparedStatement statement = connection.prepareStatement(sql);
-        return statement;
+    PreparedStatement prepareStatement(String sql) {
+        try {
+            //noinspection JDBCPrepareStatementWithNonConstantString
+            final PreparedStatement statement = connection.prepareStatement(sql);
+            return statement;
+        } catch (SQLException e) {
+            throw new DatabaseException(e);
+        }
     }
 
     /**
      * Wraps {@link Connection#commit()} method.
+     *
+     * @throws DatabaseException if SQLException occurs
      */
-    void commit() throws SQLException {
-        connection.commit();
+    void commit() {
+        try {
+            connection.commit();
+        } catch (SQLException e) {
+            throw new DatabaseException(e);
+        }
     }
 
     /**
      * Wraps {@link Connection#rollback()} method.
      *
-     * @throws RuntimeException if SQLException occurs
+     * @throws DatabaseException if SQLException occurs
      */
     void rollback() {
         try {
             connection.rollback();
         } catch (SQLException e) {
-            throw propagate(e);
+            throw new DatabaseException(e);
         }
     }
 
     /**
      * Wraps {@link Connection#close()} method.
      *
-     * @throws RuntimeException if SQLException occurs
+     * @throws DatabaseException if SQLException occurs
      */
     @Override
     public void close() {
         try {
             connection.close();
         } catch (SQLException e) {
-            throw propagate(e);
+            throw new DatabaseException(e);
         }
     }
 }

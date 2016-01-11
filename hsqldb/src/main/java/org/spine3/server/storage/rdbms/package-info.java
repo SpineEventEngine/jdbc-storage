@@ -19,6 +19,6 @@
  */
 
 @ParametersAreNonnullByDefault
-package org.spine3.server.storage.hsqldb;
+package org.spine3.server.storage.rdbms;
 
 import javax.annotation.ParametersAreNonnullByDefault;

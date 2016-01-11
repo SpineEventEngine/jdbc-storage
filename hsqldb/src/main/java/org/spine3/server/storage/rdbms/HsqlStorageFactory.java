@@ -18,7 +18,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.spine3.server.storage.hsqldb;
+package org.spine3.server.storage.rdbms;
 
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.Message;

@@ -18,16 +18,13 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.spine3.server.storage.hsqldb;
+package org.spine3.server.storage.rdbms;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
-
-import static com.google.common.base.Throwables.propagate;
 
 /**
  * The facade for operations with HyperSQL Database.
@@ -58,34 +55,17 @@ class HsqlDb implements AutoCloseable {
     /**
      * Retrieves a wrapped connection with the given auto commit mode.
      *
-     * @throws RuntimeException if a database access error occurs
+     * @throws DatabaseException if an error occurs during an interaction with the DB
      * @see Connection#setAutoCommit(boolean)
      */
-    ConnectionWrapper getConnection(boolean autoCommit) {
+    ConnectionWrapper getConnection(boolean autoCommit) throws DatabaseException {
         try {
             final Connection connection = dataSource.getConnection();
             connection.setAutoCommit(autoCommit);
             final ConnectionWrapper wrapper = ConnectionWrapper.wrap(connection);
             return wrapper;
         } catch (SQLException e) {
-            throw propagate(e);
-        }
-    }
-
-    /**
-     * Executes the SQL statement in {@link PreparedStatement} object.
-     *
-     * @param sql the SQL statement to execute
-     * @throws RuntimeException if a database access error occurs
-     * @see PreparedStatement#execute(String)
-     */
-    void execute(String sql) {
-        //noinspection JDBCPrepareStatementWithNonConstantString
-        try (ConnectionWrapper connection = getConnection(true);
-             final PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.execute();
-        } catch (SQLException e) {
-            propagate(e);
+            throw new DatabaseException(e);
         }
     }
 
