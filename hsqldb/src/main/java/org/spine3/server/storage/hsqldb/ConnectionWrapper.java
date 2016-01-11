@@ -80,7 +80,7 @@ class ConnectionWrapper implements AutoCloseable {
         try {
             connection.rollback();
         } catch (SQLException e) {
-            propagate(e);
+            throw propagate(e);
         }
     }
 
@@ -94,7 +94,7 @@ class ConnectionWrapper implements AutoCloseable {
         try {
             connection.close();
         } catch (SQLException e) {
-            propagate(e);
+            throw propagate(e);
         }
     }
 }
