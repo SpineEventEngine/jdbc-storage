@@ -46,7 +46,6 @@ import static org.spine3.util.Identifiers.idToString;
  * @see HsqlStorageFactory
  * @author Alexander Litus
  */
-@SuppressWarnings("DuplicateStringLiteralInspection")
 class HsqlEntityStorage<I, M extends Message> extends EntityStorage<I, M> implements AutoCloseable {
 
     /**
