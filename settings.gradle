@@ -1,4 +1,4 @@
 rootProject.name = 'jdbc-storage'
 
-include ':hsqldb'
-project(':hsqldb').projectDir = "$rootDir/hsqldb" as File
+include ':rdbms'
+project(':rdbms').projectDir = "$rootDir/rdbms" as File
