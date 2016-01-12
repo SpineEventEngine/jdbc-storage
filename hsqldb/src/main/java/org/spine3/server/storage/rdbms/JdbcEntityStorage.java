@@ -41,12 +41,12 @@ import static org.spine3.protobuf.Messages.toAny;
 import static org.spine3.util.Identifiers.idToString;
 
 /**
- * The implementation of the entity storage based on HyperSQL Database.
+ * The implementation of the entity storage based on the RDBMS.
  *
- * @see HsqlStorageFactory
+ * @see JdbcStorageFactory
  * @author Alexander Litus
  */
-class HsqlEntityStorage<I, M extends Message> extends EntityStorage<I, M> implements AutoCloseable {
+class JdbcEntityStorage<I, M extends Message> extends EntityStorage<I, M> implements AutoCloseable {
 
     /**
      * Entity column name.
@@ -86,7 +86,7 @@ class HsqlEntityStorage<I, M extends Message> extends EntityStorage<I, M> implem
     private static final Pattern PATTERN_DOT = Pattern.compile("\\.");
     private static final String UNDERSCORE = "_";
 
-    private final HsqlDb database;
+    private final DataSourceWrapper dataSource;
     private final TypeName typeName;
     private final String tableName;
 
@@ -98,15 +98,15 @@ class HsqlEntityStorage<I, M extends Message> extends EntityStorage<I, M> implem
     /**
      * Creates a new storage instance.
      *
-     * @param database   the database wrapper
+     * @param dataSource the dataSource wrapper
      * @param descriptor the descriptor of the type of messages to save to the storage
      */
-    static <I, M extends Message> HsqlEntityStorage<I, M> newInstance(HsqlDb database, Descriptor descriptor) {
-        return new HsqlEntityStorage<>(database, descriptor);
+    static <I, M extends Message> JdbcEntityStorage<I, M> newInstance(DataSourceWrapper dataSource, Descriptor descriptor) {
+        return new JdbcEntityStorage<>(dataSource, descriptor);
     }
 
-    private HsqlEntityStorage(HsqlDb database, Descriptor descriptor) {
-        this.database = database;
+    private JdbcEntityStorage(DataSourceWrapper dataSource, Descriptor descriptor) {
+        this.dataSource = dataSource;
         this.typeName = TypeName.of(descriptor);
         final String className = typeName.value();
         this.tableName = PATTERN_DOT.matcher(className).replaceAll(UNDERSCORE).toLowerCase();
@@ -132,7 +132,7 @@ class HsqlEntityStorage<I, M extends Message> extends EntityStorage<I, M> implem
     @Override
     public M read(I id) throws DatabaseException {
         final String idString = idToString(id);
-        try (ConnectionWrapper connection = database.getConnection(true);
+        try (ConnectionWrapper connection = dataSource.getConnection(true);
              PreparedStatement statement = selectByIdStatement(connection, idString)) {
             final M result = findById(statement);
             return result;
@@ -175,7 +175,7 @@ class HsqlEntityStorage<I, M extends Message> extends EntityStorage<I, M> implem
 
         final String idString = idToString(id);
         final byte[] serializedEntity = serialize(message);
-        try (ConnectionWrapper connection = database.getConnection(false)) {
+        try (ConnectionWrapper connection = dataSource.getConnection(false)) {
             if (containsEntity(idString, connection)) {
                 update(idString, serializedEntity, connection);
             } else {
@@ -191,7 +191,7 @@ class HsqlEntityStorage<I, M extends Message> extends EntityStorage<I, M> implem
     }
 
     private void createTableIfDoesNotExist(String sql, String tableName) throws DatabaseException {
-        try (ConnectionWrapper connection = database.getConnection(true);
+        try (ConnectionWrapper connection = dataSource.getConnection(true);
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.execute();
         } catch (SQLException e) {
@@ -262,7 +262,7 @@ class HsqlEntityStorage<I, M extends Message> extends EntityStorage<I, M> implem
 
     @Override
     public void close() {
-        database.close();
+        dataSource.close();
     }
 
     /**
@@ -271,7 +271,7 @@ class HsqlEntityStorage<I, M extends Message> extends EntityStorage<I, M> implem
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     void clear() throws DatabaseException {
-        try (ConnectionWrapper connection = database.getConnection(true);
+        try (ConnectionWrapper connection = dataSource.getConnection(true);
              final PreparedStatement statement = connection.prepareStatement(deleteAllSql)) {
             statement.execute();
         } catch (SQLException e) {
@@ -290,6 +290,6 @@ class HsqlEntityStorage<I, M extends Message> extends EntityStorage<I, M> implem
     private enum LogSingleton {
         INSTANCE;
         @SuppressWarnings("NonSerializableFieldInSerializableClass")
-        private final Logger value = LoggerFactory.getLogger(HsqlEntityStorage.class);
+        private final Logger value = LoggerFactory.getLogger(JdbcEntityStorage.class);
     }
 }

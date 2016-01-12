@@ -34,38 +34,35 @@ import static org.junit.Assert.fail;
  * @author Alexander Litus
  */
 @SuppressWarnings("InstanceMethodNamingConvention")
-public class HsqlEntityStorageShould extends EntityStorageShould {
+public class JdbcEntityStorageShould extends EntityStorageShould {
 
     /**
-     * The URL of in-memory database.
+     * The URL of in-memory HyperSQL DB.
      */
     private static final String DB_URL = "jdbc:hsqldb:mem:entitytests";
 
-    private static final HsqlDb DATABASE = newHsqlDb();
+    private static final DataSourceWrapper DATA_SOURCE = newDataSource();
 
-    private static final HsqlEntityStorage<String, StringValue> STORAGE = newStorage(DATABASE);
+    private static final JdbcEntityStorage<String, StringValue> STORAGE = newStorage(DATA_SOURCE);
 
-    public HsqlEntityStorageShould() {
+    public JdbcEntityStorageShould() {
         super(STORAGE);
     }
 
-    private static HsqlDb newHsqlDb() {
+    private static DataSourceWrapper newDataSource() {
         final HikariConfig config = new HikariConfig();
         config.setJdbcUrl(DB_URL);
-        return HsqlDb.newInstance(config);
+        // username and password are not required for such a database
+        return HikariDataSourceWrapper.newInstance(config);
     }
 
-    private static HsqlEntityStorage<String, StringValue> newStorage(HsqlDb db) {
-        return HsqlEntityStorage.newInstance(db, StringValue.getDescriptor());
+    private static JdbcEntityStorage<String, StringValue> newStorage(DataSourceWrapper db) {
+        return JdbcEntityStorage.newInstance(db, StringValue.getDescriptor());
     }
 
     @After
     public void tearDownTest() {
-        try {
-            STORAGE.clear();
-        } catch (DatabaseException e) {
-            // NOP
-        }
+        STORAGE.clear();
     }
 
     @AfterClass
@@ -75,7 +72,7 @@ public class HsqlEntityStorageShould extends EntityStorageShould {
 
     @Test
     public void close_itself() {
-        final HsqlEntityStorage<String, StringValue> storage = newStorage(newHsqlDb());
+        final JdbcEntityStorage<String, StringValue> storage = newStorage(newDataSource());
         storage.close();
         try {
             storage.read("any-id");

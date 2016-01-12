@@ -23,51 +23,38 @@ package org.spine3.server.storage.rdbms;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.Message;
 import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
 import org.spine3.server.Entity;
 import org.spine3.server.aggregate.Aggregate;
 import org.spine3.server.storage.*;
+
+import javax.sql.DataSource;
 
 import static org.spine3.protobuf.Messages.getClassDescriptor;
 import static org.spine3.util.Classes.getGenericParameterType;
 
 /**
- * Creates storages based on HyperSQL Database.
+ * Creates storages based on JDBC-compliant RDBMS.
  *
  * @author Alexander Litus
  */
-public class HsqlStorageFactory implements StorageFactory {
-
-    private static final String DATA_SOURCE_CLASS_NAME = "org.hsqldb.jdbc.JDBCDataSource";
+public class JdbcStorageFactory implements StorageFactory {
 
     private static final int ENTITY_MESSAGE_TYPE_PARAMETER_INDEX = 1;
 
-    private final HsqlDb database;
+    private final DataSourceWrapper dataSource;
 
     /**
      * Creates a new instance with the specified data source configuration.
      *
-     * <p>Please see required and optional config properties list and other documentation:
-     * <ul>
-     *     <li><a href="https://github.com/brettwooldridge/HikariCP#essentials">HikariCP config properties</a></li>
-     *     <li><a href="https://github.com/brettwooldridge/HikariCP#initialization">HikariCP configuration sample</a></li>
-     * </ul>
-     * NOTE: {@code dataSourceClassName} config property is set automatically.
-     *
-     * <p>Examples of JDBC URL:
-     *
-     * <p>{@code jdbc:hsqldb:hsql://localhost:9001/dbname;ifexists=true}
-     * <p>{@code jdbc:hsqldb:mem:inmemorydb} (for in-memory database)
-     *
-     * @param config the config used to create {@link HikariDataSource}.
+     * @param config the config used to create the {@link DataSource}
      */
-    public static HsqlStorageFactory newInstance(HikariConfig config) {
-        return new HsqlStorageFactory(config);
+    public static JdbcStorageFactory newInstance(DataSourceConfig config) {
+        return new JdbcStorageFactory(config);
     }
 
-    private HsqlStorageFactory(HikariConfig config) {
-        config.setDataSourceClassName(DATA_SOURCE_CLASS_NAME);
-        this.database = HsqlDb.newInstance(config);
+    private JdbcStorageFactory(DataSourceConfig config) {
+        final HikariConfig hikariConfig = ConfigConverter.toHikariConfig(config);
+        this.dataSource = HikariDataSourceWrapper.newInstance(hikariConfig);
     }
 
     @Override
@@ -95,7 +82,7 @@ public class HsqlStorageFactory implements StorageFactory {
     public <I, M extends Message> EntityStorage<I, M> createEntityStorage(Class<? extends Entity<I, M>> entityClass) {
         final Class<Message> messageClass = getGenericParameterType(entityClass, ENTITY_MESSAGE_TYPE_PARAMETER_INDEX);
         final Descriptors.Descriptor descriptor = (Descriptors.Descriptor) getClassDescriptor(messageClass);
-        return HsqlEntityStorage.newInstance(database, descriptor);
+        return JdbcEntityStorage.newInstance(dataSource, descriptor);
     }
 
     @Override
@@ -105,6 +92,59 @@ public class HsqlStorageFactory implements StorageFactory {
 
     @Override
     public void close() {
-        database.close();
+        dataSource.close();
+    }
+
+    private static class ConfigConverter {
+
+        @SuppressWarnings({"MethodWithMoreThanThreeNegations", "OverlyLongMethod"}) // is OK in this case
+        private static HikariConfig toHikariConfig(DataSourceConfig config) {
+            final HikariConfig result = new HikariConfig();
+
+            // Required fields
+
+            result.setDataSourceClassName(config.getDataSourceClassName());
+            result.setJdbcUrl(config.getJdbcUrl());
+            result.setUsername(config.getUsername());
+            result.setPassword(config.getPassword());
+
+            // Optional fields
+
+            final Boolean autoCommit = config.getAutoCommit();
+            if (autoCommit != null) {
+                result.setAutoCommit(autoCommit);
+            }
+
+            final Long connectionTimeout = config.getConnectionTimeout();
+            if (connectionTimeout != null) {
+                result.setConnectionTimeout(connectionTimeout);
+            }
+
+            final Long idleTimeout = config.getIdleTimeout();
+            if (idleTimeout != null) {
+                result.setIdleTimeout(idleTimeout);
+            }
+
+            final Long maxLifetime = config.getMaxLifetime();
+            if (maxLifetime != null) {
+                result.setMaxLifetime(maxLifetime);
+            }
+
+            final String connectionTestQuery = config.getConnectionTestQuery();
+            if (connectionTestQuery != null) {
+                result.setConnectionTestQuery(connectionTestQuery);
+            }
+
+            final Integer maxPoolSize = config.getMaxPoolSize();
+            if (maxPoolSize != null) {
+                result.setMaximumPoolSize(maxPoolSize);
+            }
+
+            final String poolName = config.getPoolName();
+            if (poolName != null) {
+                result.setPoolName(poolName);
+            }
+            return result;
+        }
     }
 }

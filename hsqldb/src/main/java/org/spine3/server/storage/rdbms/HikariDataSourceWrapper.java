@@ -23,54 +23,42 @@ package org.spine3.server.storage.rdbms;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
-import java.sql.Connection;
-import java.sql.SQLException;
+import javax.sql.DataSource;
 
 /**
- * The facade for operations with HyperSQL Database.
- * Uses <a href="https://github.com/brettwooldridge/HikariCP">HikariCP</a connection pool</a>.
+ * The wrapper for {@link HikariDataSource}.
  *
+ * @see <a href="https://github.com/brettwooldridge/HikariCP">HikariCP connection pool</a>.
  * @author Alexander Litus
  */
-class HsqlDb implements AutoCloseable {
+class HikariDataSourceWrapper extends DataSourceWrapper {
 
     private final HikariDataSource dataSource;
 
     /**
      * Creates a new instance with the specified configuration.
      *
-     * <p>Please see {@link HsqlStorageFactory#newInstance(HikariConfig)} for more info.
+     * <p>Please see
+     * <a href="https://github.com/brettwooldridge/HikariCP#configuration-knobs-baby">HikariCP configuration</a>
+     * for more info.
      *
      * @param config the config used to create {@link HikariDataSource}.
-     * @see
      */
-    static HsqlDb newInstance(HikariConfig config) {
-        return new HsqlDb(config);
+    static HikariDataSourceWrapper newInstance(HikariConfig config) {
+        return new HikariDataSourceWrapper(config);
     }
 
-    private HsqlDb(HikariConfig config) {
+    protected HikariDataSourceWrapper(HikariConfig config) {
         dataSource = new HikariDataSource(config);
-    }
-
-    /**
-     * Retrieves a wrapped connection with the given auto commit mode.
-     *
-     * @throws DatabaseException if an error occurs during an interaction with the DB
-     * @see Connection#setAutoCommit(boolean)
-     */
-    ConnectionWrapper getConnection(boolean autoCommit) throws DatabaseException {
-        try {
-            final Connection connection = dataSource.getConnection();
-            connection.setAutoCommit(autoCommit);
-            final ConnectionWrapper wrapper = ConnectionWrapper.wrap(connection);
-            return wrapper;
-        } catch (SQLException e) {
-            throw new DatabaseException(e);
-        }
     }
 
     @Override
     public void close() {
         dataSource.close();
+    }
+
+    @Override
+    protected DataSource getDataSource() {
+        return dataSource;
     }
 }
