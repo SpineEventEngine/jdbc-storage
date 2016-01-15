@@ -20,8 +20,6 @@
 
 package org.spine3.server.storage.rdbms;
 
-import com.google.protobuf.Descriptors;
-import com.google.protobuf.Message;
 import com.zaxxer.hikari.HikariConfig;
 import org.spine3.server.Entity;
 import org.spine3.server.aggregate.Aggregate;
@@ -29,17 +27,12 @@ import org.spine3.server.storage.*;
 
 import javax.sql.DataSource;
 
-import static org.spine3.protobuf.Messages.getClassDescriptor;
-import static org.spine3.util.Classes.getGenericParameterType;
-
 /**
  * Creates storages based on JDBC-compliant RDBMS.
  *
  * @author Alexander Litus
  */
 public class JdbcStorageFactory implements StorageFactory {
-
-    private static final int ENTITY_MESSAGE_TYPE_PARAMETER_INDEX = 1;
 
     private final DataSourceWrapper dataSource;
 
@@ -80,9 +73,7 @@ public class JdbcStorageFactory implements StorageFactory {
 
     @Override
     public <I> EntityStorage<I> createEntityStorage(Class<? extends Entity<I, ?>> entityClass) {
-        final Class<Message> messageClass = getGenericParameterType(entityClass, ENTITY_MESSAGE_TYPE_PARAMETER_INDEX);
-        final Descriptors.Descriptor descriptor = (Descriptors.Descriptor) getClassDescriptor(messageClass);
-        return JdbcEntityStorage.newInstance(dataSource, descriptor);
+        return JdbcEntityStorage.newInstance(dataSource, entityClass);
     }
 
     @Override

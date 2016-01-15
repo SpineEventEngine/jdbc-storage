@@ -36,8 +36,7 @@ import java.sql.SQLException;
 import java.util.regex.Pattern;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.protobuf.Descriptors.Descriptor;
-import static org.spine3.protobuf.Messages.*;
+import static org.spine3.protobuf.Messages.fromAny;
 import static org.spine3.protobuf.Messages.toAny;
 
 /**
@@ -46,7 +45,7 @@ import static org.spine3.protobuf.Messages.toAny;
  * @see JdbcStorageFactory
  * @author Alexander Litus
  */
-class JdbcEntityStorage<I, M extends Message> extends EntityStorage<I> implements AutoCloseable {
+class JdbcEntityStorage<I> extends EntityStorage<I> implements AutoCloseable {
 
     /**
      * Entity record column name.
@@ -84,10 +83,10 @@ class JdbcEntityStorage<I, M extends Message> extends EntityStorage<I> implement
     }
 
     private static final Pattern PATTERN_DOT = Pattern.compile("\\.");
+    private static final Pattern PATTERN_DOLLAR = Pattern.compile("\\$");
     private static final String UNDERSCORE = "_";
 
     private final DataSourceWrapper dataSource;
-    private final TypeName typeName;
     private final String tableName;
 
     private final String insertSql;
@@ -99,17 +98,17 @@ class JdbcEntityStorage<I, M extends Message> extends EntityStorage<I> implement
      * Creates a new storage instance.
      *
      * @param dataSource the dataSource wrapper
-     * @param descriptor the descriptor of the type of messages to save to the storage
+     * @param entityClass the class of entities to save to the storage
      */
-    static <I, M extends Message> JdbcEntityStorage<I, M> newInstance(DataSourceWrapper dataSource, Descriptor descriptor) {
-        return new JdbcEntityStorage<>(dataSource, descriptor);
+    static <I> JdbcEntityStorage<I> newInstance(DataSourceWrapper dataSource, Class entityClass) {
+        return new JdbcEntityStorage<>(dataSource, entityClass);
     }
 
-    private JdbcEntityStorage(DataSourceWrapper dataSource, Descriptor descriptor) {
+    private JdbcEntityStorage(DataSourceWrapper dataSource, Class entityClass) {
         this.dataSource = dataSource;
-        this.typeName = TypeName.of(descriptor);
-        final String className = typeName.value();
-        this.tableName = PATTERN_DOT.matcher(className).replaceAll(UNDERSCORE).toLowerCase();
+        final String className = entityClass.getName();
+        final String tableNameTmp = PATTERN_DOT.matcher(className).replaceAll(UNDERSCORE);
+        this.tableName = PATTERN_DOLLAR.matcher(tableNameTmp).replaceAll(UNDERSCORE).toLowerCase();
 
         this.insertSql = setTableName(SqlDrafts.INSERT_RECORD);
         this.updateSql = setTableName(SqlDrafts.UPDATE_RECORD);

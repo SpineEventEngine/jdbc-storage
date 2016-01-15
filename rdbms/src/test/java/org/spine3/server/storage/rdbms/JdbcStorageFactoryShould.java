@@ -47,6 +47,13 @@ public class JdbcStorageFactoryShould {
         assertNotNull(storage);
     }
 
+    @Test
+    public void create_entity_storage_if_intity_class_is_inner() {
+        final JdbcStorageFactory factory = JdbcStorageFactory.newInstance(CONFIG);
+        final EntityStorage<String> storage = factory.createEntityStorage(TestEntity.InnerTestEntity.class);
+        assertNotNull(storage);
+    }
+
     public static class TestEntity extends Entity<String, StringValue> {
 
         public TestEntity(String id) {
@@ -56,6 +63,18 @@ public class JdbcStorageFactoryShould {
         @Override
         protected StringValue getDefaultState() {
             return StringValue.getDefaultInstance();
+        }
+
+        public static class InnerTestEntity extends Entity<String, StringValue> {
+
+            public InnerTestEntity(String id) {
+                super(id);
+            }
+
+            @Override
+            protected StringValue getDefaultState() {
+                return StringValue.getDefaultInstance();
+            }
         }
     }
 }

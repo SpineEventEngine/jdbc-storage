@@ -47,7 +47,7 @@ public class JdbcEntityStorageShould extends EntityStorageShould {
 
     private static final DataSourceWrapper DATA_SOURCE = newDataSource();
 
-    private static final JdbcEntityStorage<String, StringValue> STORAGE = newStorage(DATA_SOURCE);
+    private static final JdbcEntityStorage<String> STORAGE = newStorage(DATA_SOURCE);
 
     public JdbcEntityStorageShould() {
         super(STORAGE);
@@ -60,8 +60,8 @@ public class JdbcEntityStorageShould extends EntityStorageShould {
         return HikariDataSourceWrapper.newInstance(config);
     }
 
-    private static JdbcEntityStorage<String, StringValue> newStorage(DataSourceWrapper db) {
-        return JdbcEntityStorage.newInstance(db, StringValue.getDescriptor());
+    private static JdbcEntityStorage<String> newStorage(DataSourceWrapper db) {
+        return JdbcEntityStorage.newInstance(db, JdbcStorageFactoryShould.TestEntity.class);
     }
 
     @After
@@ -76,7 +76,7 @@ public class JdbcEntityStorageShould extends EntityStorageShould {
 
     @Test
     public void close_itself() {
-        final JdbcEntityStorage<String, StringValue> storage = newStorage(newDataSource());
+        final JdbcEntityStorage<String> storage = newStorage(newDataSource());
         storage.close();
         try {
             storage.read("any-id");
@@ -89,19 +89,23 @@ public class JdbcEntityStorageShould extends EntityStorageShould {
 
     @Test
     public void clear_itself() {
-        final StringValue value = StringValue.newBuilder().setValue(newUuid()).build();
         final String idString = newUuid();
-        final EntityStorageRecord.Id id = EntityStorageRecord.Id.newBuilder().setStringValue(idString).build();
-        final EntityStorageRecord record = EntityStorageRecord.newBuilder()
-                .setState(toAny(value))
-                .setId(id)
-                .setVersion(5) // set any non-default value
-                .setWhenModified(TimeUtil.getCurrentTime())
-                .build();
+        final EntityStorageRecord record = newEntityRecord(newUuid(), idString);
         STORAGE.write(record);
         STORAGE.clear();
 
-        final EntityStorageRecord actual = STORAGE.read(id.getStringValue());
+        final EntityStorageRecord actual = STORAGE.read(idString);
         assertNull(actual);
+    }
+
+    private static EntityStorageRecord newEntityRecord(String value, String id) {
+        final EntityStorageRecord.Id recordId = EntityStorageRecord.Id.newBuilder().setStringValue(id).build();
+        final StringValue stringValue = StringValue.newBuilder().setValue(newUuid()).build();
+        final EntityStorageRecord.Builder builder = EntityStorageRecord.newBuilder()
+                .setState(toAny(stringValue))
+                .setId(recordId)
+                .setVersion(5) // set any non-default value
+                .setWhenModified(TimeUtil.getCurrentTime());
+        return builder.build();
     }
 }
