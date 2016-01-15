@@ -174,10 +174,10 @@ class JdbcEntityStorage<I> extends EntityStorage<I> implements AutoCloseable {
         final EntityStorageRecord.Id id = toRecordId(record.getId());
         final byte[] serializedRecord = serialize(record);
         try (ConnectionWrapper connection = dataSource.getConnection(false)) {
-            if (containsRecord(id, connection)) {
-                update(id, serializedRecord, connection);
+            if (containsRecord(connection, id)) {
+                update(connection, id, serializedRecord);
             } else {
-                insert(id, serializedRecord, connection);
+                insert(connection, id, serializedRecord);
             }
         }
     }
@@ -198,7 +198,7 @@ class JdbcEntityStorage<I> extends EntityStorage<I> implements AutoCloseable {
         }
     }
 
-    private boolean containsRecord(EntityStorageRecord.Id id, ConnectionWrapper connection) {
+    private boolean containsRecord(ConnectionWrapper connection, EntityStorageRecord.Id id) {
         try (PreparedStatement statement = selectByIdStatement(connection, id);
              ResultSet resultSet = statement.executeQuery()) {
             final boolean hasNext = resultSet.next();
@@ -210,21 +210,21 @@ class JdbcEntityStorage<I> extends EntityStorage<I> implements AutoCloseable {
         }
     }
 
-    private void update(EntityStorageRecord.Id id, byte[] serializedEntity, ConnectionWrapper connection) {
+    private void update(ConnectionWrapper connection, EntityStorageRecord.Id id, byte[] serializedEntity) {
         try (PreparedStatement statement = updateRecordStatement(connection, id, serializedEntity)) {
             statement.execute();
             connection.commit();
         } catch (SQLException e) {
-            throw handleDbException(e, id, connection);
+            throw handleDbException(connection, e, id);
         }
     }
 
-    private void insert(EntityStorageRecord.Id id, byte[] serializedEntity, ConnectionWrapper connection) {
+    private void insert(ConnectionWrapper connection, EntityStorageRecord.Id id, byte[] serializedEntity) {
         try (PreparedStatement statement = insertRecordStatement(connection, id, serializedEntity)) {
             statement.execute();
             connection.commit();
         } catch (SQLException e) {
-            throw handleDbException(e, id, connection);
+            throw handleDbException(connection, e, id);
         }
     }
 
@@ -273,7 +273,7 @@ class JdbcEntityStorage<I> extends EntityStorage<I> implements AutoCloseable {
         }
     }
 
-    private static DatabaseException handleDbException(SQLException e, EntityStorageRecord.Id id, ConnectionWrapper connection) {
+    private static DatabaseException handleDbException(ConnectionWrapper connection, SQLException e, EntityStorageRecord.Id id) {
         logTransactionError(id, e);
         connection.rollback();
         throw new DatabaseException(e);
