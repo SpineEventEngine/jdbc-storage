@@ -20,6 +20,7 @@
 
 package org.spine3.server.storage.rdbms;
 
+import javax.annotation.Nullable;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.Driver;
@@ -54,12 +55,19 @@ public class DataSourceConfig {
     /**
      * Optional
      */
+    @Nullable
     private final Boolean autoCommit;
+    @Nullable
     private final Long connectionTimeout;
+    @Nullable
     private final Long idleTimeout;
+    @Nullable
     private final Long maxLifetime;
+    @Nullable
     private final String connectionTestQuery;
+    @Nullable
     private final Integer maxPoolSize;
+    @Nullable
     private final String poolName;
 
     private DataSourceConfig(Builder builder) {
@@ -89,6 +97,7 @@ public class DataSourceConfig {
     /**
      * See {@link Builder#setDataSourceClassName(String)}.
      */
+    @Nullable
     public String getDataSourceClassName() {
         return dataSourceClassName;
     }
@@ -96,6 +105,7 @@ public class DataSourceConfig {
     /**
      * See {@link Builder#setJdbcUrl(String)}.
      */
+    @Nullable
     public String getJdbcUrl() {
         return jdbcUrl;
     }
@@ -103,6 +113,7 @@ public class DataSourceConfig {
     /**
      * See {@link Builder#setUsername(String)}.
      */
+    @Nullable
     public String getUsername() {
         return username;
     }
@@ -110,6 +121,7 @@ public class DataSourceConfig {
     /**
      * See {@link Builder#setPassword(String)}.
      */
+    @Nullable
     public String getPassword() {
         return password;
     }
@@ -117,6 +129,7 @@ public class DataSourceConfig {
     /**
      * See {@link Builder#setAutoCommit(Boolean)}.
      */
+    @Nullable
     public Boolean getAutoCommit() {
         return autoCommit;
     }
@@ -124,6 +137,7 @@ public class DataSourceConfig {
     /**
      * See {@link Builder#setConnectionTimeout(Long)}.
      */
+    @Nullable
     public Long getConnectionTimeout() {
         return connectionTimeout;
     }
@@ -131,6 +145,7 @@ public class DataSourceConfig {
     /**
      * See {@link Builder#setIdleTimeout(Long)}.
      */
+    @Nullable
     public Long getIdleTimeout() {
         return idleTimeout;
     }
@@ -138,6 +153,7 @@ public class DataSourceConfig {
     /**
      * See {@link Builder#setMaxLifetime(Long)}.
      */
+    @Nullable
     public Long getMaxLifetime() {
         return maxLifetime;
     }
@@ -145,6 +161,7 @@ public class DataSourceConfig {
     /**
      * See {@link Builder#setConnectionTestQuery(String)}.
      */
+    @Nullable
     public String getConnectionTestQuery() {
         return connectionTestQuery;
     }
@@ -152,6 +169,7 @@ public class DataSourceConfig {
     /**
      * See {@link Builder#setMaxPoolSize(Integer)}.
      */
+    @Nullable
     public Integer getMaxPoolSize() {
         return maxPoolSize;
     }
@@ -159,6 +177,7 @@ public class DataSourceConfig {
     /**
      * See {@link Builder#setPoolName(String)}.
      */
+    @Nullable
     public String getPoolName() {
         return poolName;
     }
@@ -179,12 +198,19 @@ public class DataSourceConfig {
         /**
          * Optional
          */
+        @Nullable
         private Boolean autoCommit;
+        @Nullable
         private Long connectionTimeout;
+        @Nullable
         private Long idleTimeout;
+        @Nullable
         private Long maxLifetime;
+        @Nullable
         private String connectionTestQuery;
+        @Nullable
         private Integer maxPoolSize;
+        @Nullable
         private String poolName;
 
         @SuppressWarnings("MethodWithMoreThanThreeNegations")

@@ -25,8 +25,8 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.spine3.protobuf.Messages;
 import org.spine3.server.storage.EntityStorage;
+import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.type.TypeName;
 
 import javax.annotation.Nullable;
@@ -35,10 +35,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.regex.Pattern;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.protobuf.Descriptors.Descriptor;
+import static org.spine3.protobuf.Messages.*;
 import static org.spine3.protobuf.Messages.toAny;
-import static org.spine3.util.Identifiers.idToString;
 
 /**
  * The implementation of the entity storage based on the RDBMS.
@@ -46,10 +46,10 @@ import static org.spine3.util.Identifiers.idToString;
  * @see JdbcStorageFactory
  * @author Alexander Litus
  */
-class JdbcEntityStorage<I, M extends Message> extends EntityStorage<I, M> implements AutoCloseable {
+class JdbcEntityStorage<I, M extends Message> extends EntityStorage<I> implements AutoCloseable {
 
     /**
-     * Entity column name.
+     * Entity record column name.
      */
     private static final String ENTITY = "entity";
 
@@ -61,12 +61,12 @@ class JdbcEntityStorage<I, M extends Message> extends EntityStorage<I, M> implem
     @SuppressWarnings("UtilityClass")
     private static class SqlDrafts {
 
-        static final String INSERT_ENTITY =
+        static final String INSERT_RECORD =
                 "INSERT INTO %s " +
                         " (" + ID + ", " + ENTITY + ')' +
                         " VALUES (?, ?);";
 
-        static final String UPDATE_ENTITY =
+        static final String UPDATE_RECORD =
                 "UPDATE %s " +
                 " SET " + ENTITY + " = ? " +
                 " WHERE " + ID + " = ?;";
@@ -90,8 +90,8 @@ class JdbcEntityStorage<I, M extends Message> extends EntityStorage<I, M> implem
     private final TypeName typeName;
     private final String tableName;
 
-    private final String insertEntitySql;
-    private final String updateEntitySql;
+    private final String insertSql;
+    private final String updateSql;
     private final String selectAllByIdSql;
     private final String deleteAllSql;
 
@@ -111,8 +111,8 @@ class JdbcEntityStorage<I, M extends Message> extends EntityStorage<I, M> implem
         final String className = typeName.value();
         this.tableName = PATTERN_DOT.matcher(className).replaceAll(UNDERSCORE).toLowerCase();
 
-        this.insertEntitySql = setTableName(SqlDrafts.INSERT_ENTITY);
-        this.updateEntitySql = setTableName(SqlDrafts.UPDATE_ENTITY);
+        this.insertSql = setTableName(SqlDrafts.INSERT_RECORD);
+        this.updateSql = setTableName(SqlDrafts.UPDATE_RECORD);
         this.selectAllByIdSql = setTableName(SqlDrafts.SELECT_ALL_BY_ID);
         this.deleteAllSql = setTableName((SqlDrafts.DELETE_ALL));
         final String createTableSql = setTableName(SqlDrafts.CREATE_TABLE_IF_DOES_NOT_EXIST);
@@ -130,36 +130,36 @@ class JdbcEntityStorage<I, M extends Message> extends EntityStorage<I, M> implem
      */
     @Nullable
     @Override
-    public M read(I id) throws DatabaseException {
-        final String idString = idToString(id);
+    public EntityStorageRecord read(I id) throws DatabaseException {
+        final EntityStorageRecord.Id recordId = toRecordId(id);
         try (ConnectionWrapper connection = dataSource.getConnection(true);
-             PreparedStatement statement = selectByIdStatement(connection, idString)) {
-            final M result = findById(statement);
+             PreparedStatement statement = selectByIdStatement(connection, recordId)) {
+            final EntityStorageRecord result = findById(statement);
             return result;
         } catch (SQLException e) {
-            logTransactionError(idString, e);
+            logTransactionError(recordId, e);
             throw new DatabaseException(e);
         }
     }
 
-    private M findById(PreparedStatement statement) throws DatabaseException {
+    private static EntityStorageRecord findById(PreparedStatement statement) throws DatabaseException {
         try (ResultSet resultSet = statement.executeQuery()) {
             if (!resultSet.next()) {
                 return null;
             }
             final byte[] bytes = resultSet.getBytes(ENTITY);
-            final M message = toMessage(bytes);
-            return message;
+            final EntityStorageRecord record = toEntityRecord(bytes);
+            return record;
         } catch (SQLException e) {
             throw new DatabaseException(e);
         }
     }
 
-    private M toMessage(byte[] bytes) {
+    private static EntityStorageRecord toEntityRecord(byte[] bytes) {
         final Any.Builder builder = Any.newBuilder();
-        builder.setTypeUrl(typeName.toTypeUrl());
+        builder.setTypeUrl(TypeName.of(EntityStorageRecord.getDescriptor()).toTypeUrl());
         builder.setValue(ByteString.copyFrom(bytes));
-        final M message = Messages.fromAny(builder.build());
+        final EntityStorageRecord message = fromAny(builder.build());
         return message;
     }
 
@@ -169,22 +169,21 @@ class JdbcEntityStorage<I, M extends Message> extends EntityStorage<I, M> implem
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     @Override
-    public void write(I id, M message) throws DatabaseException {
-        checkNotNull(id, "id");
-        checkNotNull(message, "message");
+    public void write(EntityStorageRecord record) {
+        checkArgument(record.hasState(), "entity state");
 
-        final String idString = idToString(id);
-        final byte[] serializedEntity = serialize(message);
+        final EntityStorageRecord.Id id = toRecordId(record.getId());
+        final byte[] serializedRecord = serialize(record);
         try (ConnectionWrapper connection = dataSource.getConnection(false)) {
-            if (containsEntity(idString, connection)) {
-                update(idString, serializedEntity, connection);
+            if (containsRecord(id, connection)) {
+                update(id, serializedRecord, connection);
             } else {
-                insert(idString, serializedEntity, connection);
+                insert(id, serializedRecord, connection);
             }
         }
     }
 
-    private byte[] serialize(M message) {
+    private static byte[] serialize(Message message) {
         final Any any = toAny(message);
         final byte[] bytes = any.getValue().toByteArray();
         return bytes;
@@ -200,7 +199,7 @@ class JdbcEntityStorage<I, M extends Message> extends EntityStorage<I, M> implem
         }
     }
 
-    private boolean containsEntity(String id, ConnectionWrapper connection) {
+    private boolean containsRecord(EntityStorageRecord.Id id, ConnectionWrapper connection) {
         try (PreparedStatement statement = selectByIdStatement(connection, id);
              ResultSet resultSet = statement.executeQuery()) {
             final boolean hasNext = resultSet.next();
@@ -212,17 +211,8 @@ class JdbcEntityStorage<I, M extends Message> extends EntityStorage<I, M> implem
         }
     }
 
-    private void update(String idString, byte[] serializedEntity, ConnectionWrapper connection) {
-        try (PreparedStatement statement = updateEntityStatement(connection, idString, serializedEntity)) {
-            statement.execute();
-            connection.commit();
-        } catch (SQLException e) {
-            throw handleDbException(e, idString, connection);
-        }
-    }
-
-    private void insert(String id, byte[] serializedEntity, ConnectionWrapper connection) {
-        try (PreparedStatement statement = insertEntityStatement(connection, id, serializedEntity)) {
+    private void update(EntityStorageRecord.Id id, byte[] serializedEntity, ConnectionWrapper connection) {
+        try (PreparedStatement statement = updateRecordStatement(connection, id, serializedEntity)) {
             statement.execute();
             connection.commit();
         } catch (SQLException e) {
@@ -230,32 +220,62 @@ class JdbcEntityStorage<I, M extends Message> extends EntityStorage<I, M> implem
         }
     }
 
-    private PreparedStatement insertEntityStatement(ConnectionWrapper connection,
-                                                    String idString,
-                                                    byte[] serializedEntity) throws SQLException {
-        final PreparedStatement statement = connection.prepareStatement(insertEntitySql);
-        statement.setString(1, idString);
-        statement.setBytes(2, serializedEntity);
+    private void insert(EntityStorageRecord.Id id, byte[] serializedEntity, ConnectionWrapper connection) {
+        try (PreparedStatement statement = insertRecordStatement(connection, id, serializedEntity)) {
+            statement.execute();
+            connection.commit();
+        } catch (SQLException e) {
+            throw handleDbException(e, id, connection);
+        }
+    }
+
+    @SuppressWarnings("TypeMayBeWeakened")
+    private PreparedStatement insertRecordStatement(ConnectionWrapper connection,
+                                                    EntityStorageRecord.Id id,
+                                                    byte[] serializedRecord) throws SQLException {
+        final PreparedStatement statement = connection.prepareStatement(insertSql);
+        setEntityId(1, id, statement);
+        statement.setBytes(2, serializedRecord);
         return statement;
     }
 
-    private PreparedStatement updateEntityStatement(ConnectionWrapper connection,
-                                                    String id,
+    private PreparedStatement updateRecordStatement(ConnectionWrapper connection,
+                                                    EntityStorageRecord.Id id,
                                                     byte[] serializedEntity) throws SQLException {
-        final PreparedStatement statement = connection.prepareStatement(updateEntitySql);
+        final PreparedStatement statement = connection.prepareStatement(updateSql);
         statement.setBytes(1, serializedEntity);
-        statement.setString(2, id);
+        setEntityId(2, id, statement);
         return statement;
     }
 
-    private PreparedStatement selectByIdStatement(ConnectionWrapper connection, String id) throws SQLException {
+    private PreparedStatement selectByIdStatement(ConnectionWrapper connection,
+                                                  EntityStorageRecord.Id id) throws SQLException {
         final PreparedStatement statement = connection.prepareStatement(selectAllByIdSql);
-        statement.setString(1, id);
+        setEntityId(1, id, statement);
         return statement;
     }
 
-    private static DatabaseException handleDbException(SQLException e, String idString, ConnectionWrapper connection) {
-        logTransactionError(idString, e);
+    @SuppressWarnings("TypeMayBeWeakened")
+    private static void setEntityId(int idIndex, EntityStorageRecord.Id id, PreparedStatement statement) throws SQLException {
+        final EntityStorageRecord.Id.TypeCase type = id.getTypeCase();
+        switch (type) {
+            case STRING_VALUE:
+                statement.setString(idIndex, id.getStringValue());
+                break;
+            case LONG_VALUE:
+                statement.setLong(idIndex, id.getLongValue());
+                break;
+            case INT_VALUE:
+                statement.setInt(idIndex, id.getIntValue());
+                break;
+            case TYPE_NOT_SET:
+            default:
+                throw new IllegalArgumentException("Id type not set.");
+        }
+    }
+
+    private static DatabaseException handleDbException(SQLException e, EntityStorageRecord.Id id, ConnectionWrapper connection) {
+        logTransactionError(id, e);
         connection.rollback();
         throw new DatabaseException(e);
     }
@@ -279,8 +299,8 @@ class JdbcEntityStorage<I, M extends Message> extends EntityStorage<I, M> implem
         }
     }
 
-    private static void logTransactionError(String idString, Exception e) {
-        log().error("Error during transaction, entity ID = " + idString, e);
+    private static void logTransactionError(EntityStorageRecord.Id id, Exception e) {
+        log().error("Error during transaction, entity ID = " + id, e);
     }
 
     private static Logger log() {

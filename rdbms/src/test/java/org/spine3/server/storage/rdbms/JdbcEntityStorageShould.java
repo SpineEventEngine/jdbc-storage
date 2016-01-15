@@ -21,14 +21,18 @@
 package org.spine3.server.storage.rdbms;
 
 import com.google.protobuf.StringValue;
+import com.google.protobuf.util.TimeUtil;
 import com.zaxxer.hikari.HikariConfig;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Test;
+import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.EntityStorageShould;
 
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
+import static org.spine3.protobuf.Messages.toAny;
+import static org.spine3.util.Identifiers.newUuid;
 
 /**
  * @author Alexander Litus
@@ -85,13 +89,19 @@ public class JdbcEntityStorageShould extends EntityStorageShould {
 
     @Test
     public void clear_itself() {
-        final String id = "testid";
-        final StringValue entity = StringValue.newBuilder().setValue("testvalue").build();
-
-        STORAGE.write(id, entity);
+        final StringValue value = StringValue.newBuilder().setValue(newUuid()).build();
+        final String idString = newUuid();
+        final EntityStorageRecord.Id id = EntityStorageRecord.Id.newBuilder().setStringValue(idString).build();
+        final EntityStorageRecord record = EntityStorageRecord.newBuilder()
+                .setState(toAny(value))
+                .setId(id)
+                .setVersion(5) // set any non-default value
+                .setWhenModified(TimeUtil.getCurrentTime())
+                .build();
+        STORAGE.write(record);
         STORAGE.clear();
 
-        final StringValue actual = STORAGE.read(id);
+        final EntityStorageRecord actual = STORAGE.read(id.getStringValue());
         assertNull(actual);
     }
 }

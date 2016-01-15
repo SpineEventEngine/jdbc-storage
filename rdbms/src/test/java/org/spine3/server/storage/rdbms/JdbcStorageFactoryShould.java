@@ -22,8 +22,8 @@ package org.spine3.server.storage.rdbms;
 
 import com.google.protobuf.StringValue;
 import org.junit.Test;
+import org.spine3.server.Entity;
 import org.spine3.server.storage.EntityStorage;
-import org.spine3.server.storage.EntityStorageShould.TestEntity;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -43,7 +43,19 @@ public class JdbcStorageFactoryShould {
     @Test
     public void create_entity_storage() {
         final JdbcStorageFactory factory = JdbcStorageFactory.newInstance(CONFIG);
-        final EntityStorage<String, StringValue> storage = factory.createEntityStorage(TestEntity.class);
+        final EntityStorage<String> storage = factory.createEntityStorage(TestEntity.class);
         assertNotNull(storage);
+    }
+
+    public static class TestEntity extends Entity<String, StringValue> {
+
+        public TestEntity(String id) {
+            super(id);
+        }
+
+        @Override
+        protected StringValue getDefaultState() {
+            return StringValue.getDefaultInstance();
+        }
     }
 }
