@@ -1,0 +1,4 @@
+rootProject.name = 'jdbc-storage'
+
+include ':rdbms'
+project(':rdbms').projectDir = "$rootDir/rdbms" as File
