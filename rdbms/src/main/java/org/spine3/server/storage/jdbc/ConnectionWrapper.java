@@ -18,7 +18,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.spine3.server.storage.rdbms;
+package org.spine3.server.storage.jdbc;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

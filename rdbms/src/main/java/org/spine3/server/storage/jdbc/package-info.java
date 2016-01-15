@@ -18,22 +18,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.spine3.server.storage.rdbms;
+@ParametersAreNonnullByDefault
+package org.spine3.server.storage.jdbc;
 
-/**
- * Signals that an error occurred during an interaction with the DB.
- *
- * @author Alexander Litus
- */
-public class DatabaseException extends RuntimeException {
-
-    private static final long serialVersionUID = -4620698L;
-
-    public DatabaseException(String message) {
-        super(message);
-    }
-
-    public DatabaseException(Throwable cause) {
-        super(cause);
-    }
-}
+import javax.annotation.ParametersAreNonnullByDefault;
