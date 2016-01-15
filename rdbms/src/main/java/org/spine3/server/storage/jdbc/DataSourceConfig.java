@@ -213,9 +213,14 @@ public class DataSourceConfig {
         @Nullable
         private String poolName;
 
+        /**
+         * Builds a config.
+         *
+         * <p>Either {@code dataSourceClassName} or {@code jdbcUrl} is required.
+         * <p>{@code username} and {@code password} are required, but can be empty strings.
+         */
         @SuppressWarnings("MethodWithMoreThanThreeNegations")
         public DataSourceConfig build() {
-            // Either dataSourceClassName or jdbcUrl is required
             if (dataSourceClassName == null) {
                 checkState(!isNullOrEmpty(jdbcUrl), "jdbcUrl");
             }
