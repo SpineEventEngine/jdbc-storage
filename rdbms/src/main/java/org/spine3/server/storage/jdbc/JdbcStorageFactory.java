@@ -77,11 +77,6 @@ public class JdbcStorageFactory implements StorageFactory {
     }
 
     @Override
-    public void init() {
-        // NOP
-    }
-
-    @Override
     public void close() {
         dataSource.close();
     }

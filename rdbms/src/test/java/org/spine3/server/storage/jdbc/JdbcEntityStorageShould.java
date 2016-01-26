@@ -32,7 +32,7 @@ import org.spine3.server.storage.EntityStorageShould;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 import static org.spine3.protobuf.Messages.toAny;
-import static org.spine3.util.Identifiers.newUuid;
+import static org.spine3.server.util.Identifiers.newUuid;
 
 /**
  * @author Alexander Litus
@@ -79,7 +79,7 @@ public class JdbcEntityStorageShould extends EntityStorageShould {
         final JdbcEntityStorage<String> storage = newStorage(newDataSource());
         storage.close();
         try {
-            storage.read("any-id");
+            storage.readInternal("any-id");
         } catch (DatabaseException ignored) {
             // is OK because the storage is closed
             return;
@@ -89,21 +89,19 @@ public class JdbcEntityStorageShould extends EntityStorageShould {
 
     @Test
     public void clear_itself() {
-        final String idString = newUuid();
-        final EntityStorageRecord record = newEntityRecord(newUuid(), idString);
-        STORAGE.write(record);
+        final String id = newUuid();
+        final EntityStorageRecord record = newEntityRecord();
+        STORAGE.writeInternal(id, record);
         STORAGE.clear();
 
-        final EntityStorageRecord actual = STORAGE.read(idString);
+        final EntityStorageRecord actual = STORAGE.readInternal(id);
         assertNull(actual);
     }
 
-    private static EntityStorageRecord newEntityRecord(String value, String id) {
-        final EntityStorageRecord.Id recordId = EntityStorageRecord.Id.newBuilder().setStringValue(id).build();
+    private static EntityStorageRecord newEntityRecord() {
         final StringValue stringValue = StringValue.newBuilder().setValue(newUuid()).build();
         final EntityStorageRecord.Builder builder = EntityStorageRecord.newBuilder()
                 .setState(toAny(stringValue))
-                .setId(recordId)
                 .setVersion(5) // set any non-default value
                 .setWhenModified(TimeUtil.getCurrentTime());
         return builder.build();

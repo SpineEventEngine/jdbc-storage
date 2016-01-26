@@ -36,16 +36,18 @@ import java.sql.SQLException;
 import java.util.regex.Pattern;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Throwables.propagate;
 import static org.spine3.protobuf.Messages.fromAny;
 import static org.spine3.protobuf.Messages.toAny;
 
 /**
  * The implementation of the entity storage based on the RDBMS.
  *
+ * @param <I> the type of entity IDs
  * @see JdbcStorageFactory
  * @author Alexander Litus
  */
-class JdbcEntityStorage<I> extends EntityStorage<I> implements AutoCloseable {
+class JdbcEntityStorage<I> extends EntityStorage<I> {
 
     /**
      * Entity record column name.
@@ -129,7 +131,7 @@ class JdbcEntityStorage<I> extends EntityStorage<I> implements AutoCloseable {
      */
     @Nullable
     @Override
-    public EntityStorageRecord read(I id) throws DatabaseException {
+    protected EntityStorageRecord readInternal(I id) throws DatabaseException {
         final EntityStorageRecord.Id recordId = toRecordId(id);
         try (ConnectionWrapper connection = dataSource.getConnection(true);
              PreparedStatement statement = selectByIdStatement(connection, recordId)) {
@@ -138,6 +140,26 @@ class JdbcEntityStorage<I> extends EntityStorage<I> implements AutoCloseable {
         } catch (SQLException e) {
             logTransactionError(recordId, e);
             throw new DatabaseException(e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws DatabaseException if an error occurs during an interaction with the DB
+     */
+    @Override
+    protected void writeInternal(I id, EntityStorageRecord record) {
+        checkArgument(record.hasState(), "entity state");
+
+        final EntityStorageRecord.Id recordId = toRecordId(id);
+        final byte[] serializedRecord = serialize(record);
+        try (ConnectionWrapper connection = dataSource.getConnection(false)) {
+            if (containsRecord(connection, recordId)) {
+                update(connection, recordId, serializedRecord);
+            } else {
+                insert(connection, recordId, serializedRecord);
+            }
         }
     }
 
@@ -160,26 +182,6 @@ class JdbcEntityStorage<I> extends EntityStorage<I> implements AutoCloseable {
         builder.setValue(ByteString.copyFrom(bytes));
         final EntityStorageRecord message = fromAny(builder.build());
         return message;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @throws DatabaseException if an error occurs during an interaction with the DB
-     */
-    @Override
-    public void write(EntityStorageRecord record) {
-        checkArgument(record.hasState(), "entity state");
-
-        final EntityStorageRecord.Id id = toRecordId(record.getId());
-        final byte[] serializedRecord = serialize(record);
-        try (ConnectionWrapper connection = dataSource.getConnection(false)) {
-            if (containsRecord(connection, id)) {
-                update(connection, id, serializedRecord);
-            } else {
-                insert(connection, id, serializedRecord);
-            }
-        }
     }
 
     private static byte[] serialize(Message message) {
@@ -281,6 +283,11 @@ class JdbcEntityStorage<I> extends EntityStorage<I> implements AutoCloseable {
 
     @Override
     public void close() {
+        try {
+            super.close();
+        } catch (Exception e) {
+            propagate(e);
+        }
         dataSource.close();
     }
 
