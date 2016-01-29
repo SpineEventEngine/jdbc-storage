@@ -77,6 +77,12 @@ public class JdbcStorageFactory implements StorageFactory {
     }
 
     @Override
+    public <I> StreamProjectionStorage<I> createStreamProjectionStorage() {
+        // TODO:2016-01-05:alexander.litus: impl
+        return null;
+    }
+
+    @Override
     public void close() {
         dataSource.close();
     }

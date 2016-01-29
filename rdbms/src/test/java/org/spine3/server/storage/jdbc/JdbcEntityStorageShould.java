@@ -24,8 +24,8 @@ import com.google.protobuf.StringValue;
 import com.google.protobuf.util.TimeUtil;
 import com.zaxxer.hikari.HikariConfig;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Test;
+import org.spine3.server.storage.EntityStorage;
 import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.EntityStorageShould;
 
@@ -45,38 +45,29 @@ public class JdbcEntityStorageShould extends EntityStorageShould {
      */
     private static final String DB_URL = "jdbc:hsqldb:mem:entitytests";
 
-    private static final DataSourceWrapper DATA_SOURCE = newDataSource();
+    private final JdbcEntityStorage<String> storage = newStorage();
 
-    private static final JdbcEntityStorage<String> STORAGE = newStorage(DATA_SOURCE);
-
-    public JdbcEntityStorageShould() {
-        super(STORAGE);
+    @Override
+    protected EntityStorage<String> getStorage() {
+        return storage;
     }
 
-    private static DataSourceWrapper newDataSource() {
+    private static JdbcEntityStorage<String> newStorage() {
         final HikariConfig config = new HikariConfig();
         config.setJdbcUrl(DB_URL);
-        // username and password are not required for such a database
-        return HikariDataSourceWrapper.newInstance(config);
-    }
-
-    private static JdbcEntityStorage<String> newStorage(DataSourceWrapper db) {
-        return JdbcEntityStorage.newInstance(db, JdbcStorageFactoryShould.TestEntity.class);
+        // not setting username and password is OK for in-memory database
+        final DataSourceWrapper dataSource = HikariDataSourceWrapper.newInstance(config);
+        return JdbcEntityStorage.newInstance(dataSource, JdbcStorageFactoryShould.TestEntity.class);
     }
 
     @After
     public void tearDownTest() {
-        STORAGE.clear();
-    }
-
-    @AfterClass
-    public static void tearDownClass() {
-        STORAGE.close();
+        storage.close();
     }
 
     @Test
     public void close_itself() {
-        final JdbcEntityStorage<String> storage = newStorage(newDataSource());
+        final JdbcEntityStorage<String> storage = newStorage();
         storage.close();
         try {
             storage.readInternal("any-id");
@@ -91,10 +82,10 @@ public class JdbcEntityStorageShould extends EntityStorageShould {
     public void clear_itself() {
         final String id = newUuid();
         final EntityStorageRecord record = newEntityRecord();
-        STORAGE.writeInternal(id, record);
-        STORAGE.clear();
+        storage.writeInternal(id, record);
+        storage.clear();
 
-        final EntityStorageRecord actual = STORAGE.readInternal(id);
+        final EntityStorageRecord actual = storage.readInternal(id);
         assertNull(actual);
     }
 
