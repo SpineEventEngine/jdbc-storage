@@ -28,7 +28,7 @@ import javax.sql.DataSource;
 /**
  * The wrapper for {@link HikariDataSource}.
  *
- * @see <a href="https://github.com/brettwooldridge/HikariCP">HikariCP connection pool</a>.
+ * @see <a href="https://github.com/brettwooldridge/HikariCP">HikariCP connection pool</a>
  * @author Alexander Litus
  */
 class HikariDataSourceWrapper extends DataSourceWrapper {
