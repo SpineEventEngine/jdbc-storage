@@ -48,7 +48,7 @@ public class JdbcStorageFactoryShould {
     }
 
     @Test
-    public void create_entity_storage_if_intity_class_is_inner() {
+    public void create_entity_storage_if_entity_class_is_inner() {
         final JdbcStorageFactory factory = JdbcStorageFactory.newInstance(CONFIG);
         final EntityStorage<String> storage = factory.createEntityStorage(TestEntity.InnerTestEntity.class);
         assertNotNull(storage);
