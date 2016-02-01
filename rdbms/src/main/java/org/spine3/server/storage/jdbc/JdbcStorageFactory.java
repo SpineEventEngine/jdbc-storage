@@ -77,7 +77,7 @@ public class JdbcStorageFactory implements StorageFactory {
     }
 
     @Override
-    public <I> StreamProjectionStorage<I> createStreamProjectionStorage() {
+    public <I> ProjectionStorage<I> createStreamProjectionStorage() {
         // TODO:2016-01-05:alexander.litus: impl
         return null;
     }

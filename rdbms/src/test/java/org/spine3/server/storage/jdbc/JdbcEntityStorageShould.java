@@ -32,7 +32,7 @@ import org.spine3.server.storage.EntityStorageShould;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 import static org.spine3.protobuf.Messages.toAny;
-import static org.spine3.server.util.Identifiers.newUuid;
+import static org.spine3.server.Identifiers.newUuid;
 
 /**
  * @author Alexander Litus
