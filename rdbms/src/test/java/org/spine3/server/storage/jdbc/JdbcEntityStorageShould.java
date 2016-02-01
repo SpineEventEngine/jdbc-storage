@@ -41,7 +41,7 @@ import static org.spine3.server.Identifiers.newUuid;
 public class JdbcEntityStorageShould extends EntityStorageShould {
 
     /**
-     * The URL of in-memory HyperSQL DB.
+     * The URL of the in-memory HyperSQL DB.
      */
     private static final String DB_URL = "jdbc:hsqldb:mem:entitytests";
 
