@@ -36,7 +36,6 @@ import java.sql.SQLException;
 import java.util.regex.Pattern;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Throwables.propagate;
 import static org.spine3.protobuf.Messages.fromAny;
 import static org.spine3.protobuf.Messages.toAny;
 
@@ -74,7 +73,7 @@ class JdbcEntityStorage<I> extends EntityStorage<I> {
 
         static final String SELECT_ALL_BY_ID = "SELECT * FROM %s WHERE " + ID + " = ?;";
 
-        static final String DELETE_ALL = "DELETE FROM  %s ;";
+        static final String DELETE_ALL = "DELETE FROM %s ;";
 
         static final String CREATE_TABLE_IF_DOES_NOT_EXIST =
                 "CREATE TABLE IF NOT EXISTS %s (" +
@@ -102,7 +101,7 @@ class JdbcEntityStorage<I> extends EntityStorage<I> {
      * @param dataSource the dataSource wrapper
      * @param entityClass the class of entities to save to the storage
      */
-    static <I> JdbcEntityStorage<I> newInstance(DataSourceWrapper dataSource, Class entityClass) {
+    /* package */ static <I> JdbcEntityStorage<I> newInstance(DataSourceWrapper dataSource, Class entityClass) {
         return new JdbcEntityStorage<>(dataSource, entityClass);
     }
 
@@ -115,7 +114,7 @@ class JdbcEntityStorage<I> extends EntityStorage<I> {
         this.insertSql = setTableName(SqlDrafts.INSERT_RECORD);
         this.updateSql = setTableName(SqlDrafts.UPDATE_RECORD);
         this.selectAllByIdSql = setTableName(SqlDrafts.SELECT_ALL_BY_ID);
-        this.deleteAllSql = setTableName((SqlDrafts.DELETE_ALL));
+        this.deleteAllSql = setTableName(SqlDrafts.DELETE_ALL);
         final String createTableSql = setTableName(SqlDrafts.CREATE_TABLE_IF_DOES_NOT_EXIST);
         createTableIfDoesNotExist(createTableSql, this.tableName);
     }
@@ -149,7 +148,7 @@ class JdbcEntityStorage<I> extends EntityStorage<I> {
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     @Override
-    protected void writeInternal(I id, EntityStorageRecord record) {
+    protected void writeInternal(I id, EntityStorageRecord record) throws DatabaseException {
         checkArgument(record.hasState(), "entity state");
 
         final EntityStorageRecord.Id recordId = toRecordId(id);
@@ -230,7 +229,6 @@ class JdbcEntityStorage<I> extends EntityStorage<I> {
         }
     }
 
-    @SuppressWarnings("TypeMayBeWeakened")
     private PreparedStatement insertRecordStatement(ConnectionWrapper connection,
                                                     EntityStorageRecord.Id id,
                                                     byte[] serializedRecord) throws SQLException {
@@ -256,7 +254,7 @@ class JdbcEntityStorage<I> extends EntityStorage<I> {
         return statement;
     }
 
-    @SuppressWarnings("TypeMayBeWeakened")
+    // TODO:2016-02-01:alexander.litus: find out what IDs to expect on startup
     private static void setEntityId(int idIndex, EntityStorageRecord.Id id, PreparedStatement statement) throws SQLException {
         final EntityStorageRecord.Id.TypeCase type = id.getTypeCase();
         switch (type) {
@@ -271,7 +269,7 @@ class JdbcEntityStorage<I> extends EntityStorage<I> {
                 break;
             case TYPE_NOT_SET:
             default:
-                throw new IllegalArgumentException("Id type not set.");
+                throw new IllegalArgumentException("Id type is not set.");
         }
     }
 
@@ -282,13 +280,13 @@ class JdbcEntityStorage<I> extends EntityStorage<I> {
     }
 
     @Override
-    public void close() {
+    public void close() throws DatabaseException {
+        dataSource.close();
         try {
             super.close();
         } catch (Exception e) {
-            propagate(e);
+            throw new DatabaseException(e);
         }
-        dataSource.close();
     }
 
     /**
@@ -296,7 +294,7 @@ class JdbcEntityStorage<I> extends EntityStorage<I> {
      *
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
-    void clear() throws DatabaseException {
+    /* package */ void clear() throws DatabaseException {
         try (ConnectionWrapper connection = dataSource.getConnection(true);
              final PreparedStatement statement = connection.prepareStatement(deleteAllSql)) {
             statement.execute();

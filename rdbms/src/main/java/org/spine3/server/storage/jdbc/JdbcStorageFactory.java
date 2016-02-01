@@ -62,13 +62,9 @@ public class JdbcStorageFactory implements StorageFactory {
         return null;
     }
 
-    /**
-     * NOTE: the parameter is not used.
-     */
     @Override
-    public <I> AggregateStorage<I> createAggregateStorage(Class<? extends Aggregate<I, ?>> unused) {
-        // TODO:2016-01-05:alexander.litus: impl
-        return null;
+    public <I> AggregateStorage<I> createAggregateStorage(Class<? extends Aggregate<I, ?>> aggregateClass) {
+        return JdbcAggregateStorage.newInstance(dataSource, aggregateClass);
     }
 
     @Override

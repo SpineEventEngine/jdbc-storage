@@ -53,8 +53,12 @@ class HikariDataSourceWrapper extends DataSourceWrapper {
     }
 
     @Override
-    public void close() {
-        dataSource.close();
+    public void close() throws DatabaseException {
+        try {
+            dataSource.close();
+        } catch (RuntimeException e) {
+            throw new DatabaseException(e);
+        }
     }
 
     @Override

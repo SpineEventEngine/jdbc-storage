@@ -54,7 +54,6 @@ abstract class DataSourceWrapper implements AutoCloseable {
         }
     }
 
-    // Is overridden to do not throw {@link Exception}.
     @Override
-    public abstract void close();
+    public abstract void close() throws DatabaseException;
 }
