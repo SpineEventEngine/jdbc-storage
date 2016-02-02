@@ -25,6 +25,8 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.spine3.server.Entity;
+import org.spine3.server.EntityId;
 import org.spine3.server.storage.EntityStorage;
 import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.type.TypeName;
@@ -42,7 +44,7 @@ import static org.spine3.protobuf.Messages.toAny;
 /**
  * The implementation of the entity storage based on the RDBMS.
  *
- * @param <I> the type of entity IDs
+ * @param <I> the type of entity IDs. See {@link EntityId} for details.
  * @see JdbcStorageFactory
  * @author Alexander Litus
  */
@@ -101,11 +103,12 @@ class JdbcEntityStorage<I> extends EntityStorage<I> {
      * @param dataSource the dataSource wrapper
      * @param entityClass the class of entities to save to the storage
      */
-    /* package */ static <I> JdbcEntityStorage<I> newInstance(DataSourceWrapper dataSource, Class entityClass) {
+    /* package */ static <I> JdbcEntityStorage<I> newInstance(DataSourceWrapper dataSource,
+                                                              Class<? extends Entity<I, ?>> entityClass) {
         return new JdbcEntityStorage<>(dataSource, entityClass);
     }
 
-    private JdbcEntityStorage(DataSourceWrapper dataSource, Class entityClass) {
+    private JdbcEntityStorage(DataSourceWrapper dataSource, Class<? extends Entity<I, ?>> entityClass) {
         this.dataSource = dataSource;
         final String className = entityClass.getName();
         final String tableNameTmp = PATTERN_DOT.matcher(className).replaceAll(UNDERSCORE);
