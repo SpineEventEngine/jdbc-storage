@@ -60,20 +60,10 @@ public class JdbcStorageFactoryShould {
             super(id);
         }
 
-        @Override
-        protected StringValue getDefaultState() {
-            return StringValue.getDefaultInstance();
-        }
-
         public static class InnerTestEntity extends Entity<String, StringValue> {
 
             public InnerTestEntity(String id) {
                 super(id);
-            }
-
-            @Override
-            protected StringValue getDefaultState() {
-                return StringValue.getDefaultInstance();
             }
         }
     }
