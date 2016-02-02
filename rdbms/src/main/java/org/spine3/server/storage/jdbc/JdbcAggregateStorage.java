@@ -26,6 +26,10 @@ import com.google.protobuf.Message;
 import com.google.protobuf.Timestamp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.spine3.server.EntityId;
+import org.spine3.server.Identifiers;
+import org.spine3.server.aggregate.Aggregate;
+import org.spine3.server.reflect.Classes;
 import org.spine3.server.storage.AggregateStorage;
 import org.spine3.server.storage.AggregateStorageRecord;
 import org.spine3.type.TypeName;
@@ -38,6 +42,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.regex.Pattern;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.spine3.io.IoUtil.closeAll;
 import static org.spine3.protobuf.Messages.fromAny;
 import static org.spine3.protobuf.Messages.toAny;
@@ -45,7 +50,7 @@ import static org.spine3.protobuf.Messages.toAny;
 /**
  * The implementation of the aggregate storage based on the RDBMS.
  *
- * @param <I> the type of aggregate IDs
+ * @param <I> the type of aggregate IDs. See {@link EntityId} for details.
  * @see JdbcStorageFactory
  * @author Alexander Litus
  */
@@ -71,7 +76,9 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
      */
     private static final String NANOSECONDS = "nanoseconds";
 
-    @SuppressWarnings("UtilityClass")
+    private static final int AGGREGATE_ID_TYPE_GENERIC_PARAM_INDEX = 0;
+
+    @SuppressWarnings({"UtilityClass", "DuplicateStringLiteralInspection"})
     private static class SqlDrafts {
 
         static final String INSERT_RECORD =
@@ -79,26 +86,25 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
                 " (" + ID + ", " + AGGREGATE + ", " + SECONDS + ", " + NANOSECONDS + ") " +
                 " VALUES (?, ?, ?, ?);";
 
-        static final String SELECT_BY_ID_SORTED =
+        static final String SELECT_BY_ID_SORTED_BY_TIME_DESC =
                 "SELECT " + AGGREGATE + " FROM %s " +
                 " WHERE " + ID + " = ? " +
                 " ORDER BY " + SECONDS + " DESC, " + NANOSECONDS + " DESC;";
 
+        static final String TYPE_VARCHAR = "VARCHAR(999)";
+        static final String TYPE_BIGINT = "BIGINT";
+        static final String TYPE_INT = "INT";
+
         static final String CREATE_TABLE_IF_DOES_NOT_EXIST =
                 "CREATE TABLE IF NOT EXISTS %s (" +
-                    ID + " VARCHAR(999), " +
+                    ID + " %s, " +
                     AGGREGATE + " BLOB, " +
-                    SECONDS + " BIGINT, " +
-                    NANOSECONDS + " INT " +
+                    SECONDS + ' ' + TYPE_BIGINT + ", " +
+                    NANOSECONDS + ' ' + TYPE_INT +
                 ");";
     }
 
     private final DataSourceWrapper dataSource;
-
-    /**
-     * The name of the table where to store this type of aggregates.
-     */
-    private final String tableName;
 
     /**
      * Iterators which are not closed yet.
@@ -110,8 +116,10 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
      */
     private final Collection<PreparedStatement> statements = new HashSet<>();
 
+    private final IdHelper idHelper;
+
     private final String insertSql;
-    private final String selectByIdSortedSql;
+    private final String selectByIdSortedByTimeDescSql;
 
     // TODO:2016-01-26:alexander.litus: move to Escaper class
     private static final Pattern PATTERN_DOT = Pattern.compile("\\.");
@@ -124,24 +132,52 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
      * @param dataSource the dataSource wrapper
      * @param aggregateClass the class of aggregates to save to the storage
      */
-    static <I> JdbcAggregateStorage<I> newInstance(DataSourceWrapper dataSource, Class aggregateClass) {
+    static <I> JdbcAggregateStorage<I> newInstance(DataSourceWrapper dataSource, Class<? extends Aggregate<I, ?>> aggregateClass) {
         return new JdbcAggregateStorage<>(dataSource, aggregateClass);
     }
 
-    private JdbcAggregateStorage(DataSourceWrapper dataSource, Class aggregateClass) {
+    private JdbcAggregateStorage(DataSourceWrapper dataSource, Class<? extends Aggregate<I, ?>> aggregateClass) {
         this.dataSource = dataSource;
-        final String className = aggregateClass.getName();
-        final String tableNameTmp = PATTERN_DOT.matcher(className).replaceAll(UNDERSCORE);
-        this.tableName = PATTERN_DOLLAR.matcher(tableNameTmp).replaceAll(UNDERSCORE).toLowerCase();
 
-        this.insertSql = setTableName(SqlDrafts.INSERT_RECORD);
-        this.selectByIdSortedSql = setTableName(SqlDrafts.SELECT_BY_ID_SORTED);
-        final String createTableSql = setTableName(SqlDrafts.CREATE_TABLE_IF_DOES_NOT_EXIST);
-        createTableIfDoesNotExist(createTableSql, this.tableName);
+        final String tableName = getTableName(aggregateClass);
+        this.insertSql = String.format(SqlDrafts.INSERT_RECORD, tableName);
+        this.selectByIdSortedByTimeDescSql = String.format(SqlDrafts.SELECT_BY_ID_SORTED_BY_TIME_DESC, tableName);
+
+        this.idHelper = createHelper(aggregateClass);
+        createTableIfDoesNotExist(tableName);
     }
 
-    private String setTableName(String sql) {
-        return String.format(sql, tableName);
+    private static String getTableName(Class aggregateClass) {
+        final String className = aggregateClass.getName();
+        final String tableNameTmp = PATTERN_DOT.matcher(className).replaceAll(UNDERSCORE);
+        return PATTERN_DOLLAR.matcher(tableNameTmp).replaceAll(UNDERSCORE).toLowerCase();
+    }
+
+    @SuppressWarnings("IfMayBeConditional")
+    private IdHelper createHelper(Class<? extends Aggregate> aggregateClass) {
+        final IdHelper helper;
+        // TODO:2016-02-02:alexander.litus: find out why cannot use getClass() instead of aggregateClass here
+        final Class<I> idClass = Classes.getGenericParameterType(aggregateClass, AGGREGATE_ID_TYPE_GENERIC_PARAM_INDEX);
+        if (Long.TYPE.isAssignableFrom(idClass)) {
+            helper = new LongIdHelper();
+        } else if (Integer.TYPE.isAssignableFrom(idClass)) {
+            helper = new IntIdHelper();
+        } else {
+            helper = new StringOrMessageIdHelper();
+        }
+        return helper;
+    }
+
+    private void createTableIfDoesNotExist(String tableName) throws DatabaseException {
+        final String idColumnType = idHelper.getIdColumnType();
+        final String createTableSql = String.format(SqlDrafts.CREATE_TABLE_IF_DOES_NOT_EXIST, tableName, idColumnType);
+        try (ConnectionWrapper connection = dataSource.getConnection(true);
+             PreparedStatement statement = connection.prepareStatement(createTableSql)) {
+            statement.execute();
+        } catch (SQLException e) {
+            log().error("Error during table creation, table name: " + tableName, e);
+            throw new DatabaseException(e);
+        }
     }
 
     /**
@@ -151,11 +187,9 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
      */
     @Override
     protected void writeInternal(I id, AggregateStorageRecord record) throws DatabaseException {
-        final AggregateStorageRecord.Id recordId = AggregateStorage.toRecordId(id);
-
         final byte[] serializedRecord = serialize(record);
         try (ConnectionWrapper connection = dataSource.getConnection(false)) {
-            insert(connection, recordId, serializedRecord, record);
+            insert(connection, id, serializedRecord, record);
         }
     }
 
@@ -174,16 +208,13 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
      */
     @Override
     protected Iterator<AggregateStorageRecord> historyBackward(I id) throws DatabaseException {
-        final AggregateStorageRecord.Id recordId = toRecordId(id);
+        checkNotNull(id);
         try (ConnectionWrapper connection = dataSource.getConnection(true)) {
-            final PreparedStatement statement = selectByIdStatement(connection, recordId);
+            final PreparedStatement statement = selectByIdStatement(connection, id);
             statements.add(statement);
             final DbIterator iterator = new DbIterator(statement);
             iterators.add(iterator);
             return iterator;
-        } catch (SQLException e) {
-            logTransactionError(recordId, e);
-            throw new DatabaseException(e);
         }
     }
 
@@ -193,8 +224,12 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
 
         private boolean isHasNextCalledBeforeNext = false;
 
-        private DbIterator(PreparedStatement selectByIdStatement) throws SQLException {
-            this.resultSet = selectByIdStatement.executeQuery();
+        private DbIterator(PreparedStatement selectByIdStatement) throws DatabaseException {
+            try {
+                this.resultSet = selectByIdStatement.executeQuery();
+            } catch (SQLException e) {
+                throw new DatabaseException(e);
+            }
         }
 
         @Override
@@ -253,74 +288,44 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
         }
     }
 
-    private void createTableIfDoesNotExist(String sql, String tableName) throws DatabaseException {
-        try (ConnectionWrapper connection = dataSource.getConnection(true);
-             PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.execute();
-        } catch (SQLException e) {
-            log().error("Error during table creation, table name: " + tableName, e);
-            throw new DatabaseException(e);
-        }
-    }
-
     private void insert(ConnectionWrapper connection,
-                        AggregateStorageRecord.Id id,
+                        I id,
                         byte[] serializedAggregate,
                         AggregateStorageRecord record) {
         try (PreparedStatement statement = insertRecordStatement(connection, id, serializedAggregate, record)) {
             statement.execute();
             connection.commit();
         } catch (SQLException e) {
-            throw handleDbException(connection, e, id);
+            logTransactionError(id, e);
+            connection.rollback();
+            throw new DatabaseException(e);
         }
     }
 
     private PreparedStatement insertRecordStatement(ConnectionWrapper connection,
-                                                    AggregateStorageRecord.Id id,
+                                                    I id,
                                                     byte[] serializedRecord,
-                                                    AggregateStorageRecord record) throws SQLException {
+                                                    AggregateStorageRecord record) {
         final PreparedStatement statement = connection.prepareStatement(insertSql);
-        setId(1, id, statement);
-        statement.setBytes(2, serializedRecord);
-        final Timestamp timestamp = record.getTimestamp();
-        statement.setLong(3, timestamp.getSeconds());
-        statement.setInt(4, timestamp.getNanos());
-        return statement;
-    }
-
-    private PreparedStatement selectByIdStatement(ConnectionWrapper connection,
-                                                  AggregateStorageRecord.Id id) throws SQLException {
-        final PreparedStatement statement = connection.prepareStatement(selectByIdSortedSql);
-        setId(1, id, statement);
-        return statement;
-    }
-
-    // TODO:2016-02-01:alexander.litus: find out what IDs to expect on startup
-    private static void setId(int idIndex, AggregateStorageRecord.Id id, PreparedStatement statement) throws SQLException {
-        final AggregateStorageRecord.Id.TypeCase type = id.getTypeCase();
-        switch (type) {
-            case STRING_VALUE:
-                statement.setString(idIndex, id.getStringValue());
-                break;
-            case LONG_VALUE:
-                statement.setLong(idIndex, id.getLongValue());
-                break;
-            case INT_VALUE:
-                statement.setInt(idIndex, id.getIntValue());
-                break;
-            case TYPE_NOT_SET:
-            default:
-                throw new IllegalArgumentException("Id type is not set.");
+        try {
+            idHelper.setId(1, id, statement);
+            statement.setBytes(2, serializedRecord);
+            final Timestamp timestamp = record.getTimestamp();
+            statement.setLong(3, timestamp.getSeconds());
+            statement.setInt(4, timestamp.getNanos());
+        } catch (SQLException e) {
+            throw new DatabaseException(e);
         }
+        return statement;
     }
 
-    private static DatabaseException handleDbException(ConnectionWrapper connection, SQLException e, AggregateStorageRecord.Id id) {
-        logTransactionError(id, e);
-        connection.rollback();
-        throw new DatabaseException(e);
+    private PreparedStatement selectByIdStatement(ConnectionWrapper connection, I id){
+        final PreparedStatement statement = connection.prepareStatement(selectByIdSortedByTimeDescSql);
+        idHelper.setId(1, id, statement);
+        return statement;
     }
 
-    private static void logTransactionError(AggregateStorageRecord.Id id, Exception e) {
+    private void logTransactionError(I id, Exception e) {
         log().error("Error during transaction, aggregate ID = " + id, e);
     }
 
@@ -337,6 +342,81 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
             super.close();
         } catch (Exception e) {
             throw new DatabaseException(e);
+        }
+    }
+
+    /**
+     * Helps to work with aggregate IDs.
+     */
+    @SuppressWarnings("ClassMayBeInterface") // cannot use ID generic parameter from static context
+    private abstract class IdHelper {
+
+        /**
+         * Returns the type of ID column.
+         */
+        public abstract String getIdColumnType();
+
+        /**
+         * Sets an ID parameter to the given value.
+         *
+         * @param index the ID parameter index
+         * @param id the ID value to set
+         * @param statement the statement to use
+         */
+        public abstract void setId(int index, I id, PreparedStatement statement);
+    }
+
+    private class LongIdHelper extends IdHelper {
+
+        @Override
+        public String getIdColumnType() {
+            return SqlDrafts.TYPE_BIGINT;
+        }
+
+        @Override
+        public void setId(int index, I id, PreparedStatement statement) {
+            final Long idLong = (Long) id;
+            try {
+                statement.setLong(index, idLong);
+            } catch (SQLException e) {
+                throw new DatabaseException(e);
+            }
+        }
+    }
+
+    private class IntIdHelper extends IdHelper {
+
+        @Override
+        public String getIdColumnType() {
+            return SqlDrafts.TYPE_INT;
+        }
+
+        @Override
+        public void setId(int index, I id, PreparedStatement statement) {
+            final Integer idInt = (Integer) id;
+            try {
+                statement.setInt(index, idInt);
+            } catch (SQLException e) {
+                throw new DatabaseException(e);
+            }
+        }
+    }
+
+    private class StringOrMessageIdHelper extends IdHelper {
+
+        @Override
+        public String getIdColumnType() {
+            return SqlDrafts.TYPE_VARCHAR;
+        }
+
+        @Override
+        public void setId(int index, I id, PreparedStatement statement) {
+            final String idString = Identifiers.idToString(id);
+            try {
+                statement.setString(index, idString);
+            } catch (SQLException e) {
+                throw new DatabaseException(e);
+            }
         }
     }
 

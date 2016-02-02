@@ -23,8 +23,10 @@ package org.spine3.server.storage.jdbc;
 import com.zaxxer.hikari.HikariConfig;
 import org.junit.After;
 import org.junit.Test;
+import org.spine3.server.aggregate.Aggregate;
 import org.spine3.server.storage.AggregateStorage;
 import org.spine3.server.storage.AggregateStorageShould;
+import org.spine3.test.project.Project;
 import org.spine3.test.project.ProjectId;
 
 import static org.junit.Assert.fail;
@@ -53,7 +55,7 @@ public class JdbcAggregateStorageShould extends AggregateStorageShould {
         config.setJdbcUrl(DB_URL);
         // not setting username and password is OK for in-memory database
         final DataSourceWrapper dataSource = HikariDataSourceWrapper.newInstance(config);
-        return JdbcAggregateStorage.newInstance(dataSource, JdbcStorageFactoryShould.TestEntity.class);
+        return JdbcAggregateStorage.newInstance(dataSource, TestAggregate.class);
     }
 
     @After
@@ -72,5 +74,11 @@ public class JdbcAggregateStorageShould extends AggregateStorageShould {
             return;
         }
         fail("Aggregate storage should close itself.");
+    }
+
+    public static class TestAggregate extends Aggregate<ProjectId, Project> {
+        public TestAggregate(ProjectId id) {
+            super(id);
+        }
     }
 }
