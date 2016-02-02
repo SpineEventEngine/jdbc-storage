@@ -156,6 +156,8 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     /**
      * {@inheritDoc}
      *
+     * <p><b>NOTE:</b> it is required to call {@link Iterator#hasNext()} before {@link Iterator#next()}.
+     *
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     @Override
@@ -176,6 +178,8 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
 
         private final ResultSet resultSet;
 
+        private boolean isHasNextCalledBeforeNext = false;
+
         private DbIterator(PreparedStatement selectByIdStatement) throws SQLException {
             this.resultSet = selectByIdStatement.executeQuery();
         }
@@ -184,6 +188,7 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
         public boolean hasNext() {
             try {
                 final boolean hasNext = resultSet.next();
+                isHasNextCalledBeforeNext = true;
                 return hasNext;
             } catch (SQLException e) {
                 throw new DatabaseException(e);
@@ -192,6 +197,10 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
 
         @Override
         public AggregateStorageRecord next() {
+            if (!isHasNextCalledBeforeNext) {
+                throw new IllegalStateException("It is required to call hasNext() before next() method.");
+            }
+            isHasNextCalledBeforeNext = false;
             try {
                 final byte[] bytes = resultSet.getBytes(AGGREGATE);
                 final AggregateStorageRecord record = toRecord(bytes);
