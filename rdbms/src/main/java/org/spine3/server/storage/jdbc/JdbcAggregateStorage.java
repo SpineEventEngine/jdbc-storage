@@ -27,7 +27,6 @@ import com.google.protobuf.Timestamp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spine3.server.EntityId;
-import org.spine3.server.Identifiers;
 import org.spine3.server.aggregate.Aggregate;
 import org.spine3.server.reflect.Classes;
 import org.spine3.server.storage.AggregateStorage;
@@ -91,16 +90,12 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
                 " WHERE " + ID + " = ? " +
                 " ORDER BY " + SECONDS + " DESC, " + NANOSECONDS + " DESC;";
 
-        static final String TYPE_VARCHAR = "VARCHAR(999)";
-        static final String TYPE_BIGINT = "BIGINT";
-        static final String TYPE_INT = "INT";
-
         static final String CREATE_TABLE_IF_DOES_NOT_EXIST =
                 "CREATE TABLE IF NOT EXISTS %s (" +
                     ID + " %s, " +
                     AGGREGATE + " BLOB, " +
-                    SECONDS + ' ' + TYPE_BIGINT + ", " +
-                    NANOSECONDS + ' ' + TYPE_INT +
+                    SECONDS + " BIGINT, " +
+                    NANOSECONDS + " INT " +
                 ");";
     }
 
@@ -116,7 +111,7 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
      */
     private final Collection<PreparedStatement> statements = new HashSet<>();
 
-    private final IdHelper idHelper;
+    private final IdHelper<I> idHelper;
 
     private final String insertSql;
     private final String selectByIdSortedByTimeDescSql;
@@ -154,16 +149,16 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     }
 
     @SuppressWarnings("IfMayBeConditional")
-    private IdHelper createHelper(Class<? extends Aggregate> aggregateClass) {
-        final IdHelper helper;
+    private IdHelper<I> createHelper(Class<? extends Aggregate> aggregateClass) {
+        final IdHelper<I> helper;
         // TODO:2016-02-02:alexander.litus: find out why cannot use getClass() instead of aggregateClass here
         final Class<I> idClass = Classes.getGenericParameterType(aggregateClass, AGGREGATE_ID_TYPE_GENERIC_PARAM_INDEX);
-        if (Long.TYPE.isAssignableFrom(idClass)) {
-            helper = new LongIdHelper();
-        } else if (Integer.TYPE.isAssignableFrom(idClass)) {
-            helper = new IntIdHelper();
+        if (Long.class.isAssignableFrom(idClass)) {
+            helper = new IdHelper.LongIdHelper<>();
+        } else if (Integer.class.isAssignableFrom(idClass)) {
+            helper = new IdHelper.IntIdHelper<>();
         } else {
-            helper = new StringOrMessageIdHelper();
+            helper = new IdHelper.StringOrMessageIdHelper<>();
         }
         return helper;
     }
@@ -342,81 +337,6 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
             super.close();
         } catch (Exception e) {
             throw new DatabaseException(e);
-        }
-    }
-
-    /**
-     * Helps to work with aggregate IDs.
-     */
-    @SuppressWarnings("ClassMayBeInterface") // cannot use ID generic parameter from static context
-    private abstract class IdHelper {
-
-        /**
-         * Returns the type of ID column.
-         */
-        public abstract String getIdColumnType();
-
-        /**
-         * Sets an ID parameter to the given value.
-         *
-         * @param index the ID parameter index
-         * @param id the ID value to set
-         * @param statement the statement to use
-         */
-        public abstract void setId(int index, I id, PreparedStatement statement);
-    }
-
-    private class LongIdHelper extends IdHelper {
-
-        @Override
-        public String getIdColumnType() {
-            return SqlDrafts.TYPE_BIGINT;
-        }
-
-        @Override
-        public void setId(int index, I id, PreparedStatement statement) {
-            final Long idLong = (Long) id;
-            try {
-                statement.setLong(index, idLong);
-            } catch (SQLException e) {
-                throw new DatabaseException(e);
-            }
-        }
-    }
-
-    private class IntIdHelper extends IdHelper {
-
-        @Override
-        public String getIdColumnType() {
-            return SqlDrafts.TYPE_INT;
-        }
-
-        @Override
-        public void setId(int index, I id, PreparedStatement statement) {
-            final Integer idInt = (Integer) id;
-            try {
-                statement.setInt(index, idInt);
-            } catch (SQLException e) {
-                throw new DatabaseException(e);
-            }
-        }
-    }
-
-    private class StringOrMessageIdHelper extends IdHelper {
-
-        @Override
-        public String getIdColumnType() {
-            return SqlDrafts.TYPE_VARCHAR;
-        }
-
-        @Override
-        public void setId(int index, I id, PreparedStatement statement) {
-            final String idString = Identifiers.idToString(id);
-            try {
-                statement.setString(index, idString);
-            } catch (SQLException e) {
-                throw new DatabaseException(e);
-            }
         }
     }
 
