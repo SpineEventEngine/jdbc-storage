@@ -60,7 +60,7 @@ class JdbcEntityStorage<I> extends EntityStorage<I> {
      */
     private static final String ID = "id";
 
-    @SuppressWarnings("UtilityClass")
+    @SuppressWarnings({"UtilityClass", "DuplicateStringLiteralInspection"})
     private static class SqlDrafts {
 
         static final String INSERT_RECORD =
@@ -73,9 +73,9 @@ class JdbcEntityStorage<I> extends EntityStorage<I> {
                 " SET " + ENTITY + " = ? " +
                 " WHERE " + ID + " = ?;";
 
-        static final String SELECT_ALL_BY_ID = "SELECT * FROM %s WHERE " + ID + " = ?;";
+        static final String SELECT_ALL_BY_ID = "SELECT " + ENTITY +" FROM %s WHERE " + ID + " = ?;";
 
-        static final String DELETE_ALL = "DELETE FROM %s ;";
+        static final String DELETE_ALL = "DELETE FROM %s;";
 
         static final String CREATE_TABLE_IF_DOES_NOT_EXIST =
                 "CREATE TABLE IF NOT EXISTS %s (" +
@@ -297,7 +297,7 @@ class JdbcEntityStorage<I> extends EntityStorage<I> {
      *
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
-    /* package */ void clear() throws DatabaseException {
+    /*package*/ void clear() throws DatabaseException {
         try (ConnectionWrapper connection = dataSource.getConnection(true);
              final PreparedStatement statement = connection.prepareStatement(deleteAllSql)) {
             statement.execute();
