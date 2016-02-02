@@ -63,8 +63,8 @@ class JdbcEntityStorage<I> extends EntityStorage<I> {
 
         static final String INSERT_RECORD =
                 "INSERT INTO %s " +
-                        " (" + ID + ", " + ENTITY + ')' +
-                        " VALUES (?, ?);";
+                " (" + ID + ", " + ENTITY + ')' +
+                " VALUES (?, ?);";
 
         static final String UPDATE_RECORD =
                 "UPDATE %s " +
@@ -194,7 +194,7 @@ class JdbcEntityStorage<I> extends EntityStorage<I> {
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.execute();
         } catch (SQLException e) {
-            log().error("Error during table creation, table name = " + tableName, e);
+            log().error("Error while creating a table with name: " + tableName, e);
             throw new DatabaseException(e);
         }
     }

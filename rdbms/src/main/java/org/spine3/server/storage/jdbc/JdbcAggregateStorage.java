@@ -38,6 +38,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.regex.Pattern;
 
+import static org.spine3.io.IoUtil.closeAll;
 import static org.spine3.protobuf.Messages.fromAny;
 import static org.spine3.protobuf.Messages.toAny;
 
@@ -51,14 +52,14 @@ import static org.spine3.protobuf.Messages.toAny;
 public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
 
     /**
-     * Aggregate record column name.
-     */
-    private static final String AGGREGATE = "aggregate";
-
-    /**
      * Aggregate ID column name.
      */
     private static final String ID = "id";
+
+    /**
+     * Aggregate record column name.
+     */
+    private static final String AGGREGATE = "aggregate";
 
     /**
      * Aggregate event seconds column name.
@@ -75,8 +76,8 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
 
         static final String INSERT_RECORD =
                 "INSERT INTO %s " +
-                        " (" + ID + ", " + AGGREGATE + ", " + SECONDS + ", " + NANOSECONDS + ')' +
-                        " VALUES (?, ?, ?, ?);";
+                " (" + ID + ", " + AGGREGATE + ", " + SECONDS + ", " + NANOSECONDS + ") " +
+                " VALUES (?, ?, ?, ?);";
 
         static final String SELECT_BY_ID_SORTED =
                 "SELECT " + AGGREGATE + " FROM %s " +
@@ -93,12 +94,24 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     }
 
     private final DataSourceWrapper dataSource;
+
+    /**
+     * The name of the table where to store this type of aggregates.
+     */
     private final String tableName;
 
+    /**
+     * Iterators which are not closed yet.
+     */
     private final Collection<DbIterator> iterators = new HashSet<>();
 
+    /**
+     * Statements which are not closed yet.
+     */
+    private final Collection<PreparedStatement> statements = new HashSet<>();
+
     private final String insertSql;
-    private final String selectAllByIdSql;
+    private final String selectByIdSortedSql;
 
     // TODO:2016-01-26:alexander.litus: move to Escaper class
     private static final Pattern PATTERN_DOT = Pattern.compile("\\.");
@@ -122,7 +135,7 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
         this.tableName = PATTERN_DOLLAR.matcher(tableNameTmp).replaceAll(UNDERSCORE).toLowerCase();
 
         this.insertSql = setTableName(SqlDrafts.INSERT_RECORD);
-        this.selectAllByIdSql = setTableName(SqlDrafts.SELECT_BY_ID_SORTED);
+        this.selectByIdSortedSql = setTableName(SqlDrafts.SELECT_BY_ID_SORTED);
         final String createTableSql = setTableName(SqlDrafts.CREATE_TABLE_IF_DOES_NOT_EXIST);
         createTableIfDoesNotExist(createTableSql, this.tableName);
     }
@@ -138,7 +151,6 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
      */
     @Override
     protected void writeInternal(I id, AggregateStorageRecord record) throws DatabaseException {
-        //checkArgument
         final AggregateStorageRecord.Id recordId = AggregateStorage.toRecordId(id);
 
         final byte[] serializedRecord = serialize(record);
@@ -163,11 +175,12 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     @Override
     protected Iterator<AggregateStorageRecord> historyBackward(I id) throws DatabaseException {
         final AggregateStorageRecord.Id recordId = toRecordId(id);
-        try (ConnectionWrapper connection = dataSource.getConnection(true);
-             PreparedStatement statement = selectByIdStatement(connection, recordId)) {
-            final DbIterator result = new DbIterator(statement);
-            iterators.add(result);
-            return result;
+        try (ConnectionWrapper connection = dataSource.getConnection(true)) {
+            final PreparedStatement statement = selectByIdStatement(connection, recordId);
+            statements.add(statement);
+            final DbIterator iterator = new DbIterator(statement);
+            iterators.add(iterator);
+            return iterator;
         } catch (SQLException e) {
             logTransactionError(recordId, e);
             throw new DatabaseException(e);
@@ -196,15 +209,22 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
         }
 
         @Override
+        @SuppressWarnings("IteratorNextCanNotThrowNoSuchElementException")
         public AggregateStorageRecord next() {
             if (!isHasNextCalledBeforeNext) {
                 throw new IllegalStateException("It is required to call hasNext() before next() method.");
             }
             isHasNextCalledBeforeNext = false;
+
+            final byte[] bytes = readRecordBytes();
+            final AggregateStorageRecord record = toRecord(bytes);
+            return record;
+        }
+
+        private byte[] readRecordBytes() {
             try {
                 final byte[] bytes = resultSet.getBytes(AGGREGATE);
-                final AggregateStorageRecord record = toRecord(bytes);
-                return record;
+                return bytes;
             } catch (SQLException e) {
                 throw new DatabaseException(e);
             }
@@ -238,7 +258,7 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.execute();
         } catch (SQLException e) {
-            log().error("Error during table creation, table name = " + tableName, e);
+            log().error("Error during table creation, table name: " + tableName, e);
             throw new DatabaseException(e);
         }
     }
@@ -270,7 +290,7 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
 
     private PreparedStatement selectByIdStatement(ConnectionWrapper connection,
                                                   AggregateStorageRecord.Id id) throws SQLException {
-        final PreparedStatement statement = connection.prepareStatement(selectAllByIdSql);
+        final PreparedStatement statement = connection.prepareStatement(selectByIdSortedSql);
         setId(1, id, statement);
         return statement;
     }
@@ -306,9 +326,12 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
 
     @Override
     public void close() throws DatabaseException {
-        for (DbIterator iterator : iterators) {
-            iterator.close();
-        }
+        closeAll(iterators);
+        iterators.clear();
+
+        closeAll(statements);
+        statements.clear();
+
         dataSource.close();
         try {
             super.close();
