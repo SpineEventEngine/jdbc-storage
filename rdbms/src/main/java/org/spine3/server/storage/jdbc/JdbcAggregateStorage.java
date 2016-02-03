@@ -59,28 +59,28 @@ import static org.spine3.server.Identifiers.idToString;
  */
 public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
 
-    /**
-     * Aggregate ID column name.
-     */
-    private static final String ID = "id";
+    @SuppressWarnings({"UtilityClass", "DuplicateStringLiteralInspection", "ClassNamingConvention"})
+    private static class SQL {
 
-    /**
-     * Aggregate record column name.
-     */
-    private static final String AGGREGATE = "aggregate";
+        /**
+         * Aggregate ID column name.
+         */
+        static final String ID = "id";
 
-    /**
-     * Aggregate event seconds column name.
-     */
-    private static final String SECONDS = "seconds";
+        /**
+         * Aggregate record column name.
+         */
+        static final String AGGREGATE = "aggregate";
 
-    /**
-     * Aggregate event nanoseconds column name.
-     */
-    private static final String NANOSECONDS = "nanoseconds";
+        /**
+         * Aggregate event seconds column name.
+         */
+        private static final String SECONDS = "seconds";
 
-    @SuppressWarnings({"UtilityClass", "DuplicateStringLiteralInspection"})
-    private static class SqlDrafts {
+        /**
+         * Aggregate event nanoseconds column name.
+         */
+        private static final String NANOSECONDS = "nanoseconds";
 
         static final String INSERT_RECORD =
                 "INSERT INTO %s " +
@@ -132,8 +132,8 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
         this.dataSource = dataSource;
 
         final String tableName = DbTableNamesEscaper.toTableName(aggregateClass);
-        this.insertSql = format(SqlDrafts.INSERT_RECORD, tableName);
-        this.selectByIdSortedByTimeDescSql = format(SqlDrafts.SELECT_BY_ID_SORTED_BY_TIME_DESC, tableName);
+        this.insertSql = format(SQL.INSERT_RECORD, tableName);
+        this.selectByIdSortedByTimeDescSql = format(SQL.SELECT_BY_ID_SORTED_BY_TIME_DESC, tableName);
 
         this.idHelper = IdHelper.newInstance(aggregateClass);
         createTableIfDoesNotExist(tableName);
@@ -141,7 +141,7 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
 
     private void createTableIfDoesNotExist(String tableName) throws DatabaseException {
         final String idColumnType = idHelper.getIdColumnType();
-        final String createTableSql = format(SqlDrafts.CREATE_TABLE_IF_DOES_NOT_EXIST, tableName, idColumnType);
+        final String createTableSql = format(SQL.CREATE_TABLE_IF_DOES_NOT_EXIST, tableName, idColumnType);
         try (ConnectionWrapper connection = dataSource.getConnection(true);
              PreparedStatement statement = connection.prepareStatement(createTableSql)) {
             statement.execute();
@@ -236,7 +236,7 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
 
         private byte[] readRecordBytes() {
             try {
-                final byte[] bytes = resultSet.getBytes(AGGREGATE);
+                final byte[] bytes = resultSet.getBytes(SQL.AGGREGATE);
                 return bytes;
             } catch (SQLException e) {
                 throw new DatabaseException(e);

@@ -55,18 +55,18 @@ import static org.spine3.server.Identifiers.idToString;
  */
 class JdbcEntityStorage<I> extends EntityStorage<I> {
 
-    /**
-     * Entity record column name.
-     */
-    private static final String ENTITY = "entity";
+    @SuppressWarnings({"UtilityClass", "DuplicateStringLiteralInspection", "ClassNamingConvention"})
+    private static class SQL {
 
-    /**
-     * Entity ID column name.
-     */
-    private static final String ID = "id";
+        /**
+         * Entity record column name.
+         */
+        static final String ENTITY = "entity";
 
-    @SuppressWarnings({"UtilityClass", "DuplicateStringLiteralInspection"})
-    private static class SqlDrafts {
+        /**
+         * Entity ID column name.
+         */
+        static final String ID = "id";
 
         static final String INSERT_RECORD =
                 "INSERT INTO %s " +
@@ -114,10 +114,10 @@ class JdbcEntityStorage<I> extends EntityStorage<I> {
         this.dataSource = dataSource;
 
         final String tableName = DbTableNamesEscaper.toTableName(entityClass);
-        this.insertSql = format(SqlDrafts.INSERT_RECORD, tableName);
-        this.updateSql = format(SqlDrafts.UPDATE_RECORD, tableName);
-        this.selectByIdSql = format(SqlDrafts.SELECT_BY_ID, tableName);
-        this.deleteAllSql = format(SqlDrafts.DELETE_ALL, tableName);
+        this.insertSql = format(SQL.INSERT_RECORD, tableName);
+        this.updateSql = format(SQL.UPDATE_RECORD, tableName);
+        this.selectByIdSql = format(SQL.SELECT_BY_ID, tableName);
+        this.deleteAllSql = format(SQL.DELETE_ALL, tableName);
 
         this.idHelper = IdHelper.newInstance(entityClass);
         createTableIfDoesNotExist(tableName);
@@ -125,7 +125,7 @@ class JdbcEntityStorage<I> extends EntityStorage<I> {
 
     private void createTableIfDoesNotExist(String tableName) throws DatabaseException {
         final String idColumnType = idHelper.getIdColumnType();
-        final String createTableSql = format(SqlDrafts.CREATE_TABLE_IF_DOES_NOT_EXIST, tableName, idColumnType);
+        final String createTableSql = format(SQL.CREATE_TABLE_IF_DOES_NOT_EXIST, tableName, idColumnType);
         try (ConnectionWrapper connection = dataSource.getConnection(true);
              PreparedStatement statement = connection.prepareStatement(createTableSql)) {
             statement.execute();
@@ -177,7 +177,7 @@ class JdbcEntityStorage<I> extends EntityStorage<I> {
             if (!resultSet.next()) {
                 return null;
             }
-            final byte[] bytes = resultSet.getBytes(ENTITY);
+            final byte[] bytes = resultSet.getBytes(SQL.ENTITY);
             final EntityStorageRecord record = toEntityRecord(bytes);
             return record;
         } catch (SQLException e) {
