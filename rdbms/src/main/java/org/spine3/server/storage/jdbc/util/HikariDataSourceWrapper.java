@@ -18,20 +18,23 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.spine3.server.storage.jdbc;
+package org.spine3.server.storage.jdbc.util;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import org.spine3.Internal;
+import org.spine3.server.storage.jdbc.DatabaseException;
 
 import javax.sql.DataSource;
 
 /**
  * The wrapper for {@link HikariDataSource}.
  *
- * @see <a href="https://github.com/brettwooldridge/HikariCP">HikariCP connection pool</a>.
+ * @see <a href="https://github.com/brettwooldridge/HikariCP">HikariCP connection pool</a>
  * @author Alexander Litus
  */
-class HikariDataSourceWrapper extends DataSourceWrapper {
+@Internal
+public class HikariDataSourceWrapper extends DataSourceWrapper {
 
     private final HikariDataSource dataSource;
 
@@ -44,7 +47,7 @@ class HikariDataSourceWrapper extends DataSourceWrapper {
      *
      * @param config the config used to create {@link HikariDataSource}.
      */
-    static HikariDataSourceWrapper newInstance(HikariConfig config) {
+    public static HikariDataSourceWrapper newInstance(HikariConfig config) {
         return new HikariDataSourceWrapper(config);
     }
 
@@ -53,12 +56,16 @@ class HikariDataSourceWrapper extends DataSourceWrapper {
     }
 
     @Override
-    public void close() {
-        dataSource.close();
+    public void close() throws DatabaseException {
+        try {
+            dataSource.close();
+        } catch (RuntimeException e) {
+            throw new DatabaseException(e);
+        }
     }
 
     @Override
-    protected DataSource getDataSource() {
+    public DataSource getDataSource() {
         return dataSource;
     }
 }
