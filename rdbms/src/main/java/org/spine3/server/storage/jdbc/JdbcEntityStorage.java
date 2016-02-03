@@ -78,7 +78,7 @@ class JdbcEntityStorage<I> extends EntityStorage<I> {
                 " SET " + ENTITY + " = ? " +
                 " WHERE " + ID + " = ?;";
 
-        static final String SELECT_ALL_BY_ID = "SELECT " + ENTITY + " FROM %s WHERE " + ID + " = ?;";
+        static final String SELECT_BY_ID = "SELECT " + ENTITY + " FROM %s WHERE " + ID + " = ?;";
 
         static final String DELETE_ALL = "DELETE FROM %s;";
 
@@ -96,7 +96,7 @@ class JdbcEntityStorage<I> extends EntityStorage<I> {
 
     private final String insertSql;
     private final String updateSql;
-    private final String selectAllByIdSql;
+    private final String selectByIdSql;
     private final String deleteAllSql;
 
     /**
@@ -116,7 +116,7 @@ class JdbcEntityStorage<I> extends EntityStorage<I> {
         final String tableName = DbTableNamesEscaper.toTableName(entityClass);
         this.insertSql = format(SqlDrafts.INSERT_RECORD, tableName);
         this.updateSql = format(SqlDrafts.UPDATE_RECORD, tableName);
-        this.selectAllByIdSql = format(SqlDrafts.SELECT_ALL_BY_ID, tableName);
+        this.selectByIdSql = format(SqlDrafts.SELECT_BY_ID, tableName);
         this.deleteAllSql = format(SqlDrafts.DELETE_ALL, tableName);
 
         this.idHelper = IdHelper.newInstance(entityClass);
@@ -252,7 +252,7 @@ class JdbcEntityStorage<I> extends EntityStorage<I> {
     }
 
     private PreparedStatement selectByIdStatement(ConnectionWrapper connection, I id) {
-        final PreparedStatement statement = connection.prepareStatement(selectAllByIdSql);
+        final PreparedStatement statement = connection.prepareStatement(selectByIdSql);
         idHelper.setId(1, id, statement);
         return statement;
     }
