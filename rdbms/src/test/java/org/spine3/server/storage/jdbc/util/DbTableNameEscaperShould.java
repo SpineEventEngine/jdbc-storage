@@ -18,33 +18,32 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.spine3.server.storage.jdbc;
+package org.spine3.server.storage.jdbc.util;
 
 import com.google.protobuf.StringValue;
 import org.junit.Test;
 import org.spine3.server.Entity;
-import org.spine3.server.storage.EntityStorage;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Alexander Litus
  */
-@SuppressWarnings({"InstanceMethodNamingConvention", "MagicNumber"})
-public class JdbcStorageFactoryShould {
-
-    private static final DataSourceConfig CONFIG = DataSourceConfig.newBuilder()
-            .setJdbcUrl("jdbc:hsqldb:mem:factorytests")
-            .setUsername("SA")
-            .setPassword("pwd")
-            .setMaxPoolSize(12)
-            .build();
+@SuppressWarnings("InstanceMethodNamingConvention")
+public class DbTableNameEscaperShould {
 
     @Test
-    public void create_entity_storage() {
-        final JdbcStorageFactory factory = JdbcStorageFactory.newInstance(CONFIG);
-        final EntityStorage<String> storage = factory.createEntityStorage(TestEntity.class);
-        assertNotNull(storage);
+    public void provide_table_name_for_class() {
+        final String tableName = DbTableNamesEscaper.toTableName(String.class);
+
+        assertEquals("java_lang_string", tableName);
+    }
+
+    @Test
+    public void provide_table_name_from_inner_class() {
+        final String tableName = DbTableNamesEscaper.toTableName(TestEntity.class);
+
+        assertEquals("org_spine3_server_storage_jdbc_util_dbtablenameescapershould_testentity", tableName);
     }
 
     private static class TestEntity extends Entity<String, StringValue> {
