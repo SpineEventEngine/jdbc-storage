@@ -41,10 +41,11 @@ import java.util.Iterator;
 import java.util.regex.Pattern;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static java.lang.String.*;
+import static java.lang.String.format;
 import static org.spine3.io.IoUtil.closeAll;
 import static org.spine3.protobuf.Messages.fromAny;
 import static org.spine3.protobuf.Messages.toAny;
+import static org.spine3.server.Identifiers.idToString;
 
 /**
  * The implementation of the aggregate storage based on the RDBMS.
@@ -304,7 +305,7 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     }
 
     private void logTransactionError(I id, Exception e) {
-        log().error("Error during transaction, aggregate ID = " + id, e);
+        log().error("Error during transaction, aggregate ID = " + idToString(id), e);
     }
 
     @Override

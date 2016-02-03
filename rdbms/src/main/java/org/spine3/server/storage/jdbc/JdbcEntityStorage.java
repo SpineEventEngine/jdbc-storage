@@ -38,9 +38,10 @@ import java.sql.SQLException;
 import java.util.regex.Pattern;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static java.lang.String.*;
+import static java.lang.String.format;
 import static org.spine3.protobuf.Messages.fromAny;
 import static org.spine3.protobuf.Messages.toAny;
+import static org.spine3.server.Identifiers.idToString;
 
 /**
  * The implementation of the entity storage based on the RDBMS.
@@ -80,7 +81,7 @@ class JdbcEntityStorage<I> extends EntityStorage<I> {
 
         static final String CREATE_TABLE_IF_DOES_NOT_EXIST =
                 "CREATE TABLE IF NOT EXISTS %s (" +
-                    ID + " VARCHAR(999), " +
+                    ID + " %s, " +
                     ENTITY + " BLOB, " +
                     "PRIMARY KEY(" + ID + ')' +
                 ");";
@@ -91,6 +92,8 @@ class JdbcEntityStorage<I> extends EntityStorage<I> {
     private static final String UNDERSCORE = "_";
 
     private final DataSourceWrapper dataSource;
+
+    private final IdHelper<I> idHelper;
 
     private final String insertSql;
     private final String updateSql;
@@ -117,8 +120,8 @@ class JdbcEntityStorage<I> extends EntityStorage<I> {
         this.selectAllByIdSql = format(SqlDrafts.SELECT_ALL_BY_ID, tableName);
         this.deleteAllSql = format(SqlDrafts.DELETE_ALL, tableName);
 
-        final String createTableSql = format(SqlDrafts.CREATE_TABLE_IF_DOES_NOT_EXIST, tableName);
-        createTableIfDoesNotExist(createTableSql, tableName);
+        this.idHelper = IdHelper.newInstance(entityClass);
+        createTableIfDoesNotExist(tableName);
     }
 
     private String getTableName(Class<? extends Entity<I, ?>> entityClass) {
@@ -126,6 +129,18 @@ class JdbcEntityStorage<I> extends EntityStorage<I> {
         final String tableNameTmp = PATTERN_DOT.matcher(className).replaceAll(UNDERSCORE);
         final String tableName = PATTERN_DOLLAR.matcher(tableNameTmp).replaceAll(UNDERSCORE).toLowerCase();
         return tableName;
+    }
+
+    private void createTableIfDoesNotExist(String tableName) throws DatabaseException {
+        final String idColumnType = idHelper.getIdColumnType();
+        final String createTableSql = format(SqlDrafts.CREATE_TABLE_IF_DOES_NOT_EXIST, tableName, idColumnType);
+        try (ConnectionWrapper connection = dataSource.getConnection(true);
+             PreparedStatement statement = connection.prepareStatement(createTableSql)) {
+            statement.execute();
+        } catch (SQLException e) {
+            log().error("Error while creating a table with the name: " + tableName, e);
+            throw new DatabaseException(e);
+        }
     }
 
     /**
@@ -136,13 +151,12 @@ class JdbcEntityStorage<I> extends EntityStorage<I> {
     @Nullable
     @Override
     protected EntityStorageRecord readInternal(I id) throws DatabaseException {
-        final EntityStorageRecord.Id recordId = toRecordId(id);
         try (ConnectionWrapper connection = dataSource.getConnection(true);
-             PreparedStatement statement = selectByIdStatement(connection, recordId)) {
+             PreparedStatement statement = selectByIdStatement(connection, id)) {
             final EntityStorageRecord result = findById(statement);
             return result;
         } catch (SQLException e) {
-            logTransactionError(recordId, e);
+            logTransactionError(id, e);
             throw new DatabaseException(e);
         }
     }
@@ -156,13 +170,12 @@ class JdbcEntityStorage<I> extends EntityStorage<I> {
     protected void writeInternal(I id, EntityStorageRecord record) throws DatabaseException {
         checkArgument(record.hasState(), "entity state");
 
-        final EntityStorageRecord.Id recordId = toRecordId(id);
         final byte[] serializedRecord = serialize(record);
         try (ConnectionWrapper connection = dataSource.getConnection(false)) {
-            if (containsRecord(connection, recordId)) {
-                update(connection, recordId, serializedRecord);
+            if (containsRecord(connection, id)) {
+                update(connection, id, serializedRecord);
             } else {
-                insert(connection, recordId, serializedRecord);
+                insert(connection, id, serializedRecord);
             }
         }
     }
@@ -194,17 +207,7 @@ class JdbcEntityStorage<I> extends EntityStorage<I> {
         return bytes;
     }
 
-    private void createTableIfDoesNotExist(String sql, String tableName) throws DatabaseException {
-        try (ConnectionWrapper connection = dataSource.getConnection(true);
-             PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.execute();
-        } catch (SQLException e) {
-            log().error("Error while creating a table with name: " + tableName, e);
-            throw new DatabaseException(e);
-        }
-    }
-
-    private boolean containsRecord(ConnectionWrapper connection, EntityStorageRecord.Id id) {
+    private boolean containsRecord(ConnectionWrapper connection, I id) {
         try (PreparedStatement statement = selectByIdStatement(connection, id);
              ResultSet resultSet = statement.executeQuery()) {
             final boolean hasNext = resultSet.next();
@@ -216,7 +219,7 @@ class JdbcEntityStorage<I> extends EntityStorage<I> {
         }
     }
 
-    private void update(ConnectionWrapper connection, EntityStorageRecord.Id id, byte[] serializedEntity) {
+    private void update(ConnectionWrapper connection, I id, byte[] serializedEntity) {
         try (PreparedStatement statement = updateRecordStatement(connection, id, serializedEntity)) {
             statement.execute();
             connection.commit();
@@ -225,7 +228,7 @@ class JdbcEntityStorage<I> extends EntityStorage<I> {
         }
     }
 
-    private void insert(ConnectionWrapper connection, EntityStorageRecord.Id id, byte[] serializedEntity) {
+    private void insert(ConnectionWrapper connection, I id, byte[] serializedEntity) {
         try (PreparedStatement statement = insertRecordStatement(connection, id, serializedEntity)) {
             statement.execute();
             connection.commit();
@@ -235,50 +238,31 @@ class JdbcEntityStorage<I> extends EntityStorage<I> {
     }
 
     private PreparedStatement insertRecordStatement(ConnectionWrapper connection,
-                                                    EntityStorageRecord.Id id,
+                                                    I id,
                                                     byte[] serializedRecord) throws SQLException {
         final PreparedStatement statement = connection.prepareStatement(insertSql);
-        setEntityId(1, id, statement);
+        idHelper.setId(1, id, statement);
         statement.setBytes(2, serializedRecord);
         return statement;
     }
 
     private PreparedStatement updateRecordStatement(ConnectionWrapper connection,
-                                                    EntityStorageRecord.Id id,
+                                                    I id,
                                                     byte[] serializedEntity) throws SQLException {
         final PreparedStatement statement = connection.prepareStatement(updateSql);
         statement.setBytes(1, serializedEntity);
-        setEntityId(2, id, statement);
+        idHelper.setId(2, id, statement);
         return statement;
     }
 
     private PreparedStatement selectByIdStatement(ConnectionWrapper connection,
-                                                  EntityStorageRecord.Id id) throws SQLException {
+                                                  I id) throws SQLException {
         final PreparedStatement statement = connection.prepareStatement(selectAllByIdSql);
-        setEntityId(1, id, statement);
+        idHelper.setId(1, id, statement);
         return statement;
     }
 
-    // TODO:2016-02-01:alexander.litus: find out what IDs to expect on startup
-    private static void setEntityId(int idIndex, EntityStorageRecord.Id id, PreparedStatement statement) throws SQLException {
-        final EntityStorageRecord.Id.TypeCase type = id.getTypeCase();
-        switch (type) {
-            case STRING_VALUE:
-                statement.setString(idIndex, id.getStringValue());
-                break;
-            case LONG_VALUE:
-                statement.setLong(idIndex, id.getLongValue());
-                break;
-            case INT_VALUE:
-                statement.setInt(idIndex, id.getIntValue());
-                break;
-            case TYPE_NOT_SET:
-            default:
-                throw new IllegalArgumentException("Id type is not set.");
-        }
-    }
-
-    private static DatabaseException handleDbException(ConnectionWrapper connection, SQLException e, EntityStorageRecord.Id id) {
+    private DatabaseException handleDbException(ConnectionWrapper connection, SQLException e, I id) {
         logTransactionError(id, e);
         connection.rollback();
         throw new DatabaseException(e);
@@ -308,8 +292,8 @@ class JdbcEntityStorage<I> extends EntityStorage<I> {
         }
     }
 
-    private static void logTransactionError(EntityStorageRecord.Id id, Exception e) {
-        log().error("Error during transaction, entity ID = " + id, e);
+    private void logTransactionError(I id, Exception e) {
+        log().error("Error during transaction, entity ID = " + idToString(id), e);
     }
 
     private static Logger log() {
