@@ -168,7 +168,14 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     protected void writeInternal(I id, AggregateStorageRecord record) throws DatabaseException {
         final byte[] serializedRecord = serialize(record);
         try (ConnectionWrapper connection = dataSource.getConnection(false)) {
-            insert(connection, id, serializedRecord, record);
+            try (PreparedStatement statement = insertRecordStatement(connection, id, serializedRecord, record)) {
+                statement.execute();
+                connection.commit();
+            } catch (SQLException e) {
+                log().error("Error during transaction, aggregate ID = " + idToString(id), e);
+                connection.rollback();
+                throw new DatabaseException(e);
+            }
         }
     }
 
@@ -267,20 +274,6 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
         }
     }
 
-    private void insert(ConnectionWrapper connection,
-                        I id,
-                        byte[] serializedAggregate,
-                        AggregateStorageRecord record) {
-        try (PreparedStatement statement = insertRecordStatement(connection, id, serializedAggregate, record)) {
-            statement.execute();
-            connection.commit();
-        } catch (SQLException e) {
-            logTransactionError(id, e);
-            connection.rollback();
-            throw new DatabaseException(e);
-        }
-    }
-
     private PreparedStatement insertRecordStatement(ConnectionWrapper connection,
                                                     I id,
                                                     byte[] serializedRecord,
@@ -302,10 +295,6 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
         final PreparedStatement statement = connection.prepareStatement(selectByIdSortedByTimeDescSql);
         idHelper.setId(1, id, statement);
         return statement;
-    }
-
-    private void logTransactionError(I id, Exception e) {
-        log().error("Error during transaction, aggregate ID = " + idToString(id), e);
     }
 
     @Override
