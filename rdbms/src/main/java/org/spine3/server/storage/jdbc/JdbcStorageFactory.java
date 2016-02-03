@@ -24,6 +24,8 @@ import com.zaxxer.hikari.HikariConfig;
 import org.spine3.server.Entity;
 import org.spine3.server.aggregate.Aggregate;
 import org.spine3.server.storage.*;
+import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
+import org.spine3.server.storage.jdbc.util.HikariDataSourceWrapper;
 
 import javax.sql.DataSource;
 

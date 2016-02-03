@@ -18,11 +18,13 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.spine3.server.storage.jdbc;
+package org.spine3.server.storage.jdbc.util;
 
+import org.spine3.Internal;
 import org.spine3.server.Entity;
 import org.spine3.server.Identifiers;
 import org.spine3.server.reflect.Classes;
+import org.spine3.server.storage.jdbc.DatabaseException;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -32,7 +34,8 @@ import java.sql.SQLException;
  *
  * @author Alexander Litus
  */
-/*package*/ abstract class IdHelper<I> {
+@Internal
+public abstract class IdHelper<I> {
 
     private static final String TYPE_VARCHAR = "VARCHAR(999)";
 
@@ -50,7 +53,7 @@ import java.sql.SQLException;
      * @return a new helper instance
      */
     @SuppressWarnings("IfMayBeConditional")
-    /*package*/ static <I> IdHelper<I> newInstance(Class<? extends Entity<I, ?>> entityClass) {
+    public static <I> IdHelper<I> newInstance(Class<? extends Entity<I, ?>> entityClass) {
         final IdHelper<I> helper;
         // TODO:2016-02-02:alexander.litus: find out why cannot use storage class instead of entityClass here
         final Class<I> idClass = Classes.getGenericParameterType(entityClass, ENTITY_OR_AGGREGATE_ID_TYPE_GENERIC_PARAM_INDEX);
@@ -67,7 +70,7 @@ import java.sql.SQLException;
     /**
      * Returns the type of ID column.
      */
-    /*package*/ abstract String getIdColumnType();
+    public abstract String getIdColumnType();
 
     /**
      * Sets an ID parameter to the given value.
@@ -76,17 +79,17 @@ import java.sql.SQLException;
      * @param id        the ID value to set
      * @param statement the statement to use
      */
-    /*package*/ abstract void setId(int index, I id, PreparedStatement statement);
+    public abstract void setId(int index, I id, PreparedStatement statement);
 
     private static class LongIdHelper<I> extends IdHelper<I> {
 
         @Override
-        /*package*/ String getIdColumnType() {
+        public String getIdColumnType() {
             return TYPE_BIGINT;
         }
 
         @Override
-        /*package*/ void setId(int index, I id, PreparedStatement statement) {
+        public void setId(int index, I id, PreparedStatement statement) {
             final Long idLong = (Long) id;
             try {
                 statement.setLong(index, idLong);
@@ -99,12 +102,12 @@ import java.sql.SQLException;
     private static class IntIdHelper<I> extends IdHelper<I> {
 
         @Override
-        /*package*/ String getIdColumnType() {
+        public String getIdColumnType() {
             return TYPE_INT;
         }
 
         @Override
-        /*package*/ void setId(int index, I id, PreparedStatement statement) {
+        public void setId(int index, I id, PreparedStatement statement) {
             final Integer idInt = (Integer) id;
             try {
                 statement.setInt(index, idInt);
@@ -117,12 +120,12 @@ import java.sql.SQLException;
     private static class StringOrMessageIdHelper<I> extends IdHelper<I> {
 
         @Override
-        /*package*/ String getIdColumnType() {
+        public String getIdColumnType() {
             return TYPE_VARCHAR;
         }
 
         @Override
-        /*package*/ void setId(int index, I id, PreparedStatement statement) {
+        public void setId(int index, I id, PreparedStatement statement) {
             final String idString = Identifiers.idToString(id);
             try {
                 statement.setString(index, idString);

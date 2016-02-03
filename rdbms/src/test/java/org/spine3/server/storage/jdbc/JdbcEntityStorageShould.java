@@ -28,6 +28,8 @@ import org.junit.Test;
 import org.spine3.server.storage.EntityStorage;
 import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.EntityStorageShould;
+import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
+import org.spine3.server.storage.jdbc.util.HikariDataSourceWrapper;
 
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;

@@ -18,7 +18,9 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.spine3.server.storage.jdbc;
+package org.spine3.server.storage.jdbc.util;
+
+import org.spine3.Internal;
 
 import java.util.regex.Pattern;
 
@@ -28,7 +30,8 @@ import java.util.regex.Pattern;
  * @author Alexander Litus
  */
 @SuppressWarnings("UtilityClass")
-/*package*/ class DbTableNamesEscaper {
+@Internal
+public class DbTableNamesEscaper {
 
     private static final Pattern PATTERN_DOT = Pattern.compile("\\.");
     private static final Pattern PATTERN_DOLLAR = Pattern.compile("\\$");
@@ -44,7 +47,7 @@ import java.util.regex.Pattern;
      * @param clazz a class which name to use
      * @return a valid DB table name
      */
-    /*package*/ static String toTableName(Class clazz) {
+    public static String toTableName(Class clazz) {
         final String className = clazz.getName();
         final String tableNameTmp = PATTERN_DOT.matcher(className).replaceAll(UNDERSCORE);
         final String result = PATTERN_DOLLAR.matcher(tableNameTmp).replaceAll(UNDERSCORE).toLowerCase();

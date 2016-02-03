@@ -29,6 +29,10 @@ import org.spine3.server.Entity;
 import org.spine3.server.EntityId;
 import org.spine3.server.storage.EntityStorage;
 import org.spine3.server.storage.EntityStorageRecord;
+import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
+import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
+import org.spine3.server.storage.jdbc.util.DbTableNamesEscaper;
+import org.spine3.server.storage.jdbc.util.IdHelper;
 import org.spine3.type.TypeName;
 
 import javax.annotation.Nullable;

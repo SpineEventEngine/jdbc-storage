@@ -30,6 +30,10 @@ import org.spine3.server.EntityId;
 import org.spine3.server.aggregate.Aggregate;
 import org.spine3.server.storage.AggregateStorage;
 import org.spine3.server.storage.AggregateStorageRecord;
+import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
+import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
+import org.spine3.server.storage.jdbc.util.DbTableNamesEscaper;
+import org.spine3.server.storage.jdbc.util.IdHelper;
 import org.spine3.type.TypeName;
 
 import java.sql.PreparedStatement;
