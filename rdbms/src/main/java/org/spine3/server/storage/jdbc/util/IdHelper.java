@@ -55,7 +55,6 @@ public abstract class IdHelper<I> {
     @SuppressWarnings("IfMayBeConditional")
     public static <I> IdHelper<I> newInstance(Class<? extends Entity<I, ?>> entityClass) {
         final IdHelper<I> helper;
-        // TODO:2016-02-02:alexander.litus: find out why cannot use storage class instead of entityClass here
         final Class<I> idClass = Classes.getGenericParameterType(entityClass, ENTITY_OR_AGGREGATE_ID_TYPE_GENERIC_PARAM_INDEX);
         if (Long.class.isAssignableFrom(idClass)) {
             helper = new LongIdHelper<>();
