@@ -75,7 +75,7 @@ class JdbcEntityStorage<I> extends EntityStorage<I> {
                 " SET " + ENTITY + " = ? " +
                 " WHERE " + ID + " = ?;";
 
-        static final String SELECT_ALL_BY_ID = "SELECT " + ENTITY +" FROM %s WHERE " + ID + " = ?;";
+        static final String SELECT_ALL_BY_ID = "SELECT " + ENTITY + " FROM %s WHERE " + ID + " = ?;";
 
         static final String DELETE_ALL = "DELETE FROM %s;";
 
@@ -237,26 +237,29 @@ class JdbcEntityStorage<I> extends EntityStorage<I> {
         }
     }
 
-    private PreparedStatement insertRecordStatement(ConnectionWrapper connection,
-                                                    I id,
-                                                    byte[] serializedRecord) throws SQLException {
-        final PreparedStatement statement = connection.prepareStatement(insertSql);
-        idHelper.setId(1, id, statement);
-        statement.setBytes(2, serializedRecord);
-        return statement;
+    private PreparedStatement insertRecordStatement(ConnectionWrapper connection, I id, byte[] serializedRecord) {
+        try {
+            final PreparedStatement statement = connection.prepareStatement(insertSql);
+            idHelper.setId(1, id, statement);
+            statement.setBytes(2, serializedRecord);
+            return statement;
+        } catch (SQLException e) {
+            throw new DatabaseException(e);
+        }
     }
 
-    private PreparedStatement updateRecordStatement(ConnectionWrapper connection,
-                                                    I id,
-                                                    byte[] serializedEntity) throws SQLException {
-        final PreparedStatement statement = connection.prepareStatement(updateSql);
-        statement.setBytes(1, serializedEntity);
-        idHelper.setId(2, id, statement);
-        return statement;
+    private PreparedStatement updateRecordStatement(ConnectionWrapper connection, I id, byte[] serializedEntity) {
+        try {
+            final PreparedStatement statement = connection.prepareStatement(updateSql);
+            statement.setBytes(1, serializedEntity);
+            idHelper.setId(2, id, statement);
+            return statement;
+        } catch (SQLException e) {
+            throw new DatabaseException(e);
+        }
     }
 
-    private PreparedStatement selectByIdStatement(ConnectionWrapper connection,
-                                                  I id) throws SQLException {
+    private PreparedStatement selectByIdStatement(ConnectionWrapper connection, I id) {
         final PreparedStatement statement = connection.prepareStatement(selectAllByIdSql);
         idHelper.setId(1, id, statement);
         return statement;
