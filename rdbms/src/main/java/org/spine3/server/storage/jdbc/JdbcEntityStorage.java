@@ -38,6 +38,7 @@ import java.sql.SQLException;
 import java.util.regex.Pattern;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static java.lang.String.*;
 import static org.spine3.protobuf.Messages.fromAny;
 import static org.spine3.protobuf.Messages.toAny;
 
@@ -90,7 +91,6 @@ class JdbcEntityStorage<I> extends EntityStorage<I> {
     private static final String UNDERSCORE = "_";
 
     private final DataSourceWrapper dataSource;
-    private final String tableName;
 
     private final String insertSql;
     private final String updateSql;
@@ -110,20 +110,22 @@ class JdbcEntityStorage<I> extends EntityStorage<I> {
 
     private JdbcEntityStorage(DataSourceWrapper dataSource, Class<? extends Entity<I, ?>> entityClass) {
         this.dataSource = dataSource;
-        final String className = entityClass.getName();
-        final String tableNameTmp = PATTERN_DOT.matcher(className).replaceAll(UNDERSCORE);
-        this.tableName = PATTERN_DOLLAR.matcher(tableNameTmp).replaceAll(UNDERSCORE).toLowerCase();
 
-        this.insertSql = setTableName(SqlDrafts.INSERT_RECORD);
-        this.updateSql = setTableName(SqlDrafts.UPDATE_RECORD);
-        this.selectAllByIdSql = setTableName(SqlDrafts.SELECT_ALL_BY_ID);
-        this.deleteAllSql = setTableName(SqlDrafts.DELETE_ALL);
-        final String createTableSql = setTableName(SqlDrafts.CREATE_TABLE_IF_DOES_NOT_EXIST);
-        createTableIfDoesNotExist(createTableSql, this.tableName);
+        final String tableName = getTableName(entityClass);
+        this.insertSql = format(SqlDrafts.INSERT_RECORD, tableName);
+        this.updateSql = format(SqlDrafts.UPDATE_RECORD, tableName);
+        this.selectAllByIdSql = format(SqlDrafts.SELECT_ALL_BY_ID, tableName);
+        this.deleteAllSql = format(SqlDrafts.DELETE_ALL, tableName);
+
+        final String createTableSql = format(SqlDrafts.CREATE_TABLE_IF_DOES_NOT_EXIST, tableName);
+        createTableIfDoesNotExist(createTableSql, tableName);
     }
 
-    private String setTableName(String sql) {
-        return String.format(sql, tableName);
+    private String getTableName(Class<? extends Entity<I, ?>> entityClass) {
+        final String className = entityClass.getName();
+        final String tableNameTmp = PATTERN_DOT.matcher(className).replaceAll(UNDERSCORE);
+        final String tableName = PATTERN_DOLLAR.matcher(tableNameTmp).replaceAll(UNDERSCORE).toLowerCase();
+        return tableName;
     }
 
     /**
