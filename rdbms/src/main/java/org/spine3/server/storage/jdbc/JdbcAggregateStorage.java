@@ -28,7 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spine3.server.EntityId;
 import org.spine3.server.aggregate.Aggregate;
-import org.spine3.server.reflect.Classes;
 import org.spine3.server.storage.AggregateStorage;
 import org.spine3.server.storage.AggregateStorageRecord;
 import org.spine3.type.TypeName;
@@ -42,6 +41,7 @@ import java.util.Iterator;
 import java.util.regex.Pattern;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.lang.String.*;
 import static org.spine3.io.IoUtil.closeAll;
 import static org.spine3.protobuf.Messages.fromAny;
 import static org.spine3.protobuf.Messages.toAny;
@@ -74,8 +74,6 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
      * Aggregate event nanoseconds column name.
      */
     private static final String NANOSECONDS = "nanoseconds";
-
-    private static final int AGGREGATE_ID_TYPE_GENERIC_PARAM_INDEX = 0;
 
     @SuppressWarnings({"UtilityClass", "DuplicateStringLiteralInspection"})
     private static class SqlDrafts {
@@ -135,10 +133,10 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
         this.dataSource = dataSource;
 
         final String tableName = getTableName(aggregateClass);
-        this.insertSql = String.format(SqlDrafts.INSERT_RECORD, tableName);
-        this.selectByIdSortedByTimeDescSql = String.format(SqlDrafts.SELECT_BY_ID_SORTED_BY_TIME_DESC, tableName);
+        this.insertSql = format(SqlDrafts.INSERT_RECORD, tableName);
+        this.selectByIdSortedByTimeDescSql = format(SqlDrafts.SELECT_BY_ID_SORTED_BY_TIME_DESC, tableName);
 
-        this.idHelper = createHelper(aggregateClass);
+        this.idHelper = IdHelper.newInstance(aggregateClass);
         createTableIfDoesNotExist(tableName);
     }
 
@@ -148,24 +146,9 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
         return PATTERN_DOLLAR.matcher(tableNameTmp).replaceAll(UNDERSCORE).toLowerCase();
     }
 
-    @SuppressWarnings("IfMayBeConditional")
-    private IdHelper<I> createHelper(Class<? extends Aggregate> aggregateClass) {
-        final IdHelper<I> helper;
-        // TODO:2016-02-02:alexander.litus: find out why cannot use getClass() instead of aggregateClass here
-        final Class<I> idClass = Classes.getGenericParameterType(aggregateClass, AGGREGATE_ID_TYPE_GENERIC_PARAM_INDEX);
-        if (Long.class.isAssignableFrom(idClass)) {
-            helper = new IdHelper.LongIdHelper<>();
-        } else if (Integer.class.isAssignableFrom(idClass)) {
-            helper = new IdHelper.IntIdHelper<>();
-        } else {
-            helper = new IdHelper.StringOrMessageIdHelper<>();
-        }
-        return helper;
-    }
-
     private void createTableIfDoesNotExist(String tableName) throws DatabaseException {
         final String idColumnType = idHelper.getIdColumnType();
-        final String createTableSql = String.format(SqlDrafts.CREATE_TABLE_IF_DOES_NOT_EXIST, tableName, idColumnType);
+        final String createTableSql = format(SqlDrafts.CREATE_TABLE_IF_DOES_NOT_EXIST, tableName, idColumnType);
         try (ConnectionWrapper connection = dataSource.getConnection(true);
              PreparedStatement statement = connection.prepareStatement(createTableSql)) {
             statement.execute();

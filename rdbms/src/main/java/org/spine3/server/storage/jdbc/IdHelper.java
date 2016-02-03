@@ -21,6 +21,8 @@
 package org.spine3.server.storage.jdbc;
 
 import org.spine3.server.Identifiers;
+import org.spine3.server.aggregate.Aggregate;
+import org.spine3.server.reflect.Classes;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -38,22 +40,40 @@ import java.sql.SQLException;
 
     private static final String TYPE_INT = "INT";
 
+    private static final int AGGREGATE_ID_TYPE_GENERIC_PARAM_INDEX = 0;
+
+    @SuppressWarnings("IfMayBeConditional")
+    /*package*/ static <I> IdHelper<I> newInstance(Class<? extends Aggregate> aggregateClass) {
+        final IdHelper<I> helper;
+        // TODO:2016-02-02:alexander.litus: find out why cannot use storage class instead of aggregateClass here
+        final Class<I> idClass = Classes.getGenericParameterType(aggregateClass, AGGREGATE_ID_TYPE_GENERIC_PARAM_INDEX);
+        if (Long.class.isAssignableFrom(idClass)) {
+            helper = new LongIdHelper<>();
+        } else if (Integer.class.isAssignableFrom(idClass)) {
+            helper = new IntIdHelper<>();
+        } else {
+            helper = new StringOrMessageIdHelper<>();
+        }
+        return helper;
+    }
 
     /**
      * Returns the type of ID column.
      */
-    /*package*/ abstract String getIdColumnType();
+    /*package*/
+    abstract String getIdColumnType();
 
     /**
      * Sets an ID parameter to the given value.
      *
-     * @param index the ID parameter index
-     * @param id the ID value to set
+     * @param index     the ID parameter index
+     * @param id        the ID value to set
      * @param statement the statement to use
      */
-    /*package*/ abstract void setId(int index, I id, PreparedStatement statement);
+    /*package*/
+    abstract void setId(int index, I id, PreparedStatement statement);
 
-    /*package*/ static class LongIdHelper<I> extends IdHelper<I> {
+    private static class LongIdHelper<I> extends IdHelper<I> {
 
         @Override
         /*package*/ String getIdColumnType() {
@@ -71,7 +91,7 @@ import java.sql.SQLException;
         }
     }
 
-    /*package*/ static class IntIdHelper<I> extends IdHelper<I> {
+    private static class IntIdHelper<I> extends IdHelper<I> {
 
         @Override
         /*package*/ String getIdColumnType() {
@@ -89,7 +109,7 @@ import java.sql.SQLException;
         }
     }
 
-    /*package*/ static class StringOrMessageIdHelper<I> extends IdHelper<I> {
+    private static class StringOrMessageIdHelper<I> extends IdHelper<I> {
 
         @Override
         /*package*/ String getIdColumnType() {
