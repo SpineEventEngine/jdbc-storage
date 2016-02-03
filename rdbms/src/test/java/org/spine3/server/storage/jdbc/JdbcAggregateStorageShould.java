@@ -23,7 +23,9 @@ package org.spine3.server.storage.jdbc;
 import com.zaxxer.hikari.HikariConfig;
 import org.junit.After;
 import org.junit.Test;
+import org.spine3.base.Event;
 import org.spine3.server.aggregate.Aggregate;
+import org.spine3.server.storage.AggregateEvents;
 import org.spine3.server.storage.AggregateStorage;
 import org.spine3.server.storage.AggregateStorageShould;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
@@ -31,8 +33,11 @@ import org.spine3.server.storage.jdbc.util.HikariDataSourceWrapper;
 import org.spine3.test.project.Project;
 import org.spine3.test.project.ProjectId;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.spine3.server.Identifiers.newUuid;
 import static org.spine3.testdata.TestAggregateIdFactory.createProjectId;
+import static org.spine3.testdata.TestEventFactory.projectCreated;
 
 /**
  * @author Alexander Litus
@@ -45,19 +50,19 @@ public class JdbcAggregateStorageShould extends AggregateStorageShould {
      */
     private static final String DB_URL = "jdbc:hsqldb:mem:aggregateStorageTests";
 
-    private final JdbcAggregateStorage<ProjectId> storage = newStorage();
+    private final JdbcAggregateStorage<ProjectId> storage = newStorage(TestAggregateWithIdMessage.class);
 
     @Override
     protected AggregateStorage<ProjectId> getStorage() {
         return storage;
     }
 
-    private static JdbcAggregateStorage<ProjectId> newStorage() {
+    private static <I> JdbcAggregateStorage<I> newStorage(Class<? extends Aggregate<I, ?>> aggregateClass) {
         final HikariConfig config = new HikariConfig();
         config.setJdbcUrl(DB_URL);
         // not setting username and password is OK for in-memory database
         final DataSourceWrapper dataSource = HikariDataSourceWrapper.newInstance(config);
-        return JdbcAggregateStorage.newInstance(dataSource, TestAggregate.class);
+        return JdbcAggregateStorage.newInstance(dataSource, aggregateClass);
     }
 
     @After
@@ -67,7 +72,7 @@ public class JdbcAggregateStorageShould extends AggregateStorageShould {
 
     @Test
     public void close_itself() {
-        final JdbcAggregateStorage<ProjectId> storage = newStorage();
+        final JdbcAggregateStorage<ProjectId> storage = newStorage(TestAggregateWithIdMessage.class);
         storage.close();
         try {
             storage.historyBackward(createProjectId("anyId"));
@@ -78,8 +83,59 @@ public class JdbcAggregateStorageShould extends AggregateStorageShould {
         fail("Aggregate storage should close itself.");
     }
 
-    public static class TestAggregate extends Aggregate<ProjectId, Project> {
-        public TestAggregate(ProjectId id) {
+    @Test
+    public void write_and_read_event_by_String_id() {
+        final JdbcAggregateStorage<String> storage = newStorage(TestAggregateWithIdString.class);
+        final String id = newUuid();
+        testWriteAndReadEvent(id, storage);
+    }
+
+    @Test
+    public void write_and_read_event_by_Long_id() {
+        final JdbcAggregateStorage<Long> storage = newStorage(TestAggregateWithIdLong.class);
+        final long id = 10L;
+        testWriteAndReadEvent(id, storage);
+    }
+
+    @Test
+    public void write_and_read_event_by_Integer_id() {
+        final JdbcAggregateStorage<Integer> storage = newStorage(TestAggregateWithIdInteger.class);
+        final int id = 10;
+        testWriteAndReadEvent(id, storage);
+    }
+
+    private static <I> void testWriteAndReadEvent(I id, JdbcAggregateStorage<I> storage) {
+        final Event expectedEvent = projectCreated();
+
+        storage.writeEvent(id, expectedEvent);
+
+        final AggregateEvents events = storage.read(id);
+        assertEquals(1, events.getEventCount());
+        final Event actualEvent = events.getEvent(0);
+
+        assertEquals(expectedEvent, actualEvent);
+    }
+
+    private static class TestAggregateWithIdMessage extends Aggregate<ProjectId, Project> {
+        private TestAggregateWithIdMessage(ProjectId id) {
+            super(id);
+        }
+    }
+
+    private static class TestAggregateWithIdString extends Aggregate<String, Project> {
+        private TestAggregateWithIdString(String id) {
+            super(id);
+        }
+    }
+
+    private static class TestAggregateWithIdInteger extends Aggregate<Integer, Project> {
+        private TestAggregateWithIdInteger(Integer id) {
+            super(id);
+        }
+    }
+
+    private static class TestAggregateWithIdLong extends Aggregate<Long, Project> {
+        private TestAggregateWithIdLong(Long id) {
             super(id);
         }
     }
