@@ -38,7 +38,6 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.regex.Pattern;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
@@ -115,11 +114,6 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     private final String insertSql;
     private final String selectByIdSortedByTimeDescSql;
 
-    // TODO:2016-01-26:alexander.litus: move to Escaper class
-    private static final Pattern PATTERN_DOT = Pattern.compile("\\.");
-    private static final Pattern PATTERN_DOLLAR = Pattern.compile("\\$");
-    private static final String UNDERSCORE = "_";
-
     /**
      * Creates a new storage instance.
      *
@@ -133,18 +127,12 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     private JdbcAggregateStorage(DataSourceWrapper dataSource, Class<? extends Aggregate<I, ?>> aggregateClass) {
         this.dataSource = dataSource;
 
-        final String tableName = getTableName(aggregateClass);
+        final String tableName = DbTableNamesEscaper.toTableName(aggregateClass);
         this.insertSql = format(SqlDrafts.INSERT_RECORD, tableName);
         this.selectByIdSortedByTimeDescSql = format(SqlDrafts.SELECT_BY_ID_SORTED_BY_TIME_DESC, tableName);
 
         this.idHelper = IdHelper.newInstance(aggregateClass);
         createTableIfDoesNotExist(tableName);
-    }
-
-    private static String getTableName(Class aggregateClass) {
-        final String className = aggregateClass.getName();
-        final String tableNameTmp = PATTERN_DOT.matcher(className).replaceAll(UNDERSCORE);
-        return PATTERN_DOLLAR.matcher(tableNameTmp).replaceAll(UNDERSCORE).toLowerCase();
     }
 
     private void createTableIfDoesNotExist(String tableName) throws DatabaseException {

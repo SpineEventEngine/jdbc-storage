@@ -35,7 +35,6 @@ import javax.annotation.Nullable;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.regex.Pattern;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.lang.String.format;
@@ -87,10 +86,6 @@ class JdbcEntityStorage<I> extends EntityStorage<I> {
                 ");";
     }
 
-    private static final Pattern PATTERN_DOT = Pattern.compile("\\.");
-    private static final Pattern PATTERN_DOLLAR = Pattern.compile("\\$");
-    private static final String UNDERSCORE = "_";
-
     private final DataSourceWrapper dataSource;
 
     private final IdHelper<I> idHelper;
@@ -114,7 +109,7 @@ class JdbcEntityStorage<I> extends EntityStorage<I> {
     private JdbcEntityStorage(DataSourceWrapper dataSource, Class<? extends Entity<I, ?>> entityClass) {
         this.dataSource = dataSource;
 
-        final String tableName = getTableName(entityClass);
+        final String tableName = DbTableNamesEscaper.toTableName(entityClass);
         this.insertSql = format(SqlDrafts.INSERT_RECORD, tableName);
         this.updateSql = format(SqlDrafts.UPDATE_RECORD, tableName);
         this.selectAllByIdSql = format(SqlDrafts.SELECT_ALL_BY_ID, tableName);
@@ -122,13 +117,6 @@ class JdbcEntityStorage<I> extends EntityStorage<I> {
 
         this.idHelper = IdHelper.newInstance(entityClass);
         createTableIfDoesNotExist(tableName);
-    }
-
-    private String getTableName(Class<? extends Entity<I, ?>> entityClass) {
-        final String className = entityClass.getName();
-        final String tableNameTmp = PATTERN_DOT.matcher(className).replaceAll(UNDERSCORE);
-        final String tableName = PATTERN_DOLLAR.matcher(tableNameTmp).replaceAll(UNDERSCORE).toLowerCase();
-        return tableName;
     }
 
     private void createTableIfDoesNotExist(String tableName) throws DatabaseException {
