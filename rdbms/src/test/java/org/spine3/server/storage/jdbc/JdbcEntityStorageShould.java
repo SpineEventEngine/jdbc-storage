@@ -24,15 +24,20 @@ import com.google.protobuf.StringValue;
 import com.google.protobuf.util.TimeUtil;
 import com.zaxxer.hikari.HikariConfig;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Test;
+import org.spine3.server.Entity;
+import org.spine3.server.storage.EntityStorage;
 import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.EntityStorageShould;
+import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
+import org.spine3.server.storage.jdbc.util.HikariDataSourceWrapper;
+import org.spine3.test.project.Project;
+import org.spine3.test.project.ProjectId;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.spine3.protobuf.Messages.toAny;
-import static org.spine3.util.Identifiers.newUuid;
+import static org.spine3.server.Identifiers.newUuid;
+import static org.spine3.testdata.TestAggregateIdFactory.createProjectId;
 
 /**
  * @author Alexander Litus
@@ -41,45 +46,66 @@ import static org.spine3.util.Identifiers.newUuid;
 public class JdbcEntityStorageShould extends EntityStorageShould {
 
     /**
-     * The URL of in-memory HyperSQL DB.
+     * The URL of the in-memory HyperSQL DB.
      */
     private static final String DB_URL = "jdbc:hsqldb:mem:entitytests";
 
-    private static final DataSourceWrapper DATA_SOURCE = newDataSource();
+    private final JdbcEntityStorage<String> storage = newStorage(TestEntityWithIdString.class);
 
-    private static final JdbcEntityStorage<String> STORAGE = newStorage(DATA_SOURCE);
-
-    public JdbcEntityStorageShould() {
-        super(STORAGE);
+    @Override
+    protected EntityStorage<String> getStorage() {
+        return storage;
     }
 
-    private static DataSourceWrapper newDataSource() {
+    private static <I> JdbcEntityStorage<I> newStorage(Class<? extends Entity<I, ?>> entityClass) {
         final HikariConfig config = new HikariConfig();
         config.setJdbcUrl(DB_URL);
-        // username and password are not required for such a database
-        return HikariDataSourceWrapper.newInstance(config);
-    }
-
-    private static JdbcEntityStorage<String> newStorage(DataSourceWrapper db) {
-        return JdbcEntityStorage.newInstance(db, JdbcStorageFactoryShould.TestEntity.class);
+        // not setting username and password is OK for in-memory database
+        final DataSourceWrapper dataSource = HikariDataSourceWrapper.newInstance(config);
+        return JdbcEntityStorage.newInstance(dataSource, entityClass);
     }
 
     @After
     public void tearDownTest() {
-        STORAGE.clear();
+        storage.close();
     }
 
-    @AfterClass
-    public static void tearDownClass() {
-        STORAGE.close();
+    @Test
+    public void write_and_read_record_by_Message_id() {
+        final JdbcEntityStorage<ProjectId> storage = newStorage(TestEntityWithIdMessage.class);
+        final ProjectId id = createProjectId(newUuid());
+        testWriteAndReadRecord(id, storage);
+    }
+
+    @Test
+    public void write_and_read_record_by_Long_id() {
+        final JdbcEntityStorage<Long> storage = newStorage(TestEntityWithIdLong.class);
+        final long id = 10L;
+        testWriteAndReadRecord(id, storage);
+    }
+
+    @Test
+    public void write_and_read_record_by_Integer_id() {
+        final JdbcEntityStorage<Integer> storage = newStorage(TestEntityWithIdInteger.class);
+        final int id = 10;
+        testWriteAndReadRecord(id, storage);
+    }
+
+    private static <I> void testWriteAndReadRecord(I id, JdbcEntityStorage<I> storage) {
+        final EntityStorageRecord expectedRecord = newEntityRecord();
+
+        storage.write(id, expectedRecord);
+        final EntityStorageRecord actualRecord = storage.read(id);
+
+        assertEquals(expectedRecord, actualRecord);
     }
 
     @Test
     public void close_itself() {
-        final JdbcEntityStorage<String> storage = newStorage(newDataSource());
+        final JdbcEntityStorage<String> storage = newStorage(TestEntityWithIdString.class);
         storage.close();
         try {
-            storage.read("any-id");
+            storage.readInternal("any-id");
         } catch (DatabaseException ignored) {
             // is OK because the storage is closed
             return;
@@ -89,23 +115,45 @@ public class JdbcEntityStorageShould extends EntityStorageShould {
 
     @Test
     public void clear_itself() {
-        final String idString = newUuid();
-        final EntityStorageRecord record = newEntityRecord(newUuid(), idString);
-        STORAGE.write(record);
-        STORAGE.clear();
+        final String id = newUuid();
+        final EntityStorageRecord record = newEntityRecord();
+        storage.writeInternal(id, record);
+        storage.clear();
 
-        final EntityStorageRecord actual = STORAGE.read(idString);
+        final EntityStorageRecord actual = storage.readInternal(id);
         assertNull(actual);
     }
 
-    private static EntityStorageRecord newEntityRecord(String value, String id) {
-        final EntityStorageRecord.Id recordId = EntityStorageRecord.Id.newBuilder().setStringValue(id).build();
+    private static EntityStorageRecord newEntityRecord() {
         final StringValue stringValue = StringValue.newBuilder().setValue(newUuid()).build();
         final EntityStorageRecord.Builder builder = EntityStorageRecord.newBuilder()
                 .setState(toAny(stringValue))
-                .setId(recordId)
                 .setVersion(5) // set any non-default value
                 .setWhenModified(TimeUtil.getCurrentTime());
         return builder.build();
+    }
+
+    private static class TestEntityWithIdMessage extends Entity<ProjectId, Project> {
+        private TestEntityWithIdMessage(ProjectId id) {
+            super(id);
+        }
+    }
+
+    private static class TestEntityWithIdString extends Entity<String, Project> {
+        private TestEntityWithIdString(String id) {
+            super(id);
+        }
+    }
+
+    private static class TestEntityWithIdInteger extends Entity<Integer, Project> {
+        private TestEntityWithIdInteger(Integer id) {
+            super(id);
+        }
+    }
+
+    private static class TestEntityWithIdLong extends Entity<Long, Project> {
+        private TestEntityWithIdLong(Long id) {
+            super(id);
+        }
     }
 }

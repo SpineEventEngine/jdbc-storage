@@ -24,6 +24,8 @@ import com.zaxxer.hikari.HikariConfig;
 import org.spine3.server.Entity;
 import org.spine3.server.aggregate.Aggregate;
 import org.spine3.server.storage.*;
+import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
+import org.spine3.server.storage.jdbc.util.HikariDataSourceWrapper;
 
 import javax.sql.DataSource;
 
@@ -62,13 +64,9 @@ public class JdbcStorageFactory implements StorageFactory {
         return null;
     }
 
-    /**
-     * NOTE: the parameter is not used.
-     */
     @Override
-    public <I> AggregateStorage<I> createAggregateStorage(Class<? extends Aggregate<I, ?>> unused) {
-        // TODO:2016-01-05:alexander.litus: impl
-        return null;
+    public <I> AggregateStorage<I> createAggregateStorage(Class<? extends Aggregate<I, ?>> aggregateClass) {
+        return JdbcAggregateStorage.newInstance(dataSource, aggregateClass);
     }
 
     @Override
@@ -77,8 +75,9 @@ public class JdbcStorageFactory implements StorageFactory {
     }
 
     @Override
-    public void init() {
-        // NOP
+    public <I> ProjectionStorage<I> createProjectionStorage() {
+        // TODO:2016-01-05:alexander.litus: impl
+        return null;
     }
 
     @Override

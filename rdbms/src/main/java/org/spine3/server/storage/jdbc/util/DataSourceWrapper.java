@@ -18,7 +18,10 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.spine3.server.storage.jdbc;
+package org.spine3.server.storage.jdbc.util;
+
+import org.spine3.Internal;
+import org.spine3.server.storage.jdbc.DatabaseException;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -29,12 +32,13 @@ import java.sql.SQLException;
  *
  * @author Alexander Litus
  */
-abstract class DataSourceWrapper implements AutoCloseable {
+@Internal
+public abstract class DataSourceWrapper implements AutoCloseable {
 
     /**
      * Returns the implementation of {@link DataSource}.
      */
-    protected abstract DataSource getDataSource();
+    public abstract DataSource getDataSource();
 
     /**
      * Retrieves a wrapped connection with the given auto commit mode.
@@ -42,7 +46,7 @@ abstract class DataSourceWrapper implements AutoCloseable {
      * @throws DatabaseException if an error occurs during an interaction with the DB
      * @see Connection#setAutoCommit(boolean)
      */
-    protected ConnectionWrapper getConnection(boolean autoCommit) throws DatabaseException {
+    public ConnectionWrapper getConnection(boolean autoCommit) throws DatabaseException {
         try {
             final DataSource dataSource = getDataSource();
             final Connection connection = dataSource.getConnection();
@@ -54,7 +58,6 @@ abstract class DataSourceWrapper implements AutoCloseable {
         }
     }
 
-    // Is overridden to do not throw {@link Exception}.
     @Override
-    public abstract void close();
+    public abstract void close() throws DatabaseException;
 }
