@@ -46,9 +46,6 @@ import static org.spine3.testdata.TestEventFactory.projectCreated;
 @SuppressWarnings("InstanceMethodNamingConvention")
 public class JdbcAggregateStorageShould extends AggregateStorageShould {
 
-    /**
-     * The URL of an in-memory DB.
-     */
     private static final String DB_URL = getInMemoryDbUrl("aggregateStorageTests");
 
     private final JdbcAggregateStorage<ProjectId> storage = newStorage(TestAggregateWithIdMessage.class);

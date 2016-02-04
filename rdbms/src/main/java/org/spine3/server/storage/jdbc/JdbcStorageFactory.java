@@ -60,8 +60,7 @@ public class JdbcStorageFactory implements StorageFactory {
 
     @Override
     public EventStorage createEventStorage() {
-        // TODO:2016-01-05:alexander.litus: impl
-        return null;
+        return JdbcEventStorage.newInstance(dataSource);
     }
 
     @Override

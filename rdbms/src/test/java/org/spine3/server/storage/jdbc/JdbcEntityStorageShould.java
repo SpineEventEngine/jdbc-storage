@@ -46,9 +46,6 @@ import static org.spine3.testdata.TestAggregateIdFactory.createProjectId;
 @SuppressWarnings("InstanceMethodNamingConvention")
 public class JdbcEntityStorageShould extends EntityStorageShould {
 
-    /**
-     * The URL of an in-memory DB.
-     */
     private static final String DB_URL = getInMemoryDbUrl("entityTests");
 
     private final JdbcEntityStorage<String> storage = newStorage(TestEntityWithIdString.class);
