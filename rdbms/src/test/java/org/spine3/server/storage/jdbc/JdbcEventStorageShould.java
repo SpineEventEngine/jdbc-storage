@@ -27,16 +27,13 @@ import org.spine3.server.storage.EventStorageShould;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.HikariDataSourceWrapper;
 
-import static org.spine3.server.storage.jdbc.JdbcStorageFactoryShould.*;
+import static org.spine3.server.storage.jdbc.JdbcStorageFactoryShould.getInMemoryDbUrl;
 
 /**
  * @author Alexander Litus
  */
 public class JdbcEventStorageShould extends EventStorageShould {
 
-    /**
-     * The URL of an in-memory DB.
-     */
     private static final String DB_URL = getInMemoryDbUrl("eventStorageTests");
 
     private final JdbcEventStorage storage = newStorage();
@@ -56,6 +53,7 @@ public class JdbcEventStorageShould extends EventStorageShould {
 
     @After
     public void tearDownTest() {
+        storage.clear();// TODO:2016-02-04:alexander.litus: find out why we have to clear
         storage.close();
     }
 }

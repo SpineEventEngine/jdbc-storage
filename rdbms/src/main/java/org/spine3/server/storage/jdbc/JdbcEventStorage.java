@@ -23,10 +23,14 @@ package org.spine3.server.storage.jdbc;
 import com.google.protobuf.Any;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.Message;
+import com.google.protobuf.Timestamp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spine3.base.Event;
 import org.spine3.base.EventId;
+import org.spine3.protobuf.Messages;
+import org.spine3.server.Identifiers;
+import org.spine3.server.event.EventFilter;
 import org.spine3.server.event.EventStreamQuery;
 import org.spine3.server.storage.EventStorage;
 import org.spine3.server.storage.EventStorageRecord;
@@ -38,8 +42,11 @@ import javax.annotation.Nullable;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.Iterator;
 
+import static com.google.common.collect.Lists.newLinkedList;
+import static org.spine3.io.IoUtil.closeAll;
 import static org.spine3.protobuf.Messages.fromAny;
 import static org.spine3.protobuf.Messages.toAny;
 
@@ -62,37 +69,68 @@ public class JdbcEventStorage extends EventStorage {
         /**
          * Event ID column name.
          */
-        static final String ID = "id";
+        static final String EVENT_ID = "event_id";
 
         /**
          * Event record column name.
          */
         static final String EVENT = "event";
 
+        /**
+         * Protobuf type name of the event column name.
+         */
+        static final String EVENT_TYPE = "event_type";
+
+        /**
+         * Aggregate ID column name.
+         */
+        static final String AGGREGATE_ID = "aggregate_id";
+
+        /**
+         * Event seconds column name.
+         */
+        static final String SECONDS = "seconds";
+
+        /**
+         * Event nanoseconds column name.
+         */
+        static final String NANOSECONDS = "nanoseconds";
+
+        // TODO:2016-02-04:alexander.litus: classes for each query
         static final String INSERT_RECORD =
-                "INSERT INTO " + TABLE_NAME +
-                " (" + ID + ", " + EVENT + ')' +
-                " VALUES (?, ?);";
+                "INSERT INTO " + TABLE_NAME + " (" +
+                    EVENT_ID + ", " +
+                    EVENT + ", " +
+                    EVENT_TYPE + ", " +
+                    AGGREGATE_ID + ", " +
+                    SECONDS + ", " +
+                    NANOSECONDS +
+                ") VALUES (?, ?, ?, ?, ?, ?);";
 
-        static final String UPDATE_RECORD =
-                "UPDATE " + TABLE_NAME +
-                " SET " + EVENT + " = ? " +
-                " WHERE " + ID + " = ?;";
+        static final String SELECT_EVENT_FROM_TABLE = "SELECT " + EVENT + " FROM " + TABLE_NAME + ' ';
 
-        static final String SELECT_BY_ID =
-                "SELECT " + EVENT +
-                " FROM " + TABLE_NAME +
-                " WHERE " + ID + " = ?;";
+        static final String SELECT_EVENT_BY_EVENT_ID = SELECT_EVENT_FROM_TABLE + " WHERE " + EVENT_ID + " = ?;";
 
         static final String CREATE_TABLE_IF_DOES_NOT_EXIST =
                 "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" +
-                    ID + " VARCHAR(256), " +
+                    EVENT_ID + " VARCHAR(512), " +
                     EVENT + " BLOB, " +
-                    "PRIMARY KEY(" + ID + ')' +
+                    EVENT_TYPE + " VARCHAR(512), " +
+                    AGGREGATE_ID + " VARCHAR(512), " +
+                    SECONDS + " BIGINT, " +
+                    NANOSECONDS + " INT, " +
+                    " PRIMARY KEY(" + EVENT_ID + ')' +
                 ");";
+
+        static final String ORDER_BY_TIME_POSTFIX = " ORDER BY " + SECONDS + " ASC, " + NANOSECONDS + " ASC;";
     }
 
     private final DataSourceWrapper dataSource;
+
+    /**
+     * Iterators which are not closed yet.
+     */
+    private final Collection<DbIterator> iterators = newLinkedList();
 
     /**
      * Creates a new storage instance.
@@ -121,11 +159,162 @@ public class JdbcEventStorage extends EventStorage {
     /**
      * {@inheritDoc}
      *
+     * <p><b>NOTE:</b> it is required to call {@link Iterator#hasNext()} before {@link Iterator#next()}.
+     *
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     @Override
     public Iterator<Event> iterator(EventStreamQuery query) throws DatabaseException {
-        return null;
+        try (ConnectionWrapper connection = dataSource.getConnection(true)) {
+            final PreparedStatement statement = filterAndSortStatement(connection, query);
+            final DbIterator iterator = new DbIterator(statement);
+            iterators.add(iterator);
+            final Iterator<Event> result = toEventIterator(iterator);
+            return result;
+        }
+    }
+
+    private static PreparedStatement filterAndSortStatement(ConnectionWrapper connection, EventStreamQuery query) {
+        final String sql = buildFilterAndSortSql(query);
+        return connection.prepareStatement(sql);
+    }
+
+    // TODO:2016-02-04:alexander.litus: add tests for other cases (time, composite filters etc)
+    private static String buildFilterAndSortSql(EventStreamQuery query) {
+        String result = SQL.SELECT_EVENT_FROM_TABLE;
+        final String timeConditionQuery = buildTimeConditionSql(query);
+        result += timeConditionQuery;
+        for (EventFilter filter : query.getFilterList()) {
+            final String eventType = filter.getEventType();
+            if (!eventType.isEmpty()) {
+                final String prefix = result.contains("WHERE") ? " AND " : " WHERE ";
+                final String eventTypeCondition = prefix + SQL.EVENT_TYPE + " = \'" + eventType + "\' ";
+                result += eventTypeCondition;
+            }
+            for (Any idAny : filter.getAggregateIdList()) {
+                final Message aggregateId = Messages.fromAny(idAny);
+                final String aggregateIdStr = Identifiers.idToString(aggregateId);
+                final String prefix = result.contains("WHERE") ? " AND " : " WHERE ";
+                final String aggregateIdCondition = prefix + SQL.AGGREGATE_ID + " = \'" + aggregateIdStr + "\' ";
+                result += aggregateIdCondition;
+            }
+        }
+        result += SQL.ORDER_BY_TIME_POSTFIX;
+        return result;
+    }
+
+    private static String buildTimeConditionSql(EventStreamQuery query) {
+        final boolean afterSpecified = query.hasAfter();
+        final boolean beforeSpecified = query.hasBefore();
+        final String where = " WHERE ";
+        String result = "";
+        if (afterSpecified && !beforeSpecified) {
+            result = where + buildIsAfterSql(query);
+        } else if (!afterSpecified && beforeSpecified) {
+            result = where + buildIsBeforeSql(query);
+        } else if (afterSpecified /* beforeSpecified is true here too */) {
+            result = where + buildIsBetweenSql(query);
+        }
+        return result;
+    }
+
+    private static String buildIsAfterSql(EventStreamQuery query) {
+        final Timestamp after = query.getAfter();
+        final long seconds = after.getSeconds();
+        final int nanos = after.getNanos();
+        final String sql = ' ' +
+                SQL.SECONDS + " > " + seconds +
+                " OR ( " +
+                    SQL.SECONDS + " = " + seconds + " AND " +
+                    SQL.NANOSECONDS + " > " + nanos +
+                ") ";
+        return sql;
+    }
+
+    private static String buildIsBeforeSql(EventStreamQuery query) {
+        final Timestamp before = query.getBefore();
+        final long seconds = before.getSeconds();
+        final int nanos = before.getNanos();
+        final String sql = ' ' +
+                SQL.SECONDS + " < " + seconds +
+                " OR ( " +
+                    SQL.SECONDS + " = " + seconds + " AND " +
+                    SQL.NANOSECONDS + " < " + nanos +
+                ") ";
+        return sql;
+    }
+
+    private static String buildIsBetweenSql(EventStreamQuery query) {
+        final String isAfterSql = buildIsAfterSql(query);
+        final String isBeforeSql = buildIsBeforeSql(query);
+        final String sql = " (" + isAfterSql + ") AND (" + isBeforeSql + ") ";
+        return sql;
+    }
+
+    private static class DbIterator implements Iterator<EventStorageRecord>, AutoCloseable {
+
+        private final ResultSet resultSet;
+
+        private final PreparedStatement filterEventsStatement;
+
+        private boolean isHasNextCalledBeforeNext = false;
+
+        private DbIterator(PreparedStatement filterStatement) throws DatabaseException {
+            try {
+                this.resultSet = filterStatement.executeQuery();
+                this.filterEventsStatement = filterStatement;
+            } catch (SQLException e) {
+                throw new DatabaseException(e);
+            }
+        }
+
+        @Override
+        public boolean hasNext() {
+            try {
+                final boolean hasNext = resultSet.next();
+                isHasNextCalledBeforeNext = true;
+                return hasNext;
+            } catch (SQLException e) {
+                throw new DatabaseException(e);
+            }
+        }
+
+        @Override
+        @SuppressWarnings("IteratorNextCanNotThrowNoSuchElementException")
+        public EventStorageRecord next() {
+            if (!isHasNextCalledBeforeNext) {
+                throw new IllegalStateException("It is required to call hasNext() before next() method.");
+            }
+            isHasNextCalledBeforeNext = false;
+
+            final byte[] bytes = readRecordBytes();
+            final EventStorageRecord record = toRecord(bytes);
+            return record;
+        }
+
+        private byte[] readRecordBytes() {
+            try {
+                final byte[] bytes = resultSet.getBytes(SQL.EVENT);
+                return bytes;
+            } catch (SQLException e) {
+                throw new DatabaseException(e);
+            }
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Removing is not supported.");
+        }
+
+        @Override
+        public void close() throws DatabaseException {
+            try {
+                resultSet.close();
+                filterEventsStatement.close();
+            } catch (SQLException e) {
+                throw new DatabaseException(e);
+            }
+        }
     }
 
     /**
@@ -135,14 +324,12 @@ public class JdbcEventStorage extends EventStorage {
      */
     @Override
     protected void writeInternal(EventStorageRecord record) throws DatabaseException {
-        final String id = record.getEventId();
-        final byte[] serializedRecord = serialize(record);
         try (ConnectionWrapper connection = dataSource.getConnection(false)) {
-            try (PreparedStatement statement = insertRecordStatement(connection, id, serializedRecord)) {
+            try (PreparedStatement statement = insertRecordStatement(connection, record)) {
                 statement.execute();
                 connection.commit();
             } catch (SQLException e) {
-                log().error("Error during transaction, event ID = " + id, e);
+                logTransactionError(e, record.getEventId());
                 connection.rollback();
                 throw new DatabaseException(e);
             }
@@ -170,7 +357,7 @@ public class JdbcEventStorage extends EventStorage {
             final EventStorageRecord result = findById(statement);
             return result;
         } catch (SQLException e) {
-            log().error("Error during transaction, event ID = " + id, e);
+            logTransactionError(e, id);
             throw new DatabaseException(e);
         }
     }
@@ -198,13 +385,23 @@ public class JdbcEventStorage extends EventStorage {
         return message;
     }
 
-    private static PreparedStatement insertRecordStatement(ConnectionWrapper connection,
-                                                           String id,
-                                                           byte[] serializedRecord) {
+    @SuppressWarnings("TypeMayBeWeakened")
+    private static PreparedStatement insertRecordStatement(ConnectionWrapper connection, EventStorageRecord record) {
         final PreparedStatement statement = connection.prepareStatement(SQL.INSERT_RECORD);
-        try {
-            statement.setString(1, id);
+        final byte[] serializedRecord = serialize(record);
+        final String eventId = record.getEventId();
+        final String eventType = record.getEventType();
+        final String aggregateId = record.getAggregateId();
+        final Timestamp timestamp = record.getTimestamp();
+        final long seconds = timestamp.getSeconds();
+        final int nanos = timestamp.getNanos();
+        try {// TODO:2016-02-04:alexander.litus: check fields
+            statement.setString(1, eventId);
             statement.setBytes(2, serializedRecord);
+            statement.setString(3, eventType);
+            statement.setString(4, aggregateId);
+            statement.setLong(5, seconds);
+            statement.setInt(6, nanos);
         } catch (SQLException e) {
             throw new DatabaseException(e);
         }
@@ -213,7 +410,7 @@ public class JdbcEventStorage extends EventStorage {
 
     private static PreparedStatement selectByIdStatement(ConnectionWrapper connection, String id){
         try {
-            final PreparedStatement statement = connection.prepareStatement(SQL.SELECT_BY_ID);
+            final PreparedStatement statement = connection.prepareStatement(SQL.SELECT_EVENT_BY_EVENT_ID);
             statement.setString(1, id);
             return statement;
         } catch (SQLException e) {
@@ -223,12 +420,34 @@ public class JdbcEventStorage extends EventStorage {
 
     @Override
     public void close() throws DatabaseException {
+        closeAll(iterators);
+        iterators.clear();
         dataSource.close();
         try {
             super.close();
         } catch (Exception e) {
             throw new DatabaseException(e);
         }
+    }
+
+    static final String DELETE_ALL = "DELETE FROM " + SQL.TABLE_NAME + ";";
+
+    /**
+     * Clears all data in the storage.
+     *
+     * @throws DatabaseException if an error occurs during an interaction with the DB
+     */
+    /*package*/ void clear() throws DatabaseException {
+        try (ConnectionWrapper connection = dataSource.getConnection(true);
+             final PreparedStatement statement = connection.prepareStatement(DELETE_ALL)) {
+            statement.execute();
+        } catch (SQLException e) {
+            throw new DatabaseException(e);
+        }
+    }
+
+    private static void logTransactionError(SQLException e, String id) {
+        log().error("Error during transaction, event ID = " + id, e);
     }
 
     private static Logger log() {
