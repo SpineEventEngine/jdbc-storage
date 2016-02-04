@@ -36,6 +36,7 @@ import org.spine3.test.project.ProjectId;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.spine3.server.Identifiers.newUuid;
+import static org.spine3.server.storage.jdbc.JdbcStorageFactoryShould.getInMemoryDbUrl;
 import static org.spine3.testdata.TestAggregateIdFactory.createProjectId;
 import static org.spine3.testdata.TestEventFactory.projectCreated;
 
@@ -46,9 +47,9 @@ import static org.spine3.testdata.TestEventFactory.projectCreated;
 public class JdbcAggregateStorageShould extends AggregateStorageShould {
 
     /**
-     * The URL of the in-memory HyperSQL DB.
+     * The URL of an in-memory DB.
      */
-    private static final String DB_URL = "jdbc:hsqldb:mem:aggregateStorageTests";
+    private static final String DB_URL = getInMemoryDbUrl("aggregateStorageTests");
 
     private final JdbcAggregateStorage<ProjectId> storage = newStorage(TestAggregateWithIdMessage.class);
 

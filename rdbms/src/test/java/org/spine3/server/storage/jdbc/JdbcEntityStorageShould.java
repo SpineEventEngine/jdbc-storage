@@ -37,6 +37,7 @@ import org.spine3.test.project.ProjectId;
 import static org.junit.Assert.*;
 import static org.spine3.protobuf.Messages.toAny;
 import static org.spine3.server.Identifiers.newUuid;
+import static org.spine3.server.storage.jdbc.JdbcStorageFactoryShould.getInMemoryDbUrl;
 import static org.spine3.testdata.TestAggregateIdFactory.createProjectId;
 
 /**
@@ -46,9 +47,9 @@ import static org.spine3.testdata.TestAggregateIdFactory.createProjectId;
 public class JdbcEntityStorageShould extends EntityStorageShould {
 
     /**
-     * The URL of the in-memory HyperSQL DB.
+     * The URL of an in-memory DB.
      */
-    private static final String DB_URL = "jdbc:hsqldb:mem:entitytests";
+    private static final String DB_URL = getInMemoryDbUrl("entityTests");
 
     private final JdbcEntityStorage<String> storage = newStorage(TestEntityWithIdString.class);
 

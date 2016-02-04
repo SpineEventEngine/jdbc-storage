@@ -33,8 +33,13 @@ import static org.junit.Assert.assertNotNull;
 @SuppressWarnings({"InstanceMethodNamingConvention", "MagicNumber"})
 public class JdbcStorageFactoryShould {
 
+    /**
+     * The URL prefix of an in-memory HyperSQL DB.
+     */
+    private static final String HSQL_IN_MEMORY_DB_URL_PREFIX = "jdbc:hsqldb:mem:";
+
     private static final DataSourceConfig CONFIG = DataSourceConfig.newBuilder()
-            .setJdbcUrl("jdbc:hsqldb:mem:factorytests")
+            .setJdbcUrl(getInMemoryDbUrl("factoryTests"))
             .setUsername("SA")
             .setPassword("pwd")
             .setMaxPoolSize(12)
@@ -45,6 +50,10 @@ public class JdbcStorageFactoryShould {
         final JdbcStorageFactory factory = JdbcStorageFactory.newInstance(CONFIG);
         final EntityStorage<String> storage = factory.createEntityStorage(TestEntity.class);
         assertNotNull(storage);
+    }
+
+    public static String getInMemoryDbUrl(String dbName) {
+        return HSQL_IN_MEMORY_DB_URL_PREFIX + dbName;
     }
 
     private static class TestEntity extends Entity<String, StringValue> {
