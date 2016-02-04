@@ -40,10 +40,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.Lists.newLinkedList;
 import static java.lang.String.format;
 import static org.spine3.io.IoUtil.closeAll;
 import static org.spine3.protobuf.Messages.fromAny;
@@ -106,12 +106,12 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     /**
      * Iterators which are not closed yet.
      */
-    private final Collection<DbIterator> iterators = new HashSet<>();
+    private final Collection<DbIterator> iterators = newLinkedList();
 
     /**
      * Statements which are not closed yet.
      */
-    private final Collection<PreparedStatement> statements = new HashSet<>();
+    private final Collection<PreparedStatement> statements = newLinkedList();
 
     private final IdHelper<I> idHelper;
 
