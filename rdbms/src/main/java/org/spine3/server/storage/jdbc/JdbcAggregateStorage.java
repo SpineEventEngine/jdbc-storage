@@ -108,11 +108,6 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
      */
     private final Collection<DbIterator> iterators = newLinkedList();
 
-    /**
-     * Statements which are not closed yet.
-     */
-    private final Collection<PreparedStatement> statements = newLinkedList();
-
     private final IdHelper<I> idHelper;
 
     private final String insertSql;
@@ -189,7 +184,6 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
         checkNotNull(id);
         try (ConnectionWrapper connection = dataSource.getConnection(true)) {
             final PreparedStatement statement = selectByIdStatement(connection, id);
-            statements.add(statement);
             final DbIterator iterator = new DbIterator(statement);
             iterators.add(iterator);
             return iterator;
@@ -199,12 +193,14 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     private static class DbIterator implements Iterator<AggregateStorageRecord>, AutoCloseable {
 
         private final ResultSet resultSet;
+        private final PreparedStatement selectByIdStatement;
 
         private boolean isHasNextCalledBeforeNext = false;
 
         private DbIterator(PreparedStatement selectByIdStatement) throws DatabaseException {
             try {
                 this.resultSet = selectByIdStatement.executeQuery();
+                this.selectByIdStatement = selectByIdStatement;
             } catch (SQLException e) {
                 throw new DatabaseException(e);
             }
@@ -252,6 +248,7 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
         public void close() throws DatabaseException {
             try {
                 resultSet.close();
+                selectByIdStatement.close();
             } catch (SQLException e) {
                 throw new DatabaseException(e);
             }
@@ -293,9 +290,6 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     public void close() throws DatabaseException {
         closeAll(iterators);
         iterators.clear();
-
-        closeAll(statements);
-        statements.clear();
 
         dataSource.close();
         try {
