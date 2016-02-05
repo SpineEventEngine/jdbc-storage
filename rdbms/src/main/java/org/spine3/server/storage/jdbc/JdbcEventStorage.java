@@ -127,7 +127,6 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
                         NANOSECONDS +
                     ") VALUES (?, ?, ?, ?, ?, ?);";
 
-            @SuppressWarnings("TypeMayBeWeakened")
             private static PreparedStatement statement(ConnectionWrapper connection, EventStorageRecord record) {
                 final PreparedStatement statement = connection.prepareStatement(INSERT_QUERY);
                 final byte[] serializedRecord = serialize(record);
