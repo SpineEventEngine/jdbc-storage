@@ -131,19 +131,24 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
             private static PreparedStatement statement(ConnectionWrapper connection, EventStorageRecord record) {
                 final PreparedStatement statement = connection.prepareStatement(INSERT_QUERY);
-                final byte[] serializedRecord = serialize(record);
-                final String eventId = record.getEventId();
-                final String eventType = record.getEventType();
-                final String aggregateId = record.getAggregateId();
                 final Timestamp timestamp = record.getTimestamp();
-                final long seconds = timestamp.getSeconds();
-                final int nanos = timestamp.getNanos();
                 try {
+                    final String eventId = record.getEventId();
                     statement.setString(1, eventId);
+
+                    final byte[] serializedRecord = serialize(record);
                     statement.setBytes(2, serializedRecord);
+
+                    final String eventType = record.getEventType();
                     statement.setString(3, eventType);
+
+                    final String aggregateId = record.getAggregateId();
                     statement.setString(4, aggregateId);
+
+                    final long seconds = timestamp.getSeconds();
                     statement.setLong(5, seconds);
+
+                    final int nanos = timestamp.getNanos();
                     statement.setInt(6, nanos);
                 } catch (SQLException e) {
                     throw new DatabaseException(e);
