@@ -20,7 +20,7 @@
 
 package org.spine3.server.storage.jdbc;
 
-import com.google.protobuf.Descriptors;
+import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Timestamp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,12 +57,12 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         /**
          * Aggregate ID column name.
          */
-        static final String ID = "id";
+        private static final String ID = "id";
 
         /**
          * Aggregate record column name.
          */
-        static final String AGGREGATE = "aggregate";
+        private static final String AGGREGATE = "aggregate";
 
         /**
          * Aggregate event seconds column name.
@@ -74,17 +74,17 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
          */
         private static final String NANOSECONDS = "nanoseconds";
 
-        static final String INSERT_RECORD =
+        private static final String INSERT =
                 "INSERT INTO %s " +
                 " (" + ID + ", " + AGGREGATE + ", " + SECONDS + ", " + NANOSECONDS + ") " +
                 " VALUES (?, ?, ?, ?);";
 
-        static final String SELECT_BY_ID_SORTED_BY_TIME_DESC =
+        private static final String SELECT_BY_ID_SORTED_BY_TIME_DESC =
                 "SELECT " + AGGREGATE + " FROM %s " +
                 " WHERE " + ID + " = ? " +
                 " ORDER BY " + SECONDS + " DESC, " + NANOSECONDS + " DESC;";
 
-        static final String CREATE_TABLE_IF_DOES_NOT_EXIST =
+        private static final String CREATE_TABLE_IF_DOES_NOT_EXIST =
                 "CREATE TABLE IF NOT EXISTS %s (" +
                     ID + " %s, " +
                     AGGREGATE + " BLOB, " +
@@ -93,7 +93,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
                 ");";
     }
 
-    private static final Descriptors.Descriptor RECORD_DESCRIPTOR = AggregateStorageRecord.getDescriptor();
+    private static final Descriptor RECORD_DESCRIPTOR = AggregateStorageRecord.getDescriptor();
 
     private final DataSourceWrapper dataSource;
 
@@ -104,8 +104,11 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
     private final IdHelper<ID> idHelper;
 
-    private final String insertSql;
-    private final String selectByIdSortedByTimeDescSql;
+    /**
+     * SQL queries.
+     */
+    private final String insertQuery;
+    private final String selectByIdSortedByTimeDescQuery;
 
     /**
      * Creates a new storage instance.
@@ -122,8 +125,8 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         this.dataSource = dataSource;
 
         final String tableName = DbTableNamesEscaper.toTableName(aggregateClass);
-        this.insertSql = format(SQL.INSERT_RECORD, tableName);
-        this.selectByIdSortedByTimeDescSql = format(SQL.SELECT_BY_ID_SORTED_BY_TIME_DESC, tableName);
+        this.insertQuery = format(SQL.INSERT, tableName);
+        this.selectByIdSortedByTimeDescQuery = format(SQL.SELECT_BY_ID_SORTED_BY_TIME_DESC, tableName);
 
         this.idHelper = IdHelper.newInstance(aggregateClass);
         createTableIfDoesNotExist(tableName);
@@ -148,9 +151,8 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
      */
     @Override
     protected void writeInternal(ID id, AggregateStorageRecord record) throws DatabaseException {
-        final byte[] serializedRecord = serialize(record);
         try (ConnectionWrapper connection = dataSource.getConnection(false)) {
-            try (PreparedStatement statement = insertRecordStatement(connection, id, serializedRecord, record)) {
+            try (PreparedStatement statement = insertRecordStatement(connection, id, record)) {
                 statement.execute();
                 connection.commit();
             } catch (SQLException e) {
@@ -180,11 +182,9 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         }
     }
 
-    private PreparedStatement insertRecordStatement(ConnectionWrapper connection,
-                                                    ID id,
-                                                    byte[] serializedRecord,
-                                                    AggregateStorageRecord record) {
-        final PreparedStatement statement = connection.prepareStatement(insertSql);
+    private PreparedStatement insertRecordStatement(ConnectionWrapper connection, ID id, AggregateStorageRecord record) {
+        final PreparedStatement statement = connection.prepareStatement(insertQuery);
+        final byte[] serializedRecord = serialize(record);
         try {
             idHelper.setId(1, id, statement);
             statement.setBytes(2, serializedRecord);
@@ -197,8 +197,8 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         return statement;
     }
 
-    private PreparedStatement selectByIdStatement(ConnectionWrapper connection, ID id){
-        final PreparedStatement statement = connection.prepareStatement(selectByIdSortedByTimeDescSql);
+    private PreparedStatement selectByIdStatement(ConnectionWrapper connection, ID id) {
+        final PreparedStatement statement = connection.prepareStatement(selectByIdSortedByTimeDescQuery);
         idHelper.setId(1, id, statement);
         return statement;
     }

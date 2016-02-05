@@ -20,6 +20,7 @@
 
 package org.spine3.server.storage.jdbc;
 
+import com.google.protobuf.Descriptors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spine3.server.Entity;
@@ -57,28 +58,28 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         /**
          * Entity record column name.
          */
-        static final String ENTITY = "entity";
+        private static final String ENTITY = "entity";
 
         /**
          * Entity ID column name.
          */
-        static final String ID = "id";
+        private static final String ID = "id";
 
-        static final String INSERT_RECORD =
+        private static final String INSERT =
                 "INSERT INTO %s " +
                 " (" + ID + ", " + ENTITY + ')' +
                 " VALUES (?, ?);";
 
-        static final String UPDATE_RECORD =
+        private static final String UPDATE =
                 "UPDATE %s " +
                 " SET " + ENTITY + " = ? " +
                 " WHERE " + ID + " = ?;";
 
-        static final String SELECT_BY_ID = "SELECT " + ENTITY + " FROM %s WHERE " + ID + " = ?;";
+        private static final String SELECT_BY_ID = "SELECT " + ENTITY + " FROM %s WHERE " + ID + " = ?;";
 
-        static final String DELETE_ALL = "DELETE FROM %s;";
+        private static final String DELETE_ALL = "DELETE FROM %s;";
 
-        static final String CREATE_TABLE_IF_DOES_NOT_EXIST =
+        private static final String CREATE_TABLE_IF_DOES_NOT_EXIST =
                 "CREATE TABLE IF NOT EXISTS %s (" +
                     ID + " %s, " +
                     ENTITY + " BLOB, " +
@@ -86,14 +87,19 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
                 ");";
     }
 
+    private static final Descriptors.Descriptor RECORD_DESCRIPTOR = EntityStorageRecord.getDescriptor();
+
     private final DataSourceWrapper dataSource;
 
     private final IdHelper<ID> idHelper;
 
-    private final String insertSql;
-    private final String updateSql;
-    private final String selectByIdSql;
-    private final String deleteAllSql;
+    /**
+     * SQL queries.
+     */
+    private final String insertQuery;
+    private final String updateQuery;
+    private final String selectByIdQuery;
+    private final String deleteAllQuery;
 
     /**
      * Creates a new storage instance.
@@ -101,7 +107,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
      * @param dataSource the dataSource wrapper
      * @param entityClass the class of entities to save to the storage
      */
-    /*package*/static <ID> JdbcEntityStorage<ID> newInstance(DataSourceWrapper dataSource,
+    /*package*/ static <ID> JdbcEntityStorage<ID> newInstance(DataSourceWrapper dataSource,
                                                                Class<? extends Entity<ID, ?>> entityClass) {
         return new JdbcEntityStorage<>(dataSource, entityClass);
     }
@@ -110,10 +116,10 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         this.dataSource = dataSource;
 
         final String tableName = DbTableNamesEscaper.toTableName(entityClass);
-        this.insertSql = format(SQL.INSERT_RECORD, tableName);
-        this.updateSql = format(SQL.UPDATE_RECORD, tableName);
-        this.selectByIdSql = format(SQL.SELECT_BY_ID, tableName);
-        this.deleteAllSql = format(SQL.DELETE_ALL, tableName);
+        this.insertQuery = format(SQL.INSERT, tableName);
+        this.updateQuery = format(SQL.UPDATE, tableName);
+        this.selectByIdQuery = format(SQL.SELECT_BY_ID, tableName);
+        this.deleteAllQuery = format(SQL.DELETE_ALL, tableName);
 
         this.idHelper = IdHelper.newInstance(entityClass);
         createTableIfDoesNotExist(tableName);
@@ -141,7 +147,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
     protected EntityStorageRecord readInternal(ID id) throws DatabaseException {
         try (ConnectionWrapper connection = dataSource.getConnection(true);
              PreparedStatement statement = selectByIdStatement(connection, id)) {
-            final EntityStorageRecord result = readDeserializedRecord(statement, SQL.ENTITY, EntityStorageRecord.getDescriptor());
+            final EntityStorageRecord result = readDeserializedRecord(statement, SQL.ENTITY, RECORD_DESCRIPTOR);
             return result;
         } catch (SQLException e) {
             logTransactionError(id, e);
@@ -200,7 +206,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
     private PreparedStatement insertRecordStatement(ConnectionWrapper connection, ID id, byte[] serializedRecord) {
         try {
-            final PreparedStatement statement = connection.prepareStatement(insertSql);
+            final PreparedStatement statement = connection.prepareStatement(insertQuery);
             idHelper.setId(1, id, statement);
             statement.setBytes(2, serializedRecord);
             return statement;
@@ -211,7 +217,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
     private PreparedStatement updateRecordStatement(ConnectionWrapper connection, ID id, byte[] serializedEntity) {
         try {
-            final PreparedStatement statement = connection.prepareStatement(updateSql);
+            final PreparedStatement statement = connection.prepareStatement(updateQuery);
             statement.setBytes(1, serializedEntity);
             idHelper.setId(2, id, statement);
             return statement;
@@ -221,7 +227,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
     }
 
     private PreparedStatement selectByIdStatement(ConnectionWrapper connection, ID id) {
-        final PreparedStatement statement = connection.prepareStatement(selectByIdSql);
+        final PreparedStatement statement = connection.prepareStatement(selectByIdQuery);
         idHelper.setId(1, id, statement);
         return statement;
     }
@@ -249,7 +255,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
      */
     /*package*/ void clear() throws DatabaseException {
         try (ConnectionWrapper connection = dataSource.getConnection(true);
-             final PreparedStatement statement = connection.prepareStatement(deleteAllSql)) {
+             final PreparedStatement statement = connection.prepareStatement(deleteAllQuery)) {
             statement.execute();
         } catch (SQLException e) {
             throw new DatabaseException(e);
