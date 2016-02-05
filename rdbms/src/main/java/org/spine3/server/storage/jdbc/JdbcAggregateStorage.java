@@ -166,6 +166,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
      *
      * <p><b>NOTE:</b> it is required to call {@link Iterator#hasNext()} before {@link Iterator#next()}.
      *
+     * @return a wrapped {@link DbIterator} instance
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     @Override

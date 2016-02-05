@@ -34,8 +34,15 @@ import java.util.NoSuchElementException;
 import static org.spine3.server.storage.jdbc.util.Serializer.readDeserializedRecord;
 
 /**
- * TODO:2015-12-08:alexander.litus: docs
+ * An iterator over a {@link ResultSet} of storage records.
  *
+ * <p>Uses {@link Serializer} to deserialize records.
+ *
+ * <p><b>NOTE:</b> it is required to call {@link Iterator#hasNext()} before {@link Iterator#next()}.
+ *
+ * <p><b>NOTE:</b> {@code remove} operation is not supported.
+ *
+ * @param <Record> type of storage records
  * @author Alexander Litus
  */
 @Internal
@@ -48,8 +55,16 @@ public class DbIterator<Record extends Message> implements Iterator<Record>, Aut
     private boolean isHasNextCalledBeforeNext = false;
     private boolean hasNext = false;
 
-    public DbIterator(PreparedStatement statement, String columnName, Descriptor descriptor)
-            throws DatabaseException {
+    /**
+     * Creates a new iterator instance.
+     *
+     * @param statement a statement used to retrieve a result set
+     *                  (both statement and result set are closed in {@link #close()}).
+     * @param columnName a name of a serialized storage record column
+     * @param descriptor a descriptor of a storage record
+     * @throws DatabaseException
+     */
+    public DbIterator(PreparedStatement statement, String columnName, Descriptor descriptor) throws DatabaseException {
         try {
             this.resultSet = statement.executeQuery();
             this.statement = statement;
