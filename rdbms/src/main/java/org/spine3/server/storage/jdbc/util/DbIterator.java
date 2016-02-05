@@ -61,15 +61,15 @@ public class DbIterator<Record extends Message> implements Iterator<Record>, Aut
      * @param statement a statement used to retrieve a result set
      *                  (both statement and result set are closed in {@link #close()}).
      * @param columnName a name of a serialized storage record column
-     * @param descriptor a descriptor of a storage record
+     * @param recordDescriptor a descriptor of a storage record
      * @throws DatabaseException
      */
-    public DbIterator(PreparedStatement statement, String columnName, Descriptor descriptor) throws DatabaseException {
+    public DbIterator(PreparedStatement statement, String columnName, Descriptor recordDescriptor) throws DatabaseException {
         try {
             this.resultSet = statement.executeQuery();
             this.statement = statement;
             this.columnName = columnName;
-            this.descriptor = descriptor;
+            this.descriptor = recordDescriptor;
         } catch (SQLException e) {
             throw new DatabaseException(e);
         }

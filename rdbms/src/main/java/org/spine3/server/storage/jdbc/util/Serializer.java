@@ -37,7 +37,7 @@ import static org.spine3.protobuf.Messages.fromAny;
 import static org.spine3.protobuf.Messages.toAny;
 
 /**
- * TODO:2015-12-08:alexander.litus: docs
+ * A utility class for serializing/deserializing storage records.
  *
  * @author Alexander Litus
  */
@@ -47,6 +47,15 @@ public class Serializer {
 
     private Serializer() {}
 
+    /**
+     * Reads one storage record from a result set produced by a {@code statement} and deserializes it.
+     *
+     * @param statement a statement used to retrieve a result set
+     * @param columnName a column name of a serialized (to bytes) storage record
+     * @param recordDescriptor a descriptor of a storage record
+     * @param <Record> a storage record type
+     * @return a deserialized record
+     */
     @Nullable
     public static <Record extends Message> Record readDeserializedRecord(PreparedStatement statement,
                                                                          String columnName,
@@ -63,7 +72,15 @@ public class Serializer {
         }
     }
 
-    @Nullable
+    /**
+     * Reads one storage record from a {@code resultSet} and deserializes it.
+     *
+     * @param resultSet a result set used to retrieve a serialized record
+     * @param columnName a column name of a serialized (to bytes) storage record
+     * @param recordDescriptor a descriptor of a storage record
+     * @param <Record> a storage record type
+     * @return a deserialized record
+     */
     public static <Record extends Message> Record readDeserializedRecord(ResultSet resultSet,
                                                                          String columnName,
                                                                          Descriptor recordDescriptor) {
@@ -76,7 +93,7 @@ public class Serializer {
         }
     }
 
-    public static <Record extends Message> Record deserializeRecord(byte[] bytes, Descriptor recordDescriptor) {
+    private static <Record extends Message> Record deserializeRecord(byte[] bytes, Descriptor recordDescriptor) {
         final Any.Builder builder = Any.newBuilder();
         final String typeUrl = TypeName.of(recordDescriptor).toTypeUrl();
         builder.setTypeUrl(typeUrl);
@@ -86,6 +103,13 @@ public class Serializer {
         return record;
     }
 
+    /**
+     * Serialized a record to an array of bytes.
+     *
+     * @param record a record to serialize
+     * @param <Record> a storage record type
+     * @return a byte array
+     */
     public static <Record extends Message> byte[] serialize(Record record) {
         final Any any = toAny(record);
         final byte[] bytes = any.getValue().toByteArray();
