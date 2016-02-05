@@ -29,6 +29,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import static org.spine3.server.storage.jdbc.util.Serializer.readDeserializedRecord;
 
@@ -45,6 +46,7 @@ public class DbIterator<Record extends Message> implements Iterator<Record>, Aut
     private final String columnName;
     private final Descriptor descriptor;
     private boolean isHasNextCalledBeforeNext = false;
+    private boolean hasNext = false;
 
     public DbIterator(PreparedStatement statement, String columnName, Descriptor descriptor)
             throws DatabaseException {
@@ -61,22 +63,24 @@ public class DbIterator<Record extends Message> implements Iterator<Record>, Aut
     @Override
     public boolean hasNext() {
         try {
-            final boolean hasNext = resultSet.next();
+            final boolean hasNextElem = resultSet.next();
+            hasNext = hasNextElem;
             isHasNextCalledBeforeNext = true;
-            return hasNext;
+            return hasNextElem;
         } catch (SQLException e) {
             throw new DatabaseException(e);
         }
     }
 
     @Override
-    @SuppressWarnings("IteratorNextCanNotThrowNoSuchElementException")
     public Record next() {
         if (!isHasNextCalledBeforeNext) {
             throw new IllegalStateException("It is required to call hasNext() before next() method.");
         }
         isHasNextCalledBeforeNext = false;
-
+        if (!hasNext) {
+            throw new NoSuchElementException("No elements remained.");
+        }
         final Record record = readDeserializedRecord(resultSet, columnName, descriptor);
         return record;
     }
