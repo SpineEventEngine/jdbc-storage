@@ -45,11 +45,11 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 /**
  * The implementation of the aggregate storage based on the RDBMS.
  *
- * @param <I> the type of aggregate IDs. See {@link EntityId} for details.
+ * @param <ID> the type of aggregate IDs. See {@link EntityId} for details.
  * @see JdbcStorageFactory
  * @author Alexander Litus
  */
-public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
+/*package*/ class JdbcAggregateStorage<ID> extends AggregateStorage<ID> {
 
     @SuppressWarnings({"UtilityClass", "DuplicateStringLiteralInspection", "ClassNamingConvention"})
     private static class SQL {
@@ -102,7 +102,7 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
      */
     private final Collection<DbIterator> iterators = newLinkedList();
 
-    private final IdHelper<I> idHelper;
+    private final IdHelper<ID> idHelper;
 
     private final String insertSql;
     private final String selectByIdSortedByTimeDescSql;
@@ -113,11 +113,12 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
      * @param dataSource the dataSource wrapper
      * @param aggregateClass the class of aggregates to save to the storage
      */
-    static <I> JdbcAggregateStorage<I> newInstance(DataSourceWrapper dataSource, Class<? extends Aggregate<I, ?>> aggregateClass) {
+    /*package*/ static <ID> JdbcAggregateStorage<ID> newInstance(DataSourceWrapper dataSource,
+                                                     Class<? extends Aggregate<ID, ?>> aggregateClass) {
         return new JdbcAggregateStorage<>(dataSource, aggregateClass);
     }
 
-    private JdbcAggregateStorage(DataSourceWrapper dataSource, Class<? extends Aggregate<I, ?>> aggregateClass) {
+    private JdbcAggregateStorage(DataSourceWrapper dataSource, Class<? extends Aggregate<ID, ?>> aggregateClass) {
         this.dataSource = dataSource;
 
         final String tableName = DbTableNamesEscaper.toTableName(aggregateClass);
@@ -146,7 +147,7 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     @Override
-    protected void writeInternal(I id, AggregateStorageRecord record) throws DatabaseException {
+    protected void writeInternal(ID id, AggregateStorageRecord record) throws DatabaseException {
         final byte[] serializedRecord = serialize(record);
         try (ConnectionWrapper connection = dataSource.getConnection(false)) {
             try (PreparedStatement statement = insertRecordStatement(connection, id, serializedRecord, record)) {
@@ -168,7 +169,7 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     @Override
-    protected Iterator<AggregateStorageRecord> historyBackward(I id) throws DatabaseException {
+    protected Iterator<AggregateStorageRecord> historyBackward(ID id) throws DatabaseException {
         checkNotNull(id);
         try (ConnectionWrapper connection = dataSource.getConnection(true)) {
             final PreparedStatement statement = selectByIdStatement(connection, id);
@@ -179,7 +180,7 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     }
 
     private PreparedStatement insertRecordStatement(ConnectionWrapper connection,
-                                                    I id,
+                                                    ID id,
                                                     byte[] serializedRecord,
                                                     AggregateStorageRecord record) {
         final PreparedStatement statement = connection.prepareStatement(insertSql);
@@ -195,7 +196,7 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
         return statement;
     }
 
-    private PreparedStatement selectByIdStatement(ConnectionWrapper connection, I id){
+    private PreparedStatement selectByIdStatement(ConnectionWrapper connection, ID id){
         final PreparedStatement statement = connection.prepareStatement(selectByIdSortedByTimeDescSql);
         idHelper.setId(1, id, statement);
         return statement;

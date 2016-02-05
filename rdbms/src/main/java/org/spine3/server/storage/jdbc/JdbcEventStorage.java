@@ -55,7 +55,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
  * @see JdbcStorageFactory
  * @author Alexander Litus
  */
-public class JdbcEventStorage extends EventStorage {
+/*package*/ class JdbcEventStorage extends EventStorage {
 
     @SuppressWarnings({"UtilityClass", "DuplicateStringLiteralInspection", "ClassNamingConvention"})
     private static class SQL {
