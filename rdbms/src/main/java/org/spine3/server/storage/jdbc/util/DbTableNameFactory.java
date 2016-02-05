@@ -25,19 +25,19 @@ import org.spine3.Internal;
 import java.util.regex.Pattern;
 
 /**
- * A utility class for escaping strings to be valid for DB table names.
+ * A utility class which provides strings valid for DB table names.
  *
  * @author Alexander Litus
  */
 @SuppressWarnings("UtilityClass")
 @Internal
-public class DbTableNamesEscaper {
+public class DbTableNameFactory {
 
     private static final Pattern PATTERN_DOT = Pattern.compile("\\.");
     private static final Pattern PATTERN_DOLLAR = Pattern.compile("\\$");
     private static final String UNDERSCORE = "_";
 
-    private DbTableNamesEscaper() {}
+    private DbTableNameFactory() {}
 
     /**
      * Retrieves a name of a class and escapes it so that it is valid to use as a DB table name. For example:
@@ -47,7 +47,7 @@ public class DbTableNamesEscaper {
      * @param clazz a class which name to use
      * @return a valid DB table name
      */
-    public static String toTableName(Class clazz) {
+    public static String newTableName(Class clazz) {
         final String className = clazz.getName();
         final String tableNameTmp = PATTERN_DOT.matcher(className).replaceAll(UNDERSCORE);
         final String result = PATTERN_DOLLAR.matcher(tableNameTmp).replaceAll(UNDERSCORE).toLowerCase();

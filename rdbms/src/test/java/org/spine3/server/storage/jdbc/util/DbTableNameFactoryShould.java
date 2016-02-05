@@ -30,20 +30,20 @@ import static org.junit.Assert.assertEquals;
  * @author Alexander Litus
  */
 @SuppressWarnings("InstanceMethodNamingConvention")
-public class DbTableNameEscaperShould {
+public class DbTableNameFactoryShould {
 
     @Test
     public void provide_table_name_for_class() {
-        final String tableName = DbTableNamesEscaper.toTableName(String.class);
+        final String tableName = DbTableNameFactory.newTableName(String.class);
 
         assertEquals("java_lang_string", tableName);
     }
 
     @Test
-    public void provide_table_name_from_inner_class() {
-        final String tableName = DbTableNamesEscaper.toTableName(TestEntity.class);
+    public void provide_table_name_for_inner_class() {
+        final String tableName = DbTableNameFactory.newTableName(TestEntity.class);
 
-        assertEquals("org_spine3_server_storage_jdbc_util_dbtablenameescapershould_testentity", tableName);
+        assertEquals("org_spine3_server_storage_jdbc_util_dbtablenamefactoryshould_testentity", tableName);
     }
 
     private static class TestEntity extends Entity<String, StringValue> {

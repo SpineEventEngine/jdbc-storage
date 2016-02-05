@@ -29,7 +29,7 @@ import org.spine3.server.storage.EntityStorage;
 import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.server.storage.jdbc.util.DbTableNamesEscaper;
+import org.spine3.server.storage.jdbc.util.DbTableNameFactory;
 import org.spine3.server.storage.jdbc.util.IdHelper;
 
 import javax.annotation.Nullable;
@@ -115,7 +115,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
     private JdbcEntityStorage(DataSourceWrapper dataSource, Class<? extends Entity<ID, ?>> entityClass) {
         this.dataSource = dataSource;
 
-        final String tableName = DbTableNamesEscaper.toTableName(entityClass);
+        final String tableName = DbTableNameFactory.newTableName(entityClass);
         this.insertQuery = format(SQL.INSERT, tableName);
         this.updateQuery = format(SQL.UPDATE, tableName);
         this.selectByIdQuery = format(SQL.SELECT_BY_ID, tableName);

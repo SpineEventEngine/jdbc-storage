@@ -124,7 +124,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
     private JdbcAggregateStorage(DataSourceWrapper dataSource, Class<? extends Aggregate<ID, ?>> aggregateClass) {
         this.dataSource = dataSource;
 
-        final String tableName = DbTableNamesEscaper.toTableName(aggregateClass);
+        final String tableName = DbTableNameFactory.newTableName(aggregateClass);
         this.insertQuery = format(SQL.INSERT, tableName);
         this.selectByIdSortedByTimeDescQuery = format(SQL.SELECT_BY_ID_SORTED_BY_TIME_DESC, tableName);
 
