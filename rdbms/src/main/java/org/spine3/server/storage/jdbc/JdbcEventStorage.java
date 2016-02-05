@@ -137,7 +137,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
                 final Timestamp timestamp = record.getTimestamp();
                 final long seconds = timestamp.getSeconds();
                 final int nanos = timestamp.getNanos();
-                try {// TODO:2016-02-04:alexander.litus: check fields
+                try {
                     statement.setString(1, eventId);
                     statement.setBytes(2, serializedRecord);
                     statement.setString(3, eventType);
