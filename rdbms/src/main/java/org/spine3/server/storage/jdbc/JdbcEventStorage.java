@@ -21,6 +21,7 @@
 package org.spine3.server.storage.jdbc;
 
 import com.google.protobuf.Any;
+import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Message;
 import com.google.protobuf.Timestamp;
 import org.slf4j.Logger;
@@ -35,10 +36,10 @@ import org.spine3.server.storage.EventStorage;
 import org.spine3.server.storage.EventStorageRecord;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
+import org.spine3.server.storage.jdbc.util.DbIterator;
 
 import javax.annotation.Nullable;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Iterator;
@@ -123,6 +124,8 @@ public class JdbcEventStorage extends EventStorage {
         static final String ORDER_BY_TIME_POSTFIX = " ORDER BY " + SECONDS + " ASC, " + NANOSECONDS + " ASC;";
     }
 
+    private static final Descriptor RECORD_DESCRIPTOR = EventStorageRecord.getDescriptor();
+
     private final DataSourceWrapper dataSource;
 
     /**
@@ -165,7 +168,7 @@ public class JdbcEventStorage extends EventStorage {
     public Iterator<Event> iterator(EventStreamQuery query) throws DatabaseException {
         try (ConnectionWrapper connection = dataSource.getConnection(true)) {
             final PreparedStatement statement = filterAndSortStatement(connection, query);
-            final DbIterator iterator = new DbIterator(statement);
+            final DbIterator<EventStorageRecord> iterator = new DbIterator<>(statement, SQL.EVENT, RECORD_DESCRIPTOR);
             iterators.add(iterator);
             final Iterator<Event> result = toEventIterator(iterator);
             return result;
@@ -247,62 +250,6 @@ public class JdbcEventStorage extends EventStorage {
         final String isBeforeSql = buildIsBeforeSql(query);
         final String sql = " (" + isAfterSql + ") AND (" + isBeforeSql + ") ";
         return sql;
-    }
-
-    private static class DbIterator implements Iterator<EventStorageRecord>, AutoCloseable {
-
-        private final ResultSet resultSet;
-
-        private final PreparedStatement filterEventsStatement;
-
-        private boolean isHasNextCalledBeforeNext = false;
-
-        private DbIterator(PreparedStatement filterStatement) throws DatabaseException {
-            try {
-                this.resultSet = filterStatement.executeQuery();
-                this.filterEventsStatement = filterStatement;
-            } catch (SQLException e) {
-                throw new DatabaseException(e);
-            }
-        }
-
-        @Override
-        public boolean hasNext() {
-            try {
-                final boolean hasNext = resultSet.next();
-                isHasNextCalledBeforeNext = true;
-                return hasNext;
-            } catch (SQLException e) {
-                throw new DatabaseException(e);
-            }
-        }
-
-        @Override
-        @SuppressWarnings("IteratorNextCanNotThrowNoSuchElementException")
-        public EventStorageRecord next() {
-            if (!isHasNextCalledBeforeNext) {
-                throw new IllegalStateException("It is required to call hasNext() before next() method.");
-            }
-            isHasNextCalledBeforeNext = false;
-
-            final EventStorageRecord record = readDeserializedRecord(resultSet, SQL.EVENT, EventStorageRecord.getDescriptor());
-            return record;
-        }
-
-        @Override
-        public void remove() {
-            throw new UnsupportedOperationException("Removing is not supported.");
-        }
-
-        @Override
-        public void close() throws DatabaseException {
-            try {
-                resultSet.close();
-                filterEventsStatement.close();
-            } catch (SQLException e) {
-                throw new DatabaseException(e);
-            }
-        }
     }
 
     /**

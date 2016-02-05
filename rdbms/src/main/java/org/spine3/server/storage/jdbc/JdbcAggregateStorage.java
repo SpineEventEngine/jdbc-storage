@@ -20,8 +20,7 @@
 
 package org.spine3.server.storage.jdbc;
 
-import com.google.protobuf.Any;
-import com.google.protobuf.ByteString;
+import com.google.protobuf.Descriptors;
 import com.google.protobuf.Timestamp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,10 +29,8 @@ import org.spine3.server.aggregate.Aggregate;
 import org.spine3.server.storage.AggregateStorage;
 import org.spine3.server.storage.AggregateStorageRecord;
 import org.spine3.server.storage.jdbc.util.*;
-import org.spine3.type.TypeName;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Iterator;
@@ -42,9 +39,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Lists.newLinkedList;
 import static java.lang.String.format;
 import static org.spine3.io.IoUtil.closeAll;
-import static org.spine3.protobuf.Messages.fromAny;
 import static org.spine3.server.Identifiers.idToString;
-import static org.spine3.server.storage.jdbc.util.Serializer.*;
+import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
 /**
  * The implementation of the aggregate storage based on the RDBMS.
@@ -96,6 +92,8 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
                     NANOSECONDS + " INT " +
                 ");";
     }
+
+    private static final Descriptors.Descriptor RECORD_DESCRIPTOR = AggregateStorageRecord.getDescriptor();
 
     private final DataSourceWrapper dataSource;
 
@@ -174,82 +172,9 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
         checkNotNull(id);
         try (ConnectionWrapper connection = dataSource.getConnection(true)) {
             final PreparedStatement statement = selectByIdStatement(connection, id);
-            final DbIterator iterator = new DbIterator(statement);
+            final DbIterator<AggregateStorageRecord> iterator = new DbIterator<>(statement, SQL.AGGREGATE, RECORD_DESCRIPTOR);
             iterators.add(iterator);
             return iterator;
-        }
-    }
-
-    private static class DbIterator implements Iterator<AggregateStorageRecord>, AutoCloseable {
-
-        private final ResultSet resultSet;
-        private final PreparedStatement selectByIdStatement;
-
-        private boolean isHasNextCalledBeforeNext = false;
-
-        private DbIterator(PreparedStatement selectByIdStatement) throws DatabaseException {
-            try {
-                this.resultSet = selectByIdStatement.executeQuery();
-                this.selectByIdStatement = selectByIdStatement;
-            } catch (SQLException e) {
-                throw new DatabaseException(e);
-            }
-        }
-
-        @Override
-        public boolean hasNext() {
-            try {
-                final boolean hasNext = resultSet.next();
-                isHasNextCalledBeforeNext = true;
-                return hasNext;
-            } catch (SQLException e) {
-                throw new DatabaseException(e);
-            }
-        }
-
-        @Override
-        @SuppressWarnings("IteratorNextCanNotThrowNoSuchElementException")
-        public AggregateStorageRecord next() {
-            if (!isHasNextCalledBeforeNext) {
-                throw new IllegalStateException("It is required to call hasNext() before next() method.");
-            }
-            isHasNextCalledBeforeNext = false;
-
-            final byte[] bytes = readRecordBytes();
-            final AggregateStorageRecord record = toRecord(bytes);
-            return record;
-        }
-
-        private byte[] readRecordBytes() {
-            try {
-                final byte[] bytes = resultSet.getBytes(SQL.AGGREGATE);
-                return bytes;
-            } catch (SQLException e) {
-                throw new DatabaseException(e);
-            }
-        }
-
-        @Override
-        public void remove() {
-            throw new UnsupportedOperationException("Removing is not supported.");
-        }
-
-        @Override
-        public void close() throws DatabaseException {
-            try {
-                resultSet.close();
-                selectByIdStatement.close();
-            } catch (SQLException e) {
-                throw new DatabaseException(e);
-            }
-        }
-
-        private static AggregateStorageRecord toRecord(byte[] bytes) {
-            final Any.Builder builder = Any.newBuilder();
-            builder.setTypeUrl(TypeName.of(AggregateStorageRecord.getDescriptor()).toTypeUrl());
-            builder.setValue(ByteString.copyFrom(bytes));
-            final AggregateStorageRecord message = fromAny(builder.build());
-            return message;
         }
     }
 
