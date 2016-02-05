@@ -20,9 +20,6 @@
 
 package org.spine3.server.storage.jdbc;
 
-import com.google.protobuf.Any;
-import com.google.protobuf.ByteString;
-import com.google.protobuf.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spine3.server.Entity;
@@ -33,7 +30,6 @@ import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbTableNamesEscaper;
 import org.spine3.server.storage.jdbc.util.IdHelper;
-import org.spine3.type.TypeName;
 
 import javax.annotation.Nullable;
 import java.sql.PreparedStatement;
@@ -42,9 +38,9 @@ import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.lang.String.format;
-import static org.spine3.protobuf.Messages.fromAny;
-import static org.spine3.protobuf.Messages.toAny;
 import static org.spine3.server.Identifiers.idToString;
+import static org.spine3.server.storage.jdbc.util.Serializer.readDeserializedRecord;
+import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
 /**
  * The implementation of the entity storage based on the RDBMS.
@@ -145,7 +141,7 @@ class JdbcEntityStorage<I> extends EntityStorage<I> {
     protected EntityStorageRecord readInternal(I id) throws DatabaseException {
         try (ConnectionWrapper connection = dataSource.getConnection(true);
              PreparedStatement statement = selectByIdStatement(connection, id)) {
-            final EntityStorageRecord result = findById(statement);
+            final EntityStorageRecord result = readDeserializedRecord(statement, SQL.ENTITY, EntityStorageRecord.getDescriptor());
             return result;
         } catch (SQLException e) {
             logTransactionError(id, e);
@@ -170,33 +166,6 @@ class JdbcEntityStorage<I> extends EntityStorage<I> {
                 insert(connection, id, serializedRecord);
             }
         }
-    }
-
-    private static EntityStorageRecord findById(PreparedStatement statement) throws DatabaseException {
-        try (ResultSet resultSet = statement.executeQuery()) {
-            if (!resultSet.next()) {
-                return null;
-            }
-            final byte[] bytes = resultSet.getBytes(SQL.ENTITY);
-            final EntityStorageRecord record = toEntityRecord(bytes);
-            return record;
-        } catch (SQLException e) {
-            throw new DatabaseException(e);
-        }
-    }
-
-    private static EntityStorageRecord toEntityRecord(byte[] bytes) {
-        final Any.Builder builder = Any.newBuilder();
-        builder.setTypeUrl(TypeName.of(EntityStorageRecord.getDescriptor()).toTypeUrl());
-        builder.setValue(ByteString.copyFrom(bytes));
-        final EntityStorageRecord message = fromAny(builder.build());
-        return message;
-    }
-
-    private static byte[] serialize(Message message) {
-        final Any any = toAny(message);
-        final byte[] bytes = any.getValue().toByteArray();
-        return bytes;
     }
 
     private boolean containsRecord(ConnectionWrapper connection, I id) {

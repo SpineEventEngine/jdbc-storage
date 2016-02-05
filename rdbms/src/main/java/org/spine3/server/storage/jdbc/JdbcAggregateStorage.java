@@ -22,7 +22,6 @@ package org.spine3.server.storage.jdbc;
 
 import com.google.protobuf.Any;
 import com.google.protobuf.ByteString;
-import com.google.protobuf.Message;
 import com.google.protobuf.Timestamp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,10 +29,7 @@ import org.spine3.server.EntityId;
 import org.spine3.server.aggregate.Aggregate;
 import org.spine3.server.storage.AggregateStorage;
 import org.spine3.server.storage.AggregateStorageRecord;
-import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
-import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.server.storage.jdbc.util.DbTableNamesEscaper;
-import org.spine3.server.storage.jdbc.util.IdHelper;
+import org.spine3.server.storage.jdbc.util.*;
 import org.spine3.type.TypeName;
 
 import java.sql.PreparedStatement;
@@ -47,8 +43,8 @@ import static com.google.common.collect.Lists.newLinkedList;
 import static java.lang.String.format;
 import static org.spine3.io.IoUtil.closeAll;
 import static org.spine3.protobuf.Messages.fromAny;
-import static org.spine3.protobuf.Messages.toAny;
 import static org.spine3.server.Identifiers.idToString;
+import static org.spine3.server.storage.jdbc.util.Serializer.*;
 
 /**
  * The implementation of the aggregate storage based on the RDBMS.
@@ -164,12 +160,6 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
                 throw new DatabaseException(e);
             }
         }
-    }
-
-    private static byte[] serialize(Message message) {
-        final Any any = toAny(message);
-        final byte[] bytes = any.getValue().toByteArray();
-        return bytes;
     }
 
     /**

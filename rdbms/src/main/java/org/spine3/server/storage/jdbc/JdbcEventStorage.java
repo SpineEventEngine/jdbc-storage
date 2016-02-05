@@ -21,7 +21,6 @@
 package org.spine3.server.storage.jdbc;
 
 import com.google.protobuf.Any;
-import com.google.protobuf.ByteString;
 import com.google.protobuf.Message;
 import com.google.protobuf.Timestamp;
 import org.slf4j.Logger;
@@ -36,7 +35,6 @@ import org.spine3.server.storage.EventStorage;
 import org.spine3.server.storage.EventStorageRecord;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.type.TypeName;
 
 import javax.annotation.Nullable;
 import java.sql.PreparedStatement;
@@ -47,8 +45,8 @@ import java.util.Iterator;
 
 import static com.google.common.collect.Lists.newLinkedList;
 import static org.spine3.io.IoUtil.closeAll;
-import static org.spine3.protobuf.Messages.fromAny;
-import static org.spine3.protobuf.Messages.toAny;
+import static org.spine3.server.storage.jdbc.util.Serializer.readDeserializedRecord;
+import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
 /**
  * The implementation of the event storage based on the RDBMS.
@@ -287,18 +285,8 @@ public class JdbcEventStorage extends EventStorage {
             }
             isHasNextCalledBeforeNext = false;
 
-            final byte[] bytes = readRecordBytes();
-            final EventStorageRecord record = toRecord(bytes);
+            final EventStorageRecord record = readDeserializedRecord(resultSet, SQL.EVENT, EventStorageRecord.getDescriptor());
             return record;
-        }
-
-        private byte[] readRecordBytes() {
-            try {
-                final byte[] bytes = resultSet.getBytes(SQL.EVENT);
-                return bytes;
-            } catch (SQLException e) {
-                throw new DatabaseException(e);
-            }
         }
 
         @Override
@@ -336,13 +324,6 @@ public class JdbcEventStorage extends EventStorage {
         }
     }
 
-    // TODO:2016-02-03:alexander.litus: extract
-    private static byte[] serialize(Message message) {
-        final Any any = toAny(message);
-        final byte[] bytes = any.getValue().toByteArray();
-        return bytes;
-    }
-
     /**
      * {@inheritDoc}
      *
@@ -354,35 +335,12 @@ public class JdbcEventStorage extends EventStorage {
         final String id = eventId.getUuid();
         try (ConnectionWrapper connection = dataSource.getConnection(true);
              PreparedStatement statement = selectByIdStatement(connection, id)) {
-            final EventStorageRecord result = findById(statement);
-            return result;
+            final EventStorageRecord record = readDeserializedRecord(statement, SQL.EVENT, EventStorageRecord.getDescriptor());
+            return record;
         } catch (SQLException e) {
             logTransactionError(e, id);
             throw new DatabaseException(e);
         }
-    }
-
-    // TODO:2016-02-03:alexander.litus: extract
-    private static EventStorageRecord findById(PreparedStatement statement) throws DatabaseException {
-        try (ResultSet resultSet = statement.executeQuery()) {
-            if (!resultSet.next()) {
-                return null;
-            }
-            final byte[] bytes = resultSet.getBytes(SQL.EVENT);
-            final EventStorageRecord record = toRecord(bytes);
-            return record;
-        } catch (SQLException e) {
-            throw new DatabaseException(e);
-        }
-    }
-
-    // TODO:2016-02-03:alexander.litus: extract
-    private static EventStorageRecord toRecord(byte[] bytes) {
-        final Any.Builder builder = Any.newBuilder();
-        builder.setTypeUrl(TypeName.of(EventStorageRecord.getDescriptor()).toTypeUrl());
-        builder.setValue(ByteString.copyFrom(bytes));
-        final EventStorageRecord message = fromAny(builder.build());
-        return message;
     }
 
     @SuppressWarnings("TypeMayBeWeakened")
