@@ -170,80 +170,97 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
             private static final String ORDER_BY_TIME_POSTFIX = " ORDER BY " + SECONDS + " ASC, " + NANOSECONDS + " ASC;";
 
             private static PreparedStatement statement(ConnectionWrapper connection, EventStreamQuery query) {
-                final String sql = buildFilterAndSortSql(query);
-                return connection.prepareStatement(sql);
-            }
-
-            // TODO:2016-02-04:alexander.litus: add tests for other cases (time, composite filters etc)
-            private static String buildFilterAndSortSql(EventStreamQuery query) {
-                String result = SELECT_EVENT_FROM_TABLE;
-                final String timeConditionQuery = buildTimeConditionSql(query);
-                result += timeConditionQuery;
+                final StringBuilder builder = new StringBuilder(SELECT_EVENT_FROM_TABLE);
+                appendTimeConditionSql(builder, query);
                 for (EventFilter filter : query.getFilterList()) {
                     final String eventType = filter.getEventType();
                     if (!eventType.isEmpty()) {
-                        final String prefix = result.contains("WHERE") ? " AND " : " WHERE ";
-                        final String eventTypeCondition = prefix + EVENT_TYPE + " = \'" + eventType + "\' ";
-                        result += eventTypeCondition;
+                        appendFilterByEventTypeSql(builder, eventType);
                     }
-                    for (Any idAny : filter.getAggregateIdList()) {
-                        final Message aggregateId = Messages.fromAny(idAny);
-                        final String aggregateIdStr = Identifiers.idToString(aggregateId);
-                        final String prefix = result.contains("WHERE") ? " AND " : " WHERE ";
-                        final String aggregateIdCondition = prefix + AGGREGATE_ID + " = \'" + aggregateIdStr + "\' ";
-                        result += aggregateIdCondition;
-                    }
+                    appendFilterByAggregateIdsSql(builder, filter);
                 }
-                result += ORDER_BY_TIME_POSTFIX;
+                builder.append(ORDER_BY_TIME_POSTFIX);
+                final String sql = builder.toString();
+                return connection.prepareStatement(sql);
+            }
+
+            private static void appendFilterByEventTypeSql(StringBuilder builder, String eventType) {
+                appendTo(builder,
+                        whereOrAnd(builder),
+                        EVENT_TYPE, " = \'", eventType, "\' ");
+            }
+
+            private static void appendFilterByAggregateIdsSql(StringBuilder builder, EventFilter filter) {
+                for (Any idAny : filter.getAggregateIdList()) {
+                    final Message aggregateId = Messages.fromAny(idAny);
+                    final String aggregateIdStr = Identifiers.idToString(aggregateId);
+                    appendTo(builder,
+                            whereOrAnd(builder),
+                            AGGREGATE_ID, " = \'", aggregateIdStr, "\' ");
+                }
+            }
+
+            private static String whereOrAnd(StringBuilder builder) {
+                final String result = builder.toString().contains("WHERE") ? " AND " : " WHERE ";
                 return result;
             }
 
-            private static String buildTimeConditionSql(EventStreamQuery query) {
+            private static StringBuilder appendTimeConditionSql(StringBuilder builder, EventStreamQuery query) {
                 final boolean afterSpecified = query.hasAfter();
                 final boolean beforeSpecified = query.hasBefore();
                 final String where = " WHERE ";
-                String result = "";
                 if (afterSpecified && !beforeSpecified) {
-                    result = where + buildIsAfterSql(query);
+                    builder.append(where);
+                    appendIsAfterSql(builder, query);
                 } else if (!afterSpecified && beforeSpecified) {
-                    result = where + buildIsBeforeSql(query);
+                    builder.append(where);
+                    appendIsBeforeSql(builder, query);
                 } else if (afterSpecified /* beforeSpecified is true here too */) {
-                    result = where + buildIsBetweenSql(query);
+                    builder.append(where);
+                    appendIsBetweenSql(builder, query);
                 }
-                return result;
+                return builder;
             }
 
-            private static String buildIsAfterSql(EventStreamQuery query) {
+            private static StringBuilder appendIsAfterSql(StringBuilder builder, EventStreamQuery query) {
                 final Timestamp after = query.getAfter();
                 final long seconds = after.getSeconds();
                 final int nanos = after.getNanos();
-                final String sql = ' ' +
-                        SECONDS + " > " + seconds +
-                        " OR ( " +
-                        SECONDS + " = " + seconds + " AND " +
-                        NANOSECONDS + " > " + nanos +
-                        ") ";
-                return sql;
+                appendTo(builder, " ",
+                        SECONDS, " > ", seconds,
+                        " OR ( ",
+                            SECONDS, " = ", seconds, " AND ",
+                            NANOSECONDS, " > ", nanos,
+                        ") ");
+                return builder;
             }
 
-            private static String buildIsBeforeSql(EventStreamQuery query) {
+            private static StringBuilder appendIsBeforeSql(StringBuilder builder, EventStreamQuery query) {
                 final Timestamp before = query.getBefore();
                 final long seconds = before.getSeconds();
                 final int nanos = before.getNanos();
-                final String sql = ' ' +
-                        SECONDS + " < " + seconds +
-                        " OR ( " +
-                        SECONDS + " = " + seconds + " AND " +
-                        NANOSECONDS + " < " + nanos +
-                        ") ";
-                return sql;
+                appendTo(builder, " ",
+                        SECONDS, " < ", seconds,
+                        " OR ( ",
+                            SECONDS, " = ", seconds, " AND ",
+                            NANOSECONDS, " < ", nanos,
+                        ") ");
+                return builder;
             }
 
-            private static String buildIsBetweenSql(EventStreamQuery query) {
-                final String isAfterSql = buildIsAfterSql(query);
-                final String isBeforeSql = buildIsBeforeSql(query);
-                final String sql = " (" + isAfterSql + ") AND (" + isBeforeSql + ") ";
-                return sql;
+            private static void appendIsBetweenSql(StringBuilder builder, EventStreamQuery query) {
+                builder.append(" (");
+                appendIsAfterSql(builder, query);
+                builder.append(") AND (");
+                appendIsBeforeSql(builder, query);
+                builder.append(") ");
+            }
+
+            private static StringBuilder appendTo(StringBuilder builder, Object... objects) {
+                for (Object object : objects) {
+                    builder.append(object);
+                }
+                return builder;
             }
         }
     }
