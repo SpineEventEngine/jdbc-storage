@@ -120,7 +120,23 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         new CreateTableIfDoesNotExistQuery().execute(tableName);
     }
 
-    private class InsertQuery {
+    private abstract class WriteQuery {
+
+        protected void execute(ConnectionWrapper connection, ID id, byte[] serializedRecord) {
+            try (PreparedStatement statement = statement(connection, id, serializedRecord)) {
+                statement.execute();
+                connection.commit();
+            } catch (SQLException e) {
+                logTransactionError(id, e);
+                connection.rollback();
+                throw new DatabaseException(e);
+            }
+        }
+
+        protected abstract PreparedStatement statement(ConnectionWrapper connection, ID id, byte[] serializedRecord);
+    }
+
+    private class InsertQuery extends WriteQuery {
 
         private final String insertQuery;
 
@@ -128,7 +144,8 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
             this.insertQuery = format(SQL.INSERT, tableName);
         }
 
-        private PreparedStatement statement(ConnectionWrapper connection, ID id, byte[] serializedRecord) {
+        @Override
+        protected PreparedStatement statement(ConnectionWrapper connection, ID id, byte[] serializedRecord) {
             try {
                 final PreparedStatement statement = connection.prepareStatement(insertQuery);
                 idColumn.setId(1, id, statement);
@@ -140,7 +157,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         }
     }
 
-    private class UpdateQuery {
+    private class UpdateQuery extends WriteQuery {
 
         private final String updateQuery;
 
@@ -148,10 +165,11 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
             this.updateQuery = format(SQL.UPDATE, tableName);
         }
 
-        private PreparedStatement statement(ConnectionWrapper connection, ID id, byte[] serializedEntity) {
+        @Override
+        protected PreparedStatement statement(ConnectionWrapper connection, ID id, byte[] serializedRecord) {
             try {
                 final PreparedStatement statement = connection.prepareStatement(updateQuery);
-                statement.setBytes(1, serializedEntity);
+                statement.setBytes(1, serializedRecord);
                 idColumn.setId(2, id, statement);
                 return statement;
             } catch (SQLException e) {
@@ -235,9 +253,9 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         final byte[] serializedRecord = serialize(record);
         try (ConnectionWrapper connection = dataSource.getConnection(false)) {
             if (containsRecord(connection, id)) {
-                update(connection, id, serializedRecord);
+                updateQuery.execute(connection, id, serializedRecord);
             } else {
-                insert(connection, id, serializedRecord);
+                insertQuery.execute(connection, id, serializedRecord);
             }
         }
     }
@@ -252,30 +270,6 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
             connection.rollback();
             return false;
         }
-    }
-
-    private void update(ConnectionWrapper connection, ID id, byte[] serializedEntity) {
-        try (PreparedStatement statement = updateQuery.statement(connection, id, serializedEntity)) {
-            statement.execute();
-            connection.commit();
-        } catch (SQLException e) {
-            throw handleDbException(connection, e, id);
-        }
-    }
-
-    private void insert(ConnectionWrapper connection, ID id, byte[] serializedEntity) {
-        try (PreparedStatement statement = insertQuery.statement(connection, id, serializedEntity)) {
-            statement.execute();
-            connection.commit();
-        } catch (SQLException e) {
-            throw handleDbException(connection, e, id);
-        }
-    }
-
-    private DatabaseException handleDbException(ConnectionWrapper connection, SQLException e, ID id) {
-        logTransactionError(id, e);
-        connection.rollback();
-        throw new DatabaseException(e);
     }
 
     @Override
