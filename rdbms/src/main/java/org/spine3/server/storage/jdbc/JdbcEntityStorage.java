@@ -52,34 +52,34 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
  */
 /*package*/ class JdbcEntityStorage<ID> extends EntityStorage<ID> {
 
-    @SuppressWarnings({"UtilityClass", "DuplicateStringLiteralInspection", "ClassNamingConvention"})
-    private static class SQL {
+    @SuppressWarnings("DuplicateStringLiteralInspection")
+    private interface SQL {
 
         /**
          * Entity record column name.
          */
-        private static final String ENTITY = "entity";
+        String ENTITY = "entity";
 
         /**
          * Entity ID column name.
          */
-        private static final String ID = "id";
+        String ID = "id";
 
-        private static final String INSERT =
+        String INSERT =
                 "INSERT INTO %s " +
                 " (" + ID + ", " + ENTITY + ')' +
                 " VALUES (?, ?);";
 
-        private static final String UPDATE =
+        String UPDATE =
                 "UPDATE %s " +
                 " SET " + ENTITY + " = ? " +
                 " WHERE " + ID + " = ?;";
 
-        private static final String SELECT_BY_ID = "SELECT " + ENTITY + " FROM %s WHERE " + ID + " = ?;";
+        String SELECT_BY_ID = "SELECT " + ENTITY + " FROM %s WHERE " + ID + " = ?;";
 
-        private static final String DELETE_ALL = "DELETE FROM %s;";
+        String DELETE_ALL = "DELETE FROM %s;";
 
-        private static final String CREATE_TABLE_IF_DOES_NOT_EXIST =
+        String CREATE_TABLE_IF_DOES_NOT_EXIST =
                 "CREATE TABLE IF NOT EXISTS %s (" +
                     ID + " %s, " +
                     ENTITY + " BLOB, " +

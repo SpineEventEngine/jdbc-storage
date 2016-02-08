@@ -51,40 +51,40 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
  */
 /*package*/ class JdbcAggregateStorage<ID> extends AggregateStorage<ID> {
 
-    @SuppressWarnings({"UtilityClass", "DuplicateStringLiteralInspection", "ClassNamingConvention"})
-    private static class SQL {
+    @SuppressWarnings("DuplicateStringLiteralInspection")
+    private interface SQL {
 
         /**
          * Aggregate ID column name.
          */
-        private static final String ID = "id";
+        String ID = "id";
 
         /**
          * Aggregate record column name.
          */
-        private static final String AGGREGATE = "aggregate";
+        String AGGREGATE = "aggregate";
 
         /**
          * Aggregate event seconds column name.
          */
-        private static final String SECONDS = "seconds";
+        String SECONDS = "seconds";
 
         /**
          * Aggregate event nanoseconds column name.
          */
-        private static final String NANOSECONDS = "nanoseconds";
+        String NANOSECONDS = "nanoseconds";
 
-        private static final String INSERT =
+        String INSERT =
                 "INSERT INTO %s " +
                 " (" + ID + ", " + AGGREGATE + ", " + SECONDS + ", " + NANOSECONDS + ") " +
                 " VALUES (?, ?, ?, ?);";
 
-        private static final String SELECT_BY_ID_SORTED_BY_TIME_DESC =
+        String SELECT_BY_ID_SORTED_BY_TIME_DESC =
                 "SELECT " + AGGREGATE + " FROM %s " +
                 " WHERE " + ID + " = ? " +
                 " ORDER BY " + SECONDS + " DESC, " + NANOSECONDS + " DESC;";
 
-        private static final String CREATE_TABLE_IF_DOES_NOT_EXIST =
+        String CREATE_TABLE_IF_DOES_NOT_EXIST =
                 "CREATE TABLE IF NOT EXISTS %s (" +
                     ID + " %s, " +
                     AGGREGATE + " BLOB, " +

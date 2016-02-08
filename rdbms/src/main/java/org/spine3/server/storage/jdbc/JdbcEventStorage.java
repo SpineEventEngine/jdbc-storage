@@ -57,49 +57,49 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
  */
 /*package*/ class JdbcEventStorage extends EventStorage {
 
-    @SuppressWarnings({"UtilityClass", "DuplicateStringLiteralInspection", "ClassNamingConvention"})
-    private static class SQL {
+    @SuppressWarnings({"UtilityClass", "DuplicateStringLiteralInspection", "UtilityClassWithoutPrivateConstructor"})
+    private interface SQL {
 
         /**
          * Events table name.
          */
-        private static final String TABLE_NAME = "events";
+        String TABLE_NAME = "events";
 
         /**
          * Event ID column name.
          */
-        private static final String EVENT_ID = "event_id";
+        String EVENT_ID = "event_id";
 
         /**
          * Event record column name.
          */
-        private static final String EVENT = "event";
+        String EVENT = "event";
 
         /**
          * Protobuf type name of the event column name.
          */
-        private static final String EVENT_TYPE = "event_type";
+        String EVENT_TYPE = "event_type";
 
         /**
          * Aggregate ID column name.
          */
-        private static final String AGGREGATE_ID = "aggregate_id";
+        String AGGREGATE_ID = "aggregate_id";
 
         /**
          * Event seconds column name.
          */
-        private static final String SECONDS = "seconds";
+        String SECONDS = "seconds";
 
         /**
          * Event nanoseconds column name.
          */
-        private static final String NANOSECONDS = "nanoseconds";
+        String NANOSECONDS = "nanoseconds";
 
-        private static final String SELECT_EVENT_FROM_TABLE = "SELECT " + EVENT + " FROM " + TABLE_NAME + ' ';
+        String SELECT_EVENT_FROM_TABLE = "SELECT " + EVENT + " FROM " + TABLE_NAME + ' ';
 
-        private static final String DELETE_ALL = "DELETE FROM " + TABLE_NAME + ';';
+        String DELETE_ALL = "DELETE FROM " + TABLE_NAME + ';';
 
-        private static class CreateTableIfDoesNotExist {
+        class CreateTableIfDoesNotExist {
 
             private static final String CREATE_TABLE_QUERY =
                     "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" +
@@ -117,7 +117,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
             }
         }
 
-        private static class Insert {
+        class Insert {
 
             private static final String INSERT_QUERY =
                     "INSERT INTO " + TABLE_NAME + " (" +
@@ -157,7 +157,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
             }
         }
 
-        private static class SelectEventByEventId {
+        class SelectEventByEventId {
 
             private static final String SELECT_QUERY = SELECT_EVENT_FROM_TABLE + " WHERE " + EVENT_ID + " = ?;";
 
@@ -172,7 +172,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
             }
         }
 
-        private static class FilterAndSort {
+        class FilterAndSort {
 
             private static final String ORDER_BY_TIME_POSTFIX = " ORDER BY " + SECONDS + " ASC, " + NANOSECONDS + " ASC;";
 
