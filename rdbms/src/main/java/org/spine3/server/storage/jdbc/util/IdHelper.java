@@ -67,7 +67,7 @@ public abstract class IdHelper<I> {
     }
 
     /**
-     * Returns the type of ID column.
+     * Returns the SQL data type string of the ID column, e.g. {@code "BIGINT"}, {@code "VARCHAR(999)"}, etc.
      */
     public abstract String getIdColumnType();
 
