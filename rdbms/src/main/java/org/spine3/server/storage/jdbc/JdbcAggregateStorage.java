@@ -104,11 +104,8 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
     private final IdColumn<ID> idColumn;
 
-    /**
-     * SQL queries.
-     */
-    private final String insertQuery;
-    private final String selectByIdSortedByTimeDescQuery;
+    private final InsertQuery insertQuery;
+    private final SelectByIdSortedByTimeDescQuery selectByIdSortedByTimeDescQuery;
 
     /**
      * Creates a new storage instance.
@@ -123,24 +120,64 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
     private JdbcAggregateStorage(DataSourceWrapper dataSource, Class<? extends Aggregate<ID, ?>> aggregateClass) {
         this.dataSource = dataSource;
-
         final String tableName = DbTableNameFactory.newTableName(aggregateClass);
-        this.insertQuery = format(SQL.INSERT, tableName);
-        this.selectByIdSortedByTimeDescQuery = format(SQL.SELECT_BY_ID_SORTED_BY_TIME_DESC, tableName);
-
+        this.insertQuery = new InsertQuery(tableName);
+        this.selectByIdSortedByTimeDescQuery = new SelectByIdSortedByTimeDescQuery(tableName);
         this.idColumn = IdColumn.newInstance(aggregateClass);
-        createTableIfDoesNotExist(tableName);
+        new CreateTableIfDoesNotExistQuery().execute(tableName);
     }
 
-    private void createTableIfDoesNotExist(String tableName) throws DatabaseException {
-        final String idColumnType = idColumn.getColumnDataType();
-        final String createTableSql = format(SQL.CREATE_TABLE_IF_DOES_NOT_EXIST, tableName, idColumnType);
-        try (ConnectionWrapper connection = dataSource.getConnection(true);
-             PreparedStatement statement = connection.prepareStatement(createTableSql)) {
-            statement.execute();
-        } catch (SQLException e) {
-            log().error("Error during table creation, table name: " + tableName, e);
-            throw new DatabaseException(e);
+    private class InsertQuery {
+
+        private final String insertQuery;
+
+        private InsertQuery(String tableName) {
+            this.insertQuery = format(SQL.INSERT, tableName);
+        }
+
+        private PreparedStatement statement(ConnectionWrapper connection, ID id, AggregateStorageRecord record) {
+            final PreparedStatement statement = connection.prepareStatement(insertQuery);
+            final byte[] serializedRecord = serialize(record);
+            try {
+                idColumn.setId(1, id, statement);
+                statement.setBytes(2, serializedRecord);
+                final Timestamp timestamp = record.getTimestamp();
+                statement.setLong(3, timestamp.getSeconds());
+                statement.setInt(4, timestamp.getNanos());
+            } catch (SQLException e) {
+                throw new DatabaseException(e);
+            }
+            return statement;
+        }
+    }
+
+    private class SelectByIdSortedByTimeDescQuery {
+
+        private final String query;
+
+        private SelectByIdSortedByTimeDescQuery(String tableName) {
+            this.query = format(SQL.SELECT_BY_ID_SORTED_BY_TIME_DESC, tableName);
+        }
+
+        private PreparedStatement statement(ConnectionWrapper connection, ID id) {
+            final PreparedStatement statement = connection.prepareStatement(query);
+            idColumn.setId(1, id, statement);
+            return statement;
+        }
+    }
+
+    private class CreateTableIfDoesNotExistQuery {
+
+        private void execute(String tableName) throws DatabaseException {
+            final String idColumnType = idColumn.getColumnDataType();
+            final String createTableSql = format(SQL.CREATE_TABLE_IF_DOES_NOT_EXIST, tableName, idColumnType);
+            try (ConnectionWrapper connection = dataSource.getConnection(true);
+                 PreparedStatement statement = connection.prepareStatement(createTableSql)) {
+                statement.execute();
+            } catch (SQLException e) {
+                log().error("Error during table creation, table name: " + tableName, e);
+                throw new DatabaseException(e);
+            }
         }
     }
 
@@ -152,7 +189,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
     @Override
     protected void writeInternal(ID id, AggregateStorageRecord record) throws DatabaseException {
         try (ConnectionWrapper connection = dataSource.getConnection(false)) {
-            try (PreparedStatement statement = insertRecordStatement(connection, id, record)) {
+            try (PreparedStatement statement = insertQuery.statement(connection, id, record)) {
                 statement.execute();
                 connection.commit();
             } catch (SQLException e) {
@@ -168,39 +205,18 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
      *
      * <p><b>NOTE:</b> it is required to call {@link Iterator#hasNext()} before {@link Iterator#next()}.
      *
-     * @return a wrapped {@link DbIterator} instance
+     * @return a new {@link DbIterator} instance
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     @Override
     protected Iterator<AggregateStorageRecord> historyBackward(ID id) throws DatabaseException {
         checkNotNull(id);
         try (ConnectionWrapper connection = dataSource.getConnection(true)) {
-            final PreparedStatement statement = selectByIdStatement(connection, id);
+            final PreparedStatement statement = selectByIdSortedByTimeDescQuery.statement(connection, id);
             final DbIterator<AggregateStorageRecord> iterator = new DbIterator<>(statement, SQL.AGGREGATE, RECORD_DESCRIPTOR);
             iterators.add(iterator);
             return iterator;
         }
-    }
-
-    private PreparedStatement insertRecordStatement(ConnectionWrapper connection, ID id, AggregateStorageRecord record) {
-        final PreparedStatement statement = connection.prepareStatement(insertQuery);
-        final byte[] serializedRecord = serialize(record);
-        try {
-            idColumn.setId(1, id, statement);
-            statement.setBytes(2, serializedRecord);
-            final Timestamp timestamp = record.getTimestamp();
-            statement.setLong(3, timestamp.getSeconds());
-            statement.setInt(4, timestamp.getNanos());
-        } catch (SQLException e) {
-            throw new DatabaseException(e);
-        }
-        return statement;
-    }
-
-    private PreparedStatement selectByIdStatement(ConnectionWrapper connection, ID id) {
-        final PreparedStatement statement = connection.prepareStatement(selectByIdSortedByTimeDescQuery);
-        idColumn.setId(1, id, statement);
-        return statement;
     }
 
     @Override
