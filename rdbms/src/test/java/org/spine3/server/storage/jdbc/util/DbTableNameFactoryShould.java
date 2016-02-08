@@ -18,42 +18,32 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.spine3.server.storage.jdbc;
+package org.spine3.server.storage.jdbc.util;
 
 import com.google.protobuf.StringValue;
 import org.junit.Test;
 import org.spine3.server.Entity;
-import org.spine3.server.storage.EntityStorage;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Alexander Litus
  */
-@SuppressWarnings({"InstanceMethodNamingConvention", "MagicNumber"})
-public class JdbcStorageFactoryShould {
-
-    /**
-     * The URL prefix of an in-memory HyperSQL DB.
-     */
-    private static final String HSQL_IN_MEMORY_DB_URL_PREFIX = "jdbc:hsqldb:mem:";
-
-    private static final DataSourceConfig CONFIG = DataSourceConfig.newBuilder()
-            .setJdbcUrl(getInMemoryDbUrl("factoryTests"))
-            .setUsername("SA")
-            .setPassword("pwd")
-            .setMaxPoolSize(12)
-            .build();
+@SuppressWarnings("InstanceMethodNamingConvention")
+public class DbTableNameFactoryShould {
 
     @Test
-    public void create_entity_storage() {
-        final JdbcStorageFactory factory = JdbcStorageFactory.newInstance(CONFIG);
-        final EntityStorage<String> storage = factory.createEntityStorage(TestEntity.class);
-        assertNotNull(storage);
+    public void provide_table_name_for_class() {
+        final String tableName = DbTableNameFactory.newTableName(String.class);
+
+        assertEquals("java_lang_string", tableName);
     }
 
-    public static String getInMemoryDbUrl(String dbName) {
-        return HSQL_IN_MEMORY_DB_URL_PREFIX + dbName;
+    @Test
+    public void provide_table_name_for_inner_class() {
+        final String tableName = DbTableNameFactory.newTableName(TestEntity.class);
+
+        assertEquals("org_spine3_server_storage_jdbc_util_dbtablenamefactoryshould_testentity", tableName);
     }
 
     private static class TestEntity extends Entity<String, StringValue> {
