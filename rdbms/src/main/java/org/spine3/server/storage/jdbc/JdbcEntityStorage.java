@@ -30,7 +30,7 @@ import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbTableNameFactory;
-import org.spine3.server.storage.jdbc.util.IdHelper;
+import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import javax.annotation.Nullable;
 import java.sql.PreparedStatement;
@@ -91,7 +91,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
     private final DataSourceWrapper dataSource;
 
-    private final IdHelper<ID> idHelper;
+    private final IdColumn<ID> idColumn;
 
     /**
      * SQL queries.
@@ -121,12 +121,12 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         this.selectByIdQuery = format(SQL.SELECT_BY_ID, tableName);
         this.deleteAllQuery = format(SQL.DELETE_ALL, tableName);
 
-        this.idHelper = IdHelper.newInstance(entityClass);
+        this.idColumn = IdColumn.newInstance(entityClass);
         createTableIfDoesNotExist(tableName);
     }
 
     private void createTableIfDoesNotExist(String tableName) throws DatabaseException {
-        final String idColumnType = idHelper.getIdColumnType();
+        final String idColumnType = idColumn.getColumnDataType();
         final String createTableSql = format(SQL.CREATE_TABLE_IF_DOES_NOT_EXIST, tableName, idColumnType);
         try (ConnectionWrapper connection = dataSource.getConnection(true);
              PreparedStatement statement = connection.prepareStatement(createTableSql)) {
@@ -207,7 +207,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
     private PreparedStatement insertRecordStatement(ConnectionWrapper connection, ID id, byte[] serializedRecord) {
         try {
             final PreparedStatement statement = connection.prepareStatement(insertQuery);
-            idHelper.setId(1, id, statement);
+            idColumn.setId(1, id, statement);
             statement.setBytes(2, serializedRecord);
             return statement;
         } catch (SQLException e) {
@@ -219,7 +219,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         try {
             final PreparedStatement statement = connection.prepareStatement(updateQuery);
             statement.setBytes(1, serializedEntity);
-            idHelper.setId(2, id, statement);
+            idColumn.setId(2, id, statement);
             return statement;
         } catch (SQLException e) {
             throw new DatabaseException(e);
@@ -228,7 +228,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
     private PreparedStatement selectByIdStatement(ConnectionWrapper connection, ID id) {
         final PreparedStatement statement = connection.prepareStatement(selectByIdQuery);
-        idHelper.setId(1, id, statement);
+        idColumn.setId(1, id, statement);
         return statement;
     }
 

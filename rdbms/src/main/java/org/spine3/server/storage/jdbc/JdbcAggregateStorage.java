@@ -102,7 +102,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
      */
     private final Collection<DbIterator> iterators = newLinkedList();
 
-    private final IdHelper<ID> idHelper;
+    private final IdColumn<ID> idColumn;
 
     /**
      * SQL queries.
@@ -128,12 +128,12 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         this.insertQuery = format(SQL.INSERT, tableName);
         this.selectByIdSortedByTimeDescQuery = format(SQL.SELECT_BY_ID_SORTED_BY_TIME_DESC, tableName);
 
-        this.idHelper = IdHelper.newInstance(aggregateClass);
+        this.idColumn = IdColumn.newInstance(aggregateClass);
         createTableIfDoesNotExist(tableName);
     }
 
     private void createTableIfDoesNotExist(String tableName) throws DatabaseException {
-        final String idColumnType = idHelper.getIdColumnType();
+        final String idColumnType = idColumn.getColumnDataType();
         final String createTableSql = format(SQL.CREATE_TABLE_IF_DOES_NOT_EXIST, tableName, idColumnType);
         try (ConnectionWrapper connection = dataSource.getConnection(true);
              PreparedStatement statement = connection.prepareStatement(createTableSql)) {
@@ -186,7 +186,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         final PreparedStatement statement = connection.prepareStatement(insertQuery);
         final byte[] serializedRecord = serialize(record);
         try {
-            idHelper.setId(1, id, statement);
+            idColumn.setId(1, id, statement);
             statement.setBytes(2, serializedRecord);
             final Timestamp timestamp = record.getTimestamp();
             statement.setLong(3, timestamp.getSeconds());
@@ -199,7 +199,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
     private PreparedStatement selectByIdStatement(ConnectionWrapper connection, ID id) {
         final PreparedStatement statement = connection.prepareStatement(selectByIdSortedByTimeDescQuery);
-        idHelper.setId(1, id, statement);
+        idColumn.setId(1, id, statement);
         return statement;
     }
 

@@ -22,6 +22,7 @@ package org.spine3.server.storage.jdbc.util;
 
 import org.spine3.Internal;
 import org.spine3.server.Entity;
+import org.spine3.server.EntityId;
 import org.spine3.server.Identifiers;
 import org.spine3.server.reflect.Classes;
 import org.spine3.server.storage.jdbc.DatabaseException;
@@ -30,12 +31,13 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 /**
- * Helps to work with entity IDs.
+ * Helps to work with entity ID columns.
  *
+ * @see EntityId
  * @author Alexander Litus
  */
 @Internal
-public abstract class IdHelper<I> {
+public abstract class IdColumn<I> {
 
     private static final String TYPE_VARCHAR = "VARCHAR(999)";
 
@@ -53,15 +55,15 @@ public abstract class IdHelper<I> {
      * @return a new helper instance
      */
     @SuppressWarnings("IfMayBeConditional")
-    public static <I> IdHelper<I> newInstance(Class<? extends Entity<I, ?>> entityClass) {
-        final IdHelper<I> helper;
+    public static <I> IdColumn<I> newInstance(Class<? extends Entity<I, ?>> entityClass) {
+        final IdColumn<I> helper;
         final Class<I> idClass = Classes.getGenericParameterType(entityClass, ENTITY_OR_AGGREGATE_ID_TYPE_GENERIC_PARAM_INDEX);
         if (Long.class.isAssignableFrom(idClass)) {
-            helper = new LongIdHelper<>();
+            helper = new LongIdColumn<>();
         } else if (Integer.class.isAssignableFrom(idClass)) {
-            helper = new IntIdHelper<>();
+            helper = new IntIdColumn<>();
         } else {
-            helper = new StringOrMessageIdHelper<>();
+            helper = new StringOrMessageIdColumn<>();
         }
         return helper;
     }
@@ -69,7 +71,7 @@ public abstract class IdHelper<I> {
     /**
      * Returns the SQL data type string of the ID column, e.g. {@code "BIGINT"}, {@code "VARCHAR(999)"}, etc.
      */
-    public abstract String getIdColumnType();
+    public abstract String getColumnDataType();
 
     /**
      * Sets an ID parameter to the given value.
@@ -80,10 +82,10 @@ public abstract class IdHelper<I> {
      */
     public abstract void setId(int index, I id, PreparedStatement statement);
 
-    private static class LongIdHelper<I> extends IdHelper<I> {
+    private static class LongIdColumn<I> extends IdColumn<I> {
 
         @Override
-        public String getIdColumnType() {
+        public String getColumnDataType() {
             return TYPE_BIGINT;
         }
 
@@ -98,10 +100,10 @@ public abstract class IdHelper<I> {
         }
     }
 
-    private static class IntIdHelper<I> extends IdHelper<I> {
+    private static class IntIdColumn<I> extends IdColumn<I> {
 
         @Override
-        public String getIdColumnType() {
+        public String getColumnDataType() {
             return TYPE_INT;
         }
 
@@ -116,10 +118,10 @@ public abstract class IdHelper<I> {
         }
     }
 
-    private static class StringOrMessageIdHelper<I> extends IdHelper<I> {
+    private static class StringOrMessageIdColumn<I> extends IdColumn<I> {
 
         @Override
-        public String getIdColumnType() {
+        public String getColumnDataType() {
             return TYPE_VARCHAR;
         }
 
