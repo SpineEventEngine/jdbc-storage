@@ -39,7 +39,7 @@ import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.lang.String.format;
-import static org.spine3.server.Identifiers.idToString;
+import static org.spine3.base.Identifiers.idToString;
 import static org.spine3.server.storage.jdbc.util.Serializer.readDeserializedRecord;
 import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 

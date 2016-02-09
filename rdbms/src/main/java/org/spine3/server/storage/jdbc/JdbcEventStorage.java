@@ -29,7 +29,6 @@ import org.slf4j.LoggerFactory;
 import org.spine3.base.Event;
 import org.spine3.base.EventId;
 import org.spine3.protobuf.Messages;
-import org.spine3.server.Identifiers;
 import org.spine3.server.event.EventFilter;
 import org.spine3.server.event.EventStreamQuery;
 import org.spine3.server.storage.EventStorage;
@@ -45,6 +44,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import static com.google.common.collect.Lists.newLinkedList;
+import static org.spine3.base.Identifiers.idToString;
 import static org.spine3.io.IoUtil.closeAll;
 import static org.spine3.server.storage.jdbc.util.Serializer.readDeserializedRecord;
 import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
@@ -81,9 +81,9 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         String EVENT_TYPE = "event_type";
 
         /**
-         * Aggregate ID column name.
+         * Producer ID column name.
          */
-        String AGGREGATE_ID = "aggregate_id";
+        String PRODUCER_ID = "producer_id";
 
         /**
          * Event seconds column name.
@@ -106,7 +106,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
                         EVENT_ID + " VARCHAR(512), " +
                         EVENT + " BLOB, " +
                         EVENT_TYPE + " VARCHAR(512), " +
-                        AGGREGATE_ID + " VARCHAR(512), " +
+                        PRODUCER_ID + " VARCHAR(512), " +
                         SECONDS + " BIGINT, " +
                         NANOSECONDS + " INT, " +
                         " PRIMARY KEY(" + EVENT_ID + ')' +
@@ -124,7 +124,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
                         EVENT_ID + ", " +
                         EVENT + ", " +
                         EVENT_TYPE + ", " +
-                        AGGREGATE_ID + ", " +
+                        PRODUCER_ID + ", " +
                         SECONDS + ", " +
                         NANOSECONDS +
                     ") VALUES (?, ?, ?, ?, ?, ?);";
@@ -142,8 +142,8 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
                     final String eventType = record.getEventType();
                     statement.setString(3, eventType);
 
-                    final String aggregateId = record.getAggregateId();
-                    statement.setString(4, aggregateId);
+                    final String producerId = record.getProducerId();
+                    statement.setString(4, producerId);
 
                     final long seconds = timestamp.getSeconds();
                     statement.setLong(5, seconds);
@@ -200,10 +200,10 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
             private static void appendFilterByAggregateIdsSql(StringBuilder builder, EventFilter filter) {
                 for (Any idAny : filter.getAggregateIdList()) {
                     final Message aggregateId = Messages.fromAny(idAny);
-                    final String aggregateIdStr = Identifiers.idToString(aggregateId);
+                    final String aggregateIdStr = idToString(aggregateId);
                     appendTo(builder,
                             whereOrAnd(builder),
-                            AGGREGATE_ID, " = \'", aggregateIdStr, "\' ");
+                            PRODUCER_ID, " = \'", aggregateIdStr, "\' ");
                 }
             }
 

@@ -20,7 +20,6 @@
 
 package org.spine3.server.storage.jdbc;
 
-import org.junit.After;
 import org.junit.Test;
 import org.spine3.base.Event;
 import org.spine3.server.aggregate.Aggregate;
@@ -33,7 +32,7 @@ import org.spine3.test.project.ProjectId;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.spine3.server.Identifiers.newUuid;
+import static org.spine3.base.Identifiers.newUuid;
 import static org.spine3.server.storage.jdbc.JdbcStorageFactoryShould.newInMemoryDataSource;
 import static org.spine3.testdata.TestAggregateIdFactory.createProjectId;
 import static org.spine3.testdata.TestEventFactory.projectCreated;
@@ -44,21 +43,15 @@ import static org.spine3.testdata.TestEventFactory.projectCreated;
 @SuppressWarnings("InstanceMethodNamingConvention")
 public class JdbcAggregateStorageShould extends AggregateStorageShould {
 
-    private final JdbcAggregateStorage<ProjectId> storage = newStorage(TestAggregateWithIdMessage.class);
-
     @Override
     protected AggregateStorage<ProjectId> getStorage() {
+        final JdbcAggregateStorage<ProjectId> storage = newStorage(TestAggregateWithIdMessage.class);
         return storage;
     }
 
     private static <I> JdbcAggregateStorage<I> newStorage(Class<? extends Aggregate<I, ?>> aggregateClass) {
         final DataSourceWrapper dataSource = newInMemoryDataSource("aggregateStorageTests");
         return JdbcAggregateStorage.newInstance(dataSource, aggregateClass);
-    }
-
-    @After
-    public void tearDownTest() {
-        storage.close();
     }
 
     @Test

@@ -22,7 +22,6 @@ package org.spine3.server.storage.jdbc;
 
 import com.google.protobuf.StringValue;
 import com.google.protobuf.util.TimeUtil;
-import org.junit.After;
 import org.junit.Test;
 import org.spine3.server.Entity;
 import org.spine3.server.storage.EntityStorage;
@@ -33,8 +32,8 @@ import org.spine3.test.project.Project;
 import org.spine3.test.project.ProjectId;
 
 import static org.junit.Assert.*;
+import static org.spine3.base.Identifiers.newUuid;
 import static org.spine3.protobuf.Messages.toAny;
-import static org.spine3.server.Identifiers.newUuid;
 import static org.spine3.server.storage.jdbc.JdbcStorageFactoryShould.newInMemoryDataSource;
 import static org.spine3.testdata.TestAggregateIdFactory.createProjectId;
 
@@ -44,21 +43,15 @@ import static org.spine3.testdata.TestAggregateIdFactory.createProjectId;
 @SuppressWarnings("InstanceMethodNamingConvention")
 public class JdbcEntityStorageShould extends EntityStorageShould {
 
-    private final JdbcEntityStorage<String> storage = newStorage(TestEntityWithIdString.class);
-
     @Override
     protected EntityStorage<String> getStorage() {
+        final JdbcEntityStorage<String> storage = newStorage(TestEntityWithIdString.class);
         return storage;
     }
 
     private static <I> JdbcEntityStorage<I> newStorage(Class<? extends Entity<I, ?>> entityClass) {
         final DataSourceWrapper dataSource = newInMemoryDataSource("entityStorageTests");
         return JdbcEntityStorage.newInstance(dataSource, entityClass);
-    }
-
-    @After
-    public void tearDownTest() {
-        storage.close();
     }
 
     @Test
@@ -101,11 +94,12 @@ public class JdbcEntityStorageShould extends EntityStorageShould {
             // is OK because the storage is closed
             return;
         }
-        fail("Storage should close itself.");
+        fail("Storage must close itself.");
     }
 
     @Test
     public void clear_itself() {
+        final JdbcEntityStorage<String> storage = newStorage(TestEntityWithIdString.class);
         final String id = newUuid();
         final EntityStorageRecord record = newEntityRecord();
         storage.writeInternal(id, record);

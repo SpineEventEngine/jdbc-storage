@@ -38,8 +38,8 @@ import java.util.Iterator;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Lists.newLinkedList;
 import static java.lang.String.format;
+import static org.spine3.base.Identifiers.idToString;
 import static org.spine3.io.IoUtil.closeAll;
-import static org.spine3.server.Identifiers.idToString;
 import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
 /**

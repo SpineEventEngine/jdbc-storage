@@ -23,11 +23,12 @@ package org.spine3.server.storage.jdbc.util;
 import org.spine3.Internal;
 import org.spine3.server.Entity;
 import org.spine3.server.EntityId;
-import org.spine3.server.Identifiers;
 import org.spine3.server.storage.jdbc.DatabaseException;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+
+import static org.spine3.base.Identifiers.idToString;
 
 /**
  * Helps to work with entity ID columns.
@@ -124,7 +125,7 @@ public abstract class IdColumn<ID> {
 
         @Override
         public void setId(int index, ID id, PreparedStatement statement) {
-            final String idString = Identifiers.idToString(id);
+            final String idString = idToString(id);
             try {
                 statement.setString(index, idString);
             } catch (SQLException e) {

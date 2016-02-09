@@ -33,7 +33,7 @@ import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.HikariDataSourceWrapper;
 
 import static org.junit.Assert.assertNotNull;
-import static org.spine3.server.Identifiers.newUuid;
+import static org.spine3.base.Identifiers.newUuid;
 
 /**
  * @author Alexander Litus
