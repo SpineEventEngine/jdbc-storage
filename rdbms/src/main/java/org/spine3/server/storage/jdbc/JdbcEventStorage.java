@@ -97,8 +97,6 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
         String SELECT_EVENT_FROM_TABLE = "SELECT " + EVENT + " FROM " + TABLE_NAME + ' ';
 
-        String DELETE_ALL = "DELETE FROM " + TABLE_NAME + ';';
-
         class CreateTableIfDoesNotExist {
 
             private static final String CREATE_TABLE_QUERY =
@@ -370,20 +368,6 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         try {
             super.close();
         } catch (Exception e) {
-            throw new DatabaseException(e);
-        }
-    }
-
-    /**
-     * Clears all data in the storage.
-     *
-     * @throws DatabaseException if an error occurs during an interaction with the DB
-     */
-    /*package*/ void clear() throws DatabaseException {
-        try (ConnectionWrapper connection = dataSource.getConnection(true);
-             final PreparedStatement statement = connection.prepareStatement(SQL.DELETE_ALL)) {
-            statement.execute();
-        } catch (SQLException e) {
             throw new DatabaseException(e);
         }
     }
