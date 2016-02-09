@@ -85,12 +85,12 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
                         COMMAND +
                     ") VALUES (?, ?);";
 
-            private static PreparedStatement statement(ConnectionWrapper connection, CommandStorageRecord record) {
+            private static PreparedStatement statement(ConnectionWrapper connection,
+                                                       String commandId,
+                                                       CommandStorageRecord record) {
                 final PreparedStatement statement = connection.prepareStatement(INSERT_QUERY);
                 try {
-                    final String commandId = record.getCommandId();
                     statement.setString(1, commandId);
-
                     final byte[] serializedRecord = serialize(record);
                     statement.setBytes(2, serializedRecord);
                 } catch (SQLException e) {
@@ -137,7 +137,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
              PreparedStatement statement = SQL.CreateTableIfDoesNotExist.statement(connection)) {
             statement.execute();
         } catch (SQLException e) {
-            log().error("Error during table creation:", e);
+            log().error("Exception during table creation:", e);
             throw new DatabaseException(e);
         }
     }
@@ -149,16 +149,17 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     @Override
-    public void write(CommandId id, CommandStorageRecord record) {
-        checkNotNull(id);
+    public void write(CommandId commandId, CommandStorageRecord record) throws DatabaseException {
+        checkNotNull(commandId);
         checkNotClosed();
 
+        final String id = commandId.getUuid();
         try (ConnectionWrapper connection = dataSource.getConnection(false)) {
-            try (PreparedStatement statement = SQL.Insert.statement(connection, record)) {
+            try (PreparedStatement statement = SQL.Insert.statement(connection, id, record)) {
                 statement.execute();
                 connection.commit();
             } catch (SQLException e) {
-                logTransactionException(id.getUuid(), e);
+                logTransactionException(id, e);
                 connection.rollback();
                 throw new DatabaseException(e);
             }
@@ -174,7 +175,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
     @Nullable
     @Override
     @SuppressWarnings("RefusedBequest") // the method from the superclass throws an UnsupportedOperationException
-    public CommandStorageRecord read(CommandId commandId) {
+    public CommandStorageRecord read(CommandId commandId) throws DatabaseException {
         checkNotClosed();
         final String id = commandId.getUuid();
         try (ConnectionWrapper connection = dataSource.getConnection(true);
