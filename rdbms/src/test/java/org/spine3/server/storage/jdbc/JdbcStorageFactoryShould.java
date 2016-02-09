@@ -27,6 +27,7 @@ import org.junit.Test;
 import org.spine3.server.Entity;
 import org.spine3.server.aggregate.Aggregate;
 import org.spine3.server.storage.AggregateStorage;
+import org.spine3.server.storage.CommandStorage;
 import org.spine3.server.storage.EntityStorage;
 import org.spine3.server.storage.EventStorage;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
@@ -75,6 +76,12 @@ public class JdbcStorageFactoryShould {
     @Test
     public void create_event_storage() {
         final EventStorage storage = factory.createEventStorage();
+        assertNotNull(storage);
+    }
+
+    @Test
+    public void create_command_storage() {
+        final CommandStorage storage = factory.createCommandStorage();
         assertNotNull(storage);
     }
 
