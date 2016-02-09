@@ -20,21 +20,17 @@
 
 package org.spine3.server.storage.jdbc;
 
-import com.zaxxer.hikari.HikariConfig;
 import org.junit.After;
 import org.spine3.server.storage.EventStorage;
 import org.spine3.server.storage.EventStorageShould;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.server.storage.jdbc.util.HikariDataSourceWrapper;
 
-import static org.spine3.server.storage.jdbc.JdbcStorageFactoryShould.getInMemoryDbUrl;
+import static org.spine3.server.storage.jdbc.JdbcStorageFactoryShould.newInMemoryDataSource;
 
 /**
  * @author Alexander Litus
  */
 public class JdbcEventStorageShould extends EventStorageShould {
-
-    private static final String DB_URL = getInMemoryDbUrl("eventStorageTests");
 
     private final JdbcEventStorage storage = newStorage();
 
@@ -43,17 +39,13 @@ public class JdbcEventStorageShould extends EventStorageShould {
         return storage;
     }
 
-    private static JdbcEventStorage newStorage() {
-        final HikariConfig config = new HikariConfig();
-        config.setJdbcUrl(DB_URL);
-        // not setting username and password is OK for in-memory database
-        final DataSourceWrapper dataSource = HikariDataSourceWrapper.newInstance(config);
+    public static JdbcEventStorage newStorage() {
+        final DataSourceWrapper dataSource = newInMemoryDataSource("eventStorageTests");
         return JdbcEventStorage.newInstance(dataSource);
     }
 
     @After
     public void tearDownTest() {
-        storage.clear();// TODO:2016-02-04:alexander.litus: find out why we have to clear
         storage.close();
     }
 }

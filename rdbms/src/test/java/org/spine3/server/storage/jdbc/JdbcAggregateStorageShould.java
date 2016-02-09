@@ -20,7 +20,6 @@
 
 package org.spine3.server.storage.jdbc;
 
-import com.zaxxer.hikari.HikariConfig;
 import org.junit.After;
 import org.junit.Test;
 import org.spine3.base.Event;
@@ -29,14 +28,13 @@ import org.spine3.server.storage.AggregateEvents;
 import org.spine3.server.storage.AggregateStorage;
 import org.spine3.server.storage.AggregateStorageShould;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.server.storage.jdbc.util.HikariDataSourceWrapper;
 import org.spine3.test.project.Project;
 import org.spine3.test.project.ProjectId;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.spine3.server.Identifiers.newUuid;
-import static org.spine3.server.storage.jdbc.JdbcStorageFactoryShould.getInMemoryDbUrl;
+import static org.spine3.server.storage.jdbc.JdbcStorageFactoryShould.newInMemoryDataSource;
 import static org.spine3.testdata.TestAggregateIdFactory.createProjectId;
 import static org.spine3.testdata.TestEventFactory.projectCreated;
 
@@ -46,8 +44,6 @@ import static org.spine3.testdata.TestEventFactory.projectCreated;
 @SuppressWarnings("InstanceMethodNamingConvention")
 public class JdbcAggregateStorageShould extends AggregateStorageShould {
 
-    private static final String DB_URL = getInMemoryDbUrl("aggregateStorageTests");
-
     private final JdbcAggregateStorage<ProjectId> storage = newStorage(TestAggregateWithIdMessage.class);
 
     @Override
@@ -56,10 +52,7 @@ public class JdbcAggregateStorageShould extends AggregateStorageShould {
     }
 
     private static <I> JdbcAggregateStorage<I> newStorage(Class<? extends Aggregate<I, ?>> aggregateClass) {
-        final HikariConfig config = new HikariConfig();
-        config.setJdbcUrl(DB_URL);
-        // not setting username and password is OK for in-memory database
-        final DataSourceWrapper dataSource = HikariDataSourceWrapper.newInstance(config);
+        final DataSourceWrapper dataSource = newInMemoryDataSource("aggregateStorageTests");
         return JdbcAggregateStorage.newInstance(dataSource, aggregateClass);
     }
 

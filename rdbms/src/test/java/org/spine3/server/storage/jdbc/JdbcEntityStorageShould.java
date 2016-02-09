@@ -22,7 +22,6 @@ package org.spine3.server.storage.jdbc;
 
 import com.google.protobuf.StringValue;
 import com.google.protobuf.util.TimeUtil;
-import com.zaxxer.hikari.HikariConfig;
 import org.junit.After;
 import org.junit.Test;
 import org.spine3.server.Entity;
@@ -30,14 +29,13 @@ import org.spine3.server.storage.EntityStorage;
 import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.EntityStorageShould;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.server.storage.jdbc.util.HikariDataSourceWrapper;
 import org.spine3.test.project.Project;
 import org.spine3.test.project.ProjectId;
 
 import static org.junit.Assert.*;
 import static org.spine3.protobuf.Messages.toAny;
 import static org.spine3.server.Identifiers.newUuid;
-import static org.spine3.server.storage.jdbc.JdbcStorageFactoryShould.getInMemoryDbUrl;
+import static org.spine3.server.storage.jdbc.JdbcStorageFactoryShould.newInMemoryDataSource;
 import static org.spine3.testdata.TestAggregateIdFactory.createProjectId;
 
 /**
@@ -45,8 +43,6 @@ import static org.spine3.testdata.TestAggregateIdFactory.createProjectId;
  */
 @SuppressWarnings("InstanceMethodNamingConvention")
 public class JdbcEntityStorageShould extends EntityStorageShould {
-
-    private static final String DB_URL = getInMemoryDbUrl("entityTests");
 
     private final JdbcEntityStorage<String> storage = newStorage(TestEntityWithIdString.class);
 
@@ -56,10 +52,7 @@ public class JdbcEntityStorageShould extends EntityStorageShould {
     }
 
     private static <I> JdbcEntityStorage<I> newStorage(Class<? extends Entity<I, ?>> entityClass) {
-        final HikariConfig config = new HikariConfig();
-        config.setJdbcUrl(DB_URL);
-        // not setting username and password is OK for in-memory database
-        final DataSourceWrapper dataSource = HikariDataSourceWrapper.newInstance(config);
+        final DataSourceWrapper dataSource = newInMemoryDataSource("entityStorageTests");
         return JdbcEntityStorage.newInstance(dataSource, entityClass);
     }
 
