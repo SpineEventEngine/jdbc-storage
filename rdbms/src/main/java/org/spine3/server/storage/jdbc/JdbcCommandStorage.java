@@ -198,7 +198,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         }
     }
 
-    private static void logTransactionException(String commandId, SQLException e) {
+    private static void logTransactionException(String commandId, Exception e) {
         log().error("Error during transaction, command ID = " + commandId, e);
     }
 

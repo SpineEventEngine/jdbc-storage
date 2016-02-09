@@ -372,7 +372,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         }
     }
 
-    private static void logTransactionError(SQLException e, String id) {
+    private static void logTransactionError(Exception e, String id) {
         log().error("Error during transaction, event ID = " + id, e);
     }
 

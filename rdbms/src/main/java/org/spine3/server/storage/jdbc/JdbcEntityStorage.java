@@ -20,7 +20,6 @@
 
 package org.spine3.server.storage.jdbc;
 
-import com.google.protobuf.Descriptors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spine3.server.Entity;
@@ -38,6 +37,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.protobuf.Descriptors.Descriptor;
 import static java.lang.String.format;
 import static org.spine3.base.Identifiers.idToString;
 import static org.spine3.server.storage.jdbc.util.Serializer.readDeserializedRecord;
@@ -46,11 +46,11 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 /**
  * The implementation of the entity storage based on the RDBMS.
  *
- * @param <ID> the type of entity IDs. See {@link EntityId} for details.
+ * @param <Id> the type of entity IDs. See {@link EntityId} for details.
  * @see JdbcStorageFactory
  * @author Alexander Litus
  */
-/*package*/ class JdbcEntityStorage<ID> extends EntityStorage<ID> {
+/*package*/ class JdbcEntityStorage<Id> extends EntityStorage<Id> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private interface SQL {
@@ -87,11 +87,11 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
                 ");";
     }
 
-    private static final Descriptors.Descriptor RECORD_DESCRIPTOR = EntityStorageRecord.getDescriptor();
+    private static final Descriptor RECORD_DESCRIPTOR = EntityStorageRecord.getDescriptor();
 
     private final DataSourceWrapper dataSource;
 
-    private final IdColumn<ID> idColumn;
+    private final IdColumn<Id> idColumn;
 
     private final InsertQuery insertQuery;
     private final UpdateQuery updateQuery;
@@ -104,12 +104,12 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
      * @param dataSource the dataSource wrapper
      * @param entityClass the class of entities to save to the storage
      */
-    /*package*/ static <ID> JdbcEntityStorage<ID> newInstance(DataSourceWrapper dataSource,
-                                                               Class<? extends Entity<ID, ?>> entityClass) {
+    /*package*/ static <Id> JdbcEntityStorage<Id> newInstance(DataSourceWrapper dataSource,
+                                                               Class<? extends Entity<Id, ?>> entityClass) {
         return new JdbcEntityStorage<>(dataSource, entityClass);
     }
 
-    private JdbcEntityStorage(DataSourceWrapper dataSource, Class<? extends Entity<ID, ?>> entityClass) {
+    private JdbcEntityStorage(DataSourceWrapper dataSource, Class<? extends Entity<Id, ?>> entityClass) {
         this.dataSource = dataSource;
         final String tableName = DbTableNameFactory.newTableName(entityClass);
         this.insertQuery = new InsertQuery(tableName);
@@ -122,7 +122,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
     private abstract class WriteQuery {
 
-        protected void execute(ConnectionWrapper connection, ID id, byte[] serializedRecord) {
+        protected void execute(ConnectionWrapper connection, Id id, byte[] serializedRecord) {
             try (PreparedStatement statement = statement(connection, id, serializedRecord)) {
                 statement.execute();
                 connection.commit();
@@ -133,7 +133,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
             }
         }
 
-        protected abstract PreparedStatement statement(ConnectionWrapper connection, ID id, byte[] serializedRecord);
+        protected abstract PreparedStatement statement(ConnectionWrapper connection, Id id, byte[] serializedRecord);
     }
 
     private class InsertQuery extends WriteQuery {
@@ -145,7 +145,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         }
 
         @Override
-        protected PreparedStatement statement(ConnectionWrapper connection, ID id, byte[] serializedRecord) {
+        protected PreparedStatement statement(ConnectionWrapper connection, Id id, byte[] serializedRecord) {
             try {
                 final PreparedStatement statement = connection.prepareStatement(insertQuery);
                 idColumn.setId(1, id, statement);
@@ -166,7 +166,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         }
 
         @Override
-        protected PreparedStatement statement(ConnectionWrapper connection, ID id, byte[] serializedRecord) {
+        protected PreparedStatement statement(ConnectionWrapper connection, Id id, byte[] serializedRecord) {
             try {
                 final PreparedStatement statement = connection.prepareStatement(updateQuery);
                 statement.setBytes(1, serializedRecord);
@@ -186,7 +186,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
             this.selectByIdQuery = format(SQL.SELECT_BY_ID, tableName);
         }
 
-        private PreparedStatement statement(ConnectionWrapper connection, ID id) {
+        private PreparedStatement statement(ConnectionWrapper connection, Id id) {
             final PreparedStatement statement = connection.prepareStatement(selectByIdQuery);
             idColumn.setId(1, id, statement);
             return statement;
@@ -230,7 +230,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
      */
     @Nullable
     @Override
-    protected EntityStorageRecord readInternal(ID id) throws DatabaseException {
+    protected EntityStorageRecord readInternal(Id id) throws DatabaseException {
         try (ConnectionWrapper connection = dataSource.getConnection(true);
              PreparedStatement statement = selectByIdQuery.statement(connection, id)) {
             final EntityStorageRecord result = readDeserializedRecord(statement, SQL.ENTITY, RECORD_DESCRIPTOR);
@@ -247,7 +247,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     @Override
-    protected void writeInternal(ID id, EntityStorageRecord record) throws DatabaseException {
+    protected void writeInternal(Id id, EntityStorageRecord record) throws DatabaseException {
         checkArgument(record.hasState(), "entity state");
 
         final byte[] serializedRecord = serialize(record);
@@ -260,7 +260,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         }
     }
 
-    private boolean containsRecord(ConnectionWrapper connection, ID id) {
+    private boolean containsRecord(ConnectionWrapper connection, Id id) {
         try (PreparedStatement statement = selectByIdQuery.statement(connection, id);
              ResultSet resultSet = statement.executeQuery()) {
             final boolean hasNext = resultSet.next();
@@ -296,7 +296,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         }
     }
 
-    private void logTransactionError(ID id, Exception e) {
+    private void logTransactionError(Id id, Exception e) {
         log().error("Error during transaction, entity ID = " + idToString(id), e);
     }
 
