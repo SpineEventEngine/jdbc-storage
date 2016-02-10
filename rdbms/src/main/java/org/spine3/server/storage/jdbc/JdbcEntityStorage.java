@@ -194,8 +194,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         }
     }
 
-    @SuppressWarnings("InnerClassMayBeStatic") // not static to be consistent
-    private class DeleteAllQuery {
+    private static class DeleteAllQuery {
 
         private final String deleteAllQuery;
 
