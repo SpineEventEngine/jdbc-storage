@@ -26,12 +26,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.spine3.server.Entity;
 import org.spine3.server.aggregate.Aggregate;
-import org.spine3.server.storage.AggregateStorage;
-import org.spine3.server.storage.CommandStorage;
-import org.spine3.server.storage.EntityStorage;
-import org.spine3.server.storage.EventStorage;
+import org.spine3.server.projection.Projection;
+import org.spine3.server.storage.*;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.HikariDataSourceWrapper;
+import org.spine3.test.project.Project;
 
 import static org.junit.Assert.assertNotNull;
 import static org.spine3.base.Identifiers.newUuid;
@@ -85,6 +84,12 @@ public class JdbcStorageFactoryShould {
         assertNotNull(storage);
     }
 
+    @Test
+    public void create_projection_storage() {
+        final ProjectionStorage<String> storage = factory.createProjectionStorage(TestProjection.class);
+        assertNotNull(storage);
+    }
+
     public static DataSourceWrapper newInMemoryDataSource(String dbName) {
         final HikariConfig config = new HikariConfig();
         final String dbUrl = newInMemoryDbUrl(dbName);
@@ -108,6 +113,13 @@ public class JdbcStorageFactoryShould {
     private static class TestAggregate extends Aggregate<String, StringValue> {
 
         private TestAggregate(String id) {
+            super(id);
+        }
+    }
+
+    private static class TestProjection extends Projection<String, Project> {
+
+        protected TestProjection(String id) {
             super(id);
         }
     }
