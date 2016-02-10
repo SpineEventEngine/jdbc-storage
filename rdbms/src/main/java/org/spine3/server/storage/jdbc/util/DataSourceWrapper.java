@@ -20,6 +20,8 @@
 
 package org.spine3.server.storage.jdbc.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.spine3.Internal;
 import org.spine3.server.storage.jdbc.DatabaseException;
 
@@ -54,10 +56,21 @@ public abstract class DataSourceWrapper implements AutoCloseable {
             final ConnectionWrapper wrapper = ConnectionWrapper.wrap(connection);
             return wrapper;
         } catch (SQLException e) {
+            log().error("Failed to get connection.", e);
             throw new DatabaseException(e);
         }
     }
 
     @Override
     public abstract void close() throws DatabaseException;
+
+    private static Logger log() {
+        return LogSingleton.INSTANCE.value;
+    }
+
+    private enum LogSingleton {
+        INSTANCE;
+        @SuppressWarnings("NonSerializableFieldInSerializableClass")
+        private final Logger value = LoggerFactory.getLogger(DataSourceWrapper.class);
+    }
 }
