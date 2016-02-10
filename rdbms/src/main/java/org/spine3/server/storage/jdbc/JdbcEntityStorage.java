@@ -123,14 +123,16 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
     private abstract class WriteQuery {
 
-        protected void execute(ConnectionWrapper connection, Id id, byte[] serializedRecord) {
-            try (PreparedStatement statement = statement(connection, id, serializedRecord)) {
-                statement.execute();
-                connection.commit();
-            } catch (SQLException e) {
-                logTransactionError(id, e);
-                connection.rollback();
-                throw new DatabaseException(e);
+        protected void execute(Id id, byte[] serializedRecord) {
+            try (ConnectionWrapper connection = dataSource.getConnection(false)) {
+                try (PreparedStatement statement = statement(connection, id, serializedRecord)) {
+                    statement.execute();
+                    connection.commit();
+                } catch (SQLException e) {
+                    logTransactionError(id, e);
+                    connection.rollback();
+                    throw new DatabaseException(e);
+                }
             }
         }
 
@@ -251,23 +253,21 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         checkArgument(record.hasState(), "entity state");
 
         final byte[] serializedRecord = serialize(record);
-        try (ConnectionWrapper connection = dataSource.getConnection(false)) {
-            if (containsRecord(connection, id)) {
-                updateQuery.execute(connection, id, serializedRecord);
-            } else {
-                insertQuery.execute(connection, id, serializedRecord);
-            }
+        if (containsRecord(id)) {
+            updateQuery.execute(id, serializedRecord);
+        } else {
+            insertQuery.execute(id, serializedRecord);
         }
     }
 
-    private boolean containsRecord(ConnectionWrapper connection, Id id) throws DatabaseException {
-        try (PreparedStatement statement = selectByIdQuery.statement(connection, id);
+    private boolean containsRecord(Id id) throws DatabaseException {
+        try (ConnectionWrapper connection = dataSource.getConnection(true);
+             PreparedStatement statement = selectByIdQuery.statement(connection, id);
              ResultSet resultSet = statement.executeQuery()) {
             final boolean hasNext = resultSet.next();
             return hasNext;
         } catch (SQLException e) {
             logTransactionError(id, e);
-            connection.rollback();
             return false;
         }
     }
