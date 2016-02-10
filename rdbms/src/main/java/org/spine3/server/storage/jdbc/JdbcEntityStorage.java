@@ -103,13 +103,14 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
      *
      * @param dataSource the dataSource wrapper
      * @param entityClass the class of entities to save to the storage
+     * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     /*package*/ static <Id> JdbcEntityStorage<Id> newInstance(DataSourceWrapper dataSource,
-                                                               Class<? extends Entity<Id, ?>> entityClass) {
+                                                               Class<? extends Entity<Id, ?>> entityClass) throws DatabaseException {
         return new JdbcEntityStorage<>(dataSource, entityClass);
     }
 
-    private JdbcEntityStorage(DataSourceWrapper dataSource, Class<? extends Entity<Id, ?>> entityClass) {
+    private JdbcEntityStorage(DataSourceWrapper dataSource, Class<? extends Entity<Id, ?>> entityClass) throws DatabaseException {
         this.dataSource = dataSource;
         final String tableName = DbTableNameFactory.newTableName(entityClass);
         this.insertQuery = new InsertQuery(tableName);
@@ -260,7 +261,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         }
     }
 
-    private boolean containsRecord(ConnectionWrapper connection, Id id) {
+    private boolean containsRecord(ConnectionWrapper connection, Id id) throws DatabaseException {
         try (PreparedStatement statement = selectByIdQuery.statement(connection, id);
              ResultSet resultSet = statement.executeQuery()) {
             final boolean hasNext = resultSet.next();

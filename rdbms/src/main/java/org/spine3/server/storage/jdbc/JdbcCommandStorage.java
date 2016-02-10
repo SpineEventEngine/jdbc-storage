@@ -123,11 +123,18 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
     private final DataSourceWrapper dataSource;
 
-    /*package*/ static CommandStorage newInstance(DataSourceWrapper dataSource) {
+    /**
+     * Creates a new storage instance.
+     *
+     * @param dataSource a data source to use to obtain connections
+     * @throws DatabaseException if an error occurs during an interaction with the DB
+     * @return a new storage instance
+     */
+    /*package*/ static CommandStorage newInstance(DataSourceWrapper dataSource) throws DatabaseException {
         return new JdbcCommandStorage(dataSource);
     }
 
-    private JdbcCommandStorage(DataSourceWrapper dataSource) {
+    private JdbcCommandStorage(DataSourceWrapper dataSource) throws DatabaseException {
         this.dataSource = dataSource;
         createTableIfDoesNotExist();
     }

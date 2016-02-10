@@ -282,13 +282,14 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
     /**
      * Creates a new storage instance.
      *
+     * @throws DatabaseException if an error occurs during an interaction with the DB
      * @param dataSource the dataSource wrapper
      */
-    /*package*/ static JdbcEventStorage newInstance(DataSourceWrapper dataSource) {
+    /*package*/ static JdbcEventStorage newInstance(DataSourceWrapper dataSource) throws DatabaseException {
         return new JdbcEventStorage(dataSource);
     }
 
-    private JdbcEventStorage(DataSourceWrapper dataSource) {
+    private JdbcEventStorage(DataSourceWrapper dataSource) throws DatabaseException {
         this.dataSource = dataSource;
         createTableIfDoesNotExist();
     }
