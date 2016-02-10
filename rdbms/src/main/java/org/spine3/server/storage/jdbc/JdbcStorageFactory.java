@@ -63,19 +63,19 @@ public class JdbcStorageFactory implements StorageFactory {
     }
 
     @Override
-    public <I> AggregateStorage<I> createAggregateStorage(Class<? extends Aggregate<I, ?>> aggregateClass) {
+    public <Id> AggregateStorage<Id> createAggregateStorage(Class<? extends Aggregate<Id, ?>> aggregateClass) {
         return JdbcAggregateStorage.newInstance(dataSource, aggregateClass);
     }
 
     @Override
-    public <I> EntityStorage<I> createEntityStorage(Class<? extends Entity<I, ?>> entityClass) {
+    public <Id> EntityStorage<Id> createEntityStorage(Class<? extends Entity<Id, ?>> entityClass) {
         return JdbcEntityStorage.newInstance(dataSource, entityClass);
     }
 
     @Override
-    public <I> ProjectionStorage<I> createProjectionStorage() {
-        // TODO:2016-01-05:alexander.litus: impl
-        return null;
+    public <Id> ProjectionStorage<Id> createProjectionStorage(Class<? extends Entity<Id, ?>> projectionClass) {
+        final JdbcEntityStorage<Id> entityStorage = JdbcEntityStorage.newInstance(dataSource, projectionClass);
+        return JdbcProjectionStorage.newInstance(dataSource, projectionClass, entityStorage);
     }
 
     @Override
