@@ -52,40 +52,15 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
  */
 /*package*/ class JdbcEntityStorage<Id> extends EntityStorage<Id> {
 
-    @SuppressWarnings("DuplicateStringLiteralInspection")
-    private interface SQL {
+    /**
+     * Entity record column name.
+     */
+    private static final String ENTITY_COL = "entity";
 
-        /**
-         * Entity record column name.
-         */
-        String ENTITY = "entity";
-
-        /**
-         * Entity ID column name.
-         */
-        String ID = "id";
-
-        String INSERT =
-                "INSERT INTO %s " +
-                " (" + ID + ", " + ENTITY + ')' +
-                " VALUES (?, ?);";
-
-        String UPDATE =
-                "UPDATE %s " +
-                " SET " + ENTITY + " = ? " +
-                " WHERE " + ID + " = ?;";
-
-        String SELECT_BY_ID = "SELECT " + ENTITY + " FROM %s WHERE " + ID + " = ?;";
-
-        String DELETE_ALL = "DELETE FROM %s;";
-
-        String CREATE_TABLE_IF_DOES_NOT_EXIST =
-                "CREATE TABLE IF NOT EXISTS %s (" +
-                    ID + " %s, " +
-                    ENTITY + " BLOB, " +
-                    "PRIMARY KEY(" + ID + ')' +
-                ");";
-    }
+    /**
+     * Entity ID column name.
+     */
+    private static final String ID_COL = "id";
 
     private static final Descriptor RECORD_DESCRIPTOR = EntityStorageRecord.getDescriptor();
 
@@ -106,11 +81,13 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     /*package*/ static <Id> JdbcEntityStorage<Id> newInstance(DataSourceWrapper dataSource,
-                                                               Class<? extends Entity<Id, ?>> entityClass) throws DatabaseException {
+                                                              Class<? extends Entity<Id, ?>> entityClass)
+                                                              throws DatabaseException {
         return new JdbcEntityStorage<>(dataSource, entityClass);
     }
 
-    private JdbcEntityStorage(DataSourceWrapper dataSource, Class<? extends Entity<Id, ?>> entityClass) throws DatabaseException {
+    private JdbcEntityStorage(DataSourceWrapper dataSource, Class<? extends Entity<Id, ?>> entityClass)
+            throws DatabaseException {
         this.dataSource = dataSource;
         final String tableName = DbTableNameFactory.newTableName(entityClass);
         this.insertQuery = new InsertQuery(tableName);
@@ -119,110 +96,6 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         this.deleteAllQuery = new DeleteAllQuery(tableName);
         this.idColumn = IdColumn.newInstance(entityClass);
         new CreateTableIfDoesNotExistQuery().execute(tableName);
-    }
-
-    private abstract class WriteQuery {
-
-        protected void execute(Id id, byte[] serializedRecord) {
-            try (ConnectionWrapper connection = dataSource.getConnection(false)) {
-                try (PreparedStatement statement = statement(connection, id, serializedRecord)) {
-                    statement.execute();
-                    connection.commit();
-                } catch (SQLException e) {
-                    logTransactionError(id, e);
-                    connection.rollback();
-                    throw new DatabaseException(e);
-                }
-            }
-        }
-
-        protected abstract PreparedStatement statement(ConnectionWrapper connection, Id id, byte[] serializedRecord);
-    }
-
-    private class InsertQuery extends WriteQuery {
-
-        private final String insertQuery;
-
-        private InsertQuery(String tableName) {
-            this.insertQuery = format(SQL.INSERT, tableName);
-        }
-
-        @Override
-        protected PreparedStatement statement(ConnectionWrapper connection, Id id, byte[] serializedRecord) {
-            try {
-                final PreparedStatement statement = connection.prepareStatement(insertQuery);
-                idColumn.setId(1, id, statement);
-                statement.setBytes(2, serializedRecord);
-                return statement;
-            } catch (SQLException e) {
-                throw new DatabaseException(e);
-            }
-        }
-    }
-
-    private class UpdateQuery extends WriteQuery {
-
-        private final String updateQuery;
-
-        private UpdateQuery(String tableName) {
-            this.updateQuery = format(SQL.UPDATE, tableName);
-        }
-
-        @Override
-        protected PreparedStatement statement(ConnectionWrapper connection, Id id, byte[] serializedRecord) {
-            try {
-                final PreparedStatement statement = connection.prepareStatement(updateQuery);
-                statement.setBytes(1, serializedRecord);
-                idColumn.setId(2, id, statement);
-                return statement;
-            } catch (SQLException e) {
-                throw new DatabaseException(e);
-            }
-        }
-    }
-
-    private class SelectByIdQuery {
-
-        private final String selectByIdQuery;
-
-        private SelectByIdQuery(String tableName) {
-            this.selectByIdQuery = format(SQL.SELECT_BY_ID, tableName);
-        }
-
-        private PreparedStatement statement(ConnectionWrapper connection, Id id) {
-            final PreparedStatement statement = connection.prepareStatement(selectByIdQuery);
-            idColumn.setId(1, id, statement);
-            return statement;
-        }
-    }
-
-    private static class DeleteAllQuery {
-
-        private final String deleteAllQuery;
-
-        private DeleteAllQuery(String tableName) {
-            this.deleteAllQuery = format(SQL.DELETE_ALL, tableName);
-        }
-
-        public PreparedStatement statement(ConnectionWrapper connection) {
-            final PreparedStatement statement = connection.prepareStatement(deleteAllQuery);
-            return statement;
-        }
-    }
-
-    private class CreateTableIfDoesNotExistQuery {
-
-        private void execute(String tableName) throws DatabaseException {
-            final String idColumnType = idColumn.getColumnDataType();
-            final String createTableSql = format(SQL.CREATE_TABLE_IF_DOES_NOT_EXIST, tableName, idColumnType);
-            try (ConnectionWrapper connection = dataSource.getConnection(true);
-                 PreparedStatement statement = connection.prepareStatement(createTableSql)) {
-                statement.execute();
-            } catch (SQLException e) {
-                log().error("Error while creating a table with the name: " + tableName, e);
-                throw new DatabaseException(e);
-            }
-        }
     }
 
     /**
@@ -235,10 +108,10 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
     protected EntityStorageRecord readInternal(Id id) throws DatabaseException {
         try (ConnectionWrapper connection = dataSource.getConnection(true);
              PreparedStatement statement = selectByIdQuery.statement(connection, id)) {
-            final EntityStorageRecord result = readDeserializedRecord(statement, SQL.ENTITY, RECORD_DESCRIPTOR);
+            final EntityStorageRecord result = readDeserializedRecord(statement, ENTITY_COL, RECORD_DESCRIPTOR);
             return result;
         } catch (SQLException e) {
-            logTransactionError(id, e);
+            logTransactionError("reading record", id, e);
             throw new DatabaseException(e);
         }
     }
@@ -267,7 +140,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
             final boolean hasNext = resultSet.next();
             return hasNext;
         } catch (SQLException e) {
-            logTransactionError(id, e);
+            logTransactionError("checking record", id, e);
             return false;
         }
     }
@@ -296,8 +169,134 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         }
     }
 
-    private void logTransactionError(Id id, Exception e) {
-        log().error("Error during transaction, entity ID = " + idToString(id), e);
+    private abstract class WriteQuery {
+
+        private final String query;
+        private final int idIndexInQuery;
+        private final int entityIndexInQuery;
+
+        protected WriteQuery(String query, int idIndexInQuery, int entityIndexInQuery) {
+            this.query = query;
+            this.idIndexInQuery = idIndexInQuery;
+            this.entityIndexInQuery = entityIndexInQuery;
+        }
+
+        protected void execute(Id id, byte[] serializedRecord) {
+            try (ConnectionWrapper connection = dataSource.getConnection(false)) {
+                try (PreparedStatement statement = statement(connection, id, serializedRecord)) {
+                    statement.execute();
+                    connection.commit();
+                } catch (SQLException e) {
+                    logTransactionError("writing record", id, e);
+                    connection.rollback();
+                    throw new DatabaseException(e);
+                }
+            }
+        }
+
+        private PreparedStatement statement(ConnectionWrapper connection, Id id, byte[] serializedRecord) {
+            try {
+                final PreparedStatement statement = connection.prepareStatement(query);
+                idColumn.setId(idIndexInQuery, id, statement);
+                statement.setBytes(entityIndexInQuery, serializedRecord);
+                return statement;
+            } catch (SQLException e) {
+                throw new DatabaseException(e);
+            }
+        }
+    }
+
+    private class InsertQuery extends WriteQuery {
+
+        @SuppressWarnings("DuplicateStringLiteralInspection")
+        private static final String INSERT =
+                "INSERT INTO %s " +
+                " (" + ID_COL + ", " + ENTITY_COL + ')' +
+                " VALUES (?, ?);";
+
+        private static final int ID_INDEX_IN_QUERY = 1;
+        private static final int ENTITY_INDEX_IN_QUERY = 2;
+
+        private InsertQuery(String tableName) {
+            super(format(INSERT, tableName), ID_INDEX_IN_QUERY, ENTITY_INDEX_IN_QUERY);
+        }
+    }
+
+    private class UpdateQuery extends WriteQuery {
+
+        @SuppressWarnings("DuplicateStringLiteralInspection")
+        private static final String UPDATE =
+                "UPDATE %s " +
+                " SET " + ENTITY_COL + " = ? " +
+                " WHERE " + ID_COL + " = ?;";
+
+        private static final int ID_INDEX_IN_QUERY = 2;
+        private static final int ENTITY_INDEX_IN_QUERY = 1;
+
+        private UpdateQuery(String tableName) {
+            super(format(UPDATE, tableName), ID_INDEX_IN_QUERY, ENTITY_INDEX_IN_QUERY);
+        }
+    }
+
+    private class SelectByIdQuery {
+
+        @SuppressWarnings("DuplicateStringLiteralInspection")
+        private static final String SELECT_BY_ID = "SELECT " + ENTITY_COL + " FROM %s WHERE " + ID_COL + " = ?;";
+
+        private final String selectByIdQuery;
+
+        private SelectByIdQuery(String tableName) {
+            this.selectByIdQuery = format(SELECT_BY_ID, tableName);
+        }
+
+        private PreparedStatement statement(ConnectionWrapper connection, Id id) {
+            final PreparedStatement statement = connection.prepareStatement(selectByIdQuery);
+            idColumn.setId(1, id, statement);
+            return statement;
+        }
+    }
+
+    private static class DeleteAllQuery {
+
+        private static final String DELETE_ALL = "DELETE FROM %s ;";
+
+        private final String deleteAllQuery;
+
+        private DeleteAllQuery(String tableName) {
+            this.deleteAllQuery = format(DELETE_ALL, tableName);
+        }
+
+        public PreparedStatement statement(ConnectionWrapper connection) {
+            final PreparedStatement statement = connection.prepareStatement(deleteAllQuery);
+            return statement;
+        }
+    }
+
+    private class CreateTableIfDoesNotExistQuery {
+
+        @SuppressWarnings("DuplicateStringLiteralInspection")
+        private static final String CREATE_TABLE_IF_DOES_NOT_EXIST =
+                "CREATE TABLE IF NOT EXISTS %s (" +
+                    ID_COL + " %s, " +
+                    ENTITY_COL + " BLOB, " +
+                    "PRIMARY KEY(" + ID_COL + ')' +
+                ");";
+
+        private void execute(String tableName) throws DatabaseException {
+            final String idColumnType = idColumn.getColumnDataType();
+            final String createTableSql = format(CREATE_TABLE_IF_DOES_NOT_EXIST, tableName, idColumnType);
+            try (ConnectionWrapper connection = dataSource.getConnection(true);
+                 PreparedStatement statement = connection.prepareStatement(createTableSql)) {
+                statement.execute();
+            } catch (SQLException e) {
+                log().error("Error while creating a table with the name: " + tableName, e);
+                throw new DatabaseException(e);
+            }
+        }
+    }
+
+    private void logTransactionError(String actionName, Id id, Exception e) {
+        log().error("Error during " + actionName + ", entity ID = " + idToString(id), e);
     }
 
     private static Logger log() {

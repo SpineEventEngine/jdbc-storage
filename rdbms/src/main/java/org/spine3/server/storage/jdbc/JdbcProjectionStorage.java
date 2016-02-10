@@ -47,42 +47,22 @@ import static org.spine3.server.storage.jdbc.util.DbTableNameFactory.newTableNam
  */
 /*package*/ class JdbcProjectionStorage<Id> extends ProjectionStorage<Id> {
 
+    /**
+     * A suffix of a table name where the last event time is stored.
+     */
+    private static final String LAST_EVENT_TIME_TABLE_NAME_SUFFIX = "_last_event_time";
+
+    /**
+     * Last event time seconds column name.
+     */
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private interface SQL {
+    private static final String SECONDS_COL = "seconds";
 
-        /**
-         * A suffix of a table name where the last event time is stored.
-         */
-        String LAST_EVENT_TIME_TABLE_NAME_SUFFIX = "_last_event_time";
-
-        /**
-         * Last event time seconds column name.
-         */
-        String SECONDS = "seconds";
-
-        /**
-         * Last event time nanoseconds column name.
-         */
-        String NANOSECONDS = "nanoseconds";
-
-        String CREATE_TABLE_IF_DOES_NOT_EXIST =
-                "CREATE TABLE IF NOT EXISTS %s (" +
-                    SECONDS + " BIGINT, " +
-                    NANOSECONDS + " INT " +
-                ");";
-
-        String INSERT =
-                "INSERT INTO %s " +
-                " (" + SECONDS + ", " + NANOSECONDS + ')' +
-                " VALUES (?, ?);";
-
-        String UPDATE =
-                "UPDATE %s SET " +
-                SECONDS + " = ?, " +
-                NANOSECONDS + " = ?;";
-
-        String SELECT = "SELECT " + SECONDS + ", " + NANOSECONDS + " FROM %s ;";
-    }
+    /**
+     * Last event time nanoseconds column name.
+     */
+    @SuppressWarnings("DuplicateStringLiteralInspection")
+    private static final String NANOS_COL = "nanoseconds";
 
     private final DataSourceWrapper dataSource;
 
@@ -112,17 +92,80 @@ import static org.spine3.server.storage.jdbc.util.DbTableNameFactory.newTableNam
                                   JdbcEntityStorage<Id> entityStorage) throws DatabaseException {
         this.dataSource = dataSource;
         this.entityStorage = entityStorage;
-        final String tableName = newTableName(projectionClass) + SQL.LAST_EVENT_TIME_TABLE_NAME_SUFFIX;
+        final String tableName = newTableName(projectionClass) + LAST_EVENT_TIME_TABLE_NAME_SUFFIX;
         this.insertQuery = new InsertQuery(tableName);
         this.updateQuery = new UpdateQuery(tableName);
         this.selectQuery = new SelectQuery(tableName);
         new CreateTableIfDoesNotExistQuery().execute(tableName);
     }
 
+    @Override
+    public void writeLastHandledEventTime(Timestamp time) throws DatabaseException {
+        if (containsLastEventTime()) {
+            updateQuery.execute(time);
+        } else {
+            insertQuery.execute(time);
+        }
+    }
+
+    private boolean containsLastEventTime() throws DatabaseException {
+        try (ConnectionWrapper connection = dataSource.getConnection(true);
+             PreparedStatement statement = selectQuery.statement(connection);
+             ResultSet resultSet = statement.executeQuery()) {
+            final boolean containsEventTime = resultSet.next();
+            return containsEventTime;
+        } catch (SQLException e) {
+            log().error("Failed to check last event time.", e);
+            throw new DatabaseException(e);
+        }
+    }
+
+    @Override
+    @Nullable
+    public Timestamp readLastHandledEventTime() throws DatabaseException {
+        try (ConnectionWrapper connection = dataSource.getConnection(true);
+             PreparedStatement statement = selectQuery.statement(connection);
+             ResultSet resultSet = statement.executeQuery()) {
+            if (!resultSet.next()) {
+                return null;
+            }
+            final long seconds = resultSet.getLong(SECONDS_COL);
+            final int nanos = resultSet.getInt(NANOS_COL);
+            final Timestamp time = Timestamp.newBuilder().setSeconds(seconds).setNanos(nanos).build();
+            return time;
+        } catch (SQLException e) {
+            log().error("Failed to read last event time.", e);
+            throw new DatabaseException(e);
+        }
+    }
+
+    @Override
+    protected EntityStorage<Id> getEntityStorage() {
+        return entityStorage;
+    }
+
+    @Override
+    public void close() throws DatabaseException {
+        // close only entityStorage because it must close dataSource itself
+        entityStorage.close();
+        try {
+            super.close();
+        } catch (Exception e) {
+            throw new DatabaseException(e);
+        }
+    }
+
+    @SuppressWarnings("DuplicateStringLiteralInspection")
     private class CreateTableIfDoesNotExistQuery {
 
+        private static final String CREATE_TABLE_IF_DOES_NOT_EXIST =
+                "CREATE TABLE IF NOT EXISTS %s (" +
+                    SECONDS_COL + " BIGINT, " +
+                    NANOS_COL + " INT " +
+                ");";
+
         private void execute(String tableName) throws DatabaseException {
-            final String createTableSql = format(SQL.CREATE_TABLE_IF_DOES_NOT_EXIST, tableName);
+            final String createTableSql = format(CREATE_TABLE_IF_DOES_NOT_EXIST, tableName);
             try (ConnectionWrapper connection = dataSource.getConnection(true);
                  PreparedStatement statement = connection.prepareStatement(createTableSql)) {
                 statement.execute();
@@ -168,87 +211,46 @@ import static org.spine3.server.storage.jdbc.util.DbTableNameFactory.newTableNam
         }
     }
 
+    @SuppressWarnings("DuplicateStringLiteralInspection")
     private class InsertQuery extends WriteQuery {
 
+        private static final String INSERT =
+                "INSERT INTO %s " +
+                " (" + SECONDS_COL + ", " + NANOS_COL + ')' +
+                " VALUES (?, ?);";
+
         protected InsertQuery(String tableName) {
-            super(format(SQL.INSERT, tableName));
+            super(format(INSERT, tableName));
         }
     }
 
+    @SuppressWarnings("DuplicateStringLiteralInspection")
     private class UpdateQuery extends WriteQuery {
 
+        private static final String UPDATE =
+                "UPDATE %s SET " +
+                SECONDS_COL + " = ?, " +
+                NANOS_COL + " = ?;";
+
         protected UpdateQuery(String tableName) {
-            super(format(SQL.UPDATE, tableName));
+            super(format(UPDATE, tableName));
         }
     }
 
+    @SuppressWarnings("DuplicateStringLiteralInspection")
     private static class SelectQuery {
+
+        private static final String SELECT_QUERY = "SELECT " + SECONDS_COL + ", " + NANOS_COL + " FROM %s ;";
 
         private final String selectQuery;
 
         private SelectQuery(String tableName) {
-            this.selectQuery = format(SQL.SELECT, tableName);
+            this.selectQuery = format(SELECT_QUERY, tableName);
         }
 
         private PreparedStatement statement(ConnectionWrapper connection) {
             final PreparedStatement statement = connection.prepareStatement(selectQuery);
             return statement;
-        }
-    }
-
-    @Override
-    public void writeLastHandledEventTime(Timestamp time) throws DatabaseException {
-        if (containsLastEventTime()) {
-            updateQuery.execute(time);
-        } else {
-            insertQuery.execute(time);
-        }
-    }
-
-    private boolean containsLastEventTime() throws DatabaseException {
-        try (ConnectionWrapper connection = dataSource.getConnection(true);
-             PreparedStatement statement = selectQuery.statement(connection);
-             ResultSet resultSet = statement.executeQuery()) {
-            final boolean containsEventTime = resultSet.next();
-            return containsEventTime;
-        } catch (SQLException e) {
-            log().error("Failed to check last event time.", e);
-            throw new DatabaseException(e);
-        }
-    }
-
-    @Override
-    @Nullable
-    public Timestamp readLastHandledEventTime() throws DatabaseException {
-        try (ConnectionWrapper connection = dataSource.getConnection(true);
-             PreparedStatement statement = selectQuery.statement(connection);
-             ResultSet resultSet = statement.executeQuery()) {
-            if (!resultSet.next()) {
-                return null;
-            }
-            final long seconds = resultSet.getLong(SQL.SECONDS);
-            final int nanos = resultSet.getInt(SQL.NANOSECONDS);
-            final Timestamp time = Timestamp.newBuilder().setSeconds(seconds).setNanos(nanos).build();
-            return time;
-        } catch (SQLException e) {
-            log().error("Failed to read last event time.", e);
-            throw new DatabaseException(e);
-        }
-    }
-
-    @Override
-    protected EntityStorage<Id> getEntityStorage() {
-        return entityStorage;
-    }
-
-    @Override
-    public void close() throws DatabaseException {
-        // close only entityStorage because it must close dataSource itself
-        entityStorage.close();
-        try {
-            super.close();
-        } catch (Exception e) {
-            throw new DatabaseException(e);
         }
     }
 

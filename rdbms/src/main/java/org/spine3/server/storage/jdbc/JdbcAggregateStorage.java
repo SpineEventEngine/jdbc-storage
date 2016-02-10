@@ -51,47 +51,27 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
  */
 /*package*/ class JdbcAggregateStorage<Id> extends AggregateStorage<Id> {
 
+    /**
+     * Aggregate ID column name.
+     */
+    private static final String ID_COL = "id";
+
+    /**
+     * Aggregate record column name.
+     */
+    private static final String AGGREGATE_COL = "aggregate";
+
+    /**
+     * Aggregate event seconds column name.
+     */
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private interface SQL {
+    private static final String SECONDS_COL = "seconds";
 
-        /**
-         * Aggregate ID column name.
-         */
-        String ID = "id";
-
-        /**
-         * Aggregate record column name.
-         */
-        String AGGREGATE = "aggregate";
-
-        /**
-         * Aggregate event seconds column name.
-         */
-        String SECONDS = "seconds";
-
-        /**
-         * Aggregate event nanoseconds column name.
-         */
-        String NANOSECONDS = "nanoseconds";
-
-        String INSERT =
-                "INSERT INTO %s " +
-                " (" + ID + ", " + AGGREGATE + ", " + SECONDS + ", " + NANOSECONDS + ") " +
-                " VALUES (?, ?, ?, ?);";
-
-        String SELECT_BY_ID_SORTED_BY_TIME_DESC =
-                "SELECT " + AGGREGATE + " FROM %s " +
-                " WHERE " + ID + " = ? " +
-                " ORDER BY " + SECONDS + " DESC, " + NANOSECONDS + " DESC;";
-
-        String CREATE_TABLE_IF_DOES_NOT_EXIST =
-                "CREATE TABLE IF NOT EXISTS %s (" +
-                    ID + " %s, " +
-                    AGGREGATE + " BLOB, " +
-                    SECONDS + " BIGINT, " +
-                    NANOSECONDS + " INT " +
-                ");";
-    }
+    /**
+     * Aggregate event nanoseconds column name.
+     */
+    @SuppressWarnings("DuplicateStringLiteralInspection")
+    private static final String NANOS_COL = "nanoseconds";
 
     private static final Descriptor RECORD_DESCRIPTOR = AggregateStorageRecord.getDescriptor();
 
@@ -115,7 +95,8 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     /*package*/ static <ID> JdbcAggregateStorage<ID> newInstance(DataSourceWrapper dataSource,
-                                                     Class<? extends Aggregate<ID, ?>> aggregateClass) throws DatabaseException {
+                                                                 Class<? extends Aggregate<ID, ?>> aggregateClass)
+                                                                 throws DatabaseException {
         return new JdbcAggregateStorage<>(dataSource, aggregateClass);
     }
 
@@ -129,12 +110,69 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         new CreateTableIfDoesNotExistQuery().execute(tableName);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @throws DatabaseException if an error occurs during an interaction with the DB
+     */
+    @Override
+    protected void writeInternal(Id id, AggregateStorageRecord record) throws DatabaseException {
+        try (ConnectionWrapper connection = dataSource.getConnection(false)) {
+            try (PreparedStatement statement = insertQuery.statement(connection, id, record)) {
+                statement.execute();
+                connection.commit();
+            } catch (SQLException e) {
+                log().error("Error during writing record, aggregate ID = " + idToString(id), e);
+                connection.rollback();
+                throw new DatabaseException(e);
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p><b>NOTE:</b> it is required to call {@link Iterator#hasNext()} before {@link Iterator#next()}.
+     *
+     * @return a new {@link DbIterator} instance
+     * @throws DatabaseException if an error occurs during an interaction with the DB
+     */
+    @Override
+    protected Iterator<AggregateStorageRecord> historyBackward(Id id) throws DatabaseException {
+        checkNotNull(id);
+        try (ConnectionWrapper connection = dataSource.getConnection(true)) {
+            final PreparedStatement statement = selectByIdSortedByTimeDescQuery.statement(connection, id);
+            final DbIterator<AggregateStorageRecord> iterator = new DbIterator<>(statement, AGGREGATE_COL, RECORD_DESCRIPTOR);
+            iterators.add(iterator);
+            return iterator;
+        }
+    }
+
+    @Override
+    public void close() throws DatabaseException {
+        closeAll(iterators);
+        iterators.clear();
+
+        dataSource.close();
+        try {
+            super.close();
+        } catch (Exception e) {
+            throw new DatabaseException(e);
+        }
+    }
+
     private class InsertQuery {
+
+        @SuppressWarnings("DuplicateStringLiteralInspection")
+        private static final String INSERT =
+                "INSERT INTO %s " +
+                " (" + ID_COL + ", " + AGGREGATE_COL + ", " + SECONDS_COL + ", " + NANOS_COL + ") " +
+                " VALUES (?, ?, ?, ?);";
 
         private final String insertQuery;
 
         private InsertQuery(String tableName) {
-            this.insertQuery = format(SQL.INSERT, tableName);
+            this.insertQuery = format(INSERT, tableName);
         }
 
         private PreparedStatement statement(ConnectionWrapper connection, Id id, AggregateStorageRecord record) {
@@ -155,10 +193,16 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
     private class SelectByIdSortedByTimeDescQuery {
 
+        @SuppressWarnings("DuplicateStringLiteralInspection")
+        private static final String SELECT_BY_ID_SORTED_BY_TIME_DESC =
+                "SELECT " + AGGREGATE_COL + " FROM %s " +
+                " WHERE " + ID_COL + " = ? " +
+                " ORDER BY " + SECONDS_COL + " DESC, " + NANOS_COL + " DESC;";
+
         private final String query;
 
         private SelectByIdSortedByTimeDescQuery(String tableName) {
-            this.query = format(SQL.SELECT_BY_ID_SORTED_BY_TIME_DESC, tableName);
+            this.query = format(SELECT_BY_ID_SORTED_BY_TIME_DESC, tableName);
         }
 
         private PreparedStatement statement(ConnectionWrapper connection, Id id) {
@@ -170,9 +214,18 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
     private class CreateTableIfDoesNotExistQuery {
 
+        @SuppressWarnings("DuplicateStringLiteralInspection")
+        private static final String CREATE_TABLE_IF_DOES_NOT_EXIST =
+                "CREATE TABLE IF NOT EXISTS %s (" +
+                    ID_COL + " %s, " +
+                    AGGREGATE_COL + " BLOB, " +
+                    SECONDS_COL + " BIGINT, " +
+                    NANOS_COL + " INT " +
+                ");";
+
         private void execute(String tableName) throws DatabaseException {
             final String idColumnType = idColumn.getColumnDataType();
-            final String createTableSql = format(SQL.CREATE_TABLE_IF_DOES_NOT_EXIST, tableName, idColumnType);
+            final String createTableSql = format(CREATE_TABLE_IF_DOES_NOT_EXIST, tableName, idColumnType);
             try (ConnectionWrapper connection = dataSource.getConnection(true);
                  PreparedStatement statement = connection.prepareStatement(createTableSql)) {
                 statement.execute();
@@ -180,57 +233,6 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
                 log().error("Error during table creation, table name: " + tableName, e);
                 throw new DatabaseException(e);
             }
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @throws DatabaseException if an error occurs during an interaction with the DB
-     */
-    @Override
-    protected void writeInternal(Id id, AggregateStorageRecord record) throws DatabaseException {
-        try (ConnectionWrapper connection = dataSource.getConnection(false)) {
-            try (PreparedStatement statement = insertQuery.statement(connection, id, record)) {
-                statement.execute();
-                connection.commit();
-            } catch (SQLException e) {
-                log().error("Error during transaction, aggregate ID = " + idToString(id), e);
-                connection.rollback();
-                throw new DatabaseException(e);
-            }
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * <p><b>NOTE:</b> it is required to call {@link Iterator#hasNext()} before {@link Iterator#next()}.
-     *
-     * @return a new {@link DbIterator} instance
-     * @throws DatabaseException if an error occurs during an interaction with the DB
-     */
-    @Override
-    protected Iterator<AggregateStorageRecord> historyBackward(Id id) throws DatabaseException {
-        checkNotNull(id);
-        try (ConnectionWrapper connection = dataSource.getConnection(true)) {
-            final PreparedStatement statement = selectByIdSortedByTimeDescQuery.statement(connection, id);
-            final DbIterator<AggregateStorageRecord> iterator = new DbIterator<>(statement, SQL.AGGREGATE, RECORD_DESCRIPTOR);
-            iterators.add(iterator);
-            return iterator;
-        }
-    }
-
-    @Override
-    public void close() throws DatabaseException {
-        closeAll(iterators);
-        iterators.clear();
-
-        dataSource.close();
-        try {
-            super.close();
-        } catch (Exception e) {
-            throw new DatabaseException(e);
         }
     }
 

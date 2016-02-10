@@ -57,218 +57,45 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
  */
 /*package*/ class JdbcEventStorage extends EventStorage {
 
-    @SuppressWarnings({"UtilityClass", "DuplicateStringLiteralInspection", "UtilityClassWithoutPrivateConstructor"})
-    private interface SQL {
+    /**
+     * Events table name.
+     */
+    private static final String TABLE_NAME = "events";
 
-        /**
-         * Events table name.
-         */
-        String TABLE_NAME = "events";
+    /**
+     * Event ID column name.
+     */
+    private static final String EVENT_ID = "event_id";
 
-        /**
-         * Event ID column name.
-         */
-        String EVENT_ID = "event_id";
+    /**
+     * Event record column name.
+     */
+    private static final String EVENT = "event";
 
-        /**
-         * Event record column name.
-         */
-        String EVENT = "event";
+    /**
+     * Protobuf type name of the event column name.
+     */
+    private static final String EVENT_TYPE = "event_type";
 
-        /**
-         * Protobuf type name of the event column name.
-         */
-        String EVENT_TYPE = "event_type";
+    /**
+     * Producer ID column name.
+     */
+    private static final String PRODUCER_ID = "producer_id";
 
-        /**
-         * Producer ID column name.
-         */
-        String PRODUCER_ID = "producer_id";
+    /**
+     * Event seconds column name.
+     */
+    @SuppressWarnings("DuplicateStringLiteralInspection")
+    private static final String SECONDS = "seconds";
 
-        /**
-         * Event seconds column name.
-         */
-        String SECONDS = "seconds";
+    /**
+     * Event nanoseconds column name.
+     */
+    @SuppressWarnings("DuplicateStringLiteralInspection")
+    private static final String NANOSECONDS = "nanoseconds";
 
-        /**
-         * Event nanoseconds column name.
-         */
-        String NANOSECONDS = "nanoseconds";
-
-        String SELECT_EVENT_FROM_TABLE = "SELECT " + EVENT + " FROM " + TABLE_NAME + ' ';
-
-        class CreateTableIfDoesNotExist {
-
-            private static final String CREATE_TABLE_QUERY =
-                    "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" +
-                        EVENT_ID + " VARCHAR(512), " +
-                        EVENT + " BLOB, " +
-                        EVENT_TYPE + " VARCHAR(512), " +
-                        PRODUCER_ID + " VARCHAR(512), " +
-                        SECONDS + " BIGINT, " +
-                        NANOSECONDS + " INT, " +
-                        " PRIMARY KEY(" + EVENT_ID + ')' +
-                    ");";
-
-            private static PreparedStatement statement(ConnectionWrapper connection) {
-                return connection.prepareStatement(CREATE_TABLE_QUERY);
-            }
-        }
-
-        class Insert {
-
-            private static final String INSERT_QUERY =
-                    "INSERT INTO " + TABLE_NAME + " (" +
-                        EVENT_ID + ", " +
-                        EVENT + ", " +
-                        EVENT_TYPE + ", " +
-                        PRODUCER_ID + ", " +
-                        SECONDS + ", " +
-                        NANOSECONDS +
-                    ") VALUES (?, ?, ?, ?, ?, ?);";
-
-            private static PreparedStatement statement(ConnectionWrapper connection, EventStorageRecord record) {
-                final PreparedStatement statement = connection.prepareStatement(INSERT_QUERY);
-                final Timestamp timestamp = record.getTimestamp();
-                try {
-                    final String eventId = record.getEventId();
-                    statement.setString(1, eventId);
-
-                    final byte[] serializedRecord = serialize(record);
-                    statement.setBytes(2, serializedRecord);
-
-                    final String eventType = record.getEventType();
-                    statement.setString(3, eventType);
-
-                    final String producerId = record.getProducerId();
-                    statement.setString(4, producerId);
-
-                    final long seconds = timestamp.getSeconds();
-                    statement.setLong(5, seconds);
-
-                    final int nanos = timestamp.getNanos();
-                    statement.setInt(6, nanos);
-                } catch (SQLException e) {
-                    throw new DatabaseException(e);
-                }
-                return statement;
-            }
-        }
-
-        class SelectEventByEventId {
-
-            private static final String SELECT_QUERY = SELECT_EVENT_FROM_TABLE + " WHERE " + EVENT_ID + " = ?;";
-
-            private static PreparedStatement statement(ConnectionWrapper connection, String id){
-                try {
-                    final PreparedStatement statement = connection.prepareStatement(SELECT_QUERY);
-                    statement.setString(1, id);
-                    return statement;
-                } catch (SQLException e) {
-                    throw new DatabaseException(e);
-                }
-            }
-        }
-
-        class FilterAndSort {
-
-            private static final String ORDER_BY_TIME_POSTFIX = " ORDER BY " + SECONDS + " ASC, " + NANOSECONDS + " ASC;";
-
-            private static PreparedStatement statement(ConnectionWrapper connection, EventStreamQuery query) {
-                final StringBuilder builder = new StringBuilder(SELECT_EVENT_FROM_TABLE);
-                appendTimeConditionSql(builder, query);
-                for (EventFilter filter : query.getFilterList()) {
-                    final String eventType = filter.getEventType();
-                    if (!eventType.isEmpty()) {
-                        appendFilterByEventTypeSql(builder, eventType);
-                    }
-                    appendFilterByAggregateIdsSql(builder, filter);
-                }
-                builder.append(ORDER_BY_TIME_POSTFIX);
-                final String sql = builder.toString();
-                return connection.prepareStatement(sql);
-            }
-
-            private static void appendFilterByEventTypeSql(StringBuilder builder, String eventType) {
-                appendTo(builder,
-                        whereOrAnd(builder),
-                        EVENT_TYPE, " = \'", eventType, "\' ");
-            }
-
-            private static void appendFilterByAggregateIdsSql(StringBuilder builder, EventFilter filter) {
-                for (Any idAny : filter.getAggregateIdList()) {
-                    final Message aggregateId = Messages.fromAny(idAny);
-                    final String aggregateIdStr = idToString(aggregateId);
-                    appendTo(builder,
-                            whereOrAnd(builder),
-                            PRODUCER_ID, " = \'", aggregateIdStr, "\' ");
-                }
-            }
-
-            private static String whereOrAnd(StringBuilder builder) {
-                final String result = builder.toString().contains("WHERE") ? " AND " : " WHERE ";
-                return result;
-            }
-
-            private static StringBuilder appendTimeConditionSql(StringBuilder builder, EventStreamQuery query) {
-                final boolean afterSpecified = query.hasAfter();
-                final boolean beforeSpecified = query.hasBefore();
-                final String where = " WHERE ";
-                if (afterSpecified && !beforeSpecified) {
-                    builder.append(where);
-                    appendIsAfterSql(builder, query);
-                } else if (!afterSpecified && beforeSpecified) {
-                    builder.append(where);
-                    appendIsBeforeSql(builder, query);
-                } else if (afterSpecified /* beforeSpecified is true here too */) {
-                    builder.append(where);
-                    appendIsBetweenSql(builder, query);
-                }
-                return builder;
-            }
-
-            private static StringBuilder appendIsAfterSql(StringBuilder builder, EventStreamQuery query) {
-                final Timestamp after = query.getAfter();
-                final long seconds = after.getSeconds();
-                final int nanos = after.getNanos();
-                appendTo(builder, " ",
-                        SECONDS, " > ", seconds,
-                        " OR ( ",
-                            SECONDS, " = ", seconds, " AND ",
-                            NANOSECONDS, " > ", nanos,
-                        ") ");
-                return builder;
-            }
-
-            private static StringBuilder appendIsBeforeSql(StringBuilder builder, EventStreamQuery query) {
-                final Timestamp before = query.getBefore();
-                final long seconds = before.getSeconds();
-                final int nanos = before.getNanos();
-                appendTo(builder, " ",
-                        SECONDS, " < ", seconds,
-                        " OR ( ",
-                            SECONDS, " = ", seconds, " AND ",
-                            NANOSECONDS, " < ", nanos,
-                        ") ");
-                return builder;
-            }
-
-            private static void appendIsBetweenSql(StringBuilder builder, EventStreamQuery query) {
-                builder.append(" (");
-                appendIsAfterSql(builder, query);
-                builder.append(") AND (");
-                appendIsBeforeSql(builder, query);
-                builder.append(") ");
-            }
-
-            private static StringBuilder appendTo(StringBuilder builder, Object... objects) {
-                for (Object object : objects) {
-                    builder.append(object);
-                }
-                return builder;
-            }
-        }
-    }
+    @SuppressWarnings("DuplicateStringLiteralInspection")
+    private static final String SELECT_EVENT_FROM_TABLE = "SELECT " + EVENT + " FROM " + TABLE_NAME + ' ';
 
     private static final Descriptor RECORD_DESCRIPTOR = EventStorageRecord.getDescriptor();
 
@@ -291,17 +118,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
     private JdbcEventStorage(DataSourceWrapper dataSource) throws DatabaseException {
         this.dataSource = dataSource;
-        createTableIfDoesNotExist();
-    }
-
-    private void createTableIfDoesNotExist() throws DatabaseException {
-        try (ConnectionWrapper connection = dataSource.getConnection(true);
-             PreparedStatement statement = SQL.CreateTableIfDoesNotExist.statement(connection)) {
-            statement.execute();
-        } catch (SQLException e) {
-            log().error("Error during table creation:", e);
-            throw new DatabaseException(e);
-        }
+        CreateTableIfDoesNotExistQuery.execute(dataSource);
     }
 
     /**
@@ -315,8 +132,8 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
     @Override
     public Iterator<Event> iterator(EventStreamQuery query) throws DatabaseException {
         try (ConnectionWrapper connection = dataSource.getConnection(true)) {
-            final PreparedStatement statement = SQL.FilterAndSort.statement(connection, query);
-            final DbIterator<EventStorageRecord> iterator = new DbIterator<>(statement, SQL.EVENT, RECORD_DESCRIPTOR);
+            final PreparedStatement statement = FilterAndSortQuery.prepareStatement(connection, query);
+            final DbIterator<EventStorageRecord> iterator = new DbIterator<>(statement, EVENT, RECORD_DESCRIPTOR);
             iterators.add(iterator);
             final Iterator<Event> result = toEventIterator(iterator);
             return result;
@@ -331,11 +148,11 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
     @Override
     protected void writeInternal(EventStorageRecord record) throws DatabaseException {
         try (ConnectionWrapper connection = dataSource.getConnection(false)) {
-            try (PreparedStatement statement = SQL.Insert.statement(connection, record)) {
+            try (PreparedStatement statement = InsertQuery.prepareStatement(connection, record)) {
                 statement.execute();
                 connection.commit();
             } catch (SQLException e) {
-                logTransactionError(e, record.getEventId());
+                log().error("Error during writing event record, event ID = " + record.getEventId(), e);
                 connection.rollback();
                 throw new DatabaseException(e);
             }
@@ -352,11 +169,11 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
     protected EventStorageRecord readInternal(EventId eventId) throws DatabaseException {
         final String id = eventId.getUuid();
         try (ConnectionWrapper connection = dataSource.getConnection(true);
-             PreparedStatement statement = SQL.SelectEventByEventId.statement(connection, id)) {
-            final EventStorageRecord record = readDeserializedRecord(statement, SQL.EVENT, RECORD_DESCRIPTOR);
+             PreparedStatement statement = SelectEventByEventIdQuery.prepareStatement(connection, id)) {
+            final EventStorageRecord record = readDeserializedRecord(statement, EVENT, RECORD_DESCRIPTOR);
             return record;
         } catch (SQLException e) {
-            logTransactionError(e, id);
+            log().error("Error during reading event record, event ID = " + id, e);
             throw new DatabaseException(e);
         }
     }
@@ -373,8 +190,186 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         }
     }
 
-    private static void logTransactionError(Exception e, String id) {
-        log().error("Error during transaction, event ID = " + id, e);
+    @SuppressWarnings({"UtilityClass", "DuplicateStringLiteralInspection"})
+    private static class CreateTableIfDoesNotExistQuery {
+
+        private static final String CREATE_TABLE_QUERY =
+                "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" +
+                    EVENT_ID + " VARCHAR(512), " +
+                    EVENT + " BLOB, " +
+                    EVENT_TYPE + " VARCHAR(512), " +
+                    PRODUCER_ID + " VARCHAR(512), " +
+                    SECONDS + " BIGINT, " +
+                    NANOSECONDS + " INT, " +
+                    " PRIMARY KEY(" + EVENT_ID + ')' +
+                ");";
+
+        private static void execute(DataSourceWrapper dataSource) throws DatabaseException {
+            try (ConnectionWrapper connection = dataSource.getConnection(true);
+                 PreparedStatement statement = connection.prepareStatement(CREATE_TABLE_QUERY)) {
+                statement.execute();
+            } catch (SQLException e) {
+                log().error("Error during table creation:", e);
+                throw new DatabaseException(e);
+            }
+        }
+    }
+
+    @SuppressWarnings({"UtilityClass", "DuplicateStringLiteralInspection"})
+    private static class InsertQuery {
+
+        private static final String INSERT_QUERY =
+                "INSERT INTO " + TABLE_NAME + " (" +
+                    EVENT_ID + ", " +
+                    EVENT + ", " +
+                    EVENT_TYPE + ", " +
+                    PRODUCER_ID + ", " +
+                    SECONDS + ", " +
+                    NANOSECONDS +
+                ") VALUES (?, ?, ?, ?, ?, ?);";
+
+        private static PreparedStatement prepareStatement(ConnectionWrapper connection, EventStorageRecord record) {
+            final PreparedStatement statement = connection.prepareStatement(INSERT_QUERY);
+            final Timestamp timestamp = record.getTimestamp();
+            try {
+                final String eventId = record.getEventId();
+                statement.setString(1, eventId);
+
+                final byte[] serializedRecord = serialize(record);
+                statement.setBytes(2, serializedRecord);
+
+                final String eventType = record.getEventType();
+                statement.setString(3, eventType);
+
+                final String producerId = record.getProducerId();
+                statement.setString(4, producerId);
+
+                final long seconds = timestamp.getSeconds();
+                statement.setLong(5, seconds);
+
+                final int nanos = timestamp.getNanos();
+                statement.setInt(6, nanos);
+            } catch (SQLException e) {
+                throw new DatabaseException(e);
+            }
+            return statement;
+        }
+    }
+
+    @SuppressWarnings({"UtilityClass", "DuplicateStringLiteralInspection"})
+    private static class SelectEventByEventIdQuery {
+
+        private static final String SELECT_QUERY = SELECT_EVENT_FROM_TABLE + " WHERE " + EVENT_ID + " = ?;";
+
+        private static PreparedStatement prepareStatement(ConnectionWrapper connection, String id){
+            try {
+                final PreparedStatement statement = connection.prepareStatement(SELECT_QUERY);
+                statement.setString(1, id);
+                return statement;
+            } catch (SQLException e) {
+                throw new DatabaseException(e);
+            }
+        }
+    }
+
+    @SuppressWarnings({"UtilityClass", "DuplicateStringLiteralInspection"})
+    private static class FilterAndSortQuery {
+
+        private static final String ORDER_BY_TIME_POSTFIX = " ORDER BY " + SECONDS + " ASC, " + NANOSECONDS + " ASC;";
+
+        private static PreparedStatement prepareStatement(ConnectionWrapper connection, EventStreamQuery query) {
+            final StringBuilder builder = new StringBuilder(SELECT_EVENT_FROM_TABLE);
+            appendTimeConditionSql(builder, query);
+            for (EventFilter filter : query.getFilterList()) {
+                final String eventType = filter.getEventType();
+                if (!eventType.isEmpty()) {
+                    appendFilterByEventTypeSql(builder, eventType);
+                }
+                appendFilterByAggregateIdsSql(builder, filter);
+            }
+            builder.append(ORDER_BY_TIME_POSTFIX);
+            final String sql = builder.toString();
+            return connection.prepareStatement(sql);
+        }
+
+        private static void appendFilterByEventTypeSql(StringBuilder builder, String eventType) {
+            appendTo(builder,
+                    whereOrAnd(builder),
+                    EVENT_TYPE, " = \'", eventType, "\' ");
+        }
+
+        private static void appendFilterByAggregateIdsSql(StringBuilder builder, EventFilter filter) {
+            for (Any idAny : filter.getAggregateIdList()) {
+                final Message aggregateId = Messages.fromAny(idAny);
+                final String aggregateIdStr = idToString(aggregateId);
+                appendTo(builder,
+                        whereOrAnd(builder),
+                        PRODUCER_ID, " = \'", aggregateIdStr, "\' ");
+            }
+        }
+
+        private static String whereOrAnd(StringBuilder builder) {
+            final String result = builder.toString().contains("WHERE") ? " AND " : " WHERE ";
+            return result;
+        }
+
+        private static StringBuilder appendTimeConditionSql(StringBuilder builder, EventStreamQuery query) {
+            final boolean afterSpecified = query.hasAfter();
+            final boolean beforeSpecified = query.hasBefore();
+            final String where = " WHERE ";
+            if (afterSpecified && !beforeSpecified) {
+                builder.append(where);
+                appendIsAfterSql(builder, query);
+            } else if (!afterSpecified && beforeSpecified) {
+                builder.append(where);
+                appendIsBeforeSql(builder, query);
+            } else if (afterSpecified /* beforeSpecified is true here too */) {
+                builder.append(where);
+                appendIsBetweenSql(builder, query);
+            }
+            return builder;
+        }
+
+        private static StringBuilder appendIsAfterSql(StringBuilder builder, EventStreamQuery query) {
+            final Timestamp after = query.getAfter();
+            final long seconds = after.getSeconds();
+            final int nanos = after.getNanos();
+            appendTo(builder, " ",
+                    SECONDS, " > ", seconds,
+                    " OR ( ",
+                        SECONDS, " = ", seconds, " AND ",
+                        NANOSECONDS, " > ", nanos,
+                    ") ");
+            return builder;
+        }
+
+        private static StringBuilder appendIsBeforeSql(StringBuilder builder, EventStreamQuery query) {
+            final Timestamp before = query.getBefore();
+            final long seconds = before.getSeconds();
+            final int nanos = before.getNanos();
+            appendTo(builder, " ",
+                    SECONDS, " < ", seconds,
+                    " OR ( ",
+                        SECONDS, " = ", seconds, " AND ",
+                        NANOSECONDS, " < ", nanos,
+                    ") ");
+            return builder;
+        }
+
+        private static void appendIsBetweenSql(StringBuilder builder, EventStreamQuery query) {
+            builder.append(" (");
+            appendIsAfterSql(builder, query);
+            builder.append(") AND (");
+            appendIsBeforeSql(builder, query);
+            builder.append(") ");
+        }
+
+        private static StringBuilder appendTo(StringBuilder builder, Object... objects) {
+            for (Object object : objects) {
+                builder.append(object);
+            }
+            return builder;
+        }
     }
 
     private static Logger log() {
