@@ -62,7 +62,7 @@ public class DbIterator<Record extends Message> implements Iterator<Record>, Aut
      *                  (both statement and result set are closed in {@link #close()}).
      * @param columnName a name of a serialized storage record column
      * @param recordDescriptor a descriptor of a storage record
-     * @throws DatabaseException
+     * @throws DatabaseException if an error occurs during interaction with the DB
      */
     public DbIterator(PreparedStatement statement, String columnName, Descriptor recordDescriptor) throws DatabaseException {
         try {

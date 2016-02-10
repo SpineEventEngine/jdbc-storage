@@ -33,11 +33,12 @@ import static org.spine3.base.Identifiers.idToString;
 /**
  * Helps to work with entity ID columns.
  *
+ * @param <Id> the type of entity IDs
  * @see EntityId
  * @author Alexander Litus
  */
 @Internal
-public abstract class IdColumn<ID> {
+public abstract class IdColumn<Id> {
 
     private static final String TYPE_VARCHAR = "VARCHAR(999)";
 
@@ -49,13 +50,13 @@ public abstract class IdColumn<ID> {
      * Creates a new instance.
      *
      * @param entityClass a class of an entity or an aggregate
-     * @param <ID> the type of entity IDs
+     * @param <Id> the type of entity IDs
      * @return a new helper instance
      */
     @SuppressWarnings("IfMayBeConditional")
-    public static <ID> IdColumn<ID> newInstance(Class<? extends Entity<ID, ?>> entityClass) {
-        final IdColumn<ID> helper;
-        final Class<ID> idClass = Entity.getIdClass(entityClass);
+    public static <Id> IdColumn<Id> newInstance(Class<? extends Entity<Id, ?>> entityClass) {
+        final IdColumn<Id> helper;
+        final Class<Id> idClass = Entity.getIdClass(entityClass);
         if (Long.class.isAssignableFrom(idClass)) {
             helper = new LongIdColumn<>();
         } else if (Integer.class.isAssignableFrom(idClass)) {
@@ -78,9 +79,9 @@ public abstract class IdColumn<ID> {
      * @param id        the ID value to set
      * @param statement the statement to use
      */
-    public abstract void setId(int index, ID id, PreparedStatement statement);
+    public abstract void setId(int index, Id id, PreparedStatement statement);
 
-    private static class LongIdColumn<ID> extends IdColumn<ID> {
+    private static class LongIdColumn<Id> extends IdColumn<Id> {
 
         @Override
         public String getColumnDataType() {
@@ -88,7 +89,7 @@ public abstract class IdColumn<ID> {
         }
 
         @Override
-        public void setId(int index, ID id, PreparedStatement statement) {
+        public void setId(int index, Id id, PreparedStatement statement) {
             final Long idLong = (Long) id;
             try {
                 statement.setLong(index, idLong);
@@ -98,7 +99,7 @@ public abstract class IdColumn<ID> {
         }
     }
 
-    private static class IntIdColumn<ID> extends IdColumn<ID> {
+    private static class IntIdColumn<Id> extends IdColumn<Id> {
 
         @Override
         public String getColumnDataType() {
@@ -106,7 +107,7 @@ public abstract class IdColumn<ID> {
         }
 
         @Override
-        public void setId(int index, ID id, PreparedStatement statement) {
+        public void setId(int index, Id id, PreparedStatement statement) {
             final Integer idInt = (Integer) id;
             try {
                 statement.setInt(index, idInt);
@@ -116,7 +117,7 @@ public abstract class IdColumn<ID> {
         }
     }
 
-    private static class StringOrMessageIdColumn<ID> extends IdColumn<ID> {
+    private static class StringOrMessageIdColumn<Id> extends IdColumn<Id> {
 
         @Override
         public String getColumnDataType() {
@@ -124,7 +125,7 @@ public abstract class IdColumn<ID> {
         }
 
         @Override
-        public void setId(int index, ID id, PreparedStatement statement) {
+        public void setId(int index, Id id, PreparedStatement statement) {
             final String idString = idToString(id);
             try {
                 statement.setString(index, idString);
