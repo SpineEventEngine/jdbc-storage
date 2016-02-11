@@ -140,7 +140,7 @@ import static org.spine3.server.storage.jdbc.util.DbTableNameFactory.newTableNam
     }
 
     @Override
-    protected EntityStorage<Id> getEntityStorage() {
+    public EntityStorage<Id> getEntityStorage() {
         return entityStorage;
     }
 
