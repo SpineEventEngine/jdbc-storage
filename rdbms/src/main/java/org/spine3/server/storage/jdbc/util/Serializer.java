@@ -33,11 +33,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.spine3.protobuf.Messages.fromAny;
 import static org.spine3.protobuf.Messages.toAny;
 
 /**
- * A utility class for serializing/deserializing storage records.
+ * A utility class for serializing/deserializing messages.
  *
  * @author Alexander Litus
  */
@@ -48,70 +49,59 @@ public class Serializer {
     private Serializer() {}
 
     /**
-     * Reads one storage record from a result set produced by a {@code statement} and deserializes it.
+     * Reads one message from a result set produced by a {@code statement} and deserializes it.
      *
      * @param statement a statement used to retrieve a result set
-     * @param columnName a column name of a serialized (to bytes) storage record
-     * @param recordDescriptor a descriptor of a storage record
-     * @param <Record> a storage record type
-     * @return a deserialized record
+     * @param columnName a column name of a serialized (to bytes) message
+     * @param messageDescriptor a descriptor of a message
+     * @param <M> a message type
+     * @return a deserialized message
      */
     @Nullable
-    public static <Record extends Message> Record readDeserializedRecord(PreparedStatement statement,
-                                                                         String columnName,
-                                                                         Descriptor recordDescriptor) {
+    public static <M extends Message> M readAndDeserializeMessage(PreparedStatement statement,
+                                                                  String columnName,
+                                                                  Descriptor messageDescriptor) {
         try (ResultSet resultSet = statement.executeQuery()) {
             if (!resultSet.next()) {
                 return null;
             }
             final byte[] bytes = resultSet.getBytes(columnName);
-            final Record record = deserializeRecord(bytes, recordDescriptor);
-            return record;
+            final M message = deserializeMessage(bytes, messageDescriptor);
+            return message;
         } catch (SQLException e) {
             throw new DatabaseException(e);
         }
     }
 
     /**
-     * Reads one storage record from a {@code resultSet} and deserializes it.
+     * Deserializes a {@link Message}.
      *
-     * @param resultSet a result set used to retrieve a serialized record
-     * @param columnName a column name of a serialized (to bytes) storage record
-     * @param recordDescriptor a descriptor of a storage record
-     * @param <Record> a storage record type
-     * @return a deserialized record
+     * @param bytes a serialized message
+     * @param messageDescriptor a descriptor of a message
+     * @param <M> a type of message expected
+     * @return a message instance
      */
-    public static <Record extends Message> Record readDeserializedRecord(ResultSet resultSet,
-                                                                         String columnName,
-                                                                         Descriptor recordDescriptor) {
-        try {
-            final byte[] bytes = resultSet.getBytes(columnName);
-            final Record record = deserializeRecord(bytes, recordDescriptor);
-            return record;
-        } catch (SQLException e) {
-            throw new DatabaseException(e);
-        }
-    }
-
-    private static <Record extends Message> Record deserializeRecord(byte[] bytes, Descriptor recordDescriptor) {
+    public static <M extends Message> M deserializeMessage(byte[] bytes, Descriptor messageDescriptor) {
+        checkNotNull(bytes);
         final Any.Builder builder = Any.newBuilder();
-        final String typeUrl = TypeName.of(recordDescriptor).toTypeUrl();
+        final String typeUrl = TypeName.of(messageDescriptor).toTypeUrl();
         builder.setTypeUrl(typeUrl);
         final ByteString byteString = ByteString.copyFrom(bytes);
         builder.setValue(byteString);
-        final Record record = fromAny(builder.build());
-        return record;
+        final M message = fromAny(builder.build());
+        return message;
     }
 
     /**
-     * Serialized a record to an array of bytes.
+     * Serializes a message to an array of bytes.
      *
-     * @param record a record to serialize
-     * @param <Record> a storage record type
+     * @param message a message to serialize
+     * @param <M> a message type
      * @return a byte array
      */
-    public static <Record extends Message> byte[] serialize(Record record) {
-        final Any any = toAny(record);
+    public static <M extends Message> byte[] serialize(M message) {
+        checkNotNull(message);
+        final Any any = toAny(message);
         final byte[] bytes = any.getValue().toByteArray();
         return bytes;
     }

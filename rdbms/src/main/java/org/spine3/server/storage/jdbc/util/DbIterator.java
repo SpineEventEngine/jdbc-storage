@@ -31,7 +31,7 @@ import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import static org.spine3.server.storage.jdbc.util.Serializer.readDeserializedRecord;
+import static org.spine3.server.storage.jdbc.util.Serializer.deserializeMessage;
 
 /**
  * An iterator over a {@link ResultSet} of storage records.
@@ -51,7 +51,7 @@ public class DbIterator<Record extends Message> implements Iterator<Record>, Aut
     private final ResultSet resultSet;
     private final PreparedStatement statement;
     private final String columnName;
-    private final Descriptor descriptor;
+    private final Descriptor recordDescriptor;
     private boolean isHasNextCalledBeforeNext = false;
     private boolean hasNext = false;
 
@@ -69,7 +69,7 @@ public class DbIterator<Record extends Message> implements Iterator<Record>, Aut
             this.resultSet = statement.executeQuery();
             this.statement = statement;
             this.columnName = columnName;
-            this.descriptor = recordDescriptor;
+            this.recordDescriptor = recordDescriptor;
         } catch (SQLException e) {
             throw new DatabaseException(e);
         }
@@ -96,8 +96,18 @@ public class DbIterator<Record extends Message> implements Iterator<Record>, Aut
         if (!hasNext) {
             throw new NoSuchElementException("No elements remained.");
         }
-        final Record record = readDeserializedRecord(resultSet, columnName, descriptor);
+        final byte[] bytes = readBytes();
+        final Record record = deserializeMessage(bytes, recordDescriptor);
         return record;
+    }
+
+    private byte[] readBytes() {
+        try {
+            final byte[] bytes = resultSet.getBytes(columnName);
+            return bytes;
+        } catch (SQLException e) {
+            throw new DatabaseException(e);
+        }
     }
 
     @Override

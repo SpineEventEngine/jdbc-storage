@@ -46,7 +46,7 @@ import java.util.Iterator;
 import static com.google.common.collect.Lists.newLinkedList;
 import static org.spine3.base.Identifiers.idToString;
 import static org.spine3.io.IoUtil.closeAll;
-import static org.spine3.server.storage.jdbc.util.Serializer.readDeserializedRecord;
+import static org.spine3.server.storage.jdbc.util.Serializer.readAndDeserializeMessage;
 import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
 /**
@@ -170,7 +170,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         final String id = eventId.getUuid();
         try (ConnectionWrapper connection = dataSource.getConnection(true);
              PreparedStatement statement = SelectEventByEventIdQuery.prepareStatement(connection, id)) {
-            final EventStorageRecord record = readDeserializedRecord(statement, EVENT, RECORD_DESCRIPTOR);
+            final EventStorageRecord record = readAndDeserializeMessage(statement, EVENT, RECORD_DESCRIPTOR);
             return record;
         } catch (SQLException e) {
             log().error("Error during reading event record, event ID = " + id, e);

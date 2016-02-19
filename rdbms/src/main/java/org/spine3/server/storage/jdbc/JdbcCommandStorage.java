@@ -24,6 +24,9 @@ import com.google.protobuf.Descriptors.Descriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spine3.base.CommandId;
+import org.spine3.base.CommandStatus;
+import org.spine3.base.Error;
+import org.spine3.base.Failure;
 import org.spine3.server.storage.CommandStorage;
 import org.spine3.server.storage.CommandStorageRecord;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
@@ -31,10 +34,11 @@ import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
 import javax.annotation.Nullable;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.spine3.server.storage.jdbc.util.Serializer.readDeserializedRecord;
+import static org.spine3.server.storage.jdbc.util.Serializer.deserializeMessage;
 import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
 /**
@@ -43,6 +47,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
  * @see JdbcStorageFactory
  * @author Alexander Litus
  */
+@SuppressWarnings("UtilityClass")
 /*package*/ class JdbcCommandStorage extends CommandStorage {
 
     /**
@@ -60,7 +65,26 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
      */
     private static final String COMMAND_COL = "command";
 
-    private static final Descriptor RECORD_DESCRIPTOR = CommandStorageRecord.getDescriptor();
+    private static final Descriptor COMMAND_RECORD_DESCRIPTOR = CommandStorageRecord.getDescriptor();
+
+    /**
+     * Is command status OK column name.
+     */
+    private static final String IS_STATUS_OK_COL = "status_ok";
+
+    /**
+     * Command error column name.
+     */
+    private static final String ERROR_COL = "error";
+
+    private static final Descriptor ERROR_DESCRIPTOR = Error.getDescriptor();
+
+    /**
+     * Command failure column name.
+     */
+    private static final String FAILURE_COL = "failure";
+
+    private static final Descriptor FAILURE_DESCRIPTOR = Failure.getDescriptor();
 
     private final DataSourceWrapper dataSource;
 
@@ -86,22 +110,44 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
      * @throws IllegalStateException if the storage is closed
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
+    @Nullable
     @Override
-    public void write(CommandId commandId, CommandStorageRecord record) throws DatabaseException {
-        checkNotNull(commandId);
+    @SuppressWarnings("RefusedBequest") // the method from the superclass throws an UnsupportedOperationException
+    public CommandStorageRecord read(CommandId commandId) throws DatabaseException {
         checkNotClosed();
 
-        final String id = commandId.getUuid();
-        try (ConnectionWrapper connection = dataSource.getConnection(false)) {
-            try (PreparedStatement statement = InsertQuery.statement(connection, id, record)) {
-                statement.execute();
-                connection.commit();
-            } catch (SQLException e) {
-                log().error("Error while writing command record, command ID = " + commandId, e);
-                connection.rollback();
-                throw new DatabaseException(e);
-            }
+        final SelectCommandByIdQuery query = new SelectCommandByIdQuery();
+        final CommandStorageRecord record = query.execute(commandId);
+        return record;
+    }
+
+    @Nullable
+    private static CommandStorageRecord readRecord(ResultSet resultSet) throws SQLException {
+        if (!resultSet.next()) {
+            return null;
         }
+        final byte[] commandRecordBytes = resultSet.getBytes(COMMAND_COL);
+        final CommandStorageRecord record = deserializeMessage(commandRecordBytes, COMMAND_RECORD_DESCRIPTOR);
+        final CommandStorageRecord.Builder builder = record.toBuilder();
+        final boolean isStatusOk = resultSet.getBoolean(IS_STATUS_OK_COL);
+        if (isStatusOk) {
+            return builder.setStatus(CommandStatus.OK).build();
+        }
+        final byte[] errorBytes = resultSet.getBytes(ERROR_COL);
+        if (errorBytes != null) {
+            final Error error = deserializeMessage(errorBytes, ERROR_DESCRIPTOR);
+            return builder.setError(error)
+                    .setStatus(CommandStatus.ERROR)
+                    .build();
+        }
+        final byte[] failureBytes = resultSet.getBytes(FAILURE_COL);
+        if (failureBytes != null) {
+            final Failure failure = deserializeMessage(failureBytes, FAILURE_DESCRIPTOR);
+            return builder.setFailure(failure)
+                    .setStatus(CommandStatus.FAILURE)
+                    .build();
+        }
+        return builder.build();
     }
 
     /**
@@ -110,20 +156,56 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
      * @throws IllegalStateException if the storage is closed
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
-    @Nullable
     @Override
-    @SuppressWarnings("RefusedBequest") // the method from the superclass throws an UnsupportedOperationException
-    public CommandStorageRecord read(CommandId commandId) throws DatabaseException {
+    public void write(CommandId commandId, CommandStorageRecord record) throws DatabaseException {
+        checkNotNull(commandId);
         checkNotClosed();
-        final String id = commandId.getUuid();
-        try (ConnectionWrapper connection = dataSource.getConnection(true);
-             PreparedStatement statement = SelectCommandByIdQuery.statement(connection, id)) {
-            final CommandStorageRecord record = readDeserializedRecord(statement, COMMAND_COL, RECORD_DESCRIPTOR);
-            return record;
-        } catch (SQLException e) {
-            log().error("Error while reading command record, command ID = " + commandId, e);
-            throw new DatabaseException(e);
-        }
+
+        new InsertCommandQuery(record).execute(commandId);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws IllegalStateException if the storage is closed
+     * @throws DatabaseException if an error occurs during an interaction with the DB
+     */
+    @Override
+    public void setOkStatus(CommandId commandId) throws DatabaseException {
+        checkNotNull(commandId);
+        checkNotClosed();
+
+        new SetOkStatusQuery().execute(commandId);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws IllegalStateException if the storage is closed
+     * @throws DatabaseException if an error occurs during an interaction with the DB
+     */
+    @Override
+    public void updateStatus(CommandId commandId, Error error) throws DatabaseException {
+        checkNotNull(commandId);
+        checkNotNull(error);
+        checkNotClosed();
+
+        new SetErrorQuery(error).execute(commandId);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws IllegalStateException if the storage is closed
+     * @throws DatabaseException if an error occurs during an interaction with the DB
+     */
+    @Override
+    public void updateStatus(CommandId commandId, Failure failure) throws DatabaseException {
+        checkNotNull(commandId);
+        checkNotNull(failure);
+        checkNotClosed();
+
+        new SetFailureQuery(failure).execute(commandId);
     }
 
     @Override
@@ -136,13 +218,16 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         }
     }
 
-    @SuppressWarnings({"UtilityClass", "DuplicateStringLiteralInspection"})
     private static class CreateTableIfDoesNotExistQuery {
 
+        @SuppressWarnings("DuplicateStringLiteralInspection")
         private static final String CREATE_TABLE_QUERY =
                 "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" +
                     ID_COL + " VARCHAR(512), " +
                     COMMAND_COL + " BLOB, " +
+                    IS_STATUS_OK_COL + " BOOLEAN, " +
+                    ERROR_COL + " BLOB, " +
+                    FAILURE_COL + " BLOB, " +
                     " PRIMARY KEY(" + ID_COL + ')' +
                 ");";
 
@@ -157,18 +242,43 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         }
     }
 
-    @SuppressWarnings({"UtilityClass", "DuplicateStringLiteralInspection"})
-    private static class InsertQuery {
+    private abstract class WriteQuery {
 
+        @SuppressWarnings("TypeMayBeWeakened")
+        protected void execute(CommandId commandId) {
+            final String id = commandId.getUuid();
+            try (ConnectionWrapper connection = dataSource.getConnection(false)) {
+                try (PreparedStatement statement = statement(connection, id)) {
+                    statement.execute();
+                    connection.commit();
+                } catch (SQLException e) {
+                    log().error("Error while writing, command ID = " + id, e);
+                    connection.rollback();
+                    throw new DatabaseException(e);
+                }
+            }
+        }
+
+        protected abstract PreparedStatement statement(ConnectionWrapper connection, String commandId);
+    }
+
+    private class InsertCommandQuery extends WriteQuery {
+
+        @SuppressWarnings("DuplicateStringLiteralInspection")
         private static final String INSERT_QUERY =
                 "INSERT INTO " + TABLE_NAME + " (" +
-                ID_COL + ", " +
-                COMMAND_COL +
+                    ID_COL + ", " +
+                    COMMAND_COL +
                 ") VALUES (?, ?);";
 
-        private static PreparedStatement statement(ConnectionWrapper connection,
-                                                   String commandId,
-                                                   CommandStorageRecord record) {
+        private final CommandStorageRecord record;
+
+        private InsertCommandQuery(CommandStorageRecord record) {
+            this.record = record;
+        }
+
+        @Override
+        protected PreparedStatement statement(ConnectionWrapper connection, String commandId) {
             final PreparedStatement statement = connection.prepareStatement(INSERT_QUERY);
             try {
                 statement.setString(1, commandId);
@@ -181,15 +291,107 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         }
     }
 
-    @SuppressWarnings({"UtilityClass", "DuplicateStringLiteralInspection"})
-    private static class SelectCommandByIdQuery {
+    private class SetOkStatusQuery extends WriteQuery {
 
+        @SuppressWarnings("DuplicateStringLiteralInspection")
+        private static final String SET_OK_STATUS_QUERY =
+                "UPDATE " + TABLE_NAME +
+                " SET " + IS_STATUS_OK_COL + " = true " +
+                " WHERE " + ID_COL + " = ? ;";
+
+        @Override
+        protected PreparedStatement statement(ConnectionWrapper connection, String commandId) {
+            final PreparedStatement statement = connection.prepareStatement(SET_OK_STATUS_QUERY);
+            try {
+                statement.setString(1, commandId);
+            } catch (SQLException e) {
+                throw new DatabaseException(e);
+            }
+            return statement;
+        }
+    }
+
+    private class SetErrorQuery extends WriteQuery {
+
+        @SuppressWarnings("DuplicateStringLiteralInspection")
+        private static final String SET_ERROR_QUERY =
+                "UPDATE " + TABLE_NAME +
+                " SET " +
+                    IS_STATUS_OK_COL + " = false, " +
+                    ERROR_COL + " = ? " +
+                " WHERE " + ID_COL + " = ? ;";
+
+        private final Error error;
+
+        private SetErrorQuery(Error error) {
+            this.error = error;
+        }
+
+        @Override
+        protected PreparedStatement statement(ConnectionWrapper connection, String commandId) {
+            final PreparedStatement statement = connection.prepareStatement(SET_ERROR_QUERY);
+            try {
+                final byte[] serializedError = serialize(error);
+                statement.setBytes(1, serializedError);
+                statement.setString(2, commandId);
+            } catch (SQLException e) {
+                throw new DatabaseException(e);
+            }
+            return statement;
+        }
+    }
+
+    private class SetFailureQuery extends WriteQuery {
+
+        @SuppressWarnings("DuplicateStringLiteralInspection")
+        private static final String SET_FAILURE_QUERY =
+                "UPDATE " + TABLE_NAME +
+                " SET " +
+                    IS_STATUS_OK_COL + " = false, " +
+                    FAILURE_COL + " = ? " +
+                " WHERE " + ID_COL + " = ? ;";
+
+        private final Failure failure;
+
+        private SetFailureQuery(Failure failure) {
+            this.failure = failure;
+        }
+
+        @Override
+        protected PreparedStatement statement(ConnectionWrapper connection, String commandId) {
+            final PreparedStatement statement = connection.prepareStatement(SET_FAILURE_QUERY);
+            try {
+                final byte[] serializedError = serialize(failure);
+                statement.setBytes(1, serializedError);
+                statement.setString(2, commandId);
+            } catch (SQLException e) {
+                throw new DatabaseException(e);
+            }
+            return statement;
+        }
+    }
+
+    private class SelectCommandByIdQuery {
+
+        @SuppressWarnings("DuplicateStringLiteralInspection")
         private static final String SELECT_QUERY =
-                "SELECT " + COMMAND_COL +
-                " FROM " + TABLE_NAME +
+                "SELECT * FROM " + TABLE_NAME +
                 " WHERE " + ID_COL + " = ?;";
 
-        private static PreparedStatement statement(ConnectionWrapper connection, String id) {
+        @SuppressWarnings("TypeMayBeWeakened")
+        private CommandStorageRecord execute(CommandId commandId) {
+            try (ConnectionWrapper connection = dataSource.getConnection(true);
+                 PreparedStatement statement = statement(connection, commandId.getUuid());
+                 ResultSet resultSet = statement.executeQuery()) {
+                final CommandStorageRecord record = readRecord(resultSet);
+                return record;
+            } catch (SQLException e) {
+                log().error("Error while reading command record, command ID = " + commandId, e);
+                throw new DatabaseException(e);
+            }
+        }
+
+        private PreparedStatement statement(ConnectionWrapper connection, String id) {
             try {
                 final PreparedStatement statement = connection.prepareStatement(SELECT_QUERY);
                 statement.setString(1, id);

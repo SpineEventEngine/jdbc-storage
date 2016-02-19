@@ -40,7 +40,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.protobuf.Descriptors.Descriptor;
 import static java.lang.String.format;
 import static org.spine3.base.Identifiers.idToString;
-import static org.spine3.server.storage.jdbc.util.Serializer.readDeserializedRecord;
+import static org.spine3.server.storage.jdbc.util.Serializer.readAndDeserializeMessage;
 import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
 /**
@@ -108,7 +108,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
     protected EntityStorageRecord readInternal(Id id) throws DatabaseException {
         try (ConnectionWrapper connection = dataSource.getConnection(true);
              PreparedStatement statement = selectByIdQuery.statement(connection, id)) {
-            final EntityStorageRecord result = readDeserializedRecord(statement, ENTITY_COL, RECORD_DESCRIPTOR);
+            final EntityStorageRecord result = readAndDeserializeMessage(statement, ENTITY_COL, RECORD_DESCRIPTOR);
             return result;
         } catch (SQLException e) {
             logTransactionError("reading record", id, e);
