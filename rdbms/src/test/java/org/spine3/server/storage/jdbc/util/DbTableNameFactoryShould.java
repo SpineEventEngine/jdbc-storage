@@ -22,7 +22,7 @@ package org.spine3.server.storage.jdbc.util;
 
 import com.google.protobuf.StringValue;
 import org.junit.Test;
-import org.spine3.server.Entity;
+import org.spine3.server.entity.Entity;
 
 import static org.junit.Assert.assertEquals;
 

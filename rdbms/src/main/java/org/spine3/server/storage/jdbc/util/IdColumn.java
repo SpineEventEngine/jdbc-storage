@@ -21,8 +21,8 @@
 package org.spine3.server.storage.jdbc.util;
 
 import org.spine3.Internal;
-import org.spine3.server.Entity;
-import org.spine3.server.EntityId;
+import org.spine3.server.entity.Entity;
+import org.spine3.server.entity.EntityId;
 import org.spine3.server.storage.jdbc.DatabaseException;
 
 import java.sql.PreparedStatement;

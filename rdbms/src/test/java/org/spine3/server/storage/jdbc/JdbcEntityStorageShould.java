@@ -23,7 +23,7 @@ package org.spine3.server.storage.jdbc;
 import com.google.protobuf.StringValue;
 import com.google.protobuf.util.TimeUtil;
 import org.junit.Test;
-import org.spine3.server.Entity;
+import org.spine3.server.entity.Entity;
 import org.spine3.server.storage.EntityStorage;
 import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.EntityStorageShould;
@@ -35,18 +35,23 @@ import static org.junit.Assert.*;
 import static org.spine3.base.Identifiers.newUuid;
 import static org.spine3.protobuf.Messages.toAny;
 import static org.spine3.server.storage.jdbc.JdbcStorageFactoryShould.newInMemoryDataSource;
-import static org.spine3.testdata.TestAggregateIdFactory.createProjectId;
+import static org.spine3.testdata.TestAggregateIdFactory.newProjectId;
 
 /**
  * @author Alexander Litus
  */
 @SuppressWarnings("InstanceMethodNamingConvention")
-public class JdbcEntityStorageShould extends EntityStorageShould {
+public class JdbcEntityStorageShould extends EntityStorageShould<String> {
 
     @Override
     protected EntityStorage<String> getStorage() {
         final JdbcEntityStorage<String> storage = newStorage(TestEntityWithIdString.class);
         return storage;
+    }
+
+    @Override
+    protected String newId() {
+        return newUuid();
     }
 
     private static <I> JdbcEntityStorage<I> newStorage(Class<? extends Entity<I, ?>> entityClass) {
@@ -57,7 +62,7 @@ public class JdbcEntityStorageShould extends EntityStorageShould {
     @Test
     public void write_and_read_record_by_Message_id() {
         final JdbcEntityStorage<ProjectId> storage = newStorage(TestEntityWithIdMessage.class);
-        final ProjectId id = createProjectId(newUuid());
+        final ProjectId id = newProjectId(newUuid());
         testWriteAndReadRecord(id, storage);
     }
 

@@ -22,8 +22,8 @@ package org.spine3.server.storage.jdbc;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.spine3.server.Entity;
-import org.spine3.server.EntityId;
+import org.spine3.server.entity.Entity;
+import org.spine3.server.entity.EntityId;
 import org.spine3.server.storage.EntityStorage;
 import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;

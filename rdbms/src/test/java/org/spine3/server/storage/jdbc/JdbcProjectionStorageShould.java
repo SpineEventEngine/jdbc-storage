@@ -26,10 +26,12 @@ import org.spine3.server.storage.ProjectionStorageShould;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.test.project.Project;
 
+import static org.spine3.base.Identifiers.newUuid;
+
 /**
  * @author Alexander Litus
  */
-public class JdbcProjectionStorageShould extends ProjectionStorageShould {
+public class JdbcProjectionStorageShould extends ProjectionStorageShould<String> {
 
     @Override
     protected ProjectionStorage<String> getStorage() {
@@ -37,6 +39,11 @@ public class JdbcProjectionStorageShould extends ProjectionStorageShould {
         final Class<TestProjection> projectionClass = TestProjection.class;
         final JdbcEntityStorage<String> entityStorage = JdbcEntityStorage.newInstance(dataSource, projectionClass);
         return JdbcProjectionStorage.newInstance(dataSource, projectionClass, entityStorage);
+    }
+
+    @Override
+    protected String newId() {
+        return newUuid();
     }
 
     private static class TestProjection extends Projection<String, Project> {

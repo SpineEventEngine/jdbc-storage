@@ -34,7 +34,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.spine3.base.Identifiers.newUuid;
 import static org.spine3.server.storage.jdbc.JdbcStorageFactoryShould.newInMemoryDataSource;
-import static org.spine3.testdata.TestAggregateIdFactory.createProjectId;
+import static org.spine3.testdata.TestAggregateIdFactory.newProjectId;
 import static org.spine3.testdata.TestEventFactory.projectCreated;
 
 /**
@@ -59,7 +59,7 @@ public class JdbcAggregateStorageShould extends AggregateStorageShould {
         final JdbcAggregateStorage<ProjectId> storage = newStorage(TestAggregateWithIdMessage.class);
         storage.close();
         try {
-            storage.historyBackward(createProjectId("anyId"));
+            storage.historyBackward(newProjectId("anyId"));
         } catch (DatabaseException ignored) {
             // is OK because the storage is closed
             return;

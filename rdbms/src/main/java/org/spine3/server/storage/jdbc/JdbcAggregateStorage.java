@@ -24,11 +24,15 @@ import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Timestamp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.spine3.server.EntityId;
 import org.spine3.server.aggregate.Aggregate;
+import org.spine3.server.entity.EntityId;
 import org.spine3.server.storage.AggregateStorage;
 import org.spine3.server.storage.AggregateStorageRecord;
-import org.spine3.server.storage.jdbc.util.*;
+import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
+import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
+import org.spine3.server.storage.jdbc.util.DbIterator;
+import org.spine3.server.storage.jdbc.util.DbTableNameFactory;
+import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
