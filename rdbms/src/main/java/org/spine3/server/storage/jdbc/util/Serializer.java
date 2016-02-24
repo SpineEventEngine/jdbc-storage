@@ -25,13 +25,7 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Message;
 import org.spine3.Internal;
-import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.type.TypeName;
-
-import javax.annotation.Nullable;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.spine3.protobuf.Messages.fromAny;
@@ -47,31 +41,6 @@ import static org.spine3.protobuf.Messages.toAny;
 public class Serializer {
 
     private Serializer() {}
-
-    /**
-     * Reads one message from a result set produced by a {@code statement} and deserializes it.
-     *
-     * @param statement a statement used to retrieve a result set
-     * @param columnName a column name of a serialized (to bytes) message
-     * @param messageDescriptor a descriptor of a message
-     * @param <M> a message type
-     * @return a deserialized message
-     */
-    @Nullable
-    public static <M extends Message> M readAndDeserializeMessage(PreparedStatement statement,
-                                                                  String columnName,
-                                                                  Descriptor messageDescriptor) {
-        try (ResultSet resultSet = statement.executeQuery()) {
-            if (!resultSet.next()) {
-                return null;
-            }
-            final byte[] bytes = resultSet.getBytes(columnName);
-            final M message = deserializeMessage(bytes, messageDescriptor);
-            return message;
-        } catch (SQLException e) {
-            throw new DatabaseException(e);
-        }
-    }
 
     /**
      * Deserializes a {@link Message}.

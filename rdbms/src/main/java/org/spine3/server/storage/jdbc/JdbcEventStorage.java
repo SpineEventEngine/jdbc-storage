@@ -39,6 +39,7 @@ import org.spine3.server.storage.jdbc.util.DbIterator;
 
 import javax.annotation.Nullable;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Iterator;
@@ -46,7 +47,7 @@ import java.util.Iterator;
 import static com.google.common.collect.Lists.newLinkedList;
 import static org.spine3.base.Identifiers.idToString;
 import static org.spine3.io.IoUtil.closeAll;
-import static org.spine3.server.storage.jdbc.util.Serializer.readAndDeserializeMessage;
+import static org.spine3.server.storage.jdbc.util.Serializer.deserializeMessage;
 import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
 /**
@@ -65,37 +66,37 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
     /**
      * Event ID column name.
      */
-    private static final String EVENT_ID = "event_id";
+    private static final String EVENT_ID_COL = "event_id";
 
     /**
      * Event record column name.
      */
-    private static final String EVENT = "event";
+    private static final String EVENT_COL = "event";
 
     /**
      * Protobuf type name of the event column name.
      */
-    private static final String EVENT_TYPE = "event_type";
+    private static final String EVENT_TYPE_COL = "event_type";
 
     /**
      * Producer ID column name.
      */
-    private static final String PRODUCER_ID = "producer_id";
+    private static final String PRODUCER_ID_COL = "producer_id";
 
     /**
      * Event seconds column name.
      */
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String SECONDS = "seconds";
+    private static final String SECONDS_COL = "seconds";
 
     /**
      * Event nanoseconds column name.
      */
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String NANOSECONDS = "nanoseconds";
+    private static final String NANOSECONDS_COL = "nanoseconds";
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String SELECT_EVENT_FROM_TABLE = "SELECT " + EVENT + " FROM " + TABLE_NAME + ' ';
+    private static final String SELECT_EVENT_FROM_TABLE = "SELECT " + EVENT_COL + " FROM " + TABLE_NAME + ' ';
 
     private static final Descriptor RECORD_DESCRIPTOR = EventStorageRecord.getDescriptor();
 
@@ -133,7 +134,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
     public Iterator<Event> iterator(EventStreamQuery query) throws DatabaseException {
         try (ConnectionWrapper connection = dataSource.getConnection(true)) {
             final PreparedStatement statement = FilterAndSortQuery.prepareStatement(connection, query);
-            final DbIterator<EventStorageRecord> iterator = new DbIterator<>(statement, EVENT, RECORD_DESCRIPTOR);
+            final DbIterator<EventStorageRecord> iterator = new DbIterator<>(statement, EVENT_COL, RECORD_DESCRIPTOR);
             iterators.add(iterator);
             final Iterator<Event> result = toEventIterator(iterator);
             return result;
@@ -191,13 +192,13 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         @SuppressWarnings("DuplicateStringLiteralInspection")
         private static final String CREATE_TABLE_QUERY =
                 "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" +
-                    EVENT_ID + " VARCHAR(512), " +
-                    EVENT + " BLOB, " +
-                    EVENT_TYPE + " VARCHAR(512), " +
-                    PRODUCER_ID + " VARCHAR(512), " +
-                    SECONDS + " BIGINT, " +
-                    NANOSECONDS + " INT, " +
-                    " PRIMARY KEY(" + EVENT_ID + ')' +
+                        EVENT_ID_COL + " VARCHAR(512), " +
+                        EVENT_COL + " BLOB, " +
+                        EVENT_TYPE_COL + " VARCHAR(512), " +
+                        PRODUCER_ID_COL + " VARCHAR(512), " +
+                        SECONDS_COL + " BIGINT, " +
+                        NANOSECONDS_COL + " INT, " +
+                    " PRIMARY KEY(" + EVENT_ID_COL + ')' +
                 ");";
 
         private static void execute(DataSourceWrapper dataSource) throws DatabaseException {
@@ -234,12 +235,12 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         @SuppressWarnings("DuplicateStringLiteralInspection")
         private static final String INSERT_QUERY =
                 "INSERT INTO " + TABLE_NAME + " (" +
-                    EVENT_ID + ", " +
-                    EVENT + ", " +
-                    EVENT_TYPE + ", " +
-                    PRODUCER_ID + ", " +
-                    SECONDS + ", " +
-                    NANOSECONDS +
+                    EVENT_ID_COL + ", " +
+                    EVENT_COL + ", " +
+                    EVENT_TYPE_COL + ", " +
+                    PRODUCER_ID_COL + ", " +
+                    SECONDS_COL + ", " +
+                    NANOSECONDS_COL +
                 ") VALUES (?, ?, ?, ?, ?, ?);";
 
         @Override
@@ -277,12 +278,12 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         private static final String INSERT_QUERY =
                 "UPDATE " + TABLE_NAME +
                 " SET " +
-                    EVENT + " = ?, " +
-                    EVENT_TYPE + " = ?, " +
-                    PRODUCER_ID + " = ?, " +
-                    SECONDS + " = ?, " +
-                    NANOSECONDS + " = ? " +
-                " WHERE " + EVENT_ID + " = ? ;";
+                    EVENT_COL + " = ?, " +
+                    EVENT_TYPE_COL + " = ?, " +
+                    PRODUCER_ID_COL + " = ?, " +
+                    SECONDS_COL + " = ?, " +
+                    NANOSECONDS_COL + " = ? " +
+                " WHERE " + EVENT_ID_COL + " = ? ;";
 
         @Override
         protected PreparedStatement prepareStatement(ConnectionWrapper connection, EventStorageRecord record) {
@@ -316,13 +317,18 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
     private class SelectEventByEventIdQuery {
 
         @SuppressWarnings("DuplicateStringLiteralInspection")
-        private static final String SELECT_QUERY = SELECT_EVENT_FROM_TABLE + " WHERE " + EVENT_ID + " = ?;";
+        private static final String SELECT_QUERY = SELECT_EVENT_FROM_TABLE + " WHERE " + EVENT_ID_COL + " = ?;";
 
         @Nullable
         protected EventStorageRecord execute(String eventId) throws DatabaseException {
             try (ConnectionWrapper connection = dataSource.getConnection(true);
-                 PreparedStatement statement = prepareStatement(connection, eventId)) {
-                final EventStorageRecord record = readAndDeserializeMessage(statement, EVENT, RECORD_DESCRIPTOR);
+                 PreparedStatement statement = prepareStatement(connection, eventId);
+                 ResultSet resultSet = statement.executeQuery()) {
+                if (!resultSet.next()) {
+                    return null;
+                }
+                final byte[] bytes = resultSet.getBytes(EVENT_COL);
+                final EventStorageRecord record = deserializeMessage(bytes, RECORD_DESCRIPTOR);
                 return record;
             } catch (SQLException e) {
                 log().error("Error during reading event record, event ID = " + eventId, e);
@@ -330,7 +336,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
             }
         }
 
-        private PreparedStatement prepareStatement(ConnectionWrapper connection, String id){
+        private PreparedStatement prepareStatement(ConnectionWrapper connection, String id) {
             try {
                 final PreparedStatement statement = connection.prepareStatement(SELECT_QUERY);
                 statement.setString(1, id);
@@ -344,7 +350,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
     @SuppressWarnings({"UtilityClass", "DuplicateStringLiteralInspection"})
     private static class FilterAndSortQuery {
 
-        private static final String ORDER_BY_TIME_POSTFIX = " ORDER BY " + SECONDS + " ASC, " + NANOSECONDS + " ASC;";
+        private static final String ORDER_BY_TIME_POSTFIX = " ORDER BY " + SECONDS_COL + " ASC, " + NANOSECONDS_COL + " ASC;";
 
         private static PreparedStatement prepareStatement(ConnectionWrapper connection, EventStreamQuery query) {
             final StringBuilder builder = new StringBuilder(SELECT_EVENT_FROM_TABLE);
@@ -364,7 +370,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         private static void appendFilterByEventTypeSql(StringBuilder builder, String eventType) {
             appendTo(builder,
                     whereOrAnd(builder),
-                    EVENT_TYPE, " = \'", eventType, "\' ");
+                    EVENT_TYPE_COL, " = \'", eventType, "\' ");
         }
 
         private static void appendFilterByAggregateIdsSql(StringBuilder builder, EventFilter filter) {
@@ -373,7 +379,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
                 final String aggregateIdStr = idToString(aggregateId);
                 appendTo(builder,
                         whereOrAnd(builder),
-                        PRODUCER_ID, " = \'", aggregateIdStr, "\' ");
+                        PRODUCER_ID_COL, " = \'", aggregateIdStr, "\' ");
             }
         }
 
@@ -404,10 +410,10 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
             final long seconds = after.getSeconds();
             final int nanos = after.getNanos();
             appendTo(builder, " ",
-                    SECONDS, " > ", seconds,
+                    SECONDS_COL, " > ", seconds,
                     " OR ( ",
-                        SECONDS, " = ", seconds, " AND ",
-                        NANOSECONDS, " > ", nanos,
+                    SECONDS_COL, " = ", seconds, " AND ",
+                    NANOSECONDS_COL, " > ", nanos,
                     ") ");
             return builder;
         }
@@ -417,10 +423,10 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
             final long seconds = before.getSeconds();
             final int nanos = before.getNanos();
             appendTo(builder, " ",
-                    SECONDS, " < ", seconds,
+                    SECONDS_COL, " < ", seconds,
                     " OR ( ",
-                        SECONDS, " = ", seconds, " AND ",
-                        NANOSECONDS, " < ", nanos,
+                    SECONDS_COL, " = ", seconds, " AND ",
+                    NANOSECONDS_COL, " < ", nanos,
                     ") ");
             return builder;
         }

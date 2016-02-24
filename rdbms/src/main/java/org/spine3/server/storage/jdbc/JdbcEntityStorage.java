@@ -40,7 +40,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.protobuf.Descriptors.Descriptor;
 import static java.lang.String.format;
 import static org.spine3.base.Identifiers.idToString;
-import static org.spine3.server.storage.jdbc.util.Serializer.readAndDeserializeMessage;
+import static org.spine3.server.storage.jdbc.util.Serializer.deserializeMessage;
 import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
 /**
@@ -106,15 +106,10 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
     @Nullable
     @Override
     protected EntityStorageRecord readInternal(Id id) throws DatabaseException {
-        try (ConnectionWrapper connection = dataSource.getConnection(true);
-             PreparedStatement statement = selectByIdQuery.statement(connection, id)) {
-            final EntityStorageRecord result = readAndDeserializeMessage(statement, ENTITY_COL, RECORD_DESCRIPTOR);
-            return result;
-        } catch (SQLException e) {
-            logTransactionError("reading record", id, e);
-            throw new DatabaseException(e);
-        }
+        final EntityStorageRecord record = selectByIdQuery.execute(id);
+        return record;
     }
+
 
     /**
      * {@inheritDoc}
@@ -133,6 +128,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         }
     }
 
+    // TODO:2016-02-24:alexander.litus: use read method
     private boolean containsRecord(Id id) throws DatabaseException {
         try (ConnectionWrapper connection = dataSource.getConnection(true);
              PreparedStatement statement = selectByIdQuery.statement(connection, id);
@@ -247,6 +243,23 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
         private SelectByIdQuery(String tableName) {
             this.selectByIdQuery = format(SELECT_BY_ID, tableName);
+        }
+
+        @Nullable
+        protected EntityStorageRecord execute(Id id) throws DatabaseException {
+            try (ConnectionWrapper connection = dataSource.getConnection(true);
+                 PreparedStatement statement = statement(connection, id);
+                 ResultSet resultSet = statement.executeQuery()) {
+                if (!resultSet.next()) {
+                    return null;
+                }
+                final byte[] bytes = resultSet.getBytes(ENTITY_COL);
+                final EntityStorageRecord result = deserializeMessage(bytes, RECORD_DESCRIPTOR);
+                return result;
+            } catch (SQLException e) {
+                logTransactionError("reading record", id, e);
+                throw new DatabaseException(e);
+            }
         }
 
         private PreparedStatement statement(ConnectionWrapper connection, Id id) {
