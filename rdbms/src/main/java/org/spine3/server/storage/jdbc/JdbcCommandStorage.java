@@ -380,6 +380,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
                 "SELECT * FROM " + TABLE_NAME +
                 " WHERE " + ID_COL + " = ?;";
 
+        @Nullable
         @SuppressWarnings("TypeMayBeWeakened")
         private CommandStorageRecord execute(CommandId commandId) {
             try (ConnectionWrapper connection = dataSource.getConnection(true);
