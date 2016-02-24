@@ -147,16 +147,17 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
      */
     @Override
     protected void writeInternal(EventStorageRecord record) throws DatabaseException {
-        try (ConnectionWrapper connection = dataSource.getConnection(false)) {
-            try (PreparedStatement statement = InsertQuery.prepareStatement(connection, record)) {
-                statement.execute();
-                connection.commit();
-            } catch (SQLException e) {
-                log().error("Error during writing event record, event ID = " + record.getEventId(), e);
-                connection.rollback();
-                throw new DatabaseException(e);
-            }
+        if (containsRecord(record.getEventId())) {
+            new UpdateQuery().execute(record);
+        } else {
+            new InsertQuery().execute(record);
         }
+    }
+
+    private boolean containsRecord(String id) {
+        final EventStorageRecord record = new SelectEventByEventIdQuery().execute(id);
+        final boolean contains = record != null;
+        return contains;
     }
 
     /**
@@ -168,14 +169,8 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
     @Override
     protected EventStorageRecord readInternal(EventId eventId) throws DatabaseException {
         final String id = eventId.getUuid();
-        try (ConnectionWrapper connection = dataSource.getConnection(true);
-             PreparedStatement statement = SelectEventByEventIdQuery.prepareStatement(connection, id)) {
-            final EventStorageRecord record = readAndDeserializeMessage(statement, EVENT, RECORD_DESCRIPTOR);
-            return record;
-        } catch (SQLException e) {
-            log().error("Error during reading event record, event ID = " + id, e);
-            throw new DatabaseException(e);
-        }
+        final EventStorageRecord record = new SelectEventByEventIdQuery().execute(id);
+        return record;
     }
 
     @Override
@@ -190,9 +185,10 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         }
     }
 
-    @SuppressWarnings({"UtilityClass", "DuplicateStringLiteralInspection"})
+    @SuppressWarnings("UtilityClass")
     private static class CreateTableIfDoesNotExistQuery {
 
+        @SuppressWarnings("DuplicateStringLiteralInspection")
         private static final String CREATE_TABLE_QUERY =
                 "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" +
                     EVENT_ID + " VARCHAR(512), " +
@@ -215,9 +211,27 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         }
     }
 
-    @SuppressWarnings({"UtilityClass", "DuplicateStringLiteralInspection"})
-    private static class InsertQuery {
+    private abstract class WriteQuery {
 
+        protected void execute(EventStorageRecord record) {
+            try (ConnectionWrapper connection = dataSource.getConnection(false)) {
+                try (PreparedStatement statement = prepareStatement(connection, record)) {
+                    statement.execute();
+                    connection.commit();
+                } catch (SQLException e) {
+                    log().error("Error during writing event record, event ID = " + record.getEventId(), e);
+                    connection.rollback();
+                    throw new DatabaseException(e);
+                }
+            }
+        }
+
+        protected abstract PreparedStatement prepareStatement(ConnectionWrapper connection, EventStorageRecord record);
+    }
+
+    private class InsertQuery extends WriteQuery {
+
+        @SuppressWarnings("DuplicateStringLiteralInspection")
         private static final String INSERT_QUERY =
                 "INSERT INTO " + TABLE_NAME + " (" +
                     EVENT_ID + ", " +
@@ -228,7 +242,8 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
                     NANOSECONDS +
                 ") VALUES (?, ?, ?, ?, ?, ?);";
 
-        private static PreparedStatement prepareStatement(ConnectionWrapper connection, EventStorageRecord record) {
+        @Override
+        protected PreparedStatement prepareStatement(ConnectionWrapper connection, EventStorageRecord record) {
             final PreparedStatement statement = connection.prepareStatement(INSERT_QUERY);
             final Timestamp timestamp = record.getTimestamp();
             try {
@@ -256,12 +271,66 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         }
     }
 
-    @SuppressWarnings({"UtilityClass", "DuplicateStringLiteralInspection"})
-    private static class SelectEventByEventIdQuery {
+    private class UpdateQuery extends WriteQuery {
 
+        @SuppressWarnings("DuplicateStringLiteralInspection")
+        private static final String INSERT_QUERY =
+                "UPDATE " + TABLE_NAME +
+                " SET " +
+                    EVENT + " = ?, " +
+                    EVENT_TYPE + " = ?, " +
+                    PRODUCER_ID + " = ?, " +
+                    SECONDS + " = ?, " +
+                    NANOSECONDS + " = ? " +
+                " WHERE " + EVENT_ID + " = ? ;";
+
+        @Override
+        protected PreparedStatement prepareStatement(ConnectionWrapper connection, EventStorageRecord record) {
+            final PreparedStatement statement = connection.prepareStatement(INSERT_QUERY);
+            final Timestamp timestamp = record.getTimestamp();
+            try {
+                final byte[] serializedRecord = serialize(record);
+                statement.setBytes(1, serializedRecord);
+
+                final String eventType = record.getEventType();
+                statement.setString(2, eventType);
+
+                final String producerId = record.getProducerId();
+                statement.setString(3, producerId);
+
+                final long seconds = timestamp.getSeconds();
+                statement.setLong(4, seconds);
+
+                final int nanos = timestamp.getNanos();
+                statement.setInt(5, nanos);
+
+                final String eventId = record.getEventId();
+                statement.setString(6, eventId);
+            } catch (SQLException e) {
+                throw new DatabaseException(e);
+            }
+            return statement;
+        }
+    }
+
+    private class SelectEventByEventIdQuery {
+
+        @SuppressWarnings("DuplicateStringLiteralInspection")
         private static final String SELECT_QUERY = SELECT_EVENT_FROM_TABLE + " WHERE " + EVENT_ID + " = ?;";
 
-        private static PreparedStatement prepareStatement(ConnectionWrapper connection, String id){
+        @Nullable
+        protected EventStorageRecord execute(String eventId) throws DatabaseException {
+            try (ConnectionWrapper connection = dataSource.getConnection(true);
+                 PreparedStatement statement = prepareStatement(connection, eventId)) {
+                final EventStorageRecord record = readAndDeserializeMessage(statement, EVENT, RECORD_DESCRIPTOR);
+                return record;
+            } catch (SQLException e) {
+                log().error("Error during reading event record, event ID = " + eventId, e);
+                throw new DatabaseException(e);
+            }
+        }
+
+        private PreparedStatement prepareStatement(ConnectionWrapper connection, String id){
             try {
                 final PreparedStatement statement = connection.prepareStatement(SELECT_QUERY);
                 statement.setString(1, id);

@@ -42,6 +42,7 @@ import java.sql.SQLException;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.spine3.server.storage.jdbc.util.Serializer.deserializeMessage;
 import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
+import static org.spine3.validate.Validate.checkNotDefault;
 
 /**
  * The implementation of the command storage based on the RDBMS.
@@ -133,7 +134,8 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
      */
     @Override
     public void write(CommandId commandId, CommandStorageRecord record) throws DatabaseException {
-        checkNotNull(commandId);
+        checkNotDefault(commandId);
+        checkNotDefault(record);
         checkNotClosed();
 
         if (containsRecord(commandId)) {
