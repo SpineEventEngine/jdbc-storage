@@ -120,25 +120,17 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
     protected void writeInternal(Id id, EntityStorageRecord record) throws DatabaseException {
         checkArgument(record.hasState(), "entity state");
 
-        final byte[] serializedRecord = serialize(record);
         if (containsRecord(id)) {
-            updateQuery.execute(id, serializedRecord);
+            updateQuery.execute(id, record);
         } else {
-            insertQuery.execute(id, serializedRecord);
+            insertQuery.execute(id, record);
         }
     }
 
-    // TODO:2016-02-24:alexander.litus: use read method
     private boolean containsRecord(Id id) throws DatabaseException {
-        try (ConnectionWrapper connection = dataSource.getConnection(true);
-             PreparedStatement statement = selectByIdQuery.statement(connection, id);
-             ResultSet resultSet = statement.executeQuery()) {
-            final boolean hasNext = resultSet.next();
-            return hasNext;
-        } catch (SQLException e) {
-            logTransactionError("checking record", id, e);
-            return false;
-        }
+        final EntityStorageRecord record = selectByIdQuery.execute(id);
+        final boolean contains = record != null;
+        return contains;
     }
 
     @Override
@@ -177,9 +169,9 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
             this.entityIndexInQuery = entityIndexInQuery;
         }
 
-        protected void execute(Id id, byte[] serializedRecord) {
+        protected void execute(Id id, EntityStorageRecord record) {
             try (ConnectionWrapper connection = dataSource.getConnection(false)) {
-                try (PreparedStatement statement = statement(connection, id, serializedRecord)) {
+                try (PreparedStatement statement = statement(connection, id, record)) {
                     statement.execute();
                     connection.commit();
                 } catch (SQLException e) {
@@ -190,10 +182,12 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
             }
         }
 
-        private PreparedStatement statement(ConnectionWrapper connection, Id id, byte[] serializedRecord) {
+        private PreparedStatement statement(ConnectionWrapper connection, Id id, EntityStorageRecord record) {
             try {
                 final PreparedStatement statement = connection.prepareStatement(query);
                 idColumn.setId(idIndexInQuery, id, statement);
+
+                final byte[] serializedRecord = serialize(record);
                 statement.setBytes(entityIndexInQuery, serializedRecord);
                 return statement;
             } catch (SQLException e) {
