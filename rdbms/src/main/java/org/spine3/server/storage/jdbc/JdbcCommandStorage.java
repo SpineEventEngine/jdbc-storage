@@ -110,7 +110,6 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
      * @throws IllegalStateException if the storage is closed
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
-    @Nullable
     @Override
     @SuppressWarnings("RefusedBequest") // the method from the superclass throws an UnsupportedOperationException
     public CommandStorageRecord read(CommandId commandId) throws DatabaseException {
@@ -118,6 +117,9 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
         final SelectCommandByIdQuery query = new SelectCommandByIdQuery();
         final CommandStorageRecord record = query.execute(commandId);
+        if (record == null) {
+            return CommandStorageRecord.getDefaultInstance();
+        }
         return record;
     }
 
