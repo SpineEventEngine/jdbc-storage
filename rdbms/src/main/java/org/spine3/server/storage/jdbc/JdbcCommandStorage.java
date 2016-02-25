@@ -21,7 +21,6 @@
 package org.spine3.server.storage.jdbc;
 
 import com.google.protobuf.Descriptors.Descriptor;
-import com.google.protobuf.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spine3.base.CommandId;
@@ -30,10 +29,8 @@ import org.spine3.base.Error;
 import org.spine3.base.Failure;
 import org.spine3.server.storage.CommandStorage;
 import org.spine3.server.storage.CommandStorageRecord;
-import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
-import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
+import org.spine3.server.storage.jdbc.util.*;
 import org.spine3.server.storage.jdbc.util.IdColumn.StringIdColumn;
-import org.spine3.server.storage.jdbc.util.SelectByIdQuery;
 import org.spine3.validate.Validate;
 
 import javax.annotation.Nullable;
@@ -43,7 +40,6 @@ import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.spine3.server.storage.jdbc.util.Serializer.deserialize;
-import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 import static org.spine3.validate.Validate.checkNotDefault;
 
 /**
@@ -90,6 +86,8 @@ import static org.spine3.validate.Validate.checkNotDefault;
     private static final String FAILURE_COL = "failure";
 
     private static final Descriptor FAILURE_DESCRIPTOR = Failure.getDescriptor();
+
+    private static final StringIdColumn STRING_ID_COLUMN = new StringIdColumn();
 
     private final DataSourceWrapper dataSource;
 
@@ -141,9 +139,9 @@ import static org.spine3.validate.Validate.checkNotDefault;
         checkNotClosed();
 
         if (containsRecord(commandId)) {
-            new UpdateCommandQuery(record).execute(commandId);
+            UpdateCommandQuery.newInstance(dataSource, commandId, record).execute();
         } else {
-            new InsertCommandQuery(record).execute(commandId);
+            InsertCommandQuery.newInstance(dataSource, commandId, record).execute();
         }
     }
 
@@ -164,7 +162,7 @@ import static org.spine3.validate.Validate.checkNotDefault;
         checkNotNull(commandId);
         checkNotClosed();
 
-        new SetOkStatusQuery().execute(commandId);
+        new SetOkStatusQuery(commandId).execute();
     }
 
     /**
@@ -179,7 +177,7 @@ import static org.spine3.validate.Validate.checkNotDefault;
         checkNotNull(error);
         checkNotClosed();
 
-        new SetErrorQuery(error).execute(commandId);
+        SetErrorQuery.newInstance(dataSource, commandId, error).execute();
     }
 
     /**
@@ -194,7 +192,7 @@ import static org.spine3.validate.Validate.checkNotDefault;
         checkNotNull(failure);
         checkNotClosed();
 
-        new SetFailureQuery(failure).execute(commandId);
+        SetFailureQuery.newInstance(dataSource, commandId, failure).execute();
     }
 
     @Override
@@ -231,54 +229,7 @@ import static org.spine3.validate.Validate.checkNotDefault;
         }
     }
 
-    private abstract class WriteQuery {
-
-        @SuppressWarnings("TypeMayBeWeakened")
-        protected void execute(CommandId commandId) {
-            final String id = commandId.getUuid();
-            try (ConnectionWrapper connection = dataSource.getConnection(false)) {
-                try (PreparedStatement statement = statement(connection, id)) {
-                    statement.execute();
-                    connection.commit();
-                } catch (SQLException e) {
-                    log().error("Error while writing, command ID = " + id, e);
-                    connection.rollback();
-                    throw new DatabaseException(e);
-                }
-            }
-        }
-
-        protected abstract PreparedStatement statement(ConnectionWrapper connection, String commandId);
-    }
-
-    private class WriteRecordQuery<M extends Message> extends WriteQuery {
-
-        private final byte[] recordBytes;
-        private final String query;
-        private final int idIndexInQuery;
-        private final int recordIndexInQuery;
-
-        protected WriteRecordQuery(M record, String query, int idIndexInQuery, int recordIndexInQuery) {
-            this.recordBytes = serialize(record);
-            this.query = query;
-            this.idIndexInQuery = idIndexInQuery;
-            this.recordIndexInQuery = recordIndexInQuery;
-        }
-
-        @Override
-        protected PreparedStatement statement(ConnectionWrapper connection, String commandId) {
-            try {
-                final PreparedStatement statement = connection.prepareStatement(query);
-                statement.setString(idIndexInQuery, commandId);
-                statement.setBytes(recordIndexInQuery, recordBytes);
-                return statement;
-            } catch (SQLException e) {
-                throw new DatabaseException(e);
-            }
-        }
-    }
-
-    private class InsertCommandQuery extends WriteRecordQuery<CommandStorageRecord> {
+    private static class InsertCommandQuery extends WriteRecordQuery<String, CommandStorageRecord> {
 
         @SuppressWarnings("DuplicateStringLiteralInspection")
         private static final String INSERT_QUERY =
@@ -290,12 +241,38 @@ import static org.spine3.validate.Validate.checkNotDefault;
         private static final int ID_INDEX_IN_QUERY = 1;
         private static final int RECORD_INDEX_IN_QUERY = 2;
 
-        protected InsertCommandQuery(CommandStorageRecord record) {
-            super(record, INSERT_QUERY, ID_INDEX_IN_QUERY, RECORD_INDEX_IN_QUERY);
+        private InsertCommandQuery(Builder builder) {
+            super(builder);
+        }
+
+        public static InsertCommandQuery newInstance(DataSourceWrapper dataSource, CommandId commandId, CommandStorageRecord record) {
+            final String id = commandId.getUuid();
+            return new Builder()
+                    .setDataSource(dataSource)
+                    .setId(id)
+                    .setRecord(record)
+                    .build();
+        }
+
+        private static class Builder extends AbstractBuilder<InsertCommandQuery, String, CommandStorageRecord> {
+
+            @Override
+            public InsertCommandQuery build() {
+                setQuery(INSERT_QUERY);
+                setIdIndexInQuery(ID_INDEX_IN_QUERY);
+                setRecordIndexInQuery(RECORD_INDEX_IN_QUERY);
+                setIdColumn(STRING_ID_COLUMN);
+                return new InsertCommandQuery(this);
+            }
+        }
+
+        @Override
+        protected void log(SQLException exception) {
+            logError(exception, "command insertion", getId());
         }
     }
 
-    private class UpdateCommandQuery extends WriteRecordQuery<CommandStorageRecord> {
+    private static class UpdateCommandQuery extends WriteRecordQuery<String, CommandStorageRecord> {
 
         @SuppressWarnings("DuplicateStringLiteralInspection")
         private static final String UPDATE_QUERY =
@@ -306,8 +283,33 @@ import static org.spine3.validate.Validate.checkNotDefault;
         private static final int RECORD_INDEX_IN_QUERY = 1;
         private static final int ID_INDEX_IN_QUERY = 2;
 
-        private UpdateCommandQuery(CommandStorageRecord record) {
-            super(record, UPDATE_QUERY, ID_INDEX_IN_QUERY, RECORD_INDEX_IN_QUERY);
+        protected UpdateCommandQuery(Builder builder) {
+            super(builder);
+        }
+
+        private static UpdateCommandQuery newInstance(DataSourceWrapper dataSource, CommandId commandId, CommandStorageRecord record) {
+            return new Builder()
+                    .setDataSource(dataSource)
+                    .setId(commandId.getUuid())
+                    .setRecord(record)
+                    .build();
+        }
+
+        private static class Builder extends AbstractBuilder<UpdateCommandQuery, String, CommandStorageRecord> {
+
+            @Override
+            public UpdateCommandQuery build() {
+                setQuery(UPDATE_QUERY);
+                setIdIndexInQuery(ID_INDEX_IN_QUERY);
+                setRecordIndexInQuery(RECORD_INDEX_IN_QUERY);
+                setIdColumn(STRING_ID_COLUMN);
+                return new UpdateCommandQuery(this);
+            }
+        }
+
+        @Override
+        protected void log(SQLException exception) {
+            logError(exception, "updating command", getId());
         }
     }
 
@@ -319,19 +321,37 @@ import static org.spine3.validate.Validate.checkNotDefault;
                 " SET " + IS_STATUS_OK_COL + " = true " +
                 " WHERE " + ID_COL + " = ? ;";
 
+        private final CommandId commandId;
+
+        protected SetOkStatusQuery(CommandId commandId) {
+            this.commandId = commandId;
+        }
+
         @Override
-        protected PreparedStatement statement(ConnectionWrapper connection, String commandId) {
+        protected DataSourceWrapper getDataSource() {
+            return dataSource;
+        }
+
+        @Override
+        @SuppressWarnings("RefusedBequest")
+        protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
             final PreparedStatement statement = connection.prepareStatement(SET_OK_STATUS_QUERY);
+            final String id = commandId.getUuid();
             try {
-                statement.setString(1, commandId);
+                statement.setString(1, id);
             } catch (SQLException e) {
                 throw new DatabaseException(e);
             }
             return statement;
         }
+
+        @Override
+        protected void log(SQLException exception) {
+            logError(exception, "setting OK command status", commandId.getUuid());
+        }
     }
 
-    private class SetErrorQuery extends WriteRecordQuery<Error> {
+    private static class SetErrorQuery extends WriteRecordQuery<String, Error> {
 
         @SuppressWarnings("DuplicateStringLiteralInspection")
         private static final String SET_ERROR_QUERY =
@@ -344,12 +364,37 @@ import static org.spine3.validate.Validate.checkNotDefault;
         private static final int ERROR_INDEX_IN_QUERY = 1;
         private static final int ID_INDEX_IN_QUERY = 2;
 
-        protected SetErrorQuery(Error error) {
-            super(error, SET_ERROR_QUERY, ID_INDEX_IN_QUERY, ERROR_INDEX_IN_QUERY);
+        protected SetErrorQuery(Builder builder) {
+            super(builder);
+        }
+
+        private static SetErrorQuery newInstance(DataSourceWrapper dataSource, CommandId commandId, Error error) {
+            return new Builder()
+                    .setDataSource(dataSource)
+                    .setId(commandId.getUuid())
+                    .setRecord(error)
+                    .build();
+        }
+
+        private static class Builder extends AbstractBuilder<SetErrorQuery, String, Error> {
+
+            @Override
+            public SetErrorQuery build() {
+                setQuery(SET_ERROR_QUERY);
+                setIdIndexInQuery(ID_INDEX_IN_QUERY);
+                setRecordIndexInQuery(ERROR_INDEX_IN_QUERY);
+                setIdColumn(STRING_ID_COLUMN);
+                return new SetErrorQuery(this);
+            }
+        }
+
+        @Override
+        protected void log(SQLException exception) {
+            logError(exception, "setting error command status", getId());
         }
     }
 
-    private class SetFailureQuery extends WriteRecordQuery<Failure> {
+    private static class SetFailureQuery extends WriteRecordQuery<String, Failure> {
 
         @SuppressWarnings("DuplicateStringLiteralInspection")
         private static final String SET_FAILURE_QUERY =
@@ -362,8 +407,33 @@ import static org.spine3.validate.Validate.checkNotDefault;
         private static final int FAILURE_INDEX_IN_QUERY = 1;
         private static final int ID_INDEX_IN_QUERY = 2;
 
-        protected SetFailureQuery(Failure failure) {
-            super(failure, SET_FAILURE_QUERY, ID_INDEX_IN_QUERY, FAILURE_INDEX_IN_QUERY);
+        protected SetFailureQuery(Builder builder) {
+            super(builder);
+        }
+
+        private static SetFailureQuery newInstance(DataSourceWrapper dataSource, CommandId commandId, Failure failure) {
+            return new Builder()
+                    .setDataSource(dataSource)
+                    .setId(commandId.getUuid())
+                    .setRecord(failure)
+                    .build();
+        }
+
+        private static class Builder extends AbstractBuilder<SetFailureQuery, String, Failure> {
+
+            @Override
+            public SetFailureQuery build() {
+                setQuery(SET_FAILURE_QUERY);
+                setIdIndexInQuery(ID_INDEX_IN_QUERY);
+                setRecordIndexInQuery(FAILURE_INDEX_IN_QUERY);
+                setIdColumn(STRING_ID_COLUMN);
+                return new SetFailureQuery(this);
+            }
+        }
+
+        @Override
+        protected void log(SQLException exception) {
+            logError(exception, "setting failure command status", getId());
         }
     }
 
@@ -408,6 +478,10 @@ import static org.spine3.validate.Validate.checkNotDefault;
             }
             return builder.build();
         }
+    }
+
+    private static void logError(SQLException e, String actionName, String commandId) {
+        log().error("Exception during {}, command ID: {}", actionName, commandId, e);
     }
 
     private static Logger log() {
