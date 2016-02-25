@@ -24,7 +24,6 @@ import com.google.protobuf.Timestamp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spine3.server.entity.Entity;
-import org.spine3.server.entity.EntityId;
 import org.spine3.server.storage.EntityStorage;
 import org.spine3.server.storage.ProjectionStorage;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
@@ -41,7 +40,7 @@ import static org.spine3.server.storage.jdbc.util.DbTableNameFactory.newTableNam
 /**
  * The implementation of the projection storage based on the RDBMS.
  *
- * @param <Id> a type of projection IDs. See {@link EntityId} for details.
+ * @param <Id> a type of projection IDs
  * @see JdbcStorageFactory
  * @author Alexander Litus
  */
@@ -78,7 +77,7 @@ import static org.spine3.server.storage.jdbc.util.DbTableNameFactory.newTableNam
      * @param dataSource a data source used by an {@code entityStorage}
      * @param projectionClass a class of projections to store
      * @param entityStorage an entity storage to use
-     * @param <Id> a type of projection IDs. See {@link EntityId} for details.
+     * @param <Id> a type of projection IDs
      * @return a new storage instance
      */
     /*package*/ static <Id> ProjectionStorage<Id> newInstance(DataSourceWrapper dataSource,

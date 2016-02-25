@@ -25,7 +25,6 @@ import com.google.protobuf.Timestamp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spine3.server.aggregate.Aggregate;
-import org.spine3.server.entity.EntityId;
 import org.spine3.server.storage.AggregateStorage;
 import org.spine3.server.storage.AggregateStorageRecord;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
@@ -49,7 +48,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 /**
  * The implementation of the aggregate storage based on the RDBMS.
  *
- * @param <Id> the type of aggregate IDs. See {@link EntityId} for details.
+ * @param <Id> the type of aggregate IDs
  * @see JdbcStorageFactory
  * @author Alexander Litus
  */
