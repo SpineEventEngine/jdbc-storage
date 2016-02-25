@@ -87,7 +87,7 @@ public class JdbcAggregateStorageShould extends AggregateStorageShould {
         final int id = 10;
         testWriteAndReadEvent(id, storage);
     }
-
+// TODO:2016-02-25:alexander.litus: move these tests up
     private static <I> void testWriteAndReadEvent(I id, JdbcAggregateStorage<I> storage) {
         final Event expectedEvent = projectCreated();
 

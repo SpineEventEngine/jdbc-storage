@@ -231,7 +231,7 @@ import static org.spine3.validate.Validate.isDefault;
         }
 
         @Nullable
-        public Timestamp execute() throws DatabaseException {
+        private Timestamp execute() throws DatabaseException {
             try (ConnectionWrapper connection = dataSource.getConnection(true);
                  PreparedStatement statement = connection.prepareStatement(selectQuery);
                  ResultSet resultSet = statement.executeQuery()) {
