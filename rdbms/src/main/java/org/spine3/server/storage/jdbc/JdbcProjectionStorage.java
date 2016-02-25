@@ -108,15 +108,9 @@ import static org.spine3.server.storage.jdbc.util.DbTableNameFactory.newTableNam
     }
 
     private boolean containsLastEventTime() throws DatabaseException {
-        try (ConnectionWrapper connection = dataSource.getConnection(true);
-             PreparedStatement statement = selectQuery.statement(connection);
-             ResultSet resultSet = statement.executeQuery()) {
-            final boolean containsEventTime = resultSet.next();
-            return containsEventTime;
-        } catch (SQLException e) {
-            log().error("Failed to check last event time.", e);
-            throw new DatabaseException(e);
-        }
+        final Timestamp time = readLastHandledEventTime();
+        final boolean containsEventTime = time != null;
+        return containsEventTime;
     }
 
     @Override
