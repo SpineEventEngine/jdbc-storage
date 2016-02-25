@@ -267,8 +267,8 @@ import static org.spine3.validate.Validate.checkNotDefault;
         }
 
         @Override
-        protected void log(SQLException exception) {
-            logError(exception, "command insertion", getId());
+        protected void logError(SQLException exception) {
+            log(exception, "command insertion", getId());
         }
     }
 
@@ -308,8 +308,8 @@ import static org.spine3.validate.Validate.checkNotDefault;
         }
 
         @Override
-        protected void log(SQLException exception) {
-            logError(exception, "updating command", getId());
+        protected void logError(SQLException exception) {
+            log(exception, "updating command", getId());
         }
     }
 
@@ -342,8 +342,8 @@ import static org.spine3.validate.Validate.checkNotDefault;
         }
 
         @Override
-        protected void log(SQLException exception) {
-            logError(exception, "setting OK command status", commandId.getUuid());
+        protected void logError(SQLException exception) {
+            log(exception, "setting OK command status", commandId.getUuid());
         }
     }
 
@@ -385,8 +385,8 @@ import static org.spine3.validate.Validate.checkNotDefault;
         }
 
         @Override
-        protected void log(SQLException exception) {
-            logError(exception, "setting error command status", getId());
+        protected void logError(SQLException exception) {
+            log(exception, "setting error command status", getId());
         }
     }
 
@@ -428,8 +428,8 @@ import static org.spine3.validate.Validate.checkNotDefault;
         }
 
         @Override
-        protected void log(SQLException exception) {
-            logError(exception, "setting failure command status", getId());
+        protected void logError(SQLException exception) {
+            log(exception, "setting failure command status", getId());
         }
     }
 
@@ -476,7 +476,7 @@ import static org.spine3.validate.Validate.checkNotDefault;
         }
     }
 
-    private static void logError(SQLException e, String actionName, String commandId) {
+    private static void log(SQLException e, String actionName, String commandId) {
         log().error("Exception during {}, command ID: {}", actionName, commandId, e);
     }
 

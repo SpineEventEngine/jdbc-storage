@@ -181,8 +181,8 @@ import static org.spine3.validate.Validate.isDefault;
         }
 
         @Override
-        protected void log(SQLException exception) {
-            JdbcProjectionStorage.log().error("Failed to write last event timestamp.");
+        protected void logError(SQLException exception) {
+            log().error("Failed to write last event timestamp.");
         }
     }
 

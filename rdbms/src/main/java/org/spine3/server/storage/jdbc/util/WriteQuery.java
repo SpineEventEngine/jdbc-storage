@@ -49,7 +49,7 @@ public abstract class WriteQuery {
                 statement.execute();
                 connection.commit();
             } catch (SQLException e) {
-                log(e);
+                logError(e);
                 connection.rollback();
                 throw new DatabaseException(e);
             }
@@ -64,5 +64,5 @@ public abstract class WriteQuery {
     /**
      * Logs an occurred exception.
      */
-    protected abstract void log(SQLException exception);
+    protected abstract void logError(SQLException exception);
 }

@@ -33,11 +33,8 @@ import org.spine3.server.event.EventFilter;
 import org.spine3.server.event.EventStreamQuery;
 import org.spine3.server.storage.EventStorage;
 import org.spine3.server.storage.EventStorageRecord;
-import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
-import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.server.storage.jdbc.util.DbIterator;
+import org.spine3.server.storage.jdbc.util.*;
 import org.spine3.server.storage.jdbc.util.IdColumn.StringIdColumn;
-import org.spine3.server.storage.jdbc.util.SelectByIdQuery;
 
 import javax.annotation.Nullable;
 import java.sql.PreparedStatement;
@@ -149,9 +146,9 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
     @Override
     protected void writeInternal(EventStorageRecord record) throws DatabaseException {
         if (containsRecord(record.getEventId())) {
-            new UpdateQuery().execute(record);
+            new UpdateQuery(record).execute();
         } else {
-            new InsertQuery().execute(record);
+            new InsertQuery(record).execute();
         }
     }
 
@@ -212,24 +209,6 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         }
     }
 
-    private abstract class WriteQuery {
-
-        protected void execute(EventStorageRecord record) {
-            try (ConnectionWrapper connection = dataSource.getConnection(false)) {
-                try (PreparedStatement statement = prepareStatement(connection, record)) {
-                    statement.execute();
-                    connection.commit();
-                } catch (SQLException e) {
-                    log().error("Error during writing event record, event ID = " + record.getEventId(), e);
-                    connection.rollback();
-                    throw new DatabaseException(e);
-                }
-            }
-        }
-
-        protected abstract PreparedStatement prepareStatement(ConnectionWrapper connection, EventStorageRecord record);
-    }
-
     private class InsertQuery extends WriteQuery {
 
         @SuppressWarnings("DuplicateStringLiteralInspection")
@@ -243,8 +222,15 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
                     NANOSECONDS_COL +
                 ") VALUES (?, ?, ?, ?, ?, ?);";
 
+        private final EventStorageRecord record;
+
+        private InsertQuery(EventStorageRecord record) {
+            super(dataSource);
+            this.record = record;
+        }
+
         @Override
-        protected PreparedStatement prepareStatement(ConnectionWrapper connection, EventStorageRecord record) {
+        protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
             final PreparedStatement statement = connection.prepareStatement(INSERT_QUERY);
             final Timestamp timestamp = record.getTimestamp();
             try {
@@ -270,6 +256,11 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
             }
             return statement;
         }
+
+        @Override
+        protected void logError(SQLException exception) {
+            log().error("Failed to insert event record, event ID: {}", record.getEventId());
+        }
     }
 
     private class UpdateQuery extends WriteQuery {
@@ -285,8 +276,15 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
                     NANOSECONDS_COL + " = ? " +
                 " WHERE " + EVENT_ID_COL + " = ? ;";
 
+        private final EventStorageRecord record;
+
+        private UpdateQuery(EventStorageRecord record) {
+            super(dataSource);
+            this.record = record;
+        }
+
         @Override
-        protected PreparedStatement prepareStatement(ConnectionWrapper connection, EventStorageRecord record) {
+        protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
             final PreparedStatement statement = connection.prepareStatement(INSERT_QUERY);
             final Timestamp timestamp = record.getTimestamp();
             try {
@@ -311,6 +309,11 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
                 throw new DatabaseException(e);
             }
             return statement;
+        }
+
+        @Override
+        protected void logError(SQLException exception) {
+            log().error("Failed to update event record, event ID: {}", record.getEventId());
         }
     }
 
