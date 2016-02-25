@@ -34,7 +34,7 @@ import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.spine3.base.Identifiers.idToString;
-import static org.spine3.server.storage.jdbc.util.Serializer.deserializeMessage;
+import static org.spine3.server.storage.jdbc.util.Serializer.deserialize;
 
 /**
  * A query which obtains a storage record by an ID.
@@ -72,7 +72,7 @@ public class SelectByIdQuery<I, R extends Message> {
      * @param id a record ID
      * @return a storage record {@link Message} or {@code null} if there is no needed data
      * @throws DatabaseException if an error occurs during an interaction with the DB
-     * @see Serializer#deserializeMessage(byte[], Descriptor)
+     * @see Serializer#deserialize(byte[], Descriptor)
      */
     @Nullable
     public R execute(I id) throws DatabaseException {
@@ -109,7 +109,7 @@ public class SelectByIdQuery<I, R extends Message> {
         if (bytes == null) {
             return null;
         }
-        final R record = deserializeMessage(bytes, recordDescriptor);
+        final R record = deserialize(bytes, recordDescriptor);
         return record;
     }
 

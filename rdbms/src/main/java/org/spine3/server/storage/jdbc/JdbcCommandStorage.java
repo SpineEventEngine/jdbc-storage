@@ -42,7 +42,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.spine3.server.storage.jdbc.util.Serializer.deserializeMessage;
+import static org.spine3.server.storage.jdbc.util.Serializer.deserialize;
 import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 import static org.spine3.validate.Validate.checkNotDefault;
 
@@ -386,7 +386,7 @@ import static org.spine3.validate.Validate.checkNotDefault;
             if (recordBytes == null) {
                 return null;
             }
-            final CommandStorageRecord record = deserializeMessage(recordBytes, COMMAND_RECORD_DESCRIPTOR);
+            final CommandStorageRecord record = deserialize(recordBytes, COMMAND_RECORD_DESCRIPTOR);
             final CommandStorageRecord.Builder builder = record.toBuilder();
             final boolean isStatusOk = resultSet.getBoolean(IS_STATUS_OK_COL);
             if (isStatusOk) {
@@ -394,14 +394,14 @@ import static org.spine3.validate.Validate.checkNotDefault;
             }
             final byte[] errorBytes = resultSet.getBytes(ERROR_COL);
             if (errorBytes != null) {
-                final Error error = deserializeMessage(errorBytes, ERROR_DESCRIPTOR);
+                final Error error = deserialize(errorBytes, ERROR_DESCRIPTOR);
                 return builder.setError(error)
                         .setStatus(CommandStatus.ERROR)
                         .build();
             }
             final byte[] failureBytes = resultSet.getBytes(FAILURE_COL);
             if (failureBytes != null) {
-                final Failure failure = deserializeMessage(failureBytes, FAILURE_DESCRIPTOR);
+                final Failure failure = deserialize(failureBytes, FAILURE_DESCRIPTOR);
                 return builder.setFailure(failure)
                         .setStatus(CommandStatus.FAILURE)
                         .build();

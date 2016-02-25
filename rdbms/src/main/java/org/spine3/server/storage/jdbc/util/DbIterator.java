@@ -31,7 +31,7 @@ import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import static org.spine3.server.storage.jdbc.util.Serializer.deserializeMessage;
+import static org.spine3.server.storage.jdbc.util.Serializer.deserialize;
 
 /**
  * An iterator over a {@link ResultSet} of storage records.
@@ -98,7 +98,7 @@ public class DbIterator<Record extends Message> implements Iterator<Record>, Aut
             throw new NoSuchElementException("No elements remained.");
         }
         final byte[] bytes = readBytes();
-        final Record record = deserializeMessage(bytes, recordDescriptor);
+        final Record record = deserialize(bytes, recordDescriptor);
         return record;
     }
 

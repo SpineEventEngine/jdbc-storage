@@ -43,25 +43,6 @@ public class Serializer {
     private Serializer() {}
 
     /**
-     * Deserializes a {@link Message}.
-     *
-     * @param bytes a serialized message
-     * @param messageDescriptor a descriptor of a message
-     * @param <M> a type of message expected
-     * @return a message instance
-     */
-    public static <M extends Message> M deserializeMessage(byte[] bytes, Descriptor messageDescriptor) {
-        checkNotNull(bytes);
-        final Any.Builder builder = Any.newBuilder();
-        final String typeUrl = TypeName.of(messageDescriptor).toTypeUrl();
-        builder.setTypeUrl(typeUrl);
-        final ByteString byteString = ByteString.copyFrom(bytes);
-        builder.setValue(byteString);
-        final M message = fromAny(builder.build());
-        return message;
-    }
-
-    /**
      * Serializes a message to an array of bytes.
      *
      * @param message a message to serialize
@@ -73,5 +54,24 @@ public class Serializer {
         final Any any = toAny(message);
         final byte[] bytes = any.getValue().toByteArray();
         return bytes;
+    }
+
+    /**
+     * Deserializes a {@link Message}.
+     *
+     * @param bytes a serialized message
+     * @param messageDescriptor a descriptor of a message
+     * @param <M> a type of message expected
+     * @return a message instance
+     */
+    public static <M extends Message> M deserialize(byte[] bytes, Descriptor messageDescriptor) {
+        checkNotNull(bytes);
+        final Any.Builder builder = Any.newBuilder();
+        final String typeUrl = TypeName.of(messageDescriptor).toTypeUrl();
+        builder.setTypeUrl(typeUrl);
+        final ByteString byteString = ByteString.copyFrom(bytes);
+        builder.setValue(byteString);
+        final M message = fromAny(builder.build());
+        return message;
     }
 }
