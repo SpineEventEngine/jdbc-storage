@@ -90,7 +90,7 @@ public class JdbcEntityStorageShould extends EntityStorageShould<String> {
     }
 
     @Test
-    public void close_itself() {
+    public void close_itself_and_throw_exception_on_read() {
         final JdbcEntityStorage<String> storage = newStorage(TestEntityWithIdString.class);
         storage.close();
         try {
