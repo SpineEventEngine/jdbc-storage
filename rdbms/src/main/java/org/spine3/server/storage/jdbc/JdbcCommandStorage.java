@@ -29,8 +29,12 @@ import org.spine3.base.Error;
 import org.spine3.base.Failure;
 import org.spine3.server.storage.CommandStorage;
 import org.spine3.server.storage.CommandStorageRecord;
-import org.spine3.server.storage.jdbc.util.*;
+import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
+import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn.StringIdColumn;
+import org.spine3.server.storage.jdbc.util.SelectByIdQuery;
+import org.spine3.server.storage.jdbc.util.WriteQuery;
+import org.spine3.server.storage.jdbc.util.WriteRecordQuery;
 import org.spine3.validate.Validate;
 
 import javax.annotation.Nullable;

@@ -33,8 +33,12 @@ import org.spine3.server.event.EventFilter;
 import org.spine3.server.event.EventStreamQuery;
 import org.spine3.server.storage.EventStorage;
 import org.spine3.server.storage.EventStorageRecord;
-import org.spine3.server.storage.jdbc.util.*;
+import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
+import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
+import org.spine3.server.storage.jdbc.util.DbIterator;
 import org.spine3.server.storage.jdbc.util.IdColumn.StringIdColumn;
+import org.spine3.server.storage.jdbc.util.SelectByIdQuery;
+import org.spine3.server.storage.jdbc.util.WriteQuery;
 
 import javax.annotation.Nullable;
 import java.sql.PreparedStatement;

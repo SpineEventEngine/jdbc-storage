@@ -30,6 +30,7 @@ import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbTableNameFactory;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 import org.spine3.server.storage.jdbc.util.SelectByIdQuery;
+import org.spine3.server.storage.jdbc.util.WriteRecordQuery;
 
 import javax.annotation.Nullable;
 import java.sql.PreparedStatement;
@@ -39,7 +40,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.protobuf.Descriptors.Descriptor;
 import static java.lang.String.format;
 import static org.spine3.base.Identifiers.idToString;
-import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
 /**
  * The implementation of the entity storage based on the RDBMS.
@@ -61,15 +61,16 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
     private static final String ID_COL = "id";
 
     private static final Descriptor RECORD_DESCRIPTOR = EntityStorageRecord.getDescriptor();
+    private static final IdColumn.StringIdColumn STRING_ID_COLUMN = new IdColumn.StringIdColumn();
 
     private final DataSourceWrapper dataSource;
 
     private final IdColumn<Id> idColumn;
 
-    private final InsertQuery insertQuery;
-    private final UpdateQuery updateQuery;
     private final SelectEntityByIdQuery selectByIdQuery;
     private final DeleteAllQuery deleteAllQuery;
+
+    private final String tableName;
 
     /**
      * Creates a new storage instance.
@@ -88,13 +89,11 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
             throws DatabaseException {
         this.dataSource = dataSource;
         this.idColumn = IdColumn.newInstance(entityClass);
-
-        final String tableName = DbTableNameFactory.newTableName(entityClass);
-        new CreateTableIfDoesNotExistQuery().execute(tableName);
-        this.insertQuery = new InsertQuery(tableName);
-        this.updateQuery = new UpdateQuery(tableName);
+        this.tableName = DbTableNameFactory.newTableName(entityClass);
         this.selectByIdQuery = new SelectEntityByIdQuery(tableName);
         this.deleteAllQuery = new DeleteAllQuery(tableName);
+
+        new CreateTableIfDoesNotExistQuery().execute(tableName);
     }
 
     /**
@@ -120,9 +119,9 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         checkArgument(record.hasState(), "entity state");
 
         if (containsRecord(id)) {
-            updateQuery.execute(id, record);
+            newUpdateEntityQuery(id, record).execute();
         } else {
-            insertQuery.execute(id, record);
+            newInsertEntityQuery(id, record).execute();
         }
     }
 
@@ -156,49 +155,30 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         }
     }
 
-    private abstract class WriteQuery {
-
-        private final String query;
-        private final int idIndexInQuery;
-        private final int entityIndexInQuery;
-
-        protected WriteQuery(String query, int idIndexInQuery, int entityIndexInQuery) {
-            this.query = query;
-            this.idIndexInQuery = idIndexInQuery;
-            this.entityIndexInQuery = entityIndexInQuery;
-        }
-
-        protected void execute(Id id, EntityStorageRecord record) {
-            try (ConnectionWrapper connection = dataSource.getConnection(false)) {
-                try (PreparedStatement statement = statement(connection, id, record)) {
-                    statement.execute();
-                    connection.commit();
-                } catch (SQLException e) {
-                    log().error("Error during writing a record, entity ID = " + idToString(id), e);
-                    connection.rollback();
-                    throw new DatabaseException(e);
-                }
-            }
-        }
-
-        private PreparedStatement statement(ConnectionWrapper connection, Id id, EntityStorageRecord record) {
-            try {
-                final PreparedStatement statement = connection.prepareStatement(query);
-                idColumn.setId(idIndexInQuery, id, statement);
-
-                final byte[] serializedRecord = serialize(record);
-                statement.setBytes(entityIndexInQuery, serializedRecord);
-                return statement;
-            } catch (SQLException e) {
-                throw new DatabaseException(e);
-            }
-        }
+    private InsertEntityQuery<Id> newInsertEntityQuery(Id id, EntityStorageRecord record) {
+        return new InsertEntityQuery.Builder<Id>()
+                .setDataSource(dataSource)
+                .setQuery(format(InsertEntityQuery.INSERT_QUERY, tableName))
+                .setIdColumn(idColumn)
+                .setId(id)
+                .setRecord(record)
+                .build();
     }
 
-    private class InsertQuery extends WriteQuery {
+    private UpdateEntityQuery<Id> newUpdateEntityQuery(Id id, EntityStorageRecord record) {
+        return new UpdateEntityQuery.Builder<Id>()
+                .setDataSource(dataSource)
+                .setQuery(format(UpdateEntityQuery.UPDATE_QUERY, tableName))
+                .setIdColumn(idColumn)
+                .setId(id)
+                .setRecord(record)
+                .build();
+    }
+
+    private static class InsertEntityQuery<Id> extends WriteRecordQuery<Id, EntityStorageRecord> {
 
         @SuppressWarnings("DuplicateStringLiteralInspection")
-        private static final String INSERT =
+        private static final String INSERT_QUERY =
                 "INSERT INTO %s " +
                 " (" + ID_COL + ", " + ENTITY_COL + ')' +
                 " VALUES (?, ?);";
@@ -206,15 +186,31 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         private static final int ID_INDEX_IN_QUERY = 1;
         private static final int ENTITY_INDEX_IN_QUERY = 2;
 
-        private InsertQuery(String tableName) {
-            super(format(INSERT, tableName), ID_INDEX_IN_QUERY, ENTITY_INDEX_IN_QUERY);
+        private InsertEntityQuery(Builder<Id> builder) {
+            super(builder);
+        }
+
+        private static class Builder<Id> extends AbstractBuilder<InsertEntityQuery<Id>, Id, EntityStorageRecord> {
+
+            @Override
+            public InsertEntityQuery<Id> build() {
+                setIdIndexInQuery(ID_INDEX_IN_QUERY);
+                setRecordIndexInQuery(ENTITY_INDEX_IN_QUERY);
+                return new InsertEntityQuery<>(this);
+            }
+        }
+
+        @Override
+        protected void logError(SQLException exception) {
+            final String id = idToString(getId());
+            log().error("Failed to insert entity record, ID: {}", id);
         }
     }
 
-    private class UpdateQuery extends WriteQuery {
+    private static class UpdateEntityQuery<Id> extends WriteRecordQuery<Id, EntityStorageRecord> {
 
         @SuppressWarnings("DuplicateStringLiteralInspection")
-        private static final String UPDATE =
+        private static final String UPDATE_QUERY =
                 "UPDATE %s " +
                 " SET " + ENTITY_COL + " = ? " +
                 " WHERE " + ID_COL + " = ?;";
@@ -222,8 +218,24 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         private static final int ENTITY_INDEX_IN_QUERY = 1;
         private static final int ID_INDEX_IN_QUERY = 2;
 
-        private UpdateQuery(String tableName) {
-            super(format(UPDATE, tableName), ID_INDEX_IN_QUERY, ENTITY_INDEX_IN_QUERY);
+        private UpdateEntityQuery(Builder<Id> builder) {
+            super(builder);
+        }
+
+        private static class Builder<Id> extends WriteRecordQuery.AbstractBuilder<UpdateEntityQuery<Id>, Id, EntityStorageRecord> {
+
+            @Override
+            public UpdateEntityQuery<Id> build() {
+                setIdIndexInQuery(ID_INDEX_IN_QUERY);
+                setRecordIndexInQuery(ENTITY_INDEX_IN_QUERY);
+                return new UpdateEntityQuery<>(this);
+            }
+        }
+
+        @Override
+        protected void logError(SQLException exception) {
+            final String id = idToString(getId());
+            log().error("Failed to update entity record, ID: {}", id);
         }
     }
 
