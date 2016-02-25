@@ -20,7 +20,9 @@
 
 package org.spine3.server.storage.jdbc.util;
 
+import com.google.protobuf.Message;
 import org.spine3.Internal;
+import org.spine3.server.aggregate.Aggregate;
 import org.spine3.server.entity.Entity;
 import org.spine3.server.storage.jdbc.DatabaseException;
 
@@ -30,9 +32,9 @@ import java.sql.SQLException;
 import static org.spine3.base.Identifiers.idToString;
 
 /**
- * Helps to work with entity ID columns.
+ * Helps to work with {@link Entity} ID columns.
  *
- * @param <Id> the type of entity IDs
+ * @param <Id> the type of {@link Entity} IDs
  * @author Alexander Litus
  */
 @Internal
@@ -47,18 +49,22 @@ public abstract class IdColumn<Id> {
     /**
      * Creates a new instance.
      *
-     * @param entityClass a class of an entity or an aggregate
-     * @param <Id> the type of entity IDs
+     * @param entityClass a class of an {@link Entity} or an {@link Aggregate}
+     * @param <Id> the type of {@link Entity} IDs
      * @return a new helper instance
      */
     @SuppressWarnings("IfMayBeConditional")
     public static <Id> IdColumn<Id> newInstance(Class<? extends Entity<Id, ?>> entityClass) {
         final IdColumn<Id> helper;
         final Class<Id> idClass = Entity.getIdClass(entityClass);
-        if (Long.class.isAssignableFrom(idClass)) {
-            helper = new LongIdColumn<>();
-        } else if (Integer.class.isAssignableFrom(idClass)) {
-            helper = new IntIdColumn<>();
+        if (idClass.equals(Long.class)) {
+            @SuppressWarnings("unchecked") // is checked already
+            final IdColumn<Id> longIdColumn = (IdColumn<Id>) new LongIdColumn();
+            helper = longIdColumn;
+        } else if (idClass.equals(Integer.class)) {
+            @SuppressWarnings("unchecked") // is checked already
+            final IdColumn<Id> intIdColumn = (IdColumn<Id>) new IntIdColumn();
+            helper = intIdColumn;
         } else {
             helper = new StringOrMessageIdColumn<>();
         }
@@ -76,10 +82,14 @@ public abstract class IdColumn<Id> {
      * @param index     the ID parameter index
      * @param id        the ID value to set
      * @param statement the statement to use
+     * @throws DatabaseException if an error occurs during an interaction with the DB
      */
-    public abstract void setId(int index, Id id, PreparedStatement statement);
+    public abstract void setId(int index, Id id, PreparedStatement statement) throws DatabaseException;
 
-    private static class LongIdColumn<Id> extends IdColumn<Id> {
+    /**
+     * Helps to work with columns which contain {@code long} {@link Entity} IDs.
+     */
+    private static class LongIdColumn extends IdColumn<Long> {
 
         @Override
         public String getColumnDataType() {
@@ -87,17 +97,19 @@ public abstract class IdColumn<Id> {
         }
 
         @Override
-        public void setId(int index, Id id, PreparedStatement statement) {
-            final Long idLong = (Long) id;
+        public void setId(int index, Long id, PreparedStatement statement) throws DatabaseException {
             try {
-                statement.setLong(index, idLong);
+                statement.setLong(index, id);
             } catch (SQLException e) {
                 throw new DatabaseException(e);
             }
         }
     }
 
-    private static class IntIdColumn<Id> extends IdColumn<Id> {
+    /**
+     * Helps to work with columns which contain {@code integer} {@link Entity} IDs.
+     */
+    private static class IntIdColumn extends IdColumn<Integer> {
 
         @Override
         public String getColumnDataType() {
@@ -105,17 +117,19 @@ public abstract class IdColumn<Id> {
         }
 
         @Override
-        public void setId(int index, Id id, PreparedStatement statement) {
-            final Integer idInt = (Integer) id;
+        public void setId(int index, Integer id, PreparedStatement statement) throws DatabaseException {
             try {
-                statement.setInt(index, idInt);
+                statement.setInt(index, id);
             } catch (SQLException e) {
                 throw new DatabaseException(e);
             }
         }
     }
 
-    public static class StringOrMessageIdColumn<Id> extends IdColumn<Id> {
+    /**
+     * Helps to work with columns which contain either {@link Message} or {@code string} {@link Entity} IDs.
+     */
+    private static class StringOrMessageIdColumn<Id> extends IdColumn<Id> {
 
         @Override
         public String getColumnDataType() {
@@ -123,7 +137,7 @@ public abstract class IdColumn<Id> {
         }
 
         @Override
-        public void setId(int index, Id id, PreparedStatement statement) {
+        public void setId(int index, Id id, PreparedStatement statement) throws DatabaseException {
             final String idString = idToString(id);
             try {
                 statement.setString(index, idString);
@@ -131,5 +145,11 @@ public abstract class IdColumn<Id> {
                 throw new DatabaseException(e);
             }
         }
+    }
+
+    /**
+     * Helps to work with columns which contain {@code string} {@link Entity} IDs.
+     */
+    public static class StringIdColumn extends StringOrMessageIdColumn<String> {
     }
 }

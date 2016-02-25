@@ -33,7 +33,11 @@ import org.spine3.server.event.EventFilter;
 import org.spine3.server.event.EventStreamQuery;
 import org.spine3.server.storage.EventStorage;
 import org.spine3.server.storage.EventStorageRecord;
-import org.spine3.server.storage.jdbc.util.*;
+import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
+import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
+import org.spine3.server.storage.jdbc.util.DbIterator;
+import org.spine3.server.storage.jdbc.util.IdColumn.StringIdColumn;
+import org.spine3.server.storage.jdbc.util.SelectByIdQuery;
 
 import javax.annotation.Nullable;
 import java.sql.PreparedStatement;
@@ -316,7 +320,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         private static final String SELECT_QUERY = SELECT_EVENT_FROM_TABLE + " WHERE " + EVENT_ID_COL + " = ?;";
 
         protected SelectEventByIdQuery() {
-            super(SELECT_QUERY, dataSource, new IdColumn.StringOrMessageIdColumn<String>());
+            super(SELECT_QUERY, dataSource, new StringIdColumn());
             setRecordColumnName(EVENT_COL);
             setRecordDescriptor(RECORD_DESCRIPTOR);
         }

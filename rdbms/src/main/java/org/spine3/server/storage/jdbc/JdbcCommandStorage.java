@@ -32,7 +32,7 @@ import org.spine3.server.storage.CommandStorage;
 import org.spine3.server.storage.CommandStorageRecord;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.server.storage.jdbc.util.IdColumn;
+import org.spine3.server.storage.jdbc.util.IdColumn.StringIdColumn;
 import org.spine3.server.storage.jdbc.util.SelectByIdQuery;
 import org.spine3.validate.Validate;
 
@@ -375,7 +375,7 @@ import static org.spine3.validate.Validate.checkNotDefault;
                 " WHERE " + ID_COL + " = ?;";
 
         protected SelectCommandByIdQuery() {
-            super(SELECT_QUERY, dataSource, new IdColumn.StringOrMessageIdColumn<String>());
+            super(SELECT_QUERY, dataSource, new StringIdColumn());
         }
 
         @Nullable
