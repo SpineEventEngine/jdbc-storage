@@ -32,6 +32,7 @@ import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbIterator;
 import org.spine3.server.storage.jdbc.util.DbTableNameFactory;
 import org.spine3.server.storage.jdbc.util.IdColumn;
+import org.spine3.server.storage.jdbc.util.WriteQuery;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -87,8 +88,8 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
     private final IdColumn<Id> idColumn;
 
-    private final InsertQuery insertQuery;
-    private final SelectByIdSortedByTimeDescQuery selectByIdSortedByTimeDescQuery;
+    private final String tableName;
+    private final SelectByIdSortedByTimeDescQuery selectByIdSortedQuery;
 
     /**
      * Creates a new storage instance.
@@ -106,10 +107,10 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
     private JdbcAggregateStorage(DataSourceWrapper dataSource, Class<? extends Aggregate<Id, ?>> aggregateClass)
             throws DatabaseException {
         this.dataSource = dataSource;
-        final String tableName = DbTableNameFactory.newTableName(aggregateClass);
-        this.insertQuery = new InsertQuery(tableName);
-        this.selectByIdSortedByTimeDescQuery = new SelectByIdSortedByTimeDescQuery(tableName);
+        this.tableName = DbTableNameFactory.newTableName(aggregateClass);
         this.idColumn = IdColumn.newInstance(aggregateClass);
+        this.selectByIdSortedQuery = new SelectByIdSortedByTimeDescQuery(tableName);
+
         new CreateTableIfDoesNotExistQuery().execute(tableName);
     }
 
@@ -120,16 +121,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
      */
     @Override
     protected void writeInternal(Id id, AggregateStorageRecord record) throws DatabaseException {
-        try (ConnectionWrapper connection = dataSource.getConnection(false)) {
-            try (PreparedStatement statement = insertQuery.statement(connection, id, record)) {
-                statement.execute();
-                connection.commit();
-            } catch (SQLException e) {
-                log().error("Error during writing record, aggregate ID = " + idToString(id), e);
-                connection.rollback();
-                throw new DatabaseException(e);
-            }
-        }
+        new InsertQuery(id, record).execute();
     }
 
     /**
@@ -144,7 +136,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
     protected Iterator<AggregateStorageRecord> historyBackward(Id id) throws DatabaseException {
         checkNotNull(id);
         try (ConnectionWrapper connection = dataSource.getConnection(true)) {
-            final PreparedStatement statement = selectByIdSortedByTimeDescQuery.statement(connection, id);
+            final PreparedStatement statement = selectByIdSortedQuery.statement(connection, id);
             final DbIterator<AggregateStorageRecord> iterator = new DbIterator<>(statement, AGGREGATE_COL, RECORD_DESCRIPTOR);
             iterators.add(iterator);
             return iterator;
@@ -164,7 +156,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         }
     }
 
-    private class InsertQuery {
+    private class InsertQuery extends WriteQuery {
 
         @SuppressWarnings("DuplicateStringLiteralInspection")
         private static final String INSERT =
@@ -173,12 +165,18 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
                 " VALUES (?, ?, ?, ?);";
 
         private final String insertQuery;
+        private final AggregateStorageRecord record;
+        private final Id id;
 
-        private InsertQuery(String tableName) {
+        private InsertQuery(Id id, AggregateStorageRecord record) {
+            super(dataSource);
             this.insertQuery = format(INSERT, tableName);
+            this.record = record;
+            this.id = id;
         }
 
-        private PreparedStatement statement(ConnectionWrapper connection, Id id, AggregateStorageRecord record) {
+        @Override
+        protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
             final PreparedStatement statement = connection.prepareStatement(insertQuery);
             final byte[] serializedRecord = serialize(record);
             try {
@@ -191,6 +189,11 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
                 throw new DatabaseException(e);
             }
             return statement;
+        }
+
+        @Override
+        protected void logError(SQLException exception) {
+            log().error("Error during writing record, aggregate ID = " + idToString(id), exception);
         }
     }
 
