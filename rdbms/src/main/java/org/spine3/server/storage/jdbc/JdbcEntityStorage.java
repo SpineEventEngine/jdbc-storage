@@ -234,8 +234,8 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
         private SelectEntityByIdQuery(String tableName) {
             super(format(SELECT_BY_ID, tableName), dataSource, idColumn);
-            setRecordColumnName(ENTITY_COL);
-            setRecordDescriptor(RECORD_DESCRIPTOR);
+            setMessageColumnName(ENTITY_COL);
+            setMessageDescriptor(RECORD_DESCRIPTOR);
         }
     }
 

@@ -381,7 +381,7 @@ import static org.spine3.validate.Validate.checkNotDefault;
         @Nullable
         @Override
         @SuppressWarnings("RefusedBequest")
-        protected CommandStorageRecord readRecord(ResultSet resultSet) throws SQLException {
+        protected CommandStorageRecord readMessage(ResultSet resultSet) throws SQLException {
             final byte[] recordBytes = resultSet.getBytes(COMMAND_COL);
             if (recordBytes == null) {
                 return null;

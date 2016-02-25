@@ -37,26 +37,26 @@ import static org.spine3.base.Identifiers.idToString;
 import static org.spine3.server.storage.jdbc.util.Serializer.deserialize;
 
 /**
- * A query which obtains a storage record by an ID.
+ * A query which obtains a {@link Message} by an ID.
  *
- * @param <I> a type of storage record IDs
- * @param <R> a type of storage records
+ * @param <I> a type of storage message IDs
+ * @param <M> a type of messages to read
  * @author Alexander Litus
  */
 @Internal
-public class SelectByIdQuery<I, R extends Message> {
+public class SelectByIdQuery<I, M extends Message> {
 
     private final String query;
     private final DataSourceWrapper dataSource;
     private final IdColumn<I> idColumn;
 
-    private String recordColumnName;
-    private Descriptor recordDescriptor;
+    private String messageColumnName;
+    private Descriptor messageDescriptor;
 
     /**
      * Creates a new query instance.
      *
-     * @param query SQL select query which selects records by an ID (must have one ID parameter)
+     * @param query SQL select query which selects a message by an ID (must have one ID parameter to set)
      * @param dataSource a data source to use to obtain DB connections
      * @param idColumn a helper object used to set IDs to statements as parameters
      */
@@ -67,66 +67,66 @@ public class SelectByIdQuery<I, R extends Message> {
     }
 
     /**
-     * Executes a query, obtains a serialized record and deserializes it.
+     * Executes a query, obtains a serialized message and deserializes it.
      *
-     * @param id a record ID
-     * @return a storage record {@link Message} or {@code null} if there is no needed data
+     * @param id a message ID
+     * @return a message or {@code null} if there is no needed data
      * @throws DatabaseException if an error occurs during an interaction with the DB
      * @see Serializer#deserialize(byte[], Descriptor)
      */
     @Nullable
-    public R execute(I id) throws DatabaseException {
+    public M execute(I id) throws DatabaseException {
         try (ConnectionWrapper connection = dataSource.getConnection(true);
              PreparedStatement statement = prepareStatement(connection, id);
              ResultSet resultSet = statement.executeQuery()) {
             if (!resultSet.next()) {
                 return null;
             }
-            final R record = readRecord(resultSet);
-            return record;
+            final M message = readMessage(resultSet);
+            return message;
         } catch (SQLException e) {
-            log().error("Error during reading a record, ID = " + idToString(id), e);
+            log().error("Error during reading a message, ID = " + idToString(id), e);
             throw new DatabaseException(e);
         }
     }
 
     /**
-     * Retrieves a record from a DB result set.
+     * Retrieves a message from a DB result set.
      *
-     * <p>The default implementation reads a record as byte array and deserializes it.
-     * In order to do so, it is required to {@link #setRecordColumnName(String)} and
-     * {@link #setRecordDescriptor(Descriptor)}.
+     * <p>The default implementation reads a message as byte array and deserializes it.
+     * In order to do so, it is required to {@link #setMessageColumnName(String)} and
+     * {@link #setMessageDescriptor(Descriptor)}.
      *
      * @param resultSet a data set with the cursor pointed to the first row
-     * @return a record instance or {@code null} if the row does not contain the needed data
+     * @return a message instance or {@code null} if the row does not contain the needed data
      * @throws SQLException if an error occurs during an interaction with the DB
      */
     @Nullable
-    protected R readRecord(ResultSet resultSet) throws SQLException {
-        checkNotNull(recordColumnName, "Record column name must be set.");
-        checkNotNull(recordDescriptor, "Record descriptor must be set.");
-        final byte[] bytes = resultSet.getBytes(recordColumnName);
+    protected M readMessage(ResultSet resultSet) throws SQLException {
+        checkNotNull(messageColumnName, "messageColumnName must be set.");
+        checkNotNull(messageDescriptor, "messageDescriptor must be set.");
+        final byte[] bytes = resultSet.getBytes(messageColumnName);
         if (bytes == null) {
             return null;
         }
-        final R record = deserialize(bytes, recordDescriptor);
-        return record;
+        final M message = deserialize(bytes, messageDescriptor);
+        return message;
     }
 
     /**
-     * Sets a DB column name which contains serialized records.
-     * It is required in order to use the default {@link #readRecord(ResultSet)} implementation.
+     * Sets a DB column name which contains serialized messages.
+     * It is required in order to use the default {@link #readMessage(ResultSet)} implementation.
      */
-    public void setRecordColumnName(String recordColumnName) {
-        this.recordColumnName = recordColumnName;
+    public void setMessageColumnName(String messageColumnName) {
+        this.messageColumnName = messageColumnName;
     }
 
     /**
-     * Sets a descriptor of the storage record message.
-     * It is required in order to use the default {@link #readRecord(ResultSet)} implementation.
+     * Sets a descriptor of the messages to read.
+     * It is required in order to use the default {@link #readMessage(ResultSet)} implementation.
      */
-    public void setRecordDescriptor(Descriptor recordDescriptor) {
-        this.recordDescriptor = recordDescriptor;
+    public void setMessageDescriptor(Descriptor messageDescriptor) {
+        this.messageDescriptor = messageDescriptor;
     }
 
     private PreparedStatement prepareStatement(ConnectionWrapper connection, I id) {

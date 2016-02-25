@@ -321,8 +321,8 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
         protected SelectEventByIdQuery() {
             super(SELECT_QUERY, dataSource, new StringIdColumn());
-            setRecordColumnName(EVENT_COL);
-            setRecordDescriptor(RECORD_DESCRIPTOR);
+            setMessageColumnName(EVENT_COL);
+            setMessageDescriptor(RECORD_DESCRIPTOR);
         }
     }
 
