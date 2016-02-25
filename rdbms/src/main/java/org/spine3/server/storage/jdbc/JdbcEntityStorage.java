@@ -219,8 +219,8 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
                 " SET " + ENTITY_COL + " = ? " +
                 " WHERE " + ID_COL + " = ?;";
 
-        private static final int ID_INDEX_IN_QUERY = 2;
         private static final int ENTITY_INDEX_IN_QUERY = 1;
+        private static final int ID_INDEX_IN_QUERY = 2;
 
         private UpdateQuery(String tableName) {
             super(format(UPDATE, tableName), ID_INDEX_IN_QUERY, ENTITY_INDEX_IN_QUERY);
