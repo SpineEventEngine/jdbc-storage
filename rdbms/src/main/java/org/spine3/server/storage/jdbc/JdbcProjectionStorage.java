@@ -36,6 +36,7 @@ import java.sql.SQLException;
 
 import static java.lang.String.format;
 import static org.spine3.server.storage.jdbc.util.DbTableNameFactory.newTableName;
+import static org.spine3.validate.Validate.isDefault;
 
 /**
  * The implementation of the projection storage based on the RDBMS.
@@ -116,20 +117,8 @@ import static org.spine3.server.storage.jdbc.util.DbTableNameFactory.newTableNam
     @Override
     @Nullable
     public Timestamp readLastHandledEventTime() throws DatabaseException {
-        try (ConnectionWrapper connection = dataSource.getConnection(true);
-             PreparedStatement statement = selectQuery.statement(connection);
-             ResultSet resultSet = statement.executeQuery()) {
-            if (!resultSet.next()) {
-                return null;
-            }
-            final long seconds = resultSet.getLong(SECONDS_COL);
-            final int nanos = resultSet.getInt(NANOS_COL);
-            final Timestamp time = Timestamp.newBuilder().setSeconds(seconds).setNanos(nanos).build();
-            return time;
-        } catch (SQLException e) {
-            log().error("Failed to read last event time.", e);
-            throw new DatabaseException(e);
-        }
+        final Timestamp timestamp = selectQuery.execute();
+        return timestamp;
     }
 
     @Override
@@ -231,7 +220,7 @@ import static org.spine3.server.storage.jdbc.util.DbTableNameFactory.newTableNam
     }
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static class SelectQuery {
+    private class SelectQuery {
 
         private static final String SELECT_QUERY = "SELECT " + SECONDS_COL + ", " + NANOS_COL + " FROM %s ;";
 
@@ -241,9 +230,25 @@ import static org.spine3.server.storage.jdbc.util.DbTableNameFactory.newTableNam
             this.selectQuery = format(SELECT_QUERY, tableName);
         }
 
-        private PreparedStatement statement(ConnectionWrapper connection) {
-            final PreparedStatement statement = connection.prepareStatement(selectQuery);
-            return statement;
+        @Nullable
+        public Timestamp execute() throws DatabaseException {
+            try (ConnectionWrapper connection = dataSource.getConnection(true);
+                 PreparedStatement statement = connection.prepareStatement(selectQuery);
+                 ResultSet resultSet = statement.executeQuery()) {
+                if (!resultSet.next()) {
+                    return null;
+                }
+                final long seconds = resultSet.getLong(SECONDS_COL);
+                final int nanos = resultSet.getInt(NANOS_COL);
+                final Timestamp time = Timestamp.newBuilder().setSeconds(seconds).setNanos(nanos).build();
+                if (isDefault(time)) {
+                    return null;
+                }
+                return time;
+            } catch (SQLException e) {
+                log().error("Failed to read last event time.", e);
+                throw new DatabaseException(e);
+            }
         }
     }
 
