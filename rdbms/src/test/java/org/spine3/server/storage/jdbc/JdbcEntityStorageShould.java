@@ -20,8 +20,6 @@
 
 package org.spine3.server.storage.jdbc;
 
-import com.google.protobuf.StringValue;
-import com.google.protobuf.util.TimeUtil;
 import org.junit.Test;
 import org.spine3.server.entity.Entity;
 import org.spine3.server.storage.EntityStorage;
@@ -33,7 +31,6 @@ import org.spine3.test.project.ProjectId;
 
 import static org.junit.Assert.*;
 import static org.spine3.base.Identifiers.newUuid;
-import static org.spine3.protobuf.Messages.toAny;
 import static org.spine3.server.storage.jdbc.JdbcStorageFactoryShould.newInMemoryDataSource;
 import static org.spine3.testdata.TestAggregateIdFactory.newProjectId;
 
@@ -80,8 +77,8 @@ public class JdbcEntityStorageShould extends EntityStorageShould<String> {
         testWriteAndReadRecord(id, storage);
     }
 
-    private static <I> void testWriteAndReadRecord(I id, JdbcEntityStorage<I> storage) {
-        final EntityStorageRecord expectedRecord = newEntityRecord();
+    private <I> void testWriteAndReadRecord(I id, JdbcEntityStorage<I> storage) {
+        final EntityStorageRecord expectedRecord = newStorageRecord();
 
         storage.write(id, expectedRecord);
         final EntityStorageRecord actualRecord = storage.read(id);
@@ -106,21 +103,12 @@ public class JdbcEntityStorageShould extends EntityStorageShould<String> {
     public void clear_itself() {
         final JdbcEntityStorage<String> storage = newStorage(TestEntityWithIdString.class);
         final String id = newUuid();
-        final EntityStorageRecord record = newEntityRecord();
+        final EntityStorageRecord record = newStorageRecord();
         storage.writeInternal(id, record);
         storage.clear();
 
         final EntityStorageRecord actual = storage.readInternal(id);
         assertNull(actual);
-    }
-
-    private static EntityStorageRecord newEntityRecord() {
-        final StringValue stringValue = StringValue.newBuilder().setValue(newUuid()).build();
-        final EntityStorageRecord.Builder builder = EntityStorageRecord.newBuilder()
-                .setState(toAny(stringValue))
-                .setVersion(5) // set any non-default value
-                .setWhenModified(TimeUtil.getCurrentTime());
-        return builder.build();
     }
 
     private static class TestEntityWithIdMessage extends Entity<ProjectId, Project> {
