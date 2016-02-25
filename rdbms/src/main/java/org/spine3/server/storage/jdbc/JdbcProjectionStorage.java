@@ -28,6 +28,7 @@ import org.spine3.server.storage.EntityStorage;
 import org.spine3.server.storage.ProjectionStorage;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
+import org.spine3.server.storage.jdbc.util.WriteQuery;
 
 import javax.annotation.Nullable;
 import java.sql.PreparedStatement;
@@ -68,9 +69,7 @@ import static org.spine3.validate.Validate.isDefault;
 
     private final JdbcEntityStorage<Id> entityStorage;
 
-    private final InsertQuery insertQuery;
-    private final UpdateQuery updateQuery;
-    private final SelectQuery selectQuery;
+    private final String tableName;
 
     /**
      * Creates a new storage instance.
@@ -92,19 +91,17 @@ import static org.spine3.validate.Validate.isDefault;
                                   JdbcEntityStorage<Id> entityStorage) throws DatabaseException {
         this.dataSource = dataSource;
         this.entityStorage = entityStorage;
-        final String tableName = newTableName(projectionClass) + LAST_EVENT_TIME_TABLE_NAME_SUFFIX;
-        this.insertQuery = new InsertQuery(tableName);
-        this.updateQuery = new UpdateQuery(tableName);
-        this.selectQuery = new SelectQuery(tableName);
+        this.tableName = newTableName(projectionClass) + LAST_EVENT_TIME_TABLE_NAME_SUFFIX;
+
         new CreateTableIfDoesNotExistQuery().execute(tableName);
     }
 
     @Override
     public void writeLastHandledEventTime(Timestamp time) throws DatabaseException {
         if (containsLastEventTime()) {
-            updateQuery.execute(time);
+            new UpdateTimestampQuery(time).execute();
         } else {
-            insertQuery.execute(time);
+            new InsertTimestampQuery(time).execute();
         }
     }
 
@@ -117,7 +114,7 @@ import static org.spine3.validate.Validate.isDefault;
     @Override
     @Nullable
     public Timestamp readLastHandledEventTime() throws DatabaseException {
-        final Timestamp timestamp = selectQuery.execute();
+        final Timestamp timestamp = new SelectTimestampQuery().execute();
         return timestamp;
     }
 
@@ -158,28 +155,19 @@ import static org.spine3.validate.Validate.isDefault;
         }
     }
 
-    private abstract class WriteQuery {
+    private class WriteTimestampQuery extends WriteQuery {
 
         private final String query;
+        private final Timestamp timestamp;
 
-        protected WriteQuery(String query) {
+        private WriteTimestampQuery(String query, Timestamp timestamp) {
+            super(dataSource);
             this.query = query;
+            this.timestamp = timestamp;
         }
 
-        protected void execute(Timestamp timestamp) {
-            try (ConnectionWrapper connection = dataSource.getConnection(false)) {
-                try (PreparedStatement statement = prepareStatement(connection, timestamp)) {
-                    statement.execute();
-                    connection.commit();
-                } catch (SQLException e) {
-                    log().error("Failed to write last event time.", e);
-                    connection.rollback();
-                    throw new DatabaseException(e);
-                }
-            }
-        }
-
-        private PreparedStatement prepareStatement(ConnectionWrapper connection, Timestamp timestamp) {
+        @Override
+        protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
             final PreparedStatement statement = connection.prepareStatement(query);
             final long seconds = timestamp.getSeconds();
             final int nanos = timestamp.getNanos();
@@ -191,42 +179,46 @@ import static org.spine3.validate.Validate.isDefault;
                 throw new DatabaseException(e);
             }
         }
+
+        @Override
+        protected void log(SQLException exception) {
+            JdbcProjectionStorage.log().error("Failed to write last event timestamp.");
+        }
     }
 
-    @SuppressWarnings("DuplicateStringLiteralInspection")
-    private class InsertQuery extends WriteQuery {
+    private class InsertTimestampQuery extends WriteTimestampQuery {
 
-        private static final String INSERT =
+        @SuppressWarnings("DuplicateStringLiteralInspection")
+        private static final String INSERT_QUERY =
                 "INSERT INTO %s " +
                 " (" + SECONDS_COL + ", " + NANOS_COL + ')' +
                 " VALUES (?, ?);";
 
-        protected InsertQuery(String tableName) {
-            super(format(INSERT, tableName));
+        private InsertTimestampQuery(Timestamp timestamp) {
+            super(format(INSERT_QUERY, tableName), timestamp);
         }
     }
 
-    @SuppressWarnings("DuplicateStringLiteralInspection")
-    private class UpdateQuery extends WriteQuery {
+    private class UpdateTimestampQuery extends WriteTimestampQuery {
 
-        private static final String UPDATE =
+        private static final String UPDATE_QUERY =
                 "UPDATE %s SET " +
                 SECONDS_COL + " = ?, " +
                 NANOS_COL + " = ?;";
 
-        protected UpdateQuery(String tableName) {
-            super(format(UPDATE, tableName));
+        private UpdateTimestampQuery(Timestamp timestamp) {
+            super(format(UPDATE_QUERY, tableName), timestamp);
         }
     }
 
-    @SuppressWarnings("DuplicateStringLiteralInspection")
-    private class SelectQuery {
+    private class SelectTimestampQuery {
 
+        @SuppressWarnings("DuplicateStringLiteralInspection")
         private static final String SELECT_QUERY = "SELECT " + SECONDS_COL + ", " + NANOS_COL + " FROM %s ;";
 
         private final String selectQuery;
 
-        private SelectQuery(String tableName) {
+        private SelectTimestampQuery() {
             this.selectQuery = format(SELECT_QUERY, tableName);
         }
 

@@ -324,12 +324,8 @@ import static org.spine3.validate.Validate.checkNotDefault;
         private final CommandId commandId;
 
         protected SetOkStatusQuery(CommandId commandId) {
+            super(dataSource);
             this.commandId = commandId;
-        }
-
-        @Override
-        protected DataSourceWrapper getDataSource() {
-            return dataSource;
         }
 
         @Override

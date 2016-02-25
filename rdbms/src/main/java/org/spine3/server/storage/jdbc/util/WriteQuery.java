@@ -34,11 +34,16 @@ import java.sql.SQLException;
 @Internal
 public abstract class WriteQuery {
 
+    private final DataSourceWrapper dataSource;
+
+    protected WriteQuery(DataSourceWrapper dataSource) {
+        this.dataSource = dataSource;
+    }
+
     /**
      * Executes a write query.
      */
     public void execute() {
-        final DataSourceWrapper dataSource = getDataSource();
         try (ConnectionWrapper connection = dataSource.getConnection(false)) {
             try (PreparedStatement statement = prepareStatement(connection)) {
                 statement.execute();
@@ -50,11 +55,6 @@ public abstract class WriteQuery {
             }
         }
     }
-
-    /**
-     * Returns a data source.
-     */
-    protected abstract DataSourceWrapper getDataSource();
 
     /**
      * Prepares SQL statement using the connection.

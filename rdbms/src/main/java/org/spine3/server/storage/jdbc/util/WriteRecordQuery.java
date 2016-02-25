@@ -37,7 +37,6 @@ import java.sql.SQLException;
 @Internal
 public abstract class WriteRecordQuery<Id, Record extends Message> extends WriteQuery {
 
-    private final DataSourceWrapper dataSource;
     private final String query;
     private final int idIndexInQuery;
     private final int recordIndexInQuery;
@@ -49,7 +48,7 @@ public abstract class WriteRecordQuery<Id, Record extends Message> extends Write
      * Creates a new query instance based on the passed builder.
      */
     protected WriteRecordQuery(AbstractBuilder<? extends WriteRecordQuery<Id, Record>, Id, Record> builder) {
-        this.dataSource = builder.dataSource;
+        super(builder.dataSource);
         this.query = builder.query;
         this.idIndexInQuery = builder.idIndexInQuery;
         this.recordIndexInQuery = builder.recordIndexInQuery;
@@ -70,11 +69,6 @@ public abstract class WriteRecordQuery<Id, Record extends Message> extends Write
         } catch (SQLException e) {
             throw new DatabaseException(e);
         }
-    }
-
-    @Override
-    public DataSourceWrapper getDataSource() {
-        return dataSource;
     }
 
     protected Id getId() {
