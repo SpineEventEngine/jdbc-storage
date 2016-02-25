@@ -32,6 +32,8 @@ import org.spine3.server.storage.CommandStorage;
 import org.spine3.server.storage.CommandStorageRecord;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
+import org.spine3.server.storage.jdbc.util.IdColumn;
+import org.spine3.server.storage.jdbc.util.SelectByIdQuery;
 import org.spine3.validate.Validate;
 
 import javax.annotation.Nullable;
@@ -119,7 +121,7 @@ import static org.spine3.validate.Validate.checkNotDefault;
         checkNotClosed();
 
         final SelectCommandByIdQuery query = new SelectCommandByIdQuery();
-        final CommandStorageRecord record = query.execute(commandId);
+        final CommandStorageRecord record = query.execute(commandId.getUuid());
         if (record == null) {
             return CommandStorageRecord.getDefaultInstance();
         }
@@ -365,34 +367,26 @@ import static org.spine3.validate.Validate.checkNotDefault;
         }
     }
 
-    private class SelectCommandByIdQuery {
+    private class SelectCommandByIdQuery extends SelectByIdQuery<String, CommandStorageRecord> {
 
         @SuppressWarnings("DuplicateStringLiteralInspection")
         private static final String SELECT_QUERY =
                 "SELECT * FROM " + TABLE_NAME +
                 " WHERE " + ID_COL + " = ?;";
 
-        @Nullable
-        @SuppressWarnings("TypeMayBeWeakened")
-        private CommandStorageRecord execute(CommandId commandId) {
-            try (ConnectionWrapper connection = dataSource.getConnection(true);
-                 PreparedStatement statement = statement(connection, commandId.getUuid());
-                 ResultSet resultSet = statement.executeQuery()) {
-                final CommandStorageRecord record = readRecord(resultSet);
-                return record;
-            } catch (SQLException e) {
-                log().error("Error while reading command record, command ID = " + commandId, e);
-                throw new DatabaseException(e);
-            }
+        protected SelectCommandByIdQuery() {
+            super(SELECT_QUERY, dataSource, new IdColumn.StringOrMessageIdColumn<String>());
         }
 
         @Nullable
-        private CommandStorageRecord readRecord(ResultSet resultSet) throws SQLException {
-            if (!resultSet.next()) {
+        @Override
+        @SuppressWarnings("RefusedBequest")
+        protected CommandStorageRecord readRecord(ResultSet resultSet) throws SQLException {
+            final byte[] recordBytes = resultSet.getBytes(COMMAND_COL);
+            if (recordBytes == null) {
                 return null;
             }
-            final byte[] commandRecordBytes = resultSet.getBytes(COMMAND_COL);
-            final CommandStorageRecord record = deserializeMessage(commandRecordBytes, COMMAND_RECORD_DESCRIPTOR);
+            final CommandStorageRecord record = deserializeMessage(recordBytes, COMMAND_RECORD_DESCRIPTOR);
             final CommandStorageRecord.Builder builder = record.toBuilder();
             final boolean isStatusOk = resultSet.getBoolean(IS_STATUS_OK_COL);
             if (isStatusOk) {
@@ -413,16 +407,6 @@ import static org.spine3.validate.Validate.checkNotDefault;
                         .build();
             }
             return builder.build();
-        }
-
-        private PreparedStatement statement(ConnectionWrapper connection, String id) {
-            try {
-                final PreparedStatement statement = connection.prepareStatement(SELECT_QUERY);
-                statement.setString(1, id);
-                return statement;
-            } catch (SQLException e) {
-                throw new DatabaseException(e);
-            }
         }
     }
 

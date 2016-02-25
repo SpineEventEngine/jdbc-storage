@@ -23,30 +23,28 @@ package org.spine3.server.storage.jdbc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spine3.server.entity.Entity;
-import org.spine3.server.entity.EntityId;
 import org.spine3.server.storage.EntityStorage;
 import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbTableNameFactory;
 import org.spine3.server.storage.jdbc.util.IdColumn;
+import org.spine3.server.storage.jdbc.util.SelectByIdQuery;
 
 import javax.annotation.Nullable;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.protobuf.Descriptors.Descriptor;
 import static java.lang.String.format;
 import static org.spine3.base.Identifiers.idToString;
-import static org.spine3.server.storage.jdbc.util.Serializer.deserializeMessage;
 import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
 /**
  * The implementation of the entity storage based on the RDBMS.
  *
- * @param <Id> the type of entity IDs. See {@link EntityId} for details.
+ * @param <Id> the type of entity IDs
  * @see JdbcStorageFactory
  * @author Alexander Litus
  */
@@ -70,7 +68,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
     private final InsertQuery insertQuery;
     private final UpdateQuery updateQuery;
-    private final SelectByIdQuery selectByIdQuery;
+    private final SelectEntityByIdQuery selectByIdQuery;
     private final DeleteAllQuery deleteAllQuery;
 
     /**
@@ -89,13 +87,14 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
     private JdbcEntityStorage(DataSourceWrapper dataSource, Class<? extends Entity<Id, ?>> entityClass)
             throws DatabaseException {
         this.dataSource = dataSource;
+        this.idColumn = IdColumn.newInstance(entityClass);
+
         final String tableName = DbTableNameFactory.newTableName(entityClass);
+        new CreateTableIfDoesNotExistQuery().execute(tableName);
         this.insertQuery = new InsertQuery(tableName);
         this.updateQuery = new UpdateQuery(tableName);
-        this.selectByIdQuery = new SelectByIdQuery(tableName);
+        this.selectByIdQuery = new SelectEntityByIdQuery(tableName);
         this.deleteAllQuery = new DeleteAllQuery(tableName);
-        this.idColumn = IdColumn.newInstance(entityClass);
-        new CreateTableIfDoesNotExistQuery().execute(tableName);
     }
 
     /**
@@ -175,7 +174,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
                     statement.execute();
                     connection.commit();
                 } catch (SQLException e) {
-                    logTransactionError("writing record", id, e);
+                    log().error("Error during writing a record, entity ID = " + idToString(id), e);
                     connection.rollback();
                     throw new DatabaseException(e);
                 }
@@ -228,38 +227,15 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         }
     }
 
-    private class SelectByIdQuery {
+    private class SelectEntityByIdQuery extends SelectByIdQuery<Id, EntityStorageRecord> {
 
         @SuppressWarnings("DuplicateStringLiteralInspection")
         private static final String SELECT_BY_ID = "SELECT " + ENTITY_COL + " FROM %s WHERE " + ID_COL + " = ?;";
 
-        private final String selectByIdQuery;
-
-        private SelectByIdQuery(String tableName) {
-            this.selectByIdQuery = format(SELECT_BY_ID, tableName);
-        }
-
-        @Nullable
-        protected EntityStorageRecord execute(Id id) throws DatabaseException {
-            try (ConnectionWrapper connection = dataSource.getConnection(true);
-                 PreparedStatement statement = statement(connection, id);
-                 ResultSet resultSet = statement.executeQuery()) {
-                if (!resultSet.next()) {
-                    return null;
-                }
-                final byte[] bytes = resultSet.getBytes(ENTITY_COL);
-                final EntityStorageRecord result = deserializeMessage(bytes, RECORD_DESCRIPTOR);
-                return result;
-            } catch (SQLException e) {
-                logTransactionError("reading record", id, e);
-                throw new DatabaseException(e);
-            }
-        }
-
-        private PreparedStatement statement(ConnectionWrapper connection, Id id) {
-            final PreparedStatement statement = connection.prepareStatement(selectByIdQuery);
-            idColumn.setId(1, id, statement);
-            return statement;
+        private SelectEntityByIdQuery(String tableName) {
+            super(format(SELECT_BY_ID, tableName), dataSource, idColumn);
+            setRecordColumnName(ENTITY_COL);
+            setRecordDescriptor(RECORD_DESCRIPTOR);
         }
     }
 
@@ -300,10 +276,6 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
                 throw new DatabaseException(e);
             }
         }
-    }
-
-    private void logTransactionError(String actionName, Id id, Exception e) {
-        log().error("Error during " + actionName + ", entity ID = " + idToString(id), e);
     }
 
     private static Logger log() {

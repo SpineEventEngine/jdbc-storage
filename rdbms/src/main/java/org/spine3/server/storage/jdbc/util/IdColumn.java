@@ -22,7 +22,6 @@ package org.spine3.server.storage.jdbc.util;
 
 import org.spine3.Internal;
 import org.spine3.server.entity.Entity;
-import org.spine3.server.entity.EntityId;
 import org.spine3.server.storage.jdbc.DatabaseException;
 
 import java.sql.PreparedStatement;
@@ -34,7 +33,6 @@ import static org.spine3.base.Identifiers.idToString;
  * Helps to work with entity ID columns.
  *
  * @param <Id> the type of entity IDs
- * @see EntityId
  * @author Alexander Litus
  */
 @Internal
@@ -117,7 +115,7 @@ public abstract class IdColumn<Id> {
         }
     }
 
-    private static class StringOrMessageIdColumn<Id> extends IdColumn<Id> {
+    public static class StringOrMessageIdColumn<Id> extends IdColumn<Id> {
 
         @Override
         public String getColumnDataType() {

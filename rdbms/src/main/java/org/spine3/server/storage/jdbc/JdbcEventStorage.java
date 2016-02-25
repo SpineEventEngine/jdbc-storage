@@ -33,13 +33,10 @@ import org.spine3.server.event.EventFilter;
 import org.spine3.server.event.EventStreamQuery;
 import org.spine3.server.storage.EventStorage;
 import org.spine3.server.storage.EventStorageRecord;
-import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
-import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.server.storage.jdbc.util.DbIterator;
+import org.spine3.server.storage.jdbc.util.*;
 
 import javax.annotation.Nullable;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Iterator;
@@ -47,7 +44,6 @@ import java.util.Iterator;
 import static com.google.common.collect.Lists.newLinkedList;
 import static org.spine3.base.Identifiers.idToString;
 import static org.spine3.io.IoUtil.closeAll;
-import static org.spine3.server.storage.jdbc.util.Serializer.deserializeMessage;
 import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
 /**
@@ -155,12 +151,6 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         }
     }
 
-    private boolean containsRecord(String id) {
-        final EventStorageRecord record = new SelectEventByEventIdQuery().execute(id);
-        final boolean contains = record != null;
-        return contains;
-    }
-
     /**
      * {@inheritDoc}
      *
@@ -170,8 +160,14 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
     @Override
     protected EventStorageRecord readInternal(EventId eventId) throws DatabaseException {
         final String id = eventId.getUuid();
-        final EventStorageRecord record = new SelectEventByEventIdQuery().execute(id);
+        final EventStorageRecord record = new SelectEventByIdQuery().execute(id);
         return record;
+    }
+
+    private boolean containsRecord(String id) {
+        final EventStorageRecord record = new SelectEventByIdQuery().execute(id);
+        final boolean contains = record != null;
+        return contains;
     }
 
     @Override
@@ -314,36 +310,15 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         }
     }
 
-    private class SelectEventByEventIdQuery {
+    private class SelectEventByIdQuery extends SelectByIdQuery<String, EventStorageRecord> {
 
         @SuppressWarnings("DuplicateStringLiteralInspection")
         private static final String SELECT_QUERY = SELECT_EVENT_FROM_TABLE + " WHERE " + EVENT_ID_COL + " = ?;";
 
-        @Nullable
-        protected EventStorageRecord execute(String eventId) throws DatabaseException {
-            try (ConnectionWrapper connection = dataSource.getConnection(true);
-                 PreparedStatement statement = prepareStatement(connection, eventId);
-                 ResultSet resultSet = statement.executeQuery()) {
-                if (!resultSet.next()) {
-                    return null;
-                }
-                final byte[] bytes = resultSet.getBytes(EVENT_COL);
-                final EventStorageRecord record = deserializeMessage(bytes, RECORD_DESCRIPTOR);
-                return record;
-            } catch (SQLException e) {
-                log().error("Error during reading event record, event ID = " + eventId, e);
-                throw new DatabaseException(e);
-            }
-        }
-
-        private PreparedStatement prepareStatement(ConnectionWrapper connection, String id) {
-            try {
-                final PreparedStatement statement = connection.prepareStatement(SELECT_QUERY);
-                statement.setString(1, id);
-                return statement;
-            } catch (SQLException e) {
-                throw new DatabaseException(e);
-            }
+        protected SelectEventByIdQuery() {
+            super(SELECT_QUERY, dataSource, new IdColumn.StringOrMessageIdColumn<String>());
+            setRecordColumnName(EVENT_COL);
+            setRecordDescriptor(RECORD_DESCRIPTOR);
         }
     }
 
@@ -412,8 +387,8 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
             appendTo(builder, " ",
                     SECONDS_COL, " > ", seconds,
                     " OR ( ",
-                    SECONDS_COL, " = ", seconds, " AND ",
-                    NANOSECONDS_COL, " > ", nanos,
+                        SECONDS_COL, " = ", seconds, " AND ",
+                        NANOSECONDS_COL, " > ", nanos,
                     ") ");
             return builder;
         }
@@ -425,8 +400,8 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
             appendTo(builder, " ",
                     SECONDS_COL, " < ", seconds,
                     " OR ( ",
-                    SECONDS_COL, " = ", seconds, " AND ",
-                    NANOSECONDS_COL, " < ", nanos,
+                        SECONDS_COL, " = ", seconds, " AND ",
+                        NANOSECONDS_COL, " < ", nanos,
                     ") ");
             return builder;
         }
