@@ -27,12 +27,11 @@ import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.EntityStorageShould;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.test.project.Project;
-import org.spine3.test.project.ProjectId;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 import static org.spine3.base.Identifiers.newUuid;
 import static org.spine3.server.storage.jdbc.JdbcStorageFactoryShould.newInMemoryDataSource;
-import static org.spine3.testdata.TestAggregateIdFactory.newProjectId;
 
 /**
  * @author Alexander Litus
@@ -42,8 +41,13 @@ public class JdbcEntityStorageShould extends EntityStorageShould<String> {
 
     @Override
     protected EntityStorage<String> getStorage() {
-        final JdbcEntityStorage<String> storage = newStorage(TestEntityWithIdString.class);
-        return storage;
+        return getStorage(TestEntityWithStringId.class);
+    }
+
+    @Override
+    protected <I> JdbcEntityStorage<I> getStorage(Class<? extends Entity<I, ?>> entityClass) {
+        final DataSourceWrapper dataSource = newInMemoryDataSource("entityStorageTests");
+        return JdbcEntityStorage.newInstance(dataSource, entityClass);
     }
 
     @Override
@@ -51,44 +55,9 @@ public class JdbcEntityStorageShould extends EntityStorageShould<String> {
         return newUuid();
     }
 
-    private static <I> JdbcEntityStorage<I> newStorage(Class<? extends Entity<I, ?>> entityClass) {
-        final DataSourceWrapper dataSource = newInMemoryDataSource("entityStorageTests");
-        return JdbcEntityStorage.newInstance(dataSource, entityClass);
-    }
-
-    @Test
-    public void write_and_read_record_by_Message_id() {
-        final JdbcEntityStorage<ProjectId> storage = newStorage(TestEntityWithIdMessage.class);
-        final ProjectId id = newProjectId(newUuid());
-        testWriteAndReadRecord(id, storage);
-    }
-
-    @Test
-    public void write_and_read_record_by_Long_id() {
-        final JdbcEntityStorage<Long> storage = newStorage(TestEntityWithIdLong.class);
-        final long id = 10L;
-        testWriteAndReadRecord(id, storage);
-    }
-
-    @Test
-    public void write_and_read_record_by_Integer_id() {
-        final JdbcEntityStorage<Integer> storage = newStorage(TestEntityWithIdInteger.class);
-        final int id = 10;
-        testWriteAndReadRecord(id, storage);
-    }
-
-    private <I> void testWriteAndReadRecord(I id, JdbcEntityStorage<I> storage) {
-        final EntityStorageRecord expectedRecord = newStorageRecord();
-
-        storage.write(id, expectedRecord);
-        final EntityStorageRecord actualRecord = storage.read(id);
-
-        assertEquals(expectedRecord, actualRecord);
-    }
-
     @Test
     public void close_itself_and_throw_exception_on_read() {
-        final JdbcEntityStorage<String> storage = newStorage(TestEntityWithIdString.class);
+        final JdbcEntityStorage<String> storage = getStorage(TestEntityWithStringId.class);
         storage.close();
         try {
             storage.readInternal("any-id");
@@ -101,7 +70,7 @@ public class JdbcEntityStorageShould extends EntityStorageShould<String> {
 
     @Test
     public void clear_itself() {
-        final JdbcEntityStorage<String> storage = newStorage(TestEntityWithIdString.class);
+        final JdbcEntityStorage<String> storage = getStorage(TestEntityWithStringId.class);
         final String id = newUuid();
         final EntityStorageRecord record = newStorageRecord();
         storage.writeInternal(id, record);
@@ -111,26 +80,9 @@ public class JdbcEntityStorageShould extends EntityStorageShould<String> {
         assertNull(actual);
     }
 
-    private static class TestEntityWithIdMessage extends Entity<ProjectId, Project> {
-        private TestEntityWithIdMessage(ProjectId id) {
-            super(id);
-        }
-    }
+    private static class TestEntityWithStringId extends Entity<String, Project> {
 
-    private static class TestEntityWithIdString extends Entity<String, Project> {
-        private TestEntityWithIdString(String id) {
-            super(id);
-        }
-    }
-
-    private static class TestEntityWithIdInteger extends Entity<Integer, Project> {
-        private TestEntityWithIdInteger(Integer id) {
-            super(id);
-        }
-    }
-
-    private static class TestEntityWithIdLong extends Entity<Long, Project> {
-        private TestEntityWithIdLong(Long id) {
+        private TestEntityWithStringId(String id) {
             super(id);
         }
     }

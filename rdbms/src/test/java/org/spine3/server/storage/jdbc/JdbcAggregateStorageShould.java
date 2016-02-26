@@ -20,22 +20,18 @@
 
 package org.spine3.server.storage.jdbc;
 
+import com.google.protobuf.Message;
 import org.junit.Test;
-import org.spine3.base.Event;
 import org.spine3.server.aggregate.Aggregate;
-import org.spine3.server.storage.AggregateEvents;
 import org.spine3.server.storage.AggregateStorage;
 import org.spine3.server.storage.AggregateStorageShould;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.test.project.Project;
 import org.spine3.test.project.ProjectId;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.spine3.base.Identifiers.newUuid;
 import static org.spine3.server.storage.jdbc.JdbcStorageFactoryShould.newInMemoryDataSource;
 import static org.spine3.testdata.TestAggregateIdFactory.newProjectId;
-import static org.spine3.testdata.TestEventFactory.projectCreated;
 
 /**
  * @author Alexander Litus
@@ -45,18 +41,19 @@ public class JdbcAggregateStorageShould extends AggregateStorageShould {
 
     @Override
     protected AggregateStorage<ProjectId> getStorage() {
-        final JdbcAggregateStorage<ProjectId> storage = newStorage(TestAggregateWithIdMessage.class);
+        final JdbcAggregateStorage<ProjectId> storage = getStorage(TestAggregateWithMessageId.class);
         return storage;
     }
 
-    private static <I> JdbcAggregateStorage<I> newStorage(Class<? extends Aggregate<I, ?>> aggregateClass) {
+    @Override
+    protected <Id> JdbcAggregateStorage<Id> getStorage(Class<? extends Aggregate<Id, ? extends Message>> aggregateClass) {
         final DataSourceWrapper dataSource = newInMemoryDataSource("aggregateStorageTests");
         return JdbcAggregateStorage.newInstance(dataSource, aggregateClass);
     }
 
     @Test
     public void close_itself() {
-        final JdbcAggregateStorage<ProjectId> storage = newStorage(TestAggregateWithIdMessage.class);
+        final JdbcAggregateStorage<ProjectId> storage = getStorage(TestAggregateWithMessageId.class);
         storage.close();
         try {
             storage.historyBackward(newProjectId("anyId"));
@@ -67,59 +64,8 @@ public class JdbcAggregateStorageShould extends AggregateStorageShould {
         fail("Aggregate storage should close itself.");
     }
 
-    @Test
-    public void write_and_read_event_by_String_id() {
-        final JdbcAggregateStorage<String> storage = newStorage(TestAggregateWithIdString.class);
-        final String id = newUuid();
-        testWriteAndReadEvent(id, storage);
-    }
-
-    @Test
-    public void write_and_read_event_by_Long_id() {
-        final JdbcAggregateStorage<Long> storage = newStorage(TestAggregateWithIdLong.class);
-        final long id = 10L;
-        testWriteAndReadEvent(id, storage);
-    }
-
-    @Test
-    public void write_and_read_event_by_Integer_id() {
-        final JdbcAggregateStorage<Integer> storage = newStorage(TestAggregateWithIdInteger.class);
-        final int id = 10;
-        testWriteAndReadEvent(id, storage);
-    }
-// TODO:2016-02-25:alexander.litus: move these tests up
-    private static <I> void testWriteAndReadEvent(I id, JdbcAggregateStorage<I> storage) {
-        final Event expectedEvent = projectCreated();
-
-        storage.writeEvent(id, expectedEvent);
-
-        final AggregateEvents events = storage.read(id);
-        assertEquals(1, events.getEventCount());
-        final Event actualEvent = events.getEvent(0);
-
-        assertEquals(expectedEvent, actualEvent);
-    }
-
-    private static class TestAggregateWithIdMessage extends Aggregate<ProjectId, Project> {
-        private TestAggregateWithIdMessage(ProjectId id) {
-            super(id);
-        }
-    }
-
-    private static class TestAggregateWithIdString extends Aggregate<String, Project> {
-        private TestAggregateWithIdString(String id) {
-            super(id);
-        }
-    }
-
-    private static class TestAggregateWithIdInteger extends Aggregate<Integer, Project> {
-        private TestAggregateWithIdInteger(Integer id) {
-            super(id);
-        }
-    }
-
-    private static class TestAggregateWithIdLong extends Aggregate<Long, Project> {
-        private TestAggregateWithIdLong(Long id) {
+    private static class TestAggregateWithMessageId extends Aggregate<ProjectId, Project> {
+        private TestAggregateWithMessageId(ProjectId id) {
             super(id);
         }
     }
