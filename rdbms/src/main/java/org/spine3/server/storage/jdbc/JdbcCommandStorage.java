@@ -118,7 +118,6 @@ import static org.spine3.validate.Validate.checkNotDefault;
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     @Override
-    @SuppressWarnings("RefusedBequest") // the method from the superclass throws an UnsupportedOperationException
     public CommandStorageRecord read(CommandId commandId) throws DatabaseException {
         checkNotClosed();
 
@@ -287,7 +286,7 @@ import static org.spine3.validate.Validate.checkNotDefault;
         private static final int RECORD_INDEX_IN_QUERY = 1;
         private static final int ID_INDEX_IN_QUERY = 2;
 
-        protected UpdateCommandQuery(Builder builder) {
+        private UpdateCommandQuery(Builder builder) {
             super(builder);
         }
 
@@ -327,13 +326,12 @@ import static org.spine3.validate.Validate.checkNotDefault;
 
         private final CommandId commandId;
 
-        protected SetOkStatusQuery(CommandId commandId) {
+        private SetOkStatusQuery(CommandId commandId) {
             super(dataSource);
             this.commandId = commandId;
         }
 
         @Override
-        @SuppressWarnings("RefusedBequest")
         protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
             final PreparedStatement statement = connection.prepareStatement(SET_OK_STATUS_QUERY);
             final String id = commandId.getUuid();
@@ -364,7 +362,7 @@ import static org.spine3.validate.Validate.checkNotDefault;
         private static final int ERROR_INDEX_IN_QUERY = 1;
         private static final int ID_INDEX_IN_QUERY = 2;
 
-        protected SetErrorQuery(Builder builder) {
+        private SetErrorQuery(Builder builder) {
             super(builder);
         }
 
@@ -407,7 +405,7 @@ import static org.spine3.validate.Validate.checkNotDefault;
         private static final int FAILURE_INDEX_IN_QUERY = 1;
         private static final int ID_INDEX_IN_QUERY = 2;
 
-        protected SetFailureQuery(Builder builder) {
+        private SetFailureQuery(Builder builder) {
             super(builder);
         }
 
@@ -444,7 +442,7 @@ import static org.spine3.validate.Validate.checkNotDefault;
                 "SELECT * FROM " + TABLE_NAME +
                 " WHERE " + ID_COL + " = ?;";
 
-        protected SelectCommandByIdQuery() {
+        private SelectCommandByIdQuery() {
             super(SELECT_QUERY, dataSource, new StringIdColumn());
         }
 

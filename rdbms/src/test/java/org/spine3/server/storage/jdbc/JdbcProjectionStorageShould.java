@@ -48,7 +48,7 @@ public class JdbcProjectionStorageShould extends ProjectionStorageShould<String>
 
     private static class TestProjection extends Projection<String, Project> {
 
-        protected TestProjection(String id) {
+        private TestProjection(String id) {
             super(id);
         }
     }

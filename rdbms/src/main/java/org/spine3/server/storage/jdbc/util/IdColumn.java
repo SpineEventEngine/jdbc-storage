@@ -53,7 +53,6 @@ public abstract class IdColumn<Id> {
      * @param <Id> the type of {@link Entity} IDs
      * @return a new helper instance
      */
-    @SuppressWarnings("IfMayBeConditional")
     public static <Id> IdColumn<Id> newInstance(Class<? extends Entity<Id, ?>> entityClass) {
         final IdColumn<Id> helper;
         final Class<Id> idClass = Entity.getIdClass(entityClass);

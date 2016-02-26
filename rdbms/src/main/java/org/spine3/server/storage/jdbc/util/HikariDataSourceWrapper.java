@@ -51,7 +51,7 @@ public class HikariDataSourceWrapper extends DataSourceWrapper {
         return new HikariDataSourceWrapper(config);
     }
 
-    protected HikariDataSourceWrapper(HikariConfig config) {
+    private HikariDataSourceWrapper(HikariConfig config) {
         dataSource = new HikariDataSource(config);
     }
 

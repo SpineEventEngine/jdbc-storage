@@ -326,7 +326,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         @SuppressWarnings("DuplicateStringLiteralInspection")
         private static final String SELECT_QUERY = SELECT_EVENT_FROM_TABLE + " WHERE " + EVENT_ID_COL + " = ?;";
 
-        protected SelectEventByIdQuery() {
+        private SelectEventByIdQuery() {
             super(SELECT_QUERY, dataSource, new StringIdColumn());
             setMessageColumnName(EVENT_COL);
             setMessageDescriptor(RECORD_DESCRIPTOR);

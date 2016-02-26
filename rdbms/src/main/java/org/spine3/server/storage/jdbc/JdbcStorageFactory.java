@@ -90,7 +90,7 @@ public class JdbcStorageFactory implements StorageFactory {
 
     private static class ConfigConverter {
 
-        @SuppressWarnings({"MethodWithMoreThanThreeNegations", "OverlyLongMethod"}) // is OK in this case
+        @SuppressWarnings({"MethodWithMoreThanThreeNegations"}) // is OK in this case
         private static HikariConfig toHikariConfig(DataSourceConfig config) {
             final HikariConfig result = new HikariConfig();
 

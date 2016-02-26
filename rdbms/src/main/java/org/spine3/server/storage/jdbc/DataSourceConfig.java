@@ -205,9 +205,9 @@ public class DataSourceConfig {
         @Nullable
         private Long idleTimeout;
         @Nullable
-        private Long maxLifetime;
-        @Nullable
         private String connectionTestQuery;
+        @Nullable
+        private Long maxLifetime;
         @Nullable
         private Integer maxPoolSize;
         @Nullable
@@ -297,8 +297,8 @@ public class DataSourceConfig {
          *
          * <p>Examples of JDBC URL (HyperSQL DB):
          *
-         * <p>{@code jdbc:hsqldb:hsql://localhost:9001/dbname;ifexists=true}
-         * <p>{@code jdbc:hsqldb:mem:inmemorydb} (for in-memory database)
+         * <p>{@code jdbc:hsqldb:hsql://localhost:9001/dbName;ifexists=true}
+         * <p>{@code jdbc:hsqldb:mem:inMemoryDb} (for in-memory database)
          *
          * <p>Default: none
          *
@@ -388,6 +388,7 @@ public class DataSourceConfig {
         /**
          * See {@link #setConnectionTimeout(Long)}.
          */
+        @Nullable
         public Long getConnectionTimeout() {
             return connectionTimeout;
         }
@@ -411,6 +412,7 @@ public class DataSourceConfig {
         /**
          * See {@link #setIdleTimeout(Long)}.
          */
+        @Nullable
         public Long getIdleTimeout() {
             return idleTimeout;
         }
@@ -436,6 +438,7 @@ public class DataSourceConfig {
         /**
          * See {@link #setMaxLifetime(Long)}.
          */
+        @Nullable
         public Long getMaxLifetime() {
             return maxLifetime;
         }
@@ -465,6 +468,7 @@ public class DataSourceConfig {
         /**
          * See {@link #setConnectionTestQuery(String)}.
          */
+        @Nullable
         public String getConnectionTestQuery() {
             return connectionTestQuery;
         }
@@ -490,6 +494,7 @@ public class DataSourceConfig {
         /**
          * See {@link #setMaxPoolSize(Integer)}.
          */
+        @Nullable
         public Integer getMaxPoolSize() {
             return maxPoolSize;
         }
@@ -516,6 +521,7 @@ public class DataSourceConfig {
         /**
          * See {@link #setPoolName(String)}.
          */
+        @Nullable
         public String getPoolName() {
             return poolName;
         }
