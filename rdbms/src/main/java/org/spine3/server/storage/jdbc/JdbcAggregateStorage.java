@@ -99,12 +99,12 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     /*package*/ static <ID> JdbcAggregateStorage<ID> newInstance(DataSourceWrapper dataSource,
-                                                                 Class<? extends Aggregate<ID, ?>> aggregateClass)
+                                                                 Class<? extends Aggregate<ID, ?, ?>> aggregateClass)
                                                                  throws DatabaseException {
         return new JdbcAggregateStorage<>(dataSource, aggregateClass);
     }
 
-    private JdbcAggregateStorage(DataSourceWrapper dataSource, Class<? extends Aggregate<Id, ?>> aggregateClass)
+    private JdbcAggregateStorage(DataSourceWrapper dataSource, Class<? extends Aggregate<Id, ?, ?>> aggregateClass)
             throws DatabaseException {
         this.dataSource = dataSource;
         this.tableName = DbTableNameFactory.newTableName(aggregateClass);

@@ -114,7 +114,7 @@ public class JdbcStorageFactoryShould {
         }
     }
 
-    private static class TestAggregate extends Aggregate<String, StringValue> {
+    private static class TestAggregate extends Aggregate<String, StringValue, StringValue.Builder> {
 
         private TestAggregate(String id) {
             super(id);

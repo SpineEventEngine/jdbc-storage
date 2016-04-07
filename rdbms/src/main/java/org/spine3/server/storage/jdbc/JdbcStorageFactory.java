@@ -68,7 +68,7 @@ public class JdbcStorageFactory implements StorageFactory {
     }
 
     @Override
-    public <Id> AggregateStorage<Id> createAggregateStorage(Class<? extends Aggregate<Id, ?>> aggregateClass) {
+    public <Id> AggregateStorage<Id> createAggregateStorage(Class<? extends Aggregate<Id, ?, ?>> aggregateClass) {
         return JdbcAggregateStorage.newInstance(dataSource, aggregateClass);
     }
 

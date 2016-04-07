@@ -46,7 +46,7 @@ public class JdbcAggregateStorageShould extends AggregateStorageShould {
     }
 
     @Override
-    protected <Id> JdbcAggregateStorage<Id> getStorage(Class<? extends Aggregate<Id, ? extends Message>> aggregateClass) {
+    protected <Id> JdbcAggregateStorage<Id> getStorage(Class<? extends Aggregate<Id, ? extends Message, ?>> aggregateClass) {
         final DataSourceWrapper dataSource = newInMemoryDataSource("aggregateStorageTests");
         return JdbcAggregateStorage.newInstance(dataSource, aggregateClass);
     }
@@ -64,7 +64,7 @@ public class JdbcAggregateStorageShould extends AggregateStorageShould {
         fail("Aggregate storage should close itself.");
     }
 
-    private static class TestAggregateWithMessageId extends Aggregate<ProjectId, Project> {
+    private static class TestAggregateWithMessageId extends Aggregate<ProjectId, Project, Project.Builder> {
         private TestAggregateWithMessageId(ProjectId id) {
             super(id);
         }
