@@ -53,7 +53,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 /*package*/ class JdbcAggregateStorage<Id> extends AggregateStorage<Id> {
 
     /**
-     * Aggregate ID column name.
+     * Aggregate ID column name (contains in `main` and `event_count` tables).
      */
     private static final String ID_COL = "id";
 
@@ -77,7 +77,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
     /**
      * A count of events after the last snapshot column name.
      */
-    private static final String EVENT_COUNT = "event_count";
+    private static final String EVENT_COUNT_COL = "event_count";
 
     /**
      * A suffix of a table name where the last event time is stored.
@@ -125,8 +125,9 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
     }
 
     @Override
-    public int readEventCountAfterLastSnapshot() {
-        final Integer count = new SelectEventCountQuery().execute();
+    public int readEventCountAfterLastSnapshot(Id id) {
+        checkNotClosed();
+        final Integer count = new SelectEventCountQuery().execute(id);
         if (count == null) {
             return 0;
         }
@@ -134,16 +135,17 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
     }
 
     @Override
-    public void writeEventCountAfterLastSnapshot(int count) {
-        if (containsEventCount()) {
-            new UpdateEventCountQuery(count).execute();
+    public void writeEventCountAfterLastSnapshot(Id id, int count) {
+        checkNotClosed();
+        if (containsEventCount(id)) {
+            new UpdateEventCountQuery(count, id).execute();
         } else {
-            new InsertEventCountQuery(count).execute();
+            new InsertEventCountQuery(count, id).execute();
         }
     }
 
-    private boolean containsEventCount() {
-        final Integer count = new SelectEventCountQuery().execute();
+    private boolean containsEventCount(Id id) {
+        final Integer count = new SelectEventCountQuery().execute(id);
         final boolean contains = count != null;
         return contains;
     }
@@ -256,6 +258,11 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
         private final String query;
 
+        /**
+         * Creates a new query.
+         *
+         * @param query a query with format params: table name and id column type string.
+         */
         protected CreateTableIfDoesNotExistQuery(String query) {
             this.query = query;
         }
@@ -295,7 +302,8 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         @SuppressWarnings("DuplicateStringLiteralInspection")
         private static final String QUERY =
                 "CREATE TABLE IF NOT EXISTS %s (" +
-                    EVENT_COUNT + " BIGINT " +
+                    ID_COL + " %s, " +
+                    EVENT_COUNT_COL + " BIGINT " +
                 ");";
 
         protected CreateEventCountTableIfDoesNotExistQuery() {
@@ -303,14 +311,16 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         }
     }
 
-    private class WriteEventCountQuery extends WriteQuery {
+    private abstract class WriteEventCountQuery extends WriteQuery {
 
         private final String query;
+        private final Id id;
         private final int count;
 
-        private WriteEventCountQuery(String query, int count) {
+        protected WriteEventCountQuery(String query, Id id, int count) {
             super(dataSource);
             this.query = query;
+            this.id = id;
             this.count = count;
         }
 
@@ -318,12 +328,17 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
             final PreparedStatement statement = connection.prepareStatement(query);
             try {
-                statement.setLong(1, count);
+                idColumn.setId(getIdIndexInQuery(), id, statement);
+                statement.setLong(getEventCountIndexInQuery(), count);
                 return statement;
             } catch (SQLException e) {
                 throw new DatabaseException(e);
             }
         }
+
+        protected abstract int getIdIndexInQuery();
+
+        protected abstract int getEventCountIndexInQuery();
 
         @Override
         protected void logError(SQLException e) {
@@ -336,28 +351,54 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         @SuppressWarnings("DuplicateStringLiteralInspection")
         private static final String INSERT_QUERY =
                 "INSERT INTO %s " +
-                " (" + EVENT_COUNT + ')' +
-                " VALUES (?);";
+                " (" + ID_COL + ", " + EVENT_COUNT_COL + ')' +
+                " VALUES (?, ?);";
 
-        private InsertEventCountQuery(int count) {
-            super(format(INSERT_QUERY, eventCountTableName), count);
+        private InsertEventCountQuery(int count, Id id) {
+            super(format(INSERT_QUERY, eventCountTableName), id, count);
+        }
+
+        @Override
+        protected int getIdIndexInQuery() {
+            return 1;
+        }
+
+        @Override
+        protected int getEventCountIndexInQuery() {
+            return 2;
         }
     }
 
     private class UpdateEventCountQuery extends WriteEventCountQuery {
 
         @SuppressWarnings("DuplicateStringLiteralInspection")
-        private static final String UPDATE_QUERY = "UPDATE %s SET " + EVENT_COUNT + " = ?;";
+        private static final String UPDATE_QUERY =
+                "UPDATE %s " +
+                " SET " + EVENT_COUNT_COL + " = ? " +
+                " WHERE " + ID_COL + " = ?;";
 
-        private UpdateEventCountQuery(int count) {
-            super(format(UPDATE_QUERY, eventCountTableName), count);
+        private UpdateEventCountQuery(int count, Id id) {
+            super(format(UPDATE_QUERY, eventCountTableName), id, count);
+        }
+
+        @Override
+        protected int getIdIndexInQuery() {
+            return 2;
+        }
+
+        @Override
+        protected int getEventCountIndexInQuery() {
+            return 1;
         }
     }
 
     private class SelectEventCountQuery {
 
         @SuppressWarnings("DuplicateStringLiteralInspection")
-        private static final String SELECT_QUERY = "SELECT " + EVENT_COUNT + " FROM %s ;";
+        private static final String SELECT_QUERY =
+                "SELECT " + EVENT_COUNT_COL +
+                " FROM %s " +
+                " WHERE " + ID_COL + " = ?;";
 
         private final String selectQuery;
 
@@ -366,19 +407,25 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         }
 
         @Nullable
-        private Integer execute() throws DatabaseException {
+        private Integer execute(Id id) throws DatabaseException {
             try (ConnectionWrapper connection = dataSource.getConnection(true);
-                 PreparedStatement statement = connection.prepareStatement(selectQuery);
+                 PreparedStatement statement = prepareStatement(connection, id);
                  ResultSet resultSet = statement.executeQuery()) {
                 if (!resultSet.next()) {
                     return null;
                 }
-                final int eventCount = resultSet.getInt(EVENT_COUNT);
+                final int eventCount = resultSet.getInt(EVENT_COUNT_COL);
                 return eventCount;
             } catch (SQLException e) {
                 log().error("Failed to read an event count after the last snapshot.", e);
                 throw new DatabaseException(e);
             }
+        }
+
+        private PreparedStatement prepareStatement(ConnectionWrapper connection, Id id) {
+            final PreparedStatement statement = connection.prepareStatement(selectQuery);
+            idColumn.setId(1, id, statement);
+            return statement;
         }
     }
 
