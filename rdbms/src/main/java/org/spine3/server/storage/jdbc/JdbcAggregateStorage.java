@@ -27,14 +27,11 @@ import org.slf4j.LoggerFactory;
 import org.spine3.server.aggregate.Aggregate;
 import org.spine3.server.storage.AggregateStorage;
 import org.spine3.server.storage.AggregateStorageRecord;
-import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
-import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.server.storage.jdbc.util.DbIterator;
-import org.spine3.server.storage.jdbc.util.DbTableNameFactory;
-import org.spine3.server.storage.jdbc.util.IdColumn;
-import org.spine3.server.storage.jdbc.util.WriteQuery;
+import org.spine3.server.storage.jdbc.util.*;
 
+import javax.annotation.Nullable;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Iterator;
@@ -77,6 +74,16 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String NANOS_COL = "nanoseconds";
 
+    /**
+     * A count of events after the last snapshot column name.
+     */
+    private static final String EVENT_COUNT = "event_count";
+
+    /**
+     * A suffix of a table name where the last event time is stored.
+     */
+    private static final String EVENT_COUNT_TABLE_NAME_SUFFIX = "_event_count";
+
     private static final Descriptor RECORD_DESCRIPTOR = AggregateStorageRecord.getDescriptor();
 
     private final DataSourceWrapper dataSource;
@@ -88,7 +95,9 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
     private final IdColumn<Id> idColumn;
 
-    private final String tableName;
+    private final String mainTableName;
+    private final String eventCountTableName;
+
     private final SelectByIdSortedByTimeDescQuery selectByIdSortedQuery;
 
     /**
@@ -107,11 +116,36 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
     private JdbcAggregateStorage(DataSourceWrapper dataSource, Class<? extends Aggregate<Id, ?, ?>> aggregateClass)
             throws DatabaseException {
         this.dataSource = dataSource;
-        this.tableName = DbTableNameFactory.newTableName(aggregateClass);
+        this.mainTableName = DbTableNameFactory.newTableName(aggregateClass);
+        this.eventCountTableName = mainTableName + EVENT_COUNT_TABLE_NAME_SUFFIX;
         this.idColumn = IdColumn.newInstance(aggregateClass);
-        this.selectByIdSortedQuery = new SelectByIdSortedByTimeDescQuery(tableName);
+        this.selectByIdSortedQuery = new SelectByIdSortedByTimeDescQuery(mainTableName);
+        new CreateMainTableIfDoesNotExistQuery().execute(mainTableName);
+        new CreateEventCountTableIfDoesNotExistQuery().execute(eventCountTableName);
+    }
 
-        new CreateTableIfDoesNotExistQuery().execute(tableName);
+    @Override
+    public int readEventCountAfterLastSnapshot() {
+        final Integer count = new SelectEventCountQuery().execute();
+        if (count == null) {
+            return 0;
+        }
+        return count;
+    }
+
+    @Override
+    public void writeEventCountAfterLastSnapshot(int count) {
+        if (containsEventCount()) {
+            new UpdateEventCountQuery(count).execute();
+        } else {
+            new InsertEventCountQuery(count).execute();
+        }
+    }
+
+    private boolean containsEventCount() {
+        final Integer count = new SelectEventCountQuery().execute();
+        final boolean contains = count != null;
+        return contains;
     }
 
     /**
@@ -121,7 +155,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
      */
     @Override
     protected void writeInternal(Id id, AggregateStorageRecord record) throws DatabaseException {
-        new InsertQuery(id, record).execute();
+        new InsertRecordQuery(id, record).execute();
     }
 
     /**
@@ -156,7 +190,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         }
     }
 
-    private class InsertQuery extends WriteQuery {
+    private class InsertRecordQuery extends WriteQuery {
 
         @SuppressWarnings("DuplicateStringLiteralInspection")
         private static final String INSERT =
@@ -168,9 +202,9 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         private final AggregateStorageRecord record;
         private final Id id;
 
-        private InsertQuery(Id id, AggregateStorageRecord record) {
+        private InsertRecordQuery(Id id, AggregateStorageRecord record) {
             super(dataSource);
-            this.insertQuery = format(INSERT, tableName);
+            this.insertQuery = format(INSERT, mainTableName);
             this.record = record;
             this.id = id;
         }
@@ -218,10 +252,31 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         }
     }
 
-    private class CreateTableIfDoesNotExistQuery {
+    private abstract class CreateTableIfDoesNotExistQuery {
+
+        private final String query;
+
+        protected CreateTableIfDoesNotExistQuery(String query) {
+            this.query = query;
+        }
+
+        protected void execute(String tableName) throws DatabaseException {
+            final String idColumnType = idColumn.getColumnDataType();
+            final String createTableSql = format(query, tableName, idColumnType);
+            try (ConnectionWrapper connection = dataSource.getConnection(true);
+                 PreparedStatement statement = connection.prepareStatement(createTableSql)) {
+                statement.execute();
+            } catch (SQLException e) {
+                log().error("Error during table creation, table name: " + tableName, e);
+                throw new DatabaseException(e);
+            }
+        }
+    }
+
+    private class CreateMainTableIfDoesNotExistQuery extends CreateTableIfDoesNotExistQuery {
 
         @SuppressWarnings("DuplicateStringLiteralInspection")
-        private static final String CREATE_TABLE_IF_DOES_NOT_EXIST =
+        private static final String QUERY =
                 "CREATE TABLE IF NOT EXISTS %s (" +
                     ID_COL + " %s, " +
                     AGGREGATE_COL + " BLOB, " +
@@ -229,14 +284,99 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
                     NANOS_COL + " INT " +
                 ");";
 
-        private void execute(String tableName) throws DatabaseException {
-            final String idColumnType = idColumn.getColumnDataType();
-            final String createTableSql = format(CREATE_TABLE_IF_DOES_NOT_EXIST, tableName, idColumnType);
-            try (ConnectionWrapper connection = dataSource.getConnection(true);
-                 PreparedStatement statement = connection.prepareStatement(createTableSql)) {
-                statement.execute();
+
+        protected CreateMainTableIfDoesNotExistQuery() {
+            super(QUERY);
+        }
+    }
+
+    private class CreateEventCountTableIfDoesNotExistQuery extends CreateTableIfDoesNotExistQuery {
+
+        @SuppressWarnings("DuplicateStringLiteralInspection")
+        private static final String QUERY =
+                "CREATE TABLE IF NOT EXISTS %s (" +
+                    EVENT_COUNT + " BIGINT " +
+                ");";
+
+        protected CreateEventCountTableIfDoesNotExistQuery() {
+            super(QUERY);
+        }
+    }
+
+    private class WriteEventCountQuery extends WriteQuery {
+
+        private final String query;
+        private final int count;
+
+        private WriteEventCountQuery(String query, int count) {
+            super(dataSource);
+            this.query = query;
+            this.count = count;
+        }
+
+        @Override
+        protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
+            final PreparedStatement statement = connection.prepareStatement(query);
+            try {
+                statement.setLong(1, count);
+                return statement;
             } catch (SQLException e) {
-                log().error("Error during table creation, table name: " + tableName, e);
+                throw new DatabaseException(e);
+            }
+        }
+
+        @Override
+        protected void logError(SQLException e) {
+            log().error("Failed to write the count of events after the last snapshot.", e);
+        }
+    }
+
+    private class InsertEventCountQuery extends WriteEventCountQuery {
+
+        @SuppressWarnings("DuplicateStringLiteralInspection")
+        private static final String INSERT_QUERY =
+                "INSERT INTO %s " +
+                " (" + EVENT_COUNT + ')' +
+                " VALUES (?);";
+
+        private InsertEventCountQuery(int count) {
+            super(format(INSERT_QUERY, eventCountTableName), count);
+        }
+    }
+
+    private class UpdateEventCountQuery extends WriteEventCountQuery {
+
+        @SuppressWarnings("DuplicateStringLiteralInspection")
+        private static final String UPDATE_QUERY = "UPDATE %s SET " + EVENT_COUNT + " = ?;";
+
+        private UpdateEventCountQuery(int count) {
+            super(format(UPDATE_QUERY, eventCountTableName), count);
+        }
+    }
+
+    private class SelectEventCountQuery {
+
+        @SuppressWarnings("DuplicateStringLiteralInspection")
+        private static final String SELECT_QUERY = "SELECT " + EVENT_COUNT + " FROM %s ;";
+
+        private final String selectQuery;
+
+        private SelectEventCountQuery() {
+            this.selectQuery = format(SELECT_QUERY, eventCountTableName);
+        }
+
+        @Nullable
+        private Integer execute() throws DatabaseException {
+            try (ConnectionWrapper connection = dataSource.getConnection(true);
+                 PreparedStatement statement = connection.prepareStatement(selectQuery);
+                 ResultSet resultSet = statement.executeQuery()) {
+                if (!resultSet.next()) {
+                    return null;
+                }
+                final int eventCount = resultSet.getInt(EVENT_COUNT);
+                return eventCount;
+            } catch (SQLException e) {
+                log().error("Failed to read an event count after the last snapshot.", e);
                 throw new DatabaseException(e);
             }
         }
