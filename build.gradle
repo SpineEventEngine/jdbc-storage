@@ -77,24 +77,22 @@ subprojects {
 
     final String SRC_ROOT_DIR = "$projectDir/src"
     final String GEN_ROOT_DIR = "$projectDir/generated"
-    final String GEN_MAIN_JAVA_DIR = "${GEN_ROOT_DIR}/main/java"
-    final String GEN_TEST_JAVA_DIR = "${GEN_ROOT_DIR}/test/java"
 
     sourceSets {
         main {
             proto.srcDirs = ["${SRC_ROOT_DIR}/main/proto"]
-            java.srcDirs = [GEN_MAIN_JAVA_DIR, "${SRC_ROOT_DIR}/main/java"]
+            java.srcDirs = ["${GEN_ROOT_DIR}/main/java", "${SRC_ROOT_DIR}/main/java"]
             resources.srcDirs = ["${GEN_ROOT_DIR}/main/resources"]
         }
         test {
             proto.srcDirs = ["${SRC_ROOT_DIR}/test/proto"]
-            java.srcDirs = [GEN_TEST_JAVA_DIR, "${SRC_ROOT_DIR}/test/java"]
+            java.srcDirs = ["${GEN_ROOT_DIR}/test/java", "${SRC_ROOT_DIR}/test/java"]
             resources.srcDirs = ["${GEN_ROOT_DIR}/test/resources"]
         }
     }
 
     protobuf {
-        generatedFilesBaseDir = "$projectDir/generated"
+        generatedFilesBaseDir = GEN_ROOT_DIR
         protoc {
             artifact = project.PROTOBUF_DEPENDENCY
         }
