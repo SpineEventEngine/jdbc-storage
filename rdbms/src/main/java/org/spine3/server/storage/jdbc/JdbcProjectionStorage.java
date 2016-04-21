@@ -182,7 +182,7 @@ import static org.spine3.validate.Validate.isDefault;
 
         @Override
         protected void logError(SQLException exception) {
-            log().error("Failed to write last event timestamp.");
+            log().error("Failed to write last event timestamp.", exception);
         }
     }
 
@@ -201,6 +201,7 @@ import static org.spine3.validate.Validate.isDefault;
 
     private class UpdateTimestampQuery extends WriteTimestampQuery {
 
+        @SuppressWarnings("DuplicateStringLiteralInspection")
         private static final String UPDATE_QUERY =
                 "UPDATE %s SET " +
                 SECONDS_COL + " = ?, " +

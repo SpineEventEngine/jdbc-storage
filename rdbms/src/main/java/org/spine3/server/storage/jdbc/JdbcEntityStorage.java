@@ -201,9 +201,9 @@ import static org.spine3.base.Identifiers.idToString;
         }
 
         @Override
-        protected void logError(SQLException exception) {
+        protected void logError(SQLException e) {
             final String id = idToString(getId());
-            log().error("Failed to insert entity record, ID: {}", id);
+            log().error("Failed to insert entity record, ID: " + id, e);
         }
     }
 
@@ -235,7 +235,7 @@ import static org.spine3.base.Identifiers.idToString;
         @Override
         protected void logError(SQLException exception) {
             final String id = idToString(getId());
-            log().error("Failed to update entity record, ID: {}", id);
+            log().error("Failed to update entity record, ID: " + id, exception);
         }
     }
 

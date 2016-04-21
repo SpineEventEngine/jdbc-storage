@@ -263,7 +263,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
         @Override
         protected void logError(SQLException exception) {
-            log().error("Failed to insert event record, event ID: {}", record.getEventId());
+            log().error("Failed to insert event record, event ID: " + record.getEventId(), exception);
         }
     }
 
@@ -317,7 +317,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
         @Override
         protected void logError(SQLException exception) {
-            log().error("Failed to update event record, event ID: {}", record.getEventId());
+            log().error("Failed to update event record, event ID: " + record.getEventId(), exception);
         }
     }
 
