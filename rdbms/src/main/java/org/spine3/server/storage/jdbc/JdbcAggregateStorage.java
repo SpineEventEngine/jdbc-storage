@@ -108,13 +108,15 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     /*package*/ static <ID> JdbcAggregateStorage<ID> newInstance(DataSourceWrapper dataSource,
-                                                                 Class<? extends Aggregate<ID, ?, ?>> aggregateClass)
+                                                                 Class<? extends Aggregate<ID, ?, ?>> aggregateClass,
+                                                                 boolean multitenant)
                                                                  throws DatabaseException {
-        return new JdbcAggregateStorage<>(dataSource, aggregateClass);
+        return new JdbcAggregateStorage<>(dataSource, aggregateClass, multitenant);
     }
 
-    private JdbcAggregateStorage(DataSourceWrapper dataSource, Class<? extends Aggregate<Id, ?, ?>> aggregateClass)
+    private JdbcAggregateStorage(DataSourceWrapper dataSource, Class<? extends Aggregate<Id, ?, ?>> aggregateClass, boolean multitenant)
             throws DatabaseException {
+        super(multitenant);
         this.dataSource = dataSource;
         this.mainTableName = DbTableNameFactory.newTableName(aggregateClass);
         this.eventCountTableName = mainTableName + EVENT_COUNT_TABLE_NAME_SUFFIX;

@@ -48,7 +48,7 @@ public class JdbcAggregateStorageShould extends AggregateStorageShould {
     @Override
     protected <Id> JdbcAggregateStorage<Id> getStorage(Class<? extends Aggregate<Id, ? extends Message, ?>> aggregateClass) {
         final DataSourceWrapper dataSource = newInMemoryDataSource("aggregateStorageTests");
-        return JdbcAggregateStorage.newInstance(dataSource, aggregateClass);
+        return JdbcAggregateStorage.newInstance(dataSource, aggregateClass, false);
     }
 
     @Test

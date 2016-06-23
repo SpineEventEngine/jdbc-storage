@@ -80,15 +80,19 @@ import static org.spine3.validate.Validate.isDefault;
      * @param <Id> a type of projection IDs
      * @return a new storage instance
      */
-    /*package*/ static <Id> ProjectionStorage<Id> newInstance(DataSourceWrapper dataSource,
-                                                            Class<? extends Entity<Id, ?>> projectionClass,
-                                                            JdbcEntityStorage<Id> entityStorage) throws DatabaseException {
-        return new JdbcProjectionStorage<>(dataSource, projectionClass, entityStorage);
+    /*package*/
+    static <Id> ProjectionStorage<Id> newInstance(DataSourceWrapper dataSource,
+                                                  Class<? extends Entity<Id, ?>> projectionClass,
+                                                  JdbcEntityStorage<Id> entityStorage,
+                                                  boolean multitenant) throws DatabaseException {
+        return new JdbcProjectionStorage<>(dataSource, projectionClass, entityStorage, multitenant);
     }
 
     private JdbcProjectionStorage(DataSourceWrapper dataSource,
                                   Class<? extends Entity<Id, ?>> projectionClass,
-                                  JdbcEntityStorage<Id> entityStorage) throws DatabaseException {
+                                  JdbcEntityStorage<Id> entityStorage,
+                                  boolean multitenant) throws DatabaseException {
+        super(multitenant);
         this.dataSource = dataSource;
         this.entityStorage = entityStorage;
         this.tableName = newTableName(projectionClass) + LAST_EVENT_TIME_TABLE_NAME_SUFFIX;

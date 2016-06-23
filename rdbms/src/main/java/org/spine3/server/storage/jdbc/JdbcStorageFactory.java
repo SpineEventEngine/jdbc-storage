@@ -58,29 +58,34 @@ public class JdbcStorageFactory implements StorageFactory {
     }
 
     @Override
+    public boolean isMultitenant() {
+        return false;
+    }
+
+    @Override
     public CommandStorage createCommandStorage() {
-        return JdbcCommandStorage.newInstance(dataSource);
+        return JdbcCommandStorage.newInstance(dataSource, false);
     }
 
     @Override
     public EventStorage createEventStorage() {
-        return JdbcEventStorage.newInstance(dataSource);
+        return JdbcEventStorage.newInstance(dataSource, false);
     }
 
     @Override
     public <Id> AggregateStorage<Id> createAggregateStorage(Class<? extends Aggregate<Id, ?, ?>> aggregateClass) {
-        return JdbcAggregateStorage.newInstance(dataSource, aggregateClass);
+        return JdbcAggregateStorage.newInstance(dataSource, aggregateClass, false);
     }
 
     @Override
     public <Id> EntityStorage<Id> createEntityStorage(Class<? extends Entity<Id, ?>> entityClass) {
-        return JdbcEntityStorage.newInstance(dataSource, entityClass);
+        return JdbcEntityStorage.newInstance(dataSource, entityClass, false);
     }
 
     @Override
     public <Id> ProjectionStorage<Id> createProjectionStorage(Class<? extends Entity<Id, ?>> projectionClass) {
-        final JdbcEntityStorage<Id> entityStorage = JdbcEntityStorage.newInstance(dataSource, projectionClass);
-        return JdbcProjectionStorage.newInstance(dataSource, projectionClass, entityStorage);
+        final JdbcEntityStorage<Id> entityStorage = JdbcEntityStorage.newInstance(dataSource, projectionClass, false);
+        return JdbcProjectionStorage.newInstance(dataSource, projectionClass, entityStorage, false);
     }
 
     @Override

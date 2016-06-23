@@ -80,13 +80,15 @@ import static org.spine3.base.Identifiers.idToString;
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     /*package*/ static <Id> JdbcEntityStorage<Id> newInstance(DataSourceWrapper dataSource,
-                                                              Class<? extends Entity<Id, ?>> entityClass)
+                                                              Class<? extends Entity<Id, ?>> entityClass,
+                                                              boolean multitenant)
                                                               throws DatabaseException {
-        return new JdbcEntityStorage<>(dataSource, entityClass);
+        return new JdbcEntityStorage<>(dataSource, entityClass, multitenant);
     }
 
-    private JdbcEntityStorage(DataSourceWrapper dataSource, Class<? extends Entity<Id, ?>> entityClass)
+    private JdbcEntityStorage(DataSourceWrapper dataSource, Class<? extends Entity<Id, ?>> entityClass, boolean multitenant)
             throws DatabaseException {
+        super(multitenant);
         this.dataSource = dataSource;
         this.idColumn = IdColumn.newInstance(entityClass);
         this.tableName = DbTableNameFactory.newTableName(entityClass);

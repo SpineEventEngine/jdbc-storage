@@ -29,18 +29,17 @@ import org.spine3.base.Error;
 import org.spine3.base.Failure;
 import org.spine3.server.storage.CommandStorage;
 import org.spine3.server.storage.CommandStorageRecord;
-import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
-import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
+import org.spine3.server.storage.jdbc.util.*;
 import org.spine3.server.storage.jdbc.util.IdColumn.StringIdColumn;
-import org.spine3.server.storage.jdbc.util.SelectByIdQuery;
-import org.spine3.server.storage.jdbc.util.WriteQuery;
-import org.spine3.server.storage.jdbc.util.WriteRecordQuery;
 import org.spine3.validate.Validate;
 
 import javax.annotation.Nullable;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.spine3.server.storage.jdbc.util.Serializer.deserialize;
@@ -102,11 +101,12 @@ import static org.spine3.validate.Validate.checkNotDefault;
      * @throws DatabaseException if an error occurs during an interaction with the DB
      * @return a new storage instance
      */
-    /*package*/ static CommandStorage newInstance(DataSourceWrapper dataSource) throws DatabaseException {
-        return new JdbcCommandStorage(dataSource);
+    /*package*/ static CommandStorage newInstance(DataSourceWrapper dataSource, boolean multitenant) throws DatabaseException {
+        return new JdbcCommandStorage(dataSource, multitenant);
     }
 
-    private JdbcCommandStorage(DataSourceWrapper dataSource) throws DatabaseException {
+    private JdbcCommandStorage(DataSourceWrapper dataSource, boolean multitenant) throws DatabaseException {
+        super(multitenant);
         this.dataSource = dataSource;
         CreateTableIfDoesNotExistQuery.execute(dataSource);
     }
@@ -127,6 +127,26 @@ import static org.spine3.validate.Validate.checkNotDefault;
             return CommandStorageRecord.getDefaultInstance();
         }
         return record;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws IllegalStateException if the storage is closed
+     * @throws DatabaseException if an error occurs during an interaction with the DB
+     */
+    @Override
+    public Iterator<CommandStorageRecord> read(CommandStatus status){
+       /* checkNotClosed();
+
+        final SelectCommandByIdQuery query = new SelectCommandByIdQuery();
+        final CommandStorageRecord record = query.execute(commandStatus.getUuid());
+        if (record == null) {
+            return CommandStorageRecord.getDefaultInstance();
+        }*/
+        final List<CommandStorageRecord> records = new ArrayList<CommandStorageRecord>();
+        //records.add(record);
+        return records.iterator();
     }
 
     /**
@@ -475,6 +495,21 @@ import static org.spine3.validate.Validate.checkNotDefault;
                         .build();
             }
             return builder.build();
+        }
+    }
+
+    private class SelectCommandByStatusQuery extends SelectByIdQuery<String, CommandStorageRecord> {
+
+
+        /**
+         * Creates a new query instance.
+         *
+         * @param query      SQL select query which selects a message by an ID (must have one ID parameter to set)
+         * @param dataSource a data source to use to obtain DB connections
+         * @param idColumn   a helper object used to set IDs to statements as parameters
+         */
+        protected SelectCommandByStatusQuery(String query, DataSourceWrapper dataSource, IdColumn<String> idColumn) {
+            super(query, dataSource, idColumn);
         }
     }
 

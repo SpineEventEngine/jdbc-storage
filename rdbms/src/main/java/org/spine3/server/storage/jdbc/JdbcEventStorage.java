@@ -114,11 +114,12 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
      * @throws DatabaseException if an error occurs during an interaction with the DB
      * @param dataSource the dataSource wrapper
      */
-    /*package*/ static JdbcEventStorage newInstance(DataSourceWrapper dataSource) throws DatabaseException {
-        return new JdbcEventStorage(dataSource);
+    /*package*/ static JdbcEventStorage newInstance(DataSourceWrapper dataSource, boolean multitenant) throws DatabaseException {
+        return new JdbcEventStorage(dataSource, multitenant);
     }
 
-    private JdbcEventStorage(DataSourceWrapper dataSource) throws DatabaseException {
+    private JdbcEventStorage(DataSourceWrapper dataSource, boolean multitenant) throws DatabaseException {
+        super(multitenant);
         this.dataSource = dataSource;
         CreateTableIfDoesNotExistQuery.execute(dataSource);
     }
