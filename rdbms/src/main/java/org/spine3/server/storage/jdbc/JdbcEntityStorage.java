@@ -25,12 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.spine3.server.entity.Entity;
 import org.spine3.server.storage.EntityStorage;
 import org.spine3.server.storage.EntityStorageRecord;
-import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
-import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.server.storage.jdbc.util.DbTableNameFactory;
-import org.spine3.server.storage.jdbc.util.IdColumn;
-import org.spine3.server.storage.jdbc.util.SelectByIdQuery;
-import org.spine3.server.storage.jdbc.util.WriteRecordQuery;
+import org.spine3.server.storage.jdbc.util.*;
 
 import javax.annotation.Nullable;
 import java.sql.PreparedStatement;
@@ -71,6 +66,7 @@ import static org.spine3.base.Identifiers.idToString;
     private final DeleteAllQuery deleteAllQuery;
 
     private final String tableName;
+
 
     /**
      * Creates a new storage instance.
@@ -192,13 +188,18 @@ import static org.spine3.base.Identifiers.idToString;
             super(builder);
         }
 
-        private static class Builder<Id> extends AbstractBuilder<InsertEntityQuery<Id>, Id, EntityStorageRecord> {
+        private static class Builder<Id> extends AbstractBuilder<Builder<Id>, InsertEntityQuery<Id>, Id, EntityStorageRecord> {
 
             @Override
             public InsertEntityQuery<Id> build() {
                 setIdIndexInQuery(ID_INDEX_IN_QUERY);
                 setRecordIndexInQuery(ENTITY_INDEX_IN_QUERY);
                 return new InsertEntityQuery<>(this);
+            }
+
+            @Override
+            protected Builder getThis() {
+                return this;
             }
         }
 
@@ -224,13 +225,18 @@ import static org.spine3.base.Identifiers.idToString;
             super(builder);
         }
 
-        private static class Builder<Id> extends WriteRecordQuery.AbstractBuilder<UpdateEntityQuery<Id>, Id, EntityStorageRecord> {
+        private static class Builder<Id> extends AbstractBuilder<Builder<Id>, UpdateEntityQuery<Id>, Id, EntityStorageRecord> {
 
             @Override
             public UpdateEntityQuery<Id> build() {
                 setIdIndexInQuery(ID_INDEX_IN_QUERY);
                 setRecordIndexInQuery(ENTITY_INDEX_IN_QUERY);
                 return new UpdateEntityQuery<>(this);
+            }
+
+            @Override
+            protected Builder<Id> getThis() {
+                return this;
             }
         }
 
@@ -247,7 +253,7 @@ import static org.spine3.base.Identifiers.idToString;
         private static final String SELECT_BY_ID = "SELECT " + ENTITY_COL + " FROM %s WHERE " + ID_COL + " = ?;";
 
         private SelectEntityByIdQuery(String tableName) {
-            super(format(SELECT_BY_ID, tableName), dataSource, idColumn);
+            super(format(SELECT_BY_ID, tableName), JdbcEntityStorage.this.dataSource, idColumn);
             setMessageColumnName(ENTITY_COL);
             setMessageDescriptor(RECORD_DESCRIPTOR);
         }

@@ -256,8 +256,7 @@ import static org.spine3.validate.Validate.checkNotDefault;
     }
 
 
-
-    private static class InsertCommandQuery extends WriteCommandRecordQuery{
+    private static class InsertCommandQuery extends WriteCommandRecordQuery {
 
         @SuppressWarnings("DuplicateStringLiteralInspection")
         private static final String INSERT_QUERY =
@@ -298,7 +297,7 @@ import static org.spine3.validate.Validate.checkNotDefault;
             }
 
             @Override
-            protected Builder getThis(){
+            protected Builder getThis() {
                 return this;
             }
         }
@@ -309,7 +308,7 @@ import static org.spine3.validate.Validate.checkNotDefault;
         }
     }
 
-    private static class UpdateCommandQuery extends WriteRecordQuery<String, CommandStorageRecord> {
+    private static class UpdateCommandQuery extends WriteCommandRecordQuery{
 
         @SuppressWarnings("DuplicateStringLiteralInspection")
         private static final String UPDATE_QUERY =
@@ -328,23 +327,29 @@ import static org.spine3.validate.Validate.checkNotDefault;
 
         private static UpdateCommandQuery newInstance(DataSourceWrapper dataSource, CommandId commandId, CommandStorageRecord record) {
             return new Builder()
+                    .setStatusIndexInQuery(COMMAND_STATUS_INDEX_IN_QUERY)
+                    .setStatus(record.getStatusValue())
                     .setDataSource(dataSource)
                     .setId(commandId.getUuid())
                     .setRecord(record)
-                    .setStatus(record.getStatusValue())
+                    .setQuery(UPDATE_QUERY)
+                    .setIdIndexInQuery(ID_INDEX_IN_QUERY)
+                    .setRecordIndexInQuery(RECORD_INDEX_IN_QUERY)
+                    .setIdColumn(STRING_ID_COLUMN)
                     .build();
         }
 
-        private static class Builder extends AbstractBuilder<UpdateCommandQuery, String, CommandStorageRecord> {
+        private static class Builder extends CommandQueryBuilder<Builder, UpdateCommandQuery> {
 
             @Override
             public UpdateCommandQuery build() {
-                setQuery(UPDATE_QUERY);
-                setIdIndexInQuery(ID_INDEX_IN_QUERY);
-                setRecordIndexInQuery(RECORD_INDEX_IN_QUERY);
-                setStatusIndexInQuery(COMMAND_STATUS_INDEX_IN_QUERY);
-                setIdColumn(STRING_ID_COLUMN);
+
                 return new UpdateCommandQuery(this);
+            }
+
+            @Override
+            protected CommandQueryBuilder<Builder, UpdateCommandQuery> getThis() {
+                return this;
             }
         }
 
@@ -412,7 +417,7 @@ import static org.spine3.validate.Validate.checkNotDefault;
                     .build();
         }
 
-        private static class Builder extends AbstractBuilder<SetErrorQuery, String, Error> {
+        private static class Builder extends AbstractBuilder<Builder, SetErrorQuery, String, Error> {
 
             @Override
             public SetErrorQuery build() {
@@ -421,6 +426,11 @@ import static org.spine3.validate.Validate.checkNotDefault;
                 setRecordIndexInQuery(ERROR_INDEX_IN_QUERY);
                 setIdColumn(STRING_ID_COLUMN);
                 return new SetErrorQuery(this);
+            }
+
+            @Override
+            protected Builder getThis() {
+                return this;
             }
         }
 
@@ -455,7 +465,7 @@ import static org.spine3.validate.Validate.checkNotDefault;
                     .build();
         }
 
-        private static class Builder extends AbstractBuilder<SetFailureQuery, String, Failure> {
+        private static class Builder extends AbstractBuilder<Builder, SetFailureQuery, String, Failure> {
 
             @Override
             public SetFailureQuery build() {
@@ -464,6 +474,11 @@ import static org.spine3.validate.Validate.checkNotDefault;
                 setRecordIndexInQuery(FAILURE_INDEX_IN_QUERY);
                 setIdColumn(STRING_ID_COLUMN);
                 return new SetFailureQuery(this);
+            }
+
+            @Override
+            protected Builder getThis() {
+                return this;
             }
         }
 
