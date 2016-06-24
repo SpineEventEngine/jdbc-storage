@@ -23,12 +23,13 @@ package org.spine3.server.storage.jdbc.util;
 import org.spine3.Internal;
 import org.spine3.base.CommandStatus;
 import org.spine3.server.storage.jdbc.DatabaseException;
+import org.spine3.base.Command;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 /**
- * A query which obtains a {@link org.spine3.base.Command} by an command status.
+ * A query which obtains a {@link Command} by an command status.
  *
  * @author Andrey Lavrov
  */
