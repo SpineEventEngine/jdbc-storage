@@ -197,6 +197,7 @@ import static org.spine3.base.Identifiers.idToString;
                 return new InsertEntityQuery<>(this);
             }
 
+            @SuppressWarnings("unchecked")
             @Override
             protected Builder getThis() {
                 return this;
@@ -253,7 +254,7 @@ import static org.spine3.base.Identifiers.idToString;
         private static final String SELECT_BY_ID = "SELECT " + ENTITY_COL + " FROM %s WHERE " + ID_COL + " = ?;";
 
         private SelectEntityByIdQuery(String tableName) {
-            super(format(SELECT_BY_ID, tableName), JdbcEntityStorage.this.dataSource, idColumn);
+            super(format(SELECT_BY_ID, tableName), dataSource, idColumn);
             setMessageColumnName(ENTITY_COL);
             setMessageDescriptor(RECORD_DESCRIPTOR);
         }

@@ -543,7 +543,7 @@ import static org.spine3.validate.Validate.checkNotDefault;
         private final Logger value = LoggerFactory.getLogger(JdbcCommandStorage.class);
     }
 
-    private class SelectCommandByStatusQuery extends SelectByStatusQuery {
+    private static class SelectCommandByStatusQuery extends SelectByStatusQuery {
 
         @SuppressWarnings("DuplicateStringLiteralInspection")
         private static final String SELECT_BY_STATUS_QUERY =
@@ -553,6 +553,5 @@ import static org.spine3.validate.Validate.checkNotDefault;
         private SelectCommandByStatusQuery(CommandStatus status) {
             super(SELECT_BY_STATUS_QUERY, status);
         }
-
     }
 }
