@@ -37,19 +37,18 @@ import javax.annotation.Nullable;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.lang.String.format;
 import static org.spine3.server.storage.jdbc.util.Serializer.deserialize;
 import static org.spine3.validate.Validate.checkNotDefault;
 
 /**
  * The implementation of the command storage based on the RDBMS.
  *
- * @see JdbcStorageFactory
  * @author Alexander Litus
+ * @see JdbcStorageFactory
  */
 @SuppressWarnings("UtilityClass")
 /*package*/ class JdbcCommandStorage extends CommandStorage {
@@ -77,6 +76,11 @@ import static org.spine3.validate.Validate.checkNotDefault;
     private static final String IS_STATUS_OK_COL = "status_ok";
 
     /**
+     * Is command status OK column name.
+     */
+    private static final String COMMAND_STATUS_COL = "command_status";
+
+    /**
      * Command error column name.
      */
     private static final String ERROR_COL = "error";
@@ -98,10 +102,11 @@ import static org.spine3.validate.Validate.checkNotDefault;
      * Creates a new storage instance.
      *
      * @param dataSource a data source to use to obtain connections
-     * @throws DatabaseException if an error occurs during an interaction with the DB
      * @return a new storage instance
+     * @throws DatabaseException if an error occurs during an interaction with the DB
      */
-    /*package*/ static CommandStorage newInstance(DataSourceWrapper dataSource, boolean multitenant) throws DatabaseException {
+    /*package*/
+    static CommandStorage newInstance(DataSourceWrapper dataSource, boolean multitenant) throws DatabaseException {
         return new JdbcCommandStorage(dataSource, multitenant);
     }
 
@@ -115,7 +120,7 @@ import static org.spine3.validate.Validate.checkNotDefault;
      * {@inheritDoc}
      *
      * @throws IllegalStateException if the storage is closed
-     * @throws DatabaseException if an error occurs during an interaction with the DB
+     * @throws DatabaseException     if an error occurs during an interaction with the DB
      */
     @Override
     public CommandStorageRecord read(CommandId commandId) throws DatabaseException {
@@ -133,27 +138,24 @@ import static org.spine3.validate.Validate.checkNotDefault;
      * {@inheritDoc}
      *
      * @throws IllegalStateException if the storage is closed
-     * @throws DatabaseException if an error occurs during an interaction with the DB
+     * @throws DatabaseException     if an error occurs during an interaction with the DB
      */
     @Override
-    public Iterator<CommandStorageRecord> read(CommandStatus status){
-       /* checkNotClosed();
-
-        final SelectCommandByIdQuery query = new SelectCommandByIdQuery();
-        final CommandStorageRecord record = query.execute(commandStatus.getUuid());
-        if (record == null) {
-            return CommandStorageRecord.getDefaultInstance();
-        }*/
-        final List<CommandStorageRecord> records = new ArrayList<CommandStorageRecord>();
-        //records.add(record);
-        return records.iterator();
+    public Iterator<CommandStorageRecord> read(CommandStatus status) {
+        checkNotNull(status);
+        try (ConnectionWrapper connection = dataSource.getConnection(true)) {
+            final SelectCommandByStatusQuery query = new SelectCommandByStatusQuery(status.getNumber());
+            final PreparedStatement statement = query.prepareStatement(connection);
+            final DbIterator<CommandStorageRecord> iterator = new DbIterator<>(statement, COMMAND_STATUS_COL, COMMAND_RECORD_DESCRIPTOR);
+            return iterator;
+        }
     }
 
     /**
      * {@inheritDoc}
      *
      * @throws IllegalStateException if the storage is closed
-     * @throws DatabaseException if an error occurs during an interaction with the DB
+     * @throws DatabaseException     if an error occurs during an interaction with the DB
      */
     @Override
     public void write(CommandId commandId, CommandStorageRecord record) throws DatabaseException {
@@ -178,7 +180,7 @@ import static org.spine3.validate.Validate.checkNotDefault;
      * {@inheritDoc}
      *
      * @throws IllegalStateException if the storage is closed
-     * @throws DatabaseException if an error occurs during an interaction with the DB
+     * @throws DatabaseException     if an error occurs during an interaction with the DB
      */
     @Override
     public void setOkStatus(CommandId commandId) throws DatabaseException {
@@ -192,7 +194,7 @@ import static org.spine3.validate.Validate.checkNotDefault;
      * {@inheritDoc}
      *
      * @throws IllegalStateException if the storage is closed
-     * @throws DatabaseException if an error occurs during an interaction with the DB
+     * @throws DatabaseException     if an error occurs during an interaction with the DB
      */
     @Override
     public void updateStatus(CommandId commandId, Error error) throws DatabaseException {
@@ -207,7 +209,7 @@ import static org.spine3.validate.Validate.checkNotDefault;
      * {@inheritDoc}
      *
      * @throws IllegalStateException if the storage is closed
-     * @throws DatabaseException if an error occurs during an interaction with the DB
+     * @throws DatabaseException     if an error occurs during an interaction with the DB
      */
     @Override
     public void updateStatus(CommandId commandId, Failure failure) throws DatabaseException {
@@ -233,13 +235,14 @@ import static org.spine3.validate.Validate.checkNotDefault;
         @SuppressWarnings("DuplicateStringLiteralInspection")
         private static final String CREATE_TABLE_QUERY =
                 "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" +
-                    ID_COL + " VARCHAR(512), " +
-                    COMMAND_COL + " BLOB, " +
-                    IS_STATUS_OK_COL + " BOOLEAN, " +
-                    ERROR_COL + " BLOB, " +
-                    FAILURE_COL + " BLOB, " +
-                    " PRIMARY KEY(" + ID_COL + ')' +
-                ");";
+                        ID_COL + " VARCHAR(512), " +
+                        COMMAND_COL + " BLOB, " +
+                        IS_STATUS_OK_COL + " BOOLEAN, " +
+                        COMMAND_STATUS_COL + " INT, " +
+                        ERROR_COL + " BLOB, " +
+                        FAILURE_COL + " BLOB, " +
+                        " PRIMARY KEY(" + ID_COL + ')' +
+                        ");";
 
         private static void execute(DataSourceWrapper dataSource) throws DatabaseException {
             try (ConnectionWrapper connection = dataSource.getConnection(true);
@@ -252,17 +255,21 @@ import static org.spine3.validate.Validate.checkNotDefault;
         }
     }
 
-    private static class InsertCommandQuery extends WriteRecordQuery<String, CommandStorageRecord> {
+
+
+    private static class InsertCommandQuery extends WriteCommandRecordQuery{
 
         @SuppressWarnings("DuplicateStringLiteralInspection")
         private static final String INSERT_QUERY =
                 "INSERT INTO " + TABLE_NAME + " (" +
-                    ID_COL + ", " +
-                    COMMAND_COL +
-                ") VALUES (?, ?);";
+                        ID_COL + ", " +
+                        COMMAND_STATUS_COL + ", " +
+                        COMMAND_COL +
+                        ") VALUES (?, ?, ?);";
 
         private static final int ID_INDEX_IN_QUERY = 1;
-        private static final int RECORD_INDEX_IN_QUERY = 2;
+        private static final int COMMAND_STATUS_INDEX_IN_QUERY = 2;
+        private static final int RECORD_INDEX_IN_QUERY = 3;
 
         private InsertCommandQuery(Builder builder) {
             super(builder);
@@ -270,22 +277,29 @@ import static org.spine3.validate.Validate.checkNotDefault;
 
         public static InsertCommandQuery newInstance(DataSourceWrapper dataSource, CommandId commandId, CommandStorageRecord record) {
             final String id = commandId.getUuid();
-            return new Builder()
+            final InsertCommandQuery build = new Builder()
+                    .setStatusIndexInQuery(COMMAND_STATUS_INDEX_IN_QUERY)
+                    .setStatus(record.getStatusValue())
                     .setDataSource(dataSource)
                     .setId(id)
                     .setRecord(record)
+                    .setQuery(INSERT_QUERY)
+                    .setIdIndexInQuery(ID_INDEX_IN_QUERY)
+                    .setRecordIndexInQuery(RECORD_INDEX_IN_QUERY).setIdColumn(STRING_ID_COLUMN)
                     .build();
+            return build;
         }
 
-        private static class Builder extends AbstractBuilder<InsertCommandQuery, String, CommandStorageRecord> {
+        private static class Builder extends CommandQueryBuilder<Builder, InsertCommandQuery> {
 
             @Override
             public InsertCommandQuery build() {
-                setQuery(INSERT_QUERY);
-                setIdIndexInQuery(ID_INDEX_IN_QUERY);
-                setRecordIndexInQuery(RECORD_INDEX_IN_QUERY);
-                setIdColumn(STRING_ID_COLUMN);
                 return new InsertCommandQuery(this);
+            }
+
+            @Override
+            protected Builder getThis(){
+                return this;
             }
         }
 
@@ -300,11 +314,13 @@ import static org.spine3.validate.Validate.checkNotDefault;
         @SuppressWarnings("DuplicateStringLiteralInspection")
         private static final String UPDATE_QUERY =
                 "UPDATE " + TABLE_NAME +
-                " SET " + COMMAND_COL + " = ? " +
-                " WHERE " + ID_COL + " = ?;";
+                        " SET " + COMMAND_COL + " = ? " +
+                        " SET " + COMMAND_STATUS_COL + " = ? " +
+                        " WHERE " + ID_COL + " = ?;";
 
         private static final int RECORD_INDEX_IN_QUERY = 1;
-        private static final int ID_INDEX_IN_QUERY = 2;
+        private static final int COMMAND_STATUS_INDEX_IN_QUERY = 2;
+        private static final int ID_INDEX_IN_QUERY = 3;
 
         private UpdateCommandQuery(Builder builder) {
             super(builder);
@@ -315,6 +331,7 @@ import static org.spine3.validate.Validate.checkNotDefault;
                     .setDataSource(dataSource)
                     .setId(commandId.getUuid())
                     .setRecord(record)
+                    .setStatus(record.getStatusValue())
                     .build();
         }
 
@@ -325,6 +342,7 @@ import static org.spine3.validate.Validate.checkNotDefault;
                 setQuery(UPDATE_QUERY);
                 setIdIndexInQuery(ID_INDEX_IN_QUERY);
                 setRecordIndexInQuery(RECORD_INDEX_IN_QUERY);
+                setStatusIndexInQuery(COMMAND_STATUS_INDEX_IN_QUERY);
                 setIdColumn(STRING_ID_COLUMN);
                 return new UpdateCommandQuery(this);
             }
@@ -341,8 +359,8 @@ import static org.spine3.validate.Validate.checkNotDefault;
         @SuppressWarnings("DuplicateStringLiteralInspection")
         private static final String SET_OK_STATUS_QUERY =
                 "UPDATE " + TABLE_NAME +
-                " SET " + IS_STATUS_OK_COL + " = true " +
-                " WHERE " + ID_COL + " = ? ;";
+                        " SET " + IS_STATUS_OK_COL + " = true " +
+                        " WHERE " + ID_COL + " = ? ;";
 
         private final CommandId commandId;
 
@@ -374,10 +392,10 @@ import static org.spine3.validate.Validate.checkNotDefault;
         @SuppressWarnings("DuplicateStringLiteralInspection")
         private static final String SET_ERROR_QUERY =
                 "UPDATE " + TABLE_NAME +
-                " SET " +
-                    IS_STATUS_OK_COL + " = false, " +
-                    ERROR_COL + " = ? " +
-                " WHERE " + ID_COL + " = ? ;";
+                        " SET " +
+                        IS_STATUS_OK_COL + " = false, " +
+                        ERROR_COL + " = ? " +
+                        " WHERE " + ID_COL + " = ? ;";
 
         private static final int ERROR_INDEX_IN_QUERY = 1;
         private static final int ID_INDEX_IN_QUERY = 2;
@@ -417,10 +435,10 @@ import static org.spine3.validate.Validate.checkNotDefault;
         @SuppressWarnings("DuplicateStringLiteralInspection")
         private static final String SET_FAILURE_QUERY =
                 "UPDATE " + TABLE_NAME +
-                " SET " +
-                    IS_STATUS_OK_COL + " = false, " +
-                    FAILURE_COL + " = ? " +
-                " WHERE " + ID_COL + " = ? ;";
+                        " SET " +
+                        IS_STATUS_OK_COL + " = false, " +
+                        FAILURE_COL + " = ? " +
+                        " WHERE " + ID_COL + " = ? ;";
 
         private static final int FAILURE_INDEX_IN_QUERY = 1;
         private static final int ID_INDEX_IN_QUERY = 2;
@@ -460,7 +478,7 @@ import static org.spine3.validate.Validate.checkNotDefault;
         @SuppressWarnings("DuplicateStringLiteralInspection")
         private static final String SELECT_QUERY =
                 "SELECT * FROM " + TABLE_NAME +
-                " WHERE " + ID_COL + " = ?;";
+                        " WHERE " + ID_COL + " = ?;";
 
         private SelectCommandByIdQuery() {
             super(SELECT_QUERY, dataSource, new StringIdColumn());
@@ -498,21 +516,6 @@ import static org.spine3.validate.Validate.checkNotDefault;
         }
     }
 
-    private class SelectCommandByStatusQuery extends SelectByIdQuery<String, CommandStorageRecord> {
-
-
-        /**
-         * Creates a new query instance.
-         *
-         * @param query      SQL select query which selects a message by an ID (must have one ID parameter to set)
-         * @param dataSource a data source to use to obtain DB connections
-         * @param idColumn   a helper object used to set IDs to statements as parameters
-         */
-        protected SelectCommandByStatusQuery(String query, DataSourceWrapper dataSource, IdColumn<String> idColumn) {
-            super(query, dataSource, idColumn);
-        }
-    }
-
     private static void log(SQLException e, String actionName, String commandId) {
         log().error("Exception during {}, command ID: {}", actionName, commandId, e);
     }
@@ -525,5 +528,30 @@ import static org.spine3.validate.Validate.checkNotDefault;
         INSTANCE;
         @SuppressWarnings("NonSerializableFieldInSerializableClass")
         private final Logger value = LoggerFactory.getLogger(JdbcCommandStorage.class);
+    }
+
+    private class SelectCommandByStatusQuery extends WriteQuery {
+
+        @SuppressWarnings("DuplicateStringLiteralInspection")
+        private final String SELECT_BY_STATUS_QUERY;
+
+        private SelectCommandByStatusQuery(int statusCode) {
+            super(dataSource);
+            SELECT_BY_STATUS_QUERY =
+                    "SELECT * FROM " + TABLE_NAME +
+                            " WHERE " + COMMAND_STATUS_COL + " = "
+                            + statusCode + ";";
+        }
+
+        @Override
+        protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
+            final PreparedStatement statement = connection.prepareStatement(SELECT_BY_STATUS_QUERY);
+            return statement;
+        }
+
+        @Override
+        protected void logError(SQLException exception) {
+            log().error("failed to read by status", exception);
+        }
     }
 }

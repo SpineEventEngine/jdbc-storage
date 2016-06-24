@@ -47,7 +47,7 @@ public abstract class WriteRecordQuery<Id, Record extends Message> extends Write
     /**
      * Creates a new query instance based on the passed builder.
      */
-    protected WriteRecordQuery(AbstractBuilder<? extends WriteRecordQuery<Id, Record>, Id, Record> builder) {
+    protected WriteRecordQuery(AbstractBuilder<? extends AbstractBuilder, ? extends WriteRecordQuery<Id, Record>, Id, Record> builder) {
         super(builder.dataSource);
         this.query = builder.query;
         this.idIndexInQuery = builder.idIndexInQuery;
@@ -82,7 +82,11 @@ public abstract class WriteRecordQuery<Id, Record extends Message> extends Write
      * @param <Id> a type of record IDs
      * @param <Record> a type of records to write
      */
-    public abstract static class AbstractBuilder<Query extends WriteRecordQuery<Id, Record>, Id, Record extends Message> {
+    public abstract static class AbstractBuilder
+            <B extends AbstractBuilder<B, Query, Id, Record>,
+            Query extends WriteRecordQuery<Id, Record>,
+            Id,
+            Record extends Message> {
 
         private DataSourceWrapper dataSource;
         private String query;
@@ -94,39 +98,41 @@ public abstract class WriteRecordQuery<Id, Record extends Message> extends Write
 
         public abstract Query build();
 
-        public AbstractBuilder<Query, Id, Record> setDataSource(DataSourceWrapper dataSource) {
+        protected abstract B getThis();
+
+        public AbstractBuilder<B, Query, Id, Record> setDataSource(DataSourceWrapper dataSource) {
             this.dataSource = dataSource;
-            return this;
+            return getThis();
         }
 
-        public AbstractBuilder<Query, Id, Record> setQuery(String query) {
+        public AbstractBuilder<B, Query, Id, Record> setQuery(String query) {
             this.query = query;
-            return this;
+            return getThis();
         }
 
-        public AbstractBuilder<Query, Id, Record> setIdIndexInQuery(int idIndexInQuery) {
+        public AbstractBuilder<B, Query, Id, Record> setIdIndexInQuery(int idIndexInQuery) {
             this.idIndexInQuery = idIndexInQuery;
-            return this;
+            return getThis();
         }
 
-        public AbstractBuilder<Query, Id, Record> setRecordIndexInQuery(int recordIndexInQuery) {
+        public AbstractBuilder<B, Query, Id, Record> setRecordIndexInQuery(int recordIndexInQuery) {
             this.recordIndexInQuery = recordIndexInQuery;
-            return this;
+            return getThis();
         }
 
-        public AbstractBuilder<Query, Id, Record> setIdColumn(IdColumn<Id> idColumn) {
+        public AbstractBuilder<B, Query, Id, Record> setIdColumn(IdColumn<Id> idColumn) {
             this.idColumn = idColumn;
-            return this;
+            return getThis();
         }
 
-        public AbstractBuilder<Query, Id, Record> setId(Id id) {
+        public AbstractBuilder<B, Query, Id, Record> setId(Id id) {
             this.id = id;
-            return this;
+            return getThis();
         }
 
-        public AbstractBuilder<Query, Id, Record> setRecord(Record record) {
+        public AbstractBuilder<B, Query, Id, Record> setRecord(Record record) {
             this.record = record;
-            return this;
+            return getThis();
         }
     }
 }
