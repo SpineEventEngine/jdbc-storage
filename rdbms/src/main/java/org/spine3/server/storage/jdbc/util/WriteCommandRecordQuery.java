@@ -27,18 +27,30 @@ import org.spine3.server.storage.jdbc.DatabaseException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+/**
+ * A base class for working with Command table (Writing case).
+ *
+ * @author Andrey Lavrov
+ */
+
 public abstract class WriteCommandRecordQuery
         extends WriteRecordQuery<String, CommandStorageRecord> {
 
     private final int statusIndexInQuery;
     private final CommandStatus status;
 
+    /**
+     * Creates a new query instance based on the passed builder.
+     */
     protected WriteCommandRecordQuery(CommandQueryBuilder<? extends CommandQueryBuilder, ? extends WriteCommandRecordQuery> builder) {
         super(builder);
         this.statusIndexInQuery = builder.statusIndexInQuery;
         this.status = builder.status;
     }
 
+    /**
+     * Prepares SQL statement using the connection.
+     */
     @Override
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
         final PreparedStatement statement = super.prepareStatement(connection);
@@ -51,19 +63,20 @@ public abstract class WriteCommandRecordQuery
     }
 
     /**
+     * Abstract builder extension to match additional columns in commands table.
      */
-    public abstract static class CommandQueryBuilder<B extends CommandQueryBuilder<B, Query>, Query extends WriteCommandRecordQuery>
-            extends AbstractBuilder<CommandQueryBuilder<B, Query>, Query, String, CommandStorageRecord> {
+    public abstract static class CommandQueryBuilder<Builder extends CommandQueryBuilder<Builder, Query>, Query extends WriteCommandRecordQuery>
+            extends AbstractBuilder<CommandQueryBuilder<Builder, Query>, Query, String, CommandStorageRecord> {
 
         private int statusIndexInQuery;
         private CommandStatus status;
 
-        public CommandQueryBuilder<B, Query> setStatusIndexInQuery(int statusIndexInQuery) {
+        public CommandQueryBuilder<Builder, Query> setStatusIndexInQuery(int statusIndexInQuery) {
             this.statusIndexInQuery = statusIndexInQuery;
             return getThis();
         }
 
-        public CommandQueryBuilder<B, Query> setStatus(CommandStatus status) {
+        public CommandQueryBuilder<Builder, Query> setStatus(CommandStatus status) {
             this.status = status;
             return getThis();
         }

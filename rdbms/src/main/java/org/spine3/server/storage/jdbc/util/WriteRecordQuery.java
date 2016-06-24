@@ -83,7 +83,7 @@ public abstract class WriteRecordQuery<Id, Record extends Message> extends Write
      * @param <Record> a type of records to write
      */
     public abstract static class AbstractBuilder
-            <B extends AbstractBuilder<B, Query, Id, Record>,
+            <Builder extends AbstractBuilder<Builder, Query, Id, Record>,
             Query extends WriteRecordQuery<Id, Record>,
             Id,
             Record extends Message> {
@@ -98,39 +98,39 @@ public abstract class WriteRecordQuery<Id, Record extends Message> extends Write
 
         public abstract Query build();
 
-        protected abstract B getThis();
+        protected abstract Builder getThis();
 
-        public AbstractBuilder<B, Query, Id, Record> setDataSource(DataSourceWrapper dataSource) {
+        public AbstractBuilder<Builder, Query, Id, Record> setDataSource(DataSourceWrapper dataSource) {
             this.dataSource = dataSource;
             return getThis();
         }
 
-        public AbstractBuilder<B, Query, Id, Record> setQuery(String query) {
+        public AbstractBuilder<Builder, Query, Id, Record> setQuery(String query) {
             this.query = query;
             return getThis();
         }
 
-        public AbstractBuilder<B, Query, Id, Record> setIdIndexInQuery(int idIndexInQuery) {
+        public AbstractBuilder<Builder, Query, Id, Record> setIdIndexInQuery(int idIndexInQuery) {
             this.idIndexInQuery = idIndexInQuery;
             return getThis();
         }
 
-        public AbstractBuilder<B, Query, Id, Record> setRecordIndexInQuery(int recordIndexInQuery) {
+        public AbstractBuilder<Builder, Query, Id, Record> setRecordIndexInQuery(int recordIndexInQuery) {
             this.recordIndexInQuery = recordIndexInQuery;
             return getThis();
         }
 
-        public AbstractBuilder<B, Query, Id, Record> setIdColumn(IdColumn<Id> idColumn) {
+        public AbstractBuilder<Builder, Query, Id, Record> setIdColumn(IdColumn<Id> idColumn) {
             this.idColumn = idColumn;
             return getThis();
         }
 
-        public AbstractBuilder<B, Query, Id, Record> setId(Id id) {
+        public AbstractBuilder<Builder, Query, Id, Record> setId(Id id) {
             this.id = id;
             return getThis();
         }
 
-        public AbstractBuilder<B, Query, Id, Record> setRecord(Record record) {
+        public AbstractBuilder<Builder, Query, Id, Record> setRecord(Record record) {
             this.record = record;
             return getThis();
         }

@@ -40,7 +40,6 @@ import java.sql.SQLException;
 import java.util.Iterator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static java.lang.String.format;
 import static org.spine3.server.storage.jdbc.util.Serializer.deserialize;
 import static org.spine3.validate.Validate.checkNotDefault;
 
@@ -51,7 +50,7 @@ import static org.spine3.validate.Validate.checkNotDefault;
  * @see JdbcStorageFactory
  */
 @SuppressWarnings("UtilityClass")
-/*package*/ class JdbcCommandStorage extends CommandStorage {
+/* package */ class JdbcCommandStorage extends CommandStorage {
 
     /**
      * Commands table name.
@@ -313,9 +312,9 @@ import static org.spine3.validate.Validate.checkNotDefault;
         @SuppressWarnings("DuplicateStringLiteralInspection")
         private static final String UPDATE_QUERY =
                 "UPDATE " + TABLE_NAME +
-                        " SET " + COMMAND_COL + " = ? " +
-                        ", " + COMMAND_STATUS_COL + " = ? " +
-                        " WHERE " + ID_COL + " = ?;";
+                 " SET " + COMMAND_COL + " = ? " +
+                 ", " + COMMAND_STATUS_COL + " = ? " +
+                 " WHERE " + ID_COL + " = ?;";
 
         private static final int RECORD_INDEX_IN_QUERY = 1;
         private static final int COMMAND_STATUS_INDEX_IN_QUERY = 2;
@@ -549,8 +548,8 @@ import static org.spine3.validate.Validate.checkNotDefault;
 
         @SuppressWarnings("DuplicateStringLiteralInspection")
         private static final String SELECT_BY_STATUS_QUERY =
-                "SELECT * FROM " + TABLE_NAME  +
-                        " WHERE " + COMMAND_STATUS_COL +" = ?;";
+                "SELECT * FROM " + TABLE_NAME +
+                        " WHERE " + COMMAND_STATUS_COL + " = ?;";
 
         private SelectCommandByStatusQuery(CommandStatus status) {
             super(SELECT_BY_STATUS_QUERY, status);

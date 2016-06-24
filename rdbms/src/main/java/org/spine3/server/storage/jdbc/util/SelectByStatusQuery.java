@@ -20,29 +20,17 @@
 
 package org.spine3.server.storage.jdbc.util;
 
-import com.google.protobuf.Descriptors.Descriptor;
-import com.google.protobuf.Message;
-import com.google.protobuf.StringValue;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.spine3.Internal;
 import org.spine3.base.CommandStatus;
-import org.spine3.server.storage.CommandStorageRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
 
-import javax.annotation.Nullable;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static org.spine3.base.Identifiers.idToString;
-import static org.spine3.server.storage.jdbc.util.Serializer.deserialize;
-
 /**
- * A query which obtains a {@link Message} by an ID.
+ * A query which obtains a {@link org.spine3.base.Command} by an command status.
  *
- * @author Alexander Litus
+ * @author Andrey Lavrov
  */
 @Internal
 public class SelectByStatusQuery {
@@ -54,7 +42,7 @@ public class SelectByStatusQuery {
     /**
      * Creates a new query instance.
      *
-     * @param query SQL select query which selects a message by an ID (must have one ID parameter to set)
+     * @param query SQL select query which selects a Command by an command status (must have one CommandStatus parameter to set)
      */
     protected SelectByStatusQuery(String query, CommandStatus status) {
         this.query = query;
@@ -62,6 +50,9 @@ public class SelectByStatusQuery {
     }
 
 
+    /**
+     * Prepares SQL statement using the connection.
+     */
     public PreparedStatement prepareStatement(ConnectionWrapper connection) {
         final PreparedStatement statement = connection.prepareStatement(query);
         try {

@@ -43,10 +43,10 @@ import static org.spine3.validate.Validate.isDefault;
  * The implementation of the projection storage based on the RDBMS.
  *
  * @param <Id> a type of projection IDs
- * @see JdbcStorageFactory
  * @author Alexander Litus
+ * @see JdbcStorageFactory
  */
-/*package*/ class JdbcProjectionStorage<Id> extends ProjectionStorage<Id> {
+/* package */ class JdbcProjectionStorage<Id> extends ProjectionStorage<Id> {
 
     /**
      * A suffix of a table name where the last event time is stored.
@@ -74,10 +74,10 @@ import static org.spine3.validate.Validate.isDefault;
     /**
      * Creates a new storage instance.
      *
-     * @param dataSource a data source used by an {@code entityStorage}
+     * @param dataSource      a data source used by an {@code entityStorage}
      * @param projectionClass a class of projections to store
-     * @param entityStorage an entity storage to use
-     * @param <Id> a type of projection IDs
+     * @param entityStorage   an entity storage to use
+     * @param <Id>            a type of projection IDs
      * @return a new storage instance
      */
     /*package*/
@@ -143,9 +143,9 @@ import static org.spine3.validate.Validate.isDefault;
 
         private static final String CREATE_TABLE_IF_DOES_NOT_EXIST =
                 "CREATE TABLE IF NOT EXISTS %s (" +
-                    SECONDS_COL + " BIGINT, " +
-                    NANOS_COL + " INT " +
-                ");";
+                        SECONDS_COL + " BIGINT, " +
+                        NANOS_COL + " INT " +
+                        ");";
 
         private void execute(String tableName) throws DatabaseException {
             final String createTableSql = format(CREATE_TABLE_IF_DOES_NOT_EXIST, tableName);
@@ -195,8 +195,8 @@ import static org.spine3.validate.Validate.isDefault;
         @SuppressWarnings("DuplicateStringLiteralInspection")
         private static final String INSERT_QUERY =
                 "INSERT INTO %s " +
-                " (" + SECONDS_COL + ", " + NANOS_COL + ')' +
-                " VALUES (?, ?);";
+                        " (" + SECONDS_COL + ", " + NANOS_COL + ')' +
+                        " VALUES (?, ?);";
 
         private InsertTimestampQuery(Timestamp timestamp) {
             super(format(INSERT_QUERY, tableName), timestamp);
@@ -208,8 +208,8 @@ import static org.spine3.validate.Validate.isDefault;
         @SuppressWarnings("DuplicateStringLiteralInspection")
         private static final String UPDATE_QUERY =
                 "UPDATE %s SET " +
-                SECONDS_COL + " = ?, " +
-                NANOS_COL + " = ?;";
+                        SECONDS_COL + " = ?, " +
+                        NANOS_COL + " = ?;";
 
         private UpdateTimestampQuery(Timestamp timestamp) {
             super(format(UPDATE_QUERY, tableName), timestamp);
