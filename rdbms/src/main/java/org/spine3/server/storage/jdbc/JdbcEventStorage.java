@@ -356,7 +356,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
         private static void appendFilterByEventTypeSql(StringBuilder builder, String eventType) {
             appendTo(builder,
-                    whereOrAnd(builder),
+                    whereOrOr(builder),
                     EVENT_TYPE_COL, " = \'", eventType, "\' ");
         }
 
@@ -365,13 +365,13 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
                 final Message aggregateId = Messages.fromAny(idAny);
                 final String aggregateIdStr = idToString(aggregateId);
                 appendTo(builder,
-                        whereOrAnd(builder),
+                        whereOrOr(builder),
                         PRODUCER_ID_COL, " = \'", aggregateIdStr, "\' ");
             }
         }
 
-        private static String whereOrAnd(StringBuilder builder) {
-            final String result = builder.toString().contains("WHERE") ? " AND " : " WHERE ";
+        private static String whereOrOr(StringBuilder builder) {
+            final String result = builder.toString().contains("WHERE") ? " OR " : " WHERE ";
             return result;
         }
 
