@@ -42,6 +42,7 @@ import javax.sql.DataSource;
 public class JdbcStorageFactory implements StorageFactory {
 
     private final DataSourceWrapper dataSource;
+    private final boolean multitenant;
 
     /**
      * Creates a new instance with the specified data source configuration.
@@ -55,11 +56,12 @@ public class JdbcStorageFactory implements StorageFactory {
     private JdbcStorageFactory(DataSourceConfig config) {
         final HikariConfig hikariConfig = ConfigConverter.toHikariConfig(config);
         this.dataSource = HikariDataSourceWrapper.newInstance(hikariConfig);
+        this.multitenant = config.isMultitenant();
     }
 
     @Override
     public boolean isMultitenant() {
-        return false;
+        return multitenant;
     }
 
     @Override
@@ -95,7 +97,7 @@ public class JdbcStorageFactory implements StorageFactory {
 
     private static class ConfigConverter {
 
-        @SuppressWarnings({"MethodWithMoreThanThreeNegations"}) // is OK in this case
+        @SuppressWarnings("MethodWithMoreThanThreeNegations") // is OK in this case
         private static HikariConfig toHikariConfig(DataSourceConfig config) {
             final HikariConfig result = new HikariConfig();
 
