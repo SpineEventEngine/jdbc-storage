@@ -547,7 +547,7 @@ import static org.spine3.validate.Validate.checkNotDefault;
 
         @SuppressWarnings("DuplicateStringLiteralInspection")
         private static final String SELECT_BY_STATUS_QUERY =
-                "SELECT command FROM " + TABLE_NAME +
+                "SELECT " +  COMMAND_COL + " FROM " + TABLE_NAME +
                 " WHERE " + COMMAND_STATUS_COL + " = ?;";
 
         private SelectCommandByStatusQuery(CommandStatus status) {
