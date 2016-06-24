@@ -20,45 +20,20 @@
 
 package org.spine3.server.storage.jdbc;
 
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
+import org.spine3.server.storage.EventStorage;
+import org.spine3.server.storage.EventStorageShould;
+import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
-import javax.sql.DataSource;
+import static org.spine3.server.storage.jdbc.JdbcStorageFactoryShould.newInMemoryDataSource;
 
 /**
- * The wrapper for {@link HikariDataSource}.
- *
- * @see <a href="https://github.com/brettwooldridge/HikariCP">HikariCP connection pool</a>.
  * @author Alexander Litus
  */
-class HikariDataSourceWrapper extends DataSourceWrapper {
-
-    private final HikariDataSource dataSource;
-
-    /**
-     * Creates a new instance with the specified configuration.
-     *
-     * <p>Please see
-     * <a href="https://github.com/brettwooldridge/HikariCP#configuration-knobs-baby">HikariCP configuration</a>
-     * for more info.
-     *
-     * @param config the config used to create {@link HikariDataSource}.
-     */
-    static HikariDataSourceWrapper newInstance(HikariConfig config) {
-        return new HikariDataSourceWrapper(config);
-    }
-
-    protected HikariDataSourceWrapper(HikariConfig config) {
-        dataSource = new HikariDataSource(config);
-    }
+public class JdbcEventStorageShould extends EventStorageShould {
 
     @Override
-    public void close() {
-        dataSource.close();
-    }
-
-    @Override
-    protected DataSource getDataSource() {
-        return dataSource;
+    protected EventStorage getStorage() {
+        final DataSourceWrapper dataSource = newInMemoryDataSource("eventStorageTests");
+        return JdbcEventStorage.newInstance(dataSource, false);
     }
 }

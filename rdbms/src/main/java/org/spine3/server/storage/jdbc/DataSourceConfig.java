@@ -51,6 +51,7 @@ public class DataSourceConfig {
     private final String jdbcUrl;
     private final String username;
     private final String password;
+    private final boolean multitenant;
 
     /**
      * Optional
@@ -75,6 +76,7 @@ public class DataSourceConfig {
         this.jdbcUrl = builder.getJdbcUrl();
         this.username = builder.getUsername();
         this.password = builder.getPassword();
+        this.multitenant = builder.isMultitenant();
 
         this.autoCommit = builder.isAutoCommit();
         this.connectionTimeout = builder.getConnectionTimeout();
@@ -124,6 +126,13 @@ public class DataSourceConfig {
     @Nullable
     public String getPassword() {
         return password;
+    }
+
+    /**
+     * See {@link Builder#setMultitenant(boolean)}.
+     */
+    public boolean isMultitenant() {
+        return multitenant;
     }
 
     /**
@@ -194,6 +203,7 @@ public class DataSourceConfig {
         private String jdbcUrl;
         private String username;
         private String password;
+        private boolean multitenant;
 
         /**
          * Optional
@@ -205,9 +215,9 @@ public class DataSourceConfig {
         @Nullable
         private Long idleTimeout;
         @Nullable
-        private Long maxLifetime;
-        @Nullable
         private String connectionTestQuery;
+        @Nullable
+        private Long maxLifetime;
         @Nullable
         private Integer maxPoolSize;
         @Nullable
@@ -297,8 +307,8 @@ public class DataSourceConfig {
          *
          * <p>Examples of JDBC URL (HyperSQL DB):
          *
-         * <p>{@code jdbc:hsqldb:hsql://localhost:9001/dbname;ifexists=true}
-         * <p>{@code jdbc:hsqldb:mem:inmemorydb} (for in-memory database)
+         * <p>{@code jdbc:hsqldb:hsql://localhost:9001/dbName;ifexists=true}
+         * <p>{@code jdbc:hsqldb:mem:inMemoryDb} (for in-memory database)
          *
          * <p>Default: none
          *
@@ -366,6 +376,23 @@ public class DataSourceConfig {
         }
 
         /**
+         * See {@link #setMultitenant(boolean)}.
+         */
+        public boolean isMultitenant() {
+            return multitenant;
+        }
+
+        /**
+         * Defines is storage multitenant
+         *
+         * @param multitenant the password to set
+         */
+        public Builder setMultitenant(boolean multitenant) {
+            this.multitenant = multitenant;
+            return this;
+        }
+
+        /**
          * See {@link #setAutoCommit(Boolean)}.
          */
         public Boolean isAutoCommit() {
@@ -388,6 +415,7 @@ public class DataSourceConfig {
         /**
          * See {@link #setConnectionTimeout(Long)}.
          */
+        @Nullable
         public Long getConnectionTimeout() {
             return connectionTimeout;
         }
@@ -411,6 +439,7 @@ public class DataSourceConfig {
         /**
          * See {@link #setIdleTimeout(Long)}.
          */
+        @Nullable
         public Long getIdleTimeout() {
             return idleTimeout;
         }
@@ -436,6 +465,7 @@ public class DataSourceConfig {
         /**
          * See {@link #setMaxLifetime(Long)}.
          */
+        @Nullable
         public Long getMaxLifetime() {
             return maxLifetime;
         }
@@ -465,6 +495,7 @@ public class DataSourceConfig {
         /**
          * See {@link #setConnectionTestQuery(String)}.
          */
+        @Nullable
         public String getConnectionTestQuery() {
             return connectionTestQuery;
         }
@@ -490,10 +521,10 @@ public class DataSourceConfig {
         /**
          * See {@link #setMaxPoolSize(Integer)}.
          */
+        @Nullable
         public Integer getMaxPoolSize() {
             return maxPoolSize;
         }
-
         /**
          * Sets the maximum size that the pool is allowed to reach, including both idle and in-use connections.
          *
@@ -513,9 +544,11 @@ public class DataSourceConfig {
             this.maxPoolSize = maxPoolSize;
             return this;
         }
+
         /**
          * See {@link #setPoolName(String)}.
          */
+        @Nullable
         public String getPoolName() {
             return poolName;
         }

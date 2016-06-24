@@ -18,7 +18,10 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.spine3.server.storage.jdbc;
+package org.spine3.server.storage.jdbc.util;
+
+import org.spine3.Internal;
+import org.spine3.server.storage.jdbc.DatabaseException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -29,7 +32,8 @@ import java.sql.SQLException;
  *
  * @author Alexander Litus
  */
-class ConnectionWrapper implements AutoCloseable {
+@Internal
+public class ConnectionWrapper implements AutoCloseable {
 
     private final Connection connection;
 
@@ -38,7 +42,7 @@ class ConnectionWrapper implements AutoCloseable {
      *
      * @param connection the connection to wrap
      */
-    static ConnectionWrapper wrap(Connection connection) {
+    public static ConnectionWrapper wrap(Connection connection) {
         return new ConnectionWrapper(connection);
     }
 
@@ -49,7 +53,7 @@ class ConnectionWrapper implements AutoCloseable {
     /**
      * Returns the wrapped connection object.
      */
-    Connection get() {
+    public Connection get() {
         return connection;
     }
 
@@ -58,7 +62,7 @@ class ConnectionWrapper implements AutoCloseable {
      *
      * @throws DatabaseException if SQLException occurs
      */
-    PreparedStatement prepareStatement(String sql) {
+    public PreparedStatement prepareStatement(String sql) {
         try {
             //noinspection JDBCPrepareStatementWithNonConstantString
             final PreparedStatement statement = connection.prepareStatement(sql);
@@ -73,7 +77,7 @@ class ConnectionWrapper implements AutoCloseable {
      *
      * @throws DatabaseException if SQLException occurs
      */
-    void commit() {
+    public void commit() {
         try {
             connection.commit();
         } catch (SQLException e) {
@@ -86,7 +90,7 @@ class ConnectionWrapper implements AutoCloseable {
      *
      * @throws DatabaseException if SQLException occurs
      */
-    void rollback() {
+    public void rollback() {
         try {
             connection.rollback();
         } catch (SQLException e) {

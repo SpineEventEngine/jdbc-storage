@@ -20,106 +20,78 @@
 
 package org.spine3.server.storage.jdbc;
 
-import com.google.protobuf.Any;
-import com.google.protobuf.ByteString;
-import com.google.protobuf.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.spine3.server.entity.Entity;
 import org.spine3.server.storage.EntityStorage;
 import org.spine3.server.storage.EntityStorageRecord;
-import org.spine3.type.TypeName;
+import org.spine3.server.storage.jdbc.util.*;
 
 import javax.annotation.Nullable;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.regex.Pattern;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static org.spine3.protobuf.Messages.fromAny;
-import static org.spine3.protobuf.Messages.toAny;
+import static com.google.protobuf.Descriptors.Descriptor;
+import static java.lang.String.format;
+import static org.spine3.base.Identifiers.idToString;
 
 /**
  * The implementation of the entity storage based on the RDBMS.
  *
+ * @param <Id> the type of entity IDs
  * @see JdbcStorageFactory
  * @author Alexander Litus
  */
-class JdbcEntityStorage<I> extends EntityStorage<I> implements AutoCloseable {
+/*package*/ class JdbcEntityStorage<Id> extends EntityStorage<Id> {
 
     /**
      * Entity record column name.
      */
-    private static final String ENTITY = "entity";
+    private static final String ENTITY_COL = "entity";
 
     /**
      * Entity ID column name.
      */
-    private static final String ID = "id";
+    private static final String ID_COL = "id";
 
-    @SuppressWarnings("UtilityClass")
-    private static class SqlDrafts {
-
-        static final String INSERT_RECORD =
-                "INSERT INTO %s " +
-                        " (" + ID + ", " + ENTITY + ')' +
-                        " VALUES (?, ?);";
-
-        static final String UPDATE_RECORD =
-                "UPDATE %s " +
-                " SET " + ENTITY + " = ? " +
-                " WHERE " + ID + " = ?;";
-
-        static final String SELECT_ALL_BY_ID = "SELECT * FROM %s WHERE " + ID + " = ?;";
-
-        static final String DELETE_ALL = "DELETE FROM  %s ;";
-
-        static final String CREATE_TABLE_IF_DOES_NOT_EXIST =
-                "CREATE TABLE IF NOT EXISTS %s (" +
-                    ID + " VARCHAR(999), " +
-                    ENTITY + " BLOB, " +
-                    "PRIMARY KEY(" + ID + ')' +
-                ");";
-    }
-
-    private static final Pattern PATTERN_DOT = Pattern.compile("\\.");
-    private static final Pattern PATTERN_DOLLAR = Pattern.compile("\\$");
-    private static final String UNDERSCORE = "_";
+    private static final Descriptor RECORD_DESCRIPTOR = EntityStorageRecord.getDescriptor();
+    private static final IdColumn.StringIdColumn STRING_ID_COLUMN = new IdColumn.StringIdColumn();
 
     private final DataSourceWrapper dataSource;
+
+    private final IdColumn<Id> idColumn;
+
+    private final SelectEntityByIdQuery selectByIdQuery;
+    private final DeleteAllQuery deleteAllQuery;
+
     private final String tableName;
 
-    private final String insertSql;
-    private final String updateSql;
-    private final String selectAllByIdSql;
-    private final String deleteAllSql;
 
     /**
      * Creates a new storage instance.
      *
      * @param dataSource the dataSource wrapper
      * @param entityClass the class of entities to save to the storage
+     * @throws DatabaseException if an error occurs during an interaction with the DB
      */
-    static <I> JdbcEntityStorage<I> newInstance(DataSourceWrapper dataSource, Class entityClass) {
-        return new JdbcEntityStorage<>(dataSource, entityClass);
+    /*package*/ static <Id> JdbcEntityStorage<Id> newInstance(DataSourceWrapper dataSource,
+                                                              Class<? extends Entity<Id, ?>> entityClass,
+                                                              boolean multitenant)
+                                                              throws DatabaseException {
+        return new JdbcEntityStorage<>(dataSource, entityClass, multitenant);
     }
 
-    private JdbcEntityStorage(DataSourceWrapper dataSource, Class entityClass) {
+    private JdbcEntityStorage(DataSourceWrapper dataSource, Class<? extends Entity<Id, ?>> entityClass, boolean multitenant)
+            throws DatabaseException {
+        super(multitenant);
         this.dataSource = dataSource;
-        final String className = entityClass.getName();
-        final String tableNameTmp = PATTERN_DOT.matcher(className).replaceAll(UNDERSCORE);
-        this.tableName = PATTERN_DOLLAR.matcher(tableNameTmp).replaceAll(UNDERSCORE).toLowerCase();
+        this.idColumn = IdColumn.newInstance(entityClass);
+        this.tableName = DbTableNameFactory.newTableName(entityClass);
+        this.selectByIdQuery = new SelectEntityByIdQuery(tableName);
+        this.deleteAllQuery = new DeleteAllQuery(tableName);
 
-        this.insertSql = setTableName(SqlDrafts.INSERT_RECORD);
-        this.updateSql = setTableName(SqlDrafts.UPDATE_RECORD);
-        this.selectAllByIdSql = setTableName(SqlDrafts.SELECT_ALL_BY_ID);
-        this.deleteAllSql = setTableName((SqlDrafts.DELETE_ALL));
-        final String createTableSql = setTableName(SqlDrafts.CREATE_TABLE_IF_DOES_NOT_EXIST);
-        createTableIfDoesNotExist(createTableSql, this.tableName);
-    }
-
-    private String setTableName(String sql) {
-        return String.format(sql, tableName);
+        new CreateTableIfDoesNotExistQuery().execute(tableName);
     }
 
     /**
@@ -129,38 +101,11 @@ class JdbcEntityStorage<I> extends EntityStorage<I> implements AutoCloseable {
      */
     @Nullable
     @Override
-    public EntityStorageRecord read(I id) throws DatabaseException {
-        final EntityStorageRecord.Id recordId = toRecordId(id);
-        try (ConnectionWrapper connection = dataSource.getConnection(true);
-             PreparedStatement statement = selectByIdStatement(connection, recordId)) {
-            final EntityStorageRecord result = findById(statement);
-            return result;
-        } catch (SQLException e) {
-            logTransactionError(recordId, e);
-            throw new DatabaseException(e);
-        }
+    protected EntityStorageRecord readInternal(Id id) throws DatabaseException {
+        final EntityStorageRecord record = selectByIdQuery.execute(id);
+        return record;
     }
 
-    private static EntityStorageRecord findById(PreparedStatement statement) throws DatabaseException {
-        try (ResultSet resultSet = statement.executeQuery()) {
-            if (!resultSet.next()) {
-                return null;
-            }
-            final byte[] bytes = resultSet.getBytes(ENTITY);
-            final EntityStorageRecord record = toEntityRecord(bytes);
-            return record;
-        } catch (SQLException e) {
-            throw new DatabaseException(e);
-        }
-    }
-
-    private static EntityStorageRecord toEntityRecord(byte[] bytes) {
-        final Any.Builder builder = Any.newBuilder();
-        builder.setTypeUrl(TypeName.of(EntityStorageRecord.getDescriptor()).toTypeUrl());
-        builder.setValue(ByteString.copyFrom(bytes));
-        final EntityStorageRecord message = fromAny(builder.build());
-        return message;
-    }
 
     /**
      * {@inheritDoc}
@@ -168,120 +113,30 @@ class JdbcEntityStorage<I> extends EntityStorage<I> implements AutoCloseable {
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     @Override
-    public void write(EntityStorageRecord record) {
+    protected void writeInternal(Id id, EntityStorageRecord record) throws DatabaseException {
         checkArgument(record.hasState(), "entity state");
 
-        final EntityStorageRecord.Id id = toRecordId(record.getId());
-        final byte[] serializedRecord = serialize(record);
-        try (ConnectionWrapper connection = dataSource.getConnection(false)) {
-            if (containsRecord(connection, id)) {
-                update(connection, id, serializedRecord);
-            } else {
-                insert(connection, id, serializedRecord);
-            }
+        if (containsRecord(id)) {
+            newUpdateEntityQuery(id, record).execute();
+        } else {
+            newInsertEntityQuery(id, record).execute();
         }
     }
 
-    private static byte[] serialize(Message message) {
-        final Any any = toAny(message);
-        final byte[] bytes = any.getValue().toByteArray();
-        return bytes;
-    }
-
-    private void createTableIfDoesNotExist(String sql, String tableName) throws DatabaseException {
-        try (ConnectionWrapper connection = dataSource.getConnection(true);
-             PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.execute();
-        } catch (SQLException e) {
-            log().error("Error during table creation, table name = " + tableName, e);
-            throw new DatabaseException(e);
-        }
-    }
-
-    private boolean containsRecord(ConnectionWrapper connection, EntityStorageRecord.Id id) {
-        try (PreparedStatement statement = selectByIdStatement(connection, id);
-             ResultSet resultSet = statement.executeQuery()) {
-            final boolean hasNext = resultSet.next();
-            return hasNext;
-        } catch (SQLException e) {
-            logTransactionError(id, e);
-            connection.rollback();
-            return false;
-        }
-    }
-
-    private void update(ConnectionWrapper connection, EntityStorageRecord.Id id, byte[] serializedEntity) {
-        try (PreparedStatement statement = updateRecordStatement(connection, id, serializedEntity)) {
-            statement.execute();
-            connection.commit();
-        } catch (SQLException e) {
-            throw handleDbException(connection, e, id);
-        }
-    }
-
-    private void insert(ConnectionWrapper connection, EntityStorageRecord.Id id, byte[] serializedEntity) {
-        try (PreparedStatement statement = insertRecordStatement(connection, id, serializedEntity)) {
-            statement.execute();
-            connection.commit();
-        } catch (SQLException e) {
-            throw handleDbException(connection, e, id);
-        }
-    }
-
-    @SuppressWarnings("TypeMayBeWeakened")
-    private PreparedStatement insertRecordStatement(ConnectionWrapper connection,
-                                                    EntityStorageRecord.Id id,
-                                                    byte[] serializedRecord) throws SQLException {
-        final PreparedStatement statement = connection.prepareStatement(insertSql);
-        setEntityId(1, id, statement);
-        statement.setBytes(2, serializedRecord);
-        return statement;
-    }
-
-    private PreparedStatement updateRecordStatement(ConnectionWrapper connection,
-                                                    EntityStorageRecord.Id id,
-                                                    byte[] serializedEntity) throws SQLException {
-        final PreparedStatement statement = connection.prepareStatement(updateSql);
-        statement.setBytes(1, serializedEntity);
-        setEntityId(2, id, statement);
-        return statement;
-    }
-
-    private PreparedStatement selectByIdStatement(ConnectionWrapper connection,
-                                                  EntityStorageRecord.Id id) throws SQLException {
-        final PreparedStatement statement = connection.prepareStatement(selectAllByIdSql);
-        setEntityId(1, id, statement);
-        return statement;
-    }
-
-    @SuppressWarnings("TypeMayBeWeakened")
-    private static void setEntityId(int idIndex, EntityStorageRecord.Id id, PreparedStatement statement) throws SQLException {
-        final EntityStorageRecord.Id.TypeCase type = id.getTypeCase();
-        switch (type) {
-            case STRING_VALUE:
-                statement.setString(idIndex, id.getStringValue());
-                break;
-            case LONG_VALUE:
-                statement.setLong(idIndex, id.getLongValue());
-                break;
-            case INT_VALUE:
-                statement.setInt(idIndex, id.getIntValue());
-                break;
-            case TYPE_NOT_SET:
-            default:
-                throw new IllegalArgumentException("Id type not set.");
-        }
-    }
-
-    private static DatabaseException handleDbException(ConnectionWrapper connection, SQLException e, EntityStorageRecord.Id id) {
-        logTransactionError(id, e);
-        connection.rollback();
-        throw new DatabaseException(e);
+    private boolean containsRecord(Id id) throws DatabaseException {
+        final EntityStorageRecord record = selectByIdQuery.execute(id);
+        final boolean contains = record != null;
+        return contains;
     }
 
     @Override
-    public void close() {
+    public void close() throws DatabaseException {
         dataSource.close();
+        try {
+            super.close();
+        } catch (Exception e) {
+            throw new DatabaseException(e);
+        }
     }
 
     /**
@@ -289,17 +144,159 @@ class JdbcEntityStorage<I> extends EntityStorage<I> implements AutoCloseable {
      *
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
-    void clear() throws DatabaseException {
+    /*package*/ void clear() throws DatabaseException {
         try (ConnectionWrapper connection = dataSource.getConnection(true);
-             final PreparedStatement statement = connection.prepareStatement(deleteAllSql)) {
+             final PreparedStatement statement = deleteAllQuery.statement(connection)) {
             statement.execute();
         } catch (SQLException e) {
             throw new DatabaseException(e);
         }
     }
 
-    private static void logTransactionError(EntityStorageRecord.Id id, Exception e) {
-        log().error("Error during transaction, entity ID = " + id, e);
+    private InsertEntityQuery<Id> newInsertEntityQuery(Id id, EntityStorageRecord record) {
+        return new InsertEntityQuery.Builder<Id>()
+                .setDataSource(dataSource)
+                .setQuery(format(InsertEntityQuery.INSERT_QUERY, tableName))
+                .setIdColumn(idColumn)
+                .setId(id)
+                .setRecord(record)
+                .build();
+    }
+
+    private UpdateEntityQuery<Id> newUpdateEntityQuery(Id id, EntityStorageRecord record) {
+        return new UpdateEntityQuery.Builder<Id>()
+                .setDataSource(dataSource)
+                .setQuery(format(UpdateEntityQuery.UPDATE_QUERY, tableName))
+                .setIdColumn(idColumn)
+                .setId(id)
+                .setRecord(record)
+                .build();
+    }
+
+    private static class InsertEntityQuery<Id> extends WriteRecordQuery<Id, EntityStorageRecord> {
+
+        @SuppressWarnings("DuplicateStringLiteralInspection")
+        private static final String INSERT_QUERY =
+                "INSERT INTO %s " +
+                " (" + ID_COL + ", " + ENTITY_COL + ')' +
+                " VALUES (?, ?);";
+
+        private static final int ID_INDEX_IN_QUERY = 1;
+        private static final int ENTITY_INDEX_IN_QUERY = 2;
+
+        private InsertEntityQuery(Builder<Id> builder) {
+            super(builder);
+        }
+
+        private static class Builder<Id> extends AbstractBuilder<Builder<Id>, InsertEntityQuery<Id>, Id, EntityStorageRecord> {
+
+            @Override
+            public InsertEntityQuery<Id> build() {
+                setIdIndexInQuery(ID_INDEX_IN_QUERY);
+                setRecordIndexInQuery(ENTITY_INDEX_IN_QUERY);
+                return new InsertEntityQuery<>(this);
+            }
+
+            @SuppressWarnings("unchecked")
+            @Override
+            protected Builder getThis() {
+                return this;
+            }
+        }
+
+        @Override
+        protected void logError(SQLException e) {
+            final String id = idToString(getId());
+            log().error("Failed to insert entity record, ID: " + id, e);
+        }
+    }
+
+    private static class UpdateEntityQuery<Id> extends WriteRecordQuery<Id, EntityStorageRecord> {
+
+        @SuppressWarnings("DuplicateStringLiteralInspection")
+        private static final String UPDATE_QUERY =
+                "UPDATE %s " +
+                " SET " + ENTITY_COL + " = ? " +
+                " WHERE " + ID_COL + " = ?;";
+
+        private static final int ENTITY_INDEX_IN_QUERY = 1;
+        private static final int ID_INDEX_IN_QUERY = 2;
+
+        private UpdateEntityQuery(Builder<Id> builder) {
+            super(builder);
+        }
+
+        private static class Builder<Id> extends AbstractBuilder<Builder<Id>, UpdateEntityQuery<Id>, Id, EntityStorageRecord> {
+
+            @Override
+            public UpdateEntityQuery<Id> build() {
+                setIdIndexInQuery(ID_INDEX_IN_QUERY);
+                setRecordIndexInQuery(ENTITY_INDEX_IN_QUERY);
+                return new UpdateEntityQuery<>(this);
+            }
+
+            @Override
+            protected Builder<Id> getThis() {
+                return this;
+            }
+        }
+
+        @Override
+        protected void logError(SQLException exception) {
+            final String id = idToString(getId());
+            log().error("Failed to update entity record, ID: " + id, exception);
+        }
+    }
+
+    private class SelectEntityByIdQuery extends SelectByIdQuery<Id, EntityStorageRecord> {
+
+        @SuppressWarnings("DuplicateStringLiteralInspection")
+        private static final String SELECT_BY_ID = "SELECT " + ENTITY_COL + " FROM %s WHERE " + ID_COL + " = ?;";
+
+        private SelectEntityByIdQuery(String tableName) {
+            super(format(SELECT_BY_ID, tableName), dataSource, idColumn);
+            setMessageColumnName(ENTITY_COL);
+            setMessageDescriptor(RECORD_DESCRIPTOR);
+        }
+    }
+
+    private static class DeleteAllQuery {
+
+        private static final String DELETE_ALL = "DELETE FROM %s ;";
+
+        private final String deleteAllQuery;
+
+        private DeleteAllQuery(String tableName) {
+            this.deleteAllQuery = format(DELETE_ALL, tableName);
+        }
+
+        public PreparedStatement statement(ConnectionWrapper connection) {
+            final PreparedStatement statement = connection.prepareStatement(deleteAllQuery);
+            return statement;
+        }
+    }
+
+    private class CreateTableIfDoesNotExistQuery {
+
+        @SuppressWarnings("DuplicateStringLiteralInspection")
+        private static final String CREATE_TABLE_IF_DOES_NOT_EXIST =
+                "CREATE TABLE IF NOT EXISTS %s (" +
+                    ID_COL + " %s, " +
+                    ENTITY_COL + " BLOB, " +
+                    "PRIMARY KEY(" + ID_COL + ')' +
+                ");";
+
+        private void execute(String tableName) throws DatabaseException {
+            final String idColumnType = idColumn.getColumnDataType();
+            final String createTableSql = format(CREATE_TABLE_IF_DOES_NOT_EXIST, tableName, idColumnType);
+            try (ConnectionWrapper connection = dataSource.getConnection(true);
+                 PreparedStatement statement = connection.prepareStatement(createTableSql)) {
+                statement.execute();
+            } catch (SQLException e) {
+                log().error("Error while creating a table with the name: " + tableName, e);
+                throw new DatabaseException(e);
+            }
+        }
     }
 
     private static Logger log() {

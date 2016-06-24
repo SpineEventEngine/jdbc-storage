@@ -21,11 +21,23 @@
 package org.spine3.server.storage.jdbc;
 
 import com.google.protobuf.StringValue;
+import com.zaxxer.hikari.HikariConfig;
+import org.junit.Before;
 import org.junit.Test;
-import org.spine3.server.Entity;
+import org.spine3.server.aggregate.Aggregate;
+import org.spine3.server.entity.Entity;
+import org.spine3.server.projection.Projection;
+import org.spine3.server.storage.AggregateStorage;
+import org.spine3.server.storage.CommandStorage;
 import org.spine3.server.storage.EntityStorage;
+import org.spine3.server.storage.EventStorage;
+import org.spine3.server.storage.ProjectionStorage;
+import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
+import org.spine3.server.storage.jdbc.util.HikariDataSourceWrapper;
+import org.spine3.test.project.Project;
 
 import static org.junit.Assert.assertNotNull;
+import static org.spine3.base.Identifiers.newUuid;
 
 /**
  * @author Alexander Litus
@@ -33,48 +45,86 @@ import static org.junit.Assert.assertNotNull;
 @SuppressWarnings({"InstanceMethodNamingConvention", "MagicNumber"})
 public class JdbcStorageFactoryShould {
 
-    private static final DataSourceConfig CONFIG = DataSourceConfig.newBuilder()
-            .setJdbcUrl("jdbc:hsqldb:mem:factorytests")
-            .setUsername("SA")
-            .setPassword("pwd")
-            .setMaxPoolSize(12)
-            .build();
+    /**
+     * The URL prefix of an in-memory HyperSQL DB.
+     */
+    private static final String HSQL_IN_MEMORY_DB_URL_PREFIX = "jdbc:hsqldb:mem:";
+
+    private JdbcStorageFactory factory;
+
+    @Before
+    public void setUpTest() {
+        final String dbUrl = newInMemoryDbUrl("factoryTests");
+        final DataSourceConfig config = DataSourceConfig.newBuilder()
+                .setJdbcUrl(dbUrl)
+                .setUsername("SA")
+                .setPassword("pwd")
+                .setMaxPoolSize(12)
+                .build();
+        factory = JdbcStorageFactory.newInstance(config);
+    }
 
     @Test
     public void create_entity_storage() {
-        final JdbcStorageFactory factory = JdbcStorageFactory.newInstance(CONFIG);
         final EntityStorage<String> storage = factory.createEntityStorage(TestEntity.class);
         assertNotNull(storage);
     }
 
     @Test
-    public void create_entity_storage_if_intity_class_is_inner() {
-        final JdbcStorageFactory factory = JdbcStorageFactory.newInstance(CONFIG);
-        final EntityStorage<String> storage = factory.createEntityStorage(TestEntity.InnerTestEntity.class);
+    public void create_aggregate_storage() {
+        final AggregateStorage<String> storage = factory.createAggregateStorage(TestAggregate.class);
         assertNotNull(storage);
     }
 
-    public static class TestEntity extends Entity<String, StringValue> {
+    @Test
+    public void create_event_storage() {
+        final EventStorage storage = factory.createEventStorage();
+        assertNotNull(storage);
+    }
 
-        public TestEntity(String id) {
+    @Test
+    public void create_command_storage() {
+        final CommandStorage storage = factory.createCommandStorage();
+        assertNotNull(storage);
+    }
+
+    @Test
+    public void create_projection_storage() {
+        final ProjectionStorage<String> storage = factory.createProjectionStorage(TestProjection.class);
+        assertNotNull(storage);
+    }
+
+    public static DataSourceWrapper newInMemoryDataSource(String dbName) {
+        final HikariConfig config = new HikariConfig();
+        final String dbUrl = newInMemoryDbUrl(dbName);
+        config.setJdbcUrl(dbUrl);
+        // not setting username and password is OK for in-memory database
+        final DataSourceWrapper dataSource = HikariDataSourceWrapper.newInstance(config);
+        return dataSource;
+    }
+
+    private static String newInMemoryDbUrl(String dbNamePrefix) {
+        return HSQL_IN_MEMORY_DB_URL_PREFIX + dbNamePrefix + newUuid();
+    }
+
+    private static class TestEntity extends Entity<String, StringValue> {
+
+        private TestEntity(String id) {
             super(id);
         }
+    }
 
-        @Override
-        protected StringValue getDefaultState() {
-            return StringValue.getDefaultInstance();
+    private static class TestAggregate extends Aggregate<String, StringValue, StringValue.Builder> {
+
+        private TestAggregate(String id) {
+            super(id);
         }
+    }
 
-        public static class InnerTestEntity extends Entity<String, StringValue> {
+    private static class TestProjection extends Projection<String, Project> {
 
-            public InnerTestEntity(String id) {
-                super(id);
-            }
-
-            @Override
-            protected StringValue getDefaultState() {
-                return StringValue.getDefaultInstance();
-            }
+        private TestProjection(String id) {
+            super(id);
         }
     }
 }

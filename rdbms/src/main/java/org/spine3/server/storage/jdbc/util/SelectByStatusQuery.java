@@ -18,43 +18,49 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.spine3.server.storage.jdbc;
+package org.spine3.server.storage.jdbc.util;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
+import org.spine3.Internal;
+import org.spine3.base.CommandStatus;
+import org.spine3.server.storage.jdbc.DatabaseException;
+import org.spine3.base.Command;
+
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 /**
- * The base class for {@link DataSource} wrappers.
+ * A query which obtains a {@link Command} by an command status.
  *
- * @author Alexander Litus
+ * @author Andrey Lavrov
  */
-abstract class DataSourceWrapper implements AutoCloseable {
+@Internal
+public class SelectByStatusQuery {
+
+    private final String query;
+
+    private final CommandStatus status;
 
     /**
-     * Returns the implementation of {@link DataSource}.
-     */
-    protected abstract DataSource getDataSource();
-
-    /**
-     * Retrieves a wrapped connection with the given auto commit mode.
+     * Creates a new query instance.
      *
-     * @throws DatabaseException if an error occurs during an interaction with the DB
-     * @see Connection#setAutoCommit(boolean)
+     * @param query SQL select query which selects a Command by an command status (must have one CommandStatus parameter to set)
      */
-    protected ConnectionWrapper getConnection(boolean autoCommit) throws DatabaseException {
+    protected SelectByStatusQuery(String query, CommandStatus status) {
+        this.query = query;
+        this.status = status;
+    }
+
+
+    /**
+     * Prepares SQL statement using the connection.
+     */
+    public PreparedStatement prepareStatement(ConnectionWrapper connection) {
+        final PreparedStatement statement = connection.prepareStatement(query);
         try {
-            final DataSource dataSource = getDataSource();
-            final Connection connection = dataSource.getConnection();
-            connection.setAutoCommit(autoCommit);
-            final ConnectionWrapper wrapper = ConnectionWrapper.wrap(connection);
-            return wrapper;
+            statement.setString(1, status.toString());
         } catch (SQLException e) {
             throw new DatabaseException(e);
         }
+        return statement;
     }
-
-    // Is overridden to do not throw {@link Exception}.
-    @Override
-    public abstract void close();
 }

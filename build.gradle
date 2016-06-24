@@ -1,7 +1,7 @@
 project.ext {
-    PROTOBUF_VERSION = '3.0.0-beta-1'
+    PROTOBUF_VERSION = '3.0.0-beta-3'
     PROTOBUF_DEPENDENCY = "com.google.protobuf:protoc:${project.PROTOBUF_VERSION}"
-    SPINE_VERSION = '0.2'
+    SPINE_VERSION = '0.4.4-SNAPSHOT'
 }
 
 buildscript {
@@ -10,16 +10,15 @@ buildscript {
     }
     repositories {
         mavenCentral()
-        mavenLocal()
     }
     dependencies {
-        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.7.0'
+        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.7.7'
     }
 }
 
 allprojects {
-    apply plugin: 'java'
     apply plugin: 'maven'
+    apply plugin: 'jacoco'
 
     group = 'org.spine3.jdbc'
     version = '0.1'
@@ -40,25 +39,27 @@ subprojects {
     // org.gradle.java.home=/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/
 
     repositories {
-        mavenLocal()
         mavenCentral()
+        maven {
+            url = 'http://maven.teamdev.com/repository/spine'
+        }
     }
 
     dependencies {
-        // TODO:2015-11-16:alexander.litus: change Spine local dependencies to Maven central repository dependencies
-        // when Spine can be used for evaluation in real projects.
         // Spine
-        compile group: 'org.spine3', name: 'core-java', version: project.SPINE_VERSION, changing: true
+        compile group: 'org.spine3', name: 'server', version: project.SPINE_VERSION, changing: true
+        compile group: 'org.spine3', name: 'client', version: project.SPINE_VERSION, changing: true
+        compile group: 'org.spine3', name: 'testutil', version: project.SPINE_VERSION, changing: true
 
         // Guava
         compile group: 'com.google.guava', name: 'guava', version: '19.0'
 
         // Findbugs
-        compile group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.0'
+        compile group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
 
         // SLF4J
-        compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.12'
-        compile group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.12'
+        compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.21'
+        compile group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.21'
 
         // Protobuf
         compile group: 'com.google.protobuf', name: 'protobuf-java', version: project.PROTOBUF_VERSION
@@ -71,28 +72,39 @@ subprojects {
         testCompile group: 'org.hamcrest', name: 'hamcrest-all', version: '1.3'
     }
 
+    configurations.all {
+        resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+    }
+
     final String SRC_ROOT_DIR = "$projectDir/src"
     final String GEN_ROOT_DIR = "$projectDir/generated"
-    final String GEN_MAIN_JAVA_DIR = "${GEN_ROOT_DIR}/main/java"
-    final String GEN_TEST_JAVA_DIR = "${GEN_ROOT_DIR}/test/java"
 
     sourceSets {
         main {
             proto.srcDirs = ["${SRC_ROOT_DIR}/main/proto"]
-            java.srcDirs = [GEN_MAIN_JAVA_DIR, "${SRC_ROOT_DIR}/main/java"]
+            java.srcDirs = ["${GEN_ROOT_DIR}/main/java", "${SRC_ROOT_DIR}/main/java"]
             resources.srcDirs = ["${GEN_ROOT_DIR}/main/resources"]
         }
         test {
             proto.srcDirs = ["${SRC_ROOT_DIR}/test/proto"]
-            java.srcDirs = [GEN_TEST_JAVA_DIR, "${SRC_ROOT_DIR}/test/java"]
+            java.srcDirs = ["${GEN_ROOT_DIR}/test/java", "${SRC_ROOT_DIR}/test/java"]
             resources.srcDirs = ["${GEN_ROOT_DIR}/test/resources"]
         }
     }
 
     protobuf {
-        generatedFilesBaseDir = "$projectDir/generated"
+        generatedFilesBaseDir = GEN_ROOT_DIR
         protoc {
             artifact = project.PROTOBUF_DEPENDENCY
         }
     }
+
+    jacocoTestReport {
+        reports {
+            xml.enabled = true
+            html.enabled = true
+        }
+    }
+
+    check.dependsOn jacocoTestReport
 }

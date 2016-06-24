@@ -20,69 +20,52 @@
 
 package org.spine3.server.storage.jdbc;
 
+import com.google.protobuf.Message;
 import org.junit.Test;
-import org.spine3.server.entity.Entity;
-import org.spine3.server.storage.EntityStorage;
-import org.spine3.server.storage.EntityStorageRecord;
-import org.spine3.server.storage.EntityStorageShould;
+import org.spine3.server.aggregate.Aggregate;
+import org.spine3.server.storage.AggregateStorage;
+import org.spine3.server.storage.AggregateStorageShould;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.test.project.Project;
+import org.spine3.test.project.ProjectId;
 
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
-import static org.spine3.base.Identifiers.newUuid;
 import static org.spine3.server.storage.jdbc.JdbcStorageFactoryShould.newInMemoryDataSource;
+import static org.spine3.testdata.TestAggregateIdFactory.newProjectId;
 
 /**
  * @author Alexander Litus
  */
 @SuppressWarnings("InstanceMethodNamingConvention")
-public class JdbcEntityStorageShould extends EntityStorageShould<String> {
+public class JdbcAggregateStorageShould extends AggregateStorageShould {
 
     @Override
-    protected EntityStorage<String> getStorage() {
-        return getStorage(TestEntityWithStringId.class);
+    protected AggregateStorage<ProjectId> getStorage() {
+        final JdbcAggregateStorage<ProjectId> storage = getStorage(TestAggregateWithMessageId.class);
+        return storage;
     }
 
     @Override
-    protected <I> JdbcEntityStorage<I> getStorage(Class<? extends Entity<I, ?>> entityClass) {
-        final DataSourceWrapper dataSource = newInMemoryDataSource("entityStorageTests");
-        return JdbcEntityStorage.newInstance(dataSource, entityClass, false);
-    }
-
-    @Override
-    protected String newId() {
-        return newUuid();
+    protected <Id> JdbcAggregateStorage<Id> getStorage(Class<? extends Aggregate<Id, ? extends Message, ?>> aggregateClass) {
+        final DataSourceWrapper dataSource = newInMemoryDataSource("aggregateStorageTests");
+        return JdbcAggregateStorage.newInstance(dataSource, aggregateClass, false);
     }
 
     @Test
-    public void close_itself_and_throw_exception_on_read() {
-        final JdbcEntityStorage<String> storage = getStorage(TestEntityWithStringId.class);
+    public void close_itself() {
+        final JdbcAggregateStorage<ProjectId> storage = getStorage(TestAggregateWithMessageId.class);
         storage.close();
         try {
-            storage.readInternal("any-id");
+            storage.historyBackward(newProjectId("anyId"));
         } catch (DatabaseException ignored) {
             // is OK because the storage is closed
             return;
         }
-        fail("Storage must close itself.");
+        fail("Aggregate storage should close itself.");
     }
 
-    @Test
-    public void clear_itself() {
-        final JdbcEntityStorage<String> storage = getStorage(TestEntityWithStringId.class);
-        final String id = newUuid();
-        final EntityStorageRecord record = newStorageRecord();
-        storage.writeInternal(id, record);
-        storage.clear();
-
-        final EntityStorageRecord actual = storage.readInternal(id);
-        assertNull(actual);
-    }
-
-    private static class TestEntityWithStringId extends Entity<String, Project> {
-
-        private TestEntityWithStringId(String id) {
+    private static class TestAggregateWithMessageId extends Aggregate<ProjectId, Project, Project.Builder> {
+        private TestAggregateWithMessageId(ProjectId id) {
             super(id);
         }
     }

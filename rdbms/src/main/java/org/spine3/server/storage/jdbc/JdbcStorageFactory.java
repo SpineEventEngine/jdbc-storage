@@ -21,9 +21,16 @@
 package org.spine3.server.storage.jdbc;
 
 import com.zaxxer.hikari.HikariConfig;
-import org.spine3.server.Entity;
+import org.spine3.server.entity.Entity;
 import org.spine3.server.aggregate.Aggregate;
-import org.spine3.server.storage.*;
+import org.spine3.server.storage.AggregateStorage;
+import org.spine3.server.storage.CommandStorage;
+import org.spine3.server.storage.EntityStorage;
+import org.spine3.server.storage.EventStorage;
+import org.spine3.server.storage.ProjectionStorage;
+import org.spine3.server.storage.StorageFactory;
+import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
+import org.spine3.server.storage.jdbc.util.HikariDataSourceWrapper;
 
 import javax.sql.DataSource;
 
@@ -35,6 +42,7 @@ import javax.sql.DataSource;
 public class JdbcStorageFactory implements StorageFactory {
 
     private final DataSourceWrapper dataSource;
+    private final boolean multitenant;
 
     /**
      * Creates a new instance with the specified data source configuration.
@@ -48,37 +56,38 @@ public class JdbcStorageFactory implements StorageFactory {
     private JdbcStorageFactory(DataSourceConfig config) {
         final HikariConfig hikariConfig = ConfigConverter.toHikariConfig(config);
         this.dataSource = HikariDataSourceWrapper.newInstance(hikariConfig);
+        this.multitenant = config.isMultitenant();
+    }
+
+    @Override
+    public boolean isMultitenant() {
+        return multitenant;
     }
 
     @Override
     public CommandStorage createCommandStorage() {
-        // TODO:2016-01-05:alexander.litus: impl
-        return null;
+        return JdbcCommandStorage.newInstance(dataSource, false);
     }
 
     @Override
     public EventStorage createEventStorage() {
-        // TODO:2016-01-05:alexander.litus: impl
-        return null;
-    }
-
-    /**
-     * NOTE: the parameter is not used.
-     */
-    @Override
-    public <I> AggregateStorage<I> createAggregateStorage(Class<? extends Aggregate<I, ?>> unused) {
-        // TODO:2016-01-05:alexander.litus: impl
-        return null;
+        return JdbcEventStorage.newInstance(dataSource, false);
     }
 
     @Override
-    public <I> EntityStorage<I> createEntityStorage(Class<? extends Entity<I, ?>> entityClass) {
-        return JdbcEntityStorage.newInstance(dataSource, entityClass);
+    public <Id> AggregateStorage<Id> createAggregateStorage(Class<? extends Aggregate<Id, ?, ?>> aggregateClass) {
+        return JdbcAggregateStorage.newInstance(dataSource, aggregateClass, false);
     }
 
     @Override
-    public void init() {
-        // NOP
+    public <Id> EntityStorage<Id> createEntityStorage(Class<? extends Entity<Id, ?>> entityClass) {
+        return JdbcEntityStorage.newInstance(dataSource, entityClass, false);
+    }
+
+    @Override
+    public <Id> ProjectionStorage<Id> createProjectionStorage(Class<? extends Entity<Id, ?>> projectionClass) {
+        final JdbcEntityStorage<Id> entityStorage = JdbcEntityStorage.newInstance(dataSource, projectionClass, false);
+        return JdbcProjectionStorage.newInstance(dataSource, projectionClass, entityStorage, false);
     }
 
     @Override
@@ -88,7 +97,7 @@ public class JdbcStorageFactory implements StorageFactory {
 
     private static class ConfigConverter {
 
-        @SuppressWarnings({"MethodWithMoreThanThreeNegations", "OverlyLongMethod"}) // is OK in this case
+        @SuppressWarnings("MethodWithMoreThanThreeNegations") // is OK in this case
         private static HikariConfig toHikariConfig(DataSourceConfig config) {
             final HikariConfig result = new HikariConfig();
 
