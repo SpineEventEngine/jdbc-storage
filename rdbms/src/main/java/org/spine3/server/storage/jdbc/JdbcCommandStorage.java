@@ -312,9 +312,9 @@ import static org.spine3.validate.Validate.checkNotDefault;
         @SuppressWarnings("DuplicateStringLiteralInspection")
         private static final String UPDATE_QUERY =
                 "UPDATE " + TABLE_NAME +
-                 " SET " + COMMAND_COL + " = ? " +
-                 ", " + COMMAND_STATUS_COL + " = ? " +
-                 " WHERE " + ID_COL + " = ?;";
+                " SET " + COMMAND_COL + " = ? " +
+                ", " + COMMAND_STATUS_COL + " = ? " +
+                " WHERE " + ID_COL + " = ?;";
 
         private static final int RECORD_INDEX_IN_QUERY = 1;
         private static final int COMMAND_STATUS_INDEX_IN_QUERY = 2;
@@ -363,8 +363,8 @@ import static org.spine3.validate.Validate.checkNotDefault;
         @SuppressWarnings("DuplicateStringLiteralInspection")
         private static final String SET_OK_STATUS_QUERY =
                 "UPDATE " + TABLE_NAME +
-                        " SET " + IS_STATUS_OK_COL + " = true " +
-                        " WHERE " + ID_COL + " = ? ;";
+                " SET " + IS_STATUS_OK_COL + " = true " +
+                " WHERE " + ID_COL + " = ? ;";
 
         private final CommandId commandId;
 
@@ -396,10 +396,10 @@ import static org.spine3.validate.Validate.checkNotDefault;
         @SuppressWarnings("DuplicateStringLiteralInspection")
         private static final String SET_ERROR_QUERY =
                 "UPDATE " + TABLE_NAME +
-                        " SET " +
-                        IS_STATUS_OK_COL + " = false, " +
-                        ERROR_COL + " = ? " +
-                        " WHERE " + ID_COL + " = ? ;";
+                " SET " +
+                IS_STATUS_OK_COL + " = false, " +
+                ERROR_COL + " = ? " +
+                " WHERE " + ID_COL + " = ? ;";
 
         private static final int ERROR_INDEX_IN_QUERY = 1;
         private static final int ID_INDEX_IN_QUERY = 2;
@@ -444,10 +444,9 @@ import static org.spine3.validate.Validate.checkNotDefault;
         @SuppressWarnings("DuplicateStringLiteralInspection")
         private static final String SET_FAILURE_QUERY =
                 "UPDATE " + TABLE_NAME +
-                        " SET " +
-                        IS_STATUS_OK_COL + " = false, " +
-                        FAILURE_COL + " = ? " +
-                        " WHERE " + ID_COL + " = ? ;";
+                " SET " + IS_STATUS_OK_COL + " = false, " +
+                FAILURE_COL + " = ? " +
+                " WHERE " + ID_COL + " = ? ;";
 
         private static final int FAILURE_INDEX_IN_QUERY = 1;
         private static final int ID_INDEX_IN_QUERY = 2;
@@ -492,7 +491,7 @@ import static org.spine3.validate.Validate.checkNotDefault;
         @SuppressWarnings("DuplicateStringLiteralInspection")
         private static final String SELECT_QUERY =
                 "SELECT * FROM " + TABLE_NAME +
-                        " WHERE " + ID_COL + " = ?;";
+                " WHERE " + ID_COL + " = ?;";
 
         private SelectCommandByIdQuery() {
             super(SELECT_QUERY, dataSource, new StringIdColumn());
@@ -548,8 +547,8 @@ import static org.spine3.validate.Validate.checkNotDefault;
 
         @SuppressWarnings("DuplicateStringLiteralInspection")
         private static final String SELECT_BY_STATUS_QUERY =
-                "SELECT * FROM " + TABLE_NAME +
-                        " WHERE " + COMMAND_STATUS_COL + " = ?;";
+                "SELECT command FROM " + TABLE_NAME +
+                " WHERE " + COMMAND_STATUS_COL + " = ?;";
 
         private SelectCommandByStatusQuery(CommandStatus status) {
             super(SELECT_BY_STATUS_QUERY, status);
