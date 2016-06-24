@@ -20,53 +20,55 @@
 
 package org.spine3.server.storage.jdbc.util;
 
+import com.google.protobuf.Descriptors.Descriptor;
+import com.google.protobuf.Message;
+import com.google.protobuf.StringValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.spine3.Internal;
 import org.spine3.base.CommandStatus;
 import org.spine3.server.storage.CommandStorageRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
 
+import javax.annotation.Nullable;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public abstract class WriteCommandRecordQuery
-        extends WriteRecordQuery<String, CommandStorageRecord> {
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.spine3.base.Identifiers.idToString;
+import static org.spine3.server.storage.jdbc.util.Serializer.deserialize;
 
-    private final int statusIndexInQuery;
+/**
+ * A query which obtains a {@link Message} by an ID.
+ *
+ * @author Alexander Litus
+ */
+@Internal
+public class SelectByStatusQuery {
+
+    private final String query;
+
     private final CommandStatus status;
 
-    protected WriteCommandRecordQuery(CommandQueryBuilder<? extends CommandQueryBuilder, ? extends WriteCommandRecordQuery> builder) {
-        super(builder);
-        this.statusIndexInQuery = builder.statusIndexInQuery;
-        this.status = builder.status;
+    /**
+     * Creates a new query instance.
+     *
+     * @param query SQL select query which selects a message by an ID (must have one ID parameter to set)
+     */
+    protected SelectByStatusQuery(String query, CommandStatus status) {
+        this.query = query;
+        this.status = status;
     }
 
-    @Override
-    protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
-        final PreparedStatement statement = super.prepareStatement(connection);
+
+    public PreparedStatement prepareStatement(ConnectionWrapper connection) {
+        final PreparedStatement statement = connection.prepareStatement(query);
         try {
-            statement.setString(statusIndexInQuery, status.name());
+            statement.setString(1, status.toString());
         } catch (SQLException e) {
             throw new DatabaseException(e);
         }
         return statement;
-    }
-
-    /**
-     */
-    public abstract static class CommandQueryBuilder<B extends CommandQueryBuilder<B, Query>, Query extends WriteCommandRecordQuery>
-            extends AbstractBuilder<CommandQueryBuilder<B, Query>, Query, String, CommandStorageRecord> {
-
-        private int statusIndexInQuery;
-        private CommandStatus status;
-
-        public CommandQueryBuilder<B, Query> setStatusIndexInQuery(int statusIndexInQuery) {
-            this.statusIndexInQuery = statusIndexInQuery;
-            return getThis();
-        }
-
-        public CommandQueryBuilder<B, Query> setStatus(CommandStatus status) {
-            this.status = status;
-            return getThis();
-        }
-
     }
 }

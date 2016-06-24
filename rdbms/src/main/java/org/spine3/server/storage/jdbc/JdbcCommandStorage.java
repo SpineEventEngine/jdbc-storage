@@ -144,9 +144,9 @@ import static org.spine3.validate.Validate.checkNotDefault;
     public Iterator<CommandStorageRecord> read(CommandStatus status) {
         checkNotNull(status);
         try (ConnectionWrapper connection = dataSource.getConnection(true)) {
-            final SelectCommandByStatusQuery query = new SelectCommandByStatusQuery(status.getNumber());
+            final SelectCommandByStatusQuery query = new SelectCommandByStatusQuery(status);
             final PreparedStatement statement = query.prepareStatement(connection);
-            final DbIterator<CommandStorageRecord> iterator = new DbIterator<>(statement, COMMAND_STATUS_COL, COMMAND_RECORD_DESCRIPTOR);
+            final DbIterator<CommandStorageRecord> iterator = new DbIterator<>(statement, COMMAND_COL, COMMAND_RECORD_DESCRIPTOR);
             return iterator;
         }
     }
@@ -238,7 +238,7 @@ import static org.spine3.validate.Validate.checkNotDefault;
                         ID_COL + " VARCHAR(512), " +
                         COMMAND_COL + " BLOB, " +
                         IS_STATUS_OK_COL + " BOOLEAN, " +
-                        COMMAND_STATUS_COL + " INT, " +
+                        COMMAND_STATUS_COL + " VARCHAR(512), " +
                         ERROR_COL + " BLOB, " +
                         FAILURE_COL + " BLOB, " +
                         " PRIMARY KEY(" + ID_COL + ')' +
@@ -278,7 +278,7 @@ import static org.spine3.validate.Validate.checkNotDefault;
             final String id = commandId.getUuid();
             final InsertCommandQuery build = new Builder()
                     .setStatusIndexInQuery(COMMAND_STATUS_INDEX_IN_QUERY)
-                    .setStatus(record.getStatusValue())
+                    .setStatus(CommandStatus.forNumber(record.getStatusValue()))
                     .setDataSource(dataSource)
                     .setId(id)
                     .setRecord(record)
@@ -308,13 +308,13 @@ import static org.spine3.validate.Validate.checkNotDefault;
         }
     }
 
-    private static class UpdateCommandQuery extends WriteCommandRecordQuery{
+    private static class UpdateCommandQuery extends WriteCommandRecordQuery {
 
         @SuppressWarnings("DuplicateStringLiteralInspection")
         private static final String UPDATE_QUERY =
                 "UPDATE " + TABLE_NAME +
                         " SET " + COMMAND_COL + " = ? " +
-                        " SET " + COMMAND_STATUS_COL + " = ? " +
+                        ", " + COMMAND_STATUS_COL + " = ? " +
                         " WHERE " + ID_COL + " = ?;";
 
         private static final int RECORD_INDEX_IN_QUERY = 1;
@@ -328,7 +328,7 @@ import static org.spine3.validate.Validate.checkNotDefault;
         private static UpdateCommandQuery newInstance(DataSourceWrapper dataSource, CommandId commandId, CommandStorageRecord record) {
             return new Builder()
                     .setStatusIndexInQuery(COMMAND_STATUS_INDEX_IN_QUERY)
-                    .setStatus(record.getStatusValue())
+                    .setStatus(CommandStatus.forNumber(record.getStatusValue()))
                     .setDataSource(dataSource)
                     .setId(commandId.getUuid())
                     .setRecord(record)
@@ -545,28 +545,16 @@ import static org.spine3.validate.Validate.checkNotDefault;
         private final Logger value = LoggerFactory.getLogger(JdbcCommandStorage.class);
     }
 
-    private class SelectCommandByStatusQuery extends WriteQuery {
+    private class SelectCommandByStatusQuery extends SelectByStatusQuery {
 
         @SuppressWarnings("DuplicateStringLiteralInspection")
-        private final String SELECT_BY_STATUS_QUERY;
+        private static final String SELECT_BY_STATUS_QUERY =
+                "SELECT * FROM " + TABLE_NAME  +
+                        " WHERE " + COMMAND_STATUS_COL +" = ?;";
 
-        private SelectCommandByStatusQuery(int statusCode) {
-            super(dataSource);
-            SELECT_BY_STATUS_QUERY =
-                    "SELECT * FROM " + TABLE_NAME +
-                            " WHERE " + COMMAND_STATUS_COL + " = "
-                            + statusCode + ";";
+        private SelectCommandByStatusQuery(CommandStatus status) {
+            super(SELECT_BY_STATUS_QUERY, status);
         }
 
-        @Override
-        protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
-            final PreparedStatement statement = connection.prepareStatement(SELECT_BY_STATUS_QUERY);
-            return statement;
-        }
-
-        @Override
-        protected void logError(SQLException exception) {
-            log().error("failed to read by status", exception);
-        }
     }
 }
