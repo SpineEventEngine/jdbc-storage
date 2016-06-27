@@ -18,11 +18,13 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.spine3.server.storage.jdbc.query;
+package org.spine3.server.storage.jdbc.query.tables.commands;
 
+import org.spine3.base.CommandId;
 import org.spine3.base.CommandStatus;
 import org.spine3.server.storage.CommandStorageRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
+import org.spine3.server.storage.jdbc.query.WriteRecord;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 
 import java.sql.PreparedStatement;
@@ -34,19 +36,17 @@ import java.sql.SQLException;
  * @author Andrey Lavrov
  */
 
-public class WriteRecordCommandRecord extends WriteRecord<String, CommandStorageRecord> {
+public abstract class WriteCommandRecord
+        extends WriteRecord<String, CommandStorageRecord> {
 
+    private int statusIndexInQuery;
     private final CommandStatus status;
-    private final int statusIndexInQuery = 1;
 
-    /**
-     * Creates a new query instance based on the passed builder.
-     */
-    protected WriteRecordCommandRecord(Builder builder) {
+    protected WriteCommandRecord(Builder<? extends Builder, ? extends WriteCommandRecord> builder) {
         super(builder);
+        this.statusIndexInQuery = builder.statusIndexInQuery;
         this.status = builder.status;
     }
-
 
     @Override
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
@@ -59,27 +59,21 @@ public class WriteRecordCommandRecord extends WriteRecord<String, CommandStorage
         return statement;
     }
 
-    Builder newInstance(){
-        return new Builder();
-    }
+    public abstract static class Builder<B extends Builder<B, Q>, Q extends WriteCommandRecord>
+            extends WriteRecord.Builder<B, Q, String, CommandStorageRecord> {
 
-    private class Builder extends WriteRecord.Builder <Builder, WriteRecordCommandRecord, String, CommandStorageRecord> {
-
+        private int statusIndexInQuery;
         private CommandStatus status;
 
-        public Builder status(CommandStatus status) {
+        public Builder<B, Q> setStatusIndexInQuery(int statusIndexInQuery) {
+            this.statusIndexInQuery = statusIndexInQuery;
+            return this.getThis();
+        }
+
+        public Builder<B, Q> setStatus(CommandStatus status) {
             this.status = status;
-            return getThis();
+            return this.getThis();
         }
 
-        @Override
-        public WriteRecordCommandRecord build() {
-            return new WriteRecordCommandRecord(this);
-        }
-
-        @Override
-        protected Builder getThis() {
-            return this;
-        }
     }
 }

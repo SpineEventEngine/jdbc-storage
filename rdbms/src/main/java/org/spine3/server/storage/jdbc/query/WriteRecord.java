@@ -21,6 +21,7 @@
 package org.spine3.server.storage.jdbc.query;
 
 
+import com.google.protobuf.Descriptors;
 import com.google.protobuf.Message;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
@@ -30,18 +31,22 @@ import org.spine3.server.storage.jdbc.util.Serializer;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public abstract class WriteRecord<Id, Record extends Message> extends Abstract {
+public abstract class WriteRecord<Id, Record extends Message> extends Abstract implements Write{
 
     private final Id id;
     private final Record record;
 
-    private int idIndexInQuery = 1;
-    private int recordIndexInQuery = 2;
+    private int idIndexInQuery;
+    private int recordIndexInQuery;
     private final IdColumn<Id> idColumn;
+
+    private String messageColumnName;
+    private Descriptors.Descriptor messageDescriptor;
 
     protected WriteRecord(Builder<? extends Builder, ? extends WriteRecord, Id, Record> builder) {
         super(builder);
-
+        this.idIndexInQuery = builder.idIndexInQuery;
+        this.recordIndexInQuery = builder.recordIndexInQuery;
         this.idColumn = builder.idColumn;
         this.id = builder.id;
         this.record = builder.record;
@@ -60,6 +65,14 @@ public abstract class WriteRecord<Id, Record extends Message> extends Abstract {
         }
     }
 
+    public void setMessageColumnName(String messageColumnName) {
+        this.messageColumnName = messageColumnName;
+    }
+
+    public void setMessageDescriptor(Descriptors.Descriptor messageDescriptor) {
+        this.messageDescriptor = messageDescriptor;
+    }
+
     @Override
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
         final PreparedStatement statement = super.prepareStatement(connection);
@@ -75,8 +88,10 @@ public abstract class WriteRecord<Id, Record extends Message> extends Abstract {
         }
     }
 
-    protected abstract static class Builder<B extends Builder<B, Q, Id, Record>, Q extends WriteRecord, Id, Record extends Message>
+    public abstract static class Builder<B extends Builder<B, Q, Id, Record>, Q extends WriteRecord, Id, Record extends Message>
             extends Abstract.Builder<B, Q>{
+        private int idIndexInQuery;
+        private int recordIndexInQuery;
         private IdColumn<Id> idColumn;
         private Id id;
         private Record record;
@@ -94,6 +109,16 @@ public abstract class WriteRecord<Id, Record extends Message> extends Abstract {
 
         public Builder<B, Q, Id, Record> setIdColumn(IdColumn<Id> idColumn) {
             this.idColumn = idColumn;
+            return getThis();
+        }
+
+        public Builder<B, Q, Id, Record> setIdIndexInQuery(int idIndexInQuery) {
+            this.idIndexInQuery = idIndexInQuery;
+            return getThis();
+        }
+
+        public Builder<B, Q, Id, Record> setRecordIndexInQuery(int recordIndexInQuery) {
+            this.recordIndexInQuery = recordIndexInQuery;
             return getThis();
         }
     }

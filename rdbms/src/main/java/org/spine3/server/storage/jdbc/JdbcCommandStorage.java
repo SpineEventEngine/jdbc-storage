@@ -29,7 +29,8 @@ import org.spine3.base.Error;
 import org.spine3.base.Failure;
 import org.spine3.server.storage.CommandStorage;
 import org.spine3.server.storage.CommandStorageRecord;
-import org.spine3.server.storage.jdbc.query.CreateCommandTableIfNo;
+import org.spine3.server.storage.jdbc.query.tables.commands.CreateCommandTableIfNo;
+import org.spine3.server.storage.jdbc.query.tables.commands.InsertCommandQuery;
 import org.spine3.server.storage.jdbc.util.*;
 import org.spine3.server.storage.jdbc.util.IdColumn.StringIdColumn;
 import org.spine3.validate.Validate;
@@ -170,7 +171,14 @@ import static org.spine3.validate.Validate.checkNotDefault;
         if (containsRecord(commandId)) {
             UpdateCommandQuery.newInstance(dataSource, commandId, record).execute();
         } else {
-            InsertCommandQuery.newInstance(dataSource, commandId, record).execute();
+            InsertCommandQuery.getBuilder()
+                    .setStatus(CommandStatus.forNumber(record.getStatusValue()))
+                    .setId(commandId.getUuid())
+                    .setRecord(record)
+                    .setIdColumn(STRING_ID_COLUMN)
+                    .setDataSource(dataSource)
+                    .build()
+                    .execute();
         }
     }
 
@@ -234,57 +242,6 @@ import static org.spine3.validate.Validate.checkNotDefault;
         }
     }
 
-    private static class InsertCommandQuery extends WriteCommandRecordQuery {
-
-        @SuppressWarnings("DuplicateStringLiteralInspection")
-        private static final String INSERT_QUERY =
-                "INSERT INTO " + TABLE_NAME + " (" +
-                        ID_COL + ", " +
-                        COMMAND_STATUS_COL + ", " +
-                        COMMAND_COL +
-                        ") VALUES (?, ?, ?);";
-
-        private static final int ID_INDEX_IN_QUERY = 1;
-        private static final int COMMAND_STATUS_INDEX_IN_QUERY = 2;
-        private static final int RECORD_INDEX_IN_QUERY = 3;
-
-        private InsertCommandQuery(Builder builder) {
-            super(builder);
-        }
-
-        public static InsertCommandQuery newInstance(DataSourceWrapper dataSource, CommandId commandId, CommandStorageRecord record) {
-            final String id = commandId.getUuid();
-            final InsertCommandQuery build = new Builder()
-                    .setStatusIndexInQuery(COMMAND_STATUS_INDEX_IN_QUERY)
-                    .setStatus(CommandStatus.forNumber(record.getStatusValue()))
-                    .setDataSource(dataSource)
-                    .setId(id)
-                    .setRecord(record)
-                    .setQuery(INSERT_QUERY)
-                    .setIdIndexInQuery(ID_INDEX_IN_QUERY)
-                    .setRecordIndexInQuery(RECORD_INDEX_IN_QUERY).setIdColumn(STRING_ID_COLUMN)
-                    .build();
-            return build;
-        }
-
-        private static class Builder extends CommandQueryBuilder<Builder, InsertCommandQuery> {
-
-            @Override
-            public InsertCommandQuery build() {
-                return new InsertCommandQuery(this);
-            }
-
-            @Override
-            protected Builder getThis() {
-                return this;
-            }
-        }
-
-        @Override
-        protected void logError(SQLException exception) {
-            log(exception, "command insertion", getId());
-        }
-    }
 
     private static class UpdateCommandQuery extends WriteCommandRecordQuery {
 

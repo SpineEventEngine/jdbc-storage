@@ -34,29 +34,22 @@ import java.sql.ResultSet;
 /**
  * @author Andrey Lavrov
  */
-public abstract class Abstract{
+public abstract class Abstract implements Write{
 
     private final String query;
     protected final DataSourceWrapper dataSource;
-
-    private String messageColumnName;
-    private Descriptors.Descriptor messageDescriptor;
 
     protected Abstract(Builder<? extends Builder, ? extends Abstract> builder) {
         this.query = builder.query;
         this.dataSource = builder.dataSource;
     }
 
-    public void setMessageColumnName(String messageColumnName) {
-        this.messageColumnName = messageColumnName;
-    }
-
-    public void setMessageDescriptor(Descriptors.Descriptor messageDescriptor) {
-        this.messageDescriptor = messageDescriptor;
-    }
-
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
         return connection.prepareStatement(query);
+    }
+
+    public String getQuery() {
+        return query;
     }
 
     public abstract static class Builder<B extends Builder<B, Q>, Q extends Abstract> {
