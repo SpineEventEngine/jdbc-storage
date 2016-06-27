@@ -20,41 +20,44 @@
 
 package org.spine3.server.storage.jdbc.query;
 
+
 import com.google.protobuf.Message;
-import org.spine3.Internal;
 import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.util.*;
+import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
+import org.spine3.server.storage.jdbc.util.IdColumn;
+import org.spine3.server.storage.jdbc.util.Serializer;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-/**
- * A query which is executed in order to write a {@link Message} record to the data source.
- *
- * @param <Id> a type of record IDs
- * @param <Record> a type of records to write
- * @author Alexander Litus
- */
-@Internal
-public abstract class WriteRecord<Id, Record extends Message> extends Write {
+public abstract class WriteRecord<Id, Record extends Message> extends Abstract {
 
     private final Id id;
     private final Record record;
 
-    private final int idIndexInQuery;
-    private final int recordIndexInQuery;
+    private int idIndexInQuery = 1;
+    private int recordIndexInQuery = 2;
     private final IdColumn<Id> idColumn;
 
-    /**
-     * Creates a new query instance based on the passed builder.
-     */
-    protected WriteRecord(Builder<? extends Builder, ? extends WriteRecord<Id, Record>, Id, Record> builder) {
+    protected WriteRecord(Builder<? extends Builder, ? extends WriteRecord, Id, Record> builder) {
         super(builder);
-        this.idIndexInQuery = builder.idIndexInQuery;
-        this.recordIndexInQuery = builder.recordIndexInQuery;
+
         this.idColumn = builder.idColumn;
         this.id = builder.id;
         this.record = builder.record;
+    }
+
+    public void execute() throws DatabaseException {
+        try (ConnectionWrapper connection = this.dataSource.getConnection(false)) {
+            try (PreparedStatement statement = prepareStatement(connection)) {
+                statement.execute();
+                connection.commit();
+            } catch (SQLException e) {
+                // logError(e);
+                connection.rollback();
+                throw new DatabaseException(e);
+            }
+        }
     }
 
     @Override
@@ -72,35 +75,12 @@ public abstract class WriteRecord<Id, Record extends Message> extends Write {
         }
     }
 
-    protected Id getId() {
-        return id;
-    }
-
-
-    protected abstract static class Builder<B extends Builder<B, Q, Id, Record>, Q extends WriteRecord<Id, Record>, Id, Record extends Message>
-            extends Write.Builder<B, Q>{
-
-        private int idIndexInQuery;
-        private int recordIndexInQuery;
+    protected abstract static class Builder<B extends Builder<B, Q, Id, Record>, Q extends WriteRecord, Id, Record extends Message>
+            extends Abstract.Builder<B, Q>{
         private IdColumn<Id> idColumn;
         private Id id;
         private Record record;
 
-
-        public Builder<B, Q, Id, Record> setIdIndexInQuery(int idIndexInQuery) {
-            this.idIndexInQuery = idIndexInQuery;
-            return getThis();
-        }
-
-        public Builder<B, Q, Id, Record> setRecordIndexInQuery(int recordIndexInQuery) {
-            this.recordIndexInQuery = recordIndexInQuery;
-            return getThis();
-        }
-
-        public Builder<B, Q, Id, Record> setIdColumn(IdColumn<Id> idColumn) {
-            this.idColumn = idColumn;
-            return getThis();
-        }
 
         public Builder<B, Q, Id, Record> setId(Id id) {
             this.id = id;
@@ -111,5 +91,11 @@ public abstract class WriteRecord<Id, Record extends Message> extends Write {
             this.record = record;
             return getThis();
         }
+
+        public Builder<B, Q, Id, Record> setIdColumn(IdColumn<Id> idColumn) {
+            this.idColumn = idColumn;
+            return getThis();
+        }
     }
+
 }

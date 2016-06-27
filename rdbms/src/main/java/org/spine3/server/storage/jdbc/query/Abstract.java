@@ -34,7 +34,7 @@ import java.sql.ResultSet;
 /**
  * @author Andrey Lavrov
  */
-public abstract class Abstract<M extends Message> implements Query<M> {
+public abstract class Abstract{
 
     private final String query;
     protected final DataSourceWrapper dataSource;
@@ -56,8 +56,7 @@ public abstract class Abstract<M extends Message> implements Query<M> {
     }
 
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
-        final PreparedStatement statement = connection.prepareStatement(query);
-        return statement;
+        return connection.prepareStatement(query);
     }
 
     public abstract static class Builder<B extends Builder<B, Q>, Q extends Abstract> {
@@ -65,7 +64,7 @@ public abstract class Abstract<M extends Message> implements Query<M> {
         private DataSourceWrapper dataSource;
         private String query;
 
-        public abstract Query build();
+        public abstract Q build();
 
         protected abstract B getThis();
 

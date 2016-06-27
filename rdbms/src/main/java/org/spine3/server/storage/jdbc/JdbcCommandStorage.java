@@ -29,6 +29,7 @@ import org.spine3.base.Error;
 import org.spine3.base.Failure;
 import org.spine3.server.storage.CommandStorage;
 import org.spine3.server.storage.CommandStorageRecord;
+import org.spine3.server.storage.jdbc.query.CreateCommandTableIfNo;
 import org.spine3.server.storage.jdbc.util.*;
 import org.spine3.server.storage.jdbc.util.IdColumn.StringIdColumn;
 import org.spine3.validate.Validate;
@@ -112,7 +113,11 @@ import static org.spine3.validate.Validate.checkNotDefault;
     private JdbcCommandStorage(DataSourceWrapper dataSource, boolean multitenant) throws DatabaseException {
         super(multitenant);
         this.dataSource = dataSource;
-        CreateTableIfDoesNotExistQuery.execute(dataSource);
+        CreateCommandTableIfNo
+                .getBuilder()
+                .setDataSource(dataSource)
+                .build()
+                .execute();
     }
 
     /**
@@ -228,32 +233,6 @@ import static org.spine3.validate.Validate.checkNotDefault;
             throw new DatabaseException(e);
         }
     }
-
-    private static class CreateTableIfDoesNotExistQuery {
-
-        @SuppressWarnings("DuplicateStringLiteralInspection")
-        private static final String CREATE_TABLE_QUERY =
-                "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" +
-                        ID_COL + " VARCHAR(512), " +
-                        COMMAND_COL + " BLOB, " +
-                        IS_STATUS_OK_COL + " BOOLEAN, " +
-                        COMMAND_STATUS_COL + " VARCHAR(512), " +
-                        ERROR_COL + " BLOB, " +
-                        FAILURE_COL + " BLOB, " +
-                        " PRIMARY KEY(" + ID_COL + ')' +
-                        ");";
-
-        private static void execute(DataSourceWrapper dataSource) throws DatabaseException {
-            try (ConnectionWrapper connection = dataSource.getConnection(true);
-                 PreparedStatement statement = connection.prepareStatement(CREATE_TABLE_QUERY)) {
-                statement.execute();
-            } catch (SQLException e) {
-                log().error("Exception during table creation:", e);
-                throw new DatabaseException(e);
-            }
-        }
-    }
-
 
     private static class InsertCommandQuery extends WriteCommandRecordQuery {
 

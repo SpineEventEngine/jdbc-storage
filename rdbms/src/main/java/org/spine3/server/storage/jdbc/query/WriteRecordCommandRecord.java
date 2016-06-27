@@ -24,7 +24,6 @@ import org.spine3.base.CommandStatus;
 import org.spine3.server.storage.CommandStorageRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
-import org.spine3.server.storage.jdbc.util.WriteCommandRecordQuery;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -35,17 +34,16 @@ import java.sql.SQLException;
  * @author Andrey Lavrov
  */
 
-public class WriteCommandRecord extends WriteRecord<String, CommandStorageRecord> {
+public class WriteRecordCommandRecord extends WriteRecord<String, CommandStorageRecord> {
 
     private final CommandStatus status;
-    private final int statusIndexInQuery;
+    private final int statusIndexInQuery = 1;
 
     /**
      * Creates a new query instance based on the passed builder.
      */
-    protected WriteCommandRecord(Builder builder) {
+    protected WriteRecordCommandRecord(Builder builder) {
         super(builder);
-        this.statusIndexInQuery = builder.statusIndexInQuery;
         this.status = builder.status;
     }
 
@@ -61,25 +59,22 @@ public class WriteCommandRecord extends WriteRecord<String, CommandStorageRecord
         return statement;
     }
 
+    Builder newInstance(){
+        return new Builder();
+    }
 
-    public static class Builder extends WriteRecord.Builder <Builder, WriteCommandRecord, String, CommandStorageRecord> {
+    private class Builder extends WriteRecord.Builder <Builder, WriteRecordCommandRecord, String, CommandStorageRecord> {
 
-        private int statusIndexInQuery;
         private CommandStatus status;
 
-        public Builder setStatusIndexInQuery(int statusIndexInQuery) {
-            this.statusIndexInQuery = statusIndexInQuery;
-            return getThis();
-        }
-
-        public Builder setStatus(CommandStatus status) {
+        public Builder status(CommandStatus status) {
             this.status = status;
             return getThis();
         }
 
         @Override
-        public Query build() {
-            return new WriteCommandRecord(this);
+        public WriteRecordCommandRecord build() {
+            return new WriteRecordCommandRecord(this);
         }
 
         @Override
