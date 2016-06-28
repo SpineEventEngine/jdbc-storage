@@ -15,7 +15,6 @@ public class CreateCommandTableIfNo extends Abstract implements Write {
             "CREATE TABLE IF NOT EXISTS " + CommandTable.TABLE_NAME + " (" +
                     CommandTable.ID_COL + " VARCHAR(512), " +
                     CommandTable.COMMAND_COL + " BLOB, " +
-                    CommandTable.IS_STATUS_OK_COL + " BOOLEAN, " +
                     CommandTable.COMMAND_STATUS_COL + " VARCHAR(512), " +
                     CommandTable.ERROR_COL + " BLOB, " +
                     CommandTable.FAILURE_COL + " BLOB, " +

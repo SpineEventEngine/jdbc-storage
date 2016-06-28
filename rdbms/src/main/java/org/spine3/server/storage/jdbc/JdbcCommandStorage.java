@@ -76,11 +76,6 @@ import static org.spine3.validate.Validate.checkNotDefault;
     /**
      * Is command status OK column name.
      */
-    private static final String IS_STATUS_OK_COL = "status_ok";
-
-    /**
-     * Is command status OK column name.
-     */
     private static final String COMMAND_STATUS_COL = "command_status";
 
     /**
@@ -256,46 +251,12 @@ import static org.spine3.validate.Validate.checkNotDefault;
         }
     }
 
-   /* private class SetOkStatusQuery extends WriteQuery {
-
-        @SuppressWarnings("DuplicateStringLiteralInspection")
-        private static final String SET_OK_STATUS_QUERY =
-                "UPDATE " + TABLE_NAME +
-                " SET " + IS_STATUS_OK_COL + " = true " +
-                " WHERE " + ID_COL + " = ? ;";
-
-        private final CommandId commandId;
-
-        private SetOkStatusQuery(CommandId commandId) {
-            super(dataSource);
-            this.commandId = commandId;
-        }
-
-        @Override
-        protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
-            final PreparedStatement statement = connection.prepareStatement(SET_OK_STATUS_QUERY);
-            final String id = commandId.getUuid();
-            try {
-                statement.setString(1, id);
-            } catch (SQLException e) {
-                throw new DatabaseException(e);
-            }
-            return statement;
-        }
-
-        @Override
-        protected void logError(SQLException exception) {
-            log(exception, "setting OK command status", commandId.getUuid());
-        }
-    }
-*/
     private static class SetErrorQuery extends WriteRecordQuery<String, Error> {
 
         @SuppressWarnings("DuplicateStringLiteralInspection")
         private static final String SET_ERROR_QUERY =
                 "UPDATE " + TABLE_NAME +
                 " SET " +
-                IS_STATUS_OK_COL + " = false, " +
                 ERROR_COL + " = ? " +
                 " WHERE " + ID_COL + " = ? ;";
 
@@ -342,7 +303,7 @@ import static org.spine3.validate.Validate.checkNotDefault;
         @SuppressWarnings("DuplicateStringLiteralInspection")
         private static final String SET_FAILURE_QUERY =
                 "UPDATE " + TABLE_NAME +
-                " SET " + IS_STATUS_OK_COL + " = false, " +
+                " SET " +
                 FAILURE_COL + " = ? " +
                 " WHERE " + ID_COL + " = ? ;";
 
@@ -405,8 +366,8 @@ import static org.spine3.validate.Validate.checkNotDefault;
             }
             final CommandStorageRecord record = deserialize(recordBytes, COMMAND_RECORD_DESCRIPTOR);
             final CommandStorageRecord.Builder builder = record.toBuilder();
-            final boolean isStatusOk = resultSet.getBoolean(IS_STATUS_OK_COL);
-            if (isStatusOk) {
+            final String status = resultSet.getString(COMMAND_STATUS_COL);
+            if (status.equals(CommandStatus.forNumber(CommandStatus.OK_VALUE).name())) {
                 return builder.setStatus(CommandStatus.OK).build();
             }
             final byte[] errorBytes = resultSet.getBytes(ERROR_COL);

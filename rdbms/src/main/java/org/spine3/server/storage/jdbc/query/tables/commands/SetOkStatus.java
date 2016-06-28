@@ -5,7 +5,7 @@ import org.spine3.server.storage.jdbc.query.UpdateRecord;
 import org.spine3.server.storage.jdbc.query.constants.CommandTable;
 
 
-public class SetOkStatus extends UpdateRecord {
+public class SetOkStatus extends UpdateRecord<String> {
 
     private static final String SET_OK_STATUS_QUERY =
             "UPDATE " + CommandTable.TABLE_NAME +
