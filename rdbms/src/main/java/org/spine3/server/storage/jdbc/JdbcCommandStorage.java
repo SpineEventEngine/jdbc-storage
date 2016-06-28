@@ -66,7 +66,7 @@ import static org.spine3.validate.Validate.checkNotDefault;
     private JdbcCommandStorage(DataSourceWrapper dataSource, boolean multitenant) throws DatabaseException {
         super(multitenant);
         this.dataSource = dataSource;
-        CreateCommandTableIfNo
+        CreateTableIfDoesNotExistQuery
                 .getBuilder()
                 .setDataSource(dataSource)
                 .build()

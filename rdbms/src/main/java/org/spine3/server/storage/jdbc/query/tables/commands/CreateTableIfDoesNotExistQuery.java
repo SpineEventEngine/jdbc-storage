@@ -9,7 +9,7 @@ import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public class CreateCommandTableIfNo extends Abstract implements Write {
+public class CreateTableIfDoesNotExistQuery extends Abstract implements Write {
 
     private static final String INSERT_QUERY =
             "CREATE TABLE IF NOT EXISTS " + CommandTable.TABLE_NAME + " (" +
@@ -21,11 +21,11 @@ public class CreateCommandTableIfNo extends Abstract implements Write {
                     " PRIMARY KEY(" + CommandTable.ID_COL + ')' +
                     ");";
 
-    public CreateCommandTableIfNo(Builder builder) {
+    public CreateTableIfDoesNotExistQuery(Builder builder) {
         super(builder);
     }
 
-    public static Builder getBuilder(){
+    public static Builder getBuilder() {
         Builder builder = new Builder();
         builder.setQuery(INSERT_QUERY);
         return builder;
@@ -41,11 +41,11 @@ public class CreateCommandTableIfNo extends Abstract implements Write {
         }
     }
 
-    public static class Builder extends Abstract.Builder<Builder, CreateCommandTableIfNo>{
+    public static class Builder extends Abstract.Builder<Builder, CreateTableIfDoesNotExistQuery> {
 
         @Override
-        public CreateCommandTableIfNo build() {
-            return new CreateCommandTableIfNo(this);
+        public CreateTableIfDoesNotExistQuery build() {
+            return new CreateTableIfDoesNotExistQuery(this);
         }
 
         @Override

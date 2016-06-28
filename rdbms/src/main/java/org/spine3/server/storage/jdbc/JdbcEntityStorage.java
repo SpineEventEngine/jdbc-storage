@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.spine3.server.entity.Entity;
 import org.spine3.server.storage.EntityStorage;
 import org.spine3.server.storage.EntityStorageRecord;
+import org.spine3.server.storage.jdbc.query.tables.entity.CreateTableIfDoesNotExistQuery;
 import org.spine3.server.storage.jdbc.util.*;
 
 import javax.annotation.Nullable;
@@ -91,7 +92,12 @@ import static org.spine3.base.Identifiers.idToString;
         this.selectByIdQuery = new SelectEntityByIdQuery(tableName);
         this.deleteAllQuery = new DeleteAllQuery(tableName);
 
-        new CreateTableIfDoesNotExistQuery().execute(tableName);
+        CreateTableIfDoesNotExistQuery.getBuilder()
+                .setDataSource(dataSource)
+                .setIdType(idColumn.getColumnDataType())
+                .setTableName(tableName)
+                .build()
+                .execute();
     }
 
     /**
@@ -273,29 +279,6 @@ import static org.spine3.base.Identifiers.idToString;
         public PreparedStatement statement(ConnectionWrapper connection) {
             final PreparedStatement statement = connection.prepareStatement(deleteAllQuery);
             return statement;
-        }
-    }
-
-    private class CreateTableIfDoesNotExistQuery {
-
-        @SuppressWarnings("DuplicateStringLiteralInspection")
-        private static final String CREATE_TABLE_IF_DOES_NOT_EXIST =
-                "CREATE TABLE IF NOT EXISTS %s (" +
-                    ID_COL + " %s, " +
-                    ENTITY_COL + " BLOB, " +
-                    "PRIMARY KEY(" + ID_COL + ')' +
-                ");";
-
-        private void execute(String tableName) throws DatabaseException {
-            final String idColumnType = idColumn.getColumnDataType();
-            final String createTableSql = format(CREATE_TABLE_IF_DOES_NOT_EXIST, tableName, idColumnType);
-            try (ConnectionWrapper connection = dataSource.getConnection(true);
-                 PreparedStatement statement = connection.prepareStatement(createTableSql)) {
-                statement.execute();
-            } catch (SQLException e) {
-                log().error("Error while creating a table with the name: " + tableName, e);
-                throw new DatabaseException(e);
-            }
         }
     }
 

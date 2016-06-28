@@ -70,6 +70,22 @@ public abstract class IdColumn<Id> {
         return helper;
     }
 
+    public static <Id> IdColumn<Id> newInstance(String idType) {
+        final IdColumn<Id> helper;
+        if (idType.equals(TYPE_BIGINT)) {
+            @SuppressWarnings("unchecked") // is checked already
+            final IdColumn<Id> longIdColumn = (IdColumn<Id>) new LongIdColumn();
+            helper = longIdColumn;
+        } else if (idType.equals(TYPE_INT)) {
+            @SuppressWarnings("unchecked") // is checked already
+            final IdColumn<Id> intIdColumn = (IdColumn<Id>) new IntIdColumn();
+            helper = intIdColumn;
+        } else {
+            helper = new StringOrMessageIdColumn<>();
+        }
+        return helper;
+    }
+
     /**
      * Returns the SQL data type string of the ID column, e.g. {@code "BIGINT"}, {@code "VARCHAR(999)"}, etc.
      */
