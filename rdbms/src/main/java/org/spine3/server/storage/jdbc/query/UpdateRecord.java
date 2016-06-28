@@ -49,17 +49,17 @@ public class UpdateRecord <Id> extends Abstract implements Write{
         private IdColumn<Id> idColumn;
         private Id id;
 
-        public Builder<B, Q, Id> setId(Id id) {
+        public B setId(Id id) {
             this.id = id;
             return getThis();
         }
 
-        public Builder<B, Q, Id> setIdColumn(IdColumn<Id> idColumn) {
+        public B setIdColumn(IdColumn<Id> idColumn) {
             this.idColumn = idColumn;
             return getThis();
         }
 
-        public Builder<B, Q, Id> setIdIndexInQuery(int idIndexInQuery) {
+        public B setIdIndexInQuery(int idIndexInQuery) {
             this.idIndexInQuery = idIndexInQuery;
             return getThis();
         }

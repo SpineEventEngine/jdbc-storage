@@ -97,27 +97,27 @@ public abstract class WriteRecord<Id, Record extends Message> extends Abstract i
         private Record record;
 
 
-        public Builder<B, Q, Id, Record> setId(Id id) {
+        public B setId(Id id) {
             this.id = id;
             return getThis();
         }
 
-        public Builder<B, Q, Id, Record> setRecord(Record record) {
+        public B setRecord(Record record) {
             this.record = record;
             return getThis();
         }
 
-        public Builder<B, Q, Id, Record> setIdColumn(IdColumn<Id> idColumn) {
+        public B setIdColumn(IdColumn<Id> idColumn) {
             this.idColumn = idColumn;
             return getThis();
         }
 
-        public Builder<B, Q, Id, Record> setIdIndexInQuery(int idIndexInQuery) {
+        public B setIdIndexInQuery(int idIndexInQuery) {
             this.idIndexInQuery = idIndexInQuery;
             return getThis();
         }
 
-        public Builder<B, Q, Id, Record> setRecordIndexInQuery(int recordIndexInQuery) {
+        public B setRecordIndexInQuery(int recordIndexInQuery) {
             this.recordIndexInQuery = recordIndexInQuery;
             return getThis();
         }

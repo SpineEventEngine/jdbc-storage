@@ -34,7 +34,7 @@ import java.sql.ResultSet;
 /**
  * @author Andrey Lavrov
  */
-public abstract class Abstract implements Write{
+public abstract class Abstract{
 
     private final String query;
     protected final DataSourceWrapper dataSource;
@@ -61,12 +61,12 @@ public abstract class Abstract implements Write{
 
         protected abstract B getThis();
 
-        public Builder<B, Q> setDataSource(DataSourceWrapper dataSource) {
+        public B setDataSource(DataSourceWrapper dataSource) {
             this.dataSource = dataSource;
             return getThis();
         }
 
-        public Builder<B, Q> setQuery(String query) {
+        public B setQuery(String query) {
             this.query = query;
             return getThis();
         }

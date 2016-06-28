@@ -3,7 +3,7 @@ package org.spine3.server.storage.jdbc.query.tables.commands;
 import org.spine3.server.storage.jdbc.query.constants.CommandTable;
 
 
-public class InsertCommand extends WriteCommandRecord {
+public class InsertCommandQuery extends WriteCommandRecord {
 
     private static final String INSERT_QUERY =
             "INSERT INTO " + CommandTable.TABLE_NAME + " (" +
@@ -12,7 +12,7 @@ public class InsertCommand extends WriteCommandRecord {
                     CommandTable.COMMAND_COL +
                     ") VALUES (?, ?, ?);";
 
-    private InsertCommand(Builder builder) {
+    private InsertCommandQuery(Builder builder) {
         super(builder);
     }
 
@@ -29,11 +29,11 @@ public class InsertCommand extends WriteCommandRecord {
         return builder;
     }
 
-    public static class Builder extends WriteCommandRecord.Builder<Builder, InsertCommand> {
+    public static class Builder extends WriteCommandRecord.Builder<Builder, InsertCommandQuery> {
 
         @Override
-        public InsertCommand build() {
-            return new InsertCommand(this);
+        public InsertCommandQuery build() {
+            return new InsertCommandQuery(this);
         }
 
         @Override

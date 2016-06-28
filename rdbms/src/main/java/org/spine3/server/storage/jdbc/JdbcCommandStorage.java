@@ -20,7 +20,6 @@
 
 package org.spine3.server.storage.jdbc;
 
-import com.google.protobuf.Descriptors.Descriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spine3.base.CommandId;
@@ -29,19 +28,17 @@ import org.spine3.base.Error;
 import org.spine3.base.Failure;
 import org.spine3.server.storage.CommandStorage;
 import org.spine3.server.storage.CommandStorageRecord;
+import org.spine3.server.storage.jdbc.query.constants.CommandTable;
 import org.spine3.server.storage.jdbc.query.tables.commands.*;
+import org.spine3.server.storage.jdbc.query.tables.commands.SelectByStatusQuery;
 import org.spine3.server.storage.jdbc.util.*;
-import org.spine3.server.storage.jdbc.util.IdColumn.StringIdColumn;
 import org.spine3.validate.Validate;
 
-import javax.annotation.Nullable;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Iterator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.spine3.server.storage.jdbc.util.Serializer.deserialize;
 import static org.spine3.validate.Validate.checkNotDefault;
 
 /**
@@ -52,45 +49,6 @@ import static org.spine3.validate.Validate.checkNotDefault;
  */
 @SuppressWarnings("UtilityClass")
 /* package */ class JdbcCommandStorage extends CommandStorage {
-
-    /**
-     * Commands table name.
-     */
-    private static final String TABLE_NAME = "commands";
-
-    /**
-     * Command ID column name.
-     */
-    private static final String ID_COL = "id";
-
-    /**
-     * Command record column name.
-     */
-    private static final String COMMAND_COL = "command";
-
-    private static final Descriptor COMMAND_RECORD_DESCRIPTOR = CommandStorageRecord.getDescriptor();
-
-    /**
-     * Is command status OK column name.
-     */
-    private static final String COMMAND_STATUS_COL = "command_status";
-
-    /**
-     * Command error column name.
-     */
-    private static final String ERROR_COL = "error";
-
-    private static final Descriptor ERROR_DESCRIPTOR = Error.getDescriptor();
-
-    /**
-     * Command failure column name.
-     */
-    private static final String FAILURE_COL = "failure";
-
-    private static final Descriptor FAILURE_DESCRIPTOR = Failure.getDescriptor();
-
-    private static final StringIdColumn STRING_ID_COLUMN = new StringIdColumn();
-
     private final DataSourceWrapper dataSource;
 
     /**
@@ -125,8 +83,8 @@ import static org.spine3.validate.Validate.checkNotDefault;
     public CommandStorageRecord read(CommandId commandId) throws DatabaseException {
         checkNotClosed();
 
-        final SelectCommandByIdQuery query = new SelectCommandByIdQuery();
-        final CommandStorageRecord record = query.execute(commandId.getUuid());
+        final SelectCommandById query = new SelectCommandById(dataSource, commandId.getUuid());
+        final CommandStorageRecord record = query.execute();
         if (record == null) {
             return CommandStorageRecord.getDefaultInstance();
         }
@@ -143,9 +101,13 @@ import static org.spine3.validate.Validate.checkNotDefault;
     public Iterator<CommandStorageRecord> read(CommandStatus status) {
         checkNotNull(status);
         try (ConnectionWrapper connection = dataSource.getConnection(true)) {
-            final SelectCommandByStatusQuery query = new SelectCommandByStatusQuery(status);
-            final PreparedStatement statement = query.prepareStatement(connection);
-            final DbIterator<CommandStorageRecord> iterator = new DbIterator<>(statement, COMMAND_COL, COMMAND_RECORD_DESCRIPTOR);
+            ResultSet resultSet = SelectByStatusQuery.getBuilder()
+                    .setDataSource(dataSource)
+                    .setStatus(status)
+                    .build()
+                    .execute();
+
+            final DbIterator<CommandStorageRecord> iterator = new DbIterator<>(resultSet, CommandTable.COMMAND_COL, CommandTable.COMMAND_RECORD_DESCRIPTOR);
             return iterator;
         }
     }
@@ -162,22 +124,23 @@ import static org.spine3.validate.Validate.checkNotDefault;
         checkNotDefault(record);
         checkNotClosed();
 
+        CommandStatus status = CommandStatus.forNumber(record.getStatusValue());
         if (containsRecord(commandId)) {
-            UpdateCommand.getBuilder()
-                    .setStatus(CommandStatus.forNumber(record.getStatusValue()))
+            UpdateCommandQuery.getBuilder()
+                    .setDataSource(dataSource)
+                    .setIdColumn(CommandTable.STRING_ID_COLUMN)
                     .setId(commandId.getUuid())
                     .setRecord(record)
-                    .setIdColumn(STRING_ID_COLUMN)
-                    .setDataSource(dataSource)
+                    .setStatus(status)
                     .build()
                     .execute();
         } else {
-            InsertCommand.getBuilder()
-                    .setStatus(CommandStatus.forNumber(record.getStatusValue()))
+            InsertCommandQuery.getBuilder()
+                    .setDataSource(dataSource)
+                    .setIdColumn(CommandTable.STRING_ID_COLUMN)
                     .setId(commandId.getUuid())
                     .setRecord(record)
-                    .setIdColumn(STRING_ID_COLUMN)
-                    .setDataSource(dataSource)
+                    .setStatus(status)
                     .build()
                     .execute();
         }
@@ -201,9 +164,9 @@ import static org.spine3.validate.Validate.checkNotDefault;
         checkNotClosed();
 
         SetOkStatus.getBuilder()
-                .setIdColumn(STRING_ID_COLUMN)
-                .setId(commandId.getUuid())
                 .setDataSource(this.dataSource)
+                .setIdColumn(CommandTable.STRING_ID_COLUMN)
+                .setId(commandId.getUuid())
                 .build()
                 .execute();
     }
@@ -221,10 +184,10 @@ import static org.spine3.validate.Validate.checkNotDefault;
         checkNotClosed();
 
         SetError.getBuilder()
-                .setRecord(error)
-                .setId(commandId.getUuid())
-                .setIdColumn(STRING_ID_COLUMN)
                 .setDataSource(dataSource)
+                .setIdColumn(CommandTable.STRING_ID_COLUMN)
+                .setId(commandId.getUuid())
+                .setRecord(error)
                 .build()
                 .execute();
     }
@@ -242,10 +205,10 @@ import static org.spine3.validate.Validate.checkNotDefault;
         checkNotClosed();
 
         SetFailure.getBuilder()
-                .setRecord(failure)
-                .setId(commandId.getUuid())
-                .setIdColumn(STRING_ID_COLUMN)
                 .setDataSource(dataSource)
+                .setIdColumn(CommandTable.STRING_ID_COLUMN)
+                .setId(commandId.getUuid())
+                .setRecord(failure)
                 .build()
                 .execute();
     }
@@ -257,49 +220,6 @@ import static org.spine3.validate.Validate.checkNotDefault;
             super.close();
         } catch (Exception e) {
             throw new DatabaseException(e);
-        }
-    }
-
-    private class SelectCommandByIdQuery extends SelectByIdQuery<String, CommandStorageRecord> {
-
-        @SuppressWarnings("DuplicateStringLiteralInspection")
-        private static final String SELECT_QUERY =
-                "SELECT * FROM " + TABLE_NAME +
-                " WHERE " + ID_COL + " = ?;";
-
-        private SelectCommandByIdQuery() {
-            super(SELECT_QUERY, dataSource, new StringIdColumn());
-        }
-
-        @Nullable
-        @Override
-        @SuppressWarnings("RefusedBequest")
-        protected CommandStorageRecord readMessage(ResultSet resultSet) throws SQLException {
-            final byte[] recordBytes = resultSet.getBytes(COMMAND_COL);
-            if (recordBytes == null) {
-                return null;
-            }
-            final CommandStorageRecord record = deserialize(recordBytes, COMMAND_RECORD_DESCRIPTOR);
-            final CommandStorageRecord.Builder builder = record.toBuilder();
-            final String status = resultSet.getString(COMMAND_STATUS_COL);
-            if (status.equals(CommandStatus.forNumber(CommandStatus.OK_VALUE).name())) {
-                return builder.setStatus(CommandStatus.OK).build();
-            }
-            final byte[] errorBytes = resultSet.getBytes(ERROR_COL);
-            if (errorBytes != null) {
-                final Error error = deserialize(errorBytes, ERROR_DESCRIPTOR);
-                return builder.setError(error)
-                        .setStatus(CommandStatus.ERROR)
-                        .build();
-            }
-            final byte[] failureBytes = resultSet.getBytes(FAILURE_COL);
-            if (failureBytes != null) {
-                final Failure failure = deserialize(failureBytes, FAILURE_DESCRIPTOR);
-                return builder.setFailure(failure)
-                        .setStatus(CommandStatus.FAILURE)
-                        .build();
-            }
-            return builder.build();
         }
     }
 
@@ -315,17 +235,5 @@ import static org.spine3.validate.Validate.checkNotDefault;
         INSTANCE;
         @SuppressWarnings("NonSerializableFieldInSerializableClass")
         private final Logger value = LoggerFactory.getLogger(JdbcCommandStorage.class);
-    }
-
-    private static class SelectCommandByStatusQuery extends SelectByStatusQuery {
-
-        @SuppressWarnings("DuplicateStringLiteralInspection")
-        private static final String SELECT_BY_STATUS_QUERY =
-                "SELECT " +  COMMAND_COL + " FROM " + TABLE_NAME +
-                " WHERE " + COMMAND_STATUS_COL + " = ?;";
-
-        private SelectCommandByStatusQuery(CommandStatus status) {
-            super(SELECT_BY_STATUS_QUERY, status);
-        }
     }
 }

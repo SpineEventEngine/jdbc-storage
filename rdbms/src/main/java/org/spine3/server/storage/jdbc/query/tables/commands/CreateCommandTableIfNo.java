@@ -11,7 +11,7 @@ import java.sql.SQLException;
 
 public class CreateCommandTableIfNo extends Abstract implements Write {
 
-    private static final String insertQuery =
+    private static final String INSERT_QUERY =
             "CREATE TABLE IF NOT EXISTS " + CommandTable.TABLE_NAME + " (" +
                     CommandTable.ID_COL + " VARCHAR(512), " +
                     CommandTable.COMMAND_COL + " BLOB, " +
@@ -27,7 +27,7 @@ public class CreateCommandTableIfNo extends Abstract implements Write {
 
     public static Builder getBuilder(){
         Builder builder = new Builder();
-        builder.setQuery(insertQuery);
+        builder.setQuery(INSERT_QUERY);
         return builder;
     }
 

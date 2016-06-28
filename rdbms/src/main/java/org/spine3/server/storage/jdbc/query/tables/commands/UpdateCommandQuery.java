@@ -3,7 +3,7 @@ package org.spine3.server.storage.jdbc.query.tables.commands;
 import org.spine3.server.storage.jdbc.query.constants.CommandTable;
 
 
-public class UpdateCommand extends WriteCommandRecord {
+public class UpdateCommandQuery extends WriteCommandRecord {
 
     private static final String UPDATE_QUERY =
             "UPDATE " + CommandTable.TABLE_NAME +
@@ -11,7 +11,7 @@ public class UpdateCommand extends WriteCommandRecord {
                     ", " + CommandTable.COMMAND_STATUS_COL + " = ? " +
                     " WHERE " + CommandTable.ID_COL + " = ?;";
 
-    private UpdateCommand(Builder builder) {
+    private UpdateCommandQuery(Builder builder) {
         super(builder);
     }
 
@@ -28,11 +28,11 @@ public class UpdateCommand extends WriteCommandRecord {
         return builder;
     }
 
-    public static class Builder extends WriteCommandRecord.Builder<Builder, UpdateCommand> {
+    public static class Builder extends WriteCommandRecord.Builder<Builder, UpdateCommandQuery> {
 
         @Override
-        public UpdateCommand build() {
-            return new UpdateCommand(this);
+        public UpdateCommandQuery build() {
+            return new UpdateCommandQuery(this);
         }
 
         @Override
