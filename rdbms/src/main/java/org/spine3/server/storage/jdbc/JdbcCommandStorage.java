@@ -29,10 +29,7 @@ import org.spine3.base.Error;
 import org.spine3.base.Failure;
 import org.spine3.server.storage.CommandStorage;
 import org.spine3.server.storage.CommandStorageRecord;
-import org.spine3.server.storage.jdbc.query.tables.commands.CreateCommandTableIfNo;
-import org.spine3.server.storage.jdbc.query.tables.commands.InsertCommand;
-import org.spine3.server.storage.jdbc.query.tables.commands.SetOkStatus;
-import org.spine3.server.storage.jdbc.query.tables.commands.UpdateCommand;
+import org.spine3.server.storage.jdbc.query.tables.commands.*;
 import org.spine3.server.storage.jdbc.util.*;
 import org.spine3.server.storage.jdbc.util.IdColumn.StringIdColumn;
 import org.spine3.validate.Validate;
@@ -223,7 +220,13 @@ import static org.spine3.validate.Validate.checkNotDefault;
         checkNotNull(error);
         checkNotClosed();
 
-        SetErrorQuery.newInstance(dataSource, commandId, error).execute();
+        SetError.getBuilder()
+                .setRecord(error)
+                .setId(commandId.getUuid())
+                .setIdColumn(STRING_ID_COLUMN)
+                .setDataSource(dataSource)
+                .build()
+                .execute();
     }
 
     /**
@@ -238,7 +241,13 @@ import static org.spine3.validate.Validate.checkNotDefault;
         checkNotNull(failure);
         checkNotClosed();
 
-        SetFailureQuery.newInstance(dataSource, commandId, failure).execute();
+        SetFailure.getBuilder()
+                .setRecord(failure)
+                .setId(commandId.getUuid())
+                .setIdColumn(STRING_ID_COLUMN)
+                .setDataSource(dataSource)
+                .build()
+                .execute();
     }
 
     @Override
@@ -248,100 +257,6 @@ import static org.spine3.validate.Validate.checkNotDefault;
             super.close();
         } catch (Exception e) {
             throw new DatabaseException(e);
-        }
-    }
-
-    private static class SetErrorQuery extends WriteRecordQuery<String, Error> {
-
-        @SuppressWarnings("DuplicateStringLiteralInspection")
-        private static final String SET_ERROR_QUERY =
-                "UPDATE " + TABLE_NAME +
-                " SET " +
-                ERROR_COL + " = ? " +
-                " WHERE " + ID_COL + " = ? ;";
-
-        private static final int ERROR_INDEX_IN_QUERY = 1;
-        private static final int ID_INDEX_IN_QUERY = 2;
-
-        private SetErrorQuery(Builder builder) {
-            super(builder);
-        }
-
-        private static SetErrorQuery newInstance(DataSourceWrapper dataSource, CommandId commandId, Error error) {
-            return new Builder()
-                    .setDataSource(dataSource)
-                    .setId(commandId.getUuid())
-                    .setRecord(error)
-                    .build();
-        }
-
-        private static class Builder extends AbstractBuilder<Builder, SetErrorQuery, String, Error> {
-
-            @Override
-            public SetErrorQuery build() {
-                setQuery(SET_ERROR_QUERY);
-                setIdIndexInQuery(ID_INDEX_IN_QUERY);
-                setRecordIndexInQuery(ERROR_INDEX_IN_QUERY);
-                setIdColumn(STRING_ID_COLUMN);
-                return new SetErrorQuery(this);
-            }
-
-            @Override
-            protected Builder getThis() {
-                return this;
-            }
-        }
-
-        @Override
-        protected void logError(SQLException exception) {
-            log(exception, "setting error command status", getId());
-        }
-    }
-
-    private static class SetFailureQuery extends WriteRecordQuery<String, Failure> {
-
-        @SuppressWarnings("DuplicateStringLiteralInspection")
-        private static final String SET_FAILURE_QUERY =
-                "UPDATE " + TABLE_NAME +
-                " SET " +
-                FAILURE_COL + " = ? " +
-                " WHERE " + ID_COL + " = ? ;";
-
-        private static final int FAILURE_INDEX_IN_QUERY = 1;
-        private static final int ID_INDEX_IN_QUERY = 2;
-
-        private SetFailureQuery(Builder builder) {
-            super(builder);
-        }
-
-        private static SetFailureQuery newInstance(DataSourceWrapper dataSource, CommandId commandId, Failure failure) {
-            return new Builder()
-                    .setDataSource(dataSource)
-                    .setId(commandId.getUuid())
-                    .setRecord(failure)
-                    .build();
-        }
-
-        private static class Builder extends AbstractBuilder<Builder, SetFailureQuery, String, Failure> {
-
-            @Override
-            public SetFailureQuery build() {
-                setQuery(SET_FAILURE_QUERY);
-                setIdIndexInQuery(ID_INDEX_IN_QUERY);
-                setRecordIndexInQuery(FAILURE_INDEX_IN_QUERY);
-                setIdColumn(STRING_ID_COLUMN);
-                return new SetFailureQuery(this);
-            }
-
-            @Override
-            protected Builder getThis() {
-                return this;
-            }
-        }
-
-        @Override
-        protected void logError(SQLException exception) {
-            log(exception, "setting failure command status", getId());
         }
     }
 
