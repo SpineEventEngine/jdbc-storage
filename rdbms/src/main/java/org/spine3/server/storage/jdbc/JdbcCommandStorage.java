@@ -30,7 +30,9 @@ import org.spine3.base.Failure;
 import org.spine3.server.storage.CommandStorage;
 import org.spine3.server.storage.CommandStorageRecord;
 import org.spine3.server.storage.jdbc.query.tables.commands.CreateCommandTableIfNo;
-import org.spine3.server.storage.jdbc.query.tables.commands.InsertCommandQuery;
+import org.spine3.server.storage.jdbc.query.tables.commands.InsertCommand;
+import org.spine3.server.storage.jdbc.query.tables.commands.SetOkStatus;
+import org.spine3.server.storage.jdbc.query.tables.commands.UpdateCommand;
 import org.spine3.server.storage.jdbc.util.*;
 import org.spine3.server.storage.jdbc.util.IdColumn.StringIdColumn;
 import org.spine3.validate.Validate;
@@ -169,9 +171,16 @@ import static org.spine3.validate.Validate.checkNotDefault;
         checkNotClosed();
 
         if (containsRecord(commandId)) {
-            UpdateCommandQuery.newInstance(dataSource, commandId, record).execute();
+            UpdateCommand.getBuilder()
+                    .setStatus(CommandStatus.forNumber(record.getStatusValue()))
+                    .setId(commandId.getUuid())
+                    .setRecord(record)
+                    .setIdColumn(STRING_ID_COLUMN)
+                    .setDataSource(dataSource)
+                    .build()
+                    .execute();
         } else {
-            InsertCommandQuery.getBuilder()
+            InsertCommand.getBuilder()
                     .setStatus(CommandStatus.forNumber(record.getStatusValue()))
                     .setId(commandId.getUuid())
                     .setRecord(record)
@@ -199,7 +208,12 @@ import static org.spine3.validate.Validate.checkNotDefault;
         checkNotNull(commandId);
         checkNotClosed();
 
-        new SetOkStatusQuery(commandId).execute();
+        SetOkStatus.getBuilder()
+                .setIdColumn(STRING_ID_COLUMN)
+                .setId(commandId.getUuid())
+                .setDataSource(this.dataSource)
+                .build()
+                .execute();
     }
 
     /**
@@ -242,59 +256,7 @@ import static org.spine3.validate.Validate.checkNotDefault;
         }
     }
 
-
-    private static class UpdateCommandQuery extends WriteCommandRecordQuery {
-
-        @SuppressWarnings("DuplicateStringLiteralInspection")
-        private static final String UPDATE_QUERY =
-                "UPDATE " + TABLE_NAME +
-                " SET " + COMMAND_COL + " = ? " +
-                ", " + COMMAND_STATUS_COL + " = ? " +
-                " WHERE " + ID_COL + " = ?;";
-
-        private static final int RECORD_INDEX_IN_QUERY = 1;
-        private static final int COMMAND_STATUS_INDEX_IN_QUERY = 2;
-        private static final int ID_INDEX_IN_QUERY = 3;
-
-        private UpdateCommandQuery(Builder builder) {
-            super(builder);
-        }
-
-        private static UpdateCommandQuery newInstance(DataSourceWrapper dataSource, CommandId commandId, CommandStorageRecord record) {
-            return new Builder()
-                    .setStatusIndexInQuery(COMMAND_STATUS_INDEX_IN_QUERY)
-                    .setStatus(CommandStatus.forNumber(record.getStatusValue()))
-                    .setDataSource(dataSource)
-                    .setId(commandId.getUuid())
-                    .setRecord(record)
-                    .setQuery(UPDATE_QUERY)
-                    .setIdIndexInQuery(ID_INDEX_IN_QUERY)
-                    .setRecordIndexInQuery(RECORD_INDEX_IN_QUERY)
-                    .setIdColumn(STRING_ID_COLUMN)
-                    .build();
-        }
-
-        private static class Builder extends CommandQueryBuilder<Builder, UpdateCommandQuery> {
-
-            @Override
-            public UpdateCommandQuery build() {
-
-                return new UpdateCommandQuery(this);
-            }
-
-            @Override
-            protected CommandQueryBuilder<Builder, UpdateCommandQuery> getThis() {
-                return this;
-            }
-        }
-
-        @Override
-        protected void logError(SQLException exception) {
-            log(exception, "updating command", getId());
-        }
-    }
-
-    private class SetOkStatusQuery extends WriteQuery {
+   /* private class SetOkStatusQuery extends WriteQuery {
 
         @SuppressWarnings("DuplicateStringLiteralInspection")
         private static final String SET_OK_STATUS_QUERY =
@@ -326,7 +288,7 @@ import static org.spine3.validate.Validate.checkNotDefault;
             log(exception, "setting OK command status", commandId.getUuid());
         }
     }
-
+*/
     private static class SetErrorQuery extends WriteRecordQuery<String, Error> {
 
         @SuppressWarnings("DuplicateStringLiteralInspection")

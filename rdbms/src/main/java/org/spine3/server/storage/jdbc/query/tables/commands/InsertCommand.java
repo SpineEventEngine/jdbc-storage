@@ -2,10 +2,8 @@ package org.spine3.server.storage.jdbc.query.tables.commands;
 
 import org.spine3.server.storage.jdbc.query.constants.CommandTable;
 
-import java.sql.SQLException;
 
-
-public class InsertCommandQuery extends WriteCommandRecord {
+public class InsertCommand extends WriteCommandRecord {
 
     private static final String INSERT_QUERY =
             "INSERT INTO " + CommandTable.TABLE_NAME + " (" +
@@ -14,7 +12,7 @@ public class InsertCommandQuery extends WriteCommandRecord {
                     CommandTable.COMMAND_COL +
                     ") VALUES (?, ?, ?);";
 
-    private InsertCommandQuery(Builder builder) {
+    private InsertCommand(Builder builder) {
         super(builder);
     }
 
@@ -31,11 +29,11 @@ public class InsertCommandQuery extends WriteCommandRecord {
         return builder;
     }
 
-    public static class Builder extends WriteCommandRecord.Builder<Builder, InsertCommandQuery> {
+    public static class Builder extends WriteCommandRecord.Builder<Builder, InsertCommand> {
 
         @Override
-        public InsertCommandQuery build() {
-            return new InsertCommandQuery(this);
+        public InsertCommand build() {
+            return new InsertCommand(this);
         }
 
         @Override
