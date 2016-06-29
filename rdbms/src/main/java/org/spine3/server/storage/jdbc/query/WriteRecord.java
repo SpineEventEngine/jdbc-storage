@@ -34,14 +34,16 @@ import java.sql.SQLException;
 public abstract class WriteRecord<Id, Record extends Message> extends AbstractQuery implements Write{
 
     private final Id id;
+
+    public Record getRecord() {
+        return record;
+    }
+
     private final Record record;
 
-    private int idIndexInQuery;
-    private int recordIndexInQuery;
+    private final int idIndexInQuery;
+    private final int recordIndexInQuery;
     private final IdColumn<Id> idColumn;
-
-    private String messageColumnName;
-    private Descriptors.Descriptor messageDescriptor;
 
     protected WriteRecord(Builder<? extends Builder, ? extends WriteRecord, Id, Record> builder) {
         super(builder);
@@ -52,6 +54,7 @@ public abstract class WriteRecord<Id, Record extends Message> extends AbstractQu
         this.record = builder.record;
     }
 
+    @Override
     public void execute() throws DatabaseException {
         try (ConnectionWrapper connection = this.dataSource.getConnection(false)) {
             try (PreparedStatement statement = prepareStatement(connection)) {
@@ -63,14 +66,6 @@ public abstract class WriteRecord<Id, Record extends Message> extends AbstractQu
                 throw new DatabaseException(e);
             }
         }
-    }
-
-    public void setMessageColumnName(String messageColumnName) {
-        this.messageColumnName = messageColumnName;
-    }
-
-    public void setMessageDescriptor(Descriptors.Descriptor messageDescriptor) {
-        this.messageDescriptor = messageDescriptor;
     }
 
     @Override

@@ -81,7 +81,7 @@ public class  SelectByStatusQuery extends AbstractQuery implements ReadMany {
 
     @Override
     public ResultSet execute() throws DatabaseException {
-        ResultSet resultSet;
+        final ResultSet resultSet;
         try (ConnectionWrapper connection = dataSource.getConnection(true)) {
             final PreparedStatement statement = this.prepareStatement(connection);
             resultSet = statement.executeQuery();
