@@ -25,17 +25,14 @@ import org.slf4j.LoggerFactory;
 import org.spine3.server.entity.Entity;
 import org.spine3.server.storage.EntityStorage;
 import org.spine3.server.storage.EntityStorageRecord;
-import org.spine3.server.storage.jdbc.query.tables.entity.CreateTableIfDoesNotExistQuery;
+import org.spine3.server.storage.jdbc.query.tables.entity.*;
 import org.spine3.server.storage.jdbc.util.*;
 
 import javax.annotation.Nullable;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.protobuf.Descriptors.Descriptor;
 import static java.lang.String.format;
-import static org.spine3.base.Identifiers.idToString;
 
 /**
  * The implementation of the entity storage based on the RDBMS.
@@ -46,25 +43,9 @@ import static org.spine3.base.Identifiers.idToString;
  */
 /*package*/ class JdbcEntityStorage<Id> extends EntityStorage<Id> {
 
-    /**
-     * Entity record column name.
-     */
-    private static final String ENTITY_COL = "entity";
-
-    /**
-     * Entity ID column name.
-     */
-    private static final String ID_COL = "id";
-
-    private static final Descriptor RECORD_DESCRIPTOR = EntityStorageRecord.getDescriptor();
-    private static final IdColumn.StringIdColumn STRING_ID_COLUMN = new IdColumn.StringIdColumn();
-
     private final DataSourceWrapper dataSource;
 
     private final IdColumn<Id> idColumn;
-
-    private final SelectEntityByIdQuery selectByIdQuery;
-    private final DeleteAllQuery deleteAllQuery;
 
     private final String tableName;
 
@@ -89,8 +70,6 @@ import static org.spine3.base.Identifiers.idToString;
         this.dataSource = dataSource;
         this.idColumn = IdColumn.newInstance(entityClass);
         this.tableName = DbTableNameFactory.newTableName(entityClass);
-        this.selectByIdQuery = new SelectEntityByIdQuery(tableName);
-        this.deleteAllQuery = new DeleteAllQuery(tableName);
 
         CreateTableIfDoesNotExistQuery.getBuilder()
                 .setDataSource(dataSource)
@@ -108,7 +87,7 @@ import static org.spine3.base.Identifiers.idToString;
     @Nullable
     @Override
     protected EntityStorageRecord readInternal(Id id) throws DatabaseException {
-        final EntityStorageRecord record = selectByIdQuery.execute(id);
+        final EntityStorageRecord record = new SelectEntityByIdQuery<>(tableName, dataSource, idColumn, id).execute();
         return record;
     }
 
@@ -123,14 +102,26 @@ import static org.spine3.base.Identifiers.idToString;
         checkArgument(record.hasState(), "entity state");
 
         if (containsRecord(id)) {
-            newUpdateEntityQuery(id, record).execute();
+            UpdateEntityQuery.<Id>getBuilder(tableName)
+                    .setIdColumn(idColumn)
+                    .setId(id)
+                    .setRecord(record)
+                    .setDataSource(dataSource)
+                    .build()
+                    .execute();
         } else {
-            newInsertEntityQuery(id, record).execute();
+            InsertEntityQuery.<Id>getBuilder(tableName)
+                    .setId(id)
+                    .setIdColumn(idColumn)
+                    .setRecord(record)
+                    .setDataSource(dataSource)
+                    .build()
+                    .execute();
         }
     }
 
     private boolean containsRecord(Id id) throws DatabaseException {
-        final EntityStorageRecord record = selectByIdQuery.execute(id);
+        final EntityStorageRecord record = new SelectEntityByIdQuery<>(tableName, dataSource, idColumn, id).execute();
         final boolean contains = record != null;
         return contains;
     }
@@ -151,137 +142,11 @@ import static org.spine3.base.Identifiers.idToString;
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     /*package*/ void clear() throws DatabaseException {
-        try (ConnectionWrapper connection = dataSource.getConnection(true);
-             final PreparedStatement statement = deleteAllQuery.statement(connection)) {
-            statement.execute();
-        } catch (SQLException e) {
-            throw new DatabaseException(e);
-        }
-    }
-
-    private InsertEntityQuery<Id> newInsertEntityQuery(Id id, EntityStorageRecord record) {
-        return new InsertEntityQuery.Builder<Id>()
+        DeleteAllQuery.getBuilder(tableName)
                 .setDataSource(dataSource)
-                .setQuery(format(InsertEntityQuery.INSERT_QUERY, tableName))
-                .setIdColumn(idColumn)
-                .setId(id)
-                .setRecord(record)
-                .build();
+                .build()
+                .execute();
     }
-
-    private UpdateEntityQuery<Id> newUpdateEntityQuery(Id id, EntityStorageRecord record) {
-        return new UpdateEntityQuery.Builder<Id>()
-                .setDataSource(dataSource)
-                .setQuery(format(UpdateEntityQuery.UPDATE_QUERY, tableName))
-                .setIdColumn(idColumn)
-                .setId(id)
-                .setRecord(record)
-                .build();
-    }
-
-    private static class InsertEntityQuery<Id> extends WriteRecordQuery<Id, EntityStorageRecord> {
-
-        @SuppressWarnings("DuplicateStringLiteralInspection")
-        private static final String INSERT_QUERY =
-                "INSERT INTO %s " +
-                " (" + ID_COL + ", " + ENTITY_COL + ')' +
-                " VALUES (?, ?);";
-
-        private static final int ID_INDEX_IN_QUERY = 1;
-        private static final int ENTITY_INDEX_IN_QUERY = 2;
-
-        private InsertEntityQuery(Builder<Id> builder) {
-            super(builder);
-        }
-
-        private static class Builder<Id> extends AbstractBuilder<Builder<Id>, InsertEntityQuery<Id>, Id, EntityStorageRecord> {
-
-            @Override
-            public InsertEntityQuery<Id> build() {
-                setIdIndexInQuery(ID_INDEX_IN_QUERY);
-                setRecordIndexInQuery(ENTITY_INDEX_IN_QUERY);
-                return new InsertEntityQuery<>(this);
-            }
-
-            @SuppressWarnings("unchecked")
-            @Override
-            protected Builder getThis() {
-                return this;
-            }
-        }
-
-        @Override
-        protected void logError(SQLException e) {
-            final String id = idToString(getId());
-            log().error("Failed to insert entity record, ID: " + id, e);
-        }
-    }
-
-    private static class UpdateEntityQuery<Id> extends WriteRecordQuery<Id, EntityStorageRecord> {
-
-        @SuppressWarnings("DuplicateStringLiteralInspection")
-        private static final String UPDATE_QUERY =
-                "UPDATE %s " +
-                " SET " + ENTITY_COL + " = ? " +
-                " WHERE " + ID_COL + " = ?;";
-
-        private static final int ENTITY_INDEX_IN_QUERY = 1;
-        private static final int ID_INDEX_IN_QUERY = 2;
-
-        private UpdateEntityQuery(Builder<Id> builder) {
-            super(builder);
-        }
-
-        private static class Builder<Id> extends AbstractBuilder<Builder<Id>, UpdateEntityQuery<Id>, Id, EntityStorageRecord> {
-
-            @Override
-            public UpdateEntityQuery<Id> build() {
-                setIdIndexInQuery(ID_INDEX_IN_QUERY);
-                setRecordIndexInQuery(ENTITY_INDEX_IN_QUERY);
-                return new UpdateEntityQuery<>(this);
-            }
-
-            @Override
-            protected Builder<Id> getThis() {
-                return this;
-            }
-        }
-
-        @Override
-        protected void logError(SQLException exception) {
-            final String id = idToString(getId());
-            log().error("Failed to update entity record, ID: " + id, exception);
-        }
-    }
-
-    private class SelectEntityByIdQuery extends SelectByIdQuery<Id, EntityStorageRecord> {
-
-        @SuppressWarnings("DuplicateStringLiteralInspection")
-        private static final String SELECT_BY_ID = "SELECT " + ENTITY_COL + " FROM %s WHERE " + ID_COL + " = ?;";
-
-        private SelectEntityByIdQuery(String tableName) {
-            super(format(SELECT_BY_ID, tableName), dataSource, idColumn);
-            setMessageColumnName(ENTITY_COL);
-            setMessageDescriptor(RECORD_DESCRIPTOR);
-        }
-    }
-
-    private static class DeleteAllQuery {
-
-        private static final String DELETE_ALL = "DELETE FROM %s ;";
-
-        private final String deleteAllQuery;
-
-        private DeleteAllQuery(String tableName) {
-            this.deleteAllQuery = format(DELETE_ALL, tableName);
-        }
-
-        public PreparedStatement statement(ConnectionWrapper connection) {
-            final PreparedStatement statement = connection.prepareStatement(deleteAllQuery);
-            return statement;
-        }
-    }
-
     private static Logger log() {
         return LogSingleton.INSTANCE.value;
     }

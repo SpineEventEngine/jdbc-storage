@@ -1,11 +1,8 @@
 package org.spine3.server.storage.jdbc.query.tables.entity;
 
 import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.query.Abstract;
-import org.spine3.server.storage.jdbc.query.Write;
-import org.spine3.server.storage.jdbc.query.constants.CommandTable;
+import org.spine3.server.storage.jdbc.query.AbstractQuery;
 import org.spine3.server.storage.jdbc.query.constants.EntityTable;
-import org.spine3.server.storage.jdbc.query.tables.commands.UpdateCommandQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
@@ -14,7 +11,7 @@ import java.sql.SQLException;
 
 import static java.lang.String.format;
 
-public class CreateTableIfDoesNotExistQuery extends Abstract{
+public class CreateTableIfDoesNotExistQuery extends AbstractQuery {
 
     private final IdColumn idColumn;
     private final String tableName;
@@ -46,12 +43,12 @@ public class CreateTableIfDoesNotExistQuery extends Abstract{
     }
 
     public static Builder getBuilder() {
-        Builder builder = new Builder();
+        final Builder builder = new Builder();
         builder.setQuery(CREATE_TABLE_IF_DOES_NOT_EXIST);
         return builder;
     }
 
-    public static class Builder extends Abstract.Builder<Builder, CreateTableIfDoesNotExistQuery> {
+    public static class Builder extends AbstractQuery.Builder<Builder, CreateTableIfDoesNotExistQuery> {
 
         private String idType;
         private String tableName;

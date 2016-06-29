@@ -3,8 +3,9 @@ package org.spine3.server.storage.jdbc.query.tables.commands;
 import org.spine3.server.storage.jdbc.query.constants.CommandTable;
 
 
-public class UpdateCommandQuery extends WriteCommandRecord {
+public class UpdateCommandQuery extends WriteCommandRecordQuery {
 
+    @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String UPDATE_QUERY =
             "UPDATE " + CommandTable.TABLE_NAME +
                     " SET " + CommandTable.COMMAND_COL + " = ? " +
@@ -20,7 +21,7 @@ public class UpdateCommandQuery extends WriteCommandRecord {
     }*/
 
     public static Builder getBuilder() {
-        Builder builder = new Builder();
+        final Builder builder = new Builder();
         builder.setStatusIndexInQuery(2)
                 .setIdIndexInQuery(3)
                 .setRecordIndexInQuery(1)
@@ -28,7 +29,7 @@ public class UpdateCommandQuery extends WriteCommandRecord {
         return builder;
     }
 
-    public static class Builder extends WriteCommandRecord.Builder<Builder, UpdateCommandQuery> {
+    public static class Builder extends WriteCommandRecordQuery.Builder<Builder, UpdateCommandQuery> {
 
         @Override
         public UpdateCommandQuery build() {

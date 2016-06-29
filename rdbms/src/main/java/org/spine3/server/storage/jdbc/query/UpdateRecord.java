@@ -1,6 +1,5 @@
 package org.spine3.server.storage.jdbc.query;
 
-import com.google.protobuf.Descriptors;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
@@ -8,7 +7,7 @@ import org.spine3.server.storage.jdbc.util.IdColumn;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public class UpdateRecord <Id> extends Abstract implements Write{
+public class UpdateRecord <Id> extends AbstractQuery implements Write{
 
     private final Id id;
     private int idIndexInQuery;
@@ -21,6 +20,7 @@ public class UpdateRecord <Id> extends Abstract implements Write{
         this.id = builder.id;
     }
 
+    @Override
     public void execute() throws DatabaseException {
         try (ConnectionWrapper connection = this.dataSource.getConnection(false)) {
             try (PreparedStatement statement = prepareStatement(connection)) {
@@ -44,7 +44,7 @@ public class UpdateRecord <Id> extends Abstract implements Write{
     }
 
     public abstract static class Builder<B extends Builder<B, Q, Id>, Q extends UpdateRecord, Id>
-            extends Abstract.Builder<B, Q>{
+            extends AbstractQuery.Builder<B, Q>{
         private int idIndexInQuery;
         private IdColumn<Id> idColumn;
         private Id id;

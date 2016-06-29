@@ -31,7 +31,7 @@ import org.spine3.server.storage.jdbc.util.Serializer;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public abstract class WriteRecord<Id, Record extends Message> extends Abstract implements Write{
+public abstract class WriteRecord<Id, Record extends Message> extends AbstractQuery implements Write{
 
     private final Id id;
     private final Record record;
@@ -89,7 +89,7 @@ public abstract class WriteRecord<Id, Record extends Message> extends Abstract i
     }
 
     public abstract static class Builder<B extends Builder<B, Q, Id, Record>, Q extends WriteRecord, Id, Record extends Message>
-            extends Abstract.Builder<B, Q>{
+            extends AbstractQuery.Builder<B, Q>{
         private int idIndexInQuery;
         private int recordIndexInQuery;
         private IdColumn<Id> idColumn;

@@ -25,7 +25,7 @@ import org.spine3.Internal;
 import org.spine3.base.Command;
 import org.spine3.base.CommandStatus;
 import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.query.Abstract;
+import org.spine3.server.storage.jdbc.query.AbstractQuery;
 import org.spine3.server.storage.jdbc.query.ReadMany;
 import org.spine3.server.storage.jdbc.query.constants.CommandTable;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
@@ -42,9 +42,10 @@ import java.sql.SQLException;
  */
 
 @Internal
-public class SelectByStatusQuery extends Abstract implements ReadMany {
+public class  SelectByStatusQuery extends AbstractQuery implements ReadMany {
     private final CommandStatus status;
 
+    @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String SELECT_BY_STATUS_QUERY =
             "SELECT " +  CommandTable.COMMAND_COL + " FROM " + CommandTable.TABLE_NAME +
                     " WHERE " + CommandTable.COMMAND_STATUS_COL + " = ?;";
@@ -59,7 +60,7 @@ public class SelectByStatusQuery extends Abstract implements ReadMany {
     }
 
     public static Builder getBuilder() {
-        Builder builder = new Builder();
+        final Builder builder = new Builder();
         builder.setQuery(SELECT_BY_STATUS_QUERY);
         return builder;
     }
@@ -67,6 +68,7 @@ public class SelectByStatusQuery extends Abstract implements ReadMany {
     /**
      * Prepares SQL statement using the connection.
      */
+    @Override
     public PreparedStatement prepareStatement(ConnectionWrapper connection) {
         final PreparedStatement statement = super.prepareStatement(connection);
         try {
@@ -79,17 +81,17 @@ public class SelectByStatusQuery extends Abstract implements ReadMany {
 
     @Override
     public ResultSet execute() throws DatabaseException {
-        ResultSet resultSet = null;
+        ResultSet resultSet;
         try (ConnectionWrapper connection = dataSource.getConnection(true)) {
             final PreparedStatement statement = this.prepareStatement(connection);
             resultSet = statement.executeQuery();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException(e);
         }
         return resultSet;
     }
 
-    public static class Builder extends Abstract.Builder<Builder, SelectByStatusQuery> {
+    public static class Builder extends AbstractQuery.Builder<Builder, SelectByStatusQuery> {
 
         private CommandStatus status;
 

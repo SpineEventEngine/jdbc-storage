@@ -5,14 +5,15 @@ import org.spine3.server.storage.jdbc.query.UpdateRecord;
 import org.spine3.server.storage.jdbc.query.constants.CommandTable;
 
 
-public class SetOkStatus extends UpdateRecord<String> {
+public class SetOkStatusQuery extends UpdateRecord<String> {
 
+    @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String SET_OK_STATUS_QUERY =
             "UPDATE " + CommandTable.TABLE_NAME +
             " SET " + CommandTable.COMMAND_STATUS_COL + " = '" + CommandStatus.forNumber(CommandStatus.OK_VALUE).name() + "'" +
             " WHERE " + CommandTable.ID_COL + " = ? ;";
 
-    private SetOkStatus(Builder builder) {
+    private SetOkStatusQuery(Builder builder) {
         super(builder);
     }
 
@@ -21,17 +22,17 @@ public class SetOkStatus extends UpdateRecord<String> {
     }*/
 
     public static Builder getBuilder() {
-        Builder builder = new Builder();
+        final Builder builder = new Builder();
         builder.setIdIndexInQuery(1)
                .setQuery(SET_OK_STATUS_QUERY);
         return builder;
     }
 
-    public static class Builder extends UpdateRecord.Builder<Builder, SetOkStatus, String> {
+    public static class Builder extends UpdateRecord.Builder<Builder, SetOkStatusQuery, String> {
 
         @Override
-        public SetOkStatus build() {
-            return new SetOkStatus(this);
+        public SetOkStatusQuery build() {
+            return new SetOkStatusQuery(this);
         }
 
         @Override

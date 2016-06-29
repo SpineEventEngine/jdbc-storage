@@ -20,7 +20,6 @@
 
 package org.spine3.server.storage.jdbc.query.tables.commands;
 
-import org.spine3.base.CommandId;
 import org.spine3.base.CommandStatus;
 import org.spine3.server.storage.CommandStorageRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
@@ -36,13 +35,13 @@ import java.sql.SQLException;
  * @author Andrey Lavrov
  */
 
-public abstract class WriteCommandRecord
+public abstract class WriteCommandRecordQuery
         extends WriteRecord<String, CommandStorageRecord> {
 
-    private int statusIndexInQuery;
+    private final int statusIndexInQuery;
     private final CommandStatus status;
 
-    protected WriteCommandRecord(Builder<? extends Builder, ? extends WriteCommandRecord> builder) {
+    protected WriteCommandRecordQuery(Builder<? extends Builder, ? extends WriteCommandRecordQuery> builder) {
         super(builder);
         this.statusIndexInQuery = builder.statusIndexInQuery;
         this.status = builder.status;
@@ -59,7 +58,7 @@ public abstract class WriteCommandRecord
         return statement;
     }
 
-    public abstract static class Builder<B extends Builder<B, Q>, Q extends WriteCommandRecord>
+    public abstract static class Builder<B extends Builder<B, Q>, Q extends WriteCommandRecordQuery>
             extends WriteRecord.Builder<B, Q, String, CommandStorageRecord> {
 
         private int statusIndexInQuery;

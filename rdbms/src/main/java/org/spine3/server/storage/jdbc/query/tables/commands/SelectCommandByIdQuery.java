@@ -37,14 +37,14 @@ import java.sql.SQLException;
 import static org.spine3.server.storage.jdbc.util.Serializer.deserialize;
 
 @Internal
-public class SelectCommandById extends SelectById<String, CommandStorageRecord> {
+public class SelectCommandByIdQuery extends SelectById<String, CommandStorageRecord> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String SELECT_QUERY =
                     "SELECT * FROM " + CommandTable.TABLE_NAME +
                     " WHERE " + CommandTable.ID_COL + " = ?;";
 
-    public SelectCommandById(DataSourceWrapper dataSource, String id) {
+    public SelectCommandByIdQuery(DataSourceWrapper dataSource, String id) {
         super(SELECT_QUERY, dataSource, new IdColumn.StringIdColumn(), id);
     }
 

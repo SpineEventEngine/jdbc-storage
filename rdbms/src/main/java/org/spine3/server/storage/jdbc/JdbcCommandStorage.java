@@ -83,7 +83,7 @@ import static org.spine3.validate.Validate.checkNotDefault;
     public CommandStorageRecord read(CommandId commandId) throws DatabaseException {
         checkNotClosed();
 
-        final SelectCommandById query = new SelectCommandById(dataSource, commandId.getUuid());
+        final SelectCommandByIdQuery query = new SelectCommandByIdQuery(dataSource, commandId.getUuid());
         final CommandStorageRecord record = query.execute();
         if (record == null) {
             return CommandStorageRecord.getDefaultInstance();
@@ -163,7 +163,7 @@ import static org.spine3.validate.Validate.checkNotDefault;
         checkNotNull(commandId);
         checkNotClosed();
 
-        SetOkStatus.getBuilder()
+        SetOkStatusQuery.getBuilder()
                 .setDataSource(this.dataSource)
                 .setIdColumn(CommandTable.STRING_ID_COLUMN)
                 .setId(commandId.getUuid())
@@ -183,7 +183,7 @@ import static org.spine3.validate.Validate.checkNotDefault;
         checkNotNull(error);
         checkNotClosed();
 
-        SetError.getBuilder()
+        SetErrorQuery.getBuilder()
                 .setDataSource(dataSource)
                 .setIdColumn(CommandTable.STRING_ID_COLUMN)
                 .setId(commandId.getUuid())
@@ -204,7 +204,7 @@ import static org.spine3.validate.Validate.checkNotDefault;
         checkNotNull(failure);
         checkNotClosed();
 
-        SetFailure.getBuilder()
+        SetFailureQuery.getBuilder()
                 .setDataSource(dataSource)
                 .setIdColumn(CommandTable.STRING_ID_COLUMN)
                 .setId(commandId.getUuid())

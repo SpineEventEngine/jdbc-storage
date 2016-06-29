@@ -20,26 +20,20 @@
 
 package org.spine3.server.storage.jdbc.query;
 
-import com.google.protobuf.Descriptors;
-import com.google.protobuf.Message;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 
 /**
  * @author Andrey Lavrov
  */
-public abstract class Abstract{
+public class AbstractQuery {
 
     private final String query;
     protected final DataSourceWrapper dataSource;
 
-    protected Abstract(Builder<? extends Builder, ? extends Abstract> builder) {
+    protected AbstractQuery(Builder<? extends Builder, ? extends AbstractQuery> builder) {
         this.query = builder.query;
         this.dataSource = builder.dataSource;
     }
@@ -52,7 +46,7 @@ public abstract class Abstract{
         return query;
     }
 
-    public abstract static class Builder<B extends Builder<B, Q>, Q extends Abstract> {
+    public abstract static class Builder<B extends Builder<B, Q>, Q extends AbstractQuery> {
 
         private DataSourceWrapper dataSource;
         private String query;

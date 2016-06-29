@@ -5,15 +5,16 @@ import org.spine3.server.storage.jdbc.query.WriteRecord;
 import org.spine3.server.storage.jdbc.query.constants.CommandTable;
 
 
-public class SetFailure extends WriteRecord<String, Failure> {
+public class SetFailureQuery extends WriteRecord<String, Failure> {
 
+    @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String SET_FAILURE_QUERY =
             "UPDATE " + CommandTable.TABLE_NAME +
                     " SET " +
                     CommandTable.FAILURE_COL + " = ? " +
                     " WHERE " + CommandTable.ID_COL + " = ? ;";
 
-    private SetFailure(Builder builder) {
+    private SetFailureQuery(Builder builder) {
         super(builder);
     }
 
@@ -22,18 +23,18 @@ public class SetFailure extends WriteRecord<String, Failure> {
     }*/
 
     public static Builder getBuilder() {
-        Builder builder = new Builder();
+        final Builder builder = new Builder();
         builder.setIdIndexInQuery(2)
                 .setRecordIndexInQuery(1)
                 .setQuery(SET_FAILURE_QUERY);
         return builder;
     }
 
-    public static class Builder extends WriteRecord.Builder<Builder, SetFailure, String, Failure> {
+    public static class Builder extends WriteRecord.Builder<Builder, SetFailureQuery, String, Failure> {
 
         @Override
-        public SetFailure build() {
-            return new SetFailure(this);
+        public SetFailureQuery build() {
+            return new SetFailureQuery(this);
         }
 
         @Override
