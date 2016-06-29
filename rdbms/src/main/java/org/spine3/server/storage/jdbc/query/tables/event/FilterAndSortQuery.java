@@ -62,11 +62,13 @@ public class FilterAndSortQuery extends AbstractQuery implements ReadMany {
         }
     }
 
+    @SuppressWarnings("DuplicateStringLiteralInspection")
     private static String whereOrOr(StringBuilder builder) {
         final String result = builder.toString().contains("WHERE") ? " OR " : " WHERE ";
         return result;
     }
 
+    @SuppressWarnings("DuplicateStringLiteralInspection")
     private static StringBuilder appendTimeConditionSql(StringBuilder builder, EventStreamQuery query) {
         final boolean afterSpecified = query.hasAfter();
         final boolean beforeSpecified = query.hasBefore();
@@ -84,6 +86,7 @@ public class FilterAndSortQuery extends AbstractQuery implements ReadMany {
         return builder;
     }
 
+    @SuppressWarnings("DuplicateStringLiteralInspection")
     private static StringBuilder appendIsAfterSql(StringBuilder builder, EventStreamQuery query) {
         final Timestamp after = query.getAfter();
         final long seconds = after.getSeconds();
@@ -91,12 +94,13 @@ public class FilterAndSortQuery extends AbstractQuery implements ReadMany {
         appendTo(builder, " ",
                 EventTable.SECONDS_COL, " > ", seconds,
                 " OR ( ",
-                EventTable.SECONDS_COL, " = ", seconds, " AND ",
-                EventTable.NANOSECONDS_COL, " > ", nanos,
+                    EventTable.SECONDS_COL, " = ", seconds, " AND ",
+                    EventTable.NANOSECONDS_COL, " > ", nanos,
                 ") ");
         return builder;
     }
 
+    @SuppressWarnings("DuplicateStringLiteralInspection")
     private static StringBuilder appendIsBeforeSql(StringBuilder builder, EventStreamQuery query) {
         final Timestamp before = query.getBefore();
         final long seconds = before.getSeconds();

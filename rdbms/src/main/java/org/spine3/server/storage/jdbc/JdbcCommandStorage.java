@@ -106,7 +106,6 @@ import static org.spine3.validate.Validate.checkNotDefault;
                     .setStatus(status)
                     .build()
                     .execute();
-
             final DbIterator<CommandStorageRecord> iterator = new DbIterator<>(resultSet, CommandTable.COMMAND_COL, CommandTable.COMMAND_RECORD_DESCRIPTOR);
             return iterator;
         }

@@ -27,6 +27,8 @@ import org.slf4j.LoggerFactory;
 import org.spine3.server.aggregate.Aggregate;
 import org.spine3.server.storage.AggregateStorage;
 import org.spine3.server.storage.AggregateStorageRecord;
+import org.spine3.server.storage.jdbc.query.constants.AggregateTable;
+import org.spine3.server.storage.jdbc.query.tables.aggregate.*;
 import org.spine3.server.storage.jdbc.util.*;
 
 import javax.annotation.Nullable;
@@ -52,40 +54,6 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
  */
 /*package*/ class JdbcAggregateStorage<Id> extends AggregateStorage<Id> {
 
-    /**
-     * Aggregate ID column name (contains in `main` and `event_count` tables).
-     */
-    private static final String ID_COL = "id";
-
-    /**
-     * Aggregate record column name.
-     */
-    private static final String AGGREGATE_COL = "aggregate";
-
-    /**
-     * Aggregate event seconds column name.
-     */
-    @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String SECONDS_COL = "seconds";
-
-    /**
-     * Aggregate event nanoseconds column name.
-     */
-    @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String NANOS_COL = "nanoseconds";
-
-    /**
-     * A count of events after the last snapshot column name.
-     */
-    private static final String EVENT_COUNT_COL = "event_count";
-
-    /**
-     * A suffix of a table name where the last event time is stored.
-     */
-    private static final String EVENT_COUNT_TABLE_NAME_SUFFIX = "_event_count";
-
-    private static final Descriptor RECORD_DESCRIPTOR = AggregateStorageRecord.getDescriptor();
-
     private final DataSourceWrapper dataSource;
 
     /**
@@ -98,7 +66,6 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
     private final String mainTableName;
     private final String eventCountTableName;
 
-    private final SelectByIdSortedByTimeDescQuery selectByIdSortedQuery;
 
     /**
      * Creates a new storage instance.
@@ -119,17 +86,31 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         super(multitenant);
         this.dataSource = dataSource;
         this.mainTableName = DbTableNameFactory.newTableName(aggregateClass);
-        this.eventCountTableName = mainTableName + EVENT_COUNT_TABLE_NAME_SUFFIX;
+        this.eventCountTableName = mainTableName + AggregateTable.EVENT_COUNT_TABLE_NAME_SUFFIX;
         this.idColumn = IdColumn.newInstance(aggregateClass);
-        this.selectByIdSortedQuery = new SelectByIdSortedByTimeDescQuery(mainTableName);
-        new CreateMainTableIfDoesNotExistQuery().execute(mainTableName);
-        new CreateEventCountTableIfDoesNotExistQuery().execute(eventCountTableName);
+        CreateMainTableIfDoesNotExistQuery.getBuilder()
+                .setTableName(mainTableName)
+                .setIdType(idColumn.getColumnDataType())
+                .setDataSource(dataSource)
+                .build()
+                .execute();
+        CreateEventCountTableIfDoesNotExistQuery.getBuilder()
+                .setTableName(eventCountTableName)
+                .setIdType(idColumn.getColumnDataType())
+                .setDataSource(dataSource)
+                .build()
+                .execute();
     }
 
     @Override
     public int readEventCountAfterLastSnapshot(Id id) {
         checkNotClosed();
-        final Integer count = new SelectEventCountQuery().execute(id);
+        final Integer count = SelectEventCountByIdQuery.<Id>getBuilder(eventCountTableName)
+                .setIdColumn(idColumn)
+                .setId(id)
+                .setDataSource(dataSource)
+                .build()
+                .execute();
         if (count == null) {
             return 0;
         }
@@ -140,14 +121,31 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
     public void writeEventCountAfterLastSnapshot(Id id, int count) {
         checkNotClosed();
         if (containsEventCount(id)) {
-            new UpdateEventCountQuery(count, id).execute();
+            UpdateEventCountQuery.<Id>getBuilder(eventCountTableName)
+                    .setIdColumn(idColumn)
+                    .setId(id)
+                    .setCount(count)
+                    .setDataSource(dataSource)
+                    .build()
+                    .execute();
         } else {
-            new InsertEventCountQuery(count, id).execute();
+            InsertEventCountQuery.<Id>getBuilder(eventCountTableName)
+                    .setIdColumn(idColumn)
+                    .setId(id)
+                    .setCount(count)
+                    .setDataSource(dataSource)
+                    .build()
+                    .execute();
         }
     }
 
     private boolean containsEventCount(Id id) {
-        final Integer count = new SelectEventCountQuery().execute(id);
+        final Integer count = SelectEventCountByIdQuery.<Id>getBuilder(eventCountTableName)
+                .setIdColumn(idColumn)
+                .setId(id)
+                .setDataSource(dataSource)
+                .build()
+                .execute();
         final boolean contains = count != null;
         return contains;
     }
@@ -159,7 +157,13 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
      */
     @Override
     protected void writeInternal(Id id, AggregateStorageRecord record) throws DatabaseException {
-        new InsertRecordQuery(id, record).execute();
+        InsertRecordQuery.<Id>getBuilder(mainTableName)
+                .setIdColumn(idColumn)
+                .setId(id)
+                .setRecord(record)
+                .setDataSource(dataSource)
+                .build()
+                .execute();
     }
 
     /**
@@ -173,12 +177,15 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
     @Override
     protected Iterator<AggregateStorageRecord> historyBackward(Id id) throws DatabaseException {
         checkNotNull(id);
-        try (ConnectionWrapper connection = dataSource.getConnection(true)) {
-            final PreparedStatement statement = selectByIdSortedQuery.statement(connection, id);
-            final DbIterator<AggregateStorageRecord> iterator = new DbIterator<>(statement, AGGREGATE_COL, RECORD_DESCRIPTOR);
+            final ResultSet resultSet = SelectByIdSortedByTimeDescQuery.<Id>getBuilder(mainTableName)
+                    .setIdColumn(idColumn)
+                    .setId(id)
+                    .setDataSource(dataSource)
+                    .build()
+                    .execute();
+            final DbIterator<AggregateStorageRecord> iterator = new DbIterator<>(resultSet, AggregateTable.AGGREGATE_COL, AggregateTable.RECORD_DESCRIPTOR);
             iterators.add(iterator);
             return iterator;
-        }
     }
 
     @Override
@@ -191,243 +198,6 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
             super.close();
         } catch (Exception e) {
             throw new DatabaseException(e);
-        }
-    }
-
-    private class InsertRecordQuery extends WriteQuery {
-
-        @SuppressWarnings("DuplicateStringLiteralInspection")
-        private static final String INSERT =
-                "INSERT INTO %s " +
-                " (" + ID_COL + ", " + AGGREGATE_COL + ", " + SECONDS_COL + ", " + NANOS_COL + ") " +
-                " VALUES (?, ?, ?, ?);";
-
-        private final String insertQuery;
-        private final AggregateStorageRecord record;
-        private final Id id;
-
-        private InsertRecordQuery(Id id, AggregateStorageRecord record) {
-            super(dataSource);
-            this.insertQuery = format(INSERT, mainTableName);
-            this.record = record;
-            this.id = id;
-        }
-
-        @Override
-        protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
-            final PreparedStatement statement = connection.prepareStatement(insertQuery);
-            final byte[] serializedRecord = serialize(record);
-            try {
-                idColumn.setId(1, id, statement);
-                statement.setBytes(2, serializedRecord);
-                final Timestamp timestamp = record.getTimestamp();
-                statement.setLong(3, timestamp.getSeconds());
-                statement.setInt(4, timestamp.getNanos());
-            } catch (SQLException e) {
-                throw new DatabaseException(e);
-            }
-            return statement;
-        }
-
-        @Override
-        protected void logError(SQLException exception) {
-            log().error("Error during writing record, aggregate ID = " + idToString(id), exception);
-        }
-    }
-
-    private class SelectByIdSortedByTimeDescQuery {
-
-        @SuppressWarnings("DuplicateStringLiteralInspection")
-        private static final String SELECT_BY_ID_SORTED_BY_TIME_DESC =
-                "SELECT " + AGGREGATE_COL + " FROM %s " +
-                " WHERE " + ID_COL + " = ? " +
-                " ORDER BY " + SECONDS_COL + " DESC, " + NANOS_COL + " DESC;";
-
-        private final String query;
-
-        private SelectByIdSortedByTimeDescQuery(String tableName) {
-            this.query = format(SELECT_BY_ID_SORTED_BY_TIME_DESC, tableName);
-        }
-
-        private PreparedStatement statement(ConnectionWrapper connection, Id id) {
-            final PreparedStatement statement = connection.prepareStatement(query);
-            idColumn.setId(1, id, statement);
-            return statement;
-        }
-    }
-
-    private abstract class CreateTableIfDoesNotExistQuery {
-
-        private final String query;
-
-        /**
-         * Creates a new query.
-         *
-         * @param query a query with format params: table name and id column type string.
-         */
-        protected CreateTableIfDoesNotExistQuery(String query) {
-            this.query = query;
-        }
-
-        protected void execute(String tableName) throws DatabaseException {
-            final String idColumnType = idColumn.getColumnDataType();
-            final String createTableSql = format(query, tableName, idColumnType);
-            try (ConnectionWrapper connection = dataSource.getConnection(true);
-                 PreparedStatement statement = connection.prepareStatement(createTableSql)) {
-                statement.execute();
-            } catch (SQLException e) {
-                log().error("Error during table creation, table name: " + tableName, e);
-                throw new DatabaseException(e);
-            }
-        }
-    }
-
-    private class CreateMainTableIfDoesNotExistQuery extends CreateTableIfDoesNotExistQuery {
-
-        @SuppressWarnings("DuplicateStringLiteralInspection")
-        private static final String QUERY =
-                "CREATE TABLE IF NOT EXISTS %s (" +
-                    ID_COL + " %s, " +
-                    AGGREGATE_COL + " BLOB, " +
-                    SECONDS_COL + " BIGINT, " +
-                    NANOS_COL + " INT " +
-                ");";
-
-
-        protected CreateMainTableIfDoesNotExistQuery() {
-            super(QUERY);
-        }
-    }
-
-    private class CreateEventCountTableIfDoesNotExistQuery extends CreateTableIfDoesNotExistQuery {
-
-        @SuppressWarnings("DuplicateStringLiteralInspection")
-        private static final String QUERY =
-                "CREATE TABLE IF NOT EXISTS %s (" +
-                    ID_COL + " %s, " +
-                    EVENT_COUNT_COL + " BIGINT " +
-                ");";
-
-        protected CreateEventCountTableIfDoesNotExistQuery() {
-            super(QUERY);
-        }
-    }
-
-    private abstract class WriteEventCountQuery extends WriteQuery {
-
-        private final String query;
-        private final Id id;
-        private final int count;
-
-        protected WriteEventCountQuery(String query, Id id, int count) {
-            super(dataSource);
-            this.query = query;
-            this.id = id;
-            this.count = count;
-        }
-
-        @Override
-        protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
-            final PreparedStatement statement = connection.prepareStatement(query);
-            try {
-                idColumn.setId(getIdIndexInQuery(), id, statement);
-                statement.setLong(getEventCountIndexInQuery(), count);
-                return statement;
-            } catch (SQLException e) {
-                throw new DatabaseException(e);
-            }
-        }
-
-        protected abstract int getIdIndexInQuery();
-
-        protected abstract int getEventCountIndexInQuery();
-
-        @Override
-        protected void logError(SQLException e) {
-            log().error("Failed to write the count of events after the last snapshot.", e);
-        }
-    }
-
-    private class InsertEventCountQuery extends WriteEventCountQuery {
-
-        @SuppressWarnings("DuplicateStringLiteralInspection")
-        private static final String INSERT_QUERY =
-                "INSERT INTO %s " +
-                " (" + ID_COL + ", " + EVENT_COUNT_COL + ')' +
-                " VALUES (?, ?);";
-
-        private InsertEventCountQuery(int count, Id id) {
-            super(format(INSERT_QUERY, eventCountTableName), id, count);
-        }
-
-        @Override
-        protected int getIdIndexInQuery() {
-            return 1;
-        }
-
-        @Override
-        protected int getEventCountIndexInQuery() {
-            return 2;
-        }
-    }
-
-    private class UpdateEventCountQuery extends WriteEventCountQuery {
-
-        @SuppressWarnings("DuplicateStringLiteralInspection")
-        private static final String UPDATE_QUERY =
-                "UPDATE %s " +
-                " SET " + EVENT_COUNT_COL + " = ? " +
-                " WHERE " + ID_COL + " = ?;";
-
-        private UpdateEventCountQuery(int count, Id id) {
-            super(format(UPDATE_QUERY, eventCountTableName), id, count);
-        }
-
-        @Override
-        protected int getIdIndexInQuery() {
-            return 2;
-        }
-
-        @Override
-        protected int getEventCountIndexInQuery() {
-            return 1;
-        }
-    }
-
-    private class SelectEventCountQuery {
-
-        @SuppressWarnings("DuplicateStringLiteralInspection")
-        private static final String SELECT_QUERY =
-                "SELECT " + EVENT_COUNT_COL +
-                " FROM %s " +
-                " WHERE " + ID_COL + " = ?;";
-
-        private final String selectQuery;
-
-        private SelectEventCountQuery() {
-            this.selectQuery = format(SELECT_QUERY, eventCountTableName);
-        }
-
-        @Nullable
-        private Integer execute(Id id) throws DatabaseException {
-            try (ConnectionWrapper connection = dataSource.getConnection(true);
-                 PreparedStatement statement = prepareStatement(connection, id);
-                 ResultSet resultSet = statement.executeQuery()) {
-                if (!resultSet.next()) {
-                    return null;
-                }
-                final int eventCount = resultSet.getInt(EVENT_COUNT_COL);
-                return eventCount;
-            } catch (SQLException e) {
-                log().error("Failed to read an event count after the last snapshot.", e);
-                throw new DatabaseException(e);
-            }
-        }
-
-        private PreparedStatement prepareStatement(ConnectionWrapper connection, Id id) {
-            final PreparedStatement statement = connection.prepareStatement(selectQuery);
-            idColumn.setId(1, id, statement);
-            return statement;
         }
     }
 
