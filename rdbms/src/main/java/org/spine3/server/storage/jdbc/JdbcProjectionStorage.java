@@ -26,6 +26,10 @@ import org.slf4j.LoggerFactory;
 import org.spine3.server.entity.Entity;
 import org.spine3.server.storage.EntityStorage;
 import org.spine3.server.storage.ProjectionStorage;
+import org.spine3.server.storage.jdbc.query.tables.projection.CreateTableIfDoesNotExistQuery;
+import org.spine3.server.storage.jdbc.query.tables.projection.InsertTimestampQuery;
+import org.spine3.server.storage.jdbc.query.tables.projection.SelectTimestampQuery;
+import org.spine3.server.storage.jdbc.query.tables.projection.UpdateTimestampQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.WriteQuery;
@@ -97,15 +101,27 @@ import static org.spine3.validate.Validate.isDefault;
         this.entityStorage = entityStorage;
         this.tableName = newTableName(projectionClass) + LAST_EVENT_TIME_TABLE_NAME_SUFFIX;
 
-        new CreateTableIfDoesNotExistQuery().execute(tableName);
+        CreateTableIfDoesNotExistQuery.getBuilder()
+                .setTableName(tableName)
+                .setDataSource(dataSource)
+                .build()
+                .execute();
     }
 
     @Override
     public void writeLastHandledEventTime(Timestamp time) throws DatabaseException {
         if (containsLastEventTime()) {
-            new UpdateTimestampQuery(time).execute();
+            UpdateTimestampQuery.getBuilder(tableName)
+                    .setTimestamp(time)
+                    .setDataSource(dataSource)
+                    .build()
+                    .execute();
         } else {
-            new InsertTimestampQuery(time).execute();
+            InsertTimestampQuery.getBuilder(tableName)
+                    .setTimestamp(time)
+                    .setDataSource(dataSource)
+                    .build()
+                    .execute();
         }
     }
 
@@ -118,7 +134,10 @@ import static org.spine3.validate.Validate.isDefault;
     @Override
     @Nullable
     public Timestamp readLastHandledEventTime() throws DatabaseException {
-        final Timestamp timestamp = new SelectTimestampQuery().execute();
+        final Timestamp timestamp = SelectTimestampQuery.getBuilder(tableName)
+                .setDataSource(dataSource)
+                .build()
+                .execute();
         return timestamp;
     }
 
@@ -135,117 +154,6 @@ import static org.spine3.validate.Validate.isDefault;
             super.close();
         } catch (Exception e) {
             throw new DatabaseException(e);
-        }
-    }
-
-    @SuppressWarnings("DuplicateStringLiteralInspection")
-    private class CreateTableIfDoesNotExistQuery {
-
-        private static final String CREATE_TABLE_IF_DOES_NOT_EXIST =
-                "CREATE TABLE IF NOT EXISTS %s (" +
-                    SECONDS_COL + " BIGINT, " +
-                    NANOS_COL + " INT " +
-                ");";
-
-        private void execute(String tableName) throws DatabaseException {
-            final String createTableSql = format(CREATE_TABLE_IF_DOES_NOT_EXIST, tableName);
-            try (ConnectionWrapper connection = dataSource.getConnection(true);
-                 PreparedStatement statement = connection.prepareStatement(createTableSql)) {
-                statement.execute();
-            } catch (SQLException e) {
-                log().error("Failed to create a table with the name: " + tableName, e);
-                throw new DatabaseException(e);
-            }
-        }
-    }
-
-    private class WriteTimestampQuery extends WriteQuery {
-
-        private final String query;
-        private final Timestamp timestamp;
-
-        private WriteTimestampQuery(String query, Timestamp timestamp) {
-            super(dataSource);
-            this.query = query;
-            this.timestamp = timestamp;
-        }
-
-        @Override
-        protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
-            final PreparedStatement statement = connection.prepareStatement(query);
-            final long seconds = timestamp.getSeconds();
-            final int nanos = timestamp.getNanos();
-            try {
-                statement.setLong(1, seconds);
-                statement.setInt(2, nanos);
-                return statement;
-            } catch (SQLException e) {
-                throw new DatabaseException(e);
-            }
-        }
-
-        @Override
-        protected void logError(SQLException exception) {
-            log().error("Failed to write last event timestamp.", exception);
-        }
-    }
-
-    private class InsertTimestampQuery extends WriteTimestampQuery {
-
-        @SuppressWarnings("DuplicateStringLiteralInspection")
-        private static final String INSERT_QUERY =
-                "INSERT INTO %s " +
-                " (" + SECONDS_COL + ", " + NANOS_COL + ')' +
-                " VALUES (?, ?);";
-
-        private InsertTimestampQuery(Timestamp timestamp) {
-            super(format(INSERT_QUERY, tableName), timestamp);
-        }
-    }
-
-    private class UpdateTimestampQuery extends WriteTimestampQuery {
-
-        @SuppressWarnings("DuplicateStringLiteralInspection")
-        private static final String UPDATE_QUERY =
-                "UPDATE %s SET " +
-                SECONDS_COL + " = ?, " +
-                NANOS_COL + " = ?;";
-
-        private UpdateTimestampQuery(Timestamp timestamp) {
-            super(format(UPDATE_QUERY, tableName), timestamp);
-        }
-    }
-
-    private class SelectTimestampQuery {
-
-        @SuppressWarnings("DuplicateStringLiteralInspection")
-        private static final String SELECT_QUERY = "SELECT " + SECONDS_COL + ", " + NANOS_COL + " FROM %s ;";
-
-        private final String selectQuery;
-
-        private SelectTimestampQuery() {
-            this.selectQuery = format(SELECT_QUERY, tableName);
-        }
-
-        @Nullable
-        private Timestamp execute() throws DatabaseException {
-            try (ConnectionWrapper connection = dataSource.getConnection(true);
-                 PreparedStatement statement = connection.prepareStatement(selectQuery);
-                 ResultSet resultSet = statement.executeQuery()) {
-                if (!resultSet.next()) {
-                    return null;
-                }
-                final long seconds = resultSet.getLong(SECONDS_COL);
-                final int nanos = resultSet.getInt(NANOS_COL);
-                final Timestamp time = Timestamp.newBuilder().setSeconds(seconds).setNanos(nanos).build();
-                if (isDefault(time)) {
-                    return null;
-                }
-                return time;
-            } catch (SQLException e) {
-                log().error("Failed to read last event time.", e);
-                throw new DatabaseException(e);
-            }
         }
     }
 
