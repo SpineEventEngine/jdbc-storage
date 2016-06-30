@@ -20,13 +20,11 @@
 
 package org.spine3.server.storage.jdbc;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.spine3.server.aggregate.Aggregate;
 import org.spine3.server.storage.AggregateStorage;
 import org.spine3.server.storage.AggregateStorageRecord;
 import org.spine3.server.storage.jdbc.query.constants.AggregateTable;
-import org.spine3.server.storage.jdbc.query.factory.AggregateStorageFactory;
+import org.spine3.server.storage.jdbc.query.factory.AggregateStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbIterator;
 
@@ -55,7 +53,7 @@ import static org.spine3.io.IoUtil.closeAll;
     private final Collection<DbIterator> iterators = newLinkedList();
 
 
-    private final AggregateStorageFactory<Id> queryFactory;
+    private final AggregateStorageQueryFactory<Id> queryFactory;
 
 
     /**
@@ -76,7 +74,7 @@ import static org.spine3.io.IoUtil.closeAll;
             throws DatabaseException {
         super(multitenant);
         this.dataSource = dataSource;
-        this.queryFactory = new AggregateStorageFactory<Id>(dataSource,aggregateClass);
+        this.queryFactory = new AggregateStorageQueryFactory<Id>(dataSource,aggregateClass);
         queryFactory.getCreateMainTableIfDoesNotExistQuery().execute();
         queryFactory.getCreateEventCountTableIfDoesNotExistQuery().execute();
     }

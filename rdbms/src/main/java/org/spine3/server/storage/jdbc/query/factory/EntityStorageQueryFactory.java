@@ -9,14 +9,14 @@ import org.spine3.server.storage.jdbc.util.DbTableNameFactory;
 import org.spine3.server.storage.jdbc.query.tables.entity.SelectEntityByIdQuery;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
-public class EntityStorageFactory<I> {
+public class EntityStorageQueryFactory<I> {
 
     private final IdColumn<I> idColumn;
     private final DataSourceWrapper dataSource;
     private final Class<? extends Entity<I, ?>> entityClass;
     private final String tableName;
 
-    public EntityStorageFactory(DataSourceWrapper dataSource, Class<? extends Entity<I, ?>> entityClass) {
+    public EntityStorageQueryFactory(DataSourceWrapper dataSource, Class<? extends Entity<I, ?>> entityClass) {
         this.idColumn = IdColumn.newInstance(entityClass);
         this.dataSource = dataSource;
         this.entityClass = entityClass;

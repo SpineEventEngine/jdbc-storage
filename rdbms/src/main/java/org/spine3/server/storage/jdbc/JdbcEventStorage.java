@@ -20,39 +20,25 @@
 
 package org.spine3.server.storage.jdbc;
 
-import com.google.protobuf.Any;
-import com.google.protobuf.Descriptors.Descriptor;
-import com.google.protobuf.Message;
-import com.google.protobuf.Timestamp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spine3.base.Event;
 import org.spine3.base.EventId;
-import org.spine3.protobuf.Messages;
-import org.spine3.server.event.EventFilter;
 import org.spine3.server.event.EventStreamQuery;
 import org.spine3.server.storage.EventStorage;
 import org.spine3.server.storage.EventStorageRecord;
 import org.spine3.server.storage.jdbc.query.constants.EventTable;
-import org.spine3.server.storage.jdbc.query.tables.event.*;
-import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
+import org.spine3.server.storage.jdbc.query.factory.EventStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbIterator;
-import org.spine3.server.storage.jdbc.util.IdColumn.StringIdColumn;
-import org.spine3.server.storage.jdbc.util.SelectByIdQuery;
-import org.spine3.server.storage.jdbc.util.WriteQuery;
 
 import javax.annotation.Nullable;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Iterator;
 
 import static com.google.common.collect.Lists.newLinkedList;
-import static org.spine3.base.Identifiers.idToString;
 import static org.spine3.io.IoUtil.closeAll;
-import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
 /**
  * The implementation of the event storage based on the RDBMS.
@@ -64,6 +50,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
     private final DataSourceWrapper dataSource;
 
+    private final EventStorageQueryFactory queryFactory;
     /**
      * Iterators which are not closed yet.
      */
@@ -82,10 +69,8 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
     private JdbcEventStorage(DataSourceWrapper dataSource, boolean multitenant) throws DatabaseException {
         super(multitenant);
         this.dataSource = dataSource;
-        CreateTableIfDoesNotExistQuery.getBuilder()
-                .setDataSource(dataSource)
-                .build()
-                .execute();
+        queryFactory = new EventStorageQueryFactory(dataSource);
+        queryFactory.getCreateTableIfDoesNotExistQuery().execute();
     }
 
     /**
@@ -98,13 +83,11 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
      */
     @Override
     public Iterator<Event> iterator(EventStreamQuery query) throws DatabaseException {
-        try (ConnectionWrapper connection = dataSource.getConnection(true)) {
-            final ResultSet resultSet = FilterAndSortQuery.getBuilder().setStreamQuery(query).setDataSource(dataSource).build().execute();
-            final DbIterator<EventStorageRecord> iterator = new DbIterator<>(resultSet, EventTable.EVENT_COL, EventTable.RECORD_DESCRIPTOR);
-            iterators.add(iterator);
-            final Iterator<Event> result = toEventIterator(iterator);
-            return result;
-        }
+        final ResultSet resultSet = queryFactory.getFilterAndSortQuery(query).execute();
+        final DbIterator<EventStorageRecord> iterator = new DbIterator<>(resultSet, EventTable.EVENT_COL, EventTable.RECORD_DESCRIPTOR);
+        iterators.add(iterator);
+        final Iterator<Event> result = toEventIterator(iterator);
+        return result;
     }
 
     /**
@@ -115,17 +98,9 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
     @Override
     protected void writeInternal(EventStorageRecord record) throws DatabaseException {
         if (containsRecord(record.getEventId())) {
-            UpdateEventQuery.getBuilder()
-                    .setRecord(record)
-                    .setDataSource(dataSource)
-                    .build()
-                    .execute();
+           queryFactory.getUpdateEventQuery(record).execute();
         } else {
-            InsertEventQuery.getBuilder()
-                    .setRecord(record)
-                    .setDataSource(dataSource)
-                    .build()
-                    .execute();
+           queryFactory.getInsertEventQuery(record).execute();
         }
     }
 
@@ -138,12 +113,12 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
     @Override
     protected EventStorageRecord readInternal(EventId eventId) throws DatabaseException {
         final String id = eventId.getUuid();
-        final EventStorageRecord record = new SelectEventByIdQuery(dataSource, id).execute();
+        final EventStorageRecord record = queryFactory.getSelectEventByIdQuery(id).execute();
         return record;
     }
 
     private boolean containsRecord(String id) {
-        final EventStorageRecord record = new SelectEventByIdQuery(dataSource, id).execute();
+        final EventStorageRecord record = queryFactory.getSelectEventByIdQuery(id).execute();
         final boolean contains = record != null;
         return contains;
     }

@@ -11,14 +11,14 @@ import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbTableNameFactory;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
-public class AggregateStorageFactory<I>{
+public class AggregateStorageQueryFactory<I>{
 
     private final IdColumn<I> idColumn;
     private final String mainTableName;
     private final String eventCountTableName;
     private final DataSourceWrapper dataSource;
 
-    public AggregateStorageFactory(DataSourceWrapper dataSource, Class<? extends Entity<I, ?>> aggregateClass) {
+    public AggregateStorageQueryFactory(DataSourceWrapper dataSource, Class<? extends Entity<I, ?>> aggregateClass) {
         this.idColumn = IdColumn.newInstance(aggregateClass);
         this.mainTableName = DbTableNameFactory.newTableName(aggregateClass);
         this.eventCountTableName = mainTableName + AggregateTable.EVENT_COUNT_TABLE_NAME_SUFFIX;
@@ -32,7 +32,7 @@ public class AggregateStorageFactory<I>{
     private enum LogSingleton {
         INSTANCE;
         @SuppressWarnings("NonSerializableFieldInSerializableClass")
-        private final Logger value = LoggerFactory.getLogger(AggregateStorageFactory.class);
+        private final Logger value = LoggerFactory.getLogger(AggregateStorageQueryFactory.class);
     }
 
     public CreateMainTableIfDoesNotExistQuery getCreateMainTableIfDoesNotExistQuery() {

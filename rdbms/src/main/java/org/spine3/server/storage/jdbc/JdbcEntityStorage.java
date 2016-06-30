@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.spine3.server.entity.Entity;
 import org.spine3.server.storage.EntityStorage;
 import org.spine3.server.storage.EntityStorageRecord;
-import org.spine3.server.storage.jdbc.query.factory.EntityStorageFactory;
+import org.spine3.server.storage.jdbc.query.factory.EntityStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.*;
 
 import javax.annotation.Nullable;
@@ -43,7 +43,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 
     private final DataSourceWrapper dataSource;
 
-    private final EntityStorageFactory<I> queryFactory;
+    private final EntityStorageQueryFactory<I> queryFactory;
     /**
      * Creates a new storage instance.
      *
@@ -62,7 +62,7 @@ import static com.google.common.base.Preconditions.checkArgument;
             throws DatabaseException {
         super(multitenant);
         this.dataSource = dataSource;
-        queryFactory = new EntityStorageFactory<I>(dataSource, entityClass);
+        queryFactory = new EntityStorageQueryFactory<I>(dataSource, entityClass);
         queryFactory.getCreateTableIfDoesNotExistQuery().execute();
     }
 
