@@ -27,38 +27,35 @@ import org.spine3.server.entity.Entity;
 import org.spine3.server.storage.EntityStorage;
 import org.spine3.server.storage.ProjectionStorage;
 import org.spine3.server.storage.jdbc.query.constants.ProjectionTable;
+import org.spine3.server.storage.jdbc.query.factory.ProjectionStorageQueryFactory;
 import org.spine3.server.storage.jdbc.query.tables.projection.CreateTableIfDoesNotExistQuery;
 import org.spine3.server.storage.jdbc.query.tables.projection.InsertTimestampQuery;
 import org.spine3.server.storage.jdbc.query.tables.projection.SelectTimestampQuery;
 import org.spine3.server.storage.jdbc.query.tables.projection.UpdateTimestampQuery;
-import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.server.storage.jdbc.util.WriteQuery;
 
 import javax.annotation.Nullable;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 import static java.lang.String.format;
 import static org.spine3.server.storage.jdbc.util.DbTableNameFactory.newTableName;
-import static org.spine3.validate.Validate.isDefault;
 
 /**
  * The implementation of the projection storage based on the RDBMS.
  *
- * @param <Id> a type of projection IDs
+ * @param <I> a type of projection IDs
  * @author Alexander Litus
  * @see JdbcStorageFactory
  */
-/* package */ class JdbcProjectionStorage<Id> extends ProjectionStorage<Id> {
+/* package */ class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
 
 
     private final DataSourceWrapper dataSource;
 
-    private final JdbcEntityStorage<Id> entityStorage;
+    private final JdbcEntityStorage<I> entityStorage;
 
     private final String tableName;
+
+    private final ProjectionStorageQueryFactory queryFactory;
 
     /**
      * Creates a new storage instance.
@@ -78,35 +75,24 @@ import static org.spine3.validate.Validate.isDefault;
     }
 
     private JdbcProjectionStorage(DataSourceWrapper dataSource,
-                                  Class<? extends Entity<Id, ?>> projectionClass,
-                                  JdbcEntityStorage<Id> entityStorage,
+                                  Class<? extends Entity<I, ?>> projectionClass,
+                                  JdbcEntityStorage<I> entityStorage,
                                   boolean multitenant) throws DatabaseException {
         super(multitenant);
         this.dataSource = dataSource;
         this.entityStorage = entityStorage;
         this.tableName = newTableName(projectionClass) + ProjectionTable.LAST_EVENT_TIME_TABLE_NAME_SUFFIX;
+        this.queryFactory = new ProjectionStorageQueryFactory<>(dataSource, projectionClass);
 
-        CreateTableIfDoesNotExistQuery.getBuilder()
-                .setTableName(tableName)
-                .setDataSource(dataSource)
-                .build()
-                .execute();
+       queryFactory.getCreateTableIfDoesNotExistQuery().execute();
     }
 
     @Override
     public void writeLastHandledEventTime(Timestamp time) throws DatabaseException {
         if (containsLastEventTime()) {
-            UpdateTimestampQuery.getBuilder(tableName)
-                    .setTimestamp(time)
-                    .setDataSource(dataSource)
-                    .build()
-                    .execute();
+           queryFactory.getUpdateTimestampQuery(time).execute();
         } else {
-            InsertTimestampQuery.getBuilder(tableName)
-                    .setTimestamp(time)
-                    .setDataSource(dataSource)
-                    .build()
-                    .execute();
+            queryFactory.getInsertTimestampQuery(time).execute();
         }
     }
 
@@ -119,15 +105,12 @@ import static org.spine3.validate.Validate.isDefault;
     @Override
     @Nullable
     public Timestamp readLastHandledEventTime() throws DatabaseException {
-        final Timestamp timestamp = SelectTimestampQuery.getBuilder(tableName)
-                .setDataSource(dataSource)
-                .build()
-                .execute();
+        final Timestamp timestamp = queryFactory.getSelectTimestampQuery().execute();
         return timestamp;
     }
 
     @Override
-    public EntityStorage<Id> getEntityStorage() {
+    public EntityStorage<I> getEntityStorage() {
         return entityStorage;
     }
 

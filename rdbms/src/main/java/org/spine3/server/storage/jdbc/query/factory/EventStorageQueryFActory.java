@@ -1,34 +1,62 @@
-/*
 package org.spine3.server.storage.jdbc.query.factory;
 
 
-import org.spine3.server.entity.Entity;
-import org.spine3.server.storage.jdbc.query.tables.aggregate.CreateMainTableIfDoesNotExistQuery;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.spine3.server.event.EventStreamQuery;
+import org.spine3.server.storage.EventStorageRecord;
+import org.spine3.server.storage.jdbc.query.tables.event.*;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.server.storage.jdbc.util.DbTableNameFactory;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
-public class EventStorageQueryFactory {
+public class EventStorageQueryFactory{
 
-    private final IdColumn<String> idColumn = new IdColumn.StringIdColumn();
-    private final String mainTableName;
+    private final IdColumn idColumn;
     private final DataSourceWrapper dataSource;
-    private final Class<? extends Entity<I, ?>> entityClass;
 
-    public EntityStorageFactory(DataSourceWrapper dataSource, Class<? extends Entity<I, ?>> entityClass) {
-        super(dataSource);
-        this.idColumn = IdColumn.newInstance(entityClass);
-        this.mainTableName = DbTableNameFactory.newTableName(entityClass);
+    public EventStorageQueryFactory(DataSourceWrapper dataSource) {
+        this.idColumn = new IdColumn.StringIdColumn();
         this.dataSource = dataSource;
-        this.entityClass = entityClass;
     }
 
-    public CreateMainTableIfDoesNotExistQuery getCreateTableIfDoesNotExistQuery() {
-        return CreateMainTableIfDoesNotExistQuery.getBuilder()
-                .setTableName(mainTableName)
-                .setIdType(idColumn.getColumnDataType())
+    private static Logger log() {
+        return LogSingleton.INSTANCE.value;
+    }
+
+    private enum LogSingleton {
+        INSTANCE;
+        @SuppressWarnings("NonSerializableFieldInSerializableClass")
+        private final Logger value = LoggerFactory.getLogger(EventStorageQueryFactory.class);
+    }
+
+    public CreateTableIfDoesNotExistQuery getCreateTableIfDoesNotExistQuery(){
+        return CreateTableIfDoesNotExistQuery.getBuilder()
+                .setDataSource(dataSource)
+                .build();
+    }
+
+    public InsertEventQuery getInsertEventQuery(EventStorageRecord record){
+        return InsertEventQuery.getBuilder()
+                .setRecord(record)
+                .setDataSource(dataSource)
+                .build();
+    }
+
+    public UpdateEventQuery getUpdateEventQuery(EventStorageRecord record){
+        return UpdateEventQuery.getBuilder()
+                .setRecord(record)
+                .setDataSource(dataSource)
+                .build();
+    }
+
+    public SelectEventByIdQuery getSelectEventByIdQuery(String id){
+        return new SelectEventByIdQuery(dataSource, id);
+    }
+
+    public FilterAndSortQuery getFilterAndSortQuery(EventStreamQuery streamQuery){
+        return FilterAndSortQuery.getBuilder()
+                .setStreamQuery(streamQuery)
                 .setDataSource(dataSource)
                 .build();
     }
 }
-*/
