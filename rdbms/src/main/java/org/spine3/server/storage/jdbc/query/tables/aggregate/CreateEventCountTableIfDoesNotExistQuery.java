@@ -31,9 +31,9 @@ import java.sql.SQLException;
 
 import static java.lang.String.format;
 
-public class CreateEventCountTableIfDoesNotExistQuery extends AbstractQuery {
+public class CreateEventCountTableIfDoesNotExistQuery<I> extends AbstractQuery {
 
-    private final IdColumn idColumn;
+    private final IdColumn<I> idColumn;
     private final String tableName;
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
@@ -43,9 +43,9 @@ public class CreateEventCountTableIfDoesNotExistQuery extends AbstractQuery {
                     AggregateTable.EVENT_COUNT_COL + " BIGINT " +
                     ");";
 
-    protected CreateEventCountTableIfDoesNotExistQuery(Builder builder) {
+    protected CreateEventCountTableIfDoesNotExistQuery(Builder<I> builder) {
         super(builder);
-        this.idColumn = IdColumn.newInstance(builder.idType);
+        this.idColumn = builder.idColumn;
         this.tableName = builder.tableName;
     }
 
@@ -61,34 +61,34 @@ public class CreateEventCountTableIfDoesNotExistQuery extends AbstractQuery {
         }
     }
 
-    public static Builder getBuilder() {
-        final Builder builder = new Builder();
+    public static <I> Builder<I> getBuilder() {
+        final Builder<I> builder = new Builder<I>();
         builder.setQuery(QUERY);
         return builder;
     }
 
-    public static class Builder extends AbstractQuery.Builder<Builder, CreateEventCountTableIfDoesNotExistQuery> {
+    public static class Builder<I> extends AbstractQuery.Builder<Builder<I>, CreateEventCountTableIfDoesNotExistQuery> {
 
-        private String idType;
+        private IdColumn<I> idColumn;
         private String tableName;
 
         @Override
         public CreateEventCountTableIfDoesNotExistQuery build() {
-            return new CreateEventCountTableIfDoesNotExistQuery(this);
+            return new CreateEventCountTableIfDoesNotExistQuery<I>(this);
         }
 
-        public Builder setIdType(String idType){
-            this.idType = idType;
+        public Builder<I> setIdColumn(IdColumn<I> idColumn) {
+            this.idColumn = idColumn;
             return getThis();
         }
 
-        public Builder setTableName(String tableName){
+        public Builder<I> setTableName(String tableName) {
             this.tableName = tableName;
             return getThis();
         }
 
         @Override
-        protected Builder getThis() {
+        protected Builder<I> getThis() {
             return this;
         }
     }

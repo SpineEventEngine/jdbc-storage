@@ -23,7 +23,6 @@ package org.spine3.server.storage.jdbc.query.tables.aggregate;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.AbstractQuery;
 import org.spine3.server.storage.jdbc.query.constants.AggregateTable;
-import org.spine3.server.storage.jdbc.query.constants.EntityTable;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
@@ -32,9 +31,9 @@ import java.sql.SQLException;
 
 import static java.lang.String.format;
 
-public class CreateMainTableIfDoesNotExistQuery extends AbstractQuery {
+public class CreateMainTableIfDoesNotExistQuery<I> extends AbstractQuery {
 
-    private final IdColumn idColumn;
+    private final IdColumn<I> idColumn;
     private final String tableName;
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
@@ -46,9 +45,9 @@ public class CreateMainTableIfDoesNotExistQuery extends AbstractQuery {
                     AggregateTable.NANOS_COL + " INT " +
                     ");";
 
-    protected CreateMainTableIfDoesNotExistQuery(Builder builder) {
+    protected CreateMainTableIfDoesNotExistQuery(Builder<I> builder) {
         super(builder);
-        this.idColumn = IdColumn.newInstance(builder.idType);
+        this.idColumn = builder.idColumn;
         this.tableName = builder.tableName;
     }
 
@@ -64,34 +63,34 @@ public class CreateMainTableIfDoesNotExistQuery extends AbstractQuery {
         }
     }
 
-    public static Builder getBuilder() {
-        final Builder builder = new Builder();
+    public static <I>Builder <I>getBuilder() {
+        final Builder <I>builder = new Builder<>();
         builder.setQuery(QUERY);
         return builder;
     }
 
-    public static class Builder extends AbstractQuery.Builder<Builder, CreateMainTableIfDoesNotExistQuery> {
+    public static class Builder<I> extends AbstractQuery.Builder<Builder<I>, CreateMainTableIfDoesNotExistQuery> {
 
-        private String idType;
+        private IdColumn<I> idColumn;
         private String tableName;
 
         @Override
         public CreateMainTableIfDoesNotExistQuery build() {
-            return new CreateMainTableIfDoesNotExistQuery(this);
+            return new CreateMainTableIfDoesNotExistQuery<I>(this);
         }
 
-        public Builder setIdType(String idType){
-            this.idType = idType;
+        public Builder<I> setIdColumn(IdColumn<I> idColumn) {
+            this.idColumn = idColumn;
             return getThis();
         }
 
-        public Builder setTableName(String tableName){
+        public Builder<I> setTableName(String tableName) {
             this.tableName = tableName;
             return getThis();
         }
 
         @Override
-        protected Builder getThis() {
+        protected Builder<I> getThis() {
             return this;
         }
     }

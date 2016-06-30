@@ -20,12 +20,9 @@
 
 package org.spine3.server.storage.jdbc.query.tables.aggregate;
 
-import com.google.protobuf.Timestamp;
-import org.spine3.base.CommandStatus;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.UpdateRecord;
 import org.spine3.server.storage.jdbc.query.constants.AggregateTable;
-import org.spine3.server.storage.jdbc.query.constants.CommandTable;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 
 import java.sql.PreparedStatement;

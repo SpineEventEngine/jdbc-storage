@@ -79,6 +79,7 @@ public class SelectById<I, M extends Message> implements ReadOne<M> {
      * @throws DatabaseException if an error occurs during an interaction with the DB
      * @see Serializer#deserialize(byte[], Descriptor)
      */
+    @Override
     @Nullable
     public M execute() throws DatabaseException {
         try (ConnectionWrapper connection = dataSource.getConnection(true);
@@ -134,7 +135,7 @@ public class SelectById<I, M extends Message> implements ReadOne<M> {
         this.messageDescriptor = messageDescriptor;
     }
 
-    private PreparedStatement prepareStatement(ConnectionWrapper connection, I id) {
+    protected PreparedStatement prepareStatement(ConnectionWrapper connection, I id) {
         final PreparedStatement statement = connection.prepareStatement(query);
         idColumn.setId(1, id, statement);
         return statement;

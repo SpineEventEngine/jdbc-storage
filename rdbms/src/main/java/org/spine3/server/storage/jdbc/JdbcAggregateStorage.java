@@ -20,30 +20,23 @@
 
 package org.spine3.server.storage.jdbc;
 
-import com.google.protobuf.Descriptors.Descriptor;
-import com.google.protobuf.Timestamp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spine3.server.aggregate.Aggregate;
 import org.spine3.server.storage.AggregateStorage;
 import org.spine3.server.storage.AggregateStorageRecord;
 import org.spine3.server.storage.jdbc.query.constants.AggregateTable;
-import org.spine3.server.storage.jdbc.query.tables.aggregate.*;
-import org.spine3.server.storage.jdbc.util.*;
+import org.spine3.server.storage.jdbc.query.factory.AggregateStorageFactory;
+import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
+import org.spine3.server.storage.jdbc.util.DbIterator;
 
-import javax.annotation.Nullable;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Iterator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Lists.newLinkedList;
-import static java.lang.String.format;
-import static org.spine3.base.Identifiers.idToString;
 import static org.spine3.io.IoUtil.closeAll;
-import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
 /**
  * The implementation of the aggregate storage based on the RDBMS.
@@ -61,10 +54,8 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
      */
     private final Collection<DbIterator> iterators = newLinkedList();
 
-    private final IdColumn<Id> idColumn;
 
-    private final String mainTableName;
-    private final String eventCountTableName;
+    private final AggregateStorageFactory<Id> queryFactory;
 
 
     /**
@@ -85,32 +76,15 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
             throws DatabaseException {
         super(multitenant);
         this.dataSource = dataSource;
-        this.mainTableName = DbTableNameFactory.newTableName(aggregateClass);
-        this.eventCountTableName = mainTableName + AggregateTable.EVENT_COUNT_TABLE_NAME_SUFFIX;
-        this.idColumn = IdColumn.newInstance(aggregateClass);
-        CreateMainTableIfDoesNotExistQuery.getBuilder()
-                .setTableName(mainTableName)
-                .setIdType(idColumn.getColumnDataType())
-                .setDataSource(dataSource)
-                .build()
-                .execute();
-        CreateEventCountTableIfDoesNotExistQuery.getBuilder()
-                .setTableName(eventCountTableName)
-                .setIdType(idColumn.getColumnDataType())
-                .setDataSource(dataSource)
-                .build()
-                .execute();
+        this.queryFactory = new AggregateStorageFactory<Id>(dataSource,aggregateClass);
+        queryFactory.getCreateMainTableIfDoesNotExistQuery().execute();
+        queryFactory.getCreateEventCountTableIfDoesNotExistQuery().execute();
     }
 
     @Override
     public int readEventCountAfterLastSnapshot(Id id) {
         checkNotClosed();
-        final Integer count = SelectEventCountByIdQuery.<Id>getBuilder(eventCountTableName)
-                .setIdColumn(idColumn)
-                .setId(id)
-                .setDataSource(dataSource)
-                .build()
-                .execute();
+        final Integer count = queryFactory.getSelectEventCountByIdQuery(id).execute();
         if (count == null) {
             return 0;
         }
@@ -121,31 +95,14 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
     public void writeEventCountAfterLastSnapshot(Id id, int count) {
         checkNotClosed();
         if (containsEventCount(id)) {
-            UpdateEventCountQuery.<Id>getBuilder(eventCountTableName)
-                    .setIdColumn(idColumn)
-                    .setId(id)
-                    .setCount(count)
-                    .setDataSource(dataSource)
-                    .build()
-                    .execute();
+            queryFactory.getUpdateEventCountQuery(id, count).execute();
         } else {
-            InsertEventCountQuery.<Id>getBuilder(eventCountTableName)
-                    .setIdColumn(idColumn)
-                    .setId(id)
-                    .setCount(count)
-                    .setDataSource(dataSource)
-                    .build()
-                    .execute();
+            queryFactory.getInsertEventCountQuery(id, count).execute();
         }
     }
 
     private boolean containsEventCount(Id id) {
-        final Integer count = SelectEventCountByIdQuery.<Id>getBuilder(eventCountTableName)
-                .setIdColumn(idColumn)
-                .setId(id)
-                .setDataSource(dataSource)
-                .build()
-                .execute();
+        final Integer count = queryFactory.getSelectEventCountByIdQuery(id).execute();
         final boolean contains = count != null;
         return contains;
     }
@@ -157,13 +114,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
      */
     @Override
     protected void writeInternal(Id id, AggregateStorageRecord record) throws DatabaseException {
-        InsertRecordQuery.<Id>getBuilder(mainTableName)
-                .setIdColumn(idColumn)
-                .setId(id)
-                .setRecord(record)
-                .setDataSource(dataSource)
-                .build()
-                .execute();
+        queryFactory.getInsertRecordQuery(id, record).execute();
     }
 
     /**
@@ -177,12 +128,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
     @Override
     protected Iterator<AggregateStorageRecord> historyBackward(Id id) throws DatabaseException {
         checkNotNull(id);
-            final ResultSet resultSet = SelectByIdSortedByTimeDescQuery.<Id>getBuilder(mainTableName)
-                    .setIdColumn(idColumn)
-                    .setId(id)
-                    .setDataSource(dataSource)
-                    .build()
-                    .execute();
+            final ResultSet resultSet = queryFactory.getSelectByIdSortedByTimeDescQuery(id).execute();
             final DbIterator<AggregateStorageRecord> iterator = new DbIterator<>(resultSet, AggregateTable.AGGREGATE_COL, AggregateTable.RECORD_DESCRIPTOR);
             iterators.add(iterator);
             return iterator;
@@ -199,15 +145,5 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
         } catch (Exception e) {
             throw new DatabaseException(e);
         }
-    }
-
-    private static Logger log() {
-        return LogSingleton.INSTANCE.value;
-    }
-
-    private enum LogSingleton {
-        INSTANCE;
-        @SuppressWarnings("NonSerializableFieldInSerializableClass")
-        private final Logger value = LoggerFactory.getLogger(JdbcAggregateStorage.class);
     }
 }

@@ -31,9 +31,9 @@ import java.sql.SQLException;
 
 import static java.lang.String.format;
 
-public class CreateTableIfDoesNotExistQuery extends AbstractQuery {
+public class CreateTableIfDoesNotExistQuery<I> extends AbstractQuery {
 
-    private final IdColumn idColumn;
+    private final IdColumn<I> idColumn;
     private final String tableName;
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
@@ -44,9 +44,9 @@ public class CreateTableIfDoesNotExistQuery extends AbstractQuery {
                     "PRIMARY KEY(" + EntityTable.ID_COL + ')' +
                     ");";
 
-    protected CreateTableIfDoesNotExistQuery(Builder builder) {
+    protected CreateTableIfDoesNotExistQuery(Builder<I> builder) {
         super(builder);
-        this.idColumn = IdColumn.newInstance(builder.idType);
+        this.idColumn = builder.idColumn;
         this.tableName = builder.tableName;
     }
 
@@ -62,34 +62,34 @@ public class CreateTableIfDoesNotExistQuery extends AbstractQuery {
         }
     }
 
-    public static Builder getBuilder() {
-        final Builder builder = new Builder();
+    public static <I>Builder<I> getBuilder() {
+        final Builder <I> builder = new Builder<I>();
         builder.setQuery(CREATE_TABLE_IF_DOES_NOT_EXIST);
         return builder;
     }
 
-    public static class Builder extends AbstractQuery.Builder<Builder, CreateTableIfDoesNotExistQuery> {
+    public static class Builder<I> extends AbstractQuery.Builder<Builder<I>, CreateTableIfDoesNotExistQuery> {
 
-        private String idType;
+        private IdColumn<I> idColumn;
         private String tableName;
 
         @Override
         public CreateTableIfDoesNotExistQuery build() {
-            return new CreateTableIfDoesNotExistQuery(this);
+            return new CreateTableIfDoesNotExistQuery<I>(this);
         }
 
-        public Builder setIdType(String idType){
-            this.idType = idType;
+        public Builder<I> setIdColumn(IdColumn<I> idColumn){
+            this.idColumn = idColumn;
             return getThis();
         }
 
-        public Builder setTableName(String tableName){
+        public Builder<I> setTableName(String tableName){
             this.tableName = tableName;
             return getThis();
         }
 
         @Override
-        protected Builder getThis() {
+        protected Builder<I> getThis() {
             return this;
         }
     }

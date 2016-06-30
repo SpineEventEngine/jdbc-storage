@@ -21,23 +21,13 @@
 package org.spine3.server.storage.jdbc.query.tables.entity;
 
 import org.spine3.Internal;
-import org.spine3.base.CommandStatus;
-import org.spine3.base.Error;
-import org.spine3.base.Failure;
-import org.spine3.server.storage.CommandStorageRecord;
 import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.jdbc.query.SelectById;
-import org.spine3.server.storage.jdbc.query.constants.CommandTable;
 import org.spine3.server.storage.jdbc.query.constants.EntityTable;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
-import javax.annotation.Nullable;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import static java.lang.String.format;
-import static org.spine3.server.storage.jdbc.util.Serializer.deserialize;
 
 @Internal
 public class SelectEntityByIdQuery<Id> extends SelectById<Id, EntityStorageRecord> {

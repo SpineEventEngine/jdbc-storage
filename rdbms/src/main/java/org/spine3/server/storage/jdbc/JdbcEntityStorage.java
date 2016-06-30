@@ -25,31 +25,25 @@ import org.slf4j.LoggerFactory;
 import org.spine3.server.entity.Entity;
 import org.spine3.server.storage.EntityStorage;
 import org.spine3.server.storage.EntityStorageRecord;
-import org.spine3.server.storage.jdbc.query.tables.entity.*;
+import org.spine3.server.storage.jdbc.query.factory.EntityStorageFactory;
 import org.spine3.server.storage.jdbc.util.*;
 
 import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.protobuf.Descriptors.Descriptor;
-import static java.lang.String.format;
 
 /**
  * The implementation of the entity storage based on the RDBMS.
  *
- * @param <Id> the type of entity IDs
+ * @param <I> the type of entity IDs
  * @see JdbcStorageFactory
  * @author Alexander Litus
  */
-/*package*/ class JdbcEntityStorage<Id> extends EntityStorage<Id> {
+/*package*/ class JdbcEntityStorage<I> extends EntityStorage<I> {
 
     private final DataSourceWrapper dataSource;
 
-    private final IdColumn<Id> idColumn;
-
-    private final String tableName;
-
-
+    private final EntityStorageFactory<I> queryFactory;
     /**
      * Creates a new storage instance.
      *
@@ -64,19 +58,12 @@ import static java.lang.String.format;
         return new JdbcEntityStorage<>(dataSource, entityClass, multitenant);
     }
 
-    private JdbcEntityStorage(DataSourceWrapper dataSource, Class<? extends Entity<Id, ?>> entityClass, boolean multitenant)
+    private JdbcEntityStorage(DataSourceWrapper dataSource, Class<? extends Entity<I, ?>> entityClass, boolean multitenant)
             throws DatabaseException {
         super(multitenant);
         this.dataSource = dataSource;
-        this.idColumn = IdColumn.newInstance(entityClass);
-        this.tableName = DbTableNameFactory.newTableName(entityClass);
-
-        CreateTableIfDoesNotExistQuery.getBuilder()
-                .setDataSource(dataSource)
-                .setIdType(idColumn.getColumnDataType())
-                .setTableName(tableName)
-                .build()
-                .execute();
+        queryFactory = new EntityStorageFactory<I>(dataSource, entityClass);
+        queryFactory.getCreateTableIfDoesNotExistQuery().execute();
     }
 
     /**
@@ -86,8 +73,8 @@ import static java.lang.String.format;
      */
     @Nullable
     @Override
-    protected EntityStorageRecord readInternal(Id id) throws DatabaseException {
-        final EntityStorageRecord record = new SelectEntityByIdQuery<>(tableName, dataSource, idColumn, id).execute();
+    protected EntityStorageRecord readInternal(I id) throws DatabaseException {
+        final EntityStorageRecord record = queryFactory.getSelectEntityByIdQuery(id).execute();
         return record;
     }
 
@@ -98,30 +85,18 @@ import static java.lang.String.format;
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     @Override
-    protected void writeInternal(Id id, EntityStorageRecord record) throws DatabaseException {
+    protected void writeInternal(I id, EntityStorageRecord record) throws DatabaseException {
         checkArgument(record.hasState(), "entity state");
 
         if (containsRecord(id)) {
-            UpdateEntityQuery.<Id>getBuilder(tableName)
-                    .setIdColumn(idColumn)
-                    .setId(id)
-                    .setRecord(record)
-                    .setDataSource(dataSource)
-                    .build()
-                    .execute();
+            queryFactory.getUpdateEntityQuery(id, record).execute();
         } else {
-            InsertEntityQuery.<Id>getBuilder(tableName)
-                    .setId(id)
-                    .setIdColumn(idColumn)
-                    .setRecord(record)
-                    .setDataSource(dataSource)
-                    .build()
-                    .execute();
+            queryFactory.getInsertEntityQuery(id, record).execute();
         }
     }
 
-    private boolean containsRecord(Id id) throws DatabaseException {
-        final EntityStorageRecord record = new SelectEntityByIdQuery<>(tableName, dataSource, idColumn, id).execute();
+    private boolean containsRecord(I id) throws DatabaseException {
+        final EntityStorageRecord record = queryFactory.getSelectEntityByIdQuery(id).execute();
         final boolean contains = record != null;
         return contains;
     }
@@ -142,10 +117,7 @@ import static java.lang.String.format;
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     /*package*/ void clear() throws DatabaseException {
-        DeleteAllQuery.getBuilder(tableName)
-                .setDataSource(dataSource)
-                .build()
-                .execute();
+       queryFactory.getDeleteAllQuery().execute();
     }
     private static Logger log() {
         return LogSingleton.INSTANCE.value;
