@@ -18,49 +18,51 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.spine3.server.storage.jdbc.query;
+package org.spine3.server.storage.jdbc.entity.query;
 
-import org.spine3.Internal;
 import org.spine3.server.storage.jdbc.DatabaseException;
+import org.spine3.server.storage.jdbc.query.AbstractQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-/**
- * A query which is executed in order to write to the data source.
- *
- * @author Alexander Litus
- */
-@Internal
-public class WriteQuery extends AbstractQuery{
+import static java.lang.String.format;
 
-    protected WriteQuery(Builder<? extends Builder, ? extends WriteQuery> builder) {
+public class DeleteAllQuery extends AbstractQuery {
+
+    private static final String DELETE_ALL = "DELETE FROM %s ;";
+
+    private DeleteAllQuery(Builder builder) {
         super(builder);
     }
 
-    /**
-     * Executes a write query.
-     */
-    public void execute() {
-        try (ConnectionWrapper connection = dataSource.getConnection(false)) {
-            try (PreparedStatement statement = prepareStatement(connection)) {
-                statement.execute();
-                connection.commit();
-            } catch (SQLException e) {
-                //logError(e);
-                connection.rollback();
-                throw new DatabaseException(e);
-            }
+    public void execute() throws DatabaseException {
+        try (ConnectionWrapper connection = dataSource.getConnection(true);
+             PreparedStatement statement = prepareStatement(connection)) {
+            statement.execute();
+        } catch (SQLException e) {
+            //log().error("Error while creating a table with the name: " + tableName, e);
+            throw new DatabaseException(e);
         }
     }
 
-  /*  *//**
-     * Logs an occurred exception.
-     *//*
-    protected abstract void logError(SQLException exception);*/
+    public static Builder getBuilder(String tableName) {
+        final Builder builder = new Builder();
+        builder.setQuery(format(DELETE_ALL, tableName));
+        return builder;
+    }
 
-    public abstract static class Builder<B extends Builder<B, Q>, Q extends WriteQuery>
-            extends AbstractQuery.Builder<B, Q> {
+    public static class Builder extends AbstractQuery.Builder<Builder, DeleteAllQuery> {
+
+        @Override
+        public DeleteAllQuery build() {
+            return new DeleteAllQuery(this);
+        }
+
+        @Override
+        protected Builder getThis() {
+            return this;
+        }
     }
 }
