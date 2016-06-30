@@ -60,14 +60,14 @@ import static org.spine3.validate.Validate.checkNotDefault;
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     /*package*/
-    static CommandStorage newInstance(DataSourceWrapper dataSource, boolean multitenant) throws DatabaseException {
-        return new JdbcCommandStorage(dataSource, multitenant);
+    static CommandStorage newInstance(DataSourceWrapper dataSource, boolean multitenant, CommandStorageQueryFactory queryFactory) throws DatabaseException {
+        return new JdbcCommandStorage(dataSource, multitenant, queryFactory);
     }
 
-    private JdbcCommandStorage(DataSourceWrapper dataSource, boolean multitenant) throws DatabaseException {
+    private JdbcCommandStorage(DataSourceWrapper dataSource, boolean multitenant, CommandStorageQueryFactory queryFactory) throws DatabaseException {
         super(multitenant);
         this.dataSource = dataSource;
-        this.queryFactory = new CommandStorageQueryFactory(dataSource);
+        this.queryFactory = queryFactory;
         queryFactory.getCreateTableIfDoesNotExistQuery().execute();
     }
 

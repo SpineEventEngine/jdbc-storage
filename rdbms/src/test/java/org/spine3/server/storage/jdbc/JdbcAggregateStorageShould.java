@@ -25,6 +25,7 @@ import org.junit.Test;
 import org.spine3.server.aggregate.Aggregate;
 import org.spine3.server.storage.AggregateStorage;
 import org.spine3.server.storage.AggregateStorageShould;
+import org.spine3.server.storage.jdbc.query.factory.AggregateStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.test.project.Project;
 import org.spine3.test.project.ProjectId;
@@ -48,7 +49,7 @@ public class JdbcAggregateStorageShould extends AggregateStorageShould {
     @Override
     protected <Id> JdbcAggregateStorage<Id> getStorage(Class<? extends Aggregate<Id, ? extends Message, ?>> aggregateClass) {
         final DataSourceWrapper dataSource = newInMemoryDataSource("aggregateStorageTests");
-        return JdbcAggregateStorage.newInstance(dataSource, aggregateClass, false);
+        return JdbcAggregateStorage.newInstance(dataSource, false, new AggregateStorageQueryFactory<Id>(dataSource, aggregateClass));
     }
 
     @Test

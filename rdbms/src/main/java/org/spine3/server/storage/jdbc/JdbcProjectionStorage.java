@@ -28,10 +28,6 @@ import org.spine3.server.storage.EntityStorage;
 import org.spine3.server.storage.ProjectionStorage;
 import org.spine3.server.storage.jdbc.query.constants.ProjectionTable;
 import org.spine3.server.storage.jdbc.query.factory.ProjectionStorageQueryFactory;
-import org.spine3.server.storage.jdbc.query.tables.projection.CreateTableIfDoesNotExistQuery;
-import org.spine3.server.storage.jdbc.query.tables.projection.InsertTimestampQuery;
-import org.spine3.server.storage.jdbc.query.tables.projection.SelectTimestampQuery;
-import org.spine3.server.storage.jdbc.query.tables.projection.UpdateTimestampQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
 import javax.annotation.Nullable;
@@ -53,36 +49,32 @@ import static org.spine3.server.storage.jdbc.util.DbTableNameFactory.newTableNam
 
     private final JdbcEntityStorage<I> entityStorage;
 
-    private final String tableName;
-
     private final ProjectionStorageQueryFactory queryFactory;
 
     /**
      * Creates a new storage instance.
      *
      * @param dataSource      a data source used by an {@code entityStorage}
-     * @param projectionClass a class of projections to store
      * @param entityStorage   an entity storage to use
-     * @param <Id>            a type of projection IDs
+     * @param <I>            a type of projection IDs
      * @return a new storage instance
      */
     /*package*/
-    static <Id> ProjectionStorage<Id> newInstance(DataSourceWrapper dataSource,
-                                                  Class<? extends Entity<Id, ?>> projectionClass,
-                                                  JdbcEntityStorage<Id> entityStorage,
-                                                  boolean multitenant) throws DatabaseException {
-        return new JdbcProjectionStorage<>(dataSource, projectionClass, entityStorage, multitenant);
+    static <I> ProjectionStorage<I> newInstance(DataSourceWrapper dataSource,
+                                                JdbcEntityStorage<I> entityStorage,
+                                                boolean multitenant,
+                                                ProjectionStorageQueryFactory<I> queryFactory) throws DatabaseException {
+        return new JdbcProjectionStorage<>(dataSource, entityStorage, multitenant, queryFactory);
     }
 
     private JdbcProjectionStorage(DataSourceWrapper dataSource,
-                                  Class<? extends Entity<I, ?>> projectionClass,
                                   JdbcEntityStorage<I> entityStorage,
-                                  boolean multitenant) throws DatabaseException {
+                                  boolean multitenant,
+                                  ProjectionStorageQueryFactory<I> queryFactory) throws DatabaseException {
         super(multitenant);
         this.dataSource = dataSource;
         this.entityStorage = entityStorage;
-        this.tableName = newTableName(projectionClass) + ProjectionTable.LAST_EVENT_TIME_TABLE_NAME_SUFFIX;
-        this.queryFactory = new ProjectionStorageQueryFactory<>(dataSource, projectionClass);
+        this.queryFactory = queryFactory;
 
        queryFactory.getCreateTableIfDoesNotExistQuery().execute();
     }

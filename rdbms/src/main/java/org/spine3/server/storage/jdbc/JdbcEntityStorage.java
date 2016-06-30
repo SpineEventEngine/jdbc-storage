@@ -48,21 +48,20 @@ import static com.google.common.base.Preconditions.checkArgument;
      * Creates a new storage instance.
      *
      * @param dataSource the dataSource wrapper
-     * @param entityClass the class of entities to save to the storage
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
-    /*package*/ static <Id> JdbcEntityStorage<Id> newInstance(DataSourceWrapper dataSource,
-                                                              Class<? extends Entity<Id, ?>> entityClass,
-                                                              boolean multitenant)
+    /*package*/ static <I> JdbcEntityStorage<I> newInstance(DataSourceWrapper dataSource,
+                                                            boolean multitenant,
+                                                            EntityStorageQueryFactory<I> queryFactory)
                                                               throws DatabaseException {
-        return new JdbcEntityStorage<>(dataSource, entityClass, multitenant);
+        return new JdbcEntityStorage<>(dataSource, multitenant, queryFactory);
     }
 
-    private JdbcEntityStorage(DataSourceWrapper dataSource, Class<? extends Entity<I, ?>> entityClass, boolean multitenant)
+    private JdbcEntityStorage(DataSourceWrapper dataSource, boolean multitenant, EntityStorageQueryFactory<I> queryFactory)
             throws DatabaseException {
         super(multitenant);
         this.dataSource = dataSource;
-        queryFactory = new EntityStorageQueryFactory<I>(dataSource, entityClass);
+        this.queryFactory = queryFactory;
         queryFactory.getCreateTableIfDoesNotExistQuery().execute();
     }
 

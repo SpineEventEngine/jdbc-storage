@@ -28,6 +28,7 @@ import org.spine3.server.event.EventStreamQuery;
 import org.spine3.server.storage.EventStorage;
 import org.spine3.server.storage.EventStorageRecord;
 import org.spine3.server.storage.jdbc.query.constants.EventTable;
+import org.spine3.server.storage.jdbc.query.factory.EntityStorageQueryFactory;
 import org.spine3.server.storage.jdbc.query.factory.EventStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbIterator;
@@ -62,14 +63,14 @@ import static org.spine3.io.IoUtil.closeAll;
      * @throws DatabaseException if an error occurs during an interaction with the DB
      * @param dataSource the dataSource wrapper
      */
-    /*package*/ static JdbcEventStorage newInstance(DataSourceWrapper dataSource, boolean multitenant) throws DatabaseException {
-        return new JdbcEventStorage(dataSource, multitenant);
+    /*package*/ static JdbcEventStorage newInstance(DataSourceWrapper dataSource, boolean multitenant, EventStorageQueryFactory queryFactory) throws DatabaseException {
+        return new JdbcEventStorage(dataSource, multitenant, queryFactory);
     }
 
-    private JdbcEventStorage(DataSourceWrapper dataSource, boolean multitenant) throws DatabaseException {
+    private JdbcEventStorage(DataSourceWrapper dataSource, boolean multitenant, EventStorageQueryFactory queryFactory) throws DatabaseException {
         super(multitenant);
         this.dataSource = dataSource;
-        queryFactory = new EventStorageQueryFactory(dataSource);
+        this.queryFactory = queryFactory;
         queryFactory.getCreateTableIfDoesNotExistQuery().execute();
     }
 

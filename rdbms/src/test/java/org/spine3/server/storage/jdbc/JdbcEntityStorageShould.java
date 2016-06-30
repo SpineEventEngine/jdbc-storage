@@ -25,6 +25,7 @@ import org.spine3.server.entity.Entity;
 import org.spine3.server.storage.EntityStorage;
 import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.EntityStorageShould;
+import org.spine3.server.storage.jdbc.query.factory.EntityStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.test.project.Project;
 
@@ -47,7 +48,7 @@ public class JdbcEntityStorageShould extends EntityStorageShould<String> {
     @Override
     protected <I> JdbcEntityStorage<I> getStorage(Class<? extends Entity<I, ?>> entityClass) {
         final DataSourceWrapper dataSource = newInMemoryDataSource("entityStorageTests");
-        return JdbcEntityStorage.newInstance(dataSource, entityClass, false);
+        return JdbcEntityStorage.newInstance(dataSource, false, new EntityStorageQueryFactory<I>(dataSource, entityClass));
     }
 
     @Override

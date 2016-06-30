@@ -3,6 +3,7 @@ package org.spine3.server.storage.jdbc.query.factory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.spine3.server.aggregate.Aggregate;
 import org.spine3.server.entity.Entity;
 import org.spine3.server.storage.AggregateStorageRecord;
 import org.spine3.server.storage.jdbc.query.constants.AggregateTable;
@@ -18,7 +19,7 @@ public class AggregateStorageQueryFactory<I>{
     private final String eventCountTableName;
     private final DataSourceWrapper dataSource;
 
-    public AggregateStorageQueryFactory(DataSourceWrapper dataSource, Class<? extends Entity<I, ?>> aggregateClass) {
+    public AggregateStorageQueryFactory(DataSourceWrapper dataSource, Class<? extends Aggregate<I, ?, ?>> aggregateClass) {
         this.idColumn = IdColumn.newInstance(aggregateClass);
         this.mainTableName = DbTableNameFactory.newTableName(aggregateClass);
         this.eventCountTableName = mainTableName + AggregateTable.EVENT_COUNT_TABLE_NAME_SUFFIX;

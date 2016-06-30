@@ -39,11 +39,11 @@ import static org.spine3.io.IoUtil.closeAll;
 /**
  * The implementation of the aggregate storage based on the RDBMS.
  *
- * @param <Id> the type of aggregate IDs
+ * @param <I> the type of aggregate IDs
  * @see JdbcStorageFactory
  * @author Alexander Litus
  */
-/*package*/ class JdbcAggregateStorage<Id> extends AggregateStorage<Id> {
+/*package*/ class JdbcAggregateStorage<I> extends AggregateStorage<I> {
 
     private final DataSourceWrapper dataSource;
 
@@ -53,34 +53,33 @@ import static org.spine3.io.IoUtil.closeAll;
     private final Collection<DbIterator> iterators = newLinkedList();
 
 
-    private final AggregateStorageQueryFactory<Id> queryFactory;
+    private final AggregateStorageQueryFactory<I> queryFactory;
 
 
     /**
      * Creates a new storage instance.
      *
      * @param dataSource the dataSource wrapper
-     * @param aggregateClass the class of aggregates to save to the storage
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
-    /*package*/ static <ID> JdbcAggregateStorage<ID> newInstance(DataSourceWrapper dataSource,
-                                                                 Class<? extends Aggregate<ID, ?, ?>> aggregateClass,
-                                                                 boolean multitenant)
+    /*package*/ static <I> JdbcAggregateStorage<I> newInstance(DataSourceWrapper dataSource,
+                                                               boolean multitenant,
+                                                               AggregateStorageQueryFactory<I> queryFactory)
                                                                  throws DatabaseException {
-        return new JdbcAggregateStorage<>(dataSource, aggregateClass, multitenant);
+        return new JdbcAggregateStorage<>(dataSource, multitenant, queryFactory);
     }
 
-    private JdbcAggregateStorage(DataSourceWrapper dataSource, Class<? extends Aggregate<Id, ?, ?>> aggregateClass, boolean multitenant)
+    private JdbcAggregateStorage(DataSourceWrapper dataSource, boolean multitenant, AggregateStorageQueryFactory<I> queryFactory)
             throws DatabaseException {
         super(multitenant);
         this.dataSource = dataSource;
-        this.queryFactory = new AggregateStorageQueryFactory<Id>(dataSource,aggregateClass);
+        this.queryFactory = queryFactory;
         queryFactory.getCreateMainTableIfDoesNotExistQuery().execute();
         queryFactory.getCreateEventCountTableIfDoesNotExistQuery().execute();
     }
 
     @Override
-    public int readEventCountAfterLastSnapshot(Id id) {
+    public int readEventCountAfterLastSnapshot(I id) {
         checkNotClosed();
         final Integer count = queryFactory.getSelectEventCountByIdQuery(id).execute();
         if (count == null) {
@@ -90,7 +89,7 @@ import static org.spine3.io.IoUtil.closeAll;
     }
 
     @Override
-    public void writeEventCountAfterLastSnapshot(Id id, int count) {
+    public void writeEventCountAfterLastSnapshot(I id, int count) {
         checkNotClosed();
         if (containsEventCount(id)) {
             queryFactory.getUpdateEventCountQuery(id, count).execute();
@@ -99,7 +98,7 @@ import static org.spine3.io.IoUtil.closeAll;
         }
     }
 
-    private boolean containsEventCount(Id id) {
+    private boolean containsEventCount(I id) {
         final Integer count = queryFactory.getSelectEventCountByIdQuery(id).execute();
         final boolean contains = count != null;
         return contains;
@@ -111,7 +110,7 @@ import static org.spine3.io.IoUtil.closeAll;
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     @Override
-    protected void writeInternal(Id id, AggregateStorageRecord record) throws DatabaseException {
+    protected void writeInternal(I id, AggregateStorageRecord record) throws DatabaseException {
         queryFactory.getInsertRecordQuery(id, record).execute();
     }
 
@@ -124,7 +123,7 @@ import static org.spine3.io.IoUtil.closeAll;
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     @Override
-    protected Iterator<AggregateStorageRecord> historyBackward(Id id) throws DatabaseException {
+    protected Iterator<AggregateStorageRecord> historyBackward(I id) throws DatabaseException {
         checkNotNull(id);
             final ResultSet resultSet = queryFactory.getSelectByIdSortedByTimeDescQuery(id).execute();
             final DbIterator<AggregateStorageRecord> iterator = new DbIterator<>(resultSet, AggregateTable.AGGREGATE_COL, AggregateTable.RECORD_DESCRIPTOR);
