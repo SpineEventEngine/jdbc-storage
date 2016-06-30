@@ -125,10 +125,9 @@ import static org.spine3.io.IoUtil.closeAll;
     @Override
     protected Iterator<AggregateStorageRecord> historyBackward(I id) throws DatabaseException {
         checkNotNull(id);
-            final ResultSet resultSet = queryFactory.getSelectByIdSortedByTimeDescQuery(id).execute();
-            final DbIterator<AggregateStorageRecord> iterator = new DbIterator<>(resultSet, AggregateTable.AGGREGATE_COL, AggregateTable.RECORD_DESCRIPTOR);
-            iterators.add(iterator);
-            return iterator;
+        final Iterator<AggregateStorageRecord> iterator = queryFactory.getSelectByIdSortedByTimeDescQuery(id).execute();
+        iterators.add((DbIterator) iterator);
+        return iterator;
     }
 
     @Override

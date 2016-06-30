@@ -98,9 +98,7 @@ import static org.spine3.validate.Validate.checkNotDefault;
     @Override
     public Iterator<CommandStorageRecord> read(CommandStatus status) {
         checkNotNull(status);
-        ResultSet resultSet = queryFactory.getSelectByStatusQuery(status).execute();
-        final DbIterator<CommandStorageRecord> iterator = new DbIterator<>(resultSet, CommandTable.COMMAND_COL, CommandTable.COMMAND_RECORD_DESCRIPTOR);
-        return iterator;
+        return queryFactory.getSelectByStatusQuery(status).execute();
     }
 
     /**

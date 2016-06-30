@@ -21,19 +21,22 @@
 package org.spine3.server.storage.jdbc.query.tables.aggregate;
 
 
+import org.spine3.server.storage.AggregateStorageRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.AbstractQuery;
 import org.spine3.server.storage.jdbc.query.constants.AggregateTable;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
+import org.spine3.server.storage.jdbc.util.DbIterator;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Iterator;
 
 import static java.lang.String.format;
 
-public class SelectByIdSortedByTimeDescQuery<Id> extends AbstractQuery{
+public class SelectByIdSortedByTimeDescQuery<Id> extends AbstractQuery {
 
     private final IdColumn<Id> idColumn;
     private final Id id;
@@ -51,45 +54,45 @@ public class SelectByIdSortedByTimeDescQuery<Id> extends AbstractQuery{
         this.id = builder.id;
     }
 
-    public ResultSet execute() throws DatabaseException {
+    public Iterator<AggregateStorageRecord> execute() throws DatabaseException {
         try (ConnectionWrapper connection = dataSource.getConnection(true);
-             PreparedStatement statement = super.prepareStatement(connection)) {
+             PreparedStatement statement = prepareStatement(connection)) {
             idColumn.setId(1, id, statement);
-            return statement.executeQuery();
+            return new DbIterator<>(statement, AggregateTable.AGGREGATE_COL, AggregateTable.RECORD_DESCRIPTOR);
         } catch (SQLException e) {
             //log().error("Error while creating a table with the name: " + tableName, e);
             throw new DatabaseException(e);
         }
     }
 
-    public static <Id> Builder <Id> getBuilder(String tableName) {
+    public static <Id> Builder<Id> getBuilder(String tableName) {
         final Builder<Id> builder = new Builder<>();
         builder.setQuery(format(SELECT_BY_ID_SORTED_BY_TIME_DESC, tableName));
         return builder;
     }
 
-    public static class Builder<Id> extends AbstractQuery.Builder<Builder<Id>, SelectByIdSortedByTimeDescQuery> {
+    public static class Builder<I> extends AbstractQuery.Builder<Builder<I>, SelectByIdSortedByTimeDescQuery> {
 
-        private IdColumn<Id> idColumn;
-        private Id id;
+        private IdColumn<I> idColumn;
+        private I id;
 
         @Override
-        public SelectByIdSortedByTimeDescQuery build() {
-            return new SelectByIdSortedByTimeDescQuery(this);
+        public SelectByIdSortedByTimeDescQuery<I> build() {
+            return new SelectByIdSortedByTimeDescQuery<>(this);
         }
 
-        public Builder<Id> setIdColumn(IdColumn<Id> idColumn){
+        public Builder<I> setIdColumn(IdColumn<I> idColumn) {
             this.idColumn = idColumn;
             return getThis();
         }
 
-        public Builder<Id> setId(Id id){
+        public Builder<I> setId(I id) {
             this.id = id;
             return getThis();
         }
 
         @Override
-        protected Builder<Id> getThis() {
+        protected Builder<I> getThis() {
             return this;
         }
     }

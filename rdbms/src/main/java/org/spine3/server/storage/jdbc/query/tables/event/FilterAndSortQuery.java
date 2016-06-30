@@ -24,17 +24,21 @@ package org.spine3.server.storage.jdbc.query.tables.event;
 import com.google.protobuf.Any;
 import com.google.protobuf.Message;
 import com.google.protobuf.Timestamp;
+import org.spine3.base.Event;
 import org.spine3.protobuf.Messages;
 import org.spine3.server.event.EventFilter;
 import org.spine3.server.event.EventStreamQuery;
+import org.spine3.server.storage.EventStorageRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.AbstractQuery;
 import org.spine3.server.storage.jdbc.query.constants.EventTable;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
+import org.spine3.server.storage.jdbc.util.DbIterator;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Iterator;
 
 import static org.spine3.base.Identifiers.idToString;
 
@@ -152,15 +156,11 @@ public class FilterAndSortQuery extends AbstractQuery {
         return builder;
     }
 
-    public ResultSet execute() throws DatabaseException {
-        final ResultSet resultSet;
+    public Iterator<EventStorageRecord> execute() throws DatabaseException {
         try (ConnectionWrapper connection = dataSource.getConnection(true)) {
             final PreparedStatement statement = prepareStatement(connection, streamQuery);
-            resultSet = statement.executeQuery();
-        } catch (SQLException e) {
-            throw new DatabaseException(e);
+            return new DbIterator<>(statement, EventTable.EVENT_COL, EventTable.RECORD_DESCRIPTOR);
         }
-        return resultSet;
     }
 
     public static class Builder extends AbstractQuery.Builder<Builder, FilterAndSortQuery> {

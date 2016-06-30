@@ -75,13 +75,6 @@ public class DbIterator<Record extends Message> implements Iterator<Record>, Aut
         }
     }
 
-    public DbIterator(ResultSet resultSet, String columnName, Descriptor recordDescriptor) throws DatabaseException {
-        this.resultSet = resultSet;
-        this.statement = null;
-        this.columnName = columnName;
-        this.recordDescriptor = recordDescriptor;
-    }
-
     @Override
     public boolean hasNext() {
         try {

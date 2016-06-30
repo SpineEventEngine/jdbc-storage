@@ -23,14 +23,17 @@ package org.spine3.server.storage.jdbc.query.tables.commands;
 import org.spine3.Internal;
 import org.spine3.base.Command;
 import org.spine3.base.CommandStatus;
+import org.spine3.server.storage.CommandStorageRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.AbstractQuery;
 import org.spine3.server.storage.jdbc.query.constants.CommandTable;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
+import org.spine3.server.storage.jdbc.util.DbIterator;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Iterator;
 
 
 /**
@@ -77,15 +80,13 @@ public class  SelectByStatusQuery extends AbstractQuery{
         return statement;
     }
 
-    public ResultSet execute() throws DatabaseException {
+    public Iterator<CommandStorageRecord> execute() throws DatabaseException {
         final ResultSet resultSet;
         try (ConnectionWrapper connection = dataSource.getConnection(true)) {
             final PreparedStatement statement = this.prepareStatement(connection);
-            resultSet = statement.executeQuery();
-        } catch (SQLException e) {
-            throw new DatabaseException(e);
+            return new DbIterator<>(statement, CommandTable.COMMAND_COL, CommandTable.COMMAND_RECORD_DESCRIPTOR);
+
         }
-        return resultSet;
     }
 
     public static class Builder extends AbstractQuery.Builder<Builder, SelectByStatusQuery> {

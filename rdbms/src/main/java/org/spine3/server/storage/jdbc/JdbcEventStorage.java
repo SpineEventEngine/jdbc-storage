@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.spine3.base.Event;
 import org.spine3.base.EventId;
 import org.spine3.server.event.EventStreamQuery;
+import org.spine3.server.storage.CommandStorageRecord;
 import org.spine3.server.storage.EventStorage;
 import org.spine3.server.storage.EventStorageRecord;
 import org.spine3.server.storage.jdbc.query.constants.EventTable;
@@ -84,9 +85,9 @@ import static org.spine3.io.IoUtil.closeAll;
      */
     @Override
     public Iterator<Event> iterator(EventStreamQuery query) throws DatabaseException {
-        final ResultSet resultSet = queryFactory.getFilterAndSortQuery(query).execute();
-        final DbIterator<EventStorageRecord> iterator = new DbIterator<>(resultSet, EventTable.EVENT_COL, EventTable.RECORD_DESCRIPTOR);
-        iterators.add(iterator);
+        final Iterator<EventStorageRecord> iterator = queryFactory.getFilterAndSortQuery(query).execute();
+
+        iterators.add((DbIterator) iterator);
         final Iterator<Event> result = toEventIterator(iterator);
         return result;
     }

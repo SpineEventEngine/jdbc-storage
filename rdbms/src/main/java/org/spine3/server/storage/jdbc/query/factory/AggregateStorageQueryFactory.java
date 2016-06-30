@@ -87,7 +87,7 @@ public class AggregateStorageQueryFactory<I>{
                 .build();
     }
 
-    public SelectByIdSortedByTimeDescQuery getSelectByIdSortedByTimeDescQuery(I id){
+    public SelectByIdSortedByTimeDescQuery<I> getSelectByIdSortedByTimeDescQuery(I id){
         return SelectByIdSortedByTimeDescQuery.<I>getBuilder(mainTableName)
                 .setIdColumn(idColumn)
                 .setId(id)
