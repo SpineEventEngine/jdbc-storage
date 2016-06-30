@@ -29,9 +29,9 @@ import org.spine3.base.Failure;
 import org.spine3.server.storage.CommandStorage;
 import org.spine3.server.storage.CommandStorageRecord;
 import org.spine3.server.storage.jdbc.query.constants.CommandTable;
-import org.spine3.server.storage.jdbc.query.tables.commands.*;
-import org.spine3.server.storage.jdbc.query.tables.commands.SelectByStatusQuery;
-import org.spine3.server.storage.jdbc.util.*;
+import org.spine3.server.storage.jdbc.query.factory.CommandStorageQueryFactory;
+import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
+import org.spine3.server.storage.jdbc.util.DbIterator;
 import org.spine3.validate.Validate;
 
 import java.sql.ResultSet;
@@ -51,6 +51,7 @@ import static org.spine3.validate.Validate.checkNotDefault;
 /* package */ class JdbcCommandStorage extends CommandStorage {
     private final DataSourceWrapper dataSource;
 
+    private final CommandStorageQueryFactory queryFactory;
     /**
      * Creates a new storage instance.
      *
@@ -66,11 +67,8 @@ import static org.spine3.validate.Validate.checkNotDefault;
     private JdbcCommandStorage(DataSourceWrapper dataSource, boolean multitenant) throws DatabaseException {
         super(multitenant);
         this.dataSource = dataSource;
-        CreateTableIfDoesNotExistQuery
-                .getBuilder()
-                .setDataSource(dataSource)
-                .build()
-                .execute();
+        this.queryFactory = new CommandStorageQueryFactory(dataSource);
+        queryFactory.getCreateTableIfDoesNotExistQuery().execute();
     }
 
     /**
@@ -83,8 +81,8 @@ import static org.spine3.validate.Validate.checkNotDefault;
     public CommandStorageRecord read(CommandId commandId) throws DatabaseException {
         checkNotClosed();
 
-        final SelectCommandByIdQuery query = new SelectCommandByIdQuery(dataSource, commandId.getUuid());
-        final CommandStorageRecord record = query.execute();
+        final CommandStorageRecord record = queryFactory.getSelectCommandByIdQuery(commandId).execute();
+
         if (record == null) {
             return CommandStorageRecord.getDefaultInstance();
         }
@@ -100,15 +98,9 @@ import static org.spine3.validate.Validate.checkNotDefault;
     @Override
     public Iterator<CommandStorageRecord> read(CommandStatus status) {
         checkNotNull(status);
-        try (ConnectionWrapper connection = dataSource.getConnection(true)) {
-            ResultSet resultSet = SelectByStatusQuery.getBuilder()
-                    .setDataSource(dataSource)
-                    .setStatus(status)
-                    .build()
-                    .execute();
-            final DbIterator<CommandStorageRecord> iterator = new DbIterator<>(resultSet, CommandTable.COMMAND_COL, CommandTable.COMMAND_RECORD_DESCRIPTOR);
-            return iterator;
-        }
+        ResultSet resultSet = queryFactory.getSelectByStatusQuery(status).execute();
+        final DbIterator<CommandStorageRecord> iterator = new DbIterator<>(resultSet, CommandTable.COMMAND_COL, CommandTable.COMMAND_RECORD_DESCRIPTOR);
+        return iterator;
     }
 
     /**
@@ -123,25 +115,10 @@ import static org.spine3.validate.Validate.checkNotDefault;
         checkNotDefault(record);
         checkNotClosed();
 
-        CommandStatus status = CommandStatus.forNumber(record.getStatusValue());
         if (containsRecord(commandId)) {
-            UpdateCommandQuery.getBuilder()
-                    .setDataSource(dataSource)
-                    .setIdColumn(CommandTable.STRING_ID_COLUMN)
-                    .setId(commandId.getUuid())
-                    .setRecord(record)
-                    .setStatus(status)
-                    .build()
-                    .execute();
+            queryFactory.getUpdateCommandQuery(commandId, record).execute();
         } else {
-            InsertCommandQuery.getBuilder()
-                    .setDataSource(dataSource)
-                    .setIdColumn(CommandTable.STRING_ID_COLUMN)
-                    .setId(commandId.getUuid())
-                    .setRecord(record)
-                    .setStatus(status)
-                    .build()
-                    .execute();
+            queryFactory.getInsertCommandQuery(commandId, record).execute();
         }
     }
 
@@ -162,12 +139,7 @@ import static org.spine3.validate.Validate.checkNotDefault;
         checkNotNull(commandId);
         checkNotClosed();
 
-        SetOkStatusQuery.getBuilder()
-                .setDataSource(this.dataSource)
-                .setIdColumn(CommandTable.STRING_ID_COLUMN)
-                .setId(commandId.getUuid())
-                .build()
-                .execute();
+        queryFactory.getSetOkStatusQuery(commandId).execute();
     }
 
     /**
@@ -182,13 +154,7 @@ import static org.spine3.validate.Validate.checkNotDefault;
         checkNotNull(error);
         checkNotClosed();
 
-        SetErrorQuery.getBuilder()
-                .setDataSource(dataSource)
-                .setIdColumn(CommandTable.STRING_ID_COLUMN)
-                .setId(commandId.getUuid())
-                .setRecord(error)
-                .build()
-                .execute();
+        queryFactory.getSetErrorQuery(commandId, error).execute();
     }
 
     /**
@@ -203,13 +169,7 @@ import static org.spine3.validate.Validate.checkNotDefault;
         checkNotNull(failure);
         checkNotClosed();
 
-        SetFailureQuery.getBuilder()
-                .setDataSource(dataSource)
-                .setIdColumn(CommandTable.STRING_ID_COLUMN)
-                .setId(commandId.getUuid())
-                .setRecord(failure)
-                .build()
-                .execute();
+        queryFactory.getSetFailureQuery(commandId, failure).execute();
     }
 
     @Override
