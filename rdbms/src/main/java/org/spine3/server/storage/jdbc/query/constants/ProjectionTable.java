@@ -20,12 +20,13 @@
 
 package org.spine3.server.storage.jdbc.query.constants;
 
+/**
+ * A utility class representing constants which are necessary for working with projection table.
+ *
+ * @author Andrey Lavrov
+ */
+@SuppressWarnings("UtilityClass")
 public class ProjectionTable {
-
-    /**
-     * A suffix of a table name where the last event time is stored.
-     */
-    public static final String LAST_EVENT_TIME_TABLE_NAME_SUFFIX = "_last_event_time";
 
     /**
      * Last event time seconds column name.
@@ -38,4 +39,12 @@ public class ProjectionTable {
      */
     @SuppressWarnings("DuplicateStringLiteralInspection")
     public static final String NANOS_COL = "nanoseconds";
+
+    /**
+     * A suffix of a table name where the last event time is stored.
+     */
+    public static final String LAST_EVENT_TIME_TABLE_NAME_SUFFIX = "_last_event_time";
+
+    private ProjectionTable() {
+    }
 }

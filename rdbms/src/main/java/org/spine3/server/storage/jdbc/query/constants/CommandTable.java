@@ -26,9 +26,14 @@ import org.spine3.base.Failure;
 import org.spine3.server.storage.CommandStorageRecord;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
-
+/**
+ * A utility class representing constants which are necessary for working with command table.
+ *
+ * @author Andrey Lavrov
+ */
 @SuppressWarnings("UtilityClass")
 public class CommandTable {
+
     /**
      * Commands table name.
      */
@@ -44,15 +49,8 @@ public class CommandTable {
      */
     public static final String COMMAND_COL = "command";
 
-    public static final Descriptors.Descriptor COMMAND_RECORD_DESCRIPTOR = CommandStorageRecord.getDescriptor();
-
     /**
-     * Is command status OK column name.
-     */
-    public static final String IS_STATUS_OK_COL = "status_ok";
-
-    /**
-     * Is command status OK column name.
+     * Is command status column name.
      */
     public static final String COMMAND_STATUS_COL = "command_status";
 
@@ -61,13 +59,24 @@ public class CommandTable {
      */
     public static final String ERROR_COL = "error";
 
-    public static final Descriptors.Descriptor ERROR_DESCRIPTOR = Error.getDescriptor();
-
     /**
      * Command failure column name.
      */
     public static final String FAILURE_COL = "failure";
 
+    /**
+     * Record descriptor for Command record type.
+     */
+    public static final Descriptors.Descriptor COMMAND_RECORD_DESCRIPTOR = CommandStorageRecord.getDescriptor();
+
+    /**
+     * Record descriptor for Error record type.
+     */
+    public static final Descriptors.Descriptor ERROR_DESCRIPTOR = Error.getDescriptor();
+
+    /**
+     * Record descriptor for Failure record type.
+     */
     public static final Descriptors.Descriptor FAILURE_DESCRIPTOR = Failure.getDescriptor();
 
     public static final IdColumn.StringIdColumn STRING_ID_COLUMN = new IdColumn.StringIdColumn();

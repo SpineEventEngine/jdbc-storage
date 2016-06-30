@@ -20,11 +20,17 @@
 
 package org.spine3.server.storage.jdbc.query.constants;
 
-
 import com.google.protobuf.Descriptors;
 import org.spine3.server.storage.AggregateStorageRecord;
 
+/**
+ * A utility class representing constants which are necessary for working with aggregate tables.
+ *
+ * @author Andrey Lavrov
+ */
+@SuppressWarnings("UtilityClass")
 public class AggregateTable {
+
     /**
      * Aggregate ID column name (contains in `main` and `event_count` tables).
      */
@@ -33,7 +39,6 @@ public class AggregateTable {
     /**
      * Aggregate record column name.
      */
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     public static final String AGGREGATE_COL = "aggregate";
 
     /**
@@ -51,17 +56,17 @@ public class AggregateTable {
     /**
      * A count of events after the last snapshot column name.
      */
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     public static final String EVENT_COUNT_COL = "event_count";
 
     /**
      * A suffix of a table name where the last event time is stored.
      */
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     public static final String EVENT_COUNT_TABLE_NAME_SUFFIX = "_event_count";
 
+    /**
+     * Record descriptor for specified record type.
+     */
     public static final Descriptors.Descriptor RECORD_DESCRIPTOR = AggregateStorageRecord.getDescriptor();
-
 
     private AggregateTable() {
     }

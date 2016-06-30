@@ -22,8 +22,13 @@ package org.spine3.server.storage.jdbc.query.constants;
 
 import com.google.protobuf.Descriptors;
 import org.spine3.server.storage.EntityStorageRecord;
-import org.spine3.server.storage.jdbc.util.IdColumn;
 
+/**
+ * A utility class representing constants which are necessary for working with entity tables.
+ *
+ * @author Andrey Lavrov
+ */
+@SuppressWarnings("UtilityClass")
 public class EntityTable {
 
     /**
@@ -36,6 +41,11 @@ public class EntityTable {
      */
     public static final String ID_COL = "id";
 
+    /**
+     * Record descriptor for Entity record type.
+     */
     public static final Descriptors.Descriptor RECORD_DESCRIPTOR = EntityStorageRecord.getDescriptor();
 
+    private EntityTable() {
+    }
 }

@@ -23,8 +23,17 @@ package org.spine3.server.storage.jdbc.query.constants;
 import com.google.protobuf.Descriptors;
 import org.spine3.server.storage.EventStorageRecord;
 
+/**
+ * A utility class representing constants which are necessary for working with event table.
+ *
+ * @author Andrey Lavrov
+ */
 @SuppressWarnings("UtilityClass")
 public class EventTable {
+
+    /**
+     * Event table name.
+     */
     public static final String TABLE_NAME = "events";
 
     /**
@@ -62,6 +71,9 @@ public class EventTable {
     @SuppressWarnings("DuplicateStringLiteralInspection")
     public static final String SELECT_EVENT_FROM_TABLE = "SELECT " + EVENT_COL + " FROM " + TABLE_NAME + ' ';
 
+    /**
+     * Record descriptor for Event record type.
+     */
     public static final Descriptors.Descriptor RECORD_DESCRIPTOR = EventStorageRecord.getDescriptor();
 
     private EventTable() {
