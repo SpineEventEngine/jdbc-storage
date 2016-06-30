@@ -18,10 +18,14 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.spine3.server.storage.jdbc.util;
+package org.spine3.server.storage.jdbc.query;
 
+import com.google.protobuf.Message;
 import org.spine3.Internal;
 import org.spine3.server.storage.jdbc.DatabaseException;
+import org.spine3.server.storage.jdbc.query.tables.event.InsertEventQuery;
+import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
+import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -32,12 +36,10 @@ import java.sql.SQLException;
  * @author Alexander Litus
  */
 @Internal
-public abstract class WriteQuery {
+public abstract class WriteQuery extends AbstractQuery{
 
-    private final DataSourceWrapper dataSource;
-
-    protected WriteQuery(DataSourceWrapper dataSource) {
-        this.dataSource = dataSource;
+    protected WriteQuery(Builder<? extends Builder, ? extends WriteQuery> builder) {
+        super(builder);
     }
 
     /**
@@ -49,20 +51,19 @@ public abstract class WriteQuery {
                 statement.execute();
                 connection.commit();
             } catch (SQLException e) {
-                logError(e);
+                //logError(e);
                 connection.rollback();
                 throw new DatabaseException(e);
             }
         }
     }
 
-    /**
-     * Prepares SQL statement using the connection.
-     */
-    protected abstract PreparedStatement prepareStatement(ConnectionWrapper connection);
-
-    /**
+  /*  *//**
      * Logs an occurred exception.
-     */
-    protected abstract void logError(SQLException exception);
+     *//*
+    protected abstract void logError(SQLException exception);*/
+
+    public abstract static class Builder<B extends Builder<B, Q>, Q extends WriteQuery>
+            extends AbstractQuery.Builder<B, Q> {
+    }
 }

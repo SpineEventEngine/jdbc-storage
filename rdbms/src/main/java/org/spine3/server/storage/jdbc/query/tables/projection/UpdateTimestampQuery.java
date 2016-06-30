@@ -23,6 +23,7 @@ package org.spine3.server.storage.jdbc.query.tables.projection;
 import com.google.protobuf.Timestamp;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.AbstractQuery;
+import org.spine3.server.storage.jdbc.query.WriteQuery;
 import org.spine3.server.storage.jdbc.query.constants.ProjectionTable;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 
@@ -32,7 +33,7 @@ import java.sql.SQLException;
 import static java.lang.String.format;
 
 
-public class UpdateTimestampQuery<Id> extends AbstractQuery{
+public class UpdateTimestampQuery<Id> extends WriteQuery{
 
     private final Timestamp timestamp;
 
@@ -51,19 +52,6 @@ public class UpdateTimestampQuery<Id> extends AbstractQuery{
     /*protected void logError(SQLException exception) {
         log(exception, "command insertion", getId());
     }*/
-
-    public void execute() {
-        try (ConnectionWrapper connection = dataSource.getConnection(false)) {
-            try (PreparedStatement statement = prepareStatement(connection)) {
-                statement.execute();
-                connection.commit();
-            } catch (SQLException e) {
-                //logError(e);
-                connection.rollback();
-                throw new DatabaseException(e);
-            }
-        }
-    }
 
     public static <Id> Builder <Id> getBuilder(String tableName) {
         final Builder<Id> builder = new Builder<>();
@@ -85,7 +73,7 @@ public class UpdateTimestampQuery<Id> extends AbstractQuery{
         }
     }
 
-    public static class Builder<Id> extends AbstractQuery.Builder<Builder<Id>, UpdateTimestampQuery> {
+    public static class Builder<Id> extends WriteQuery.Builder<Builder<Id>, UpdateTimestampQuery> {
 
         private Timestamp timestamp;
 

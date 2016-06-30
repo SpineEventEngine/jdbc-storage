@@ -27,7 +27,7 @@ import org.spine3.server.storage.jdbc.util.IdColumn;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public class UpdateRecord <Id> extends AbstractQuery {
+public class UpdateRecord <Id> extends WriteQuery {
 
     private final Id id;
     private int idIndexInQuery;
@@ -40,19 +40,6 @@ public class UpdateRecord <Id> extends AbstractQuery {
         this.id = builder.id;
     }
 
-    public void execute() throws DatabaseException {
-        try (ConnectionWrapper connection = this.dataSource.getConnection(false)) {
-            try (PreparedStatement statement = prepareStatement(connection)) {
-                statement.execute();
-                connection.commit();
-            } catch (SQLException e) {
-                // logError(e);
-                connection.rollback();
-                throw new DatabaseException(e);
-            }
-        }
-    }
-
     @Override
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
         final PreparedStatement statement = super.prepareStatement(connection);
@@ -63,7 +50,7 @@ public class UpdateRecord <Id> extends AbstractQuery {
     }
 
     public abstract static class Builder<B extends Builder<B, Q, Id>, Q extends UpdateRecord, Id>
-            extends AbstractQuery.Builder<B, Q>{
+            extends WriteQuery.Builder<B, Q>{
         private int idIndexInQuery;
         private IdColumn<Id> idColumn;
         private Id id;
