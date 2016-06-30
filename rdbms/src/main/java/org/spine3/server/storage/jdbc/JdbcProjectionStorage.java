@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.spine3.server.entity.Entity;
 import org.spine3.server.storage.EntityStorage;
 import org.spine3.server.storage.ProjectionStorage;
+import org.spine3.server.storage.jdbc.query.constants.ProjectionTable;
 import org.spine3.server.storage.jdbc.query.tables.projection.CreateTableIfDoesNotExistQuery;
 import org.spine3.server.storage.jdbc.query.tables.projection.InsertTimestampQuery;
 import org.spine3.server.storage.jdbc.query.tables.projection.SelectTimestampQuery;
@@ -52,22 +53,6 @@ import static org.spine3.validate.Validate.isDefault;
  */
 /* package */ class JdbcProjectionStorage<Id> extends ProjectionStorage<Id> {
 
-    /**
-     * A suffix of a table name where the last event time is stored.
-     */
-    private static final String LAST_EVENT_TIME_TABLE_NAME_SUFFIX = "_last_event_time";
-
-    /**
-     * Last event time seconds column name.
-     */
-    @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String SECONDS_COL = "seconds";
-
-    /**
-     * Last event time nanoseconds column name.
-     */
-    @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String NANOS_COL = "nanoseconds";
 
     private final DataSourceWrapper dataSource;
 
@@ -99,7 +84,7 @@ import static org.spine3.validate.Validate.isDefault;
         super(multitenant);
         this.dataSource = dataSource;
         this.entityStorage = entityStorage;
-        this.tableName = newTableName(projectionClass) + LAST_EVENT_TIME_TABLE_NAME_SUFFIX;
+        this.tableName = newTableName(projectionClass) + ProjectionTable.LAST_EVENT_TIME_TABLE_NAME_SUFFIX;
 
         CreateTableIfDoesNotExistQuery.getBuilder()
                 .setTableName(tableName)
