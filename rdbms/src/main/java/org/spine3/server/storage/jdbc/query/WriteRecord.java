@@ -30,7 +30,7 @@ import org.spine3.server.storage.jdbc.util.Serializer;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public abstract class WriteRecord<Id, Record extends Message> extends AbstractQuery implements Write{
+public abstract class WriteRecord<Id, Record extends Message> extends AbstractQuery{
 
     private final Id id;
 
@@ -53,7 +53,6 @@ public abstract class WriteRecord<Id, Record extends Message> extends AbstractQu
         this.record = builder.record;
     }
 
-    @Override
     public void execute() throws DatabaseException {
         try (ConnectionWrapper connection = this.dataSource.getConnection(false)) {
             try (PreparedStatement statement = prepareStatement(connection)) {

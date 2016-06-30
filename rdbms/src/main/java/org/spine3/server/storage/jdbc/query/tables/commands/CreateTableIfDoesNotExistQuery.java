@@ -22,14 +22,13 @@ package org.spine3.server.storage.jdbc.query.tables.commands;
 
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.AbstractQuery;
-import org.spine3.server.storage.jdbc.query.Write;
 import org.spine3.server.storage.jdbc.query.constants.CommandTable;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public class CreateTableIfDoesNotExistQuery extends AbstractQuery implements Write {
+public class CreateTableIfDoesNotExistQuery extends AbstractQuery {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String INSERT_QUERY =
@@ -52,7 +51,6 @@ public class CreateTableIfDoesNotExistQuery extends AbstractQuery implements Wri
         return builder;
     }
 
-    @Override
     public void execute() throws DatabaseException {
         try (ConnectionWrapper connection = dataSource.getConnection(true);
              PreparedStatement statement = this.prepareStatement(connection)) {

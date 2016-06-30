@@ -48,7 +48,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.deserialize;
  * @author Alexander Litus
  */
 @Internal
-public class SelectById<I, M extends Message> implements ReadOne<M> {
+public class SelectById<I, M extends Message>{
 
     private final String query;
     private final DataSourceWrapper dataSource;
@@ -79,7 +79,6 @@ public class SelectById<I, M extends Message> implements ReadOne<M> {
      * @throws DatabaseException if an error occurs during an interaction with the DB
      * @see Serializer#deserialize(byte[], Descriptor)
      */
-    @Override
     @Nullable
     public M execute() throws DatabaseException {
         try (ConnectionWrapper connection = dataSource.getConnection(true);

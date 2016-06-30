@@ -27,11 +27,8 @@ import com.google.protobuf.Timestamp;
 import org.spine3.protobuf.Messages;
 import org.spine3.server.event.EventFilter;
 import org.spine3.server.event.EventStreamQuery;
-import org.spine3.server.storage.EventStorageRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.AbstractQuery;
-import org.spine3.server.storage.jdbc.query.ReadMany;
-import org.spine3.server.storage.jdbc.query.WriteRecord;
 import org.spine3.server.storage.jdbc.query.constants.EventTable;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 
@@ -41,7 +38,7 @@ import java.sql.SQLException;
 
 import static org.spine3.base.Identifiers.idToString;
 
-public class FilterAndSortQuery extends AbstractQuery implements ReadMany {
+public class FilterAndSortQuery extends AbstractQuery {
     private static final String ORDER_BY_TIME_POSTFIX = " ORDER BY " + EventTable.SECONDS_COL + " ASC, " + EventTable.NANOSECONDS_COL + " ASC;";
 
     private final EventStreamQuery streamQuery;
@@ -155,7 +152,6 @@ public class FilterAndSortQuery extends AbstractQuery implements ReadMany {
         return builder;
     }
 
-    @Override
     public ResultSet execute() throws DatabaseException {
         final ResultSet resultSet;
         try (ConnectionWrapper connection = dataSource.getConnection(true)) {

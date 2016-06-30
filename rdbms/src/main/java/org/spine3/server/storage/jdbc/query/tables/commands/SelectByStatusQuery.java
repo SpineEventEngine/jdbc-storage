@@ -25,7 +25,6 @@ import org.spine3.base.Command;
 import org.spine3.base.CommandStatus;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.AbstractQuery;
-import org.spine3.server.storage.jdbc.query.ReadMany;
 import org.spine3.server.storage.jdbc.query.constants.CommandTable;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 
@@ -41,7 +40,7 @@ import java.sql.SQLException;
  */
 
 @Internal
-public class  SelectByStatusQuery extends AbstractQuery implements ReadMany {
+public class  SelectByStatusQuery extends AbstractQuery{
     private final CommandStatus status;
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
@@ -78,7 +77,6 @@ public class  SelectByStatusQuery extends AbstractQuery implements ReadMany {
         return statement;
     }
 
-    @Override
     public ResultSet execute() throws DatabaseException {
         final ResultSet resultSet;
         try (ConnectionWrapper connection = dataSource.getConnection(true)) {

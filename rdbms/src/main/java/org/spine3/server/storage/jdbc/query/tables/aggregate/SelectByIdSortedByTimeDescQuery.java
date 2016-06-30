@@ -23,7 +23,6 @@ package org.spine3.server.storage.jdbc.query.tables.aggregate;
 
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.AbstractQuery;
-import org.spine3.server.storage.jdbc.query.ReadMany;
 import org.spine3.server.storage.jdbc.query.constants.AggregateTable;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
@@ -34,7 +33,7 @@ import java.sql.SQLException;
 
 import static java.lang.String.format;
 
-public class SelectByIdSortedByTimeDescQuery<Id> extends AbstractQuery implements ReadMany{
+public class SelectByIdSortedByTimeDescQuery<Id> extends AbstractQuery{
 
     private final IdColumn<Id> idColumn;
     private final Id id;
@@ -52,7 +51,6 @@ public class SelectByIdSortedByTimeDescQuery<Id> extends AbstractQuery implement
         this.id = builder.id;
     }
 
-    @Override
     public ResultSet execute() throws DatabaseException {
         try (ConnectionWrapper connection = dataSource.getConnection(true);
              PreparedStatement statement = super.prepareStatement(connection)) {
