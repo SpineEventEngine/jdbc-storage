@@ -57,7 +57,7 @@ public class SelectByIdSortedByTimeDescQuery<I> extends AbstractQuery {
         try (ConnectionWrapper connection = this.getDataSource().getConnection(true);
              PreparedStatement statement = prepareStatement(connection)) {
             idColumn.setId(1, id, statement);
-            return new DbIterator<>(statement, AGGREGATE_COL, RECORD_DESCRIPTOR);
+            return new DbIterator<>(statement, AGGREGATE_COL, AggregateStorageRecord.getDescriptor());
         } catch (SQLException e) {
             this.getLogger().error("Error while selecting entity by aggregates id sorted by time: ", e);
             throw new DatabaseException(e);

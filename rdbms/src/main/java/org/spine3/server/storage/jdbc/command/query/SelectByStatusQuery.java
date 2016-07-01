@@ -85,7 +85,7 @@ public class  SelectByStatusQuery extends AbstractQuery{
     public Iterator<CommandStorageRecord> execute() throws DatabaseException {
         try (ConnectionWrapper connection = this.getDataSource().getConnection(true)) {
             final PreparedStatement statement = this.prepareStatement(connection);
-            return new DbIterator<>(statement, Constants.COMMAND_COL, Constants.COMMAND_RECORD_DESCRIPTOR);
+            return new DbIterator<>(statement, COMMAND_COL, CommandStorageRecord.getDescriptor());
         }
     }
 

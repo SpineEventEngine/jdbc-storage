@@ -42,7 +42,7 @@ public class SelectEventByIdQuery extends SelectByIdQuery<String, EventStorageRe
         builder.setIdIndexInQuery(1)
                 .setQuery(SELECT_QUERY)
                 .setMessageColumnName(EVENT_COL)
-                .setMessageDescriptor(RECORD_DESCRIPTOR);
+                .setMessageDescriptor(EventStorageRecord.getDescriptor());
         return builder;
     }
 

@@ -42,7 +42,7 @@ public class SelectEntityByIdQuery<I> extends SelectByIdQuery<I, EntityStorageRe
         builder.setIdIndexInQuery(1)
                 .setQuery(format(SELECT_BY_ID, tableName))
                 .setMessageColumnName(ENTITY_COL)
-                .setMessageDescriptor(RECORD_DESCRIPTOR);
+                .setMessageDescriptor(EntityStorageRecord.getDescriptor());
         return builder;
     }
 

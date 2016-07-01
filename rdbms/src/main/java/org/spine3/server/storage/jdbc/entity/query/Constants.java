@@ -29,7 +29,7 @@ import org.spine3.server.storage.EntityStorageRecord;
  * @author Andrey Lavrov
  */
 @SuppressWarnings("UtilityClass")
-/* package */ class Constants {
+/* package */ final class Constants {
 
     /**
      * Entity record column name.
@@ -40,11 +40,6 @@ import org.spine3.server.storage.EntityStorageRecord;
      * Entity ID column name.
      */
     /* package */ static final String ID_COL = "id";
-
-    /**
-     * Record descriptor for Entity record type.
-     */
-    /* package */ static final Descriptors.Descriptor RECORD_DESCRIPTOR = EntityStorageRecord.getDescriptor();
 
     private Constants() {
     }

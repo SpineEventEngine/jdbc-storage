@@ -26,7 +26,7 @@ package org.spine3.server.storage.jdbc.projection.query;
  * @author Andrey Lavrov
  */
 @SuppressWarnings("UtilityClass")
-/* package */ class Constants {
+/* package */ final class Constants {
 
     /**
      * Last event time seconds column name.

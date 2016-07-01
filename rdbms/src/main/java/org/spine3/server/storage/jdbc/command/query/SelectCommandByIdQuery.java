@@ -58,7 +58,7 @@ public class SelectCommandByIdQuery extends SelectByIdQuery<String, CommandStora
         if (recordBytes == null) {
             return null;
         }
-        final CommandStorageRecord record = deserialize(recordBytes, COMMAND_RECORD_DESCRIPTOR);
+        final CommandStorageRecord record = deserialize(recordBytes, CommandStorageRecord.getDescriptor());
         final CommandStorageRecord.Builder builder = record.toBuilder();
         final String status = resultSet.getString(COMMAND_STATUS_COL);
         if (status.equals(CommandStatus.forNumber(CommandStatus.OK_VALUE).name())) {
@@ -66,14 +66,14 @@ public class SelectCommandByIdQuery extends SelectByIdQuery<String, CommandStora
         }
         final byte[] errorBytes = resultSet.getBytes(ERROR_COL);
         if (errorBytes != null) {
-            final Error error = deserialize(errorBytes, ERROR_DESCRIPTOR);
+            final Error error = deserialize(errorBytes, Error.getDescriptor());
             return builder.setError(error)
                     .setStatus(CommandStatus.ERROR)
                     .build();
         }
         final byte[] failureBytes = resultSet.getBytes(FAILURE_COL);
         if (failureBytes != null) {
-            final Failure failure = deserialize(failureBytes, FAILURE_DESCRIPTOR);
+            final Failure failure = deserialize(failureBytes, Failure.getDescriptor());
             return builder.setFailure(failure)
                     .setStatus(CommandStatus.FAILURE)
                     .build();

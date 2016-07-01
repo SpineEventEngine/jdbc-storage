@@ -31,7 +31,7 @@ import org.spine3.server.storage.CommandStorageRecord;
  * @author Andrey Lavrov
  */
 @SuppressWarnings("UtilityClass")
-/* package */ class Constants {
+/* package */ final class Constants {
 
     /**
      * Commands table name.
@@ -62,21 +62,6 @@ import org.spine3.server.storage.CommandStorageRecord;
      * Command failure column name.
      */
     /* package */ static final String FAILURE_COL = "failure";
-
-    /**
-     * Record descriptor for Command record type.
-     */
-    /* package */ static final Descriptors.Descriptor COMMAND_RECORD_DESCRIPTOR = CommandStorageRecord.getDescriptor();
-
-    /**
-     * Record descriptor for Error record type.
-     */
-    /* package */ static final Descriptors.Descriptor ERROR_DESCRIPTOR = Error.getDescriptor();
-
-    /**
-     * Record descriptor for Failure record type.
-     */
-    /* package */ static final Descriptors.Descriptor FAILURE_DESCRIPTOR = Failure.getDescriptor();
 
     private Constants() {
     }

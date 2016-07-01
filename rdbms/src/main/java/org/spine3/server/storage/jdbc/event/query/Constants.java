@@ -29,7 +29,7 @@ import org.spine3.server.storage.EventStorageRecord;
  * @author Andrey Lavrov
  */
 @SuppressWarnings("UtilityClass")
-/* package */ class Constants {
+/* package */ final class Constants {
 
     /**
      * Event table name.
@@ -70,11 +70,6 @@ import org.spine3.server.storage.EventStorageRecord;
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     /* package */ static final String SELECT_EVENT_FROM_TABLE = "SELECT " + EVENT_COL + " FROM " + TABLE_NAME + ' ';
-
-    /**
-     * Record descriptor for Event record type.
-     */
-    /* package */ static final Descriptors.Descriptor RECORD_DESCRIPTOR = EventStorageRecord.getDescriptor();
 
     private Constants() {
     }

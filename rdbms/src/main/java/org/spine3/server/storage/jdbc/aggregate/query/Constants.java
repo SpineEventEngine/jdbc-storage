@@ -63,11 +63,6 @@ import org.spine3.server.storage.AggregateStorageRecord;
      */
     /* package */ static final String EVENT_COUNT_TABLE_NAME_SUFFIX = "_event_count";
 
-    /**
-     * Record descriptor for specified record type.
-     */
-    /* package */ static final Descriptors.Descriptor RECORD_DESCRIPTOR = AggregateStorageRecord.getDescriptor();
-
     private Constants() {
     }
 }
