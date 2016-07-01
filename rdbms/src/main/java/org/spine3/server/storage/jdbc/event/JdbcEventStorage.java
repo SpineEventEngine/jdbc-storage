@@ -62,11 +62,17 @@ public class JdbcEventStorage extends EventStorage {
      * @throws DatabaseException if an error occurs during an interaction with the DB
      * @param dataSource the dataSource wrapper
      */
-    public static JdbcEventStorage newInstance(DataSourceWrapper dataSource, boolean multitenant, EventStorageQueryFactory queryFactory) throws DatabaseException {
+    public static JdbcEventStorage newInstance(DataSourceWrapper dataSource,
+                                               boolean multitenant,
+                                               EventStorageQueryFactory queryFactory)
+            throws DatabaseException {
         return new JdbcEventStorage(dataSource, multitenant, queryFactory);
     }
 
-    private JdbcEventStorage(DataSourceWrapper dataSource, boolean multitenant, EventStorageQueryFactory queryFactory) throws DatabaseException {
+    private JdbcEventStorage(DataSourceWrapper dataSource,
+                             boolean multitenant,
+                             EventStorageQueryFactory queryFactory)
+            throws DatabaseException {
         super(multitenant);
         this.dataSource = dataSource;
         this.queryFactory = queryFactory;

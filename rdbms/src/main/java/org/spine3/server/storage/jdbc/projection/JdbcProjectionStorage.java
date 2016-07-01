@@ -55,9 +55,10 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
      * @return a new storage instance
      */
     public static <I> ProjectionStorage<I> newInstance(DataSourceWrapper dataSource,
-                                                JdbcEntityStorage<I> entityStorage,
-                                                boolean multitenant,
-                                                ProjectionStorageQueryFactory<I> queryFactory) throws DatabaseException {
+                                                       JdbcEntityStorage<I> entityStorage,
+                                                       boolean multitenant,
+                                                       ProjectionStorageQueryFactory<I> queryFactory)
+            throws DatabaseException {
         return new JdbcProjectionStorage<>(dataSource, entityStorage, multitenant, queryFactory);
     }
 
@@ -109,10 +110,6 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
         } catch (Exception e) {
             throw new DatabaseException(e);
         }
-    }
-
-    private static Logger log() {
-        return LogSingleton.INSTANCE.value;
     }
 
     private enum LogSingleton {

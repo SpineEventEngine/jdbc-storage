@@ -62,9 +62,9 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     public static <I> JdbcAggregateStorage<I> newInstance(DataSourceWrapper dataSource,
-                                                               boolean multitenant,
-                                                               AggregateStorageQueryFactory<I> queryFactory)
-                                                                 throws DatabaseException {
+                                                          boolean multitenant,
+                                                          AggregateStorageQueryFactory<I> queryFactory)
+            throws DatabaseException {
         return new JdbcAggregateStorage<>(dataSource, multitenant, queryFactory);
     }
 

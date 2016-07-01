@@ -89,24 +89,30 @@ public class JdbcStorageFactory implements StorageFactory {
 
     @Override
     public <I> EntityStorage<I> createEntityStorage(Class<? extends Entity<I, ?>> entityClass) {
-        return JdbcEntityStorage.newInstance(dataSource, false, getEntityStorageQueryFactory(dataSource, entityClass));
+        return JdbcEntityStorage
+                .newInstance(dataSource, false, getEntityStorageQueryFactory(dataSource, entityClass));
     }
 
     @Override
     public <I> ProjectionStorage<I> createProjectionStorage(Class<? extends Entity<I, ?>> projectionClass) {
-        final JdbcEntityStorage<I> entityStorage = JdbcEntityStorage.newInstance(dataSource, false, getEntityStorageQueryFactory(dataSource, projectionClass));
-        return JdbcProjectionStorage.newInstance(dataSource, entityStorage, false, getProjectionStorageQueryFactory(dataSource, projectionClass));
+        final JdbcEntityStorage<I> entityStorage = JdbcEntityStorage
+                .newInstance(dataSource, false, getEntityStorageQueryFactory(dataSource, projectionClass));
+        return JdbcProjectionStorage
+                .newInstance(dataSource, entityStorage, false, getProjectionStorageQueryFactory(dataSource, projectionClass));
     }
 
-    protected  <I> AggregateStorageQueryFactory<I> getAggregateStorageQueryFactory(DataSourceWrapper dataSource, Class<? extends Aggregate<I, ?, ?>> aggregateClass){
+    protected  <I> AggregateStorageQueryFactory<I> getAggregateStorageQueryFactory(DataSourceWrapper dataSource,
+                                                                                   Class<? extends Aggregate<I, ?, ?>> aggregateClass){
         return new AggregateStorageQueryFactory<>(dataSource, aggregateClass);
     }
 
-    protected <I> EntityStorageQueryFactory<I> getEntityStorageQueryFactory(DataSourceWrapper dataSource, Class<? extends Entity<I, ?>> entityClass){
+    protected <I> EntityStorageQueryFactory<I> getEntityStorageQueryFactory(DataSourceWrapper dataSource,
+                                                                            Class<? extends Entity<I, ?>> entityClass){
         return new EntityStorageQueryFactory<>(dataSource, entityClass);
     }
 
-    protected <I> ProjectionStorageQueryFactory<I> getProjectionStorageQueryFactory(DataSourceWrapper dataSource, Class<? extends Entity<I, ?>> entityClass){
+    protected <I> ProjectionStorageQueryFactory<I> getProjectionStorageQueryFactory(DataSourceWrapper dataSource,
+                                                                                    Class<? extends Entity<I, ?>> entityClass){
         return new ProjectionStorageQueryFactory<>(dataSource, entityClass);
     }
 

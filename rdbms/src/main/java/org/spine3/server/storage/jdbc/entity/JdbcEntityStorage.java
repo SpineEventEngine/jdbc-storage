@@ -53,9 +53,9 @@ public class JdbcEntityStorage<I> extends EntityStorage<I> {
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     public static <I> JdbcEntityStorage<I> newInstance(DataSourceWrapper dataSource,
-                                                            boolean multitenant,
-                                                            EntityStorageQueryFactory<I> queryFactory)
-                                                              throws DatabaseException {
+                                                       boolean multitenant,
+                                                       EntityStorageQueryFactory<I> queryFactory)
+            throws DatabaseException {
         return new JdbcEntityStorage<>(dataSource, multitenant, queryFactory);
     }
 
