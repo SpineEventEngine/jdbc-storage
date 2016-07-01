@@ -34,17 +34,17 @@ import org.spine3.server.storage.EntityStorageRecord;
     /**
      * Entity record column name.
      */
-    public static final String ENTITY_COL = "entity";
+    /* package */ static final String ENTITY_COL = "entity";
 
     /**
      * Entity ID column name.
      */
-    public static final String ID_COL = "id";
+    /* package */ static final String ID_COL = "id";
 
     /**
      * Record descriptor for Entity record type.
      */
-    public static final Descriptors.Descriptor RECORD_DESCRIPTOR = EntityStorageRecord.getDescriptor();
+    /* package */ static final Descriptors.Descriptor RECORD_DESCRIPTOR = EntityStorageRecord.getDescriptor();
 
     private Constants() {
     }

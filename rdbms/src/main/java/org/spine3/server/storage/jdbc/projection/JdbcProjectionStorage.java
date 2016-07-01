@@ -33,8 +33,6 @@ import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
 import javax.annotation.Nullable;
 
-import static java.lang.String.format;
-
 /**
  * The implementation of the projection storage based on the RDBMS.
  *

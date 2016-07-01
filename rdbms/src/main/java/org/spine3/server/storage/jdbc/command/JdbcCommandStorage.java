@@ -34,8 +34,6 @@ import org.spine3.server.storage.jdbc.command.query.CommandStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.validate.Validate;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-import java.sql.SQLException;
 import java.util.Iterator;
 
 import static com.google.common.base.Preconditions.checkNotNull;

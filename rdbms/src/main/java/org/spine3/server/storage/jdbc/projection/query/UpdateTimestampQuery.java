@@ -24,12 +24,13 @@ import com.google.protobuf.Timestamp;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.WriteQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
-import static org.spine3.server.storage.jdbc.projection.query.Constants.*;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import static java.lang.String.format;
+import static org.spine3.server.storage.jdbc.projection.query.Constants.NANOS_COL;
+import static org.spine3.server.storage.jdbc.projection.query.Constants.SECONDS_COL;
 
 
 public class UpdateTimestampQuery extends WriteQuery{

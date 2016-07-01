@@ -24,7 +24,6 @@ import com.google.protobuf.Descriptors;
 import org.spine3.base.Error;
 import org.spine3.base.Failure;
 import org.spine3.server.storage.CommandStorageRecord;
-import org.spine3.server.storage.jdbc.util.IdColumn;
 
 /**
  * A utility class representing constants which are necessary for working with command table.
@@ -37,47 +36,47 @@ import org.spine3.server.storage.jdbc.util.IdColumn;
     /**
      * Commands table name.
      */
-    public static final String TABLE_NAME = "commands";
+    /* package */ static final String TABLE_NAME = "commands";
 
     /**
      * Command ID column name.
      */
-    public static final String ID_COL = "id";
+    /* package */ static final String ID_COL = "id";
 
     /**
      * Command record column name.
      */
-    public static final String COMMAND_COL = "command";
+    /* package */ static final String COMMAND_COL = "command";
 
     /**
      * Is command status column name.
      */
-    public static final String COMMAND_STATUS_COL = "command_status";
+    /* package */ static final String COMMAND_STATUS_COL = "command_status";
 
     /**
      * Command error column name.
      */
-    public static final String ERROR_COL = "error";
+    /* package */ static final String ERROR_COL = "error";
 
     /**
      * Command failure column name.
      */
-    public static final String FAILURE_COL = "failure";
+    /* package */ static final String FAILURE_COL = "failure";
 
     /**
      * Record descriptor for Command record type.
      */
-    public static final Descriptors.Descriptor COMMAND_RECORD_DESCRIPTOR = CommandStorageRecord.getDescriptor();
+    /* package */ static final Descriptors.Descriptor COMMAND_RECORD_DESCRIPTOR = CommandStorageRecord.getDescriptor();
 
     /**
      * Record descriptor for Error record type.
      */
-    public static final Descriptors.Descriptor ERROR_DESCRIPTOR = Error.getDescriptor();
+    /* package */ static final Descriptors.Descriptor ERROR_DESCRIPTOR = Error.getDescriptor();
 
     /**
      * Record descriptor for Failure record type.
      */
-    public static final Descriptors.Descriptor FAILURE_DESCRIPTOR = Failure.getDescriptor();
+    /* package */ static final Descriptors.Descriptor FAILURE_DESCRIPTOR = Failure.getDescriptor();
 
     private Constants() {
     }

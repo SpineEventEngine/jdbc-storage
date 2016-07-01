@@ -21,6 +21,4 @@
 @ParametersAreNonnullByDefault
 package org.spine3.server.storage.jdbc.aggregate;
 
-import io.grpc.Internal;
-
 import javax.annotation.ParametersAreNonnullByDefault;

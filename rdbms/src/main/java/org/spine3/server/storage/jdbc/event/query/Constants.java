@@ -34,47 +34,47 @@ import org.spine3.server.storage.EventStorageRecord;
     /**
      * Event table name.
      */
-    public static final String TABLE_NAME = "events";
+    /* package */ static final String TABLE_NAME = "events";
 
     /**
      * Event ID column name.
      */
-    public static final String EVENT_ID_COL = "event_id";
+    /* package */ static final String EVENT_ID_COL = "event_id";
 
     /**
      * Event record column name.
      */
-    public static final String EVENT_COL = "event";
+    /* package */ static final String EVENT_COL = "event";
 
     /**
      * Protobuf type name of the event column name.
      */
-    public static final String EVENT_TYPE_COL = "event_type";
+    /* package */ static final String EVENT_TYPE_COL = "event_type";
 
     /**
      * Producer ID column name.
      */
-    public static final String PRODUCER_ID_COL = "producer_id";
+    /* package */ static final String PRODUCER_ID_COL = "producer_id";
 
     /**
      * Event seconds column name.
      */
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    public static final String SECONDS_COL = "seconds";
+    /* package */ static final String SECONDS_COL = "seconds";
 
     /**
      * Event nanoseconds column name.
      */
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    public static final String NANOSECONDS_COL = "nanoseconds";
+    /* package */ static final String NANOSECONDS_COL = "nanoseconds";
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    public static final String SELECT_EVENT_FROM_TABLE = "SELECT " + EVENT_COL + " FROM " + TABLE_NAME + ' ';
+    /* package */ static final String SELECT_EVENT_FROM_TABLE = "SELECT " + EVENT_COL + " FROM " + TABLE_NAME + ' ';
 
     /**
      * Record descriptor for Event record type.
      */
-    public static final Descriptors.Descriptor RECORD_DESCRIPTOR = EventStorageRecord.getDescriptor();
+    /* package */ static final Descriptors.Descriptor RECORD_DESCRIPTOR = EventStorageRecord.getDescriptor();
 
     private Constants() {
     }

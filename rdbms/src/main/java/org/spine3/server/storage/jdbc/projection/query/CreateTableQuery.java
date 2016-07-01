@@ -23,12 +23,13 @@ package org.spine3.server.storage.jdbc.projection.query;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.AbstractQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
-import static org.spine3.server.storage.jdbc.projection.query.Constants.*;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import static java.lang.String.format;
+import static org.spine3.server.storage.jdbc.projection.query.Constants.NANOS_COL;
+import static org.spine3.server.storage.jdbc.projection.query.Constants.SECONDS_COL;
 
 public class CreateTableQuery extends AbstractQuery {
 

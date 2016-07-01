@@ -22,9 +22,10 @@ package org.spine3.server.storage.jdbc.entity.query;
 
 import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.jdbc.query.WriteRecord;
-import static org.spine3.server.storage.jdbc.entity.query.Constants.*;
 
 import static java.lang.String.format;
+import static org.spine3.server.storage.jdbc.entity.query.Constants.ENTITY_COL;
+import static org.spine3.server.storage.jdbc.entity.query.Constants.ID_COL;
 
 
 public class UpdateEntityQuery<I> extends WriteRecord<I, EntityStorageRecord> {

@@ -28,12 +28,12 @@ import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.AbstractQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.DbIterator;
-import static org.spine3.server.storage.jdbc.command.query.Constants.*;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Iterator;
+
+import static org.spine3.server.storage.jdbc.command.query.Constants.*;
 
 
 /**

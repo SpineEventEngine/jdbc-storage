@@ -24,12 +24,13 @@ import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.AbstractQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
-import static org.spine3.server.storage.jdbc.entity.query.Constants.*;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import static java.lang.String.format;
+import static org.spine3.server.storage.jdbc.entity.query.Constants.ENTITY_COL;
+import static org.spine3.server.storage.jdbc.entity.query.Constants.ID_COL;
 
 public class CreateTableQuery<I> extends AbstractQuery {
 

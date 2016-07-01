@@ -23,10 +23,11 @@ package org.spine3.server.storage.jdbc.event.query;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.AbstractQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
-import static org.spine3.server.storage.jdbc.event.query.Constants.*;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+
+import static org.spine3.server.storage.jdbc.event.query.Constants.*;
 
 
 public class CreateTableQuery extends AbstractQuery {

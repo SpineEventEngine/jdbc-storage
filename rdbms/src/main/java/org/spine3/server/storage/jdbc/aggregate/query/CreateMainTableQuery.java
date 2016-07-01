@@ -24,12 +24,12 @@ import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.AbstractQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
-import static org.spine3.server.storage.jdbc.aggregate.query.Constants.*;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import static java.lang.String.format;
+import static org.spine3.server.storage.jdbc.aggregate.query.Constants.*;
 
 public class CreateMainTableQuery<I> extends AbstractQuery {
 

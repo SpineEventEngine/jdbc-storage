@@ -23,13 +23,13 @@ package org.spine3.server.storage.jdbc.aggregate.query;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.UpdateRecord;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
-import static org.spine3.server.storage.jdbc.aggregate.query.Constants.ID_COL;
-import static org.spine3.server.storage.jdbc.aggregate.query.Constants.EVENT_COUNT_COL;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import static java.lang.String.format;
+import static org.spine3.server.storage.jdbc.aggregate.query.Constants.EVENT_COUNT_COL;
+import static org.spine3.server.storage.jdbc.aggregate.query.Constants.ID_COL;
 
 
 public class UpdateEventCountQuery<I> extends UpdateRecord<I> {

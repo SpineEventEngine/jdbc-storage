@@ -20,12 +20,10 @@
 
 package org.spine3.server.storage.jdbc.query;
 
-import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
 
 public class UpdateRecord <I> extends WriteQuery {
 

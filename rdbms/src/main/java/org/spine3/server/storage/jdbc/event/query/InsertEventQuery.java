@@ -25,11 +25,11 @@ import org.spine3.server.storage.EventStorageRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.WriteRecord;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
-import static org.spine3.server.storage.jdbc.event.query.Constants.*;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import static org.spine3.server.storage.jdbc.event.query.Constants.*;
 import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
 

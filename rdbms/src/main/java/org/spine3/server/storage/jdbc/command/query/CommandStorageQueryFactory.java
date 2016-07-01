@@ -2,7 +2,6 @@ package org.spine3.server.storage.jdbc.command.query;
 
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.spine3.base.CommandId;
 import org.spine3.base.CommandStatus;
 import org.spine3.base.Error;

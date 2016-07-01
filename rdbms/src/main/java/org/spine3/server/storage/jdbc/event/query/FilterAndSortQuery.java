@@ -31,12 +31,12 @@ import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.AbstractQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.DbIterator;
-import static org.spine3.server.storage.jdbc.event.query.Constants.*;
 
 import java.sql.PreparedStatement;
 import java.util.Iterator;
 
 import static org.spine3.base.Identifiers.idToString;
+import static org.spine3.server.storage.jdbc.event.query.Constants.*;
 
 public class FilterAndSortQuery extends AbstractQuery {
 

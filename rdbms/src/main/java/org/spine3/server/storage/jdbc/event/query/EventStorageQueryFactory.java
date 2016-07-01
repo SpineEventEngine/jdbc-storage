@@ -2,7 +2,6 @@ package org.spine3.server.storage.jdbc.event.query;
 
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.spine3.server.event.EventStreamQuery;
 import org.spine3.server.storage.EventStorageRecord;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;

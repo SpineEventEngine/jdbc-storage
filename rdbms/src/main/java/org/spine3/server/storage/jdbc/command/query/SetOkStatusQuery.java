@@ -22,6 +22,7 @@ package org.spine3.server.storage.jdbc.command.query;
 
 import org.spine3.base.CommandStatus;
 import org.spine3.server.storage.jdbc.query.UpdateRecord;
+
 import static org.spine3.server.storage.jdbc.command.query.Constants.*;
 
 

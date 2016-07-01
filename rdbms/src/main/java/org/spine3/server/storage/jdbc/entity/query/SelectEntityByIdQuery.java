@@ -25,9 +25,9 @@ import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.jdbc.query.SelectById;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
-import static org.spine3.server.storage.jdbc.entity.query.Constants.*;
 
 import static java.lang.String.format;
+import static org.spine3.server.storage.jdbc.entity.query.Constants.*;
 
 @Internal
 public class SelectEntityByIdQuery<I> extends SelectById<I, EntityStorageRecord> {

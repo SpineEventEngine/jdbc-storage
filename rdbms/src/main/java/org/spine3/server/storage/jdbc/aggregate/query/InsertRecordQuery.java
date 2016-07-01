@@ -25,12 +25,12 @@ import org.spine3.server.storage.AggregateStorageRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.WriteRecord;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
-import static org.spine3.server.storage.jdbc.aggregate.query.Constants.*;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import static java.lang.String.format;
+import static org.spine3.server.storage.jdbc.aggregate.query.Constants.*;
 
 
 public class InsertRecordQuery<I> extends WriteRecord<I, AggregateStorageRecord> {

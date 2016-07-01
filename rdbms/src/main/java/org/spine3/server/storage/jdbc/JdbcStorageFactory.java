@@ -21,20 +21,15 @@
 package org.spine3.server.storage.jdbc;
 
 import com.zaxxer.hikari.HikariConfig;
-import org.spine3.server.entity.Entity;
 import org.spine3.server.aggregate.Aggregate;
-import org.spine3.server.storage.AggregateStorage;
-import org.spine3.server.storage.CommandStorage;
-import org.spine3.server.storage.EntityStorage;
-import org.spine3.server.storage.EventStorage;
-import org.spine3.server.storage.ProjectionStorage;
-import org.spine3.server.storage.StorageFactory;
+import org.spine3.server.entity.Entity;
+import org.spine3.server.storage.*;
 import org.spine3.server.storage.jdbc.aggregate.JdbcAggregateStorage;
 import org.spine3.server.storage.jdbc.aggregate.query.AggregateStorageQueryFactory;
 import org.spine3.server.storage.jdbc.command.JdbcCommandStorage;
 import org.spine3.server.storage.jdbc.command.query.CommandStorageQueryFactory;
-import org.spine3.server.storage.jdbc.entity.query.EntityStorageQueryFactory;
 import org.spine3.server.storage.jdbc.entity.JdbcEntityStorage;
+import org.spine3.server.storage.jdbc.entity.query.EntityStorageQueryFactory;
 import org.spine3.server.storage.jdbc.event.JdbcEventStorage;
 import org.spine3.server.storage.jdbc.event.query.EventStorageQueryFactory;
 import org.spine3.server.storage.jdbc.projection.JdbcProjectionStorage;
