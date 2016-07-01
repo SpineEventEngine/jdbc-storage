@@ -50,6 +50,7 @@ public class SetErrorQuery extends WriteRecord<String, Error > {
         return builder;
     }
 
+    @SuppressWarnings("ClassNameSameAsAncestorName")
     public static class Builder extends WriteRecord.Builder<Builder, SetErrorQuery, String, Error> {
 
         @Override

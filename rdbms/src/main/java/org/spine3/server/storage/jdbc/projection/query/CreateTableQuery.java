@@ -18,54 +18,64 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.spine3.server.storage.jdbc.command.query;
+package org.spine3.server.storage.jdbc.projection.query;
 
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.AbstractQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
-import static org.spine3.server.storage.jdbc.command.query.Constants.*;
+import static org.spine3.server.storage.jdbc.projection.query.Constants.*;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public class CreateTableIfDoesNotExistQuery extends AbstractQuery {
+import static java.lang.String.format;
+
+public class CreateTableQuery extends AbstractQuery {
+
+    private final String tableName;
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String INSERT_QUERY =
-            "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" +
-                    ID_COL + " VARCHAR(512), " +
-                    COMMAND_COL + " BLOB, " +
-                    COMMAND_STATUS_COL + " VARCHAR(512), " +
-                    ERROR_COL + " BLOB, " +
-                    FAILURE_COL + " BLOB, " +
-                    " PRIMARY KEY(" + ID_COL + ')' +
+    private static final String CREATE_TABLE_IF_DOES_NOT_EXIST =
+            "CREATE TABLE IF NOT EXISTS %s (" +
+                    SECONDS_COL + " BIGINT, " +
+                    NANOS_COL + " INT " +
                     ");";
 
-    public CreateTableIfDoesNotExistQuery(Builder builder) {
+    protected CreateTableQuery(Builder builder) {
         super(builder);
-    }
-
-    public static Builder getBuilder() {
-        final Builder builder = new Builder();
-        builder.setQuery(INSERT_QUERY);
-        return builder;
+        this.tableName = builder.tableName;
     }
 
     public void execute() throws DatabaseException {
+        final String createTableSql = format(CREATE_TABLE_IF_DOES_NOT_EXIST, tableName);
         try (ConnectionWrapper connection = dataSource.getConnection(true);
-             PreparedStatement statement = this.prepareStatement(connection)) {
+             PreparedStatement statement = connection.prepareStatement(createTableSql)) {
             statement.execute();
         } catch (SQLException e) {
-            //log().error("Exception during table creation:", e);
+            //log().error("Error while creating a table with the name: " + tableName, e);
             throw new DatabaseException(e);
         }
     }
 
-    public static class Builder extends AbstractQuery.Builder<Builder, CreateTableIfDoesNotExistQuery> {
+    public static Builder newBuilder() {
+        final Builder builder = new Builder();
+        builder.setQuery(CREATE_TABLE_IF_DOES_NOT_EXIST);
+        return builder;
+    }
+
+    @SuppressWarnings("ClassNameSameAsAncestorName")
+    public static class Builder extends AbstractQuery.Builder<Builder, CreateTableQuery> {
+
+        private String tableName;
 
         @Override
-        public CreateTableIfDoesNotExistQuery build() {
-            return new CreateTableIfDoesNotExistQuery(this);
+        public CreateTableQuery build() {
+            return new CreateTableQuery(this);
+        }
+
+        public Builder setTableName(String tableName){
+            this.tableName = tableName;
+            return getThis();
         }
 
         @Override
@@ -73,5 +83,4 @@ public class CreateTableIfDoesNotExistQuery extends AbstractQuery {
             return this;
         }
     }
-
 }

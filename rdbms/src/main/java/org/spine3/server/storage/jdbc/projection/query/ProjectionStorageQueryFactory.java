@@ -33,28 +33,28 @@ public class ProjectionStorageQueryFactory<I> {
         private final Logger value = LoggerFactory.getLogger(ProjectionStorageQueryFactory.class);
     }
 
-    public CreateTableIfDoesNotExistQuery getCreateTableIfDoesNotExistQuery() {
-        return CreateTableIfDoesNotExistQuery.newBuilder()
+    public CreateTableQuery newCreateTableQuery() {
+        return CreateTableQuery.newBuilder()
                 .setTableName(tableName)
                 .setDataSource(dataSource)
                 .build();
     }
 
-    public InsertTimestampQuery getInsertTimestampQuery(Timestamp time) {
+    public InsertTimestampQuery newInsertTimestampQuery(Timestamp time) {
         return InsertTimestampQuery.newBuilder(tableName)
                 .setTimestamp(time)
                 .setDataSource(dataSource)
                 .build();
     }
 
-    public UpdateTimestampQuery getUpdateTimestampQuery(Timestamp time) {
+    public UpdateTimestampQuery newUpdateTimestampQuery(Timestamp time) {
         return UpdateTimestampQuery.newBuilder(tableName)
                 .setTimestamp(time)
                 .setDataSource(dataSource)
                 .build();
     }
 
-    public SelectTimestampQuery getSelectTimestampQuery() {
+    public SelectTimestampQuery newSelectTimestampQuery() {
         return SelectTimestampQuery.newBuilder(tableName)
                 .setDataSource(dataSource)
                 .build();

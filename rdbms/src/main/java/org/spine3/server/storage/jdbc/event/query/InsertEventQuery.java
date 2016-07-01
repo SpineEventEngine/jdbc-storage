@@ -88,6 +88,7 @@ public class InsertEventQuery extends WriteRecord<String, EventStorageRecord> {
         return builder;
     }
 
+    @SuppressWarnings("ClassNameSameAsAncestorName")
     public static class Builder extends WriteRecord.Builder<Builder, InsertEventQuery, String, EventStorageRecord> {
 
         @Override

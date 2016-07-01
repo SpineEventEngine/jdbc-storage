@@ -81,6 +81,7 @@ public class SelectEventCountByIdQuery<Id> extends AbstractQuery {
         return builder;
     }
 
+    @SuppressWarnings("ClassNameSameAsAncestorName")
     public static class Builder<Id> extends AbstractQuery.Builder<Builder<Id>, SelectEventCountByIdQuery> {
 
         private IdColumn<Id> idColumn;

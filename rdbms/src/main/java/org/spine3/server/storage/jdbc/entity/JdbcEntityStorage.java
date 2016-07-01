@@ -64,7 +64,7 @@ public class JdbcEntityStorage<I> extends EntityStorage<I> {
         super(multitenant);
         this.dataSource = dataSource;
         this.queryFactory = queryFactory;
-        queryFactory.getCreateTableIfDoesNotExistQuery().execute();
+        queryFactory.newCreateTableQuery().execute();
     }
 
     /**
@@ -75,7 +75,7 @@ public class JdbcEntityStorage<I> extends EntityStorage<I> {
     @Nullable
     @Override
     protected EntityStorageRecord readInternal(I id) throws DatabaseException {
-        final EntityStorageRecord record = queryFactory.getSelectEntityByIdQuery(id).execute();
+        final EntityStorageRecord record = queryFactory.newSelectEntityByIdQuery(id).execute();
         return record;
     }
 
@@ -91,14 +91,14 @@ public class JdbcEntityStorage<I> extends EntityStorage<I> {
         checkArgument(record.hasState(), "entity state");
 
         if (containsRecord(id)) {
-            queryFactory.getUpdateEntityQuery(id, record).execute();
+            queryFactory.newUpdateEntityQuery(id, record).execute();
         } else {
-            queryFactory.getInsertEntityQuery(id, record).execute();
+            queryFactory.newInsertEntityQuery(id, record).execute();
         }
     }
 
     private boolean containsRecord(I id) throws DatabaseException {
-        final EntityStorageRecord record = queryFactory.getSelectEntityByIdQuery(id).execute();
+        final EntityStorageRecord record = queryFactory.newSelectEntityByIdQuery(id).execute();
         final boolean contains = record != null;
         return contains;
     }
@@ -119,7 +119,7 @@ public class JdbcEntityStorage<I> extends EntityStorage<I> {
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     /*package*/ void clear() throws DatabaseException {
-       queryFactory.getDeleteAllQuery().execute();
+       queryFactory.newDeleteAllQuery().execute();
     }
     private static Logger log() {
         return LogSingleton.INSTANCE.value;

@@ -31,13 +31,13 @@ public class CommandStorageQueryFactory {
         private final Logger value = LoggerFactory.getLogger(CommandStorageQueryFactory.class);
     }
 
-    public CreateTableIfDoesNotExistQuery getCreateTableIfDoesNotExistQuery(){
-        return CreateTableIfDoesNotExistQuery.newBuilder()
+    public CreateTableQuery newCreateTableQuery(){
+        return CreateTableQuery.newBuilder()
                 .setDataSource(dataSource)
                 .build();
     }
 
-    public InsertCommandQuery getInsertCommandQuery(CommandId id, CommandStorageRecord record){
+    public InsertCommandQuery newInsertCommandQuery(CommandId id, CommandStorageRecord record){
         return InsertCommandQuery.newBuilder()
                 .setDataSource(dataSource)
                 .setIdColumn(idColumn)
@@ -48,7 +48,7 @@ public class CommandStorageQueryFactory {
     }
 
     @SuppressWarnings("")
-    public UpdateCommandQuery getUpdateCommandQuery(CommandId id, CommandStorageRecord record){
+    public UpdateCommandQuery newUpdateCommandQuery(CommandId id, CommandStorageRecord record){
         return UpdateCommandQuery.newBuilder()
                 .setDataSource(dataSource)
                 .setIdColumn(idColumn)
@@ -58,7 +58,7 @@ public class CommandStorageQueryFactory {
                 .build();
     }
 
-    public SetErrorQuery getSetErrorQuery(CommandId id, Error error){
+    public SetErrorQuery newSetErrorQuery(CommandId id, Error error){
         return SetErrorQuery.newBuilder()
                 .setDataSource(dataSource)
                 .setIdColumn(idColumn)
@@ -67,7 +67,7 @@ public class CommandStorageQueryFactory {
                 .build();
     }
 
-    public SetFailureQuery getSetFailureQuery(CommandId id, Failure failure){
+    public SetFailureQuery newSetFailureQuery(CommandId id, Failure failure){
         return SetFailureQuery.newBuilder()
                 .setDataSource(dataSource)
                 .setIdColumn(idColumn)
@@ -76,7 +76,7 @@ public class CommandStorageQueryFactory {
                 .build();
     }
 
-    public SetOkStatusQuery getSetOkStatusQuery(CommandId id){
+    public SetOkStatusQuery newSetOkStatusQuery(CommandId id){
         return SetOkStatusQuery.newBuilder()
                 .setDataSource(this.dataSource)
                 .setIdColumn(idColumn)
@@ -84,11 +84,11 @@ public class CommandStorageQueryFactory {
                 .build();
     }
 
-    public SelectCommandByIdQuery getSelectCommandByIdQuery(CommandId id){
+    public SelectCommandByIdQuery newSelectCommandByIdQuery(CommandId id){
         return new SelectCommandByIdQuery(dataSource, id.getUuid());
     }
 
-    public SelectByStatusQuery getSelectByStatusQuery(CommandStatus status){
+    public SelectByStatusQuery newSelectByStatusQuery(CommandStatus status){
         return SelectByStatusQuery.newBuilder()
                 .setDataSource(dataSource)
                 .setStatus(status)

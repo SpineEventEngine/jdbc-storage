@@ -24,14 +24,15 @@ import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.AbstractQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
-import static org.spine3.server.storage.jdbc.aggregate.query.Constants.*;
+import static org.spine3.server.storage.jdbc.aggregate.query.Constants.ID_COL;
+import static org.spine3.server.storage.jdbc.aggregate.query.Constants.EVENT_COUNT_COL;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import static java.lang.String.format;
 
-public class CreateMainTableIfDoesNotExistQuery<I> extends AbstractQuery {
+public class CreateEventCountQuery<I> extends AbstractQuery {
 
     private final IdColumn<I> idColumn;
     private final String tableName;
@@ -40,12 +41,10 @@ public class CreateMainTableIfDoesNotExistQuery<I> extends AbstractQuery {
     private static final String QUERY =
             "CREATE TABLE IF NOT EXISTS %s (" +
                     ID_COL + " %s, " +
-                    AGGREGATE_COL + " BLOB, " +
-                    SECONDS_COL + " BIGINT, " +
-                    NANOS_COL + " INT " +
+                    EVENT_COUNT_COL + " BIGINT " +
                     ");";
 
-    protected CreateMainTableIfDoesNotExistQuery(Builder<I> builder) {
+    protected CreateEventCountQuery(Builder<I> builder) {
         super(builder);
         this.idColumn = builder.idColumn;
         this.tableName = builder.tableName;
@@ -63,20 +62,21 @@ public class CreateMainTableIfDoesNotExistQuery<I> extends AbstractQuery {
         }
     }
 
-    public static <I>Builder <I>newBuilder() {
-        final Builder <I>builder = new Builder<>();
+    public static <I> Builder<I> newBuilder() {
+        final Builder<I> builder = new Builder<>();
         builder.setQuery(QUERY);
         return builder;
     }
 
-    public static class Builder<I> extends AbstractQuery.Builder<Builder<I>, CreateMainTableIfDoesNotExistQuery> {
+    @SuppressWarnings("ClassNameSameAsAncestorName")
+    public static class Builder<I> extends AbstractQuery.Builder<Builder<I>, CreateEventCountQuery> {
 
         private IdColumn<I> idColumn;
         private String tableName;
 
         @Override
-        public CreateMainTableIfDoesNotExistQuery build() {
-            return new CreateMainTableIfDoesNotExistQuery<>(this);
+        public CreateEventCountQuery build() {
+            return new CreateEventCountQuery<>(this);
         }
 
         public Builder<I> setIdColumn(IdColumn<I> idColumn) {

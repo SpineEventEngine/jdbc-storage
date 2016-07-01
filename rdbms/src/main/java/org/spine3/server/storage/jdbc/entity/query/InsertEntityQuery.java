@@ -52,6 +52,7 @@ public class InsertEntityQuery<Id> extends WriteRecord<Id, EntityStorageRecord> 
         return builder;
     }
 
+    @SuppressWarnings("ClassNameSameAsAncestorName")
     public static class Builder<Id> extends WriteRecord.Builder<Builder<Id>, InsertEntityQuery, Id, EntityStorageRecord> {
 
         @Override

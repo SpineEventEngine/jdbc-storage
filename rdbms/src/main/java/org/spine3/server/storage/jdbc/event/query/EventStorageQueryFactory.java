@@ -28,31 +28,31 @@ public class EventStorageQueryFactory{
         private final Logger value = LoggerFactory.getLogger(EventStorageQueryFactory.class);
     }
 
-    public CreateTableIfDoesNotExistQuery getCreateTableIfDoesNotExistQuery(){
-        return CreateTableIfDoesNotExistQuery.newBuilder()
+    public CreateTableQuery newCreateTableQuery(){
+        return CreateTableQuery.newBuilder()
                 .setDataSource(dataSource)
                 .build();
     }
 
-    public InsertEventQuery getInsertEventQuery(EventStorageRecord record){
+    public InsertEventQuery newInsertEventQuery(EventStorageRecord record){
         return InsertEventQuery.newBuilder()
                 .setRecord(record)
                 .setDataSource(dataSource)
                 .build();
     }
 
-    public UpdateEventQuery getUpdateEventQuery(EventStorageRecord record){
+    public UpdateEventQuery newUpdateEventQuery(EventStorageRecord record){
         return UpdateEventQuery.newBuilder()
                 .setRecord(record)
                 .setDataSource(dataSource)
                 .build();
     }
 
-    public SelectEventByIdQuery getSelectEventByIdQuery(String id){
+    public SelectEventByIdQuery newSelectEventByIdQuery(String id){
         return new SelectEventByIdQuery(dataSource, id);
     }
 
-    public FilterAndSortQuery getFilterAndSortQuery(EventStreamQuery streamQuery){
+    public FilterAndSortQuery newFilterAndSortQuery(EventStreamQuery streamQuery){
         return FilterAndSortQuery.newBuilder()
                 .setStreamQuery(streamQuery)
                 .setDataSource(dataSource)

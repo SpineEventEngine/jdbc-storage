@@ -72,6 +72,7 @@ public class InsertRecordQuery<Id> extends WriteRecord<Id, AggregateStorageRecor
         return builder;
     }
 
+    @SuppressWarnings("ClassNameSameAsAncestorName")
     public static class Builder<Id> extends WriteRecord.Builder<Builder<Id>, InsertRecordQuery, Id, AggregateStorageRecord> {
 
         @Override

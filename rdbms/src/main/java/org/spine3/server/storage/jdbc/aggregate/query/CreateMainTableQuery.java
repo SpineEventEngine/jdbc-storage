@@ -18,36 +18,42 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.spine3.server.storage.jdbc.projection.query;
+package org.spine3.server.storage.jdbc.aggregate.query;
 
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.AbstractQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
-import static org.spine3.server.storage.jdbc.projection.query.Constants.*;
+import org.spine3.server.storage.jdbc.util.IdColumn;
+import static org.spine3.server.storage.jdbc.aggregate.query.Constants.*;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import static java.lang.String.format;
 
-public class CreateTableIfDoesNotExistQuery extends AbstractQuery {
+public class CreateMainTableQuery<I> extends AbstractQuery {
 
+    private final IdColumn<I> idColumn;
     private final String tableName;
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String CREATE_TABLE_IF_DOES_NOT_EXIST =
+    private static final String QUERY =
             "CREATE TABLE IF NOT EXISTS %s (" +
+                    ID_COL + " %s, " +
+                    AGGREGATE_COL + " BLOB, " +
                     SECONDS_COL + " BIGINT, " +
                     NANOS_COL + " INT " +
                     ");";
 
-    protected CreateTableIfDoesNotExistQuery(Builder builder) {
+    protected CreateMainTableQuery(Builder<I> builder) {
         super(builder);
+        this.idColumn = builder.idColumn;
         this.tableName = builder.tableName;
     }
 
     public void execute() throws DatabaseException {
-        final String createTableSql = format(CREATE_TABLE_IF_DOES_NOT_EXIST, tableName);
+        final String idColumnType = idColumn.getColumnDataType();
+        final String createTableSql = format(QUERY, tableName, idColumnType);
         try (ConnectionWrapper connection = dataSource.getConnection(true);
              PreparedStatement statement = connection.prepareStatement(createTableSql)) {
             statement.execute();
@@ -57,28 +63,35 @@ public class CreateTableIfDoesNotExistQuery extends AbstractQuery {
         }
     }
 
-    public static Builder newBuilder() {
-        final Builder builder = new Builder();
-        builder.setQuery(CREATE_TABLE_IF_DOES_NOT_EXIST);
+    public static <I>Builder <I>newBuilder() {
+        final Builder <I>builder = new Builder<>();
+        builder.setQuery(QUERY);
         return builder;
     }
 
-    public static class Builder extends AbstractQuery.Builder<Builder, CreateTableIfDoesNotExistQuery> {
+    @SuppressWarnings("ClassNameSameAsAncestorName")
+    public static class Builder<I> extends AbstractQuery.Builder<Builder<I>, CreateMainTableQuery> {
 
+        private IdColumn<I> idColumn;
         private String tableName;
 
         @Override
-        public CreateTableIfDoesNotExistQuery build() {
-            return new CreateTableIfDoesNotExistQuery(this);
+        public CreateMainTableQuery build() {
+            return new CreateMainTableQuery<>(this);
         }
 
-        public Builder setTableName(String tableName){
+        public Builder<I> setIdColumn(IdColumn<I> idColumn) {
+            this.idColumn = idColumn;
+            return getThis();
+        }
+
+        public Builder<I> setTableName(String tableName) {
             this.tableName = tableName;
             return getThis();
         }
 
         @Override
-        protected Builder getThis() {
+        protected Builder<I> getThis() {
             return this;
         }
     }

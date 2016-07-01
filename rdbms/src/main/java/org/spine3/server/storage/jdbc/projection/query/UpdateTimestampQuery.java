@@ -72,6 +72,7 @@ public class UpdateTimestampQuery<Id> extends WriteQuery{
         }
     }
 
+    @SuppressWarnings("ClassNameSameAsAncestorName")
     public static class Builder<Id> extends WriteQuery.Builder<Builder<Id>, UpdateTimestampQuery> {
 
         private Timestamp timestamp;

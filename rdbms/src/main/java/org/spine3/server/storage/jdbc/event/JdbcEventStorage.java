@@ -70,7 +70,7 @@ public class JdbcEventStorage extends EventStorage {
         super(multitenant);
         this.dataSource = dataSource;
         this.queryFactory = queryFactory;
-        queryFactory.getCreateTableIfDoesNotExistQuery().execute();
+        queryFactory.newCreateTableQuery().execute();
     }
 
     /**
@@ -83,7 +83,7 @@ public class JdbcEventStorage extends EventStorage {
      */
     @Override
     public Iterator<Event> iterator(EventStreamQuery query) throws DatabaseException {
-        final Iterator<EventStorageRecord> iterator = queryFactory.getFilterAndSortQuery(query).execute();
+        final Iterator<EventStorageRecord> iterator = queryFactory.newFilterAndSortQuery(query).execute();
 
         iterators.add((DbIterator) iterator);
         final Iterator<Event> result = toEventIterator(iterator);
@@ -98,9 +98,9 @@ public class JdbcEventStorage extends EventStorage {
     @Override
     protected void writeInternal(EventStorageRecord record) throws DatabaseException {
         if (containsRecord(record.getEventId())) {
-           queryFactory.getUpdateEventQuery(record).execute();
+           queryFactory.newUpdateEventQuery(record).execute();
         } else {
-           queryFactory.getInsertEventQuery(record).execute();
+           queryFactory.newInsertEventQuery(record).execute();
         }
     }
 
@@ -113,12 +113,12 @@ public class JdbcEventStorage extends EventStorage {
     @Override
     protected EventStorageRecord readInternal(EventId eventId) throws DatabaseException {
         final String id = eventId.getUuid();
-        final EventStorageRecord record = queryFactory.getSelectEventByIdQuery(id).execute();
+        final EventStorageRecord record = queryFactory.newSelectEventByIdQuery(id).execute();
         return record;
     }
 
     private boolean containsRecord(String id) {
-        final EventStorageRecord record = queryFactory.getSelectEventByIdQuery(id).execute();
+        final EventStorageRecord record = queryFactory.newSelectEventByIdQuery(id).execute();
         final boolean contains = record != null;
         return contains;
     }

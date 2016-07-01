@@ -70,6 +70,7 @@ public class InsertEventCountQuery<Id> extends UpdateRecord<Id> {
         return builder;
     }
 
+    @SuppressWarnings("ClassNameSameAsAncestorName")
     public static class Builder<Id> extends UpdateRecord.Builder<Builder<Id>, InsertEventCountQuery, Id> {
 
         private int count;

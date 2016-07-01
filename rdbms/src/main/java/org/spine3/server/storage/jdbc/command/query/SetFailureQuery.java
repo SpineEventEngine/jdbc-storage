@@ -50,6 +50,7 @@ public class SetFailureQuery extends WriteRecord<String, Failure> {
         return builder;
     }
 
+    @SuppressWarnings("ClassNameSameAsAncestorName")
     public static class Builder extends WriteRecord.Builder<Builder, SetFailureQuery, String, Failure> {
 
         @Override

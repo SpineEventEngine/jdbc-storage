@@ -20,40 +20,53 @@
 
 package org.spine3.server.storage.jdbc.command.query;
 
-import org.spine3.base.CommandStatus;
-import org.spine3.server.storage.jdbc.query.UpdateRecord;
+import org.spine3.server.storage.jdbc.DatabaseException;
+import org.spine3.server.storage.jdbc.query.AbstractQuery;
+import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import static org.spine3.server.storage.jdbc.command.query.Constants.*;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
-public class SetOkStatusQuery extends UpdateRecord<String> {
+public class CreateTableQuery extends AbstractQuery {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String SET_OK_STATUS_QUERY =
-            "UPDATE " + TABLE_NAME +
-            " SET " + COMMAND_STATUS_COL + " = '" + CommandStatus.forNumber(CommandStatus.OK_VALUE).name() + '\'' +
-            " WHERE " + ID_COL + " = ? ;";
+    private static final String INSERT_QUERY =
+            "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" +
+                    ID_COL + " VARCHAR(512), " +
+                    COMMAND_COL + " BLOB, " +
+                    COMMAND_STATUS_COL + " VARCHAR(512), " +
+                    ERROR_COL + " BLOB, " +
+                    FAILURE_COL + " BLOB, " +
+                    " PRIMARY KEY(" + ID_COL + ')' +
+                    ");";
 
-    private SetOkStatusQuery(Builder builder) {
+    public CreateTableQuery(Builder builder) {
         super(builder);
     }
 
-    /*protected void logError(SQLException exception) {
-        log(exception, "command insertion", getId());
-    }*/
-
     public static Builder newBuilder() {
         final Builder builder = new Builder();
-        builder.setIdIndexInQuery(1)
-               .setQuery(SET_OK_STATUS_QUERY);
+        builder.setQuery(INSERT_QUERY);
         return builder;
     }
 
+    public void execute() throws DatabaseException {
+        try (ConnectionWrapper connection = dataSource.getConnection(true);
+             PreparedStatement statement = this.prepareStatement(connection)) {
+            statement.execute();
+        } catch (SQLException e) {
+            //log().error("Exception during table creation:", e);
+            throw new DatabaseException(e);
+        }
+    }
+
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder extends UpdateRecord.Builder<Builder, SetOkStatusQuery, String> {
+    public static class Builder extends AbstractQuery.Builder<Builder, CreateTableQuery> {
 
         @Override
-        public SetOkStatusQuery build() {
-            return new SetOkStatusQuery(this);
+        public CreateTableQuery build() {
+            return new CreateTableQuery(this);
         }
 
         @Override
@@ -61,4 +74,5 @@ public class SetOkStatusQuery extends UpdateRecord<String> {
             return this;
         }
     }
+
 }

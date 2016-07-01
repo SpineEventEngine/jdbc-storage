@@ -60,6 +60,7 @@ public class WriteQuery extends AbstractQuery{
      *//*
     protected abstract void logError(SQLException exception);*/
 
+    @SuppressWarnings("ClassNameSameAsAncestorName")
     public abstract static class Builder<B extends Builder<B, Q>, Q extends WriteQuery>
             extends AbstractQuery.Builder<B, Q> {
     }

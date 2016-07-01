@@ -73,14 +73,14 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
         super(multitenant);
         this.dataSource = dataSource;
         this.queryFactory = queryFactory;
-        queryFactory.getCreateMainTableIfDoesNotExistQuery().execute();
-        queryFactory.getCreateEventCountTableIfDoesNotExistQuery().execute();
+        queryFactory.newCreateMainTableQuery().execute();
+        queryFactory.newCreateEventCountTableQuery().execute();
     }
 
     @Override
     public int readEventCountAfterLastSnapshot(I id) {
         checkNotClosed();
-        final Integer count = queryFactory.getSelectEventCountByIdQuery(id).execute();
+        final Integer count = queryFactory.newSelectEventCountByIdQuery(id).execute();
         if (count == null) {
             return 0;
         }
@@ -91,14 +91,14 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     public void writeEventCountAfterLastSnapshot(I id, int count) {
         checkNotClosed();
         if (containsEventCount(id)) {
-            queryFactory.getUpdateEventCountQuery(id, count).execute();
+            queryFactory.newUpdateEventCountQuery(id, count).execute();
         } else {
-            queryFactory.getInsertEventCountQuery(id, count).execute();
+            queryFactory.newInsertEventCountQuery(id, count).execute();
         }
     }
 
     private boolean containsEventCount(I id) {
-        final Integer count = queryFactory.getSelectEventCountByIdQuery(id).execute();
+        final Integer count = queryFactory.newSelectEventCountByIdQuery(id).execute();
         final boolean contains = count != null;
         return contains;
     }
@@ -110,7 +110,7 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
      */
     @Override
     protected void writeInternal(I id, AggregateStorageRecord record) throws DatabaseException {
-        queryFactory.getInsertRecordQuery(id, record).execute();
+        queryFactory.newInsertRecordQuery(id, record).execute();
     }
 
     /**
@@ -124,7 +124,7 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     @Override
     protected Iterator<AggregateStorageRecord> historyBackward(I id) throws DatabaseException {
         checkNotNull(id);
-        final Iterator<AggregateStorageRecord> iterator = queryFactory.getSelectByIdSortedByTimeDescQuery(id).execute();
+        final Iterator<AggregateStorageRecord> iterator = queryFactory.newSelectByIdSortedByTimeDescQuery(id).execute();
         iterators.add((DbIterator) iterator);
         return iterator;
     }

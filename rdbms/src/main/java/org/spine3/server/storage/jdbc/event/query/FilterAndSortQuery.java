@@ -161,6 +161,7 @@ public class FilterAndSortQuery extends AbstractQuery {
         }
     }
 
+    @SuppressWarnings("ClassNameSameAsAncestorName")
     public static class Builder extends AbstractQuery.Builder<Builder, FilterAndSortQuery> {
 
         private EventStreamQuery streamQuery;

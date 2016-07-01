@@ -18,39 +18,43 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.spine3.server.storage.jdbc.event.query;
+package org.spine3.server.storage.jdbc.entity.query;
 
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.AbstractQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
-import static org.spine3.server.storage.jdbc.event.query.Constants.*;
+import org.spine3.server.storage.jdbc.util.IdColumn;
+import static org.spine3.server.storage.jdbc.entity.query.Constants.*;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import static java.lang.String.format;
 
-public class CreateTableIfDoesNotExistQuery extends AbstractQuery {
+public class CreateTableQuery<I> extends AbstractQuery {
+
+    private final IdColumn<I> idColumn;
+    private final String tableName;
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String CREATE_TABLE_QUERY =
-            "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" +
-                    EVENT_ID_COL + " VARCHAR(512), " +
-                    EVENT_COL + " BLOB, " +
-                    EVENT_TYPE_COL + " VARCHAR(512), " +
-                    PRODUCER_ID_COL + " VARCHAR(512), " +
-                    SECONDS_COL + " BIGINT, " +
-                    NANOSECONDS_COL + " INT, " +
-                    " PRIMARY KEY(" + EVENT_ID_COL + ')' +
+    private static final String CREATE_TABLE_IF_DOES_NOT_EXIST =
+            "CREATE TABLE IF NOT EXISTS %s (" +
+                    ID_COL + " %s, " +
+                    ENTITY_COL + " BLOB, " +
+                    "PRIMARY KEY(" + ID_COL + ')' +
                     ");";
 
-    protected CreateTableIfDoesNotExistQuery(Builder builder) {
+    protected CreateTableQuery(Builder<I> builder) {
         super(builder);
+        this.idColumn = builder.idColumn;
+        this.tableName = builder.tableName;
     }
 
     public void execute() throws DatabaseException {
+        final String idColumnType = idColumn.getColumnDataType();
+        final String createTableSql = format(CREATE_TABLE_IF_DOES_NOT_EXIST, tableName, idColumnType);
         try (ConnectionWrapper connection = dataSource.getConnection(true);
-             PreparedStatement statement = prepareStatement(connection)) {
+             PreparedStatement statement = connection.prepareStatement(createTableSql)) {
             statement.execute();
         } catch (SQLException e) {
             //log().error("Error while creating a table with the name: " + tableName, e);
@@ -58,21 +62,35 @@ public class CreateTableIfDoesNotExistQuery extends AbstractQuery {
         }
     }
 
-    public static Builder newBuilder() {
-        final Builder builder = new Builder();
-        builder.setQuery(CREATE_TABLE_QUERY);
+    public static <I>Builder<I> newBuilder() {
+        final Builder <I> builder = new Builder<>();
+        builder.setQuery(CREATE_TABLE_IF_DOES_NOT_EXIST);
         return builder;
     }
 
-    public static class Builder extends AbstractQuery.Builder<Builder, CreateTableIfDoesNotExistQuery> {
+    @SuppressWarnings("ClassNameSameAsAncestorName")
+    public static class Builder<I> extends AbstractQuery.Builder<Builder<I>, CreateTableQuery> {
+
+        private IdColumn<I> idColumn;
+        private String tableName;
 
         @Override
-        public CreateTableIfDoesNotExistQuery build() {
-            return new CreateTableIfDoesNotExistQuery(this);
+        public CreateTableQuery build() {
+            return new CreateTableQuery<>(this);
+        }
+
+        public Builder<I> setIdColumn(IdColumn<I> idColumn){
+            this.idColumn = idColumn;
+            return getThis();
+        }
+
+        public Builder<I> setTableName(String tableName){
+            this.tableName = tableName;
+            return getThis();
         }
 
         @Override
-        protected Builder getThis() {
+        protected Builder<I> getThis() {
             return this;
         }
     }

@@ -70,6 +70,7 @@ public class SelectByIdSortedByTimeDescQuery<Id> extends AbstractQuery {
         return builder;
     }
 
+    @SuppressWarnings("ClassNameSameAsAncestorName")
     public static class Builder<I> extends AbstractQuery.Builder<Builder<I>, SelectByIdSortedByTimeDescQuery> {
 
         private IdColumn<I> idColumn;

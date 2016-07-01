@@ -68,6 +68,7 @@ public abstract class WriteRecord<Id, Record extends Message> extends WriteQuery
         }
     }
 
+    @SuppressWarnings("ClassNameSameAsAncestorName")
     public abstract static class Builder<B extends Builder<B, Q, Id, Record>, Q extends WriteRecord, Id, Record extends Message>
             extends WriteQuery.Builder<B, Q>{
         private int idIndexInQuery;

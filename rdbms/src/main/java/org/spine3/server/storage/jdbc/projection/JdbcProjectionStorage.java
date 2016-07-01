@@ -71,15 +71,15 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
         this.entityStorage = entityStorage;
         this.queryFactory = queryFactory;
 
-       queryFactory.getCreateTableIfDoesNotExistQuery().execute();
+       queryFactory.newCreateTableQuery().execute();
     }
 
     @Override
     public void writeLastHandledEventTime(Timestamp time) throws DatabaseException {
         if (containsLastEventTime()) {
-           queryFactory.getUpdateTimestampQuery(time).execute();
+           queryFactory.newUpdateTimestampQuery(time).execute();
         } else {
-            queryFactory.getInsertTimestampQuery(time).execute();
+            queryFactory.newInsertTimestampQuery(time).execute();
         }
     }
 
@@ -92,7 +92,7 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
     @Override
     @Nullable
     public Timestamp readLastHandledEventTime() throws DatabaseException {
-        final Timestamp timestamp = queryFactory.getSelectTimestampQuery().execute();
+        final Timestamp timestamp = queryFactory.newSelectTimestampQuery().execute();
         return timestamp;
     }
 

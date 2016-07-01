@@ -89,6 +89,7 @@ public class  SelectByStatusQuery extends AbstractQuery{
         }
     }
 
+    @SuppressWarnings("ClassNameSameAsAncestorName")
     public static class Builder extends AbstractQuery.Builder<Builder, SelectByStatusQuery> {
 
         private CommandStatus status;

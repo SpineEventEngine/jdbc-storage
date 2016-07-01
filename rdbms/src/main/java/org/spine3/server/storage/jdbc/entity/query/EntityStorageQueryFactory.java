@@ -19,15 +19,15 @@ public class EntityStorageQueryFactory<I> {
         this.tableName = DbTableNameFactory.newTableName(entityClass);
     }
 
-    public CreateTableIfDoesNotExistQuery getCreateTableIfDoesNotExistQuery() {
-        return CreateTableIfDoesNotExistQuery.<I>newBuilder()
+    public CreateTableQuery newCreateTableQuery() {
+        return CreateTableQuery.<I>newBuilder()
                 .setDataSource(dataSource)
                 .setIdColumn(idColumn)
                 .setTableName(tableName)
                 .build();
     }
 
-    public UpdateEntityQuery getUpdateEntityQuery(I id, EntityStorageRecord record) {
+    public UpdateEntityQuery newUpdateEntityQuery(I id, EntityStorageRecord record) {
         return UpdateEntityQuery.<I>newBuilder(tableName)
                 .setIdColumn(idColumn)
                 .setId(id)
@@ -36,7 +36,7 @@ public class EntityStorageQueryFactory<I> {
                 .build();
     }
 
-    public InsertEntityQuery getInsertEntityQuery(I id, EntityStorageRecord record) {
+    public InsertEntityQuery newInsertEntityQuery(I id, EntityStorageRecord record) {
         return InsertEntityQuery.<I>newBuilder(tableName)
                 .setId(id)
                 .setIdColumn(idColumn)
@@ -45,11 +45,11 @@ public class EntityStorageQueryFactory<I> {
                 .build();
     }
 
-    public SelectEntityByIdQuery <I> getSelectEntityByIdQuery(I id){
+    public SelectEntityByIdQuery <I> newSelectEntityByIdQuery(I id){
         return new SelectEntityByIdQuery<>(tableName, dataSource, idColumn, id);
     }
 
-    public DeleteAllQuery getDeleteAllQuery(){
+    public DeleteAllQuery newDeleteAllQuery(){
         return DeleteAllQuery.newBuilder(tableName)
                 .setDataSource(dataSource)
                 .build();

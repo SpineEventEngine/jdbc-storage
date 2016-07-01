@@ -58,6 +58,7 @@ public abstract class WriteCommandRecordQuery
         return statement;
     }
 
+    @SuppressWarnings("ClassNameSameAsAncestorName")
     public abstract static class Builder<B extends Builder<B, Q>, Q extends WriteCommandRecordQuery>
             extends WriteRecord.Builder<B, Q, String, CommandStorageRecord> {
 

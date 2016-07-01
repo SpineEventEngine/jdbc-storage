@@ -70,6 +70,7 @@ public class SelectTimestampQuery extends AbstractQuery{
         return builder;
     }
 
+    @SuppressWarnings("ClassNameSameAsAncestorName")
     public static class Builder extends AbstractQuery.Builder<Builder, SelectTimestampQuery> {
 
         @Override

@@ -49,6 +49,7 @@ public class UpdateRecord <Id> extends WriteQuery {
         return statement;
     }
 
+    @SuppressWarnings("ClassNameSameAsAncestorName")
     public abstract static class Builder<B extends Builder<B, Q, Id>, Q extends UpdateRecord, Id>
             extends WriteQuery.Builder<B, Q>{
         private int idIndexInQuery;
