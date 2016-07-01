@@ -35,63 +35,70 @@ public class AggregateStorageQueryFactory<I>{
     }
 
     public CreateMainTableQuery newCreateMainTableQuery() {
-        return CreateMainTableQuery.<I>newBuilder()
+        final CreateMainTableQuery.Builder<I> builder = CreateMainTableQuery.<I>newBuilder()
                 .setTableName(mainTableName)
                 .setIdColumn(idColumn)
-                .setDataSource(dataSource)
-                .build();
+                .setDataSource(dataSource);
+
+        return builder.build();
     }
 
     public CreateEventCountQuery newCreateEventCountTableQuery() {
-        return CreateEventCountQuery.<I>newBuilder()
+        final CreateEventCountQuery.Builder<I> builder = CreateEventCountQuery.<I>newBuilder()
                 .setTableName(eventCountTableName)
                 .setIdColumn(idColumn)
-                .setDataSource(dataSource)
-                .build();
+                .setDataSource(dataSource);
+
+        return builder.build();
     }
 
     public InsertEventCountQuery newInsertEventCountQuery(I id, int count){
-        return InsertEventCountQuery.<I>newBuilder(eventCountTableName)
+        final InsertEventCountQuery.Builder<I> builder = InsertEventCountQuery.<I>newBuilder(eventCountTableName)
                 .setIdColumn(idColumn)
                 .setId(id)
                 .setCount(count)
-                .setDataSource(dataSource)
-                .build();
+                .setDataSource(dataSource);
+
+        return builder.build();
     }
 
     public UpdateEventCountQuery newUpdateEventCountQuery(I id, int count){
-        return UpdateEventCountQuery.<I>newBuilder(eventCountTableName)
+        final UpdateEventCountQuery.Builder<I> builder = UpdateEventCountQuery.<I>newBuilder(eventCountTableName)
                 .setIdColumn(idColumn)
                 .setId(id)
                 .setCount(count)
-                .setDataSource(dataSource)
-                .build();
+                .setDataSource(dataSource);
+
+        return builder.build();
     }
 
     public InsertRecordQuery newInsertRecordQuery(I id, AggregateStorageRecord record){
-        return InsertRecordQuery.<I>newBuilder(mainTableName)
+        final InsertRecordQuery.Builder<I> builder = InsertRecordQuery.<I>newBuilder(mainTableName)
                 .setIdColumn(idColumn)
                 .setId(id)
                 .setRecord(record)
-                .setDataSource(dataSource)
-                .build();
+                .setDataSource(dataSource);
+
+        return builder.build();
     }
 
     public SelectEventCountByIdQuery newSelectEventCountByIdQuery(I id){
-        return SelectEventCountByIdQuery.<I>newBuilder(eventCountTableName)
+        final SelectEventCountByIdQuery.Builder<I> builder = SelectEventCountByIdQuery.<I>newBuilder(eventCountTableName)
                 .setIdColumn(idColumn)
                 .setId(id)
-                .setDataSource(dataSource)
-                .build();
+                .setDataSource(dataSource);
+
+        return builder.build();
     }
 
     @SuppressWarnings("InstanceMethodNamingConvention")
     public SelectByIdSortedByTimeDescQuery<I> newSelectByIdSortedByTimeDescQuery(I id){
-        return SelectByIdSortedByTimeDescQuery.<I>newBuilder(mainTableName)
+        final SelectByIdSortedByTimeDescQuery.Builder<I> builder = SelectByIdSortedByTimeDescQuery.<I>newBuilder(mainTableName)
                 .setIdColumn(idColumn)
                 .setId(id)
-                .setDataSource(dataSource)
-                .build();
+                .setDataSource(dataSource);
+
+        return builder.build();
     }
 
 }

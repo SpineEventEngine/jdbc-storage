@@ -32,7 +32,7 @@ import com.google.protobuf.Timestamp;
 import static java.lang.String.format;
 
 
-public class InsertTimestampQuery<Id> extends WriteQuery{
+public class InsertTimestampQuery extends WriteQuery{
 
     private final Timestamp timestamp;
 
@@ -42,7 +42,7 @@ public class InsertTimestampQuery<Id> extends WriteQuery{
                     " (" + SECONDS_COL + ", " + NANOS_COL + ')' +
                     " VALUES (?, ?);";
 
-    private InsertTimestampQuery(Builder<Id> builder) {
+    private InsertTimestampQuery(Builder builder) {
         super(builder);
         this.timestamp = builder.timestamp;
     }
@@ -53,8 +53,8 @@ public class InsertTimestampQuery<Id> extends WriteQuery{
     }*/
 
 
-    public static <Id> Builder <Id> newBuilder(String tableName) {
-        final Builder<Id> builder = new Builder<>();
+    public static  Builder  newBuilder(String tableName) {
+        final Builder builder = new Builder();
         builder.setQuery(format(INSERT_QUERY, tableName));
         return builder;
     }
@@ -74,22 +74,22 @@ public class InsertTimestampQuery<Id> extends WriteQuery{
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder<I> extends WriteQuery.Builder<Builder<I>, InsertTimestampQuery> {
+    public static class Builder extends WriteQuery.Builder<Builder, InsertTimestampQuery> {
 
         private Timestamp timestamp;
 
         @Override
         public InsertTimestampQuery build() {
-            return new InsertTimestampQuery<>(this);
+            return new InsertTimestampQuery(this);
         }
 
-        public Builder<I> setTimestamp(Timestamp timestamp){
+        public Builder setTimestamp(Timestamp timestamp){
             this.timestamp = timestamp;
             return getThis();
         }
 
         @Override
-        protected Builder<I> getThis() {
+        protected Builder getThis() {
             return this;
         }
     }

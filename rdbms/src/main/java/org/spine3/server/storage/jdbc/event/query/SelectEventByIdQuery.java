@@ -25,13 +25,15 @@ import org.spine3.server.storage.EventStorageRecord;
 import org.spine3.server.storage.jdbc.query.SelectById;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
+
 import static org.spine3.server.storage.jdbc.event.query.Constants.*;
 
 @Internal
 public class SelectEventByIdQuery extends SelectById<String, EventStorageRecord> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String SELECT_QUERY = SELECT_EVENT_FROM_TABLE + " WHERE " + EVENT_ID_COL + " = ?;";
+    private static final String SELECT_QUERY = SELECT_EVENT_FROM_TABLE +
+                                               " WHERE " + EVENT_ID_COL + " = ?;";
 
     public SelectEventByIdQuery(DataSourceWrapper dataSource, String id) {
         super(SELECT_QUERY, dataSource, new IdColumn.StringIdColumn(), id);

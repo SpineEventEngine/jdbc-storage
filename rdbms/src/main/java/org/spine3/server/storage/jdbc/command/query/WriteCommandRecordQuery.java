@@ -65,12 +65,12 @@ public abstract class WriteCommandRecordQuery
         private int statusIndexInQuery;
         private CommandStatus status;
 
-        public Builder<B, Q> setStatusIndexInQuery(int statusIndexInQuery) {
+        public B setStatusIndexInQuery(int statusIndexInQuery) {
             this.statusIndexInQuery = statusIndexInQuery;
             return this.getThis();
         }
 
-        public Builder<B, Q> setStatus(CommandStatus status) {
+        public B setStatus(CommandStatus status) {
             this.status = status;
             return this.getThis();
         }

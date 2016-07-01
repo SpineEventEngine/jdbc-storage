@@ -11,6 +11,7 @@ import org.spine3.server.storage.CommandStorageRecord;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
+@SuppressWarnings("TypeMayBeWeakened")
 public class CommandStorageQueryFactory {
 
     private final IdColumn <String> idColumn;
@@ -32,56 +33,61 @@ public class CommandStorageQueryFactory {
     }
 
     public CreateTableQuery newCreateTableQuery(){
-        return CreateTableQuery.newBuilder()
-                .setDataSource(dataSource)
-                .build();
+        final CreateTableQuery.Builder builder = CreateTableQuery.newBuilder()
+                .setDataSource(dataSource);
+
+        return builder.build();
     }
 
     public InsertCommandQuery newInsertCommandQuery(CommandId id, CommandStorageRecord record){
-        return InsertCommandQuery.newBuilder()
+        final InsertCommandQuery.Builder builder = InsertCommandQuery.newBuilder()
                 .setDataSource(dataSource)
                 .setIdColumn(idColumn)
                 .setId(id.getUuid())
                 .setRecord(record)
-                .setStatus(CommandStatus.forNumber(record.getStatusValue()))
-                .build();
+                .setStatus(CommandStatus.forNumber(record.getStatusValue()));
+
+        return builder.build();
     }
 
-    @SuppressWarnings("")
     public UpdateCommandQuery newUpdateCommandQuery(CommandId id, CommandStorageRecord record){
-        return UpdateCommandQuery.newBuilder()
+        final UpdateCommandQuery.Builder builder = UpdateCommandQuery.newBuilder()
                 .setDataSource(dataSource)
                 .setIdColumn(idColumn)
                 .setId(id.getUuid())
                 .setRecord(record)
-                .setStatus(CommandStatus.forNumber(record.getStatusValue()))
-                .build();
+                .setStatus(CommandStatus.forNumber(record.getStatusValue()));
+
+        return builder.build();
     }
 
     public SetErrorQuery newSetErrorQuery(CommandId id, Error error){
-        return SetErrorQuery.newBuilder()
+        final SetErrorQuery.Builder builder = SetErrorQuery.newBuilder()
                 .setDataSource(dataSource)
                 .setIdColumn(idColumn)
                 .setId(id.getUuid())
-                .setRecord(error)
-                .build();
+                .setRecord(error);
+
+        return builder.build();
     }
 
     public SetFailureQuery newSetFailureQuery(CommandId id, Failure failure){
-        return SetFailureQuery.newBuilder()
+        final SetFailureQuery.Builder builder = SetFailureQuery.newBuilder()
                 .setDataSource(dataSource)
                 .setIdColumn(idColumn)
                 .setId(id.getUuid())
-                .setRecord(failure)
-                .build();
+                .setRecord(failure);
+
+        return builder.build();
     }
 
     public SetOkStatusQuery newSetOkStatusQuery(CommandId id){
-        return SetOkStatusQuery.newBuilder()
+        final SetOkStatusQuery.Builder builder = SetOkStatusQuery.newBuilder()
                 .setDataSource(this.dataSource)
                 .setIdColumn(idColumn)
-                .setId(id.getUuid())
-                .build();
+                .setId(id.getUuid());
+
+        return builder.build();
     }
 
     public SelectCommandByIdQuery newSelectCommandByIdQuery(CommandId id){
@@ -89,9 +95,10 @@ public class CommandStorageQueryFactory {
     }
 
     public SelectByStatusQuery newSelectByStatusQuery(CommandStatus status){
-        return SelectByStatusQuery.newBuilder()
+        final SelectByStatusQuery.Builder builder = SelectByStatusQuery.newBuilder()
                 .setDataSource(dataSource)
-                .setStatus(status)
-                .build();
+                .setStatus(status);
+
+        return builder.build();
     }
 }

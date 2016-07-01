@@ -10,11 +10,9 @@ import org.spine3.server.storage.jdbc.util.IdColumn;
 
 public class EventStorageQueryFactory{
 
-    private final IdColumn idColumn;
     private final DataSourceWrapper dataSource;
 
     public EventStorageQueryFactory(DataSourceWrapper dataSource) {
-        this.idColumn = new IdColumn.StringIdColumn();
         this.dataSource = dataSource;
     }
 
@@ -29,23 +27,26 @@ public class EventStorageQueryFactory{
     }
 
     public CreateTableQuery newCreateTableQuery(){
-        return CreateTableQuery.newBuilder()
-                .setDataSource(dataSource)
-                .build();
+        final CreateTableQuery.Builder builder = CreateTableQuery.newBuilder()
+                .setDataSource(dataSource);
+
+        return builder.build();
     }
 
     public InsertEventQuery newInsertEventQuery(EventStorageRecord record){
-        return InsertEventQuery.newBuilder()
+        final InsertEventQuery.Builder builder = InsertEventQuery.newBuilder()
                 .setRecord(record)
-                .setDataSource(dataSource)
-                .build();
+                .setDataSource(dataSource);
+
+        return builder.build();
     }
 
     public UpdateEventQuery newUpdateEventQuery(EventStorageRecord record){
-        return UpdateEventQuery.newBuilder()
+        final UpdateEventQuery.Builder builder = UpdateEventQuery.newBuilder()
                 .setRecord(record)
-                .setDataSource(dataSource)
-                .build();
+                .setDataSource(dataSource);
+
+        return builder.build();
     }
 
     public SelectEventByIdQuery newSelectEventByIdQuery(String id){
@@ -53,9 +54,10 @@ public class EventStorageQueryFactory{
     }
 
     public FilterAndSortQuery newFilterAndSortQuery(EventStreamQuery streamQuery){
-        return FilterAndSortQuery.newBuilder()
+        final FilterAndSortQuery.Builder builder = FilterAndSortQuery.newBuilder()
                 .setStreamQuery(streamQuery)
-                .setDataSource(dataSource)
-                .build();
+                .setDataSource(dataSource);
+
+        return builder.build();
     }
 }

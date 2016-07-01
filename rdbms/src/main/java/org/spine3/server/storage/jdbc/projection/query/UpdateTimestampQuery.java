@@ -32,7 +32,7 @@ import java.sql.SQLException;
 import static java.lang.String.format;
 
 
-public class UpdateTimestampQuery<Id> extends WriteQuery{
+public class UpdateTimestampQuery extends WriteQuery{
 
     private final Timestamp timestamp;
 
@@ -42,7 +42,7 @@ public class UpdateTimestampQuery<Id> extends WriteQuery{
                     SECONDS_COL + " = ?, " +
                     NANOS_COL + " = ?;";
 
-    private UpdateTimestampQuery(Builder<Id> builder) {
+    private UpdateTimestampQuery(Builder builder) {
         super(builder);
         this.timestamp = builder.timestamp;
     }
@@ -52,8 +52,8 @@ public class UpdateTimestampQuery<Id> extends WriteQuery{
         log(exception, "command insertion", getId());
     }*/
 
-    public static <Id> Builder <Id> newBuilder(String tableName) {
-        final Builder<Id> builder = new Builder<>();
+    public static  Builder  newBuilder(String tableName) {
+        final Builder builder = new Builder();
         builder.setQuery(format(UPDATE_QUERY, tableName));
         return builder;
     }
@@ -73,22 +73,22 @@ public class UpdateTimestampQuery<Id> extends WriteQuery{
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder<Id> extends WriteQuery.Builder<Builder<Id>, UpdateTimestampQuery> {
+    public static class Builder extends WriteQuery.Builder<Builder, UpdateTimestampQuery> {
 
         private Timestamp timestamp;
 
         @Override
         public UpdateTimestampQuery build() {
-            return new UpdateTimestampQuery<>(this);
+            return new UpdateTimestampQuery(this);
         }
 
-        public Builder<Id> setTimestamp(Timestamp timestamp){
+        public Builder setTimestamp(Timestamp timestamp){
             this.timestamp = timestamp;
             return getThis();
         }
 
         @Override
-        protected Builder<Id> getThis() {
+        protected Builder getThis() {
             return this;
         }
     }
