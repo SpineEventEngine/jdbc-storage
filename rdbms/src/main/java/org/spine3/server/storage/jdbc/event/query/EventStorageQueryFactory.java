@@ -10,8 +10,8 @@ import org.spine3.server.storage.jdbc.util.IdColumn;
 public class EventStorageQueryFactory{
 
     private final DataSourceWrapper dataSource;
+    private final IdColumn<String> idColumn;
     private Logger logger;
-    private IdColumn<String> idColumn;
 
     public EventStorageQueryFactory(DataSourceWrapper dataSource) {
         this.dataSource = dataSource;

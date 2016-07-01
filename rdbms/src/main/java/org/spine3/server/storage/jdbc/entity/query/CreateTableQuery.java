@@ -21,7 +21,7 @@
 package org.spine3.server.storage.jdbc.entity.query;
 
 import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.query.AbstractQuery;
+import org.spine3.server.storage.jdbc.query.Query;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
@@ -32,7 +32,7 @@ import static java.lang.String.format;
 import static org.spine3.server.storage.jdbc.entity.query.Constants.ENTITY_COL;
 import static org.spine3.server.storage.jdbc.entity.query.Constants.ID_COL;
 
-public class CreateTableQuery<I> extends AbstractQuery {
+public class CreateTableQuery<I> extends Query {
 
     private final IdColumn<I> idColumn;
     private final String tableName;
@@ -55,7 +55,7 @@ public class CreateTableQuery<I> extends AbstractQuery {
     public void execute() throws DatabaseException {
         final String idColumnType = idColumn.getColumnDataType();
         final String createTableSql = format(CREATE_TABLE_IF_DOES_NOT_EXIST, tableName, idColumnType);
-        try (ConnectionWrapper connection = this.getDataSource().getConnection(true);
+        try (ConnectionWrapper connection = this.getConnection(true);
              PreparedStatement statement = connection.prepareStatement(createTableSql)) {
             statement.execute();
         } catch (SQLException e) {
@@ -71,7 +71,7 @@ public class CreateTableQuery<I> extends AbstractQuery {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder<I> extends AbstractQuery.Builder<Builder<I>, CreateTableQuery> {
+    public static class Builder<I> extends Query.Builder<Builder<I>, CreateTableQuery> {
 
         private IdColumn<I> idColumn;
         private String tableName;

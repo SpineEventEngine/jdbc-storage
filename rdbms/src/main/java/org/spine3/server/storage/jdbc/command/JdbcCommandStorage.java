@@ -97,7 +97,8 @@ public class JdbcCommandStorage extends CommandStorage {
     @Override
     public Iterator<CommandStorageRecord> read(CommandStatus status) {
         checkNotNull(status);
-        return queryFactory.newSelectByStatusQuery(status).execute();
+        final Iterator<CommandStorageRecord> iterator = queryFactory.newSelectByStatusQuery(status).execute();
+        return iterator;
     }
 
     /**

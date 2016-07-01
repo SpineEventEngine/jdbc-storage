@@ -68,7 +68,9 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
         return new JdbcAggregateStorage<>(dataSource, multitenant, queryFactory);
     }
 
-    private JdbcAggregateStorage(DataSourceWrapper dataSource, boolean multitenant, AggregateStorageQueryFactory<I> queryFactory)
+    private JdbcAggregateStorage(DataSourceWrapper dataSource,
+                                 boolean multitenant,
+                                 AggregateStorageQueryFactory<I> queryFactory)
             throws DatabaseException {
         super(multitenant);
         this.dataSource = dataSource;

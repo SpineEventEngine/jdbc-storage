@@ -45,7 +45,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.deserialize;
  * @author Alexander Litus
  */
 @Internal
-public class SelectByIdQuery<I, M extends Message> extends AbstractQuery{
+public class SelectByIdQuery<I, M extends Message> extends Query {
 
     private final IdColumn<I> idColumn;
     private final I id;
@@ -73,7 +73,7 @@ public class SelectByIdQuery<I, M extends Message> extends AbstractQuery{
      */
     @Nullable
     public M execute() throws DatabaseException {
-        try (ConnectionWrapper connection = getDataSource().getConnection(true);
+        try (ConnectionWrapper connection = this.getConnection(true);
              PreparedStatement statement = prepareStatement(connection, id);
              ResultSet resultSet = statement.executeQuery()) {
             if (!resultSet.next()) {
@@ -115,8 +115,8 @@ public class SelectByIdQuery<I, M extends Message> extends AbstractQuery{
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public abstract static class Builder<B extends Builder<B, Q, I, Record>, Q extends AbstractQuery, I, Record extends Message>
-            extends AbstractQuery.Builder<B, Q>{
+    public abstract static class Builder<B extends Builder<B, Q, I, Record>, Q extends Query, I, Record extends Message>
+            extends Query.Builder<B, Q>{
 
         private int idIndexInQuery;
         private IdColumn<I> idColumn;

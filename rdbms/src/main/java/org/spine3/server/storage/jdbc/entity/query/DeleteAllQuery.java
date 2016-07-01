@@ -21,7 +21,7 @@
 package org.spine3.server.storage.jdbc.entity.query;
 
 import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.query.AbstractQuery;
+import org.spine3.server.storage.jdbc.query.Query;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 
 import java.sql.PreparedStatement;
@@ -29,7 +29,7 @@ import java.sql.SQLException;
 
 import static java.lang.String.format;
 
-public class DeleteAllQuery extends AbstractQuery {
+public class DeleteAllQuery extends Query {
 
     private static final String DELETE_ALL = "DELETE FROM %s ;";
 
@@ -38,7 +38,7 @@ public class DeleteAllQuery extends AbstractQuery {
     }
 
     public void execute() throws DatabaseException {
-        try (ConnectionWrapper connection = this.getDataSource().getConnection(true);
+        try (ConnectionWrapper connection = this.getConnection(true);
              PreparedStatement statement = prepareStatement(connection)) {
             statement.execute();
         } catch (SQLException e) {
@@ -54,7 +54,7 @@ public class DeleteAllQuery extends AbstractQuery {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder extends AbstractQuery.Builder<Builder, DeleteAllQuery> {
+    public static class Builder extends Query.Builder<Builder, DeleteAllQuery> {
 
         @Override
         public DeleteAllQuery build() {

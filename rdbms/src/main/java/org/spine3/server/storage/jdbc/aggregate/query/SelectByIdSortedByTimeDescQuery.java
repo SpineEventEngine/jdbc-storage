@@ -23,7 +23,7 @@ package org.spine3.server.storage.jdbc.aggregate.query;
 
 import org.spine3.server.storage.AggregateStorageRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.query.AbstractQuery;
+import org.spine3.server.storage.jdbc.query.Query;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.DbIterator;
 import org.spine3.server.storage.jdbc.util.IdColumn;
@@ -35,7 +35,7 @@ import java.util.Iterator;
 import static java.lang.String.format;
 import static org.spine3.server.storage.jdbc.aggregate.query.Constants.*;
 
-public class SelectByIdSortedByTimeDescQuery<I> extends AbstractQuery {
+public class SelectByIdSortedByTimeDescQuery<I> extends Query {
 
     private final IdColumn<I> idColumn;
     private final I id;
@@ -54,7 +54,7 @@ public class SelectByIdSortedByTimeDescQuery<I> extends AbstractQuery {
     }
 
     public Iterator<AggregateStorageRecord> execute() throws DatabaseException {
-        try (ConnectionWrapper connection = this.getDataSource().getConnection(true);
+        try (ConnectionWrapper connection = this.getConnection(true);
              PreparedStatement statement = prepareStatement(connection)) {
             idColumn.setId(1, id, statement);
             return new DbIterator<>(statement, AGGREGATE_COL, AggregateStorageRecord.getDescriptor());
@@ -71,7 +71,7 @@ public class SelectByIdSortedByTimeDescQuery<I> extends AbstractQuery {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder<I> extends AbstractQuery.Builder<Builder<I>, SelectByIdSortedByTimeDescQuery> {
+    public static class Builder<I> extends Query.Builder<Builder<I>, SelectByIdSortedByTimeDescQuery> {
 
         private IdColumn<I> idColumn;
         private I id;

@@ -21,7 +21,7 @@
 package org.spine3.server.storage.jdbc.event.query;
 
 import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.query.AbstractQuery;
+import org.spine3.server.storage.jdbc.query.Query;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 
 import java.sql.PreparedStatement;
@@ -30,7 +30,7 @@ import java.sql.SQLException;
 import static org.spine3.server.storage.jdbc.event.query.Constants.*;
 
 
-public class CreateTableQuery extends AbstractQuery {
+public class CreateTableQuery extends Query {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String CREATE_TABLE_QUERY =
@@ -49,7 +49,7 @@ public class CreateTableQuery extends AbstractQuery {
     }
 
     public void execute() throws DatabaseException {
-        try (ConnectionWrapper connection = this.getDataSource().getConnection(true);
+        try (ConnectionWrapper connection = this.getConnection(true);
              PreparedStatement statement = prepareStatement(connection)) {
             statement.execute();
         } catch (SQLException e) {
@@ -65,7 +65,7 @@ public class CreateTableQuery extends AbstractQuery {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder extends AbstractQuery.Builder<Builder, CreateTableQuery> {
+    public static class Builder extends Query.Builder<Builder, CreateTableQuery> {
 
         @Override
         public CreateTableQuery build() {

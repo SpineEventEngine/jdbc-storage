@@ -33,7 +33,7 @@ import java.sql.SQLException;
  * @author Alexander Litus
  */
 @Internal
-public class WriteQuery extends AbstractQuery{
+public class WriteQuery extends Query {
 
     protected WriteQuery(Builder<? extends Builder, ? extends WriteQuery> builder) {
         super(builder);
@@ -43,7 +43,7 @@ public class WriteQuery extends AbstractQuery{
      * Executes a write query.
      */
     public void execute() {
-        try (ConnectionWrapper connection = this.getDataSource().getConnection(false)) {
+        try (ConnectionWrapper connection = this.getConnection(false)) {
             try (PreparedStatement statement = prepareStatement(connection)) {
                 statement.execute();
                 connection.commit();
@@ -57,6 +57,6 @@ public class WriteQuery extends AbstractQuery{
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
     public abstract static class Builder<B extends Builder<B, Q>, Q extends WriteQuery>
-            extends AbstractQuery.Builder<B, Q> {
+            extends Query.Builder<B, Q> {
     }
 }

@@ -21,7 +21,7 @@
 package org.spine3.server.storage.jdbc.projection.query;
 
 import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.query.AbstractQuery;
+import org.spine3.server.storage.jdbc.query.Query;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 
 import java.sql.PreparedStatement;
@@ -31,7 +31,7 @@ import static java.lang.String.format;
 import static org.spine3.server.storage.jdbc.projection.query.Constants.NANOS_COL;
 import static org.spine3.server.storage.jdbc.projection.query.Constants.SECONDS_COL;
 
-public class CreateTableQuery extends AbstractQuery {
+public class CreateTableQuery extends Query {
 
     private final String tableName;
 
@@ -50,7 +50,7 @@ public class CreateTableQuery extends AbstractQuery {
     @SuppressWarnings("DuplicateStringLiteralInspection")
     public void execute() throws DatabaseException {
         final String createTableSql = format(CREATE_TABLE_IF_DOES_NOT_EXIST, tableName);
-        try (ConnectionWrapper connection = this.getDataSource().getConnection(true);
+        try (ConnectionWrapper connection = this.getConnection(true);
              PreparedStatement statement = connection.prepareStatement(createTableSql)) {
             statement.execute();
         } catch (SQLException e) {
@@ -66,7 +66,7 @@ public class CreateTableQuery extends AbstractQuery {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder extends AbstractQuery.Builder<Builder, CreateTableQuery> {
+    public static class Builder extends Query.Builder<Builder, CreateTableQuery> {
 
         private String tableName;
 

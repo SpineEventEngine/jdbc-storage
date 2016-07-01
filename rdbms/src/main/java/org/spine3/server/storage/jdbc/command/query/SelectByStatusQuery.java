@@ -25,7 +25,7 @@ import org.spine3.base.Command;
 import org.spine3.base.CommandStatus;
 import org.spine3.server.storage.CommandStorageRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.query.AbstractQuery;
+import org.spine3.server.storage.jdbc.query.Query;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.DbIterator;
 
@@ -43,13 +43,14 @@ import static org.spine3.server.storage.jdbc.command.query.Constants.*;
  */
 
 @Internal
-public class SelectByStatusQuery extends AbstractQuery {
+public class SelectByStatusQuery extends Query {
+
     private final CommandStatus status;
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String SELECT_BY_STATUS_QUERY =
             "SELECT " + COMMAND_COL + " FROM " + TABLE_NAME +
-                    " WHERE " + COMMAND_STATUS_COL + " = ?;";
+            " WHERE " + COMMAND_STATUS_COL + " = ?;";
 
     /**
      * Creates a new query instance.
@@ -59,6 +60,9 @@ public class SelectByStatusQuery extends AbstractQuery {
         this.status = builder.status;
     }
 
+    /**
+     *
+     */
     public static Builder newBuilder() {
         final Builder builder = new Builder();
         builder.setQuery(SELECT_BY_STATUS_QUERY);
@@ -82,14 +86,14 @@ public class SelectByStatusQuery extends AbstractQuery {
     }
 
     public Iterator<CommandStorageRecord> execute() throws DatabaseException {
-        try (ConnectionWrapper connection = this.getDataSource().getConnection(true)) {
+        try (ConnectionWrapper connection = this.getConnection(true)) {
             final PreparedStatement statement = this.prepareStatement(connection);
             return new DbIterator<>(statement, COMMAND_COL, CommandStorageRecord.getDescriptor());
         }
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder extends AbstractQuery.Builder<Builder, SelectByStatusQuery> {
+    public static class Builder extends Query.Builder<Builder, SelectByStatusQuery> {
 
         private CommandStatus status;
 

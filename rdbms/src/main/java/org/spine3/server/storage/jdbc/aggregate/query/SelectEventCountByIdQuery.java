@@ -22,7 +22,7 @@ package org.spine3.server.storage.jdbc.aggregate.query;
 
 
 import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.query.AbstractQuery;
+import org.spine3.server.storage.jdbc.query.Query;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
@@ -35,7 +35,7 @@ import static java.lang.String.format;
 import static org.spine3.server.storage.jdbc.aggregate.query.Constants.EVENT_COUNT_COL;
 import static org.spine3.server.storage.jdbc.aggregate.query.Constants.ID_COL;
 
-public class SelectEventCountByIdQuery<I> extends AbstractQuery {
+public class SelectEventCountByIdQuery<I> extends Query {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String SELECT_QUERY =
@@ -54,7 +54,7 @@ public class SelectEventCountByIdQuery<I> extends AbstractQuery {
 
     @Nullable
     public Integer execute() throws DatabaseException {
-        try (ConnectionWrapper connection = this.getDataSource().getConnection(true);
+        try (ConnectionWrapper connection = this.getConnection(true);
              PreparedStatement statement = prepareStatement(connection);
              ResultSet resultSet = statement.executeQuery()) {
             if (!resultSet.next()) {
@@ -82,7 +82,7 @@ public class SelectEventCountByIdQuery<I> extends AbstractQuery {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder<I> extends AbstractQuery.Builder<Builder<I>, SelectEventCountByIdQuery> {
+    public static class Builder<I> extends Query.Builder<Builder<I>, SelectEventCountByIdQuery> {
 
         private IdColumn<I> idColumn;
         private I id;

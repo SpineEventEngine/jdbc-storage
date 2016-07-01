@@ -29,13 +29,13 @@ import java.sql.PreparedStatement;
 /**
  * @author Andrey Lavrov
  */
-public class AbstractQuery {
+public class Query {
 
     private final String query;
     private final DataSourceWrapper dataSource;
     private final Logger logger;
 
-    protected AbstractQuery(Builder<? extends Builder, ? extends AbstractQuery> builder) {
+    protected Query(Builder<? extends Builder, ? extends Query> builder) {
         this.query = builder.query;
         this.dataSource = builder.dataSource;
         this.logger = builder.logger;
@@ -53,11 +53,11 @@ public class AbstractQuery {
         return logger;
     }
 
-    public DataSourceWrapper getDataSource() {
-        return dataSource;
+    public ConnectionWrapper getConnection(boolean autocommit) {
+        return dataSource.getConnection(autocommit);
     }
 
-    public abstract static class Builder<B extends Builder<B, Q>, Q extends AbstractQuery> {
+    public abstract static class Builder<B extends Builder<B, Q>, Q extends Query> {
 
         private String query;
         private DataSourceWrapper dataSource;

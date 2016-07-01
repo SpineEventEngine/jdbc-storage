@@ -23,7 +23,7 @@ package org.spine3.server.storage.jdbc.projection.query;
 
 import com.google.protobuf.Timestamp;
 import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.query.AbstractQuery;
+import org.spine3.server.storage.jdbc.query.Query;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 
 import javax.annotation.Nullable;
@@ -36,7 +36,7 @@ import static org.spine3.server.storage.jdbc.projection.query.Constants.NANOS_CO
 import static org.spine3.server.storage.jdbc.projection.query.Constants.SECONDS_COL;
 import static org.spine3.validate.Validate.isDefault;
 
-public class SelectTimestampQuery extends AbstractQuery {
+public class SelectTimestampQuery extends Query {
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String SELECT_QUERY = "SELECT " +
             SECONDS_COL + ", " +
@@ -48,7 +48,7 @@ public class SelectTimestampQuery extends AbstractQuery {
 
     @Nullable
     public Timestamp execute() throws DatabaseException {
-        try (ConnectionWrapper connection = this.getDataSource().getConnection(true);
+        try (ConnectionWrapper connection = this.getConnection(true);
              PreparedStatement statement = prepareStatement(connection);
              ResultSet resultSet = statement.executeQuery()) {
             if (!resultSet.next()) {
@@ -74,7 +74,7 @@ public class SelectTimestampQuery extends AbstractQuery {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder extends AbstractQuery.Builder<Builder, SelectTimestampQuery> {
+    public static class Builder extends Query.Builder<Builder, SelectTimestampQuery> {
 
         @Override
         public SelectTimestampQuery build() {
