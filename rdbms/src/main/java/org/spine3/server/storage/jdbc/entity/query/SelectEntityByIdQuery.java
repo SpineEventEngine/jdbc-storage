@@ -23,8 +23,6 @@ package org.spine3.server.storage.jdbc.entity.query;
 import org.spine3.Internal;
 import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.jdbc.query.SelectByIdQuery;
-import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import static java.lang.String.format;
 import static org.spine3.server.storage.jdbc.entity.query.Constants.*;
@@ -35,9 +33,30 @@ public class SelectEntityByIdQuery<I> extends SelectByIdQuery<I, EntityStorageRe
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String SELECT_BY_ID = "SELECT " + ENTITY_COL + " FROM %s WHERE " + ID_COL + " = ?;";
 
-    public SelectEntityByIdQuery(String tableName, DataSourceWrapper dataSource, IdColumn<I> idColumn, I id) {
-        super(format(SELECT_BY_ID, tableName), dataSource, idColumn, id);
-        setMessageColumnName(ENTITY_COL);
-        setMessageDescriptor(RECORD_DESCRIPTOR);
+    public SelectEntityByIdQuery(Builder<I> builder) {
+        super(builder);
+    }
+
+    public static <I> Builder <I> newBuilder(String tableName) {
+        final Builder<I> builder = new Builder<>();
+        builder.setIdIndexInQuery(1)
+                .setQuery(format(SELECT_BY_ID, tableName))
+                .setMessageColumnName(ENTITY_COL)
+                .setMessageDescriptor(RECORD_DESCRIPTOR);
+        return builder;
+    }
+
+    @SuppressWarnings("ClassNameSameAsAncestorName")
+    public static class Builder<I> extends SelectByIdQuery.Builder<Builder<I>, SelectEntityByIdQuery<I>, I, EntityStorageRecord>{
+
+        @Override
+        public SelectEntityByIdQuery<I> build() {
+            return new SelectEntityByIdQuery<>(this);
+        }
+
+        @Override
+        protected Builder<I> getThis() {
+            return this;
+        }
     }
 }

@@ -20,11 +20,13 @@
 
 package org.spine3.server.storage.jdbc.command.query;
 
+import com.google.protobuf.Message;
 import org.spine3.Internal;
 import org.spine3.base.CommandStatus;
 import org.spine3.base.Error;
 import org.spine3.base.Failure;
 import org.spine3.server.storage.CommandStorageRecord;
+import org.spine3.server.storage.jdbc.query.AbstractQuery;
 import org.spine3.server.storage.jdbc.query.SelectByIdQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
@@ -44,8 +46,8 @@ public class SelectCommandByIdQuery extends SelectByIdQuery<String, CommandStora
                     "SELECT * FROM " + TABLE_NAME +
                     " WHERE " + ID_COL + " = ?;";
 
-    public SelectCommandByIdQuery(DataSourceWrapper dataSource, String id) {
-        super(SELECT_QUERY, dataSource, new IdColumn.StringIdColumn(), id);
+    public SelectCommandByIdQuery(Builder builder) {
+        super(builder);
     }
 
     @Nullable
@@ -77,5 +79,26 @@ public class SelectCommandByIdQuery extends SelectByIdQuery<String, CommandStora
                     .build();
         }
         return builder.build();
+    }
+
+    public static Builder newBuilder() {
+        final Builder builder = new Builder();
+        builder.setIdIndexInQuery(1)
+                .setQuery(SELECT_QUERY);
+        return builder;
+    }
+
+    @SuppressWarnings("ClassNameSameAsAncestorName")
+    public static class Builder extends SelectByIdQuery.Builder<Builder, SelectCommandByIdQuery, String, CommandStorageRecord>{
+
+        @Override
+        public SelectCommandByIdQuery build() {
+            return new SelectCommandByIdQuery(this);
+        }
+
+        @Override
+        protected Builder getThis() {
+            return this;
+        }
     }
 }

@@ -4,6 +4,7 @@ package org.spine3.server.storage.jdbc.entity.query;
 import org.slf4j.Logger;
 import org.spine3.server.entity.Entity;
 import org.spine3.server.storage.EntityStorageRecord;
+import org.spine3.server.storage.jdbc.command.query.SelectCommandByIdQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbTableNameFactory;
 import org.spine3.server.storage.jdbc.util.IdColumn;
@@ -54,7 +55,13 @@ public class EntityStorageQueryFactory<I> {
     }
 
     public SelectEntityByIdQuery <I> newSelectEntityByIdQuery(I id){
-        return new SelectEntityByIdQuery<>(tableName, dataSource, idColumn, id);
+        final SelectEntityByIdQuery.Builder<I> builder = SelectEntityByIdQuery.<I>newBuilder(tableName)
+                .setDataSource(dataSource)
+                .setLogger(logger)
+                .setIdColumn(idColumn)
+                .setId(id);
+
+        return builder.build();
     }
 
     public DeleteAllQuery newDeleteAllQuery(){

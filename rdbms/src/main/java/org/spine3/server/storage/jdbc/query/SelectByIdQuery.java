@@ -25,6 +25,7 @@ import com.google.protobuf.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spine3.Internal;
+import org.spine3.net.Url;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
@@ -48,28 +49,23 @@ import static org.spine3.server.storage.jdbc.util.Serializer.deserialize;
  * @author Alexander Litus
  */
 @Internal
-public class SelectByIdQuery<I, M extends Message>{
+public class SelectByIdQuery<I, M extends Message> extends AbstractQuery{
 
-    private final String query;
-    private final DataSourceWrapper dataSource;
     private final IdColumn<I> idColumn;
     private final I id;
+    private final int idIndexInQuery;
 
-    private String messageColumnName;
-    private Descriptor messageDescriptor;
+    private final String messageColumnName;
+    private final Descriptor messageDescriptor;
 
-    /**
-     * Creates a new query instance.
-     *
-     * @param query SQL select query which selects a message by an ID (must have one ID parameter to set)
-     * @param dataSource a data source to use to obtain DB connections
-     * @param idColumn a helper object used to set IDs to statements as parameters
-     */
-    protected SelectByIdQuery(String query, DataSourceWrapper dataSource, IdColumn<I> idColumn, I id) {
-        this.query = query;
-        this.dataSource = dataSource;
-        this.idColumn = idColumn;
-        this.id = id;
+
+    protected SelectByIdQuery(Builder<? extends Builder, ? extends SelectByIdQuery, I, M> builder) {
+       super(builder);
+        this.idColumn = builder.idColumn;
+        this.id = builder.id;
+        this.idIndexInQuery = builder.idIndexInQuery;
+        this.messageColumnName = builder.messageColumnName;
+        this.messageDescriptor = builder.messageDescriptor;
     }
 
     /**
@@ -81,7 +77,7 @@ public class SelectByIdQuery<I, M extends Message>{
      */
     @Nullable
     public M execute() throws DatabaseException {
-        try (ConnectionWrapper connection = dataSource.getConnection(true);
+        try (ConnectionWrapper connection = getDataSource().getConnection(true);
              PreparedStatement statement = prepareStatement(connection, id);
              ResultSet resultSet = statement.executeQuery()) {
             if (!resultSet.next()) {
@@ -90,7 +86,7 @@ public class SelectByIdQuery<I, M extends Message>{
             final M message = readMessage(resultSet);
             return message;
         } catch (SQLException e) {
-            log().error("Error during reading a message, ID = " + idToString(id), e);
+            this.getLogger().error("Error during reading a message, ID = " + idToString(id), e);
             throw new DatabaseException(e);
         }
     }
@@ -99,8 +95,6 @@ public class SelectByIdQuery<I, M extends Message>{
      * Retrieves a message from a DB result set.
      *
      * <p>The default implementation reads a message as byte array and deserializes it.
-     * In order to do so, it is required to {@link #setMessageColumnName(String)} and
-     * {@link #setMessageDescriptor(Descriptor)}.
      *
      * @param resultSet a data set with the cursor pointed to the first row
      * @return a message instance or {@code null} if the row does not contain the needed data
@@ -118,35 +112,46 @@ public class SelectByIdQuery<I, M extends Message>{
         return message;
     }
 
-    /**
-     * Sets a DB column name which contains serialized messages.
-     * It is required in order to use the default {@link #readMessage(ResultSet)} implementation.
-     */
-    public void setMessageColumnName(String messageColumnName) {
-        this.messageColumnName = messageColumnName;
-    }
-
-    /**
-     * Sets a descriptor of the messages to read.
-     * It is required in order to use the default {@link #readMessage(ResultSet)} implementation.
-     */
-    public void setMessageDescriptor(Descriptor messageDescriptor) {
-        this.messageDescriptor = messageDescriptor;
-    }
-
     protected PreparedStatement prepareStatement(ConnectionWrapper connection, I id) {
-        final PreparedStatement statement = connection.prepareStatement(query);
-        idColumn.setId(1, id, statement);
+        final PreparedStatement statement = prepareStatement(connection);
+        idColumn.setId(idIndexInQuery, id, statement);
         return statement;
     }
 
-    private static Logger log() {
-        return LogSingleton.INSTANCE.value;
-    }
+    @SuppressWarnings("ClassNameSameAsAncestorName")
+    public abstract static class Builder<B extends Builder<B, Q, I, Record>, Q extends AbstractQuery, I, Record extends Message>
+            extends AbstractQuery.Builder<B, Q>{
 
-    private enum LogSingleton {
-        INSTANCE;
-        @SuppressWarnings("NonSerializableFieldInSerializableClass")
-        private final Logger value = LoggerFactory.getLogger(SelectByIdQuery.class);
+        private int idIndexInQuery;
+        private IdColumn<I> idColumn;
+        private I id;
+
+        private String messageColumnName;
+        private Descriptor messageDescriptor;
+
+        public B setId(I id) {
+            this.id = id;
+            return getThis();
+        }
+
+        public B setIdColumn(IdColumn<I> idColumn) {
+            this.idColumn = idColumn;
+            return getThis();
+        }
+
+        public B setIdIndexInQuery(int idIndexInQuery) {
+            this.idIndexInQuery = idIndexInQuery;
+            return getThis();
+        }
+
+        public B setMessageColumnName(String messageColumnName) {
+            this.messageColumnName = messageColumnName;
+            return getThis();
+        }
+
+        public B setMessageDescriptor(Descriptor messageDescriptor) {
+            this.messageDescriptor = messageDescriptor;
+            return getThis();
+        }
     }
 }

@@ -91,7 +91,13 @@ public class CommandStorageQueryFactory {
     }
 
     public SelectCommandByIdQuery newSelectCommandByIdQuery(CommandId id){
-        return new SelectCommandByIdQuery(dataSource, id.getUuid());
+        final SelectCommandByIdQuery.Builder builder = SelectCommandByIdQuery.newBuilder()
+                .setDataSource(dataSource)
+                .setLogger(logger)
+                .setIdColumn(idColumn)
+                .setId(id.getUuid());
+
+        return builder.build();
     }
 
     public SelectByStatusQuery newSelectByStatusQuery(CommandStatus status){
