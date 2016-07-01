@@ -20,7 +20,7 @@ public class EntityStorageQueryFactory<I> {
     }
 
     public CreateTableIfDoesNotExistQuery getCreateTableIfDoesNotExistQuery() {
-        return CreateTableIfDoesNotExistQuery.<I>getBuilder()
+        return CreateTableIfDoesNotExistQuery.<I>newBuilder()
                 .setDataSource(dataSource)
                 .setIdColumn(idColumn)
                 .setTableName(tableName)
@@ -28,7 +28,7 @@ public class EntityStorageQueryFactory<I> {
     }
 
     public UpdateEntityQuery getUpdateEntityQuery(I id, EntityStorageRecord record) {
-        return UpdateEntityQuery.<I>getBuilder(tableName)
+        return UpdateEntityQuery.<I>newBuilder(tableName)
                 .setIdColumn(idColumn)
                 .setId(id)
                 .setRecord(record)
@@ -37,7 +37,7 @@ public class EntityStorageQueryFactory<I> {
     }
 
     public InsertEntityQuery getInsertEntityQuery(I id, EntityStorageRecord record) {
-        return InsertEntityQuery.<I>getBuilder(tableName)
+        return InsertEntityQuery.<I>newBuilder(tableName)
                 .setId(id)
                 .setIdColumn(idColumn)
                 .setRecord(record)
@@ -50,7 +50,7 @@ public class EntityStorageQueryFactory<I> {
     }
 
     public DeleteAllQuery getDeleteAllQuery(){
-        return DeleteAllQuery.getBuilder(tableName)
+        return DeleteAllQuery.newBuilder(tableName)
                 .setDataSource(dataSource)
                 .build();
     }

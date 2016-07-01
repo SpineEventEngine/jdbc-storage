@@ -44,9 +44,6 @@ import static java.lang.String.format;
  */
 public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
 
-
-    private final DataSourceWrapper dataSource;
-
     private final JdbcEntityStorage<I> entityStorage;
 
     private final ProjectionStorageQueryFactory queryFactory;
@@ -71,7 +68,6 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
                                   boolean multitenant,
                                   ProjectionStorageQueryFactory<I> queryFactory) throws DatabaseException {
         super(multitenant);
-        this.dataSource = dataSource;
         this.entityStorage = entityStorage;
         this.queryFactory = queryFactory;
 

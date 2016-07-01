@@ -64,7 +64,7 @@ public class SelectByIdSortedByTimeDescQuery<Id> extends AbstractQuery {
         }
     }
 
-    public static <Id> Builder<Id> getBuilder(String tableName) {
+    public static <Id> Builder<Id> newBuilder(String tableName) {
         final Builder<Id> builder = new Builder<>();
         builder.setQuery(format(SELECT_BY_ID_SORTED_BY_TIME_DESC, tableName));
         return builder;

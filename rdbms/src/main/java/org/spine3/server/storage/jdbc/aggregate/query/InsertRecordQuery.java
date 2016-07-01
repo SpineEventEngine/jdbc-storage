@@ -64,7 +64,7 @@ public class InsertRecordQuery<Id> extends WriteRecord<Id, AggregateStorageRecor
         log(exception, "command insertion", getId());
     }*/
 
-    public static <Id> Builder <Id> getBuilder(String tableName) {
+    public static <Id> Builder <Id> newBuilder(String tableName) {
         final Builder<Id> builder = new Builder<>();
         builder.setIdIndexInQuery(1)
                 .setRecordIndexInQuery(2)

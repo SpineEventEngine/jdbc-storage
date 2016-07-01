@@ -41,7 +41,7 @@ public class SetOkStatusQuery extends UpdateRecord<String> {
         log(exception, "command insertion", getId());
     }*/
 
-    public static Builder getBuilder() {
+    public static Builder newBuilder() {
         final Builder builder = new Builder();
         builder.setIdIndexInQuery(1)
                .setQuery(SET_OK_STATUS_QUERY);

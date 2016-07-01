@@ -60,7 +60,7 @@ public class  SelectByStatusQuery extends AbstractQuery{
         this.status = builder.status;
     }
 
-    public static Builder getBuilder() {
+    public static Builder newBuilder() {
         final Builder builder = new Builder();
         builder.setQuery(SELECT_BY_STATUS_QUERY);
         return builder;

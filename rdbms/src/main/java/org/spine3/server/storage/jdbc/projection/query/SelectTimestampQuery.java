@@ -64,7 +64,7 @@ public class SelectTimestampQuery extends AbstractQuery{
         }
     }
 
-    public static Builder getBuilder(String tableName) {
+    public static Builder newBuilder(String tableName) {
         final Builder builder = new Builder();
         builder.setQuery(format(SELECT_QUERY, tableName));
         return builder;

@@ -82,7 +82,7 @@ public class InsertEventQuery extends WriteRecord<String, EventStorageRecord> {
         log(exception, "command insertion", getId());
     }*/
 
-    public static Builder getBuilder() {
+    public static Builder newBuilder() {
         final Builder builder = new Builder();
         builder.setQuery(INSERT_QUERY);
         return builder;

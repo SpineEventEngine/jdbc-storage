@@ -63,7 +63,7 @@ public class CreateMainTableIfDoesNotExistQuery<I> extends AbstractQuery {
         }
     }
 
-    public static <I>Builder <I>getBuilder() {
+    public static <I>Builder <I>newBuilder() {
         final Builder <I>builder = new Builder<>();
         builder.setQuery(QUERY);
         return builder;

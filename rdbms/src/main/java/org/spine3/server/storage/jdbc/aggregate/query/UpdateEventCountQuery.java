@@ -63,7 +63,7 @@ public class UpdateEventCountQuery<Id> extends UpdateRecord<Id> {
         }
     }
 
-    public static <I> Builder<I> getBuilder(String tableName) {
+    public static <I> Builder<I> newBuilder(String tableName) {
         final Builder<I> builder = new Builder<>();
         builder.setQuery(format(UPDATE_QUERY, tableName))
                 .setIdIndexInQuery(2);

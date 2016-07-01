@@ -39,7 +39,7 @@ public class UpdateCommandQuery extends WriteCommandRecordQuery {
         log(exception, "command insertion", getId());
     }*/
 
-    public static Builder getBuilder() {
+    public static Builder newBuilder() {
         final Builder builder = new Builder();
         builder.setStatusIndexInQuery(2)
                 .setIdIndexInQuery(3)

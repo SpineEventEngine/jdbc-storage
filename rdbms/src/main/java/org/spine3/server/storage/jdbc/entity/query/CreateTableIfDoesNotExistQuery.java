@@ -62,7 +62,7 @@ public class CreateTableIfDoesNotExistQuery<I> extends AbstractQuery {
         }
     }
 
-    public static <I>Builder<I> getBuilder() {
+    public static <I>Builder<I> newBuilder() {
         final Builder <I> builder = new Builder<>();
         builder.setQuery(CREATE_TABLE_IF_DOES_NOT_EXIST);
         return builder;

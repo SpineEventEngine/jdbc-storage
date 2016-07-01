@@ -148,7 +148,7 @@ public class FilterAndSortQuery extends AbstractQuery {
         return builder;
     }
 
-    public static Builder getBuilder() {
+    public static Builder newBuilder() {
         final Builder builder = new Builder();
         builder.setQuery(ORDER_BY_TIME_POSTFIX);
         return builder;

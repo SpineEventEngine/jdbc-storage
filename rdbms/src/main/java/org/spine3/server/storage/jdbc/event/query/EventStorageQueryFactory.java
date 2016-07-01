@@ -29,20 +29,20 @@ public class EventStorageQueryFactory{
     }
 
     public CreateTableIfDoesNotExistQuery getCreateTableIfDoesNotExistQuery(){
-        return CreateTableIfDoesNotExistQuery.getBuilder()
+        return CreateTableIfDoesNotExistQuery.newBuilder()
                 .setDataSource(dataSource)
                 .build();
     }
 
     public InsertEventQuery getInsertEventQuery(EventStorageRecord record){
-        return InsertEventQuery.getBuilder()
+        return InsertEventQuery.newBuilder()
                 .setRecord(record)
                 .setDataSource(dataSource)
                 .build();
     }
 
     public UpdateEventQuery getUpdateEventQuery(EventStorageRecord record){
-        return UpdateEventQuery.getBuilder()
+        return UpdateEventQuery.newBuilder()
                 .setRecord(record)
                 .setDataSource(dataSource)
                 .build();
@@ -53,7 +53,7 @@ public class EventStorageQueryFactory{
     }
 
     public FilterAndSortQuery getFilterAndSortQuery(EventStreamQuery streamQuery){
-        return FilterAndSortQuery.getBuilder()
+        return FilterAndSortQuery.newBuilder()
                 .setStreamQuery(streamQuery)
                 .setDataSource(dataSource)
                 .build();

@@ -63,7 +63,7 @@ public class InsertEventCountQuery<Id> extends UpdateRecord<Id> {
         }
     }
 
-    public static <I> Builder<I> getBuilder(String tableName) {
+    public static <I> Builder<I> newBuilder(String tableName) {
         final Builder<I> builder = new Builder<>();
         builder.setQuery(format(INSERT_QUERY, tableName))
                 .setIdIndexInQuery(1);

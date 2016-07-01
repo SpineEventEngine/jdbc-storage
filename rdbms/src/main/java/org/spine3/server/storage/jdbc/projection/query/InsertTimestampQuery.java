@@ -53,7 +53,7 @@ public class InsertTimestampQuery<Id> extends WriteQuery{
     }*/
 
 
-    public static <Id> Builder <Id> getBuilder(String tableName) {
+    public static <Id> Builder <Id> newBuilder(String tableName) {
         final Builder<Id> builder = new Builder<>();
         builder.setQuery(format(INSERT_QUERY, tableName));
         return builder;

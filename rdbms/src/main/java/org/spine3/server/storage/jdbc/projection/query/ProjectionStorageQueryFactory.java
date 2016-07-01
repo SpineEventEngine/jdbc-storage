@@ -34,28 +34,28 @@ public class ProjectionStorageQueryFactory<I> {
     }
 
     public CreateTableIfDoesNotExistQuery getCreateTableIfDoesNotExistQuery() {
-        return CreateTableIfDoesNotExistQuery.getBuilder()
+        return CreateTableIfDoesNotExistQuery.newBuilder()
                 .setTableName(tableName)
                 .setDataSource(dataSource)
                 .build();
     }
 
     public InsertTimestampQuery getInsertTimestampQuery(Timestamp time) {
-        return InsertTimestampQuery.getBuilder(tableName)
+        return InsertTimestampQuery.newBuilder(tableName)
                 .setTimestamp(time)
                 .setDataSource(dataSource)
                 .build();
     }
 
     public UpdateTimestampQuery getUpdateTimestampQuery(Timestamp time) {
-        return UpdateTimestampQuery.getBuilder(tableName)
+        return UpdateTimestampQuery.newBuilder(tableName)
                 .setTimestamp(time)
                 .setDataSource(dataSource)
                 .build();
     }
 
     public SelectTimestampQuery getSelectTimestampQuery() {
-        return SelectTimestampQuery.getBuilder(tableName)
+        return SelectTimestampQuery.newBuilder(tableName)
                 .setDataSource(dataSource)
                 .build();
     }

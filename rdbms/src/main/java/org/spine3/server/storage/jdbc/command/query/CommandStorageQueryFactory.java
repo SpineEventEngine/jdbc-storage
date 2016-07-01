@@ -32,13 +32,13 @@ public class CommandStorageQueryFactory {
     }
 
     public CreateTableIfDoesNotExistQuery getCreateTableIfDoesNotExistQuery(){
-        return CreateTableIfDoesNotExistQuery.getBuilder()
+        return CreateTableIfDoesNotExistQuery.newBuilder()
                 .setDataSource(dataSource)
                 .build();
     }
 
     public InsertCommandQuery getInsertCommandQuery(CommandId id, CommandStorageRecord record){
-        return InsertCommandQuery.getBuilder()
+        return InsertCommandQuery.newBuilder()
                 .setDataSource(dataSource)
                 .setIdColumn(idColumn)
                 .setId(id.getUuid())
@@ -49,7 +49,7 @@ public class CommandStorageQueryFactory {
 
     @SuppressWarnings("")
     public UpdateCommandQuery getUpdateCommandQuery(CommandId id, CommandStorageRecord record){
-        return UpdateCommandQuery.getBuilder()
+        return UpdateCommandQuery.newBuilder()
                 .setDataSource(dataSource)
                 .setIdColumn(idColumn)
                 .setId(id.getUuid())
@@ -59,7 +59,7 @@ public class CommandStorageQueryFactory {
     }
 
     public SetErrorQuery getSetErrorQuery(CommandId id, Error error){
-        return SetErrorQuery.getBuilder()
+        return SetErrorQuery.newBuilder()
                 .setDataSource(dataSource)
                 .setIdColumn(idColumn)
                 .setId(id.getUuid())
@@ -68,7 +68,7 @@ public class CommandStorageQueryFactory {
     }
 
     public SetFailureQuery getSetFailureQuery(CommandId id, Failure failure){
-        return SetFailureQuery.getBuilder()
+        return SetFailureQuery.newBuilder()
                 .setDataSource(dataSource)
                 .setIdColumn(idColumn)
                 .setId(id.getUuid())
@@ -77,7 +77,7 @@ public class CommandStorageQueryFactory {
     }
 
     public SetOkStatusQuery getSetOkStatusQuery(CommandId id){
-        return SetOkStatusQuery.getBuilder()
+        return SetOkStatusQuery.newBuilder()
                 .setDataSource(this.dataSource)
                 .setIdColumn(idColumn)
                 .setId(id.getUuid())
@@ -89,7 +89,7 @@ public class CommandStorageQueryFactory {
     }
 
     public SelectByStatusQuery getSelectByStatusQuery(CommandStatus status){
-        return SelectByStatusQuery.getBuilder()
+        return SelectByStatusQuery.newBuilder()
                 .setDataSource(dataSource)
                 .setStatus(status)
                 .build();

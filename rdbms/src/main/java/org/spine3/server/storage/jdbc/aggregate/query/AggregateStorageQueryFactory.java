@@ -35,7 +35,7 @@ public class AggregateStorageQueryFactory<I>{
     }
 
     public CreateMainTableIfDoesNotExistQuery getCreateMainTableIfDoesNotExistQuery() {
-        return CreateMainTableIfDoesNotExistQuery.<I>getBuilder()
+        return CreateMainTableIfDoesNotExistQuery.<I>newBuilder()
                 .setTableName(mainTableName)
                 .setIdColumn(idColumn)
                 .setDataSource(dataSource)
@@ -43,7 +43,7 @@ public class AggregateStorageQueryFactory<I>{
     }
 
     public CreateEventCountTableIfDoesNotExistQuery getCreateEventCountTableIfDoesNotExistQuery() {
-        return CreateEventCountTableIfDoesNotExistQuery.<I>getBuilder()
+        return CreateEventCountTableIfDoesNotExistQuery.<I>newBuilder()
                 .setTableName(eventCountTableName)
                 .setIdColumn(idColumn)
                 .setDataSource(dataSource)
@@ -51,7 +51,7 @@ public class AggregateStorageQueryFactory<I>{
     }
 
     public InsertEventCountQuery getInsertEventCountQuery(I id, int count){
-        return InsertEventCountQuery.<I>getBuilder(eventCountTableName)
+        return InsertEventCountQuery.<I>newBuilder(eventCountTableName)
                 .setIdColumn(idColumn)
                 .setId(id)
                 .setCount(count)
@@ -60,7 +60,7 @@ public class AggregateStorageQueryFactory<I>{
     }
 
     public UpdateEventCountQuery getUpdateEventCountQuery(I id, int count){
-        return UpdateEventCountQuery.<I>getBuilder(eventCountTableName)
+        return UpdateEventCountQuery.<I>newBuilder(eventCountTableName)
                 .setIdColumn(idColumn)
                 .setId(id)
                 .setCount(count)
@@ -69,7 +69,7 @@ public class AggregateStorageQueryFactory<I>{
     }
 
     public InsertRecordQuery getInsertRecordQuery(I id, AggregateStorageRecord record){
-        return InsertRecordQuery.<I>getBuilder(mainTableName)
+        return InsertRecordQuery.<I>newBuilder(mainTableName)
                 .setIdColumn(idColumn)
                 .setId(id)
                 .setRecord(record)
@@ -78,7 +78,7 @@ public class AggregateStorageQueryFactory<I>{
     }
 
     public SelectEventCountByIdQuery getSelectEventCountByIdQuery(I id){
-        return SelectEventCountByIdQuery.<I>getBuilder(eventCountTableName)
+        return SelectEventCountByIdQuery.<I>newBuilder(eventCountTableName)
                 .setIdColumn(idColumn)
                 .setId(id)
                 .setDataSource(dataSource)
@@ -86,7 +86,7 @@ public class AggregateStorageQueryFactory<I>{
     }
 
     public SelectByIdSortedByTimeDescQuery<I> getSelectByIdSortedByTimeDescQuery(I id){
-        return SelectByIdSortedByTimeDescQuery.<I>getBuilder(mainTableName)
+        return SelectByIdSortedByTimeDescQuery.<I>newBuilder(mainTableName)
                 .setIdColumn(idColumn)
                 .setId(id)
                 .setDataSource(dataSource)

@@ -75,7 +75,7 @@ public class SelectEventCountByIdQuery<Id> extends AbstractQuery {
         return statement;
     }
 
-    public static <I> Builder<I> getBuilder(String tableName) {
+    public static <I> Builder<I> newBuilder(String tableName) {
         final Builder<I> builder = new Builder<>();
         builder.setQuery(format(SELECT_QUERY, tableName));
         return builder;
