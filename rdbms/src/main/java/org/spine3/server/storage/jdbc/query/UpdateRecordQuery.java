@@ -69,5 +69,4 @@ public class UpdateRecordQuery<I> extends WriteQuery {
             return getThis();
         }
     }
-
 }

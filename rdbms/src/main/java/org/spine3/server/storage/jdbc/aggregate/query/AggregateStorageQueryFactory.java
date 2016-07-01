@@ -102,5 +102,4 @@ public class AggregateStorageQueryFactory<I>{
 
         return builder.build();
     }
-
 }

@@ -103,5 +103,4 @@ public abstract class WriteRecordQuery<I, Record extends Message> extends WriteQ
             return getThis();
         }
     }
-
 }

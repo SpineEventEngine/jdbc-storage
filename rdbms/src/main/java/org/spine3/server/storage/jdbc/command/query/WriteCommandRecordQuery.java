@@ -76,6 +76,5 @@ public class WriteCommandRecordQuery
             this.status = status;
             return this.getThis();
         }
-
     }
 }

@@ -110,4 +110,3 @@ public class  SelectByStatusQuery extends AbstractQuery{
         }
     }
 }
-
