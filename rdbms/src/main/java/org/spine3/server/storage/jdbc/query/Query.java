@@ -49,11 +49,11 @@ public class Query {
         return query;
     }
 
-    public Logger getLogger() {
+    protected Logger getLogger() {
         return logger;
     }
 
-    public ConnectionWrapper getConnection(boolean autocommit) {
+    protected ConnectionWrapper getConnection(boolean autocommit) {
         return dataSource.getConnection(autocommit);
     }
 
