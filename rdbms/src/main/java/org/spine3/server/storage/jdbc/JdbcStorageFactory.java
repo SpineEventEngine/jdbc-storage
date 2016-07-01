@@ -85,7 +85,7 @@ public class JdbcStorageFactory implements StorageFactory {
     }
 
     @Override
-    public <Id> AggregateStorage<Id> createAggregateStorage(Class<? extends Aggregate<Id, ?, ?>> aggregateClass) {
+    public <I> AggregateStorage<I> createAggregateStorage(Class<? extends Aggregate<I, ?, ?>> aggregateClass) {
         return JdbcAggregateStorage.newInstance(dataSource,
                 false,
                 getAggregateStorageQueryFactory(dataSource, aggregateClass));
@@ -93,13 +93,13 @@ public class JdbcStorageFactory implements StorageFactory {
 
 
     @Override
-    public <Id> EntityStorage<Id> createEntityStorage(Class<? extends Entity<Id, ?>> entityClass) {
+    public <I> EntityStorage<I> createEntityStorage(Class<? extends Entity<I, ?>> entityClass) {
         return JdbcEntityStorage.newInstance(dataSource, false, getEntityStorageQueryFactory(dataSource, entityClass));
     }
 
     @Override
-    public <Id> ProjectionStorage<Id> createProjectionStorage(Class<? extends Entity<Id, ?>> projectionClass) {
-        final JdbcEntityStorage<Id> entityStorage = JdbcEntityStorage.newInstance(dataSource, false, getEntityStorageQueryFactory(dataSource, projectionClass));
+    public <I> ProjectionStorage<I> createProjectionStorage(Class<? extends Entity<I, ?>> projectionClass) {
+        final JdbcEntityStorage<I> entityStorage = JdbcEntityStorage.newInstance(dataSource, false, getEntityStorageQueryFactory(dataSource, projectionClass));
         return JdbcProjectionStorage.newInstance(dataSource, entityStorage, false, getProjectionStorageQueryFactory(dataSource, projectionClass));
     }
 

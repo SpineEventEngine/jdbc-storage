@@ -35,10 +35,10 @@ import java.util.Iterator;
 
 import static java.lang.String.format;
 
-public class SelectByIdSortedByTimeDescQuery<Id> extends AbstractQuery {
+public class SelectByIdSortedByTimeDescQuery<I> extends AbstractQuery {
 
-    private final IdColumn<Id> idColumn;
-    private final Id id;
+    private final IdColumn<I> idColumn;
+    private final I id;
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String SELECT_BY_ID_SORTED_BY_TIME_DESC =
@@ -47,7 +47,7 @@ public class SelectByIdSortedByTimeDescQuery<Id> extends AbstractQuery {
                     " ORDER BY " + SECONDS_COL + " DESC, " + NANOS_COL + " DESC;";
 
 
-    private SelectByIdSortedByTimeDescQuery(Builder<Id> builder) {
+    private SelectByIdSortedByTimeDescQuery(Builder<I> builder) {
         super(builder);
         this.idColumn = builder.idColumn;
         this.id = builder.id;
@@ -64,8 +64,8 @@ public class SelectByIdSortedByTimeDescQuery<Id> extends AbstractQuery {
         }
     }
 
-    public static <Id> Builder<Id> newBuilder(String tableName) {
-        final Builder<Id> builder = new Builder<>();
+    public static <I> Builder<I> newBuilder(String tableName) {
+        final Builder<I> builder = new Builder<>();
         builder.setQuery(format(SELECT_BY_ID_SORTED_BY_TIME_DESC, tableName));
         return builder;
     }

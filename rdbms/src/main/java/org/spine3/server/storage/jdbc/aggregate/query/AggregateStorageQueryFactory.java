@@ -2,12 +2,12 @@ package org.spine3.server.storage.jdbc.aggregate.query;
 
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.spine3.server.aggregate.Aggregate;
 import org.spine3.server.storage.AggregateStorageRecord;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbTableNameFactory;
 import org.spine3.server.storage.jdbc.util.IdColumn;
+
 import static org.spine3.server.storage.jdbc.aggregate.query.Constants.EVENT_COUNT_TABLE_NAME_SUFFIX;
 
 public class AggregateStorageQueryFactory<I>{

@@ -32,7 +32,7 @@ import java.sql.SQLException;
 import static java.lang.String.format;
 
 
-public class UpdateEventCountQuery<Id> extends UpdateRecord<Id> {
+public class UpdateEventCountQuery<I> extends UpdateRecord<I> {
 
     private final int count;
 
@@ -42,7 +42,7 @@ public class UpdateEventCountQuery<Id> extends UpdateRecord<Id> {
                     " SET " + EVENT_COUNT_COL + " = ? " +
                     " WHERE " + ID_COL + " = ?;";
 
-    private UpdateEventCountQuery(Builder<Id> builder) {
+    private UpdateEventCountQuery(Builder<I> builder) {
         super(builder);
         this.count = builder.count;
     }
@@ -69,22 +69,22 @@ public class UpdateEventCountQuery<Id> extends UpdateRecord<Id> {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder<Id> extends UpdateRecord.Builder<Builder<Id>, UpdateEventCountQuery, Id> {
+    public static class Builder<I> extends UpdateRecord.Builder<Builder<I>, UpdateEventCountQuery, I> {
 
         private int count;
 
         @Override
-        public UpdateEventCountQuery<Id> build() {
+        public UpdateEventCountQuery<I> build() {
             return new UpdateEventCountQuery<>(this);
         }
 
-        public Builder<Id> setCount(int count){
+        public Builder<I> setCount(int count){
             this.count = count;
             return getThis();
         }
 
         @Override
-        protected Builder<Id> getThis() {
+        protected Builder<I> getThis() {
             return this;
         }
     }

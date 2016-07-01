@@ -35,7 +35,7 @@ import java.sql.SQLException;
 
 import static java.lang.String.format;
 
-public class SelectEventCountByIdQuery<Id> extends AbstractQuery {
+public class SelectEventCountByIdQuery<I> extends AbstractQuery {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String SELECT_QUERY =
@@ -43,10 +43,10 @@ public class SelectEventCountByIdQuery<Id> extends AbstractQuery {
                     " FROM %s " +
                     " WHERE " + ID_COL + " = ?;";
 
-    private final IdColumn<Id> idColumn;
-    private final Id id;
+    private final IdColumn<I> idColumn;
+    private final I id;
 
-    private SelectEventCountByIdQuery(Builder<Id> builder) {
+    private SelectEventCountByIdQuery(Builder<I> builder) {
         super(builder);
         this.idColumn = builder.idColumn;
         this.id = builder.id;
@@ -82,28 +82,28 @@ public class SelectEventCountByIdQuery<Id> extends AbstractQuery {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder<Id> extends AbstractQuery.Builder<Builder<Id>, SelectEventCountByIdQuery> {
+    public static class Builder<I> extends AbstractQuery.Builder<Builder<I>, SelectEventCountByIdQuery> {
 
-        private IdColumn<Id> idColumn;
-        private Id id;
+        private IdColumn<I> idColumn;
+        private I id;
 
         @Override
-        public SelectEventCountByIdQuery<Id> build() {
+        public SelectEventCountByIdQuery<I> build() {
             return new SelectEventCountByIdQuery<>(this);
         }
 
-        public Builder<Id> setIdColumn(IdColumn<Id> idColumn){
+        public Builder<I> setIdColumn(IdColumn<I> idColumn){
             this.idColumn = idColumn;
             return getThis();
         }
 
-        public Builder<Id> setId(Id id){
+        public Builder<I> setId(I id){
             this.id = id;
             return getThis();
         }
 
         @Override
-        protected Builder<Id> getThis() {
+        protected Builder<I> getThis() {
             return this;
         }
     }

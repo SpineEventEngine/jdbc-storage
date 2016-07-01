@@ -30,12 +30,12 @@ import static org.spine3.server.storage.jdbc.entity.query.Constants.*;
 import static java.lang.String.format;
 
 @Internal
-public class SelectEntityByIdQuery<Id> extends SelectById<Id, EntityStorageRecord> {
+public class SelectEntityByIdQuery<I> extends SelectById<I, EntityStorageRecord> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String SELECT_BY_ID = "SELECT " + ENTITY_COL + " FROM %s WHERE " + ID_COL + " = ?;";
 
-    public SelectEntityByIdQuery(String tableName, DataSourceWrapper dataSource, IdColumn<Id> idColumn, Id id) {
+    public SelectEntityByIdQuery(String tableName, DataSourceWrapper dataSource, IdColumn<I> idColumn, I id) {
         super(format(SELECT_BY_ID, tableName), dataSource, idColumn, id);
         setMessageColumnName(ENTITY_COL);
         setMessageDescriptor(RECORD_DESCRIPTOR);

@@ -34,11 +34,11 @@ import static org.spine3.base.Identifiers.idToString;
 /**
  * Helps to work with {@link Entity} ID columns.
  *
- * @param <Id> the type of {@link Entity} IDs
+ * @param <I> the type of {@link Entity} IDs
  * @author Alexander Litus
  */
 @Internal
-public abstract class IdColumn<Id> {
+public abstract class IdColumn<I> {
 
     private static final String TYPE_VARCHAR = "VARCHAR(999)";
 
@@ -50,19 +50,19 @@ public abstract class IdColumn<Id> {
      * Creates a new instance.
      *
      * @param entityClass a class of an {@link Entity} or an {@link Aggregate}
-     * @param <Id> the type of {@link Entity} IDs
+     * @param <I> the type of {@link Entity} IDs
      * @return a new helper instance
      */
-    public static <Id> IdColumn<Id> newInstance(Class<? extends Entity<Id, ?>> entityClass) {
-        final IdColumn<Id> helper;
-        final Class<Id> idClass = Entity.getIdClass(entityClass);
+    public static <I> IdColumn<I> newInstance(Class<? extends Entity<I, ?>> entityClass) {
+        final IdColumn<I> helper;
+        final Class<I> idClass = Entity.getIdClass(entityClass);
         if (idClass.equals(Long.class)) {
             @SuppressWarnings("unchecked") // is checked already
-            final IdColumn<Id> longIdColumn = (IdColumn<Id>) new LongIdColumn();
+            final IdColumn<I> longIdColumn = (IdColumn<I>) new LongIdColumn();
             helper = longIdColumn;
         } else if (idClass.equals(Integer.class)) {
             @SuppressWarnings("unchecked") // is checked already
-            final IdColumn<Id> intIdColumn = (IdColumn<Id>) new IntIdColumn();
+            final IdColumn<I> intIdColumn = (IdColumn<I>) new IntIdColumn();
             helper = intIdColumn;
         } else {
             helper = new StringOrMessageIdColumn<>();
@@ -70,18 +70,22 @@ public abstract class IdColumn<Id> {
         return helper;
     }
 
-    public static <Id> IdColumn<Id> newInstance(String idType) {
-        final IdColumn<Id> helper;
-        if (idType.equals(TYPE_BIGINT)) {
-            @SuppressWarnings("unchecked") // is checked already
-            final IdColumn<Id> longIdColumn = (IdColumn<Id>) new LongIdColumn();
-            helper = longIdColumn;
-        } else if (idType.equals(TYPE_INT)) {
-            @SuppressWarnings("unchecked") // is checked already
-            final IdColumn<Id> intIdColumn = (IdColumn<Id>) new IntIdColumn();
-            helper = intIdColumn;
-        } else {
-            helper = new StringOrMessageIdColumn<>();
+    public static <I> IdColumn<I> newInstance(String idType) {
+        final IdColumn<I> helper;
+        switch (idType) {
+            case TYPE_BIGINT:
+                @SuppressWarnings("unchecked") // is checked already
+                final IdColumn<I> longIdColumn = (IdColumn<I>) new LongIdColumn();
+                helper = longIdColumn;
+                break;
+            case TYPE_INT:
+                @SuppressWarnings("unchecked") // is checked already
+                final IdColumn<I> intIdColumn = (IdColumn<I>) new IntIdColumn();
+                helper = intIdColumn;
+                break;
+            default:
+                helper = new StringOrMessageIdColumn<>();
+                break;
         }
         return helper;
     }
@@ -99,7 +103,7 @@ public abstract class IdColumn<Id> {
      * @param statement the statement to use
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
-    public abstract void setId(int index, Id id, PreparedStatement statement) throws DatabaseException;
+    public abstract void setId(int index, I id, PreparedStatement statement) throws DatabaseException;
 
     /**
      * Helps to work with columns which contain {@code long} {@link Entity} IDs.
@@ -144,7 +148,7 @@ public abstract class IdColumn<Id> {
     /**
      * Helps to work with columns which contain either {@link Message} or {@code string} {@link Entity} IDs.
      */
-    private static class StringOrMessageIdColumn<Id> extends IdColumn<Id> {
+    private static class StringOrMessageIdColumn<I> extends IdColumn<I> {
 
         @Override
         public String getColumnDataType() {
@@ -152,7 +156,7 @@ public abstract class IdColumn<Id> {
         }
 
         @Override
-        public void setId(int index, Id id, PreparedStatement statement) throws DatabaseException {
+        public void setId(int index, I id, PreparedStatement statement) throws DatabaseException {
             final String idString = idToString(id);
             try {
                 statement.setString(index, idString);

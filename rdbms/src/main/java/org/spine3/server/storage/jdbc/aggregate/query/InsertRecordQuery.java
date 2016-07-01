@@ -33,7 +33,7 @@ import java.sql.SQLException;
 import static java.lang.String.format;
 
 
-public class InsertRecordQuery<Id> extends WriteRecord<Id, AggregateStorageRecord> {
+public class InsertRecordQuery<I> extends WriteRecord<I, AggregateStorageRecord> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String INSERT_QUERY =
@@ -41,7 +41,7 @@ public class InsertRecordQuery<Id> extends WriteRecord<Id, AggregateStorageRecor
                     " (" + ID_COL + ", " + AGGREGATE_COL + ", " + SECONDS_COL + ", " + NANOS_COL + ") " +
                     " VALUES (?, ?, ?, ?);";
 
-    private InsertRecordQuery(Builder<Id> builder) {
+    private InsertRecordQuery(Builder<I> builder) {
         super(builder);
     }
 
@@ -62,8 +62,8 @@ public class InsertRecordQuery<Id> extends WriteRecord<Id, AggregateStorageRecor
         }
     }
 
-    public static <Id> Builder <Id> newBuilder(String tableName) {
-        final Builder<Id> builder = new Builder<>();
+    public static <I> Builder <I> newBuilder(String tableName) {
+        final Builder<I> builder = new Builder<>();
         builder.setIdIndexInQuery(1)
                 .setRecordIndexInQuery(2)
                 .setQuery(format(INSERT_QUERY, tableName));
@@ -71,7 +71,7 @@ public class InsertRecordQuery<Id> extends WriteRecord<Id, AggregateStorageRecor
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder<Id> extends WriteRecord.Builder<Builder<Id>, InsertRecordQuery, Id, AggregateStorageRecord> {
+    public static class Builder<I> extends WriteRecord.Builder<Builder<I>, InsertRecordQuery, I, AggregateStorageRecord> {
 
         @Override
         public InsertRecordQuery build() {
@@ -79,7 +79,7 @@ public class InsertRecordQuery<Id> extends WriteRecord<Id, AggregateStorageRecor
         }
 
         @Override
-        protected Builder<Id> getThis() {
+        protected Builder<I> getThis() {
             return this;
         }
     }

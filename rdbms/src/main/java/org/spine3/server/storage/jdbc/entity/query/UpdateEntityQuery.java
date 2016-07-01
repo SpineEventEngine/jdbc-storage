@@ -27,7 +27,7 @@ import static org.spine3.server.storage.jdbc.entity.query.Constants.*;
 import static java.lang.String.format;
 
 
-public class UpdateEntityQuery<Id> extends WriteRecord<Id, EntityStorageRecord> {
+public class UpdateEntityQuery<I> extends WriteRecord<I, EntityStorageRecord> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String UPDATE_QUERY =
@@ -35,12 +35,12 @@ public class UpdateEntityQuery<Id> extends WriteRecord<Id, EntityStorageRecord> 
                     " SET " + ENTITY_COL + " = ? " +
                     " WHERE " + ID_COL + " = ?;";
 
-    private UpdateEntityQuery(Builder<Id> builder) {
+    private UpdateEntityQuery(Builder<I> builder) {
         super(builder);
     }
 
-    public static <Id> Builder <Id> newBuilder(String tableName) {
-        final Builder<Id> builder = new Builder<>();
+    public static <I> Builder <I> newBuilder(String tableName) {
+        final Builder<I> builder = new Builder<>();
         builder.setIdIndexInQuery(2)
                 .setRecordIndexInQuery(1)
                 .setQuery(format(UPDATE_QUERY, tableName));
@@ -48,7 +48,7 @@ public class UpdateEntityQuery<Id> extends WriteRecord<Id, EntityStorageRecord> 
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder<Id> extends WriteRecord.Builder<Builder<Id>, UpdateEntityQuery, Id, EntityStorageRecord> {
+    public static class Builder<I> extends WriteRecord.Builder<Builder<I>, UpdateEntityQuery, I, EntityStorageRecord> {
 
         @Override
         public UpdateEntityQuery build() {
@@ -56,7 +56,7 @@ public class UpdateEntityQuery<Id> extends WriteRecord<Id, EntityStorageRecord> 
         }
 
         @Override
-        protected Builder<Id> getThis() {
+        protected Builder<I> getThis() {
             return this;
         }
     }

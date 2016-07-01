@@ -27,13 +27,13 @@ import org.spine3.server.storage.jdbc.util.IdColumn;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public class UpdateRecord <Id> extends WriteQuery {
+public class UpdateRecord <I> extends WriteQuery {
 
-    private final Id id;
+    private final I id;
     private int idIndexInQuery;
-    private final IdColumn<Id> idColumn;
+    private final IdColumn<I> idColumn;
 
-    protected UpdateRecord(Builder<? extends Builder, ? extends UpdateRecord, Id> builder) {
+    protected UpdateRecord(Builder<? extends Builder, ? extends UpdateRecord, I> builder) {
         super(builder);
         this.idIndexInQuery = builder.idIndexInQuery;
         this.idColumn = builder.idColumn;
@@ -50,18 +50,18 @@ public class UpdateRecord <Id> extends WriteQuery {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public abstract static class Builder<B extends Builder<B, Q, Id>, Q extends UpdateRecord, Id>
+    public abstract static class Builder<B extends Builder<B, Q, I>, Q extends UpdateRecord, I>
             extends WriteQuery.Builder<B, Q>{
         private int idIndexInQuery;
-        private IdColumn<Id> idColumn;
-        private Id id;
+        private IdColumn<I> idColumn;
+        private I id;
 
-        public B setId(Id id) {
+        public B setId(I id) {
             this.id = id;
             return getThis();
         }
 
-        public B setIdColumn(IdColumn<Id> idColumn) {
+        public B setIdColumn(IdColumn<I> idColumn) {
             this.idColumn = idColumn;
             return getThis();
         }

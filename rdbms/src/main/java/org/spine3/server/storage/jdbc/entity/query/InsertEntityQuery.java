@@ -27,7 +27,7 @@ import static org.spine3.server.storage.jdbc.entity.query.Constants.*;
 import static java.lang.String.format;
 
 
-public class InsertEntityQuery<Id> extends WriteRecord<Id, EntityStorageRecord> {
+public class InsertEntityQuery<I> extends WriteRecord<I, EntityStorageRecord> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String INSERT_QUERY =
@@ -35,12 +35,12 @@ public class InsertEntityQuery<Id> extends WriteRecord<Id, EntityStorageRecord> 
                     " (" + ID_COL + ", " + ENTITY_COL + ')' +
                     " VALUES (?, ?);";
 
-    private InsertEntityQuery(Builder<Id> builder) {
+    private InsertEntityQuery(Builder<I> builder) {
         super(builder);
     }
 
-    public static <Id> Builder <Id> newBuilder(String tableName) {
-        final Builder<Id> builder = new Builder<>();
+    public static <I> Builder <I> newBuilder(String tableName) {
+        final Builder<I> builder = new Builder<>();
         builder.setIdIndexInQuery(1)
                 .setRecordIndexInQuery(2)
                 .setQuery(format(INSERT_QUERY, tableName));
@@ -48,7 +48,7 @@ public class InsertEntityQuery<Id> extends WriteRecord<Id, EntityStorageRecord> 
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder<Id> extends WriteRecord.Builder<Builder<Id>, InsertEntityQuery, Id, EntityStorageRecord> {
+    public static class Builder<I> extends WriteRecord.Builder<Builder<I>, InsertEntityQuery, I, EntityStorageRecord> {
 
         @Override
         public InsertEntityQuery build() {
@@ -56,7 +56,7 @@ public class InsertEntityQuery<Id> extends WriteRecord<Id, EntityStorageRecord> 
         }
 
         @Override
-        protected Builder<Id> getThis() {
+        protected Builder<I> getThis() {
             return this;
         }
     }
