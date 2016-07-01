@@ -63,7 +63,7 @@ public class SelectEventCountByIdQuery<Id> extends AbstractQuery {
             final int eventCount = resultSet.getInt(EVENT_COUNT_COL);
             return eventCount;
         } catch (SQLException e) {
-            // log().error("Failed to read an event count after the last snapshot.", e);
+            this.getLogger().error("Failed to read an event count after the last snapshot.", e);
             throw new DatabaseException(e);
         }
     }

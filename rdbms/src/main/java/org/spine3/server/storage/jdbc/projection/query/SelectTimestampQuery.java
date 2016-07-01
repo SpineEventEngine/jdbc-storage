@@ -25,6 +25,7 @@ import com.google.protobuf.Timestamp;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.AbstractQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
+
 import static org.spine3.server.storage.jdbc.projection.query.Constants.*;
 
 import javax.annotation.Nullable;
@@ -35,9 +36,11 @@ import java.sql.SQLException;
 import static java.lang.String.format;
 import static org.spine3.validate.Validate.isDefault;
 
-public class SelectTimestampQuery extends AbstractQuery{
+public class SelectTimestampQuery extends AbstractQuery {
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String SELECT_QUERY = "SELECT " + SECONDS_COL + ", " + NANOS_COL + " FROM %s ;";
+    private static final String SELECT_QUERY = "SELECT " +
+            SECONDS_COL + ", " +
+            NANOS_COL + " FROM %s ;";
 
     private SelectTimestampQuery(Builder builder) {
         super(builder);
@@ -59,7 +62,7 @@ public class SelectTimestampQuery extends AbstractQuery{
             }
             return time;
         } catch (SQLException e) {
-            //log().error("Failed to read last event time.", e);
+            this.getLogger().error("Failed to read last event time.", e);
             throw new DatabaseException(e);
         }
     }

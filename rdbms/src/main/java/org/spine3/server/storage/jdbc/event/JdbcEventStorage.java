@@ -70,6 +70,7 @@ public class JdbcEventStorage extends EventStorage {
         super(multitenant);
         this.dataSource = dataSource;
         this.queryFactory = queryFactory;
+        queryFactory.setLogger(LogSingleton.INSTANCE.value);
         queryFactory.newCreateTableQuery().execute();
     }
 
@@ -133,10 +134,6 @@ public class JdbcEventStorage extends EventStorage {
         } catch (Exception e) {
             throw new DatabaseException(e);
         }
-    }
-
-    private static Logger log() {
-        return LogSingleton.INSTANCE.value;
     }
 
     private enum LogSingleton {

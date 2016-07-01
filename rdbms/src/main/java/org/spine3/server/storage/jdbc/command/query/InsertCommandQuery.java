@@ -36,9 +36,6 @@ public class InsertCommandQuery extends WriteCommandRecordQuery {
         super(builder);
     }
 
-    /*protected void logError(SQLException exception) {
-        log(exception, "command insertion", getId());
-    }*/
 
     public static Builder newBuilder() {
         final Builder builder = new Builder();

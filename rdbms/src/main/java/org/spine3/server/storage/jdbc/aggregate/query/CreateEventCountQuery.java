@@ -50,6 +50,7 @@ public class CreateEventCountQuery<I> extends AbstractQuery {
         this.tableName = builder.tableName;
     }
 
+    @SuppressWarnings("DuplicateStringLiteralInspection")
     public void execute() throws DatabaseException {
         final String idColumnType = idColumn.getColumnDataType();
         final String createTableSql = format(QUERY, tableName, idColumnType);
@@ -57,7 +58,7 @@ public class CreateEventCountQuery<I> extends AbstractQuery {
              PreparedStatement statement = connection.prepareStatement(createTableSql)) {
             statement.execute();
         } catch (SQLException e) {
-            //log().error("Error while creating a table with the name: " + tableName, e);
+            this.getLogger().error("Error while creating a table with the name: " + tableName, e);
             throw new DatabaseException(e);
         }
     }

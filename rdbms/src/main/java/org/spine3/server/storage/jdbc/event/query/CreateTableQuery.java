@@ -52,7 +52,7 @@ public class CreateTableQuery extends AbstractQuery {
              PreparedStatement statement = prepareStatement(connection)) {
             statement.execute();
         } catch (SQLException e) {
-            //log().error("Error while creating a table with the name: " + tableName, e);
+            this.getLogger().error("Error while creating an event table ", e);
             throw new DatabaseException(e);
         }
     }

@@ -59,7 +59,7 @@ public class SelectByIdSortedByTimeDescQuery<Id> extends AbstractQuery {
             idColumn.setId(1, id, statement);
             return new DbIterator<>(statement, AGGREGATE_COL, RECORD_DESCRIPTOR);
         } catch (SQLException e) {
-            //log().error("Error while creating a table with the name: " + tableName, e);
+            this.getLogger().error("Error while selecting entity by aggregates id sorted by time: ", e);
             throw new DatabaseException(e);
         }
     }

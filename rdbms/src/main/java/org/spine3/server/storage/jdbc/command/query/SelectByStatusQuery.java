@@ -70,22 +70,22 @@ public class  SelectByStatusQuery extends AbstractQuery{
      * Prepares SQL statement using the connection.
      */
     @Override
+    @SuppressWarnings("DuplicateStringLiteralInspection")
     public PreparedStatement prepareStatement(ConnectionWrapper connection) {
         final PreparedStatement statement = super.prepareStatement(connection);
         try {
             statement.setString(1, status.toString());
         } catch (SQLException e) {
+            this.getLogger().error("Failed to prepare statement ", e);
             throw new DatabaseException(e);
         }
         return statement;
     }
 
     public Iterator<CommandStorageRecord> execute() throws DatabaseException {
-        final ResultSet resultSet;
         try (ConnectionWrapper connection = dataSource.getConnection(true)) {
             final PreparedStatement statement = this.prepareStatement(connection);
             return new DbIterator<>(statement, Constants.COMMAND_COL, Constants.COMMAND_RECORD_DESCRIPTOR);
-
         }
     }
 

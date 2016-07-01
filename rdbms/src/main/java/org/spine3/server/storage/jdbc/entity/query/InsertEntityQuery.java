@@ -39,11 +39,6 @@ public class InsertEntityQuery<Id> extends WriteRecord<Id, EntityStorageRecord> 
         super(builder);
     }
 
-
-    /*protected void logError(SQLException exception) {
-        log(exception, "command insertion", getId());
-    }*/
-
     public static <Id> Builder <Id> newBuilder(String tableName) {
         final Builder<Id> builder = new Builder<>();
         builder.setIdIndexInQuery(1)

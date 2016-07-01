@@ -20,6 +20,7 @@
 
 package org.spine3.server.storage.jdbc.query;
 
+import org.slf4j.Logger;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
@@ -28,14 +29,16 @@ import java.sql.PreparedStatement;
 /**
  * @author Andrey Lavrov
  */
-public class AbstractQuery {
+public abstract class AbstractQuery {
 
     private final String query;
     protected final DataSourceWrapper dataSource;
+    private final Logger logger;
 
     protected AbstractQuery(Builder<? extends Builder, ? extends AbstractQuery> builder) {
         this.query = builder.query;
         this.dataSource = builder.dataSource;
+        this.logger = builder.logger;
     }
 
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
@@ -46,10 +49,15 @@ public class AbstractQuery {
         return query;
     }
 
+    public Logger getLogger() {
+        return logger;
+    }
+
     public abstract static class Builder<B extends Builder<B, Q>, Q extends AbstractQuery> {
 
-        private DataSourceWrapper dataSource;
         private String query;
+        private DataSourceWrapper dataSource;
+        private Logger logger;
 
         public abstract Q build();
 
@@ -62,6 +70,11 @@ public class AbstractQuery {
 
         public B setQuery(String query) {
             this.query = query;
+            return getThis();
+        }
+
+        public B setLogger(Logger logger) {
+            this.logger = logger;
             return getThis();
         }
     }

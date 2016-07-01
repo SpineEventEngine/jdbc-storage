@@ -16,6 +16,7 @@ public class AggregateStorageQueryFactory<I>{
     private final String mainTableName;
     private final String eventCountTableName;
     private final DataSourceWrapper dataSource;
+    private Logger logger;
 
     public AggregateStorageQueryFactory(DataSourceWrapper dataSource, Class<? extends Aggregate<I, ?, ?>> aggregateClass) {
         this.idColumn = IdColumn.newInstance(aggregateClass);
@@ -24,69 +25,69 @@ public class AggregateStorageQueryFactory<I>{
         this.dataSource = dataSource;
     }
 
-    private static Logger log() {
-        return LogSingleton.INSTANCE.value;
-    }
-
-    private enum LogSingleton {
-        INSTANCE;
-        @SuppressWarnings("NonSerializableFieldInSerializableClass")
-        private final Logger value = LoggerFactory.getLogger(AggregateStorageQueryFactory.class);
+    public void setLogger(Logger logger) {
+        this.logger = logger;
     }
 
     public CreateMainTableQuery newCreateMainTableQuery() {
         final CreateMainTableQuery.Builder<I> builder = CreateMainTableQuery.<I>newBuilder()
+                .setDataSource(dataSource)
+                .setLogger(logger)
                 .setTableName(mainTableName)
-                .setIdColumn(idColumn)
-                .setDataSource(dataSource);
+                .setIdColumn(idColumn);
 
         return builder.build();
     }
 
     public CreateEventCountQuery newCreateEventCountTableQuery() {
         final CreateEventCountQuery.Builder<I> builder = CreateEventCountQuery.<I>newBuilder()
+                .setDataSource(dataSource)
+                .setLogger(logger)
                 .setTableName(eventCountTableName)
-                .setIdColumn(idColumn)
-                .setDataSource(dataSource);
+                .setIdColumn(idColumn);
 
         return builder.build();
     }
 
     public InsertEventCountQuery newInsertEventCountQuery(I id, int count){
         final InsertEventCountQuery.Builder<I> builder = InsertEventCountQuery.<I>newBuilder(eventCountTableName)
+                .setDataSource(dataSource)
+                .setLogger(logger)
                 .setIdColumn(idColumn)
                 .setId(id)
-                .setCount(count)
-                .setDataSource(dataSource);
+                .setCount(count);
 
         return builder.build();
     }
 
     public UpdateEventCountQuery newUpdateEventCountQuery(I id, int count){
         final UpdateEventCountQuery.Builder<I> builder = UpdateEventCountQuery.<I>newBuilder(eventCountTableName)
+                .setDataSource(dataSource)
+                .setLogger(logger)
                 .setIdColumn(idColumn)
                 .setId(id)
-                .setCount(count)
-                .setDataSource(dataSource);
+                .setCount(count);
 
         return builder.build();
     }
 
     public InsertRecordQuery newInsertRecordQuery(I id, AggregateStorageRecord record){
         final InsertRecordQuery.Builder<I> builder = InsertRecordQuery.<I>newBuilder(mainTableName)
+                .setDataSource(dataSource)
+                .setLogger(logger)
                 .setIdColumn(idColumn)
                 .setId(id)
-                .setRecord(record)
-                .setDataSource(dataSource);
+                .setRecord(record);
 
         return builder.build();
     }
 
     public SelectEventCountByIdQuery newSelectEventCountByIdQuery(I id){
         final SelectEventCountByIdQuery.Builder<I> builder = SelectEventCountByIdQuery.<I>newBuilder(eventCountTableName)
+                .setDataSource(dataSource)
+                .setLogger(logger)
                 .setIdColumn(idColumn)
-                .setId(id)
-                .setDataSource(dataSource);
+                .setId(id);
 
         return builder.build();
     }
@@ -94,9 +95,10 @@ public class AggregateStorageQueryFactory<I>{
     @SuppressWarnings("InstanceMethodNamingConvention")
     public SelectByIdSortedByTimeDescQuery<I> newSelectByIdSortedByTimeDescQuery(I id){
         final SelectByIdSortedByTimeDescQuery.Builder<I> builder = SelectByIdSortedByTimeDescQuery.<I>newBuilder(mainTableName)
+                .setDataSource(dataSource)
+                .setLogger(logger)
                 .setIdColumn(idColumn)
-                .setId(id)
-                .setDataSource(dataSource);
+                .setId(id);
 
         return builder.build();
     }

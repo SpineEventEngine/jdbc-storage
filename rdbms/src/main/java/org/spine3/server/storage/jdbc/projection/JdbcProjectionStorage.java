@@ -70,6 +70,7 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
         super(multitenant);
         this.entityStorage = entityStorage;
         this.queryFactory = queryFactory;
+        queryFactory.setLogger(LogSingleton.INSTANCE.value);
 
        queryFactory.newCreateTableQuery().execute();
     }

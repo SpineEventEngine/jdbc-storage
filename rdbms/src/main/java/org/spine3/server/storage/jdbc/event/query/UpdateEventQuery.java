@@ -51,6 +51,7 @@ public class UpdateEventQuery extends WriteRecord<String, EventStorageRecord> {
     }
 
     @Override
+    @SuppressWarnings("DuplicateStringLiteralInspection")
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
         final PreparedStatement statement = connection.prepareStatement(UPDATE_QUERY);
             final Timestamp timestamp = this.getRecord().getTimestamp();
@@ -73,14 +74,11 @@ public class UpdateEventQuery extends WriteRecord<String, EventStorageRecord> {
             final String eventId = this.getRecord().getEventId();
             statement.setString(6, eventId);
         } catch (SQLException e) {
+            this.getLogger().error("Failed to prepare statement ", e);
             throw new DatabaseException(e);
         }
         return statement;
     }
-
-    /*protected void logError(SQLException exception) {
-        log(exception, "command insertion", getId());
-    }*/
 
     public static Builder newBuilder() {
         final Builder builder = new Builder();

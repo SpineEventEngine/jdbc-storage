@@ -64,6 +64,8 @@ public class JdbcEntityStorage<I> extends EntityStorage<I> {
         super(multitenant);
         this.dataSource = dataSource;
         this.queryFactory = queryFactory;
+        queryFactory.setLogger(LogSingleton.INSTANCE.value);
+        queryFactory.setLogger(LogSingleton.INSTANCE.value);
         queryFactory.newCreateTableQuery().execute();
     }
 
@@ -120,9 +122,6 @@ public class JdbcEntityStorage<I> extends EntityStorage<I> {
      */
     /*package*/ void clear() throws DatabaseException {
        queryFactory.newDeleteAllQuery().execute();
-    }
-    private static Logger log() {
-        return LogSingleton.INSTANCE.value;
     }
 
     private enum LogSingleton {

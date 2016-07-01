@@ -56,7 +56,7 @@ public class CreateTableQuery extends AbstractQuery {
              PreparedStatement statement = this.prepareStatement(connection)) {
             statement.execute();
         } catch (SQLException e) {
-            //log().error("Exception during table creation:", e);
+            this.getLogger().error("Exception during table creation:", e);
             throw new DatabaseException(e);
         }
     }

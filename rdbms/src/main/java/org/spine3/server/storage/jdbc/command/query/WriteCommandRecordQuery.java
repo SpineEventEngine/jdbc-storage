@@ -35,7 +35,7 @@ import java.sql.SQLException;
  * @author Andrey Lavrov
  */
 
-public abstract class WriteCommandRecordQuery
+public class WriteCommandRecordQuery
         extends WriteRecord<String, CommandStorageRecord> {
 
     private final int statusIndexInQuery;
@@ -48,11 +48,13 @@ public abstract class WriteCommandRecordQuery
     }
 
     @Override
+    @SuppressWarnings("DuplicateStringLiteralInspection")
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
         final PreparedStatement statement = super.prepareStatement(connection);
         try {
             statement.setString(statusIndexInQuery, status.name());
         } catch (SQLException e) {
+            this.getLogger().error("Failed to prepare statement ", e);
             throw new DatabaseException(e);
         }
         return statement;

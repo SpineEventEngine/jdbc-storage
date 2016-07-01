@@ -34,6 +34,7 @@ import org.spine3.server.storage.jdbc.command.query.CommandStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.validate.Validate;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.sql.SQLException;
 import java.util.Iterator;
 
@@ -67,6 +68,7 @@ public class JdbcCommandStorage extends CommandStorage {
         super(multitenant);
         this.dataSource = dataSource;
         this.queryFactory = queryFactory;
+        queryFactory.setLogger(LogSingleton.INSTANCE.value);
         queryFactory.newCreateTableQuery().execute();
     }
 
@@ -177,14 +179,6 @@ public class JdbcCommandStorage extends CommandStorage {
         } catch (Exception e) {
             throw new DatabaseException(e);
         }
-    }
-
-    private static void log(SQLException e, String actionName, String commandId) {
-        log().error("Exception during {}, command ID: {}", actionName, commandId, e);
-    }
-
-    private static Logger log() {
-        return LogSingleton.INSTANCE.value;
     }
 
     private enum LogSingleton {

@@ -16,6 +16,7 @@ public class ProjectionStorageQueryFactory<I> {
     private final IdColumn<I> idColumn;
     private final String tableName;
     private final DataSourceWrapper dataSource;
+    private Logger logger;
 
     public ProjectionStorageQueryFactory(DataSourceWrapper dataSource, Class<? extends Entity<I, ?>> projectionClass) {
         this.idColumn = IdColumn.newInstance(projectionClass);
@@ -23,43 +24,41 @@ public class ProjectionStorageQueryFactory<I> {
         this.dataSource = dataSource;
     }
 
-    private static Logger log() {
-        return LogSingleton.INSTANCE.value;
-    }
-
-    private enum LogSingleton {
-        INSTANCE;
-        @SuppressWarnings("NonSerializableFieldInSerializableClass")
-        private final Logger value = LoggerFactory.getLogger(ProjectionStorageQueryFactory.class);
+    public void setLogger(Logger logger) {
+        this.logger = logger;
     }
 
     public CreateTableQuery newCreateTableQuery() {
         final CreateTableQuery.Builder builder = CreateTableQuery.newBuilder()
-                .setTableName(tableName)
-                .setDataSource(dataSource);
+                .setDataSource(dataSource)
+                .setLogger(logger)
+                .setTableName(tableName);
 
         return builder.build();
     }
 
     public InsertTimestampQuery newInsertTimestampQuery(Timestamp time) {
         final InsertTimestampQuery.Builder builder = InsertTimestampQuery.newBuilder(tableName)
-                .setTimestamp(time)
-                .setDataSource(dataSource);
+                .setDataSource(dataSource)
+                .setLogger(logger)
+                .setTimestamp(time);
 
         return builder.build();
     }
 
     public UpdateTimestampQuery newUpdateTimestampQuery(Timestamp time) {
         final UpdateTimestampQuery.Builder builder = UpdateTimestampQuery.newBuilder(tableName)
-                .setTimestamp(time)
-                .setDataSource(dataSource);
+                .setDataSource(dataSource)
+                .setLogger(logger)
+                .setTimestamp(time);
 
         return builder.build();
     }
 
     public SelectTimestampQuery newSelectTimestampQuery() {
         final SelectTimestampQuery.Builder builder = SelectTimestampQuery.newBuilder(tableName)
-                .setDataSource(dataSource);
+                .setDataSource(dataSource)
+                .setLogger(logger);
 
         return builder.build();
     }

@@ -47,6 +47,7 @@ public class InsertRecordQuery<Id> extends WriteRecord<Id, AggregateStorageRecor
 
 
     @Override
+    @SuppressWarnings("DuplicateStringLiteralInspection")
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
         final PreparedStatement statement = super.prepareStatement(connection);
 
@@ -56,13 +57,10 @@ public class InsertRecordQuery<Id> extends WriteRecord<Id, AggregateStorageRecor
             statement.setInt(4, timestamp.getNanos());
             return statement;
         } catch (SQLException e) {
+            this.getLogger().error("Failed to prepare statement ", e);
             throw new DatabaseException(e);
         }
     }
-
-    /*protected void logError(SQLException exception) {
-        log(exception, "command insertion", getId());
-    }*/
 
     public static <Id> Builder <Id> newBuilder(String tableName) {
         final Builder<Id> builder = new Builder<>();

@@ -47,11 +47,8 @@ public class UpdateEventCountQuery<Id> extends UpdateRecord<Id> {
         this.count = builder.count;
     }
 
-    /*protected void logError(SQLException exception) {
-        log(exception, "command insertion", getId());
-    }*/
-
     @Override
+    @SuppressWarnings("DuplicateStringLiteralInspection")
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
         final PreparedStatement statement = super.prepareStatement(connection);
 
@@ -59,6 +56,7 @@ public class UpdateEventCountQuery<Id> extends UpdateRecord<Id> {
             statement.setInt(1, count);
             return statement;
         } catch (SQLException e) {
+            this.getLogger().error("Failed to prepare statement ", e);
             throw new DatabaseException(e);
         }
     }

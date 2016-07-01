@@ -48,17 +48,12 @@ public class WriteQuery extends AbstractQuery{
                 statement.execute();
                 connection.commit();
             } catch (SQLException e) {
-                //logError(e);
+                this.getLogger().error("Failed to execute write operation.", e);
                 connection.rollback();
                 throw new DatabaseException(e);
             }
         }
     }
-
-  /*  *//**
-     * Logs an occurred exception.
-     *//*
-    protected abstract void logError(SQLException exception);*/
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
     public abstract static class Builder<B extends Builder<B, Q>, Q extends WriteQuery>

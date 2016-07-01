@@ -1,6 +1,7 @@
 package org.spine3.server.storage.jdbc.entity.query;
 
 
+import org.slf4j.Logger;
 import org.spine3.server.entity.Entity;
 import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
@@ -12,6 +13,7 @@ public class EntityStorageQueryFactory<I> {
     private final IdColumn<I> idColumn;
     private final DataSourceWrapper dataSource;
     private final String tableName;
+    private Logger logger;
 
     public EntityStorageQueryFactory(DataSourceWrapper dataSource, Class<? extends Entity<I, ?>> entityClass) {
         this.idColumn = IdColumn.newInstance(entityClass);
@@ -22,6 +24,7 @@ public class EntityStorageQueryFactory<I> {
     public CreateTableQuery newCreateTableQuery() {
         final CreateTableQuery.Builder<I> builder = CreateTableQuery.<I>newBuilder()
                 .setDataSource(dataSource)
+                .setLogger(logger)
                 .setIdColumn(idColumn)
                 .setTableName(tableName);
 
@@ -30,20 +33,22 @@ public class EntityStorageQueryFactory<I> {
 
     public UpdateEntityQuery newUpdateEntityQuery(I id, EntityStorageRecord record) {
         final UpdateEntityQuery.Builder<I> builder = UpdateEntityQuery.<I>newBuilder(tableName)
+                .setDataSource(dataSource)
+                .setLogger(logger)
                 .setIdColumn(idColumn)
                 .setId(id)
-                .setRecord(record)
-                .setDataSource(dataSource);
+                .setRecord(record);
 
         return builder.build();
     }
 
     public InsertEntityQuery newInsertEntityQuery(I id, EntityStorageRecord record) {
         final InsertEntityQuery.Builder<I> builder = InsertEntityQuery.<I>newBuilder(tableName)
+                .setDataSource(dataSource)
+                .setLogger(logger)
                 .setId(id)
                 .setIdColumn(idColumn)
-                .setRecord(record)
-                .setDataSource(dataSource);
+                .setRecord(record);
 
         return builder.build();
     }
@@ -54,8 +59,13 @@ public class EntityStorageQueryFactory<I> {
 
     public DeleteAllQuery newDeleteAllQuery(){
         final DeleteAllQuery.Builder builder = DeleteAllQuery.newBuilder(tableName)
-                .setDataSource(dataSource);
+                .setDataSource(dataSource)
+                .setLogger(logger);
 
         return builder.build();
+    }
+
+    public void setLogger(Logger logger) {
+        this.logger = logger;
     }
 }

@@ -16,25 +16,21 @@ public class CommandStorageQueryFactory {
 
     private final IdColumn <String> idColumn;
     private final DataSourceWrapper dataSource;
+    private Logger logger;
 
     public CommandStorageQueryFactory(DataSourceWrapper dataSource) {
         this.idColumn = new IdColumn.StringIdColumn();
         this.dataSource = dataSource;
     }
 
-    private static Logger log() {
-        return LogSingleton.INSTANCE.value;
-    }
-
-    private enum LogSingleton {
-        INSTANCE;
-        @SuppressWarnings("NonSerializableFieldInSerializableClass")
-        private final Logger value = LoggerFactory.getLogger(CommandStorageQueryFactory.class);
+    public void setLogger(Logger logger) {
+        this.logger = logger;
     }
 
     public CreateTableQuery newCreateTableQuery(){
         final CreateTableQuery.Builder builder = CreateTableQuery.newBuilder()
-                .setDataSource(dataSource);
+                .setDataSource(dataSource)
+                .setLogger(logger);
 
         return builder.build();
     }
@@ -42,6 +38,7 @@ public class CommandStorageQueryFactory {
     public InsertCommandQuery newInsertCommandQuery(CommandId id, CommandStorageRecord record){
         final InsertCommandQuery.Builder builder = InsertCommandQuery.newBuilder()
                 .setDataSource(dataSource)
+                .setLogger(logger)
                 .setIdColumn(idColumn)
                 .setId(id.getUuid())
                 .setRecord(record)
@@ -53,6 +50,7 @@ public class CommandStorageQueryFactory {
     public UpdateCommandQuery newUpdateCommandQuery(CommandId id, CommandStorageRecord record){
         final UpdateCommandQuery.Builder builder = UpdateCommandQuery.newBuilder()
                 .setDataSource(dataSource)
+                .setLogger(logger)
                 .setIdColumn(idColumn)
                 .setId(id.getUuid())
                 .setRecord(record)
@@ -64,6 +62,7 @@ public class CommandStorageQueryFactory {
     public SetErrorQuery newSetErrorQuery(CommandId id, Error error){
         final SetErrorQuery.Builder builder = SetErrorQuery.newBuilder()
                 .setDataSource(dataSource)
+                .setLogger(logger)
                 .setIdColumn(idColumn)
                 .setId(id.getUuid())
                 .setRecord(error);
@@ -74,6 +73,7 @@ public class CommandStorageQueryFactory {
     public SetFailureQuery newSetFailureQuery(CommandId id, Failure failure){
         final SetFailureQuery.Builder builder = SetFailureQuery.newBuilder()
                 .setDataSource(dataSource)
+                .setLogger(logger)
                 .setIdColumn(idColumn)
                 .setId(id.getUuid())
                 .setRecord(failure);
@@ -84,6 +84,7 @@ public class CommandStorageQueryFactory {
     public SetOkStatusQuery newSetOkStatusQuery(CommandId id){
         final SetOkStatusQuery.Builder builder = SetOkStatusQuery.newBuilder()
                 .setDataSource(this.dataSource)
+                .setLogger(logger)
                 .setIdColumn(idColumn)
                 .setId(id.getUuid());
 
@@ -97,6 +98,7 @@ public class CommandStorageQueryFactory {
     public SelectByStatusQuery newSelectByStatusQuery(CommandStatus status){
         final SelectByStatusQuery.Builder builder = SelectByStatusQuery.newBuilder()
                 .setDataSource(dataSource)
+                .setLogger(logger)
                 .setStatus(status);
 
         return builder.build();
