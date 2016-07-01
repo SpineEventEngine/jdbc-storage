@@ -21,12 +21,12 @@
 package org.spine3.server.storage.jdbc.command.query;
 
 import org.spine3.base.CommandStatus;
-import org.spine3.server.storage.jdbc.query.UpdateRecord;
+import org.spine3.server.storage.jdbc.query.UpdateRecordQuery;
 
 import static org.spine3.server.storage.jdbc.command.query.Constants.*;
 
 
-public class SetOkStatusQuery extends UpdateRecord<String> {
+public class SetOkStatusQuery extends UpdateRecordQuery<String> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String SET_OK_STATUS_QUERY =
@@ -46,7 +46,7 @@ public class SetOkStatusQuery extends UpdateRecord<String> {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder extends UpdateRecord.Builder<Builder, SetOkStatusQuery, String> {
+    public static class Builder extends UpdateRecordQuery.Builder<Builder, SetOkStatusQuery, String> {
 
         @Override
         public SetOkStatusQuery build() {

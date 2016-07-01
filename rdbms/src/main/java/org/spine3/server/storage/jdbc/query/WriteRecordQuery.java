@@ -30,7 +30,7 @@ import org.spine3.server.storage.jdbc.util.Serializer;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public abstract class WriteRecord<I, Record extends Message> extends WriteQuery{
+public abstract class WriteRecordQuery<I, Record extends Message> extends WriteQuery{
 
     private final I id;
 
@@ -44,7 +44,7 @@ public abstract class WriteRecord<I, Record extends Message> extends WriteQuery{
     private final int recordIndexInQuery;
     private final IdColumn<I> idColumn;
 
-    protected WriteRecord(Builder<? extends Builder, ? extends WriteRecord, I, Record> builder) {
+    protected WriteRecordQuery(Builder<? extends Builder, ? extends WriteRecordQuery, I, Record> builder) {
         super(builder);
         this.idIndexInQuery = builder.idIndexInQuery;
         this.recordIndexInQuery = builder.recordIndexInQuery;
@@ -69,7 +69,7 @@ public abstract class WriteRecord<I, Record extends Message> extends WriteQuery{
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public abstract static class Builder<B extends Builder<B, Q, I, Record>, Q extends WriteRecord, I, Record extends Message>
+    public abstract static class Builder<B extends Builder<B, Q, I, Record>, Q extends WriteRecordQuery, I, Record extends Message>
             extends WriteQuery.Builder<B, Q>{
         private int idIndexInQuery;
         private int recordIndexInQuery;

@@ -23,7 +23,7 @@ package org.spine3.server.storage.jdbc.command.query;
 import org.spine3.base.CommandStatus;
 import org.spine3.server.storage.CommandStorageRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.query.WriteRecord;
+import org.spine3.server.storage.jdbc.query.WriteRecordQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 
 import java.sql.PreparedStatement;
@@ -36,7 +36,7 @@ import java.sql.SQLException;
  */
 
 public class WriteCommandRecordQuery
-        extends WriteRecord<String, CommandStorageRecord> {
+        extends WriteRecordQuery<String, CommandStorageRecord> {
 
     private final int statusIndexInQuery;
     private final CommandStatus status;
@@ -62,7 +62,7 @@ public class WriteCommandRecordQuery
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
     public abstract static class Builder<B extends Builder<B, Q>, Q extends WriteCommandRecordQuery>
-            extends WriteRecord.Builder<B, Q, String, CommandStorageRecord> {
+            extends WriteRecordQuery.Builder<B, Q, String, CommandStorageRecord> {
 
         private int statusIndexInQuery;
         private CommandStatus status;

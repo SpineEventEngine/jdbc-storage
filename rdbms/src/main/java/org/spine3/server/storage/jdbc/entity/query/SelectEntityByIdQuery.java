@@ -22,7 +22,7 @@ package org.spine3.server.storage.jdbc.entity.query;
 
 import org.spine3.Internal;
 import org.spine3.server.storage.EntityStorageRecord;
-import org.spine3.server.storage.jdbc.query.SelectById;
+import org.spine3.server.storage.jdbc.query.SelectByIdQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
@@ -30,7 +30,7 @@ import static java.lang.String.format;
 import static org.spine3.server.storage.jdbc.entity.query.Constants.*;
 
 @Internal
-public class SelectEntityByIdQuery<I> extends SelectById<I, EntityStorageRecord> {
+public class SelectEntityByIdQuery<I> extends SelectByIdQuery<I, EntityStorageRecord> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String SELECT_BY_ID = "SELECT " + ENTITY_COL + " FROM %s WHERE " + ID_COL + " = ?;";

@@ -21,14 +21,14 @@
 package org.spine3.server.storage.jdbc.entity.query;
 
 import org.spine3.server.storage.EntityStorageRecord;
-import org.spine3.server.storage.jdbc.query.WriteRecord;
+import org.spine3.server.storage.jdbc.query.WriteRecordQuery;
 
 import static java.lang.String.format;
 import static org.spine3.server.storage.jdbc.entity.query.Constants.ENTITY_COL;
 import static org.spine3.server.storage.jdbc.entity.query.Constants.ID_COL;
 
 
-public class UpdateEntityQuery<I> extends WriteRecord<I, EntityStorageRecord> {
+public class UpdateEntityQuery<I> extends WriteRecordQuery<I, EntityStorageRecord> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String UPDATE_QUERY =
@@ -49,7 +49,7 @@ public class UpdateEntityQuery<I> extends WriteRecord<I, EntityStorageRecord> {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder<I> extends WriteRecord.Builder<Builder<I>, UpdateEntityQuery, I, EntityStorageRecord> {
+    public static class Builder<I> extends WriteRecordQuery.Builder<Builder<I>, UpdateEntityQuery, I, EntityStorageRecord> {
 
         @Override
         public UpdateEntityQuery build() {

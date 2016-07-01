@@ -21,12 +21,12 @@
 package org.spine3.server.storage.jdbc.command.query;
 
 import org.spine3.base.Failure;
-import org.spine3.server.storage.jdbc.query.WriteRecord;
+import org.spine3.server.storage.jdbc.query.WriteRecordQuery;
 
 import static org.spine3.server.storage.jdbc.command.query.Constants.*;
 
 
-public class SetFailureQuery extends WriteRecord<String, Failure> {
+public class SetFailureQuery extends WriteRecordQuery<String, Failure> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String SET_FAILURE_QUERY =
@@ -48,7 +48,7 @@ public class SetFailureQuery extends WriteRecord<String, Failure> {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder extends WriteRecord.Builder<Builder, SetFailureQuery, String, Failure> {
+    public static class Builder extends WriteRecordQuery.Builder<Builder, SetFailureQuery, String, Failure> {
 
         @Override
         public SetFailureQuery build() {

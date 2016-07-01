@@ -23,7 +23,7 @@ package org.spine3.server.storage.jdbc.aggregate.query;
 import com.google.protobuf.Timestamp;
 import org.spine3.server.storage.AggregateStorageRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.query.WriteRecord;
+import org.spine3.server.storage.jdbc.query.WriteRecordQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 
 import java.sql.PreparedStatement;
@@ -33,7 +33,7 @@ import static java.lang.String.format;
 import static org.spine3.server.storage.jdbc.aggregate.query.Constants.*;
 
 
-public class InsertRecordQuery<I> extends WriteRecord<I, AggregateStorageRecord> {
+public class InsertRecordQuery<I> extends WriteRecordQuery<I, AggregateStorageRecord> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String INSERT_QUERY =
@@ -71,7 +71,7 @@ public class InsertRecordQuery<I> extends WriteRecord<I, AggregateStorageRecord>
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder<I> extends WriteRecord.Builder<Builder<I>, InsertRecordQuery, I, AggregateStorageRecord> {
+    public static class Builder<I> extends WriteRecordQuery.Builder<Builder<I>, InsertRecordQuery, I, AggregateStorageRecord> {
 
         @Override
         public InsertRecordQuery build() {

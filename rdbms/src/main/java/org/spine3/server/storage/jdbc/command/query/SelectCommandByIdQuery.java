@@ -25,7 +25,7 @@ import org.spine3.base.CommandStatus;
 import org.spine3.base.Error;
 import org.spine3.base.Failure;
 import org.spine3.server.storage.CommandStorageRecord;
-import org.spine3.server.storage.jdbc.query.SelectById;
+import org.spine3.server.storage.jdbc.query.SelectByIdQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
@@ -37,7 +37,7 @@ import static org.spine3.server.storage.jdbc.command.query.Constants.*;
 import static org.spine3.server.storage.jdbc.util.Serializer.deserialize;
 
 @Internal
-public class SelectCommandByIdQuery extends SelectById<String, CommandStorageRecord> {
+public class SelectCommandByIdQuery extends SelectByIdQuery<String, CommandStorageRecord> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String SELECT_QUERY =

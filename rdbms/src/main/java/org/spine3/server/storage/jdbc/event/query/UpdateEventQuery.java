@@ -23,7 +23,7 @@ package org.spine3.server.storage.jdbc.event.query;
 import com.google.protobuf.Timestamp;
 import org.spine3.server.storage.EventStorageRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.query.WriteRecord;
+import org.spine3.server.storage.jdbc.query.WriteRecordQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 
 import java.sql.PreparedStatement;
@@ -33,7 +33,7 @@ import static org.spine3.server.storage.jdbc.event.query.Constants.*;
 import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
 
-public class UpdateEventQuery extends WriteRecord<String, EventStorageRecord> {
+public class UpdateEventQuery extends WriteRecordQuery<String, EventStorageRecord> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String UPDATE_QUERY =
@@ -87,7 +87,7 @@ public class UpdateEventQuery extends WriteRecord<String, EventStorageRecord> {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder extends WriteRecord.Builder<Builder, UpdateEventQuery, String, EventStorageRecord> {
+    public static class Builder extends WriteRecordQuery.Builder<Builder, UpdateEventQuery, String, EventStorageRecord> {
 
         @Override
         public UpdateEventQuery build() {

@@ -22,14 +22,14 @@ package org.spine3.server.storage.jdbc.event.query;
 
 import org.spine3.Internal;
 import org.spine3.server.storage.EventStorageRecord;
-import org.spine3.server.storage.jdbc.query.SelectById;
+import org.spine3.server.storage.jdbc.query.SelectByIdQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import static org.spine3.server.storage.jdbc.event.query.Constants.*;
 
 @Internal
-public class SelectEventByIdQuery extends SelectById<String, EventStorageRecord> {
+public class SelectEventByIdQuery extends SelectByIdQuery<String, EventStorageRecord> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String SELECT_QUERY = SELECT_EVENT_FROM_TABLE +

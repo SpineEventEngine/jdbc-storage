@@ -25,13 +25,13 @@ import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import java.sql.PreparedStatement;
 
-public class UpdateRecord <I> extends WriteQuery {
+public class UpdateRecordQuery<I> extends WriteQuery {
 
     private final I id;
     private int idIndexInQuery;
     private final IdColumn<I> idColumn;
 
-    protected UpdateRecord(Builder<? extends Builder, ? extends UpdateRecord, I> builder) {
+    protected UpdateRecordQuery(Builder<? extends Builder, ? extends UpdateRecordQuery, I> builder) {
         super(builder);
         this.idIndexInQuery = builder.idIndexInQuery;
         this.idColumn = builder.idColumn;
@@ -48,7 +48,7 @@ public class UpdateRecord <I> extends WriteQuery {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public abstract static class Builder<B extends Builder<B, Q, I>, Q extends UpdateRecord, I>
+    public abstract static class Builder<B extends Builder<B, Q, I>, Q extends UpdateRecordQuery, I>
             extends WriteQuery.Builder<B, Q>{
         private int idIndexInQuery;
         private IdColumn<I> idColumn;

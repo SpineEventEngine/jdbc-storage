@@ -21,7 +21,7 @@
 package org.spine3.server.storage.jdbc.aggregate.query;
 
 import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.query.UpdateRecord;
+import org.spine3.server.storage.jdbc.query.UpdateRecordQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 
 import java.sql.PreparedStatement;
@@ -32,7 +32,7 @@ import static org.spine3.server.storage.jdbc.aggregate.query.Constants.EVENT_COU
 import static org.spine3.server.storage.jdbc.aggregate.query.Constants.ID_COL;
 
 
-public class InsertEventCountQuery<I> extends UpdateRecord<I> {
+public class InsertEventCountQuery<I> extends UpdateRecordQuery<I> {
 
     private final int count;
 
@@ -69,7 +69,7 @@ public class InsertEventCountQuery<I> extends UpdateRecord<I> {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder<I> extends UpdateRecord.Builder<Builder<I>, InsertEventCountQuery, I> {
+    public static class Builder<I> extends UpdateRecordQuery.Builder<Builder<I>, InsertEventCountQuery, I> {
 
         private int count;
 

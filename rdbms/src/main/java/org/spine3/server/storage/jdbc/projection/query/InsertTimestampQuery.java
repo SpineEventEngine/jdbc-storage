@@ -48,12 +48,6 @@ public class InsertTimestampQuery extends WriteQuery{
         this.timestamp = builder.timestamp;
     }
 
-
-    /*protected void logError(SQLException exception) {
-        log(exception, "command insertion", getId());
-    }*/
-
-
     public static  Builder  newBuilder(String tableName) {
         final Builder builder = new Builder();
         builder.setQuery(format(INSERT_QUERY, tableName));

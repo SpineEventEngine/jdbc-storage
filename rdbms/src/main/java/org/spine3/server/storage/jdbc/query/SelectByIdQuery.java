@@ -48,7 +48,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.deserialize;
  * @author Alexander Litus
  */
 @Internal
-public class SelectById<I, M extends Message>{
+public class SelectByIdQuery<I, M extends Message>{
 
     private final String query;
     private final DataSourceWrapper dataSource;
@@ -65,7 +65,7 @@ public class SelectById<I, M extends Message>{
      * @param dataSource a data source to use to obtain DB connections
      * @param idColumn a helper object used to set IDs to statements as parameters
      */
-    protected SelectById(String query, DataSourceWrapper dataSource, IdColumn<I> idColumn, I id) {
+    protected SelectByIdQuery(String query, DataSourceWrapper dataSource, IdColumn<I> idColumn, I id) {
         this.query = query;
         this.dataSource = dataSource;
         this.idColumn = idColumn;
@@ -147,6 +147,6 @@ public class SelectById<I, M extends Message>{
     private enum LogSingleton {
         INSTANCE;
         @SuppressWarnings("NonSerializableFieldInSerializableClass")
-        private final Logger value = LoggerFactory.getLogger(SelectById.class);
+        private final Logger value = LoggerFactory.getLogger(SelectByIdQuery.class);
     }
 }
