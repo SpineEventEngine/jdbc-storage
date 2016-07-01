@@ -43,17 +43,16 @@ import static org.spine3.server.storage.jdbc.command.query.Constants.*;
  */
 
 @Internal
-public class  SelectByStatusQuery extends AbstractQuery{
+public class SelectByStatusQuery extends AbstractQuery {
     private final CommandStatus status;
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String SELECT_BY_STATUS_QUERY =
-            "SELECT " +  COMMAND_COL + " FROM " + TABLE_NAME +
+            "SELECT " + COMMAND_COL + " FROM " + TABLE_NAME +
                     " WHERE " + COMMAND_STATUS_COL + " = ?;";
 
     /**
      * Creates a new query instance.
-     *
      */
     protected SelectByStatusQuery(Builder builder) {
         super(builder);
@@ -99,7 +98,7 @@ public class  SelectByStatusQuery extends AbstractQuery{
             return new SelectByStatusQuery(this);
         }
 
-        public Builder setStatus(CommandStatus status){
+        public Builder setStatus(CommandStatus status) {
             this.status = status;
             return getThis();
         }
