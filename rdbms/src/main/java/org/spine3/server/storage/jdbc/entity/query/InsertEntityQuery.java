@@ -22,6 +22,7 @@ package org.spine3.server.storage.jdbc.entity.query;
 
 import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.jdbc.query.WriteRecord;
+import static org.spine3.server.storage.jdbc.entity.query.Constants.*;
 
 import static java.lang.String.format;
 
@@ -31,7 +32,7 @@ public class InsertEntityQuery<Id> extends WriteRecord<Id, EntityStorageRecord> 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String INSERT_QUERY =
             "INSERT INTO %s " +
-                    " (" + EntityTable.ID_COL + ", " + EntityTable.ENTITY_COL + ')' +
+                    " (" + ID_COL + ", " + ENTITY_COL + ')' +
                     " VALUES (?, ?);";
 
     private InsertEntityQuery(Builder<Id> builder) {

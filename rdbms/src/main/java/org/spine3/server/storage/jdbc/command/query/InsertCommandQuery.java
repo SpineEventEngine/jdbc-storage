@@ -20,17 +20,16 @@
 
 package org.spine3.server.storage.jdbc.command.query;
 
-import org.spine3.server.storage.jdbc.event.query.CommandTable;
-
+import static org.spine3.server.storage.jdbc.command.query.Constants.*;
 
 public class InsertCommandQuery extends WriteCommandRecordQuery {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String INSERT_QUERY =
-            "INSERT INTO " + CommandTable.TABLE_NAME + " (" +
-                    CommandTable.ID_COL + ", " +
-                    CommandTable.COMMAND_STATUS_COL + ", " +
-                    CommandTable.COMMAND_COL +
+            "INSERT INTO " + TABLE_NAME + " (" +
+                    ID_COL + ", " +
+                    COMMAND_STATUS_COL + ", " +
+                    COMMAND_COL +
                     ") VALUES (?, ?, ?);";
 
     private InsertCommandQuery(Builder builder) {

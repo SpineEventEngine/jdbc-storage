@@ -22,17 +22,17 @@ package org.spine3.server.storage.jdbc.command.query;
 
 import org.spine3.base.Error;
 import org.spine3.server.storage.jdbc.query.WriteRecord;
-import org.spine3.server.storage.jdbc.event.query.CommandTable;
+import static org.spine3.server.storage.jdbc.command.query.Constants.*;
 
 
 public class SetErrorQuery extends WriteRecord<String, Error > {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String SET_ERROR_QUERY =
-            "UPDATE " + CommandTable.TABLE_NAME +
+            "UPDATE " + TABLE_NAME +
                     " SET " +
-                    CommandTable.ERROR_COL + " = ? " +
-                    " WHERE " + CommandTable.ID_COL + " = ? ;";
+                    ERROR_COL + " = ? " +
+                    " WHERE " + ID_COL + " = ? ;";
 
     private SetErrorQuery(Builder builder) {
         super(builder);

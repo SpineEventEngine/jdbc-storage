@@ -18,7 +18,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.spine3.server.storage.jdbc.event.query;
+package org.spine3.server.storage.jdbc.command.query;
 
 import com.google.protobuf.Descriptors;
 import org.spine3.base.Error;
@@ -32,7 +32,7 @@ import org.spine3.server.storage.jdbc.util.IdColumn;
  * @author Andrey Lavrov
  */
 @SuppressWarnings("UtilityClass")
-public class CommandTable {
+/* package */ class Constants {
 
     /**
      * Commands table name.
@@ -79,8 +79,6 @@ public class CommandTable {
      */
     public static final Descriptors.Descriptor FAILURE_DESCRIPTOR = Failure.getDescriptor();
 
-    public static final IdColumn.StringIdColumn STRING_ID_COLUMN = new IdColumn.StringIdColumn();
-
-    private CommandTable() {
+    private Constants() {
     }
 }

@@ -29,7 +29,7 @@ import org.spine3.server.storage.AggregateStorageRecord;
  * @author Andrey Lavrov
  */
 @SuppressWarnings("UtilityClass")
-/* package */ final class AggregateTable {
+/* package */ final class Constants {
 
     /**
      * Aggregate ID column name (contains in `main` and `event_count` tables).
@@ -68,6 +68,6 @@ import org.spine3.server.storage.AggregateStorageRecord;
      */
     public static final Descriptors.Descriptor RECORD_DESCRIPTOR = AggregateStorageRecord.getDescriptor();
 
-    private AggregateTable() {
+    private Constants() {
     }
 }

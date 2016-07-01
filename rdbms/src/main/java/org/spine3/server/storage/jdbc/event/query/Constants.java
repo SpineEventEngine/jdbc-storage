@@ -18,33 +18,64 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.spine3.server.storage.jdbc.projection.query;
+package org.spine3.server.storage.jdbc.event.query;
+
+import com.google.protobuf.Descriptors;
+import org.spine3.server.storage.EventStorageRecord;
 
 /**
- * A utility class representing constants which are necessary for working with projection table.
+ * A utility class representing constants which are necessary for working with event table.
  *
  * @author Andrey Lavrov
  */
 @SuppressWarnings("UtilityClass")
-public class ProjectionTable {
+/* package */ class Constants {
 
     /**
-     * Last event time seconds column name.
+     * Event table name.
+     */
+    public static final String TABLE_NAME = "events";
+
+    /**
+     * Event ID column name.
+     */
+    public static final String EVENT_ID_COL = "event_id";
+
+    /**
+     * Event record column name.
+     */
+    public static final String EVENT_COL = "event";
+
+    /**
+     * Protobuf type name of the event column name.
+     */
+    public static final String EVENT_TYPE_COL = "event_type";
+
+    /**
+     * Producer ID column name.
+     */
+    public static final String PRODUCER_ID_COL = "producer_id";
+
+    /**
+     * Event seconds column name.
      */
     @SuppressWarnings("DuplicateStringLiteralInspection")
     public static final String SECONDS_COL = "seconds";
 
     /**
-     * Last event time nanoseconds column name.
+     * Event nanoseconds column name.
      */
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    public static final String NANOS_COL = "nanoseconds";
+    public static final String NANOSECONDS_COL = "nanoseconds";
+
+    @SuppressWarnings("DuplicateStringLiteralInspection")
+    public static final String SELECT_EVENT_FROM_TABLE = "SELECT " + EVENT_COL + " FROM " + TABLE_NAME + ' ';
 
     /**
-     * A suffix of a table name where the last event time is stored.
+     * Record descriptor for Event record type.
      */
-    public static final String LAST_EVENT_TIME_TABLE_NAME_SUFFIX = "_last_event_time";
+    public static final Descriptors.Descriptor RECORD_DESCRIPTOR = EventStorageRecord.getDescriptor();
 
-    private ProjectionTable() {
+    private Constants() {
     }
 }

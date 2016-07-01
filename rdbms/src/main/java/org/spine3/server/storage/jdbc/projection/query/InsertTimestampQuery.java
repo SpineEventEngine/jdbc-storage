@@ -23,6 +23,7 @@ package org.spine3.server.storage.jdbc.projection.query;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.WriteQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
+import static org.spine3.server.storage.jdbc.projection.query.Constants.*;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -38,7 +39,7 @@ public class InsertTimestampQuery<Id> extends WriteQuery{
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String INSERT_QUERY =
             "INSERT INTO %s " +
-                    " (" + ProjectionTable.SECONDS_COL + ", " + ProjectionTable.NANOS_COL + ')' +
+                    " (" + SECONDS_COL + ", " + NANOS_COL + ')' +
                     " VALUES (?, ?);";
 
     private InsertTimestampQuery(Builder<Id> builder) {

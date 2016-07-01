@@ -18,34 +18,33 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.spine3.server.storage.jdbc.entity.query;
-
-import com.google.protobuf.Descriptors;
-import org.spine3.server.storage.EntityStorageRecord;
+package org.spine3.server.storage.jdbc.projection.query;
 
 /**
- * A utility class representing constants which are necessary for working with entity tables.
+ * A utility class representing constants which are necessary for working with projection table.
  *
  * @author Andrey Lavrov
  */
 @SuppressWarnings("UtilityClass")
-/* package */ class EntityTable {
+/* package */ class Constants {
 
     /**
-     * Entity record column name.
+     * Last event time seconds column name.
      */
-    public static final String ENTITY_COL = "entity";
+    @SuppressWarnings("DuplicateStringLiteralInspection")
+    public static final String SECONDS_COL = "seconds";
 
     /**
-     * Entity ID column name.
+     * Last event time nanoseconds column name.
      */
-    public static final String ID_COL = "id";
+    @SuppressWarnings("DuplicateStringLiteralInspection")
+    public static final String NANOS_COL = "nanoseconds";
 
     /**
-     * Record descriptor for Entity record type.
+     * A suffix of a table name where the last event time is stored.
      */
-    public static final Descriptors.Descriptor RECORD_DESCRIPTOR = EntityStorageRecord.getDescriptor();
+    public static final String LAST_EVENT_TIME_TABLE_NAME_SUFFIX = "_last_event_time";
 
-    private EntityTable() {
+    private Constants() {
     }
 }

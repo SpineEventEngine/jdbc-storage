@@ -25,6 +25,7 @@ import org.spine3.server.storage.EventStorageRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.WriteRecord;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
+import static org.spine3.server.storage.jdbc.event.query.Constants.*;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -36,13 +37,13 @@ public class InsertEventQuery extends WriteRecord<String, EventStorageRecord> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String INSERT_QUERY =
-            "INSERT INTO " + EventTable.TABLE_NAME + " (" +
-                    EventTable.EVENT_ID_COL + ", " +
-                    EventTable.EVENT_COL + ", " +
-                    EventTable.EVENT_TYPE_COL + ", " +
-                    EventTable.PRODUCER_ID_COL + ", " +
-                    EventTable.SECONDS_COL + ", " +
-                    EventTable.NANOSECONDS_COL +
+            "INSERT INTO " + TABLE_NAME + " (" +
+                    EVENT_ID_COL + ", " +
+                    EVENT_COL + ", " +
+                    EVENT_TYPE_COL + ", " +
+                    PRODUCER_ID_COL + ", " +
+                    SECONDS_COL + ", " +
+                    NANOSECONDS_COL +
                     ") VALUES (?, ?, ?, ?, ?, ?);";
 
     private InsertEventQuery(Builder builder) {

@@ -23,6 +23,7 @@ package org.spine3.server.storage.jdbc.projection.query;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.AbstractQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
+import static org.spine3.server.storage.jdbc.projection.query.Constants.*;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -36,8 +37,8 @@ public class CreateTableIfDoesNotExistQuery extends AbstractQuery {
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String CREATE_TABLE_IF_DOES_NOT_EXIST =
             "CREATE TABLE IF NOT EXISTS %s (" +
-                    ProjectionTable.SECONDS_COL + " BIGINT, " +
-                    ProjectionTable.NANOS_COL + " INT " +
+                    SECONDS_COL + " BIGINT, " +
+                    NANOS_COL + " INT " +
                     ");";
 
     protected CreateTableIfDoesNotExistQuery(Builder builder) {

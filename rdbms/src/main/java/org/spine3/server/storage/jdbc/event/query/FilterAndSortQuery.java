@@ -20,7 +20,6 @@
 
 package org.spine3.server.storage.jdbc.event.query;
 
-
 import com.google.protobuf.Any;
 import com.google.protobuf.Message;
 import com.google.protobuf.Timestamp;
@@ -32,6 +31,7 @@ import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.AbstractQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.DbIterator;
+import static org.spine3.server.storage.jdbc.event.query.Constants.*;
 
 import java.sql.PreparedStatement;
 import java.util.Iterator;
@@ -39,7 +39,9 @@ import java.util.Iterator;
 import static org.spine3.base.Identifiers.idToString;
 
 public class FilterAndSortQuery extends AbstractQuery {
-    private static final String ORDER_BY_TIME_POSTFIX = " ORDER BY " + EventTable.SECONDS_COL + " ASC, " + EventTable.NANOSECONDS_COL + " ASC;";
+
+    @SuppressWarnings("DuplicateStringLiteralInspection")
+    private static final String ORDER_BY_TIME_POSTFIX = " ORDER BY " + SECONDS_COL + " ASC, " + NANOSECONDS_COL + " ASC;";
 
     private final EventStreamQuery streamQuery;
 
@@ -49,7 +51,7 @@ public class FilterAndSortQuery extends AbstractQuery {
     }
 
     private static PreparedStatement prepareStatement(ConnectionWrapper connection, EventStreamQuery query) {
-        final StringBuilder builder = new StringBuilder(EventTable.SELECT_EVENT_FROM_TABLE);
+        final StringBuilder builder = new StringBuilder(SELECT_EVENT_FROM_TABLE);
         appendTimeConditionSql(builder, query);
         for (EventFilter filter : query.getFilterList()) {
             final String eventType = filter.getEventType();
@@ -66,7 +68,7 @@ public class FilterAndSortQuery extends AbstractQuery {
     private static void appendFilterByEventTypeSql(StringBuilder builder, String eventType) {
         appendTo(builder,
                 whereOrOr(builder),
-                EventTable.EVENT_TYPE_COL, " = \'", eventType, "\' ");
+                EVENT_TYPE_COL, " = \'", eventType, "\' ");
     }
 
     private static void appendFilterByAggregateIdsSql(StringBuilder builder, EventFilter filter) {
@@ -75,7 +77,7 @@ public class FilterAndSortQuery extends AbstractQuery {
             final String aggregateIdStr = idToString(aggregateId);
             appendTo(builder,
                     whereOrOr(builder),
-                    EventTable.PRODUCER_ID_COL, " = \'", aggregateIdStr, "\' ");
+                    PRODUCER_ID_COL, " = \'", aggregateIdStr, "\' ");
         }
     }
 
@@ -109,10 +111,10 @@ public class FilterAndSortQuery extends AbstractQuery {
         final long seconds = after.getSeconds();
         final int nanos = after.getNanos();
         appendTo(builder, " ",
-                EventTable.SECONDS_COL, " > ", seconds,
+                SECONDS_COL, " > ", seconds,
                 " OR ( ",
-                    EventTable.SECONDS_COL, " = ", seconds, " AND ",
-                    EventTable.NANOSECONDS_COL, " > ", nanos,
+                    SECONDS_COL, " = ", seconds, " AND ",
+                    NANOSECONDS_COL, " > ", nanos,
                 ") ");
         return builder;
     }
@@ -123,10 +125,10 @@ public class FilterAndSortQuery extends AbstractQuery {
         final long seconds = before.getSeconds();
         final int nanos = before.getNanos();
         appendTo(builder, " ",
-                EventTable.SECONDS_COL, " < ", seconds,
+                SECONDS_COL, " < ", seconds,
                 " OR ( ",
-                EventTable.SECONDS_COL, " = ", seconds, " AND ",
-                EventTable.NANOSECONDS_COL, " < ", nanos,
+                SECONDS_COL, " = ", seconds, " AND ",
+                NANOSECONDS_COL, " < ", nanos,
                 ") ");
         return builder;
     }
@@ -155,7 +157,7 @@ public class FilterAndSortQuery extends AbstractQuery {
     public Iterator<EventStorageRecord> execute() throws DatabaseException {
         try (ConnectionWrapper connection = dataSource.getConnection(true)) {
             final PreparedStatement statement = prepareStatement(connection, streamQuery);
-            return new DbIterator<>(statement, EventTable.EVENT_COL, EventTable.RECORD_DESCRIPTOR);
+            return new DbIterator<>(statement, EVENT_COL, RECORD_DESCRIPTOR);
         }
     }
 

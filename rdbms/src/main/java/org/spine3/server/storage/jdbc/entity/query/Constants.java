@@ -20,24 +20,32 @@
 
 package org.spine3.server.storage.jdbc.entity.query;
 
-import org.spine3.Internal;
+import com.google.protobuf.Descriptors;
 import org.spine3.server.storage.EntityStorageRecord;
-import org.spine3.server.storage.jdbc.query.SelectById;
-import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.server.storage.jdbc.util.IdColumn;
-import static org.spine3.server.storage.jdbc.entity.query.Constants.*;
 
-import static java.lang.String.format;
+/**
+ * A utility class representing constants which are necessary for working with entity tables.
+ *
+ * @author Andrey Lavrov
+ */
+@SuppressWarnings("UtilityClass")
+/* package */ class Constants {
 
-@Internal
-public class SelectEntityByIdQuery<Id> extends SelectById<Id, EntityStorageRecord> {
+    /**
+     * Entity record column name.
+     */
+    public static final String ENTITY_COL = "entity";
 
-    @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String SELECT_BY_ID = "SELECT " + ENTITY_COL + " FROM %s WHERE " + ID_COL + " = ?;";
+    /**
+     * Entity ID column name.
+     */
+    public static final String ID_COL = "id";
 
-    public SelectEntityByIdQuery(String tableName, DataSourceWrapper dataSource, IdColumn<Id> idColumn, Id id) {
-        super(format(SELECT_BY_ID, tableName), dataSource, idColumn, id);
-        setMessageColumnName(ENTITY_COL);
-        setMessageDescriptor(RECORD_DESCRIPTOR);
+    /**
+     * Record descriptor for Entity record type.
+     */
+    public static final Descriptors.Descriptor RECORD_DESCRIPTOR = EntityStorageRecord.getDescriptor();
+
+    private Constants() {
     }
 }

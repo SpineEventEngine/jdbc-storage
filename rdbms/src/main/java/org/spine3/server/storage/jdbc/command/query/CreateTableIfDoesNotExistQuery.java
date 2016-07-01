@@ -22,8 +22,8 @@ package org.spine3.server.storage.jdbc.command.query;
 
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.AbstractQuery;
-import org.spine3.server.storage.jdbc.event.query.CommandTable;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
+import static org.spine3.server.storage.jdbc.command.query.Constants.*;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -32,13 +32,13 @@ public class CreateTableIfDoesNotExistQuery extends AbstractQuery {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String INSERT_QUERY =
-            "CREATE TABLE IF NOT EXISTS " + CommandTable.TABLE_NAME + " (" +
-                    CommandTable.ID_COL + " VARCHAR(512), " +
-                    CommandTable.COMMAND_COL + " BLOB, " +
-                    CommandTable.COMMAND_STATUS_COL + " VARCHAR(512), " +
-                    CommandTable.ERROR_COL + " BLOB, " +
-                    CommandTable.FAILURE_COL + " BLOB, " +
-                    " PRIMARY KEY(" + CommandTable.ID_COL + ')' +
+            "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" +
+                    ID_COL + " VARCHAR(512), " +
+                    COMMAND_COL + " BLOB, " +
+                    COMMAND_STATUS_COL + " VARCHAR(512), " +
+                    ERROR_COL + " BLOB, " +
+                    FAILURE_COL + " BLOB, " +
+                    " PRIMARY KEY(" + ID_COL + ')' +
                     ");";
 
     public CreateTableIfDoesNotExistQuery(Builder builder) {

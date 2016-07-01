@@ -20,17 +20,16 @@
 
 package org.spine3.server.storage.jdbc.command.query;
 
-import org.spine3.server.storage.jdbc.event.query.CommandTable;
-
+import static org.spine3.server.storage.jdbc.command.query.Constants.*;
 
 public class UpdateCommandQuery extends WriteCommandRecordQuery {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String UPDATE_QUERY =
-            "UPDATE " + CommandTable.TABLE_NAME +
-                    " SET " + CommandTable.COMMAND_COL + " = ? " +
-                    ", " + CommandTable.COMMAND_STATUS_COL + " = ? " +
-                    " WHERE " + CommandTable.ID_COL + " = ?;";
+            "UPDATE " + TABLE_NAME +
+                    " SET " + COMMAND_COL + " = ? " +
+                    ", " + COMMAND_STATUS_COL + " = ? " +
+                    " WHERE " + ID_COL + " = ?;";
 
     private UpdateCommandQuery(Builder builder) {
         super(builder);

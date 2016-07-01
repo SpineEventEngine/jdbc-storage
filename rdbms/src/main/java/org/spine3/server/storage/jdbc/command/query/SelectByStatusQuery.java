@@ -26,9 +26,9 @@ import org.spine3.base.CommandStatus;
 import org.spine3.server.storage.CommandStorageRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.AbstractQuery;
-import org.spine3.server.storage.jdbc.event.query.CommandTable;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.DbIterator;
+import static org.spine3.server.storage.jdbc.command.query.Constants.*;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -48,8 +48,8 @@ public class  SelectByStatusQuery extends AbstractQuery{
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String SELECT_BY_STATUS_QUERY =
-            "SELECT " +  CommandTable.COMMAND_COL + " FROM " + CommandTable.TABLE_NAME +
-                    " WHERE " + CommandTable.COMMAND_STATUS_COL + " = ?;";
+            "SELECT " +  COMMAND_COL + " FROM " + TABLE_NAME +
+                    " WHERE " + COMMAND_STATUS_COL + " = ?;";
 
     /**
      * Creates a new query instance.
@@ -84,7 +84,7 @@ public class  SelectByStatusQuery extends AbstractQuery{
         final ResultSet resultSet;
         try (ConnectionWrapper connection = dataSource.getConnection(true)) {
             final PreparedStatement statement = this.prepareStatement(connection);
-            return new DbIterator<>(statement, CommandTable.COMMAND_COL, CommandTable.COMMAND_RECORD_DESCRIPTOR);
+            return new DbIterator<>(statement, Constants.COMMAND_COL, Constants.COMMAND_RECORD_DESCRIPTOR);
 
         }
     }

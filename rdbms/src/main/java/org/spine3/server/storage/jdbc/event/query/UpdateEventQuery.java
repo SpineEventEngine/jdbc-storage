@@ -25,6 +25,7 @@ import org.spine3.server.storage.EventStorageRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.WriteRecord;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
+import static org.spine3.server.storage.jdbc.event.query.Constants.*;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -36,14 +37,14 @@ public class UpdateEventQuery extends WriteRecord<String, EventStorageRecord> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String UPDATE_QUERY =
-            "UPDATE " + EventTable.TABLE_NAME +
+            "UPDATE " + TABLE_NAME +
                     " SET " +
-                    EventTable.EVENT_COL + " = ?, " +
-                    EventTable.EVENT_TYPE_COL + " = ?, " +
-                    EventTable.PRODUCER_ID_COL + " = ?, " +
-                    EventTable.SECONDS_COL + " = ?, " +
-                    EventTable.NANOSECONDS_COL + " = ? " +
-                    " WHERE " + EventTable.EVENT_ID_COL + " = ? ;";
+                    EVENT_COL + " = ?, " +
+                    EVENT_TYPE_COL + " = ?, " +
+                    PRODUCER_ID_COL + " = ?, " +
+                    SECONDS_COL + " = ?, " +
+                    NANOSECONDS_COL + " = ? " +
+                    " WHERE " + EVENT_ID_COL + " = ? ;";
 
     private UpdateEventQuery(Builder builder) {
         super(builder);

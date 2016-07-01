@@ -25,6 +25,7 @@ import com.google.protobuf.Timestamp;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.AbstractQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
+import static org.spine3.server.storage.jdbc.projection.query.Constants.*;
 
 import javax.annotation.Nullable;
 import java.sql.PreparedStatement;
@@ -36,7 +37,7 @@ import static org.spine3.validate.Validate.isDefault;
 
 public class SelectTimestampQuery extends AbstractQuery{
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String SELECT_QUERY = "SELECT " + ProjectionTable.SECONDS_COL + ", " + ProjectionTable.NANOS_COL + " FROM %s ;";
+    private static final String SELECT_QUERY = "SELECT " + SECONDS_COL + ", " + NANOS_COL + " FROM %s ;";
 
     private SelectTimestampQuery(Builder builder) {
         super(builder);
@@ -50,8 +51,8 @@ public class SelectTimestampQuery extends AbstractQuery{
             if (!resultSet.next()) {
                 return null;
             }
-            final long seconds = resultSet.getLong(ProjectionTable.SECONDS_COL);
-            final int nanos = resultSet.getInt(ProjectionTable.NANOS_COL);
+            final long seconds = resultSet.getLong(SECONDS_COL);
+            final int nanos = resultSet.getInt(NANOS_COL);
             final Timestamp time = Timestamp.newBuilder().setSeconds(seconds).setNanos(nanos).build();
             if (isDefault(time)) {
                 return null;

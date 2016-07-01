@@ -22,16 +22,16 @@ package org.spine3.server.storage.jdbc.command.query;
 
 import org.spine3.base.CommandStatus;
 import org.spine3.server.storage.jdbc.query.UpdateRecord;
-import org.spine3.server.storage.jdbc.event.query.CommandTable;
+import static org.spine3.server.storage.jdbc.command.query.Constants.*;
 
 
 public class SetOkStatusQuery extends UpdateRecord<String> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String SET_OK_STATUS_QUERY =
-            "UPDATE " + CommandTable.TABLE_NAME +
-            " SET " + CommandTable.COMMAND_STATUS_COL + " = '" + CommandStatus.forNumber(CommandStatus.OK_VALUE).name() + "'" +
-            " WHERE " + CommandTable.ID_COL + " = ? ;";
+            "UPDATE " + TABLE_NAME +
+            " SET " + COMMAND_STATUS_COL + " = '" + CommandStatus.forNumber(CommandStatus.OK_VALUE).name() + '\'' +
+            " WHERE " + ID_COL + " = ? ;";
 
     private SetOkStatusQuery(Builder builder) {
         super(builder);

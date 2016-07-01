@@ -23,6 +23,8 @@ package org.spine3.server.storage.jdbc.aggregate.query;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.UpdateRecord;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
+import static org.spine3.server.storage.jdbc.aggregate.query.Constants.ID_COL;
+import static org.spine3.server.storage.jdbc.aggregate.query.Constants.EVENT_COUNT_COL;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -37,8 +39,8 @@ public class UpdateEventCountQuery<Id> extends UpdateRecord<Id> {
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String UPDATE_QUERY =
             "UPDATE %s " +
-                    " SET " + AggregateTable.EVENT_COUNT_COL + " = ? " +
-                    " WHERE " + AggregateTable.ID_COL + " = ?;";
+                    " SET " + EVENT_COUNT_COL + " = ? " +
+                    " WHERE " + ID_COL + " = ?;";
 
     private UpdateEventCountQuery(Builder<Id> builder) {
         super(builder);

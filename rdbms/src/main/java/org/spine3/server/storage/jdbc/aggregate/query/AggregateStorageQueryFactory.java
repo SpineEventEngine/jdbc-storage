@@ -8,6 +8,7 @@ import org.spine3.server.storage.AggregateStorageRecord;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbTableNameFactory;
 import org.spine3.server.storage.jdbc.util.IdColumn;
+import static org.spine3.server.storage.jdbc.aggregate.query.Constants.EVENT_COUNT_TABLE_NAME_SUFFIX;
 
 public class AggregateStorageQueryFactory<I>{
 
@@ -19,7 +20,7 @@ public class AggregateStorageQueryFactory<I>{
     public AggregateStorageQueryFactory(DataSourceWrapper dataSource, Class<? extends Aggregate<I, ?, ?>> aggregateClass) {
         this.idColumn = IdColumn.newInstance(aggregateClass);
         this.mainTableName = DbTableNameFactory.newTableName(aggregateClass);
-        this.eventCountTableName = mainTableName + AggregateTable.EVENT_COUNT_TABLE_NAME_SUFFIX;
+        this.eventCountTableName = mainTableName + EVENT_COUNT_TABLE_NAME_SUFFIX;
         this.dataSource = dataSource;
     }
 

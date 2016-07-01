@@ -25,6 +25,7 @@ import org.spine3.server.storage.AggregateStorageRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.WriteRecord;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
+import static org.spine3.server.storage.jdbc.aggregate.query.Constants.*;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -37,7 +38,7 @@ public class InsertRecordQuery<Id> extends WriteRecord<Id, AggregateStorageRecor
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String INSERT_QUERY =
             "INSERT INTO %s " +
-                    " (" + AggregateTable.ID_COL + ", " + AggregateTable.AGGREGATE_COL + ", " + AggregateTable.SECONDS_COL + ", " + AggregateTable.NANOS_COL + ") " +
+                    " (" + ID_COL + ", " + AGGREGATE_COL + ", " + SECONDS_COL + ", " + NANOS_COL + ") " +
                     " VALUES (?, ?, ?, ?);";
 
     private InsertRecordQuery(Builder<Id> builder) {

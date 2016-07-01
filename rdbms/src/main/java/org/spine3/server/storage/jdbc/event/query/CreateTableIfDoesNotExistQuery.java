@@ -23,6 +23,7 @@ package org.spine3.server.storage.jdbc.event.query;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.AbstractQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
+import static org.spine3.server.storage.jdbc.event.query.Constants.*;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -33,14 +34,14 @@ public class CreateTableIfDoesNotExistQuery extends AbstractQuery {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String CREATE_TABLE_QUERY =
-            "CREATE TABLE IF NOT EXISTS " + EventTable.TABLE_NAME + " (" +
-                    EventTable.EVENT_ID_COL + " VARCHAR(512), " +
-                    EventTable.EVENT_COL + " BLOB, " +
-                    EventTable.EVENT_TYPE_COL + " VARCHAR(512), " +
-                    EventTable.PRODUCER_ID_COL + " VARCHAR(512), " +
-                    EventTable.SECONDS_COL + " BIGINT, " +
-                    EventTable.NANOSECONDS_COL + " INT, " +
-                    " PRIMARY KEY(" + EventTable.EVENT_ID_COL + ')' +
+            "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" +
+                    EVENT_ID_COL + " VARCHAR(512), " +
+                    EVENT_COL + " BLOB, " +
+                    EVENT_TYPE_COL + " VARCHAR(512), " +
+                    PRODUCER_ID_COL + " VARCHAR(512), " +
+                    SECONDS_COL + " BIGINT, " +
+                    NANOSECONDS_COL + " INT, " +
+                    " PRIMARY KEY(" + EVENT_ID_COL + ')' +
                     ");";
 
     protected CreateTableIfDoesNotExistQuery(Builder builder) {

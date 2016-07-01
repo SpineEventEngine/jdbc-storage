@@ -24,6 +24,8 @@ import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.AbstractQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
+import static org.spine3.server.storage.jdbc.aggregate.query.Constants.ID_COL;
+import static org.spine3.server.storage.jdbc.aggregate.query.Constants.EVENT_COUNT_COL;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -38,8 +40,8 @@ public class CreateEventCountTableIfDoesNotExistQuery<I> extends AbstractQuery {
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY =
             "CREATE TABLE IF NOT EXISTS %s (" +
-                    AggregateTable.ID_COL + " %s, " +
-                    AggregateTable.EVENT_COUNT_COL + " BIGINT " +
+                    ID_COL + " %s, " +
+                    EVENT_COUNT_COL + " BIGINT " +
                     ");";
 
     protected CreateEventCountTableIfDoesNotExistQuery(Builder<I> builder) {

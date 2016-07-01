@@ -24,6 +24,7 @@ import com.google.protobuf.Timestamp;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.WriteQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
+import static org.spine3.server.storage.jdbc.projection.query.Constants.*;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -38,8 +39,8 @@ public class UpdateTimestampQuery<Id> extends WriteQuery{
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String UPDATE_QUERY =
             "UPDATE %s SET " +
-                    ProjectionTable.SECONDS_COL + " = ?, " +
-                    ProjectionTable.NANOS_COL + " = ?;";
+                    SECONDS_COL + " = ?, " +
+                    NANOS_COL + " = ?;";
 
     private UpdateTimestampQuery(Builder<Id> builder) {
         super(builder);

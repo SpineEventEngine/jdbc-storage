@@ -22,6 +22,7 @@ package org.spine3.server.storage.jdbc.entity.query;
 
 import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.jdbc.query.WriteRecord;
+import static org.spine3.server.storage.jdbc.entity.query.Constants.*;
 
 import static java.lang.String.format;
 
@@ -31,8 +32,8 @@ public class UpdateEntityQuery<Id> extends WriteRecord<Id, EntityStorageRecord> 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String UPDATE_QUERY =
             "UPDATE %s " +
-                    " SET " + EntityTable.ENTITY_COL + " = ? " +
-                    " WHERE " + EntityTable.ID_COL + " = ?;";
+                    " SET " + ENTITY_COL + " = ? " +
+                    " WHERE " + ID_COL + " = ?;";
 
     private UpdateEntityQuery(Builder<Id> builder) {
         super(builder);

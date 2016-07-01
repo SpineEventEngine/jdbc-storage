@@ -26,9 +26,9 @@ import org.spine3.base.Error;
 import org.spine3.base.Failure;
 import org.spine3.server.storage.CommandStorageRecord;
 import org.spine3.server.storage.jdbc.query.SelectById;
-import org.spine3.server.storage.jdbc.event.query.CommandTable;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
+import static org.spine3.server.storage.jdbc.command.query.Constants.*;
 
 import javax.annotation.Nullable;
 import java.sql.ResultSet;
@@ -41,8 +41,8 @@ public class SelectCommandByIdQuery extends SelectById<String, CommandStorageRec
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String SELECT_QUERY =
-                    "SELECT * FROM " + CommandTable.TABLE_NAME +
-                    " WHERE " + CommandTable.ID_COL + " = ?;";
+                    "SELECT * FROM " + TABLE_NAME +
+                    " WHERE " + ID_COL + " = ?;";
 
     public SelectCommandByIdQuery(DataSourceWrapper dataSource, String id) {
         super(SELECT_QUERY, dataSource, new IdColumn.StringIdColumn(), id);
@@ -52,26 +52,26 @@ public class SelectCommandByIdQuery extends SelectById<String, CommandStorageRec
     @Override
     @SuppressWarnings("RefusedBequest")
     protected CommandStorageRecord readMessage(ResultSet resultSet) throws SQLException {
-        final byte[] recordBytes = resultSet.getBytes(CommandTable.COMMAND_COL);
+        final byte[] recordBytes = resultSet.getBytes(COMMAND_COL);
         if (recordBytes == null) {
             return null;
         }
-        final CommandStorageRecord record = deserialize(recordBytes, CommandTable.COMMAND_RECORD_DESCRIPTOR);
+        final CommandStorageRecord record = deserialize(recordBytes, COMMAND_RECORD_DESCRIPTOR);
         final CommandStorageRecord.Builder builder = record.toBuilder();
-        final String status = resultSet.getString(CommandTable.COMMAND_STATUS_COL);
+        final String status = resultSet.getString(COMMAND_STATUS_COL);
         if (status.equals(CommandStatus.forNumber(CommandStatus.OK_VALUE).name())) {
             return builder.setStatus(CommandStatus.OK).build();
         }
-        final byte[] errorBytes = resultSet.getBytes(CommandTable.ERROR_COL);
+        final byte[] errorBytes = resultSet.getBytes(ERROR_COL);
         if (errorBytes != null) {
-            final Error error = deserialize(errorBytes, CommandTable.ERROR_DESCRIPTOR);
+            final Error error = deserialize(errorBytes, ERROR_DESCRIPTOR);
             return builder.setError(error)
                     .setStatus(CommandStatus.ERROR)
                     .build();
         }
-        final byte[] failureBytes = resultSet.getBytes(CommandTable.FAILURE_COL);
+        final byte[] failureBytes = resultSet.getBytes(FAILURE_COL);
         if (failureBytes != null) {
-            final Failure failure = deserialize(failureBytes, CommandTable.FAILURE_DESCRIPTOR);
+            final Failure failure = deserialize(failureBytes, FAILURE_DESCRIPTOR);
             return builder.setFailure(failure)
                     .setStatus(CommandStatus.FAILURE)
                     .build();

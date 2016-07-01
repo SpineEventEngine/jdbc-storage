@@ -27,6 +27,7 @@ import org.spine3.server.storage.jdbc.query.AbstractQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.DbIterator;
 import org.spine3.server.storage.jdbc.util.IdColumn;
+import static org.spine3.server.storage.jdbc.aggregate.query.Constants.*;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -41,9 +42,9 @@ public class SelectByIdSortedByTimeDescQuery<Id> extends AbstractQuery {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String SELECT_BY_ID_SORTED_BY_TIME_DESC =
-            "SELECT " + AggregateTable.AGGREGATE_COL + " FROM %s " +
-                    " WHERE " + AggregateTable.ID_COL + " = ? " +
-                    " ORDER BY " + AggregateTable.SECONDS_COL + " DESC, " + AggregateTable.NANOS_COL + " DESC;";
+            "SELECT " + AGGREGATE_COL + " FROM %s " +
+                    " WHERE " + ID_COL + " = ? " +
+                    " ORDER BY " + SECONDS_COL + " DESC, " + NANOS_COL + " DESC;";
 
 
     private SelectByIdSortedByTimeDescQuery(Builder<Id> builder) {
@@ -56,7 +57,7 @@ public class SelectByIdSortedByTimeDescQuery<Id> extends AbstractQuery {
         try (ConnectionWrapper connection = dataSource.getConnection(true);
              PreparedStatement statement = prepareStatement(connection)) {
             idColumn.setId(1, id, statement);
-            return new DbIterator<>(statement, AggregateTable.AGGREGATE_COL, AggregateTable.RECORD_DESCRIPTOR);
+            return new DbIterator<>(statement, AGGREGATE_COL, RECORD_DESCRIPTOR);
         } catch (SQLException e) {
             //log().error("Error while creating a table with the name: " + tableName, e);
             throw new DatabaseException(e);

@@ -24,6 +24,7 @@ import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.AbstractQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
+import static org.spine3.server.storage.jdbc.entity.query.Constants.*;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -38,9 +39,9 @@ public class CreateTableIfDoesNotExistQuery<I> extends AbstractQuery {
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String CREATE_TABLE_IF_DOES_NOT_EXIST =
             "CREATE TABLE IF NOT EXISTS %s (" +
-                    EntityTable.ID_COL + " %s, " +
-                    EntityTable.ENTITY_COL + " BLOB, " +
-                    "PRIMARY KEY(" + EntityTable.ID_COL + ')' +
+                    ID_COL + " %s, " +
+                    ENTITY_COL + " BLOB, " +
+                    "PRIMARY KEY(" + ID_COL + ')' +
                     ");";
 
     protected CreateTableIfDoesNotExistQuery(Builder<I> builder) {

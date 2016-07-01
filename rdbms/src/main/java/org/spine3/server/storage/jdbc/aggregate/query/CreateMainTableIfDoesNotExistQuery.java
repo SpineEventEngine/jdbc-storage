@@ -24,6 +24,7 @@ import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.AbstractQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
+import static org.spine3.server.storage.jdbc.aggregate.query.Constants.*;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -38,10 +39,10 @@ public class CreateMainTableIfDoesNotExistQuery<I> extends AbstractQuery {
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY =
             "CREATE TABLE IF NOT EXISTS %s (" +
-                    AggregateTable.ID_COL + " %s, " +
-                    AggregateTable.AGGREGATE_COL + " BLOB, " +
-                    AggregateTable.SECONDS_COL + " BIGINT, " +
-                    AggregateTable.NANOS_COL + " INT " +
+                    ID_COL + " %s, " +
+                    AGGREGATE_COL + " BLOB, " +
+                    SECONDS_COL + " BIGINT, " +
+                    NANOS_COL + " INT " +
                     ");";
 
     protected CreateMainTableIfDoesNotExistQuery(Builder<I> builder) {

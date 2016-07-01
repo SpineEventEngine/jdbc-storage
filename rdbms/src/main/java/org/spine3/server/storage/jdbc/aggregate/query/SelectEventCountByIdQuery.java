@@ -25,6 +25,8 @@ import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.AbstractQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
+import static org.spine3.server.storage.jdbc.aggregate.query.Constants.EVENT_COUNT_COL;
+import static org.spine3.server.storage.jdbc.aggregate.query.Constants.ID_COL;
 
 import javax.annotation.Nullable;
 import java.sql.PreparedStatement;
@@ -37,9 +39,9 @@ public class SelectEventCountByIdQuery<Id> extends AbstractQuery {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String SELECT_QUERY =
-            "SELECT " + AggregateTable.EVENT_COUNT_COL +
+            "SELECT " + EVENT_COUNT_COL +
                     " FROM %s " +
-                    " WHERE " + AggregateTable.ID_COL + " = ?;";
+                    " WHERE " + ID_COL + " = ?;";
 
     private final IdColumn<Id> idColumn;
     private final Id id;
@@ -58,7 +60,7 @@ public class SelectEventCountByIdQuery<Id> extends AbstractQuery {
             if (!resultSet.next()) {
                 return null;
             }
-            final int eventCount = resultSet.getInt(AggregateTable.EVENT_COUNT_COL);
+            final int eventCount = resultSet.getInt(EVENT_COUNT_COL);
             return eventCount;
         } catch (SQLException e) {
             // log().error("Failed to read an event count after the last snapshot.", e);
