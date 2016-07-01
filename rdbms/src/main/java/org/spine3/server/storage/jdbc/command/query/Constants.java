@@ -20,11 +20,6 @@
 
 package org.spine3.server.storage.jdbc.command.query;
 
-import com.google.protobuf.Descriptors;
-import org.spine3.base.Error;
-import org.spine3.base.Failure;
-import org.spine3.server.storage.CommandStorageRecord;
-
 /**
  * A utility class representing constants which are necessary for working with command table.
  *

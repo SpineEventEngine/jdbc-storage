@@ -20,9 +20,6 @@
 
 package org.spine3.server.storage.jdbc.event.query;
 
-import com.google.protobuf.Descriptors;
-import org.spine3.server.storage.EventStorageRecord;
-
 /**
  * A utility class representing constants which are necessary for working with event table.
  *

@@ -22,13 +22,9 @@ package org.spine3.server.storage.jdbc.query;
 
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Message;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.spine3.Internal;
-import org.spine3.net.Url;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
-import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 import org.spine3.server.storage.jdbc.util.Serializer;
 

@@ -20,9 +20,6 @@
 
 package org.spine3.server.storage.jdbc.aggregate.query;
 
-import com.google.protobuf.Descriptors;
-import org.spine3.server.storage.AggregateStorageRecord;
-
 /**
  * A utility class representing constants which are necessary for working with aggregate tables.
  *

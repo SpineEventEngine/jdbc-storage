@@ -20,16 +20,12 @@
 
 package org.spine3.server.storage.jdbc.command.query;
 
-import com.google.protobuf.Message;
 import org.spine3.Internal;
 import org.spine3.base.CommandStatus;
 import org.spine3.base.Error;
 import org.spine3.base.Failure;
 import org.spine3.server.storage.CommandStorageRecord;
-import org.spine3.server.storage.jdbc.query.AbstractQuery;
 import org.spine3.server.storage.jdbc.query.SelectByIdQuery;
-import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import javax.annotation.Nullable;
 import java.sql.ResultSet;
