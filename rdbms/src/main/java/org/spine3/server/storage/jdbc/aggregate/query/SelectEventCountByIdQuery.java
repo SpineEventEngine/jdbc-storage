@@ -54,7 +54,7 @@ public class SelectEventCountByIdQuery<Id> extends AbstractQuery {
 
     @Nullable
     public Integer execute() throws DatabaseException {
-        try (ConnectionWrapper connection = dataSource.getConnection(true);
+        try (ConnectionWrapper connection = this.getDataSource().getConnection(true);
              PreparedStatement statement = prepareStatement(connection);
              ResultSet resultSet = statement.executeQuery()) {
             if (!resultSet.next()) {

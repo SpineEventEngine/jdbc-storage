@@ -155,7 +155,7 @@ public class FilterAndSortQuery extends AbstractQuery {
     }
 
     public Iterator<EventStorageRecord> execute() throws DatabaseException {
-        try (ConnectionWrapper connection = dataSource.getConnection(true)) {
+        try (ConnectionWrapper connection = this.getDataSource().getConnection(true)) {
             final PreparedStatement statement = prepareStatement(connection, streamQuery);
             return new DbIterator<>(statement, EVENT_COL, RECORD_DESCRIPTOR);
         }

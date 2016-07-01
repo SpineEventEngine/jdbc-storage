@@ -48,7 +48,7 @@ public class SelectTimestampQuery extends AbstractQuery {
 
     @Nullable
     public Timestamp execute() throws DatabaseException {
-        try (ConnectionWrapper connection = dataSource.getConnection(true);
+        try (ConnectionWrapper connection = this.getDataSource().getConnection(true);
              PreparedStatement statement = prepareStatement(connection);
              ResultSet resultSet = statement.executeQuery()) {
             if (!resultSet.next()) {

@@ -23,6 +23,7 @@ package org.spine3.server.storage.jdbc.aggregate.query;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.UpdateRecord;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
+
 import static org.spine3.server.storage.jdbc.aggregate.query.Constants.ID_COL;
 import static org.spine3.server.storage.jdbc.aggregate.query.Constants.EVENT_COUNT_COL;
 
@@ -78,7 +79,7 @@ public class InsertEventCountQuery<Id> extends UpdateRecord<Id> {
             return new InsertEventCountQuery<>(this);
         }
 
-        public Builder<Id> setCount(int count){
+        public Builder<Id> setCount(int count) {
             this.count = count;
             return getThis();
         }

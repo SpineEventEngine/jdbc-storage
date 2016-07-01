@@ -48,7 +48,7 @@ public class CreateTableQuery extends AbstractQuery {
     }
 
     public void execute() throws DatabaseException {
-        try (ConnectionWrapper connection = dataSource.getConnection(true);
+        try (ConnectionWrapper connection = this.getDataSource().getConnection(true);
              PreparedStatement statement = prepareStatement(connection)) {
             statement.execute();
         } catch (SQLException e) {

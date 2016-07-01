@@ -29,10 +29,10 @@ import java.sql.PreparedStatement;
 /**
  * @author Andrey Lavrov
  */
-public abstract class AbstractQuery {
+public class AbstractQuery {
 
     private final String query;
-    protected final DataSourceWrapper dataSource;
+    private final DataSourceWrapper dataSource;
     private final Logger logger;
 
     protected AbstractQuery(Builder<? extends Builder, ? extends AbstractQuery> builder) {
@@ -51,6 +51,10 @@ public abstract class AbstractQuery {
 
     public Logger getLogger() {
         return logger;
+    }
+
+    public DataSourceWrapper getDataSource() {
+        return dataSource;
     }
 
     public abstract static class Builder<B extends Builder<B, Q>, Q extends AbstractQuery> {

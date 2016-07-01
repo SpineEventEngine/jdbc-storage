@@ -49,7 +49,7 @@ public class CreateTableQuery extends AbstractQuery {
     @SuppressWarnings("DuplicateStringLiteralInspection")
     public void execute() throws DatabaseException {
         final String createTableSql = format(CREATE_TABLE_IF_DOES_NOT_EXIST, tableName);
-        try (ConnectionWrapper connection = dataSource.getConnection(true);
+        try (ConnectionWrapper connection = this.getDataSource().getConnection(true);
              PreparedStatement statement = connection.prepareStatement(createTableSql)) {
             statement.execute();
         } catch (SQLException e) {

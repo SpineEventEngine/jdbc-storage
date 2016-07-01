@@ -43,7 +43,7 @@ public class WriteQuery extends AbstractQuery{
      * Executes a write query.
      */
     public void execute() {
-        try (ConnectionWrapper connection = dataSource.getConnection(false)) {
+        try (ConnectionWrapper connection = this.getDataSource().getConnection(false)) {
             try (PreparedStatement statement = prepareStatement(connection)) {
                 statement.execute();
                 connection.commit();

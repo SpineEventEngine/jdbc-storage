@@ -54,7 +54,7 @@ public class CreateEventCountQuery<I> extends AbstractQuery {
     public void execute() throws DatabaseException {
         final String idColumnType = idColumn.getColumnDataType();
         final String createTableSql = format(QUERY, tableName, idColumnType);
-        try (ConnectionWrapper connection = dataSource.getConnection(true);
+        try (ConnectionWrapper connection = this.getDataSource().getConnection(true);
              PreparedStatement statement = connection.prepareStatement(createTableSql)) {
             statement.execute();
         } catch (SQLException e) {

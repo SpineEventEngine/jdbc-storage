@@ -54,7 +54,7 @@ public class SelectByIdSortedByTimeDescQuery<Id> extends AbstractQuery {
     }
 
     public Iterator<AggregateStorageRecord> execute() throws DatabaseException {
-        try (ConnectionWrapper connection = dataSource.getConnection(true);
+        try (ConnectionWrapper connection = this.getDataSource().getConnection(true);
              PreparedStatement statement = prepareStatement(connection)) {
             idColumn.setId(1, id, statement);
             return new DbIterator<>(statement, AGGREGATE_COL, RECORD_DESCRIPTOR);
