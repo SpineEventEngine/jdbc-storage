@@ -46,19 +46,19 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
 
     private final DataSourceWrapper dataSource;
 
-    /**
-     * Iterators which are not closed yet.
-     */
+    /*Iterators which are not closed yet.*/
     private final Collection<DbIterator> iterators = newLinkedList();
 
-
+    /*Creates queries for interaction with database*/
     private final AggregateStorageQueryFactory<I> queryFactory;
 
 
     /**
      * Creates a new storage instance.
      *
-     * @param dataSource the dataSource wrapper
+     * @param dataSource the dataSource wrapper.
+     * @param multitenant defines can this datasource be accessed from multiple sources
+     * @param queryFactory factory that generates queries for interaction with aggregate tables
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     public static <I> JdbcAggregateStorage<I> newInstance(DataSourceWrapper dataSource,
@@ -68,7 +68,7 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
         return new JdbcAggregateStorage<>(dataSource, multitenant, queryFactory);
     }
 
-    private JdbcAggregateStorage(DataSourceWrapper dataSource,
+    protected JdbcAggregateStorage(DataSourceWrapper dataSource,
                                  boolean multitenant,
                                  AggregateStorageQueryFactory<I> queryFactory)
             throws DatabaseException {

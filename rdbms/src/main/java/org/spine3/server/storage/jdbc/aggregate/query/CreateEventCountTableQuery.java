@@ -32,7 +32,12 @@ import static java.lang.String.format;
 import static org.spine3.server.storage.jdbc.aggregate.query.Constants.EVENT_COUNT_COL;
 import static org.spine3.server.storage.jdbc.aggregate.query.Constants.ID_COL;
 
-public class CreateEventCountQuery<I> extends Query {
+/**
+ * Query that creates new aggregate table with event counts if it does not exist.
+ *
+ * @author Andrey Lavrov
+ */
+public class CreateEventCountTableQuery<I> extends Query {
 
     private final IdColumn<I> idColumn;
     private final String tableName;
@@ -44,7 +49,7 @@ public class CreateEventCountQuery<I> extends Query {
                     EVENT_COUNT_COL + " BIGINT " +
                     ");";
 
-    protected CreateEventCountQuery(Builder<I> builder) {
+    protected CreateEventCountTableQuery(Builder<I> builder) {
         super(builder);
         this.idColumn = builder.idColumn;
         this.tableName = builder.tableName;
@@ -70,14 +75,14 @@ public class CreateEventCountQuery<I> extends Query {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder<I> extends Query.Builder<Builder<I>, CreateEventCountQuery> {
+    public static class Builder<I> extends Query.Builder<Builder<I>, CreateEventCountTableQuery> {
 
         private IdColumn<I> idColumn;
         private String tableName;
 
         @Override
-        public CreateEventCountQuery build() {
-            return new CreateEventCountQuery<>(this);
+        public CreateEventCountTableQuery build() {
+            return new CreateEventCountTableQuery<>(this);
         }
 
         public Builder<I> setIdColumn(IdColumn<I> idColumn) {

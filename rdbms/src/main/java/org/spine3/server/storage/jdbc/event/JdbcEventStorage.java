@@ -51,6 +51,7 @@ public class JdbcEventStorage extends EventStorage {
     private final DataSourceWrapper dataSource;
 
     private final EventStorageQueryFactory queryFactory;
+
     /**
      * Iterators which are not closed yet.
      */
@@ -61,6 +62,7 @@ public class JdbcEventStorage extends EventStorage {
      *
      * @throws DatabaseException if an error occurs during an interaction with the DB
      * @param dataSource the dataSource wrapper
+     *
      */
     public static JdbcEventStorage newInstance(DataSourceWrapper dataSource,
                                                boolean multitenant,
@@ -69,9 +71,9 @@ public class JdbcEventStorage extends EventStorage {
         return new JdbcEventStorage(dataSource, multitenant, queryFactory);
     }
 
-    private JdbcEventStorage(DataSourceWrapper dataSource,
-                             boolean multitenant,
-                             EventStorageQueryFactory queryFactory)
+    protected JdbcEventStorage(DataSourceWrapper dataSource,
+                               boolean multitenant,
+                               EventStorageQueryFactory queryFactory)
             throws DatabaseException {
         super(multitenant);
         this.dataSource = dataSource;

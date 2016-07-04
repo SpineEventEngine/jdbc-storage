@@ -32,11 +32,10 @@ import org.spine3.server.storage.jdbc.util.IdColumn;
 import static org.spine3.server.storage.jdbc.aggregate.query.Constants.EVENT_COUNT_TABLE_NAME_SUFFIX;
 
 /**
- * This class provides public methods for creating the most commonly used queries.
- * To use you custom queries extend this class and overwrite necessary methods.
- * See {@link JdbcStorageFactory} to see how to pass your custom factory to the storage
+ * This class creates the most commonly used queries.
  *
- * @param <I> ID type of the Aggregate {@link AggregateStorage} for which this query factory is created.
+ * @param <I> Aggregate ID type
+ * @author Andrey Lavrov
  */
 public class AggregateStorageQueryFactory<I> {
 
@@ -47,9 +46,10 @@ public class AggregateStorageQueryFactory<I> {
     private Logger logger;
 
     /**
+     * Creates a new instance.
      *
      * @param dataSource the dataSource wrapper
-     * @param aggregateClass class of aggregate of the owning {@link AggregateStorage}
+     * @param aggregateClass class aggregate of the {@link AggregateStorage}
      */
     public AggregateStorageQueryFactory(DataSourceWrapper dataSource, Class<? extends Aggregate<I, ?, ?>> aggregateClass) {
         this.idColumn = IdColumn.newInstance(aggregateClass);
@@ -59,46 +59,41 @@ public class AggregateStorageQueryFactory<I> {
     }
 
     /**
-     * Use this method to path your custom loggers if you decide to overwrite {@link AggregateStorage}
+     * Sets custom loggers.
      *
-     * @param logger logger which will be used to log exceptions during queries execution
+     * @param logger to log exceptions during queries execution
      */
     public void setLogger(Logger logger) {
         this.logger = logger;
     }
 
-    /**
-     * Returns a query which creates the new query witch creates new aggregate Main table if it does not exist
-     *
-     * If you overwrite this method with your custom query keep in mind that default {@link AggregateStorage}
-     * realisation supposes that it creates a new table only if it does not exist
-     */
+    /** Returns a query that creates a new aggregate Main table if it does not exist. */
     public CreateMainTableQuery newCreateMainTableQuery() {
         final CreateMainTableQuery.Builder<I> builder = CreateMainTableQuery.<I>newBuilder()
                 .setDataSource(dataSource)
                 .setLogger(logger)
                 .setTableName(mainTableName)
                 .setIdColumn(idColumn);
-
         return builder.build();
     }
 
-    /**
-     * Returns a query which creates the new query witch creates new aggregate EventCount table if it does not exist
-     *
-     * If you overwrite this method with your custom query keep in mind that default {@link AggregateStorage}
-     * realisation supposes that it creates a new table only if it does not exist
-     */
-    public CreateEventCountQuery newCreateEventCountTableQuery() {
-        final CreateEventCountQuery.Builder<I> builder = CreateEventCountQuery.<I>newBuilder()
+    /** Returns a query that creates a new aggregate EventCount table if it does not exist */
+    public CreateEventCountTableQuery newCreateEventCountTableQuery() {
+        final CreateEventCountTableQuery.Builder<I> builder = CreateEventCountTableQuery.<I>newBuilder()
                 .setDataSource(dataSource)
                 .setLogger(logger)
                 .setTableName(eventCountTableName)
                 .setIdColumn(idColumn);
-
         return builder.build();
     }
 
+    /**
+     * Returns a query that inserts a new event count to EventCountTable
+     *
+     * @param id    corresponding aggregates id
+     * @param count event count
+     * @return      query that inserts new event count
+     */
     public InsertEventCountQuery newInsertEventCountQuery(I id, int count) {
         final InsertEventCountQuery.Builder<I> builder = InsertEventCountQuery.<I>newBuilder(eventCountTableName)
                 .setDataSource(dataSource)
@@ -106,10 +101,16 @@ public class AggregateStorageQueryFactory<I> {
                 .setIdColumn(idColumn)
                 .setId(id)
                 .setCount(count);
-
         return builder.build();
     }
 
+    /**
+     * Returns a query that updates event count in EventCountTable
+     *
+     * @param id    corresponding aggregates id
+     * @param count event count
+     * @return      query that updates new event count
+     */
     public UpdateEventCountQuery newUpdateEventCountQuery(I id, int count) {
         final UpdateEventCountQuery.Builder<I> builder = UpdateEventCountQuery.<I>newBuilder(eventCountTableName)
                 .setDataSource(dataSource)
@@ -117,10 +118,16 @@ public class AggregateStorageQueryFactory<I> {
                 .setIdColumn(idColumn)
                 .setId(id)
                 .setCount(count);
-
         return builder.build();
     }
 
+    /**
+     * Returns a query that inserts a new aggregate record to MainTable
+     *
+     * @param id     aggregates id
+     * @param record new aggregate record
+     * @return       query that inserts new aggregate record
+     */
     public InsertRecordQuery newInsertRecordQuery(I id, AggregateStorageRecord record) {
         final InsertRecordQuery.Builder<I> builder = InsertRecordQuery.<I>newBuilder(mainTableName)
                 .setDataSource(dataSource)
@@ -128,20 +135,30 @@ public class AggregateStorageQueryFactory<I> {
                 .setIdColumn(idColumn)
                 .setId(id)
                 .setRecord(record);
-
         return builder.build();
     }
 
+    /**
+     * Returns a query that selects event count by it`s ID.
+     *
+     * @param id corresponding aggregate id
+     * @return   query that selects event count by id of the corresponding aggregate
+     */
     public SelectEventCountByIdQuery newSelectEventCountByIdQuery(I id) {
         final SelectEventCountByIdQuery.Builder<I> builder = SelectEventCountByIdQuery.<I>newBuilder(eventCountTableName)
                 .setDataSource(dataSource)
                 .setLogger(logger)
                 .setIdColumn(idColumn)
                 .setId(id);
-
         return builder.build();
     }
 
+    /**
+     * Returns a query that selects aggregate records by ID sorted by time descending.
+     *
+     * @param id aggregate id
+     * @return   query that selects aggregate records by ID sorted by time descending
+     */
     @SuppressWarnings("InstanceMethodNamingConvention")
     public SelectByIdSortedByTimeDescQuery<I> newSelectByIdSortedByTimeDescQuery(I id) {
         final SelectByIdSortedByTimeDescQuery.Builder<I> builder = SelectByIdSortedByTimeDescQuery.<I>newBuilder(mainTableName)
@@ -149,7 +166,6 @@ public class AggregateStorageQueryFactory<I> {
                 .setLogger(logger)
                 .setIdColumn(idColumn)
                 .setId(id);
-
         return builder.build();
     }
 }

@@ -35,6 +35,11 @@ import java.util.Iterator;
 import static java.lang.String.format;
 import static org.spine3.server.storage.jdbc.aggregate.query.Constants.*;
 
+/**
+ * Query that selects event count by it`s ID.
+ *
+ * @author Andrey Lavrov
+ */
 public class SelectByIdSortedByTimeDescQuery<I> extends Query {
 
     private final IdColumn<I> idColumn;

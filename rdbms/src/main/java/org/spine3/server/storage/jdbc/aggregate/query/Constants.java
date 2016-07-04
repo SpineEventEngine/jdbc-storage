@@ -28,36 +28,24 @@ package org.spine3.server.storage.jdbc.aggregate.query;
 @SuppressWarnings("UtilityClass")
 /* package */ final class Constants {
 
-    /**
-     * Aggregate ID column name (contains in `main` and `event_count` tables).
-     */
+    /** Aggregate ID column name (is contained in main table and table with event count). */
     /* package */ static final String ID_COL = "id";
 
-    /**
-     * Aggregate record column name.
-     */
+    /** Aggregate record column name. */
     /* package */ static final String AGGREGATE_COL = "aggregate";
 
-    /**
-     * Aggregate event seconds column name.
-     */
+    /** Aggregate event seconds column name. */
     @SuppressWarnings("DuplicateStringLiteralInspection")
     /* package */ static final String SECONDS_COL = "seconds";
 
-    /**
-     * Aggregate event nanoseconds column name.
-     */
+    /** Aggregate event nanoseconds column name. */
     @SuppressWarnings("DuplicateStringLiteralInspection")
     /* package */ static final String NANOS_COL = "nanoseconds";
 
-    /**
-     * A count of events after the last snapshot column name.
-     */
+    /** A count of events after the last snapshot column name. */
     /* package */ static final String EVENT_COUNT_COL = "event_count";
 
-    /**
-     * A suffix of a table name where the last event time is stored.
-     */
+    /** A suffix of a table name where the last event time is stored. */
     /* package */ static final String EVENT_COUNT_TABLE_NAME_SUFFIX = "_event_count";
 
     private Constants() {

@@ -31,6 +31,11 @@ import java.sql.SQLException;
 import static java.lang.String.format;
 import static org.spine3.server.storage.jdbc.aggregate.query.Constants.*;
 
+/**
+ * Query that creates a new aggregate main table if it does not exist.
+ *
+ * @author Andrey Lavrov
+ */
 public class CreateMainTableQuery<I> extends Query {
 
     private final IdColumn<I> idColumn;

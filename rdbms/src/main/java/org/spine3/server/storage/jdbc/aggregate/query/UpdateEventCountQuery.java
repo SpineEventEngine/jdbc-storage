@@ -31,7 +31,11 @@ import static java.lang.String.format;
 import static org.spine3.server.storage.jdbc.aggregate.query.Constants.EVENT_COUNT_COL;
 import static org.spine3.server.storage.jdbc.aggregate.query.Constants.ID_COL;
 
-
+/**
+ * Query that updates event count in the table with event counts.
+ *
+ * @author Andrey Lavrov
+ */
 public class UpdateEventCountQuery<I> extends UpdateRecordQuery<I> {
 
     private final int count;

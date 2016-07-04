@@ -35,6 +35,11 @@ import static java.lang.String.format;
 import static org.spine3.server.storage.jdbc.aggregate.query.Constants.EVENT_COUNT_COL;
 import static org.spine3.server.storage.jdbc.aggregate.query.Constants.ID_COL;
 
+/**
+ * Query that selects aggregate records by ID sorted by time descending.
+ *
+ * @author Andrey Lavrov
+ */
 public class SelectEventCountByIdQuery<I> extends Query {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")

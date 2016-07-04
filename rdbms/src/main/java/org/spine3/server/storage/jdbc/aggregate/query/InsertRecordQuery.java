@@ -32,7 +32,11 @@ import java.sql.SQLException;
 import static java.lang.String.format;
 import static org.spine3.server.storage.jdbc.aggregate.query.Constants.*;
 
-
+/**
+ * Query that inserts a new aggregate record to the main table.
+ *
+ * @author Andrey Lavrov
+ */
 public class InsertRecordQuery<I> extends WriteRecordQuery<I, AggregateStorageRecord> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
