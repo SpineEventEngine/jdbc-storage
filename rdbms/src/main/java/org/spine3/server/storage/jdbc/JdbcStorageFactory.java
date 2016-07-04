@@ -21,14 +21,19 @@
 package org.spine3.server.storage.jdbc;
 
 import com.zaxxer.hikari.HikariConfig;
-import org.spine3.server.entity.Entity;
 import org.spine3.server.aggregate.Aggregate;
-import org.spine3.server.storage.AggregateStorage;
-import org.spine3.server.storage.CommandStorage;
-import org.spine3.server.storage.EntityStorage;
-import org.spine3.server.storage.EventStorage;
-import org.spine3.server.storage.ProjectionStorage;
-import org.spine3.server.storage.StorageFactory;
+import org.spine3.server.entity.Entity;
+import org.spine3.server.storage.*;
+import org.spine3.server.storage.jdbc.aggregate.JdbcAggregateStorage;
+import org.spine3.server.storage.jdbc.aggregate.query.AggregateStorageQueryFactory;
+import org.spine3.server.storage.jdbc.command.JdbcCommandStorage;
+import org.spine3.server.storage.jdbc.command.query.CommandStorageQueryFactory;
+import org.spine3.server.storage.jdbc.entity.JdbcEntityStorage;
+import org.spine3.server.storage.jdbc.entity.query.EntityStorageQueryFactory;
+import org.spine3.server.storage.jdbc.event.JdbcEventStorage;
+import org.spine3.server.storage.jdbc.event.query.EventStorageQueryFactory;
+import org.spine3.server.storage.jdbc.projection.JdbcProjectionStorage;
+import org.spine3.server.storage.jdbc.projection.query.ProjectionStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.HikariDataSourceWrapper;
 
@@ -66,28 +71,57 @@ public class JdbcStorageFactory implements StorageFactory {
 
     @Override
     public CommandStorage createCommandStorage() {
-        return JdbcCommandStorage.newInstance(dataSource, false);
+        return JdbcCommandStorage.newInstance(dataSource, false, getCommandStorageQueryFactory(dataSource));
     }
 
     @Override
     public EventStorage createEventStorage() {
-        return JdbcEventStorage.newInstance(dataSource, false);
+        return JdbcEventStorage.newInstance(dataSource, false, getEventStorageQueryFactory(dataSource));
     }
 
     @Override
-    public <Id> AggregateStorage<Id> createAggregateStorage(Class<? extends Aggregate<Id, ?, ?>> aggregateClass) {
-        return JdbcAggregateStorage.newInstance(dataSource, aggregateClass, false);
+    public <I> AggregateStorage<I> createAggregateStorage(Class<? extends Aggregate<I, ?, ?>> aggregateClass) {
+        return JdbcAggregateStorage.newInstance(dataSource,
+                false,
+                getAggregateStorageQueryFactory(dataSource, aggregateClass));
+    }
+
+
+    @Override
+    public <I> EntityStorage<I> createEntityStorage(Class<? extends Entity<I, ?>> entityClass) {
+        return JdbcEntityStorage
+                .newInstance(dataSource, false, getEntityStorageQueryFactory(dataSource, entityClass));
     }
 
     @Override
-    public <Id> EntityStorage<Id> createEntityStorage(Class<? extends Entity<Id, ?>> entityClass) {
-        return JdbcEntityStorage.newInstance(dataSource, entityClass, false);
+    public <I> ProjectionStorage<I> createProjectionStorage(Class<? extends Entity<I, ?>> projectionClass) {
+        final JdbcEntityStorage<I> entityStorage = JdbcEntityStorage
+                .newInstance(dataSource, false, getEntityStorageQueryFactory(dataSource, projectionClass));
+        return JdbcProjectionStorage
+                .newInstance(dataSource, entityStorage, false, getProjectionStorageQueryFactory(dataSource, projectionClass));
     }
 
-    @Override
-    public <Id> ProjectionStorage<Id> createProjectionStorage(Class<? extends Entity<Id, ?>> projectionClass) {
-        final JdbcEntityStorage<Id> entityStorage = JdbcEntityStorage.newInstance(dataSource, projectionClass, false);
-        return JdbcProjectionStorage.newInstance(dataSource, projectionClass, entityStorage, false);
+    protected  <I> AggregateStorageQueryFactory<I> getAggregateStorageQueryFactory(DataSourceWrapper dataSource,
+                                                                                   Class<? extends Aggregate<I, ?, ?>> aggregateClass){
+        return new AggregateStorageQueryFactory<>(dataSource, aggregateClass);
+    }
+
+    protected <I> EntityStorageQueryFactory<I> getEntityStorageQueryFactory(DataSourceWrapper dataSource,
+                                                                            Class<? extends Entity<I, ?>> entityClass){
+        return new EntityStorageQueryFactory<>(dataSource, entityClass);
+    }
+
+    protected <I> ProjectionStorageQueryFactory<I> getProjectionStorageQueryFactory(DataSourceWrapper dataSource,
+                                                                                    Class<? extends Entity<I, ?>> entityClass){
+        return new ProjectionStorageQueryFactory<>(dataSource, entityClass);
+    }
+
+    protected EventStorageQueryFactory getEventStorageQueryFactory(DataSourceWrapper dataSource){
+        return new EventStorageQueryFactory(dataSource);
+    }
+
+    protected CommandStorageQueryFactory getCommandStorageQueryFactory(DataSourceWrapper dataSource){
+        return new CommandStorageQueryFactory(dataSource);
     }
 
     @Override
