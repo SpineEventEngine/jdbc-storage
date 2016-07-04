@@ -29,11 +29,12 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import static java.lang.String.format;
-import static org.spine3.server.storage.jdbc.aggregate.query.Constants.*;
+import static org.spine3.server.storage.jdbc.aggregate.query.Table.AggregateRecord.*;
 
 /**
- * Query that creates a new aggregate main table if it does not exist.
+ * Query that creates a new {@link Table.AggregateRecord} if it does not exist.
  *
+ * @author Alexander Litus
  * @author Andrey Lavrov
  */
 public class CreateMainTableQuery<I> extends Query {

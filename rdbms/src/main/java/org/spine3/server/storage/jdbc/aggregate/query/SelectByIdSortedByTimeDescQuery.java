@@ -33,11 +33,12 @@ import java.sql.SQLException;
 import java.util.Iterator;
 
 import static java.lang.String.format;
-import static org.spine3.server.storage.jdbc.aggregate.query.Constants.*;
+import static org.spine3.server.storage.jdbc.aggregate.query.Table.AggregateRecord.*;
 
 /**
- * Query that selects event count by it`s ID.
+ * Query that selects {@link AggregateStorageRecord} by corresponding aggregate ID sorted by time descending.
  *
+ * @author Alexander Litus
  * @author Andrey Lavrov
  */
 public class SelectByIdSortedByTimeDescQuery<I> extends Query {
@@ -64,7 +65,7 @@ public class SelectByIdSortedByTimeDescQuery<I> extends Query {
             idColumn.setId(1, id, statement);
             return new DbIterator<>(statement, AGGREGATE_COL, AggregateStorageRecord.getDescriptor());
         } catch (SQLException e) {
-            this.getLogger().error("Error while selecting entity by aggregates id sorted by time: ", e);
+            this.getLogger().error("Error while selecting entity by aggregate id sorted by time: ", e);
             throw new DatabaseException(e);
         }
     }

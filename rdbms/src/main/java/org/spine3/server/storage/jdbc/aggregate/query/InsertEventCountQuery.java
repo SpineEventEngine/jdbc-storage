@@ -28,12 +28,13 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import static java.lang.String.format;
-import static org.spine3.server.storage.jdbc.aggregate.query.Constants.EVENT_COUNT_COL;
-import static org.spine3.server.storage.jdbc.aggregate.query.Constants.ID_COL;
+import static org.spine3.server.storage.jdbc.aggregate.query.Table.EventCount.EVENT_COUNT_COL;
+import static org.spine3.server.storage.jdbc.aggregate.query.Table.EventCount.ID_COL;
 
 /**
- * Query that inserts a new event count to the table with event counts.
+ * Query that inserts a new aggregate event count after the last snapshot to the {@link Table.EventCount}.
  *
+ * @author Alexander Litus
  * @author Andrey Lavrov
  */
 public class InsertEventCountQuery<I> extends UpdateRecordQuery<I> {

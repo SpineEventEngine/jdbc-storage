@@ -30,11 +30,12 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import static java.lang.String.format;
-import static org.spine3.server.storage.jdbc.aggregate.query.Constants.*;
+import static org.spine3.server.storage.jdbc.aggregate.query.Table.AggregateRecord.*;
 
 /**
- * Query that inserts a new aggregate record to the main table.
+ * Query that inserts a new {@link AggregateStorageRecord} to the {@link Table.AggregateRecord}.
  *
+ * @author Alexander Litus
  * @author Andrey Lavrov
  */
 public class InsertRecordQuery<I> extends WriteRecordQuery<I, AggregateStorageRecord> {

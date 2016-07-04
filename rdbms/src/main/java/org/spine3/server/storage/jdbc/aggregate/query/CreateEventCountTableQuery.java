@@ -29,12 +29,13 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import static java.lang.String.format;
-import static org.spine3.server.storage.jdbc.aggregate.query.Constants.EVENT_COUNT_COL;
-import static org.spine3.server.storage.jdbc.aggregate.query.Constants.ID_COL;
+import static org.spine3.server.storage.jdbc.aggregate.query.Table.EventCount.EVENT_COUNT_COL;
+import static org.spine3.server.storage.jdbc.aggregate.query.Table.EventCount.ID_COL;
 
 /**
- * Query that creates new aggregate table with event counts if it does not exist.
+ * Query that creates a new {@link Table.EventCount} if it does not exist.
  *
+ * @author Alexander Litus
  * @author Andrey Lavrov
  */
 public class CreateEventCountTableQuery<I> extends Query {
@@ -44,10 +45,9 @@ public class CreateEventCountTableQuery<I> extends Query {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY =
-            "CREATE TABLE IF NOT EXISTS %s (" +
+                    "CREATE TABLE IF NOT EXISTS %s (" +
                     ID_COL + " %s, " +
-                    EVENT_COUNT_COL + " BIGINT " +
-                    ");";
+                    EVENT_COUNT_COL + " BIGINT " +  ");";
 
     protected CreateEventCountTableQuery(Builder<I> builder) {
         super(builder);

@@ -24,18 +24,17 @@ import org.slf4j.Logger;
 import org.spine3.server.aggregate.Aggregate;
 import org.spine3.server.storage.AggregateStorage;
 import org.spine3.server.storage.AggregateStorageRecord;
-import org.spine3.server.storage.jdbc.JdbcStorageFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbTableNameFactory;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
-import static org.spine3.server.storage.jdbc.aggregate.query.Constants.EVENT_COUNT_TABLE_NAME_SUFFIX;
+import static org.spine3.server.storage.jdbc.aggregate.query.Table.EventCount.EVENT_COUNT_TABLE_NAME_SUFFIX;
 
 /**
- * This class creates the most commonly used queries.
+ * This class creates queries for interaction with {@link Table.AggregateRecord} and {@link Table.EventCount}.
  *
- * @param <I> Aggregate ID type
- * @author Andrey Lavrov
+ * @param <I>   the type of IDs used in the storage
+ * @author      Andrey Lavrov
  */
 public class AggregateStorageQueryFactory<I> {
 
@@ -48,8 +47,8 @@ public class AggregateStorageQueryFactory<I> {
     /**
      * Creates a new instance.
      *
-     * @param dataSource the dataSource wrapper
-     * @param aggregateClass class aggregate of the {@link AggregateStorage}
+     * @param dataSource        instance of {@link DataSourceWrapper}
+     * @param aggregateClass    aggregate class of corresponding {@link AggregateStorage} instance
      */
     public AggregateStorageQueryFactory(DataSourceWrapper dataSource, Class<? extends Aggregate<I, ?, ?>> aggregateClass) {
         this.idColumn = IdColumn.newInstance(aggregateClass);
@@ -58,16 +57,12 @@ public class AggregateStorageQueryFactory<I> {
         this.dataSource = dataSource;
     }
 
-    /**
-     * Sets custom loggers.
-     *
-     * @param logger to log exceptions during queries execution
-     */
+    /** Sets the logger for logging exceptions during queries execution. */
     public void setLogger(Logger logger) {
         this.logger = logger;
     }
 
-    /** Returns a query that creates a new aggregate Main table if it does not exist. */
+    /** Returns a query that creates a new {@link Table.AggregateRecord} if it does not exist. */
     public CreateMainTableQuery newCreateMainTableQuery() {
         final CreateMainTableQuery.Builder<I> builder = CreateMainTableQuery.<I>newBuilder()
                 .setDataSource(dataSource)
@@ -77,7 +72,7 @@ public class AggregateStorageQueryFactory<I> {
         return builder.build();
     }
 
-    /** Returns a query that creates a new aggregate EventCount table if it does not exist */
+    /** Returns a query that creates a new {@link Table.EventCount} if it does not exist. */
     public CreateEventCountTableQuery newCreateEventCountTableQuery() {
         final CreateEventCountTableQuery.Builder<I> builder = CreateEventCountTableQuery.<I>newBuilder()
                 .setDataSource(dataSource)
@@ -88,11 +83,10 @@ public class AggregateStorageQueryFactory<I> {
     }
 
     /**
-     * Returns a query that inserts a new event count to EventCountTable
+     * Returns a  query that inserts a new aggregate event count after the last snapshot to the {@link Table.EventCount}.
      *
-     * @param id    corresponding aggregates id
-     * @param count event count
-     * @return      query that inserts new event count
+     * @param id       corresponding aggregate id
+     * @param count    event count
      */
     public InsertEventCountQuery newInsertEventCountQuery(I id, int count) {
         final InsertEventCountQuery.Builder<I> builder = InsertEventCountQuery.<I>newBuilder(eventCountTableName)
@@ -105,11 +99,10 @@ public class AggregateStorageQueryFactory<I> {
     }
 
     /**
-     * Returns a query that updates event count in EventCountTable
+     * Returns a query that updates aggregate event count in the {@link Table.EventCount}.
      *
-     * @param id    corresponding aggregates id
-     * @param count event count
-     * @return      query that updates new event count
+     * @param id        corresponding aggregate id
+     * @param count     new event count
      */
     public UpdateEventCountQuery newUpdateEventCountQuery(I id, int count) {
         final UpdateEventCountQuery.Builder<I> builder = UpdateEventCountQuery.<I>newBuilder(eventCountTableName)
@@ -122,11 +115,10 @@ public class AggregateStorageQueryFactory<I> {
     }
 
     /**
-     * Returns a query that inserts a new aggregate record to MainTable
+     * Returns a query that inserts a new {@link AggregateStorageRecord} to the {@link Table.AggregateRecord}.
      *
-     * @param id     aggregates id
-     * @param record new aggregate record
-     * @return       query that inserts new aggregate record
+     * @param id        aggregate id
+     * @param record    new aggregate record
      */
     public InsertRecordQuery newInsertRecordQuery(I id, AggregateStorageRecord record) {
         final InsertRecordQuery.Builder<I> builder = InsertRecordQuery.<I>newBuilder(mainTableName)
@@ -138,12 +130,7 @@ public class AggregateStorageQueryFactory<I> {
         return builder.build();
     }
 
-    /**
-     * Returns a query that selects event count by it`s ID.
-     *
-     * @param id corresponding aggregate id
-     * @return   query that selects event count by id of the corresponding aggregate
-     */
+    /** Returns a query that selects event count by corresponding aggregate ID. */
     public SelectEventCountByIdQuery newSelectEventCountByIdQuery(I id) {
         final SelectEventCountByIdQuery.Builder<I> builder = SelectEventCountByIdQuery.<I>newBuilder(eventCountTableName)
                 .setDataSource(dataSource)
@@ -153,12 +140,7 @@ public class AggregateStorageQueryFactory<I> {
         return builder.build();
     }
 
-    /**
-     * Returns a query that selects aggregate records by ID sorted by time descending.
-     *
-     * @param id aggregate id
-     * @return   query that selects aggregate records by ID sorted by time descending
-     */
+    /** Returns a query that selects aggregate records by ID sorted by time descending. */
     @SuppressWarnings("InstanceMethodNamingConvention")
     public SelectByIdSortedByTimeDescQuery<I> newSelectByIdSortedByTimeDescQuery(I id) {
         final SelectByIdSortedByTimeDescQuery.Builder<I> builder = SelectByIdSortedByTimeDescQuery.<I>newBuilder(mainTableName)

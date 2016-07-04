@@ -32,12 +32,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static java.lang.String.format;
-import static org.spine3.server.storage.jdbc.aggregate.query.Constants.EVENT_COUNT_COL;
-import static org.spine3.server.storage.jdbc.aggregate.query.Constants.ID_COL;
+import static org.spine3.server.storage.jdbc.aggregate.query.Table.EventCount.EVENT_COUNT_COL;
+import static org.spine3.server.storage.jdbc.aggregate.query.Table.EventCount.ID_COL;
 
 /**
- * Query that selects aggregate records by ID sorted by time descending.
+ * Query that selects event count by corresponding aggregate ID.
  *
+ * @author Alexander Litus
  * @author Andrey Lavrov
  */
 public class SelectEventCountByIdQuery<I> extends Query {

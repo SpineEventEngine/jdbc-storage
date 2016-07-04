@@ -20,6 +20,7 @@
 
 package org.spine3.server.storage.jdbc.aggregate;
 
+import org.hsqldb.Table;
 import org.spine3.server.storage.AggregateStorage;
 import org.spine3.server.storage.AggregateStorageRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
@@ -38,27 +39,29 @@ import static org.spine3.io.IoUtil.closeAll;
 /**
  * The implementation of the aggregate storage based on the RDBMS.
  *
- * @param <I> the type of aggregate IDs
- * @see JdbcStorageFactory
- * @author Alexander Litus
+ * <p> This storage contains 2 tables by default, they are described in {@link org.spine3.server.storage.jdbc.aggregate.query.Table}
+ *
+ * @param <I>   the type of aggregate IDs
+ * @see         JdbcStorageFactory
+ * @author      Alexander Litus
  */
 public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
 
     private final DataSourceWrapper dataSource;
 
-    /*Iterators which are not closed yet.*/
+    /** Iterators which are not closed yet. */
     private final Collection<DbIterator> iterators = newLinkedList();
 
-    /*Creates queries for interaction with database*/
+    /** Creates queries for interaction with database. */
     private final AggregateStorageQueryFactory<I> queryFactory;
 
 
     /**
      * Creates a new storage instance.
      *
-     * @param dataSource the dataSource wrapper.
-     * @param multitenant defines can this datasource be accessed from multiple sources
-     * @param queryFactory factory that generates queries for interaction with aggregate tables
+     * @param dataSource    the dataSource wrapper
+     * @param multitenant   defines can this datasource be accessed from multiple sources
+     * @param queryFactory  factory that generates queries for interaction with aggregate tables
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     public static <I> JdbcAggregateStorage<I> newInstance(DataSourceWrapper dataSource,
