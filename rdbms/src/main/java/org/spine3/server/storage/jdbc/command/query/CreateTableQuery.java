@@ -30,7 +30,7 @@ import java.sql.SQLException;
 import static org.spine3.server.storage.jdbc.command.query.CommandTable.*;
 
 /**
- * Query that creates a new {@link CommandTable} if it does not exist
+ * Query that creates a new {@link CommandTable} if it does not exist.
  *
  * @author Alexander Litus
  * @author Andrey Lavrov

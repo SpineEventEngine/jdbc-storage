@@ -24,10 +24,15 @@ import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.jdbc.query.WriteRecordQuery;
 
 import static java.lang.String.format;
-import static org.spine3.server.storage.jdbc.entity.query.Constants.ENTITY_COL;
-import static org.spine3.server.storage.jdbc.entity.query.Constants.ID_COL;
+import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ENTITY_COL;
+import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
 
-
+/**
+ * Query that updates {@link EntityStorageRecord} in the {@link EntityTable}.
+ *
+ * @author Alexander Litus
+ * @author Andrey Lavrov
+ */
 public class UpdateEntityQuery<I> extends WriteRecordQuery<I, EntityStorageRecord> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")

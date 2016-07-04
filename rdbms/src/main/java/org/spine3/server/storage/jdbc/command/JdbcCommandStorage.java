@@ -57,15 +57,22 @@ public class JdbcCommandStorage extends CommandStorage {
      * Creates a new storage instance.
      *
      * @param dataSource            a data source to use to obtain connections
+     * @param multitenant           defines is this storage multitenant
      * @param queryFactory          factory that generates queries for interaction with command table
      * @return                      a new storage instance
      * @throws DatabaseException    if an error occurs during an interaction with the DB
      */
-    public static CommandStorage newInstance(DataSourceWrapper dataSource, boolean multitenant, CommandStorageQueryFactory queryFactory) throws DatabaseException {
+    public static CommandStorage newInstance(DataSourceWrapper dataSource,
+                                             boolean multitenant,
+                                             CommandStorageQueryFactory queryFactory)
+            throws DatabaseException {
         return new JdbcCommandStorage(dataSource, multitenant, queryFactory);
     }
 
-    private JdbcCommandStorage(DataSourceWrapper dataSource, boolean multitenant, CommandStorageQueryFactory queryFactory) throws DatabaseException {
+    private JdbcCommandStorage(DataSourceWrapper dataSource,
+                               boolean multitenant,
+                               CommandStorageQueryFactory queryFactory)
+            throws DatabaseException {
         super(multitenant);
         this.dataSource = dataSource;
         this.queryFactory = queryFactory;

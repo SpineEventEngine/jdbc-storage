@@ -61,7 +61,6 @@ public class CommandStorageQueryFactory {
         final CreateTableQuery.Builder builder = CreateTableQuery.newBuilder()
                 .setDataSource(dataSource)
                 .setLogger(logger);
-
         return builder.build();
     }
 
@@ -79,14 +78,13 @@ public class CommandStorageQueryFactory {
                 .setId(id.getUuid())
                 .setRecord(record)
                 .setStatus(CommandStatus.forNumber(record.getStatusValue()));
-
         return builder.build();
     }
 
     /**
      * Returns a query that updates {@link CommandStorageRecord} in the {@link CommandTable}.
      *
-     * @param id        command record id
+     * @param id        command id
      * @param record    updated record state
      */
     public UpdateCommandQuery newUpdateCommandQuery(CommandId id, CommandStorageRecord record){
@@ -97,7 +95,6 @@ public class CommandStorageQueryFactory {
                 .setId(id.getUuid())
                 .setRecord(record)
                 .setStatus(CommandStatus.forNumber(record.getStatusValue()));
-
         return builder.build();
     }
 
@@ -105,7 +102,7 @@ public class CommandStorageQueryFactory {
      * Returns a query that updates {@link CommandStorageRecord} with a new {@link Error}.
      *
      * @param id        command record id
-     * @param error     {@link Error}
+     * @param error     a technical error occurred during command handling
      */
     public SetErrorQuery newSetErrorQuery(CommandId id, Error error){
         final SetErrorQuery.Builder builder = SetErrorQuery.newBuilder()
@@ -114,7 +111,6 @@ public class CommandStorageQueryFactory {
                 .setIdColumn(idColumn)
                 .setId(id.getUuid())
                 .setRecord(error);
-
         return builder.build();
     }
 
@@ -122,7 +118,7 @@ public class CommandStorageQueryFactory {
      * Returns a query that updates {@link CommandStorageRecord} with a new {@link Failure}.
      *
      * @param id        command record id
-     * @param failure   {@link Failure}
+     * @param failure   a business failure occurred during command handling
      */
     public SetFailureQuery newSetFailureQuery(CommandId id, Failure failure){
         final SetFailureQuery.Builder builder = SetFailureQuery.newBuilder()
@@ -131,7 +127,6 @@ public class CommandStorageQueryFactory {
                 .setIdColumn(idColumn)
                 .setId(id.getUuid())
                 .setRecord(failure);
-
         return builder.build();
     }
 
@@ -146,7 +141,6 @@ public class CommandStorageQueryFactory {
                 .setLogger(logger)
                 .setIdColumn(idColumn)
                 .setId(id.getUuid());
-
         return builder.build();
     }
 
@@ -157,17 +151,15 @@ public class CommandStorageQueryFactory {
                 .setLogger(logger)
                 .setIdColumn(idColumn)
                 .setId(id.getUuid());
-
         return builder.build();
     }
 
-    /** Returns a query that {@link CommandStorageRecord} record by {@link CommandStatus}. */
+    /** Returns a query that {@link CommandStorageRecord} selects record by {@link CommandStatus}. */
     public SelectCommandByStatusQuery newSelectCommandByStatusQuery(CommandStatus status){
         final SelectCommandByStatusQuery.Builder builder = SelectCommandByStatusQuery.newBuilder()
                 .setDataSource(dataSource)
                 .setLogger(logger)
                 .setStatus(status);
-
         return builder.build();
     }
 }

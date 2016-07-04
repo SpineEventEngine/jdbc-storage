@@ -20,15 +20,19 @@
 
 package org.spine3.server.storage.jdbc.entity.query;
 
-import org.spine3.Internal;
 import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.jdbc.query.SelectByIdQuery;
 
 import static java.lang.String.format;
-import static org.spine3.server.storage.jdbc.entity.query.Constants.ENTITY_COL;
-import static org.spine3.server.storage.jdbc.entity.query.Constants.ID_COL;
+import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ENTITY_COL;
+import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
 
-@Internal
+/**
+ * Query that selects {@link EntityStorageRecord} by ID.
+ *
+ * @author Alexander Litus
+ * @author Andrey Lavrov
+ */
 public class SelectEntityByIdQuery<I> extends SelectByIdQuery<I, EntityStorageRecord> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")

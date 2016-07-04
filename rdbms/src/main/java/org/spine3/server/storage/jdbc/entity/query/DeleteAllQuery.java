@@ -29,6 +29,12 @@ import java.sql.SQLException;
 
 import static java.lang.String.format;
 
+/**
+ * Query that deletes all from {@link EntityTable}.
+ *
+ * @author Alexander Litus
+ * @author Andrey Lavrov
+ */
 public class DeleteAllQuery extends Query {
 
     private static final String DELETE_ALL = "DELETE FROM %s ;";

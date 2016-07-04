@@ -30,7 +30,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 /**
- * A base class for working with Command table (Writing case).
+ * A base class for working with {@link CommandTable} (Writing case).
  *
  * @author Andrey Lavrov
  */

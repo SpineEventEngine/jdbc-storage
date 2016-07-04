@@ -27,7 +27,6 @@ import org.spine3.server.storage.jdbc.JdbcStorageFactory;
 import org.spine3.server.storage.jdbc.aggregate.query.AggregateStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbIterator;
-
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -54,12 +53,11 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     /** Creates queries for interaction with database. */
     private final AggregateStorageQueryFactory<I> queryFactory;
 
-
     /**
      * Creates a new storage instance.
      *
      * @param dataSource            the dataSource wrapper
-     * @param multitenant           defines can this datasource be accessed from multiple sources
+     * @param multitenant           defines is this storage multitenant
      * @param queryFactory          factory that generates queries for interaction with aggregate tables
      * @throws DatabaseException    if an error occurs during an interaction with the DB
      */
@@ -71,8 +69,8 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     }
 
     protected JdbcAggregateStorage(DataSourceWrapper dataSource,
-                                 boolean multitenant,
-                                 AggregateStorageQueryFactory<I> queryFactory)
+                                   boolean multitenant,
+                                   AggregateStorageQueryFactory<I> queryFactory)
             throws DatabaseException {
         super(multitenant);
         this.dataSource = dataSource;

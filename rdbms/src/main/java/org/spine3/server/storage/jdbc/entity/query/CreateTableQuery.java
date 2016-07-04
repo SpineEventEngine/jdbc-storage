@@ -29,9 +29,15 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import static java.lang.String.format;
-import static org.spine3.server.storage.jdbc.entity.query.Constants.ENTITY_COL;
-import static org.spine3.server.storage.jdbc.entity.query.Constants.ID_COL;
+import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ENTITY_COL;
+import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
 
+/**
+ * Query that creates a new {@link EntityTable} if it does not exist.
+ *
+ * @author Alexander Litus
+ * @author Andrey Lavrov
+ */
 public class CreateTableQuery<I> extends Query {
 
     private final IdColumn<I> idColumn;

@@ -46,11 +46,14 @@ public class JdbcEntityStorage<I> extends EntityStorage<I> {
     private final DataSourceWrapper dataSource;
 
     private final EntityStorageQueryFactory<I> queryFactory;
+
     /**
      * Creates a new storage instance.
      *
-     * @param dataSource the dataSource wrapper
-     * @throws DatabaseException if an error occurs during an interaction with the DB
+     * @param dataSource            the dataSource wrapper
+     * @param multitenant           defines is this storage multitenant
+     * @param queryFactory          factory that generates queries for interaction with entity table
+     * @throws DatabaseException    if an error occurs during an interaction with the DB
      */
     public static <I> JdbcEntityStorage<I> newInstance(DataSourceWrapper dataSource,
                                                        boolean multitenant,
@@ -64,7 +67,6 @@ public class JdbcEntityStorage<I> extends EntityStorage<I> {
         super(multitenant);
         this.dataSource = dataSource;
         this.queryFactory = queryFactory;
-        queryFactory.setLogger(LogSingleton.INSTANCE.value);
         queryFactory.setLogger(LogSingleton.INSTANCE.value);
         queryFactory.newCreateTableQuery().execute();
     }

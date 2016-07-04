@@ -35,7 +35,7 @@ import static org.spine3.server.storage.jdbc.command.query.CommandTable.*;
 
 
 /**
- * query that selects {@link CommandStorageRecord} by {@link CommandStatus}.
+ * Query that selects {@link CommandStorageRecord} by {@link CommandStatus}.
  *
  * @author Alexander Litus
  * @author Andrey Lavrov
