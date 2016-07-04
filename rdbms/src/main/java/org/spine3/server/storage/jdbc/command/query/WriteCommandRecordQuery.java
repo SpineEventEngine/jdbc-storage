@@ -34,7 +34,6 @@ import java.sql.SQLException;
  *
  * @author Andrey Lavrov
  */
-
 public class WriteCommandRecordQuery
         extends WriteRecordQuery<String, CommandStorageRecord> {
 

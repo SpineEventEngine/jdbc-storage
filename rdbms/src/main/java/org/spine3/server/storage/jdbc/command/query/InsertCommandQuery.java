@@ -20,8 +20,16 @@
 
 package org.spine3.server.storage.jdbc.command.query;
 
-import static org.spine3.server.storage.jdbc.command.query.Constants.*;
+import org.spine3.server.storage.CommandStorageRecord;
 
+import static org.spine3.server.storage.jdbc.command.query.CommandTable.*;
+
+/**
+ * that inserts a new {@link CommandStorageRecord} to the {@link CommandTable}.
+ *
+ * @author Alexander Litus
+ * @author Andrey Lavrov
+ */
 public class InsertCommandQuery extends WriteCommandRecordQuery {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")

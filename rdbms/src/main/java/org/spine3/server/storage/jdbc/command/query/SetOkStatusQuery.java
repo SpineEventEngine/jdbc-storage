@@ -23,9 +23,14 @@ package org.spine3.server.storage.jdbc.command.query;
 import org.spine3.base.CommandStatus;
 import org.spine3.server.storage.jdbc.query.UpdateRecordQuery;
 
-import static org.spine3.server.storage.jdbc.command.query.Constants.*;
+import static org.spine3.server.storage.jdbc.command.query.CommandTable.*;
 
-
+/**
+ * Query that sets {@link CommandStatus} to OK state.
+ *
+ * @author Alexander Litus
+ * @author Andrey Lavrov
+ */
 public class SetOkStatusQuery extends UpdateRecordQuery<String> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")

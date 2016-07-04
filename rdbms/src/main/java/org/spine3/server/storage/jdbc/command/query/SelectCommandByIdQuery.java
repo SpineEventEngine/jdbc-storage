@@ -20,7 +20,6 @@
 
 package org.spine3.server.storage.jdbc.command.query;
 
-import org.spine3.Internal;
 import org.spine3.base.CommandStatus;
 import org.spine3.base.Error;
 import org.spine3.base.Failure;
@@ -31,10 +30,15 @@ import javax.annotation.Nullable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import static org.spine3.server.storage.jdbc.command.query.Constants.*;
+import static org.spine3.server.storage.jdbc.command.query.CommandTable.*;
 import static org.spine3.server.storage.jdbc.util.Serializer.deserialize;
 
-@Internal
+/**
+ * Query that selects {@link CommandStorageRecord} by ID.
+ *
+ * @author Alexander Litus
+ * @author Andrey Lavrov
+ */
 public class SelectCommandByIdQuery extends SelectByIdQuery<String, CommandStorageRecord> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")

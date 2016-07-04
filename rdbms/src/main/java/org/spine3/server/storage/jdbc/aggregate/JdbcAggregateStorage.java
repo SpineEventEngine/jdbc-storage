@@ -20,7 +20,6 @@
 
 package org.spine3.server.storage.jdbc.aggregate;
 
-import org.hsqldb.Table;
 import org.spine3.server.storage.AggregateStorage;
 import org.spine3.server.storage.AggregateStorageRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
@@ -59,10 +58,10 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     /**
      * Creates a new storage instance.
      *
-     * @param dataSource    the dataSource wrapper
-     * @param multitenant   defines can this datasource be accessed from multiple sources
-     * @param queryFactory  factory that generates queries for interaction with aggregate tables
-     * @throws DatabaseException if an error occurs during an interaction with the DB
+     * @param dataSource            the dataSource wrapper
+     * @param multitenant           defines can this datasource be accessed from multiple sources
+     * @param queryFactory          factory that generates queries for interaction with aggregate tables
+     * @throws DatabaseException    if an error occurs during an interaction with the DB
      */
     public static <I> JdbcAggregateStorage<I> newInstance(DataSourceWrapper dataSource,
                                                           boolean multitenant,

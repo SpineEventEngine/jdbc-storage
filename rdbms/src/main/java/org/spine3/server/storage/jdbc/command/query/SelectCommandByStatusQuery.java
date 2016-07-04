@@ -20,8 +20,6 @@
 
 package org.spine3.server.storage.jdbc.command.query;
 
-import org.spine3.Internal;
-import org.spine3.base.Command;
 import org.spine3.base.CommandStatus;
 import org.spine3.server.storage.CommandStorageRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
@@ -33,17 +31,16 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Iterator;
 
-import static org.spine3.server.storage.jdbc.command.query.Constants.*;
+import static org.spine3.server.storage.jdbc.command.query.CommandTable.*;
 
 
 /**
- * A query which obtains a {@link Command} by an command status.
+ * query that selects {@link CommandStorageRecord} by {@link CommandStatus}.
  *
+ * @author Alexander Litus
  * @author Andrey Lavrov
  */
-
-@Internal
-public class SelectByStatusQuery extends Query {
+public class SelectCommandByStatusQuery extends Query {
 
     private final CommandStatus status;
 
@@ -55,7 +52,7 @@ public class SelectByStatusQuery extends Query {
     /**
      * Creates a new query instance.
      */
-    protected SelectByStatusQuery(Builder builder) {
+    protected SelectCommandByStatusQuery(Builder builder) {
         super(builder);
         this.status = builder.status;
     }
@@ -93,13 +90,13 @@ public class SelectByStatusQuery extends Query {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder extends Query.Builder<Builder, SelectByStatusQuery> {
+    public static class Builder extends Query.Builder<Builder, SelectCommandByStatusQuery> {
 
         private CommandStatus status;
 
         @Override
-        public SelectByStatusQuery build() {
-            return new SelectByStatusQuery(this);
+        public SelectCommandByStatusQuery build() {
+            return new SelectCommandByStatusQuery(this);
         }
 
         public Builder setStatus(CommandStatus status) {

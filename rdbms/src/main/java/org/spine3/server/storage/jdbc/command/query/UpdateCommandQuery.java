@@ -20,8 +20,16 @@
 
 package org.spine3.server.storage.jdbc.command.query;
 
-import static org.spine3.server.storage.jdbc.command.query.Constants.*;
+import org.spine3.server.storage.CommandStorageRecord;
 
+import static org.spine3.server.storage.jdbc.command.query.CommandTable.*;
+
+/**
+ * Query that updates {@link CommandStorageRecord} in the {@link CommandTable}.
+ *
+ *
+ * @author Andrey Lavrov
+ */
 public class UpdateCommandQuery extends WriteCommandRecordQuery {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")

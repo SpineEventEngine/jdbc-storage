@@ -41,23 +41,26 @@ import static org.spine3.validate.Validate.checkNotDefault;
 
 /**
  * The implementation of the command storage based on the RDBMS.
+ * This storage contains 1 table. {@link org.spine3.server.storage.jdbc.command.query.CommandTable}
  *
  * @author Alexander Litus
  * @see JdbcStorageFactory
  */
 @SuppressWarnings("UtilityClass")
 public class JdbcCommandStorage extends CommandStorage {
+
     private final DataSourceWrapper dataSource;
 
     private final CommandStorageQueryFactory queryFactory;
+
     /**
      * Creates a new storage instance.
      *
-     * @param dataSource a data source to use to obtain connections
-     * @return a new storage instance
-     * @throws DatabaseException if an error occurs during an interaction with the DB
+     * @param dataSource            a data source to use to obtain connections
+     * @param queryFactory          factory that generates queries for interaction with command table
+     * @return                      a new storage instance
+     * @throws DatabaseException    if an error occurs during an interaction with the DB
      */
-
     public static CommandStorage newInstance(DataSourceWrapper dataSource, boolean multitenant, CommandStorageQueryFactory queryFactory) throws DatabaseException {
         return new JdbcCommandStorage(dataSource, multitenant, queryFactory);
     }
@@ -97,7 +100,7 @@ public class JdbcCommandStorage extends CommandStorage {
     @Override
     public Iterator<CommandStorageRecord> read(CommandStatus status) {
         checkNotNull(status);
-        final Iterator<CommandStorageRecord> iterator = queryFactory.newSelectByStatusQuery(status).execute();
+        final Iterator<CommandStorageRecord> iterator = queryFactory.newSelectCommandByStatusQuery(status).execute();
         return iterator;
     }
 

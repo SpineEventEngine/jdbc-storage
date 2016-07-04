@@ -23,41 +23,30 @@ package org.spine3.server.storage.jdbc.command.query;
 /**
  * A utility class representing constants which are necessary for working with command table.
  *
+ * @author Alexander Litus
  * @author Andrey Lavrov
  */
 @SuppressWarnings("UtilityClass")
-/* package */ final class Constants {
+/* package */ final class CommandTable {
 
-    /**
-     * Commands table name.
-     */
+    /** Commands table name. */
     /* package */ static final String TABLE_NAME = "commands";
 
-    /**
-     * Command ID column name.
-     */
+    /** Command ID column name. */
     /* package */ static final String ID_COL = "id";
 
-    /**
-     * Command record column name.
-     */
+    /** Command record column name. */
     /* package */ static final String COMMAND_COL = "command";
 
-    /**
-     * Is command status column name.
-     */
+    /** Command status column name. */
     /* package */ static final String COMMAND_STATUS_COL = "command_status";
 
-    /**
-     * Command error column name.
-     */
+    /** Command error column name. */
     /* package */ static final String ERROR_COL = "error";
 
-    /**
-     * Command failure column name.
-     */
+    /** Command failure column name. */
     /* package */ static final String FAILURE_COL = "failure";
 
-    private Constants() {
+    private CommandTable() {
     }
 }
