@@ -26,6 +26,7 @@ package org.spine3.server.storage.jdbc.projection.query;
  * @author Andrey Lavrov
  */
 @SuppressWarnings("UtilityClass")
+/* This table is a single row which represents timestamp of the last handled event. */
 /* package */ final class ProjectionTable {
 
     /** Last event time seconds column name. */

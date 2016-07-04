@@ -41,7 +41,6 @@ import static org.spine3.validate.Validate.checkNotDefault;
 
 /**
  * The implementation of the command storage based on the RDBMS.
- * This storage contains 1 table. {@link org.spine3.server.storage.jdbc.command.query.CommandTable}
  *
  * @author Alexander Litus
  * @see JdbcStorageFactory

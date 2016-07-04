@@ -37,7 +37,7 @@ import static org.spine3.io.IoUtil.closeAll;
 /**
  * The implementation of the aggregate storage based on the RDBMS.
  *
- * <p> This storage contains 2 tables by default, they are described in {@link org.spine3.server.storage.jdbc.aggregate.query.Table}
+ * <p> This storage contains 2 tables by default, they are described in {@link org.spine3.server.storage.jdbc.aggregate.query.Table}.
  *
  * @param <I>   the type of aggregate IDs
  * @see         JdbcStorageFactory

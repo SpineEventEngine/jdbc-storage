@@ -36,7 +36,7 @@ import static org.spine3.server.storage.jdbc.projection.query.ProjectionTable.SE
 import static org.spine3.validate.Validate.isDefault;
 
 /**
- * Query that selects all {@link Timestamp} from the {@link ProjectionTable}.
+ * Query that selects timestamp from the {@link ProjectionTable}.
  *
  * @author Alexander Litus
  * @author Andrey Lavrov

@@ -83,7 +83,7 @@ public class ProjectionStorageQueryFactory<I> {
         return builder.build();
     }
 
-    /** Returns a query that selects all {@link Timestamp} from the {@link ProjectionTable}. */
+    /** Returns a query that selects timestamp from the {@link ProjectionTable}. */
     public SelectTimestampQuery newSelectTimestampQuery() {
         final SelectTimestampQuery.Builder builder = SelectTimestampQuery.newBuilder(tableName)
                 .setDataSource(dataSource)
