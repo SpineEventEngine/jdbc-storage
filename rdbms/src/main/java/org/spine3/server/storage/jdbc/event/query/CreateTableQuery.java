@@ -27,9 +27,14 @@ import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import static org.spine3.server.storage.jdbc.event.query.Constants.*;
+import static org.spine3.server.storage.jdbc.event.query.EventTable.*;
 
-
+/**
+ * Query that creates a new {@link EventTable} if it does not exist.
+ *
+ * @author Alexander Litus
+ * @author Andrey Lavrov
+ */
 public class CreateTableQuery extends Query {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")

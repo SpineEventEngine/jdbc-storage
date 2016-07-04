@@ -29,10 +29,15 @@ import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import static org.spine3.server.storage.jdbc.event.query.Constants.*;
+import static org.spine3.server.storage.jdbc.event.query.EventTable.*;
 import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
-
+/**
+ * Query that inserts a new {@link EventStorageRecord} to the {@link EventTable}.
+ *
+ * @author Alexander Litus
+ * @author Andrey Lavrov
+ */
 public class InsertEventQuery extends WriteRecordQuery<String, EventStorageRecord> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")

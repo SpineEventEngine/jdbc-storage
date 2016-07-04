@@ -20,13 +20,17 @@
 
 package org.spine3.server.storage.jdbc.event.query;
 
-import org.spine3.Internal;
 import org.spine3.server.storage.EventStorageRecord;
 import org.spine3.server.storage.jdbc.query.SelectByIdQuery;
 
-import static org.spine3.server.storage.jdbc.event.query.Constants.*;
+import static org.spine3.server.storage.jdbc.event.query.EventTable.*;
 
-@Internal
+/**
+ * Query that selects {@link EventStorageRecord} by ID.
+ *
+ * @author Alexander Litus
+ * @author Andrey Lavrov
+ */
 public class SelectEventByIdQuery extends SelectByIdQuery<String, EventStorageRecord> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")

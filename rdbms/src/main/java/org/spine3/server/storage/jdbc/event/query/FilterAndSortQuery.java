@@ -36,8 +36,14 @@ import java.sql.PreparedStatement;
 import java.util.Iterator;
 
 import static org.spine3.base.Identifiers.idToString;
-import static org.spine3.server.storage.jdbc.event.query.Constants.*;
+import static org.spine3.server.storage.jdbc.event.query.EventTable.*;
 
+/**
+ * Query that selects {@link EventStorageRecord} by specified {@link EventStreamQuery}.
+ *
+ * @author Alexander Litus
+ * @author Andrey Lavrov
+ */
 public class FilterAndSortQuery extends Query {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")

@@ -52,17 +52,16 @@ public class JdbcEventStorage extends EventStorage {
 
     private final EventStorageQueryFactory queryFactory;
 
-    /**
-     * Iterators which are not closed yet.
-     */
+    /** Iterators which are not closed yet. */
     private final Collection<DbIterator> iterators = newLinkedList();
 
     /**
      * Creates a new storage instance.
      *
-     * @throws DatabaseException if an error occurs during an interaction with the DB
-     * @param dataSource the dataSource wrapper
-     *
+     * @param dataSource            the dataSource wrapper
+     * @param multitenant           defines is this storage multitenant
+     * @param queryFactory          factory that will generate queries for interaction with event table.
+     * @throws DatabaseException    if an error occurs during an interaction with the DB
      */
     public static JdbcEventStorage newInstance(DataSourceWrapper dataSource,
                                                boolean multitenant,
