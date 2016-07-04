@@ -69,7 +69,7 @@ public class JdbcCommandStorage extends CommandStorage {
         return new JdbcCommandStorage(dataSource, multitenant, queryFactory);
     }
 
-    private JdbcCommandStorage(DataSourceWrapper dataSource,
+    protected JdbcCommandStorage(DataSourceWrapper dataSource,
                                boolean multitenant,
                                CommandStorageQueryFactory queryFactory)
             throws DatabaseException {

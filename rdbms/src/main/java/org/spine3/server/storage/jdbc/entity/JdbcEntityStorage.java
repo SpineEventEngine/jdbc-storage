@@ -62,7 +62,7 @@ public class JdbcEntityStorage<I> extends EntityStorage<I> {
         return new JdbcEntityStorage<>(dataSource, multitenant, queryFactory);
     }
 
-    private JdbcEntityStorage(DataSourceWrapper dataSource, boolean multitenant, EntityStorageQueryFactory<I> queryFactory)
+    protected JdbcEntityStorage(DataSourceWrapper dataSource, boolean multitenant, EntityStorageQueryFactory<I> queryFactory)
             throws DatabaseException {
         super(multitenant);
         this.dataSource = dataSource;

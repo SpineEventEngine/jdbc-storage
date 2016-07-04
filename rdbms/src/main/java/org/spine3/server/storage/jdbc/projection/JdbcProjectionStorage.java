@@ -51,7 +51,9 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
      *
      * @param dataSource      a data source used by an {@code entityStorage}
      * @param entityStorage   an entity storage to use
-     * @param <I>            a type of projection IDs
+     * @param multitenant     defines is this storage multitenant
+     * @param queryFactory    factory that will generate queries for interaction with projection table.
+     * @param <I>             a type of projection IDs
      * @return a new storage instance
      */
     public static <I> ProjectionStorage<I> newInstance(DataSourceWrapper dataSource,
@@ -62,7 +64,7 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
         return new JdbcProjectionStorage<>(dataSource, entityStorage, multitenant, queryFactory);
     }
 
-    private JdbcProjectionStorage(DataSourceWrapper dataSource,
+    protected JdbcProjectionStorage(DataSourceWrapper dataSource,
                                   JdbcEntityStorage<I> entityStorage,
                                   boolean multitenant,
                                   ProjectionStorageQueryFactory<I> queryFactory) throws DatabaseException {

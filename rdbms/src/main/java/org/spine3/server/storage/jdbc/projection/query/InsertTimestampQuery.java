@@ -29,10 +29,15 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import static java.lang.String.format;
-import static org.spine3.server.storage.jdbc.projection.query.Constants.NANOS_COL;
-import static org.spine3.server.storage.jdbc.projection.query.Constants.SECONDS_COL;
+import static org.spine3.server.storage.jdbc.projection.query.ProjectionTable.NANOS_COL;
+import static org.spine3.server.storage.jdbc.projection.query.ProjectionTable.SECONDS_COL;
 
-
+/**
+ * Query that inserts a new {@link Timestamp} to the {@link ProjectionTable}.
+ *
+ * @author Alexander Litus
+ * @author Andrey Lavrov
+ */
 public class InsertTimestampQuery extends WriteQuery{
 
     private final Timestamp timestamp;
