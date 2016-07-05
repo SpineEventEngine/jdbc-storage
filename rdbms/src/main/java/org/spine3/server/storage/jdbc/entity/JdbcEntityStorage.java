@@ -68,7 +68,7 @@ public class JdbcEntityStorage<I> extends EntityStorage<I> {
         this.dataSource = dataSource;
         this.queryFactory = queryFactory;
         queryFactory.setLogger(LogSingleton.INSTANCE.value);
-        queryFactory.newCreateTableQuery().execute();
+        queryFactory.newCreateEntityTableQuery().execute();
     }
 
     /**

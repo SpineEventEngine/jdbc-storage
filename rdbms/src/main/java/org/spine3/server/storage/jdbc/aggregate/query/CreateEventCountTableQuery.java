@@ -20,15 +20,8 @@
 
 package org.spine3.server.storage.jdbc.aggregate.query;
 
-import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.query.Query;
-import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
-import org.spine3.server.storage.jdbc.util.IdColumn;
+import org.spine3.server.storage.jdbc.query.CreateTableQuery;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-
-import static java.lang.String.format;
 import static org.spine3.server.storage.jdbc.aggregate.query.Table.EventCount.EVENT_COUNT_COL;
 import static org.spine3.server.storage.jdbc.aggregate.query.Table.EventCount.ID_COL;
 
@@ -38,10 +31,7 @@ import static org.spine3.server.storage.jdbc.aggregate.query.Table.EventCount.ID
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-public class CreateEventCountTableQuery<I> extends Query {
-
-    private final IdColumn<I> idColumn;
-    private final String tableName;
+public class CreateEventCountTableQuery<I> extends CreateTableQuery<I> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY =
@@ -51,21 +41,6 @@ public class CreateEventCountTableQuery<I> extends Query {
 
     protected CreateEventCountTableQuery(Builder<I> builder) {
         super(builder);
-        this.idColumn = builder.idColumn;
-        this.tableName = builder.tableName;
-    }
-
-    @SuppressWarnings("DuplicateStringLiteralInspection")
-    public void execute() throws DatabaseException {
-        final String idColumnType = idColumn.getColumnDataType();
-        final String createTableSql = format(QUERY, tableName, idColumnType);
-        try (ConnectionWrapper connection = this.getConnection(true);
-             PreparedStatement statement = connection.prepareStatement(createTableSql)) {
-            statement.execute();
-        } catch (SQLException e) {
-            this.getLogger().error("Error while creating a table with the name: " + tableName, e);
-            throw new DatabaseException(e);
-        }
     }
 
     public static <I> Builder<I> newBuilder() {
@@ -75,24 +50,11 @@ public class CreateEventCountTableQuery<I> extends Query {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder<I> extends Query.Builder<Builder<I>, CreateEventCountTableQuery> {
-
-        private IdColumn<I> idColumn;
-        private String tableName;
+    public static class Builder<I> extends CreateTableQuery.Builder<Builder<I>, CreateEventCountTableQuery, I> {
 
         @Override
         public CreateEventCountTableQuery build() {
             return new CreateEventCountTableQuery<>(this);
-        }
-
-        public Builder<I> setIdColumn(IdColumn<I> idColumn) {
-            this.idColumn = idColumn;
-            return getThis();
-        }
-
-        public Builder<I> setTableName(String tableName) {
-            this.tableName = tableName;
-            return getThis();
         }
 
         @Override

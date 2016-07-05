@@ -20,12 +20,7 @@
 
 package org.spine3.server.storage.jdbc.command.query;
 
-import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.query.Query;
-import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
-
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import org.spine3.server.storage.jdbc.query.CreateTableQuery;
 
 import static org.spine3.server.storage.jdbc.command.query.CommandTable.*;
 
@@ -35,12 +30,12 @@ import static org.spine3.server.storage.jdbc.command.query.CommandTable.*;
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-public class CreateTableQuery extends Query {
+public class CreateCommandTableQuery extends CreateTableQuery<String> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String INSERT_QUERY =
-            "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" +
-                    ID_COL + " VARCHAR(512), " +
+            "CREATE TABLE IF NOT EXISTS %s (" +
+                    ID_COL + " %s, " +
                     COMMAND_COL + " BLOB, " +
                     COMMAND_STATUS_COL + " VARCHAR(512), " +
                     ERROR_COL + " BLOB, " +
@@ -48,7 +43,7 @@ public class CreateTableQuery extends Query {
                     " PRIMARY KEY(" + ID_COL + ')' +
                     ");";
 
-    public CreateTableQuery(Builder builder) {
+    public CreateCommandTableQuery(Builder builder) {
         super(builder);
     }
 
@@ -58,22 +53,12 @@ public class CreateTableQuery extends Query {
         return builder;
     }
 
-    public void execute() throws DatabaseException {
-        try (ConnectionWrapper connection = this.getConnection(true);
-             PreparedStatement statement = this.prepareStatement(connection)) {
-            statement.execute();
-        } catch (SQLException e) {
-            this.getLogger().error("Exception during table creation:", e);
-            throw new DatabaseException(e);
-        }
-    }
-
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder extends Query.Builder<Builder, CreateTableQuery> {
+    public static class Builder extends CreateTableQuery.Builder<Builder, CreateCommandTableQuery, String> {
 
         @Override
-        public CreateTableQuery build() {
-            return new CreateTableQuery(this);
+        public CreateCommandTableQuery build() {
+            return new CreateCommandTableQuery(this);
         }
 
         @Override

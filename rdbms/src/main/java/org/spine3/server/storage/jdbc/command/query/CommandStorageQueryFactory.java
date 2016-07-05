@@ -29,6 +29,8 @@ import org.spine3.server.storage.CommandStorageRecord;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
+import static org.spine3.server.storage.jdbc.command.query.CommandTable.TABLE_NAME;
+
 /**
  * This class creates queries for interaction with {@link CommandTable}.
  *
@@ -57,10 +59,12 @@ public class CommandStorageQueryFactory {
     }
 
     /** Returns a query that creates a new {@link CommandTable} if it does not exist. */
-    public CreateTableQuery newCreateTableQuery(){
-        final CreateTableQuery.Builder builder = CreateTableQuery.newBuilder()
+    public CreateCommandTableQuery newCreateCommandTableQuery(){
+        final CreateCommandTableQuery.Builder builder = CreateCommandTableQuery.newBuilder()
                 .setDataSource(dataSource)
-                .setLogger(logger);
+                .setLogger(logger)
+                .setIdColumn(idColumn)
+                .setTableName(TABLE_NAME);
         return builder.build();
     }
 

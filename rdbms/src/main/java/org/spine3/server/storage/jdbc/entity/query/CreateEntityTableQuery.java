@@ -18,45 +18,45 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.spine3.server.storage.jdbc.aggregate.query;
+package org.spine3.server.storage.jdbc.entity.query;
 
 import org.spine3.server.storage.jdbc.query.CreateTableQuery;
 
-import static org.spine3.server.storage.jdbc.aggregate.query.Table.AggregateRecord.*;
+import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ENTITY_COL;
+import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
 
 /**
- * Query that creates a new {@link Table.AggregateRecord} if it does not exist.
+ * Query that creates a new {@link EntityTable} if it does not exist.
  *
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-public class CreateMainTableQuery<I> extends CreateTableQuery<I> {
+public class CreateEntityTableQuery<I> extends CreateTableQuery<I> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String QUERY =
+    private static final String CREATE_TABLE_IF_DOES_NOT_EXIST =
             "CREATE TABLE IF NOT EXISTS %s (" +
                     ID_COL + " %s, " +
-                    AGGREGATE_COL + " BLOB, " +
-                    SECONDS_COL + " BIGINT, " +
-                    NANOS_COL + " INT " +
+                    ENTITY_COL + " BLOB, " +
+                    "PRIMARY KEY(" + ID_COL + ')' +
                     ");";
 
-    protected CreateMainTableQuery(Builder<I> builder) {
+    protected CreateEntityTableQuery(Builder<I> builder) {
         super(builder);
     }
 
-    public static <I>Builder <I>newBuilder() {
-        final Builder <I>builder = new Builder<>();
-        builder.setQuery(QUERY);
+    public static <I>Builder<I> newBuilder() {
+        final Builder <I> builder = new Builder<>();
+        builder.setQuery(CREATE_TABLE_IF_DOES_NOT_EXIST);
         return builder;
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder<I> extends CreateTableQuery.Builder<Builder<I>, CreateMainTableQuery, I> {
+    public static class Builder<I> extends CreateTableQuery.Builder<Builder<I>, CreateEntityTableQuery, I> {
 
         @Override
-        public CreateMainTableQuery build() {
-            return new CreateMainTableQuery<>(this);
+        public CreateEntityTableQuery build() {
+            return new CreateEntityTableQuery<>(this);
         }
 
         @Override

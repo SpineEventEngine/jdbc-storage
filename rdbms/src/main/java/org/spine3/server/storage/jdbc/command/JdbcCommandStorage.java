@@ -76,7 +76,7 @@ public class JdbcCommandStorage extends CommandStorage {
         this.dataSource = dataSource;
         this.queryFactory = queryFactory;
         queryFactory.setLogger(LogSingleton.INSTANCE.value);
-        queryFactory.newCreateTableQuery().execute();
+        queryFactory.newCreateCommandTableQuery().execute();
     }
 
     /**

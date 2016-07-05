@@ -18,51 +18,51 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.spine3.server.storage.jdbc.entity.query;
+package org.spine3.server.storage.jdbc.query;
 
+import org.spine3.Internal;
 import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.query.Query;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
+import javax.annotation.Nullable;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import static java.lang.String.format;
-import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ENTITY_COL;
-import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
 
 /**
- * Query that creates a new {@link EntityTable} if it does not exist.
+ * A query that creates data table if it does not exist.
  *
- * @author Alexander Litus
  * @author Andrey Lavrov
  */
+@Internal
 public class CreateTableQuery<I> extends Query {
 
+    @Nullable
     private final IdColumn<I> idColumn;
     private final String tableName;
 
-    @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String CREATE_TABLE_IF_DOES_NOT_EXIST =
-            "CREATE TABLE IF NOT EXISTS %s (" +
-                    ID_COL + " %s, " +
-                    ENTITY_COL + " BLOB, " +
-                    "PRIMARY KEY(" + ID_COL + ')' +
-                    ");";
-
-    protected CreateTableQuery(Builder<I> builder) {
+    protected CreateTableQuery(Builder<? extends Builder, ? extends CreateTableQuery, I> builder) {
         super(builder);
         this.idColumn = builder.idColumn;
         this.tableName = builder.tableName;
     }
 
-    @SuppressWarnings("DuplicateStringLiteralInspection")
-    public void execute() throws DatabaseException {
-        final String idColumnType = idColumn.getColumnDataType();
-        final String createTableSql = format(CREATE_TABLE_IF_DOES_NOT_EXIST, tableName, idColumnType);
+    /**
+     * Executes a create table query.
+     * Creates tables with ID column if idColumn is null, or with out it otherwise.
+     */
+    public void execute() {
+        final String sql;
+        if (idColumn != null) {
+            final String idColumnType = idColumn.getColumnDataType();
+            sql = format(this.getQuery(), tableName, idColumnType);
+        } else {
+            sql = format(this.getQuery(), tableName);
+        }
         try (ConnectionWrapper connection = this.getConnection(true);
-             PreparedStatement statement = connection.prepareStatement(createTableSql)) {
+             PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.execute();
         } catch (SQLException e) {
             this.getLogger().error("Error while creating a table with the name: " + tableName, e);
@@ -70,36 +70,21 @@ public class CreateTableQuery<I> extends Query {
         }
     }
 
-    public static <I>Builder<I> newBuilder() {
-        final Builder <I> builder = new Builder<>();
-        builder.setQuery(CREATE_TABLE_IF_DOES_NOT_EXIST);
-        return builder;
-    }
-
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder<I> extends Query.Builder<Builder<I>, CreateTableQuery> {
+    public abstract static class Builder<B extends Builder<B, Q, I>, Q extends CreateTableQuery, I>
+            extends Query.Builder<B, Q> {
 
         private IdColumn<I> idColumn;
         private String tableName;
 
-        @Override
-        public CreateTableQuery build() {
-            return new CreateTableQuery<>(this);
-        }
-
-        public Builder<I> setIdColumn(IdColumn<I> idColumn){
+        public B setIdColumn(IdColumn<I> idColumn){
             this.idColumn = idColumn;
             return getThis();
         }
 
-        public Builder<I> setTableName(String tableName){
+        public B setTableName(String tableName){
             this.tableName = tableName;
             return getThis();
-        }
-
-        @Override
-        protected Builder<I> getThis() {
-            return this;
         }
     }
 }
