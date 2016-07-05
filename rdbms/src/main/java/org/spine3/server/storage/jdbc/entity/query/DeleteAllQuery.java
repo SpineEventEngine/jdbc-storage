@@ -22,6 +22,7 @@ package org.spine3.server.storage.jdbc.entity.query;
 
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.Query;
+import org.spine3.server.storage.jdbc.query.WriteQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 
 import java.sql.PreparedStatement;
@@ -35,22 +36,12 @@ import static java.lang.String.format;
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-public class DeleteAllQuery extends Query {
+public class DeleteAllQuery extends WriteQuery {
 
     private static final String DELETE_ALL = "DELETE FROM %s ;";
 
     private DeleteAllQuery(Builder builder) {
         super(builder);
-    }
-
-    public void execute() throws DatabaseException {
-        try (ConnectionWrapper connection = this.getConnection(true);
-             PreparedStatement statement = prepareStatement(connection)) {
-            statement.execute();
-        } catch (SQLException e) {
-            this.getLogger().error("Error while deleting all from entity table ", e);
-            throw new DatabaseException(e);
-        }
     }
 
     public static Builder newBuilder(String tableName) {
@@ -60,7 +51,7 @@ public class DeleteAllQuery extends Query {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder extends Query.Builder<Builder, DeleteAllQuery> {
+    public static class Builder extends WriteQuery.Builder<Builder, DeleteAllQuery> {
 
         @Override
         public DeleteAllQuery build() {

@@ -54,16 +54,18 @@ public class JdbcStorageFactory implements StorageFactory {
     /**
      * Creates a new instance with the specified data source configuration.
      *
-     * @param config the config used to create the {@link DataSource}
+     * @param config        the config used to create the {@link DataSource}
+     * @param multitenant   defines whether created storage will be multi-tenant
      */
     public static JdbcStorageFactory newInstance(DataSourceConfig config, boolean multitenant) {
         return new JdbcStorageFactory(config, multitenant);
     }
 
     /**
-     * Creates a new instance with the specified data source configuration.
+     * Creates a new instance with the specified data source.
      *
-     * @param dataSource the {@link DataSource} on which created storages are based.
+     * @param dataSource    the {@link DataSource} on which created storages are based.
+     * @param multitenant   defines whether created storage will be multi-tenant
      */
     public static JdbcStorageFactory newInstance(DataSource dataSource, boolean multitenant) {
         return new JdbcStorageFactory(DataSourceWrapper.wrap(dataSource), multitenant);
@@ -117,12 +119,11 @@ public class JdbcStorageFactory implements StorageFactory {
     }
 
     /**
-     * Returns {@link AggregateStorageQueryFactory}.
-     * Override this method to use custom {@link AggregateStorageQueryFactory} extensions.
+     * Creates a new {@link AggregateStorageQueryFactory} which produces database queries for corresponding {@link JdbcAggregateStorage}.
      *
      * @param dataSource        {@link DataSource} on which corresponding {@link JdbcAggregateStorage} is based
-     * @param aggregateClass    class of {@link Aggregate} stored in corresponding {@link JdbcAggregateStorage}
-     * @param <I>               a type of stored aggregate IDs
+     * @param aggregateClass    class of aggregates which are stored in the corresponding {@link JdbcAggregateStorage}
+     * @param <I>               a type of IDs of stored aggregates
      */
     protected  <I> AggregateStorageQueryFactory<I> getAggregateStorageQueryFactory(DataSourceWrapper dataSource,
                                                                                    Class<? extends Aggregate<I, ?, ?>> aggregateClass){
@@ -130,12 +131,11 @@ public class JdbcStorageFactory implements StorageFactory {
     }
 
     /**
-     * Returns {@link EntityStorageQueryFactory}.
-     * Override this method to use custom {@link EntityStorageQueryFactory} extensions.
+     * Creates a new {@link EntityStorageQueryFactory} which produces database queries for corresponding {@link JdbcEntityStorage}.
      *
      * @param dataSource        {@link DataSource} on which corresponding {@link JdbcEntityStorage} is based
-     * @param entityClass       class of entity stored in corresponding {@link JdbcEntityStorage}
-     * @param <I>               a type of stored entity IDs
+     * @param entityClass       class of entities which are stored in the corresponding {@link JdbcEntityStorage}
+     * @param <I>               a type of IDs of stored entities
      */
     protected <I> EntityStorageQueryFactory<I> getEntityStorageQueryFactory(DataSourceWrapper dataSource,
                                                                             Class<? extends Entity<I, ?>> entityClass){
@@ -143,12 +143,11 @@ public class JdbcStorageFactory implements StorageFactory {
     }
 
     /**
-     * Returns {@link ProjectionStorageQueryFactory}.
-     * Override this method to use custom {@link ProjectionStorageQueryFactory} extensions.
+     * Creates a new {@link ProjectionStorageQueryFactory} which produces database queries for corresponding {@link JdbcProjectionStorage}.
      *
      * @param dataSource        {@link DataSource} on which corresponding {@link JdbcProjectionStorage} is based
-     * @param entityClass       class of entity stored in corresponding {@link JdbcEntityStorage}
-     * @param <I>               a type of stored in corresponding {@link JdbcEntityStorage} entity IDs
+     * @param entityClass       class of entities which are stored in the corresponding {@link JdbcEntityStorage}
+     * @param <I>               a type of IDs of entities from the corresponding {@link JdbcEntityStorage}
      */
     protected <I> ProjectionStorageQueryFactory<I> getProjectionStorageQueryFactory(DataSourceWrapper dataSource,
                                                                                     Class<? extends Entity<I, ?>> entityClass){
@@ -156,8 +155,7 @@ public class JdbcStorageFactory implements StorageFactory {
     }
 
     /**
-     * Returns {@link EventStorageQueryFactory}.
-     * Override this method to use custom {@link EventStorageQueryFactory} extensions.
+     * Creates a new {@link EventStorageQueryFactory} which produces database queries for corresponding {@link JdbcEventStorage}.
      *
      * @param dataSource        {@link DataSource} on which corresponding {@link JdbcEventStorage} is based
      */
@@ -166,8 +164,7 @@ public class JdbcStorageFactory implements StorageFactory {
     }
 
     /**
-     * Returns {@link CommandStorageQueryFactory}.
-     * Override this method to use custom {@link CommandStorageQueryFactory} extensions.
+     * Creates a new {@link CommandStorageQueryFactory} which produces database queries for corresponding {@link JdbcCommandStorage}.
      *
      * @param dataSource        {@link DataSource} on which corresponding {@link JdbcCommandStorage} is based
      */

@@ -131,7 +131,7 @@ public class AggregateStorageQueryFactory<I> {
     }
 
     /** Returns a query that selects event count by corresponding aggregate ID. */
-    public SelectEventCountByIdQuery newSelectEventCountByIdQuery(I id) {
+    public SelectEventCountByIdQuery<I> newSelectEventCountByIdQuery(I id) {
         final SelectEventCountByIdQuery.Builder<I> builder = SelectEventCountByIdQuery.<I>newBuilder(eventCountTableName)
                 .setDataSource(dataSource)
                 .setLogger(logger)

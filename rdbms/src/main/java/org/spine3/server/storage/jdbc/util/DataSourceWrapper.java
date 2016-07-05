@@ -30,7 +30,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
- * Wrapper for {@link DataSource}.
+ * Wrapper for {@link DataSource} instances.
  *
  * @author Alexander Litus
  * @author Andrey Lavrov
@@ -84,7 +84,7 @@ public class DataSourceWrapper implements AutoCloseable {
             }
             return;
         }
-        log().warn("Close method is not implemented for " + this.dataSource.getClass());
+        log().warn("Close method is not implemented in " + this.dataSource.getClass());
     }
 
     private static Logger log() {
