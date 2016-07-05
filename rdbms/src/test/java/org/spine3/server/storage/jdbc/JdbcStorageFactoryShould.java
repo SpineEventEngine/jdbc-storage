@@ -22,6 +22,7 @@ package org.spine3.server.storage.jdbc;
 
 import com.google.protobuf.StringValue;
 import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import org.junit.Before;
 import org.junit.Test;
 import org.spine3.server.aggregate.Aggregate;
@@ -29,7 +30,6 @@ import org.spine3.server.entity.Entity;
 import org.spine3.server.projection.Projection;
 import org.spine3.server.storage.*;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.server.storage.jdbc.util.HikariDataSourceWrapper;
 import org.spine3.test.project.Project;
 
 import static org.junit.Assert.assertNotNull;
@@ -57,7 +57,7 @@ public class JdbcStorageFactoryShould {
                 .setPassword("pwd")
                 .setMaxPoolSize(12)
                 .build();
-        factory = JdbcStorageFactory.newInstance(config);
+        factory = JdbcStorageFactory.newInstance(config, false);
     }
 
     @Test
@@ -95,7 +95,7 @@ public class JdbcStorageFactoryShould {
         final String dbUrl = newInMemoryDbUrl(dbName);
         config.setJdbcUrl(dbUrl);
         // not setting username and password is OK for in-memory database
-        final DataSourceWrapper dataSource = HikariDataSourceWrapper.newInstance(config);
+        final DataSourceWrapper dataSource = DataSourceWrapper.wrap(new HikariDataSource(config));
         return dataSource;
     }
 

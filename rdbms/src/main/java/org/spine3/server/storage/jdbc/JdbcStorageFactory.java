@@ -21,6 +21,7 @@
 package org.spine3.server.storage.jdbc;
 
 import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import org.spine3.server.aggregate.Aggregate;
 import org.spine3.server.entity.Entity;
 import org.spine3.server.storage.*;
@@ -35,7 +36,7 @@ import org.spine3.server.storage.jdbc.event.query.EventStorageQueryFactory;
 import org.spine3.server.storage.jdbc.projection.JdbcProjectionStorage;
 import org.spine3.server.storage.jdbc.projection.query.ProjectionStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.server.storage.jdbc.util.HikariDataSourceWrapper;
+import org.spine3.server.storage.jdbc.util.DefaultDataSourceConfigConverter;
 
 import javax.sql.DataSource;
 
@@ -43,6 +44,7 @@ import javax.sql.DataSource;
  * Creates storages based on JDBC-compliant RDBMS.
  *
  * @author Alexander Litus
+ * @author Andrey Lavrov
  */
 public class JdbcStorageFactory implements StorageFactory {
 
@@ -54,14 +56,28 @@ public class JdbcStorageFactory implements StorageFactory {
      *
      * @param config the config used to create the {@link DataSource}
      */
-    public static JdbcStorageFactory newInstance(DataSourceConfig config) {
-        return new JdbcStorageFactory(config);
+    public static JdbcStorageFactory newInstance(DataSourceConfig config, boolean multitenant) {
+        return new JdbcStorageFactory(config, multitenant);
     }
 
-    private JdbcStorageFactory(DataSourceConfig config) {
-        final HikariConfig hikariConfig = ConfigConverter.toHikariConfig(config);
-        this.dataSource = HikariDataSourceWrapper.newInstance(hikariConfig);
-        this.multitenant = config.isMultitenant();
+    /**
+     * Creates a new instance with the specified data source configuration.
+     *
+     * @param dataSource the {@link DataSource} on which created storages are based.
+     */
+    public static JdbcStorageFactory newInstance(DataSource dataSource, boolean multitenant) {
+        return new JdbcStorageFactory(DataSourceWrapper.wrap(dataSource), multitenant);
+    }
+
+    protected JdbcStorageFactory(DataSourceConfig config, boolean multitenant) {
+        final HikariConfig hikariConfig = DefaultDataSourceConfigConverter.convert(config);
+        this.dataSource = DataSourceWrapper.wrap(new HikariDataSource(hikariConfig));
+        this.multitenant = multitenant;
+    }
+
+    protected JdbcStorageFactory(DataSourceWrapper dataSource, boolean multitenant) {
+        this.dataSource = dataSource;
+        this.multitenant = multitenant;
     }
 
     @Override
@@ -86,7 +102,6 @@ public class JdbcStorageFactory implements StorageFactory {
                 getAggregateStorageQueryFactory(dataSource, aggregateClass));
     }
 
-
     @Override
     public <I> EntityStorage<I> createEntityStorage(Class<? extends Entity<I, ?>> entityClass) {
         return JdbcEntityStorage
@@ -101,25 +116,61 @@ public class JdbcStorageFactory implements StorageFactory {
                 .newInstance(dataSource, entityStorage, false, getProjectionStorageQueryFactory(dataSource, projectionClass));
     }
 
+    /**
+     * Returns {@link AggregateStorageQueryFactory}.
+     * Override this method to use custom {@link AggregateStorageQueryFactory} extensions.
+     *
+     * @param dataSource        {@link DataSource} on which corresponding {@link JdbcAggregateStorage} is based
+     * @param aggregateClass    class of {@link Aggregate} stored in corresponding {@link JdbcAggregateStorage}
+     * @param <I>               a type of stored aggregate IDs
+     */
     protected  <I> AggregateStorageQueryFactory<I> getAggregateStorageQueryFactory(DataSourceWrapper dataSource,
                                                                                    Class<? extends Aggregate<I, ?, ?>> aggregateClass){
         return new AggregateStorageQueryFactory<>(dataSource, aggregateClass);
     }
 
+    /**
+     * Returns {@link EntityStorageQueryFactory}.
+     * Override this method to use custom {@link EntityStorageQueryFactory} extensions.
+     *
+     * @param dataSource        {@link DataSource} on which corresponding {@link JdbcEntityStorage} is based
+     * @param entityClass       class of entity stored in corresponding {@link JdbcEntityStorage}
+     * @param <I>               a type of stored entity IDs
+     */
     protected <I> EntityStorageQueryFactory<I> getEntityStorageQueryFactory(DataSourceWrapper dataSource,
                                                                             Class<? extends Entity<I, ?>> entityClass){
         return new EntityStorageQueryFactory<>(dataSource, entityClass);
     }
 
+    /**
+     * Returns {@link ProjectionStorageQueryFactory}.
+     * Override this method to use custom {@link ProjectionStorageQueryFactory} extensions.
+     *
+     * @param dataSource        {@link DataSource} on which corresponding {@link JdbcProjectionStorage} is based
+     * @param entityClass       class of entity stored in corresponding {@link JdbcEntityStorage}
+     * @param <I>               a type of stored in corresponding {@link JdbcEntityStorage} entity IDs
+     */
     protected <I> ProjectionStorageQueryFactory<I> getProjectionStorageQueryFactory(DataSourceWrapper dataSource,
                                                                                     Class<? extends Entity<I, ?>> entityClass){
         return new ProjectionStorageQueryFactory<>(dataSource, entityClass);
     }
 
+    /**
+     * Returns {@link EventStorageQueryFactory}.
+     * Override this method to use custom {@link EventStorageQueryFactory} extensions.
+     *
+     * @param dataSource        {@link DataSource} on which corresponding {@link JdbcEventStorage} is based
+     */
     protected EventStorageQueryFactory getEventStorageQueryFactory(DataSourceWrapper dataSource){
         return new EventStorageQueryFactory(dataSource);
     }
 
+    /**
+     * Returns {@link CommandStorageQueryFactory}.
+     * Override this method to use custom {@link CommandStorageQueryFactory} extensions.
+     *
+     * @param dataSource        {@link DataSource} on which corresponding {@link JdbcCommandStorage} is based
+     */
     protected CommandStorageQueryFactory getCommandStorageQueryFactory(DataSourceWrapper dataSource){
         return new CommandStorageQueryFactory(dataSource);
     }
@@ -127,58 +178,5 @@ public class JdbcStorageFactory implements StorageFactory {
     @Override
     public void close() {
         dataSource.close();
-    }
-
-    private static class ConfigConverter {
-
-        @SuppressWarnings("MethodWithMoreThanThreeNegations") // is OK in this case
-        private static HikariConfig toHikariConfig(DataSourceConfig config) {
-            final HikariConfig result = new HikariConfig();
-
-            // Required fields
-
-            result.setDataSourceClassName(config.getDataSourceClassName());
-            result.setJdbcUrl(config.getJdbcUrl());
-            result.setUsername(config.getUsername());
-            result.setPassword(config.getPassword());
-
-            // Optional fields
-
-            final Boolean autoCommit = config.getAutoCommit();
-            if (autoCommit != null) {
-                result.setAutoCommit(autoCommit);
-            }
-
-            final Long connectionTimeout = config.getConnectionTimeout();
-            if (connectionTimeout != null) {
-                result.setConnectionTimeout(connectionTimeout);
-            }
-
-            final Long idleTimeout = config.getIdleTimeout();
-            if (idleTimeout != null) {
-                result.setIdleTimeout(idleTimeout);
-            }
-
-            final Long maxLifetime = config.getMaxLifetime();
-            if (maxLifetime != null) {
-                result.setMaxLifetime(maxLifetime);
-            }
-
-            final String connectionTestQuery = config.getConnectionTestQuery();
-            if (connectionTestQuery != null) {
-                result.setConnectionTestQuery(connectionTestQuery);
-            }
-
-            final Integer maxPoolSize = config.getMaxPoolSize();
-            if (maxPoolSize != null) {
-                result.setMaximumPoolSize(maxPoolSize);
-            }
-
-            final String poolName = config.getPoolName();
-            if (poolName != null) {
-                result.setPoolName(poolName);
-            }
-            return result;
-        }
     }
 }

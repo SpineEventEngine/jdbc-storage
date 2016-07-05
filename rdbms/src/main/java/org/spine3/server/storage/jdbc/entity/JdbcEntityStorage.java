@@ -83,7 +83,6 @@ public class JdbcEntityStorage<I> extends EntityStorage<I> {
         return record;
     }
 
-
     /**
      * {@inheritDoc}
      *

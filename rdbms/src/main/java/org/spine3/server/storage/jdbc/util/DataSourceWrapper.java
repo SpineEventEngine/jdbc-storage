@@ -30,17 +30,24 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
- * The base class for {@link DataSource} wrappers.
+ * Wrapper for {@link DataSource}.
  *
  * @author Alexander Litus
+ * @author Andrey Lavrov
  */
 @Internal
-public abstract class DataSourceWrapper implements AutoCloseable {
+public class DataSourceWrapper implements AutoCloseable {
 
-    /**
-     * Returns the implementation of {@link DataSource}.
-     */
-    public abstract DataSource getDataSource();
+    private final DataSource dataSource;
+
+    /** Wraps custom {@link DataSource} implementation */
+    public static DataSourceWrapper wrap(DataSource dataSource){
+        return new DataSourceWrapper(dataSource);
+    }
+
+    protected DataSourceWrapper(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
 
     /**
      * Retrieves a wrapped connection with the given auto commit mode.
@@ -50,7 +57,6 @@ public abstract class DataSourceWrapper implements AutoCloseable {
      */
     public ConnectionWrapper getConnection(boolean autoCommit) throws DatabaseException {
         try {
-            final DataSource dataSource = getDataSource();
             final Connection connection = dataSource.getConnection();
             connection.setAutoCommit(autoCommit);
             final ConnectionWrapper wrapper = ConnectionWrapper.wrap(connection);
@@ -61,8 +67,25 @@ public abstract class DataSourceWrapper implements AutoCloseable {
         }
     }
 
+    /**
+     * Closes wrapped {@link DataSource} implementation if it implements {@link AutoCloseable}.
+     * Otherwise warning will be thrown.
+     *
+     * @throws DatabaseException
+    */
     @Override
-    public abstract void close() throws DatabaseException;
+    public void close() throws DatabaseException{
+        if (dataSource instanceof AutoCloseable){
+            try {
+                ((AutoCloseable) dataSource).close();
+            } catch (Exception e) {
+                log().error("Error occurred while closing DataSource ", e);
+                throw new DatabaseException(e);
+            }
+            return;
+        }
+        log().warn("Close method is not implemented for " + this.dataSource.getClass());
+    }
 
     private static Logger log() {
         return LogSingleton.INSTANCE.value;
