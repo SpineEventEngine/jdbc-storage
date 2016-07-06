@@ -33,53 +33,53 @@ import static org.spine3.server.storage.jdbc.event.query.EventTable.*;
 import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
 /**
- * Query that updates {@link EventStorageRecord} in the {@link EventTable}.
+ * Query that inserts a new {@link EventStorageRecord} to the {@link EventTable}.
  *
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-public class UpdateEventQuery extends WriteRecordQuery<String, EventStorageRecord> {
+public class InsertEventRecordQuery extends WriteRecordQuery<String, EventStorageRecord> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String UPDATE_QUERY =
-            "UPDATE " + TABLE_NAME +
-                    " SET " +
-                    EVENT_COL + " = ?, " +
-                    EVENT_TYPE_COL + " = ?, " +
-                    PRODUCER_ID_COL + " = ?, " +
-                    SECONDS_COL + " = ?, " +
-                    NANOSECONDS_COL + " = ? " +
-                    " WHERE " + EVENT_ID_COL + " = ? ;";
+    private static final String INSERT_QUERY =
+            "INSERT INTO " + TABLE_NAME + " (" +
+                    EVENT_ID_COL + ", " +
+                    EVENT_COL + ", " +
+                    EVENT_TYPE_COL + ", " +
+                    PRODUCER_ID_COL + ", " +
+                    SECONDS_COL + ", " +
+                    NANOSECONDS_COL +
+                    ") VALUES (?, ?, ?, ?, ?, ?);";
 
-    private UpdateEventQuery(Builder builder) {
+    private InsertEventRecordQuery(Builder builder) {
         super(builder);
     }
 
     @Override
     @SuppressWarnings("DuplicateStringLiteralInspection")
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
-        final PreparedStatement statement = connection.prepareStatement(UPDATE_QUERY);
-            final Timestamp timestamp = this.getRecord().getTimestamp();
+        final PreparedStatement statement = connection.prepareStatement(INSERT_QUERY);
+        final Timestamp timestamp = getRecord().getTimestamp();
         try {
-            final byte[] serializedRecord = serialize(this.getRecord());
-            statement.setBytes(1, serializedRecord);
+            final String eventId = getRecord().getEventId();
+            statement.setString(1, eventId);
 
-            final String eventType = this.getRecord().getEventType();
-            statement.setString(2, eventType);
+            final byte[] serializedRecord = serialize(getRecord());
+            statement.setBytes(2, serializedRecord);
 
-            final String producerId = this.getRecord().getProducerId();
-            statement.setString(3, producerId);
+            final String eventType = getRecord().getEventType();
+            statement.setString(3, eventType);
+
+            final String producerId = getRecord().getProducerId();
+            statement.setString(4, producerId);
 
             final long seconds = timestamp.getSeconds();
-            statement.setLong(4, seconds);
+            statement.setLong(5, seconds);
 
             final int nanos = timestamp.getNanos();
-            statement.setInt(5, nanos);
-
-            final String eventId = this.getRecord().getEventId();
-            statement.setString(6, eventId);
+            statement.setInt(6, nanos);
         } catch (SQLException e) {
-            this.getLogger().error("Failed to prepare statement ", e);
+            getLogger().error("Failed to build statement", e);
             throw new DatabaseException(e);
         }
         return statement;
@@ -87,16 +87,16 @@ public class UpdateEventQuery extends WriteRecordQuery<String, EventStorageRecor
 
     public static Builder newBuilder() {
         final Builder builder = new Builder();
-        builder.setQuery(UPDATE_QUERY);
+        builder.setQuery(INSERT_QUERY);
         return builder;
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder extends WriteRecordQuery.Builder<Builder, UpdateEventQuery, String, EventStorageRecord> {
+    public static class Builder extends WriteRecordQuery.Builder<Builder, InsertEventRecordQuery, String, EventStorageRecord> {
 
         @Override
-        public UpdateEventQuery build() {
-            return new UpdateEventQuery(this);
+        public InsertEventRecordQuery build() {
+            return new InsertEventRecordQuery(this);
         }
 
         @Override

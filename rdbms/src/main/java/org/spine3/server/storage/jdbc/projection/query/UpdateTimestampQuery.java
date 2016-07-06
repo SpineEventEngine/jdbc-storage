@@ -69,6 +69,7 @@ public class UpdateTimestampQuery extends WriteQuery{
             statement.setInt(2, nanos);
             return statement;
         } catch (SQLException e) {
+            getLogger().error("Failed to prepare statement.", e);
             throw new DatabaseException(e);
         }
     }

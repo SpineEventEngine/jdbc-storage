@@ -120,8 +120,8 @@ public class AggregateStorageQueryFactory<I> {
      * @param id        aggregate id
      * @param record    new aggregate record
      */
-    public InsertRecordQuery newInsertRecordQuery(I id, AggregateStorageRecord record) {
-        final InsertRecordQuery.Builder<I> builder = InsertRecordQuery.<I>newBuilder(mainTableName)
+    public InsertAggregateRecordQuery newInsertRecordQuery(I id, AggregateStorageRecord record) {
+        final InsertAggregateRecordQuery.Builder<I> builder = InsertAggregateRecordQuery.<I>newBuilder(mainTableName)
                 .setDataSource(dataSource)
                 .setLogger(logger)
                 .setIdColumn(idColumn)

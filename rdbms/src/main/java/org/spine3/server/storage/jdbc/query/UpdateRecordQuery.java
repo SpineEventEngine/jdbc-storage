@@ -41,9 +41,7 @@ public class UpdateRecordQuery<I> extends WriteQuery {
     @Override
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
         final PreparedStatement statement = super.prepareStatement(connection);
-
         idColumn.setId(idIndexInQuery, id, statement);
-
         return statement;
     }
 

@@ -140,7 +140,6 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     public void close() throws DatabaseException {
         closeAll(iterators);
         iterators.clear();
-
         dataSource.close();
         try {
             super.close();

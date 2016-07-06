@@ -30,6 +30,7 @@ import org.spine3.server.entity.Entity;
 import org.spine3.server.projection.Projection;
 import org.spine3.server.storage.*;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
+import org.spine3.server.storage.jdbc.util.DefaultDataSourceConfigConverter;
 import org.spine3.test.project.Project;
 
 import static org.junit.Assert.assertNotNull;
@@ -58,6 +59,20 @@ public class JdbcStorageFactoryShould {
                 .setMaxPoolSize(12)
                 .build();
         factory = JdbcStorageFactory.newInstance(config, false);
+    }
+
+    @Test
+    public void allow_to_use_custom_data_source(){
+        final String dbUrl = newInMemoryDbUrl("factoryTests");
+        final DataSourceConfig config = DataSourceConfig.newBuilder()
+                .setJdbcUrl(dbUrl)
+                .setUsername("SA")
+                .setPassword("pwd")
+                .setMaxPoolSize(12)
+                .build();
+        final HikariConfig hikariConfig = DefaultDataSourceConfigConverter.convert(config);
+        final JdbcStorageFactory factory = JdbcStorageFactory.newInstance(new HikariDataSource(hikariConfig), false);
+        assertNotNull(factory);
     }
 
     @Test
