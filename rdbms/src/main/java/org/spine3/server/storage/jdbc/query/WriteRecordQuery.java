@@ -55,14 +55,13 @@ public abstract class WriteRecordQuery<I, Record extends Message> extends WriteQ
     @Override
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
         final PreparedStatement statement = super.prepareStatement(connection);
-
         try {
             idColumn.setId(idIndexInQuery, id, statement);
-
             final byte[] bytes = Serializer.serialize(record);
             statement.setBytes(recordIndexInQuery, bytes);
             return statement;
         } catch (SQLException e) {
+            getLogger().error("Failed to write record with id " + this.id, e);
             throw new DatabaseException(e);
         }
     }

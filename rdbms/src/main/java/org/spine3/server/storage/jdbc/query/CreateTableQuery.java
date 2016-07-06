@@ -57,9 +57,9 @@ public class CreateTableQuery<I> extends Query {
         final String sql;
         if (idColumn != null) {
             final String idColumnType = idColumn.getColumnDataType();
-            sql = format(this.getQuery(), tableName, idColumnType);
+            sql = format(getQuery(), tableName, idColumnType);
         } else {
-            sql = format(this.getQuery(), tableName);
+            sql = format(getQuery(), tableName);
         }
         try (ConnectionWrapper connection = this.getConnection(true);
              PreparedStatement statement = connection.prepareStatement(sql)) {

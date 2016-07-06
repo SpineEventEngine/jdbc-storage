@@ -26,8 +26,8 @@ import org.spine3.server.storage.jdbc.DataSourceConfig;
 import javax.sql.DataSource;
 
 /**
- * Converter for default used {@link DataSource} implementation.
- * Currently used default implementation: <a href="https://github.com/brettwooldridge/HikariCP">HikariCP</a>
+ * A converter for the default {@link DataSource} config.
+ * The default implementation is: <a href="https://github.com/brettwooldridge/HikariCP">HikariCP</a> connection pool.
  *
  * @author Alexander Litus
  * @author Andrey Lavrov
