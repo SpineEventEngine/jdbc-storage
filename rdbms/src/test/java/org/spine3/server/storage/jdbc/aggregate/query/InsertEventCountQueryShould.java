@@ -22,12 +22,11 @@ package org.spine3.server.storage.jdbc.aggregate.query;
 
 import org.junit.Test;
 import org.slf4j.Logger;
+import org.spine3.server.storage.jdbc.DataSourceMock;
 import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import static org.junit.Assert.fail;
@@ -42,14 +41,8 @@ public class InsertEventCountQueryShould {
     @SuppressWarnings("DuplicateStringLiteralInspection")
     public void handle_sql_exception() throws SQLException {
         final Logger logger = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock = mock(DataSourceWrapper.class);
-        final PreparedStatement preparedStatementMock = mock(PreparedStatement.class);
-        final ConnectionWrapper connectionMock = mock(ConnectionWrapper.class);
+        final DataSourceWrapper dataSourceMock = DataSourceMock.getMockDataSourceExceptionOnAnySet();
         final IdColumn idColumnMock = mock(IdColumn.class);
-
-        when(dataSourceMock.getConnection(anyBoolean())).thenReturn(connectionMock);
-        when(connectionMock.prepareStatement(anyString())).thenReturn(preparedStatementMock);
-        doThrow(new SQLException("")).when(preparedStatementMock).setInt(anyInt(), anyInt());
 
         final InsertEventCountQuery query = InsertEventCountQuery.newBuilder(anyString())
                 .setDataSource(dataSourceMock)

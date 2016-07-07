@@ -27,9 +27,9 @@ import com.google.protobuf.Message;
 
     /* package */ static final Any recordMock = Any.getDefaultInstance();
 
-    /* package */ static class CreateTableMockExtension extends CreateTableQuery<String>{
+    /* package */ static class CreateTableMock extends CreateTableQuery<String>{
 
-        protected CreateTableMockExtension(Builder builder) {
+        protected CreateTableMock(Builder builder) {
             super(builder);
         }
 
@@ -40,11 +40,11 @@ import com.google.protobuf.Message;
         }
 
         @SuppressWarnings("ClassNameSameAsAncestorName")
-        public static class Builder extends CreateTableQuery.Builder<Builder, CreateTableMockExtension, String> {
+        public static class Builder extends CreateTableQuery.Builder<Builder, CreateTableMock, String> {
 
             @Override
-            public CreateTableMockExtension build() {
-                return new CreateTableMockExtension(this);
+            public CreateTableMock build() {
+                return new CreateTableMock(this);
             }
 
             @Override
@@ -54,9 +54,9 @@ import com.google.protobuf.Message;
         }
     }
 
-    /* package */ static class SelectByIdQueryMockExtension extends SelectByIdQuery<String, Message>{
+    /* package */ static class SelectByIdQueryMock extends SelectByIdQuery<String, Message>{
 
-        protected SelectByIdQueryMockExtension(Builder builder) {
+        protected SelectByIdQueryMock(Builder builder) {
             super(builder);
         }
 
@@ -67,11 +67,11 @@ import com.google.protobuf.Message;
         }
 
         @SuppressWarnings("ClassNameSameAsAncestorName")
-        public static class Builder extends SelectByIdQuery.Builder<Builder, SelectByIdQueryMockExtension, String, Message> {
+        public static class Builder extends SelectByIdQuery.Builder<Builder, SelectByIdQueryMock, String, Message> {
 
             @Override
-            public SelectByIdQueryMockExtension build() {
-                return new SelectByIdQueryMockExtension(this);
+            public SelectByIdQueryMock build() {
+                return new SelectByIdQueryMock(this);
             }
 
             @Override
@@ -81,9 +81,9 @@ import com.google.protobuf.Message;
         }
     }
 
-    /* package */ static class WriteRecordQueryMockExtension extends WriteRecordQuery<String, Message>{
+    /* package */ static class WriteRecordQueryMock extends WriteRecordQuery<String, Message>{
 
-        protected WriteRecordQueryMockExtension(Builder builder) {
+        protected WriteRecordQueryMock(Builder builder) {
             super(builder);
         }
 
@@ -94,11 +94,11 @@ import com.google.protobuf.Message;
         }
 
         @SuppressWarnings("ClassNameSameAsAncestorName")
-        public static class Builder extends WriteRecordQuery.Builder<Builder, WriteRecordQueryMockExtension, String, Message> {
+        public static class Builder extends WriteRecordQuery.Builder<Builder, WriteRecordQueryMock, String, Message> {
 
             @Override
-            public WriteRecordQueryMockExtension build() {
-                return new WriteRecordQueryMockExtension(this);
+            public WriteRecordQueryMock build() {
+                return new WriteRecordQueryMock(this);
             }
 
             @Override
@@ -108,9 +108,9 @@ import com.google.protobuf.Message;
         }
     }
 
-    /* package */ static class WriteQueryMockExtension extends WriteQuery{
+    /* package */ static class WriteQueryMock extends WriteQuery{
 
-        protected WriteQueryMockExtension(Builder builder) {
+        protected WriteQueryMock(Builder builder) {
             super(builder);
         }
 
@@ -121,11 +121,11 @@ import com.google.protobuf.Message;
         }
 
         @SuppressWarnings("ClassNameSameAsAncestorName")
-        public static class Builder extends WriteQuery.Builder<Builder, WriteQueryMockExtension> {
+        public static class Builder extends WriteQuery.Builder<Builder, WriteQueryMock> {
 
             @Override
-            public WriteQueryMockExtension build() {
-                return new WriteQueryMockExtension(this);
+            public WriteQueryMock build() {
+                return new WriteQueryMock(this);
             }
 
             @Override

@@ -39,7 +39,7 @@ import static org.spine3.base.Identifiers.newUuid;
 /**
  * @author Alexander Litus
  */
-@SuppressWarnings({"InstanceMethodNamingConvention", "MagicNumber"})
+@SuppressWarnings({"InstanceMethodNamingConvention", "MagicNumber", "DuplicateStringLiteralInspection"})
 public class JdbcStorageFactoryShould {
 
     /**
@@ -70,8 +70,7 @@ public class JdbcStorageFactoryShould {
                 .setPassword("pwd")
                 .setMaxPoolSize(12)
                 .build();
-        final HikariConfig hikariConfig = DefaultDataSourceConfigConverter.convert(config);
-        final JdbcStorageFactory factory = JdbcStorageFactory.newInstance(new HikariDataSource(hikariConfig), false);
+        final JdbcStorageFactory factory = JdbcStorageFactory.newInstance(DataSourceMock.getClosableDataSourceWrapper(), false);
         assertNotNull(factory);
     }
 

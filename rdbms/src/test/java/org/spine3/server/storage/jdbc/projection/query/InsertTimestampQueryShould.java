@@ -23,11 +23,10 @@ package org.spine3.server.storage.jdbc.projection.query;
 import com.google.protobuf.Timestamp;
 import org.junit.Test;
 import org.slf4j.Logger;
+import org.spine3.server.storage.jdbc.DataSourceMock;
 import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import static org.junit.Assert.fail;
@@ -41,13 +40,7 @@ public class InsertTimestampQueryShould {
     @Test
     public void handle_sql_exception() throws SQLException {
         final Logger logger = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock = mock(DataSourceWrapper.class);
-        final PreparedStatement preparedStatementMock = mock(PreparedStatement.class);
-        final ConnectionWrapper connectionMock = mock(ConnectionWrapper.class);
-
-        when(dataSourceMock.getConnection(anyBoolean())).thenReturn(connectionMock);
-        when(connectionMock.prepareStatement(anyString())).thenReturn(preparedStatementMock);
-        doThrow(new SQLException("")).when(preparedStatementMock).setLong(anyInt(), anyLong());
+        final DataSourceWrapper dataSourceMock = DataSourceMock.getMockDataSourceExceptionOnAnySet();
 
         final InsertTimestampQuery query = InsertTimestampQuery.newBuilder(anyString())
                 .setDataSource(dataSourceMock)

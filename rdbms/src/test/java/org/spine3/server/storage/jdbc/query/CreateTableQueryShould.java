@@ -22,11 +22,10 @@ package org.spine3.server.storage.jdbc.query;
 
 import org.junit.Test;
 import org.slf4j.Logger;
+import org.spine3.server.storage.jdbc.DataSourceMock;
 import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import static org.junit.Assert.fail;
@@ -40,15 +39,9 @@ public class CreateTableQueryShould {
     @Test
     public void handle_sql_exception() throws SQLException {
         final Logger logger = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock = mock(DataSourceWrapper.class);
-        final ConnectionWrapper connectionMock = mock(ConnectionWrapper.class);
-        final PreparedStatement preparedStatementMock = mock(PreparedStatement.class);
+        final DataSourceWrapper dataSourceMock = DataSourceMock.getMockDataSourceExceptionOnAnyExecute();
 
-        when(dataSourceMock.getConnection(anyBoolean())).thenReturn(connectionMock);
-        when(connectionMock.prepareStatement(anyString())).thenReturn(preparedStatementMock);
-        when(preparedStatementMock.execute()).thenThrow(new SQLException(""));
-
-        final CreateTableQuery query = Given.CreateTableMockExtension.newBuilder()
+        final CreateTableQuery query = Given.CreateTableMock.newBuilder()
                 .setDataSource(dataSourceMock)
                 .setLogger(logger)
                 .build();

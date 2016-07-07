@@ -22,15 +22,13 @@ package org.spine3.server.storage.jdbc.query;
 
 import org.junit.Test;
 import org.slf4j.Logger;
+import org.spine3.server.storage.jdbc.DataSourceMock;
 import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
@@ -42,15 +40,9 @@ public class WriteQueryShould {
     @Test
     public void handle_database_exception() throws SQLException {
         final Logger logger = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock = mock(DataSourceWrapper.class);
-        final ConnectionWrapper connectionMock = mock(ConnectionWrapper.class);
-        final PreparedStatement preparedStatementMock = mock(PreparedStatement.class);
+        final DataSourceWrapper dataSourceMock = DataSourceMock.getMockDataSourceExceptionOnAnyExecute();
 
-        when(dataSourceMock.getConnection(anyBoolean())).thenReturn(connectionMock);
-        when(connectionMock.prepareStatement(anyString())).thenReturn(preparedStatementMock);
-        doThrow(new SQLException("")).when(preparedStatementMock).execute();
-
-        final WriteQuery query = Given.WriteQueryMockExtension.newBuilder()
+        final WriteQuery query = Given.WriteQueryMock.newBuilder()
                 .setDataSource(dataSourceMock)
                 .setLogger(logger)
                 .build();

@@ -22,16 +22,14 @@ package org.spine3.server.storage.jdbc.query;
 
 import org.junit.Test;
 import org.slf4j.Logger;
+import org.spine3.server.storage.jdbc.DataSourceMock;
 import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
@@ -43,16 +41,10 @@ public class WriteRecordQueryShould {
     @Test
     public void handle_database_exception() throws SQLException {
         final Logger logger = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock = mock(DataSourceWrapper.class);
-        final ConnectionWrapper connectionMock = mock(ConnectionWrapper.class);
-        final PreparedStatement preparedStatementMock = mock(PreparedStatement.class);
+        final DataSourceWrapper dataSourceMock = DataSourceMock.getMockDataSourceExceptionOnAnyExecute();
         final IdColumn<String> idColumnMock = mock(IdColumn.StringIdColumn.class);
 
-        when(dataSourceMock.getConnection(anyBoolean())).thenReturn(connectionMock);
-        when(connectionMock.prepareStatement(anyString())).thenReturn(preparedStatementMock);
-        doThrow(new SQLException("")).when(preparedStatementMock).setBytes(anyInt(), any(byte[].class));
-
-        final WriteRecordQuery query = Given.WriteRecordQueryMockExtension.newBuilder()
+        final WriteRecordQuery query = Given.WriteRecordQueryMock.newBuilder()
                 .setDataSource(dataSourceMock)
                 .setLogger(logger)
                 .setIdColumn(idColumnMock)

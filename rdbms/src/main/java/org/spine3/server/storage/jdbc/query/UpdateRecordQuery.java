@@ -28,7 +28,7 @@ import java.sql.PreparedStatement;
 public class UpdateRecordQuery<I> extends WriteQuery {
 
     private final I id;
-    private int idIndexInQuery;
+    private final int idIndexInQuery;
     private final IdColumn<I> idColumn;
 
     protected UpdateRecordQuery(Builder<? extends Builder, ? extends UpdateRecordQuery, I> builder) {
