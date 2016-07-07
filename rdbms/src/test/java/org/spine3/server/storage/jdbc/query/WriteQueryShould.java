@@ -37,7 +37,7 @@ public class WriteQueryShould {
 
     @Test
     public void handle_database_exception() throws SQLException {
-        final WriteQuery query = Given. getWriteQueryMockMock();
+        final WriteQuery query = Given.getWriteQueryMock();
         try {
             query.execute();
             fail();

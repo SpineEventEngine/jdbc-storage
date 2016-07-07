@@ -86,7 +86,7 @@ import static org.mockito.Mockito.when;
         return builder.build();
     }
 
-    /* package */ static WriteQueryMock getWriteQueryMockMock() throws SQLException {
+    /* package */ static WriteQueryMock getWriteQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
         final DataSourceWrapper dataSourceMock = DataSourceMock.getMockDataSourceExceptionOnAnyExecute();
         final WriteQueryMock.Builder builder = WriteQueryMock.newBuilder()
@@ -220,7 +220,7 @@ import static org.mockito.Mockito.when;
     }
 
     @SuppressWarnings("StaticVariableUsedBeforeInitialization")
-    public static Logger getLoggerMock() {
+    /* package */ static Logger getLoggerMock() {
         return loggerMock;
     }
 }

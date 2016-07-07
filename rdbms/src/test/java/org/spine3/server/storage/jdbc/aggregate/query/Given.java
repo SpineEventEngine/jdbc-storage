@@ -34,9 +34,8 @@ import static org.mockito.Mockito.mock;
 /**
  * @author Andrey Lavrov
  */
-/* package */
 @SuppressWarnings("UtilityClass")
-class Given {
+/* package */ class Given {
 
     @SuppressWarnings("StaticNonFinalField")
     private static Logger loggerMock = null;
@@ -87,7 +86,7 @@ class Given {
     }
 
     @SuppressWarnings("StaticVariableUsedBeforeInitialization")
-    public static Logger getLoggerMock() {
+    /* package */ static Logger getLoggerMock() {
         return loggerMock;
     }
 }

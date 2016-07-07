@@ -71,7 +71,7 @@ import static org.mockito.Mockito.mock;
     }
 
     @SuppressWarnings("StaticVariableUsedBeforeInitialization")
-    public static Logger getLoggerMock() {
+    /* package */ static Logger getLoggerMock() {
         return loggerMock;
     }
 }
