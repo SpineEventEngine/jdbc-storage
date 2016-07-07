@@ -50,7 +50,7 @@ public class SelectByIdQueryShould {
         final DataSourceWrapper dataSourceMock = mock(DataSourceWrapper.class);
         final ConnectionWrapper connectionMock = mock(ConnectionWrapper.class);
         final PreparedStatement preparedStatementMock = mock(PreparedStatement.class);
-        final IdColumn idColumnMock = mock(IdColumn.class);
+        final IdColumn<String> idColumnMock = mock(IdColumn.StringIdColumn.class);
 
         when(dataSourceMock.getConnection(anyBoolean())).thenReturn(connectionMock);
         when(connectionMock.prepareStatement(anyString())).thenReturn(preparedStatementMock);
@@ -63,11 +63,10 @@ public class SelectByIdQueryShould {
                 .build();
         try {
             query.execute();
-        } catch (DatabaseException e) {
+            fail();
+        } catch (DatabaseException expected) {
             verify(logger).error(anyString(), any(SQLException.class));
-            return; //OK
         }
-        fail("Expected Database exception.");
     }
 
     @Test
@@ -76,7 +75,7 @@ public class SelectByIdQueryShould {
         final DataSourceWrapper dataSourceMock = mock(DataSourceWrapper.class);
         final ConnectionWrapper connectionMock = mock(ConnectionWrapper.class);
         final PreparedStatement preparedStatementMock = mock(PreparedStatement.class);
-        final IdColumn idColumnMock = mock(IdColumn.class);
+        final IdColumn<String> idColumnMock = mock(IdColumn.StringIdColumn.class);
         final ResultSet resultSetMock = mock(ResultSet.class);
 
         when(dataSourceMock.getConnection(anyBoolean())).thenReturn(connectionMock);

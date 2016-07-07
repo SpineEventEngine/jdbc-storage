@@ -24,7 +24,6 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.spine3.base.CommandStatus;
 import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.aggregate.query.SelectEventCountByIdQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
@@ -59,10 +58,9 @@ public class SelectCommandByStatusQueryShould {
                 .build();
         try {
             query.execute();
-        } catch (DatabaseException e) {
+            fail();
+        } catch (DatabaseException expected) {
             verify(logger).error(anyString(), any(SQLException.class));
-            return; //OK
         }
-        fail("Expected Database exception.");
     }
 }

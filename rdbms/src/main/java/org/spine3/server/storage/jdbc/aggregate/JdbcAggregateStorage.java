@@ -20,7 +20,6 @@
 
 package org.spine3.server.storage.jdbc.aggregate;
 
-import com.google.protobuf.Int32Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spine3.server.storage.AggregateStorage;

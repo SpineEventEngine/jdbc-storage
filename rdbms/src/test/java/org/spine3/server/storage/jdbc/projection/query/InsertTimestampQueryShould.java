@@ -23,12 +23,9 @@ package org.spine3.server.storage.jdbc.projection.query;
 import com.google.protobuf.Timestamp;
 import org.junit.Test;
 import org.slf4j.Logger;
-import org.spine3.server.storage.EventStorageRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.event.query.InsertEventRecordQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -59,10 +56,9 @@ public class InsertTimestampQueryShould {
                 .build();
         try {
             query.execute();
-        } catch (DatabaseException e) {
+            fail();
+        } catch (DatabaseException expected) {
             verify(logger).error(anyString(), any(SQLException.class));
-            return; //OK
         }
-        fail("Expected Database exception.");
     }
 }

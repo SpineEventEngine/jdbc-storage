@@ -32,8 +32,6 @@ import org.spine3.test.project.Project;
 import org.spine3.test.project.ProjectId;
 
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.spine3.server.storage.jdbc.JdbcStorageFactoryShould.newInMemoryDataSource;
 import static org.spine3.testdata.TestAggregateIdFactory.newProjectId;
 

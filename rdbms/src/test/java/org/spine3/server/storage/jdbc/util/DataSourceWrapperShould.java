@@ -24,11 +24,8 @@ import com.zaxxer.hikari.HikariDataSource;
 import org.junit.Test;
 import org.spine3.server.storage.jdbc.DatabaseException;
 
-import javax.sql.DataSource;
-
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * @author Andrey Lavrov
@@ -39,7 +36,7 @@ public class DataSourceWrapperShould {
     public void throw_database_exception_if_fail_to_close(){
         final HikariDataSource closableDataSourceMock = mock(HikariDataSource.class);
         doThrow(new RuntimeException("")).when(closableDataSourceMock).close();
-        DataSourceWrapper wrapper = DataSourceWrapper.wrap(closableDataSourceMock);
+        final DataSourceWrapper wrapper = DataSourceWrapper.wrap(closableDataSourceMock);
         wrapper.close();
     }
 }

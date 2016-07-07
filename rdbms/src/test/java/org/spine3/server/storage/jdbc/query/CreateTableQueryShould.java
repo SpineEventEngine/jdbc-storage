@@ -54,10 +54,9 @@ public class CreateTableQueryShould {
                 .build();
         try {
             query.execute();
-        } catch (DatabaseException e) {
+            fail();
+        } catch (DatabaseException expected) {
             verify(logger).error(anyString(), any(SQLException.class));
-            return; //OK
         }
-        fail("Expected Database exception.");
     }
 }

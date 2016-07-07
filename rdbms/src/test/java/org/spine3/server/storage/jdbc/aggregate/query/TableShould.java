@@ -31,6 +31,7 @@ import static org.spine3.test.Tests.hasPrivateUtilityConstructor;
 public class TableShould {
 
     @Test
+    @SuppressWarnings("DuplicateStringLiteralInspection")
     public void have_private_constructors() {
         assertTrue(hasPrivateUtilityConstructor(Table.class));
         assertTrue(hasPrivateUtilityConstructor(Table.AggregateRecord.class));

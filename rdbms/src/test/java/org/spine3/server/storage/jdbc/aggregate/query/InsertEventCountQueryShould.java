@@ -22,9 +22,7 @@ package org.spine3.server.storage.jdbc.aggregate.query;
 
 import org.junit.Test;
 import org.slf4j.Logger;
-import org.spine3.server.storage.AggregateStorageRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.aggregate.query.InsertAggregateRecordQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
@@ -41,6 +39,7 @@ import static org.mockito.Mockito.*;
 public class InsertEventCountQueryShould {
 
     @Test
+    @SuppressWarnings("DuplicateStringLiteralInspection")
     public void handle_sql_exception() throws SQLException {
         final Logger logger = mock(Logger.class);
         final DataSourceWrapper dataSourceMock = mock(DataSourceWrapper.class);
@@ -59,10 +58,9 @@ public class InsertEventCountQueryShould {
                 .build();
         try {
             query.execute();
-        } catch (DatabaseException e) {
+            fail();
+        } catch (DatabaseException expected) {
             verify(logger).error(anyString(), any(SQLException.class));
-            return; //OK
         }
-        fail("Expected Database exception.");
     }
 }

@@ -23,10 +23,8 @@ package org.spine3.server.storage.jdbc.projection.query;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.command.query.SelectCommandByIdQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -56,7 +54,7 @@ public class SelectTimestampQueryShould {
                 .build();
         try {
             query.execute();
-            fail("Expected Database exception.");
+            fail();
         } catch (DatabaseException expected) {
             verify(logger).error(anyString(), any(SQLException.class));
         }

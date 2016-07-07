@@ -23,7 +23,6 @@ package org.spine3.server.storage.jdbc.command.query;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.aggregate.query.SelectEventCountByIdQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
@@ -45,7 +44,7 @@ public class SelectCommandByIdQueryShould {
         final DataSourceWrapper dataSourceMock = mock(DataSourceWrapper.class);
         final PreparedStatement preparedStatementMock = mock(PreparedStatement.class);
         final ConnectionWrapper connectionMock = mock(ConnectionWrapper.class);
-        final IdColumn idColumnMock = mock(IdColumn.class);
+        final IdColumn<String> idColumnMock = mock(IdColumn.StringIdColumn.class);
 
         when(dataSourceMock.getConnection(anyBoolean())).thenReturn(connectionMock);
         when(connectionMock.prepareStatement(anyString())).thenReturn(preparedStatementMock);
@@ -58,10 +57,9 @@ public class SelectCommandByIdQueryShould {
                 .build();
         try {
             query.execute();
-        } catch (DatabaseException e) {
+            fail();
+        } catch (DatabaseException expected) {
             verify(logger).error(anyString(), any(SQLException.class));
-            return; //OK
         }
-        fail("Expected Database exception.");
     }
 }
