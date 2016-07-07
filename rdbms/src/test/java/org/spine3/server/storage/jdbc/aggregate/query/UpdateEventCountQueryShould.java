@@ -21,11 +21,7 @@
 package org.spine3.server.storage.jdbc.aggregate.query;
 
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.spine3.server.storage.jdbc.DataSourceMock;
 import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import java.sql.SQLException;
 
@@ -39,20 +35,12 @@ public class UpdateEventCountQueryShould {
 
     @Test
     public void handle_sql_exception() throws SQLException {
-        final Logger logger = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock = DataSourceMock.getMockDataSourceExceptionOnAnySet();
-        final IdColumn idColumnMock = mock(IdColumn.class);
-
-        final UpdateEventCountQuery query = UpdateEventCountQuery.newBuilder(anyString())
-                .setDataSource(dataSourceMock)
-                .setLogger(logger)
-                .setIdColumn(idColumnMock)
-                .build();
+        final UpdateEventCountQuery query = Given.getUpdateEventCountQueryMock();
         try {
             query.execute();
             fail();
         } catch (DatabaseException expected) {
-            verify(logger).error(anyString(), any(SQLException.class));
+            verify(Given.getLoggerMock()).error(anyString(), any(SQLException.class));
         }
     }
 }

@@ -20,25 +20,17 @@
 
 package org.spine3.server.storage.jdbc.query;
 
-import com.google.protobuf.Any;
 import com.google.protobuf.Message;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.spine3.server.storage.jdbc.DataSourceMock;
 import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
-import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.server.storage.jdbc.util.IdColumn;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.verify;
 
 /**
  * @author Andrey Lavrov
@@ -47,45 +39,18 @@ public class SelectByIdQueryShould {
 
     @Test
     public void handle_database_exception() throws SQLException {
-        final Logger logger = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock = DataSourceMock.getMockDataSourceExceptionOnAnyExecute();
-        final IdColumn<String> idColumnMock = mock(IdColumn.StringIdColumn.class);
-
-        final SelectByIdQuery query = Given.SelectByIdQueryMock.newBuilder()
-                .setDataSource(dataSourceMock)
-                .setLogger(logger)
-                .setIdColumn(idColumnMock)
-                .build();
+        final SelectByIdQuery query = Given.getSelectByIdQueryMock();
         try {
             query.execute();
             fail();
         } catch (DatabaseException expected) {
-            verify(logger).error(anyString(), any(SQLException.class));
+            verify(Given.getLoggerMock()).error(anyString(), any(SQLException.class));
         }
     }
 
     @Test
     public void return_null_if_nothing_was_read_from_db() throws SQLException {
-        final Logger logger = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock = mock(DataSourceWrapper.class);
-        final ConnectionWrapper connectionMock = mock(ConnectionWrapper.class);
-        final PreparedStatement preparedStatementMock = mock(PreparedStatement.class);
-        final IdColumn<String> idColumnMock = mock(IdColumn.StringIdColumn.class);
-        final ResultSet resultSetMock = mock(ResultSet.class);
-
-        when(dataSourceMock.getConnection(anyBoolean())).thenReturn(connectionMock);
-        when(connectionMock.prepareStatement(anyString())).thenReturn(preparedStatementMock);
-        when(preparedStatementMock.executeQuery()).thenReturn(resultSetMock);
-        when(resultSetMock.next()).thenReturn(true);
-        when(resultSetMock.getBytes(anyString())).thenReturn(null);
-
-        final SelectByIdQuery query = Given.SelectByIdQueryMock.newBuilder()
-                .setDataSource(dataSourceMock)
-                .setLogger(logger)
-                .setIdColumn(idColumnMock)
-                .setMessageColumnName(anyString())
-                .setMessageDescriptor(Any.getDescriptor())
-                .build();
+        final SelectByIdQuery query = Given.getSelectByIdQueryReturningEmptyResultSetMock();
         final Message result = query.execute();
         assertNull("If nothing is read from the database the result of the query must be null", result);
     }

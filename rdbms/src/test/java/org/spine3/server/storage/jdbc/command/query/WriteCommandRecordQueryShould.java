@@ -21,13 +21,7 @@
 package org.spine3.server.storage.jdbc.command.query;
 
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.spine3.base.CommandStatus;
-import org.spine3.server.storage.CommandStorageRecord;
-import org.spine3.server.storage.jdbc.DataSourceMock;
 import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import java.sql.SQLException;
 
@@ -41,22 +35,12 @@ public class WriteCommandRecordQueryShould {
 
     @Test
     public void handle_sql_exception() throws SQLException {
-        final Logger logger = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock = DataSourceMock.getMockDataSourceExceptionOnAnySet();
-        final IdColumn<String> idColumnMock = mock(IdColumn.StringIdColumn.class);
-
-        final WriteCommandRecordQuery query = InsertCommandQuery.newBuilder()
-                .setDataSource(dataSourceMock)
-                .setLogger(logger)
-                .setIdColumn(idColumnMock)
-                .setRecord(CommandStorageRecord.getDefaultInstance())
-                .setStatus(CommandStatus.UNDEFINED)
-                .build();
+        final WriteCommandRecordQuery query = Given.getWriteCommandRecordQueryMock();
         try {
             query.execute();
             fail();
         } catch (DatabaseException expected) {
-            verify(logger).error(anyString(), any(SQLException.class));
+            verify(Given.getLoggerMock()).error(anyString(), any(SQLException.class));
         }
     }
 }

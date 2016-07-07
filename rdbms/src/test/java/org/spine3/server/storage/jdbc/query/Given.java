@@ -22,18 +22,99 @@ package org.spine3.server.storage.jdbc.query;
 
 import com.google.protobuf.Any;
 import com.google.protobuf.Message;
+import org.slf4j.Logger;
+import org.spine3.server.storage.jdbc.DataSourceMock;
+import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
+import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
+import org.spine3.server.storage.jdbc.util.IdColumn;
+
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /* package */ class Given {
 
-    /* package */ static final Any recordMock = Any.getDefaultInstance();
+    @SuppressWarnings("StaticNonFinalField")
+    private static Logger loggerMock = null;
+    private static final IdColumn<String> idColumnMock = mock(IdColumn.StringIdColumn.class);
 
-    /* package */ static class CreateTableMock extends CreateTableQuery<String>{
+    /* package */ static CreateTableQuery getCreateTableQueryMock() throws SQLException {
+        loggerMock = mock(Logger.class);
+        final DataSourceWrapper dataSourceMock = DataSourceMock.getMockDataSourceExceptionOnAnyExecute();
+        final CreateTableMock.Builder builder = CreateTableMock.newBuilder()
+                .setDataSource(dataSourceMock)
+                .setLogger(loggerMock);
+        return builder.build();
+    }
+
+    /* package */ static SelectByIdQueryMock getSelectByIdQueryMock() throws SQLException {
+        loggerMock = mock(Logger.class);
+        final DataSourceWrapper dataSourceMock = DataSourceMock.getMockDataSourceExceptionOnAnyExecute();
+        final SelectByIdQueryMock.Builder builder = SelectByIdQueryMock.newBuilder()
+                .setDataSource(dataSourceMock)
+                .setLogger(loggerMock)
+                .setIdColumn(idColumnMock);
+        return builder.build();
+    }
+
+    /* package */ static SelectByIdQueryMock getSelectByIdQueryReturningEmptyResultSetMock() throws SQLException {
+        loggerMock = mock(Logger.class);
+
+        final DataSourceWrapper dataSourceMock = mock(DataSourceWrapper.class);
+        final ConnectionWrapper connectionMock = mock(ConnectionWrapper.class);
+        final PreparedStatement preparedStatementMock = mock(PreparedStatement.class);
+        final IdColumn<String> idColumnMock = mock(IdColumn.StringIdColumn.class);
+        final ResultSet resultSetMock = mock(ResultSet.class);
+
+        when(dataSourceMock.getConnection(anyBoolean())).thenReturn(connectionMock);
+        when(connectionMock.prepareStatement(anyString())).thenReturn(preparedStatementMock);
+        when(preparedStatementMock.executeQuery()).thenReturn(resultSetMock);
+        when(resultSetMock.next()).thenReturn(true);
+        when(resultSetMock.getBytes(anyString())).thenReturn(null);
+
+        final SelectByIdQueryMock.Builder builder = SelectByIdQueryMock.newBuilder()
+                .setDataSource(dataSourceMock)
+                .setLogger(loggerMock)
+                .setIdColumn(idColumnMock)
+                .setMessageColumnName(anyString())
+                .setMessageDescriptor(Any.getDescriptor());
+        return builder.build();
+    }
+
+    /* package */ static WriteQueryMock getWriteQueryMockMock() throws SQLException {
+        loggerMock = mock(Logger.class);
+        final DataSourceWrapper dataSourceMock = DataSourceMock.getMockDataSourceExceptionOnAnyExecute();
+        final WriteQueryMock.Builder builder = WriteQueryMock.newBuilder()
+                .setDataSource(dataSourceMock)
+                .setLogger(loggerMock);
+        return builder.build();
+    }
+
+    /* package */ static WriteRecordQueryMock getWriteRecordQueryMock() throws SQLException {
+        loggerMock = mock(Logger.class);
+        final DataSourceWrapper dataSourceMock = DataSourceMock.getMockDataSourceExceptionOnAnyExecute();
+        final WriteRecordQueryMock.Builder builder = WriteRecordQueryMock.newBuilder()
+                .setDataSource(dataSourceMock)
+                .setLogger(loggerMock)
+                .setIdColumn(idColumnMock)
+                .setRecord(Given.recordMock);
+        return builder.build();
+    }
+
+    private static final Any recordMock = Any.getDefaultInstance();
+
+    private static class CreateTableMock extends CreateTableQuery<String> {
 
         protected CreateTableMock(Builder builder) {
             super(builder);
         }
 
-        public static  Builder newBuilder() {
+        public static Builder newBuilder() {
             final Builder builder = new Builder();
             builder.setQuery("");
             return builder;
@@ -54,13 +135,13 @@ import com.google.protobuf.Message;
         }
     }
 
-    /* package */ static class SelectByIdQueryMock extends SelectByIdQuery<String, Message>{
+    private static class SelectByIdQueryMock extends SelectByIdQuery<String, Message> {
 
         protected SelectByIdQueryMock(Builder builder) {
             super(builder);
         }
 
-        public static  Builder newBuilder() {
+        public static Builder newBuilder() {
             final Builder builder = new Builder();
             builder.setQuery("");
             return builder;
@@ -81,13 +162,13 @@ import com.google.protobuf.Message;
         }
     }
 
-    /* package */ static class WriteRecordQueryMock extends WriteRecordQuery<String, Message>{
+    private static class WriteRecordQueryMock extends WriteRecordQuery<String, Message> {
 
         protected WriteRecordQueryMock(Builder builder) {
             super(builder);
         }
 
-        public static  Builder newBuilder() {
+        public static Builder newBuilder() {
             final Builder builder = new Builder();
             builder.setQuery("");
             return builder;
@@ -108,13 +189,13 @@ import com.google.protobuf.Message;
         }
     }
 
-    /* package */ static class WriteQueryMock extends WriteQuery{
+    private static class WriteQueryMock extends WriteQuery {
 
         protected WriteQueryMock(Builder builder) {
             super(builder);
         }
 
-        public static  Builder newBuilder() {
+        public static Builder newBuilder() {
             final Builder builder = new Builder();
             builder.setQuery("");
             return builder;
@@ -136,5 +217,10 @@ import com.google.protobuf.Message;
     }
 
     private Given() {
+    }
+
+    @SuppressWarnings("StaticVariableUsedBeforeInitialization")
+    public static Logger getLoggerMock() {
+        return loggerMock;
     }
 }

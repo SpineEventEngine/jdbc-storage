@@ -30,7 +30,6 @@ import org.spine3.server.entity.Entity;
 import org.spine3.server.projection.Projection;
 import org.spine3.server.storage.*;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.server.storage.jdbc.util.DefaultDataSourceConfigConverter;
 import org.spine3.test.project.Project;
 
 import static org.junit.Assert.assertNotNull;

@@ -21,10 +21,7 @@
 package org.spine3.server.storage.jdbc.projection.query;
 
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.spine3.server.storage.jdbc.DataSourceMock;
 import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
 import java.sql.SQLException;
 
@@ -38,18 +35,12 @@ public class SelectTimestampQueryShould {
 
     @Test
     public void handle_sql_exception() throws SQLException {
-        final Logger logger = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock = DataSourceMock.getMockDataSourceExceptionOnAnyExecute();
-
-        final SelectTimestampQuery query = SelectTimestampQuery.newBuilder(anyString())
-                .setDataSource(dataSourceMock)
-                .setLogger(logger)
-                .build();
+        final SelectTimestampQuery query = Given.getSelectTimestampQueryMock();
         try {
             query.execute();
             fail();
         } catch (DatabaseException expected) {
-            verify(logger).error(anyString(), any(SQLException.class));
+            verify(Given.getLoggerMock()).error(anyString(), any(SQLException.class));
         }
     }
 }

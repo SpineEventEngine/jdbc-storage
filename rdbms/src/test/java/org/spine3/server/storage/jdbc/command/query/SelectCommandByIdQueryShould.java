@@ -21,11 +21,7 @@
 package org.spine3.server.storage.jdbc.command.query;
 
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.spine3.server.storage.jdbc.DataSourceMock;
 import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import java.sql.SQLException;
 
@@ -39,20 +35,12 @@ public class SelectCommandByIdQueryShould {
 
     @Test
     public void handle_sql_exception() throws SQLException {
-        final Logger logger = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock = DataSourceMock.getMockDataSourceExceptionOnAnyExecute();
-        final IdColumn<String> idColumnMock = mock(IdColumn.StringIdColumn.class);
-
-        final SelectCommandByIdQuery query = SelectCommandByIdQuery.newBuilder()
-                .setDataSource(dataSourceMock)
-                .setLogger(logger)
-                .setIdColumn(idColumnMock)
-                .build();
+        final SelectCommandByIdQuery query = Given.getSelectCommandByIdQueryMock();
         try {
             query.execute();
             fail();
         } catch (DatabaseException expected) {
-            verify(logger).error(anyString(), any(SQLException.class));
+            verify(Given.getLoggerMock()).error(anyString(), any(SQLException.class));
         }
     }
 }

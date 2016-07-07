@@ -21,17 +21,14 @@
 package org.spine3.server.storage.jdbc.query;
 
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.spine3.server.storage.jdbc.DataSourceMock;
 import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import java.sql.SQLException;
 
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.verify;
 
 /**
  * @author Andrey Lavrov
@@ -40,21 +37,12 @@ public class WriteRecordQueryShould {
 
     @Test
     public void handle_database_exception() throws SQLException {
-        final Logger logger = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock = DataSourceMock.getMockDataSourceExceptionOnAnyExecute();
-        final IdColumn<String> idColumnMock = mock(IdColumn.StringIdColumn.class);
-
-        final WriteRecordQuery query = Given.WriteRecordQueryMock.newBuilder()
-                .setDataSource(dataSourceMock)
-                .setLogger(logger)
-                .setIdColumn(idColumnMock)
-                .setRecord(Given.recordMock)
-                .build();
+        final WriteRecordQuery query = Given.getWriteRecordQueryMock();
         try {
             query.execute();
             fail();
         } catch (DatabaseException expected) {
-            verify(logger).error(anyString(), any(SQLException.class));
+            verify(Given.getLoggerMock()).error(anyString(), any(SQLException.class));
         }
     }
 }
