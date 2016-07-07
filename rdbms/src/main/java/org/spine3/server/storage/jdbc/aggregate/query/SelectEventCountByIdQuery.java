@@ -44,7 +44,7 @@ import static org.spine3.server.storage.jdbc.aggregate.query.Table.EventCount.ID
 public class SelectEventCountByIdQuery<I> extends Query {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String SELECT_QUERY =
+    private static final String QUERY_TEMPLATE =
             "SELECT " + EVENT_COUNT_COL +
                     " FROM %s " +
                     " WHERE " + ID_COL + " = ?;";
@@ -83,7 +83,7 @@ public class SelectEventCountByIdQuery<I> extends Query {
 
     public static <I> Builder<I> newBuilder(String tableName) {
         final Builder<I> builder = new Builder<>();
-        builder.setQuery(format(SELECT_QUERY, tableName));
+        builder.setQuery(format(QUERY_TEMPLATE, tableName));
         return builder;
     }
 

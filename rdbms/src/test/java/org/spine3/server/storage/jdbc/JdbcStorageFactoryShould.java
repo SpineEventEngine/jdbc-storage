@@ -22,6 +22,7 @@ package org.spine3.server.storage.jdbc;
 
 import com.google.protobuf.StringValue;
 import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import org.junit.Before;
 import org.junit.Test;
 import org.spine3.server.aggregate.Aggregate;
@@ -29,7 +30,6 @@ import org.spine3.server.entity.Entity;
 import org.spine3.server.projection.Projection;
 import org.spine3.server.storage.*;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.server.storage.jdbc.util.HikariDataSourceWrapper;
 import org.spine3.test.project.Project;
 
 import static org.junit.Assert.assertNotNull;
@@ -38,7 +38,7 @@ import static org.spine3.base.Identifiers.newUuid;
 /**
  * @author Alexander Litus
  */
-@SuppressWarnings({"InstanceMethodNamingConvention", "MagicNumber"})
+@SuppressWarnings({"InstanceMethodNamingConvention", "MagicNumber", "DuplicateStringLiteralInspection"})
 public class JdbcStorageFactoryShould {
 
     /**
@@ -57,7 +57,20 @@ public class JdbcStorageFactoryShould {
                 .setPassword("pwd")
                 .setMaxPoolSize(12)
                 .build();
-        factory = JdbcStorageFactory.newInstance(config);
+        factory = JdbcStorageFactory.newInstance(config, false);
+    }
+
+    @Test
+    public void allow_to_use_custom_data_source(){
+        final String dbUrl = newInMemoryDbUrl("factoryTests");
+        final DataSourceConfig config = DataSourceConfig.newBuilder()
+                .setJdbcUrl(dbUrl)
+                .setUsername("SA")
+                .setPassword("pwd")
+                .setMaxPoolSize(12)
+                .build();
+        final JdbcStorageFactory factory = JdbcStorageFactory.newInstance(DataSourceMock.getClosableDataSourceWrapper(), false);
+        assertNotNull(factory);
     }
 
     @Test
@@ -95,7 +108,7 @@ public class JdbcStorageFactoryShould {
         final String dbUrl = newInMemoryDbUrl(dbName);
         config.setJdbcUrl(dbUrl);
         // not setting username and password is OK for in-memory database
-        final DataSourceWrapper dataSource = HikariDataSourceWrapper.newInstance(config);
+        final DataSourceWrapper dataSource = DataSourceWrapper.wrap(new HikariDataSource(config));
         return dataSource;
     }
 

@@ -36,7 +36,7 @@ import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
 public class InsertEntityQuery<I> extends WriteRecordQuery<I, EntityStorageRecord> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String INSERT_QUERY =
+    private static final String QUERY_TEMPLATE =
             "INSERT INTO %s " +
                     " (" + ID_COL + ", " + ENTITY_COL + ')' +
                     " VALUES (?, ?);";
@@ -49,7 +49,7 @@ public class InsertEntityQuery<I> extends WriteRecordQuery<I, EntityStorageRecor
         final Builder<I> builder = new Builder<>();
         builder.setIdIndexInQuery(1)
                 .setRecordIndexInQuery(2)
-                .setQuery(format(INSERT_QUERY, tableName));
+                .setQuery(format(QUERY_TEMPLATE, tableName));
         return builder;
     }
 

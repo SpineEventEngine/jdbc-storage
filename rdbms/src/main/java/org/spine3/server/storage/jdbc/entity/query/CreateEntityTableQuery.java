@@ -20,15 +20,8 @@
 
 package org.spine3.server.storage.jdbc.entity.query;
 
-import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.query.Query;
-import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
-import org.spine3.server.storage.jdbc.util.IdColumn;
+import org.spine3.server.storage.jdbc.query.CreateTableQuery;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-
-import static java.lang.String.format;
 import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ENTITY_COL;
 import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
 
@@ -38,63 +31,32 @@ import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-public class CreateTableQuery<I> extends Query {
-
-    private final IdColumn<I> idColumn;
-    private final String tableName;
+public class CreateEntityTableQuery<I> extends CreateTableQuery<I> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String CREATE_TABLE_IF_DOES_NOT_EXIST =
+    private static final String QUERY_TEMPLATE =
             "CREATE TABLE IF NOT EXISTS %s (" +
                     ID_COL + " %s, " +
                     ENTITY_COL + " BLOB, " +
                     "PRIMARY KEY(" + ID_COL + ')' +
                     ");";
 
-    protected CreateTableQuery(Builder<I> builder) {
+    protected CreateEntityTableQuery(Builder<I> builder) {
         super(builder);
-        this.idColumn = builder.idColumn;
-        this.tableName = builder.tableName;
-    }
-
-    @SuppressWarnings("DuplicateStringLiteralInspection")
-    public void execute() throws DatabaseException {
-        final String idColumnType = idColumn.getColumnDataType();
-        final String createTableSql = format(CREATE_TABLE_IF_DOES_NOT_EXIST, tableName, idColumnType);
-        try (ConnectionWrapper connection = this.getConnection(true);
-             PreparedStatement statement = connection.prepareStatement(createTableSql)) {
-            statement.execute();
-        } catch (SQLException e) {
-            this.getLogger().error("Error while creating a table with the name: " + tableName, e);
-            throw new DatabaseException(e);
-        }
     }
 
     public static <I>Builder<I> newBuilder() {
         final Builder <I> builder = new Builder<>();
-        builder.setQuery(CREATE_TABLE_IF_DOES_NOT_EXIST);
+        builder.setQuery(QUERY_TEMPLATE);
         return builder;
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder<I> extends Query.Builder<Builder<I>, CreateTableQuery> {
-
-        private IdColumn<I> idColumn;
-        private String tableName;
+    public static class Builder<I> extends CreateTableQuery.Builder<Builder<I>, CreateEntityTableQuery, I> {
 
         @Override
-        public CreateTableQuery build() {
-            return new CreateTableQuery<>(this);
-        }
-
-        public Builder<I> setIdColumn(IdColumn<I> idColumn){
-            this.idColumn = idColumn;
-            return getThis();
-        }
-
-        public Builder<I> setTableName(String tableName){
-            this.tableName = tableName;
-            return getThis();
+        public CreateEntityTableQuery build() {
+            return new CreateEntityTableQuery<>(this);
         }
 
         @Override

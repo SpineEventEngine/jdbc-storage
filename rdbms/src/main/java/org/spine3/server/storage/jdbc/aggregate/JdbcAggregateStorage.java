@@ -20,6 +20,8 @@
 
 package org.spine3.server.storage.jdbc.aggregate;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.spine3.server.storage.AggregateStorage;
 import org.spine3.server.storage.AggregateStorageRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
@@ -27,6 +29,7 @@ import org.spine3.server.storage.jdbc.JdbcStorageFactory;
 import org.spine3.server.storage.jdbc.aggregate.query.AggregateStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbIterator;
+
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -75,6 +78,7 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
         super(multitenant);
         this.dataSource = dataSource;
         this.queryFactory = queryFactory;
+        queryFactory.setLogger(LogSingleton.INSTANCE.value);
         queryFactory.newCreateMainTableQuery().execute();
         queryFactory.newCreateEventCountTableQuery().execute();
     }
@@ -135,12 +139,17 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     public void close() throws DatabaseException {
         closeAll(iterators);
         iterators.clear();
-
         dataSource.close();
         try {
             super.close();
         } catch (Exception e) {
             throw new DatabaseException(e);
         }
+    }
+
+    private enum LogSingleton {
+        INSTANCE;
+        @SuppressWarnings("NonSerializableFieldInSerializableClass")
+        private final Logger value = LoggerFactory.getLogger(JdbcAggregateStorage.class);
     }
 }

@@ -47,7 +47,7 @@ public class SelectByIdSortedByTimeDescQuery<I> extends Query {
     private final I id;
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String SELECT_BY_ID_SORTED_BY_TIME_DESC =
+    private static final String QUERY_TEMPLATE =
             "SELECT " + AGGREGATE_COL + " FROM %s " +
                     " WHERE " + ID_COL + " = ? " +
                     " ORDER BY " + SECONDS_COL + " DESC, " + NANOS_COL + " DESC;";
@@ -72,7 +72,7 @@ public class SelectByIdSortedByTimeDescQuery<I> extends Query {
 
     public static <I> Builder<I> newBuilder(String tableName) {
         final Builder<I> builder = new Builder<>();
-        builder.setQuery(format(SELECT_BY_ID_SORTED_BY_TIME_DESC, tableName));
+        builder.setQuery(format(QUERY_TEMPLATE, tableName));
         return builder;
     }
 

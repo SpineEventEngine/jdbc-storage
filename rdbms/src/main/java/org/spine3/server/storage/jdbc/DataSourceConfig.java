@@ -51,7 +51,6 @@ public class DataSourceConfig {
     private final String jdbcUrl;
     private final String username;
     private final String password;
-    private final boolean multitenant;
 
     /**
      * Optional
@@ -76,7 +75,6 @@ public class DataSourceConfig {
         this.jdbcUrl = builder.getJdbcUrl();
         this.username = builder.getUsername();
         this.password = builder.getPassword();
-        this.multitenant = builder.isMultitenant();
 
         this.autoCommit = builder.isAutoCommit();
         this.connectionTimeout = builder.getConnectionTimeout();
@@ -126,13 +124,6 @@ public class DataSourceConfig {
     @Nullable
     public String getPassword() {
         return password;
-    }
-
-    /**
-     * See {@link Builder#setMultitenant(boolean)}.
-     */
-    public boolean isMultitenant() {
-        return multitenant;
     }
 
     /**
@@ -203,7 +194,6 @@ public class DataSourceConfig {
         private String jdbcUrl;
         private String username;
         private String password;
-        private boolean multitenant;
 
         /**
          * Optional
@@ -372,23 +362,6 @@ public class DataSourceConfig {
          */
         public Builder setPassword(String password) {
             this.password = password;
-            return this;
-        }
-
-        /**
-         * See {@link #setMultitenant(boolean)}.
-         */
-        public boolean isMultitenant() {
-            return multitenant;
-        }
-
-        /**
-         * Defines is storage multitenant
-         *
-         * @param multitenant the password to set
-         */
-        public Builder setMultitenant(boolean multitenant) {
-            this.multitenant = multitenant;
             return this;
         }
 

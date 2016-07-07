@@ -70,29 +70,7 @@ public abstract class IdColumn<I> {
         return helper;
     }
 
-    public static <I> IdColumn<I> newInstance(String idType) {
-        final IdColumn<I> helper;
-        switch (idType) {
-            case TYPE_BIGINT:
-                @SuppressWarnings("unchecked") // is checked already
-                final IdColumn<I> longIdColumn = (IdColumn<I>) new LongIdColumn();
-                helper = longIdColumn;
-                break;
-            case TYPE_INT:
-                @SuppressWarnings("unchecked") // is checked already
-                final IdColumn<I> intIdColumn = (IdColumn<I>) new IntIdColumn();
-                helper = intIdColumn;
-                break;
-            default:
-                helper = new StringOrMessageIdColumn<>();
-                break;
-        }
-        return helper;
-    }
-
-    /**
-     * Returns the SQL data type string of the ID column, e.g. {@code "BIGINT"}, {@code "VARCHAR(999)"}, etc.
-     */
+    /** Returns the SQL data type string of the ID column, e.g. {@code "BIGINT"}, {@code "VARCHAR(999)"}, etc. */
     public abstract String getColumnDataType();
 
     /**
@@ -105,9 +83,7 @@ public abstract class IdColumn<I> {
      */
     public abstract void setId(int index, I id, PreparedStatement statement) throws DatabaseException;
 
-    /**
-     * Helps to work with columns which contain {@code long} {@link Entity} IDs.
-     */
+    /** Helps to work with columns which contain {@code long} {@link Entity} IDs. */
     private static class LongIdColumn extends IdColumn<Long> {
 
         @Override
@@ -125,9 +101,7 @@ public abstract class IdColumn<I> {
         }
     }
 
-    /**
-     * Helps to work with columns which contain {@code integer} {@link Entity} IDs.
-     */
+    /** Helps to work with columns which contain {@code integer} {@link Entity} IDs. */
     private static class IntIdColumn extends IdColumn<Integer> {
 
         @Override
@@ -145,9 +119,7 @@ public abstract class IdColumn<I> {
         }
     }
 
-    /**
-     * Helps to work with columns which contain either {@link Message} or {@code string} {@link Entity} IDs.
-     */
+    /** Helps to work with columns which contain either {@link Message} or {@code string} {@link Entity} IDs. */
     private static class StringOrMessageIdColumn<I> extends IdColumn<I> {
 
         @Override
@@ -166,9 +138,7 @@ public abstract class IdColumn<I> {
         }
     }
 
-    /**
-     * Helps to work with columns which contain {@code string} {@link Entity} IDs.
-     */
+    /** Helps to work with columns which contain {@code string} {@link Entity} IDs. */
     public static class StringIdColumn extends StringOrMessageIdColumn<String> {
     }
 }

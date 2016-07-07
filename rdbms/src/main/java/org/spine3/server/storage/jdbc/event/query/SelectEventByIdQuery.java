@@ -34,7 +34,7 @@ import static org.spine3.server.storage.jdbc.event.query.EventTable.*;
 public class SelectEventByIdQuery extends SelectByIdQuery<String, EventStorageRecord> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String SELECT_QUERY = SELECT_EVENT_FROM_TABLE +
+    private static final String QUERY_TEMPLATE = SELECT_EVENT_FROM_TABLE +
                                                " WHERE " + EVENT_ID_COL + " = ?;";
 
     public SelectEventByIdQuery(Builder builder) {
@@ -44,7 +44,7 @@ public class SelectEventByIdQuery extends SelectByIdQuery<String, EventStorageRe
     public static Builder newBuilder() {
         final Builder builder = new Builder();
         builder.setIdIndexInQuery(1)
-                .setQuery(SELECT_QUERY)
+                .setQuery(QUERY_TEMPLATE)
                 .setMessageColumnName(EVENT_COL)
                 .setMessageDescriptor(EventStorageRecord.getDescriptor());
         return builder;

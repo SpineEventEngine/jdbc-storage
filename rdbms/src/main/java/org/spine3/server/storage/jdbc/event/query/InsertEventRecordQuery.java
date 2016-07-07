@@ -38,10 +38,10 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-public class InsertEventQuery extends WriteRecordQuery<String, EventStorageRecord> {
+public class InsertEventRecordQuery extends WriteRecordQuery<String, EventStorageRecord> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String INSERT_QUERY =
+    private static final String QUERY_TEMPLATE =
             "INSERT INTO " + TABLE_NAME + " (" +
                     EVENT_ID_COL + ", " +
                     EVENT_COL + ", " +
@@ -51,26 +51,26 @@ public class InsertEventQuery extends WriteRecordQuery<String, EventStorageRecor
                     NANOSECONDS_COL +
                     ") VALUES (?, ?, ?, ?, ?, ?);";
 
-    private InsertEventQuery(Builder builder) {
+    private InsertEventRecordQuery(Builder builder) {
         super(builder);
     }
 
     @Override
     @SuppressWarnings("DuplicateStringLiteralInspection")
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
-        final PreparedStatement statement = connection.prepareStatement(INSERT_QUERY);
-            final Timestamp timestamp = this.getRecord().getTimestamp();
+        final PreparedStatement statement = connection.prepareStatement(QUERY_TEMPLATE);
+        final Timestamp timestamp = getRecord().getTimestamp();
         try {
-            final String eventId = this.getRecord().getEventId();
+            final String eventId = getRecord().getEventId();
             statement.setString(1, eventId);
 
-            final byte[] serializedRecord = serialize(this.getRecord());
+            final byte[] serializedRecord = serialize(getRecord());
             statement.setBytes(2, serializedRecord);
 
-            final String eventType = this.getRecord().getEventType();
+            final String eventType = getRecord().getEventType();
             statement.setString(3, eventType);
 
-            final String producerId = this.getRecord().getProducerId();
+            final String producerId = getRecord().getProducerId();
             statement.setString(4, producerId);
 
             final long seconds = timestamp.getSeconds();
@@ -79,7 +79,7 @@ public class InsertEventQuery extends WriteRecordQuery<String, EventStorageRecor
             final int nanos = timestamp.getNanos();
             statement.setInt(6, nanos);
         } catch (SQLException e) {
-            this.getLogger().error("Failed to prepare statement ", e);
+            getLogger().error("Failed to build statement", e);
             throw new DatabaseException(e);
         }
         return statement;
@@ -87,16 +87,16 @@ public class InsertEventQuery extends WriteRecordQuery<String, EventStorageRecor
 
     public static Builder newBuilder() {
         final Builder builder = new Builder();
-        builder.setQuery(INSERT_QUERY);
+        builder.setQuery(QUERY_TEMPLATE);
         return builder;
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder extends WriteRecordQuery.Builder<Builder, InsertEventQuery, String, EventStorageRecord> {
+    public static class Builder extends WriteRecordQuery.Builder<Builder, InsertEventRecordQuery, String, EventStorageRecord> {
 
         @Override
-        public InsertEventQuery build() {
-            return new InsertEventQuery(this);
+        public InsertEventRecordQuery build() {
+            return new InsertEventRecordQuery(this);
         }
 
         @Override

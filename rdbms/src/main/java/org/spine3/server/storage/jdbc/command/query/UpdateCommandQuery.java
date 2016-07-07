@@ -32,7 +32,7 @@ import static org.spine3.server.storage.jdbc.command.query.CommandTable.*;
 public class UpdateCommandQuery extends WriteCommandRecordQuery {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String UPDATE_QUERY =
+    private static final String QUERY_TEMPLATE =
             "UPDATE " + TABLE_NAME +
                     " SET " + COMMAND_COL + " = ? " +
                     ", " + COMMAND_STATUS_COL + " = ? " +
@@ -47,7 +47,7 @@ public class UpdateCommandQuery extends WriteCommandRecordQuery {
         builder.setStatusIndexInQuery(2)
                 .setIdIndexInQuery(3)
                 .setRecordIndexInQuery(1)
-                .setQuery(UPDATE_QUERY);
+                .setQuery(QUERY_TEMPLATE);
         return builder;
     }
 

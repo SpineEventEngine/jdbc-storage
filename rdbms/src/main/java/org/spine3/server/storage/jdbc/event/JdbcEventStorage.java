@@ -78,7 +78,7 @@ public class JdbcEventStorage extends EventStorage {
         this.dataSource = dataSource;
         this.queryFactory = queryFactory;
         queryFactory.setLogger(LogSingleton.INSTANCE.value);
-        queryFactory.newCreateTableQuery().execute();
+        queryFactory.newCreateEventTableQuery().execute();
     }
 
     /**

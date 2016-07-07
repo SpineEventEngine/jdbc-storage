@@ -42,7 +42,7 @@ public class UpdateEventCountQuery<I> extends UpdateRecordQuery<I> {
     private final int count;
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String UPDATE_QUERY =
+    private static final String QUERY_TEMPLATE =
             "UPDATE %s " +
                     " SET " + EVENT_COUNT_COL + " = ? " +
                     " WHERE " + ID_COL + " = ?;";
@@ -68,7 +68,7 @@ public class UpdateEventCountQuery<I> extends UpdateRecordQuery<I> {
 
     public static <I> Builder<I> newBuilder(String tableName) {
         final Builder<I> builder = new Builder<>();
-        builder.setQuery(format(UPDATE_QUERY, tableName))
+        builder.setQuery(format(QUERY_TEMPLATE, tableName))
                 .setIdIndexInQuery(2);
         return builder;
     }

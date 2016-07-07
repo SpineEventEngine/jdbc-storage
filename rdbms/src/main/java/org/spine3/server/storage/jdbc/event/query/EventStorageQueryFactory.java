@@ -26,6 +26,8 @@ import org.spine3.server.storage.EventStorageRecord;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
+import static org.spine3.server.storage.jdbc.event.query.EventTable.TABLE_NAME;
+
 /**
  * This class creates queries for interaction with {@link EventTable}.
  *
@@ -53,10 +55,12 @@ public class EventStorageQueryFactory{
     }
 
     /** Returns a query that creates a new {@link EventTable} if it does not exist. */
-    public CreateTableQuery newCreateTableQuery(){
-        final CreateTableQuery.Builder builder = CreateTableQuery.newBuilder()
+    public CreateEventTableQuery newCreateEventTableQuery(){
+        final CreateEventTableQuery.Builder builder = CreateEventTableQuery.newBuilder()
                 .setDataSource(dataSource)
-                .setLogger(logger);
+                .setLogger(logger)
+                .setIdColumn(idColumn)
+                .setTableName(TABLE_NAME);
         return builder.build();
     }
 
@@ -65,8 +69,8 @@ public class EventStorageQueryFactory{
      *
      * @param record    new event record
      */
-    public InsertEventQuery newInsertEventQuery(EventStorageRecord record){
-        final InsertEventQuery.Builder builder = InsertEventQuery.newBuilder()
+    public InsertEventRecordQuery newInsertEventQuery(EventStorageRecord record){
+        final InsertEventRecordQuery.Builder builder = InsertEventRecordQuery.newBuilder()
                 .setDataSource(dataSource)
                 .setLogger(logger)
                 .setRecord(record);
@@ -78,8 +82,8 @@ public class EventStorageQueryFactory{
      *
      * @param record    updated record state
      */
-    public UpdateEventQuery newUpdateEventQuery(EventStorageRecord record){
-        final UpdateEventQuery.Builder builder = UpdateEventQuery.newBuilder()
+    public UpdateEventRecordQuery newUpdateEventQuery(EventStorageRecord record){
+        final UpdateEventRecordQuery.Builder builder = UpdateEventRecordQuery.newBuilder()
                 .setDataSource(dataSource)
                 .setLogger(logger)
                 .setRecord(record);

@@ -43,7 +43,7 @@ public class UpdateTimestampQuery extends WriteQuery{
     private final Timestamp timestamp;
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String UPDATE_QUERY =
+    private static final String QUERY_TEMPLATE =
             "UPDATE %s SET " +
                     SECONDS_COL + " = ?, " +
                     NANOS_COL + " = ?;";
@@ -55,11 +55,12 @@ public class UpdateTimestampQuery extends WriteQuery{
 
     public static  Builder  newBuilder(String tableName) {
         final Builder builder = new Builder();
-        builder.setQuery(format(UPDATE_QUERY, tableName));
+        builder.setQuery(format(QUERY_TEMPLATE, tableName));
         return builder;
     }
 
     @Override
+    @SuppressWarnings("DuplicateStringLiteralInspection")
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
         final PreparedStatement statement = super.prepareStatement(connection);
         final long seconds = timestamp.getSeconds();
@@ -69,6 +70,7 @@ public class UpdateTimestampQuery extends WriteQuery{
             statement.setInt(2, nanos);
             return statement;
         } catch (SQLException e) {
+            getLogger().error("Failed to prepare statement.", e);
             throw new DatabaseException(e);
         }
     }

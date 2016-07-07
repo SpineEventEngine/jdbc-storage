@@ -32,16 +32,14 @@ import java.sql.SQLException;
 public abstract class WriteRecordQuery<I, Record extends Message> extends WriteQuery{
 
     private final I id;
+    private final Record record;
+    private final int idIndexInQuery;
+    private final int recordIndexInQuery;
+    private final IdColumn<I> idColumn;
 
     public Record getRecord() {
         return record;
     }
-
-    private final Record record;
-
-    private final int idIndexInQuery;
-    private final int recordIndexInQuery;
-    private final IdColumn<I> idColumn;
 
     protected WriteRecordQuery(Builder<? extends Builder, ? extends WriteRecordQuery, I, Record> builder) {
         super(builder);
@@ -55,14 +53,13 @@ public abstract class WriteRecordQuery<I, Record extends Message> extends WriteQ
     @Override
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
         final PreparedStatement statement = super.prepareStatement(connection);
-
         try {
             idColumn.setId(idIndexInQuery, id, statement);
-
             final byte[] bytes = Serializer.serialize(record);
             statement.setBytes(recordIndexInQuery, bytes);
             return statement;
         } catch (SQLException e) {
+            getLogger().error("Failed to write record with id " + id, e);
             throw new DatabaseException(e);
         }
     }

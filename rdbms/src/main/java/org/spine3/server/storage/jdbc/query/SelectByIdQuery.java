@@ -56,7 +56,7 @@ public class SelectByIdQuery<I, M extends Message> extends Query {
 
 
     protected SelectByIdQuery(Builder<? extends Builder, ? extends SelectByIdQuery, I, M> builder) {
-       super(builder);
+        super(builder);
         this.idColumn = builder.idColumn;
         this.id = builder.id;
         this.idIndexInQuery = builder.idIndexInQuery;
@@ -98,8 +98,8 @@ public class SelectByIdQuery<I, M extends Message> extends Query {
      */
     @Nullable
     protected M readMessage(ResultSet resultSet) throws SQLException {
-        checkNotNull(messageColumnName, "messageColumnName must be set.");
-        checkNotNull(messageDescriptor, "messageDescriptor must be set.");
+        checkNotNull(messageColumnName);
+        checkNotNull(messageDescriptor);
         final byte[] bytes = resultSet.getBytes(messageColumnName);
         if (bytes == null) {
             return null;

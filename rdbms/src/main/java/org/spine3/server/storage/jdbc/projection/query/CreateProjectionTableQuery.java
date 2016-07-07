@@ -20,14 +20,8 @@
 
 package org.spine3.server.storage.jdbc.projection.query;
 
-import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.query.Query;
-import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
+import org.spine3.server.storage.jdbc.query.CreateTableQuery;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-
-import static java.lang.String.format;
 import static org.spine3.server.storage.jdbc.projection.query.ProjectionTable.NANOS_COL;
 import static org.spine3.server.storage.jdbc.projection.query.ProjectionTable.SECONDS_COL;
 
@@ -37,53 +31,31 @@ import static org.spine3.server.storage.jdbc.projection.query.ProjectionTable.SE
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-public class CreateTableQuery extends Query {
-
-    private final String tableName;
+public class CreateProjectionTableQuery extends CreateTableQuery<String> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String CREATE_TABLE_IF_DOES_NOT_EXIST =
+    private static final String QUERY_TEMPLATE =
             "CREATE TABLE IF NOT EXISTS %s (" +
                     SECONDS_COL + " BIGINT, " +
                     NANOS_COL + " INT " +
                     ");";
 
-    protected CreateTableQuery(Builder builder) {
+    protected CreateProjectionTableQuery(Builder builder) {
         super(builder);
-        this.tableName = builder.tableName;
-    }
-
-    @SuppressWarnings("DuplicateStringLiteralInspection")
-    public void execute() throws DatabaseException {
-        final String createTableSql = format(CREATE_TABLE_IF_DOES_NOT_EXIST, tableName);
-        try (ConnectionWrapper connection = this.getConnection(true);
-             PreparedStatement statement = connection.prepareStatement(createTableSql)) {
-            statement.execute();
-        } catch (SQLException e) {
-            getLogger().error("Error while creating a table with the name: " + tableName, e);
-            throw new DatabaseException(e);
-        }
     }
 
     public static Builder newBuilder() {
         final Builder builder = new Builder();
-        builder.setQuery(CREATE_TABLE_IF_DOES_NOT_EXIST);
+        builder.setQuery(QUERY_TEMPLATE);
         return builder;
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder extends Query.Builder<Builder, CreateTableQuery> {
-
-        private String tableName;
+    public static class Builder extends CreateTableQuery.Builder<Builder, CreateProjectionTableQuery, String> {
 
         @Override
-        public CreateTableQuery build() {
-            return new CreateTableQuery(this);
-        }
-
-        public Builder setTableName(String tableName){
-            this.tableName = tableName;
-            return getThis();
+        public CreateProjectionTableQuery build() {
+            return new CreateProjectionTableQuery(this);
         }
 
         @Override

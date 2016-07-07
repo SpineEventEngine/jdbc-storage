@@ -120,8 +120,8 @@ public class AggregateStorageQueryFactory<I> {
      * @param id        aggregate id
      * @param record    new aggregate record
      */
-    public InsertRecordQuery newInsertRecordQuery(I id, AggregateStorageRecord record) {
-        final InsertRecordQuery.Builder<I> builder = InsertRecordQuery.<I>newBuilder(mainTableName)
+    public InsertAggregateRecordQuery newInsertRecordQuery(I id, AggregateStorageRecord record) {
+        final InsertAggregateRecordQuery.Builder<I> builder = InsertAggregateRecordQuery.<I>newBuilder(mainTableName)
                 .setDataSource(dataSource)
                 .setLogger(logger)
                 .setIdColumn(idColumn)
@@ -131,7 +131,7 @@ public class AggregateStorageQueryFactory<I> {
     }
 
     /** Returns a query that selects event count by corresponding aggregate ID. */
-    public SelectEventCountByIdQuery newSelectEventCountByIdQuery(I id) {
+    public SelectEventCountByIdQuery<I> newSelectEventCountByIdQuery(I id) {
         final SelectEventCountByIdQuery.Builder<I> builder = SelectEventCountByIdQuery.<I>newBuilder(eventCountTableName)
                 .setDataSource(dataSource)
                 .setLogger(logger)

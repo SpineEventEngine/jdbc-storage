@@ -20,12 +20,7 @@
 
 package org.spine3.server.storage.jdbc.event.query;
 
-import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.query.Query;
-import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
-
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import org.spine3.server.storage.jdbc.query.CreateTableQuery;
 
 import static org.spine3.server.storage.jdbc.event.query.EventTable.*;
 
@@ -35,12 +30,12 @@ import static org.spine3.server.storage.jdbc.event.query.EventTable.*;
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-public class CreateTableQuery extends Query {
+public class CreateEventTableQuery extends CreateTableQuery<String> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String CREATE_TABLE_QUERY =
-            "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" +
-                    EVENT_ID_COL + " VARCHAR(512), " +
+    private static final String QUERY_TEMPLATE =
+            "CREATE TABLE IF NOT EXISTS %s (" +
+                    EVENT_ID_COL + " %s, " +
                     EVENT_COL + " BLOB, " +
                     EVENT_TYPE_COL + " VARCHAR(512), " +
                     PRODUCER_ID_COL + " VARCHAR(512), " +
@@ -49,32 +44,22 @@ public class CreateTableQuery extends Query {
                     " PRIMARY KEY(" + EVENT_ID_COL + ')' +
                     ");";
 
-    protected CreateTableQuery(Builder builder) {
+    protected CreateEventTableQuery(Builder builder) {
         super(builder);
-    }
-
-    public void execute() throws DatabaseException {
-        try (ConnectionWrapper connection = this.getConnection(true);
-             PreparedStatement statement = prepareStatement(connection)) {
-            statement.execute();
-        } catch (SQLException e) {
-            this.getLogger().error("Error while creating an event table ", e);
-            throw new DatabaseException(e);
-        }
     }
 
     public static Builder newBuilder() {
         final Builder builder = new Builder();
-        builder.setQuery(CREATE_TABLE_QUERY);
+        builder.setQuery(QUERY_TEMPLATE);
         return builder;
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder extends Query.Builder<Builder, CreateTableQuery> {
+    public static class Builder extends CreateTableQuery.Builder<Builder, CreateEventTableQuery, String> {
 
         @Override
-        public CreateTableQuery build() {
-            return new CreateTableQuery(this);
+        public CreateEventTableQuery build() {
+            return new CreateEventTableQuery(this);
         }
 
         @Override

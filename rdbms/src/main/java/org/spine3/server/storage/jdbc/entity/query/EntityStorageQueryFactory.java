@@ -22,11 +22,11 @@ package org.spine3.server.storage.jdbc.entity.query;
 
 import org.slf4j.Logger;
 import org.spine3.server.entity.Entity;
+import org.spine3.server.storage.EntityStorage;
 import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbTableNameFactory;
 import org.spine3.server.storage.jdbc.util.IdColumn;
-import org.spine3.server.storage.EntityStorage;
 
 /**
  * This class creates queries for interaction with {@link EntityTable}.
@@ -53,8 +53,8 @@ public class EntityStorageQueryFactory<I> {
     }
 
     /** Returns a query that creates a new {@link EntityTable} if it does not exist. */
-    public CreateTableQuery newCreateTableQuery() {
-        final CreateTableQuery.Builder<I> builder = CreateTableQuery.<I>newBuilder()
+    public CreateEntityTableQuery newCreateEntityTableQuery() {
+        final CreateEntityTableQuery.Builder<I> builder = CreateEntityTableQuery.<I>newBuilder()
                 .setDataSource(dataSource)
                 .setLogger(logger)
                 .setIdColumn(idColumn)

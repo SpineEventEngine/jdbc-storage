@@ -38,15 +38,15 @@ import static org.spine3.server.storage.jdbc.aggregate.query.Table.AggregateReco
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-public class InsertRecordQuery<I> extends WriteRecordQuery<I, AggregateStorageRecord> {
+public class InsertAggregateRecordQuery<I> extends WriteRecordQuery<I, AggregateStorageRecord> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String INSERT_QUERY =
+    private static final String QUERY_TEMPLATE =
             "INSERT INTO %s " +
                     " (" + ID_COL + ", " + AGGREGATE_COL + ", " + SECONDS_COL + ", " + NANOS_COL + ") " +
                     " VALUES (?, ?, ?, ?);";
 
-    private InsertRecordQuery(Builder<I> builder) {
+    private InsertAggregateRecordQuery(Builder<I> builder) {
         super(builder);
     }
 
@@ -71,16 +71,16 @@ public class InsertRecordQuery<I> extends WriteRecordQuery<I, AggregateStorageRe
         final Builder<I> builder = new Builder<>();
         builder.setIdIndexInQuery(1)
                 .setRecordIndexInQuery(2)
-                .setQuery(format(INSERT_QUERY, tableName));
+                .setQuery(format(QUERY_TEMPLATE, tableName));
         return builder;
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder<I> extends WriteRecordQuery.Builder<Builder<I>, InsertRecordQuery, I, AggregateStorageRecord> {
+    public static class Builder<I> extends WriteRecordQuery.Builder<Builder<I>, InsertAggregateRecordQuery, I, AggregateStorageRecord> {
 
         @Override
-        public InsertRecordQuery build() {
-            return new InsertRecordQuery<>(this);
+        public InsertAggregateRecordQuery build() {
+            return new InsertAggregateRecordQuery<>(this);
         }
 
         @Override

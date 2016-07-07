@@ -38,10 +38,10 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-public class UpdateEventQuery extends WriteRecordQuery<String, EventStorageRecord> {
+public class UpdateEventRecordQuery extends WriteRecordQuery<String, EventStorageRecord> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String UPDATE_QUERY =
+    private static final String QUERY_TEMPLATE =
             "UPDATE " + TABLE_NAME +
                     " SET " +
                     EVENT_COL + " = ?, " +
@@ -51,14 +51,14 @@ public class UpdateEventQuery extends WriteRecordQuery<String, EventStorageRecor
                     NANOSECONDS_COL + " = ? " +
                     " WHERE " + EVENT_ID_COL + " = ? ;";
 
-    private UpdateEventQuery(Builder builder) {
+    private UpdateEventRecordQuery(Builder builder) {
         super(builder);
     }
 
     @Override
     @SuppressWarnings("DuplicateStringLiteralInspection")
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
-        final PreparedStatement statement = connection.prepareStatement(UPDATE_QUERY);
+        final PreparedStatement statement = connection.prepareStatement(QUERY_TEMPLATE);
             final Timestamp timestamp = this.getRecord().getTimestamp();
         try {
             final byte[] serializedRecord = serialize(this.getRecord());
@@ -87,16 +87,16 @@ public class UpdateEventQuery extends WriteRecordQuery<String, EventStorageRecor
 
     public static Builder newBuilder() {
         final Builder builder = new Builder();
-        builder.setQuery(UPDATE_QUERY);
+        builder.setQuery(QUERY_TEMPLATE);
         return builder;
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder extends WriteRecordQuery.Builder<Builder, UpdateEventQuery, String, EventStorageRecord> {
+    public static class Builder extends WriteRecordQuery.Builder<Builder, UpdateEventRecordQuery, String, EventStorageRecord> {
 
         @Override
-        public UpdateEventQuery build() {
-            return new UpdateEventQuery(this);
+        public UpdateEventRecordQuery build() {
+            return new UpdateEventRecordQuery(this);
         }
 
         @Override
