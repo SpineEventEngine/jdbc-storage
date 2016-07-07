@@ -33,7 +33,7 @@ import static org.spine3.server.storage.jdbc.command.query.CommandTable.*;
 public class InsertCommandQuery extends WriteCommandRecordQuery {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String INSERT_QUERY =
+    private static final String QUERY_TEMPLATE =
             "INSERT INTO " + TABLE_NAME + " (" +
                     ID_COL + ", " +
                     COMMAND_STATUS_COL + ", " +
@@ -50,7 +50,7 @@ public class InsertCommandQuery extends WriteCommandRecordQuery {
         builder.setStatusIndexInQuery(2)
                 .setIdIndexInQuery(1)
                 .setRecordIndexInQuery(3)
-                .setQuery(INSERT_QUERY);
+                .setQuery(QUERY_TEMPLATE);
         return builder;
     }
 

@@ -41,7 +41,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 public class UpdateEventRecordQuery extends WriteRecordQuery<String, EventStorageRecord> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String UPDATE_QUERY =
+    private static final String QUERY_TEMPLATE =
             "UPDATE " + TABLE_NAME +
                     " SET " +
                     EVENT_COL + " = ?, " +
@@ -58,7 +58,7 @@ public class UpdateEventRecordQuery extends WriteRecordQuery<String, EventStorag
     @Override
     @SuppressWarnings("DuplicateStringLiteralInspection")
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
-        final PreparedStatement statement = connection.prepareStatement(UPDATE_QUERY);
+        final PreparedStatement statement = connection.prepareStatement(QUERY_TEMPLATE);
             final Timestamp timestamp = this.getRecord().getTimestamp();
         try {
             final byte[] serializedRecord = serialize(this.getRecord());
@@ -87,7 +87,7 @@ public class UpdateEventRecordQuery extends WriteRecordQuery<String, EventStorag
 
     public static Builder newBuilder() {
         final Builder builder = new Builder();
-        builder.setQuery(UPDATE_QUERY);
+        builder.setQuery(QUERY_TEMPLATE);
         return builder;
     }
 

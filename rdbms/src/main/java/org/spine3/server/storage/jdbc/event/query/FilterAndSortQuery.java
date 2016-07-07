@@ -47,7 +47,7 @@ import static org.spine3.server.storage.jdbc.event.query.EventTable.*;
 public class FilterAndSortQuery extends Query {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String ORDER_BY_TIME_POSTFIX = " ORDER BY " + SECONDS_COL + " ASC, " + NANOSECONDS_COL + " ASC;";
+    private static final String QUERY_TEMPLATE = " ORDER BY " + SECONDS_COL + " ASC, " + NANOSECONDS_COL + " ASC;";
 
     private final EventStreamQuery streamQuery;
 
@@ -66,7 +66,7 @@ public class FilterAndSortQuery extends Query {
             }
             appendFilterByAggregateIdsSql(builder, filter);
         }
-        builder.append(ORDER_BY_TIME_POSTFIX);
+        builder.append(QUERY_TEMPLATE);
         final String sql = builder.toString();
         return connection.prepareStatement(sql);
     }
@@ -156,7 +156,7 @@ public class FilterAndSortQuery extends Query {
 
     public static Builder newBuilder() {
         final Builder builder = new Builder();
-        builder.setQuery(ORDER_BY_TIME_POSTFIX);
+        builder.setQuery(QUERY_TEMPLATE);
         return builder;
     }
 

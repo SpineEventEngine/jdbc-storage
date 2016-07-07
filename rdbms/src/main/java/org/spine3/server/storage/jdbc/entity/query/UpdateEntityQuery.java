@@ -36,7 +36,7 @@ import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
 public class UpdateEntityQuery<I> extends WriteRecordQuery<I, EntityStorageRecord> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String UPDATE_QUERY =
+    private static final String QUERY_TEMPLATE =
             "UPDATE %s " +
                     " SET " + ENTITY_COL + " = ? " +
                     " WHERE " + ID_COL + " = ?;";
@@ -49,7 +49,7 @@ public class UpdateEntityQuery<I> extends WriteRecordQuery<I, EntityStorageRecor
         final Builder<I> builder = new Builder<>();
         builder.setIdIndexInQuery(2)
                 .setRecordIndexInQuery(1)
-                .setQuery(format(UPDATE_QUERY, tableName));
+                .setQuery(format(QUERY_TEMPLATE, tableName));
         return builder;
     }
 

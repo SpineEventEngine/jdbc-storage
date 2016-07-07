@@ -33,7 +33,7 @@ import static org.spine3.server.storage.jdbc.event.query.EventTable.*;
 public class CreateEventTableQuery extends CreateTableQuery<String> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String CREATE_TABLE_QUERY =
+    private static final String QUERY_TEMPLATE =
             "CREATE TABLE IF NOT EXISTS %s (" +
                     EVENT_ID_COL + " %s, " +
                     EVENT_COL + " BLOB, " +
@@ -50,7 +50,7 @@ public class CreateEventTableQuery extends CreateTableQuery<String> {
 
     public static Builder newBuilder() {
         final Builder builder = new Builder();
-        builder.setQuery(CREATE_TABLE_QUERY);
+        builder.setQuery(QUERY_TEMPLATE);
         return builder;
     }
 

@@ -50,9 +50,7 @@ public class ConnectionWrapper implements AutoCloseable {
         this.connection = connection;
     }
 
-    /**
-     * Returns the wrapped connection object.
-     */
+    /** Returns the wrapped connection object. */
     public Connection get() {
         return connection;
     }

@@ -43,7 +43,7 @@ import static org.spine3.validate.Validate.isDefault;
  */
 public class SelectTimestampQuery extends Query {
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String SELECT_QUERY = "SELECT " +
+    private static final String QUERY_TEMPLATE = "SELECT " +
             SECONDS_COL + ", " +
             NANOS_COL + " FROM %s ;";
 
@@ -74,7 +74,7 @@ public class SelectTimestampQuery extends Query {
 
     public static Builder newBuilder(String tableName) {
         final Builder builder = new Builder();
-        builder.setQuery(format(SELECT_QUERY, tableName));
+        builder.setQuery(format(QUERY_TEMPLATE, tableName));
         return builder;
     }
 

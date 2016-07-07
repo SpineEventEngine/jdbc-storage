@@ -34,7 +34,7 @@ import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
 public class CreateEntityTableQuery<I> extends CreateTableQuery<I> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String CREATE_TABLE_IF_DOES_NOT_EXIST =
+    private static final String QUERY_TEMPLATE =
             "CREATE TABLE IF NOT EXISTS %s (" +
                     ID_COL + " %s, " +
                     ENTITY_COL + " BLOB, " +
@@ -47,7 +47,7 @@ public class CreateEntityTableQuery<I> extends CreateTableQuery<I> {
 
     public static <I>Builder<I> newBuilder() {
         final Builder <I> builder = new Builder<>();
-        builder.setQuery(CREATE_TABLE_IF_DOES_NOT_EXIST);
+        builder.setQuery(QUERY_TEMPLATE);
         return builder;
     }
 

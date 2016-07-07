@@ -41,7 +41,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 public class InsertEventRecordQuery extends WriteRecordQuery<String, EventStorageRecord> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String INSERT_QUERY =
+    private static final String QUERY_TEMPLATE =
             "INSERT INTO " + TABLE_NAME + " (" +
                     EVENT_ID_COL + ", " +
                     EVENT_COL + ", " +
@@ -58,7 +58,7 @@ public class InsertEventRecordQuery extends WriteRecordQuery<String, EventStorag
     @Override
     @SuppressWarnings("DuplicateStringLiteralInspection")
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
-        final PreparedStatement statement = connection.prepareStatement(INSERT_QUERY);
+        final PreparedStatement statement = connection.prepareStatement(QUERY_TEMPLATE);
         final Timestamp timestamp = getRecord().getTimestamp();
         try {
             final String eventId = getRecord().getEventId();
@@ -87,7 +87,7 @@ public class InsertEventRecordQuery extends WriteRecordQuery<String, EventStorag
 
     public static Builder newBuilder() {
         final Builder builder = new Builder();
-        builder.setQuery(INSERT_QUERY);
+        builder.setQuery(QUERY_TEMPLATE);
         return builder;
     }
 

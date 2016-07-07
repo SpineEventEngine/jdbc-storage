@@ -45,7 +45,7 @@ public class SelectCommandByStatusQuery extends Query {
     private final CommandStatus status;
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String SELECT_BY_STATUS_QUERY =
+    private static final String QUERY_TEMPLATE =
             "SELECT " + COMMAND_COL + " FROM " + TABLE_NAME +
             " WHERE " + COMMAND_STATUS_COL + " = ?;";
 
@@ -62,7 +62,7 @@ public class SelectCommandByStatusQuery extends Query {
      */
     public static Builder newBuilder() {
         final Builder builder = new Builder();
-        builder.setQuery(SELECT_BY_STATUS_QUERY);
+        builder.setQuery(QUERY_TEMPLATE);
         return builder;
     }
 

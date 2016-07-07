@@ -34,7 +34,7 @@ import static org.spine3.server.storage.jdbc.projection.query.ProjectionTable.SE
 public class CreateProjectionTableQuery extends CreateTableQuery<String> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String CREATE_TABLE_IF_DOES_NOT_EXIST =
+    private static final String QUERY_TEMPLATE =
             "CREATE TABLE IF NOT EXISTS %s (" +
                     SECONDS_COL + " BIGINT, " +
                     NANOS_COL + " INT " +
@@ -46,7 +46,7 @@ public class CreateProjectionTableQuery extends CreateTableQuery<String> {
 
     public static Builder newBuilder() {
         final Builder builder = new Builder();
-        builder.setQuery(CREATE_TABLE_IF_DOES_NOT_EXIST);
+        builder.setQuery(QUERY_TEMPLATE);
         return builder;
     }
 

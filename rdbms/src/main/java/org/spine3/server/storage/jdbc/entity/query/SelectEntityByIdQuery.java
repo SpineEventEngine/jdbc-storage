@@ -36,7 +36,7 @@ import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
 public class SelectEntityByIdQuery<I> extends SelectByIdQuery<I, EntityStorageRecord> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String SELECT_BY_ID = "SELECT " + ENTITY_COL + " FROM %s WHERE " + ID_COL + " = ?;";
+    private static final String QUERY_TEMPLATE = "SELECT " + ENTITY_COL + " FROM %s WHERE " + ID_COL + " = ?;";
 
     public SelectEntityByIdQuery(Builder<I> builder) {
         super(builder);
@@ -45,7 +45,7 @@ public class SelectEntityByIdQuery<I> extends SelectByIdQuery<I, EntityStorageRe
     public static <I> Builder <I> newBuilder(String tableName) {
         final Builder<I> builder = new Builder<>();
         builder.setIdIndexInQuery(1)
-                .setQuery(format(SELECT_BY_ID, tableName))
+                .setQuery(format(QUERY_TEMPLATE, tableName))
                 .setMessageColumnName(ENTITY_COL)
                 .setMessageDescriptor(EntityStorageRecord.getDescriptor());
         return builder;

@@ -33,7 +33,7 @@ import static org.spine3.server.storage.jdbc.command.query.CommandTable.*;
 public class CreateCommandTableQuery extends CreateTableQuery<String> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String INSERT_QUERY =
+    private static final String QUERY_TEMPLATE =
             "CREATE TABLE IF NOT EXISTS %s (" +
                     ID_COL + " %s, " +
                     COMMAND_COL + " BLOB, " +
@@ -49,7 +49,7 @@ public class CreateCommandTableQuery extends CreateTableQuery<String> {
 
     public static Builder newBuilder() {
         final Builder builder = new Builder();
-        builder.setQuery(INSERT_QUERY);
+        builder.setQuery(QUERY_TEMPLATE);
         return builder;
     }
 

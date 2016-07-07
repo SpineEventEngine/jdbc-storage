@@ -33,7 +33,7 @@ import static org.spine3.server.storage.jdbc.aggregate.query.Table.AggregateReco
 public class CreateMainTableQuery<I> extends CreateTableQuery<I> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String QUERY =
+    private static final String QUERY_TEMPLATE =
             "CREATE TABLE IF NOT EXISTS %s (" +
                     ID_COL + " %s, " +
                     AGGREGATE_COL + " BLOB, " +
@@ -47,7 +47,7 @@ public class CreateMainTableQuery<I> extends CreateTableQuery<I> {
 
     public static <I>Builder <I>newBuilder() {
         final Builder <I>builder = new Builder<>();
-        builder.setQuery(QUERY);
+        builder.setQuery(QUERY_TEMPLATE);
         return builder;
     }
 

@@ -41,7 +41,7 @@ import static org.spine3.server.storage.jdbc.aggregate.query.Table.AggregateReco
 public class InsertAggregateRecordQuery<I> extends WriteRecordQuery<I, AggregateStorageRecord> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String INSERT_QUERY =
+    private static final String QUERY_TEMPLATE =
             "INSERT INTO %s " +
                     " (" + ID_COL + ", " + AGGREGATE_COL + ", " + SECONDS_COL + ", " + NANOS_COL + ") " +
                     " VALUES (?, ?, ?, ?);";
@@ -71,7 +71,7 @@ public class InsertAggregateRecordQuery<I> extends WriteRecordQuery<I, Aggregate
         final Builder<I> builder = new Builder<>();
         builder.setIdIndexInQuery(1)
                 .setRecordIndexInQuery(2)
-                .setQuery(format(INSERT_QUERY, tableName));
+                .setQuery(format(QUERY_TEMPLATE, tableName));
         return builder;
     }
 

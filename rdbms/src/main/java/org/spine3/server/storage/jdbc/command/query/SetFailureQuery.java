@@ -35,7 +35,7 @@ import static org.spine3.server.storage.jdbc.command.query.CommandTable.*;
 public class SetFailureQuery extends WriteRecordQuery<String, Failure> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String SET_FAILURE_QUERY =
+    private static final String QUERY_TEMPLATE =
             "UPDATE " + TABLE_NAME +
                     " SET " +
                     FAILURE_COL + " = ? " +
@@ -49,7 +49,7 @@ public class SetFailureQuery extends WriteRecordQuery<String, Failure> {
         final Builder builder = new Builder();
         builder.setIdIndexInQuery(2)
                 .setRecordIndexInQuery(1)
-                .setQuery(SET_FAILURE_QUERY);
+                .setQuery(QUERY_TEMPLATE);
         return builder;
     }
 

@@ -34,7 +34,7 @@ import static org.spine3.server.storage.jdbc.command.query.CommandTable.*;
 public class SetOkStatusQuery extends UpdateRecordQuery<String> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String SET_OK_STATUS_QUERY =
+    private static final String QUERY_TEMPLATE =
             "UPDATE " + TABLE_NAME +
             " SET " + COMMAND_STATUS_COL + " = '" + CommandStatus.forNumber(CommandStatus.OK_VALUE).name() + '\'' +
             " WHERE " + ID_COL + " = ? ;";
@@ -46,7 +46,7 @@ public class SetOkStatusQuery extends UpdateRecordQuery<String> {
     public static Builder newBuilder() {
         final Builder builder = new Builder();
         builder.setIdIndexInQuery(1)
-               .setQuery(SET_OK_STATUS_QUERY);
+               .setQuery(QUERY_TEMPLATE);
         return builder;
     }
 

@@ -20,13 +20,7 @@
 
 package org.spine3.server.storage.jdbc.entity.query;
 
-import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.query.Query;
 import org.spine3.server.storage.jdbc.query.WriteQuery;
-import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
-
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 
 import static java.lang.String.format;
 
@@ -38,7 +32,7 @@ import static java.lang.String.format;
  */
 public class DeleteAllQuery extends WriteQuery {
 
-    private static final String DELETE_ALL = "DELETE FROM %s ;";
+    private static final String QUERY_TEMPLATE = "DELETE FROM %s ;";
 
     private DeleteAllQuery(Builder builder) {
         super(builder);
@@ -46,7 +40,7 @@ public class DeleteAllQuery extends WriteQuery {
 
     public static Builder newBuilder(String tableName) {
         final Builder builder = new Builder();
-        builder.setQuery(format(DELETE_ALL, tableName));
+        builder.setQuery(format(QUERY_TEMPLATE, tableName));
         return builder;
     }
 

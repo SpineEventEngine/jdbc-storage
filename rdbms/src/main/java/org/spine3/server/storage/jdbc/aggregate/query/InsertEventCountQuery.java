@@ -42,7 +42,7 @@ public class InsertEventCountQuery<I> extends UpdateRecordQuery<I> {
     private final int count;
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String INSERT_QUERY =
+    private static final String QUERY_TEMPLATE =
             "INSERT INTO %s " +
                     " (" + ID_COL + ", " + EVENT_COUNT_COL + ')' +
                     " VALUES (?, ?);";
@@ -68,7 +68,7 @@ public class InsertEventCountQuery<I> extends UpdateRecordQuery<I> {
 
     public static <I> Builder<I> newBuilder(String tableName) {
         final Builder<I> builder = new Builder<>();
-        builder.setQuery(format(INSERT_QUERY, tableName))
+        builder.setQuery(format(QUERY_TEMPLATE, tableName))
                 .setIdIndexInQuery(1);
         return builder;
     }

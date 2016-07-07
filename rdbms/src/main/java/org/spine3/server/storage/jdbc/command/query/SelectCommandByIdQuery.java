@@ -42,7 +42,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.deserialize;
 public class SelectCommandByIdQuery extends SelectByIdQuery<String, CommandStorageRecord> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String SELECT_QUERY =
+    private static final String QUERY_TEMPLATE =
                     "SELECT * FROM " + TABLE_NAME +
                     " WHERE " + ID_COL + " = ?;";
 
@@ -84,7 +84,7 @@ public class SelectCommandByIdQuery extends SelectByIdQuery<String, CommandStora
     public static Builder newBuilder() {
         final Builder builder = new Builder();
         builder.setIdIndexInQuery(1)
-                .setQuery(SELECT_QUERY);
+                .setQuery(QUERY_TEMPLATE);
         return builder;
     }
 
