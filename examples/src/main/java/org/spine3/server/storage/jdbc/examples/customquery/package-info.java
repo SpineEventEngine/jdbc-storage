@@ -18,12 +18,10 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.spine3.server.storage.jdbc.query;
+@Internal
+@ParametersAreNonnullByDefault
+package org.spine3.server.storage.jdbc.examples.customquery;
 
-/**
- *  @param <R> result type of the query.
- */
-public interface Query<R> {
+import io.grpc.Internal;
 
-    R execute();
-}
+import javax.annotation.ParametersAreNonnullByDefault;

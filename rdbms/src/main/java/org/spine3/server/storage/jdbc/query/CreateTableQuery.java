@@ -37,7 +37,7 @@ import static java.lang.String.format;
  * @author Andrey Lavrov
  */
 @Internal
-public class CreateTableQuery<I> extends Query {
+public class CreateTableQuery<I> extends AbstractQuery<Void> {
 
     @Nullable
     private final IdColumn<I> idColumn;
@@ -53,7 +53,8 @@ public class CreateTableQuery<I> extends Query {
      * Executes a create table query.
      * Creates tables with ID column if idColumn is null, or with out it otherwise.
      */
-    public void execute() {
+    @Override
+    public Void execute() {
         final String sql;
         if (idColumn != null) {
             final String idColumnType = idColumn.getColumnDataType();
@@ -68,11 +69,13 @@ public class CreateTableQuery<I> extends Query {
             this.getLogger().error("Error while creating a table with the name: " + tableName, e);
             throw new DatabaseException(e);
         }
+        //noinspection ReturnOfNull
+        return null;
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
     public abstract static class Builder<B extends Builder<B, Q, I>, Q extends CreateTableQuery, I>
-            extends Query.Builder<B, Q> {
+            extends AbstractQuery.Builder<B, Q> {
 
         private IdColumn<I> idColumn;
         private String tableName;

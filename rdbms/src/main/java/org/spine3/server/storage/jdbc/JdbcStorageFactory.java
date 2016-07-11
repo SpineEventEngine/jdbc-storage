@@ -176,4 +176,8 @@ public class JdbcStorageFactory implements StorageFactory {
     public void close() {
         dataSource.close();
     }
+
+    protected DataSourceWrapper getDataSource() {
+        return dataSource;
+    }
 }

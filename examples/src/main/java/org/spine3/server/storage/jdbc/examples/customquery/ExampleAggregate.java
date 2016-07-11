@@ -18,12 +18,14 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.spine3.server.storage.jdbc.query;
+package org.spine3.server.storage.jdbc.examples.customquery;
 
-/**
- *  @param <R> result type of the query.
- */
-public interface Query<R> {
+import com.google.protobuf.StringValue;
+import org.spine3.server.aggregate.Aggregate;
 
-    R execute();
+/* package */ class ExampleAggregate extends Aggregate<String, StringValue, StringValue.Builder> {
+
+    private ExampleAggregate(String id) {
+        super(id);
+    }
 }

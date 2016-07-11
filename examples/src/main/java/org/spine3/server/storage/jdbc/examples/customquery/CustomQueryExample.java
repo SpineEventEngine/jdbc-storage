@@ -18,12 +18,29 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.spine3.server.storage.jdbc.query;
+package org.spine3.server.storage.jdbc.examples.customquery;
 
-/**
- *  @param <R> result type of the query.
- */
-public interface Query<R> {
+import org.spine3.server.storage.AggregateStorage;
+import org.spine3.server.storage.jdbc.DataSourceConfig;
 
-    R execute();
+public class CustomQueryExample {
+
+    private CustomQueryExample() {
+    }
+
+    public static void main(String[] args) {
+        final DataSourceConfig config = DataSourceConfig.newBuilder()
+                .setJdbcUrl("jdbc:hsqldb:mem:example")
+                .setUsername("SA")
+                .setPassword("pass")
+                .setMaxPoolSize(12)
+                .build();
+        final myJdbcStorageFactory storageFactory = myJdbcStorageFactory.newInstance(config, false);
+        final AggregateStorage<String> aggregateStorage = storageFactory.createAggregateStorage(ExampleAggregate.class);
+        try {
+            aggregateStorage.close();
+        } catch (Exception e) {
+            //NOP
+        }
+    }
 }

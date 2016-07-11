@@ -26,8 +26,11 @@ import org.spine3.base.CommandStatus;
 import org.spine3.base.Error;
 import org.spine3.base.Failure;
 import org.spine3.server.storage.CommandStorageRecord;
+import org.spine3.server.storage.jdbc.query.Query;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
+
+import java.util.Iterator;
 
 import static org.spine3.server.storage.jdbc.command.query.CommandTable.TABLE_NAME;
 
@@ -36,7 +39,7 @@ import static org.spine3.server.storage.jdbc.command.query.CommandTable.TABLE_NA
  *
  * @author Andrey Lavrov
  */
-@SuppressWarnings("TypeMayBeWeakened")
+@SuppressWarnings({"TypeMayBeWeakened", "OverlyCoupledClass"})
 public class CommandStorageQueryFactory {
 
     private final IdColumn <String> idColumn;
@@ -59,7 +62,7 @@ public class CommandStorageQueryFactory {
     }
 
     /** Returns a query that creates a new {@link CommandTable} if it does not exist. */
-    public CreateCommandTableQuery newCreateCommandTableQuery(){
+    public Query<Void> newCreateCommandTableQuery(){
         final CreateCommandTableQuery.Builder builder = CreateCommandTableQuery.newBuilder()
                 .setDataSource(dataSource)
                 .setLogger(logger)
@@ -74,7 +77,7 @@ public class CommandStorageQueryFactory {
      * @param id        new command record id
      * @param record    new command record
      */
-    public InsertCommandQuery newInsertCommandQuery(CommandId id, CommandStorageRecord record){
+    public Query<Void> newInsertCommandQuery(CommandId id, CommandStorageRecord record){
         final InsertCommandQuery.Builder builder = InsertCommandQuery.newBuilder()
                 .setDataSource(dataSource)
                 .setLogger(logger)
@@ -91,7 +94,7 @@ public class CommandStorageQueryFactory {
      * @param id        command id
      * @param record    updated record state
      */
-    public UpdateCommandQuery newUpdateCommandQuery(CommandId id, CommandStorageRecord record){
+    public Query<Void> newUpdateCommandQuery(CommandId id, CommandStorageRecord record){
         final UpdateCommandQuery.Builder builder = UpdateCommandQuery.newBuilder()
                 .setDataSource(dataSource)
                 .setLogger(logger)
@@ -108,7 +111,7 @@ public class CommandStorageQueryFactory {
      * @param id        command record id
      * @param error     a technical error occurred during command handling
      */
-    public SetErrorQuery newSetErrorQuery(CommandId id, Error error){
+    public Query<Void> newSetErrorQuery(CommandId id, Error error){
         final SetErrorQuery.Builder builder = SetErrorQuery.newBuilder()
                 .setDataSource(dataSource)
                 .setLogger(logger)
@@ -124,7 +127,7 @@ public class CommandStorageQueryFactory {
      * @param id        command record id
      * @param failure   a business failure occurred during command handling
      */
-    public SetFailureQuery newSetFailureQuery(CommandId id, Failure failure){
+    public Query<Void> newSetFailureQuery(CommandId id, Failure failure){
         final SetFailureQuery.Builder builder = SetFailureQuery.newBuilder()
                 .setDataSource(dataSource)
                 .setLogger(logger)
@@ -139,7 +142,7 @@ public class CommandStorageQueryFactory {
      *
      * @param id    command record id
      */
-    public SetOkStatusQuery newSetOkStatusQuery(CommandId id){
+    public Query<Void> newSetOkStatusQuery(CommandId id){
         final SetOkStatusQuery.Builder builder = SetOkStatusQuery.newBuilder()
                 .setDataSource(this.dataSource)
                 .setLogger(logger)
@@ -149,7 +152,7 @@ public class CommandStorageQueryFactory {
     }
 
     /** Returns a query that selects {@link CommandStorageRecord} by ID. */
-    public SelectCommandByIdQuery newSelectCommandByIdQuery(CommandId id){
+    public Query<CommandStorageRecord> newSelectCommandByIdQuery(CommandId id){
         final SelectCommandByIdQuery.Builder builder = SelectCommandByIdQuery.newBuilder()
                 .setDataSource(dataSource)
                 .setLogger(logger)
@@ -159,7 +162,7 @@ public class CommandStorageQueryFactory {
     }
 
     /** Returns a query that {@link CommandStorageRecord} selects record by {@link CommandStatus}. */
-    public SelectCommandByStatusQuery newSelectCommandByStatusQuery(CommandStatus status){
+    public Query<Iterator<CommandStorageRecord>> newSelectCommandByStatusQuery(CommandStatus status){
         final SelectCommandByStatusQuery.Builder builder = SelectCommandByStatusQuery.newBuilder()
                 .setDataSource(dataSource)
                 .setLogger(logger)

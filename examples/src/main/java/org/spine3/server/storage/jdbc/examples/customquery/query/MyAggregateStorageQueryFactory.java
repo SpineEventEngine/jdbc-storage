@@ -18,12 +18,29 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.spine3.server.storage.jdbc.query;
+package org.spine3.server.storage.jdbc.examples.customquery.query;
 
-/**
- *  @param <R> result type of the query.
- */
-public interface Query<R> {
 
-    R execute();
+import org.spine3.server.aggregate.Aggregate;
+import org.spine3.server.storage.jdbc.query.CreateTableQuery;
+import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
+
+public class MyAggregateStorageQueryFactory<I>
+        extends org.spine3.server.storage.jdbc.aggregate.query.AggregateStorageQueryFactory<I>{
+
+    public MyAggregateStorageQueryFactory(DataSourceWrapper dataSource,
+                                          Class<? extends Aggregate<I, ?, ?>> aggregateClass) {
+        super(dataSource, aggregateClass);
+    }
+
+    @SuppressWarnings("RefusedBequest")
+    @Override
+    public CreateTableQuery newCreateMainTableQuery() {
+        final MyCreateMainTableQuery.Builder builder = MyCreateMainTableQuery.<I>newBuilder()
+                .setDataSource(getDataSource())
+                .setLogger(getLogger())
+                .setTableName("Main_table")
+                .setIdColumn(getIdColumn());
+        return builder.build();
+    }
 }

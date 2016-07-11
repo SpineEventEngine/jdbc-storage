@@ -29,6 +29,7 @@ import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.JdbcStorageFactory;
 import org.spine3.server.storage.jdbc.entity.JdbcEntityStorage;
 import org.spine3.server.storage.jdbc.projection.query.ProjectionStorageQueryFactory;
+import org.spine3.server.storage.jdbc.query.Query;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
 import javax.annotation.Nullable;
@@ -44,7 +45,7 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
 
     private final JdbcEntityStorage<I> entityStorage;
 
-    private final ProjectionStorageQueryFactory queryFactory;
+    private final ProjectionStorageQueryFactory<I> queryFactory;
 
     /**
      * Creates a new storage instance.
@@ -94,7 +95,7 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
     @Override
     @Nullable
     public Timestamp readLastHandledEventTime() throws DatabaseException {
-        final Timestamp timestamp = queryFactory.newSelectTimestampQuery().execute();
+        final Timestamp timestamp =  queryFactory.newSelectTimestampQuery().execute();
         return timestamp;
     }
 

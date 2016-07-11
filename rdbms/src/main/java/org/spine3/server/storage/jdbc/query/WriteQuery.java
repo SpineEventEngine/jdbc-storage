@@ -33,16 +33,15 @@ import java.sql.SQLException;
  * @author Alexander Litus
  */
 @Internal
-public class WriteQuery extends Query {
+public class WriteQuery extends AbstractQuery<Void> {
 
     protected WriteQuery(Builder<? extends Builder, ? extends WriteQuery> builder) {
         super(builder);
     }
 
-    /**
-     * Executes a write query.
-     */
-    public void execute() {
+    /** Executes a write query. */
+    @Override
+    public Void execute() {
         try (ConnectionWrapper connection = this.getConnection(false)) {
             try (PreparedStatement statement = prepareStatement(connection)) {
                 statement.execute();
@@ -53,10 +52,12 @@ public class WriteQuery extends Query {
                 throw new DatabaseException(e);
             }
         }
+        //noinspection ReturnOfNull
+        return null;
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
     public abstract static class Builder<B extends Builder<B, Q>, Q extends WriteQuery>
-            extends Query.Builder<B, Q> {
+            extends AbstractQuery.Builder<B, Q> {
     }
 }

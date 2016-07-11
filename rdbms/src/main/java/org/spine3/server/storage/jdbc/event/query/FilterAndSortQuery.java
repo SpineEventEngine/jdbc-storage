@@ -28,7 +28,7 @@ import org.spine3.server.event.EventFilter;
 import org.spine3.server.event.EventStreamQuery;
 import org.spine3.server.storage.EventStorageRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.query.Query;
+import org.spine3.server.storage.jdbc.query.AbstractQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.DbIterator;
 
@@ -44,7 +44,7 @@ import static org.spine3.server.storage.jdbc.event.query.EventTable.*;
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-public class FilterAndSortQuery extends Query {
+public class FilterAndSortQuery extends AbstractQuery<Iterator<EventStorageRecord>> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE = " ORDER BY " + SECONDS_COL + " ASC, " + NANOSECONDS_COL + " ASC;";
@@ -160,6 +160,7 @@ public class FilterAndSortQuery extends Query {
         return builder;
     }
 
+    @Override
     public Iterator<EventStorageRecord> execute() throws DatabaseException {
         try (ConnectionWrapper connection = this.getConnection(true)) {
             final PreparedStatement statement = prepareStatement(connection, streamQuery);
@@ -168,7 +169,7 @@ public class FilterAndSortQuery extends Query {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder extends Query.Builder<Builder, FilterAndSortQuery> {
+    public static class Builder extends AbstractQuery.Builder<Builder, FilterAndSortQuery> {
 
         private EventStreamQuery streamQuery;
 

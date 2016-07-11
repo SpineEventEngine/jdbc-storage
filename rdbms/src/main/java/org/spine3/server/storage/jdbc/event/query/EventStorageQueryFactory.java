@@ -23,8 +23,11 @@ package org.spine3.server.storage.jdbc.event.query;
 import org.slf4j.Logger;
 import org.spine3.server.event.EventStreamQuery;
 import org.spine3.server.storage.EventStorageRecord;
+import org.spine3.server.storage.jdbc.query.Query;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
+
+import java.util.Iterator;
 
 import static org.spine3.server.storage.jdbc.event.query.EventTable.TABLE_NAME;
 
@@ -55,7 +58,7 @@ public class EventStorageQueryFactory{
     }
 
     /** Returns a query that creates a new {@link EventTable} if it does not exist. */
-    public CreateEventTableQuery newCreateEventTableQuery(){
+    public Query newCreateEventTableQuery(){
         final CreateEventTableQuery.Builder builder = CreateEventTableQuery.newBuilder()
                 .setDataSource(dataSource)
                 .setLogger(logger)
@@ -69,7 +72,7 @@ public class EventStorageQueryFactory{
      *
      * @param record    new event record
      */
-    public InsertEventRecordQuery newInsertEventQuery(EventStorageRecord record){
+    public Query newInsertEventQuery(EventStorageRecord record){
         final InsertEventRecordQuery.Builder builder = InsertEventRecordQuery.newBuilder()
                 .setDataSource(dataSource)
                 .setLogger(logger)
@@ -82,7 +85,7 @@ public class EventStorageQueryFactory{
      *
      * @param record    updated record state
      */
-    public UpdateEventRecordQuery newUpdateEventQuery(EventStorageRecord record){
+    public Query newUpdateEventQuery(EventStorageRecord record){
         final UpdateEventRecordQuery.Builder builder = UpdateEventRecordQuery.newBuilder()
                 .setDataSource(dataSource)
                 .setLogger(logger)
@@ -91,7 +94,7 @@ public class EventStorageQueryFactory{
     }
 
     /** Returns a query that selects {@link EventStorageRecord} by ID. */
-    public SelectEventByIdQuery newSelectEventByIdQuery(String id){
+    public Query<EventStorageRecord> newSelectEventByIdQuery(String id){
         final SelectEventByIdQuery.Builder builder = SelectEventByIdQuery.newBuilder()
                 .setDataSource(dataSource)
                 .setLogger(logger)
@@ -101,7 +104,7 @@ public class EventStorageQueryFactory{
     }
 
     /** Returns a query that selects {@link EventStorageRecord} by specified {@link EventStreamQuery}. */
-    public FilterAndSortQuery newFilterAndSortQuery(EventStreamQuery streamQuery){
+    public Query<Iterator<EventStorageRecord>> newFilterAndSortQuery(EventStreamQuery streamQuery) {
         final FilterAndSortQuery.Builder builder = FilterAndSortQuery.newBuilder()
                 .setDataSource(dataSource)
                 .setLogger(logger)

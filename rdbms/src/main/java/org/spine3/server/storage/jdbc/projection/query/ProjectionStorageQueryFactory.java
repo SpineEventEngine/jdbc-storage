@@ -24,6 +24,7 @@ import com.google.protobuf.Timestamp;
 import org.slf4j.Logger;
 import org.spine3.server.entity.Entity;
 import org.spine3.server.storage.ProjectionStorage;
+import org.spine3.server.storage.jdbc.query.Query;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
 import static org.spine3.server.storage.jdbc.projection.query.ProjectionTable.LAST_EVENT_TIME_TABLE_NAME_SUFFIX;
@@ -57,7 +58,7 @@ public class ProjectionStorageQueryFactory<I> {
     }
 
     /** Returns a query that creates a new {@link ProjectionTable} if it does not exist. */
-    public CreateProjectionTableQuery newCreateTableQuery() {
+    public Query newCreateTableQuery() {
         final CreateProjectionTableQuery.Builder builder = CreateProjectionTableQuery.newBuilder()
                 .setDataSource(dataSource)
                 .setLogger(logger)
@@ -66,7 +67,7 @@ public class ProjectionStorageQueryFactory<I> {
     }
 
     /** Returns a query that inserts a new {@link Timestamp} to the {@link ProjectionTable}. */
-    public InsertTimestampQuery newInsertTimestampQuery(Timestamp time) {
+    public Query newInsertTimestampQuery(Timestamp time) {
         final InsertTimestampQuery.Builder builder = InsertTimestampQuery.newBuilder(tableName)
                 .setDataSource(dataSource)
                 .setLogger(logger)
@@ -75,7 +76,7 @@ public class ProjectionStorageQueryFactory<I> {
     }
 
     /** Returns a query that updates {@link Timestamp} in the {@link ProjectionTable}. */
-    public UpdateTimestampQuery newUpdateTimestampQuery(Timestamp time) {
+    public Query newUpdateTimestampQuery(Timestamp time) {
         final UpdateTimestampQuery.Builder builder = UpdateTimestampQuery.newBuilder(tableName)
                 .setDataSource(dataSource)
                 .setLogger(logger)
@@ -84,7 +85,7 @@ public class ProjectionStorageQueryFactory<I> {
     }
 
     /** Returns a query that selects timestamp from the {@link ProjectionTable}. */
-    public SelectTimestampQuery newSelectTimestampQuery() {
+    public Query<Timestamp> newSelectTimestampQuery() {
         final SelectTimestampQuery.Builder builder = SelectTimestampQuery.newBuilder(tableName)
                 .setDataSource(dataSource)
                 .setLogger(logger);
