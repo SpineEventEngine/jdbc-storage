@@ -28,7 +28,7 @@ import org.spine3.server.storage.EntityStorageShould;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.entity.query.EntityStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.test.project.Project;
+import org.spine3.test.storage.Project;
 
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;

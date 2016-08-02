@@ -28,12 +28,11 @@ import org.spine3.server.storage.AggregateStorageShould;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.aggregate.query.AggregateStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.test.project.Project;
-import org.spine3.test.project.ProjectId;
+import org.spine3.test.storage.Project;
+import org.spine3.test.storage.ProjectId;
 
 import static org.junit.Assert.fail;
 import static org.spine3.server.storage.jdbc.JdbcStorageFactoryShould.newInMemoryDataSource;
-import static org.spine3.testdata.TestAggregateIdFactory.newProjectId;
 
 /**
  * @author Alexander Litus
@@ -58,8 +57,8 @@ public class JdbcAggregateStorageShould extends AggregateStorageShould {
         final JdbcAggregateStorage<ProjectId> storage = getStorage(TestAggregateWithMessageId.class);
         storage.close();
         try {
-            storage.historyBackward(newProjectId("anyId"));
-        } catch (DatabaseException ignored) {
+            storage.historyBackward(ProjectId.getDefaultInstance());
+        } catch (DatabaseException expected) {
             // is OK because the storage is closed
             return;
         }

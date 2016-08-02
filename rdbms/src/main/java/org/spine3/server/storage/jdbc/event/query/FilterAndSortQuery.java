@@ -23,7 +23,7 @@ package org.spine3.server.storage.jdbc.event.query;
 import com.google.protobuf.Any;
 import com.google.protobuf.Message;
 import com.google.protobuf.Timestamp;
-import org.spine3.protobuf.Messages;
+import org.spine3.protobuf.AnyPacker;
 import org.spine3.server.event.EventFilter;
 import org.spine3.server.event.EventStreamQuery;
 import org.spine3.server.storage.EventStorageRecord;
@@ -79,7 +79,7 @@ public class FilterAndSortQuery extends Query {
 
     private static void appendFilterByAggregateIdsSql(StringBuilder builder, EventFilter filter) {
         for (Any idAny : filter.getAggregateIdList()) {
-            final Message aggregateId = Messages.fromAny(idAny);
+            final Message aggregateId = AnyPacker.unpack(idAny);
             final String aggregateIdStr = idToString(aggregateId);
             appendTo(builder,
                     whereOrOr(builder),
