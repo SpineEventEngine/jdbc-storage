@@ -31,13 +31,9 @@ import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 import java.util.logging.Logger;
 
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
-public class DataSourceMock {
+public class DataSourceMock { // TODO:2016-08-02:alexander.litus: refactor
 
     private DataSourceMock() {
     }
