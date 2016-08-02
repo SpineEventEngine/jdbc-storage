@@ -40,6 +40,10 @@ import static org.mockito.Mockito.*;
     private static Logger loggerMock = null;
     private static final IdColumn<String> idColumnMock = mock(IdColumn.StringIdColumn.class);
 
+    // TODO:2016-08-02:alexander.litus: these methods are used in one place only (each), so move them there.
+    // Apply this for all such cases in all Given classes.
+
+    // TODO:2016-08-02:alexander.litus: rename all such methods to `createTableQueryWhichThrows`.
     /* package */ static CreateTableQuery getCreateTableQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
         final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnExecuteStatement();
