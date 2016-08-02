@@ -22,7 +22,7 @@ package org.spine3.server.storage.jdbc.projection.query;
 
 import com.google.protobuf.Timestamp;
 import org.slf4j.Logger;
-import org.spine3.server.storage.jdbc.DataSourceMock;
+import org.spine3.server.storage.jdbc.GivenDataSource;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
 import java.sql.SQLException;
@@ -42,7 +42,7 @@ import static org.mockito.Mockito.*;
 
     /* package */ static InsertTimestampQuery getInsertTimestampQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock = DataSourceMock.getMockDataSourceExceptionOnAnySet();
+        final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnSettingStatementParam();
         final InsertTimestampQuery.Builder builder = InsertTimestampQuery.newBuilder(anyString())
                 .setDataSource(dataSourceMock)
                 .setLogger(loggerMock)
@@ -52,7 +52,7 @@ import static org.mockito.Mockito.*;
 
     /* package */ static SelectTimestampQuery getSelectTimestampQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock = DataSourceMock.getMockDataSourceExceptionOnAnyExecute();
+        final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnExecuteStatement();
         final SelectTimestampQuery.Builder builder = SelectTimestampQuery.newBuilder(anyString())
                 .setDataSource(dataSourceMock)
                 .setLogger(loggerMock);
@@ -61,7 +61,7 @@ import static org.mockito.Mockito.*;
 
     /* package */ static UpdateTimestampQuery getUpdateTimestampQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock = DataSourceMock.getMockDataSourceExceptionOnAnySet();
+        final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnSettingStatementParam();
         final UpdateTimestampQuery.Builder builder = UpdateTimestampQuery.newBuilder(anyString())
                 .setDataSource(dataSourceMock)
                 .setLogger(loggerMock)

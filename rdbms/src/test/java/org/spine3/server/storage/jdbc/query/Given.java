@@ -23,7 +23,7 @@ package org.spine3.server.storage.jdbc.query;
 import com.google.protobuf.Any;
 import com.google.protobuf.Message;
 import org.slf4j.Logger;
-import org.spine3.server.storage.jdbc.DataSourceMock;
+import org.spine3.server.storage.jdbc.GivenDataSource;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
@@ -42,7 +42,7 @@ import static org.mockito.Mockito.*;
 
     /* package */ static CreateTableQuery getCreateTableQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock = DataSourceMock.getMockDataSourceExceptionOnAnyExecute();
+        final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnExecuteStatement();
         final CreateTableMock.Builder builder = CreateTableMock.newBuilder()
                 .setDataSource(dataSourceMock)
                 .setLogger(loggerMock);
@@ -51,7 +51,7 @@ import static org.mockito.Mockito.*;
 
     /* package */ static SelectByIdQueryMock getSelectByIdQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock = DataSourceMock.getMockDataSourceExceptionOnAnyExecute();
+        final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnExecuteStatement();
         final SelectByIdQueryMock.Builder builder = SelectByIdQueryMock.newBuilder()
                 .setDataSource(dataSourceMock)
                 .setLogger(loggerMock)
@@ -85,7 +85,7 @@ import static org.mockito.Mockito.*;
 
     /* package */ static WriteQueryMock getWriteQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock = DataSourceMock.getMockDataSourceExceptionOnAnyExecute();
+        final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnExecuteStatement();
         final WriteQueryMock.Builder builder = WriteQueryMock.newBuilder()
                 .setDataSource(dataSourceMock)
                 .setLogger(loggerMock);
@@ -94,12 +94,12 @@ import static org.mockito.Mockito.*;
 
     /* package */ static WriteRecordQueryMock getWriteRecordQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock = DataSourceMock.getMockDataSourceExceptionOnAnyExecute();
+        final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnExecuteStatement();
         final WriteRecordQueryMock.Builder builder = WriteRecordQueryMock.newBuilder()
                 .setDataSource(dataSourceMock)
                 .setLogger(loggerMock)
                 .setIdColumn(idColumnMock)
-                .setRecord(Given.recordMock);
+                .setRecord(recordMock);
         return builder.build();
     }
 

@@ -23,7 +23,7 @@ package org.spine3.server.storage.jdbc.command.query;
 import org.slf4j.Logger;
 import org.spine3.base.CommandStatus;
 import org.spine3.server.storage.CommandStorageRecord;
-import org.spine3.server.storage.jdbc.DataSourceMock;
+import org.spine3.server.storage.jdbc.GivenDataSource;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
@@ -46,7 +46,7 @@ import static org.mockito.Mockito.mock;
 
     /* package */ static SelectCommandByIdQuery getSelectCommandByIdQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock = DataSourceMock.getMockDataSourceExceptionOnAnyExecute();
+        final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnExecuteStatement();
         final SelectCommandByIdQuery.Builder builder = SelectCommandByIdQuery.newBuilder()
                 .setDataSource(dataSourceMock)
                 .setLogger(loggerMock)
@@ -56,7 +56,7 @@ import static org.mockito.Mockito.mock;
 
     /* package */ static SelectCommandByStatusQuery getSelectCommandByStatusQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock = DataSourceMock.getMockDataSourceExceptionOnAnySet();
+        final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnSettingStatementParam();
         final SelectCommandByStatusQuery.Builder builder = SelectCommandByStatusQuery.newBuilder()
                 .setDataSource(dataSourceMock)
                 .setLogger(loggerMock)
@@ -66,7 +66,7 @@ import static org.mockito.Mockito.mock;
 
     /* package */ static WriteCommandRecordQuery getWriteCommandRecordQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock = DataSourceMock.getMockDataSourceExceptionOnAnySet();
+        final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnSettingStatementParam();
         final InsertCommandQuery.Builder builder = InsertCommandQuery.newBuilder()
                 .setDataSource(dataSourceMock)
                 .setLogger(loggerMock)
