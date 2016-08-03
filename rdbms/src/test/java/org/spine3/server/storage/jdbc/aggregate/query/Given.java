@@ -22,14 +22,13 @@ package org.spine3.server.storage.jdbc.aggregate.query;
 
 import org.slf4j.Logger;
 import org.spine3.server.storage.AggregateStorageRecord;
-import org.spine3.server.storage.jdbc.DataSourceMock;
+import org.spine3.server.storage.jdbc.GivenDataSource;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import java.sql.SQLException;
 
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 
 /**
  * @author Andrey Lavrov
@@ -46,7 +45,7 @@ import static org.mockito.Mockito.mock;
 
     /* package */ static InsertAggregateRecordQuery getInsertAggregateRecordQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock = DataSourceMock.getMockDataSourceExceptionOnAnySet();
+        final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnSettingStatementParam();
         final InsertAggregateRecordQuery.Builder<String> builder = InsertAggregateRecordQuery.<String>newBuilder(anyString())
                 .setDataSource(dataSourceMock)
                 .setLogger(loggerMock)
@@ -57,7 +56,7 @@ import static org.mockito.Mockito.mock;
 
     /* package */ static InsertEventCountQuery getInsertEventCountQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock = DataSourceMock.getMockDataSourceExceptionOnAnySet();
+        final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnSettingStatementParam();
         final InsertEventCountQuery.Builder<String> builder = InsertEventCountQuery.<String>newBuilder(anyString())
                 .setDataSource(dataSourceMock)
                 .setLogger(loggerMock)
@@ -67,7 +66,7 @@ import static org.mockito.Mockito.mock;
 
     /* package */ static SelectEventCountByIdQuery getSelectEventCountByIdQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock = DataSourceMock.getMockDataSourceExceptionOnAnyExecute();
+        final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnExecuteStatement();
         final SelectEventCountByIdQuery.Builder<String> builder = SelectEventCountByIdQuery.<String>newBuilder(anyString())
                 .setDataSource(dataSourceMock)
                 .setLogger(loggerMock)
@@ -77,7 +76,7 @@ import static org.mockito.Mockito.mock;
 
     /* package */ static UpdateEventCountQuery getUpdateEventCountQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock = DataSourceMock.getMockDataSourceExceptionOnAnySet();
+        final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnSettingStatementParam();
         final UpdateEventCountQuery.Builder<String> builder = UpdateEventCountQuery.<String>newBuilder(anyString())
                 .setDataSource(dataSourceMock)
                 .setLogger(loggerMock)

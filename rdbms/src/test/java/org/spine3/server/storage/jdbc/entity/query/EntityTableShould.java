@@ -31,7 +31,7 @@ import static org.spine3.test.Tests.hasPrivateUtilityConstructor;
 public class EntityTableShould {
 
     @Test
-    public void have_private_constructors() {
+    public void have_private_constructor() {
         assertTrue(hasPrivateUtilityConstructor(EntityTable.class));
     }
 }

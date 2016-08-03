@@ -25,11 +25,10 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Message;
 import org.spine3.Internal;
+import org.spine3.protobuf.AnyPacker;
 import org.spine3.type.TypeName;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.spine3.protobuf.Messages.fromAny;
-import static org.spine3.protobuf.Messages.toAny;
 
 /**
  * A utility class for serializing/deserializing messages.
@@ -51,7 +50,7 @@ public class Serializer {
      */
     public static <M extends Message> byte[] serialize(M message) {
         checkNotNull(message);
-        final Any any = toAny(message);
+        final Any any = AnyPacker.pack(message);
         final byte[] bytes = any.getValue().toByteArray();
         return bytes;
     }
@@ -71,7 +70,7 @@ public class Serializer {
         builder.setTypeUrl(typeUrl);
         final ByteString byteString = ByteString.copyFrom(bytes);
         builder.setValue(byteString);
-        final M message = fromAny(builder.build());
+        final M message = AnyPacker.unpack(builder.build());
         return message;
     }
 }

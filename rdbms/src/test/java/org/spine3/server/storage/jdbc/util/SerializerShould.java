@@ -20,12 +20,13 @@
 
 package org.spine3.server.storage.jdbc.util;
 
+import com.google.protobuf.StringValue;
 import org.junit.Test;
-import org.spine3.test.project.ProjectId;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.spine3.testdata.TestAggregateIdFactory.newProjectId;
+import static org.spine3.base.Identifiers.newUuid;
+import static org.spine3.protobuf.Values.newStringValue;
 
 /**
  * @author Alexander Litus
@@ -35,12 +36,12 @@ public class SerializerShould {
 
     @Test
     public void serialize_and_deserialize_message() {
-        final ProjectId expected = newProjectId();
+        final StringValue expected = newStringValue(newUuid());
 
         final byte[] bytes = Serializer.serialize(expected);
         assertTrue(bytes.length > 0);
 
-        final ProjectId actual = Serializer.deserialize(bytes, expected.getDescriptorForType());
+        final StringValue actual = Serializer.deserialize(bytes, expected.getDescriptorForType());
         assertEquals(expected, actual);
     }
 }

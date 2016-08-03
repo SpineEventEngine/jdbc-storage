@@ -43,7 +43,7 @@ public class WriteQuery extends Query {
      * Executes a write query.
      */
     public void execute() {
-        try (ConnectionWrapper connection = this.getConnection(false)) {
+        try (ConnectionWrapper connection = getConnection(false)) {
             try (PreparedStatement statement = prepareStatement(connection)) {
                 statement.execute();
                 connection.commit();

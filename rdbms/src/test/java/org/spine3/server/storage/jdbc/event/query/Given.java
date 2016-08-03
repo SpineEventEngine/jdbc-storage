@@ -22,7 +22,7 @@ package org.spine3.server.storage.jdbc.event.query;
 
 import org.slf4j.Logger;
 import org.spine3.server.storage.EventStorageRecord;
-import org.spine3.server.storage.jdbc.DataSourceMock;
+import org.spine3.server.storage.jdbc.GivenDataSource;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
@@ -45,7 +45,7 @@ import static org.mockito.Mockito.mock;
 
     /* package */ static InsertEventRecordQuery getInsertEventRecordQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock = DataSourceMock.getMockDataSourceExceptionOnAnySet();
+        final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnSettingStatementParam();
         final InsertEventRecordQuery.Builder builder = InsertEventRecordQuery.newBuilder()
                 .setDataSource(dataSourceMock)
                 .setLogger(loggerMock)
@@ -56,7 +56,7 @@ import static org.mockito.Mockito.mock;
 
     /* package */ static UpdateEventRecordQuery getUpdateEventRecordQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock = DataSourceMock.getMockDataSourceExceptionOnAnySet();
+        final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnSettingStatementParam();
         final UpdateEventRecordQuery.Builder builder = UpdateEventRecordQuery.newBuilder()
                 .setDataSource(dataSourceMock)
                 .setLogger(loggerMock)

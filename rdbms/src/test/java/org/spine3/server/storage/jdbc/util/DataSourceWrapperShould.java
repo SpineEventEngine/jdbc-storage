@@ -20,23 +20,30 @@
 
 package org.spine3.server.storage.jdbc.util;
 
-import com.zaxxer.hikari.HikariDataSource;
 import org.junit.Test;
 import org.spine3.server.storage.jdbc.DatabaseException;
+import org.spine3.server.storage.jdbc.GivenDataSource;
+import org.spine3.server.storage.jdbc.GivenDataSource.ClosableDataSource;
 
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 
 /**
  * @author Andrey Lavrov
  */
 public class DataSourceWrapperShould {
 
-    @Test(expected = DatabaseException.class)
-    public void throw_database_exception_if_fail_to_close(){
-        final HikariDataSource closableDataSourceMock = mock(HikariDataSource.class);
-        doThrow(new RuntimeException("")).when(closableDataSourceMock).close();
-        final DataSourceWrapper wrapper = DataSourceWrapper.wrap(closableDataSourceMock);
-        wrapper.close();
+    @Test
+    public void throw_database_exception_if_fail_to_close() throws Exception {
+        final ClosableDataSource dataSource = GivenDataSource.whichIsAutoCloseable();
+        doThrow(new Exception("")).when(dataSource).close();
+        final DataSourceWrapper wrapper = DataSourceWrapper.wrap(dataSource);
+
+        try {
+            wrapper.close();
+        } catch (DatabaseException expected) {
+            return;
+        }
+        fail();
     }
 }

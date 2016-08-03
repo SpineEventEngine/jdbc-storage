@@ -41,7 +41,7 @@ public class DataSourceWrapper implements AutoCloseable {
     private final DataSource dataSource;
 
     /** Wraps custom {@link DataSource} implementation */
-    public static DataSourceWrapper wrap(DataSource dataSource){
+    public static DataSourceWrapper wrap(DataSource dataSource) {
         return new DataSourceWrapper(dataSource);
     }
 
@@ -69,13 +69,13 @@ public class DataSourceWrapper implements AutoCloseable {
 
     /**
      * Closes wrapped {@link DataSource} implementation if it implements {@link AutoCloseable}.
-     * Otherwise warning will be thrown.
+     * Otherwise a warning is logged.
      *
      * @throws DatabaseException
     */
     @Override
-    public void close() throws DatabaseException{
-        if (dataSource instanceof AutoCloseable){
+    public void close() throws DatabaseException {
+        if (dataSource instanceof AutoCloseable) {
             try {
                 ((AutoCloseable) dataSource).close();
             } catch (Exception e) {

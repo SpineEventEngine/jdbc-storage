@@ -28,11 +28,18 @@ import org.junit.Test;
 import org.spine3.server.aggregate.Aggregate;
 import org.spine3.server.entity.Entity;
 import org.spine3.server.projection.Projection;
-import org.spine3.server.storage.*;
+import org.spine3.server.storage.AggregateStorage;
+import org.spine3.server.storage.CommandStorage;
+import org.spine3.server.storage.EntityStorage;
+import org.spine3.server.storage.EventStorage;
+import org.spine3.server.storage.ProjectionStorage;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.test.project.Project;
+import org.spine3.test.storage.Project;
+
+import javax.sql.DataSource;
 
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.mock;
 import static org.spine3.base.Identifiers.newUuid;
 
 /**
@@ -62,14 +69,7 @@ public class JdbcStorageFactoryShould {
 
     @Test
     public void allow_to_use_custom_data_source(){
-        final String dbUrl = newInMemoryDbUrl("factoryTests");
-        final DataSourceConfig config = DataSourceConfig.newBuilder()
-                .setJdbcUrl(dbUrl)
-                .setUsername("SA")
-                .setPassword("pwd")
-                .setMaxPoolSize(12)
-                .build();
-        final JdbcStorageFactory factory = JdbcStorageFactory.newInstance(DataSourceMock.getClosableDataSourceWrapper(), false);
+        final JdbcStorageFactory factory = JdbcStorageFactory.newInstance(mock(DataSource.class), false);
         assertNotNull(factory);
     }
 
