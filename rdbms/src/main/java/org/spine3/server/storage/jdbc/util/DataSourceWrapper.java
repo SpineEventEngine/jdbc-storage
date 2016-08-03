@@ -69,7 +69,7 @@ public class DataSourceWrapper implements AutoCloseable {
 
     /**
      * Closes wrapped {@link DataSource} implementation if it implements {@link AutoCloseable}.
-     * Otherwise warning will be thrown.
+     * Otherwise a warning is logged.
      *
      * @throws DatabaseException
     */

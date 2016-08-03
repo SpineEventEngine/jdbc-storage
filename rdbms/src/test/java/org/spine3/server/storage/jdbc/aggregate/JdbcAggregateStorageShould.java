@@ -53,13 +53,13 @@ public class JdbcAggregateStorageShould extends AggregateStorageShould {
     }
 
     @Test
-    public void close_itself() {
+    public void throw_exception_if_try_to_use_closed_storage() {
         final JdbcAggregateStorage<ProjectId> storage = getStorage(TestAggregateWithMessageId.class);
         storage.close();
         try {
             storage.historyBackward(ProjectId.getDefaultInstance());
         } catch (DatabaseException expected) {
-            // is OK because the storage is closed
+            // expected exception because the storage is closed
             return;
         }
         fail("Aggregate storage should close itself.");

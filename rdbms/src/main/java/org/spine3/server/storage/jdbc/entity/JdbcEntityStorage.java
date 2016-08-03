@@ -33,6 +33,7 @@ import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Throwables.propagate;
 
 /**
  * The implementation of the entity storage based on the RDBMS.
@@ -112,7 +113,7 @@ public class JdbcEntityStorage<I> extends EntityStorage<I> {
         try {
             super.close();
         } catch (Exception e) {
-            throw new DatabaseException(e);
+            throw propagate(e);
         }
     }
 

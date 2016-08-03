@@ -33,6 +33,8 @@ import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
 import javax.annotation.Nullable;
 
+import static com.google.common.base.Throwables.propagate;
+
 /**
  * The implementation of the projection storage based on the RDBMS.
  *
@@ -110,7 +112,7 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
         try {
             super.close();
         } catch (Exception e) {
-            throw new DatabaseException(e);
+            throw propagate(e);
         }
     }
 

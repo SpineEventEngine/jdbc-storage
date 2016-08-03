@@ -34,6 +34,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Throwables.propagate;
 import static com.google.common.collect.Lists.newLinkedList;
 import static org.spine3.io.IoUtil.closeAll;
 
@@ -143,7 +144,7 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
         try {
             super.close();
         } catch (Exception e) {
-            throw new DatabaseException(e);
+            throw propagate(e);
         }
     }
 

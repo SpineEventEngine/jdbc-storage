@@ -37,6 +37,7 @@ import org.spine3.validate.Validate;
 import java.util.Iterator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Throwables.propagate;
 import static org.spine3.validate.Validate.checkNotDefault;
 
 /**
@@ -185,7 +186,7 @@ public class JdbcCommandStorage extends CommandStorage {
         try {
             super.close();
         } catch (Exception e) {
-            throw new DatabaseException(e);
+            throw propagate(e);
         }
     }
 
