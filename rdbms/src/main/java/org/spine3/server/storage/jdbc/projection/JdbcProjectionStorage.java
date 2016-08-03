@@ -107,13 +107,13 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
 
     @Override
     public void close() throws DatabaseException {
-        // close only entityStorage because it must close dataSource itself
-        entityStorage.close();
         try {
             super.close();
         } catch (Exception e) {
             throw propagate(e);
         }
+        // close only entityStorage because it must close dataSource by itself
+        entityStorage.close();
     }
 
     private enum LogSingleton {
