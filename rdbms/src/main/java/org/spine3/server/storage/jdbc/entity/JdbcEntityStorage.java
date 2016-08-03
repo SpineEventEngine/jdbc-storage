@@ -109,12 +109,12 @@ public class JdbcEntityStorage<I> extends EntityStorage<I> {
 
     @Override
     public void close() throws DatabaseException {
-        dataSource.close();
         try {
             super.close();
         } catch (Exception e) {
             throw propagate(e);
         }
+        dataSource.close();
     }
 
     /**

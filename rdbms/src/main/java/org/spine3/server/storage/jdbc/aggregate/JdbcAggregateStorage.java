@@ -138,14 +138,14 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
 
     @Override
     public void close() throws DatabaseException {
-        closeAll(iterators);
-        iterators.clear();
-        dataSource.close();
         try {
             super.close();
         } catch (Exception e) {
             throw propagate(e);
         }
+        closeAll(iterators);
+        iterators.clear();
+        dataSource.close();
     }
 
     private enum LogSingleton {
