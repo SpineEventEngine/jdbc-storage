@@ -1,6 +1,6 @@
 
 project.ext {
-    SPINE_VERSION = '0.5.1-SNAPSHOT'
+    SPINE_VERSION = '0.5.9-SNAPSHOT'
 }
 
 allprojects {
