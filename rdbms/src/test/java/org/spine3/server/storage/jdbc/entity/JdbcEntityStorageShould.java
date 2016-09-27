@@ -47,9 +47,9 @@ public class JdbcEntityStorageShould extends EntityStorageShould<String> {
     }
 
     @Override
-    protected <I> JdbcEntityStorage<I> getStorage(Class<? extends Entity<I, ?>> entityClass) {
+    protected <I> JdbcRecordStorage<I> getStorage(Class<? extends Entity<I, ?>> entityClass) {
         final DataSourceWrapper dataSource = newInMemoryDataSource("entityStorageTests");
-        return JdbcEntityStorage.newInstance(dataSource, false, new EntityStorageQueryFactory<I>(dataSource, entityClass));
+        return JdbcRecordStorage.newInstance(dataSource, false, new EntityStorageQueryFactory<I>(dataSource, entityClass));
     }
 
     @Override
@@ -59,7 +59,7 @@ public class JdbcEntityStorageShould extends EntityStorageShould<String> {
 
     @Test
     public void close_itself_and_throw_exception_on_read() {
-        final JdbcEntityStorage<String> storage = getStorage(TestEntityWithStringId.class);
+        final JdbcRecordStorage<String> storage = getStorage(TestEntityWithStringId.class);
         storage.close();
         try {
             storage.readInternal("any-id");
@@ -72,7 +72,7 @@ public class JdbcEntityStorageShould extends EntityStorageShould<String> {
 
     @Test
     public void clear_itself() {
-        final JdbcEntityStorage<String> storage = getStorage(TestEntityWithStringId.class);
+        final JdbcRecordStorage<String> storage = getStorage(TestEntityWithStringId.class);
         final String id = newUuid();
         final EntityStorageRecord record = newStorageRecord();
         storage.writeInternal(id, record);
