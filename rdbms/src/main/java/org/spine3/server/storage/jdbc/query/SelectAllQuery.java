@@ -20,6 +20,8 @@
 
 package org.spine3.server.storage.jdbc.query;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.FieldMask;
@@ -27,10 +29,12 @@ import com.google.protobuf.Message;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.Serializer;
 
+import javax.annotation.Nullable;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * @author Dmytro Dashenkov
@@ -39,18 +43,37 @@ public class SelectAllQuery<M extends Message> extends Query {
 
     private final Descriptors.Descriptor messageDescriptor;
     private final String messageColumnLabel;
-    private final FieldMask fieldMask;
+    private final Collection<String> queriedFields;
+
+    private static final int ESTIMATED_QUERY_STRING_LIENGTH = 256;
+
+    private static final Function<String, String> fqnToShortName = new Function<String, String>() {
+        @Nullable
+        @Override
+        public String apply(@Nullable String input) {
+            if (input == null) {
+                return null;
+            }
+
+            final int startIndex = input.lastIndexOf('.');
+            if (startIndex < 0) {
+                return input;
+            }
+
+            return input.substring(startIndex);
+        }
+    };
 
     protected SelectAllQuery(Builder builder) {
         super(builder);
         this.messageDescriptor = builder.messageDescriptor;
         this.messageColumnLabel = builder.messageColumnLabel;
-        this.fieldMask = builder.fieldMask;
+        this.queriedFields = Collections2.transform(builder.fieldMask.getPathsList(), fqnToShortName);
 
     }
 
     public Collection<M> execute() throws SQLException {
-        final String sql = getQuery();
+        final String sql = getMaskedQuery();
 
         final PreparedStatement sqlStatement;
 
@@ -72,16 +95,58 @@ public class SelectAllQuery<M extends Message> extends Query {
         return resultListBuilder.build();
     }
 
+    private String getMaskedQuery() {
+        final String query = getQuery();
+
+        final int fieldsIndex = query.indexOf('*');
+
+        if (fieldsIndex < 0) {
+            return query;
+        }
+
+        final StringBuilder queryBuilder = new StringBuilder(ESTIMATED_QUERY_STRING_LIENGTH);
+
+        final String queryStart = query.substring(0, fieldsIndex).trim();
+        queryBuilder.append(queryStart);
+        queryBuilder.append('(');
+
+
+        // Need to know if there is a next step before loop check
+        final Iterator<String> queriedFieldsIterator = queriedFields.iterator();
+        while (queriedFieldsIterator.hasNext()) {
+            queryBuilder.append(queriedFieldsIterator.next());
+
+            if (queriedFieldsIterator.hasNext()) {
+                queryBuilder.append(", ");
+            }
+        }
+
+        final String queryEnd = query.substring(fieldsIndex + 1).trim();
+
+        queryBuilder.append(')');
+        queryBuilder.append(queryEnd);
+
+        return queryBuilder.toString();
+
+    }
+
     private M readSingleMessage(ResultSet resultSet) throws SQLException {
         return Serializer.deserialize(resultSet.getBytes(messageColumnLabel), messageDescriptor);
     }
 
+    public static Builder newBuilder() {
+        return new Builder();
+    }
+
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    private static class Builder extends Query.Builder<Builder, SelectAllQuery> {
+    public static class Builder extends Query.Builder<Builder, SelectAllQuery> {
 
         private Descriptors.Descriptor messageDescriptor;
         private String messageColumnLabel;
         private FieldMask fieldMask;
+
+        private Builder() {
+        }
 
         public Builder setMessageDescriptor(Descriptors.Descriptor messageDescriptor) {
             this.messageDescriptor = messageDescriptor;
