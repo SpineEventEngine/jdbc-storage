@@ -21,16 +21,18 @@
 package org.spine3.server.storage.jdbc.entity;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.protobuf.FieldMask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.spine3.server.storage.EntityStorage;
 import org.spine3.server.storage.EntityStorageRecord;
+import org.spine3.server.storage.RecordStorage;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.JdbcStorageFactory;
 import org.spine3.server.storage.jdbc.entity.query.EntityStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
 import javax.annotation.Nullable;
+import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Throwables.propagate;
@@ -42,7 +44,7 @@ import static com.google.common.base.Throwables.propagate;
  * @see JdbcStorageFactory
  * @author Alexander Litus
  */
-public class JdbcEntityStorage<I> extends EntityStorage<I> {
+public class JdbcEntityStorage<I> extends RecordStorage<I> {
 
     private final DataSourceWrapper dataSource;
 
@@ -82,6 +84,27 @@ public class JdbcEntityStorage<I> extends EntityStorage<I> {
     protected EntityStorageRecord readInternal(I id) throws DatabaseException {
         final EntityStorageRecord record = queryFactory.newSelectEntityByIdQuery(id).execute();
         return record;
+    }
+
+    // TODO:27-09-16:dmytro.dashenkov: Implement.
+    @Override
+    protected Iterable<EntityStorageRecord> readBulkInternal(Iterable<I> ids) {
+        return null;
+    }
+
+    @Override
+    protected Iterable<EntityStorageRecord> readBulkInternal(Iterable<I> ids, FieldMask fieldMask) {
+        return null;
+    }
+
+    @Override
+    protected Map<I, EntityStorageRecord> readAllInternal() {
+        return null;
+    }
+
+    @Override
+    protected Map<I, EntityStorageRecord> readAllInternal(FieldMask fieldMask) {
+        return null;
     }
 
     /**

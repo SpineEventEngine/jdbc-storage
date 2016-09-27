@@ -24,12 +24,7 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.spine3.server.aggregate.Aggregate;
 import org.spine3.server.entity.Entity;
-import org.spine3.server.storage.AggregateStorage;
-import org.spine3.server.storage.CommandStorage;
-import org.spine3.server.storage.EntityStorage;
-import org.spine3.server.storage.EventStorage;
-import org.spine3.server.storage.ProjectionStorage;
-import org.spine3.server.storage.StorageFactory;
+import org.spine3.server.storage.*;
 import org.spine3.server.storage.jdbc.aggregate.JdbcAggregateStorage;
 import org.spine3.server.storage.jdbc.aggregate.query.AggregateStorageQueryFactory;
 import org.spine3.server.storage.jdbc.command.JdbcCommandStorage;
@@ -102,6 +97,12 @@ public class JdbcStorageFactory implements StorageFactory {
         return JdbcEventStorage.newInstance(dataSource, false, getEventStorageQueryFactory(dataSource));
     }
 
+    // TODO:27-09-16:dmytro.dashenkov: Implement.
+    @Override
+    public StandStorage createStandStorage() {
+        return null;
+    }
+
     @Override
     public <I> AggregateStorage<I> createAggregateStorage(Class<? extends Aggregate<I, ?, ?>> aggregateClass) {
         return JdbcAggregateStorage.newInstance(dataSource,
@@ -110,7 +111,7 @@ public class JdbcStorageFactory implements StorageFactory {
     }
 
     @Override
-    public <I> EntityStorage<I> createEntityStorage(Class<? extends Entity<I, ?>> entityClass) {
+    public <I> RecordStorage<I> createRecordStorage(Class<? extends Entity<I, ?>> entityClass) {
         return JdbcEntityStorage
                 .newInstance(dataSource, false, getEntityStorageQueryFactory(dataSource, entityClass));
     }

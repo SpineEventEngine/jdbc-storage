@@ -22,9 +22,9 @@ package org.spine3.server.storage.jdbc.entity;
 
 import org.junit.Test;
 import org.spine3.server.entity.Entity;
-import org.spine3.server.storage.EntityStorage;
 import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.EntityStorageShould;
+import org.spine3.server.storage.RecordStorage;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.entity.query.EntityStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
@@ -42,7 +42,7 @@ import static org.spine3.server.storage.jdbc.JdbcStorageFactoryShould.newInMemor
 public class JdbcEntityStorageShould extends EntityStorageShould<String> {
 
     @Override
-    protected EntityStorage<String> getStorage() {
+    protected RecordStorage<String> getStorage() {
         return getStorage(TestEntityWithStringId.class);
     }
 

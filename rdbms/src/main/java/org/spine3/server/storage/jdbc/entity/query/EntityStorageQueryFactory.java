@@ -22,8 +22,8 @@ package org.spine3.server.storage.jdbc.entity.query;
 
 import org.slf4j.Logger;
 import org.spine3.server.entity.Entity;
-import org.spine3.server.storage.EntityStorage;
 import org.spine3.server.storage.EntityStorageRecord;
+import org.spine3.server.storage.RecordStorage;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbTableNameFactory;
 import org.spine3.server.storage.jdbc.util.IdColumn;
@@ -44,7 +44,7 @@ public class EntityStorageQueryFactory<I> {
      * Creates a new instance.
      *
      * @param dataSource    instance of {@link DataSourceWrapper}
-     * @param entityClass   entity class of corresponding {@link EntityStorage} instance
+     * @param entityClass   entity class of corresponding {@link RecordStorage} instance
      */
     public EntityStorageQueryFactory(DataSourceWrapper dataSource, Class<? extends Entity<I, ?>> entityClass) {
         this.idColumn = IdColumn.newInstance(entityClass);
