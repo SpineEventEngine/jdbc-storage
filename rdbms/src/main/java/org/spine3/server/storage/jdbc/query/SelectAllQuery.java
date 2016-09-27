@@ -22,6 +22,7 @@ package org.spine3.server.storage.jdbc.query;
 
 import com.google.common.collect.ImmutableList;
 import com.google.protobuf.Descriptors;
+import com.google.protobuf.FieldMask;
 import com.google.protobuf.Message;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.Serializer;
@@ -38,11 +39,13 @@ public class SelectAllQuery<M extends Message> extends Query {
 
     private final Descriptors.Descriptor messageDescriptor;
     private final String messageColumnLabel;
+    private final FieldMask fieldMask;
 
     protected SelectAllQuery(Builder builder) {
         super(builder);
         this.messageDescriptor = builder.messageDescriptor;
         this.messageColumnLabel = builder.messageColumnLabel;
+        this.fieldMask = builder.fieldMask;
 
     }
 
@@ -60,7 +63,7 @@ public class SelectAllQuery<M extends Message> extends Query {
         final ImmutableList.Builder<M> resultListBuilder = new ImmutableList.Builder<>();
 
         while (resultSet.next()) {
-            final M message = readSignleMessage(resultSet);
+            final M message = readSingleMessage(resultSet);
             resultListBuilder.add(message);
         }
 
@@ -69,7 +72,7 @@ public class SelectAllQuery<M extends Message> extends Query {
         return resultListBuilder.build();
     }
 
-    private M readSignleMessage(ResultSet resultSet) throws SQLException {
+    private M readSingleMessage(ResultSet resultSet) throws SQLException {
         return Serializer.deserialize(resultSet.getBytes(messageColumnLabel), messageDescriptor);
     }
 
@@ -78,13 +81,21 @@ public class SelectAllQuery<M extends Message> extends Query {
 
         private Descriptors.Descriptor messageDescriptor;
         private String messageColumnLabel;
+        private FieldMask fieldMask;
 
         public Builder setMessageDescriptor(Descriptors.Descriptor messageDescriptor) {
             this.messageDescriptor = messageDescriptor;
+            return getThis();
         }
 
-        public void setMessageColumnLabel(String messageColumnLabel) {
+        public Builder setMessageColumnLabel(String messageColumnLabel) {
             this.messageColumnLabel = messageColumnLabel;
+            return getThis();
+        }
+
+        public Builder setFieldMask(FieldMask fieldMask) {
+            this.fieldMask = fieldMask;
+            return getThis();
         }
 
         @Override
