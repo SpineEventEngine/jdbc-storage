@@ -46,7 +46,7 @@ public class SelectAllQuery<M extends Message> extends Query {
     private final String messageColumnLabel;
     private final Collection<String> queriedFields;
 
-    private static final int ESTIMATED_QUERY_STRING_LIENGTH = 256;
+    private static final int ESTIMATED_QUERY_STRING_LENGTH = 256;
 
     private static final Function<String, String> fqnToShortName = new Function<String, String>() {
         @Nullable
@@ -115,7 +115,7 @@ public class SelectAllQuery<M extends Message> extends Query {
             return query;
         }
 
-        final StringBuilder queryBuilder = new StringBuilder(ESTIMATED_QUERY_STRING_LIENGTH);
+        final StringBuilder queryBuilder = new StringBuilder(ESTIMATED_QUERY_STRING_LENGTH);
 
         final String queryStart = query.substring(0, fieldsIndex).trim();
         queryBuilder.append(queryStart);
