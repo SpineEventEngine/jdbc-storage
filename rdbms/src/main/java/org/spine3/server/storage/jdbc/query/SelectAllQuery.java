@@ -20,22 +20,21 @@
 
 package org.spine3.server.storage.jdbc.query;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.FieldMask;
 import com.google.protobuf.Message;
+import org.spine3.protobuf.TypeUrl;
+import org.spine3.server.entity.FieldMasks;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.Serializer;
 
-import javax.annotation.Nullable;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * @author Dmytro Dashenkov
@@ -43,44 +42,20 @@ import java.util.Iterator;
 public class SelectAllQuery<M extends Message> extends Query {
 
     private final Descriptors.Descriptor messageDescriptor;
+    private final TypeUrl typeUrl;
     private final String messageColumnLabel;
-    private final Collection<String> queriedFields;
-
-    private static final int ESTIMATED_QUERY_STRING_LENGTH = 256;
-
-    private static final Function<String, String> fqnToShortName = new Function<String, String>() {
-        @Nullable
-        @Override
-        public String apply(@Nullable String input) {
-            if (input == null) {
-                return null;
-            }
-
-            final int startIndex = input.lastIndexOf('.');
-            if (startIndex < 0) {
-                return input;
-            }
-
-            return input.substring(startIndex);
-        }
-    };
+    private final FieldMask fieldMask;
 
     protected SelectAllQuery(Builder builder) {
         super(builder);
-        this.messageDescriptor = builder.messageDescriptor;
-        this.messageColumnLabel = builder.messageColumnLabel;
-
-        if (builder.fieldMask == null) {
-            this.queriedFields = Collections.emptyList();
-        } else {
-            final Collection<String> fieldPaths = builder.fieldMask.getPathsList();
-            this.queriedFields = fieldPaths.isEmpty() ? Collections.<String>emptyList() : Collections2.transform(fieldPaths, fqnToShortName);
-        }
-
+        this.messageDescriptor = checkNotNull(builder.messageDescriptor);
+        this.messageColumnLabel = checkNotNull(builder.messageColumnLabel);
+        this.fieldMask = builder.fieldMask;
+        this.typeUrl = TypeUrl.of(messageDescriptor);
     }
 
     public Collection<M> execute() throws SQLException {
-        final String sql = getMaskedQuery();
+        final String sql = getQuery();
 
         final PreparedStatement sqlStatement;
 
@@ -94,7 +69,8 @@ public class SelectAllQuery<M extends Message> extends Query {
 
         while (resultSet.next()) {
             final M message = readSingleMessage(resultSet);
-            resultListBuilder.add(message);
+            final M maskedMessage = maskFields(message);
+            resultListBuilder.add(maskedMessage);
         }
 
         resultSet.close();
@@ -102,47 +78,16 @@ public class SelectAllQuery<M extends Message> extends Query {
         return resultListBuilder.build();
     }
 
-    private String getMaskedQuery() {
-        final String query = getQuery();
-
-        if (queriedFields.isEmpty()) {
-            return query;
-        }
-
-        final int fieldsIndex = query.indexOf('*');
-
-        if (fieldsIndex < 0) {
-            return query;
-        }
-
-        final StringBuilder queryBuilder = new StringBuilder(ESTIMATED_QUERY_STRING_LENGTH);
-
-        final String queryStart = query.substring(0, fieldsIndex).trim();
-        queryBuilder.append(queryStart);
-        queryBuilder.append('(');
-
-
-        // Need to know if there is a next step before loop check
-        final Iterator<String> queriedFieldsIterator = queriedFields.iterator();
-        while (queriedFieldsIterator.hasNext()) {
-            queryBuilder.append(queriedFieldsIterator.next());
-
-            if (queriedFieldsIterator.hasNext()) {
-                queryBuilder.append(", ");
-            }
-        }
-
-        final String queryEnd = query.substring(fieldsIndex + 1).trim();
-
-        queryBuilder.append(')');
-        queryBuilder.append(queryEnd);
-
-        return queryBuilder.toString();
-
-    }
-
     private M readSingleMessage(ResultSet resultSet) throws SQLException {
         return Serializer.deserialize(resultSet.getBytes(messageColumnLabel), messageDescriptor);
+    }
+
+    private M maskFields(M message) {
+        if (fieldMask != null) {
+            return FieldMasks.applyMask(fieldMask, message, typeUrl);
+        }
+
+        return message;
     }
 
     public static Builder newBuilder() {
