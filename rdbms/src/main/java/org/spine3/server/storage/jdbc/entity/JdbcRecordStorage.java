@@ -44,7 +44,7 @@ import static com.google.common.base.Throwables.propagate;
  * @see JdbcStorageFactory
  * @author Alexander Litus
  */
-public class JdbcEntityStorage<I> extends RecordStorage<I> {
+public class JdbcRecordStorage<I> extends RecordStorage<I> {
 
     private final DataSourceWrapper dataSource;
 
@@ -58,14 +58,14 @@ public class JdbcEntityStorage<I> extends RecordStorage<I> {
      * @param queryFactory          factory that generates queries for interaction with entity table
      * @throws DatabaseException    if an error occurs during an interaction with the DB
      */
-    public static <I> JdbcEntityStorage<I> newInstance(DataSourceWrapper dataSource,
+    public static <I> JdbcRecordStorage<I> newInstance(DataSourceWrapper dataSource,
                                                        boolean multitenant,
                                                        EntityStorageQueryFactory<I> queryFactory)
             throws DatabaseException {
-        return new JdbcEntityStorage<>(dataSource, multitenant, queryFactory);
+        return new JdbcRecordStorage<>(dataSource, multitenant, queryFactory);
     }
 
-    protected JdbcEntityStorage(DataSourceWrapper dataSource, boolean multitenant, EntityStorageQueryFactory<I> queryFactory)
+    protected JdbcRecordStorage(DataSourceWrapper dataSource, boolean multitenant, EntityStorageQueryFactory<I> queryFactory)
             throws DatabaseException {
         super(multitenant);
         this.dataSource = dataSource;
@@ -152,6 +152,6 @@ public class JdbcEntityStorage<I> extends RecordStorage<I> {
     private enum LogSingleton {
         INSTANCE;
         @SuppressWarnings("NonSerializableFieldInSerializableClass")
-        private final Logger value = LoggerFactory.getLogger(JdbcEntityStorage.class);
+        private final Logger value = LoggerFactory.getLogger(JdbcRecordStorage.class);
     }
 }

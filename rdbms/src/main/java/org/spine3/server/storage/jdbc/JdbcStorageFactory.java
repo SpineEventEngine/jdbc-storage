@@ -29,7 +29,7 @@ import org.spine3.server.storage.jdbc.aggregate.JdbcAggregateStorage;
 import org.spine3.server.storage.jdbc.aggregate.query.AggregateStorageQueryFactory;
 import org.spine3.server.storage.jdbc.command.JdbcCommandStorage;
 import org.spine3.server.storage.jdbc.command.query.CommandStorageQueryFactory;
-import org.spine3.server.storage.jdbc.entity.JdbcEntityStorage;
+import org.spine3.server.storage.jdbc.entity.JdbcRecordStorage;
 import org.spine3.server.storage.jdbc.entity.query.EntityStorageQueryFactory;
 import org.spine3.server.storage.jdbc.event.JdbcEventStorage;
 import org.spine3.server.storage.jdbc.event.query.EventStorageQueryFactory;
@@ -100,7 +100,7 @@ public class JdbcStorageFactory implements StorageFactory {
     // TODO:27-09-16:dmytro.dashenkov: Implement.
     @Override
     public StandStorage createStandStorage() {
-        return null;
+        return JdbcStandStorage.newBuilder().build();
     }
 
     @Override
@@ -112,13 +112,13 @@ public class JdbcStorageFactory implements StorageFactory {
 
     @Override
     public <I> RecordStorage<I> createRecordStorage(Class<? extends Entity<I, ?>> entityClass) {
-        return JdbcEntityStorage
+        return JdbcRecordStorage
                 .newInstance(dataSource, false, getEntityStorageQueryFactory(dataSource, entityClass));
     }
 
     @Override
     public <I> ProjectionStorage<I> createProjectionStorage(Class<? extends Entity<I, ?>> projectionClass) {
-        final JdbcEntityStorage<I> entityStorage = JdbcEntityStorage
+        final JdbcRecordStorage<I> entityStorage = JdbcRecordStorage
                 .newInstance(dataSource, false, getEntityStorageQueryFactory(dataSource, projectionClass));
         return JdbcProjectionStorage
                 .newInstance(dataSource, entityStorage, false, getProjectionStorageQueryFactory(dataSource, projectionClass));
@@ -137,10 +137,10 @@ public class JdbcStorageFactory implements StorageFactory {
     }
 
     /**
-     * Creates a new {@link EntityStorageQueryFactory} which produces database queries for corresponding {@link JdbcEntityStorage}.
+     * Creates a new {@link EntityStorageQueryFactory} which produces database queries for corresponding {@link JdbcRecordStorage}.
      *
-     * @param dataSource        {@link DataSource} on which corresponding {@link JdbcEntityStorage} is based
-     * @param entityClass       class of entities which are stored in the corresponding {@link JdbcEntityStorage}
+     * @param dataSource        {@link DataSource} on which corresponding {@link JdbcRecordStorage} is based
+     * @param entityClass       class of entities which are stored in the corresponding {@link JdbcRecordStorage}
      * @param <I>               a type of IDs of stored entities
      */
     protected <I> EntityStorageQueryFactory<I> getEntityStorageQueryFactory(DataSourceWrapper dataSource,
@@ -152,8 +152,8 @@ public class JdbcStorageFactory implements StorageFactory {
      * Creates a new {@link ProjectionStorageQueryFactory} which produces database queries for corresponding {@link JdbcProjectionStorage}.
      *
      * @param dataSource        {@link DataSource} on which corresponding {@link JdbcProjectionStorage} is based
-     * @param entityClass       class of entities which are stored in the corresponding {@link JdbcEntityStorage}
-     * @param <I>               a type of IDs of entities from the corresponding {@link JdbcEntityStorage}
+     * @param entityClass       class of entities which are stored in the corresponding {@link JdbcRecordStorage}
+     * @param <I>               a type of IDs of entities from the corresponding {@link JdbcRecordStorage}
      */
     protected <I> ProjectionStorageQueryFactory<I> getProjectionStorageQueryFactory(DataSourceWrapper dataSource,
                                                                                     Class<? extends Entity<I, ?>> entityClass){

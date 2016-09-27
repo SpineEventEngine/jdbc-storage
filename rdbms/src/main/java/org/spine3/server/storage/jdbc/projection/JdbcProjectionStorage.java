@@ -29,7 +29,7 @@ import org.spine3.server.storage.ProjectionStorage;
 import org.spine3.server.storage.RecordStorage;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.JdbcStorageFactory;
-import org.spine3.server.storage.jdbc.entity.JdbcEntityStorage;
+import org.spine3.server.storage.jdbc.entity.JdbcRecordStorage;
 import org.spine3.server.storage.jdbc.projection.query.ProjectionStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
@@ -47,7 +47,7 @@ import static com.google.common.base.Throwables.propagate;
  */
 public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
 
-    private final JdbcEntityStorage<I> entityStorage;
+    private final JdbcRecordStorage<I> entityStorage;
 
     private final ProjectionStorageQueryFactory queryFactory;
 
@@ -62,7 +62,7 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
      * @return a new storage instance
      */
     public static <I> ProjectionStorage<I> newInstance(DataSourceWrapper dataSource,
-                                                       JdbcEntityStorage<I> entityStorage,
+                                                       JdbcRecordStorage<I> entityStorage,
                                                        boolean multitenant,
                                                        ProjectionStorageQueryFactory<I> queryFactory)
             throws DatabaseException {
@@ -70,7 +70,7 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
     }
 
     protected JdbcProjectionStorage(DataSourceWrapper dataSource,
-                                  JdbcEntityStorage<I> entityStorage,
+                                  JdbcRecordStorage<I> entityStorage,
                                   boolean multitenant,
                                   ProjectionStorageQueryFactory<I> queryFactory) throws DatabaseException {
         super(multitenant);
