@@ -34,6 +34,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 
 /**
@@ -68,7 +69,13 @@ public class SelectAllQuery<M extends Message> extends Query {
         super(builder);
         this.messageDescriptor = builder.messageDescriptor;
         this.messageColumnLabel = builder.messageColumnLabel;
-        this.queriedFields = Collections2.transform(builder.fieldMask.getPathsList(), fqnToShortName);
+
+        if (builder.fieldMask == null) {
+            this.queriedFields = Collections.emptyList();
+        } else {
+            final Collection<String> fieldPaths = builder.fieldMask.getPathsList();
+            this.queriedFields = fieldPaths.isEmpty() ? Collections.<String>emptyList() : Collections2.transform(fieldPaths, fqnToShortName);
+        }
 
     }
 
@@ -97,6 +104,10 @@ public class SelectAllQuery<M extends Message> extends Query {
 
     private String getMaskedQuery() {
         final String query = getQuery();
+
+        if (queriedFields.isEmpty()) {
+            return query;
+        }
 
         final int fieldsIndex = query.indexOf('*');
 
