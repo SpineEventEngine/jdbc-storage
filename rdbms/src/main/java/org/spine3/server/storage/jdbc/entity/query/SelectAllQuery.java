@@ -20,19 +20,15 @@
 
 package org.spine3.server.storage.jdbc.entity.query;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.FieldMask;
 import com.google.protobuf.Message;
 import org.slf4j.Logger;
 import org.spine3.protobuf.TypeUrl;
-import org.spine3.server.entity.FieldMasks;
 import org.spine3.server.storage.jdbc.query.Query;
-import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.server.storage.jdbc.util.Serializer;
+import org.spine3.server.storage.jdbc.util.SqlExecutionHelper;
 
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
@@ -60,40 +56,9 @@ public class SelectAllQuery<M extends Message> extends Query {
     }
 
     public Map<Object, M> execute() throws SQLException {
-        final String sql = getQuery();
+        final ResultSet resultSet = SqlExecutionHelper.execute(getQuery(), getConnection(true));
 
-        final PreparedStatement sqlStatement;
-
-        try (ConnectionWrapper connection = getConnection(true)) {
-            sqlStatement = connection.prepareStatement(sql);
-        }
-
-        final ResultSet resultSet = sqlStatement.executeQuery();
-
-        final ImmutableMap.Builder<Object, M> resultBuilder = new ImmutableMap.Builder<>();
-
-        while (resultSet.next()) {
-            final M message = readSingleMessage(resultSet);
-            final M maskedMessage = maskFields(message);
-            final Object id = resultSet.getObject(EntityTable.ID_COL);
-            resultBuilder.put(id, maskedMessage);
-        }
-
-        resultSet.close();
-
-        return resultBuilder.build();
-    }
-
-    private M readSingleMessage(ResultSet resultSet) throws SQLException {
-        return Serializer.deserialize(resultSet.getBytes(messageColumnLabel), messageDescriptor);
-    }
-
-    private M maskFields(M message) {
-        if (fieldMask != null) {
-            return FieldMasks.applyMask(fieldMask, message, typeUrl);
-        }
-
-        return message;
+        return QueryResults.parse(resultSet, messageDescriptor, fieldMask, typeUrl);
     }
 
     public static Builder newBuilder(String tableName) {
