@@ -21,6 +21,7 @@
 package org.spine3.server.storage.jdbc.entity;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.protobuf.FieldMask;
 import org.slf4j.Logger;
@@ -89,15 +90,21 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
         return record;
     }
 
-    // TODO:27-09-16:dmytro.dashenkov: Implement.
     @Override
     protected Iterable<EntityStorageRecord> readBulkInternal(Iterable<I> ids) {
-        return null;
+        return readBulkInternal(ids, FieldMask.getDefaultInstance());
     }
 
     @Override
     protected Iterable<EntityStorageRecord> readBulkInternal(Iterable<I> ids, FieldMask fieldMask) {
-        return null;
+        final SelectBulkQuery<EntityStorageRecord> query = queryFactory.newSelectBulkQuery(ids, fieldMask, EntityStorageRecord.getDescriptor());
+        final Map<?, EntityStorageRecord> recordMap;
+        try {
+            recordMap = query.execute();
+        } catch (SQLException e) {
+            throw new DatabaseException(e);
+        }
+        return ImmutableList.copyOf(recordMap.values());
     }
 
     @Override
