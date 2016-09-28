@@ -120,7 +120,6 @@ public class EntityStorageQueryFactory<I> {
         final SelectAllQuery.Builder builder = SelectAllQuery.newBuilder(tableName)
                 .setFieldMask(fieldMask)
                 .setMessageDescriptor(descriptor)
-                .setMessageColumnLabel(EntityTable.ENTITY_COL)
                 .setLogger(logger)
                 .setDataSource(dataSource);
 

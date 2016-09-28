@@ -42,7 +42,6 @@ public class SelectAllQuery<M extends Message> extends Query {
 
     private final Descriptors.Descriptor messageDescriptor;
     private final TypeUrl typeUrl;
-    private final String messageColumnLabel;
     private final FieldMask fieldMask;
 
     private static final String TEMPLATE = "SELECT * FROM TABLE %s;";
@@ -50,7 +49,6 @@ public class SelectAllQuery<M extends Message> extends Query {
     protected SelectAllQuery(Builder<M> builder) {
         super(builder);
         this.messageDescriptor = checkNotNull(builder.messageDescriptor);
-        this.messageColumnLabel = checkNotNull(builder.messageColumnLabel);
         this.fieldMask = builder.fieldMask;
         this.typeUrl = TypeUrl.of(messageDescriptor);
     }
@@ -70,7 +68,6 @@ public class SelectAllQuery<M extends Message> extends Query {
     public static class Builder<M extends Message> extends Query.Builder<Builder<M>, SelectAllQuery> {
 
         private Descriptors.Descriptor messageDescriptor;
-        private String messageColumnLabel;
         private FieldMask fieldMask;
 
         private Builder() {
@@ -78,11 +75,6 @@ public class SelectAllQuery<M extends Message> extends Query {
 
         public Builder<M> setMessageDescriptor(Descriptors.Descriptor messageDescriptor) {
             this.messageDescriptor = messageDescriptor;
-            return getThis();
-        }
-
-        public Builder<M> setMessageColumnLabel(String messageColumnLabel) {
-            this.messageColumnLabel = messageColumnLabel;
             return getThis();
         }
 
