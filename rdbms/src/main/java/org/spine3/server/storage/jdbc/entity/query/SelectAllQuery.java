@@ -31,6 +31,7 @@ import org.spine3.server.storage.jdbc.util.SqlExecutionHelper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -44,7 +45,12 @@ public class SelectAllQuery<M extends Message> extends Query {
     private final TypeUrl typeUrl;
     private final FieldMask fieldMask;
 
-    private static final String TEMPLATE = "SELECT * FROM TABLE %s;";
+    private static final String COMMON_TEMPLATE = "SELECT * FROM TABLE %s";
+    private static final String ALL_TEMPLATE = COMMON_TEMPLATE + ';';
+    @SuppressWarnings("DuplicateStringLiteralInspection")
+    private static final String IDS_TEMPLATE = COMMON_TEMPLATE + " WHERE " + EntityTable.ID_COL + " IN (%s);";
+
+    private static final int IDS_STRING_ESTIMATED_LENGTH = 128;
 
     protected SelectAllQuery(Builder<M> builder) {
         super(builder);
@@ -59,9 +65,13 @@ public class SelectAllQuery<M extends Message> extends Query {
         return QueryResults.parse(resultSet, messageDescriptor, fieldMask, typeUrl);
     }
 
-    public static Builder newBuilder(String tableName) {
-        return new Builder<>()
-                .setQuery(String.format(TEMPLATE, tableName));
+    public static Builder<?> newBuilder(String tableName) {
+        return newBuilder()
+                .setAllQuery(tableName);
+    }
+
+    public static Builder<?> newBuilder() {
+        return new Builder<>();
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
@@ -80,6 +90,30 @@ public class SelectAllQuery<M extends Message> extends Query {
 
         public Builder<M> setFieldMask(FieldMask fieldMask) {
             this.fieldMask = fieldMask;
+            return getThis();
+        }
+
+        public Builder<M> setAllQuery(String tableName) {
+            setQuery(String.format(ALL_TEMPLATE, tableName));
+            return getThis();
+        }
+
+        public Builder<M> setIdsQuery(String tableName, Iterable<?> ids) {
+            final StringBuilder paramsBuilder = new StringBuilder(IDS_STRING_ESTIMATED_LENGTH);
+
+            final Iterator<?> params = ids.iterator();
+
+            while (params.hasNext()) {
+                final String oneId = String.valueOf(params.next());
+
+                paramsBuilder.append(oneId);
+
+                if (params.hasNext()) {
+                    paramsBuilder.append(',');
+                }
+            }
+
+            setQuery(String.format(IDS_TEMPLATE, tableName, paramsBuilder.toString()));
             return getThis();
         }
 

@@ -126,6 +126,18 @@ public class EntityStorageQueryFactory<I> {
         return builder.build();
     }
 
+    @SuppressWarnings("unchecked")
+    public <M extends Message> SelectAllQuery<M> newSelectBulkQuery(Iterable<?> ids, FieldMask fieldMask, Descriptors.Descriptor descriptor) {
+        final SelectAllQuery.Builder builder = SelectAllQuery.newBuilder()
+                .setIdsQuery(tableName, ids)
+                .setFieldMask(fieldMask)
+                .setMessageDescriptor(descriptor)
+                .setLogger(logger)
+                .setDataSource(dataSource);
+
+        return builder.build();
+    }
+
     /** Sets the logger for logging exceptions during queries execution. */
     public void setLogger(Logger logger) {
         this.logger = logger;
