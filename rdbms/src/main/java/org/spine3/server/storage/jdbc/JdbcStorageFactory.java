@@ -46,10 +46,11 @@ import javax.sql.DataSource;
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-public class JdbcStorageFactory implements StorageFactory {
+public class JdbcStorageFactory<I> implements StorageFactory {
 
     private final DataSourceWrapper dataSource;
     private final boolean multitenant;
+    private Class<? extends Entity<I, ?>> entityClass;
 
     /**
      * Creates a new instance with the specified data source configuration.
@@ -57,8 +58,8 @@ public class JdbcStorageFactory implements StorageFactory {
      * @param config        the config used to create the {@link DataSource}
      * @param multitenant   defines whether created storage will be multi-tenant
      */
-    public static JdbcStorageFactory newInstance(DataSourceConfig config, boolean multitenant) {
-        return new JdbcStorageFactory(config, multitenant);
+    public static <I> JdbcStorageFactory<I> newInstance(DataSourceConfig config, boolean multitenant, Class<? extends Entity<I, ?>> entityClass) {
+        return new JdbcStorageFactory<>(config, multitenant, entityClass);
     }
 
     /**
@@ -67,19 +68,21 @@ public class JdbcStorageFactory implements StorageFactory {
      * @param dataSource    the {@link DataSource} on which created storages are based.
      * @param multitenant   defines whether created storage will be multi-tenant
      */
-    public static JdbcStorageFactory newInstance(DataSource dataSource, boolean multitenant) {
-        return new JdbcStorageFactory(DataSourceWrapper.wrap(dataSource), multitenant);
+    public static <I> JdbcStorageFactory<I> newInstance(DataSource dataSource, boolean multitenant, Class<? extends Entity<I, ?>> entityClass) {
+        return new JdbcStorageFactory<>(DataSourceWrapper.wrap(dataSource), multitenant, entityClass);
     }
 
-    protected JdbcStorageFactory(DataSourceConfig config, boolean multitenant) {
+    protected JdbcStorageFactory(DataSourceConfig config, boolean multitenant, Class<? extends Entity<I, ?>> entityClass) {
         final HikariConfig hikariConfig = DefaultDataSourceConfigConverter.convert(config);
         this.dataSource = DataSourceWrapper.wrap(new HikariDataSource(hikariConfig));
         this.multitenant = multitenant;
+        this.entityClass = entityClass;
     }
 
-    protected JdbcStorageFactory(DataSourceWrapper dataSource, boolean multitenant) {
+    protected JdbcStorageFactory(DataSourceWrapper dataSource, boolean multitenant, Class<? extends Entity<I, ?>> entityClass) {
         this.dataSource = dataSource;
         this.multitenant = multitenant;
+        this.entityClass = entityClass;
     }
 
     @Override
@@ -102,8 +105,7 @@ public class JdbcStorageFactory implements StorageFactory {
         return JdbcStandStorage.newBuilder()
                 .setDataSource(dataSource)
                 .setMultitenant(isMultitenant())
-                // TODO:28-09-16:dmytro.dashenkov: Add EntityStorageQueryFactory to builder.
-                //.setEntityStorageQueryFactory(getEntityStorageQueryFactory(dataSource, Entity.class))
+                .setEntityStorageQueryFactory(getEntityStorageQueryFactory(dataSource, entityClass))
                 .build();
     }
 

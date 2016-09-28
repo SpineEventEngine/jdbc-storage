@@ -45,6 +45,7 @@ public class JdbcStandStorage extends StandStorage {
 
     private final JdbcRecordStorage<AggregateStateId> recordStorage;
 
+    @SuppressWarnings("unchecked")
     protected JdbcStandStorage(Builder builder) {
         super(builder.isMultitenant);
         recordStorage = JdbcRecordStorage.newInstance(builder.dataSource, builder.isMultitenant, builder.entityStorageQueryFactory);
@@ -109,18 +110,18 @@ public class JdbcStandStorage extends StandStorage {
         recordStorage.close();
     }
 
-    public static Builder newBuilder() {
-        return new Builder();
+    public static Builder<?> newBuilder() {
+        return new Builder<>();
     }
 
-    public static class Builder {
+    public static class Builder<I> {
 
         private Builder() {
         }
 
         private boolean isMultitenant;
         private DataSourceWrapper dataSource;
-        private EntityStorageQueryFactory<AggregateStateId> entityStorageQueryFactory;
+        private EntityStorageQueryFactory<I> entityStorageQueryFactory;
 
         public Builder setMultitenant(boolean multitenant) {
             isMultitenant = multitenant;
@@ -132,7 +133,7 @@ public class JdbcStandStorage extends StandStorage {
             return this;
         }
 
-        public Builder setEntityStorageQueryFactory(EntityStorageQueryFactory<AggregateStateId> queryFactory) {
+        public Builder setEntityStorageQueryFactory(EntityStorageQueryFactory<I> queryFactory) {
             this.entityStorageQueryFactory = queryFactory;
             return this;
         }

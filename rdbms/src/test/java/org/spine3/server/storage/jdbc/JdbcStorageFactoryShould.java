@@ -60,12 +60,12 @@ public class JdbcStorageFactoryShould {
                 .setPassword("pwd")
                 .setMaxPoolSize(12)
                 .build();
-        factory = JdbcStorageFactory.newInstance(config, false);
+        factory = JdbcStorageFactory.newInstance(config, false, TestAggregate.class);
     }
 
     @Test
     public void allow_to_use_custom_data_source(){
-        final JdbcStorageFactory factory = JdbcStorageFactory.newInstance(mock(DataSource.class), false);
+        final JdbcStorageFactory factory = JdbcStorageFactory.newInstance(mock(DataSource.class), false, TestProjection.class);
         assertNotNull(factory);
     }
 
