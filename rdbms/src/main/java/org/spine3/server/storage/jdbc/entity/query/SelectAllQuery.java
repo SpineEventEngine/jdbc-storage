@@ -18,15 +18,16 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.spine3.server.storage.jdbc.query;
+package org.spine3.server.storage.jdbc.entity.query;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.FieldMask;
 import com.google.protobuf.Message;
 import org.slf4j.Logger;
 import org.spine3.protobuf.TypeUrl;
 import org.spine3.server.entity.FieldMasks;
+import org.spine3.server.storage.jdbc.query.Query;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.Serializer;
@@ -34,7 +35,7 @@ import org.spine3.server.storage.jdbc.util.Serializer;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
+import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -58,7 +59,7 @@ public class SelectAllQuery<M extends Message> extends Query {
         this.typeUrl = TypeUrl.of(messageDescriptor);
     }
 
-    public Collection<M> execute() throws SQLException {
+    public Map<Object, M> execute() throws SQLException {
         final String sql = getQuery();
 
         final PreparedStatement sqlStatement;
@@ -69,17 +70,18 @@ public class SelectAllQuery<M extends Message> extends Query {
 
         final ResultSet resultSet = sqlStatement.executeQuery();
 
-        final ImmutableList.Builder<M> resultListBuilder = new ImmutableList.Builder<>();
+        final ImmutableMap.Builder<Object, M> resultBuilder = new ImmutableMap.Builder<>();
 
         while (resultSet.next()) {
             final M message = readSingleMessage(resultSet);
             final M maskedMessage = maskFields(message);
-            resultListBuilder.add(maskedMessage);
+            final Object id = resultSet.getObject(EntityTable.ID_COL);
+            resultBuilder.put(id, maskedMessage);
         }
 
         resultSet.close();
 
-        return resultListBuilder.build();
+        return resultBuilder.build();
     }
 
     private M readSingleMessage(ResultSet resultSet) throws SQLException {

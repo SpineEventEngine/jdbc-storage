@@ -21,6 +21,7 @@
 package org.spine3.server.storage.jdbc.entity;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableMap;
 import com.google.protobuf.FieldMask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,9 +30,11 @@ import org.spine3.server.storage.RecordStorage;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.JdbcStorageFactory;
 import org.spine3.server.storage.jdbc.entity.query.EntityStorageQueryFactory;
+import org.spine3.server.storage.jdbc.entity.query.SelectAllQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
 import javax.annotation.Nullable;
+import java.sql.SQLException;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -99,12 +102,22 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
 
     @Override
     protected Map<I, EntityStorageRecord> readAllInternal() {
-        return null;
+        return readAllInternal(FieldMask.getDefaultInstance());
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     protected Map<I, EntityStorageRecord> readAllInternal(FieldMask fieldMask) {
-        return null;
+        final SelectAllQuery<EntityStorageRecord> query = queryFactory.newSelectAllQuery(fieldMask, EntityStorageRecord.getDescriptor());
+        final Map<I, EntityStorageRecord> records;
+
+        try {
+            records = (Map<I, EntityStorageRecord>) query.execute();
+        } catch (SQLException e) {
+            throw new DatabaseException(e);
+        }
+
+        return ImmutableMap.copyOf(records);
     }
 
     /**

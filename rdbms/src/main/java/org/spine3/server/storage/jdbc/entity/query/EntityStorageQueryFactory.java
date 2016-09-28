@@ -27,7 +27,6 @@ import org.slf4j.Logger;
 import org.spine3.server.entity.Entity;
 import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.RecordStorage;
-import org.spine3.server.storage.jdbc.query.SelectAllQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbTableNameFactory;
 import org.spine3.server.storage.jdbc.util.IdColumn;
