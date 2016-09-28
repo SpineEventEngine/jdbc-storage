@@ -39,7 +39,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * @author Dmytro Dashenkov
  */
-public class SelectAllQuery<M extends Message> extends Query {
+public class SelectBulkQuery<M extends Message> extends Query {
 
     private final Descriptors.Descriptor messageDescriptor;
     private final TypeUrl typeUrl;
@@ -52,7 +52,7 @@ public class SelectAllQuery<M extends Message> extends Query {
 
     private static final int IDS_STRING_ESTIMATED_LENGTH = 128;
 
-    protected SelectAllQuery(Builder<M> builder) {
+    protected SelectBulkQuery(Builder<M> builder) {
         super(builder);
         this.messageDescriptor = checkNotNull(builder.messageDescriptor);
         this.fieldMask = builder.fieldMask;
@@ -75,7 +75,7 @@ public class SelectAllQuery<M extends Message> extends Query {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder<M extends Message> extends Query.Builder<Builder<M>, SelectAllQuery> {
+    public static class Builder<M extends Message> extends Query.Builder<Builder<M>, SelectBulkQuery> {
 
         private Descriptors.Descriptor messageDescriptor;
         private FieldMask fieldMask;
@@ -133,8 +133,8 @@ public class SelectAllQuery<M extends Message> extends Query {
         }
 
         @Override
-        public SelectAllQuery<M> build() {
-            return new SelectAllQuery<>(this);
+        public SelectBulkQuery<M> build() {
+            return new SelectBulkQuery<>(this);
         }
 
         @Override

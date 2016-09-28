@@ -30,7 +30,7 @@ import org.spine3.server.storage.RecordStorage;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.JdbcStorageFactory;
 import org.spine3.server.storage.jdbc.entity.query.EntityStorageQueryFactory;
-import org.spine3.server.storage.jdbc.entity.query.SelectAllQuery;
+import org.spine3.server.storage.jdbc.entity.query.SelectBulkQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
 import javax.annotation.Nullable;
@@ -108,7 +108,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     @SuppressWarnings("unchecked")
     @Override
     protected Map<I, EntityStorageRecord> readAllInternal(FieldMask fieldMask) {
-        final SelectAllQuery<EntityStorageRecord> query = queryFactory.newSelectAllQuery(fieldMask, EntityStorageRecord.getDescriptor());
+        final SelectBulkQuery<EntityStorageRecord> query = queryFactory.newSelectAllQuery(fieldMask, EntityStorageRecord.getDescriptor());
         final Map<I, EntityStorageRecord> records;
 
         try {
