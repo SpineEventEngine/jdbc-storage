@@ -119,26 +119,24 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
         entityStorage.close();
     }
 
-    // TODO:27-09-16:dmytro.dashenkov: Implement.
-
     @Override
     protected Iterable<EntityStorageRecord> readBulkInternal(Iterable<I> ids) {
-        return null;
+        return entityStorage.readBulk(ids);
     }
 
     @Override
     protected Iterable<EntityStorageRecord> readBulkInternal(Iterable<I> ids, FieldMask fieldMask) {
-        return null;
+        return entityStorage.readBulk(ids, fieldMask);
     }
 
     @Override
     protected Map<I, EntityStorageRecord> readAllInternal() {
-        return null;
+        return entityStorage.readAll();
     }
 
     @Override
     protected Map<I, EntityStorageRecord> readAllInternal(FieldMask fieldMask) {
-        return null;
+        return entityStorage.readAll(fieldMask);
     }
 
     private enum LogSingleton {
