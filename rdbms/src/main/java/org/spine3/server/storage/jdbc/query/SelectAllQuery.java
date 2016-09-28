@@ -24,9 +24,11 @@ import com.google.common.collect.ImmutableList;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.FieldMask;
 import com.google.protobuf.Message;
+import org.slf4j.Logger;
 import org.spine3.protobuf.TypeUrl;
 import org.spine3.server.entity.FieldMasks;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
+import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.Serializer;
 
 import java.sql.PreparedStatement;
@@ -46,7 +48,9 @@ public class SelectAllQuery<M extends Message> extends Query {
     private final String messageColumnLabel;
     private final FieldMask fieldMask;
 
-    protected SelectAllQuery(Builder builder) {
+    private static final String TEMPLATE = "SELECT * FROM TABLE %s;";
+
+    protected SelectAllQuery(Builder<M> builder) {
         super(builder);
         this.messageDescriptor = checkNotNull(builder.messageDescriptor);
         this.messageColumnLabel = checkNotNull(builder.messageColumnLabel);
@@ -90,12 +94,13 @@ public class SelectAllQuery<M extends Message> extends Query {
         return message;
     }
 
-    public static Builder newBuilder() {
-        return new Builder();
+    public static Builder newBuilder(String tableName) {
+        return new Builder<>()
+                .setQuery(String.format(TEMPLATE, tableName));
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder extends Query.Builder<Builder, SelectAllQuery> {
+    public static class Builder<M extends Message> extends Query.Builder<Builder<M>, SelectAllQuery> {
 
         private Descriptors.Descriptor messageDescriptor;
         private String messageColumnLabel;
@@ -104,28 +109,43 @@ public class SelectAllQuery<M extends Message> extends Query {
         private Builder() {
         }
 
-        public Builder setMessageDescriptor(Descriptors.Descriptor messageDescriptor) {
+        public Builder<M> setMessageDescriptor(Descriptors.Descriptor messageDescriptor) {
             this.messageDescriptor = messageDescriptor;
             return getThis();
         }
 
-        public Builder setMessageColumnLabel(String messageColumnLabel) {
+        public Builder<M> setMessageColumnLabel(String messageColumnLabel) {
             this.messageColumnLabel = messageColumnLabel;
             return getThis();
         }
 
-        public Builder setFieldMask(FieldMask fieldMask) {
+        public Builder<M> setFieldMask(FieldMask fieldMask) {
             this.fieldMask = fieldMask;
             return getThis();
         }
 
         @Override
-        public SelectAllQuery build() {
-            return new SelectAllQuery(this);
+        public Builder<M> setQuery(String query) {
+            return super.setQuery(query);
         }
 
         @Override
-        protected Builder getThis() {
+        public Builder<M> setDataSource(DataSourceWrapper dataSource) {
+            return super.setDataSource(dataSource);
+        }
+
+        @Override
+        public Builder<M> setLogger(Logger logger) {
+            return super.setLogger(logger);
+        }
+
+        @Override
+        public SelectAllQuery<M> build() {
+            return new SelectAllQuery<>(this);
+        }
+
+        @Override
+        protected Builder<M> getThis() {
             return this;
         }
     }

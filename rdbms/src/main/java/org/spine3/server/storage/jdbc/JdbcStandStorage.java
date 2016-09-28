@@ -116,16 +116,19 @@ public class JdbcStandStorage extends StandStorage {
         private DataSourceWrapper dataSource;
         private EntityStorageQueryFactory<AggregateStateId> entityStorageQueryFactory;
 
-        public void setMultitenant(boolean multitenant) {
+        public Builder setMultitenant(boolean multitenant) {
             isMultitenant = multitenant;
+            return this;
         }
 
-        public void setDataSource(DataSourceWrapper dataSource) {
+        public Builder setDataSource(DataSourceWrapper dataSource) {
             this.dataSource = dataSource;
+            return this;
         }
 
-        public void setEntityStorageQueryFactory(EntityStorageQueryFactory<AggregateStateId> queryFactory) {
+        public Builder setEntityStorageQueryFactory(EntityStorageQueryFactory<AggregateStateId> queryFactory) {
             this.entityStorageQueryFactory = queryFactory;
+            return this;
         }
 
         public JdbcStandStorage build() {

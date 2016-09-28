@@ -97,10 +97,14 @@ public class JdbcStorageFactory implements StorageFactory {
         return JdbcEventStorage.newInstance(dataSource, false, getEventStorageQueryFactory(dataSource));
     }
 
-    // TODO:27-09-16:dmytro.dashenkov: Implement.
     @Override
     public StandStorage createStandStorage() {
-        return JdbcStandStorage.newBuilder().build();
+        return JdbcStandStorage.newBuilder()
+                .setDataSource(dataSource)
+                .setMultitenant(isMultitenant())
+                // TODO:28-09-16:dmytro.dashenkov: Add EntityStorageQueryFactory to builder.
+                //.setEntityStorageQueryFactory(getEntityStorageQueryFactory(dataSource, Entity.class))
+                .build();
     }
 
     @Override

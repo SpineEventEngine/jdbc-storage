@@ -20,10 +20,14 @@
 
 package org.spine3.server.storage.jdbc.entity.query;
 
+import com.google.protobuf.Descriptors;
+import com.google.protobuf.FieldMask;
+import com.google.protobuf.Message;
 import org.slf4j.Logger;
 import org.spine3.server.entity.Entity;
 import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.RecordStorage;
+import org.spine3.server.storage.jdbc.query.SelectAllQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbTableNameFactory;
 import org.spine3.server.storage.jdbc.util.IdColumn;
@@ -109,6 +113,18 @@ public class EntityStorageQueryFactory<I> {
         final DeleteAllQuery.Builder builder = DeleteAllQuery.newBuilder(tableName)
                 .setDataSource(dataSource)
                 .setLogger(logger);
+        return builder.build();
+    }
+
+    @SuppressWarnings("unchecked")
+    public <M extends Message> SelectAllQuery<M> newSelectAllQuery(FieldMask fieldMask, Descriptors.Descriptor descriptor) {
+        final SelectAllQuery.Builder builder = SelectAllQuery.newBuilder(tableName)
+                .setFieldMask(fieldMask)
+                .setMessageDescriptor(descriptor)
+                .setMessageColumnLabel(EntityTable.ENTITY_COL)
+                .setLogger(logger)
+                .setDataSource(dataSource);
+
         return builder.build();
     }
 
