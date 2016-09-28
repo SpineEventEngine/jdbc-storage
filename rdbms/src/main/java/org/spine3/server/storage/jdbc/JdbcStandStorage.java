@@ -100,7 +100,13 @@ public class JdbcStandStorage extends StandStorage {
 
     @Override
     protected void writeInternal(AggregateStateId id, EntityStorageRecord record) {
+        recordStorage.write(id, record);
+    }
 
+    @Override
+    public void close() throws Exception {
+        super.close();
+        recordStorage.close();
     }
 
     public static Builder newBuilder() {
