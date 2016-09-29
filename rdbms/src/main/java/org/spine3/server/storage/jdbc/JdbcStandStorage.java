@@ -20,10 +20,9 @@
 
 package org.spine3.server.storage.jdbc;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
-import com.google.common.collect.ImmutableCollection;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Maps;
+import com.google.common.collect.*;
 import com.google.protobuf.FieldMask;
 import org.spine3.protobuf.TypeUrl;
 import org.spine3.server.stand.AggregateStateId;
@@ -34,6 +33,7 @@ import org.spine3.server.storage.jdbc.entity.query.EntityStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
 import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -41,11 +41,22 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * @author Dmytro Dashenkov
  */
+@SuppressWarnings("unchecked") // Due to lots of convertions (e.g. AggregateStateId <-> Object) IDE can't track types of collections.
 public class JdbcStandStorage extends StandStorage {
 
-    private final JdbcRecordStorage<AggregateStateId> recordStorage;
+    private final JdbcRecordStorage<Object> recordStorage;
 
-    @SuppressWarnings("unchecked")
+    private static final Function<AggregateStateId, Object> ID_MAPPER = new Function<AggregateStateId, Object>() {
+        @Nullable
+        @Override
+        public Object apply(@Nullable AggregateStateId input) {
+            if (input == null) {
+                return null;
+            }
+            return input.getAggregateId();
+        }
+    };
+
     protected JdbcStandStorage(Builder builder) {
         super(builder.isMultitenant);
         recordStorage = JdbcRecordStorage.newInstance(
@@ -79,38 +90,51 @@ public class JdbcStandStorage extends StandStorage {
     @Nullable
     @Override
     protected EntityStorageRecord readInternal(AggregateStateId id) {
-        return recordStorage.read(id);
+        return recordStorage.read(id.getAggregateId());
     }
 
     @Override
     protected Iterable<EntityStorageRecord> readBulkInternal(Iterable<AggregateStateId> ids) {
-        return recordStorage.readBulk(ids);
+        final Collection pureIds = Collections2.transform(Lists.newArrayList(ids), ID_MAPPER);
+        return recordStorage.readBulk(pureIds);
     }
 
     @Override
     protected Iterable<EntityStorageRecord> readBulkInternal(Iterable<AggregateStateId> ids, FieldMask fieldMask) {
-        return recordStorage.readBulk(ids, fieldMask);
+        final Collection pureIds = Collections2.transform(Lists.newArrayList(ids), ID_MAPPER);
+        return recordStorage.readBulk(pureIds, fieldMask);
     }
 
     @Override
     protected Map<AggregateStateId, EntityStorageRecord> readAllInternal() {
-        return recordStorage.readAll();
+        return retrieveRecordsWithValidIds(recordStorage.readAll());
     }
 
     @Override
     protected Map<AggregateStateId, EntityStorageRecord> readAllInternal(FieldMask fieldMask) {
-        return recordStorage.readAll(fieldMask);
+        return retrieveRecordsWithValidIds(recordStorage.readAll(fieldMask));
     }
 
     @Override
     protected void writeInternal(AggregateStateId id, EntityStorageRecord record) {
-        recordStorage.write(id, record);
+        recordStorage.write(id.getAggregateId(), record);
     }
 
     @Override
     public void close() throws Exception {
         super.close();
         recordStorage.close();
+    }
+
+    private static Map<AggregateStateId, EntityStorageRecord> retrieveRecordsWithValidIds(Map<?, EntityStorageRecord> records) {
+        final ImmutableMap.Builder<AggregateStateId, EntityStorageRecord> result = new ImmutableMap.Builder<>();
+
+        for (Map.Entry<?, EntityStorageRecord> entry : records.entrySet()) {
+            final AggregateStateId id = AggregateStateId.of(entry.getKey(), TypeUrl.of(entry.getValue().getState().getTypeUrl()));
+            result.put(id, entry.getValue());
+        }
+
+        return result.build();
     }
 
     public static <I> Builder<I> newBuilder() {
