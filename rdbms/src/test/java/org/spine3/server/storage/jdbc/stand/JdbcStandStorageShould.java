@@ -20,6 +20,7 @@
 
 package org.spine3.server.storage.jdbc.stand;
 
+import com.google.protobuf.Message;
 import org.junit.Test;
 import org.spine3.protobuf.AnyPacker;
 import org.spine3.protobuf.Timestamps;
@@ -35,10 +36,13 @@ import org.spine3.server.storage.jdbc.entity.query.EntityStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.test.aggregate.Project;
 
+import java.util.*;
+
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.*;
+import static org.spine3.test.Verify.assertContains;
 
 /**
  * @author Dmytro Dashenkov
@@ -135,7 +139,62 @@ public class JdbcStandStorageShould {
 
         final Given.TestAggregate aggregate = new Given.TestAggregate("some_id");
 
-        final AggregateStateId id = AggregateStateId.of(aggregate.getId(), TypeUrl.of(Project.class));
+        final EntityStorageRecord record = writeToStorage(aggregate, storage, Project.class);
+
+        final EntityStorageRecord readRecord = storage.read(AggregateStateId.of(aggregate.getId(), TypeUrl.of(Project.class)));
+
+        assertEquals(readRecord, record);
+    }
+
+    @Test
+    public void perform_bulk_read_operations() {
+        final StandStorage storage = Given.newStorage();
+
+        final Collection<Given.TestAggregate> testData = Given.testAggregates(10);
+
+        final List<EntityStorageRecord> records = new ArrayList<>();
+
+        for (Aggregate aggregate : testData) {
+            records.add(writeToStorage(aggregate, storage, Project.class));
+        }
+
+        final TypeUrl typeUrl = TypeUrl.of(Project.class);
+        final Collection<AggregateStateId> ids = new LinkedList<>();
+        ids.add(AggregateStateId.of("1", typeUrl));
+        ids.add(AggregateStateId.of("2", typeUrl));
+        ids.add(AggregateStateId.of("3", typeUrl));
+        ids.add(AggregateStateId.of("5", typeUrl));
+        ids.add(AggregateStateId.of("8", typeUrl));
+
+
+        final Collection<EntityStorageRecord> readRecords = (Collection<EntityStorageRecord>) storage.readBulk(ids);
+        assertEquals(ids.size(), readRecords.size());
+
+        assertContains(records.get(1), readRecords);
+        assertContains(records.get(2), readRecords);
+        assertContains(records.get(3), readRecords);
+        assertContains(records.get(5), readRecords);
+        assertContains(records.get(8), readRecords);
+    }
+
+    @Test
+    public void read_all_from_database() {
+        final StandStorage storage = Given.newStorage();
+
+        final Collection<Given.TestAggregate> testData = Given.testAggregates(10);
+
+        final List<EntityStorageRecord> records = new ArrayList<>();
+
+        for (Aggregate aggregate : testData) {
+            records.add(writeToStorage(aggregate, storage, Project.class));
+        }
+
+        final Map<AggregateStateId, EntityStorageRecord> readRecords = storage.readAll();
+        assertEquals(readRecords.size(), readRecords.size());
+    }
+
+    private static EntityStorageRecord writeToStorage(Aggregate<?, ?, ?> aggregate, StandStorage storage, Class<? extends Message> stateClass) {
+        final AggregateStateId id = AggregateStateId.of(aggregate.getId(), TypeUrl.of(stateClass));
         final EntityStorageRecord record = EntityStorageRecord.newBuilder()
                 .setState(AnyPacker.pack(aggregate.getState()))
                 .setWhenModified(Timestamps.getCurrentTime())
@@ -144,11 +203,8 @@ public class JdbcStandStorageShould {
 
         storage.write(id, record);
 
-        final EntityStorageRecord readRecord = storage.read(id);
-
-        assertEquals(readRecord, record);
+        return record;
     }
-
 
     /*
      * Read-write negative tests
@@ -173,7 +229,7 @@ public class JdbcStandStorageShould {
             return storage;
         }
 
-        public static class TestAggregate extends Aggregate<String, Project, Project.Builder> {
+        private static class TestAggregate extends Aggregate<String, Project, Project.Builder> {
 
             /**
              * Creates a new aggregate instance.
@@ -181,9 +237,19 @@ public class JdbcStandStorageShould {
              * @param id the ID for the new aggregate
              * @throws IllegalArgumentException if the ID is not of one of the supported types
              */
-            public TestAggregate(String id) {
+            private TestAggregate(String id) {
                 super(id);
             }
+        }
+
+        private static List<TestAggregate> testAggregates(int amount) {
+            final List<TestAggregate> aggregates = new LinkedList<>();
+
+            for (int i = 0; i < amount; i++) {
+                aggregates.add(new TestAggregate(String.valueOf(i)));
+            }
+
+            return aggregates;
         }
     }
 }
