@@ -34,6 +34,8 @@ import static org.spine3.base.Identifiers.newUuid;
 
 public class GivenDataSource {
 
+    public static final String DEFAULT_TABLE_NAME = "test";
+
     /**
      * The URL prefix of an in-memory HyperSQL DB.
      */

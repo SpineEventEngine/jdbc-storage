@@ -21,12 +21,21 @@
 package org.spine3.server.storage.jdbc.stand;
 
 import org.junit.Test;
+import org.spine3.protobuf.AnyPacker;
+import org.spine3.protobuf.Timestamps;
+import org.spine3.protobuf.TypeUrl;
+import org.spine3.server.aggregate.Aggregate;
+import org.spine3.server.stand.AggregateStateId;
+import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.StandStorage;
+import org.spine3.server.storage.jdbc.GivenDataSource;
 import org.spine3.server.storage.jdbc.JdbcStandStorage;
 import org.spine3.server.storage.jdbc.entity.query.CreateEntityTableQuery;
 import org.spine3.server.storage.jdbc.entity.query.EntityStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
+import org.spine3.test.aggregate.Project;
 
+import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.*;
@@ -120,11 +129,61 @@ public class JdbcStandStorageShould {
      * Read-write positive tests
      */
 
+    @Test
+    public void write_data_to_store() {
+        final StandStorage storage = Given.newStorage();
 
+        final Given.TestAggregate aggregate = new Given.TestAggregate("some_id");
 
+        final AggregateStateId id = AggregateStateId.of(aggregate.getId(), TypeUrl.of(Project.class));
+        final EntityStorageRecord record = EntityStorageRecord.newBuilder()
+                .setState(AnyPacker.pack(aggregate.getState()))
+                .setWhenModified(Timestamps.getCurrentTime())
+                .setVersion(1)
+                .build();
+
+        storage.write(id, record);
+
+        final EntityStorageRecord readRecord = storage.read(id);
+
+        assertEquals(readRecord, record);
+    }
 
 
     /*
      * Read-write negative tests
      */
+
+
+
+    private static class Given {
+
+        private static StandStorage newStorage() {
+            final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(GivenDataSource.DEFAULT_TABLE_NAME);
+
+            final EntityStorageQueryFactory<String> queryFactory = new EntityStorageQueryFactory<>(
+                    dataSource,
+                    TestAggregate.class);
+
+            final StandStorage storage = JdbcStandStorage.<String>newBuilder()
+                    .setEntityStorageQueryFactory(queryFactory)
+                    .setDataSource(dataSource)
+                    .build();
+
+            return storage;
+        }
+
+        public static class TestAggregate extends Aggregate<String, Project, Project.Builder> {
+
+            /**
+             * Creates a new aggregate instance.
+             *
+             * @param id the ID for the new aggregate
+             * @throws IllegalArgumentException if the ID is not of one of the supported types
+             */
+            public TestAggregate(String id) {
+                super(id);
+            }
+        }
+    }
 }
