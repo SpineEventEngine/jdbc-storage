@@ -26,12 +26,15 @@ import com.google.protobuf.Message;
 import org.slf4j.Logger;
 import org.spine3.protobuf.TypeUrl;
 import org.spine3.server.storage.jdbc.query.Query;
+import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.server.storage.jdbc.util.SqlExecutionHelper;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -44,8 +47,9 @@ public class SelectBulkQuery<M extends Message> extends Query {
     private final Descriptors.Descriptor messageDescriptor;
     private final TypeUrl typeUrl;
     private final FieldMask fieldMask;
+    private final List arguments;
 
-    private static final String COMMON_TEMPLATE = "SELECT * FROM TABLE %s";
+    private static final String COMMON_TEMPLATE = "SELECT * FROM %s";
     private static final String ALL_TEMPLATE = COMMON_TEMPLATE + ';';
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String IDS_TEMPLATE = COMMON_TEMPLATE + " WHERE " + EntityTable.ID_COL + " IN (%s);";
@@ -57,10 +61,21 @@ public class SelectBulkQuery<M extends Message> extends Query {
         this.messageDescriptor = checkNotNull(builder.messageDescriptor);
         this.fieldMask = builder.fieldMask;
         this.typeUrl = TypeUrl.of(messageDescriptor);
+        this.arguments = builder.arguments;
     }
 
     public Map<Object, M> execute() throws SQLException {
-        final ResultSet resultSet = SqlExecutionHelper.execute(getQuery(), getConnection(true));
+        final ConnectionWrapper connection = getConnection(true);
+        final PreparedStatement sqlStatement = connection.prepareStatement(getQuery());
+
+
+        for (int i = 0; i < arguments.size(); i++) {
+            sqlStatement.setObject(i + 1, arguments.get(i));
+        }
+
+        final ResultSet resultSet = sqlStatement.executeQuery();
+
+        connection.close();
 
         return QueryResults.parse(resultSet, messageDescriptor, fieldMask, typeUrl);
     }
@@ -79,6 +94,7 @@ public class SelectBulkQuery<M extends Message> extends Query {
 
         private Descriptors.Descriptor messageDescriptor;
         private FieldMask fieldMask;
+        private final List<Object> arguments = new ArrayList<>();
 
         private Builder() {
         }
@@ -104,9 +120,9 @@ public class SelectBulkQuery<M extends Message> extends Query {
             final Iterator<?> params = ids.iterator();
 
             while (params.hasNext()) {
-                final String oneId = String.valueOf(params.next());
+                paramsBuilder.append('?');
 
-                paramsBuilder.append(oneId);
+                arguments.add(params.next());
 
                 if (params.hasNext()) {
                     paramsBuilder.append(',');
