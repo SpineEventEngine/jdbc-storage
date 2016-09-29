@@ -48,7 +48,10 @@ public class JdbcStandStorage extends StandStorage {
     @SuppressWarnings("unchecked")
     protected JdbcStandStorage(Builder builder) {
         super(builder.isMultitenant);
-        recordStorage = JdbcRecordStorage.newInstance(builder.dataSource, builder.isMultitenant, builder.entityStorageQueryFactory);
+        recordStorage = JdbcRecordStorage.newInstance(
+                checkNotNull(builder.dataSource),
+                builder.isMultitenant,
+                checkNotNull(builder.entityStorageQueryFactory));
     }
 
     @Override
@@ -110,7 +113,7 @@ public class JdbcStandStorage extends StandStorage {
         recordStorage.close();
     }
 
-    public static Builder<?> newBuilder() {
+    public static <I> Builder<I> newBuilder() {
         return new Builder<>();
     }
 

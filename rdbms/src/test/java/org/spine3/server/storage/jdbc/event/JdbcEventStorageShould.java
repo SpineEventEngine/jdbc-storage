@@ -22,10 +22,10 @@ package org.spine3.server.storage.jdbc.event;
 
 import org.spine3.server.storage.EventStorage;
 import org.spine3.server.storage.EventStorageShould;
+import org.spine3.server.storage.jdbc.GivenDataSource;
 import org.spine3.server.storage.jdbc.event.query.EventStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
-import static org.spine3.server.storage.jdbc.JdbcStorageFactoryShould.newInMemoryDataSource;
 
 /**
  * @author Alexander Litus
@@ -34,7 +34,7 @@ public class JdbcEventStorageShould extends EventStorageShould {
 
     @Override
     protected EventStorage getStorage() {
-        final DataSourceWrapper dataSource = newInMemoryDataSource("eventStorageTests");
+        final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory("eventStorageTests");
         return JdbcEventStorage.newInstance(dataSource, false, new EventStorageQueryFactory(dataSource));
     }
 }

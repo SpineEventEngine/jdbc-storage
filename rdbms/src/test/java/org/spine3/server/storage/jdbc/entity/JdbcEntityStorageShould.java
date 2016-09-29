@@ -26,6 +26,7 @@ import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.EntityStorageShould;
 import org.spine3.server.storage.RecordStorage;
 import org.spine3.server.storage.jdbc.DatabaseException;
+import org.spine3.server.storage.jdbc.GivenDataSource;
 import org.spine3.server.storage.jdbc.entity.query.EntityStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.test.storage.Project;
@@ -33,7 +34,6 @@ import org.spine3.test.storage.Project;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 import static org.spine3.base.Identifiers.newUuid;
-import static org.spine3.server.storage.jdbc.JdbcStorageFactoryShould.newInMemoryDataSource;
 
 /**
  * @author Alexander Litus
@@ -48,7 +48,7 @@ public class JdbcEntityStorageShould extends EntityStorageShould<String> {
 
     @Override
     protected <I> JdbcRecordStorage<I> getStorage(Class<? extends Entity<I, ?>> entityClass) {
-        final DataSourceWrapper dataSource = newInMemoryDataSource("entityStorageTests");
+        final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory("entityStorageTests");
         return JdbcRecordStorage.newInstance(dataSource, false, new EntityStorageQueryFactory<I>(dataSource, entityClass));
     }
 
