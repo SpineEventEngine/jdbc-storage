@@ -39,12 +39,12 @@ import org.spine3.server.storage.jdbc.entity.query.EntityStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.test.aggregate.Project;
 import org.spine3.test.aggregate.ProjectId;
+import org.spine3.test.clientservice.customer.Customer;
 
 import java.util.*;
 
 import static junit.framework.TestCase.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static org.spine3.test.Verify.assertContains;
 import static org.spine3.test.Verify.assertSize;
@@ -274,12 +274,51 @@ public class JdbcStandStorageShould {
                 .next().getState());
         final Project withNameAndStatus = AnyPacker.unpack(storage.readAll(nameAndStatus).get(id).getState());
 
-        match(withIdOnly, idOnly);
-        match(withIdAndName, idAndName);
-        match(withNameAndStatus, nameAndStatus);
+        assertMatches(withIdOnly, idOnly);
+        assertMatches(withIdAndName, idAndName);
+        assertMatches(withNameAndStatus, nameAndStatus);
     }
 
+    @Test
+    public void read_all_by_type_url() {
+        final StandStorage storage = Given.newStorage();
 
+        final int aggregatesCount = 5;
+        final List<Given.TestAggregate> aggregates = Given.testAggregates(aggregatesCount);
+        final Given.TestAggregate2 differentAggregate = new Given.TestAggregate2("i_am_different");
+
+        for (Aggregate aggregate : aggregates) {
+            writeToStorage(aggregate, storage, Project.class);
+        }
+
+        final EntityStorageRecord differentRecord = writeToStorage(differentAggregate, storage, Customer.class);
+
+        final Collection<EntityStorageRecord> records = storage.readAllByType(TypeUrl.of(Project.class));
+        assertSize(aggregatesCount, records);
+        assertFalse(records.contains(differentRecord));
+    }
+
+    @SuppressWarnings("MethodWithMultipleLoops")
+    @Test
+    public void read_by_type_and_apply_field_mask() {
+        final StandStorage storage = Given.newStorage();
+
+        final List<Given.TestAggregate> aggregates = Given.testAggregatesWithState(5);
+
+        for (Aggregate aggregate : aggregates) {
+            writeToStorage(aggregate, storage, Project.class);
+        }
+
+        final FieldMask namesMask = FieldMask.newBuilder().addPaths(Project.getDescriptor().getFields().get(1)
+                .getFullName()).build();
+
+        final Collection<EntityStorageRecord> records = storage.readAllByType(TypeUrl.of(Project.class), namesMask);
+
+        for (EntityStorageRecord record : records) {
+            final Project project = AnyPacker.unpack(record.getState());
+            assertMatches(project, namesMask);
+        }
+    }
 
     /*
      * Read-write negative tests
@@ -293,7 +332,42 @@ public class JdbcStandStorageShould {
         storage.readBulk(Collections.<AggregateStateId>emptyList());
     }
 
-    private static void match(Message message, FieldMask fieldMask) {
+    /*
+     * Misc
+     * ----
+     */
+
+    @Test
+    public void be_auto_closable() throws Exception {
+        try (StandStorage storage = Given.newStorage()) {
+            assertTrue(storage.isOpen());
+            assertFalse(storage.isClosed());
+        }
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void fail_to_write_data_after_closed() throws Exception {
+        final StandStorage storage = Given.newStorage();
+
+        assertTrue(storage.isOpen());
+        storage.close();
+        assertTrue(storage.isClosed());
+
+        writeToStorage(new Given.TestAggregate("42"), storage, Project.class);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void fail_to_read_data_after_closed() throws Exception {
+        final StandStorage storage = Given.newStorage();
+
+        assertTrue(storage.isOpen());
+        storage.close();
+        assertTrue(storage.isClosed());
+
+        storage.readAll();
+    }
+
+    private static void assertMatches(Message message, FieldMask fieldMask) {
         final List<String> paths = fieldMask.getPathsList();
         for (Descriptors.FieldDescriptor field : message.getDescriptorForType().getFields()) {
 
@@ -355,11 +429,47 @@ public class JdbcStandStorageShould {
             }
         }
 
+        private static class TestAggregate2 extends Aggregate<String, Customer, Customer.Builder> {
+
+            /**
+             * Creates a new aggregate instance.
+             *
+             * @param id the ID for the new aggregate
+             * @throws IllegalArgumentException if the ID is not of one of the supported types
+             */
+            private TestAggregate2(String id) {
+                super(id);
+            }
+
+            private void setState(Customer state) {
+                incrementState(state);
+            }
+        }
+
         private static List<TestAggregate> testAggregates(int amount) {
             final List<TestAggregate> aggregates = new LinkedList<>();
 
             for (int i = 0; i < amount; i++) {
                 aggregates.add(new TestAggregate(String.valueOf(i)));
+            }
+
+            return aggregates;
+        }
+
+        private static List<TestAggregate> testAggregatesWithState(int amount) {
+            final List<TestAggregate> aggregates = new LinkedList<>();
+
+            for (int i = 0; i < amount; i++) {
+                final TestAggregate aggregate = new TestAggregate(String.valueOf(i));
+                final Project state = Project.newBuilder().setId(ProjectId.newBuilder()
+                        .setId(aggregate.getId()))
+                        .setName("Some project")
+                        .setStatus(Project.Status.CREATED)
+                        .build();
+
+                aggregate.setState(state);
+
+                aggregates.add(aggregate);
             }
 
             return aggregates;
