@@ -22,7 +22,7 @@ package org.spine3.server.storage.jdbc.aggregate.query;
 
 
 import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.query.Query;
+import org.spine3.server.storage.jdbc.query.SqlQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
@@ -41,7 +41,7 @@ import static org.spine3.server.storage.jdbc.aggregate.query.Table.EventCount.ID
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-public class SelectEventCountByIdQuery<I> extends Query {
+public class SelectEventCountByIdQuery<I> extends SqlQuery {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
@@ -88,7 +88,7 @@ public class SelectEventCountByIdQuery<I> extends Query {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder<I> extends Query.Builder<Builder<I>, SelectEventCountByIdQuery> {
+    public static class Builder<I> extends SqlQuery.Builder<Builder<I>, SelectEventCountByIdQuery> {
 
         private IdColumn<I> idColumn;
         private I id;

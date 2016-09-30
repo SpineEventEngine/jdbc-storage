@@ -23,7 +23,7 @@ package org.spine3.server.storage.jdbc.command.query;
 import org.spine3.base.CommandStatus;
 import org.spine3.server.storage.CommandStorageRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.query.Query;
+import org.spine3.server.storage.jdbc.query.SqlQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.DbIterator;
 
@@ -40,7 +40,7 @@ import static org.spine3.server.storage.jdbc.command.query.CommandTable.*;
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-public class SelectCommandByStatusQuery extends Query {
+public class SelectCommandByStatusQuery extends SqlQuery {
 
     private final CommandStatus status;
 
@@ -90,7 +90,7 @@ public class SelectCommandByStatusQuery extends Query {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder extends Query.Builder<Builder, SelectCommandByStatusQuery> {
+    public static class Builder extends SqlQuery.Builder<Builder, SelectCommandByStatusQuery> {
 
         private CommandStatus status;
 
