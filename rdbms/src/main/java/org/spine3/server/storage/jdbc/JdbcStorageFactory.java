@@ -46,8 +46,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Creates storages based on JDBC-compliant RDBMS.
  *
+ * @param <I> Id type if the {@link Entity} that will be stored in the storages created by this factory.
+ *
  * @author Alexander Litus
  * @author Andrey Lavrov
+ * @author Dmytro Dashenkov
  */
 public class JdbcStorageFactory<I> implements StorageFactory {
 
@@ -97,16 +100,26 @@ public class JdbcStorageFactory<I> implements StorageFactory {
 
     @Override
     public <I> RecordStorage<I> createRecordStorage(Class<? extends Entity<I, ?>> entityClass) {
-        return JdbcRecordStorage
-                .newInstance(dataSource, false, getEntityStorageQueryFactory(dataSource, entityClass), entityStateDescriptor);
+        return JdbcRecordStorage.newInstance(
+                dataSource,
+                false,
+                getEntityStorageQueryFactory(dataSource, entityClass),
+                entityStateDescriptor);
     }
 
     @Override
     public <I> ProjectionStorage<I> createProjectionStorage(Class<? extends Entity<I, ?>> projectionClass) {
-        final JdbcRecordStorage<I> entityStorage = JdbcRecordStorage
-                .newInstance(dataSource, false, getEntityStorageQueryFactory(dataSource, projectionClass), entityStateDescriptor);
-        return JdbcProjectionStorage
-                .newInstance(dataSource, entityStorage, false, getProjectionStorageQueryFactory(dataSource, projectionClass));
+        final JdbcRecordStorage<I> entityStorage = JdbcRecordStorage.newInstance(
+                dataSource,
+                false,
+                getEntityStorageQueryFactory(dataSource, projectionClass),
+                entityStateDescriptor);
+
+        return JdbcProjectionStorage.newInstance(
+                dataSource,
+                entityStorage,
+                false,
+                getProjectionStorageQueryFactory(dataSource, projectionClass));
     }
 
     /**
@@ -163,6 +176,9 @@ public class JdbcStorageFactory<I> implements StorageFactory {
         return new CommandStorageQueryFactory(dataSource);
     }
 
+    /**
+     * Closes used {@link DataSourceWrapper}.
+     */
     @Override
     public void close() {
         dataSource.close();
@@ -172,6 +188,9 @@ public class JdbcStorageFactory<I> implements StorageFactory {
         return new Builder<>();
     }
 
+    /**
+     * Buildes instances of {@code JdbcStorageFactory}.
+     */
     public static class Builder<I> {
 
         private DataSourceWrapper dataSource;
@@ -182,37 +201,61 @@ public class JdbcStorageFactory<I> implements StorageFactory {
         private Builder() {
         }
 
+        /**
+         * Sets optional field {@code isMultitenant}. {@code false} is used by default.
+         */
         public Builder setMultitenant(boolean multitenant) {
             this.multitenant = multitenant;
             return this;
         }
 
+        /**
+         * Sets required field {@code entityClass}.
+         */
         public Builder setEntityClass(Class<? extends Entity<I, ?>> entityClass) {
             this.entityClass = entityClass;
             return this;
         }
 
+        /**
+         * Sets required field {@code entityStateDescriptor}.
+         */
         public Builder setEntityStateDescriptor(Descriptors.Descriptor descriptor) {
             this.entityStateDescriptor = descriptor;
             return this;
         }
 
+        /**
+         * Sets required field {@code dataSource}.
+         */
         public Builder setDataSource(DataSourceWrapper dataSource) {
             this.dataSource = dataSource;
             return this;
         }
 
+        /**
+         * Sets required field {@code dataSource} from wrapped {@link DataSource}.
+         * @see DataSourceWrapper#wrap(DataSource)
+         */
         public Builder setDataSource(DataSource dataSource) {
             this.dataSource = DataSourceWrapper.wrap(dataSource);
             return this;
         }
 
+        /**
+         * Sets required field {@code dataSource} from {@link DataSourceConfig}.
+         * @see HikariConfig
+         * @see DefaultDataSourceConfigConverter#convert(DataSourceConfig)
+         */
         public Builder setDataSource(DataSourceConfig dataSource) {
             final HikariConfig hikariConfig = DefaultDataSourceConfigConverter.convert(dataSource);
             this.dataSource = DataSourceWrapper.wrap(new HikariDataSource(hikariConfig));
             return this;
         }
 
+        /**
+         * @return New instance of {@code JdbcStorageFactory}.
+         */
         public JdbcStorageFactory<I> build() {
             return new JdbcStorageFactory<>(this);
         }

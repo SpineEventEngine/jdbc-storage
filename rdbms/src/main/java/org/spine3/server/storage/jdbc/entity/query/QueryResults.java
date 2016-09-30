@@ -34,19 +34,41 @@ import java.sql.SQLException;
 import java.util.Map;
 
 /**
+ * Util class for parsing results of a db-query ({@link ResultSet}) into required in-memory representation.
+ *
  * @author Dmytro Dashenkov
  */
-public class QueryResults {
+@SuppressWarnings("UtilityClass")
+/* package */ class QueryResults {
 
-    public static <K, M extends Message> Map<K, EntityStorageRecord> parse(ResultSet resultSet, FieldMask fieldMask, TypeUrl typeUrl) throws SQLException {
-        final ImmutableMap.Builder<K, EntityStorageRecord> resultBuilder = new ImmutableMap.Builder<>();
+    private QueryResults() {
+    }
+
+    /**
+     * Transforms results of SQL query into ID-to-{@link EntityStorageRecord} {@link Map}.
+     *
+     * @param resultSet Results of the query.
+     * @param fieldMask {@code FieldMask} to apply to the results.
+     * @param typeUrl Type of retrieved {@link org.spine3.server.entity.Entity} states.
+     * @param <Id> Id type of the {@link org.spine3.server.entity.Entity}.
+     * @param <State> State type of the {@link org.spine3.server.entity.Entity}.
+     * @return ID-to-{@link EntityStorageRecord} {@link Map} representing the query results.
+     * @throws SQLException if read results contain no ID column or entity column.
+     * @see EntityTable
+     */
+    /* package */ static <Id, State extends Message> Map<Id, EntityStorageRecord> parse(
+            ResultSet resultSet,
+            FieldMask fieldMask,
+            TypeUrl typeUrl)
+            throws SQLException {
+        final ImmutableMap.Builder<Id, EntityStorageRecord> resultBuilder = new ImmutableMap.Builder<>();
 
         while (resultSet.next()) {
             final EntityStorageRecord record = readSingleMessage(resultSet);
-            final M maskedMessage = maskFields(record, fieldMask, typeUrl);
+            final State maskedMessage = maskFields(record, fieldMask, typeUrl);
 
             @SuppressWarnings("unchecked")
-            final K id = (K) resultSet.getObject(EntityTable.ID_COL);
+            final Id id = (Id) resultSet.getObject(EntityTable.ID_COL);
 
             resultBuilder.put(id, EntityStorageRecord.newBuilder(record).setState(AnyPacker.pack(maskedMessage)).build());
         }
@@ -60,7 +82,7 @@ public class QueryResults {
         return Serializer.deserialize(resultSet.getBytes(EntityTable.ENTITY_COL), EntityStorageRecord.getDescriptor());
     }
 
-    private static  <M extends Message> M maskFields(EntityStorageRecord record, FieldMask fieldMask, TypeUrl typeUrl) {
+    private static <M extends Message> M maskFields(EntityStorageRecord record, FieldMask fieldMask, TypeUrl typeUrl) {
         final M message = AnyPacker.unpack(record.getState());
         return FieldMasks.applyMask(fieldMask, message, typeUrl);
     }

@@ -22,12 +22,10 @@ package org.spine3.server.storage.jdbc.entity.query;
 
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.FieldMask;
-import org.slf4j.Logger;
 import org.spine3.protobuf.TypeUrl;
 import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.jdbc.query.Query;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
-import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -40,6 +38,13 @@ import java.util.Map;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
+ * <p>Implementation of {@link Query} for selecting all records or a bunch of records from a database.
+ * <p>{@code SQL} analogs of this are:
+ * <ul>
+ *     <li>1. {@code SELECT * FROM table;}
+ *     <li>2. {@code SELECT * FROM table WHERE id IN (?,...,?);}
+ * <ul/>
+ *
  * @author Dmytro Dashenkov
  */
 public class SelectBulkQuery extends Query {
@@ -63,6 +68,12 @@ public class SelectBulkQuery extends Query {
         this.arguments = builder.arguments;
     }
 
+    /**
+     * Executes the query.
+     *
+     * @return ID-to-{@link EntityStorageRecord} {@link Map} as the result of the query.
+     * @throws SQLException if the input data contained SQL errors or the table does not exist.
+     */
     public Map<Object, EntityStorageRecord> execute() throws SQLException {
         final ConnectionWrapper connection = getConnection(true);
         final PreparedStatement sqlStatement = connection.prepareStatement(getQuery());
@@ -79,15 +90,28 @@ public class SelectBulkQuery extends Query {
         return QueryResults.parse(resultSet, fieldMask, typeUrl);
     }
 
+    /**
+     * @return New instance of the {@link Builder} set to "query all" by default.
+     */
     public static Builder newBuilder(String tableName) {
         return newBuilder()
                 .setAllQuery(tableName);
     }
 
+    /**
+     * @return New instance of the {@link Builder}.
+     */
     public static Builder newBuilder() {
         return new Builder();
     }
 
+    /**
+     * <p>Builds instances of {@code SelectBulkQuery}.
+     * <p>All fields are required.
+     *
+     * <p>One of methods {@link #setAllQuery(String)} and {@link #setIdsQuery(String, Iterable)} should be called
+     * before {@link #build()}.
+     */
     @SuppressWarnings("ClassNameSameAsAncestorName")
     public static class Builder extends Query.Builder<Builder, SelectBulkQuery> {
 
@@ -108,11 +132,26 @@ public class SelectBulkQuery extends Query {
             return getThis();
         }
 
+        /**
+         * Sets {@code SelectBulkQuery} into "query all" mode and sets the table name.
+         * Either this method or {@link Builder#setIdsQuery(String, Iterable)} should be called before
+         * the {@code SelectBulkQuery} is built.
+         *
+         * @param tableName Name of the table to query.
+         */
         public Builder setAllQuery(String tableName) {
             setQuery(String.format(ALL_TEMPLATE, tableName));
             return getThis();
         }
 
+        /**
+         * Sets {@code SelectBulkQuery} into "query by ids" mode and sets the table name.
+         * Either this method or {@link Builder#setAllQuery(String)} should be called before
+         * the {@code SelectBulkQuery} is built.
+         *
+         * @param tableName Name of the table to query.
+         * @param ids IDs to search for.
+         */
         public Builder setIdsQuery(String tableName, Iterable<?> ids) {
             final StringBuilder paramsBuilder = new StringBuilder(IDS_STRING_ESTIMATED_LENGTH);
 
@@ -132,21 +171,9 @@ public class SelectBulkQuery extends Query {
             return getThis();
         }
 
-        @Override
-        public Builder setQuery(String query) {
-            return super.setQuery(query);
-        }
-
-        @Override
-        public Builder setDataSource(DataSourceWrapper dataSource) {
-            return super.setDataSource(dataSource);
-        }
-
-        @Override
-        public Builder setLogger(Logger logger) {
-            return super.setLogger(logger);
-        }
-
+        /**
+         * @return New instance of {@code SelectBulkQuery}.
+         */
         @Override
         public SelectBulkQuery build() {
             return new SelectBulkQuery(this);

@@ -40,6 +40,8 @@ import java.util.Map;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
+ * JDBC-based implementation of {@link StandStorage}.
+ *
  * @author Dmytro Dashenkov
  */
 @SuppressWarnings("unchecked") // Due to lots of convertions (e.g. AggregateStateId <-> Object) IDE can't track types of collections.
@@ -122,6 +124,9 @@ public class JdbcStandStorage extends StandStorage {
         recordStorage.write(id.getAggregateId(), record);
     }
 
+    /**
+     * Sets instance state to "closed" and closes used {@link JdbcRecordStorage}.
+     */
     @Override
     public void close() throws Exception {
         super.close();
@@ -139,10 +144,22 @@ public class JdbcStandStorage extends StandStorage {
         return result.build();
     }
 
+    /**
+     * Creates new instance of {@link Builder}.
+     *
+     * @param <I> Id type of the {@link org.spine3.server.entity.Entity} that will the {@code JdbcStandStorage}
+     *           created with this builder be used for.
+     * @return New parametrized instance of {@link Builder}.
+     */
     public static <I> Builder<I> newBuilder() {
         return new Builder<>();
     }
 
+    /**
+     * Builds instances of {@code JdbcStandStorage}.
+     *
+     * @param <I> Id type of the {@link org.spine3.server.entity.Entity} that will the {@code JdbcStandStorage} be used for.
+     */
     public static class Builder<I> {
 
         private boolean isMultitenant;
@@ -153,26 +170,43 @@ public class JdbcStandStorage extends StandStorage {
         private Builder() {
         }
 
+        /**
+         * Sets optional field {@code isMultitenant}. {@code false} is the default value.
+         */
         public Builder setMultitenant(boolean multitenant) {
             isMultitenant = multitenant;
             return this;
         }
 
+        /**
+         * Sets required field {@code dataSource}.
+         */
         public Builder setDataSource(DataSourceWrapper dataSource) {
             this.dataSource = dataSource;
             return this;
         }
 
+        /**
+         * Sets required field {@code stateDescriptor}.
+         *
+         * @param stateDescriptor {@link com.google.protobuf.Descriptors.Descriptor} of the {@link org.spine3.server.entity.Entity} state.
+         */
         public Builder setStateDescriptor(Descriptors.Descriptor stateDescriptor) {
             this.stateDescriptor = stateDescriptor;
             return this;
         }
 
+        /**
+         * Sets required field {@code queryFactory}.
+         */
         public Builder setEntityStorageQueryFactory(EntityStorageQueryFactory<I> queryFactory) {
             this.entityStorageQueryFactory = queryFactory;
             return this;
         }
 
+        /**
+         * @return New instance of {@code JdbcStandStorage}.
+         */
         public JdbcStandStorage build() {
             return new JdbcStandStorage(this);
         }
