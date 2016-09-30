@@ -44,7 +44,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @author Dmytro Dashenkov
  */
-@SuppressWarnings("unchecked") // Due to lots of convertions (e.g. AggregateStateId <-> Object) IDE can't track types of collections.
+@SuppressWarnings("unchecked") // Due to lots of conversions (e.g. AggregateStateId <-> Object) IDE can't track types of collections.
 public class JdbcStandStorage extends StandStorage {
 
     private final JdbcRecordStorage<Object> recordStorage;
