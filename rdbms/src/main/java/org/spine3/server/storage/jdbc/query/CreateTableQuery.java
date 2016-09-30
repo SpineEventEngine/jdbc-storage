@@ -37,7 +37,7 @@ import static java.lang.String.format;
  * @author Andrey Lavrov
  */
 @Internal
-public class CreateTableQuery<I> extends SqlQuery {
+public class CreateTableQuery<I> extends StorageQuery {
 
     @Nullable
     private final IdColumn<I> idColumn;
@@ -72,7 +72,7 @@ public class CreateTableQuery<I> extends SqlQuery {
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
     public abstract static class Builder<B extends Builder<B, Q, I>, Q extends CreateTableQuery, I>
-            extends SqlQuery.Builder<B, Q> {
+            extends StorageQuery.Builder<B, Q> {
 
         private IdColumn<I> idColumn;
         private String tableName;

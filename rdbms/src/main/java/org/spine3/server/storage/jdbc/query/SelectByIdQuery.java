@@ -45,7 +45,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.deserialize;
  * @author Alexander Litus
  */
 @Internal
-public class SelectByIdQuery<I, M extends Message> extends SqlQuery {
+public class SelectByIdQuery<I, M extends Message> extends StorageQuery {
 
     private final IdColumn<I> idColumn;
     private final I id;
@@ -115,8 +115,8 @@ public class SelectByIdQuery<I, M extends Message> extends SqlQuery {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public abstract static class Builder<B extends Builder<B, Q, I, Record>, Q extends SqlQuery, I, Record extends Message>
-            extends SqlQuery.Builder<B, Q>{
+    public abstract static class Builder<B extends Builder<B, Q, I, Record>, Q extends StorageQuery, I, Record extends Message>
+            extends StorageQuery.Builder<B, Q>{
 
         private int idIndexInQuery;
         private IdColumn<I> idColumn;

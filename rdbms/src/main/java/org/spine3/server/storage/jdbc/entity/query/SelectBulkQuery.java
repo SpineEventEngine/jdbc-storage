@@ -24,7 +24,7 @@ import com.google.protobuf.Descriptors;
 import com.google.protobuf.FieldMask;
 import org.spine3.protobuf.TypeUrl;
 import org.spine3.server.storage.EntityStorageRecord;
-import org.spine3.server.storage.jdbc.query.SqlQuery;
+import org.spine3.server.storage.jdbc.query.StorageQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 
 import java.sql.PreparedStatement;
@@ -38,7 +38,7 @@ import java.util.Map;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * <p>Implementation of {@link SqlQuery} for selecting all records or a bunch of records from a database.
+ * <p>Implementation of {@link StorageQuery} for selecting all records or a bunch of records from a database.
  * <p>{@code SQL} analogs of this are:
  * <ul>
  *     <li>1. {@code SELECT * FROM table;}
@@ -47,7 +47,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @author Dmytro Dashenkov
  */
-public class SelectBulkQuery extends SqlQuery {
+public class SelectBulkQuery extends StorageQuery {
 
     private final TypeUrl typeUrl;
     private final FieldMask fieldMask;
@@ -113,7 +113,7 @@ public class SelectBulkQuery extends SqlQuery {
      * before {@link #build()}.
      */
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder extends SqlQuery.Builder<Builder, SelectBulkQuery> {
+    public static class Builder extends StorageQuery.Builder<Builder, SelectBulkQuery> {
 
         private Descriptors.Descriptor messageDescriptor;
         private FieldMask fieldMask;
