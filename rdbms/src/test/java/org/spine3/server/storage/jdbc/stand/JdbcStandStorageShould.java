@@ -31,6 +31,7 @@ import org.spine3.server.aggregate.Aggregate;
 import org.spine3.server.stand.AggregateStateId;
 import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.StandStorage;
+import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.GivenDataSource;
 import org.spine3.server.storage.jdbc.JdbcStandStorage;
 import org.spine3.server.storage.jdbc.entity.query.CreateEntityTableQuery;
@@ -254,6 +255,19 @@ public class JdbcStandStorageShould {
         match(withNameAndStatus, nameAndStatus);
     }
 
+
+
+    /*
+     * Read-write negative tests
+     */
+
+    @Test(expected = DatabaseException.class)
+    public void fail_to_fetch_records_by_zero_ids() {
+        final StandStorage storage = Given.newStorage();
+
+        storage.readBulk(Collections.<AggregateStateId>emptyList());
+    }
+
     private static void match(Message message, FieldMask fieldMask) {
         final List<String> pathes = fieldMask.getPathsList();
         for (Descriptors.FieldDescriptor field : message.getDescriptorForType().getFields()) {
@@ -266,11 +280,6 @@ public class JdbcStandStorageShould {
             assertEquals(message.hasField(field), pathes.contains(field.getName()));
         }
     }
-
-    /*
-     * Read-write negative tests
-     */
-
 
 
     private static EntityStorageRecord writeToStorage(Aggregate<?, ?, ?> aggregate, StandStorage storage, Class<? extends Message> stateClass) {
