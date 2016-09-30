@@ -44,7 +44,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class SelectBulkQuery extends Query {
 
-    private final Descriptors.Descriptor messageDescriptor;
     private final TypeUrl typeUrl;
     private final FieldMask fieldMask;
     private final List arguments;
@@ -58,9 +57,9 @@ public class SelectBulkQuery extends Query {
 
     protected SelectBulkQuery(Builder builder) {
         super(builder);
-        this.messageDescriptor = checkNotNull(builder.messageDescriptor);
-        this.fieldMask = builder.fieldMask;
+        final Descriptors.Descriptor messageDescriptor = checkNotNull(builder.messageDescriptor);
         this.typeUrl = TypeUrl.of(messageDescriptor);
+        this.fieldMask = builder.fieldMask;
         this.arguments = builder.arguments;
     }
 
@@ -77,7 +76,7 @@ public class SelectBulkQuery extends Query {
 
         connection.close();
 
-        return QueryResults.parse(resultSet, messageDescriptor, fieldMask, typeUrl);
+        return QueryResults.parse(resultSet, fieldMask, typeUrl);
     }
 
     public static Builder newBuilder(String tableName) {

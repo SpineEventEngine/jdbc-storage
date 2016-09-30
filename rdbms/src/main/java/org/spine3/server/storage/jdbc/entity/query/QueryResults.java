@@ -21,7 +21,6 @@
 package org.spine3.server.storage.jdbc.entity.query;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.protobuf.Descriptors;
 import com.google.protobuf.FieldMask;
 import com.google.protobuf.Message;
 import org.spine3.protobuf.AnyPacker;
@@ -39,7 +38,7 @@ import java.util.Map;
  */
 public class QueryResults {
 
-    public static <K, M extends Message> Map<K, EntityStorageRecord> parse(ResultSet resultSet, Descriptors.Descriptor descriptor, FieldMask fieldMask, TypeUrl typeUrl) throws SQLException {
+    public static <K, M extends Message> Map<K, EntityStorageRecord> parse(ResultSet resultSet, FieldMask fieldMask, TypeUrl typeUrl) throws SQLException {
         final ImmutableMap.Builder<K, EntityStorageRecord> resultBuilder = new ImmutableMap.Builder<>();
 
         while (resultSet.next()) {
