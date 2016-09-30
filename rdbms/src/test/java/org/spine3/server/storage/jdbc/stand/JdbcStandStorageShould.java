@@ -205,6 +205,7 @@ public class JdbcStandStorageShould {
         assertSize(0, records);
     }
 
+    @SuppressWarnings("MethodWithMultipleLoops")
     @Test
     public void read_all_from_database() {
         final StandStorage storage = Given.newStorage();
@@ -218,9 +219,15 @@ public class JdbcStandStorageShould {
         }
 
         final Map<AggregateStateId, EntityStorageRecord> readRecords = storage.readAll();
-        assertEquals(readRecords.size(), readRecords.size());
+        assertEquals(records.size(), readRecords.size());
+
+        final Collection<EntityStorageRecord> readValues = readRecords.values();
+        for (EntityStorageRecord record : records) {
+            assertContains(record, readValues);
+        }
     }
 
+    @SuppressWarnings("DuplicateStringLiteralInspection") // Some field paths may repeat
     @Test
     public void apply_field_mask_to_read_values() {
         final StandStorage storage = Given.newStorage();
@@ -259,6 +266,7 @@ public class JdbcStandStorageShould {
 
     /*
      * Read-write negative tests
+     * -------------------------
      */
 
     @Test(expected = DatabaseException.class)
