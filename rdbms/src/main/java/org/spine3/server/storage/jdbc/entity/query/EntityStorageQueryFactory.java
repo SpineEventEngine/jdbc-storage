@@ -116,7 +116,7 @@ public class EntityStorageQueryFactory<I> {
     }
 
     @SuppressWarnings("unchecked")
-    public <M extends Message> SelectBulkQuery<M> newSelectAllQuery(FieldMask fieldMask, Descriptors.Descriptor descriptor) {
+    public <M extends Message> SelectBulkQuery newSelectAllQuery(FieldMask fieldMask, Descriptors.Descriptor descriptor) {
         final SelectBulkQuery.Builder builder = SelectBulkQuery.newBuilder(tableName)
                 .setFieldMask(fieldMask)
                 .setMessageDescriptor(descriptor)
@@ -127,7 +127,7 @@ public class EntityStorageQueryFactory<I> {
     }
 
     @SuppressWarnings("unchecked")
-    public <M extends Message> SelectBulkQuery<M> newSelectBulkQuery(Iterable<?> ids, FieldMask fieldMask, Descriptors.Descriptor descriptor) {
+    public <M extends Message> SelectBulkQuery newSelectBulkQuery(Iterable<?> ids, FieldMask fieldMask, Descriptors.Descriptor descriptor) {
         final SelectBulkQuery.Builder builder = SelectBulkQuery.newBuilder()
                 .setIdsQuery(tableName, ids)
                 .setFieldMask(fieldMask)

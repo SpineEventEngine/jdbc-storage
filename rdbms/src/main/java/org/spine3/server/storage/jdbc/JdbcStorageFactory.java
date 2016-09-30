@@ -20,6 +20,7 @@
 
 package org.spine3.server.storage.jdbc;
 
+import com.google.protobuf.Descriptors;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.spine3.server.aggregate.Aggregate;
@@ -40,6 +41,8 @@ import org.spine3.server.storage.jdbc.util.DefaultDataSourceConfigConverter;
 
 import javax.sql.DataSource;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Creates storages based on JDBC-compliant RDBMS.
  *
@@ -50,39 +53,14 @@ public class JdbcStorageFactory<I> implements StorageFactory {
 
     private final DataSourceWrapper dataSource;
     private final boolean multitenant;
-    private Class<? extends Entity<I, ?>> entityClass;
+    private final Class<? extends Entity<I, ?>> entityClass;
+    private final Descriptors.Descriptor entityStateDescriptor;
 
-    /**
-     * Creates a new instance with the specified data source configuration.
-     *
-     * @param config        the config used to create the {@link DataSource}
-     * @param multitenant   defines whether created storage will be multi-tenant
-     */
-    public static <I> JdbcStorageFactory<I> newInstance(DataSourceConfig config, boolean multitenant, Class<? extends Entity<I, ?>> entityClass) {
-        return new JdbcStorageFactory<>(config, multitenant, entityClass);
-    }
-
-    /**
-     * Creates a new instance with the specified data source.
-     *
-     * @param dataSource    the {@link DataSource} on which created storages are based.
-     * @param multitenant   defines whether created storage will be multi-tenant
-     */
-    public static <I> JdbcStorageFactory<I> newInstance(DataSource dataSource, boolean multitenant, Class<? extends Entity<I, ?>> entityClass) {
-        return new JdbcStorageFactory<>(DataSourceWrapper.wrap(dataSource), multitenant, entityClass);
-    }
-
-    protected JdbcStorageFactory(DataSourceConfig config, boolean multitenant, Class<? extends Entity<I, ?>> entityClass) {
-        final HikariConfig hikariConfig = DefaultDataSourceConfigConverter.convert(config);
-        this.dataSource = DataSourceWrapper.wrap(new HikariDataSource(hikariConfig));
-        this.multitenant = multitenant;
-        this.entityClass = entityClass;
-    }
-
-    protected JdbcStorageFactory(DataSourceWrapper dataSource, boolean multitenant, Class<? extends Entity<I, ?>> entityClass) {
-        this.dataSource = dataSource;
-        this.multitenant = multitenant;
-        this.entityClass = entityClass;
+    private JdbcStorageFactory(Builder<I> builder) {
+        this.entityClass = checkNotNull(builder.entityClass);
+        this.entityStateDescriptor = checkNotNull(builder.entityStateDescriptor);
+        this.dataSource = checkNotNull(builder.dataSource);
+        this.multitenant = builder.multitenant;
     }
 
     @Override
@@ -106,6 +84,7 @@ public class JdbcStorageFactory<I> implements StorageFactory {
                 .setDataSource(dataSource)
                 .setMultitenant(isMultitenant())
                 .setEntityStorageQueryFactory(getEntityStorageQueryFactory(dataSource, entityClass))
+                .setStateDescriptor(entityStateDescriptor)
                 .build();
     }
 
@@ -119,13 +98,13 @@ public class JdbcStorageFactory<I> implements StorageFactory {
     @Override
     public <I> RecordStorage<I> createRecordStorage(Class<? extends Entity<I, ?>> entityClass) {
         return JdbcRecordStorage
-                .newInstance(dataSource, false, getEntityStorageQueryFactory(dataSource, entityClass));
+                .newInstance(dataSource, false, getEntityStorageQueryFactory(dataSource, entityClass), entityStateDescriptor);
     }
 
     @Override
     public <I> ProjectionStorage<I> createProjectionStorage(Class<? extends Entity<I, ?>> projectionClass) {
         final JdbcRecordStorage<I> entityStorage = JdbcRecordStorage
-                .newInstance(dataSource, false, getEntityStorageQueryFactory(dataSource, projectionClass));
+                .newInstance(dataSource, false, getEntityStorageQueryFactory(dataSource, projectionClass), entityStateDescriptor);
         return JdbcProjectionStorage
                 .newInstance(dataSource, entityStorage, false, getProjectionStorageQueryFactory(dataSource, projectionClass));
     }
@@ -187,5 +166,56 @@ public class JdbcStorageFactory<I> implements StorageFactory {
     @Override
     public void close() {
         dataSource.close();
+    }
+
+    public static <I> Builder<I> newBuilder() {
+        return new Builder<>();
+    }
+
+    public static class Builder<I> {
+
+        private DataSourceWrapper dataSource;
+        private boolean multitenant;
+        private Class<? extends Entity<I, ?>> entityClass;
+        private Descriptors.Descriptor entityStateDescriptor;
+
+        private Builder() {
+        }
+
+        public Builder setMultitenant(boolean multitenant) {
+            this.multitenant = multitenant;
+            return this;
+        }
+
+        public Builder setEntityClass(Class<? extends Entity<I, ?>> entityClass) {
+            this.entityClass = entityClass;
+            return this;
+        }
+
+        public Builder setEntityStateDescriptor(Descriptors.Descriptor descriptor) {
+            this.entityStateDescriptor = descriptor;
+            return this;
+        }
+
+        public Builder setDataSource(DataSourceWrapper dataSource) {
+            this.dataSource = dataSource;
+            return this;
+        }
+
+        public Builder setDataSource(DataSource dataSource) {
+            this.dataSource = DataSourceWrapper.wrap(dataSource);
+            return this;
+        }
+
+        public Builder setDataSource(DataSourceConfig dataSource) {
+            final HikariConfig hikariConfig = DefaultDataSourceConfigConverter.convert(dataSource);
+            this.dataSource = DataSourceWrapper.wrap(new HikariDataSource(hikariConfig));
+            return this;
+        }
+
+        public JdbcStorageFactory<I> build() {
+            return new JdbcStorageFactory<>(this);
+        }
+
     }
 }

@@ -24,11 +24,12 @@ import com.google.common.collect.ImmutableMap;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.FieldMask;
 import com.google.protobuf.Message;
+import org.spine3.protobuf.AnyPacker;
 import org.spine3.protobuf.TypeUrl;
 import org.spine3.server.entity.FieldMasks;
+import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.jdbc.util.Serializer;
 
-import javax.annotation.Nullable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
@@ -38,17 +39,17 @@ import java.util.Map;
  */
 public class QueryResults {
 
-    public static <K, V extends Message> Map<K, V> parse(ResultSet resultSet, Descriptors.Descriptor descriptor, FieldMask fieldMask, TypeUrl typeUrl) throws SQLException {
-        final ImmutableMap.Builder<K, V> resultBuilder = new ImmutableMap.Builder<>();
+    public static <K, M extends Message> Map<K, EntityStorageRecord> parse(ResultSet resultSet, Descriptors.Descriptor descriptor, FieldMask fieldMask, TypeUrl typeUrl) throws SQLException {
+        final ImmutableMap.Builder<K, EntityStorageRecord> resultBuilder = new ImmutableMap.Builder<>();
 
         while (resultSet.next()) {
-            final V message = readSingleMessage(resultSet, descriptor);
-            final V maskedMessage = maskFields(message, fieldMask, typeUrl);
+            final EntityStorageRecord record = readSingleMessage(resultSet);
+            final M maskedMessage = maskFields(record, fieldMask, typeUrl);
 
             @SuppressWarnings("unchecked")
             final K id = (K) resultSet.getObject(EntityTable.ID_COL);
 
-            resultBuilder.put(id, maskedMessage);
+            resultBuilder.put(id, EntityStorageRecord.newBuilder(record).setState(AnyPacker.pack(maskedMessage)).build());
         }
 
         resultSet.close();
@@ -56,15 +57,12 @@ public class QueryResults {
         return resultBuilder.build();
     }
 
-    private static <M extends Message> M readSingleMessage(ResultSet resultSet, Descriptors.Descriptor messageDescriptor) throws SQLException {
-        return Serializer.deserialize(resultSet.getBytes(EntityTable.ENTITY_COL), messageDescriptor);
+    private static EntityStorageRecord readSingleMessage(ResultSet resultSet) throws SQLException {
+        return Serializer.deserialize(resultSet.getBytes(EntityTable.ENTITY_COL), EntityStorageRecord.getDescriptor());
     }
 
-    private static  <M extends Message> M maskFields(M message, @Nullable FieldMask fieldMask, TypeUrl typeUrl) {
-        if (fieldMask != null) {
-            return FieldMasks.applyMask(fieldMask, message, typeUrl);
-        }
-
-        return message;
+    private static  <M extends Message> M maskFields(EntityStorageRecord record, FieldMask fieldMask, TypeUrl typeUrl) {
+        final M message = AnyPacker.unpack(record.getState());
+        return FieldMasks.applyMask(fieldMask, message, typeUrl);
     }
 }

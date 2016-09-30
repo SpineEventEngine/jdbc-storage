@@ -22,9 +22,9 @@ package org.spine3.server.storage.jdbc.entity.query;
 
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.FieldMask;
-import com.google.protobuf.Message;
 import org.slf4j.Logger;
 import org.spine3.protobuf.TypeUrl;
+import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.jdbc.query.Query;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
@@ -42,7 +42,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * @author Dmytro Dashenkov
  */
-public class SelectBulkQuery<M extends Message> extends Query {
+public class SelectBulkQuery extends Query {
 
     private final Descriptors.Descriptor messageDescriptor;
     private final TypeUrl typeUrl;
@@ -56,7 +56,7 @@ public class SelectBulkQuery<M extends Message> extends Query {
 
     private static final int IDS_STRING_ESTIMATED_LENGTH = 128;
 
-    protected SelectBulkQuery(Builder<M> builder) {
+    protected SelectBulkQuery(Builder builder) {
         super(builder);
         this.messageDescriptor = checkNotNull(builder.messageDescriptor);
         this.fieldMask = builder.fieldMask;
@@ -64,7 +64,7 @@ public class SelectBulkQuery<M extends Message> extends Query {
         this.arguments = builder.arguments;
     }
 
-    public Map<Object, M> execute() throws SQLException {
+    public Map<Object, EntityStorageRecord> execute() throws SQLException {
         final ConnectionWrapper connection = getConnection(true);
         final PreparedStatement sqlStatement = connection.prepareStatement(getQuery());
 
@@ -80,17 +80,17 @@ public class SelectBulkQuery<M extends Message> extends Query {
         return QueryResults.parse(resultSet, messageDescriptor, fieldMask, typeUrl);
     }
 
-    public static Builder<?> newBuilder(String tableName) {
+    public static Builder newBuilder(String tableName) {
         return newBuilder()
                 .setAllQuery(tableName);
     }
 
-    public static Builder<?> newBuilder() {
-        return new Builder<>();
+    public static Builder newBuilder() {
+        return new Builder();
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder<M extends Message> extends Query.Builder<Builder<M>, SelectBulkQuery> {
+    public static class Builder extends Query.Builder<Builder, SelectBulkQuery> {
 
         private Descriptors.Descriptor messageDescriptor;
         private FieldMask fieldMask;
@@ -99,22 +99,22 @@ public class SelectBulkQuery<M extends Message> extends Query {
         private Builder() {
         }
 
-        public Builder<M> setMessageDescriptor(Descriptors.Descriptor messageDescriptor) {
+        public Builder setMessageDescriptor(Descriptors.Descriptor messageDescriptor) {
             this.messageDescriptor = messageDescriptor;
             return getThis();
         }
 
-        public Builder<M> setFieldMask(FieldMask fieldMask) {
+        public Builder setFieldMask(FieldMask fieldMask) {
             this.fieldMask = fieldMask;
             return getThis();
         }
 
-        public Builder<M> setAllQuery(String tableName) {
+        public Builder setAllQuery(String tableName) {
             setQuery(String.format(ALL_TEMPLATE, tableName));
             return getThis();
         }
 
-        public Builder<M> setIdsQuery(String tableName, Iterable<?> ids) {
+        public Builder setIdsQuery(String tableName, Iterable<?> ids) {
             final StringBuilder paramsBuilder = new StringBuilder(IDS_STRING_ESTIMATED_LENGTH);
 
             final Iterator<?> params = ids.iterator();
@@ -134,27 +134,27 @@ public class SelectBulkQuery<M extends Message> extends Query {
         }
 
         @Override
-        public Builder<M> setQuery(String query) {
+        public Builder setQuery(String query) {
             return super.setQuery(query);
         }
 
         @Override
-        public Builder<M> setDataSource(DataSourceWrapper dataSource) {
+        public Builder setDataSource(DataSourceWrapper dataSource) {
             return super.setDataSource(dataSource);
         }
 
         @Override
-        public Builder<M> setLogger(Logger logger) {
+        public Builder setLogger(Logger logger) {
             return super.setLogger(logger);
         }
 
         @Override
-        public SelectBulkQuery<M> build() {
-            return new SelectBulkQuery<>(this);
+        public SelectBulkQuery build() {
+            return new SelectBulkQuery(this);
         }
 
         @Override
-        protected Builder<M> getThis() {
+        protected Builder getThis() {
             return this;
         }
     }

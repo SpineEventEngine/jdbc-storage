@@ -23,6 +23,7 @@ package org.spine3.server.storage.jdbc;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.*;
+import com.google.protobuf.Descriptors;
 import com.google.protobuf.FieldMask;
 import org.spine3.protobuf.TypeUrl;
 import org.spine3.server.stand.AggregateStateId;
@@ -62,7 +63,8 @@ public class JdbcStandStorage extends StandStorage {
         recordStorage = JdbcRecordStorage.newInstance(
                 checkNotNull(builder.dataSource),
                 builder.isMultitenant,
-                checkNotNull(builder.entityStorageQueryFactory));
+                checkNotNull(builder.entityStorageQueryFactory),
+                checkNotNull(builder.stateDescriptor));
     }
 
     @Override
@@ -143,12 +145,13 @@ public class JdbcStandStorage extends StandStorage {
 
     public static class Builder<I> {
 
-        private Builder() {
-        }
-
         private boolean isMultitenant;
         private DataSourceWrapper dataSource;
+        private Descriptors.Descriptor stateDescriptor;
         private EntityStorageQueryFactory<I> entityStorageQueryFactory;
+
+        private Builder() {
+        }
 
         public Builder setMultitenant(boolean multitenant) {
             isMultitenant = multitenant;
@@ -157,6 +160,11 @@ public class JdbcStandStorage extends StandStorage {
 
         public Builder setDataSource(DataSourceWrapper dataSource) {
             this.dataSource = dataSource;
+            return this;
+        }
+
+        public Builder setStateDescriptor(Descriptors.Descriptor stateDescriptor) {
+            this.stateDescriptor = stateDescriptor;
             return this;
         }
 

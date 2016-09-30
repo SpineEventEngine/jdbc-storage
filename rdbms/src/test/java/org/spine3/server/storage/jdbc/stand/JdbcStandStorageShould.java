@@ -20,6 +20,8 @@
 
 package org.spine3.server.storage.jdbc.stand;
 
+import com.google.protobuf.Descriptors;
+import com.google.protobuf.FieldMask;
 import com.google.protobuf.Message;
 import org.junit.Test;
 import org.spine3.protobuf.AnyPacker;
@@ -35,6 +37,7 @@ import org.spine3.server.storage.jdbc.entity.query.CreateEntityTableQuery;
 import org.spine3.server.storage.jdbc.entity.query.EntityStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.test.aggregate.Project;
+import org.spine3.test.aggregate.ProjectId;
 
 import java.util.*;
 
@@ -43,6 +46,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.*;
 import static org.spine3.test.Verify.assertContains;
+import static org.spine3.test.Verify.assertSize;
 
 /**
  * @author Dmytro Dashenkov
@@ -67,6 +71,7 @@ public class JdbcStandStorageShould {
         final StandStorage standStorage = JdbcStandStorage.<String>newBuilder()
                 .setEntityStorageQueryFactory(queryFactoryMock)
                 .setDataSource(dataSourceMock)
+                .setStateDescriptor(Project.getDescriptor())
                 .setMultitenant(false)
                 .build();
 
@@ -91,6 +96,7 @@ public class JdbcStandStorageShould {
         final StandStorage standStorage = JdbcStandStorage.<String>newBuilder()
                 .setEntityStorageQueryFactory(queryFactoryMock)
                 .setDataSource(dataSourceMock)
+                .setStateDescriptor(Project.getDescriptor())
                 .build();
 
         assertNotNull(standStorage);
@@ -115,6 +121,7 @@ public class JdbcStandStorageShould {
 
         JdbcStandStorage.<String>newBuilder()
                 .setEntityStorageQueryFactory(queryFactoryMock)
+                .setStateDescriptor(Project.getDescriptor())
                 .setMultitenant(false)
                 .build();
     }
@@ -125,12 +132,14 @@ public class JdbcStandStorageShould {
 
         JdbcStandStorage.newBuilder()
                 .setDataSource(dataSourceMock)
+                .setStateDescriptor(Project.getDescriptor())
                 .setMultitenant(false)
                 .build();
     }
 
     /*
      * Read-write positive tests
+     * -------------------------
      */
 
     @Test
@@ -178,6 +187,24 @@ public class JdbcStandStorageShould {
     }
 
     @Test
+    public void handle_wrong_ids_silently() {
+        final StandStorage storage = Given.newStorage();
+
+        final TypeUrl typeUrl = TypeUrl.of(Project.class);
+        final String repeatingInvalidId = "invalid-id-1";
+
+        final Collection<AggregateStateId> ids = new LinkedList<>();
+        ids.add(AggregateStateId.of(repeatingInvalidId, typeUrl));
+        ids.add(AggregateStateId.of("invalid-id-2", typeUrl));
+        ids.add(AggregateStateId.of(repeatingInvalidId, typeUrl));
+
+        final Collection<EntityStorageRecord> records = (Collection<EntityStorageRecord>) storage.readBulk(ids);
+
+        assertNotNull(records);
+        assertSize(0, records);
+    }
+
+    @Test
     public void read_all_from_database() {
         final StandStorage storage = Given.newStorage();
 
@@ -193,6 +220,59 @@ public class JdbcStandStorageShould {
         assertEquals(readRecords.size(), readRecords.size());
     }
 
+    @Test
+    public void apply_field_mask_to_read_values() {
+        final StandStorage storage = Given.newStorage();
+
+        final String stringId = "42";
+        final AggregateStateId id = AggregateStateId.of(stringId, TypeUrl.of(Project.class));
+
+        final Project project = Project.newBuilder()
+                .setId(ProjectId.newBuilder().setId(stringId))
+                .setName("Some name")
+                .setStatus(Project.Status.DONE)
+                .build();
+
+        final Given.TestAggregate aggregate = new Given.TestAggregate(stringId);
+        aggregate.setState(project);
+
+        writeToStorage(aggregate, storage, Project.class);
+
+        final FieldMask idOnly = FieldMask.newBuilder().addPaths("spine.base.aggregate.Project.id").build();
+        final FieldMask idAndName = FieldMask.newBuilder().addPaths("spine.base.aggregate.Project.id")
+                .addPaths("spine.base.aggregate.Project.name").build();
+        final FieldMask nameAndStatus = FieldMask.newBuilder().addPaths("spine.base.aggregate.Project.name")
+                .addPaths("spine.base.aggregate.Project.status").build();
+
+        final Project withIdOnly = AnyPacker.unpack(storage.read(id, idOnly).getState());
+        final Project withIdAndName = AnyPacker.unpack(storage.readBulk(Collections.singleton(id), idAndName).iterator()
+                .next().getState());
+        final Project withNameAndStatus = AnyPacker.unpack(storage.readAll(nameAndStatus).get(id).getState());
+
+        match(withIdOnly, idOnly);
+        match(withIdAndName, idAndName);
+        match(withNameAndStatus, nameAndStatus);
+    }
+
+    private static void match(Message message, FieldMask fieldMask) {
+        final List<String> pathes = fieldMask.getPathsList();
+        for (Descriptors.FieldDescriptor field : message.getDescriptorForType().getFields()) {
+
+            // Protobuf limitation, has no effect on the test.
+            if (field.isRepeated()) {
+                continue;
+            }
+
+            assertEquals(message.hasField(field), pathes.contains(field.getName()));
+        }
+    }
+
+    /*
+     * Read-write negative tests
+     */
+
+
+
     private static EntityStorageRecord writeToStorage(Aggregate<?, ?, ?> aggregate, StandStorage storage, Class<? extends Message> stateClass) {
         final AggregateStateId id = AggregateStateId.of(aggregate.getId(), TypeUrl.of(stateClass));
         final EntityStorageRecord record = EntityStorageRecord.newBuilder()
@@ -206,12 +286,6 @@ public class JdbcStandStorageShould {
         return record;
     }
 
-    /*
-     * Read-write negative tests
-     */
-
-
-
     private static class Given {
 
         private static StandStorage newStorage() {
@@ -224,6 +298,7 @@ public class JdbcStandStorageShould {
             final StandStorage storage = JdbcStandStorage.<String>newBuilder()
                     .setEntityStorageQueryFactory(queryFactory)
                     .setDataSource(dataSource)
+                    .setStateDescriptor(Project.getDescriptor())
                     .build();
 
             return storage;
@@ -239,6 +314,10 @@ public class JdbcStandStorageShould {
              */
             private TestAggregate(String id) {
                 super(id);
+            }
+
+            private void setState(Project state) {
+                incrementState(state);
             }
         }
 

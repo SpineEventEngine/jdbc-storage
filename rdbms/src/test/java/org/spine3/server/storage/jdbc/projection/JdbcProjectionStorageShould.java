@@ -21,6 +21,7 @@
 package org.spine3.server.storage.jdbc.projection;
 
 import org.spine3.server.projection.Projection;
+import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.ProjectionStorage;
 import org.spine3.server.storage.ProjectionStorageShould;
 import org.spine3.server.storage.jdbc.GivenDataSource;
@@ -41,7 +42,11 @@ public class JdbcProjectionStorageShould extends ProjectionStorageShould<String>
     protected ProjectionStorage<String> getStorage() {
         final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory("projectionStorageTests");
         final Class<TestProjection> projectionClass = TestProjection.class;
-        final JdbcRecordStorage<String> entityStorage = JdbcRecordStorage.newInstance(dataSource, false, new EntityStorageQueryFactory<>(dataSource, projectionClass));
+        final JdbcRecordStorage<String> entityStorage = JdbcRecordStorage.newInstance(
+                dataSource,
+                false,
+                new EntityStorageQueryFactory<>(dataSource, projectionClass),
+                EntityStorageRecord.getDescriptor());
         return JdbcProjectionStorage.newInstance(dataSource, entityStorage, false, new ProjectionStorageQueryFactory<>(dataSource, projectionClass));
     }
 

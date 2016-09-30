@@ -23,6 +23,7 @@ package org.spine3.server.storage.jdbc.entity;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.protobuf.Descriptors;
 import com.google.protobuf.FieldMask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +55,8 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
 
     private final EntityStorageQueryFactory<I> queryFactory;
 
+    private final Descriptors.Descriptor stateDescriptor;
+
     /**
      * Creates a new storage instance.
      *
@@ -64,16 +67,17 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
      */
     public static <I> JdbcRecordStorage<I> newInstance(DataSourceWrapper dataSource,
                                                        boolean multitenant,
-                                                       EntityStorageQueryFactory<I> queryFactory)
+                                                       EntityStorageQueryFactory<I> queryFactory, Descriptors.Descriptor stateDescriptor)
             throws DatabaseException {
-        return new JdbcRecordStorage<>(dataSource, multitenant, queryFactory);
+        return new JdbcRecordStorage<>(dataSource, multitenant, queryFactory, stateDescriptor);
     }
 
-    protected JdbcRecordStorage(DataSourceWrapper dataSource, boolean multitenant, EntityStorageQueryFactory<I> queryFactory)
+    protected JdbcRecordStorage(DataSourceWrapper dataSource, boolean multitenant, EntityStorageQueryFactory<I> queryFactory, Descriptors.Descriptor stateDescriptor)
             throws DatabaseException {
         super(multitenant);
         this.dataSource = dataSource;
         this.queryFactory = queryFactory;
+        this.stateDescriptor = stateDescriptor;
         queryFactory.setLogger(LogSingleton.INSTANCE.value);
         queryFactory.newCreateEntityTableQuery().execute();
     }
@@ -97,7 +101,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
 
     @Override
     protected Iterable<EntityStorageRecord> readBulkInternal(Iterable<I> ids, FieldMask fieldMask) {
-        final SelectBulkQuery<EntityStorageRecord> query = queryFactory.newSelectBulkQuery(ids, fieldMask, EntityStorageRecord.getDescriptor());
+        final SelectBulkQuery query = queryFactory.newSelectBulkQuery(ids, fieldMask, stateDescriptor);
         final Map<?, EntityStorageRecord> recordMap;
         try {
             recordMap = query.execute();
@@ -115,7 +119,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     @SuppressWarnings("unchecked")
     @Override
     protected Map<I, EntityStorageRecord> readAllInternal(FieldMask fieldMask) {
-        final SelectBulkQuery<EntityStorageRecord> query = queryFactory.newSelectAllQuery(fieldMask, EntityStorageRecord.getDescriptor());
+        final SelectBulkQuery query = queryFactory.newSelectAllQuery(fieldMask, stateDescriptor);
         final Map<I, EntityStorageRecord> records;
 
         try {

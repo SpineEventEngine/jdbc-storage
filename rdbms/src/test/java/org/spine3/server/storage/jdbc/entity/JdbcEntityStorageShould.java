@@ -49,7 +49,7 @@ public class JdbcEntityStorageShould extends EntityStorageShould<String> {
     @Override
     protected <I> JdbcRecordStorage<I> getStorage(Class<? extends Entity<I, ?>> entityClass) {
         final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory("entityStorageTests");
-        return JdbcRecordStorage.newInstance(dataSource, false, new EntityStorageQueryFactory<I>(dataSource, entityClass));
+        return JdbcRecordStorage.newInstance(dataSource, false, new EntityStorageQueryFactory<>(dataSource, entityClass), Project.getDescriptor());
     }
 
     @Override
