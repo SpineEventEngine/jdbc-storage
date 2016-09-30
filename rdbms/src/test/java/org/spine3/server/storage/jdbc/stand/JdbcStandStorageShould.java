@@ -138,6 +138,22 @@ public class JdbcStandStorageShould {
                 .build();
     }
 
+    @SuppressWarnings("unchecked") // For mocks
+    @Test(expected = NullPointerException.class)
+    public void fail_to_initialize_without_entity_state_descriptor() {
+        final DataSourceWrapper dataSourceMock = mock(DataSourceWrapper.class);
+        final EntityStorageQueryFactory<String> queryFactoryMock = (EntityStorageQueryFactory<String>) mock(EntityStorageQueryFactory.class);
+
+        final CreateEntityTableQuery<String> queryMock = (CreateEntityTableQuery<String>) mock(CreateEntityTableQuery.class);
+        when(queryFactoryMock.newCreateEntityTableQuery()).thenReturn(queryMock);
+        doNothing().when(queryMock).execute();
+
+        JdbcStandStorage.<String>newBuilder()
+                .setEntityStorageQueryFactory(queryFactoryMock)
+                .setDataSource(dataSourceMock)
+                .build();
+    }
+
     /*
      * Read-write positive tests
      * -------------------------
@@ -246,11 +262,12 @@ public class JdbcStandStorageShould {
 
         writeToStorage(aggregate, storage, Project.class);
 
-        final FieldMask idOnly = FieldMask.newBuilder().addPaths("spine.base.aggregate.Project.id").build();
-        final FieldMask idAndName = FieldMask.newBuilder().addPaths("spine.base.aggregate.Project.id")
-                .addPaths("spine.base.aggregate.Project.name").build();
-        final FieldMask nameAndStatus = FieldMask.newBuilder().addPaths("spine.base.aggregate.Project.name")
-                .addPaths("spine.base.aggregate.Project.status").build();
+        final List<Descriptors.FieldDescriptor> fields = Project.getDescriptor().getFields();
+        final FieldMask idOnly = FieldMask.newBuilder().addPaths(fields.get(0).getFullName()).build();
+        final FieldMask idAndName = FieldMask.newBuilder().addPaths(fields.get(0).getFullName())
+                .addPaths(fields.get(1).getFullName()).build();
+        final FieldMask nameAndStatus = FieldMask.newBuilder().addPaths(fields.get(1).getFullName())
+                .addPaths(fields.get(3).getFullName()).build();
 
         final Project withIdOnly = AnyPacker.unpack(storage.read(id, idOnly).getState());
         final Project withIdAndName = AnyPacker.unpack(storage.readBulk(Collections.singleton(id), idAndName).iterator()
@@ -277,7 +294,7 @@ public class JdbcStandStorageShould {
     }
 
     private static void match(Message message, FieldMask fieldMask) {
-        final List<String> pathes = fieldMask.getPathsList();
+        final List<String> paths = fieldMask.getPathsList();
         for (Descriptors.FieldDescriptor field : message.getDescriptorForType().getFields()) {
 
             // Protobuf limitation, has no effect on the test.
@@ -285,7 +302,7 @@ public class JdbcStandStorageShould {
                 continue;
             }
 
-            assertEquals(message.hasField(field), pathes.contains(field.getName()));
+            assertEquals(message.hasField(field), paths.contains(field.getFullName()));
         }
     }
 
