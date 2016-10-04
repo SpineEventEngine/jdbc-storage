@@ -44,7 +44,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @author Dmytro Dashenkov
  */
-@SuppressWarnings("unchecked") // Due to lots of conversions (e.g. AggregateStateId <-> Object) IDE can't track types of collections.
 public class JdbcStandStorage extends StandStorage {
 
     private final JdbcRecordStorage<Object> recordStorage;
@@ -60,6 +59,7 @@ public class JdbcStandStorage extends StandStorage {
         }
     };
 
+    @SuppressWarnings("unchecked")
     protected JdbcStandStorage(Builder builder) {
         super(builder.isMultitenant);
         recordStorage = JdbcRecordStorage.newInstance(
@@ -97,12 +97,14 @@ public class JdbcStandStorage extends StandStorage {
         return recordStorage.read(id.getAggregateId());
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     protected Iterable<EntityStorageRecord> readBulkInternal(Iterable<AggregateStateId> ids) {
         final Collection pureIds = Collections2.transform(Lists.newArrayList(ids), ID_MAPPER);
         return recordStorage.readBulk(pureIds);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     protected Iterable<EntityStorageRecord> readBulkInternal(Iterable<AggregateStateId> ids, FieldMask fieldMask) {
         final Collection pureIds = Collections2.transform(Lists.newArrayList(ids), ID_MAPPER);
