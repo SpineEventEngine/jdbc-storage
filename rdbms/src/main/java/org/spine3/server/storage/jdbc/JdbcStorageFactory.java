@@ -46,7 +46,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Creates storages based on JDBC-compliant RDBMS.
  *
- * @param <I> Id type if the {@link Entity} that will be stored in the storages created by this factory.
+ * @param <I> ID type if the {@link Entity} that will be stored in the storages created by this factory.
  *
  * @author Alexander Litus
  * @author Andrey Lavrov

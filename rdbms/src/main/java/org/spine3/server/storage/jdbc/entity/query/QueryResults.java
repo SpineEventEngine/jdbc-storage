@@ -34,7 +34,7 @@ import java.sql.SQLException;
 import java.util.Map;
 
 /**
- * Util class for parsing results of a db-query ({@link ResultSet}) into required in-memory representation.
+ * Utility class for parsing the results of a DB query ({@link ResultSet}) into the required in-memory representation.
  *
  * @author Dmytro Dashenkov
  */
@@ -50,7 +50,7 @@ import java.util.Map;
      * @param resultSet Results of the query.
      * @param fieldMask {@code FieldMask} to apply to the results.
      * @param typeUrl Type of retrieved {@link org.spine3.server.entity.Entity} states.
-     * @param <Id> Id type of the {@link org.spine3.server.entity.Entity}.
+     * @param <Id> ID type of the {@link org.spine3.server.entity.Entity}.
      * @param <State> State type of the {@link org.spine3.server.entity.Entity}.
      * @return ID-to-{@link EntityStorageRecord} {@link Map} representing the query results.
      * @throws SQLException if read results contain no ID column or entity column.

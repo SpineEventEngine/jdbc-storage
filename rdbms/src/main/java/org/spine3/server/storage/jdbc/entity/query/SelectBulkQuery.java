@@ -38,7 +38,9 @@ import java.util.Map;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * <p>Implementation of {@link StorageQuery} for selecting all records or a bunch of records from a database.
+ * Implementation of {@link StorageQuery} for bulk selection.
+ * <p> Allows to read either all or specific records from a JDBC source.
+ *
  * <p>{@code SQL} analogs of this are:
  * <ul>
  *     <li>1. {@code SELECT * FROM table;}
@@ -99,7 +101,7 @@ public class SelectBulkQuery extends StorageQuery {
     }
 
     /**
-     * @return New instance of the {@link Builder}.
+     * @return new instance of the {@link Builder}.
      */
     public static Builder newBuilder() {
         return new Builder();
@@ -172,7 +174,7 @@ public class SelectBulkQuery extends StorageQuery {
         }
 
         /**
-         * @return New instance of {@code SelectBulkQuery}.
+         * @return new instance of {@code SelectBulkQuery}.
          */
         @Override
         public SelectBulkQuery build() {
