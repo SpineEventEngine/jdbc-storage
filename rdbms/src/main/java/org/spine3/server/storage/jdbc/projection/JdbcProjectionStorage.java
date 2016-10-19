@@ -20,18 +20,21 @@
 
 package org.spine3.server.storage.jdbc.projection;
 
+import com.google.protobuf.FieldMask;
 import com.google.protobuf.Timestamp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.spine3.server.storage.EntityStorage;
+import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.ProjectionStorage;
+import org.spine3.server.storage.RecordStorage;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.JdbcStorageFactory;
-import org.spine3.server.storage.jdbc.entity.JdbcEntityStorage;
+import org.spine3.server.storage.jdbc.entity.JdbcRecordStorage;
 import org.spine3.server.storage.jdbc.projection.query.ProjectionStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
 import javax.annotation.Nullable;
+import java.util.Map;
 
 import static com.google.common.base.Throwables.propagate;
 
@@ -44,7 +47,7 @@ import static com.google.common.base.Throwables.propagate;
  */
 public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
 
-    private final JdbcEntityStorage<I> entityStorage;
+    private final JdbcRecordStorage<I> entityStorage;
 
     private final ProjectionStorageQueryFactory queryFactory;
 
@@ -59,7 +62,7 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
      * @return a new storage instance
      */
     public static <I> ProjectionStorage<I> newInstance(DataSourceWrapper dataSource,
-                                                       JdbcEntityStorage<I> entityStorage,
+                                                       JdbcRecordStorage<I> entityStorage,
                                                        boolean multitenant,
                                                        ProjectionStorageQueryFactory<I> queryFactory)
             throws DatabaseException {
@@ -67,7 +70,7 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
     }
 
     protected JdbcProjectionStorage(DataSourceWrapper dataSource,
-                                  JdbcEntityStorage<I> entityStorage,
+                                  JdbcRecordStorage<I> entityStorage,
                                   boolean multitenant,
                                   ProjectionStorageQueryFactory<I> queryFactory) throws DatabaseException {
         super(multitenant);
@@ -101,7 +104,7 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
     }
 
     @Override
-    public EntityStorage<I> getEntityStorage() {
+    public RecordStorage<I> getRecordStorage() {
         return entityStorage;
     }
 
@@ -114,6 +117,26 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
         }
         // close only entityStorage because it must close dataSource by itself
         entityStorage.close();
+    }
+
+    @Override
+    protected Iterable<EntityStorageRecord> readMultipleRecords(Iterable<I> ids) {
+        return entityStorage.readMultiple(ids);
+    }
+
+    @Override
+    protected Iterable<EntityStorageRecord> readMultipleRecords(Iterable<I> ids, FieldMask fieldMask) {
+        return entityStorage.readMultiple(ids, fieldMask);
+    }
+
+    @Override
+    protected Map<I, EntityStorageRecord> readAllRecords() {
+        return entityStorage.readAll();
+    }
+
+    @Override
+    protected Map<I, EntityStorageRecord> readAllRecords(FieldMask fieldMask) {
+        return entityStorage.readAll(fieldMask);
     }
 
     private enum LogSingleton {

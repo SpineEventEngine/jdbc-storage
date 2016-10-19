@@ -22,7 +22,7 @@ package org.spine3.server.storage.jdbc.command;
 
 import org.spine3.server.storage.CommandStorage;
 import org.spine3.server.storage.CommandStorageShould;
-import org.spine3.server.storage.jdbc.JdbcStorageFactoryShould;
+import org.spine3.server.storage.jdbc.GivenDataSource;
 import org.spine3.server.storage.jdbc.command.query.CommandStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
@@ -33,7 +33,7 @@ public class JdbcCommandStorageShould extends CommandStorageShould {
 
     @Override
     protected CommandStorage getStorage() {
-        final DataSourceWrapper dataSource = JdbcStorageFactoryShould.newInMemoryDataSource("commandStorageTests");
+        final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory("commandStorageTests");
         final CommandStorage storage = JdbcCommandStorage.newInstance(dataSource, false, new CommandStorageQueryFactory(dataSource));
         return storage;
     }

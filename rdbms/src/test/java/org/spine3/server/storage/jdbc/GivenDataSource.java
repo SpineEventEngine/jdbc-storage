@@ -20,6 +20,8 @@
 
 package org.spine3.server.storage.jdbc;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
@@ -28,8 +30,16 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import static org.mockito.Mockito.*;
+import static org.spine3.base.Identifiers.newUuid;
 
 public class GivenDataSource {
+
+    public static final String DEFAULT_TABLE_NAME = "test";
+
+    /**
+     * The URL prefix of an in-memory HyperSQL DB.
+     */
+    private static final String HSQL_IN_MEMORY_DB_URL_PREFIX = "jdbc:hsqldb:mem:";
 
     @SuppressWarnings("ThrowableInstanceNeverThrown")
     private static final SQLException EXCEPTION = new SQLException("");
@@ -67,6 +77,19 @@ public class GivenDataSource {
 
     public static ClosableDataSource whichIsAutoCloseable(){
         return mock(ClosableDataSource.class);
+    }
+
+    public static DataSourceWrapper whichIsStoredInMemory(String dbName) {
+        final HikariConfig config = new HikariConfig();
+        final String dbUrl = prefix(dbName);
+        config.setJdbcUrl(dbUrl);
+        // not setting username and password is OK for in-memory database
+        final DataSourceWrapper dataSource = DataSourceWrapper.wrap(new HikariDataSource(config));
+        return dataSource;
+    }
+
+    public static String prefix(String dbNamePrefix) {
+        return HSQL_IN_MEMORY_DB_URL_PREFIX + dbNamePrefix + newUuid();
     }
 
     @SuppressWarnings("InterfaceNeverImplemented")

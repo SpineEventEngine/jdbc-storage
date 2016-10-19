@@ -22,7 +22,7 @@ package org.spine3.server.storage.jdbc.projection.query;
 
 import com.google.protobuf.Timestamp;
 import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.query.Query;
+import org.spine3.server.storage.jdbc.query.StorageQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 
 import javax.annotation.Nullable;
@@ -41,7 +41,7 @@ import static org.spine3.validate.Validate.isDefault;
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-public class SelectTimestampQuery extends Query {
+public class SelectTimestampQuery extends StorageQuery {
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE = "SELECT " +
             SECONDS_COL + ", " +
@@ -79,7 +79,7 @@ public class SelectTimestampQuery extends Query {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder extends Query.Builder<Builder, SelectTimestampQuery> {
+    public static class Builder extends StorageQuery.Builder<Builder, SelectTimestampQuery> {
 
         @Override
         public SelectTimestampQuery build() {

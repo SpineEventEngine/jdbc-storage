@@ -22,10 +22,11 @@ package org.spine3.server.storage.jdbc.entity;
 
 import org.junit.Test;
 import org.spine3.server.entity.Entity;
-import org.spine3.server.storage.EntityStorage;
 import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.EntityStorageShould;
+import org.spine3.server.storage.RecordStorage;
 import org.spine3.server.storage.jdbc.DatabaseException;
+import org.spine3.server.storage.jdbc.GivenDataSource;
 import org.spine3.server.storage.jdbc.entity.query.EntityStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.test.storage.Project;
@@ -33,7 +34,6 @@ import org.spine3.test.storage.Project;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 import static org.spine3.base.Identifiers.newUuid;
-import static org.spine3.server.storage.jdbc.JdbcStorageFactoryShould.newInMemoryDataSource;
 
 /**
  * @author Alexander Litus
@@ -42,14 +42,14 @@ import static org.spine3.server.storage.jdbc.JdbcStorageFactoryShould.newInMemor
 public class JdbcEntityStorageShould extends EntityStorageShould<String> {
 
     @Override
-    protected EntityStorage<String> getStorage() {
+    protected RecordStorage<String> getStorage() {
         return getStorage(TestEntityWithStringId.class);
     }
 
     @Override
-    protected <I> JdbcEntityStorage<I> getStorage(Class<? extends Entity<I, ?>> entityClass) {
-        final DataSourceWrapper dataSource = newInMemoryDataSource("entityStorageTests");
-        return JdbcEntityStorage.newInstance(dataSource, false, new EntityStorageQueryFactory<I>(dataSource, entityClass));
+    protected <I> JdbcRecordStorage<I> getStorage(Class<? extends Entity<I, ?>> entityClass) {
+        final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory("entityStorageTests");
+        return JdbcRecordStorage.newInstance(dataSource, false, new EntityStorageQueryFactory<>(dataSource, entityClass), Project.getDescriptor());
     }
 
     @Override
@@ -59,10 +59,10 @@ public class JdbcEntityStorageShould extends EntityStorageShould<String> {
 
     @Test
     public void close_itself_and_throw_exception_on_read() {
-        final JdbcEntityStorage<String> storage = getStorage(TestEntityWithStringId.class);
+        final JdbcRecordStorage<String> storage = getStorage(TestEntityWithStringId.class);
         storage.close();
         try {
-            storage.readInternal("any-id");
+            storage.readRecord("any-id");
         } catch (DatabaseException ignored) {
             // is OK because the storage is closed
             return;
@@ -72,13 +72,13 @@ public class JdbcEntityStorageShould extends EntityStorageShould<String> {
 
     @Test
     public void clear_itself() {
-        final JdbcEntityStorage<String> storage = getStorage(TestEntityWithStringId.class);
+        final JdbcRecordStorage<String> storage = getStorage(TestEntityWithStringId.class);
         final String id = newUuid();
         final EntityStorageRecord record = newStorageRecord();
-        storage.writeInternal(id, record);
+        storage.writeRecord(id, record);
         storage.clear();
 
-        final EntityStorageRecord actual = storage.readInternal(id);
+        final EntityStorageRecord actual = storage.readRecord(id);
         assertNull(actual);
     }
 

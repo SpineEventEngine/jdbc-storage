@@ -105,7 +105,7 @@ public class JdbcEventStorage extends EventStorage {
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     @Override
-    protected void writeInternal(EventStorageRecord record) throws DatabaseException {
+    protected void writeRecord(EventStorageRecord record) throws DatabaseException {
         if (containsRecord(record.getEventId())) {
            queryFactory.newUpdateEventQuery(record).execute();
         } else {
@@ -120,7 +120,7 @@ public class JdbcEventStorage extends EventStorage {
      */
     @Nullable
     @Override
-    protected EventStorageRecord readInternal(EventId eventId) throws DatabaseException {
+    protected EventStorageRecord readRecord(EventId eventId) throws DatabaseException {
         final String id = eventId.getUuid();
         final EventStorageRecord record = queryFactory.newSelectEventByIdQuery(id).execute();
         return record;

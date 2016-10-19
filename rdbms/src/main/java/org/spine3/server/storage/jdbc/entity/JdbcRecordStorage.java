@@ -20,17 +20,24 @@
 
 package org.spine3.server.storage.jdbc.entity;
 
-import com.google.api.client.repackaged.com.google.common.annotations.VisibleForTesting;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.protobuf.Descriptors;
+import com.google.protobuf.FieldMask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.spine3.server.storage.EntityStorage;
 import org.spine3.server.storage.EntityStorageRecord;
+import org.spine3.server.storage.RecordStorage;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.JdbcStorageFactory;
 import org.spine3.server.storage.jdbc.entity.query.EntityStorageQueryFactory;
+import org.spine3.server.storage.jdbc.entity.query.SelectBulkQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
 import javax.annotation.Nullable;
+import java.sql.SQLException;
+import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Throwables.propagate;
@@ -42,11 +49,13 @@ import static com.google.common.base.Throwables.propagate;
  * @see JdbcStorageFactory
  * @author Alexander Litus
  */
-public class JdbcEntityStorage<I> extends EntityStorage<I> {
+public class JdbcRecordStorage<I> extends RecordStorage<I> {
 
     private final DataSourceWrapper dataSource;
 
     private final EntityStorageQueryFactory<I> queryFactory;
+
+    private final Descriptors.Descriptor stateDescriptor;
 
     /**
      * Creates a new storage instance.
@@ -56,18 +65,19 @@ public class JdbcEntityStorage<I> extends EntityStorage<I> {
      * @param queryFactory          factory that generates queries for interaction with entity table
      * @throws DatabaseException    if an error occurs during an interaction with the DB
      */
-    public static <I> JdbcEntityStorage<I> newInstance(DataSourceWrapper dataSource,
+    public static <I> JdbcRecordStorage<I> newInstance(DataSourceWrapper dataSource,
                                                        boolean multitenant,
-                                                       EntityStorageQueryFactory<I> queryFactory)
+                                                       EntityStorageQueryFactory<I> queryFactory, Descriptors.Descriptor stateDescriptor)
             throws DatabaseException {
-        return new JdbcEntityStorage<>(dataSource, multitenant, queryFactory);
+        return new JdbcRecordStorage<>(dataSource, multitenant, queryFactory, stateDescriptor);
     }
 
-    protected JdbcEntityStorage(DataSourceWrapper dataSource, boolean multitenant, EntityStorageQueryFactory<I> queryFactory)
+    protected JdbcRecordStorage(DataSourceWrapper dataSource, boolean multitenant, EntityStorageQueryFactory<I> queryFactory, Descriptors.Descriptor stateDescriptor)
             throws DatabaseException {
         super(multitenant);
         this.dataSource = dataSource;
         this.queryFactory = queryFactory;
+        this.stateDescriptor = stateDescriptor;
         queryFactory.setLogger(LogSingleton.INSTANCE.value);
         queryFactory.newCreateEntityTableQuery().execute();
     }
@@ -79,9 +89,46 @@ public class JdbcEntityStorage<I> extends EntityStorage<I> {
      */
     @Nullable
     @Override
-    protected EntityStorageRecord readInternal(I id) throws DatabaseException {
+    protected EntityStorageRecord readRecord(I id) throws DatabaseException {
         final EntityStorageRecord record = queryFactory.newSelectEntityByIdQuery(id).execute();
         return record;
+    }
+
+    @Override
+    protected Iterable<EntityStorageRecord> readMultipleRecords(Iterable<I> ids) {
+        return readMultipleRecords(ids, FieldMask.getDefaultInstance());
+    }
+
+    @Override
+    protected Iterable<EntityStorageRecord> readMultipleRecords(Iterable<I> ids, FieldMask fieldMask) {
+        final SelectBulkQuery query = queryFactory.newSelectBulkQuery(ids, fieldMask, stateDescriptor);
+        final Map<?, EntityStorageRecord> recordMap;
+        try {
+            recordMap = query.execute();
+        } catch (SQLException e) {
+            throw new DatabaseException(e);
+        }
+        return ImmutableList.copyOf(recordMap.values());
+    }
+
+    @Override
+    protected Map<I, EntityStorageRecord> readAllRecords() {
+        return readAllRecords(FieldMask.getDefaultInstance());
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    protected Map<I, EntityStorageRecord> readAllRecords(FieldMask fieldMask) {
+        final SelectBulkQuery query = queryFactory.newSelectAllQuery(fieldMask, stateDescriptor);
+        final Map<I, EntityStorageRecord> records;
+
+        try {
+            records = (Map<I, EntityStorageRecord>) query.execute();
+        } catch (SQLException e) {
+            throw new DatabaseException(e);
+        }
+
+        return ImmutableMap.copyOf(records);
     }
 
     /**
@@ -91,7 +138,7 @@ public class JdbcEntityStorage<I> extends EntityStorage<I> {
      */
     @VisibleForTesting
     @Override
-    protected void writeInternal(I id, EntityStorageRecord record) throws DatabaseException {
+    protected void writeRecord(I id, EntityStorageRecord record) throws DatabaseException {
         checkArgument(record.hasState(), "entity state");
 
         if (containsRecord(id)) {
@@ -129,6 +176,6 @@ public class JdbcEntityStorage<I> extends EntityStorage<I> {
     private enum LogSingleton {
         INSTANCE;
         @SuppressWarnings("NonSerializableFieldInSerializableClass")
-        private final Logger value = LoggerFactory.getLogger(JdbcEntityStorage.class);
+        private final Logger value = LoggerFactory.getLogger(JdbcRecordStorage.class);
     }
 }

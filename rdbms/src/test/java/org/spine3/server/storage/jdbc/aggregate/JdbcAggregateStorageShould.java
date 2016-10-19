@@ -26,13 +26,14 @@ import org.spine3.server.aggregate.Aggregate;
 import org.spine3.server.storage.AggregateStorage;
 import org.spine3.server.storage.AggregateStorageShould;
 import org.spine3.server.storage.jdbc.DatabaseException;
+import org.spine3.server.storage.jdbc.GivenDataSource;
 import org.spine3.server.storage.jdbc.aggregate.query.AggregateStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.test.storage.Project;
 import org.spine3.test.storage.ProjectId;
 
 import static org.junit.Assert.fail;
-import static org.spine3.server.storage.jdbc.JdbcStorageFactoryShould.newInMemoryDataSource;
+
 
 /**
  * @author Alexander Litus
@@ -48,7 +49,7 @@ public class JdbcAggregateStorageShould extends AggregateStorageShould {
 
     @Override
     protected <I> JdbcAggregateStorage<I> getStorage(Class<? extends Aggregate<I, ? extends Message, ?>> aggregateClass) {
-        final DataSourceWrapper dataSource = newInMemoryDataSource("aggregateStorageTests");
+        final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory("aggregateStorageTests");
         return JdbcAggregateStorage.newInstance(dataSource, false, new AggregateStorageQueryFactory<>(dataSource, aggregateClass));
     }
 

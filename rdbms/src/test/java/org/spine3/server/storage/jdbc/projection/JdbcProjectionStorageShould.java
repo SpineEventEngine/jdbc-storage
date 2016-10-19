@@ -23,12 +23,12 @@ package org.spine3.server.storage.jdbc.projection;
 import org.spine3.server.projection.Projection;
 import org.spine3.server.storage.ProjectionStorage;
 import org.spine3.server.storage.ProjectionStorageShould;
-import org.spine3.server.storage.jdbc.JdbcStorageFactoryShould;
-import org.spine3.server.storage.jdbc.entity.JdbcEntityStorage;
+import org.spine3.server.storage.jdbc.GivenDataSource;
+import org.spine3.server.storage.jdbc.entity.JdbcRecordStorage;
 import org.spine3.server.storage.jdbc.entity.query.EntityStorageQueryFactory;
 import org.spine3.server.storage.jdbc.projection.query.ProjectionStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.test.storage.Project;
+import org.spine3.test.projection.Project;
 
 import static org.spine3.base.Identifiers.newUuid;
 
@@ -39,9 +39,13 @@ public class JdbcProjectionStorageShould extends ProjectionStorageShould<String>
 
     @Override
     protected ProjectionStorage<String> getStorage() {
-        final DataSourceWrapper dataSource = JdbcStorageFactoryShould.newInMemoryDataSource("projectionStorageTests");
+        final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory("projectionStorageTests");
         final Class<TestProjection> projectionClass = TestProjection.class;
-        final JdbcEntityStorage<String> entityStorage = JdbcEntityStorage.newInstance(dataSource, false, new EntityStorageQueryFactory<>(dataSource, projectionClass));
+        final JdbcRecordStorage<String> entityStorage = JdbcRecordStorage.newInstance(
+                dataSource,
+                false,
+                new EntityStorageQueryFactory<>(dataSource, projectionClass),
+                Project.getDescriptor());
         return JdbcProjectionStorage.newInstance(dataSource, entityStorage, false, new ProjectionStorageQueryFactory<>(dataSource, projectionClass));
     }
 

@@ -20,10 +20,13 @@
 
 package org.spine3.server.storage.jdbc.entity.query;
 
+import com.google.protobuf.Descriptors;
+import com.google.protobuf.FieldMask;
+import com.google.protobuf.Message;
 import org.slf4j.Logger;
 import org.spine3.server.entity.Entity;
-import org.spine3.server.storage.EntityStorage;
 import org.spine3.server.storage.EntityStorageRecord;
+import org.spine3.server.storage.RecordStorage;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbTableNameFactory;
 import org.spine3.server.storage.jdbc.util.IdColumn;
@@ -44,7 +47,7 @@ public class EntityStorageQueryFactory<I> {
      * Creates a new instance.
      *
      * @param dataSource    instance of {@link DataSourceWrapper}
-     * @param entityClass   entity class of corresponding {@link EntityStorage} instance
+     * @param entityClass   entity class of corresponding {@link RecordStorage} instance
      */
     public EntityStorageQueryFactory(DataSourceWrapper dataSource, Class<? extends Entity<I, ?>> entityClass) {
         this.idColumn = IdColumn.newInstance(entityClass);
@@ -109,6 +112,29 @@ public class EntityStorageQueryFactory<I> {
         final DeleteAllQuery.Builder builder = DeleteAllQuery.newBuilder(tableName)
                 .setDataSource(dataSource)
                 .setLogger(logger);
+        return builder.build();
+    }
+
+    @SuppressWarnings("unchecked")
+    public <M extends Message> SelectBulkQuery newSelectAllQuery(FieldMask fieldMask, Descriptors.Descriptor descriptor) {
+        final SelectBulkQuery.Builder builder = SelectBulkQuery.newBuilder(tableName)
+                .setFieldMask(fieldMask)
+                .setMessageDescriptor(descriptor)
+                .setLogger(logger)
+                .setDataSource(dataSource);
+
+        return builder.build();
+    }
+
+    @SuppressWarnings("unchecked")
+    public <M extends Message> SelectBulkQuery newSelectBulkQuery(Iterable<?> ids, FieldMask fieldMask, Descriptors.Descriptor descriptor) {
+        final SelectBulkQuery.Builder builder = SelectBulkQuery.newBuilder()
+                .setIdsQuery(tableName, ids)
+                .setFieldMask(fieldMask)
+                .setMessageDescriptor(descriptor)
+                .setLogger(logger)
+                .setDataSource(dataSource);
+
         return builder.build();
     }
 

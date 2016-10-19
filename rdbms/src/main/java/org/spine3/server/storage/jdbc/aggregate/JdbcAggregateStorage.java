@@ -116,7 +116,7 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     @Override
-    protected void writeInternal(I id, AggregateStorageRecord record) throws DatabaseException {
+    protected void writeRecord(I id, AggregateStorageRecord record) throws DatabaseException {
         queryFactory.newInsertRecordQuery(id, record).execute();
     }
 

@@ -21,26 +21,18 @@
 package org.spine3.server.storage.jdbc;
 
 import com.google.protobuf.StringValue;
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
 import org.junit.Before;
 import org.junit.Test;
 import org.spine3.server.aggregate.Aggregate;
 import org.spine3.server.entity.Entity;
 import org.spine3.server.projection.Projection;
-import org.spine3.server.storage.AggregateStorage;
-import org.spine3.server.storage.CommandStorage;
-import org.spine3.server.storage.EntityStorage;
-import org.spine3.server.storage.EventStorage;
-import org.spine3.server.storage.ProjectionStorage;
-import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
+import org.spine3.server.storage.*;
 import org.spine3.test.storage.Project;
 
 import javax.sql.DataSource;
 
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
-import static org.spine3.base.Identifiers.newUuid;
 
 /**
  * @author Alexander Litus
@@ -48,34 +40,41 @@ import static org.spine3.base.Identifiers.newUuid;
 @SuppressWarnings({"InstanceMethodNamingConvention", "MagicNumber", "DuplicateStringLiteralInspection"})
 public class JdbcStorageFactoryShould {
 
-    /**
-     * The URL prefix of an in-memory HyperSQL DB.
-     */
-    private static final String HSQL_IN_MEMORY_DB_URL_PREFIX = "jdbc:hsqldb:mem:";
+
 
     private JdbcStorageFactory factory;
 
     @Before
     public void setUpTest() {
-        final String dbUrl = newInMemoryDbUrl("factoryTests");
+        final String dbUrl = GivenDataSource.prefix("factoryTests");
         final DataSourceConfig config = DataSourceConfig.newBuilder()
                 .setJdbcUrl(dbUrl)
                 .setUsername("SA")
                 .setPassword("pwd")
                 .setMaxPoolSize(12)
                 .build();
-        factory = JdbcStorageFactory.newInstance(config, false);
+        factory = JdbcStorageFactory.newBuilder()
+                .setDataSource(config)
+                .setMultitenant(false)
+                .setEntityClass(TestAggregate.class)
+                .setEntityStateDescriptor(StringValue.getDescriptor())
+                .build();
     }
 
     @Test
     public void allow_to_use_custom_data_source(){
-        final JdbcStorageFactory factory = JdbcStorageFactory.newInstance(mock(DataSource.class), false);
+        final JdbcStorageFactory factory = JdbcStorageFactory.newBuilder()
+                .setDataSource(mock(DataSource.class))
+                .setEntityClass(TestProjection.class)
+                .setEntityStateDescriptor(Project.getDescriptor())
+                .build();
+
         assertNotNull(factory);
     }
 
     @Test
-    public void create_entity_storage() {
-        final EntityStorage<String> storage = factory.createEntityStorage(TestEntity.class);
+    public void create_record_storage() {
+        final RecordStorage<String> storage = factory.createRecordStorage(TestEntity.class);
         assertNotNull(storage);
     }
 
@@ -103,18 +102,13 @@ public class JdbcStorageFactoryShould {
         assertNotNull(storage);
     }
 
-    public static DataSourceWrapper newInMemoryDataSource(String dbName) {
-        final HikariConfig config = new HikariConfig();
-        final String dbUrl = newInMemoryDbUrl(dbName);
-        config.setJdbcUrl(dbUrl);
-        // not setting username and password is OK for in-memory database
-        final DataSourceWrapper dataSource = DataSourceWrapper.wrap(new HikariDataSource(config));
-        return dataSource;
+    @Test
+    public void create_stand_storage() {
+        final StandStorage storage = factory.createStandStorage();
+        assertNotNull(storage);
     }
 
-    private static String newInMemoryDbUrl(String dbNamePrefix) {
-        return HSQL_IN_MEMORY_DB_URL_PREFIX + dbNamePrefix + newUuid();
-    }
+
 
     private static class TestEntity extends Entity<String, StringValue> {
 

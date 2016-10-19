@@ -29,13 +29,13 @@ import java.sql.PreparedStatement;
 /**
  * @author Andrey Lavrov
  */
-public class Query {
+public class StorageQuery {
 
     private final String query;
     private final DataSourceWrapper dataSource;
     private final Logger logger;
 
-    protected Query(Builder<? extends Builder, ? extends Query> builder) {
+    protected StorageQuery(Builder<? extends Builder, ? extends StorageQuery> builder) {
         this.query = builder.query;
         this.dataSource = builder.dataSource;
         this.logger = builder.logger;
@@ -57,7 +57,7 @@ public class Query {
         return dataSource.getConnection(autocommit);
     }
 
-    public abstract static class Builder<B extends Builder<B, Q>, Q extends Query> {
+    public abstract static class Builder<B extends Builder<B, Q>, Q extends StorageQuery> {
 
         private String query;
         private DataSourceWrapper dataSource;
