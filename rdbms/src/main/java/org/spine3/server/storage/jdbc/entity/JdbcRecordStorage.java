@@ -89,18 +89,18 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
      */
     @Nullable
     @Override
-    protected EntityStorageRecord readInternal(I id) throws DatabaseException {
+    protected EntityStorageRecord readRecord(I id) throws DatabaseException {
         final EntityStorageRecord record = queryFactory.newSelectEntityByIdQuery(id).execute();
         return record;
     }
 
     @Override
-    protected Iterable<EntityStorageRecord> readBulkInternal(Iterable<I> ids) {
-        return readBulkInternal(ids, FieldMask.getDefaultInstance());
+    protected Iterable<EntityStorageRecord> readMultipleRecords(Iterable<I> ids) {
+        return readMultipleRecords(ids, FieldMask.getDefaultInstance());
     }
 
     @Override
-    protected Iterable<EntityStorageRecord> readBulkInternal(Iterable<I> ids, FieldMask fieldMask) {
+    protected Iterable<EntityStorageRecord> readMultipleRecords(Iterable<I> ids, FieldMask fieldMask) {
         final SelectBulkQuery query = queryFactory.newSelectBulkQuery(ids, fieldMask, stateDescriptor);
         final Map<?, EntityStorageRecord> recordMap;
         try {
@@ -112,13 +112,13 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     }
 
     @Override
-    protected Map<I, EntityStorageRecord> readAllInternal() {
-        return readAllInternal(FieldMask.getDefaultInstance());
+    protected Map<I, EntityStorageRecord> readAllRecords() {
+        return readAllRecords(FieldMask.getDefaultInstance());
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    protected Map<I, EntityStorageRecord> readAllInternal(FieldMask fieldMask) {
+    protected Map<I, EntityStorageRecord> readAllRecords(FieldMask fieldMask) {
         final SelectBulkQuery query = queryFactory.newSelectAllQuery(fieldMask, stateDescriptor);
         final Map<I, EntityStorageRecord> records;
 
@@ -138,7 +138,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
      */
     @VisibleForTesting
     @Override
-    protected void writeInternal(I id, EntityStorageRecord record) throws DatabaseException {
+    protected void writeRecord(I id, EntityStorageRecord record) throws DatabaseException {
         checkArgument(record.hasState(), "entity state");
 
         if (containsRecord(id)) {

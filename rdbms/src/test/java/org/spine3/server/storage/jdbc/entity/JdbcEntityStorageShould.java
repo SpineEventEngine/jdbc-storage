@@ -62,7 +62,7 @@ public class JdbcEntityStorageShould extends EntityStorageShould<String> {
         final JdbcRecordStorage<String> storage = getStorage(TestEntityWithStringId.class);
         storage.close();
         try {
-            storage.readInternal("any-id");
+            storage.readRecord("any-id");
         } catch (DatabaseException ignored) {
             // is OK because the storage is closed
             return;
@@ -75,10 +75,10 @@ public class JdbcEntityStorageShould extends EntityStorageShould<String> {
         final JdbcRecordStorage<String> storage = getStorage(TestEntityWithStringId.class);
         final String id = newUuid();
         final EntityStorageRecord record = newStorageRecord();
-        storage.writeInternal(id, record);
+        storage.writeRecord(id, record);
         storage.clear();
 
-        final EntityStorageRecord actual = storage.readInternal(id);
+        final EntityStorageRecord actual = storage.readRecord(id);
         assertNull(actual);
     }
 

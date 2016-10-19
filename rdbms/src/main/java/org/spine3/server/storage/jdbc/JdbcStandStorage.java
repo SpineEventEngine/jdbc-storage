@@ -93,36 +93,36 @@ public class JdbcStandStorage extends StandStorage {
 
     @Nullable
     @Override
-    protected EntityStorageRecord readInternal(AggregateStateId id) {
+    protected EntityStorageRecord readRecord(AggregateStateId id) {
         return recordStorage.read(id.getAggregateId());
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    protected Iterable<EntityStorageRecord> readBulkInternal(Iterable<AggregateStateId> ids) {
+    protected Iterable<EntityStorageRecord> readMultipleRecords(Iterable<AggregateStateId> ids) {
         final Collection pureIds = Collections2.transform(Lists.newArrayList(ids), ID_MAPPER);
-        return recordStorage.readBulk(pureIds);
+        return recordStorage.readMultiple(pureIds);
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    protected Iterable<EntityStorageRecord> readBulkInternal(Iterable<AggregateStateId> ids, FieldMask fieldMask) {
+    protected Iterable<EntityStorageRecord> readMultipleRecords(Iterable<AggregateStateId> ids, FieldMask fieldMask) {
         final Collection pureIds = Collections2.transform(Lists.newArrayList(ids), ID_MAPPER);
-        return recordStorage.readBulk(pureIds, fieldMask);
+        return recordStorage.readMultiple(pureIds, fieldMask);
     }
 
     @Override
-    protected Map<AggregateStateId, EntityStorageRecord> readAllInternal() {
+    protected Map<AggregateStateId, EntityStorageRecord> readAllRecords() {
         return retrieveRecordsWithValidIds(recordStorage.readAll());
     }
 
     @Override
-    protected Map<AggregateStateId, EntityStorageRecord> readAllInternal(FieldMask fieldMask) {
+    protected Map<AggregateStateId, EntityStorageRecord> readAllRecords(FieldMask fieldMask) {
         return retrieveRecordsWithValidIds(recordStorage.readAll(fieldMask));
     }
 
     @Override
-    protected void writeInternal(AggregateStateId id, EntityStorageRecord record) {
+    protected void writeRecord(AggregateStateId id, EntityStorageRecord record) {
         recordStorage.write(id.getAggregateId(), record);
     }
 

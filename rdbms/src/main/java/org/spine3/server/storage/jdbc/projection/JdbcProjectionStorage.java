@@ -120,22 +120,22 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
     }
 
     @Override
-    protected Iterable<EntityStorageRecord> readBulkInternal(Iterable<I> ids) {
-        return entityStorage.readBulk(ids);
+    protected Iterable<EntityStorageRecord> readMultipleRecords(Iterable<I> ids) {
+        return entityStorage.readMultiple(ids);
     }
 
     @Override
-    protected Iterable<EntityStorageRecord> readBulkInternal(Iterable<I> ids, FieldMask fieldMask) {
-        return entityStorage.readBulk(ids, fieldMask);
+    protected Iterable<EntityStorageRecord> readMultipleRecords(Iterable<I> ids, FieldMask fieldMask) {
+        return entityStorage.readMultiple(ids, fieldMask);
     }
 
     @Override
-    protected Map<I, EntityStorageRecord> readAllInternal() {
+    protected Map<I, EntityStorageRecord> readAllRecords() {
         return entityStorage.readAll();
     }
 
     @Override
-    protected Map<I, EntityStorageRecord> readAllInternal(FieldMask fieldMask) {
+    protected Map<I, EntityStorageRecord> readAllRecords(FieldMask fieldMask) {
         return entityStorage.readAll(fieldMask);
     }
 

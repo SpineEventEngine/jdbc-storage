@@ -39,7 +39,7 @@ import org.spine3.server.storage.jdbc.entity.query.EntityStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.test.aggregate.Project;
 import org.spine3.test.aggregate.ProjectId;
-import org.spine3.test.clientservice.customer.Customer;
+import org.spine3.test.commandservice.customer.Customer;
 
 import java.util.*;
 
@@ -193,7 +193,7 @@ public class JdbcStandStorageShould {
         ids.add(AggregateStateId.of("8", typeUrl));
 
 
-        final Collection<EntityStorageRecord> readRecords = (Collection<EntityStorageRecord>) storage.readBulk(ids);
+        final Collection<EntityStorageRecord> readRecords = (Collection<EntityStorageRecord>) storage.readMultiple(ids);
         assertEquals(ids.size(), readRecords.size());
 
         assertContains(records.get(1), readRecords);
@@ -215,7 +215,7 @@ public class JdbcStandStorageShould {
         ids.add(AggregateStateId.of("invalid-id-2", typeUrl));
         ids.add(AggregateStateId.of(repeatingInvalidId, typeUrl));
 
-        final Collection<EntityStorageRecord> records = (Collection<EntityStorageRecord>) storage.readBulk(ids);
+        final Collection<EntityStorageRecord> records = (Collection<EntityStorageRecord>) storage.readMultiple(ids);
 
         assertNotNull(records);
         assertSize(0, records);
@@ -270,7 +270,7 @@ public class JdbcStandStorageShould {
                 .addPaths(fields.get(3).getFullName()).build();
 
         final Project withIdOnly = AnyPacker.unpack(storage.read(id, idOnly).getState());
-        final Project withIdAndName = AnyPacker.unpack(storage.readBulk(Collections.singleton(id), idAndName).iterator()
+        final Project withIdAndName = AnyPacker.unpack(storage.readMultiple(Collections.singleton(id), idAndName).iterator()
                 .next().getState());
         final Project withNameAndStatus = AnyPacker.unpack(storage.readAll(nameAndStatus).get(id).getState());
 
@@ -329,7 +329,7 @@ public class JdbcStandStorageShould {
     public void fail_to_fetch_records_by_zero_ids() {
         final StandStorage storage = Given.newStorage();
 
-        storage.readBulk(Collections.<AggregateStateId>emptyList());
+        storage.readMultiple(Collections.<AggregateStateId>emptyList());
     }
 
     /*
