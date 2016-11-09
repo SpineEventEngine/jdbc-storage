@@ -1,6 +1,10 @@
 
 project.ext {
     SPINE_VERSION = '0.6.0'
+
+    publishPlugin = "$rootDir/scripts/publish.gradle"
+    credentialsPropertyFile = 'credentials.properties'
+    projectsToPublish = ['rdbms']
 }
 
 allprojects {
@@ -8,11 +12,11 @@ allprojects {
     apply plugin: 'jacoco'
 
     group = 'org.spine3.jdbc'
-    version = '0.1'
 }
 
 subprojects {
     apply plugin: 'java'
+    apply plugin: 'maven-publish'
 
     sourceCompatibility = 1.7
     targetCompatibility = 1.7
@@ -62,5 +66,17 @@ subprojects {
         }
     }
 
+    task sourceJar(type: Jar) {
+        from sourceSets.main.allJava
+        classifier "sources"
+    }
+
+    task testOutputJar(type: Jar) {
+        from sourceSets.test.output
+        classifier "test"
+    }
+
     check.dependsOn jacocoTestReport
 }
+
+apply from: publishPlugin
