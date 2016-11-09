@@ -12,6 +12,7 @@ allprojects {
     apply plugin: 'jacoco'
 
     group = 'org.spine3'
+    version = SPINE_VERSION
 }
 
 subprojects {
