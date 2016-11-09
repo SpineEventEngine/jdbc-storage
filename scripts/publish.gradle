@@ -57,7 +57,7 @@ projectsToPublish.each {
             publications {
                 mavenJava(MavenPublication) {
                     groupId = "${group}"
-                    artifactId = "${currentProject.name}"
+                    artifactId = "${currentProject.artifactId}"
                     version = "${currentProject.version}"
 
                     from components.java
