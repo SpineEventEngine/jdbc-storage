@@ -6,3 +6,5 @@ before_install:
 
 after_success:
   - codecov
+  - chmod +x ./scripts/publish_artifacts.sh
+  - ./scripts/publish_artifacts.sh
