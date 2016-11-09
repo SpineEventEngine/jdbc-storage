@@ -1,6 +1,6 @@
 
 project.ext {
-    SPINE_VERSION = '0.6.0'
+    SPINE_VERSION = '0.6.2-SNAPSHOT'
 
     publishPlugin = "$rootDir/scripts/publish.gradle"
     credentialsPropertyFile = 'credentials.properties'
@@ -31,9 +31,8 @@ subprojects {
 
     repositories {
         mavenCentral()
-        maven {
-            url = 'http://maven.teamdev.com/repository/spine'
-        }
+        maven { url = 'http://maven.teamdev.com/repository/spine' }
+        maven { url = 'http://maven.teamdev.com/repository/spine-snapshots' }
     }
 
     dependencies {
