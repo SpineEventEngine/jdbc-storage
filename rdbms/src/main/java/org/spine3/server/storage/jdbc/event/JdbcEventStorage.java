@@ -59,8 +59,8 @@ import static org.spine3.util.Exceptions.wrapped;
 /**
  * The implementation of the event storage based on the RDBMS.
  *
- * @see JdbcStorageFactory
  * @author Alexander Litus
+ * @see JdbcStorageFactory
  */
 public class JdbcEventStorage extends EventStorage {
 
@@ -68,16 +68,18 @@ public class JdbcEventStorage extends EventStorage {
 
     private final EventStorageQueryFactory queryFactory;
 
-    /** Iterators which are not closed yet. */
+    /**
+     * Iterators which are not closed yet.
+     */
     private final Collection<DbIterator> iterators = newLinkedList();
 
     /**
      * Creates a new storage instance.
      *
-     * @param dataSource            the dataSource wrapper
-     * @param multitenant           defines is this storage multitenant
-     * @param queryFactory          factory that will generate queries for interaction with event table
-     * @throws DatabaseException    if an error occurs during an interaction with the DB
+     * @param dataSource   the dataSource wrapper
+     * @param multitenant  defines is this storage multitenant
+     * @param queryFactory factory that will generate queries for interaction with event table
+     * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     public static JdbcEventStorage newInstance(DataSourceWrapper dataSource,
                                                boolean multitenant,
@@ -133,9 +135,9 @@ public class JdbcEventStorage extends EventStorage {
     @Override
     protected void writeRecord(EventStorageRecord record) throws DatabaseException {
         if (containsRecord(record.getEventId())) {
-           queryFactory.newUpdateEventQuery(record).execute();
+            queryFactory.newUpdateEventQuery(record).execute();
         } else {
-           queryFactory.newInsertEventQuery(record).execute();
+            queryFactory.newInsertEventQuery(record).execute();
         }
     }
 
@@ -208,7 +210,6 @@ public class JdbcEventStorage extends EventStorage {
         }
     }
 
-
     /**
      * Predicate matching an {@link Event} to a single {@link EventFilter}.
      */
@@ -235,8 +236,7 @@ public class JdbcEventStorage extends EventStorage {
         }
 
         private boolean checkFilterEmpty() {
-            return eventFieldFilters.isEmpty()
-                    && contextFieldFilters.isEmpty();
+            return eventFieldFilters.isEmpty() && contextFieldFilters.isEmpty();
         }
 
         // Defined as nullable, parameter `event` is actually non null.
@@ -271,7 +271,6 @@ public class JdbcEventStorage extends EventStorage {
             }
 
             return true;
-
         }
 
         private static boolean checkFields(
