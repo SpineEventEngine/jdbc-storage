@@ -34,7 +34,7 @@ import static org.mockito.Mockito.mock;
  * @author Andrey Lavrov
  */
 @SuppressWarnings("UtilityClass")
-/* package */ class Given {
+class Given {
 
     @SuppressWarnings("StaticNonFinalField")
     private static Logger loggerMock = null;
@@ -43,7 +43,7 @@ import static org.mockito.Mockito.mock;
     private Given() {
     }
 
-    /* package */ static InsertEventRecordQuery getInsertEventRecordQueryMock() throws SQLException {
+    static InsertEventRecordQuery getInsertEventRecordQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
         final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnSettingStatementParam();
         final InsertEventRecordQuery.Builder builder = InsertEventRecordQuery.newBuilder()
@@ -54,7 +54,7 @@ import static org.mockito.Mockito.mock;
         return builder.build();
     }
 
-    /* package */ static UpdateEventRecordQuery getUpdateEventRecordQueryMock() throws SQLException {
+    static UpdateEventRecordQuery getUpdateEventRecordQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
         final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnSettingStatementParam();
         final UpdateEventRecordQuery.Builder builder = UpdateEventRecordQuery.newBuilder()
@@ -66,7 +66,7 @@ import static org.mockito.Mockito.mock;
     }
 
     @SuppressWarnings("StaticVariableUsedBeforeInitialization")
-    /* package */ static Logger getLoggerMock() {
+    static Logger getLoggerMock() {
         return loggerMock;
     }
 }

@@ -34,7 +34,7 @@ import static org.mockito.Mockito.*;
  * @author Andrey Lavrov
  */
 @SuppressWarnings("UtilityClass")
-/* package */ class Given {
+class Given {
 
     @SuppressWarnings("StaticNonFinalField")
     private static Logger loggerMock = null;
@@ -43,7 +43,7 @@ import static org.mockito.Mockito.*;
     private Given() {
     }
 
-    /* package */ static InsertAggregateRecordQuery getInsertAggregateRecordQueryMock() throws SQLException {
+    static InsertAggregateRecordQuery getInsertAggregateRecordQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
         final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnSettingStatementParam();
         final InsertAggregateRecordQuery.Builder<String> builder = InsertAggregateRecordQuery.<String>newBuilder(anyString())
@@ -54,7 +54,7 @@ import static org.mockito.Mockito.*;
         return builder.build();
     }
 
-    /* package */ static InsertEventCountQuery getInsertEventCountQueryMock() throws SQLException {
+    static InsertEventCountQuery getInsertEventCountQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
         final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnSettingStatementParam();
         final InsertEventCountQuery.Builder<String> builder = InsertEventCountQuery.<String>newBuilder(anyString())
@@ -64,7 +64,7 @@ import static org.mockito.Mockito.*;
         return builder.build();
     }
 
-    /* package */ static SelectEventCountByIdQuery getSelectEventCountByIdQueryMock() throws SQLException {
+    static SelectEventCountByIdQuery getSelectEventCountByIdQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
         final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnExecuteStatement();
         final SelectEventCountByIdQuery.Builder<String> builder = SelectEventCountByIdQuery.<String>newBuilder(anyString())
@@ -74,7 +74,7 @@ import static org.mockito.Mockito.*;
         return builder.build();
     }
 
-    /* package */ static UpdateEventCountQuery getUpdateEventCountQueryMock() throws SQLException {
+    static UpdateEventCountQuery getUpdateEventCountQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
         final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnSettingStatementParam();
         final UpdateEventCountQuery.Builder<String> builder = UpdateEventCountQuery.<String>newBuilder(anyString())
@@ -85,7 +85,7 @@ import static org.mockito.Mockito.*;
     }
 
     @SuppressWarnings("StaticVariableUsedBeforeInitialization")
-    /* package */ static Logger getLoggerMock() {
+    static Logger getLoggerMock() {
         return loggerMock;
     }
 }

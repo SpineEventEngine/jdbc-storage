@@ -169,7 +169,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
      *
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
-    /*package*/ void clear() throws DatabaseException {
+    void clear() throws DatabaseException {
        queryFactory.newDeleteAllQuery().execute();
     }
 

@@ -39,7 +39,7 @@ import java.util.Map;
  * @author Dmytro Dashenkov
  */
 @SuppressWarnings("UtilityClass")
-/* package */ class QueryResults {
+class QueryResults {
 
     private QueryResults() {
     }
@@ -56,7 +56,7 @@ import java.util.Map;
      * @throws SQLException if read results contain no ID column or entity column.
      * @see EntityTable
      */
-    /* package */ static <Id, State extends Message> Map<Id, EntityStorageRecord> parse(
+    static <Id, State extends Message> Map<Id, EntityStorageRecord> parse(
             ResultSet resultSet,
             FieldMask fieldMask,
             TypeUrl typeUrl)

@@ -34,7 +34,7 @@ import java.sql.SQLException;
 
 import static org.mockito.Mockito.*;
 
-/* package */ class Given {
+class Given {
 
     @SuppressWarnings("StaticNonFinalField")
     private static Logger loggerMock = null;
@@ -44,7 +44,7 @@ import static org.mockito.Mockito.*;
     // Apply this for all such cases in all Given classes.
 
     // TODO:2016-08-02:alexander.litus: rename all such methods to `createTableQueryWhichThrows`.
-    /* package */ static CreateTableQuery getCreateTableQueryMock() throws SQLException {
+    static CreateTableQuery getCreateTableQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
         final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnExecuteStatement();
         final CreateTableMock.Builder builder = CreateTableMock.newBuilder()
@@ -53,7 +53,7 @@ import static org.mockito.Mockito.*;
         return builder.build();
     }
 
-    /* package */ static SelectByIdQueryMock getSelectByIdQueryMock() throws SQLException {
+    static SelectByIdQueryMock getSelectByIdQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
         final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnExecuteStatement();
         final SelectByIdQueryMock.Builder builder = SelectByIdQueryMock.newBuilder()
@@ -63,7 +63,7 @@ import static org.mockito.Mockito.*;
         return builder.build();
     }
 
-    /* package */ static SelectByIdQueryMock getSelectByIdQueryReturningEmptyResultSetMock() throws SQLException {
+    static SelectByIdQueryMock getSelectByIdQueryReturningEmptyResultSetMock() throws SQLException {
         loggerMock = mock(Logger.class);
 
         final DataSourceWrapper dataSourceMock = mock(DataSourceWrapper.class);
@@ -87,7 +87,7 @@ import static org.mockito.Mockito.*;
         return builder.build();
     }
 
-    /* package */ static WriteQueryMock getWriteQueryMock() throws SQLException {
+    static WriteQueryMock getWriteQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
         final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnExecuteStatement();
         final WriteQueryMock.Builder builder = WriteQueryMock.newBuilder()
@@ -96,7 +96,7 @@ import static org.mockito.Mockito.*;
         return builder.build();
     }
 
-    /* package */ static WriteRecordQueryMock getWriteRecordQueryMock() throws SQLException {
+    static WriteRecordQueryMock getWriteRecordQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
         final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnExecuteStatement();
         final WriteRecordQueryMock.Builder builder = WriteRecordQueryMock.newBuilder()
@@ -221,7 +221,7 @@ import static org.mockito.Mockito.*;
     }
 
     @SuppressWarnings("StaticVariableUsedBeforeInitialization")
-    /* package */ static Logger getLoggerMock() {
+    static Logger getLoggerMock() {
         return loggerMock;
     }
 }
