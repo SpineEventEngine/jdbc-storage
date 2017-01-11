@@ -66,7 +66,7 @@ public class Serializer {
     public static <M extends Message> M deserialize(byte[] bytes, Descriptor messageDescriptor) {
         checkNotNull(bytes);
         final Any.Builder builder = Any.newBuilder();
-        final String typeUrl = TypeUrl.of(messageDescriptor).value();
+        final String typeUrl = TypeUrl.from(messageDescriptor).value();
         builder.setTypeUrl(typeUrl);
         final ByteString byteString = ByteString.copyFrom(bytes);
         builder.setValue(byteString);

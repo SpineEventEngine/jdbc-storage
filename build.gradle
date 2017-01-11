@@ -1,6 +1,6 @@
 
 project.ext {
-    SPINE_VERSION = '0.6.2-SNAPSHOT'
+    SPINE_VERSION = '0.7.0'
 
     publishPlugin = "$rootDir/scripts/publish.gradle"
     credentialsPropertyFile = 'credentials.properties'
@@ -37,9 +37,9 @@ subprojects {
 
     dependencies {
         // Spine
-        compile group: 'org.spine3', name: 'server', version: project.SPINE_VERSION, changing: true
-        compile group: 'org.spine3', name: 'client', version: project.SPINE_VERSION, changing: true
-        compile group: 'org.spine3', name: 'testutil', version: project.SPINE_VERSION, changing: true
+        compile group: 'org.spine3', name: 'spine-server-core', version: project.SPINE_VERSION, changing: true
+        compile group: 'org.spine3', name: 'spine-client-core', version: project.SPINE_VERSION, changing: true
+        compile group: 'org.spine3', name: 'spine-testutil-core', version: project.SPINE_VERSION, changing: true
 
         // Guava
         compile group: 'com.google.guava', name: 'guava', version: '19.0'
