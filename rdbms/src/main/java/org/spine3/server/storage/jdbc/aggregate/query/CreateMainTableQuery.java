@@ -22,7 +22,10 @@ package org.spine3.server.storage.jdbc.aggregate.query;
 
 import org.spine3.server.storage.jdbc.query.CreateTableQuery;
 
-import static org.spine3.server.storage.jdbc.aggregate.query.Table.AggregateRecord.*;
+import static org.spine3.server.storage.jdbc.aggregate.query.Table.AggregateRecord.AGGREGATE_COL;
+import static org.spine3.server.storage.jdbc.aggregate.query.Table.AggregateRecord.ID_COL;
+import static org.spine3.server.storage.jdbc.aggregate.query.Table.AggregateRecord.NANOS_COL;
+import static org.spine3.server.storage.jdbc.aggregate.query.Table.AggregateRecord.SECONDS_COL;
 
 /**
  * Query that creates a new {@link Table.AggregateRecord} if it does not exist.

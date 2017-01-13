@@ -30,7 +30,10 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import static java.lang.String.format;
-import static org.spine3.server.storage.jdbc.aggregate.query.Table.AggregateRecord.*;
+import static org.spine3.server.storage.jdbc.aggregate.query.Table.AggregateRecord.AGGREGATE_COL;
+import static org.spine3.server.storage.jdbc.aggregate.query.Table.AggregateRecord.ID_COL;
+import static org.spine3.server.storage.jdbc.aggregate.query.Table.AggregateRecord.NANOS_COL;
+import static org.spine3.server.storage.jdbc.aggregate.query.Table.AggregateRecord.SECONDS_COL;
 
 /**
  * Query that inserts a new {@link AggregateStorageRecord} to the {@link Table.AggregateRecord}.

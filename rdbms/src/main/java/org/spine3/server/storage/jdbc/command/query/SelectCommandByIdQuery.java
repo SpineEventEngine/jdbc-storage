@@ -30,7 +30,12 @@ import javax.annotation.Nullable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import static org.spine3.server.storage.jdbc.command.query.CommandTable.*;
+import static org.spine3.server.storage.jdbc.command.query.CommandTable.COMMAND_COL;
+import static org.spine3.server.storage.jdbc.command.query.CommandTable.COMMAND_STATUS_COL;
+import static org.spine3.server.storage.jdbc.command.query.CommandTable.ERROR_COL;
+import static org.spine3.server.storage.jdbc.command.query.CommandTable.FAILURE_COL;
+import static org.spine3.server.storage.jdbc.command.query.CommandTable.ID_COL;
+import static org.spine3.server.storage.jdbc.command.query.CommandTable.TABLE_NAME;
 import static org.spine3.server.storage.jdbc.util.Serializer.deserialize;
 
 /**

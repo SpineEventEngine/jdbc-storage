@@ -26,7 +26,9 @@ import org.spine3.server.storage.jdbc.DatabaseException;
 import java.sql.SQLException;
 
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.verify;
 
 /**
  * @author Andrey Lavrov
