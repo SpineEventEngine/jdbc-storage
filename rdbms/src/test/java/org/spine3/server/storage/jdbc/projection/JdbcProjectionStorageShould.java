@@ -46,7 +46,7 @@ public class JdbcProjectionStorageShould extends ProjectionStorageShould<String>
                 false,
                 new EntityStorageQueryFactory<>(dataSource, projectionClass),
                 Project.getDescriptor());
-        return JdbcProjectionStorage.newInstance(dataSource, entityStorage, false, new ProjectionStorageQueryFactory<>(dataSource, projectionClass));
+        return JdbcProjectionStorage.newInstance(entityStorage, false, new ProjectionStorageQueryFactory<>(dataSource, projectionClass));
     }
 
     @Override

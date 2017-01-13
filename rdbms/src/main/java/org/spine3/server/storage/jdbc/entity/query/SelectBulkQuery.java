@@ -65,7 +65,7 @@ public class SelectBulkQuery extends StorageQuery {
     protected SelectBulkQuery(Builder builder) {
         super(builder);
         final Descriptors.Descriptor messageDescriptor = checkNotNull(builder.messageDescriptor);
-        this.typeUrl = TypeUrl.of(messageDescriptor);
+        this.typeUrl = TypeUrl.from(messageDescriptor);
         this.fieldMask = builder.fieldMask;
         this.arguments = builder.arguments;
     }

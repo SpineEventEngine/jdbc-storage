@@ -27,18 +27,18 @@ package org.spine3.server.storage.jdbc.projection.query;
  */
 @SuppressWarnings("UtilityClass")
 /* This table is a single row which represents timestamp of the last handled event. */
-/* package */ final class ProjectionTable {
+final class ProjectionTable {
 
     /** Last event time seconds column name. */
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    /* package */ static final String SECONDS_COL = "seconds";
+    static final String SECONDS_COL = "seconds";
 
     /** Last event time nanoseconds column name. */
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    /* package */ static final String NANOS_COL = "nanoseconds";
+    static final String NANOS_COL = "nanoseconds";
 
     /** A suffix of a table name where the last event time is stored. */
-    /* package */ static final String LAST_EVENT_TIME_TABLE_NAME_SUFFIX = "_last_event_time";
+    static final String LAST_EVENT_TIME_TABLE_NAME_SUFFIX = "_last_event_time";
 
     private ProjectionTable() {
     }

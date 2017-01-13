@@ -27,25 +27,25 @@ package org.spine3.server.storage.jdbc.command.query;
  * @author Andrey Lavrov
  */
 @SuppressWarnings("UtilityClass")
-/* package */ final class CommandTable {
+final class CommandTable {
 
     /** Commands table name. */
-    /* package */ static final String TABLE_NAME = "commands";
+    static final String TABLE_NAME = "commands";
 
     /** Command ID column name. */
-    /* package */ static final String ID_COL = "id";
+    static final String ID_COL = "id";
 
     /** Command record column name. */
-    /* package */ static final String COMMAND_COL = "command";
+    static final String COMMAND_COL = "command";
 
     /** Command status column name. */
-    /* package */ static final String COMMAND_STATUS_COL = "command_status";
+    static final String COMMAND_STATUS_COL = "command_status";
 
     /** Command error column name. */
-    /* package */ static final String ERROR_COL = "error";
+    static final String ERROR_COL = "error";
 
     /** Command failure column name. */
-    /* package */ static final String FAILURE_COL = "failure";
+    static final String FAILURE_COL = "failure";
 
     private CommandTable() {
     }

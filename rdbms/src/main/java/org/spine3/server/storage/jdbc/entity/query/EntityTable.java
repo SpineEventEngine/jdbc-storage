@@ -26,13 +26,13 @@ package org.spine3.server.storage.jdbc.entity.query;
  * @author Andrey Lavrov
  */
 @SuppressWarnings("UtilityClass")
-/* package */ final class EntityTable {
+final class EntityTable {
 
     /** Entity record column name. */
-    /* package */ static final String ENTITY_COL = "entity";
+    static final String ENTITY_COL = "entity";
 
     /** Entity ID column name. */
-    /* package */ static final String ID_COL = "id";
+    static final String ID_COL = "id";
 
     private EntityTable() {
     }
