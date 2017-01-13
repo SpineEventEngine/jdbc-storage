@@ -67,12 +67,15 @@ public class Sql {
         CREATE_TABLE("CREATE TABLE"),
         CREATE_IF_MISSING("CREATE IF NOT EXISTS"),
         DROP_TABLE("DROP TABLE"),
+        PRIMARY_KEY("PRIMARY KEY"),
 
         INSERT_INTO("INSERT INTO"),
         SELECT,
         UPDATE,
-        DELETE,
+        DELETE_FROM("DELETE FROM"),
 
+
+        ALL_ATTRIBUTES("*"),
         FROM,
         DISTINCT,
         WHERE,
@@ -84,6 +87,7 @@ public class Sql {
         NULL,
         LIKE,
         NOT,
+        IN,
         EXISTS,
         BETWEEN,
 
@@ -92,7 +96,7 @@ public class Sql {
         GROUP_BY("GROUP BY"),
         ORDER_BY("ORDER BY"),
         HAVING,
-        ACS,
+        ASC,
         DESC;
 
         private final String token;
@@ -135,7 +139,8 @@ public class Sql {
         GT(">"),
         GE(">="),
         LT("<"),
-        LE("<=");
+        LE("<="),
+        SEMICOLON(";");
 
         private final String token;
 
