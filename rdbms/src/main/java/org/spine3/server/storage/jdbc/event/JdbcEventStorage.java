@@ -20,6 +20,8 @@
 
 package org.spine3.server.storage.jdbc.event;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterators;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spine3.base.Event;
@@ -93,9 +95,10 @@ public class JdbcEventStorage extends EventStorage {
     @Override
     public Iterator<Event> iterator(EventStreamQuery query) throws DatabaseException {
         final Iterator<EventStorageRecord> iterator = queryFactory.newFilterAndSortQuery(query).execute();
-
         iterators.add((DbIterator) iterator);
-        final Iterator<Event> result = toEventIterator(iterator);
+        final Predicate<Event> filter = new MatchesStreamQuery(query);
+        final Iterator<Event> unfilteredResult = toEventIterator(iterator);
+        final Iterator<Event> result = Iterators.filter(unfilteredResult, filter);
         return result;
     }
 
