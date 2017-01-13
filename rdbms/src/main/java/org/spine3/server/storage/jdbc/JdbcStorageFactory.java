@@ -116,7 +116,6 @@ public class JdbcStorageFactory<I> implements StorageFactory {
                 entityStateDescriptor);
 
         return JdbcProjectionStorage.newInstance(
-                dataSource,
                 entityStorage,
                 false,
                 getProjectionStorageQueryFactory(dataSource, projectionClass));
