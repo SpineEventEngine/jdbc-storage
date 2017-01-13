@@ -22,6 +22,14 @@ package org.spine3.server.storage.jdbc.aggregate.query;
 
 import org.spine3.server.storage.jdbc.query.CreateTableQuery;
 
+import static org.spine3.server.storage.jdbc.Sql.Common.BRACKET_CLOSE;
+import static org.spine3.server.storage.jdbc.Sql.Common.BRACKET_OPEN;
+import static org.spine3.server.storage.jdbc.Sql.Common.COMMA;
+import static org.spine3.server.storage.jdbc.Sql.Common.SEMICOLON;
+import static org.spine3.server.storage.jdbc.Sql.Query.CREATE_IF_MISSING;
+import static org.spine3.server.storage.jdbc.Sql.Type.BIGINT;
+import static org.spine3.server.storage.jdbc.Sql.Type.BLOB;
+import static org.spine3.server.storage.jdbc.Sql.Type.INT;
 import static org.spine3.server.storage.jdbc.aggregate.query.Table.AggregateRecord.AGGREGATE_COL;
 import static org.spine3.server.storage.jdbc.aggregate.query.Table.AggregateRecord.ID_COL;
 import static org.spine3.server.storage.jdbc.aggregate.query.Table.AggregateRecord.NANOS_COL;
@@ -37,12 +45,12 @@ public class CreateMainTableQuery<I> extends CreateTableQuery<I> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
-            "CREATE TABLE IF NOT EXISTS %s (" +
-                    ID_COL + " %s, " +
-                    AGGREGATE_COL + " BLOB, " +
-                    SECONDS_COL + " BIGINT, " +
-                    NANOS_COL + " INT " +
-                    ");";
+            CREATE_IF_MISSING + "%s " + BRACKET_OPEN +
+                    ID_COL + " %s " + COMMA +
+                    AGGREGATE_COL + BLOB + COMMA +
+                    SECONDS_COL + BIGINT + COMMA +
+                    NANOS_COL + INT +
+                    BRACKET_CLOSE + SEMICOLON;
 
     protected CreateMainTableQuery(Builder<I> builder) {
         super(builder);

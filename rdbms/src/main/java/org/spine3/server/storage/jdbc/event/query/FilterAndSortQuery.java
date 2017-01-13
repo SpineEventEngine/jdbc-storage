@@ -38,6 +38,7 @@ import java.util.Iterator;
 import static org.spine3.base.Identifiers.idToString;
 import static org.spine3.server.storage.jdbc.Sql.Common.BRACKET_CLOSE;
 import static org.spine3.server.storage.jdbc.Sql.Common.BRACKET_OPEN;
+import static org.spine3.server.storage.jdbc.Sql.Common.COMMA;
 import static org.spine3.server.storage.jdbc.Sql.Common.EQUAL;
 import static org.spine3.server.storage.jdbc.Sql.Common.GT;
 import static org.spine3.server.storage.jdbc.Sql.Common.LT;
@@ -63,7 +64,7 @@ import static org.spine3.server.storage.jdbc.event.query.EventTable.SELECT_EVENT
 public class FilterAndSortQuery extends StorageQuery {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String QUERY_TEMPLATE = ORDER_BY + SECONDS_COL + ASC + NANOSECONDS_COL + ASC + SEMICOLON;
+    private static final String QUERY_TEMPLATE = ORDER_BY + SECONDS_COL + ASC + COMMA + NANOSECONDS_COL + ASC + SEMICOLON;
 
     private final EventStreamQuery streamQuery;
 

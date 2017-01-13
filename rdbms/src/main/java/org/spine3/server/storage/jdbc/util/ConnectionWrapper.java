@@ -66,7 +66,7 @@ public class ConnectionWrapper implements AutoCloseable {
             final PreparedStatement statement = connection.prepareStatement(sql);
             return statement;
         } catch (SQLException e) {
-            throw new DatabaseException(e);
+            throw new DatabaseException("Executing statement " + sql, e);
         }
     }
 

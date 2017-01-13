@@ -33,7 +33,7 @@ public class Sql {
         result.append(Common.BRACKET_OPEN);
         for (int i = 0; i < n; i++) {
             result.append(Query.PLACEHOLDER);
-            if (i - 1 != n) { // Unless last iteration
+            if (i + 1 != n) { // Unless last iteration
                 result.append(Common.COMMA);
             }
         }
@@ -65,7 +65,7 @@ public class Sql {
     public enum Query {
 
         CREATE_TABLE("CREATE TABLE"),
-        CREATE_IF_MISSING("CREATE IF NOT EXISTS"),
+        CREATE_IF_MISSING("CREATE TABLE IF NOT EXISTS"),
         DROP_TABLE("DROP TABLE"),
         PRIMARY_KEY("PRIMARY KEY"),
 

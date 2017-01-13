@@ -45,7 +45,7 @@ public class CreateEntityTableQuery<I> extends CreateTableQuery<I> {
             CREATE_IF_MISSING + " %s " + BRACKET_OPEN +
                     ID_COL + " %s, " +
                     ENTITY_COL + Sql.Type.BLOB + COMMA +
-                    PRIMARY_KEY + ID_COL + BRACKET_CLOSE +
+                    PRIMARY_KEY + BRACKET_OPEN + ID_COL + BRACKET_CLOSE +
                     BRACKET_CLOSE + SEMICOLON;
 
     protected CreateEntityTableQuery(Builder<I> builder) {

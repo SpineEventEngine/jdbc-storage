@@ -61,7 +61,7 @@ public class UpdateEventRecordQuery extends WriteRecordQuery<String, EventStorag
                     EVENT_TYPE_COL + EQUAL + PLACEHOLDER + COMMA +
                     PRODUCER_ID_COL + EQUAL + PLACEHOLDER + COMMA +
                     SECONDS_COL + EQUAL + PLACEHOLDER + COMMA +
-                    NANOSECONDS_COL + EQUAL + PLACEHOLDER + COMMA +
+                    NANOSECONDS_COL + EQUAL + PLACEHOLDER +
                     WHERE + EVENT_ID_COL +  EQUAL + PLACEHOLDER + SEMICOLON;
 
     private UpdateEventRecordQuery(Builder builder) {
