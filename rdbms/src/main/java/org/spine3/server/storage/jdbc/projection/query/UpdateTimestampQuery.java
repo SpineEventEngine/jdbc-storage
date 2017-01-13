@@ -29,6 +29,12 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import static java.lang.String.format;
+import static org.spine3.server.storage.jdbc.Sql.Common.COMMA;
+import static org.spine3.server.storage.jdbc.Sql.Common.EQUAL;
+import static org.spine3.server.storage.jdbc.Sql.Common.SEMICOLON;
+import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
+import static org.spine3.server.storage.jdbc.Sql.Query.SET;
+import static org.spine3.server.storage.jdbc.Sql.Query.UPDATE;
 import static org.spine3.server.storage.jdbc.projection.query.ProjectionTable.NANOS_COL;
 import static org.spine3.server.storage.jdbc.projection.query.ProjectionTable.SECONDS_COL;
 
@@ -44,9 +50,9 @@ public class UpdateTimestampQuery extends WriteQuery{
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
-            "UPDATE %s SET " +
-                    SECONDS_COL + " = ?, " +
-                    NANOS_COL + " = ?;";
+            UPDATE + "%s" + SET+
+                    SECONDS_COL + EQUAL + PLACEHOLDER + COMMA +
+                    NANOS_COL + EQUAL + PLACEHOLDER + SEMICOLON;
 
     private UpdateTimestampQuery(Builder builder) {
         super(builder);

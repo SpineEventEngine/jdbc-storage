@@ -33,6 +33,7 @@ final class Table {
     static class AggregateRecord {
 
         /** ID column name. */
+        @SuppressWarnings("DuplicateStringLiteralInspection") // "id" has more occurrences in this file but in different context
         static final String ID_COL = "id";
 
         /** Aggregate record column name. */
@@ -58,6 +59,7 @@ final class Table {
     static class EventCount {
 
         /** Aggregate ID column name. */
+        @SuppressWarnings("DuplicateStringLiteralInspection") // "id" has more occurrences in this file but in different context
         static final String ID_COL = "id";
 
         /** A count of events after the last snapshot column name. */

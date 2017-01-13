@@ -23,13 +23,26 @@ package org.spine3.server.storage.jdbc.event.query;
 import com.google.protobuf.Timestamp;
 import org.spine3.server.storage.EventStorageRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
+import org.spine3.server.storage.jdbc.Sql;
 import org.spine3.server.storage.jdbc.query.WriteRecordQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import static org.spine3.server.storage.jdbc.event.query.EventTable.*;
+import static org.spine3.server.storage.jdbc.Sql.Common.BRACKET_CLOSE;
+import static org.spine3.server.storage.jdbc.Sql.Common.BRACKET_OPEN;
+import static org.spine3.server.storage.jdbc.Sql.Common.COMMA;
+import static org.spine3.server.storage.jdbc.Sql.Common.SEMICOLON;
+import static org.spine3.server.storage.jdbc.Sql.Query.INSERT_INTO;
+import static org.spine3.server.storage.jdbc.Sql.Query.VALUES;
+import static org.spine3.server.storage.jdbc.event.query.EventTable.EVENT_COL;
+import static org.spine3.server.storage.jdbc.event.query.EventTable.EVENT_ID_COL;
+import static org.spine3.server.storage.jdbc.event.query.EventTable.EVENT_TYPE_COL;
+import static org.spine3.server.storage.jdbc.event.query.EventTable.NANOSECONDS_COL;
+import static org.spine3.server.storage.jdbc.event.query.EventTable.PRODUCER_ID_COL;
+import static org.spine3.server.storage.jdbc.event.query.EventTable.SECONDS_COL;
+import static org.spine3.server.storage.jdbc.event.query.EventTable.TABLE_NAME;
 import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
 /**
@@ -42,14 +55,14 @@ public class InsertEventRecordQuery extends WriteRecordQuery<String, EventStorag
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
-            "INSERT INTO " + TABLE_NAME + " (" +
-                    EVENT_ID_COL + ", " +
-                    EVENT_COL + ", " +
-                    EVENT_TYPE_COL + ", " +
-                    PRODUCER_ID_COL + ", " +
-                    SECONDS_COL + ", " +
-                    NANOSECONDS_COL +
-                    ") VALUES (?, ?, ?, ?, ?, ?);";
+            INSERT_INTO + TABLE_NAME + BRACKET_OPEN +
+                    EVENT_ID_COL + COMMA +
+                    EVENT_COL + COMMA +
+                    EVENT_TYPE_COL + COMMA +
+                    PRODUCER_ID_COL + COMMA +
+                    SECONDS_COL + COMMA +
+                    NANOSECONDS_COL + BRACKET_CLOSE +
+                    VALUES + Sql.nPlaceholders(6) + SEMICOLON;
 
     private InsertEventRecordQuery(Builder builder) {
         super(builder);

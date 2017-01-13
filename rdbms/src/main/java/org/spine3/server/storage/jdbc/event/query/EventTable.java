@@ -20,6 +20,9 @@
 
 package org.spine3.server.storage.jdbc.event.query;
 
+import static org.spine3.server.storage.jdbc.Sql.Query.FROM;
+import static org.spine3.server.storage.jdbc.Sql.Query.SELECT;
+
 /**
  * A utility class representing constants which are necessary for working with event table.
  *
@@ -52,7 +55,7 @@ final class EventTable {
     static final String NANOSECONDS_COL = "nanoseconds";
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    static final String SELECT_EVENT_FROM_TABLE = "SELECT " + EVENT_COL + " FROM " + TABLE_NAME + ' ';
+    static final String SELECT_EVENT_FROM_TABLE = SELECT + EVENT_COL + FROM + TABLE_NAME + ' ';
 
     private EventTable() {
     }

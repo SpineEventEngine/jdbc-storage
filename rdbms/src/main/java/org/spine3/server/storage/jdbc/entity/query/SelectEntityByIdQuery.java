@@ -24,6 +24,12 @@ import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.jdbc.query.SelectByIdQuery;
 
 import static java.lang.String.format;
+import static org.spine3.server.storage.jdbc.Sql.Common.EQUAL;
+import static org.spine3.server.storage.jdbc.Sql.Common.SEMICOLON;
+import static org.spine3.server.storage.jdbc.Sql.Query.FROM;
+import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
+import static org.spine3.server.storage.jdbc.Sql.Query.SELECT;
+import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
 import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ENTITY_COL;
 import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
 
@@ -36,13 +42,14 @@ import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
 public class SelectEntityByIdQuery<I> extends SelectByIdQuery<I, EntityStorageRecord> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String QUERY_TEMPLATE = "SELECT " + ENTITY_COL + " FROM %s WHERE " + ID_COL + " = ?;";
+    private static final String QUERY_TEMPLATE = SELECT + ENTITY_COL + FROM + " %s" + WHERE
+            + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
 
     public SelectEntityByIdQuery(Builder<I> builder) {
         super(builder);
     }
 
-    public static <I> Builder <I> newBuilder(String tableName) {
+    public static <I> Builder<I> newBuilder(String tableName) {
         final Builder<I> builder = new Builder<>();
         builder.setIdIndexInQuery(1)
                 .setQuery(format(QUERY_TEMPLATE, tableName))
@@ -52,7 +59,10 @@ public class SelectEntityByIdQuery<I> extends SelectByIdQuery<I, EntityStorageRe
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder<I> extends SelectByIdQuery.Builder<Builder<I>, SelectEntityByIdQuery<I>, I, EntityStorageRecord>{
+    public static class Builder<I> extends SelectByIdQuery.Builder<Builder<I>,
+                                                                   SelectEntityByIdQuery<I>,
+                                                                   I,
+                                                                   EntityStorageRecord> {
 
         @Override
         public SelectEntityByIdQuery<I> build() {

@@ -24,6 +24,12 @@ import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.jdbc.query.WriteRecordQuery;
 
 import static java.lang.String.format;
+import static org.spine3.server.storage.jdbc.Sql.Common.EQUAL;
+import static org.spine3.server.storage.jdbc.Sql.Common.SEMICOLON;
+import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
+import static org.spine3.server.storage.jdbc.Sql.Query.SET;
+import static org.spine3.server.storage.jdbc.Sql.Query.UPDATE;
+import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
 import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ENTITY_COL;
 import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
 
@@ -37,9 +43,9 @@ public class UpdateEntityQuery<I> extends WriteRecordQuery<I, EntityStorageRecor
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
-            "UPDATE %s " +
-                    " SET " + ENTITY_COL + " = ? " +
-                    " WHERE " + ID_COL + " = ?;";
+            UPDATE + "%s" +
+                    SET + ENTITY_COL + EQUAL + PLACEHOLDER +
+                    WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
 
     private UpdateEntityQuery(Builder<I> builder) {
         super(builder);

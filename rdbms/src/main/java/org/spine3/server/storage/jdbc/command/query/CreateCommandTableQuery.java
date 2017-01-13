@@ -32,14 +32,17 @@ import static org.spine3.server.storage.jdbc.command.query.CommandTable.*;
  */
 public class CreateCommandTableQuery extends CreateTableQuery<String> {
 
+    @SuppressWarnings("DuplicateStringLiteralInspection") // appears in other classes
+    private static final String BLOB = " BLOB, ";
+
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
             "CREATE TABLE IF NOT EXISTS %s (" +
                     ID_COL + " %s, " +
-                    COMMAND_COL + " BLOB, " +
+                    COMMAND_COL + BLOB +
                     COMMAND_STATUS_COL + " VARCHAR(512), " +
-                    ERROR_COL + " BLOB, " +
-                    FAILURE_COL + " BLOB, " +
+                    ERROR_COL + BLOB +
+                    FAILURE_COL + BLOB +
                     " PRIMARY KEY(" + ID_COL + ')' +
                     ");";
 

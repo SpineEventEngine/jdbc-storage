@@ -36,6 +36,14 @@ import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.spine3.server.storage.jdbc.Sql.Common.BRACKET_CLOSE;
+import static org.spine3.server.storage.jdbc.Sql.Common.BRACKET_OPEN;
+import static org.spine3.server.storage.jdbc.Sql.Common.SEMICOLON;
+import static org.spine3.server.storage.jdbc.Sql.Query.ALL_ATTRIBUTES;
+import static org.spine3.server.storage.jdbc.Sql.Query.FROM;
+import static org.spine3.server.storage.jdbc.Sql.Query.IN;
+import static org.spine3.server.storage.jdbc.Sql.Query.SELECT;
+import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
 
 /**
  * Implementation of {@link StorageQuery} for bulk selection.
@@ -55,10 +63,11 @@ public class SelectBulkQuery extends StorageQuery {
     private final FieldMask fieldMask;
     private final List arguments;
 
-    private static final String COMMON_TEMPLATE = "SELECT * FROM %s";
+    private static final String COMMON_TEMPLATE = SELECT.toString() + ALL_ATTRIBUTES + FROM + "%s";
     private static final String ALL_TEMPLATE = COMMON_TEMPLATE + ';';
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String IDS_TEMPLATE = COMMON_TEMPLATE + " WHERE " + EntityTable.ID_COL + " IN (%s);";
+    private static final String IDS_TEMPLATE = COMMON_TEMPLATE + WHERE + EntityTable.ID_COL + IN
+            + BRACKET_OPEN + " %s" + BRACKET_CLOSE + SEMICOLON;
 
     private static final int IDS_STRING_ESTIMATED_LENGTH = 128;
 
@@ -158,7 +167,7 @@ public class SelectBulkQuery extends StorageQuery {
             final StringBuilder paramsBuilder = new StringBuilder(IDS_STRING_ESTIMATED_LENGTH);
 
             final Iterator<?> params = ids.iterator();
-
+            // TODO:13-01-17:dmytro.dashenkov: Replace with Sql#nPlaceholders.
             while (params.hasNext()) {
                 paramsBuilder.append('?');
 
