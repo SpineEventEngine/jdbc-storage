@@ -71,8 +71,6 @@ public class SelectBulkQuery extends StorageQuery {
     private static final String IDS_TEMPLATE = COMMON_TEMPLATE + WHERE + EntityTable.ID_COL + IN
             + " %s" + SEMICOLON;
 
-    private static final int IDS_STRING_ESTIMATED_LENGTH = 128;
-
     protected SelectBulkQuery(Builder builder) {
         super(builder);
         final Descriptors.Descriptor messageDescriptor = checkNotNull(builder.messageDescriptor);
@@ -133,6 +131,7 @@ public class SelectBulkQuery extends StorageQuery {
         private final List<Object> arguments = new ArrayList<>();
 
         private Builder() {
+            super();
         }
 
         public Builder setMessageDescriptor(Descriptors.Descriptor messageDescriptor) {

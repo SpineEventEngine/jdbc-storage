@@ -64,7 +64,10 @@ import static org.spine3.server.storage.jdbc.event.query.EventTable.SELECT_EVENT
 public class FilterAndSortQuery extends StorageQuery {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String QUERY_TEMPLATE = ORDER_BY + SECONDS_COL + ASC + COMMA + NANOSECONDS_COL + ASC + SEMICOLON;
+    private static final String QUERY_TEMPLATE = ORDER_BY + SECONDS_COL + ASC + COMMA
+            + NANOSECONDS_COL + ASC + SEMICOLON;
+    private static final String ESCAPED_EQUAL_START = " = \'";
+    private static final String ESCAPED_EQUAL_END = "\' ";
 
     private final EventStreamQuery streamQuery;
 
@@ -91,7 +94,7 @@ public class FilterAndSortQuery extends StorageQuery {
     private static void appendFilterByEventTypeSql(StringBuilder builder, String eventType) {
         appendTo(builder,
                 whereOrOr(builder),
-                EVENT_TYPE_COL, " = \'", eventType, "\' ");
+                EVENT_TYPE_COL, ESCAPED_EQUAL_START, eventType, ESCAPED_EQUAL_END);
     }
 
     private static void appendFilterByAggregateIdsSql(StringBuilder builder, EventFilter filter) {
@@ -100,7 +103,7 @@ public class FilterAndSortQuery extends StorageQuery {
             final String aggregateIdStr = idToString(aggregateId);
             appendTo(builder,
                     whereOrOr(builder),
-                    PRODUCER_ID_COL, " = \'", aggregateIdStr, "\' ");
+                    PRODUCER_ID_COL, ESCAPED_EQUAL_START, aggregateIdStr, ESCAPED_EQUAL_END);
         }
     }
 
@@ -135,7 +138,7 @@ public class FilterAndSortQuery extends StorageQuery {
         final Timestamp after = query.getAfter();
         final long seconds = after.getSeconds();
         final int nanos = after.getNanos();
-        appendTo(builder, " ",
+        appendTo(builder, ' ',
                 SECONDS_COL, GT, seconds,
                 OR, BRACKET_OPEN,
                     SECONDS_COL, EQUAL, seconds, AND,
@@ -149,7 +152,7 @@ public class FilterAndSortQuery extends StorageQuery {
         final Timestamp before = query.getBefore();
         final long seconds = before.getSeconds();
         final int nanos = before.getNanos();
-        appendTo(builder, " ",
+        appendTo(builder, ' ',
                 SECONDS_COL, LT, seconds,
                 OR, BRACKET_OPEN,
                 SECONDS_COL, EQUAL, seconds, AND,
