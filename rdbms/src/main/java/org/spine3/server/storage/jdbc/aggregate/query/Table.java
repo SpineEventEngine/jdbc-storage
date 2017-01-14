@@ -29,12 +29,13 @@ package org.spine3.server.storage.jdbc.aggregate.query;
 @SuppressWarnings("UtilityClass")
 final class Table {
 
+    private static final String ID_COL = "id";
+
     /** Table  that contains aggregate records. */
     static class AggregateRecord {
 
         /** ID column name. */
-        @SuppressWarnings("DuplicateStringLiteralInspection") // "id" has more occurrences in this file but in different context
-        static final String ID_COL = "id";
+        static final String ID_COL = Table.ID_COL;
 
         /** Aggregate record column name. */
         static final String AGGREGATE_COL = "aggregate";
@@ -59,8 +60,7 @@ final class Table {
     static class EventCount {
 
         /** Aggregate ID column name. */
-        @SuppressWarnings("DuplicateStringLiteralInspection") // "id" has more occurrences in this file but in different context
-        static final String ID_COL = "id";
+        static final String ID_COL = Table.ID_COL;
 
         /** A count of events after the last snapshot column name. */
         static final String EVENT_COUNT_COL = "event_count";
