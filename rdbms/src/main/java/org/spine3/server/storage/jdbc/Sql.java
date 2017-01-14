@@ -20,20 +20,42 @@
 
 package org.spine3.server.storage.jdbc;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 /**
- * Set o enums and utilities for constructing the SQL sentences.
- * // TODO:13-01-17:dmytro.dashenkov: Javadoc.
+ * Set of enums and utilities for constructing the SQL sentences.
+ * <p>Contains most valid SQL keywords/key-phrases, operators and punctuation.
+ *
+ * <p>All the {@code enum} values have a valid token string representation, i.e. {@link Enum#toString() toString()}
+ * method returns a valid SQL token wrapped into the whitespaces.
  *
  * @author Dmytro Dashenkov
  */
+@SuppressWarnings("UtilityClass")
 public class Sql {
 
-    public static String nPlaceholders(int n) {
-        final StringBuilder result = new StringBuilder(n * 2 + 1);
+    private Sql() {
+    }
+
+    /**
+     * Generates a sequence of SQL {@link Sql.Query#PLACEHOLDER placeholders} of given length in format:
+     * <pre>
+     *     (?, ?, ... ?, ?)
+     *      \_____  _____/
+     *            \/
+     *          count
+     * </pre>
+     *
+     * @param count count of the placeholders to be generated
+     * @return a string of the placeholders of given count separated by commas and wrapped into the braces
+     */
+    public static String nPlaceholders(int count) {
+        checkArgument(count > 0, "Count of placeholders should be > 0");
+        final StringBuilder result = new StringBuilder(count * 2 + 1);
         result.append(Common.BRACKET_OPEN);
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < count; i++) {
             result.append(Query.PLACEHOLDER);
-            if (i + 1 != n) { // Unless last iteration
+            if (i + 1 != count) { // Unless last iteration
                 result.append(Common.COMMA);
             }
         }
@@ -42,6 +64,9 @@ public class Sql {
         return result.toString();
     }
 
+    /**
+     * Set of SQL keywords representing basic data types used in the project.
+     */
     public enum Type {
 
         BLOB("BLOB"),
@@ -62,6 +87,9 @@ public class Sql {
         }
     }
 
+    /**
+     * Set of basic SQL keywords/key-phrases for CRUD operations, predicate constructing, grouping and ordering, etc.
+     */
     public enum Query {
 
         CREATE_TABLE("CREATE TABLE"),
@@ -115,6 +143,16 @@ public class Sql {
         }
     }
 
+    /**
+     * Set of SQL keywords representing 5 aggregating functions:
+     * <ul>
+     *     <li>MIN
+     *     <li>MAX
+     *     <li>COUNT
+     *     <li>AVG
+     *     <li>SUM
+     * </ul>
+     */
     public enum Function {
 
         MIN,
@@ -129,6 +167,13 @@ public class Sql {
         }
     }
 
+    /**
+     * Set of punctuation signs used in SQL:
+     * <ul>
+     *     <li>Operators: equal, not equal, comparison operators;
+     *     <li>Signs: comma, brackets, semicolon.
+     * </ul>
+     */
     public enum Common {
 
         COMMA(","),
