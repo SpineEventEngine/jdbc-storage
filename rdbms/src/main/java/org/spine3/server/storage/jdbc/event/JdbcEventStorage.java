@@ -20,12 +20,22 @@
 
 package org.spine3.server.storage.jdbc.event;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
+import com.google.common.base.Strings;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterators;
+import com.google.common.collect.UnmodifiableIterator;
+import com.google.protobuf.Any;
+import com.google.protobuf.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spine3.base.Event;
+import org.spine3.base.EventContext;
 import org.spine3.base.EventId;
+import org.spine3.base.FieldFilter;
+import org.spine3.protobuf.AnyPacker;
+import org.spine3.server.event.EventFilter;
 import org.spine3.server.event.EventStreamQuery;
 import org.spine3.server.storage.EventStorage;
 import org.spine3.server.storage.EventStorageRecord;
@@ -36,9 +46,12 @@ import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbIterator;
 
 import javax.annotation.Nullable;
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.Lists.newLinkedList;
 import static org.spine3.io.IoUtil.closeAll;
 import static org.spine3.util.Exceptions.wrapped;
@@ -55,7 +68,9 @@ public class JdbcEventStorage extends EventStorage {
 
     private final EventStorageQueryFactory queryFactory;
 
-    /** Iterators which are not closed yet. */
+    /**
+     * Iterators which are not closed yet.
+     */
     private final Collection<DbIterator> iterators = newLinkedList();
 
     /**
@@ -95,10 +110,20 @@ public class JdbcEventStorage extends EventStorage {
     @Override
     public Iterator<Event> iterator(EventStreamQuery query) throws DatabaseException {
         final Iterator<EventStorageRecord> iterator = queryFactory.newFilterAndSortQuery(query).execute();
+
         iterators.add((DbIterator) iterator);
-        final Predicate<Event> filter = new MatchesStreamQuery(query);
-        final Iterator<Event> unfilteredResult = toEventIterator(iterator);
-        final Iterator<Event> result = Iterators.filter(unfilteredResult, filter);
+
+        /**
+         * As each {@code event} data is stored as a single serialized {@code Message}, it is not possible to query
+         * the JDBC storage for {@code Event} or {@code EventContext} field values directly.
+         *
+         * <p>Therefore, we perform in-memory post-filtering according to {@code Event} field and context filters.
+         */
+
+        final List<EventFilter> filterList = query.getFilterList();
+        final UnmodifiableIterator<EventStorageRecord> filtered =
+                Iterators.filter(iterator, new EventRecordPredicate(filterList));
+        final Iterator<Event> result = toEventIterator(filtered);
         return result;
     }
 
@@ -110,9 +135,9 @@ public class JdbcEventStorage extends EventStorage {
     @Override
     protected void writeRecord(EventStorageRecord record) throws DatabaseException {
         if (containsRecord(record.getEventId())) {
-           queryFactory.newUpdateEventQuery(record).execute();
+            queryFactory.newUpdateEventQuery(record).execute();
         } else {
-           queryFactory.newInsertEventQuery(record).execute();
+            queryFactory.newInsertEventQuery(record).execute();
         }
     }
 
@@ -145,6 +170,135 @@ public class JdbcEventStorage extends EventStorage {
         closeAll(iterators);
         iterators.clear();
         dataSource.close();
+    }
+
+    /**
+     * Predicate matching an {@link EventStorageRecord} to a number of {@link EventFilter} instances.
+     */
+    private static class EventRecordPredicate implements Predicate<EventStorageRecord> {
+
+        private final Collection<EventFilter> eventFilters;
+
+        private EventRecordPredicate(Collection<EventFilter> eventFilters) {
+            this.eventFilters = eventFilters;
+        }
+
+        @Override
+        public boolean apply(@Nullable EventStorageRecord eventRecord) {
+            if (eventRecord == null) {
+                return false;
+            }
+
+            if (eventFilters.isEmpty()) {
+                return true;
+            }
+
+            boolean nonEmptyFilterPresent = false;
+            for (EventFilter filter : eventFilters) {
+                final EventFilterChecker predicate = new EventFilterChecker(filter);
+                if (predicate.checkFilterEmpty()) {
+                    continue;
+                }
+                nonEmptyFilterPresent = true;
+                final boolean matches = predicate.apply(eventRecord);
+                if (matches) {
+                    return true;
+                }
+            }
+
+            return !nonEmptyFilterPresent;
+        }
+    }
+
+    /**
+     * Predicate matching an {@link Event} to a single {@link EventFilter}.
+     */
+    private static class EventFilterChecker implements Predicate<EventStorageRecord> {
+
+        private final Collection<FieldFilter> eventFieldFilters;
+        private final Collection<FieldFilter> contextFieldFilters;
+
+        private static final Function<Any, Message> ANY_UNPACKER = new Function<Any, Message>() {
+            @Nullable
+            @Override
+            public Message apply(@Nullable Any input) {
+                if (input == null) {
+                    return null;
+                }
+
+                return AnyPacker.unpack(input);
+            }
+        };
+
+        private EventFilterChecker(EventFilter eventFilter) {
+            this.eventFieldFilters = eventFilter.getEventFieldFilterList();
+            this.contextFieldFilters = eventFilter.getContextFieldFilterList();
+        }
+
+        private boolean checkFilterEmpty() {
+            return eventFieldFilters.isEmpty() && contextFieldFilters.isEmpty();
+        }
+
+        // Defined as nullable, parameter `event` is actually non null.
+        @SuppressWarnings({"MethodWithMoreThanThreeNegations", "MethodWithMultipleLoops"})
+        @Override
+        public boolean apply(@Nullable EventStorageRecord event) {
+            if (event == null) {
+                return false;
+            }
+
+            if (!eventFieldFilters.isEmpty()) {
+                final Any eventWrapped = event.getMessage();
+                final Message eventMessage = AnyPacker.unpack(eventWrapped);
+
+
+                // Check event fields
+                for (FieldFilter filter : eventFieldFilters) {
+                    final boolean matchesFilter = checkFields(eventMessage, filter);
+                    if (!matchesFilter) {
+                        return false;
+                    }
+                }
+            }
+
+            // Check context fields
+            final EventContext context = event.getContext();
+            for (FieldFilter filter : contextFieldFilters) {
+                final boolean matchesFilter = checkFields(context, filter);
+                if (!matchesFilter) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static boolean checkFields(
+                Message object,
+                @SuppressWarnings("TypeMayBeWeakened") /*BuilderOrType interface*/ FieldFilter filter) {
+            final String fieldPath = filter.getFieldPath();
+            final String fieldName = fieldPath.substring(fieldPath.lastIndexOf('.') + 1);
+            checkArgument(!Strings.isNullOrEmpty(fieldName), "Field filter " + filter.toString() + " is invalid");
+            final String fieldGetterName = "get" + fieldName.substring(0, 1)
+                    .toUpperCase() + fieldName.substring(1);
+
+            final Collection<Any> expectedAnys = filter.getValueList();
+            final Collection<Message> expectedValues = Collections2.transform(expectedAnys, ANY_UNPACKER);
+            Message actualValue;
+            try {
+                final Class<?> messageClass = object.getClass();
+                final Method fieldGetter = messageClass.getDeclaredMethod(fieldGetterName);
+                actualValue = (Message) fieldGetter.invoke(object);
+                if (actualValue instanceof Any) {
+                    actualValue = AnyPacker.unpack((Any) actualValue);
+                }
+            } catch (@SuppressWarnings("OverlyBroadCatchBlock") ReflectiveOperationException e) {
+                throw wrapped(e);
+            }
+
+            final boolean result = expectedValues.contains(actualValue);
+            return result;
+        }
     }
 
     private enum LogSingleton {
