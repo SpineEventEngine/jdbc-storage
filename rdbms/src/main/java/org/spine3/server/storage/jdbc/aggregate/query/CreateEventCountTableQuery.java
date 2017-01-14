@@ -22,6 +22,12 @@ package org.spine3.server.storage.jdbc.aggregate.query;
 
 import org.spine3.server.storage.jdbc.query.CreateTableQuery;
 
+import static org.spine3.server.storage.jdbc.Sql.Common.BRACKET_CLOSE;
+import static org.spine3.server.storage.jdbc.Sql.Common.BRACKET_OPEN;
+import static org.spine3.server.storage.jdbc.Sql.Common.COMMA;
+import static org.spine3.server.storage.jdbc.Sql.Common.SEMICOLON;
+import static org.spine3.server.storage.jdbc.Sql.Query.CREATE_IF_MISSING;
+import static org.spine3.server.storage.jdbc.Sql.Type.BIGINT;
 import static org.spine3.server.storage.jdbc.aggregate.query.Table.EventCount.EVENT_COUNT_COL;
 import static org.spine3.server.storage.jdbc.aggregate.query.Table.EventCount.ID_COL;
 
@@ -35,9 +41,9 @@ public class CreateEventCountTableQuery<I> extends CreateTableQuery<I> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
-                    "CREATE TABLE IF NOT EXISTS %s (" +
-                    ID_COL + " %s, " +
-                    EVENT_COUNT_COL + " BIGINT " +  ");";
+                    CREATE_IF_MISSING + " %s " + BRACKET_OPEN +
+                    ID_COL + " %s " + COMMA +
+                    EVENT_COUNT_COL + BIGINT + BRACKET_CLOSE + SEMICOLON;
 
     protected CreateEventCountTableQuery(Builder<I> builder) {
         super(builder);

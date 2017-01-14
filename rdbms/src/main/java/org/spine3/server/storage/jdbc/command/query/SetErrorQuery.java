@@ -24,7 +24,15 @@ import org.spine3.base.Error;
 import org.spine3.server.storage.CommandStorageRecord;
 import org.spine3.server.storage.jdbc.query.WriteRecordQuery;
 
-import static org.spine3.server.storage.jdbc.command.query.CommandTable.*;
+import static org.spine3.server.storage.jdbc.Sql.Common.EQUAL;
+import static org.spine3.server.storage.jdbc.Sql.Common.SEMICOLON;
+import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
+import static org.spine3.server.storage.jdbc.Sql.Query.SET;
+import static org.spine3.server.storage.jdbc.Sql.Query.UPDATE;
+import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
+import static org.spine3.server.storage.jdbc.command.query.CommandTable.ERROR_COL;
+import static org.spine3.server.storage.jdbc.command.query.CommandTable.ID_COL;
+import static org.spine3.server.storage.jdbc.command.query.CommandTable.TABLE_NAME;
 
 /**
  * Query that updates {@link CommandStorageRecord} with a new {@link Error}.
@@ -32,14 +40,14 @@ import static org.spine3.server.storage.jdbc.command.query.CommandTable.*;
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-public class SetErrorQuery extends WriteRecordQuery<String, Error > {
+public class SetErrorQuery extends WriteRecordQuery<String, Error> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
-            "UPDATE " + TABLE_NAME +
-                    " SET " +
-                    ERROR_COL + " = ? " +
-                    " WHERE " + ID_COL + " = ? ;";
+            UPDATE + TABLE_NAME +
+                    SET +
+                    ERROR_COL + EQUAL + PLACEHOLDER +
+                    WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
 
     private SetErrorQuery(Builder builder) {
         super(builder);

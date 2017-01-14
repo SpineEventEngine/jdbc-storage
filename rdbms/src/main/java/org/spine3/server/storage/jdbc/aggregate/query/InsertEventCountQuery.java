@@ -21,6 +21,7 @@
 package org.spine3.server.storage.jdbc.aggregate.query;
 
 import org.spine3.server.storage.jdbc.DatabaseException;
+import org.spine3.server.storage.jdbc.Sql;
 import org.spine3.server.storage.jdbc.query.UpdateRecordQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 
@@ -28,6 +29,12 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import static java.lang.String.format;
+import static org.spine3.server.storage.jdbc.Sql.Common.BRACKET_CLOSE;
+import static org.spine3.server.storage.jdbc.Sql.Common.BRACKET_OPEN;
+import static org.spine3.server.storage.jdbc.Sql.Common.COMMA;
+import static org.spine3.server.storage.jdbc.Sql.Common.SEMICOLON;
+import static org.spine3.server.storage.jdbc.Sql.Query.INSERT_INTO;
+import static org.spine3.server.storage.jdbc.Sql.Query.VALUES;
 import static org.spine3.server.storage.jdbc.aggregate.query.Table.EventCount.EVENT_COUNT_COL;
 import static org.spine3.server.storage.jdbc.aggregate.query.Table.EventCount.ID_COL;
 
@@ -43,9 +50,9 @@ public class InsertEventCountQuery<I> extends UpdateRecordQuery<I> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
-            "INSERT INTO %s " +
-                    " (" + ID_COL + ", " + EVENT_COUNT_COL + ')' +
-                    " VALUES (?, ?);";
+            INSERT_INTO +" %s " +
+                    BRACKET_OPEN + ID_COL + COMMA + EVENT_COUNT_COL + BRACKET_CLOSE +
+                    VALUES + Sql.nPlaceholders(2) + SEMICOLON;
 
     private InsertEventCountQuery(Builder<I> builder) {
         super(builder);

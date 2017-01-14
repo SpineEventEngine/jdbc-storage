@@ -22,7 +22,17 @@ package org.spine3.server.storage.jdbc.command.query;
 
 import org.spine3.server.storage.CommandStorageRecord;
 
-import static org.spine3.server.storage.jdbc.command.query.CommandTable.*;
+import static org.spine3.server.storage.jdbc.Sql.Common.COMMA;
+import static org.spine3.server.storage.jdbc.Sql.Common.EQUAL;
+import static org.spine3.server.storage.jdbc.Sql.Common.SEMICOLON;
+import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
+import static org.spine3.server.storage.jdbc.Sql.Query.SET;
+import static org.spine3.server.storage.jdbc.Sql.Query.UPDATE;
+import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
+import static org.spine3.server.storage.jdbc.command.query.CommandTable.COMMAND_COL;
+import static org.spine3.server.storage.jdbc.command.query.CommandTable.COMMAND_STATUS_COL;
+import static org.spine3.server.storage.jdbc.command.query.CommandTable.ID_COL;
+import static org.spine3.server.storage.jdbc.command.query.CommandTable.TABLE_NAME;
 
 /**
  * Query that updates {@link CommandStorageRecord} in the {@link CommandTable}.
@@ -33,10 +43,10 @@ public class UpdateCommandQuery extends WriteCommandRecordQuery {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
-            "UPDATE " + TABLE_NAME +
-                    " SET " + COMMAND_COL + " = ? " +
-                    ", " + COMMAND_STATUS_COL + " = ? " +
-                    " WHERE " + ID_COL + " = ?;";
+            UPDATE + TABLE_NAME +
+                    SET + COMMAND_COL + EQUAL + PLACEHOLDER +
+                    COMMA + COMMAND_STATUS_COL + EQUAL + PLACEHOLDER +
+                    WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
 
     private UpdateCommandQuery(Builder builder) {
         super(builder);

@@ -24,7 +24,15 @@ import org.spine3.base.Failure;
 import org.spine3.server.storage.CommandStorageRecord;
 import org.spine3.server.storage.jdbc.query.WriteRecordQuery;
 
-import static org.spine3.server.storage.jdbc.command.query.CommandTable.*;
+import static org.spine3.server.storage.jdbc.Sql.Common.EQUAL;
+import static org.spine3.server.storage.jdbc.Sql.Common.SEMICOLON;
+import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
+import static org.spine3.server.storage.jdbc.Sql.Query.SET;
+import static org.spine3.server.storage.jdbc.Sql.Query.UPDATE;
+import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
+import static org.spine3.server.storage.jdbc.command.query.CommandTable.FAILURE_COL;
+import static org.spine3.server.storage.jdbc.command.query.CommandTable.ID_COL;
+import static org.spine3.server.storage.jdbc.command.query.CommandTable.TABLE_NAME;
 
 /**
  * Query that updates {@link CommandStorageRecord} with a new {@link Failure}.
@@ -36,10 +44,10 @@ public class SetFailureQuery extends WriteRecordQuery<String, Failure> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
-            "UPDATE " + TABLE_NAME +
-                    " SET " +
-                    FAILURE_COL + " = ? " +
-                    " WHERE " + ID_COL + " = ? ;";
+            UPDATE + TABLE_NAME +
+                    SET +
+                    FAILURE_COL + EQUAL + PLACEHOLDER +
+                    WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
 
     private SetFailureQuery(Builder builder) {
         super(builder);
