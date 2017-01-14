@@ -30,6 +30,9 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import static org.spine3.base.Identifiers.idToString;
+import static org.spine3.server.storage.jdbc.Sql.Type.BIGINT;
+import static org.spine3.server.storage.jdbc.Sql.Type.INT;
+import static org.spine3.server.storage.jdbc.Sql.Type.VARCHAR_999;
 
 /**
  * Helps to work with {@link Entity} ID columns.
@@ -40,17 +43,11 @@ import static org.spine3.base.Identifiers.idToString;
 @Internal
 public abstract class IdColumn<I> {
 
-    private static final String TYPE_VARCHAR = "VARCHAR(999)";
-
-    private static final String TYPE_BIGINT = "BIGINT";
-
-    private static final String TYPE_INT = "INT";
-
     /**
      * Creates a new instance.
      *
      * @param entityClass a class of an {@link Entity} or an {@link Aggregate}
-     * @param <I> the type of {@link Entity} IDs
+     * @param <I>         the type of {@link Entity} IDs
      * @return a new helper instance
      */
     public static <I> IdColumn<I> newInstance(Class<? extends Entity<I, ?>> entityClass) {
@@ -70,7 +67,9 @@ public abstract class IdColumn<I> {
         return helper;
     }
 
-    /** Returns the SQL data type string of the ID column, e.g. {@code "BIGINT"}, {@code "VARCHAR(999)"}, etc. */
+    /**
+     * Returns the SQL data type string of the ID column, e.g. {@code "BIGINT"}, {@code "VARCHAR(999)"}, etc.
+     */
     public abstract String getColumnDataType();
 
     /**
@@ -83,12 +82,14 @@ public abstract class IdColumn<I> {
      */
     public abstract void setId(int index, I id, PreparedStatement statement) throws DatabaseException;
 
-    /** Helps to work with columns which contain {@code long} {@link Entity} IDs. */
+    /**
+     * Helps to work with columns which contain {@code long} {@link Entity} IDs.
+     */
     private static class LongIdColumn extends IdColumn<Long> {
 
         @Override
         public String getColumnDataType() {
-            return TYPE_BIGINT;
+            return BIGINT.toString();
         }
 
         @Override
@@ -101,12 +102,14 @@ public abstract class IdColumn<I> {
         }
     }
 
-    /** Helps to work with columns which contain {@code integer} {@link Entity} IDs. */
+    /**
+     * Helps to work with columns which contain {@code integer} {@link Entity} IDs.
+     */
     private static class IntIdColumn extends IdColumn<Integer> {
 
         @Override
         public String getColumnDataType() {
-            return TYPE_INT;
+            return INT.toString();
         }
 
         @Override
@@ -119,12 +122,14 @@ public abstract class IdColumn<I> {
         }
     }
 
-    /** Helps to work with columns which contain either {@link Message} or {@code string} {@link Entity} IDs. */
+    /**
+     * Helps to work with columns which contain either {@link Message} or {@code string} {@link Entity} IDs.
+     */
     private static class StringOrMessageIdColumn<I> extends IdColumn<I> {
 
         @Override
         public String getColumnDataType() {
-            return TYPE_VARCHAR;
+            return VARCHAR_999.toString();
         }
 
         @Override
@@ -138,7 +143,9 @@ public abstract class IdColumn<I> {
         }
     }
 
-    /** Helps to work with columns which contain {@code string} {@link Entity} IDs. */
+    /**
+     * Helps to work with columns which contain {@code string} {@link Entity} IDs.
+     */
     public static class StringIdColumn extends StringOrMessageIdColumn<String> {
     }
 }
