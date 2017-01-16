@@ -20,10 +20,15 @@
 
 package org.spine3.server.storage.jdbc;
 
+import com.google.common.base.Joiner;
+
+import java.util.Collections;
+
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.COMMA;
+import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
 
 /**
  * Set of enums and utilities for constructing the SQL sentences.
@@ -55,17 +60,11 @@ public class Sql {
      */
     public static String nPlaceholders(int count) {
         checkArgument(count > 0, "Count of placeholders should be > 0");
-        final StringBuilder result = new StringBuilder(count * 2 + 1);
-        result.append(BRACKET_OPEN);
-        for (int i = 0; i < count; i++) {
-            result.append(Query.PLACEHOLDER);
-            if (i + 1 != count) { // Unless last iteration
-                result.append(COMMA);
-            }
-        }
-        result.append(BRACKET_CLOSE);
 
-        return result.toString();
+        final String placeholders = Joiner.on(COMMA.toString())
+                .join(Collections.nCopies(count, PLACEHOLDER));
+        final String wrappedPlaceholders = BRACKET_OPEN + placeholders + BRACKET_CLOSE;
+        return wrappedPlaceholders;
     }
 
     /**
