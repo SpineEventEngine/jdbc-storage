@@ -23,8 +23,8 @@ package org.spine3.server.storage.jdbc.event.query;
 import org.spine3.server.storage.EventStorageRecord;
 import org.spine3.server.storage.jdbc.query.SelectByIdQuery;
 
-import static org.spine3.server.storage.jdbc.Sql.Common.EQUAL;
-import static org.spine3.server.storage.jdbc.Sql.Common.SEMICOLON;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
 import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
 import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
 import static org.spine3.server.storage.jdbc.event.query.EventTable.EVENT_COL;

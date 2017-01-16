@@ -38,9 +38,9 @@ import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.spine3.server.storage.jdbc.Sql.Common.BRACKET_CLOSE;
-import static org.spine3.server.storage.jdbc.Sql.Common.BRACKET_OPEN;
-import static org.spine3.server.storage.jdbc.Sql.Common.SEMICOLON;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
 import static org.spine3.server.storage.jdbc.Sql.Query.ALL_ATTRIBUTES;
 import static org.spine3.server.storage.jdbc.Sql.Query.FROM;
 import static org.spine3.server.storage.jdbc.Sql.Query.IN;

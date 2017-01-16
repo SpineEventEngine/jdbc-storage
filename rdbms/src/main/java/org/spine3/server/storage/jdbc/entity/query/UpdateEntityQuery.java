@@ -24,8 +24,8 @@ import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.jdbc.query.WriteRecordQuery;
 
 import static java.lang.String.format;
-import static org.spine3.server.storage.jdbc.Sql.Common.EQUAL;
-import static org.spine3.server.storage.jdbc.Sql.Common.SEMICOLON;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
 import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
 import static org.spine3.server.storage.jdbc.Sql.Query.SET;
 import static org.spine3.server.storage.jdbc.Sql.Query.UPDATE;

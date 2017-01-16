@@ -23,8 +23,8 @@ package org.spine3.server.storage.jdbc.command.query;
 import org.spine3.base.CommandStatus;
 import org.spine3.server.storage.jdbc.query.UpdateRecordQuery;
 
-import static org.spine3.server.storage.jdbc.Sql.Common.EQUAL;
-import static org.spine3.server.storage.jdbc.Sql.Common.SEMICOLON;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
 import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
 import static org.spine3.server.storage.jdbc.Sql.Query.SET;
 import static org.spine3.server.storage.jdbc.Sql.Query.UPDATE;

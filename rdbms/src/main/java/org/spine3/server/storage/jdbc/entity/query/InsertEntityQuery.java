@@ -24,10 +24,10 @@ import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.jdbc.query.WriteRecordQuery;
 
 import static java.lang.String.format;
-import static org.spine3.server.storage.jdbc.Sql.Common.BRACKET_CLOSE;
-import static org.spine3.server.storage.jdbc.Sql.Common.BRACKET_OPEN;
-import static org.spine3.server.storage.jdbc.Sql.Common.COMMA;
-import static org.spine3.server.storage.jdbc.Sql.Common.SEMICOLON;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.COMMA;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
 import static org.spine3.server.storage.jdbc.Sql.Query.INSERT_INTO;
 import static org.spine3.server.storage.jdbc.Sql.Query.VALUES;
 import static org.spine3.server.storage.jdbc.Sql.nPlaceholders;

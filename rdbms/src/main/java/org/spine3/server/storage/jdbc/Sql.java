@@ -21,6 +21,9 @@
 package org.spine3.server.storage.jdbc;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.COMMA;
 
 /**
  * Set of enums and utilities for constructing the SQL sentences.
@@ -52,14 +55,14 @@ public class Sql {
     public static String nPlaceholders(int count) {
         checkArgument(count > 0, "Count of placeholders should be > 0");
         final StringBuilder result = new StringBuilder(count * 2 + 1);
-        result.append(Common.BRACKET_OPEN);
+        result.append(BRACKET_OPEN);
         for (int i = 0; i < count; i++) {
             result.append(Query.PLACEHOLDER);
             if (i + 1 != count) { // Unless last iteration
-                result.append(Common.COMMA);
+                result.append(COMMA);
             }
         }
-        result.append(Common.BRACKET_CLOSE);
+        result.append(BRACKET_CLOSE);
 
         return result.toString();
     }
@@ -174,7 +177,7 @@ public class Sql {
      *     <li>Signs: comma, brackets, semicolon.
      * </ul>
      */
-    public enum Common {
+    public enum BuildingBlock {
 
         COMMA(","),
         BRACKET_OPEN("("),
@@ -189,7 +192,7 @@ public class Sql {
 
         private final String token;
 
-        Common(String token) {
+        BuildingBlock(String token) {
             this.token = token;
         }
 

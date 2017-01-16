@@ -24,9 +24,9 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.spine3.server.storage.jdbc.Sql.Common.BRACKET_CLOSE;
-import static org.spine3.server.storage.jdbc.Sql.Common.BRACKET_OPEN;
-import static org.spine3.server.storage.jdbc.Sql.Common.COMMA;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.COMMA;
 import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
 import static org.spine3.test.Tests.hasPrivateUtilityConstructor;
 
@@ -95,7 +95,7 @@ public class SqlShould {
         assertEquals(primaryKeyExpected, primaryKeyActual);
 
         final String commaExpected = " , ";
-        final String commaActual = Sql.Common.COMMA.toString();
+        final String commaActual = Sql.BuildingBlock.COMMA.toString();
         assertEquals(commaExpected, commaActual);
     }
 }

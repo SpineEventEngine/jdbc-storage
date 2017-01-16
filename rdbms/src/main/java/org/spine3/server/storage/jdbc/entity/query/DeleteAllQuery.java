@@ -23,7 +23,7 @@ package org.spine3.server.storage.jdbc.entity.query;
 import org.spine3.server.storage.jdbc.query.WriteQuery;
 
 import static java.lang.String.format;
-import static org.spine3.server.storage.jdbc.Sql.Common.SEMICOLON;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
 import static org.spine3.server.storage.jdbc.Sql.Query.DELETE_FROM;
 
 /**

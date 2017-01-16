@@ -33,9 +33,9 @@ import java.sql.SQLException;
 import java.util.Iterator;
 
 import static java.lang.String.format;
-import static org.spine3.server.storage.jdbc.Sql.Common.COMMA;
-import static org.spine3.server.storage.jdbc.Sql.Common.EQUAL;
-import static org.spine3.server.storage.jdbc.Sql.Common.SEMICOLON;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.COMMA;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
 import static org.spine3.server.storage.jdbc.Sql.Query.DESC;
 import static org.spine3.server.storage.jdbc.Sql.Query.FROM;
 import static org.spine3.server.storage.jdbc.Sql.Query.ORDER_BY;

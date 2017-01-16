@@ -32,7 +32,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static java.lang.String.format;
-import static org.spine3.server.storage.jdbc.Sql.Common.COMMA;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.COMMA;
 import static org.spine3.server.storage.jdbc.Sql.Query.FROM;
 import static org.spine3.server.storage.jdbc.Sql.Query.SELECT;
 import static org.spine3.server.storage.jdbc.projection.query.ProjectionTable.NANOS_COL;
@@ -49,7 +49,7 @@ public class SelectTimestampQuery extends StorageQuery {
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE = SELECT +
             SECONDS_COL + COMMA +
-            NANOS_COL + FROM + "%s" + Sql.Common.SEMICOLON;
+            NANOS_COL + FROM + "%s" + Sql.BuildingBlock.SEMICOLON;
 
     private SelectTimestampQuery(Builder builder) {
         super(builder);
