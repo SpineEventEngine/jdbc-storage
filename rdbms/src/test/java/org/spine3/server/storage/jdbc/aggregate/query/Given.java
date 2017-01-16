@@ -84,7 +84,6 @@ class Given {
         return builder.build();
     }
 
-    @SuppressWarnings("StaticVariableUsedBeforeInitialization")
     static Logger getLoggerMock() {
         return loggerMock;
     }

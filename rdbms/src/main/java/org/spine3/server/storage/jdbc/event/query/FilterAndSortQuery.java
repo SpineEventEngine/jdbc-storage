@@ -109,7 +109,7 @@ public class FilterAndSortQuery extends StorageQuery {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static String whereOrOr(StringBuilder builder) {
-        final String result = builder.toString().contains(WHERE.toString().trim())
+        final String result = builder.indexOf(WHERE.toString().trim()) >= 0
                                                         ? OR.toString()
                                                         : WHERE.toString();
         return result;

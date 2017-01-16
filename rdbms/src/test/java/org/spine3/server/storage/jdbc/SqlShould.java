@@ -67,9 +67,9 @@ public class SqlShould {
     @SuppressWarnings("DuplicateStringLiteralInspection")
     @Test
     public void provide_valid_sql_tokens() {
-        final String createTAbleExpected = "CREATE TABLE";
-        final String createTAbleActual = Sql.Query.CREATE_TABLE.toString().trim();
-        assertEquals(createTAbleExpected, createTAbleActual);
+        final String createTableExpected = "CREATE TABLE";
+        final String createTableActual = Sql.Query.CREATE_TABLE.toString().trim();
+        assertEquals(createTableExpected, createTableActual);
 
         final String countExpected = "COUNT";
         final String countActual = Sql.Function.COUNT.toString().trim();
