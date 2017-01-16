@@ -211,7 +211,7 @@ public class JdbcEventStorage extends EventStorage {
     }
 
     /**
-     * Predicate matching an {@link Event} to a single {@link EventFilter}.
+     * Predicate matching an {@link Event} stored as {@link EventStorageRecord} to a single {@link EventFilter}.
      */
     private static class EventFilterChecker implements Predicate<EventStorageRecord> {
 
@@ -273,9 +273,7 @@ public class JdbcEventStorage extends EventStorage {
             return true;
         }
 
-        private static boolean checkFields(
-                Message object,
-                @SuppressWarnings("TypeMayBeWeakened") /*BuilderOrType interface*/ FieldFilter filter) {
+        private static boolean checkFields(Message object, FieldFilter filter) {
             final String fieldPath = filter.getFieldPath();
             final String fieldName = fieldPath.substring(fieldPath.lastIndexOf('.') + 1);
             checkArgument(!Strings.isNullOrEmpty(fieldName), "Field filter " + filter.toString() + " is invalid");
@@ -293,6 +291,7 @@ public class JdbcEventStorage extends EventStorage {
                     actualValue = AnyPacker.unpack((Any) actualValue);
                 }
             } catch (@SuppressWarnings("OverlyBroadCatchBlock") ReflectiveOperationException e) {
+                // Catch several checked reflection exceptions that should never happen
                 throw wrapped(e);
             }
 

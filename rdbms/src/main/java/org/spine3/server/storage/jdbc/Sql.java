@@ -27,7 +27,8 @@ import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.COMMA;
 
 /**
  * Set of enums and utilities for constructing the SQL sentences.
- * <p>Contains most valid SQL keywords/key-phrases, operators and punctuation.
+ *
+ * <p>Defines the common SQL keywords, operators and punctuation. They serve as reusable parts to build SQL expressions.
  *
  * <p>All the {@code enum} values have a valid token string representation, i.e. {@link Enum#toString() toString()}
  * method returns a valid SQL token wrapped into the whitespaces.
