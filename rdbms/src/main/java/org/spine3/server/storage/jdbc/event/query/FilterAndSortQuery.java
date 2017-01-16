@@ -36,7 +36,24 @@ import java.sql.PreparedStatement;
 import java.util.Iterator;
 
 import static org.spine3.base.Identifiers.idToString;
-import static org.spine3.server.storage.jdbc.event.query.EventTable.*;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.COMMA;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.GT;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.LT;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
+import static org.spine3.server.storage.jdbc.Sql.Query.AND;
+import static org.spine3.server.storage.jdbc.Sql.Query.ASC;
+import static org.spine3.server.storage.jdbc.Sql.Query.OR;
+import static org.spine3.server.storage.jdbc.Sql.Query.ORDER_BY;
+import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
+import static org.spine3.server.storage.jdbc.event.query.EventTable.EVENT_COL;
+import static org.spine3.server.storage.jdbc.event.query.EventTable.EVENT_TYPE_COL;
+import static org.spine3.server.storage.jdbc.event.query.EventTable.NANOSECONDS_COL;
+import static org.spine3.server.storage.jdbc.event.query.EventTable.PRODUCER_ID_COL;
+import static org.spine3.server.storage.jdbc.event.query.EventTable.SECONDS_COL;
+import static org.spine3.server.storage.jdbc.event.query.EventTable.SELECT_EVENT_FROM_TABLE;
 
 /**
  * Query that selects {@link EventStorageRecord} by specified {@link EventStreamQuery}.
@@ -47,7 +64,10 @@ import static org.spine3.server.storage.jdbc.event.query.EventTable.*;
 public class FilterAndSortQuery extends StorageQuery {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String QUERY_TEMPLATE = " ORDER BY " + SECONDS_COL + " ASC, " + NANOSECONDS_COL + " ASC;";
+    private static final String QUERY_TEMPLATE = ORDER_BY + SECONDS_COL + ASC + COMMA
+            + NANOSECONDS_COL + ASC + SEMICOLON;
+    private static final String ESCAPED_EQUAL_START = " = \'";
+    private static final String ESCAPED_EQUAL_END = "\' ";
 
     private final EventStreamQuery streamQuery;
 
@@ -74,7 +94,7 @@ public class FilterAndSortQuery extends StorageQuery {
     private static void appendFilterByEventTypeSql(StringBuilder builder, String eventType) {
         appendTo(builder,
                 whereOrOr(builder),
-                EVENT_TYPE_COL, " = \'", eventType, "\' ");
+                EVENT_TYPE_COL, ESCAPED_EQUAL_START, eventType, ESCAPED_EQUAL_END);
     }
 
     private static void appendFilterByAggregateIdsSql(StringBuilder builder, EventFilter filter) {
@@ -83,13 +103,15 @@ public class FilterAndSortQuery extends StorageQuery {
             final String aggregateIdStr = idToString(aggregateId);
             appendTo(builder,
                     whereOrOr(builder),
-                    PRODUCER_ID_COL, " = \'", aggregateIdStr, "\' ");
+                    PRODUCER_ID_COL, ESCAPED_EQUAL_START, aggregateIdStr, ESCAPED_EQUAL_END);
         }
     }
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static String whereOrOr(StringBuilder builder) {
-        final String result = builder.toString().contains("WHERE") ? " OR " : " WHERE ";
+        final String result = builder.indexOf(WHERE.toString().trim()) >= 0
+                                                        ? OR.toString()
+                                                        : WHERE.toString();
         return result;
     }
 
@@ -97,7 +119,7 @@ public class FilterAndSortQuery extends StorageQuery {
     private static StringBuilder appendTimeConditionSql(StringBuilder builder, EventStreamQuery query) {
         final boolean afterSpecified = query.hasAfter();
         final boolean beforeSpecified = query.hasBefore();
-        final String where = " WHERE ";
+        final String where = WHERE.toString();
         if (afterSpecified && !beforeSpecified) {
             builder.append(where);
             appendIsAfterSql(builder, query);
@@ -116,12 +138,12 @@ public class FilterAndSortQuery extends StorageQuery {
         final Timestamp after = query.getAfter();
         final long seconds = after.getSeconds();
         final int nanos = after.getNanos();
-        appendTo(builder, " ",
-                SECONDS_COL, " > ", seconds,
-                " OR ( ",
-                    SECONDS_COL, " = ", seconds, " AND ",
-                    NANOSECONDS_COL, " > ", nanos,
-                ") ");
+        appendTo(builder, ' ',
+                SECONDS_COL, GT, seconds,
+                OR, BRACKET_OPEN,
+                    SECONDS_COL, EQUAL, seconds, AND,
+                    NANOSECONDS_COL, GT, nanos,
+                BRACKET_CLOSE.toString());
         return builder;
     }
 
@@ -130,21 +152,21 @@ public class FilterAndSortQuery extends StorageQuery {
         final Timestamp before = query.getBefore();
         final long seconds = before.getSeconds();
         final int nanos = before.getNanos();
-        appendTo(builder, " ",
-                SECONDS_COL, " < ", seconds,
-                " OR ( ",
-                SECONDS_COL, " = ", seconds, " AND ",
-                NANOSECONDS_COL, " < ", nanos,
-                ") ");
+        appendTo(builder, ' ',
+                SECONDS_COL, LT, seconds,
+                OR, BRACKET_OPEN,
+                SECONDS_COL, EQUAL, seconds, AND,
+                NANOSECONDS_COL, LT, nanos,
+                BRACKET_CLOSE);
         return builder;
     }
 
     private static void appendIsBetweenSql(StringBuilder builder, EventStreamQuery query) {
-        builder.append(" (");
+        builder.append(BRACKET_OPEN);
         appendIsAfterSql(builder, query);
-        builder.append(") AND (");
+        builder.append(BRACKET_CLOSE).append(AND).append(BRACKET_OPEN);
         appendIsBeforeSql(builder, query);
-        builder.append(") ");
+        builder.append(BRACKET_CLOSE);
     }
 
     private static StringBuilder appendTo(StringBuilder builder, Object... objects) {

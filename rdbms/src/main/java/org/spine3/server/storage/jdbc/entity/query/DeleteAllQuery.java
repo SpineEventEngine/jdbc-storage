@@ -23,6 +23,8 @@ package org.spine3.server.storage.jdbc.entity.query;
 import org.spine3.server.storage.jdbc.query.WriteQuery;
 
 import static java.lang.String.format;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
+import static org.spine3.server.storage.jdbc.Sql.Query.DELETE_FROM;
 
 /**
  * Query that deletes all from {@link EntityTable}.
@@ -32,7 +34,7 @@ import static java.lang.String.format;
  */
 public class DeleteAllQuery extends WriteQuery {
 
-    private static final String QUERY_TEMPLATE = "DELETE FROM %s ;";
+    private static final String QUERY_TEMPLATE = DELETE_FROM + "%s" + SEMICOLON;
 
     private DeleteAllQuery(Builder builder) {
         super(builder);

@@ -34,9 +34,9 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Throwables.propagate;
 import static com.google.common.collect.Lists.newLinkedList;
 import static org.spine3.io.IoUtil.closeAll;
+import static org.spine3.util.Exceptions.wrapped;
 
 /**
  * The implementation of the aggregate storage based on the RDBMS.
@@ -141,7 +141,7 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
         try {
             super.close();
         } catch (Exception e) {
-            throw propagate(e);
+            throw wrapped(e);
         }
         closeAll(iterators);
         iterators.clear();

@@ -32,15 +32,15 @@ import static org.mockito.Mockito.*;
 /**
  * @author Andrey Lavrov
  */
-/* package */ class Given {
+class Given {
 
-    /* package */ @SuppressWarnings("StaticNonFinalField")
+    @SuppressWarnings("StaticNonFinalField")
     private static Logger loggerMock = null;
 
     private Given() {
     }
 
-    /* package */ static InsertTimestampQuery getInsertTimestampQueryMock() throws SQLException {
+    static InsertTimestampQuery getInsertTimestampQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
         final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnSettingStatementParam();
         final InsertTimestampQuery.Builder builder = InsertTimestampQuery.newBuilder(anyString())
@@ -50,7 +50,7 @@ import static org.mockito.Mockito.*;
         return builder.build();
     }
 
-    /* package */ static SelectTimestampQuery getSelectTimestampQueryMock() throws SQLException {
+    static SelectTimestampQuery getSelectTimestampQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
         final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnExecuteStatement();
         final SelectTimestampQuery.Builder builder = SelectTimestampQuery.newBuilder(anyString())
@@ -59,7 +59,7 @@ import static org.mockito.Mockito.*;
         return builder.build();
     }
 
-    /* package */ static UpdateTimestampQuery getUpdateTimestampQueryMock() throws SQLException {
+    static UpdateTimestampQuery getUpdateTimestampQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
         final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnSettingStatementParam();
         final UpdateTimestampQuery.Builder builder = UpdateTimestampQuery.newBuilder(anyString())
@@ -70,7 +70,7 @@ import static org.mockito.Mockito.*;
     }
 
     @SuppressWarnings("StaticVariableUsedBeforeInitialization")
-    /* package */ static Logger getLoggerMock() {
+    static Logger getLoggerMock() {
         return loggerMock;
     }
 }

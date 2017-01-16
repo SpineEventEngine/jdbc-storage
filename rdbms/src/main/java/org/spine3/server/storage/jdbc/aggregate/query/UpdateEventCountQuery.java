@@ -28,6 +28,12 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import static java.lang.String.format;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
+import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
+import static org.spine3.server.storage.jdbc.Sql.Query.SET;
+import static org.spine3.server.storage.jdbc.Sql.Query.UPDATE;
+import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
 import static org.spine3.server.storage.jdbc.aggregate.query.Table.EventCount.EVENT_COUNT_COL;
 import static org.spine3.server.storage.jdbc.aggregate.query.Table.EventCount.ID_COL;
 
@@ -43,9 +49,9 @@ public class UpdateEventCountQuery<I> extends UpdateRecordQuery<I> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
-            "UPDATE %s " +
-                    " SET " + EVENT_COUNT_COL + " = ? " +
-                    " WHERE " + ID_COL + " = ?;";
+            UPDATE + "%s" +
+                    SET + EVENT_COUNT_COL + EQUAL + PLACEHOLDER +
+                    WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
 
     private UpdateEventCountQuery(Builder<I> builder) {
         super(builder);
@@ -83,7 +89,7 @@ public class UpdateEventCountQuery<I> extends UpdateRecordQuery<I> {
             return new UpdateEventCountQuery<>(this);
         }
 
-        public Builder<I> setCount(int count){
+        public Builder<I> setCount(int count) {
             this.count = count;
             return getThis();
         }

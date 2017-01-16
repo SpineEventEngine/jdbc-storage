@@ -23,7 +23,15 @@ package org.spine3.server.storage.jdbc.command.query;
 import org.spine3.base.CommandStatus;
 import org.spine3.server.storage.jdbc.query.UpdateRecordQuery;
 
-import static org.spine3.server.storage.jdbc.command.query.CommandTable.*;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
+import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
+import static org.spine3.server.storage.jdbc.Sql.Query.SET;
+import static org.spine3.server.storage.jdbc.Sql.Query.UPDATE;
+import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
+import static org.spine3.server.storage.jdbc.command.query.CommandTable.COMMAND_STATUS_COL;
+import static org.spine3.server.storage.jdbc.command.query.CommandTable.ID_COL;
+import static org.spine3.server.storage.jdbc.command.query.CommandTable.TABLE_NAME;
 
 /**
  * Query that sets {@link CommandStatus} to OK state.
@@ -35,9 +43,9 @@ public class SetOkStatusQuery extends UpdateRecordQuery<String> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
-            "UPDATE " + TABLE_NAME +
-            " SET " + COMMAND_STATUS_COL + " = '" + CommandStatus.forNumber(CommandStatus.OK_VALUE).name() + '\'' +
-            " WHERE " + ID_COL + " = ? ;";
+            UPDATE + TABLE_NAME +
+            SET + COMMAND_STATUS_COL + EQUAL + '\'' + CommandStatus.forNumber(CommandStatus.OK_VALUE).name() + '\'' +
+            WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
 
     private SetOkStatusQuery(Builder builder) {
         super(builder);

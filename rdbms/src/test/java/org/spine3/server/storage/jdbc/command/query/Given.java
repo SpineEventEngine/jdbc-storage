@@ -35,7 +35,7 @@ import static org.mockito.Mockito.mock;
  * @author Andrey Lavrov
  */
 @SuppressWarnings("UtilityClass")
-/* package */ class Given {
+class Given {
 
     @SuppressWarnings("StaticNonFinalField")
     private static Logger loggerMock = null;
@@ -44,7 +44,7 @@ import static org.mockito.Mockito.mock;
     private Given() {
     }
 
-    /* package */ static SelectCommandByIdQuery getSelectCommandByIdQueryMock() throws SQLException {
+    static SelectCommandByIdQuery getSelectCommandByIdQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
         final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnExecuteStatement();
         final SelectCommandByIdQuery.Builder builder = SelectCommandByIdQuery.newBuilder()
@@ -54,7 +54,7 @@ import static org.mockito.Mockito.mock;
         return builder.build();
     }
 
-    /* package */ static SelectCommandByStatusQuery getSelectCommandByStatusQueryMock() throws SQLException {
+    static SelectCommandByStatusQuery getSelectCommandByStatusQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
         final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnSettingStatementParam();
         final SelectCommandByStatusQuery.Builder builder = SelectCommandByStatusQuery.newBuilder()
@@ -64,7 +64,7 @@ import static org.mockito.Mockito.mock;
         return builder.build();
     }
 
-    /* package */ static WriteCommandRecordQuery getWriteCommandRecordQueryMock() throws SQLException {
+    static WriteCommandRecordQuery getWriteCommandRecordQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
         final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnSettingStatementParam();
         final InsertCommandQuery.Builder builder = InsertCommandQuery.newBuilder()
@@ -76,8 +76,7 @@ import static org.mockito.Mockito.mock;
         return builder.build();
     }
 
-    @SuppressWarnings("StaticVariableUsedBeforeInitialization")
-    /* package */ static Logger getLoggerMock() {
+    static Logger getLoggerMock() {
         return loggerMock;
     }
 }

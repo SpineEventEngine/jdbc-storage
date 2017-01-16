@@ -31,12 +31,11 @@ import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.JdbcStorageFactory;
 import org.spine3.server.storage.jdbc.entity.JdbcRecordStorage;
 import org.spine3.server.storage.jdbc.projection.query.ProjectionStorageQueryFactory;
-import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
 import javax.annotation.Nullable;
 import java.util.Map;
 
-import static com.google.common.base.Throwables.propagate;
+import static org.spine3.util.Exceptions.wrapped;
 
 /**
  * The implementation of the projection storage based on the RDBMS.
@@ -54,25 +53,22 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
     /**
      * Creates a new storage instance.
      *
-     * @param dataSource      a data source used by an {@code entityStorage}
      * @param entityStorage   an entity storage to use
      * @param multitenant     defines is this storage multitenant
      * @param queryFactory    factory that will generate queries for interaction with projection table
      * @param <I>             a type of projection IDs
      * @return a new storage instance
      */
-    public static <I> ProjectionStorage<I> newInstance(DataSourceWrapper dataSource,
-                                                       JdbcRecordStorage<I> entityStorage,
+    public static <I> ProjectionStorage<I> newInstance(JdbcRecordStorage<I> entityStorage,
                                                        boolean multitenant,
                                                        ProjectionStorageQueryFactory<I> queryFactory)
             throws DatabaseException {
-        return new JdbcProjectionStorage<>(dataSource, entityStorage, multitenant, queryFactory);
+        return new JdbcProjectionStorage<>(entityStorage, multitenant, queryFactory);
     }
 
-    protected JdbcProjectionStorage(DataSourceWrapper dataSource,
-                                  JdbcRecordStorage<I> entityStorage,
-                                  boolean multitenant,
-                                  ProjectionStorageQueryFactory<I> queryFactory) throws DatabaseException {
+    protected JdbcProjectionStorage(JdbcRecordStorage<I> entityStorage,
+                                    boolean multitenant,
+                                    ProjectionStorageQueryFactory<I> queryFactory) throws DatabaseException {
         super(multitenant);
         this.entityStorage = entityStorage;
         this.queryFactory = queryFactory;
@@ -113,7 +109,7 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
         try {
             super.close();
         } catch (Exception e) {
-            throw propagate(e);
+            throw wrapped(e);
         }
         // close only entityStorage because it must close dataSource by itself
         entityStorage.close();

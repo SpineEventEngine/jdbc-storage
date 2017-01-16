@@ -22,7 +22,22 @@ package org.spine3.server.storage.jdbc.event.query;
 
 import org.spine3.server.storage.jdbc.query.CreateTableQuery;
 
-import static org.spine3.server.storage.jdbc.event.query.EventTable.*;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.COMMA;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
+import static org.spine3.server.storage.jdbc.Sql.Query.CREATE_IF_MISSING;
+import static org.spine3.server.storage.jdbc.Sql.Query.PRIMARY_KEY;
+import static org.spine3.server.storage.jdbc.Sql.Type.BIGINT;
+import static org.spine3.server.storage.jdbc.Sql.Type.BLOB;
+import static org.spine3.server.storage.jdbc.Sql.Type.INT;
+import static org.spine3.server.storage.jdbc.Sql.Type.VARCHAR_512;
+import static org.spine3.server.storage.jdbc.event.query.EventTable.EVENT_COL;
+import static org.spine3.server.storage.jdbc.event.query.EventTable.EVENT_ID_COL;
+import static org.spine3.server.storage.jdbc.event.query.EventTable.EVENT_TYPE_COL;
+import static org.spine3.server.storage.jdbc.event.query.EventTable.NANOSECONDS_COL;
+import static org.spine3.server.storage.jdbc.event.query.EventTable.PRODUCER_ID_COL;
+import static org.spine3.server.storage.jdbc.event.query.EventTable.SECONDS_COL;
 
 /**
  * Query that creates a new {@link EventTable} if it does not exist.
@@ -34,15 +49,15 @@ public class CreateEventTableQuery extends CreateTableQuery<String> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
-            "CREATE TABLE IF NOT EXISTS %s (" +
-                    EVENT_ID_COL + " %s, " +
-                    EVENT_COL + " BLOB, " +
-                    EVENT_TYPE_COL + " VARCHAR(512), " +
-                    PRODUCER_ID_COL + " VARCHAR(512), " +
-                    SECONDS_COL + " BIGINT, " +
-                    NANOSECONDS_COL + " INT, " +
-                    " PRIMARY KEY(" + EVENT_ID_COL + ')' +
-                    ");";
+            CREATE_IF_MISSING + "%s" + BRACKET_OPEN +
+                    EVENT_ID_COL + " %s" + COMMA +
+                    EVENT_COL + BLOB + COMMA +
+                    EVENT_TYPE_COL + VARCHAR_512 + COMMA +
+                    PRODUCER_ID_COL + VARCHAR_512 + COMMA +
+                    SECONDS_COL + BIGINT + COMMA +
+                    NANOSECONDS_COL + INT + COMMA +
+                    PRIMARY_KEY + BRACKET_OPEN + EVENT_ID_COL + BRACKET_CLOSE +
+                    BRACKET_CLOSE + SEMICOLON;
 
     protected CreateEventTableQuery(Builder builder) {
         super(builder);

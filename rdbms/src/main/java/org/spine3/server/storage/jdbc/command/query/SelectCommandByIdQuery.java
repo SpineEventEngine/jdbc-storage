@@ -30,7 +30,19 @@ import javax.annotation.Nullable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import static org.spine3.server.storage.jdbc.command.query.CommandTable.*;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
+import static org.spine3.server.storage.jdbc.Sql.Query.ALL_ATTRIBUTES;
+import static org.spine3.server.storage.jdbc.Sql.Query.FROM;
+import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
+import static org.spine3.server.storage.jdbc.Sql.Query.SELECT;
+import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
+import static org.spine3.server.storage.jdbc.command.query.CommandTable.COMMAND_COL;
+import static org.spine3.server.storage.jdbc.command.query.CommandTable.COMMAND_STATUS_COL;
+import static org.spine3.server.storage.jdbc.command.query.CommandTable.ERROR_COL;
+import static org.spine3.server.storage.jdbc.command.query.CommandTable.FAILURE_COL;
+import static org.spine3.server.storage.jdbc.command.query.CommandTable.ID_COL;
+import static org.spine3.server.storage.jdbc.command.query.CommandTable.TABLE_NAME;
 import static org.spine3.server.storage.jdbc.util.Serializer.deserialize;
 
 /**
@@ -43,8 +55,8 @@ public class SelectCommandByIdQuery extends SelectByIdQuery<String, CommandStora
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
-                    "SELECT * FROM " + TABLE_NAME +
-                    " WHERE " + ID_COL + " = ?;";
+            SELECT.toString() + ALL_ATTRIBUTES + FROM + TABLE_NAME +
+                    WHERE + ID_COL + EQUAL  + PLACEHOLDER + SEMICOLON;
 
     public SelectCommandByIdQuery(Builder builder) {
         super(builder);

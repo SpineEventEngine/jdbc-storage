@@ -25,7 +25,13 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.spine3.server.aggregate.Aggregate;
 import org.spine3.server.entity.Entity;
-import org.spine3.server.storage.*;
+import org.spine3.server.storage.AggregateStorage;
+import org.spine3.server.storage.CommandStorage;
+import org.spine3.server.storage.EventStorage;
+import org.spine3.server.storage.ProjectionStorage;
+import org.spine3.server.storage.RecordStorage;
+import org.spine3.server.storage.StandStorage;
+import org.spine3.server.storage.StorageFactory;
 import org.spine3.server.storage.jdbc.aggregate.JdbcAggregateStorage;
 import org.spine3.server.storage.jdbc.aggregate.query.AggregateStorageQueryFactory;
 import org.spine3.server.storage.jdbc.command.JdbcCommandStorage;
@@ -116,7 +122,6 @@ public class JdbcStorageFactory<I> implements StorageFactory {
                 entityStateDescriptor);
 
         return JdbcProjectionStorage.newInstance(
-                dataSource,
                 entityStorage,
                 false,
                 getProjectionStorageQueryFactory(dataSource, projectionClass));

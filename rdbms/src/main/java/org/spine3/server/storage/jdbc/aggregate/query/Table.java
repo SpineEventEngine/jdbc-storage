@@ -27,24 +27,26 @@ package org.spine3.server.storage.jdbc.aggregate.query;
  * @author Andrey Lavrov
  */
 @SuppressWarnings("UtilityClass")
-/* package */ final class Table {
+final class Table {
+
+    private static final String ID_COL = "id";
 
     /** Table  that contains aggregate records. */
-    /* package */ static class AggregateRecord {
+    static class AggregateRecord {
 
         /** ID column name. */
-        /* package */ static final String ID_COL = "id";
+        static final String ID_COL = Table.ID_COL;
 
         /** Aggregate record column name. */
-        /* package */ static final String AGGREGATE_COL = "aggregate";
+        static final String AGGREGATE_COL = "aggregate";
 
         /** Aggregate event seconds column name. */
         @SuppressWarnings("DuplicateStringLiteralInspection")
-        /* package */ static final String SECONDS_COL = "seconds";
+        static final String SECONDS_COL = "seconds";
 
         /** Aggregate event nanoseconds column name. */
         @SuppressWarnings("DuplicateStringLiteralInspection")
-        /* package */ static final String NANOS_COL = "nanoseconds";
+        static final String NANOS_COL = "nanoseconds";
 
         private AggregateRecord() {
         }
@@ -55,16 +57,16 @@ package org.spine3.server.storage.jdbc.aggregate.query;
      * after the last snapshot of the corresponding aggregate was created,
      * or a count of all events if there were no snapshots yet.
      */
-    /* package */ static class EventCount {
+    static class EventCount {
 
         /** Aggregate ID column name. */
-        /* package */ static final String ID_COL = "id";
+        static final String ID_COL = Table.ID_COL;
 
         /** A count of events after the last snapshot column name. */
-        /* package */ static final String EVENT_COUNT_COL = "event_count";
+        static final String EVENT_COUNT_COL = "event_count";
 
         /** A suffix for this table name. */
-        /* package */ static final String EVENT_COUNT_TABLE_NAME_SUFFIX = "_event_count";
+        static final String EVENT_COUNT_TABLE_NAME_SUFFIX = "_event_count";
 
         private EventCount() {
         }

@@ -23,6 +23,7 @@ package org.spine3.server.storage.jdbc.aggregate.query;
 import com.google.protobuf.Timestamp;
 import org.spine3.server.storage.AggregateStorageRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
+import org.spine3.server.storage.jdbc.Sql;
 import org.spine3.server.storage.jdbc.query.WriteRecordQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 
@@ -30,7 +31,16 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import static java.lang.String.format;
-import static org.spine3.server.storage.jdbc.aggregate.query.Table.AggregateRecord.*;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.COMMA;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
+import static org.spine3.server.storage.jdbc.Sql.Query.INSERT_INTO;
+import static org.spine3.server.storage.jdbc.Sql.Query.VALUES;
+import static org.spine3.server.storage.jdbc.aggregate.query.Table.AggregateRecord.AGGREGATE_COL;
+import static org.spine3.server.storage.jdbc.aggregate.query.Table.AggregateRecord.ID_COL;
+import static org.spine3.server.storage.jdbc.aggregate.query.Table.AggregateRecord.NANOS_COL;
+import static org.spine3.server.storage.jdbc.aggregate.query.Table.AggregateRecord.SECONDS_COL;
 
 /**
  * Query that inserts a new {@link AggregateStorageRecord} to the {@link Table.AggregateRecord}.
@@ -42,9 +52,9 @@ public class InsertAggregateRecordQuery<I> extends WriteRecordQuery<I, Aggregate
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
-            "INSERT INTO %s " +
-                    " (" + ID_COL + ", " + AGGREGATE_COL + ", " + SECONDS_COL + ", " + NANOS_COL + ") " +
-                    " VALUES (?, ?, ?, ?);";
+            INSERT_INTO + " %s " + BRACKET_OPEN
+                    + ID_COL + COMMA + AGGREGATE_COL + COMMA + SECONDS_COL + COMMA + NANOS_COL + BRACKET_CLOSE
+                    + VALUES + Sql.nPlaceholders(4) + SEMICOLON;
 
     private InsertAggregateRecordQuery(Builder<I> builder) {
         super(builder);

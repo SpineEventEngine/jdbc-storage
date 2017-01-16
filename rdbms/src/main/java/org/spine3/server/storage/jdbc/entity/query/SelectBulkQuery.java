@@ -20,10 +20,12 @@
 
 package org.spine3.server.storage.jdbc.entity.query;
 
+import com.google.common.collect.Lists;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.FieldMask;
 import org.spine3.protobuf.TypeUrl;
 import org.spine3.server.storage.EntityStorageRecord;
+import org.spine3.server.storage.jdbc.Sql;
 import org.spine3.server.storage.jdbc.query.StorageQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 
@@ -31,11 +33,19 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
+import static org.spine3.server.storage.jdbc.Sql.Query.ALL_ATTRIBUTES;
+import static org.spine3.server.storage.jdbc.Sql.Query.FROM;
+import static org.spine3.server.storage.jdbc.Sql.Query.IN;
+import static org.spine3.server.storage.jdbc.Sql.Query.SELECT;
+import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
 
 /**
  * Implementation of {@link StorageQuery} for bulk selection.
@@ -55,17 +65,16 @@ public class SelectBulkQuery extends StorageQuery {
     private final FieldMask fieldMask;
     private final List arguments;
 
-    private static final String COMMON_TEMPLATE = "SELECT * FROM %s";
+    private static final String COMMON_TEMPLATE = SELECT.toString() + ALL_ATTRIBUTES + FROM + "%s";
     private static final String ALL_TEMPLATE = COMMON_TEMPLATE + ';';
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String IDS_TEMPLATE = COMMON_TEMPLATE + " WHERE " + EntityTable.ID_COL + " IN (%s);";
-
-    private static final int IDS_STRING_ESTIMATED_LENGTH = 128;
+    private static final String IDS_TEMPLATE = COMMON_TEMPLATE + WHERE + EntityTable.ID_COL + IN
+            + " %s" + SEMICOLON;
 
     protected SelectBulkQuery(Builder builder) {
         super(builder);
         final Descriptors.Descriptor messageDescriptor = checkNotNull(builder.messageDescriptor);
-        this.typeUrl = TypeUrl.of(messageDescriptor);
+        this.typeUrl = TypeUrl.from(messageDescriptor);
         this.fieldMask = builder.fieldMask;
         this.arguments = builder.arguments;
     }
@@ -122,6 +131,7 @@ public class SelectBulkQuery extends StorageQuery {
         private final List<Object> arguments = new ArrayList<>();
 
         private Builder() {
+            super();
         }
 
         public Builder setMessageDescriptor(Descriptors.Descriptor messageDescriptor) {
@@ -155,21 +165,20 @@ public class SelectBulkQuery extends StorageQuery {
          * @param ids IDs to search for.
          */
         public Builder setIdsQuery(String tableName, Iterable<?> ids) {
-            final StringBuilder paramsBuilder = new StringBuilder(IDS_STRING_ESTIMATED_LENGTH);
+            final Collection<?> idsCollection = Lists.newArrayList(ids);
+            final int idsCount = idsCollection.size();
 
-            final Iterator<?> params = ids.iterator();
-
-            while (params.hasNext()) {
-                paramsBuilder.append('?');
-
-                arguments.add(params.next());
-
-                if (params.hasNext()) {
-                    paramsBuilder.append(',');
-                }
+            final String placeholders;
+            if (idsCount == 0) {
+                placeholders = BRACKET_OPEN.toString() + BRACKET_CLOSE;
+            } else {
+                placeholders = Sql.nPlaceholders(idsCount);
+            }
+            for (Object id : ids) {
+                arguments.add(id);
             }
 
-            setQuery(String.format(IDS_TEMPLATE, tableName, paramsBuilder.toString()));
+            setQuery(String.format(IDS_TEMPLATE, tableName, placeholders));
             return getThis();
         }
 

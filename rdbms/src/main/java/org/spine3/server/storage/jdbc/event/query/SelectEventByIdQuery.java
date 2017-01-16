@@ -23,7 +23,13 @@ package org.spine3.server.storage.jdbc.event.query;
 import org.spine3.server.storage.EventStorageRecord;
 import org.spine3.server.storage.jdbc.query.SelectByIdQuery;
 
-import static org.spine3.server.storage.jdbc.event.query.EventTable.*;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
+import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
+import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
+import static org.spine3.server.storage.jdbc.event.query.EventTable.EVENT_COL;
+import static org.spine3.server.storage.jdbc.event.query.EventTable.EVENT_ID_COL;
+import static org.spine3.server.storage.jdbc.event.query.EventTable.SELECT_EVENT_FROM_TABLE;
 
 /**
  * Query that selects {@link EventStorageRecord} by ID.
@@ -35,7 +41,7 @@ public class SelectEventByIdQuery extends SelectByIdQuery<String, EventStorageRe
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE = SELECT_EVENT_FROM_TABLE +
-                                               " WHERE " + EVENT_ID_COL + " = ?;";
+            WHERE + EVENT_ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
 
     public SelectEventByIdQuery(Builder builder) {
         super(builder);

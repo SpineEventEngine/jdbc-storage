@@ -22,7 +22,19 @@ package org.spine3.server.storage.jdbc.command.query;
 
 import org.spine3.server.storage.jdbc.query.CreateTableQuery;
 
-import static org.spine3.server.storage.jdbc.command.query.CommandTable.*;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.COMMA;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
+import static org.spine3.server.storage.jdbc.Sql.Query.CREATE_IF_MISSING;
+import static org.spine3.server.storage.jdbc.Sql.Query.PRIMARY_KEY;
+import static org.spine3.server.storage.jdbc.Sql.Type.BLOB;
+import static org.spine3.server.storage.jdbc.Sql.Type.VARCHAR_512;
+import static org.spine3.server.storage.jdbc.command.query.CommandTable.COMMAND_COL;
+import static org.spine3.server.storage.jdbc.command.query.CommandTable.COMMAND_STATUS_COL;
+import static org.spine3.server.storage.jdbc.command.query.CommandTable.ERROR_COL;
+import static org.spine3.server.storage.jdbc.command.query.CommandTable.FAILURE_COL;
+import static org.spine3.server.storage.jdbc.command.query.CommandTable.ID_COL;
 
 /**
  * Query that creates a new {@link CommandTable} if it does not exist.
@@ -34,14 +46,14 @@ public class CreateCommandTableQuery extends CreateTableQuery<String> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
-            "CREATE TABLE IF NOT EXISTS %s (" +
-                    ID_COL + " %s, " +
-                    COMMAND_COL + " BLOB, " +
-                    COMMAND_STATUS_COL + " VARCHAR(512), " +
-                    ERROR_COL + " BLOB, " +
-                    FAILURE_COL + " BLOB, " +
-                    " PRIMARY KEY(" + ID_COL + ')' +
-                    ");";
+            CREATE_IF_MISSING + "%s" + BRACKET_OPEN +
+                    ID_COL + " %s" + COMMA +
+                    COMMAND_COL + BLOB + COMMA +
+                    COMMAND_STATUS_COL + VARCHAR_512 + COMMA +
+                    ERROR_COL + BLOB + COMMA +
+                    FAILURE_COL + BLOB + COMMA +
+                    PRIMARY_KEY + BRACKET_OPEN + ID_COL + BRACKET_CLOSE +
+                    BRACKET_CLOSE + SEMICOLON;
 
     public CreateCommandTableQuery(Builder builder) {
         super(builder);

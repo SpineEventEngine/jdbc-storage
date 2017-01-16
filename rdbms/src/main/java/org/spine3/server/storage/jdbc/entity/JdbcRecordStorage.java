@@ -40,7 +40,7 @@ import java.sql.SQLException;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Throwables.propagate;
+import static org.spine3.util.Exceptions.wrapped;
 
 /**
  * The implementation of the entity storage based on the RDBMS.
@@ -159,7 +159,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
         try {
             super.close();
         } catch (Exception e) {
-            throw propagate(e);
+            throw wrapped(e);
         }
         dataSource.close();
     }
@@ -169,7 +169,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
      *
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
-    /*package*/ void clear() throws DatabaseException {
+    void clear() throws DatabaseException {
        queryFactory.newDeleteAllQuery().execute();
     }
 

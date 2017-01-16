@@ -22,6 +22,13 @@ package org.spine3.server.storage.jdbc.projection.query;
 
 import org.spine3.server.storage.jdbc.query.CreateTableQuery;
 
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.COMMA;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
+import static org.spine3.server.storage.jdbc.Sql.Query.CREATE_IF_MISSING;
+import static org.spine3.server.storage.jdbc.Sql.Type.BIGINT;
+import static org.spine3.server.storage.jdbc.Sql.Type.INT;
 import static org.spine3.server.storage.jdbc.projection.query.ProjectionTable.NANOS_COL;
 import static org.spine3.server.storage.jdbc.projection.query.ProjectionTable.SECONDS_COL;
 
@@ -35,10 +42,10 @@ public class CreateProjectionTableQuery extends CreateTableQuery<String> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
-            "CREATE TABLE IF NOT EXISTS %s (" +
-                    SECONDS_COL + " BIGINT, " +
-                    NANOS_COL + " INT " +
-                    ");";
+            CREATE_IF_MISSING + "%s " + BRACKET_OPEN +
+                    SECONDS_COL + BIGINT + COMMA +
+                    NANOS_COL + INT + COMMA +
+                    BRACKET_CLOSE + SEMICOLON;
 
     protected CreateProjectionTableQuery(Builder builder) {
         super(builder);
