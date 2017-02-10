@@ -21,7 +21,7 @@
 package org.spine3.server.storage.jdbc.event.query;
 
 import com.google.protobuf.Timestamp;
-import org.spine3.server.storage.EventStorageRecord;
+import org.spine3.server.event.storage.EventStorageRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.WriteRecordQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
@@ -29,20 +29,9 @@ import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.COMMA;
-import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
-import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
-import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
-import static org.spine3.server.storage.jdbc.Sql.Query.SET;
-import static org.spine3.server.storage.jdbc.Sql.Query.UPDATE;
-import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
-import static org.spine3.server.storage.jdbc.event.query.EventTable.EVENT_COL;
-import static org.spine3.server.storage.jdbc.event.query.EventTable.EVENT_ID_COL;
-import static org.spine3.server.storage.jdbc.event.query.EventTable.EVENT_TYPE_COL;
-import static org.spine3.server.storage.jdbc.event.query.EventTable.NANOSECONDS_COL;
-import static org.spine3.server.storage.jdbc.event.query.EventTable.PRODUCER_ID_COL;
-import static org.spine3.server.storage.jdbc.event.query.EventTable.SECONDS_COL;
-import static org.spine3.server.storage.jdbc.event.query.EventTable.TABLE_NAME;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.*;
+import static org.spine3.server.storage.jdbc.Sql.Query.*;
+import static org.spine3.server.storage.jdbc.event.query.EventTable.*;
 import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
 /**

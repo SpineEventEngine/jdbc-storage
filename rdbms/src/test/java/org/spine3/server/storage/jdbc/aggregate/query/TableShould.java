@@ -23,7 +23,7 @@ package org.spine3.server.storage.jdbc.aggregate.query;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
-import static org.spine3.test.Tests.hasPrivateUtilityConstructor;
+import static org.spine3.test.Tests.hasPrivateParameterlessCtor;
 
 /**
  * @author Andrey Lavrov
@@ -33,8 +33,8 @@ public class TableShould {
     @Test
     @SuppressWarnings("DuplicateStringLiteralInspection")
     public void have_private_constructors() {
-        assertTrue(hasPrivateUtilityConstructor(Table.class));
-        assertTrue(hasPrivateUtilityConstructor(Table.AggregateRecord.class));
-        assertTrue(hasPrivateUtilityConstructor(Table.EventCount.class));
+        assertTrue(hasPrivateParameterlessCtor(Table.class));
+        assertTrue(hasPrivateParameterlessCtor(Table.AggregateRecord.class));
+        assertTrue(hasPrivateParameterlessCtor(Table.EventCount.class));
     }
 }

@@ -29,7 +29,7 @@ import org.spine3.server.storage.jdbc.DatabaseException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import static org.spine3.base.Identifiers.idToString;
+import static org.spine3.base.Stringifiers.idToString;
 import static org.spine3.server.storage.jdbc.Sql.Type.BIGINT;
 import static org.spine3.server.storage.jdbc.Sql.Type.INT;
 import static org.spine3.server.storage.jdbc.Sql.Type.VARCHAR_999;

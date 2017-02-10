@@ -36,9 +36,9 @@ import org.spine3.base.EventId;
 import org.spine3.base.FieldFilter;
 import org.spine3.protobuf.AnyPacker;
 import org.spine3.server.event.EventFilter;
+import org.spine3.server.event.EventStorage;
 import org.spine3.server.event.EventStreamQuery;
-import org.spine3.server.storage.EventStorage;
-import org.spine3.server.storage.EventStorageRecord;
+import org.spine3.server.event.storage.EventStorageRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.JdbcStorageFactory;
 import org.spine3.server.storage.jdbc.event.query.EventStorageQueryFactory;
@@ -53,8 +53,7 @@ import java.util.List;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.Lists.newLinkedList;
-import static org.spine3.io.IoUtil.closeAll;
-import static org.spine3.util.Exceptions.wrapped;
+import static org.spine3.server.storage.jdbc.util.Closables.closeAll;
 
 /**
  * The implementation of the event storage based on the RDBMS.
@@ -165,7 +164,7 @@ public class JdbcEventStorage extends EventStorage {
         try {
             super.close();
         } catch (Exception e) {
-            throw wrapped(e);
+            throw new IllegalStateException(e);
         }
         closeAll(iterators);
         iterators.clear();
@@ -292,7 +291,7 @@ public class JdbcEventStorage extends EventStorage {
                 }
             } catch (@SuppressWarnings("OverlyBroadCatchBlock") ReflectiveOperationException e) {
                 // Catch several checked reflection exceptions that should never happen
-                throw wrapped(e);
+                throw new IllegalStateException(e);
             }
 
             final boolean result = expectedValues.contains(actualValue);

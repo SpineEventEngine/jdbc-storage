@@ -21,8 +21,8 @@
 package org.spine3.server.storage.jdbc.projection;
 
 import org.spine3.server.projection.Projection;
-import org.spine3.server.storage.ProjectionStorage;
-import org.spine3.server.storage.ProjectionStorageShould;
+import org.spine3.server.projection.ProjectionStorage;
+import org.spine3.server.projection.ProjectionStorageShould;
 import org.spine3.server.storage.jdbc.GivenDataSource;
 import org.spine3.server.storage.jdbc.entity.JdbcRecordStorage;
 import org.spine3.server.storage.jdbc.entity.query.EntityStorageQueryFactory;

@@ -20,16 +20,14 @@
 
 package org.spine3.server.storage.jdbc.event.query;
 
-import org.spine3.server.storage.EventStorageRecord;
+import org.spine3.server.event.storage.EventStorageRecord;
 import org.spine3.server.storage.jdbc.query.SelectByIdQuery;
 
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
 import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
 import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
-import static org.spine3.server.storage.jdbc.event.query.EventTable.EVENT_COL;
-import static org.spine3.server.storage.jdbc.event.query.EventTable.EVENT_ID_COL;
-import static org.spine3.server.storage.jdbc.event.query.EventTable.SELECT_EVENT_FROM_TABLE;
+import static org.spine3.server.storage.jdbc.event.query.EventTable.*;
 
 /**
  * Query that selects {@link EventStorageRecord} by ID.

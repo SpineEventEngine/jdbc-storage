@@ -18,20 +18,23 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.spine3.server.storage.jdbc.entity.query;
+package org.spine3.server.storage.jdbc.util;
 
-import org.junit.Test;
-
-import static org.junit.Assert.assertTrue;
-import static org.spine3.test.Tests.hasPrivateParameterlessCtor;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * @author Andrey Lavrov
+ * @author Dmytro Dashenkov.
  */
-public class EntityTableShould {
+public class Closables {
 
-    @Test
-    public void have_private_constructor() {
-        assertTrue(hasPrivateParameterlessCtor(EntityTable.class));
+    public static void closeAll(Iterable<? extends AutoCloseable> closebles) {
+        checkNotNull(closebles);
+        try {
+            for (AutoCloseable closable : closebles) {
+                closable.close();
+            }
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
     }
 }

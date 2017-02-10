@@ -20,12 +20,9 @@
 
 package org.spine3.server.storage.jdbc.command.query;
 
-import org.spine3.server.storage.CommandStorageRecord;
+import org.spine3.server.command.storage.CommandStorageRecord;
 
-import static org.spine3.server.storage.jdbc.command.query.CommandTable.COMMAND_COL;
-import static org.spine3.server.storage.jdbc.command.query.CommandTable.COMMAND_STATUS_COL;
-import static org.spine3.server.storage.jdbc.command.query.CommandTable.ID_COL;
-import static org.spine3.server.storage.jdbc.command.query.CommandTable.TABLE_NAME;
+import static org.spine3.server.storage.jdbc.command.query.CommandTable.*;
 
 /**
  * Query that inserts a new {@link CommandStorageRecord} to the {@link CommandTable}.

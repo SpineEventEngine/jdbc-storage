@@ -22,8 +22,8 @@ package org.spine3.server.storage.jdbc.aggregate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.spine3.server.storage.AggregateStorage;
-import org.spine3.server.storage.AggregateStorageRecord;
+import org.spine3.server.aggregate.AggregateStorage;
+import org.spine3.server.aggregate.storage.AggregateStorageRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.JdbcStorageFactory;
 import org.spine3.server.storage.jdbc.aggregate.query.AggregateStorageQueryFactory;
@@ -35,8 +35,6 @@ import java.util.Iterator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Lists.newLinkedList;
-import static org.spine3.io.IoUtil.closeAll;
-import static org.spine3.util.Exceptions.wrapped;
 
 /**
  * The implementation of the aggregate storage based on the RDBMS.
@@ -141,9 +139,11 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
         try {
             super.close();
         } catch (Exception e) {
-            throw wrapped(e);
+            throw new DatabaseException(e);
         }
-        closeAll(iterators);
+        for(DbIterator<?> iterator : iterators) {
+            iterator.close();
+        }
         iterators.clear();
         dataSource.close();
     }

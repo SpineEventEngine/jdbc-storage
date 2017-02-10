@@ -26,8 +26,8 @@ import org.spine3.base.CommandId;
 import org.spine3.base.CommandStatus;
 import org.spine3.base.Error;
 import org.spine3.base.Failure;
-import org.spine3.server.storage.CommandStorage;
-import org.spine3.server.storage.CommandStorageRecord;
+import org.spine3.server.command.CommandStorage;
+import org.spine3.server.command.storage.CommandStorageRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.JdbcStorageFactory;
 import org.spine3.server.storage.jdbc.command.query.CommandStorageQueryFactory;
@@ -37,7 +37,6 @@ import org.spine3.validate.Validate;
 import java.util.Iterator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.spine3.util.Exceptions.wrapped;
 import static org.spine3.validate.Validate.checkNotDefault;
 
 /**
@@ -185,7 +184,7 @@ public class JdbcCommandStorage extends CommandStorage {
         try {
             super.close();
         } catch (Exception e) {
-            throw wrapped(e);
+            throw new IllegalStateException(e);
         }
         dataSource.close();
     }

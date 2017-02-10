@@ -20,8 +20,8 @@
 
 package org.spine3.server.storage.jdbc.event;
 
-import org.spine3.server.storage.EventStorage;
-import org.spine3.server.storage.EventStorageShould;
+import org.spine3.server.event.EventStorage;
+import org.spine3.server.event.EventStorageShould;
 import org.spine3.server.storage.jdbc.GivenDataSource;
 import org.spine3.server.storage.jdbc.event.query.EventStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
