@@ -25,6 +25,7 @@ import org.junit.Test;
 import java.util.HashSet;
 import java.util.Set;
 
+import static java.util.Collections.singleton;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.spine3.test.Tests.hasPrivateParameterlessCtor;
@@ -55,6 +56,12 @@ public class CloseablesShould {
         }
     }
 
+    @Test(expected = IllegalStateException.class)
+    public void throw_Illegal_state_on_failure() {
+        final AutoCloseable closeable = new FaultyClosable();
+        Closeables.closeAll(singleton(closeable));
+    }
+
     private static class StatefulClosable implements AutoCloseable {
 
         private boolean closed = false;
@@ -63,6 +70,14 @@ public class CloseablesShould {
         public void close() throws Exception {
             assertFalse(closed);
             closed = true;
+        }
+    }
+
+    private static class FaultyClosable implements AutoCloseable {
+
+        @Override
+        public void close() throws Exception {
+            throw new RuntimeException("Fault!");
         }
     }
 }
