@@ -36,9 +36,24 @@ import java.sql.PreparedStatement;
 import java.util.Iterator;
 
 import static org.spine3.base.Stringifiers.idToString;
-import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.*;
-import static org.spine3.server.storage.jdbc.Sql.Query.*;
-import static org.spine3.server.storage.jdbc.event.query.EventTable.*;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.COMMA;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.GT;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.LT;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
+import static org.spine3.server.storage.jdbc.Sql.Query.AND;
+import static org.spine3.server.storage.jdbc.Sql.Query.ASC;
+import static org.spine3.server.storage.jdbc.Sql.Query.OR;
+import static org.spine3.server.storage.jdbc.Sql.Query.ORDER_BY;
+import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
+import static org.spine3.server.storage.jdbc.event.query.EventTable.EVENT_COL;
+import static org.spine3.server.storage.jdbc.event.query.EventTable.EVENT_TYPE_COL;
+import static org.spine3.server.storage.jdbc.event.query.EventTable.NANOSECONDS_COL;
+import static org.spine3.server.storage.jdbc.event.query.EventTable.PRODUCER_ID_COL;
+import static org.spine3.server.storage.jdbc.event.query.EventTable.SECONDS_COL;
+import static org.spine3.server.storage.jdbc.event.query.EventTable.SELECT_EVENT_FROM_TABLE;
 
 /**
  * Query that selects {@link EventStorageRecord} by specified {@link EventStreamQuery}.

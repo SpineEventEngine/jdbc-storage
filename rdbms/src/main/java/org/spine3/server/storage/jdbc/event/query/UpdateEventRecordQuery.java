@@ -29,9 +29,20 @@ import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.*;
-import static org.spine3.server.storage.jdbc.Sql.Query.*;
-import static org.spine3.server.storage.jdbc.event.query.EventTable.*;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.COMMA;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
+import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
+import static org.spine3.server.storage.jdbc.Sql.Query.SET;
+import static org.spine3.server.storage.jdbc.Sql.Query.UPDATE;
+import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
+import static org.spine3.server.storage.jdbc.event.query.EventTable.EVENT_COL;
+import static org.spine3.server.storage.jdbc.event.query.EventTable.EVENT_ID_COL;
+import static org.spine3.server.storage.jdbc.event.query.EventTable.EVENT_TYPE_COL;
+import static org.spine3.server.storage.jdbc.event.query.EventTable.NANOSECONDS_COL;
+import static org.spine3.server.storage.jdbc.event.query.EventTable.PRODUCER_ID_COL;
+import static org.spine3.server.storage.jdbc.event.query.EventTable.SECONDS_COL;
+import static org.spine3.server.storage.jdbc.event.query.EventTable.TABLE_NAME;
 import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
 /**
@@ -51,7 +62,7 @@ public class UpdateEventRecordQuery extends WriteRecordQuery<String, EventStorag
                     PRODUCER_ID_COL + EQUAL + PLACEHOLDER + COMMA +
                     SECONDS_COL + EQUAL + PLACEHOLDER + COMMA +
                     NANOSECONDS_COL + EQUAL + PLACEHOLDER +
-                    WHERE + EVENT_ID_COL +  EQUAL + PLACEHOLDER + SEMICOLON;
+                    WHERE + EVENT_ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
 
     private UpdateEventRecordQuery(Builder builder) {
         super(builder);
@@ -61,7 +72,7 @@ public class UpdateEventRecordQuery extends WriteRecordQuery<String, EventStorag
     @SuppressWarnings("DuplicateStringLiteralInspection")
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
         final PreparedStatement statement = connection.prepareStatement(QUERY_TEMPLATE);
-            final Timestamp timestamp = this.getRecord().getTimestamp();
+        final Timestamp timestamp = this.getRecord().getTimestamp();
         try {
             final byte[] serializedRecord = serialize(this.getRecord());
             statement.setBytes(1, serializedRecord);

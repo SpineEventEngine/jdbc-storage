@@ -53,7 +53,7 @@ import java.util.List;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.Lists.newLinkedList;
-import static org.spine3.server.storage.jdbc.util.Closables.closeAll;
+import static org.spine3.server.storage.jdbc.util.Closeables.closeAll;
 
 /**
  * The implementation of the event storage based on the RDBMS.

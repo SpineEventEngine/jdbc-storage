@@ -23,14 +23,20 @@ package org.spine3.server.storage.jdbc.util;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
+ * A utility class for working with {@link AutoCloseable} instances.
+ *
  * @author Dmytro Dashenkov.
  */
-public class Closables {
+@SuppressWarnings("UtilityClass")
+public class Closeables {
 
-    public static void closeAll(Iterable<? extends AutoCloseable> closebles) {
-        checkNotNull(closebles);
+    private Closeables() {
+    }
+
+    public static void closeAll(Iterable<? extends AutoCloseable> closeables) {
+        checkNotNull(closeables);
         try {
-            for (AutoCloseable closable : closebles) {
+            for (AutoCloseable closable : closeables) {
                 closable.close();
             }
         } catch (Exception e) {

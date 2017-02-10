@@ -35,7 +35,7 @@ import java.util.Iterator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Lists.newLinkedList;
-import static org.spine3.server.storage.jdbc.util.Closables.closeAll;
+import static org.spine3.server.storage.jdbc.util.Closeables.closeAll;
 
 /**
  * The implementation of the aggregate storage based on the RDBMS.
