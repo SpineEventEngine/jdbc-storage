@@ -27,7 +27,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @author Dmytro Dashenkov.
  */
-@SuppressWarnings("UtilityClass")
 public class Closeables {
 
     private Closeables() {
