@@ -20,8 +20,11 @@
 
 package org.spine3.server.storage.jdbc.util;
 
+import com.google.common.collect.Lists;
 import org.junit.Test;
+import org.spine3.test.NullToleranceTest;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -38,6 +41,15 @@ public class CloseablesShould {
     @Test
     public void have_private_constructor() {
         assertTrue(hasPrivateParameterlessCtor(Closeables.class));
+    }
+
+    @Test
+    public void pass_null_tolerance_test() {
+        final boolean passed = NullToleranceTest.newBuilder()
+                                                .setClass(Closeables.class)
+                                                .build()
+                                                .check();
+        assertTrue(passed);
     }
 
     @SuppressWarnings("MethodWithMultipleLoops") // Two loops - one for data set up and one for checks
@@ -60,6 +72,24 @@ public class CloseablesShould {
     public void throw_Illegal_state_on_failure() {
         final AutoCloseable closeable = new FaultyClosable();
         Closeables.closeAll(singleton(closeable));
+    }
+
+    @Test
+    public void try_to_close_all_instances() {
+        final AutoCloseable faulty = new FaultyClosable();
+        final StatefulClosable stateful = new StatefulClosable();
+
+        final Collection<AutoCloseable> closeables = Lists.newArrayList(faulty, stateful); // Needs to be ordered
+        boolean success;
+        try {
+            Closeables.closeAll(closeables);
+            success = true;
+        } catch (IllegalStateException e) {
+            success = false;
+        }
+
+        assertFalse(success);
+        assertTrue((stateful.closed));
     }
 
     private static class StatefulClosable implements AutoCloseable {

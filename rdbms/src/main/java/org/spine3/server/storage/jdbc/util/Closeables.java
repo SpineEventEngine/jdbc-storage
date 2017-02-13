@@ -33,14 +33,36 @@ public class Closeables {
     private Closeables() {
     }
 
+    /**
+     * Closes all of the passed {@linkplain AutoCloseable AutoCloseables}.
+     *
+     * <p>In case of an {@linkplain Exception} on the {@link AutoCloseable#close()} tries to close
+     * all the rest instances.
+     *
+     * <p>The very first {@linkplain Exception} caught will be propagated in an {@link IllegalStateException}.
+     *
+     * @param closeables instances to close
+     * @throws IllegalStateException if {@linkplain AutoCloseable#close() close()} throws an {@link Exception}
+     */
     public static void closeAll(Iterable<? extends AutoCloseable> closeables) {
         checkNotNull(closeables);
-        try {
-            for (AutoCloseable closable : closeables) {
+        Exception exception = null;
+        AutoCloseable faultyInstance = null;
+        for (AutoCloseable closable : closeables) {
+            try {
                 closable.close();
+            } catch (Exception e) {
+                if (exception == null) {
+                    exception = e;
+                    faultyInstance = closable;
+                }
             }
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
+        }
+
+        if (exception != null) {
+            throw new IllegalStateException(
+                    String.format("Exception trying to close %s.", faultyInstance),
+                    exception);
         }
     }
 }
