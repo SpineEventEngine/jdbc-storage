@@ -66,6 +66,13 @@ public class JdbcAggregateStorageShould extends AggregateStorageShould {
         fail("Aggregate storage should close itself.");
     }
 
+    @Test(expected = IllegalStateException.class)
+    public void throw_exception_when_closing_twice() throws Exception {
+        final AggregateStorage<?> storage = getStorage();
+        storage.close();
+        storage.close();
+    }
+
     private static class TestAggregateWithMessageId extends Aggregate<ProjectId, Project, Project.Builder> {
         private TestAggregateWithMessageId(ProjectId id) {
             super(id);
