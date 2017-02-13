@@ -140,7 +140,7 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
         try {
             super.close();
         } catch (Exception e) {
-            throw new DatabaseException(e);
+            throw new IllegalStateException(e);
         }
         closeAll(iterators);
         iterators.clear();
