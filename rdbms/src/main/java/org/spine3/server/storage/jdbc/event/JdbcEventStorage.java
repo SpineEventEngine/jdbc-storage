@@ -20,6 +20,7 @@
 
 package org.spine3.server.storage.jdbc.event;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
@@ -174,11 +175,13 @@ public class JdbcEventStorage extends EventStorage {
     /**
      * Predicate matching an {@link EventStorageRecord} to a number of {@link EventFilter} instances.
      */
-    private static class EventRecordPredicate implements Predicate<EventStorageRecord> {
+    @VisibleForTesting
+    static class EventRecordPredicate implements Predicate<EventStorageRecord> {
 
         private final Collection<EventFilter> eventFilters;
 
-        private EventRecordPredicate(Collection<EventFilter> eventFilters) {
+        @VisibleForTesting
+        EventRecordPredicate(Collection<EventFilter> eventFilters) {
             this.eventFilters = eventFilters;
         }
 
