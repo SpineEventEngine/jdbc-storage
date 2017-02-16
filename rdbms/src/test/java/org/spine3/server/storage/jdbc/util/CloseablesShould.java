@@ -21,6 +21,7 @@
 package org.spine3.server.storage.jdbc.util;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.junit.Test;
 import org.spine3.server.storage.jdbc.exception.MultipleCloseException;
 import org.spine3.test.NullToleranceTest;
@@ -85,12 +86,20 @@ public class CloseablesShould {
         try {
             Closeables.closeAll(closeables);
             success = true;
-        } catch (MultipleCloseException e) {
+        } catch (IllegalStateException e) {
             success = false;
         }
 
         assertFalse(success);
         assertTrue((stateful.closed));
+    }
+
+    @Test(expected = MultipleCloseException.class)
+    public void throw_special_kind_of_exception_upon_multiple_failures() {
+        final Collection<AutoCloseable> closeables =
+                Sets.<AutoCloseable>newHashSet(new FaultyClosable(),
+                                               new FaultyClosable());
+        Closeables.closeAll(closeables);
     }
 
     private static class StatefulClosable implements AutoCloseable {
