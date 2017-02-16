@@ -21,6 +21,7 @@
 package org.spine3.server.storage.jdbc;
 
 import com.google.common.base.Function;
+import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableCollection;
@@ -96,9 +97,24 @@ public class JdbcStandStorage extends StandStorage {
         return result;
     }
 
+    @Override
+    public boolean markArchived(AggregateStateId id) {
+        return false;
+    }
+
+    @Override
+    public boolean markDeleted(AggregateStateId id) {
+        return false;
+    }
+
+    @Override
+    public boolean delete(AggregateStateId id) {
+        return false;
+    }
+
     @Nullable
     @Override
-    protected EntityStorageRecord readRecord(AggregateStateId id) {
+    protected Optional<EntityStorageRecord> readRecord(AggregateStateId id) {
         return recordStorage.read(id.getAggregateId());
     }
 
@@ -129,6 +145,11 @@ public class JdbcStandStorage extends StandStorage {
     @Override
     protected void writeRecord(AggregateStateId id, EntityStorageRecord record) {
         recordStorage.write(id.getAggregateId(), record);
+    }
+
+    @Override
+    protected void writeRecords(Map<AggregateStateId, EntityStorageRecord> records) {
+
     }
 
     /**

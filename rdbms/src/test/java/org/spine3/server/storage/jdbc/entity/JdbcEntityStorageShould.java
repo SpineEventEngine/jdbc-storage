@@ -20,18 +20,23 @@
 
 package org.spine3.server.storage.jdbc.entity;
 
+import com.google.common.base.Optional;
+import com.google.protobuf.Message;
 import org.junit.Test;
 import org.spine3.server.entity.Entity;
 import org.spine3.server.storage.EntityStorageRecord;
-import org.spine3.server.storage.EntityStorageShould;
 import org.spine3.server.storage.RecordStorage;
+import org.spine3.server.storage.RecordStorageShould;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.GivenDataSource;
 import org.spine3.server.storage.jdbc.entity.query.EntityStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.test.storage.Project;
+import org.spine3.test.storage.ProjectId;
+import org.spine3.testdata.Sample;
 
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 import static org.spine3.base.Identifiers.newUuid;
 
@@ -39,17 +44,15 @@ import static org.spine3.base.Identifiers.newUuid;
  * @author Alexander Litus
  */
 @SuppressWarnings("InstanceMethodNamingConvention")
-public class JdbcEntityStorageShould extends EntityStorageShould<String> {
+public class JdbcEntityStorageShould extends RecordStorageShould<String, JdbcRecordStorage<String>> {
 
     @Override
-    protected RecordStorage<String> getStorage() {
-        return getStorage(TestEntityWithStringId.class);
-    }
-
-    @Override
-    protected <I> JdbcRecordStorage<I> getStorage(Class<? extends Entity<I, ?>> entityClass) {
+    protected JdbcRecordStorage<String> getStorage() {
         final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory("entityStorageTests");
-        return JdbcRecordStorage.newInstance(dataSource, false, new EntityStorageQueryFactory<>(dataSource, entityClass), Project.getDescriptor());
+        return JdbcRecordStorage.newInstance(dataSource,
+                                             false,
+                                             new EntityStorageQueryFactory<>(dataSource, TestEntityWithStringId.class),
+                                             Project.getDescriptor());
     }
 
     @Override
@@ -59,7 +62,7 @@ public class JdbcEntityStorageShould extends EntityStorageShould<String> {
 
     @Test
     public void close_itself_and_throw_exception_on_read() {
-        final JdbcRecordStorage<String> storage = getStorage(TestEntityWithStringId.class);
+        final JdbcRecordStorage<String> storage = getStorage();
         storage.close();
         try {
             storage.readRecord("any-id");
@@ -72,14 +75,15 @@ public class JdbcEntityStorageShould extends EntityStorageShould<String> {
 
     @Test
     public void clear_itself() {
-        final JdbcRecordStorage<String> storage = getStorage(TestEntityWithStringId.class);
+        final JdbcRecordStorage<String> storage = getStorage();
         final String id = newUuid();
         final EntityStorageRecord record = newStorageRecord();
         storage.writeRecord(id, record);
         storage.clear();
 
-        final EntityStorageRecord actual = storage.readRecord(id);
-        assertNull(actual);
+        final Optional<EntityStorageRecord> actual = storage.readRecord(id);
+        assertNotNull(actual);
+        assertFalse(actual.isPresent());
     }
 
     @Test(expected = IllegalStateException.class)
@@ -87,6 +91,14 @@ public class JdbcEntityStorageShould extends EntityStorageShould<String> {
         final RecordStorage<?> storage = getStorage();
         storage.close();
         storage.close();
+    }
+
+    @Override
+    protected Message newState(String id) {
+        final Project.Builder builder = Sample.builderForType(Project.class);
+        builder.setId(ProjectId.newBuilder()
+                               .setId(id));
+        return builder.build();
     }
 
     private static class TestEntityWithStringId extends Entity<String, Project> {

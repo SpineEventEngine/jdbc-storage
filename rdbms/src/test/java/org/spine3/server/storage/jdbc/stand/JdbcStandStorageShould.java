@@ -20,6 +20,7 @@
 
 package org.spine3.server.storage.jdbc.stand;
 
+import com.google.common.base.Optional;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.FieldMask;
 import com.google.protobuf.Message;
@@ -41,11 +42,21 @@ import org.spine3.test.aggregate.Project;
 import org.spine3.test.aggregate.ProjectId;
 import org.spine3.test.commandservice.customer.Customer;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import static junit.framework.TestCase.assertEquals;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.spine3.test.Verify.assertContains;
 import static org.spine3.test.Verify.assertSize;
 
@@ -167,9 +178,12 @@ public class JdbcStandStorageShould {
 
         final EntityStorageRecord record = writeToStorage(aggregate, storage, Project.class);
 
-        final EntityStorageRecord readRecord = storage.read(AggregateStateId.of(aggregate.getId(), TypeUrl.of(Project.class)));
-
-        assertEquals(readRecord, record);
+        final Optional<EntityStorageRecord> readRecord = storage.read(
+                AggregateStateId.of(aggregate.getId(),
+                                    TypeUrl.of(Project.class)));
+        assertTrue(readRecord.isPresent());
+        final EntityStorageRecord actualRecord = readRecord.get();
+        assertEquals(actualRecord, record);
     }
 
     @Test
@@ -269,7 +283,10 @@ public class JdbcStandStorageShould {
         final FieldMask nameAndStatus = FieldMask.newBuilder().addPaths(fields.get(1).getFullName())
                 .addPaths(fields.get(3).getFullName()).build();
 
-        final Project withIdOnly = AnyPacker.unpack(storage.read(id, idOnly).getState());
+        final Optional<EntityStorageRecord> recordOptional = storage.read(id, idOnly);
+        assertTrue(recordOptional.isPresent());
+        final EntityStorageRecord record = recordOptional.get();
+        final Project withIdOnly = AnyPacker.unpack(record.getState());
         final Project withIdAndName = AnyPacker.unpack(storage.readMultiple(Collections.singleton(id), idAndName).iterator()
                 .next().getState());
         final Project withNameAndStatus = AnyPacker.unpack(storage.readAll(nameAndStatus).get(id).getState());

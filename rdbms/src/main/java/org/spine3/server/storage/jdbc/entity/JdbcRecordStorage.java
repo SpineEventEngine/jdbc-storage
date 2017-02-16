@@ -21,6 +21,7 @@
 package org.spine3.server.storage.jdbc.entity;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.protobuf.Descriptors;
@@ -81,6 +82,21 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
         queryFactory.newCreateEntityTableQuery().execute();
     }
 
+    @Override
+    public boolean markArchived(I id) {
+        return false;
+    }
+
+    @Override
+    public boolean markDeleted(I id) {
+        return false;
+    }
+
+    @Override
+    public boolean delete(I id) {
+        return false;
+    }
+
     /**
      * {@inheritDoc}
      *
@@ -88,9 +104,9 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
      */
     @Nullable
     @Override
-    protected EntityStorageRecord readRecord(I id) throws DatabaseException {
+    protected Optional<EntityStorageRecord> readRecord(I id) throws DatabaseException {
         final EntityStorageRecord record = queryFactory.newSelectEntityByIdQuery(id).execute();
-        return record;
+        return Optional.fromNullable(record);
     }
 
     @Override
@@ -145,6 +161,11 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
         } else {
             queryFactory.newInsertEntityQuery(id, record).execute();
         }
+    }
+
+    @Override
+    protected void writeRecords(Map<I, EntityStorageRecord> records) {
+
     }
 
     private boolean containsRecord(I id) throws DatabaseException {
