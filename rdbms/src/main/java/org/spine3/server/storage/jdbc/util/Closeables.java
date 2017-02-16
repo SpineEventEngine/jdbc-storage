@@ -20,6 +20,11 @@
 
 package org.spine3.server.storage.jdbc.util;
 
+import org.spine3.server.storage.jdbc.exception.MultipleCloseException;
+
+import java.util.Collection;
+import java.util.LinkedList;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -45,23 +50,22 @@ public class Closeables {
      */
     public static void closeAll(Iterable<? extends AutoCloseable> closeables) {
         checkNotNull(closeables);
-        Exception exception = null;
-        AutoCloseable faultyInstance = null;
+        final Collection<Exception> exceptions = new LinkedList<>();
         for (AutoCloseable closable : closeables) {
             try {
                 closable.close();
             } catch (Exception e) {
-                if (exception == null) {
-                    exception = e;
-                    faultyInstance = closable;
-                }
+                exceptions.add(e);
             }
         }
-
-        if (exception != null) {
-            throw new IllegalStateException(
-                    String.format("Exception trying to close %s.", faultyInstance),
-                    exception);
+        if (exceptions.isEmpty()) {
+            return;
         }
+        if (exceptions.size() == 1) {
+            final Exception cause = exceptions.iterator()
+                                              .next();
+            throw new IllegalStateException(cause);
+        }
+        throw new MultipleCloseException(exceptions);
     }
 }

@@ -22,6 +22,7 @@ package org.spine3.server.storage.jdbc.util;
 
 import com.google.common.collect.Lists;
 import org.junit.Test;
+import org.spine3.server.storage.jdbc.exception.MultipleCloseException;
 import org.spine3.test.NullToleranceTest;
 
 import java.util.Collection;
@@ -84,7 +85,7 @@ public class CloseablesShould {
         try {
             Closeables.closeAll(closeables);
             success = true;
-        } catch (IllegalStateException e) {
+        } catch (MultipleCloseException e) {
             success = false;
         }
 
