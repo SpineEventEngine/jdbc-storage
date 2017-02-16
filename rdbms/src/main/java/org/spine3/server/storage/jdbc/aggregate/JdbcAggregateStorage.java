@@ -20,10 +20,12 @@
 
 package org.spine3.server.storage.jdbc.aggregate;
 
+import com.google.common.base.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spine3.server.aggregate.AggregateStorage;
 import org.spine3.server.aggregate.storage.AggregateStorageRecord;
+import org.spine3.server.entity.status.EntityStatus;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.JdbcStorageFactory;
 import org.spine3.server.storage.jdbc.aggregate.query.AggregateStorageQueryFactory;
@@ -91,6 +93,26 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
             return 0;
         }
         return count;
+    }
+
+    @Override
+    protected Optional<EntityStatus> readStatus(I id) {
+        return null;
+    }
+
+    @Override
+    protected void writeStatus(I id, EntityStatus status) {
+
+    }
+
+    @Override
+    protected boolean markArchived(I id) {
+        return false;
+    }
+
+    @Override
+    protected boolean markDeleted(I id) {
+        return false;
     }
 
     @Override

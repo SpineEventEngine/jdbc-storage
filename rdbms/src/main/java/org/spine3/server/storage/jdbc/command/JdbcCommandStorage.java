@@ -20,6 +20,7 @@
 
 package org.spine3.server.storage.jdbc.command;
 
+import com.google.common.base.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spine3.base.CommandId;
@@ -32,7 +33,6 @@ import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.JdbcStorageFactory;
 import org.spine3.server.storage.jdbc.command.query.CommandStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.validate.Validate;
 
 import java.util.Iterator;
 
@@ -86,15 +86,12 @@ public class JdbcCommandStorage extends CommandStorage {
      * @throws DatabaseException     if an error occurs during an interaction with the DB
      */
     @Override
-    public CommandStorageRecord read(CommandId commandId) throws DatabaseException {
+    public Optional<CommandStorageRecord> read(CommandId commandId) throws DatabaseException {
         checkNotClosed();
 
         final CommandStorageRecord record = queryFactory.newSelectCommandByIdQuery(commandId).execute();
 
-        if (record == null) {
-            return CommandStorageRecord.getDefaultInstance();
-        }
-        return record;
+        return Optional.fromNullable(record);
     }
 
     /**
@@ -130,8 +127,8 @@ public class JdbcCommandStorage extends CommandStorage {
     }
 
     private boolean containsRecord(CommandId commandId) {
-        final CommandStorageRecord record = read(commandId);
-        final boolean contains = Validate.isNotDefault(record);
+        final Optional<CommandStorageRecord> record = read(commandId);
+        final boolean contains = record.isPresent();
         return contains;
     }
 

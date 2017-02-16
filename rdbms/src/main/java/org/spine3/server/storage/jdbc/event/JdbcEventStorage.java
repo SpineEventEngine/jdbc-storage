@@ -22,6 +22,7 @@ package org.spine3.server.storage.jdbc.event;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
+import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
 import com.google.common.collect.Collections2;
@@ -148,10 +149,10 @@ public class JdbcEventStorage extends EventStorage {
      */
     @Nullable
     @Override
-    protected EventStorageRecord readRecord(EventId eventId) throws DatabaseException {
+    protected Optional<EventStorageRecord> readRecord(EventId eventId) throws DatabaseException {
         final String id = eventId.getUuid();
         final EventStorageRecord record = queryFactory.newSelectEventByIdQuery(id).execute();
-        return record;
+        return Optional.fromNullable(record);
     }
 
     private boolean containsRecord(String id) {

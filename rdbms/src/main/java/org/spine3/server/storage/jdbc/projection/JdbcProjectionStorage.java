@@ -99,7 +99,7 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
     }
 
     @Override
-    public RecordStorage<I> getRecordStorage() {
+    public RecordStorage<I> recordStorage() {
         return entityStorage;
     }
 
@@ -112,6 +112,21 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
         }
         // close only entityStorage because it must close dataSource by itself
         entityStorage.close();
+    }
+
+    @Override
+    public boolean markArchived(I id) {
+        return false;
+    }
+
+    @Override
+    public boolean markDeleted(I id) {
+        return false;
+    }
+
+    @Override
+    public boolean delete(I id) {
+        return false;
     }
 
     @Override
