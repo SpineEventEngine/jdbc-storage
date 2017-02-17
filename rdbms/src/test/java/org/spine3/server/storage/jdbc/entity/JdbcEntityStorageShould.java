@@ -29,7 +29,7 @@ import org.spine3.server.storage.RecordStorage;
 import org.spine3.server.storage.RecordStorageShould;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.GivenDataSource;
-import org.spine3.server.storage.jdbc.entity.query.EntityStorageQueryFactory;
+import org.spine3.server.storage.jdbc.entity.query.RecordStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.test.storage.Project;
 import org.spine3.test.storage.ProjectId;
@@ -51,7 +51,7 @@ public class JdbcEntityStorageShould extends RecordStorageShould<String, JdbcRec
         final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory("entityStorageTests");
         return JdbcRecordStorage.newInstance(dataSource,
                                              false,
-                                             new EntityStorageQueryFactory<>(dataSource, TestEntityWithStringId.class),
+                                             new RecordStorageQueryFactory<>(dataSource, TestEntityWithStringId.class),
                                              Project.getDescriptor());
     }
 

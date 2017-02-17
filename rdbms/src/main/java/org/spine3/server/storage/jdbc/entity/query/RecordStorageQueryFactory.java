@@ -41,7 +41,7 @@ import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
  * @author Andrey Lavrov
  * @author Dmytro Dashenkov
  */
-public class EntityStorageQueryFactory<I> {
+public class RecordStorageQueryFactory<I> {
 
     private final IdColumn<I> idColumn;
     private final DataSourceWrapper dataSource;
@@ -54,7 +54,7 @@ public class EntityStorageQueryFactory<I> {
      * @param dataSource    instance of {@link DataSourceWrapper}
      * @param entityClass   entity class of corresponding {@link RecordStorage} instance
      */
-    public EntityStorageQueryFactory(DataSourceWrapper dataSource, Class<? extends Entity<I, ?>> entityClass) {
+    public RecordStorageQueryFactory(DataSourceWrapper dataSource, Class<? extends Entity<I, ?>> entityClass) {
         this.idColumn = IdColumn.newInstance(entityClass);
         this.dataSource = dataSource;
         this.tableName = DbTableNameFactory.newTableName(entityClass);

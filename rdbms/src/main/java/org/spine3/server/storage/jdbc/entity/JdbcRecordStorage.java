@@ -33,7 +33,7 @@ import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.RecordStorage;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.JdbcStorageFactory;
-import org.spine3.server.storage.jdbc.entity.query.EntityStorageQueryFactory;
+import org.spine3.server.storage.jdbc.entity.query.RecordStorageQueryFactory;
 import org.spine3.server.storage.jdbc.entity.query.SelectBulkQuery;
 import org.spine3.server.storage.jdbc.query.DeleteRowQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
@@ -57,7 +57,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
 
     private final DataSourceWrapper dataSource;
 
-    private final EntityStorageQueryFactory<I> queryFactory;
+    private final RecordStorageQueryFactory<I> queryFactory;
 
     private final Descriptors.Descriptor stateDescriptor;
 
@@ -71,12 +71,12 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
      */
     public static <I> JdbcRecordStorage<I> newInstance(DataSourceWrapper dataSource,
                                                        boolean multitenant,
-                                                       EntityStorageQueryFactory<I> queryFactory, Descriptors.Descriptor stateDescriptor)
+                                                       RecordStorageQueryFactory<I> queryFactory, Descriptors.Descriptor stateDescriptor)
             throws DatabaseException {
         return new JdbcRecordStorage<>(dataSource, multitenant, queryFactory, stateDescriptor);
     }
 
-    protected JdbcRecordStorage(DataSourceWrapper dataSource, boolean multitenant, EntityStorageQueryFactory<I> queryFactory, Descriptors.Descriptor stateDescriptor)
+    protected JdbcRecordStorage(DataSourceWrapper dataSource, boolean multitenant, RecordStorageQueryFactory<I> queryFactory, Descriptors.Descriptor stateDescriptor)
             throws DatabaseException {
         super(multitenant);
         this.dataSource = dataSource;

@@ -37,7 +37,7 @@ import org.spine3.server.storage.jdbc.aggregate.query.AggregateStorageQueryFacto
 import org.spine3.server.storage.jdbc.command.JdbcCommandStorage;
 import org.spine3.server.storage.jdbc.command.query.CommandStorageQueryFactory;
 import org.spine3.server.storage.jdbc.entity.JdbcRecordStorage;
-import org.spine3.server.storage.jdbc.entity.query.EntityStorageQueryFactory;
+import org.spine3.server.storage.jdbc.entity.query.RecordStorageQueryFactory;
 import org.spine3.server.storage.jdbc.event.JdbcEventStorage;
 import org.spine3.server.storage.jdbc.event.query.EventStorageQueryFactory;
 import org.spine3.server.storage.jdbc.projection.JdbcProjectionStorage;
@@ -92,7 +92,7 @@ public class JdbcStorageFactory<I> implements StorageFactory {
         return JdbcStandStorage.newBuilder()
                 .setDataSource(dataSource)
                 .setMultitenant(isMultitenant())
-                .setEntityStorageQueryFactory(getEntityStorageQueryFactory(dataSource, entityClass))
+                .setRecordStorageQueryFactory(getEntityStorageQueryFactory(dataSource, entityClass))
                 .setStateDescriptor(entityStateDescriptor)
                 .build();
     }
@@ -140,15 +140,15 @@ public class JdbcStorageFactory<I> implements StorageFactory {
     }
 
     /**
-     * Creates a new {@link EntityStorageQueryFactory} which produces database queries for corresponding {@link JdbcRecordStorage}.
+     * Creates a new {@link RecordStorageQueryFactory} which produces database queries for corresponding {@link JdbcRecordStorage}.
      *
      * @param dataSource        {@link DataSource} on which corresponding {@link JdbcRecordStorage} is based
      * @param entityClass       class of entities which are stored in the corresponding {@link JdbcRecordStorage}
      * @param <I>               a type of IDs of stored entities
      */
-    protected <I> EntityStorageQueryFactory<I> getEntityStorageQueryFactory(DataSourceWrapper dataSource,
+    protected <I> RecordStorageQueryFactory<I> getEntityStorageQueryFactory(DataSourceWrapper dataSource,
                                                                             Class<? extends Entity<I, ?>> entityClass){
-        return new EntityStorageQueryFactory<>(dataSource, entityClass);
+        return new RecordStorageQueryFactory<>(dataSource, entityClass);
     }
 
     /**

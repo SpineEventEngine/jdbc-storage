@@ -36,7 +36,7 @@ import org.spine3.server.stand.AggregateStateId;
 import org.spine3.server.stand.StandStorage;
 import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.jdbc.entity.JdbcRecordStorage;
-import org.spine3.server.storage.jdbc.entity.query.EntityStorageQueryFactory;
+import org.spine3.server.storage.jdbc.entity.query.RecordStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
 import javax.annotation.Nullable;
@@ -71,7 +71,7 @@ public class JdbcStandStorage extends StandStorage {
         recordStorage = JdbcRecordStorage.newInstance(
                 checkNotNull(builder.dataSource),
                 builder.isMultitenant,
-                checkNotNull(builder.entityStorageQueryFactory),
+                checkNotNull(builder.recordStorageQueryFactory),
                 checkNotNull(builder.stateDescriptor));
     }
 
@@ -192,7 +192,7 @@ public class JdbcStandStorage extends StandStorage {
         private boolean isMultitenant;
         private DataSourceWrapper dataSource;
         private Descriptors.Descriptor stateDescriptor;
-        private EntityStorageQueryFactory<I> entityStorageQueryFactory;
+        private RecordStorageQueryFactory<I> recordStorageQueryFactory;
 
         private Builder() {
         }
@@ -226,8 +226,8 @@ public class JdbcStandStorage extends StandStorage {
         /**
          * Sets required field {@code queryFactory}.
          */
-        public Builder setEntityStorageQueryFactory(EntityStorageQueryFactory<I> queryFactory) {
-            this.entityStorageQueryFactory = queryFactory;
+        public Builder setRecordStorageQueryFactory(RecordStorageQueryFactory<I> queryFactory) {
+            this.recordStorageQueryFactory = queryFactory;
             return this;
         }
 
