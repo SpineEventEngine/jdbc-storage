@@ -76,7 +76,8 @@ public class Sql {
         INT("INT"),
         BIGINT("BIGINT"),
         VARCHAR_512("VARCHAR(512)"),
-        VARCHAR_999("VARCHAR(999)");
+        VARCHAR_999("VARCHAR(999)"),
+        BOOLEAN("BOOLEAN");
 
         private final String token;
 
