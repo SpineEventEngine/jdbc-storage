@@ -20,7 +20,7 @@
 
 package org.spine3.server.storage.jdbc.command.query;
 
-import org.spine3.server.storage.CommandStorageRecord;
+import org.spine3.server.command.storage.CommandStorageRecord;
 
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.COMMA;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.EQUAL;

@@ -21,7 +21,7 @@
 package org.spine3.server.storage.jdbc.event.query;
 
 import com.google.protobuf.Timestamp;
-import org.spine3.server.storage.EventStorageRecord;
+import org.spine3.server.event.storage.EventStorageRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.Sql;
 import org.spine3.server.storage.jdbc.query.WriteRecordQuery;

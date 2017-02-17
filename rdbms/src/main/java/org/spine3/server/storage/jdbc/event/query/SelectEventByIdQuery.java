@@ -20,7 +20,7 @@
 
 package org.spine3.server.storage.jdbc.event.query;
 
-import org.spine3.server.storage.EventStorageRecord;
+import org.spine3.server.event.storage.EventStorageRecord;
 import org.spine3.server.storage.jdbc.query.SelectByIdQuery;
 
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.EQUAL;

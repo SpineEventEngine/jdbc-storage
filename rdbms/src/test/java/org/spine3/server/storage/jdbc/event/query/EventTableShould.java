@@ -23,7 +23,7 @@ package org.spine3.server.storage.jdbc.event.query;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
-import static org.spine3.test.Tests.hasPrivateUtilityConstructor;
+import static org.spine3.test.Tests.hasPrivateParameterlessCtor;
 
 /**
  * @author Andrey Lavrov
@@ -32,6 +32,6 @@ public class EventTableShould {
 
     @Test
     public void have_private_constructors() {
-        assertTrue(hasPrivateUtilityConstructor(EventTable.class));
+        assertTrue(hasPrivateParameterlessCtor(EventTable.class));
     }
 }

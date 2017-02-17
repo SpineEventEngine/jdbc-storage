@@ -23,7 +23,6 @@ package org.spine3.server.storage.jdbc.projection.query;
 import com.google.protobuf.Timestamp;
 import org.slf4j.Logger;
 import org.spine3.server.entity.Entity;
-import org.spine3.server.storage.ProjectionStorage;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
 import static org.spine3.server.storage.jdbc.projection.query.ProjectionTable.LAST_EVENT_TIME_TABLE_NAME_SUFFIX;

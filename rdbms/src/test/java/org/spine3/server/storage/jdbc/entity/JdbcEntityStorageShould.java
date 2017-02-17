@@ -82,6 +82,13 @@ public class JdbcEntityStorageShould extends EntityStorageShould<String> {
         assertNull(actual);
     }
 
+    @Test(expected = IllegalStateException.class)
+    public void throw_exception_when_closing_twice() throws Exception {
+        final RecordStorage<?> storage = getStorage();
+        storage.close();
+        storage.close();
+    }
+
     private static class TestEntityWithStringId extends Entity<String, Project> {
 
         private TestEntityWithStringId(String id) {

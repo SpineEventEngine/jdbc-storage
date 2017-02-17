@@ -21,14 +21,15 @@
 package org.spine3.server.storage.jdbc.aggregate.query;
 
 import org.slf4j.Logger;
-import org.spine3.server.storage.AggregateStorageRecord;
+import org.spine3.server.aggregate.storage.AggregateStorageRecord;
 import org.spine3.server.storage.jdbc.GivenDataSource;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import java.sql.SQLException;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.mock;
 
 /**
  * @author Andrey Lavrov

@@ -21,7 +21,7 @@
 package org.spine3.server.storage.jdbc.aggregate.query;
 
 import com.google.protobuf.Timestamp;
-import org.spine3.server.storage.AggregateStorageRecord;
+import org.spine3.server.aggregate.storage.AggregateStorageRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.Sql;
 import org.spine3.server.storage.jdbc.query.WriteRecordQuery;

@@ -24,8 +24,8 @@ import com.google.protobuf.FieldMask;
 import com.google.protobuf.Timestamp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.spine3.server.projection.ProjectionStorage;
 import org.spine3.server.storage.EntityStorageRecord;
-import org.spine3.server.storage.ProjectionStorage;
 import org.spine3.server.storage.RecordStorage;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.JdbcStorageFactory;
@@ -35,7 +35,6 @@ import org.spine3.server.storage.jdbc.projection.query.ProjectionStorageQueryFac
 import javax.annotation.Nullable;
 import java.util.Map;
 
-import static org.spine3.util.Exceptions.wrapped;
 
 /**
  * The implementation of the projection storage based on the RDBMS.
@@ -109,7 +108,7 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
         try {
             super.close();
         } catch (Exception e) {
-            throw wrapped(e);
+            throw new IllegalStateException(e);
         }
         // close only entityStorage because it must close dataSource by itself
         entityStorage.close();

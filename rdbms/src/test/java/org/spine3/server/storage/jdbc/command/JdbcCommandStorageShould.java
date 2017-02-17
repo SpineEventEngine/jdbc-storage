@@ -20,8 +20,9 @@
 
 package org.spine3.server.storage.jdbc.command;
 
-import org.spine3.server.storage.CommandStorage;
-import org.spine3.server.storage.CommandStorageShould;
+import org.junit.Test;
+import org.spine3.server.command.CommandStorage;
+import org.spine3.server.command.CommandStorageShould;
 import org.spine3.server.storage.jdbc.GivenDataSource;
 import org.spine3.server.storage.jdbc.command.query.CommandStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
@@ -36,5 +37,12 @@ public class JdbcCommandStorageShould extends CommandStorageShould {
         final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory("commandStorageTests");
         final CommandStorage storage = JdbcCommandStorage.newInstance(dataSource, false, new CommandStorageQueryFactory(dataSource));
         return storage;
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void throw_exception_when_closing_twice() throws Exception {
+        final CommandStorage storage = getStorage();
+        storage.close();
+        storage.close();
     }
 }

@@ -22,7 +22,7 @@ package org.spine3.server.storage.jdbc.command.query;
 
 import org.slf4j.Logger;
 import org.spine3.base.CommandStatus;
-import org.spine3.server.storage.CommandStorageRecord;
+import org.spine3.server.command.storage.CommandStorageRecord;
 import org.spine3.server.storage.jdbc.GivenDataSource;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
