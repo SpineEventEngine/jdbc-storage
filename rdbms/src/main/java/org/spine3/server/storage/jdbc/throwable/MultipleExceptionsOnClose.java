@@ -18,7 +18,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.spine3.server.storage.jdbc.exception;
+package org.spine3.server.storage.jdbc.throwable;
 
 import java.util.Collection;
 
@@ -32,12 +32,12 @@ import static java.lang.System.lineSeparator;
  *
  * @author Dmytro Dashenkov.
  */
-public class MultipleCloseException extends IllegalStateException {
+public class MultipleExceptionsOnClose extends Throwable {
 
     private static final long serialVersionUID = -949553467101469613L;
     private final Collection<Exception> exceptions;
 
-    public MultipleCloseException(Collection<Exception> exceptions) {
+    public MultipleExceptionsOnClose(Collection<Exception> exceptions) {
         super(format("%s fatal exceptions.", exceptions.size()));
         this.exceptions = exceptions;
     }

@@ -20,7 +20,7 @@
 
 package org.spine3.server.storage.jdbc.util;
 
-import org.spine3.server.storage.jdbc.exception.MultipleCloseException;
+import org.spine3.server.storage.jdbc.throwable.MultipleExceptionsOnClose;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -61,11 +61,15 @@ public class Closeables {
         if (exceptions.isEmpty()) {
             return;
         }
+
+        final Throwable cause;
         if (exceptions.size() == 1) {
-            final Exception cause = exceptions.iterator()
-                                              .next();
-            throw new IllegalStateException(cause);
+            cause = exceptions.iterator()
+                              .next();
+        } else {
+            cause = new MultipleExceptionsOnClose(exceptions);
         }
-        throw new MultipleCloseException(exceptions);
+
+        throw new IllegalStateException(cause);
     }
 }

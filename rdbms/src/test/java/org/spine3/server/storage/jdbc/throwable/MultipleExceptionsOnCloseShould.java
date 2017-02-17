@@ -18,17 +18,18 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.spine3.server.storage.jdbc.exception;
+package org.spine3.server.storage.jdbc.throwable;
 
 import com.google.common.collect.Lists;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.spine3.test.Verify.assertContains;
 
 /**
  * @author Dmytro Dashenkov.
  */
-public class MultipleCloseExceptionShould {
+public class MultipleExceptionsOnCloseShould {
 
     @SuppressWarnings("ThrowableNotThrown")
     @Test
@@ -40,8 +41,8 @@ public class MultipleCloseExceptionShould {
         final IllegalStateException ex2 = new IllegalStateException(message2);
         final IllegalStateException ex3 = new IllegalStateException(message3);
 
-        final MultipleCloseException aggregatingException =
-                new MultipleCloseException(Lists.<Exception>newArrayList(ex1, ex2, ex3));
+        final MultipleExceptionsOnClose aggregatingException =
+                new MultipleExceptionsOnClose(Lists.<Exception>newArrayList(ex1, ex2, ex3));
 
         final String stringName = "Exception description";
         assertContains(stringName,
@@ -53,5 +54,12 @@ public class MultipleCloseExceptionShould {
         assertContains(stringName,
                        ex3.toString(),
                        aggregatingException.toString());
+    }
+
+    @Test
+    public void be_direct_subclass_of_Throwable() {
+        final Class<MultipleExceptionsOnClose> clazz = MultipleExceptionsOnClose.class;
+        final Class<? super MultipleExceptionsOnClose> superclass = clazz.getSuperclass();
+        assertEquals(Throwable.class, superclass);
     }
 }

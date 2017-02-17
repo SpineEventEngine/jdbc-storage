@@ -23,7 +23,7 @@ package org.spine3.server.storage.jdbc.util;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.junit.Test;
-import org.spine3.server.storage.jdbc.exception.MultipleCloseException;
+import org.spine3.server.storage.jdbc.throwable.MultipleExceptionsOnClose;
 import org.spine3.test.NullToleranceTest;
 
 import java.util.Collection;
@@ -31,7 +31,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static java.util.Collections.singleton;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.spine3.test.Tests.hasPrivateParameterlessCtor;
 
@@ -94,12 +96,17 @@ public class CloseablesShould {
         assertTrue((stateful.closed));
     }
 
-    @Test(expected = MultipleCloseException.class)
-    public void throw_special_kind_of_exception_upon_multiple_failures() {
+    @Test
+    public void throw_exception_with_aggregating_cause_upon_multiple_failures() {
         final Collection<AutoCloseable> closeables =
                 Sets.<AutoCloseable>newHashSet(new FaultyClosable(),
                                                new FaultyClosable());
-        Closeables.closeAll(closeables);
+        try {
+            Closeables.closeAll(closeables);
+        } catch (IllegalStateException e) {
+            final Throwable cause = e.getCause();
+            assertThat(cause, instanceOf(MultipleExceptionsOnClose.class));
+        }
     }
 
     private static class StatefulClosable implements AutoCloseable {
