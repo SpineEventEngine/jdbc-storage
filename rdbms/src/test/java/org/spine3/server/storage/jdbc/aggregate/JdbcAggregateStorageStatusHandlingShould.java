@@ -25,6 +25,7 @@ import org.spine3.server.aggregate.AggregateStorage;
 import org.spine3.server.aggregate.AggregateStorageStatusHandlingShould;
 import org.spine3.server.storage.jdbc.GivenDataSource;
 import org.spine3.server.storage.jdbc.aggregate.query.AggregateStorageQueryFactory;
+import org.spine3.server.storage.jdbc.entity.status.EntityStatusHandlingStorageQueryFactoryImpl;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.test.aggregate.ProjectId;
 
@@ -36,6 +37,9 @@ public class JdbcAggregateStorageStatusHandlingShould extends AggregateStorageSt
     @Override
     protected AggregateStorage<ProjectId> getAggregateStorage(Class<? extends Aggregate<ProjectId, ?, ?>> aggregateClass) {
         final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory("aggregateStorageStatusHandlingTests");
-        return JdbcAggregateStorage.newInstance(dataSource, false, new AggregateStorageQueryFactory<>(dataSource, aggregateClass));
+        return JdbcAggregateStorage.newInstance(dataSource, false, new AggregateStorageQueryFactory<>(
+                dataSource,
+                aggregateClass,
+                new EntityStatusHandlingStorageQueryFactoryImpl<ProjectId>(dataSource)));
     }
 }
