@@ -45,7 +45,7 @@ import static org.spine3.base.Identifiers.newUuid;
  * @author Alexander Litus
  */
 @SuppressWarnings("InstanceMethodNamingConvention")
-public class JdbcEntityStorageShould extends RecordStorageShould<String, JdbcRecordStorage<String>> {
+public class JdbcRecordStorageShould extends RecordStorageShould<String, JdbcRecordStorage<String>> {
 
     @Override
     protected JdbcRecordStorage<String> getStorage() {

@@ -38,6 +38,7 @@ import org.spine3.server.storage.jdbc.JdbcStandStorage;
 import org.spine3.server.storage.jdbc.entity.query.CreateEntityTableQuery;
 import org.spine3.server.storage.jdbc.entity.query.RecordStorageQueryFactory;
 import org.spine3.server.storage.jdbc.entity.status.EntityStatusHandlingStorageQueryFactoryImpl;
+import org.spine3.server.storage.jdbc.entity.status.query.CreateEntityStatusTableQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.test.aggregate.Project;
 import org.spine3.test.aggregate.ProjectId;
@@ -78,8 +79,12 @@ public class JdbcStandStorageShould {
         final RecordStorageQueryFactory<String> queryFactoryMock = (RecordStorageQueryFactory<String>) mock(RecordStorageQueryFactory.class);
 
         final CreateEntityTableQuery<String> queryMock = (CreateEntityTableQuery<String>) mock(CreateEntityTableQuery.class);
+        final CreateEntityStatusTableQuery statusQueryMock = mock(CreateEntityStatusTableQuery.class);
+
         when(queryFactoryMock.newCreateEntityTableQuery()).thenReturn(queryMock);
+        when(queryFactoryMock.newCreateEntityStatusTableQuery()).thenReturn(statusQueryMock);
         doNothing().when(queryMock).execute();
+        doNothing().when(statusQueryMock).execute();
 
         final StandStorage standStorage = JdbcStandStorage.<String>newBuilder()
                 .setRecordStorageQueryFactory(queryFactoryMock)
@@ -103,8 +108,11 @@ public class JdbcStandStorageShould {
         final RecordStorageQueryFactory<String> queryFactoryMock = (RecordStorageQueryFactory<String>) mock(RecordStorageQueryFactory.class);
 
         final CreateEntityTableQuery<String> queryMock = (CreateEntityTableQuery<String>) mock(CreateEntityTableQuery.class);
+        final CreateEntityStatusTableQuery statusQueryMock = mock(CreateEntityStatusTableQuery.class);
         when(queryFactoryMock.newCreateEntityTableQuery()).thenReturn(queryMock);
+        when(queryFactoryMock.newCreateEntityStatusTableQuery()).thenReturn(statusQueryMock);
         doNothing().when(queryMock).execute();
+        doNothing().when(statusQueryMock).execute();
 
         final StandStorage standStorage = JdbcStandStorage.<String>newBuilder()
                 .setRecordStorageQueryFactory(queryFactoryMock)
