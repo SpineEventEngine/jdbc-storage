@@ -29,6 +29,7 @@ import org.spine3.server.storage.jdbc.entity.status.EntityStatusHandlingStorageQ
 import org.spine3.server.storage.jdbc.entity.status.query.CreateEntityStatusTableQuery;
 import org.spine3.server.storage.jdbc.entity.status.query.InsertEntityStatusQuery;
 import org.spine3.server.storage.jdbc.entity.status.query.SelectEntityStatusQuery;
+import org.spine3.server.storage.jdbc.entity.status.query.UpdateEntityStatusQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbTableNameFactory;
 import org.spine3.server.storage.jdbc.util.IdColumn;
@@ -79,6 +80,11 @@ public class AggregateStorageQueryFactory<I> implements EntityStatusHandlingStor
     @Override
     public SelectEntityStatusQuery newSelectEntityStatusQuery(I id) {
         return statusTableQueryFactory.newSelectEntityStatusQuery(id);
+    }
+
+    @Override
+    public UpdateEntityStatusQuery newUpdateEntityStatusQuery(I id, EntityStatus status) {
+        return statusTableQueryFactory.newUpdateEntityStatusQuery(id, status);
     }
 
     /** Sets the logger for logging exceptions during queries execution. */

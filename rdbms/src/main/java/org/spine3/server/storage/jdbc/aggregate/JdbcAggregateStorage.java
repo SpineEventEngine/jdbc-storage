@@ -29,8 +29,8 @@ import org.spine3.server.entity.status.EntityStatus;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.JdbcStorageFactory;
 import org.spine3.server.storage.jdbc.aggregate.query.AggregateStorageQueryFactory;
-import org.spine3.server.storage.jdbc.entity.status.query.InsertEntityStatusQuery;
 import org.spine3.server.storage.jdbc.entity.status.query.SelectEntityStatusQuery;
+import org.spine3.server.storage.jdbc.query.WriteQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbIterator;
 
@@ -116,7 +116,13 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
 
     @Override
     protected void writeStatus(I id, EntityStatus status) {
-        final InsertEntityStatusQuery query = queryFactory.newInsertEntityStatusQuery(id, status);
+        final WriteQuery query;
+        final Optional<EntityStatus> currentStatus = readStatus(id);
+        if (currentStatus.isPresent()) {
+            query = queryFactory.newUpdateEntityStatusQuery(id, status);
+        } else {
+            query = queryFactory.newInsertEntityStatusQuery(id, status);
+        }
         query.execute();
     }
 

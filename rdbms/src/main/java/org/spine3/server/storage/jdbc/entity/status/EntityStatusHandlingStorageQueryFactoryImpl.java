@@ -26,6 +26,7 @@ import org.spine3.server.entity.status.EntityStatus;
 import org.spine3.server.storage.jdbc.entity.status.query.CreateEntityStatusTableQuery;
 import org.spine3.server.storage.jdbc.entity.status.query.InsertEntityStatusQuery;
 import org.spine3.server.storage.jdbc.entity.status.query.SelectEntityStatusQuery;
+import org.spine3.server.storage.jdbc.entity.status.query.UpdateEntityStatusQuery;
 import org.spine3.server.storage.jdbc.entity.status.table.EntityStatusTable;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
@@ -77,6 +78,16 @@ public class EntityStatusHandlingStorageQueryFactoryImpl<I> implements EntitySta
                                        .setDataSource(dataSource)
                                        .setLogger(logger)
                                        .setId(id);
+        return builder.build();
+    }
+
+    @Override
+    public UpdateEntityStatusQuery newUpdateEntityStatusQuery(I id, EntityStatus status) {
+        final UpdateEntityStatusQuery.Builder builder = UpdateEntityStatusQuery.<I>newBuilder()
+                .setDataSource(dataSource)
+                .setLogger(logger)
+                .setId(id)
+                .setEntityStatus(status);
         return builder.build();
     }
 }

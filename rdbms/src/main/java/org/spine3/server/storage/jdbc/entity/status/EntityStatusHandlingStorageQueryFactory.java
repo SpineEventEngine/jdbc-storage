@@ -25,6 +25,7 @@ import org.spine3.server.entity.status.EntityStatus;
 import org.spine3.server.storage.jdbc.entity.status.query.CreateEntityStatusTableQuery;
 import org.spine3.server.storage.jdbc.entity.status.query.InsertEntityStatusQuery;
 import org.spine3.server.storage.jdbc.entity.status.query.SelectEntityStatusQuery;
+import org.spine3.server.storage.jdbc.entity.status.query.UpdateEntityStatusQuery;
 
 /**
  * @author Dmytro Dashenkov.
@@ -36,6 +37,8 @@ public interface EntityStatusHandlingStorageQueryFactory<I> {
     InsertEntityStatusQuery newInsertEntityStatusQuery(I id, EntityStatus entityStatus);
 
     SelectEntityStatusQuery newSelectEntityStatusQuery(I id);
+
+    UpdateEntityStatusQuery newUpdateEntityStatusQuery(I id, EntityStatus status);
 
     void setLogger(Logger logger);
 }

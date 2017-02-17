@@ -84,7 +84,7 @@ public class UpdateEntityStatusQuery extends WriteQuery {
         return builder;
     }
 
-    public static class Builder extends WriteQuery.Builder<Builder, WriteQuery> {
+    public static class Builder extends WriteQuery.Builder<Builder, UpdateEntityStatusQuery> {
 
         private String id;
         private EntityStatus entityStatus;
@@ -102,7 +102,7 @@ public class UpdateEntityStatusQuery extends WriteQuery {
         }
 
         @Override
-        public WriteQuery build() {
+        public UpdateEntityStatusQuery build() {
             checkState(id != null, "ID is not set.");
             checkState(entityStatus != null, "Entity status is not set.");
             return new UpdateEntityStatusQuery(this);
