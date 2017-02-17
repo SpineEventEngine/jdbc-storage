@@ -69,8 +69,12 @@ public class DeleteRowQuery<I> extends StorageQuery {
         private V value;
         private String table;
 
-        public Builder<V> setArgumgnt(String column, V value) {
+        public Builder<V> setColumn(String column) {
             this.column = checkNotNull(column);
+            return getThis();
+        }
+
+        public Builder<V> setValue(V value) {
             this.value = checkNotNull(value);
             return getThis();
         }
