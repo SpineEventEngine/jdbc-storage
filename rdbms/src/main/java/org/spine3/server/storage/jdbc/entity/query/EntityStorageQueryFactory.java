@@ -117,8 +117,9 @@ public class EntityStorageQueryFactory<I> {
                 .setDataSource(dataSource)
                 .setLogger(logger)
                 .setTableName(tableName)
-                .setColumn(ID_COL)
-                .setValue(id);
+                .setIdColumn(idColumn)
+                .setIdColumnName(ID_COL)
+                .setIdValue(id);
         return builder.build();
     }
 
