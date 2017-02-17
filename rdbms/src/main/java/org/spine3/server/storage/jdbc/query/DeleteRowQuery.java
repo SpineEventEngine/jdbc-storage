@@ -30,20 +30,26 @@ import static java.lang.String.format;
 import static org.spine3.base.Stringifiers.idToString;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
 import static org.spine3.server.storage.jdbc.Sql.Query.DELETE_FROM;
+import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
 import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
 
 /**
- * A query for deleting one or many items by a value of a given column.
+ * A query for deleting one or many items by a columnValue of a given column.
  *
  * @author Dmytro Dashenkov.
  */
 public class DeleteRowQuery<I> extends StorageQuery {
 
     private static final String TEMPLATE =
-            DELETE_FROM + "%s" + WHERE + "%s" + EQUAL + "%s";
+            DELETE_FROM + "%s" + WHERE + "%s" + EQUAL + PLACEHOLDER;
+    private static final int COLUMN_VALUE_PARAM_INDEX = 1;
+
+
+    private final I columnValue;
 
     protected DeleteRowQuery(Builder<I> builder) {
         super(builder);
+        this.columnValue = builder.columnValue;
     }
 
     /**
@@ -51,9 +57,11 @@ public class DeleteRowQuery<I> extends StorageQuery {
      *
      * @return {@code true} if at least one row was deleted, {@code false} otherwise
      */
-    private boolean execute() {
+    public boolean execute() {
         try (ConnectionWrapper connection = getConnection(false)) {
             final PreparedStatement statement = prepareStatement(connection);
+            final String stringColumnValue = idToString(columnValue);
+            statement.setString(COLUMN_VALUE_PARAM_INDEX, stringColumnValue);
             final int rowsAffected = statement.executeUpdate();
             connection.commit();
             final boolean result = rowsAffected != 0;
@@ -63,10 +71,14 @@ public class DeleteRowQuery<I> extends StorageQuery {
         }
     }
 
+    public static <V> Builder<V> newBuilder() {
+        return new Builder<>();
+    }
+
     public static class Builder<V> extends StorageQuery.Builder<Builder<V>, DeleteRowQuery>{
 
         private String column;
-        private V value;
+        private V columnValue;
         private String table;
 
         public Builder<V> setColumn(String column) {
@@ -75,23 +87,23 @@ public class DeleteRowQuery<I> extends StorageQuery {
         }
 
         public Builder<V> setValue(V value) {
-            this.value = checkNotNull(value);
+            this.columnValue = checkNotNull(value);
             return getThis();
         }
 
-        public Builder<V> setTable(String table) {
+        public Builder<V> setTableName(String table) {
             this.table = checkNotNull(table);
             return getThis();
         }
 
         private String composeSql() {
-            return format(TEMPLATE, table, column, idToString(value));
+            return format(TEMPLATE, table, column, idToString(columnValue));
         }
 
         @Override
         public DeleteRowQuery<V> build() {
             checkNotNull(column, "ID column must be set first");
-            checkNotNull(value, "ID value must be set first");
+            checkNotNull(columnValue, "ID columnValue must be set first");
             checkNotNull(table, "Table must be set first");
             final String sql = composeSql();
             setQuery(sql);

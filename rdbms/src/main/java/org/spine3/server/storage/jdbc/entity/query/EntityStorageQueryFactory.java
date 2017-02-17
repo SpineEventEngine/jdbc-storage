@@ -27,9 +27,12 @@ import org.slf4j.Logger;
 import org.spine3.server.entity.Entity;
 import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.RecordStorage;
+import org.spine3.server.storage.jdbc.query.DeleteRowQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbTableNameFactory;
 import org.spine3.server.storage.jdbc.util.IdColumn;
+
+import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
 
 /**
  * This class creates queries for interaction with {@link EntityTable}.
@@ -104,6 +107,16 @@ public class EntityStorageQueryFactory<I> {
                 .setLogger(logger)
                 .setIdColumn(idColumn)
                 .setId(id);
+        return builder.build();
+    }
+
+    public DeleteRowQuery<I> newDeleteRowQuery(I id) {
+        final DeleteRowQuery.Builder<I> builder = DeleteRowQuery.<I>newBuilder()
+                .setDataSource(dataSource)
+                .setLogger(logger)
+                .setTableName(tableName)
+                .setColumn(ID_COL)
+                .setValue(id);
         return builder.build();
     }
 

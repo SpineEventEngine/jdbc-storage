@@ -34,6 +34,7 @@ import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.JdbcStorageFactory;
 import org.spine3.server.storage.jdbc.entity.query.EntityStorageQueryFactory;
 import org.spine3.server.storage.jdbc.entity.query.SelectBulkQuery;
+import org.spine3.server.storage.jdbc.query.DeleteRowQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
 import javax.annotation.Nullable;
@@ -41,6 +42,7 @@ import java.sql.SQLException;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * The implementation of the entity storage based on the RDBMS.
@@ -94,7 +96,11 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
 
     @Override
     public boolean delete(I id) {
-        return false;
+        checkNotNull(id);
+
+        final DeleteRowQuery<I> query = queryFactory.newDeleteRowQuery(id);
+        final boolean result = query.execute();
+        return result;
     }
 
     /**
