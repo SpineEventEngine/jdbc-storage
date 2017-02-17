@@ -59,7 +59,7 @@ public abstract class WriteRecordQuery<I, Record extends Message> extends WriteQ
             statement.setBytes(recordIndexInQuery, bytes);
             return statement;
         } catch (SQLException e) {
-            getLogger().error("Failed to write record with id " + id, e);
+            logWriteError(id, e);
             throw new DatabaseException(e);
         }
     }

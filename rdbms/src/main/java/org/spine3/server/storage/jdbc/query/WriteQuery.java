@@ -55,6 +55,10 @@ public class WriteQuery extends StorageQuery {
         }
     }
 
+    protected void logWriteError(Object id, SQLException e) {
+        getLogger().error("Failed to write record with id " + id, e);
+    }
+
     @SuppressWarnings("ClassNameSameAsAncestorName")
     public abstract static class Builder<B extends Builder<B, Q>, Q extends WriteQuery>
             extends StorageQuery.Builder<B, Q> {

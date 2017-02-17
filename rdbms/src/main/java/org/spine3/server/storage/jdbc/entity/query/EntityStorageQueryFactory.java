@@ -22,7 +22,6 @@ package org.spine3.server.storage.jdbc.entity.query;
 
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.FieldMask;
-import com.google.protobuf.Message;
 import org.slf4j.Logger;
 import org.spine3.server.entity.Entity;
 import org.spine3.server.storage.EntityStorageRecord;
@@ -32,12 +31,15 @@ import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbTableNameFactory;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
+import java.util.Map;
+
 import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
 
 /**
  * This class creates queries for interaction with {@link EntityTable}.
  *
  * @author Andrey Lavrov
+ * @author Dmytro Dashenkov
  */
 public class EntityStorageQueryFactory<I> {
 
@@ -128,8 +130,7 @@ public class EntityStorageQueryFactory<I> {
         return builder.build();
     }
 
-    @SuppressWarnings("unchecked")
-    public <M extends Message> SelectBulkQuery newSelectAllQuery(FieldMask fieldMask, Descriptors.Descriptor descriptor) {
+    public SelectBulkQuery newSelectAllQuery(FieldMask fieldMask, Descriptors.Descriptor descriptor) {
         final SelectBulkQuery.Builder builder = SelectBulkQuery.newBuilder(tableName)
                 .setFieldMask(fieldMask)
                 .setMessageDescriptor(descriptor)
@@ -139,8 +140,7 @@ public class EntityStorageQueryFactory<I> {
         return builder.build();
     }
 
-    @SuppressWarnings("unchecked")
-    public <M extends Message> SelectBulkQuery newSelectBulkQuery(Iterable<?> ids, FieldMask fieldMask, Descriptors.Descriptor descriptor) {
+    public SelectBulkQuery newSelectBulkQuery(Iterable<?> ids, FieldMask fieldMask, Descriptors.Descriptor descriptor) {
         final SelectBulkQuery.Builder builder = SelectBulkQuery.newBuilder()
                 .setIdsQuery(tableName, ids)
                 .setFieldMask(fieldMask)
@@ -148,6 +148,16 @@ public class EntityStorageQueryFactory<I> {
                 .setLogger(logger)
                 .setDataSource(dataSource);
 
+        return builder.build();
+    }
+
+    public InsertEntityRecordsBulkQuery<I> newInsertEntityRecordsBulkQuery(Map<I, EntityStorageRecord> records) {
+        final InsertEntityRecordsBulkQuery.Builder<I> builder = InsertEntityRecordsBulkQuery.<I>newBuilder()
+                .setLogger(logger)
+                .setDataSource(dataSource)
+                .setTableName(tableName)
+                .setidColumn(idColumn)
+                .setRecords(records);
         return builder.build();
     }
 

@@ -45,7 +45,7 @@ import java.util.Map;
  */
 public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
 
-    private final JdbcRecordStorage<I> entityStorage;
+    private final JdbcRecordStorage<I> recordStorage;
 
     private final ProjectionStorageQueryFactory queryFactory;
 
@@ -65,11 +65,11 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
         return new JdbcProjectionStorage<>(entityStorage, multitenant, queryFactory);
     }
 
-    protected JdbcProjectionStorage(JdbcRecordStorage<I> entityStorage,
+    protected JdbcProjectionStorage(JdbcRecordStorage<I> recordStorage,
                                     boolean multitenant,
                                     ProjectionStorageQueryFactory<I> queryFactory) throws DatabaseException {
         super(multitenant);
-        this.entityStorage = entityStorage;
+        this.recordStorage = recordStorage;
         this.queryFactory = queryFactory;
         queryFactory.setLogger(LogSingleton.INSTANCE.value);
 
@@ -100,7 +100,7 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
 
     @Override
     public RecordStorage<I> recordStorage() {
-        return entityStorage;
+        return recordStorage;
     }
 
     @Override
@@ -110,43 +110,43 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
-        // close only entityStorage because it must close dataSource by itself
-        entityStorage.close();
+        // close only recordStorage because it must close dataSource by itself
+        recordStorage.close();
     }
 
     @Override
     public boolean markArchived(I id) {
-        return false;
+        return recordStorage.markArchived(id);
     }
 
     @Override
     public boolean markDeleted(I id) {
-        return false;
+        return recordStorage.markDeleted(id);
     }
 
     @Override
     public boolean delete(I id) {
-        return false;
+        return recordStorage.delete(id);
     }
 
     @Override
     protected Iterable<EntityStorageRecord> readMultipleRecords(Iterable<I> ids) {
-        return entityStorage.readMultiple(ids);
+        return recordStorage.readMultiple(ids);
     }
 
     @Override
     protected Iterable<EntityStorageRecord> readMultipleRecords(Iterable<I> ids, FieldMask fieldMask) {
-        return entityStorage.readMultiple(ids, fieldMask);
+        return recordStorage.readMultiple(ids, fieldMask);
     }
 
     @Override
     protected Map<I, EntityStorageRecord> readAllRecords() {
-        return entityStorage.readAll();
+        return recordStorage.readAll();
     }
 
     @Override
     protected Map<I, EntityStorageRecord> readAllRecords(FieldMask fieldMask) {
-        return entityStorage.readAll(fieldMask);
+        return recordStorage.readAll(fieldMask);
     }
 
     private enum LogSingleton {

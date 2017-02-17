@@ -39,6 +39,7 @@ import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
 import javax.annotation.Nullable;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -171,7 +172,19 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
 
     @Override
     protected void writeRecords(Map<I, EntityStorageRecord> records) {
+        // Map's initial capacity is maximum meaning no records exist in the storage yet
+        final Map<I, EntityStorageRecord> newRecords = new HashMap<>(records.size());
 
+        for (Map.Entry<I, EntityStorageRecord> unclassifiedRecord : records.entrySet()) {
+            final I id = unclassifiedRecord.getKey();
+            final EntityStorageRecord record = unclassifiedRecord.getValue();
+            if (containsRecord(id)) {
+                queryFactory.newUpdateEntityQuery(id, record).execute();
+            } else {
+                newRecords.put(id, record);
+            }
+        }
+        queryFactory.newInsertEntityRecordsBulkQuery(newRecords).execute();
     }
 
     private boolean containsRecord(I id) throws DatabaseException {
