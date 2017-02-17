@@ -35,6 +35,7 @@ import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.JdbcStorageFactory;
 import org.spine3.server.storage.jdbc.entity.query.RecordStorageQueryFactory;
 import org.spine3.server.storage.jdbc.entity.query.SelectBulkQuery;
+import org.spine3.server.storage.jdbc.entity.status.EntityStatusHandler;
 import org.spine3.server.storage.jdbc.query.DeleteRowQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
@@ -61,6 +62,8 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
 
     private final Descriptors.Descriptor stateDescriptor;
 
+    private final EntityStatusHandler<I> entityStatusHandler;
+
     /**
      * Creates a new storage instance.
      *
@@ -71,7 +74,8 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
      */
     public static <I> JdbcRecordStorage<I> newInstance(DataSourceWrapper dataSource,
                                                        boolean multitenant,
-                                                       RecordStorageQueryFactory<I> queryFactory, Descriptors.Descriptor stateDescriptor)
+                                                       RecordStorageQueryFactory<I> queryFactory,
+                                                       Descriptors.Descriptor stateDescriptor)
             throws DatabaseException {
         return new JdbcRecordStorage<>(dataSource, multitenant, queryFactory, stateDescriptor);
     }
@@ -84,40 +88,26 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
         this.stateDescriptor = stateDescriptor;
         queryFactory.setLogger(LogSingleton.INSTANCE.value);
         queryFactory.newCreateEntityTableQuery().execute();
+        this.entityStatusHandler = new EntityStatusHandler<>(queryFactory);
+        entityStatusHandler.initialize();
     }
 
     @Override
     public boolean markArchived(I id) {
-        final EntityStatus currentStatus = readStatus(id);
-        if (currentStatus.getArchived()) {
-            return false;
-        }
-        final EntityStatus newStatus = currentStatus.toBuilder()
-                .setArchived(true)
-                .build();
-        writeStatus(id, newStatus);
-        return true;
+        return entityStatusHandler.markArchived(id);
     }
 
     @Override
     public boolean markDeleted(I id) {
-        final EntityStatus currentStatus = readStatus(id);
-        if (currentStatus.getDeleted()) {
-            return false;
-        }
-        final EntityStatus newStatus = currentStatus.toBuilder()
-                                                    .setDeleted(true)
-                                                    .build();
-        writeStatus(id, newStatus);
-        return true;
+        return entityStatusHandler.markDeleted(id);
     }
 
-    private EntityStatus readStatus(I id) {
-        return null;
+    protected Optional<EntityStatus> readStatus(I id) {
+        return entityStatusHandler.readStatus(id);
     }
 
-    private void writeStatus(I id, EntityStatus status) {
-
+    protected void writeStatus(I id, EntityStatus status) {
+        entityStatusHandler.writeStatus(id, status);
     }
 
     @Override

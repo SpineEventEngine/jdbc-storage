@@ -29,8 +29,7 @@ import org.spine3.server.entity.status.EntityStatus;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.JdbcStorageFactory;
 import org.spine3.server.storage.jdbc.aggregate.query.AggregateStorageQueryFactory;
-import org.spine3.server.storage.jdbc.entity.status.query.SelectEntityStatusQuery;
-import org.spine3.server.storage.jdbc.query.WriteQuery;
+import org.spine3.server.storage.jdbc.entity.status.EntityStatusHandler;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbIterator;
 
@@ -40,7 +39,6 @@ import java.util.Iterator;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Lists.newLinkedList;
 import static org.spine3.server.storage.jdbc.util.Closeables.closeAll;
-import static org.spine3.validate.Validate.isDefault;
 
 /**
  * The implementation of the aggregate storage based on the RDBMS.
@@ -60,6 +58,8 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
 
     /** Creates queries for interaction with database. */
     private final AggregateStorageQueryFactory<I> queryFactory;
+
+    private final EntityStatusHandler<I> entityStatusHandler;
 
     /**
      * Creates a new storage instance.
@@ -88,8 +88,8 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
                     .execute();
         queryFactory.newCreateEventCountTableQuery()
                     .execute();
-        queryFactory.newCreateEntityStatusTableQuery()
-                    .execute();
+        this.entityStatusHandler = new EntityStatusHandler<>(queryFactory);
+        entityStatusHandler.initialize();
     }
 
     @Override
@@ -105,51 +105,22 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
 
     @Override
     protected Optional<EntityStatus> readStatus(I id) {
-        final SelectEntityStatusQuery query = queryFactory.newSelectEntityStatusQuery(id);
-        final EntityStatus status = query.execute();
-        final boolean absent = isDefault(status);
-        if (absent) {
-            return Optional.absent();
-        }
-        return Optional.of(status);
+        return entityStatusHandler.readStatus(id);
     }
 
     @Override
     protected void writeStatus(I id, EntityStatus status) {
-        final WriteQuery query;
-        final Optional<EntityStatus> currentStatus = readStatus(id);
-        if (currentStatus.isPresent()) {
-            query = queryFactory.newUpdateEntityStatusQuery(id, status);
-        } else {
-            query = queryFactory.newInsertEntityStatusQuery(id, status);
-        }
-        query.execute();
+        entityStatusHandler.writeStatus(id, status);
     }
 
     @Override
     protected boolean markArchived(I id) {
-        final EntityStatus currentStatus = readStatus(id).or(EntityStatus.getDefaultInstance());
-        if (currentStatus.getArchived()) {
-            return false;
-        }
-        final EntityStatus newStatus = currentStatus.toBuilder()
-                                                    .setArchived(true)
-                                                    .build();
-        writeStatus(id, newStatus);
-        return true;
+        return entityStatusHandler.markArchived(id);
     }
 
     @Override
     protected boolean markDeleted(I id) {
-        final EntityStatus currentStatus = readStatus(id).or(EntityStatus.getDefaultInstance());
-        if (currentStatus.getDeleted()) {
-            return false;
-        }
-        final EntityStatus newStatus = currentStatus.toBuilder()
-                                                    .setDeleted(true)
-                                                    .build();
-        writeStatus(id, newStatus);
-        return true;
+        return entityStatusHandler.markDeleted(id);
     }
 
     @Override

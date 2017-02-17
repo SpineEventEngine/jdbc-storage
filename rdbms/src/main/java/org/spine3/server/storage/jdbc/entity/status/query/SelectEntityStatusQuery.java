@@ -66,7 +66,7 @@ public class SelectEntityStatusQuery extends StorageQuery {
         try {
             statement.setString(1, id);
             final ResultSet resultSet = statement.executeQuery();
-            final boolean empty = !resultSet.first();
+            final boolean empty = !resultSet.next();
             if (empty) {
                 return EntityStatus.getDefaultInstance();
             }
