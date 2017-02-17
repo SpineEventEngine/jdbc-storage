@@ -20,59 +20,63 @@
 
 package org.spine3.server.storage.jdbc.entity.status.query;
 
-import org.spine3.base.Stringifiers;
 import org.spine3.server.entity.status.EntityStatus;
 import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.query.WriteQuery;
-import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
+import org.spine3.server.storage.jdbc.query.StorageQuery;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
-import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
+import static org.spine3.base.Stringifiers.idToString;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
-import static org.spine3.server.storage.jdbc.Sql.Query.INSERT_INTO;
-import static org.spine3.server.storage.jdbc.Sql.Query.VALUES;
-import static org.spine3.server.storage.jdbc.Sql.nPlaceholders;
+import static org.spine3.server.storage.jdbc.Sql.Query.ALL_ATTRIBUTES;
+import static org.spine3.server.storage.jdbc.Sql.Query.FROM;
+import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
+import static org.spine3.server.storage.jdbc.Sql.Query.SELECT;
+import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
 import static org.spine3.server.storage.jdbc.entity.status.table.EntityStatusTable.ARCHIVED_COL_INDEX;
-import static org.spine3.server.storage.jdbc.entity.status.table.EntityStatusTable.COLUMN_COUNT;
 import static org.spine3.server.storage.jdbc.entity.status.table.EntityStatusTable.DELETED_COL_INDEX;
-import static org.spine3.server.storage.jdbc.entity.status.table.EntityStatusTable.ID_COL_INDEX;
+import static org.spine3.server.storage.jdbc.entity.status.table.EntityStatusTable.ID_COL;
 import static org.spine3.server.storage.jdbc.entity.status.table.EntityStatusTable.TABLE_NAME;
 
 /**
  * @author Dmytro Dashenkov.
  */
-public class InsertEntityStatusQuery extends WriteQuery {
+public class SelectEntityStatusQuery extends StorageQuery {
 
-    private static final String SQL = INSERT_INTO + TABLE_NAME +
-            VALUES + BRACKET_OPEN + nPlaceholders(COLUMN_COUNT) + BRACKET_CLOSE + SEMICOLON;
+    private static final String SQL =
+            SELECT.toString() + ALL_ATTRIBUTES +
+                    FROM + TABLE_NAME +
+                    WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
 
     private final String id;
-    private final EntityStatus entityStatus;
 
-    protected InsertEntityStatusQuery(Builder builder) {
+    protected SelectEntityStatusQuery(Builder builder) {
         super(builder);
         this.id = builder.id;
-        this.entityStatus = builder.entityStatus;
     }
 
-    @Override
-    protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
-        final PreparedStatement statement = super.prepareStatement(connection);
-        final boolean archived = entityStatus.getArchived();
-        final boolean deleted = entityStatus.getDeleted();
+    public EntityStatus execute() {
+        final PreparedStatement statement = prepareStatement(getConnection(false));
+        final boolean archived;
+        final boolean deleted;
         try {
-            statement.setString(ID_COL_INDEX, id);
-            statement.setBoolean(ARCHIVED_COL_INDEX, archived);
-            statement.setBoolean(DELETED_COL_INDEX, deleted);
+            statement.setString(1, id);
+            final ResultSet resultSet = statement.executeQuery();
+            archived = resultSet.getBoolean(ARCHIVED_COL_INDEX);
+            deleted = resultSet.getBoolean(DELETED_COL_INDEX);
         } catch (SQLException e) {
-            logWriteError(id, e);
+            getLogger().error("Failed to read EntityStatus with.", e);
             throw new DatabaseException(e);
         }
-        return statement;
+        final EntityStatus status = EntityStatus.newBuilder()
+                                                .setArchived(archived)
+                                                .setDeleted(deleted)
+                                                .build();
+        return status;
     }
 
     public static Builder newBuilder() {
@@ -81,28 +85,20 @@ public class InsertEntityStatusQuery extends WriteQuery {
         return builder;
     }
 
-    public static class Builder extends WriteQuery.Builder<Builder, InsertEntityStatusQuery> {
+    public static class Builder extends StorageQuery.Builder<Builder, SelectEntityStatusQuery> {
 
         private String id;
-        private EntityStatus entityStatus;
-
-        public Builder setEntityStatus(EntityStatus status) {
-            this.entityStatus = checkNotNull(status);
-            return getThis();
-        }
 
         public Builder setId(Object id) {
             checkNotNull(id);
-            final String stringId = Stringifiers.idToString(id);
+            final String stringId = idToString(id);
             this.id = stringId;
             return getThis();
         }
 
         @Override
-        public InsertEntityStatusQuery build() {
-            checkNotNull(id, "ID is not set.");
-            checkNotNull(entityStatus, "Entity status is not set.");
-            return new InsertEntityStatusQuery(this);
+        public SelectEntityStatusQuery build() {
+            return new SelectEntityStatusQuery(this);
         }
 
         @Override
