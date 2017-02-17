@@ -50,8 +50,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * The implementation of the entity storage based on the RDBMS.
  *
  * @param <I> the type of entity IDs
- * @see JdbcStorageFactory
  * @author Alexander Litus
+ * @see JdbcStorageFactory
  */
 public class JdbcRecordStorage<I> extends RecordStorage<I> {
 
@@ -66,10 +66,10 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     /**
      * Creates a new storage instance.
      *
-     * @param dataSource            the dataSource wrapper
-     * @param multitenant           defines is this storage multitenant
-     * @param queryFactory          factory that generates queries for interaction with entity table
-     * @throws DatabaseException    if an error occurs during an interaction with the DB
+     * @param dataSource   the dataSource wrapper
+     * @param multitenant  defines is this storage multitenant
+     * @param queryFactory factory that generates queries for interaction with entity table
+     * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     public static <I> JdbcRecordStorage<I> newInstance(DataSourceWrapper dataSource,
                                                        boolean multitenant,
@@ -86,25 +86,31 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
         this.queryFactory = queryFactory;
         this.stateDescriptor = stateDescriptor;
         queryFactory.setLogger(LogSingleton.INSTANCE.value);
-        queryFactory.newCreateEntityTableQuery().execute();
+        queryFactory.newCreateEntityTableQuery()
+                    .execute();
         this.entityStatusHandler = new EntityStatusHandler<>(queryFactory);
         entityStatusHandler.initialize();
     }
 
     @Override
     public boolean markArchived(I id) {
-        return entityStatusHandler.markArchived(id);
+        return containsRecord(id)
+                && entityStatusHandler.markArchived(id);
     }
 
     @Override
     public boolean markDeleted(I id) {
-        return entityStatusHandler.markDeleted(id);
+        return containsRecord(id)
+                && entityStatusHandler.markDeleted(id);
     }
 
     @Override
     public boolean delete(I id) {
         checkNotNull(id);
 
+        if (!containsRecord(id)) {
+            return false;
+        }
         final DeleteRowQuery<I> query = queryFactory.newDeleteRowQuery(id);
         final boolean result = query.execute();
         return result;
@@ -118,7 +124,8 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     @Nullable
     @Override
     protected Optional<EntityStorageRecord> readRecord(I id) throws DatabaseException {
-        final EntityStorageRecord record = queryFactory.newSelectEntityByIdQuery(id).execute();
+        final EntityStorageRecord record = queryFactory.newSelectEntityByIdQuery(id)
+                                                       .execute();
         return Optional.fromNullable(record);
     }
 
@@ -170,9 +177,11 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
         checkArgument(record.hasState(), "entity state");
 
         if (containsRecord(id)) {
-            queryFactory.newUpdateEntityQuery(id, record).execute();
+            queryFactory.newUpdateEntityQuery(id, record)
+                        .execute();
         } else {
-            queryFactory.newInsertEntityQuery(id, record).execute();
+            queryFactory.newInsertEntityQuery(id, record)
+                        .execute();
         }
     }
 
@@ -185,16 +194,19 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
             final I id = unclassifiedRecord.getKey();
             final EntityStorageRecord record = unclassifiedRecord.getValue();
             if (containsRecord(id)) {
-                queryFactory.newUpdateEntityQuery(id, record).execute();
+                queryFactory.newUpdateEntityQuery(id, record)
+                            .execute();
             } else {
                 newRecords.put(id, record);
             }
         }
-        queryFactory.newInsertEntityRecordsBulkQuery(newRecords).execute();
+        queryFactory.newInsertEntityRecordsBulkQuery(newRecords)
+                    .execute();
     }
 
     private boolean containsRecord(I id) throws DatabaseException {
-        final EntityStorageRecord record = queryFactory.newSelectEntityByIdQuery(id).execute();
+        final EntityStorageRecord record = queryFactory.newSelectEntityByIdQuery(id)
+                                                       .execute();
         final boolean contains = record != null;
         return contains;
     }
@@ -215,7 +227,8 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     void clear() throws DatabaseException {
-       queryFactory.newDeleteAllQuery().execute();
+        queryFactory.newDeleteAllQuery()
+                    .execute();
     }
 
     private enum LogSingleton {
