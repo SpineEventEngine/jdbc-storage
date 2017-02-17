@@ -18,23 +18,10 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.spine3.server.storage.jdbc.entity.status.table;
-
-import org.spine3.server.entity.status.EntityStatus;
-
 /**
  * @author Dmytro Dashenkov.
  */
-public class EntityStatusTable {
+@ParametersAreNonnullByDefault
+package org.spine3.server.storage.jdbc.entity.status.query;
 
-    public static final String TABLE_NAME = EntityStatus.class.getCanonicalName()
-                                                              .replace('.', '_');
-
-    public static final int COLUMN_COUNT = 3;
-
-    public static final String ID_COL = "id";
-
-    public static final String ARCHIVED_COL = "archived";
-
-    public static final String DELETED_COL = "deleted";
-}
+import javax.annotation.ParametersAreNonnullByDefault;
