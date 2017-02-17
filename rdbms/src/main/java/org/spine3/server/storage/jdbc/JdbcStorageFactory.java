@@ -38,6 +38,8 @@ import org.spine3.server.storage.jdbc.command.JdbcCommandStorage;
 import org.spine3.server.storage.jdbc.command.query.CommandStorageQueryFactory;
 import org.spine3.server.storage.jdbc.entity.JdbcRecordStorage;
 import org.spine3.server.storage.jdbc.entity.query.RecordStorageQueryFactory;
+import org.spine3.server.storage.jdbc.entity.status.EntityStatusHandlingStorageQueryFactory;
+import org.spine3.server.storage.jdbc.entity.status.EntityStatusHandlingStorageQueryFactoryImpl;
 import org.spine3.server.storage.jdbc.event.JdbcEventStorage;
 import org.spine3.server.storage.jdbc.event.query.EventStorageQueryFactory;
 import org.spine3.server.storage.jdbc.projection.JdbcProjectionStorage;
@@ -64,6 +66,7 @@ public class JdbcStorageFactory<I> implements StorageFactory {
     private final boolean multitenant;
     private final Class<? extends Entity<I, ?>> entityClass;
     private final Descriptors.Descriptor entityStateDescriptor;
+    private EntityStatusHandlingStorageQueryFactory<?> helperFactoryInstance;
 
     private JdbcStorageFactory(Builder<I> builder) {
         this.entityClass = checkNotNull(builder.entityClass);
@@ -134,9 +137,11 @@ public class JdbcStorageFactory<I> implements StorageFactory {
      * @param aggregateClass    class of aggregates which are stored in the corresponding {@link JdbcAggregateStorage}
      * @param <I>               a type of IDs of stored aggregates
      */
-    protected  <I> AggregateStorageQueryFactory<I> getAggregateStorageQueryFactory(DataSourceWrapper dataSource,
+    protected <I> AggregateStorageQueryFactory<I> getAggregateStorageQueryFactory(DataSourceWrapper dataSource,
                                                                                    Class<? extends Aggregate<I, ?, ?>> aggregateClass){
-        return new AggregateStorageQueryFactory<>(dataSource, aggregateClass);
+        final EntityStatusHandlingStorageQueryFactory<I> helperFactory =
+                getEntityStatusHandlingStorageQueryFactory(dataSource);
+        return new AggregateStorageQueryFactory<>(dataSource, aggregateClass, helperFactory);
     }
 
     /**
@@ -148,7 +153,9 @@ public class JdbcStorageFactory<I> implements StorageFactory {
      */
     protected <I> RecordStorageQueryFactory<I> getEntityStorageQueryFactory(DataSourceWrapper dataSource,
                                                                             Class<? extends Entity<I, ?>> entityClass){
-        return new RecordStorageQueryFactory<>(dataSource, entityClass);
+        final EntityStatusHandlingStorageQueryFactory<I> helperFactory =
+                getEntityStatusHandlingStorageQueryFactory(dataSource);
+        return new RecordStorageQueryFactory<>(dataSource, entityClass, helperFactory);
     }
 
     /**
@@ -179,6 +186,13 @@ public class JdbcStorageFactory<I> implements StorageFactory {
      */
     protected CommandStorageQueryFactory getCommandStorageQueryFactory(DataSourceWrapper dataSource){
         return new CommandStorageQueryFactory(dataSource);
+    }
+
+    protected <I> EntityStatusHandlingStorageQueryFactory<I> getEntityStatusHandlingStorageQueryFactory(DataSourceWrapper dataSource) {
+        if (helperFactoryInstance == null) {
+            helperFactoryInstance = new EntityStatusHandlingStorageQueryFactoryImpl<>(dataSource);
+        }
+        return (EntityStatusHandlingStorageQueryFactory<I>) helperFactoryInstance;
     }
 
     /**

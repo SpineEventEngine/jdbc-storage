@@ -35,13 +35,17 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author Dmytro Dashenkov.
  */
 @Internal
-public class StatusHandlingStorageQueryFactoryImpl<I> implements StatusHandlingStorageQueryFactory<I> {
+public class EntityStatusHandlingStorageQueryFactoryImpl<I> implements EntityStatusHandlingStorageQueryFactory<I> {
 
     private final DataSourceWrapper dataSource;
-    private final Logger logger;
+    private Logger logger;
 
-    public StatusHandlingStorageQueryFactoryImpl(DataSourceWrapper dataSource, Logger logger) {
+    public EntityStatusHandlingStorageQueryFactoryImpl(DataSourceWrapper dataSource) {
         this.dataSource = checkNotNull(dataSource);
+    }
+
+    @Override
+    public void setLogger(Logger logger) {
         this.logger = checkNotNull(logger);
     }
 

@@ -24,8 +24,13 @@ import com.google.protobuf.Descriptors;
 import com.google.protobuf.FieldMask;
 import org.slf4j.Logger;
 import org.spine3.server.entity.Entity;
+import org.spine3.server.entity.status.EntityStatus;
 import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.RecordStorage;
+import org.spine3.server.storage.jdbc.entity.status.EntityStatusHandlingStorageQueryFactory;
+import org.spine3.server.storage.jdbc.entity.status.query.CreateEntityStatusTableQuery;
+import org.spine3.server.storage.jdbc.entity.status.query.InsertEntityStatusQuery;
+import org.spine3.server.storage.jdbc.entity.status.query.SelectEntityStatusQuery;
 import org.spine3.server.storage.jdbc.query.DeleteRowQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbTableNameFactory;
@@ -33,6 +38,7 @@ import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import java.util.Map;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
 
 /**
@@ -41,11 +47,12 @@ import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
  * @author Andrey Lavrov
  * @author Dmytro Dashenkov
  */
-public class RecordStorageQueryFactory<I> {
+public class RecordStorageQueryFactory<I> implements EntityStatusHandlingStorageQueryFactory<I> {
 
     private final IdColumn<I> idColumn;
     private final DataSourceWrapper dataSource;
     private final String tableName;
+    private final EntityStatusHandlingStorageQueryFactory<I> statusTableQueryFactory;
     private Logger logger;
 
     /**
@@ -54,10 +61,35 @@ public class RecordStorageQueryFactory<I> {
      * @param dataSource    instance of {@link DataSourceWrapper}
      * @param entityClass   entity class of corresponding {@link RecordStorage} instance
      */
-    public RecordStorageQueryFactory(DataSourceWrapper dataSource, Class<? extends Entity<I, ?>> entityClass) {
+    public RecordStorageQueryFactory(DataSourceWrapper dataSource,
+                                     Class<? extends Entity<I, ?>> entityClass,
+                                     EntityStatusHandlingStorageQueryFactory<I> statusTableQueryFactory) {
         this.idColumn = IdColumn.newInstance(entityClass);
         this.dataSource = dataSource;
         this.tableName = DbTableNameFactory.newTableName(entityClass);
+        this.statusTableQueryFactory = checkNotNull(statusTableQueryFactory);
+    }
+
+    @Override
+    public CreateEntityStatusTableQuery newCreateEntityStatusTableQuery() {
+        return statusTableQueryFactory.newCreateEntityStatusTableQuery();
+    }
+
+    @Override
+    public InsertEntityStatusQuery newInsertEntityStatusQuery(I id, EntityStatus entityStatus) {
+        return statusTableQueryFactory.newInsertEntityStatusQuery(id, entityStatus);
+    }
+
+    @Override
+    public SelectEntityStatusQuery newSelectEntityStatusQuery(I id) {
+        return statusTableQueryFactory.newSelectEntityStatusQuery(id);
+    }
+
+    /** Sets the logger for logging exceptions during queries execution. */
+    @Override
+    public void setLogger(Logger logger) {
+        this.logger = logger;
+        statusTableQueryFactory.setLogger(logger);
     }
 
     /** Returns a query that creates a new {@link EntityTable} if it does not exist. */
@@ -160,10 +192,5 @@ public class RecordStorageQueryFactory<I> {
                 .setidColumn(idColumn)
                 .setRecords(records);
         return builder.build();
-    }
-
-    /** Sets the logger for logging exceptions during queries execution. */
-    public void setLogger(Logger logger) {
-        this.logger = logger;
     }
 }
