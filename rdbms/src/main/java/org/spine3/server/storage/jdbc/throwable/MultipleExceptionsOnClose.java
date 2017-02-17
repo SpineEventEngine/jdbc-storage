@@ -20,6 +20,8 @@
 
 package org.spine3.server.storage.jdbc.throwable;
 
+import com.google.common.base.Throwables;
+
 import java.util.Collection;
 
 import static java.lang.String.format;
@@ -56,7 +58,8 @@ public class MultipleExceptionsOnClose extends Throwable {
         builder.append(selfInfo)
                .append(lineSeparator());
         for (Exception exception : exceptions) {
-            builder.append(exception)
+            final String stackTrace = Throwables.getStackTraceAsString(exception);
+            builder.append(stackTrace)
                    .append(lineSeparator());
         }
         final String result = builder.toString();
