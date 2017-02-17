@@ -29,6 +29,8 @@ import org.spine3.server.entity.status.EntityStatus;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.JdbcStorageFactory;
 import org.spine3.server.storage.jdbc.aggregate.query.AggregateStorageQueryFactory;
+import org.spine3.server.storage.jdbc.entity.status.query.InsertEntityStatusQuery;
+import org.spine3.server.storage.jdbc.entity.status.query.SelectEntityStatusQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbIterator;
 
@@ -38,6 +40,7 @@ import java.util.Iterator;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Lists.newLinkedList;
 import static org.spine3.server.storage.jdbc.util.Closeables.closeAll;
+import static org.spine3.validate.Validate.isDefault;
 
 /**
  * The implementation of the aggregate storage based on the RDBMS.
@@ -85,6 +88,8 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
                     .execute();
         queryFactory.newCreateEventCountTableQuery()
                     .execute();
+        queryFactory.newCreateEntityStatusTableQuery()
+                    .execute();
     }
 
     @Override
@@ -100,12 +105,19 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
 
     @Override
     protected Optional<EntityStatus> readStatus(I id) {
-        return null;
+        final SelectEntityStatusQuery query = queryFactory.newSelectEntityStatusQuery(id);
+        final EntityStatus status = query.execute();
+        final boolean absent = isDefault(status);
+        if (absent) {
+            return Optional.absent();
+        }
+        return Optional.of(status);
     }
 
     @Override
     protected void writeStatus(I id, EntityStatus status) {
-
+        final InsertEntityStatusQuery query = queryFactory.newInsertEntityStatusQuery(id, status);
+        query.execute();
     }
 
     @Override
