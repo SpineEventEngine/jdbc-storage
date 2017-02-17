@@ -44,9 +44,9 @@ import static org.spine3.server.storage.jdbc.util.Closeables.closeAll;
  *
  * <p> This storage contains 2 tables by default, they are described in {@link org.spine3.server.storage.jdbc.aggregate.query.Table}.
  *
- * @param <I>   the type of aggregate IDs
- * @see         JdbcStorageFactory
- * @author      Alexander Litus
+ * @param <I> the type of aggregate IDs
+ * @author Alexander Litus
+ * @see JdbcStorageFactory
  */
 public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
 
@@ -61,10 +61,10 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     /**
      * Creates a new storage instance.
      *
-     * @param dataSource            the dataSource wrapper
-     * @param multitenant           defines is this storage multitenant
-     * @param queryFactory          factory that generates queries for interaction with aggregate tables
-     * @throws DatabaseException    if an error occurs during an interaction with the DB
+     * @param dataSource   the dataSource wrapper
+     * @param multitenant  defines is this storage multitenant
+     * @param queryFactory factory that generates queries for interaction with aggregate tables
+     * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     public static <I> JdbcAggregateStorage<I> newInstance(DataSourceWrapper dataSource,
                                                           boolean multitenant,
@@ -81,14 +81,17 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
         this.dataSource = dataSource;
         this.queryFactory = queryFactory;
         queryFactory.setLogger(LogSingleton.INSTANCE.value);
-        queryFactory.newCreateMainTableQuery().execute();
-        queryFactory.newCreateEventCountTableQuery().execute();
+        queryFactory.newCreateMainTableQuery()
+                    .execute();
+        queryFactory.newCreateEventCountTableQuery()
+                    .execute();
     }
 
     @Override
     public int readEventCountAfterLastSnapshot(I id) {
         checkNotClosed();
-        final Integer count = queryFactory.newSelectEventCountByIdQuery(id).execute();
+        final Integer count = queryFactory.newSelectEventCountByIdQuery(id)
+                                          .execute();
         if (count == null) {
             return 0;
         }
@@ -107,26 +110,45 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
 
     @Override
     protected boolean markArchived(I id) {
-        return false;
+        final EntityStatus currentStatus = readStatus(id).or(EntityStatus.getDefaultInstance());
+        if (currentStatus.getArchived()) {
+            return false;
+        }
+        final EntityStatus newStatus = currentStatus.toBuilder()
+                                                    .setArchived(true)
+                                                    .build();
+        writeStatus(id, newStatus);
+        return true;
     }
 
     @Override
     protected boolean markDeleted(I id) {
-        return false;
+        final EntityStatus currentStatus = readStatus(id).or(EntityStatus.getDefaultInstance());
+        if (currentStatus.getDeleted()) {
+            return false;
+        }
+        final EntityStatus newStatus = currentStatus.toBuilder()
+                                                    .setDeleted(true)
+                                                    .build();
+        writeStatus(id, newStatus);
+        return true;
     }
 
     @Override
     public void writeEventCountAfterLastSnapshot(I id, int count) {
         checkNotClosed();
         if (containsEventCount(id)) {
-            queryFactory.newUpdateEventCountQuery(id, count).execute();
+            queryFactory.newUpdateEventCountQuery(id, count)
+                        .execute();
         } else {
-            queryFactory.newInsertEventCountQuery(id, count).execute();
+            queryFactory.newInsertEventCountQuery(id, count)
+                        .execute();
         }
     }
 
     private boolean containsEventCount(I id) {
-        final Integer count = queryFactory.newSelectEventCountByIdQuery(id).execute();
+        final Integer count = queryFactory.newSelectEventCountByIdQuery(id)
+                                          .execute();
         final boolean contains = count != null;
         return contains;
     }
@@ -138,7 +160,8 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
      */
     @Override
     protected void writeRecord(I id, AggregateStorageRecord record) throws DatabaseException {
-        queryFactory.newInsertRecordQuery(id, record).execute();
+        queryFactory.newInsertRecordQuery(id, record)
+                    .execute();
     }
 
     /**
@@ -152,7 +175,8 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     @Override
     protected Iterator<AggregateStorageRecord> historyBackward(I id) throws DatabaseException {
         checkNotNull(id);
-        final Iterator<AggregateStorageRecord> iterator = queryFactory.newSelectByIdSortedByTimeDescQuery(id).execute();
+        final Iterator<AggregateStorageRecord> iterator = queryFactory.newSelectByIdSortedByTimeDescQuery(id)
+                                                                      .execute();
         iterators.add((DbIterator) iterator);
         return iterator;
     }

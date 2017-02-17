@@ -28,6 +28,7 @@ import com.google.protobuf.Descriptors;
 import com.google.protobuf.FieldMask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.spine3.server.entity.status.EntityStatus;
 import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.RecordStorage;
 import org.spine3.server.storage.jdbc.DatabaseException;
@@ -87,12 +88,36 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
 
     @Override
     public boolean markArchived(I id) {
-        return false;
+        final EntityStatus currentStatus = readStatus(id);
+        if (currentStatus.getArchived()) {
+            return false;
+        }
+        final EntityStatus newStatus = currentStatus.toBuilder()
+                .setArchived(true)
+                .build();
+        writeStatus(id, newStatus);
+        return true;
     }
 
     @Override
     public boolean markDeleted(I id) {
-        return false;
+        final EntityStatus currentStatus = readStatus(id);
+        if (currentStatus.getDeleted()) {
+            return false;
+        }
+        final EntityStatus newStatus = currentStatus.toBuilder()
+                                                    .setDeleted(true)
+                                                    .build();
+        writeStatus(id, newStatus);
+        return true;
+    }
+
+    private EntityStatus readStatus(I id) {
+        return null;
+    }
+
+    private void writeStatus(I id, EntityStatus status) {
+
     }
 
     @Override
