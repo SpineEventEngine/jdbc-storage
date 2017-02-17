@@ -21,6 +21,7 @@
 package org.spine3.server.storage.jdbc.entity.status.query;
 
 import org.spine3.server.storage.jdbc.query.CreateTableQuery;
+import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
@@ -32,14 +33,13 @@ import static org.spine3.server.storage.jdbc.Sql.Type.VARCHAR_512;
 import static org.spine3.server.storage.jdbc.entity.status.table.EntityStatusTable.ARCHIVED_COL;
 import static org.spine3.server.storage.jdbc.entity.status.table.EntityStatusTable.DELETED_COL;
 import static org.spine3.server.storage.jdbc.entity.status.table.EntityStatusTable.ID_COL;
-import static org.spine3.server.storage.jdbc.entity.status.table.EntityStatusTable.TABLE_NAME;
 
 /**
  * @author Dmytro Dashenkov.
  */
 public class CreateEntityStatusTableQuery extends CreateTableQuery<String> {
 
-    private static final String SQL_TEMPLATE = CREATE_IF_MISSING + TABLE_NAME + BRACKET_OPEN +
+    private static final String SQL_TEMPLATE = CREATE_IF_MISSING + "%s" + BRACKET_OPEN +
             ID_COL + VARCHAR_512 + COMMA +
             ARCHIVED_COL + BOOLEAN + COMMA +
             DELETED_COL + BOOLEAN + BRACKET_CLOSE + SEMICOLON;
@@ -56,6 +56,13 @@ public class CreateEntityStatusTableQuery extends CreateTableQuery<String> {
     }
 
     public static class Builder extends CreateTableQuery.Builder<Builder, CreateEntityStatusTableQuery, String> {
+
+        @SuppressWarnings("MethodDoesntCallSuperMethod")// We don't want to override the {@code idColumn} field.
+        @Deprecated
+        @Override
+        public Builder setIdColumn(IdColumn<String> idColumn) {
+            throw new UnsupportedOperationException("Entity Status table has predefined id type: String.");
+        }
 
         @Override
         public CreateEntityStatusTableQuery build() {
