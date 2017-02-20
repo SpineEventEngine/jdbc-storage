@@ -75,7 +75,7 @@ public class SelectEntityStatusQuery extends StorageQuery {
             deleted = resultSet.getBoolean(DELETED_COL_INDEX);
             resultSet.close();
         } catch (SQLException e) {
-            getLogger().error("Failed to read EntityStatus with.", e);
+            getLogger().error("Failed to read EntityStatus.", e);
             throw new DatabaseException(e);
         }
         final EntityStatus status = EntityStatus.newBuilder()

@@ -148,7 +148,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
                        .build();
         queryFactory.newUpdateEntityQuery(id, record)
                     .execute();
-        final boolean success = entityStatusHandler.markArchived(id);
+        final boolean success = entityStatusHandler.markDeleted(id);
         checkState(
                 success,
                 format(CONTRADICTORY_DELETED_STATUS_ERROR_MESSAGE, id));
