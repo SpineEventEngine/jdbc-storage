@@ -40,4 +40,7 @@ public class EntityStatusTable {
 
     public static final String DELETED_COL = "deleted";
     public static final int DELETED_COL_INDEX = 3;
+
+    private EntityStatusTable() {
+    }
 }

@@ -23,6 +23,7 @@ package org.spine3.server.storage.jdbc.entity.status.query;
 import org.spine3.server.entity.status.EntityStatus;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.StorageQuery;
+import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -60,10 +61,10 @@ public class SelectEntityStatusQuery extends StorageQuery {
     }
 
     public EntityStatus execute() {
-        final PreparedStatement statement = prepareStatement(getConnection(false));
         final boolean archived;
         final boolean deleted;
-        try {
+        try (ConnectionWrapper connection = getConnection(false)) {
+            final PreparedStatement statement = prepareStatement(connection);
             statement.setString(1, id);
             final ResultSet resultSet = statement.executeQuery();
             final boolean empty = !resultSet.next();
