@@ -28,6 +28,7 @@ import com.google.protobuf.Descriptors;
 import com.google.protobuf.FieldMask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.spine3.server.entity.status.EntityStatus;
 import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.RecordStorage;
 import org.spine3.server.storage.jdbc.DatabaseException;
@@ -38,13 +39,14 @@ import org.spine3.server.storage.jdbc.entity.status.EntityStatusHandler;
 import org.spine3.server.storage.jdbc.query.DeleteRowQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
-import javax.annotation.Nullable;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+import static java.lang.String.format;
 
 /**
  * The implementation of the entity storage based on the RDBMS.
@@ -54,6 +56,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @see JdbcStorageFactory
  */
 public class JdbcRecordStorage<I> extends RecordStorage<I> {
+
+    private static final String CONTRADICTORY_ARCHIVED_STATUS_ERROR_MESSAGE =
+            "Entity Storage and Entity Status Storage contain contradictory info about record with ID %s archived status.";
+    private static final String CONTRADICTORY_DELETED_STATUS_ERROR_MESSAGE =
+            "Entity Storage and Entity Status Storage contain contradictory info about record with ID %s deleted status.";
 
     private final DataSourceWrapper dataSource;
 
@@ -94,14 +101,58 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
 
     @Override
     public boolean markArchived(I id) {
-        return containsRecord(id)
-                && entityStatusHandler.markArchived(id);
+        checkNotNull(id);
+
+        final Optional<EntityStorageRecord> storageRecord = readRecord(id);
+        if (!storageRecord.isPresent()) {
+            return false;
+        }
+        EntityStorageRecord record = storageRecord.get();
+        EntityStatus status = record.getEntityStatus();
+        if (status.getArchived()) {
+            return false;
+        }
+        status = status.toBuilder()
+                .setArchived(true)
+                .build();
+        record = record.toBuilder()
+                .setEntityStatus(status)
+                .build();
+        queryFactory.newUpdateEntityQuery(id, record)
+                    .execute();
+        final boolean success = entityStatusHandler.markArchived(id);
+        checkState(
+                success,
+                format(CONTRADICTORY_ARCHIVED_STATUS_ERROR_MESSAGE, id));
+        return true;
     }
 
     @Override
     public boolean markDeleted(I id) {
-        return containsRecord(id)
-                && entityStatusHandler.markDeleted(id);
+        checkNotNull(id);
+
+        final Optional<EntityStorageRecord> storageRecord = readRecord(id);
+        if (!storageRecord.isPresent()) {
+            return false;
+        }
+        EntityStorageRecord record = storageRecord.get();
+        EntityStatus status = record.getEntityStatus();
+        if (status.getDeleted()) {
+            return false;
+        }
+        status = status.toBuilder()
+                       .setDeleted(true)
+                       .build();
+        record = record.toBuilder()
+                       .setEntityStatus(status)
+                       .build();
+        queryFactory.newUpdateEntityQuery(id, record)
+                    .execute();
+        final boolean success = entityStatusHandler.markArchived(id);
+        checkState(
+                success,
+                format(CONTRADICTORY_DELETED_STATUS_ERROR_MESSAGE, id));
+        return true;
     }
 
     @Override
@@ -121,7 +172,6 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
      *
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
-    @Nullable
     @Override
     protected Optional<EntityStorageRecord> readRecord(I id) throws DatabaseException {
         final EntityStorageRecord record = queryFactory.newSelectEntityByIdQuery(id)
