@@ -73,6 +73,7 @@ public class SelectEntityStatusQuery extends StorageQuery {
             }
             archived = resultSet.getBoolean(ARCHIVED_COL_INDEX);
             deleted = resultSet.getBoolean(DELETED_COL_INDEX);
+            statement.close();
             resultSet.close();
         } catch (SQLException e) {
             getLogger().error("Failed to read EntityStatus.", e);

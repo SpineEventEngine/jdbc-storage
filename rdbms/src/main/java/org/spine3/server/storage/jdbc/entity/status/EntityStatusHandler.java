@@ -21,17 +21,25 @@
 package org.spine3.server.storage.jdbc.entity.status;
 
 import com.google.common.base.Optional;
+import com.google.protobuf.Descriptors.FieldDescriptor;
 import org.spine3.server.entity.status.EntityStatus;
 import org.spine3.server.storage.jdbc.entity.status.query.SelectEntityStatusQuery;
-import org.spine3.server.storage.jdbc.query.WriteQuery;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.spine3.server.entity.status.EntityStatus.ARCHIVED_FIELD_NUMBER;
+import static org.spine3.server.entity.status.EntityStatus.DELETED_FIELD_NUMBER;
+import static org.spine3.server.entity.status.EntityStatus.getDefaultInstance;
 import static org.spine3.validate.Validate.isDefault;
 
 /**
  * @author Dmytro Dashenkov.
  */
 public class EntityStatusHandler<I> {
+
+    private static final FieldDescriptor ARCHIVED = EntityStatus.getDescriptor()
+                                                                .findFieldByNumber(ARCHIVED_FIELD_NUMBER);
+    private static final FieldDescriptor DELETED = EntityStatus.getDescriptor()
+                                                               .findFieldByNumber(DELETED_FIELD_NUMBER);
 
     private final EntityStatusHandlingStorageQueryFactory<I> queryFactory;
 
@@ -55,38 +63,49 @@ public class EntityStatusHandler<I> {
     }
 
     public void writeStatus(I id, EntityStatus status) {
-        final WriteQuery query;
         final Optional<EntityStatus> currentStatus = readStatus(id);
-        if (currentStatus.isPresent()) {
-            query = queryFactory.newUpdateEntityStatusQuery(id, status);
+        final boolean exists = currentStatus.isPresent();
+        writeStatus(id, status, exists);
+    }
+
+    private void writeStatus(I id, EntityStatus status, boolean updateExisting) {
+        if (updateExisting) {
+            updateStatus(id, status);
         } else {
-            query = queryFactory.newInsertEntityStatusQuery(id, status);
+            insertStatus(id, status);
         }
-        query.execute();
+    }
+
+    private void updateStatus(I id, EntityStatus status) {
+        queryFactory.newUpdateEntityStatusQuery(id, status)
+                    .execute();
+    }
+
+    private void insertStatus(I id, EntityStatus status) {
+        queryFactory.newInsertEntityStatusQuery(id, status)
+                    .execute();
     }
 
     public boolean markArchived(I id) {
-        final EntityStatus currentStatus = readStatus(id).or(EntityStatus.getDefaultInstance());
-        if (currentStatus.getArchived()) {
-            return false;
-        }
-        final EntityStatus newStatus = currentStatus.toBuilder()
-                                                    .setArchived(true)
-                                                    .build();
-        writeStatus(id, newStatus);
-        return true;
+        return markField(id, ARCHIVED);
     }
 
     public boolean markDeleted(I id) {
-        final EntityStatus currentStatus = readStatus(id).or(EntityStatus.getDefaultInstance());
-        if (currentStatus.getDeleted()) {
+        return markField(id, DELETED);
+    }
+
+    private boolean markField(I id, FieldDescriptor field) {
+        final Optional<EntityStatus> readStatus = readStatus(id);
+        final boolean exists = readStatus.isPresent();
+        final EntityStatus currentStatus = readStatus.or(getDefaultInstance());
+        final boolean marked = (boolean) currentStatus.getField(field);
+        if (marked) {
             return false;
         }
         final EntityStatus newStatus = currentStatus.toBuilder()
-                                                    .setDeleted(true)
+                                                    .setField(field, true)
                                                     .build();
-        writeStatus(id, newStatus);
+        writeStatus(id, newStatus, exists);
         return true;
     }
-
 }

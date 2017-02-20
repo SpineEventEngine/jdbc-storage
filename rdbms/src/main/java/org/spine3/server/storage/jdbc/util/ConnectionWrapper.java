@@ -62,7 +62,7 @@ public class ConnectionWrapper implements AutoCloseable {
      */
     public PreparedStatement prepareStatement(String sql) {
         try {
-            //noinspection JDBCPrepareStatementWithNonConstantString
+            @SuppressWarnings("JDBCPrepareStatementWithNonConstantString")
             final PreparedStatement statement = connection.prepareStatement(sql);
             return statement;
         } catch (SQLException e) {
