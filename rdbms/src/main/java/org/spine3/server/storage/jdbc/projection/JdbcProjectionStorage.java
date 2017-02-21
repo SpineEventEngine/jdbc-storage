@@ -35,7 +35,6 @@ import org.spine3.server.storage.jdbc.projection.query.ProjectionStorageQueryFac
 import javax.annotation.Nullable;
 import java.util.Map;
 
-
 /**
  * The implementation of the projection storage based on the RDBMS.
  *
@@ -52,10 +51,10 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
     /**
      * Creates a new storage instance.
      *
-     * @param entityStorage   an entity storage to use
-     * @param multitenant     defines is this storage multitenant
-     * @param queryFactory    factory that will generate queries for interaction with projection table
-     * @param <I>             a type of projection IDs
+     * @param entityStorage an entity storage to use
+     * @param multitenant   defines is this storage multitenant
+     * @param queryFactory  factory that will generate queries for interaction with projection table
+     * @param <I>           a type of projection IDs
      * @return a new storage instance
      */
     public static <I> ProjectionStorage<I> newInstance(JdbcRecordStorage<I> entityStorage,
@@ -67,21 +66,25 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
 
     protected JdbcProjectionStorage(JdbcRecordStorage<I> recordStorage,
                                     boolean multitenant,
-                                    ProjectionStorageQueryFactory<I> queryFactory) throws DatabaseException {
+                                    ProjectionStorageQueryFactory<I> queryFactory) throws
+                                                                                   DatabaseException {
         super(multitenant);
         this.recordStorage = recordStorage;
         this.queryFactory = queryFactory;
         queryFactory.setLogger(LogSingleton.INSTANCE.value);
 
-       queryFactory.newCreateTableQuery().execute();
+        queryFactory.newCreateTableQuery()
+                    .execute();
     }
 
     @Override
     public void writeLastHandledEventTime(Timestamp time) throws DatabaseException {
         if (containsLastEventTime()) {
-           queryFactory.newUpdateTimestampQuery(time).execute();
+            queryFactory.newUpdateTimestampQuery(time)
+                        .execute();
         } else {
-            queryFactory.newInsertTimestampQuery(time).execute();
+            queryFactory.newInsertTimestampQuery(time)
+                        .execute();
         }
     }
 
@@ -94,7 +97,8 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
     @Override
     @Nullable
     public Timestamp readLastHandledEventTime() throws DatabaseException {
-        final Timestamp timestamp = queryFactory.newSelectTimestampQuery().execute();
+        final Timestamp timestamp = queryFactory.newSelectTimestampQuery()
+                                                .execute();
         return timestamp;
     }
 
@@ -135,7 +139,8 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
     }
 
     @Override
-    protected Iterable<EntityStorageRecord> readMultipleRecords(Iterable<I> ids, FieldMask fieldMask) {
+    protected Iterable<EntityStorageRecord> readMultipleRecords(Iterable<I> ids,
+                                                                FieldMask fieldMask) {
         return recordStorage.readMultiple(ids, fieldMask);
     }
 

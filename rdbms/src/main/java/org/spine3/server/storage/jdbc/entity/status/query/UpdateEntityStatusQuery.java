@@ -49,9 +49,9 @@ import static org.spine3.server.storage.jdbc.entity.status.table.EntityStatusTab
 public class UpdateEntityStatusQuery extends WriteQuery {
 
     private static final String SQL = UPDATE + TABLE_NAME + SET +
-            archived + EQUAL + PLACEHOLDER + COMMA +
-            deleted + EQUAL + PLACEHOLDER +
-            WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
+                                      archived + EQUAL + PLACEHOLDER + COMMA +
+                                      deleted + EQUAL + PLACEHOLDER +
+                                      WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
 
     private final String id;
     private final EntityStatus entityStatus;

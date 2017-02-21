@@ -33,7 +33,7 @@ import static org.spine3.server.storage.jdbc.event.query.EventTable.TABLE_NAME;
  *
  * @author Andrey Lavrov
  */
-public class EventStorageQueryFactory{
+public class EventStorageQueryFactory {
 
     private final DataSourceWrapper dataSource;
     private final IdColumn<String> idColumn;
@@ -42,7 +42,7 @@ public class EventStorageQueryFactory{
     /**
      * Creates a new instance.
      *
-     * @param dataSource    instance of {@link DataSourceWrapper}
+     * @param dataSource instance of {@link DataSourceWrapper}
      */
     public EventStorageQueryFactory(DataSourceWrapper dataSource) {
         this.dataSource = dataSource;
@@ -55,57 +55,61 @@ public class EventStorageQueryFactory{
     }
 
     /** Returns a query that creates a new {@link EventTable} if it does not exist. */
-    public CreateEventTableQuery newCreateEventTableQuery(){
+    public CreateEventTableQuery newCreateEventTableQuery() {
         final CreateEventTableQuery.Builder builder = CreateEventTableQuery.newBuilder()
-                .setDataSource(dataSource)
-                .setLogger(logger)
-                .setIdColumn(idColumn)
-                .setTableName(TABLE_NAME);
+                                                                           .setDataSource(
+                                                                                   dataSource)
+                                                                           .setLogger(logger)
+                                                                           .setIdColumn(idColumn)
+                                                                           .setTableName(
+                                                                                   TABLE_NAME);
         return builder.build();
     }
 
     /**
      * Returns a query that inserts a new {@link EventStorageRecord} to the {@link EventTable}.
      *
-     * @param record    new event record
+     * @param record new event record
      */
-    public InsertEventRecordQuery newInsertEventQuery(EventStorageRecord record){
+    public InsertEventRecordQuery newInsertEventQuery(EventStorageRecord record) {
         final InsertEventRecordQuery.Builder builder = InsertEventRecordQuery.newBuilder()
-                .setDataSource(dataSource)
-                .setLogger(logger)
-                .setRecord(record);
+                                                                             .setDataSource(
+                                                                                     dataSource)
+                                                                             .setLogger(logger)
+                                                                             .setRecord(record);
         return builder.build();
     }
 
     /**
      * Returns a query that updates {@link EventStorageRecord} in the {@link EventTable}.
      *
-     * @param record    updated record state
+     * @param record updated record state
      */
-    public UpdateEventRecordQuery newUpdateEventQuery(EventStorageRecord record){
+    public UpdateEventRecordQuery newUpdateEventQuery(EventStorageRecord record) {
         final UpdateEventRecordQuery.Builder builder = UpdateEventRecordQuery.newBuilder()
-                .setDataSource(dataSource)
-                .setLogger(logger)
-                .setRecord(record);
+                                                                             .setDataSource(
+                                                                                     dataSource)
+                                                                             .setLogger(logger)
+                                                                             .setRecord(record);
         return builder.build();
     }
 
     /** Returns a query that selects {@link EventStorageRecord} by ID. */
-    public SelectEventByIdQuery newSelectEventByIdQuery(String id){
+    public SelectEventByIdQuery newSelectEventByIdQuery(String id) {
         final SelectEventByIdQuery.Builder builder = SelectEventByIdQuery.newBuilder()
-                .setDataSource(dataSource)
-                .setLogger(logger)
-                .setIdColumn(idColumn)
-                .setId(id);
+                                                                         .setDataSource(dataSource)
+                                                                         .setLogger(logger)
+                                                                         .setIdColumn(idColumn)
+                                                                         .setId(id);
         return builder.build();
     }
 
     /** Returns a query that selects {@link EventStorageRecord} by specified {@link EventStreamQuery}. */
-    public FilterAndSortQuery newFilterAndSortQuery(EventStreamQuery streamQuery){
+    public FilterAndSortQuery newFilterAndSortQuery(EventStreamQuery streamQuery) {
         final FilterAndSortQuery.Builder builder = FilterAndSortQuery.newBuilder()
-                .setDataSource(dataSource)
-                .setLogger(logger)
-                .setStreamQuery(streamQuery);
+                                                                     .setDataSource(dataSource)
+                                                                     .setLogger(logger)
+                                                                     .setStreamQuery(streamQuery);
         return builder.build();
     }
 }

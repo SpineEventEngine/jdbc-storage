@@ -27,7 +27,6 @@ import org.spine3.server.storage.jdbc.GivenDataSource;
 import org.spine3.server.storage.jdbc.event.query.EventStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
-
 /**
  * @author Alexander Litus
  */
@@ -35,8 +34,10 @@ public class JdbcEventStorageShould extends EventStorageShould {
 
     @Override
     protected EventStorage getStorage() {
-        final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory("eventStorageTests");
-        return JdbcEventStorage.newInstance(dataSource, false, new EventStorageQueryFactory(dataSource));
+        final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(
+                "eventStorageTests");
+        return JdbcEventStorage.newInstance(dataSource, false,
+                                            new EventStorageQueryFactory(dataSource));
     }
 
     @Test(expected = IllegalStateException.class)

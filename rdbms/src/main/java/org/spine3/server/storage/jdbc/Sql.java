@@ -62,7 +62,7 @@ public class Sql {
         checkArgument(count > 0, "Count of placeholders should be > 0");
 
         final String placeholders = Joiner.on(COMMA.toString())
-                .join(Collections.nCopies(count, PLACEHOLDER));
+                                          .join(Collections.nCopies(count, PLACEHOLDER));
         final String wrappedPlaceholders = BRACKET_OPEN + placeholders + BRACKET_CLOSE;
         return wrappedPlaceholders;
     }
@@ -105,7 +105,6 @@ public class Sql {
         SELECT,
         UPDATE,
         DELETE_FROM("DELETE FROM"),
-
 
         ALL_ATTRIBUTES("*"),
         FROM,
@@ -153,11 +152,11 @@ public class Sql {
      * Set of SQL keywords representing 5 aggregating functions:
      *
      * <ul>
-     *     <li>MIN
-     *     <li>MAX
-     *     <li>COUNT
-     *     <li>AVG
-     *     <li>SUM
+     * <li>MIN
+     * <li>MAX
+     * <li>COUNT
+     * <li>AVG
+     * <li>SUM
      * </ul>
      */
     public enum Function {
@@ -178,8 +177,8 @@ public class Sql {
      * Set of punctuation signs used in SQL:
      *
      * <ul>
-     *     <li>Operators: equal, not equal, comparison operators;
-     *     <li>Punctuation: comma, brackets, semicolon.
+     * <li>Operators: equal, not equal, comparison operators;
+     * <li>Punctuation: comma, brackets, semicolon.
      * </ul>
      */
     public enum BuildingBlock {

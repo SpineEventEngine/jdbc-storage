@@ -51,8 +51,8 @@ public class SelectEntityStatusQuery extends StorageQuery {
 
     private static final String SQL =
             SELECT.toString() + archived + COMMA + deleted +
-                    FROM + TABLE_NAME +
-                    WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
+            FROM + TABLE_NAME +
+            WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
 
     private final String id;
 

@@ -75,15 +75,20 @@ public class JdbcStandStorageShould {
     @Test
     public void initialize_properly_with_all_builder_fields() {
         final DataSourceWrapper dataSourceMock = mock(DataSourceWrapper.class);
-        final RecordStorageQueryFactory<String> queryFactoryMock = (RecordStorageQueryFactory<String>) mock(RecordStorageQueryFactory.class);
+        final RecordStorageQueryFactory<String> queryFactoryMock = (RecordStorageQueryFactory<String>) mock(
+                RecordStorageQueryFactory.class);
 
-        final CreateEntityTableQuery<String> queryMock = (CreateEntityTableQuery<String>) mock(CreateEntityTableQuery.class);
-        final CreateEntityStatusTableQuery statusQueryMock = mock(CreateEntityStatusTableQuery.class);
+        final CreateEntityTableQuery<String> queryMock = (CreateEntityTableQuery<String>) mock(
+                CreateEntityTableQuery.class);
+        final CreateEntityStatusTableQuery statusQueryMock = mock(
+                CreateEntityStatusTableQuery.class);
 
         when(queryFactoryMock.newCreateEntityTableQuery()).thenReturn(queryMock);
         when(queryFactoryMock.newCreateEntityStatusTableQuery()).thenReturn(statusQueryMock);
-        doNothing().when(queryMock).execute();
-        doNothing().when(statusQueryMock).execute();
+        doNothing().when(queryMock)
+                   .execute();
+        doNothing().when(statusQueryMock)
+                   .execute();
 
         final StandStorage standStorage = JdbcStandStorage.<String>newBuilder()
                 .setRecordStorageQueryFactory(queryFactoryMock)
@@ -99,19 +104,23 @@ public class JdbcStandStorageShould {
         verify(queryMock).execute();
     }
 
-
     @SuppressWarnings("unchecked") // For mocks
     @Test
     public void initialize_properly_without_multitenancy() {
         final DataSourceWrapper dataSourceMock = mock(DataSourceWrapper.class);
-        final RecordStorageQueryFactory<String> queryFactoryMock = (RecordStorageQueryFactory<String>) mock(RecordStorageQueryFactory.class);
+        final RecordStorageQueryFactory<String> queryFactoryMock = (RecordStorageQueryFactory<String>) mock(
+                RecordStorageQueryFactory.class);
 
-        final CreateEntityTableQuery<String> queryMock = (CreateEntityTableQuery<String>) mock(CreateEntityTableQuery.class);
-        final CreateEntityStatusTableQuery statusQueryMock = mock(CreateEntityStatusTableQuery.class);
+        final CreateEntityTableQuery<String> queryMock = (CreateEntityTableQuery<String>) mock(
+                CreateEntityTableQuery.class);
+        final CreateEntityStatusTableQuery statusQueryMock = mock(
+                CreateEntityStatusTableQuery.class);
         when(queryFactoryMock.newCreateEntityTableQuery()).thenReturn(queryMock);
         when(queryFactoryMock.newCreateEntityStatusTableQuery()).thenReturn(statusQueryMock);
-        doNothing().when(queryMock).execute();
-        doNothing().when(statusQueryMock).execute();
+        doNothing().when(queryMock)
+                   .execute();
+        doNothing().when(statusQueryMock)
+                   .execute();
 
         final StandStorage standStorage = JdbcStandStorage.<String>newBuilder()
                 .setRecordStorageQueryFactory(queryFactoryMock)
@@ -123,21 +132,23 @@ public class JdbcStandStorageShould {
         assertFalse(standStorage.isMultitenant());
     }
 
-
     @Test(expected = NullPointerException.class)
     public void fail_to_initialize_with_empty_builder() {
-        JdbcStandStorage.newBuilder().build();
+        JdbcStandStorage.newBuilder()
+                        .build();
     }
-
 
     @SuppressWarnings("unchecked") // For mocks
     @Test(expected = NullPointerException.class)
     public void fail_to_initialize_without_data_source() {
-        final RecordStorageQueryFactory<String> queryFactoryMock = (RecordStorageQueryFactory<String>) mock(RecordStorageQueryFactory.class);
+        final RecordStorageQueryFactory<String> queryFactoryMock = (RecordStorageQueryFactory<String>) mock(
+                RecordStorageQueryFactory.class);
 
-        final CreateEntityTableQuery<String> queryMock = (CreateEntityTableQuery<String>) mock(CreateEntityTableQuery.class);
+        final CreateEntityTableQuery<String> queryMock = (CreateEntityTableQuery<String>) mock(
+                CreateEntityTableQuery.class);
         when(queryFactoryMock.newCreateEntityTableQuery()).thenReturn(queryMock);
-        doNothing().when(queryMock).execute();
+        doNothing().when(queryMock)
+                   .execute();
 
         JdbcStandStorage.<String>newBuilder()
                 .setRecordStorageQueryFactory(queryFactoryMock)
@@ -151,21 +162,24 @@ public class JdbcStandStorageShould {
         final DataSourceWrapper dataSourceMock = mock(DataSourceWrapper.class);
 
         JdbcStandStorage.newBuilder()
-                .setDataSource(dataSourceMock)
-                .setStateDescriptor(Project.getDescriptor())
-                .setMultitenant(false)
-                .build();
+                        .setDataSource(dataSourceMock)
+                        .setStateDescriptor(Project.getDescriptor())
+                        .setMultitenant(false)
+                        .build();
     }
 
     @SuppressWarnings("unchecked") // For mocks
     @Test(expected = NullPointerException.class)
     public void fail_to_initialize_without_entity_state_descriptor() {
         final DataSourceWrapper dataSourceMock = mock(DataSourceWrapper.class);
-        final RecordStorageQueryFactory<String> queryFactoryMock = (RecordStorageQueryFactory<String>) mock(RecordStorageQueryFactory.class);
+        final RecordStorageQueryFactory<String> queryFactoryMock = (RecordStorageQueryFactory<String>) mock(
+                RecordStorageQueryFactory.class);
 
-        final CreateEntityTableQuery<String> queryMock = (CreateEntityTableQuery<String>) mock(CreateEntityTableQuery.class);
+        final CreateEntityTableQuery<String> queryMock = (CreateEntityTableQuery<String>) mock(
+                CreateEntityTableQuery.class);
         when(queryFactoryMock.newCreateEntityTableQuery()).thenReturn(queryMock);
-        doNothing().when(queryMock).execute();
+        doNothing().when(queryMock)
+                   .execute();
 
         JdbcStandStorage.<String>newBuilder()
                 .setRecordStorageQueryFactory(queryFactoryMock)
@@ -214,8 +228,8 @@ public class JdbcStandStorageShould {
         ids.add(AggregateStateId.of("5", typeUrl));
         ids.add(AggregateStateId.of("8", typeUrl));
 
-
-        final Collection<EntityStorageRecord> readRecords = (Collection<EntityStorageRecord>) storage.readMultiple(ids);
+        final Collection<EntityStorageRecord> readRecords = (Collection<EntityStorageRecord>) storage.readMultiple(
+                ids);
         assertEquals(ids.size(), readRecords.size());
 
         assertContains(records.get(1), readRecords);
@@ -237,7 +251,8 @@ public class JdbcStandStorageShould {
         ids.add(AggregateStateId.of("invalid-id-2", typeUrl));
         ids.add(AggregateStateId.of(repeatingInvalidId, typeUrl));
 
-        final Collection<EntityStorageRecord> records = (Collection<EntityStorageRecord>) storage.readMultiple(ids);
+        final Collection<EntityStorageRecord> records = (Collection<EntityStorageRecord>) storage.readMultiple(
+                ids);
 
         assertNotNull(records);
         assertSize(0, records);
@@ -274,30 +289,48 @@ public class JdbcStandStorageShould {
         final AggregateStateId id = AggregateStateId.of(stringId, TypeUrl.of(Project.class));
 
         final Project project = Project.newBuilder()
-                .setId(ProjectId.newBuilder().setId(stringId))
-                .setName("Some name")
-                .setStatus(Project.Status.DONE)
-                .build();
+                                       .setId(ProjectId.newBuilder()
+                                                       .setId(stringId))
+                                       .setName("Some name")
+                                       .setStatus(Project.Status.DONE)
+                                       .build();
 
         final Given.TestAggregate aggregate = new Given.TestAggregate(stringId);
         aggregate.setState(project);
 
         writeToStorage(aggregate, storage, Project.class);
 
-        final List<Descriptors.FieldDescriptor> fields = Project.getDescriptor().getFields();
-        final FieldMask idOnly = FieldMask.newBuilder().addPaths(fields.get(0).getFullName()).build();
-        final FieldMask idAndName = FieldMask.newBuilder().addPaths(fields.get(0).getFullName())
-                .addPaths(fields.get(1).getFullName()).build();
-        final FieldMask nameAndStatus = FieldMask.newBuilder().addPaths(fields.get(1).getFullName())
-                .addPaths(fields.get(3).getFullName()).build();
+        final List<Descriptors.FieldDescriptor> fields = Project.getDescriptor()
+                                                                .getFields();
+        final FieldMask idOnly = FieldMask.newBuilder()
+                                          .addPaths(fields.get(0)
+                                                          .getFullName())
+                                          .build();
+        final FieldMask idAndName = FieldMask.newBuilder()
+                                             .addPaths(fields.get(0)
+                                                             .getFullName())
+                                             .addPaths(fields.get(1)
+                                                             .getFullName())
+                                             .build();
+        final FieldMask nameAndStatus = FieldMask.newBuilder()
+                                                 .addPaths(fields.get(1)
+                                                                 .getFullName())
+                                                 .addPaths(fields.get(3)
+                                                                 .getFullName())
+                                                 .build();
 
         final Optional<EntityStorageRecord> recordOptional = storage.read(id, idOnly);
         assertTrue(recordOptional.isPresent());
         final EntityStorageRecord record = recordOptional.get();
         final Project withIdOnly = AnyPacker.unpack(record.getState());
-        final Project withIdAndName = AnyPacker.unpack(storage.readMultiple(Collections.singleton(id), idAndName).iterator()
-                .next().getState());
-        final Project withNameAndStatus = AnyPacker.unpack(storage.readAll(nameAndStatus).get(id).getState());
+        final Project withIdAndName = AnyPacker.unpack(
+                storage.readMultiple(Collections.singleton(id), idAndName)
+                       .iterator()
+                       .next()
+                       .getState());
+        final Project withNameAndStatus = AnyPacker.unpack(storage.readAll(nameAndStatus)
+                                                                  .get(id)
+                                                                  .getState());
 
         assertMatches(withIdOnly, idOnly);
         assertMatches(withIdAndName, idAndName);
@@ -316,9 +349,11 @@ public class JdbcStandStorageShould {
             writeToStorage(aggregate, storage, Project.class);
         }
 
-        final EntityStorageRecord differentRecord = writeToStorage(differentAggregate, storage, Customer.class);
+        final EntityStorageRecord differentRecord = writeToStorage(differentAggregate, storage,
+                                                                   Customer.class);
 
-        final Collection<EntityStorageRecord> records = storage.readAllByType(TypeUrl.of(Project.class));
+        final Collection<EntityStorageRecord> records = storage.readAllByType(
+                TypeUrl.of(Project.class));
         assertSize(aggregatesCount, records);
         assertFalse(records.contains(differentRecord));
     }
@@ -334,10 +369,15 @@ public class JdbcStandStorageShould {
             writeToStorage(aggregate, storage, Project.class);
         }
 
-        final FieldMask namesMask = FieldMask.newBuilder().addPaths(Project.getDescriptor().getFields().get(1)
-                .getFullName()).build();
+        final FieldMask namesMask = FieldMask.newBuilder()
+                                             .addPaths(Project.getDescriptor()
+                                                              .getFields()
+                                                              .get(1)
+                                                              .getFullName())
+                                             .build();
 
-        final Collection<EntityStorageRecord> records = storage.readAllByType(TypeUrl.of(Project.class), namesMask);
+        final Collection<EntityStorageRecord> records = storage.readAllByType(
+                TypeUrl.of(Project.class), namesMask);
 
         for (EntityStorageRecord record : records) {
             final Project project = AnyPacker.unpack(record.getState());
@@ -394,7 +434,8 @@ public class JdbcStandStorageShould {
 
     private static void assertMatches(Message message, FieldMask fieldMask) {
         final List<String> paths = fieldMask.getPathsList();
-        for (Descriptors.FieldDescriptor field : message.getDescriptorForType().getFields()) {
+        for (Descriptors.FieldDescriptor field : message.getDescriptorForType()
+                                                        .getFields()) {
 
             // Protobuf limitation, has no effect on the test.
             if (field.isRepeated()) {
@@ -405,14 +446,17 @@ public class JdbcStandStorageShould {
         }
     }
 
-
-    private static EntityStorageRecord writeToStorage(Aggregate<?, ?, ?> aggregate, StandStorage storage, Class<? extends Message> stateClass) {
+    private static EntityStorageRecord writeToStorage(Aggregate<?, ?, ?> aggregate,
+                                                      StandStorage storage,
+                                                      Class<? extends Message> stateClass) {
         final AggregateStateId id = AggregateStateId.of(aggregate.getId(), TypeUrl.of(stateClass));
         final EntityStorageRecord record = EntityStorageRecord.newBuilder()
-                .setState(AnyPacker.pack(aggregate.getState()))
-                .setWhenModified(Timestamps.getCurrentTime())
-                .setVersion(1)
-                .build();
+                                                              .setState(AnyPacker.pack(
+                                                                      aggregate.getState()))
+                                                              .setWhenModified(
+                                                                      Timestamps.getCurrentTime())
+                                                              .setVersion(1)
+                                                              .build();
 
         storage.write(id, record);
 
@@ -422,7 +466,8 @@ public class JdbcStandStorageShould {
     private static class Given {
 
         private static StandStorage newStorage() {
-            final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(GivenDataSource.DEFAULT_TABLE_NAME);
+            final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(
+                    GivenDataSource.DEFAULT_TABLE_NAME);
 
             final RecordStorageQueryFactory<String> queryFactory = new RecordStorageQueryFactory<>(
                     dataSource,
@@ -486,11 +531,12 @@ public class JdbcStandStorageShould {
 
             for (int i = 0; i < amount; i++) {
                 final TestAggregate aggregate = new TestAggregate(String.valueOf(i));
-                final Project state = Project.newBuilder().setId(ProjectId.newBuilder()
-                        .setId(aggregate.getId()))
-                        .setName("Some project")
-                        .setStatus(Project.Status.CREATED)
-                        .build();
+                final Project state = Project.newBuilder()
+                                             .setId(ProjectId.newBuilder()
+                                                             .setId(aggregate.getId()))
+                                             .setName("Some project")
+                                             .setStatus(Project.Status.CREATED)
+                                             .build();
 
                 aggregate.setState(state);
 

@@ -47,8 +47,8 @@ public class EntityStatusHandlingStorageQueryFactoryImpl<I> implements EntitySta
     private Logger logger;
 
     EntityStatusHandlingStorageQueryFactoryImpl(DataSourceWrapper dataSource,
-                                                       String tableName,
-                                                       IdColumn<I> idColumn) {
+                                                String tableName,
+                                                IdColumn<I> idColumn) {
         this.dataSource = checkNotNull(dataSource);
         this.tableName = checkNotNull(tableName);
         this.idColumn = checkNotNull(idColumn);

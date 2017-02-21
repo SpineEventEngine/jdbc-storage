@@ -50,9 +50,11 @@ public class GivenDataSource {
     @SuppressWarnings("ThrowableInstanceNeverThrown")
     private static final SQLException EXCEPTION = new SQLException("");
 
-    private GivenDataSource() {}
+    private GivenDataSource() {
+    }
 
-    public static DataSourceWrapper whichThrowsExceptionOnSettingStatementParam() throws SQLException {
+    public static DataSourceWrapper whichThrowsExceptionOnSettingStatementParam() throws
+                                                                                  SQLException {
         final PreparedStatement preparedStatement = mock(PreparedStatement.class);
         final ConnectionWrapper connection = mock(ConnectionWrapper.class);
         final DataSourceWrapper dataSource = mock(DataSourceWrapper.class);
@@ -60,9 +62,12 @@ public class GivenDataSource {
         when(dataSource.getConnection(anyBoolean())).thenReturn(connection);
         when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
 
-        doThrow(EXCEPTION).when(preparedStatement).setInt(anyInt(), anyInt());
-        doThrow(EXCEPTION).when(preparedStatement).setLong(anyInt(), anyLong());
-        doThrow(EXCEPTION).when(preparedStatement).setString(anyInt(), anyString());
+        doThrow(EXCEPTION).when(preparedStatement)
+                          .setInt(anyInt(), anyInt());
+        doThrow(EXCEPTION).when(preparedStatement)
+                          .setLong(anyInt(), anyLong());
+        doThrow(EXCEPTION).when(preparedStatement)
+                          .setString(anyInt(), anyString());
 
         return dataSource;
     }
@@ -75,13 +80,15 @@ public class GivenDataSource {
         when(dataSource.getConnection(anyBoolean())).thenReturn(connection);
         when(connection.prepareStatement(anyString())).thenReturn(statement);
 
-        doThrow(EXCEPTION).when(statement).execute();
-        doThrow(EXCEPTION).when(statement).executeQuery();
+        doThrow(EXCEPTION).when(statement)
+                          .execute();
+        doThrow(EXCEPTION).when(statement)
+                          .executeQuery();
 
         return dataSource;
     }
 
-    public static ClosableDataSource whichIsAutoCloseable(){
+    public static ClosableDataSource whichIsAutoCloseable() {
         return mock(ClosableDataSource.class);
     }
 

@@ -38,22 +38,22 @@ import static org.spine3.server.storage.jdbc.projection.query.ProjectionTable.SE
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-public class InsertTimestampQuery extends WriteQuery{
+public class InsertTimestampQuery extends WriteQuery {
 
     private final Timestamp timestamp;
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
             "INSERT INTO %s " +
-                    " (" + SECONDS_COL + ", " + NANOS_COL + ')' +
-                    " VALUES (?, ?);";
+            " (" + SECONDS_COL + ", " + NANOS_COL + ')' +
+            " VALUES (?, ?);";
 
     private InsertTimestampQuery(Builder builder) {
         super(builder);
         this.timestamp = builder.timestamp;
     }
 
-    public static  Builder  newBuilder(String tableName) {
+    public static Builder newBuilder(String tableName) {
         final Builder builder = new Builder();
         builder.setQuery(format(QUERY_TEMPLATE, tableName));
         return builder;
@@ -85,7 +85,7 @@ public class InsertTimestampQuery extends WriteQuery{
             return new InsertTimestampQuery(this);
         }
 
-        public Builder setTimestamp(Timestamp timestamp){
+        public Builder setTimestamp(Timestamp timestamp) {
             this.timestamp = timestamp;
             return getThis();
         }

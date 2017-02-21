@@ -47,10 +47,13 @@ class Given {
         loggerMock = mock(Logger.class);
         final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnSettingStatementParam();
         final InsertEventRecordQuery.Builder builder = InsertEventRecordQuery.newBuilder()
-                .setDataSource(dataSourceMock)
-                .setLogger(loggerMock)
-                .setIdColumn(idColumnMock)
-                .setRecord(EventStorageRecord.getDefaultInstance());
+                                                                             .setDataSource(
+                                                                                     dataSourceMock)
+                                                                             .setLogger(loggerMock)
+                                                                             .setIdColumn(
+                                                                                     idColumnMock)
+                                                                             .setRecord(
+                                                                                     EventStorageRecord.getDefaultInstance());
         return builder.build();
     }
 
@@ -58,10 +61,13 @@ class Given {
         loggerMock = mock(Logger.class);
         final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnSettingStatementParam();
         final UpdateEventRecordQuery.Builder builder = UpdateEventRecordQuery.newBuilder()
-                .setDataSource(dataSourceMock)
-                .setLogger(loggerMock)
-                .setIdColumn(idColumnMock)
-                .setRecord(EventStorageRecord.getDefaultInstance());
+                                                                             .setDataSource(
+                                                                                     dataSourceMock)
+                                                                             .setLogger(loggerMock)
+                                                                             .setIdColumn(
+                                                                                     idColumnMock)
+                                                                             .setRecord(
+                                                                                     EventStorageRecord.getDefaultInstance());
         return builder.build();
     }
 

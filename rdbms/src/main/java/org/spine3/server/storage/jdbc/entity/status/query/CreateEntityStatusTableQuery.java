@@ -40,10 +40,9 @@ import static org.spine3.server.storage.jdbc.entity.status.table.EntityStatusTab
 public class CreateEntityStatusTableQuery extends CreateTableQuery<String> {
 
     private static final String SQL_TEMPLATE = CREATE_IF_MISSING + "%s" + BRACKET_OPEN +
-            ID_COL + VARCHAR_512 + COMMA +
-            archived + BOOLEAN + COMMA +
-            deleted + BOOLEAN + BRACKET_CLOSE + SEMICOLON;
-
+                                               ID_COL + VARCHAR_512 + COMMA +
+                                               archived + BOOLEAN + COMMA +
+                                               deleted + BOOLEAN + BRACKET_CLOSE + SEMICOLON;
 
     protected CreateEntityStatusTableQuery(Builder builder) {
         super(builder);
@@ -57,11 +56,13 @@ public class CreateEntityStatusTableQuery extends CreateTableQuery<String> {
 
     public static class Builder extends CreateTableQuery.Builder<Builder, CreateEntityStatusTableQuery, String> {
 
-        @SuppressWarnings("MethodDoesntCallSuperMethod")// We don't want to override the {@code idColumn} field.
+        @SuppressWarnings("MethodDoesntCallSuperMethod")
+// We don't want to override the {@code idColumn} field.
         @Deprecated
         @Override
         public Builder setIdColumn(IdColumn<String> idColumn) {
-            throw new UnsupportedOperationException("Entity Status table has predefined id type: String.");
+            throw new UnsupportedOperationException(
+                    "Entity Status table has predefined id type: String.");
         }
 
         @Override

@@ -42,9 +42,9 @@ public class CreateEventCountTableQuery<I> extends CreateTableQuery<I> {
     private static final String FORMAT_PLACEHOLDER = " %s ";
 
     private static final String QUERY_TEMPLATE =
-                    CREATE_IF_MISSING + FORMAT_PLACEHOLDER + BRACKET_OPEN +
-                    ID_COL + FORMAT_PLACEHOLDER + COMMA +
-                    EVENT_COUNT_COL + BIGINT + BRACKET_CLOSE + SEMICOLON;
+            CREATE_IF_MISSING + FORMAT_PLACEHOLDER + BRACKET_OPEN +
+            ID_COL + FORMAT_PLACEHOLDER + COMMA +
+            EVENT_COUNT_COL + BIGINT + BRACKET_CLOSE + SEMICOLON;
 
     protected CreateEventCountTableQuery(Builder<I> builder) {
         super(builder);

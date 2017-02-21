@@ -46,7 +46,7 @@ import static org.spine3.server.storage.jdbc.entity.status.table.EntityStatusTab
 public class InsertEntityStatusQuery extends WriteQuery {
 
     private static final String SQL = INSERT_INTO + TABLE_NAME +
-            VALUES + nPlaceholders(COLUMN_COUNT) + SEMICOLON;
+                                      VALUES + nPlaceholders(COLUMN_COUNT) + SEMICOLON;
 
     private final String id;
     private final EntityStatus entityStatus;

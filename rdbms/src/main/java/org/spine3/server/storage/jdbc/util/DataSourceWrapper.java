@@ -72,7 +72,7 @@ public class DataSourceWrapper implements AutoCloseable {
      * Otherwise a warning is logged.
      *
      * @throws DatabaseException
-    */
+     */
     @Override
     public void close() throws DatabaseException {
         if (dataSource instanceof AutoCloseable) {
@@ -84,7 +84,7 @@ public class DataSourceWrapper implements AutoCloseable {
             }
             return;
         }
-        log().warn("Close method is not implemented in " + this.dataSource.getClass());
+        log().warn("Close method is not implemented in " + dataSource.getClass());
     }
 
     private static Logger log() {

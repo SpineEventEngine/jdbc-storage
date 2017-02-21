@@ -40,7 +40,8 @@ public class JdbcProjectionStorageShould extends ProjectionStorageShould<String>
 
     @Override
     protected ProjectionStorage<String> getStorage() {
-        final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory("projectionStorageTests");
+        final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(
+                "projectionStorageTests");
         final Class<TestProjection> projectionClass = TestProjection.class;
         final JdbcRecordStorage<String> entityStorage = JdbcRecordStorage.newInstance(
                 dataSource,
@@ -49,7 +50,9 @@ public class JdbcProjectionStorageShould extends ProjectionStorageShould<String>
                         dataSource,
                         projectionClass),
                 Project.getDescriptor());
-        return JdbcProjectionStorage.newInstance(entityStorage, false, new ProjectionStorageQueryFactory<>(dataSource, projectionClass));
+        return JdbcProjectionStorage.newInstance(entityStorage, false,
+                                                 new ProjectionStorageQueryFactory<>(dataSource,
+                                                                                     projectionClass));
     }
 
     @Override

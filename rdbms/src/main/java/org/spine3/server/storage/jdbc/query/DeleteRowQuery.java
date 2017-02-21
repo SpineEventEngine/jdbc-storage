@@ -76,7 +76,7 @@ public class DeleteRowQuery<I> extends StorageQuery {
         return new Builder<>();
     }
 
-    public static class Builder<I> extends StorageQuery.Builder<Builder<I>, DeleteRowQuery>{
+    public static class Builder<I> extends StorageQuery.Builder<Builder<I>, DeleteRowQuery> {
 
         private String column;
         private I columnValue;

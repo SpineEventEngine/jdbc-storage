@@ -27,7 +27,6 @@ import static org.spine3.server.storage.jdbc.command.query.CommandTable.COMMAND_
 import static org.spine3.server.storage.jdbc.command.query.CommandTable.ID_COL;
 import static org.spine3.server.storage.jdbc.command.query.CommandTable.TABLE_NAME;
 
-
 /**
  * Query that inserts a new {@link CommandStorageRecord} to the {@link CommandTable}.
  *
@@ -39,22 +38,21 @@ public class InsertCommandQuery extends WriteCommandRecordQuery {
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
             "INSERT INTO " + TABLE_NAME + " (" +
-                    ID_COL + ", " +
-                    COMMAND_STATUS_COL + ", " +
-                    COMMAND_COL +
-                    ") VALUES (?, ?, ?);";
+            ID_COL + ", " +
+            COMMAND_STATUS_COL + ", " +
+            COMMAND_COL +
+            ") VALUES (?, ?, ?);";
 
     private InsertCommandQuery(Builder builder) {
         super(builder);
     }
 
-
     public static Builder newBuilder() {
         final Builder builder = new Builder();
         builder.setStatusIndexInQuery(2)
-                .setIdIndexInQuery(1)
-                .setRecordIndexInQuery(3)
-                .setQuery(QUERY_TEMPLATE);
+               .setIdIndexInQuery(1)
+               .setRecordIndexInQuery(3)
+               .setQuery(QUERY_TEMPLATE);
         return builder;
     }
 

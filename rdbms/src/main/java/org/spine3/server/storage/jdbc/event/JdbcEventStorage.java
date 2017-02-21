@@ -60,8 +60,8 @@ import static org.spine3.server.storage.jdbc.util.Closeables.closeAll;
 /**
  * The implementation of the event storage based on the RDBMS.
  *
- * @see JdbcStorageFactory
  * @author Alexander Litus
+ * @see JdbcStorageFactory
  */
 public class JdbcEventStorage extends EventStorage {
 
@@ -77,10 +77,10 @@ public class JdbcEventStorage extends EventStorage {
     /**
      * Creates a new storage instance.
      *
-     * @param dataSource            the dataSource wrapper
-     * @param multitenant           defines is this storage multitenant
-     * @param queryFactory          factory that will generate queries for interaction with event table
-     * @throws DatabaseException    if an error occurs during an interaction with the DB
+     * @param dataSource   the dataSource wrapper
+     * @param multitenant  defines is this storage multitenant
+     * @param queryFactory factory that will generate queries for interaction with event table
+     * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     public static JdbcEventStorage newInstance(DataSourceWrapper dataSource,
                                                boolean multitenant,
@@ -97,7 +97,8 @@ public class JdbcEventStorage extends EventStorage {
         this.dataSource = dataSource;
         this.queryFactory = queryFactory;
         queryFactory.setLogger(LogSingleton.INSTANCE.value);
-        queryFactory.newCreateEventTableQuery().execute();
+        queryFactory.newCreateEventTableQuery()
+                    .execute();
     }
 
     /**
@@ -110,7 +111,8 @@ public class JdbcEventStorage extends EventStorage {
      */
     @Override
     public Iterator<Event> iterator(EventStreamQuery query) throws DatabaseException {
-        final Iterator<EventStorageRecord> iterator = queryFactory.newFilterAndSortQuery(query).execute();
+        final Iterator<EventStorageRecord> iterator = queryFactory.newFilterAndSortQuery(query)
+                                                                  .execute();
 
         iterators.add((DbIterator) iterator);
 
@@ -136,9 +138,11 @@ public class JdbcEventStorage extends EventStorage {
     @Override
     protected void writeRecord(EventStorageRecord record) throws DatabaseException {
         if (containsRecord(record.getEventId())) {
-            queryFactory.newUpdateEventQuery(record).execute();
+            queryFactory.newUpdateEventQuery(record)
+                        .execute();
         } else {
-            queryFactory.newInsertEventQuery(record).execute();
+            queryFactory.newInsertEventQuery(record)
+                        .execute();
         }
     }
 
@@ -151,12 +155,14 @@ public class JdbcEventStorage extends EventStorage {
     @Override
     protected Optional<EventStorageRecord> readRecord(EventId eventId) throws DatabaseException {
         final String id = eventId.getUuid();
-        final EventStorageRecord record = queryFactory.newSelectEventByIdQuery(id).execute();
+        final EventStorageRecord record = queryFactory.newSelectEventByIdQuery(id)
+                                                      .execute();
         return Optional.fromNullable(record);
     }
 
     private boolean containsRecord(String id) {
-        final EventStorageRecord record = queryFactory.newSelectEventByIdQuery(id).execute();
+        final EventStorageRecord record = queryFactory.newSelectEventByIdQuery(id)
+                                                      .execute();
         final boolean contains = record != null;
         return contains;
     }
@@ -254,7 +260,6 @@ public class JdbcEventStorage extends EventStorage {
                 final Any eventWrapped = event.getMessage();
                 final Message eventMessage = AnyPacker.unpack(eventWrapped);
 
-
                 // Check event fields
                 for (FieldFilter filter : eventFieldFilters) {
                     final boolean matchesFilter = checkFields(eventMessage, filter);
@@ -279,12 +284,14 @@ public class JdbcEventStorage extends EventStorage {
         private static boolean checkFields(Message object, FieldFilter filter) {
             final String fieldPath = filter.getFieldPath();
             final String fieldName = fieldPath.substring(fieldPath.lastIndexOf('.') + 1);
-            checkArgument(!Strings.isNullOrEmpty(fieldName), "Field filter " + filter.toString() + " is invalid");
+            checkArgument(!Strings.isNullOrEmpty(fieldName),
+                          "Field filter " + filter.toString() + " is invalid");
             final String fieldGetterName = "get" + fieldName.substring(0, 1)
-                    .toUpperCase() + fieldName.substring(1);
+                                                            .toUpperCase() + fieldName.substring(1);
 
             final Collection<Any> expectedAnys = filter.getValueList();
-            final Collection<Message> expectedValues = Collections2.transform(expectedAnys, ANY_UNPACKER);
+            final Collection<Message> expectedValues = Collections2.transform(expectedAnys,
+                                                                              ANY_UNPACKER);
             Message actualValue;
             try {
                 final Class<?> messageClass = object.getClass();

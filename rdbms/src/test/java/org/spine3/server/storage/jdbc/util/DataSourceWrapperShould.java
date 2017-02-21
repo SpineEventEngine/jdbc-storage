@@ -36,7 +36,8 @@ public class DataSourceWrapperShould {
     @Test
     public void throw_database_exception_if_fail_to_close() throws Exception {
         final ClosableDataSource dataSource = GivenDataSource.whichIsAutoCloseable();
-        doThrow(new Exception("")).when(dataSource).close();
+        doThrow(new Exception("")).when(dataSource)
+                                  .close();
         final DataSourceWrapper wrapper = DataSourceWrapper.wrap(dataSource);
 
         try {

@@ -44,7 +44,9 @@ public class SetOkStatusQuery extends UpdateRecordQuery<String> {
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
             UPDATE + TABLE_NAME +
-            SET + COMMAND_STATUS_COL + EQUAL + '\'' + CommandStatus.forNumber(CommandStatus.OK_VALUE).name() + '\'' +
+            SET + COMMAND_STATUS_COL + EQUAL + '\'' +
+            CommandStatus.forNumber(CommandStatus.OK_VALUE)
+                         .name() + '\'' +
             WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
 
     private SetOkStatusQuery(Builder builder) {

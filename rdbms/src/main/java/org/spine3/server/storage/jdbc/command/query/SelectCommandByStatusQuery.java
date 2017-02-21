@@ -41,7 +41,6 @@ import static org.spine3.server.storage.jdbc.command.query.CommandTable.COMMAND_
 import static org.spine3.server.storage.jdbc.command.query.CommandTable.COMMAND_STATUS_COL;
 import static org.spine3.server.storage.jdbc.command.query.CommandTable.TABLE_NAME;
 
-
 /**
  * Query that selects {@link CommandStorageRecord} by {@link CommandStatus}.
  *
@@ -84,15 +83,15 @@ public class SelectCommandByStatusQuery extends StorageQuery {
         try {
             statement.setString(1, status.toString());
         } catch (SQLException e) {
-            this.getLogger().error("Failed to prepare statement ", e);
+            getLogger().error("Failed to prepare statement ", e);
             throw new DatabaseException(e);
         }
         return statement;
     }
 
     public Iterator<CommandStorageRecord> execute() throws DatabaseException {
-        try (ConnectionWrapper connection = this.getConnection(true)) {
-            final PreparedStatement statement = this.prepareStatement(connection);
+        try (ConnectionWrapper connection = getConnection(true)) {
+            final PreparedStatement statement = prepareStatement(connection);
             return new DbIterator<>(statement, COMMAND_COL, CommandStorageRecord.getDescriptor());
         }
     }

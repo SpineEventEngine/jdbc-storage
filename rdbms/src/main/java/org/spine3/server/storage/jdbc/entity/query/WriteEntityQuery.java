@@ -42,7 +42,8 @@ public class WriteEntityQuery<I> extends WriteRecordQuery<I, EntityStorageRecord
 
     protected static final int ID_COL_POSITION = 4;
 
-    protected WriteEntityQuery(Builder<? extends Builder, ? extends WriteRecordQuery, I, EntityStorageRecord> builder) {
+    protected WriteEntityQuery(
+            Builder<? extends Builder, ? extends WriteRecordQuery, I, EntityStorageRecord> builder) {
         super(builder);
     }
 

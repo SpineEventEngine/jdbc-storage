@@ -59,8 +59,8 @@ public class RecordStorageQueryFactory<I> implements EntityStatusHandlingStorage
     /**
      * Creates a new instance.
      *
-     * @param dataSource    instance of {@link DataSourceWrapper}
-     * @param entityClass   entity class of corresponding {@link RecordStorage} instance
+     * @param dataSource  instance of {@link DataSourceWrapper}
+     * @param entityClass entity class of corresponding {@link RecordStorage} instance
      */
     public RecordStorageQueryFactory(DataSourceWrapper dataSource,
                                      Class<? extends Entity<I, ?>> entityClass) {
@@ -123,8 +123,8 @@ public class RecordStorageQueryFactory<I> implements EntityStatusHandlingStorage
     /**
      * Returns a query that inserts a new {@link EntityStorageRecord} to the {@link EntityTable}.
      *
-     * @param id        new entity record id
-     * @param record    new entity record
+     * @param id     new entity record id
+     * @param record new entity record
      */
     public InsertEntityQuery newInsertEntityQuery(I id, EntityStorageRecord record) {
         final InsertEntityQuery.Builder<I> builder = InsertEntityQuery.<I>newBuilder(tableName)
@@ -139,8 +139,8 @@ public class RecordStorageQueryFactory<I> implements EntityStatusHandlingStorage
     /**
      * Returns a query that updates {@link EntityStorageRecord} in the {@link EntityTable}.
      *
-     * @param id        entity id
-     * @param record    updated record state
+     * @param id     entity id
+     * @param record updated record state
      */
     public UpdateEntityQuery newUpdateEntityQuery(I id, EntityStorageRecord record) {
         final UpdateEntityQuery.Builder<I> builder = UpdateEntityQuery.<I>newBuilder(tableName)
@@ -153,8 +153,9 @@ public class RecordStorageQueryFactory<I> implements EntityStatusHandlingStorage
     }
 
     /** Returns a query that selects {@link EntityStorageRecord} by ID. */
-    public SelectEntityByIdQuery <I> newSelectEntityByIdQuery(I id){
-        final SelectEntityByIdQuery.Builder<I> builder = SelectEntityByIdQuery.<I>newBuilder(tableName)
+    public SelectEntityByIdQuery<I> newSelectEntityByIdQuery(I id) {
+        final SelectEntityByIdQuery.Builder<I> builder = SelectEntityByIdQuery.<I>newBuilder(
+                tableName)
                 .setDataSource(dataSource)
                 .setLogger(logger)
                 .setIdColumn(idColumn)
@@ -174,35 +175,38 @@ public class RecordStorageQueryFactory<I> implements EntityStatusHandlingStorage
     }
 
     /** Returns a query that deletes all from {@link EntityTable}. */
-    public DeleteAllQuery newDeleteAllQuery(){
+    public DeleteAllQuery newDeleteAllQuery() {
         final DeleteAllQuery.Builder builder = DeleteAllQuery.newBuilder(tableName)
-                .setDataSource(dataSource)
-                .setLogger(logger);
+                                                             .setDataSource(dataSource)
+                                                             .setLogger(logger);
         return builder.build();
     }
 
-    public SelectBulkQuery newSelectAllQuery(FieldMask fieldMask, Descriptors.Descriptor descriptor) {
+    public SelectBulkQuery newSelectAllQuery(FieldMask fieldMask,
+                                             Descriptors.Descriptor descriptor) {
         final SelectBulkQuery.Builder builder = SelectBulkQuery.newBuilder(tableName)
-                .setFieldMask(fieldMask)
-                .setMessageDescriptor(descriptor)
-                .setLogger(logger)
-                .setDataSource(dataSource);
+                                                               .setFieldMask(fieldMask)
+                                                               .setMessageDescriptor(descriptor)
+                                                               .setLogger(logger)
+                                                               .setDataSource(dataSource);
 
         return builder.build();
     }
 
-    public SelectBulkQuery newSelectBulkQuery(Iterable<?> ids, FieldMask fieldMask, Descriptors.Descriptor descriptor) {
+    public SelectBulkQuery newSelectBulkQuery(Iterable<?> ids, FieldMask fieldMask,
+                                              Descriptors.Descriptor descriptor) {
         final SelectBulkQuery.Builder builder = SelectBulkQuery.newBuilder()
-                .setIdsQuery(tableName, ids)
-                .setFieldMask(fieldMask)
-                .setMessageDescriptor(descriptor)
-                .setLogger(logger)
-                .setDataSource(dataSource);
+                                                               .setIdsQuery(tableName, ids)
+                                                               .setFieldMask(fieldMask)
+                                                               .setMessageDescriptor(descriptor)
+                                                               .setLogger(logger)
+                                                               .setDataSource(dataSource);
 
         return builder.build();
     }
 
-    public InsertEntityRecordsBulkQuery<I> newInsertEntityRecordsBulkQuery(Map<I, EntityStorageRecord> records) {
+    public InsertEntityRecordsBulkQuery<I> newInsertEntityRecordsBulkQuery(
+            Map<I, EntityStorageRecord> records) {
         final InsertEntityRecordsBulkQuery.Builder<I> builder = InsertEntityRecordsBulkQuery.<I>newBuilder()
                 .setLogger(logger)
                 .setDataSource(dataSource)

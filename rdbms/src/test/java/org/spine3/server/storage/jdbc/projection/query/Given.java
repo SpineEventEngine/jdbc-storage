@@ -27,7 +27,8 @@ import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
 import java.sql.SQLException;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.mock;
 
 /**
  * @author Andrey Lavrov
@@ -44,9 +45,11 @@ class Given {
         loggerMock = mock(Logger.class);
         final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnSettingStatementParam();
         final InsertTimestampQuery.Builder builder = InsertTimestampQuery.newBuilder(anyString())
-                .setDataSource(dataSourceMock)
-                .setLogger(loggerMock)
-                .setTimestamp(Timestamp.getDefaultInstance());
+                                                                         .setDataSource(
+                                                                                 dataSourceMock)
+                                                                         .setLogger(loggerMock)
+                                                                         .setTimestamp(
+                                                                                 Timestamp.getDefaultInstance());
         return builder.build();
     }
 
@@ -54,8 +57,9 @@ class Given {
         loggerMock = mock(Logger.class);
         final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnExecuteStatement();
         final SelectTimestampQuery.Builder builder = SelectTimestampQuery.newBuilder(anyString())
-                .setDataSource(dataSourceMock)
-                .setLogger(loggerMock);
+                                                                         .setDataSource(
+                                                                                 dataSourceMock)
+                                                                         .setLogger(loggerMock);
         return builder.build();
     }
 
@@ -63,9 +67,11 @@ class Given {
         loggerMock = mock(Logger.class);
         final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnSettingStatementParam();
         final UpdateTimestampQuery.Builder builder = UpdateTimestampQuery.newBuilder(anyString())
-                .setDataSource(dataSourceMock)
-                .setLogger(loggerMock)
-                .setTimestamp(Timestamp.getDefaultInstance());
+                                                                         .setDataSource(
+                                                                                 dataSourceMock)
+                                                                         .setLogger(loggerMock)
+                                                                         .setTimestamp(
+                                                                                 Timestamp.getDefaultInstance());
         return builder.build();
     }
 

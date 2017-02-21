@@ -48,8 +48,8 @@ import static org.spine3.server.storage.jdbc.entity.status.table.EntityStatusTab
 public class MarkEntityQuery<I> extends StorageQuery {
 
     private static final String SQL_TEMPLATE = UPDATE + "%s" + SET +
-            "%s" + EQUAL + TRUE +
-            WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
+                                               "%s" + EQUAL + TRUE +
+                                               WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
 
     private final I id;
     private final IdColumn<I> idColumn;

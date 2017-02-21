@@ -132,7 +132,8 @@ public class AggregateStorageQueryFactory<I> implements EntityStatusHandlingStor
      * @param count event count
      */
     public InsertEventCountQuery newInsertEventCountQuery(I id, int count) {
-        final InsertEventCountQuery.Builder<I> builder = InsertEventCountQuery.<I>newBuilder(eventCountTableName)
+        final InsertEventCountQuery.Builder<I> builder = InsertEventCountQuery.<I>newBuilder(
+                eventCountTableName)
                 .setDataSource(dataSource)
                 .setLogger(logger)
                 .setIdColumn(idColumn)
@@ -148,7 +149,8 @@ public class AggregateStorageQueryFactory<I> implements EntityStatusHandlingStor
      * @param count new event count
      */
     public UpdateEventCountQuery newUpdateEventCountQuery(I id, int count) {
-        final UpdateEventCountQuery.Builder<I> builder = UpdateEventCountQuery.<I>newBuilder(eventCountTableName)
+        final UpdateEventCountQuery.Builder<I> builder = UpdateEventCountQuery.<I>newBuilder(
+                eventCountTableName)
                 .setDataSource(dataSource)
                 .setLogger(logger)
                 .setIdColumn(idColumn)
@@ -164,7 +166,8 @@ public class AggregateStorageQueryFactory<I> implements EntityStatusHandlingStor
      * @param record new aggregate record
      */
     public InsertAggregateRecordQuery newInsertRecordQuery(I id, AggregateStorageRecord record) {
-        final InsertAggregateRecordQuery.Builder<I> builder = InsertAggregateRecordQuery.<I>newBuilder(mainTableName)
+        final InsertAggregateRecordQuery.Builder<I> builder = InsertAggregateRecordQuery.<I>newBuilder(
+                mainTableName)
                 .setDataSource(dataSource)
                 .setLogger(logger)
                 .setIdColumn(idColumn)
@@ -175,7 +178,8 @@ public class AggregateStorageQueryFactory<I> implements EntityStatusHandlingStor
 
     /** Returns a query that selects event count by corresponding aggregate ID. */
     public SelectEventCountByIdQuery<I> newSelectEventCountByIdQuery(I id) {
-        final SelectEventCountByIdQuery.Builder<I> builder = SelectEventCountByIdQuery.<I>newBuilder(eventCountTableName)
+        final SelectEventCountByIdQuery.Builder<I> builder = SelectEventCountByIdQuery.<I>newBuilder(
+                eventCountTableName)
                 .setDataSource(dataSource)
                 .setLogger(logger)
                 .setIdColumn(idColumn)
@@ -186,7 +190,8 @@ public class AggregateStorageQueryFactory<I> implements EntityStatusHandlingStor
     /** Returns a query that selects aggregate records by ID sorted by time descending. */
     @SuppressWarnings("InstanceMethodNamingConvention")
     public SelectByIdSortedByTimeDescQuery<I> newSelectByIdSortedByTimeDescQuery(I id) {
-        final SelectByIdSortedByTimeDescQuery.Builder<I> builder = SelectByIdSortedByTimeDescQuery.<I>newBuilder(mainTableName)
+        final SelectByIdSortedByTimeDescQuery.Builder<I> builder = SelectByIdSortedByTimeDescQuery.<I>newBuilder(
+                mainTableName)
                 .setDataSource(dataSource)
                 .setLogger(logger)
                 .setIdColumn(idColumn)

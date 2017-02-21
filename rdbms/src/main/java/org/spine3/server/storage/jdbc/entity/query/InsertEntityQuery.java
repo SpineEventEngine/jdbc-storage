@@ -47,10 +47,10 @@ public class InsertEntityQuery<I> extends WriteEntityQuery<I> {
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
             INSERT_INTO + " %s " +
-                    BRACKET_OPEN +
-                    ENTITY_COL + COMMA + archived + COMMA + deleted + COMMA + ID_COL +
-                    BRACKET_CLOSE +
-                    VALUES + nPlaceholders(4) + SEMICOLON;
+            BRACKET_OPEN +
+            ENTITY_COL + COMMA + archived + COMMA + deleted + COMMA + ID_COL +
+            BRACKET_CLOSE +
+            VALUES + nPlaceholders(4) + SEMICOLON;
 
     private InsertEntityQuery(Builder<I> builder) {
         super(builder);
@@ -59,8 +59,8 @@ public class InsertEntityQuery<I> extends WriteEntityQuery<I> {
     public static <I> Builder<I> newBuilder(String tableName) {
         final Builder<I> builder = new Builder<>();
         builder.setIdIndexInQuery(ID_COL_POSITION)
-                .setRecordIndexInQuery(RECORD_COL_POSITION)
-                .setQuery(format(QUERY_TEMPLATE, tableName));
+               .setRecordIndexInQuery(RECORD_COL_POSITION)
+               .setQuery(format(QUERY_TEMPLATE, tableName));
         return builder;
     }
 

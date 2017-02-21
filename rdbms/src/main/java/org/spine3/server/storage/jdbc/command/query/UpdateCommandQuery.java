@@ -44,9 +44,9 @@ public class UpdateCommandQuery extends WriteCommandRecordQuery {
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
             UPDATE + TABLE_NAME +
-                    SET + COMMAND_COL + EQUAL + PLACEHOLDER +
-                    COMMA + COMMAND_STATUS_COL + EQUAL + PLACEHOLDER +
-                    WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
+            SET + COMMAND_COL + EQUAL + PLACEHOLDER +
+            COMMA + COMMAND_STATUS_COL + EQUAL + PLACEHOLDER +
+            WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
 
     private UpdateCommandQuery(Builder builder) {
         super(builder);
@@ -55,9 +55,9 @@ public class UpdateCommandQuery extends WriteCommandRecordQuery {
     public static Builder newBuilder() {
         final Builder builder = new Builder();
         builder.setStatusIndexInQuery(2)
-                .setIdIndexInQuery(3)
-                .setRecordIndexInQuery(1)
-                .setQuery(QUERY_TEMPLATE);
+               .setIdIndexInQuery(3)
+               .setRecordIndexInQuery(1)
+               .setQuery(QUERY_TEMPLATE);
         return builder;
     }
 

@@ -48,8 +48,9 @@ import static org.spine3.validate.Validate.isDefault;
 public class SelectTimestampQuery extends StorageQuery {
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE = SELECT +
-            SECONDS_COL + COMMA +
-            NANOS_COL + FROM + "%s" + Sql.BuildingBlock.SEMICOLON;
+                                                 SECONDS_COL + COMMA +
+                                                 NANOS_COL + FROM + "%s" +
+                                                 Sql.BuildingBlock.SEMICOLON;
 
     private SelectTimestampQuery(Builder builder) {
         super(builder);
@@ -57,7 +58,7 @@ public class SelectTimestampQuery extends StorageQuery {
 
     @Nullable
     public Timestamp execute() throws DatabaseException {
-        try (ConnectionWrapper connection = this.getConnection(true);
+        try (ConnectionWrapper connection = getConnection(true);
              PreparedStatement statement = prepareStatement(connection);
              ResultSet resultSet = statement.executeQuery()) {
             if (!resultSet.next()) {
@@ -65,13 +66,16 @@ public class SelectTimestampQuery extends StorageQuery {
             }
             final long seconds = resultSet.getLong(SECONDS_COL);
             final int nanos = resultSet.getInt(NANOS_COL);
-            final Timestamp time = Timestamp.newBuilder().setSeconds(seconds).setNanos(nanos).build();
+            final Timestamp time = Timestamp.newBuilder()
+                                            .setSeconds(seconds)
+                                            .setNanos(nanos)
+                                            .build();
             if (isDefault(time)) {
                 return null;
             }
             return time;
         } catch (SQLException e) {
-            this.getLogger().error("Failed to read last event time.", e);
+            getLogger().error("Failed to read last event time.", e);
             throw new DatabaseException(e);
         }
     }

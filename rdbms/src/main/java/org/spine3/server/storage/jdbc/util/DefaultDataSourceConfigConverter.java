@@ -38,7 +38,7 @@ public class DefaultDataSourceConfigConverter {
     }
 
     @SuppressWarnings("MethodWithMoreThanThreeNegations") // is OK in this case
-    public static HikariConfig convert (DataSourceConfig config) {
+    public static HikariConfig convert(DataSourceConfig config) {
         final HikariConfig result = new HikariConfig();
 
         /** Required fields */

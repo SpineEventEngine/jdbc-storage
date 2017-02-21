@@ -48,7 +48,8 @@ import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
  */
 public class SelectEntityByIdQuery<I> extends SelectByIdQuery<I, EntityStorageRecord> {
 
-    private static final String QUERY_TEMPLATE = SELECT.toString() + ALL_ATTRIBUTES + FROM + " %s" + WHERE
+    private static final String QUERY_TEMPLATE =
+            SELECT.toString() + ALL_ATTRIBUTES + FROM + " %s" + WHERE
             + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
 
     public SelectEntityByIdQuery(Builder<I> builder) {
@@ -58,9 +59,9 @@ public class SelectEntityByIdQuery<I> extends SelectByIdQuery<I, EntityStorageRe
     public static <I> Builder<I> newBuilder(String tableName) {
         final Builder<I> builder = new Builder<>();
         builder.setIdIndexInQuery(1)
-                .setQuery(format(QUERY_TEMPLATE, tableName))
-                .setMessageColumnName(ENTITY_COL)
-                .setMessageDescriptor(EntityStorageRecord.getDescriptor());
+               .setQuery(format(QUERY_TEMPLATE, tableName))
+               .setMessageColumnName(ENTITY_COL)
+               .setMessageDescriptor(EntityStorageRecord.getDescriptor());
         return builder;
     }
 
@@ -88,9 +89,9 @@ public class SelectEntityByIdQuery<I> extends SelectByIdQuery<I, EntityStorageRe
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
     public static class Builder<I> extends SelectByIdQuery.Builder<Builder<I>,
-                                                                   SelectEntityByIdQuery<I>,
-                                                                   I,
-                                                                   EntityStorageRecord> {
+            SelectEntityByIdQuery<I>,
+            I,
+            EntityStorageRecord> {
 
         @Override
         public SelectEntityByIdQuery<I> build() {

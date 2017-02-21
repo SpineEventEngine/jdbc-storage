@@ -43,7 +43,8 @@ public class DbTableNameFactoryShould {
     public void provide_table_name_for_inner_class() {
         final String tableName = DbTableNameFactory.newTableName(TestEntity.class);
 
-        assertEquals("org_spine3_server_storage_jdbc_util_dbtablenamefactoryshould_testentity", tableName);
+        assertEquals("org_spine3_server_storage_jdbc_util_dbtablenamefactoryshould_testentity",
+                     tableName);
     }
 
     private static class TestEntity extends Entity<String, StringValue> {

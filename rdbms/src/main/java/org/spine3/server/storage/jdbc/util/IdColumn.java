@@ -80,7 +80,8 @@ public abstract class IdColumn<I> {
      * @param statement the statement to use
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
-    public abstract void setId(int index, I id, PreparedStatement statement) throws DatabaseException;
+    public abstract void setId(int index, I id, PreparedStatement statement) throws
+                                                                             DatabaseException;
 
     /**
      * Helps to work with columns which contain {@code long} {@link Entity} IDs.
@@ -93,7 +94,8 @@ public abstract class IdColumn<I> {
         }
 
         @Override
-        public void setId(int index, Long id, PreparedStatement statement) throws DatabaseException {
+        public void setId(int index, Long id, PreparedStatement statement) throws
+                                                                           DatabaseException {
             try {
                 statement.setLong(index, id);
             } catch (SQLException e) {
@@ -113,7 +115,8 @@ public abstract class IdColumn<I> {
         }
 
         @Override
-        public void setId(int index, Integer id, PreparedStatement statement) throws DatabaseException {
+        public void setId(int index, Integer id, PreparedStatement statement) throws
+                                                                              DatabaseException {
             try {
                 statement.setInt(index, id);
             } catch (SQLException e) {

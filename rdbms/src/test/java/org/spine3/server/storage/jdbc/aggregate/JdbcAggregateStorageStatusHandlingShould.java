@@ -34,10 +34,13 @@ import org.spine3.test.aggregate.ProjectId;
 public class JdbcAggregateStorageStatusHandlingShould extends AggregateStorageStatusHandlingShould {
 
     @Override
-    protected AggregateStorage<ProjectId> getAggregateStorage(Class<? extends Aggregate<ProjectId, ?, ?>> aggregateClass) {
-        final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory("aggregateStorageStatusHandlingTests");
-        return JdbcAggregateStorage.newInstance(dataSource, false, new AggregateStorageQueryFactory<>(
-                dataSource,
-                aggregateClass));
+    protected AggregateStorage<ProjectId> getAggregateStorage(
+            Class<? extends Aggregate<ProjectId, ?, ?>> aggregateClass) {
+        final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(
+                "aggregateStorageStatusHandlingTests");
+        return JdbcAggregateStorage.newInstance(dataSource, false,
+                                                new AggregateStorageQueryFactory<>(
+                                                        dataSource,
+                                                        aggregateClass));
     }
 }

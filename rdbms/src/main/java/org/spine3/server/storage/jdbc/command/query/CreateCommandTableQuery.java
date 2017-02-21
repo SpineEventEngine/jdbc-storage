@@ -47,13 +47,13 @@ public class CreateCommandTableQuery extends CreateTableQuery<String> {
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
             CREATE_IF_MISSING + "%s" + BRACKET_OPEN +
-                    ID_COL + " %s" + COMMA +
-                    COMMAND_COL + BLOB + COMMA +
-                    COMMAND_STATUS_COL + VARCHAR_512 + COMMA +
-                    ERROR_COL + BLOB + COMMA +
-                    FAILURE_COL + BLOB + COMMA +
-                    PRIMARY_KEY + BRACKET_OPEN + ID_COL + BRACKET_CLOSE +
-                    BRACKET_CLOSE + SEMICOLON;
+            ID_COL + " %s" + COMMA +
+            COMMAND_COL + BLOB + COMMA +
+            COMMAND_STATUS_COL + VARCHAR_512 + COMMA +
+            ERROR_COL + BLOB + COMMA +
+            FAILURE_COL + BLOB + COMMA +
+            PRIMARY_KEY + BRACKET_OPEN + ID_COL + BRACKET_CLOSE +
+            BRACKET_CLOSE + SEMICOLON;
 
     public CreateCommandTableQuery(Builder builder) {
         super(builder);

@@ -58,8 +58,8 @@ import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
  *
  * <p>{@code SQL} analogs of this are:
  * <ul>
- *     <li>1. {@code SELECT * FROM table;}
- *     <li>2. {@code SELECT * FROM table WHERE id IN (?,...,?);}
+ * <li>1. {@code SELECT * FROM table;}
+ * <li>2. {@code SELECT * FROM table WHERE id IN (?,...,?);}
  * <ul/>
  *
  * @author Dmytro Dashenkov
@@ -71,13 +71,13 @@ public class SelectBulkQuery extends StorageQuery {
     private final List arguments;
 
     private static final String COMMON_TEMPLATE = SELECT.toString() + ALL_ATTRIBUTES +
-            FROM + "%s" +
-            WHERE + archived + NOT_EQUAL + TRUE +
-            AND + deleted + NOT_EQUAL + TRUE;
+                                                  FROM + "%s" +
+                                                  WHERE + archived + NOT_EQUAL + TRUE +
+                                                  AND + deleted + NOT_EQUAL + TRUE;
     private static final String ALL_TEMPLATE = COMMON_TEMPLATE + ';';
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String IDS_TEMPLATE = COMMON_TEMPLATE + AND + EntityTable.ID_COL + IN
-            + " %s" + SEMICOLON;
+                                               + " %s" + SEMICOLON;
 
     protected SelectBulkQuery(Builder builder) {
         super(builder);
@@ -169,7 +169,7 @@ public class SelectBulkQuery extends StorageQuery {
          * the {@code SelectBulkQuery} is built.
          *
          * @param tableName Name of the table to query.
-         * @param ids IDs to search for.
+         * @param ids       IDs to search for.
          */
         public Builder setIdsQuery(String tableName, Iterable<?> ids) {
             final Collection<?> idsCollection = Lists.newArrayList(ids);

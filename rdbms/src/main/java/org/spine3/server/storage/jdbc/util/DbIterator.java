@@ -58,13 +58,14 @@ public class DbIterator<Record extends Message> implements Iterator<Record>, Aut
     /**
      * Creates a new iterator instance.
      *
-     * @param statement a statement used to retrieve a result set
-     *                  (both statement and result set are closed in {@link #close()}).
-     * @param columnName a name of a serialized storage record column
+     * @param statement        a statement used to retrieve a result set
+     *                         (both statement and result set are closed in {@link #close()}).
+     * @param columnName       a name of a serialized storage record column
      * @param recordDescriptor a descriptor of a storage record
      * @throws DatabaseException if an error occurs during interaction with the DB
      */
-    public DbIterator(PreparedStatement statement, String columnName, Descriptor recordDescriptor) throws DatabaseException {
+    public DbIterator(PreparedStatement statement, String columnName,
+                      Descriptor recordDescriptor) throws DatabaseException {
         try {
             this.resultSet = statement.executeQuery();
             this.statement = statement;
@@ -91,7 +92,8 @@ public class DbIterator<Record extends Message> implements Iterator<Record>, Aut
     @Override
     public Record next() {
         if (!isHasNextCalledBeforeNext) {
-            throw new IllegalStateException("It is required to call hasNext() before next() method.");
+            throw new IllegalStateException(
+                    "It is required to call hasNext() before next() method.");
         }
         isHasNextCalledBeforeNext = false;
         if (!hasNext) {

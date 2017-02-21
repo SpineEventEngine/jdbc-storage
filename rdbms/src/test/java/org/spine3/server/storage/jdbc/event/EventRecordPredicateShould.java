@@ -39,14 +39,16 @@ public class EventRecordPredicateShould {
 
     @Test
     public void be_true_if_filters_are_empty() {
-        final EventRecordPredicate predicate = new EventRecordPredicate(Collections.<EventFilter>emptyList());
+        final EventRecordPredicate predicate = new EventRecordPredicate(
+                Collections.<EventFilter>emptyList());
         final boolean result = predicate.apply(EventStorageRecord.getDefaultInstance());
         assertTrue(result);
     }
 
     @Test
     public void be_false_for_null_records() {
-        final EventRecordPredicate predicate = new EventRecordPredicate(Collections.<EventFilter>emptyList());
+        final EventRecordPredicate predicate = new EventRecordPredicate(
+                Collections.<EventFilter>emptyList());
         final boolean result = predicate.apply(null);
         assertFalse(result);
     }

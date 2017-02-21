@@ -40,7 +40,8 @@ public class WriteCommandRecordQuery
     private final int statusIndexInQuery;
     private final CommandStatus status;
 
-    protected WriteCommandRecordQuery(Builder<? extends Builder, ? extends WriteCommandRecordQuery> builder) {
+    protected WriteCommandRecordQuery(
+            Builder<? extends Builder, ? extends WriteCommandRecordQuery> builder) {
         super(builder);
         this.statusIndexInQuery = builder.statusIndexInQuery;
         this.status = builder.status;
@@ -53,7 +54,7 @@ public class WriteCommandRecordQuery
         try {
             statement.setString(statusIndexInQuery, status.name());
         } catch (SQLException e) {
-            this.getLogger().error("Failed to prepare statement ", e);
+            getLogger().error("Failed to prepare statement ", e);
             throw new DatabaseException(e);
         }
         return statement;
@@ -68,12 +69,12 @@ public class WriteCommandRecordQuery
 
         public B setStatusIndexInQuery(int statusIndexInQuery) {
             this.statusIndexInQuery = statusIndexInQuery;
-            return this.getThis();
+            return getThis();
         }
 
         public B setStatus(CommandStatus status) {
             this.status = status;
-            return this.getThis();
+            return getThis();
         }
     }
 }

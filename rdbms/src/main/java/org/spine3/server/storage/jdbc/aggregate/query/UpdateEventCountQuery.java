@@ -50,8 +50,8 @@ public class UpdateEventCountQuery<I> extends UpdateRecordQuery<I> {
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
             UPDATE + "%s" +
-                    SET + EVENT_COUNT_COL + EQUAL + PLACEHOLDER +
-                    WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
+            SET + EVENT_COUNT_COL + EQUAL + PLACEHOLDER +
+            WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
 
     private UpdateEventCountQuery(Builder<I> builder) {
         super(builder);
@@ -67,7 +67,7 @@ public class UpdateEventCountQuery<I> extends UpdateRecordQuery<I> {
             statement.setInt(1, count);
             return statement;
         } catch (SQLException e) {
-            this.getLogger().error("Failed to prepare statement ", e);
+            getLogger().error("Failed to prepare statement ", e);
             throw new DatabaseException(e);
         }
     }
@@ -75,7 +75,7 @@ public class UpdateEventCountQuery<I> extends UpdateRecordQuery<I> {
     public static <I> Builder<I> newBuilder(String tableName) {
         final Builder<I> builder = new Builder<>();
         builder.setQuery(format(QUERY_TEMPLATE, tableName))
-                .setIdIndexInQuery(2);
+               .setIdIndexInQuery(2);
         return builder;
     }
 

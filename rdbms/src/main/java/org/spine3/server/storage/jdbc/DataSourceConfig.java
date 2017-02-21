@@ -39,8 +39,8 @@ import static com.google.common.base.Strings.isNullOrEmpty;
  * comes with <b>sane</b> defaults that perform well in most deployments without additional tweaking.
  * Every property is optional unless it is marked as required.
  *
- * @see Builder
  * @author Alexander Litus
+ * @see Builder
  */
 public class DataSourceConfig {
 
@@ -377,8 +377,8 @@ public class DataSourceConfig {
          *
          * <p>Default: {@code true}
          *
-         * @see Connection#setAutoCommit(boolean)
          * @param autoCommit the value to set
+         * @see Connection#setAutoCommit(boolean)
          */
         public Builder setAutoCommit(Boolean autoCommit) {
             this.autoCommit = autoCommit;
@@ -498,6 +498,7 @@ public class DataSourceConfig {
         public Integer getMaxPoolSize() {
             return maxPoolSize;
         }
+
         /**
          * Sets the maximum size that the pool is allowed to reach, including both idle and in-use connections.
          *
@@ -510,8 +511,8 @@ public class DataSourceConfig {
          *
          * <p>Default: 10
          *
-         * @see #setConnectionTimeout(Long)
          * @param maxPoolSize the value to set
+         * @see #setConnectionTimeout(Long)
          */
         public Builder setMaxPoolSize(Integer maxPoolSize) {
             this.maxPoolSize = maxPoolSize;

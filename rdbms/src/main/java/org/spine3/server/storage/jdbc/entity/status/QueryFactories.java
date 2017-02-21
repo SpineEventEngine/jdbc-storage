@@ -29,15 +29,17 @@ import org.spine3.server.storage.jdbc.util.IdColumn;
  */
 public class QueryFactories {
 
-    public static <I> EntityStatusHandlingStorageQueryFactory<I> forTable(DataSourceWrapper dataSource,
-                                                                          String tableName,
-                                                                          IdColumn<I> idColumn) {
+    public static <I> EntityStatusHandlingStorageQueryFactory<I> forTable(
+            DataSourceWrapper dataSource,
+            String tableName,
+            IdColumn<I> idColumn) {
         return new EntityStatusHandlingStorageQueryFactoryImpl<>(dataSource,
                                                                  tableName,
                                                                  idColumn);
     }
 
-    public static EntityStatusHandlingStorageQueryFactory<?> forSeparateTable(DataSourceWrapper dataSource) {
+    public static EntityStatusHandlingStorageQueryFactory<?> forSeparateTable(
+            DataSourceWrapper dataSource) {
         return new EntityStatusHandlingStorageQueryFactoryImpl<>(dataSource,
                                                                  EntityStatusTable.TABLE_NAME,
                                                                  new IdColumn.StringIdColumn());

@@ -41,7 +41,8 @@ public class SelectEventByIdQuery extends SelectByIdQuery<String, EventStorageRe
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE = SELECT_EVENT_FROM_TABLE +
-            WHERE + EVENT_ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
+                                                 WHERE + EVENT_ID_COL + EQUAL + PLACEHOLDER +
+                                                 SEMICOLON;
 
     public SelectEventByIdQuery(Builder builder) {
         super(builder);
@@ -50,14 +51,14 @@ public class SelectEventByIdQuery extends SelectByIdQuery<String, EventStorageRe
     public static Builder newBuilder() {
         final Builder builder = new Builder();
         builder.setIdIndexInQuery(1)
-                .setQuery(QUERY_TEMPLATE)
-                .setMessageColumnName(EVENT_COL)
-                .setMessageDescriptor(EventStorageRecord.getDescriptor());
+               .setQuery(QUERY_TEMPLATE)
+               .setMessageColumnName(EVENT_COL)
+               .setMessageDescriptor(EventStorageRecord.getDescriptor());
         return builder;
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder extends SelectByIdQuery.Builder<Builder, SelectEventByIdQuery, String, EventStorageRecord>{
+    public static class Builder extends SelectByIdQuery.Builder<Builder, SelectEventByIdQuery, String, EventStorageRecord> {
 
         @Override
         public SelectEventByIdQuery build() {

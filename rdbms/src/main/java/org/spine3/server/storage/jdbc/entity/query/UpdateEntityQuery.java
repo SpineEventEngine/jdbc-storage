@@ -47,20 +47,20 @@ public class UpdateEntityQuery<I> extends WriteEntityQuery<I> {
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
             UPDATE + "%s" +
-                    SET + ENTITY_COL + EQUAL + PLACEHOLDER + COMMA +
-                    archived + EQUAL + PLACEHOLDER + COMMA +
-                    deleted + EQUAL + PLACEHOLDER +
-                    WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
+            SET + ENTITY_COL + EQUAL + PLACEHOLDER + COMMA +
+            archived + EQUAL + PLACEHOLDER + COMMA +
+            deleted + EQUAL + PLACEHOLDER +
+            WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
 
     private UpdateEntityQuery(Builder<I> builder) {
         super(builder);
     }
 
-    public static <I> Builder <I> newBuilder(String tableName) {
+    public static <I> Builder<I> newBuilder(String tableName) {
         final Builder<I> builder = new Builder<>();
         builder.setIdIndexInQuery(ID_COL_POSITION)
-                .setRecordIndexInQuery(RECORD_COL_POSITION)
-                .setQuery(format(QUERY_TEMPLATE, tableName));
+               .setRecordIndexInQuery(RECORD_COL_POSITION)
+               .setQuery(format(QUERY_TEMPLATE, tableName));
         return builder;
     }
 

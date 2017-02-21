@@ -56,13 +56,13 @@ public class UpdateEventRecordQuery extends WriteRecordQuery<String, EventStorag
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
             UPDATE + TABLE_NAME +
-                    SET +
-                    EVENT_COL + EQUAL + PLACEHOLDER + COMMA +
-                    EVENT_TYPE_COL + EQUAL + PLACEHOLDER + COMMA +
-                    PRODUCER_ID_COL + EQUAL + PLACEHOLDER + COMMA +
-                    SECONDS_COL + EQUAL + PLACEHOLDER + COMMA +
-                    NANOSECONDS_COL + EQUAL + PLACEHOLDER +
-                    WHERE + EVENT_ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
+            SET +
+            EVENT_COL + EQUAL + PLACEHOLDER + COMMA +
+            EVENT_TYPE_COL + EQUAL + PLACEHOLDER + COMMA +
+            PRODUCER_ID_COL + EQUAL + PLACEHOLDER + COMMA +
+            SECONDS_COL + EQUAL + PLACEHOLDER + COMMA +
+            NANOSECONDS_COL + EQUAL + PLACEHOLDER +
+            WHERE + EVENT_ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
 
     private UpdateEventRecordQuery(Builder builder) {
         super(builder);
@@ -72,15 +72,18 @@ public class UpdateEventRecordQuery extends WriteRecordQuery<String, EventStorag
     @SuppressWarnings("DuplicateStringLiteralInspection")
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
         final PreparedStatement statement = connection.prepareStatement(QUERY_TEMPLATE);
-        final Timestamp timestamp = this.getRecord().getTimestamp();
+        final Timestamp timestamp = getRecord()
+                .getTimestamp();
         try {
-            final byte[] serializedRecord = serialize(this.getRecord());
+            final byte[] serializedRecord = serialize(getRecord());
             statement.setBytes(1, serializedRecord);
 
-            final String eventType = this.getRecord().getEventType();
+            final String eventType = getRecord()
+                    .getEventType();
             statement.setString(2, eventType);
 
-            final String producerId = this.getRecord().getProducerId();
+            final String producerId = getRecord()
+                    .getProducerId();
             statement.setString(3, producerId);
 
             final long seconds = timestamp.getSeconds();
@@ -89,10 +92,11 @@ public class UpdateEventRecordQuery extends WriteRecordQuery<String, EventStorag
             final int nanos = timestamp.getNanos();
             statement.setInt(5, nanos);
 
-            final String eventId = this.getRecord().getEventId();
+            final String eventId = getRecord()
+                    .getEventId();
             statement.setString(6, eventId);
         } catch (SQLException e) {
-            this.getLogger().error("Failed to prepare statement ", e);
+            getLogger().error("Failed to prepare statement ", e);
             throw new DatabaseException(e);
         }
         return statement;

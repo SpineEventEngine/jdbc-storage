@@ -61,11 +61,11 @@ public class CreateTableQuery<I> extends StorageQuery {
         } else {
             sql = format(getQuery(), tableName);
         }
-        try (ConnectionWrapper connection = this.getConnection(true);
+        try (ConnectionWrapper connection = getConnection(true);
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.execute();
         } catch (SQLException e) {
-            this.getLogger().error("Error while creating a table with the name: " + tableName, e);
+            getLogger().error("Error while creating a table with the name: " + tableName, e);
             throw new DatabaseException(e);
         }
     }
@@ -77,12 +77,12 @@ public class CreateTableQuery<I> extends StorageQuery {
         private IdColumn<I> idColumn;
         private String tableName;
 
-        public B setIdColumn(IdColumn<I> idColumn){
+        public B setIdColumn(IdColumn<I> idColumn) {
             this.idColumn = idColumn;
             return getThis();
         }
 
-        public B setTableName(String tableName){
+        public B setTableName(String tableName) {
             this.tableName = tableName;
             return getThis();
         }

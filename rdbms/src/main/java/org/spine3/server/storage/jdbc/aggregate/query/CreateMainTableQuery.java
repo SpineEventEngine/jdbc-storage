@@ -46,18 +46,18 @@ public class CreateMainTableQuery<I> extends CreateTableQuery<I> {
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
             CREATE_IF_MISSING + "%s " + BRACKET_OPEN +
-                    ID_COL + " %s " + COMMA +
-                    AGGREGATE_COL + BLOB + COMMA +
-                    SECONDS_COL + BIGINT + COMMA +
-                    NANOS_COL + INT +
-                    BRACKET_CLOSE + SEMICOLON;
+            ID_COL + " %s " + COMMA +
+            AGGREGATE_COL + BLOB + COMMA +
+            SECONDS_COL + BIGINT + COMMA +
+            NANOS_COL + INT +
+            BRACKET_CLOSE + SEMICOLON;
 
     protected CreateMainTableQuery(Builder<I> builder) {
         super(builder);
     }
 
-    public static <I>Builder <I>newBuilder() {
-        final Builder <I>builder = new Builder<>();
+    public static <I> Builder<I> newBuilder() {
+        final Builder<I> builder = new Builder<>();
         builder.setQuery(QUERY_TEMPLATE);
         return builder;
     }

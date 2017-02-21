@@ -164,7 +164,8 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     @Override
     protected Iterator<AggregateStorageRecord> historyBackward(I id) throws DatabaseException {
         checkNotNull(id);
-        final Iterator<AggregateStorageRecord> iterator = queryFactory.newSelectByIdSortedByTimeDescQuery(id)
+        final Iterator<AggregateStorageRecord> iterator = queryFactory.newSelectByIdSortedByTimeDescQuery(
+                id)
                                                                       .execute();
         iterators.add((DbIterator) iterator);
         return iterator;

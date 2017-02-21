@@ -78,12 +78,14 @@ public class EntityStatusHandler<I> {
     }
 
     public boolean markArchived(I id) {
-        final boolean result = queryFactory.newMarkArchivedQuery(id).execute();
+        final boolean result = queryFactory.newMarkArchivedQuery(id)
+                                           .execute();
         return result;
     }
 
     public boolean markDeleted(I id) {
-        final boolean result = queryFactory.newMarkDeletedQuery(id).execute();
+        final boolean result = queryFactory.newMarkDeletedQuery(id)
+                                           .execute();
         return result;
     }
 }

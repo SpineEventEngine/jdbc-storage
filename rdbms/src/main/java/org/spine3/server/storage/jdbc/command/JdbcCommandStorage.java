@@ -55,11 +55,11 @@ public class JdbcCommandStorage extends CommandStorage {
     /**
      * Creates a new storage instance.
      *
-     * @param dataSource            a data source to use to obtain connections
-     * @param multitenant           defines is this storage multitenant
-     * @param queryFactory          factory that generates queries for interaction with command table
-     * @return                      a new storage instance
-     * @throws DatabaseException    if an error occurs during an interaction with the DB
+     * @param dataSource   a data source to use to obtain connections
+     * @param multitenant  defines is this storage multitenant
+     * @param queryFactory factory that generates queries for interaction with command table
+     * @return a new storage instance
+     * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     public static CommandStorage newInstance(DataSourceWrapper dataSource,
                                              boolean multitenant,
@@ -69,14 +69,15 @@ public class JdbcCommandStorage extends CommandStorage {
     }
 
     protected JdbcCommandStorage(DataSourceWrapper dataSource,
-                               boolean multitenant,
-                               CommandStorageQueryFactory queryFactory)
+                                 boolean multitenant,
+                                 CommandStorageQueryFactory queryFactory)
             throws DatabaseException {
         super(multitenant);
         this.dataSource = dataSource;
         this.queryFactory = queryFactory;
         queryFactory.setLogger(LogSingleton.INSTANCE.value);
-        queryFactory.newCreateCommandTableQuery().execute();
+        queryFactory.newCreateCommandTableQuery()
+                    .execute();
     }
 
     /**
@@ -89,7 +90,8 @@ public class JdbcCommandStorage extends CommandStorage {
     public Optional<CommandStorageRecord> read(CommandId commandId) throws DatabaseException {
         checkNotClosed();
 
-        final CommandStorageRecord record = queryFactory.newSelectCommandByIdQuery(commandId).execute();
+        final CommandStorageRecord record = queryFactory.newSelectCommandByIdQuery(commandId)
+                                                        .execute();
 
         return Optional.fromNullable(record);
     }
@@ -103,7 +105,9 @@ public class JdbcCommandStorage extends CommandStorage {
     @Override
     public Iterator<CommandStorageRecord> read(CommandStatus status) {
         checkNotNull(status);
-        final Iterator<CommandStorageRecord> iterator = queryFactory.newSelectCommandByStatusQuery(status).execute();
+        final Iterator<CommandStorageRecord> iterator = queryFactory.newSelectCommandByStatusQuery(
+                status)
+                                                                    .execute();
         return iterator;
     }
 
@@ -120,9 +124,11 @@ public class JdbcCommandStorage extends CommandStorage {
         checkNotClosed();
 
         if (containsRecord(commandId)) {
-            queryFactory.newUpdateCommandQuery(commandId, record).execute();
+            queryFactory.newUpdateCommandQuery(commandId, record)
+                        .execute();
         } else {
-            queryFactory.newInsertCommandQuery(commandId, record).execute();
+            queryFactory.newInsertCommandQuery(commandId, record)
+                        .execute();
         }
     }
 
@@ -143,7 +149,8 @@ public class JdbcCommandStorage extends CommandStorage {
         checkNotNull(commandId);
         checkNotClosed();
 
-        queryFactory.newSetOkStatusQuery(commandId).execute();
+        queryFactory.newSetOkStatusQuery(commandId)
+                    .execute();
     }
 
     /**
@@ -158,7 +165,8 @@ public class JdbcCommandStorage extends CommandStorage {
         checkNotNull(error);
         checkNotClosed();
 
-        queryFactory.newSetErrorQuery(commandId, error).execute();
+        queryFactory.newSetErrorQuery(commandId, error)
+                    .execute();
     }
 
     /**
@@ -173,7 +181,8 @@ public class JdbcCommandStorage extends CommandStorage {
         checkNotNull(failure);
         checkNotClosed();
 
-        queryFactory.newSetFailureQuery(commandId, failure).execute();
+        queryFactory.newSetFailureQuery(commandId, failure)
+                    .execute();
     }
 
     @Override

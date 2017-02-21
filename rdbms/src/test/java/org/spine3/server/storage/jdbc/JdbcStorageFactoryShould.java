@@ -51,11 +51,11 @@ public class JdbcStorageFactoryShould {
     public void setUpTest() {
         final String dbUrl = GivenDataSource.prefix("factoryTests");
         final DataSourceConfig config = DataSourceConfig.newBuilder()
-                .setJdbcUrl(dbUrl)
-                .setUsername("SA")
-                .setPassword("pwd")
-                .setMaxPoolSize(12)
-                .build();
+                                                        .setJdbcUrl(dbUrl)
+                                                        .setUsername("SA")
+                                                        .setPassword("pwd")
+                                                        .setMaxPoolSize(12)
+                                                        .build();
         factory = JdbcStorageFactory.<String>newBuilder()
                 .setDataSource(config)
                 .setMultitenant(false)
@@ -65,7 +65,7 @@ public class JdbcStorageFactoryShould {
     }
 
     @Test
-    public void allow_to_use_custom_data_source(){
+    public void allow_to_use_custom_data_source() {
         final JdbcStorageFactory factory = JdbcStorageFactory.<String>newBuilder()
                 .setDataSource(mock(DataSource.class))
                 .setEntityClass(TestProjection.class)
@@ -83,7 +83,8 @@ public class JdbcStorageFactoryShould {
 
     @Test
     public void create_aggregate_storage() {
-        final AggregateStorage<String> storage = factory.createAggregateStorage(TestAggregate.class);
+        final AggregateStorage<String> storage = factory.createAggregateStorage(
+                TestAggregate.class);
         assertNotNull(storage);
     }
 
@@ -101,7 +102,8 @@ public class JdbcStorageFactoryShould {
 
     @Test
     public void create_projection_storage() {
-        final ProjectionStorage<String> storage = factory.createProjectionStorage(TestProjection.class);
+        final ProjectionStorage<String> storage = factory.createProjectionStorage(
+                TestProjection.class);
         assertNotNull(storage);
     }
 
@@ -110,8 +112,6 @@ public class JdbcStorageFactoryShould {
         final StandStorage storage = factory.createStandStorage();
         assertNotNull(storage);
     }
-
-
 
     private static class TestEntity extends Entity<String, StringValue> {
 

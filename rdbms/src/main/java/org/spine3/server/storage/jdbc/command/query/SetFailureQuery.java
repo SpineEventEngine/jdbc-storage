@@ -34,7 +34,8 @@ import static org.spine3.server.storage.jdbc.command.query.CommandTable.ID_COL;
 import static org.spine3.server.storage.jdbc.command.query.CommandTable.TABLE_NAME;
 
 /**
- * Query that updates {@link CommandStorageRecord} with a new {@link Failure}.
+ * Query that updates {@link org.spine3.server.command.storage.CommandStorageRecord} with
+ * a new {@link Failure}.
  *
  * @author Alexander Litus
  * @author Andrey Lavrov
@@ -44,9 +45,9 @@ public class SetFailureQuery extends WriteRecordQuery<String, Failure> {
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
             UPDATE + TABLE_NAME +
-                    SET +
-                    FAILURE_COL + EQUAL + PLACEHOLDER +
-                    WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
+            SET +
+            FAILURE_COL + EQUAL + PLACEHOLDER +
+            WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
 
     private SetFailureQuery(Builder builder) {
         super(builder);
@@ -55,8 +56,8 @@ public class SetFailureQuery extends WriteRecordQuery<String, Failure> {
     public static Builder newBuilder() {
         final Builder builder = new Builder();
         builder.setIdIndexInQuery(2)
-                .setRecordIndexInQuery(1)
-                .setQuery(QUERY_TEMPLATE);
+               .setRecordIndexInQuery(1)
+               .setQuery(QUERY_TEMPLATE);
         return builder;
     }
 

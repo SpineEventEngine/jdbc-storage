@@ -56,7 +56,7 @@ public class SelectCommandByIdQuery extends SelectByIdQuery<String, CommandStora
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
             SELECT.toString() + ALL_ATTRIBUTES + FROM + TABLE_NAME +
-                    WHERE + ID_COL + EQUAL  + PLACEHOLDER + SEMICOLON;
+            WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
 
     public SelectCommandByIdQuery(Builder builder) {
         super(builder);
@@ -70,25 +70,28 @@ public class SelectCommandByIdQuery extends SelectByIdQuery<String, CommandStora
         if (recordBytes == null) {
             return null;
         }
-        final CommandStorageRecord record = deserialize(recordBytes, CommandStorageRecord.getDescriptor());
+        final CommandStorageRecord record = deserialize(recordBytes,
+                                                        CommandStorageRecord.getDescriptor());
         final CommandStorageRecord.Builder builder = record.toBuilder();
         final String status = resultSet.getString(COMMAND_STATUS_COL);
-        if (status.equals(CommandStatus.forNumber(CommandStatus.OK_VALUE).name())) {
-            return builder.setStatus(CommandStatus.OK).build();
+        if (status.equals(CommandStatus.forNumber(CommandStatus.OK_VALUE)
+                                       .name())) {
+            return builder.setStatus(CommandStatus.OK)
+                          .build();
         }
         final byte[] errorBytes = resultSet.getBytes(ERROR_COL);
         if (errorBytes != null) {
             final Error error = deserialize(errorBytes, Error.getDescriptor());
             return builder.setError(error)
-                    .setStatus(CommandStatus.ERROR)
-                    .build();
+                          .setStatus(CommandStatus.ERROR)
+                          .build();
         }
         final byte[] failureBytes = resultSet.getBytes(FAILURE_COL);
         if (failureBytes != null) {
             final Failure failure = deserialize(failureBytes, Failure.getDescriptor());
             return builder.setFailure(failure)
-                    .setStatus(CommandStatus.FAILURE)
-                    .build();
+                          .setStatus(CommandStatus.FAILURE)
+                          .build();
         }
         return builder.build();
     }
@@ -96,12 +99,12 @@ public class SelectCommandByIdQuery extends SelectByIdQuery<String, CommandStora
     public static Builder newBuilder() {
         final Builder builder = new Builder();
         builder.setIdIndexInQuery(1)
-                .setQuery(QUERY_TEMPLATE);
+               .setQuery(QUERY_TEMPLATE);
         return builder;
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder extends SelectByIdQuery.Builder<Builder, SelectCommandByIdQuery, String, CommandStorageRecord>{
+    public static class Builder extends SelectByIdQuery.Builder<Builder, SelectCommandByIdQuery, String, CommandStorageRecord> {
 
         @Override
         public SelectCommandByIdQuery build() {

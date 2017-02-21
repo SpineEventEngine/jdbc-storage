@@ -49,9 +49,9 @@ class QueryResults {
      *
      * @param resultSet Results of the query.
      * @param fieldMask {@code FieldMask} to apply to the results.
-     * @param typeUrl Type of retrieved {@link org.spine3.server.entity.Entity} states.
-     * @param <Id> ID type of the {@link org.spine3.server.entity.Entity}.
-     * @param <State> State type of the {@link org.spine3.server.entity.Entity}.
+     * @param typeUrl   Type of retrieved {@link org.spine3.server.entity.Entity} states.
+     * @param <Id>      ID type of the {@link org.spine3.server.entity.Entity}.
+     * @param <State>   State type of the {@link org.spine3.server.entity.Entity}.
      * @return ID-to-{@link EntityStorageRecord} {@link Map} representing the query results.
      * @throws SQLException if read results contain no ID column or entity column.
      * @see EntityTable
@@ -70,7 +70,9 @@ class QueryResults {
             @SuppressWarnings("unchecked")
             final Id id = (Id) resultSet.getObject(EntityTable.ID_COL);
 
-            resultBuilder.put(id, EntityStorageRecord.newBuilder(record).setState(AnyPacker.pack(maskedMessage)).build());
+            resultBuilder.put(id, EntityStorageRecord.newBuilder(record)
+                                                     .setState(AnyPacker.pack(maskedMessage))
+                                                     .build());
         }
 
         resultSet.close();
@@ -79,10 +81,12 @@ class QueryResults {
     }
 
     private static EntityStorageRecord readSingleMessage(ResultSet resultSet) throws SQLException {
-        return Serializer.deserialize(resultSet.getBytes(EntityTable.ENTITY_COL), EntityStorageRecord.getDescriptor());
+        return Serializer.deserialize(resultSet.getBytes(EntityTable.ENTITY_COL),
+                                      EntityStorageRecord.getDescriptor());
     }
 
-    private static <M extends Message> M maskFields(EntityStorageRecord record, FieldMask fieldMask, TypeUrl typeUrl) {
+    private static <M extends Message> M maskFields(EntityStorageRecord record, FieldMask fieldMask,
+                                                    TypeUrl typeUrl) {
         final M message = AnyPacker.unpack(record.getState());
         return FieldMasks.applyMask(fieldMask, message, typeUrl);
     }

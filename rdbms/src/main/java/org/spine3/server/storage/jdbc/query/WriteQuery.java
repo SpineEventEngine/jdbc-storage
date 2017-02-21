@@ -48,7 +48,7 @@ public class WriteQuery extends StorageQuery {
                 statement.execute();
                 connection.commit();
             } catch (SQLException e) {
-                this.getLogger().error("Failed to execute write operation.", e);
+                getLogger().error("Failed to execute write operation.", e);
                 connection.rollback();
                 throw new DatabaseException(e);
             }

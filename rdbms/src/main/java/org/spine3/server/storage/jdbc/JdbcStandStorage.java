@@ -81,17 +81,21 @@ public class JdbcStandStorage extends StandStorage {
     }
 
     @Override
-    public ImmutableCollection<EntityStorageRecord> readAllByType(final TypeUrl type, FieldMask fieldMask) {
+    public ImmutableCollection<EntityStorageRecord> readAllByType(final TypeUrl type,
+                                                                  FieldMask fieldMask) {
         final Map<AggregateStateId, EntityStorageRecord> allRecords = readAll(fieldMask);
-        final Map<AggregateStateId, EntityStorageRecord> resultMap = Maps.filterKeys(allRecords, new Predicate<AggregateStateId>() {
-            @Override
-            public boolean apply(@Nullable AggregateStateId stateId) {
-                checkNotNull(stateId);
-                final boolean typeMatches = stateId.getStateType()
-                        .equals(type);
-                return typeMatches;
-            }
-        });
+        final Map<AggregateStateId, EntityStorageRecord> resultMap = Maps.filterKeys(allRecords,
+                                                                                     new Predicate<AggregateStateId>() {
+                                                                                         @Override
+                                                                                         public boolean apply(
+                                                                                                 @Nullable AggregateStateId stateId) {
+                                                                                             checkNotNull(
+                                                                                                     stateId);
+                                                                                             final boolean typeMatches = stateId.getStateType()
+                                                                                                                                .equals(type);
+                                                                                             return typeMatches;
+                                                                                         }
+                                                                                     });
 
         final ImmutableList<EntityStorageRecord> result = ImmutableList.copyOf(resultMap.values());
         return result;
@@ -127,7 +131,8 @@ public class JdbcStandStorage extends StandStorage {
 
     @SuppressWarnings("unchecked")
     @Override
-    protected Iterable<EntityStorageRecord> readMultipleRecords(Iterable<AggregateStateId> ids, FieldMask fieldMask) {
+    protected Iterable<EntityStorageRecord> readMultipleRecords(Iterable<AggregateStateId> ids,
+                                                                FieldMask fieldMask) {
         final Collection pureIds = Collections2.transform(Lists.newArrayList(ids), ID_MAPPER);
         return recordStorage.readMultiple(pureIds, fieldMask);
     }
@@ -161,11 +166,15 @@ public class JdbcStandStorage extends StandStorage {
         recordStorage.close();
     }
 
-    private static Map<AggregateStateId, EntityStorageRecord> retrieveRecordsWithValidIds(Map<?, EntityStorageRecord> records) {
+    private static Map<AggregateStateId, EntityStorageRecord> retrieveRecordsWithValidIds(
+            Map<?, EntityStorageRecord> records) {
         final ImmutableMap.Builder<AggregateStateId, EntityStorageRecord> result = new ImmutableMap.Builder<>();
 
         for (Map.Entry<?, EntityStorageRecord> entry : records.entrySet()) {
-            final AggregateStateId id = AggregateStateId.of(entry.getKey(), TypeUrl.of(entry.getValue().getState().getTypeUrl()));
+            final AggregateStateId id = AggregateStateId.of(entry.getKey(), TypeUrl.of(
+                    entry.getValue()
+                         .getState()
+                         .getTypeUrl()));
             result.put(id, entry.getValue());
         }
 

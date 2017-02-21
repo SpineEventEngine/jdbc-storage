@@ -20,7 +20,6 @@
 
 package org.spine3.server.storage.jdbc.aggregate.query;
 
-
 import org.spine3.server.aggregate.storage.AggregateStorageRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.StorageQuery;
@@ -61,9 +60,8 @@ public class SelectByIdSortedByTimeDescQuery<I> extends StorageQuery {
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
             SELECT + AGGREGATE_COL + FROM + "%s" +
-                    WHERE + ID_COL + EQUAL + PLACEHOLDER +
-                    ORDER_BY + SECONDS_COL + DESC + COMMA + NANOS_COL + DESC + SEMICOLON;
-
+            WHERE + ID_COL + EQUAL + PLACEHOLDER +
+            ORDER_BY + SECONDS_COL + DESC + COMMA + NANOS_COL + DESC + SEMICOLON;
 
     private SelectByIdSortedByTimeDescQuery(Builder<I> builder) {
         super(builder);
@@ -72,12 +70,13 @@ public class SelectByIdSortedByTimeDescQuery<I> extends StorageQuery {
     }
 
     public Iterator<AggregateStorageRecord> execute() throws DatabaseException {
-        try (ConnectionWrapper connection = this.getConnection(true);
+        try (ConnectionWrapper connection = getConnection(true);
              PreparedStatement statement = prepareStatement(connection)) {
             idColumn.setId(1, id, statement);
-            return new DbIterator<>(statement, AGGREGATE_COL, AggregateStorageRecord.getDescriptor());
+            return new DbIterator<>(statement, AGGREGATE_COL,
+                                    AggregateStorageRecord.getDescriptor());
         } catch (SQLException e) {
-            this.getLogger().error("Error while selecting entity by aggregate id sorted by time: ", e);
+            getLogger().error("Error while selecting entity by aggregate id sorted by time: ", e);
             throw new DatabaseException(e);
         }
     }

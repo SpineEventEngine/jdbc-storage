@@ -59,8 +59,9 @@ public class InsertEntityRecordsBulkQuery<I> extends WriteQuery {
 
     private static final int COLUMNS_COUNT = 4;
     private static final String SQL_TEMPLATE = INSERT_INTO + "%s" +
-            BRACKET_OPEN + ID_COL + COMMA + ENTITY_COL + COMMA + archived + COMMA + deleted + BRACKET_CLOSE +
-            VALUES + "%s";
+                                               BRACKET_OPEN + ID_COL + COMMA + ENTITY_COL + COMMA +
+                                               archived + COMMA + deleted + BRACKET_CLOSE +
+                                               VALUES + "%s";
     private static final String SQL_VALUES_TEMPLATE = nPlaceholders(COLUMNS_COUNT);
 
     private final Map<I, EntityStorageRecord> records;
@@ -89,7 +90,8 @@ public class InsertEntityRecordsBulkQuery<I> extends WriteQuery {
         return statement;
     }
 
-    private void addParam(PreparedStatement statement, int firstParamIndex, I id, EntityStorageRecord record) {
+    private void addParam(PreparedStatement statement, int firstParamIndex, I id,
+                          EntityStorageRecord record) {
         int paramIndex = firstParamIndex;
         try {
             idColumn.setId(paramIndex, id, statement);
@@ -136,7 +138,8 @@ public class InsertEntityRecordsBulkQuery<I> extends WriteQuery {
             checkState(!isNullOrEmpty(tableName), "Table name is not set.");
             checkState(records != null, "Records field is not set.");
 
-            final Collection<String> sqlvalues = Collections.nCopies(records.size(), SQL_VALUES_TEMPLATE);
+            final Collection<String> sqlvalues = Collections.nCopies(records.size(),
+                                                                     SQL_VALUES_TEMPLATE);
             final String sqlValuesJoined = Joiner.on(COMMA.toString())
                                                  .join(sqlvalues);
             final String sql = format(SQL_TEMPLATE, tableName, sqlValuesJoined) + SEMICOLON;

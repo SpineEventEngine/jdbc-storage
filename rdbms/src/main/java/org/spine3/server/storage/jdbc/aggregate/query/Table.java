@@ -74,5 +74,6 @@ final class Table {
         }
     }
 
-    private Table() {}
+    private Table() {
+    }
 }

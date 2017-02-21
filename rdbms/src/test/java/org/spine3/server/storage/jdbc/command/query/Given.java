@@ -48,9 +48,11 @@ class Given {
         loggerMock = mock(Logger.class);
         final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnExecuteStatement();
         final SelectCommandByIdQuery.Builder builder = SelectCommandByIdQuery.newBuilder()
-                .setDataSource(dataSourceMock)
-                .setLogger(loggerMock)
-                .setIdColumn(idColumnMock);
+                                                                             .setDataSource(
+                                                                                     dataSourceMock)
+                                                                             .setLogger(loggerMock)
+                                                                             .setIdColumn(
+                                                                                     idColumnMock);
         return builder.build();
     }
 
@@ -58,9 +60,12 @@ class Given {
         loggerMock = mock(Logger.class);
         final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnSettingStatementParam();
         final SelectCommandByStatusQuery.Builder builder = SelectCommandByStatusQuery.newBuilder()
-                .setDataSource(dataSourceMock)
-                .setLogger(loggerMock)
-                .setStatus(CommandStatus.UNDEFINED);
+                                                                                     .setDataSource(
+                                                                                             dataSourceMock)
+                                                                                     .setLogger(
+                                                                                             loggerMock)
+                                                                                     .setStatus(
+                                                                                             CommandStatus.UNDEFINED);
         return builder.build();
     }
 
@@ -68,11 +73,13 @@ class Given {
         loggerMock = mock(Logger.class);
         final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnSettingStatementParam();
         final InsertCommandQuery.Builder builder = InsertCommandQuery.newBuilder()
-                .setDataSource(dataSourceMock)
-                .setLogger(loggerMock)
-                .setIdColumn(idColumnMock)
-                .setRecord(CommandStorageRecord.getDefaultInstance())
-                .setStatus(CommandStatus.UNDEFINED);
+                                                                     .setDataSource(dataSourceMock)
+                                                                     .setLogger(loggerMock)
+                                                                     .setIdColumn(idColumnMock)
+                                                                     .setRecord(
+                                                                             CommandStorageRecord.getDefaultInstance())
+                                                                     .setStatus(
+                                                                             CommandStatus.UNDEFINED);
         return builder.build();
     }
 

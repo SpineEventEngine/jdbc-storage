@@ -56,13 +56,13 @@ public class InsertEventRecordQuery extends WriteRecordQuery<String, EventStorag
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
             INSERT_INTO + TABLE_NAME + BRACKET_OPEN +
-                    EVENT_ID_COL + COMMA +
-                    EVENT_COL + COMMA +
-                    EVENT_TYPE_COL + COMMA +
-                    PRODUCER_ID_COL + COMMA +
-                    SECONDS_COL + COMMA +
-                    NANOSECONDS_COL + BRACKET_CLOSE +
-                    VALUES + Sql.nPlaceholders(6) + SEMICOLON;
+            EVENT_ID_COL + COMMA +
+            EVENT_COL + COMMA +
+            EVENT_TYPE_COL + COMMA +
+            PRODUCER_ID_COL + COMMA +
+            SECONDS_COL + COMMA +
+            NANOSECONDS_COL + BRACKET_CLOSE +
+            VALUES + Sql.nPlaceholders(6) + SEMICOLON;
 
     private InsertEventRecordQuery(Builder builder) {
         super(builder);

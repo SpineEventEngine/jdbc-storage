@@ -78,12 +78,14 @@ public class JdbcStorageFactory<ID> implements StorageFactory {
 
     @Override
     public CommandStorage createCommandStorage() {
-        return JdbcCommandStorage.newInstance(dataSource, false, getCommandStorageQueryFactory(dataSource));
+        return JdbcCommandStorage.newInstance(dataSource, false,
+                                              getCommandStorageQueryFactory(dataSource));
     }
 
     @Override
     public EventStorage createEventStorage() {
-        return JdbcEventStorage.newInstance(dataSource, false, getEventStorageQueryFactory(dataSource));
+        return JdbcEventStorage.newInstance(dataSource, false,
+                                            getEventStorageQueryFactory(dataSource));
     }
 
     @Override
@@ -99,10 +101,12 @@ public class JdbcStorageFactory<ID> implements StorageFactory {
     }
 
     @Override
-    public <I> AggregateStorage<I> createAggregateStorage(Class<? extends Aggregate<I, ?, ?>> aggregateClass) {
+    public <I> AggregateStorage<I> createAggregateStorage(
+            Class<? extends Aggregate<I, ?, ?>> aggregateClass) {
         return JdbcAggregateStorage.newInstance(dataSource,
                                                 false,
-                                                getAggregateStorageQueryFactory(dataSource, aggregateClass));
+                                                getAggregateStorageQueryFactory(dataSource,
+                                                                                aggregateClass));
     }
 
     @Override
@@ -115,7 +119,8 @@ public class JdbcStorageFactory<ID> implements StorageFactory {
     }
 
     @Override
-    public <I> ProjectionStorage<I> createProjectionStorage(Class<? extends Entity<I, ?>> projectionClass) {
+    public <I> ProjectionStorage<I> createProjectionStorage(
+            Class<? extends Entity<I, ?>> projectionClass) {
         final JdbcRecordStorage<I> entityStorage = JdbcRecordStorage.newInstance(
                 dataSource,
                 false,
@@ -135,8 +140,9 @@ public class JdbcStorageFactory<ID> implements StorageFactory {
      * @param aggregateClass class of aggregates which are stored in the corresponding {@link JdbcAggregateStorage}
      * @param <I>            a type of IDs of stored aggregates
      */
-    protected <I> AggregateStorageQueryFactory<I> getAggregateStorageQueryFactory(DataSourceWrapper dataSource,
-                                                                                  Class<? extends Aggregate<I, ?, ?>> aggregateClass) {
+    protected <I> AggregateStorageQueryFactory<I> getAggregateStorageQueryFactory(
+            DataSourceWrapper dataSource,
+            Class<? extends Aggregate<I, ?, ?>> aggregateClass) {
         return new AggregateStorageQueryFactory<>(dataSource, aggregateClass);
     }
 
@@ -147,8 +153,9 @@ public class JdbcStorageFactory<ID> implements StorageFactory {
      * @param entityClass class of entities which are stored in the corresponding {@link JdbcRecordStorage}
      * @param <I>         a type of IDs of stored entities
      */
-    protected <I> RecordStorageQueryFactory<I> getEntityStorageQueryFactory(DataSourceWrapper dataSource,
-                                                                            Class<? extends Entity<I, ?>> entityClass) {
+    protected <I> RecordStorageQueryFactory<I> getEntityStorageQueryFactory(
+            DataSourceWrapper dataSource,
+            Class<? extends Entity<I, ?>> entityClass) {
         return new RecordStorageQueryFactory<>(dataSource, entityClass);
     }
 
@@ -159,8 +166,9 @@ public class JdbcStorageFactory<ID> implements StorageFactory {
      * @param entityClass class of entities which are stored in the corresponding {@link JdbcRecordStorage}
      * @param <I>         a type of IDs of entities from the corresponding {@link JdbcRecordStorage}
      */
-    protected <I> ProjectionStorageQueryFactory<I> getProjectionStorageQueryFactory(DataSourceWrapper dataSource,
-                                                                                    Class<? extends Entity<I, ?>> entityClass) {
+    protected <I> ProjectionStorageQueryFactory<I> getProjectionStorageQueryFactory(
+            DataSourceWrapper dataSource,
+            Class<? extends Entity<I, ?>> entityClass) {
         return new ProjectionStorageQueryFactory<>(dataSource, entityClass);
     }
 
@@ -178,7 +186,8 @@ public class JdbcStorageFactory<ID> implements StorageFactory {
      *
      * @param dataSource {@link DataSource} on which corresponding {@link JdbcCommandStorage} is based
      */
-    protected CommandStorageQueryFactory getCommandStorageQueryFactory(DataSourceWrapper dataSource) {
+    protected CommandStorageQueryFactory getCommandStorageQueryFactory(
+            DataSourceWrapper dataSource) {
         return new CommandStorageQueryFactory(dataSource);
     }
 

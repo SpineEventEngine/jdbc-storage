@@ -56,7 +56,8 @@ public class CloseablesShould {
         assertTrue(passed);
     }
 
-    @SuppressWarnings("MethodWithMultipleLoops") // Two loops - one for data set up and one for checks
+    @SuppressWarnings("MethodWithMultipleLoops")
+    // Two loops - one for data set up and one for checks
     @Test
     public void close_all_passed_instances() {
         final int count = 10;
@@ -83,7 +84,8 @@ public class CloseablesShould {
         final AutoCloseable faulty = new FaultyClosable();
         final StatefulClosable stateful = new StatefulClosable();
 
-        final Collection<AutoCloseable> closeables = Lists.newArrayList(faulty, stateful); // Needs to be ordered
+        final Collection<AutoCloseable> closeables = Lists.newArrayList(faulty,
+                                                                        stateful); // Needs to be ordered
         boolean success;
         try {
             Closeables.closeAll(closeables);

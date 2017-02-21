@@ -53,13 +53,13 @@ public class InsertAggregateRecordQuery<I> extends WriteRecordQuery<I, Aggregate
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
             INSERT_INTO + " %s " + BRACKET_OPEN
-                    + ID_COL + COMMA + AGGREGATE_COL + COMMA + SECONDS_COL + COMMA + NANOS_COL + BRACKET_CLOSE
-                    + VALUES + Sql.nPlaceholders(4) + SEMICOLON;
+            + ID_COL + COMMA + AGGREGATE_COL + COMMA + SECONDS_COL + COMMA + NANOS_COL +
+            BRACKET_CLOSE
+            + VALUES + Sql.nPlaceholders(4) + SEMICOLON;
 
     private InsertAggregateRecordQuery(Builder<I> builder) {
         super(builder);
     }
-
 
     @Override
     @SuppressWarnings("DuplicateStringLiteralInspection")
@@ -67,21 +67,21 @@ public class InsertAggregateRecordQuery<I> extends WriteRecordQuery<I, Aggregate
         final PreparedStatement statement = super.prepareStatement(connection);
 
         try {
-            final Timestamp timestamp = this.getRecord().getTimestamp();
+            final Timestamp timestamp = getRecord().getTimestamp();
             statement.setLong(3, timestamp.getSeconds());
             statement.setInt(4, timestamp.getNanos());
             return statement;
         } catch (SQLException e) {
-            this.getLogger().error("Failed to prepare statement ", e);
+            getLogger().error("Failed to prepare statement ", e);
             throw new DatabaseException(e);
         }
     }
 
-    public static <I> Builder <I> newBuilder(String tableName) {
+    public static <I> Builder<I> newBuilder(String tableName) {
         final Builder<I> builder = new Builder<>();
         builder.setIdIndexInQuery(1)
-                .setRecordIndexInQuery(2)
-                .setQuery(format(QUERY_TEMPLATE, tableName));
+               .setRecordIndexInQuery(2)
+               .setQuery(format(QUERY_TEMPLATE, tableName));
         return builder;
     }
 

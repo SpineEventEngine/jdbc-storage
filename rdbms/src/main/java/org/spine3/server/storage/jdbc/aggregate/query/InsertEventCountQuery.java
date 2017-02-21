@@ -50,9 +50,9 @@ public class InsertEventCountQuery<I> extends UpdateRecordQuery<I> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
-            INSERT_INTO +" %s " +
-                    BRACKET_OPEN + ID_COL + COMMA + EVENT_COUNT_COL + BRACKET_CLOSE +
-                    VALUES + Sql.nPlaceholders(2) + SEMICOLON;
+            INSERT_INTO + " %s " +
+            BRACKET_OPEN + ID_COL + COMMA + EVENT_COUNT_COL + BRACKET_CLOSE +
+            VALUES + Sql.nPlaceholders(2) + SEMICOLON;
 
     private InsertEventCountQuery(Builder<I> builder) {
         super(builder);
@@ -68,7 +68,7 @@ public class InsertEventCountQuery<I> extends UpdateRecordQuery<I> {
             statement.setInt(2, count);
             return statement;
         } catch (SQLException e) {
-            this.getLogger().error("Failed to prepare statement ", e);
+            getLogger().error("Failed to prepare statement ", e);
             throw new DatabaseException(e);
         }
     }
@@ -76,7 +76,7 @@ public class InsertEventCountQuery<I> extends UpdateRecordQuery<I> {
     public static <I> Builder<I> newBuilder(String tableName) {
         final Builder<I> builder = new Builder<>();
         builder.setQuery(format(QUERY_TEMPLATE, tableName))
-                .setIdIndexInQuery(1);
+               .setIdIndexInQuery(1);
         return builder;
     }
 

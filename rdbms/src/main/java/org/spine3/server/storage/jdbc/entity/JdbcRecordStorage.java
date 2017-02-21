@@ -80,7 +80,9 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
         return new JdbcRecordStorage<>(dataSource, multitenant, queryFactory, stateDescriptor);
     }
 
-    protected JdbcRecordStorage(DataSourceWrapper dataSource, boolean multitenant, RecordStorageQueryFactory<I> queryFactory, Descriptors.Descriptor stateDescriptor)
+    protected JdbcRecordStorage(DataSourceWrapper dataSource, boolean multitenant,
+                                RecordStorageQueryFactory<I> queryFactory,
+                                Descriptors.Descriptor stateDescriptor)
             throws DatabaseException {
         super(multitenant);
         this.dataSource = dataSource;
@@ -134,8 +136,10 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     }
 
     @Override
-    protected Iterable<EntityStorageRecord> readMultipleRecords(Iterable<I> ids, FieldMask fieldMask) {
-        final SelectBulkQuery query = queryFactory.newSelectBulkQuery(ids, fieldMask, stateDescriptor);
+    protected Iterable<EntityStorageRecord> readMultipleRecords(Iterable<I> ids,
+                                                                FieldMask fieldMask) {
+        final SelectBulkQuery query = queryFactory.newSelectBulkQuery(ids, fieldMask,
+                                                                      stateDescriptor);
         final Map<?, EntityStorageRecord> recordMap;
         try {
             recordMap = query.execute();
