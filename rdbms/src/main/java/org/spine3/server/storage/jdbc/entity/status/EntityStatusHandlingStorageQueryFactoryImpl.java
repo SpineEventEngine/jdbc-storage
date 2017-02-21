@@ -23,12 +23,15 @@ package org.spine3.server.storage.jdbc.entity.status;
 import org.slf4j.Logger;
 import org.spine3.Internal;
 import org.spine3.server.entity.status.EntityStatus;
+import org.spine3.server.storage.EntityStatusField;
+import org.spine3.server.storage.jdbc.entity.query.MarkEntityQuery;
 import org.spine3.server.storage.jdbc.entity.status.query.CreateEntityStatusTableQuery;
 import org.spine3.server.storage.jdbc.entity.status.query.InsertEntityStatusQuery;
 import org.spine3.server.storage.jdbc.entity.status.query.SelectEntityStatusQuery;
 import org.spine3.server.storage.jdbc.entity.status.query.UpdateEntityStatusQuery;
 import org.spine3.server.storage.jdbc.entity.status.table.EntityStatusTable;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
+import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -39,10 +42,16 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class EntityStatusHandlingStorageQueryFactoryImpl<I> implements EntityStatusHandlingStorageQueryFactory<I> {
 
     private final DataSourceWrapper dataSource;
+    private final String tableName;
+    private final IdColumn<I> idColumn;
     private Logger logger;
 
-    public EntityStatusHandlingStorageQueryFactoryImpl(DataSourceWrapper dataSource) {
+    EntityStatusHandlingStorageQueryFactoryImpl(DataSourceWrapper dataSource,
+                                                       String tableName,
+                                                       IdColumn<I> idColumn) {
         this.dataSource = checkNotNull(dataSource);
+        this.tableName = checkNotNull(tableName);
+        this.idColumn = checkNotNull(idColumn);
     }
 
     @Override
@@ -89,5 +98,27 @@ public class EntityStatusHandlingStorageQueryFactoryImpl<I> implements EntitySta
                 .setId(id)
                 .setEntityStatus(status);
         return builder.build();
+    }
+
+    @Override
+    public MarkEntityQuery<I> newMarkArchivedQuery(I id) {
+        return newMarkQuery(id, EntityStatusField.archived);
+    }
+
+    @Override
+    public MarkEntityQuery<I> newMarkDeletedQuery(I id) {
+        return newMarkQuery(id, EntityStatusField.deleted);
+    }
+
+    private MarkEntityQuery<I> newMarkQuery(I id, EntityStatusField column) {
+        final MarkEntityQuery<I> query = MarkEntityQuery.<I>newBuilder()
+                .setDataSource(dataSource)
+                .setLogger(logger)
+                .setTableName(tableName)
+                .setColumn(column)
+                .setIdColumn(idColumn)
+                .setId(id)
+                .build();
+        return query;
     }
 }

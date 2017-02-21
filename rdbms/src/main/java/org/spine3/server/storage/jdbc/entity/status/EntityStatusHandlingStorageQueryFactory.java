@@ -22,6 +22,7 @@ package org.spine3.server.storage.jdbc.entity.status;
 
 import org.slf4j.Logger;
 import org.spine3.server.entity.status.EntityStatus;
+import org.spine3.server.storage.jdbc.entity.query.MarkEntityQuery;
 import org.spine3.server.storage.jdbc.entity.status.query.CreateEntityStatusTableQuery;
 import org.spine3.server.storage.jdbc.entity.status.query.InsertEntityStatusQuery;
 import org.spine3.server.storage.jdbc.entity.status.query.SelectEntityStatusQuery;
@@ -39,6 +40,10 @@ public interface EntityStatusHandlingStorageQueryFactory<I> {
     SelectEntityStatusQuery newSelectEntityStatusQuery(I id);
 
     UpdateEntityStatusQuery newUpdateEntityStatusQuery(I id, EntityStatus status);
+
+    MarkEntityQuery<I> newMarkArchivedQuery(I id);
+
+    MarkEntityQuery<I> newMarkDeletedQuery(I id);
 
     void setLogger(Logger logger);
 }

@@ -48,7 +48,6 @@ import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
  */
 public class SelectEntityByIdQuery<I> extends SelectByIdQuery<I, EntityStorageRecord> {
 
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE = SELECT.toString() + ALL_ATTRIBUTES + FROM + " %s" + WHERE
             + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
 

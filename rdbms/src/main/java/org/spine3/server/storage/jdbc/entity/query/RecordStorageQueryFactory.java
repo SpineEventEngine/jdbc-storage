@@ -25,10 +25,10 @@ import com.google.protobuf.FieldMask;
 import org.slf4j.Logger;
 import org.spine3.server.entity.Entity;
 import org.spine3.server.entity.status.EntityStatus;
-import org.spine3.server.storage.EntityStatusField;
 import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.RecordStorage;
 import org.spine3.server.storage.jdbc.entity.status.EntityStatusHandlingStorageQueryFactory;
+import org.spine3.server.storage.jdbc.entity.status.QueryFactories;
 import org.spine3.server.storage.jdbc.entity.status.query.CreateEntityStatusTableQuery;
 import org.spine3.server.storage.jdbc.entity.status.query.InsertEntityStatusQuery;
 import org.spine3.server.storage.jdbc.entity.status.query.SelectEntityStatusQuery;
@@ -40,7 +40,6 @@ import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import java.util.Map;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
 
 /**
@@ -64,12 +63,14 @@ public class RecordStorageQueryFactory<I> implements EntityStatusHandlingStorage
      * @param entityClass   entity class of corresponding {@link RecordStorage} instance
      */
     public RecordStorageQueryFactory(DataSourceWrapper dataSource,
-                                     Class<? extends Entity<I, ?>> entityClass,
-                                     EntityStatusHandlingStorageQueryFactory<I> statusTableQueryFactory) {
+                                     Class<? extends Entity<I, ?>> entityClass) {
         this.idColumn = IdColumn.newInstance(entityClass);
         this.dataSource = dataSource;
         this.tableName = DbTableNameFactory.newTableName(entityClass);
-        this.statusTableQueryFactory = checkNotNull(statusTableQueryFactory);
+        this.statusTableQueryFactory = QueryFactories.forTable(
+                dataSource,
+                tableName,
+                idColumn);
     }
 
     @Override
@@ -90,6 +91,16 @@ public class RecordStorageQueryFactory<I> implements EntityStatusHandlingStorage
     @Override
     public UpdateEntityStatusQuery newUpdateEntityStatusQuery(I id, EntityStatus status) {
         return statusTableQueryFactory.newUpdateEntityStatusQuery(id, status);
+    }
+
+    @Override
+    public MarkEntityQuery<I> newMarkArchivedQuery(I id) {
+        return statusTableQueryFactory.newMarkArchivedQuery(id);
+    }
+
+    @Override
+    public MarkEntityQuery<I> newMarkDeletedQuery(I id) {
+        return statusTableQueryFactory.newMarkDeletedQuery(id);
     }
 
     /** Sets the logger for logging exceptions during queries execution. */
@@ -199,25 +210,5 @@ public class RecordStorageQueryFactory<I> implements EntityStatusHandlingStorage
                 .setidColumn(idColumn)
                 .setRecords(records);
         return builder.build();
-    }
-
-    public MarkEntityQuery<I> newMarkArchivedQuery(I id) {
-        return newMarkQuery(id, EntityStatusField.archived);
-    }
-
-    public MarkEntityQuery<I> newMarkDeletedQuery(I id) {
-        return newMarkQuery(id, EntityStatusField.deleted);
-    }
-
-    private MarkEntityQuery<I> newMarkQuery(I id, EntityStatusField column) {
-        final MarkEntityQuery<I> query = MarkEntityQuery.<I>newBuilder()
-                .setDataSource(dataSource)
-                .setLogger(logger)
-                .setTableName(tableName)
-                .setColumn(column)
-                .setIdColumn(idColumn)
-                .setId(id)
-                .build();
-        return query;
     }
 }

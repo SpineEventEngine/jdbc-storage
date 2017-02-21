@@ -27,7 +27,6 @@ import org.spine3.server.projection.ProjectionStorageShould;
 import org.spine3.server.storage.jdbc.GivenDataSource;
 import org.spine3.server.storage.jdbc.entity.JdbcRecordStorage;
 import org.spine3.server.storage.jdbc.entity.query.RecordStorageQueryFactory;
-import org.spine3.server.storage.jdbc.entity.status.EntityStatusHandlingStorageQueryFactoryImpl;
 import org.spine3.server.storage.jdbc.projection.query.ProjectionStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.test.projection.Project;
@@ -48,8 +47,7 @@ public class JdbcProjectionStorageShould extends ProjectionStorageShould<String>
                 false,
                 new RecordStorageQueryFactory<>(
                         dataSource,
-                        projectionClass,
-                        new EntityStatusHandlingStorageQueryFactoryImpl<String>(dataSource)),
+                        projectionClass),
                 Project.getDescriptor());
         return JdbcProjectionStorage.newInstance(entityStorage, false, new ProjectionStorageQueryFactory<>(dataSource, projectionClass));
     }

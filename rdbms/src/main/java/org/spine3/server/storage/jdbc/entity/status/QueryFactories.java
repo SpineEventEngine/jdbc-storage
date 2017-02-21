@@ -18,26 +18,28 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.spine3.server.storage.jdbc.aggregate;
+package org.spine3.server.storage.jdbc.entity.status;
 
-import org.spine3.server.aggregate.Aggregate;
-import org.spine3.server.aggregate.AggregateStorage;
-import org.spine3.server.aggregate.AggregateStorageStatusHandlingShould;
-import org.spine3.server.storage.jdbc.GivenDataSource;
-import org.spine3.server.storage.jdbc.aggregate.query.AggregateStorageQueryFactory;
+import org.spine3.server.storage.jdbc.entity.status.table.EntityStatusTable;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.test.aggregate.ProjectId;
+import org.spine3.server.storage.jdbc.util.IdColumn;
 
 /**
  * @author Dmytro Dashenkov.
  */
-public class JdbcAggregateStorageStatusHandlingShould extends AggregateStorageStatusHandlingShould {
+public class QueryFactories {
 
-    @Override
-    protected AggregateStorage<ProjectId> getAggregateStorage(Class<? extends Aggregate<ProjectId, ?, ?>> aggregateClass) {
-        final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory("aggregateStorageStatusHandlingTests");
-        return JdbcAggregateStorage.newInstance(dataSource, false, new AggregateStorageQueryFactory<>(
-                dataSource,
-                aggregateClass));
+    public static <I> EntityStatusHandlingStorageQueryFactory<I> forTable(DataSourceWrapper dataSource,
+                                                                          String tableName,
+                                                                          IdColumn<I> idColumn) {
+        return new EntityStatusHandlingStorageQueryFactoryImpl<>(dataSource,
+                                                                 tableName,
+                                                                 idColumn);
+    }
+
+    public static EntityStatusHandlingStorageQueryFactory<?> forSeparateTable(DataSourceWrapper dataSource) {
+        return new EntityStatusHandlingStorageQueryFactoryImpl<>(dataSource,
+                                                                 EntityStatusTable.TABLE_NAME,
+                                                                 new IdColumn.StringIdColumn());
     }
 }

@@ -37,7 +37,6 @@ import org.spine3.server.storage.jdbc.GivenDataSource;
 import org.spine3.server.storage.jdbc.JdbcStandStorage;
 import org.spine3.server.storage.jdbc.entity.query.CreateEntityTableQuery;
 import org.spine3.server.storage.jdbc.entity.query.RecordStorageQueryFactory;
-import org.spine3.server.storage.jdbc.entity.status.EntityStatusHandlingStorageQueryFactoryImpl;
 import org.spine3.server.storage.jdbc.entity.status.query.CreateEntityStatusTableQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.test.aggregate.Project;
@@ -427,8 +426,7 @@ public class JdbcStandStorageShould {
 
             final RecordStorageQueryFactory<String> queryFactory = new RecordStorageQueryFactory<>(
                     dataSource,
-                    TestAggregate.class,
-                    new EntityStatusHandlingStorageQueryFactoryImpl<String>(dataSource));
+                    TestAggregate.class);
 
             final StandStorage storage = JdbcStandStorage.<String>newBuilder()
                     .setRecordStorageQueryFactory(queryFactory)

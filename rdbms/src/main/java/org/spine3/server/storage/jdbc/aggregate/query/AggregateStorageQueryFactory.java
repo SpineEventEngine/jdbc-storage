@@ -25,7 +25,9 @@ import org.spine3.server.aggregate.Aggregate;
 import org.spine3.server.aggregate.AggregateStorage;
 import org.spine3.server.aggregate.storage.AggregateStorageRecord;
 import org.spine3.server.entity.status.EntityStatus;
+import org.spine3.server.storage.jdbc.entity.query.MarkEntityQuery;
 import org.spine3.server.storage.jdbc.entity.status.EntityStatusHandlingStorageQueryFactory;
+import org.spine3.server.storage.jdbc.entity.status.QueryFactories;
 import org.spine3.server.storage.jdbc.entity.status.query.CreateEntityStatusTableQuery;
 import org.spine3.server.storage.jdbc.entity.status.query.InsertEntityStatusQuery;
 import org.spine3.server.storage.jdbc.entity.status.query.SelectEntityStatusQuery;
@@ -48,7 +50,7 @@ public class AggregateStorageQueryFactory<I> implements EntityStatusHandlingStor
     private final String mainTableName;
     private final String eventCountTableName;
     private final DataSourceWrapper dataSource;
-    private final EntityStatusHandlingStorageQueryFactory<I> statusTableQueryFactory;
+    private final EntityStatusHandlingStorageQueryFactory statusTableQueryFactory;
     private Logger logger;
 
     /**
@@ -58,13 +60,12 @@ public class AggregateStorageQueryFactory<I> implements EntityStatusHandlingStor
      * @param aggregateClass aggregate class of corresponding {@link AggregateStorage} instance
      */
     public AggregateStorageQueryFactory(DataSourceWrapper dataSource,
-                                        Class<? extends Aggregate<I, ?, ?>> aggregateClass,
-                                        EntityStatusHandlingStorageQueryFactory<I> statusTableQueryFactory) {
+                                        Class<? extends Aggregate<I, ?, ?>> aggregateClass) {
         this.idColumn = IdColumn.newInstance(aggregateClass);
         this.mainTableName = DbTableNameFactory.newTableName(aggregateClass);
         this.eventCountTableName = mainTableName + EVENT_COUNT_TABLE_NAME_SUFFIX;
         this.dataSource = dataSource;
-        this.statusTableQueryFactory = statusTableQueryFactory;
+        this.statusTableQueryFactory = QueryFactories.forSeparateTable(dataSource);
     }
 
     @Override
@@ -85,6 +86,16 @@ public class AggregateStorageQueryFactory<I> implements EntityStatusHandlingStor
     @Override
     public UpdateEntityStatusQuery newUpdateEntityStatusQuery(I id, EntityStatus status) {
         return statusTableQueryFactory.newUpdateEntityStatusQuery(id, status);
+    }
+
+    @Override
+    public MarkEntityQuery<I> newMarkArchivedQuery(I id) {
+        return statusTableQueryFactory.newMarkDeletedQuery(id);
+    }
+
+    @Override
+    public MarkEntityQuery<I> newMarkDeletedQuery(I id) {
+        return statusTableQueryFactory.newMarkDeletedQuery(id);
     }
 
     /** Sets the logger for logging exceptions during queries execution. */
