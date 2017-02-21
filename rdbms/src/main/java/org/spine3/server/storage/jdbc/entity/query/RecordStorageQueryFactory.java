@@ -25,6 +25,7 @@ import com.google.protobuf.FieldMask;
 import org.slf4j.Logger;
 import org.spine3.server.entity.Entity;
 import org.spine3.server.entity.status.EntityStatus;
+import org.spine3.server.storage.EntityStatusField;
 import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.RecordStorage;
 import org.spine3.server.storage.jdbc.entity.status.EntityStatusHandlingStorageQueryFactory;
@@ -198,5 +199,25 @@ public class RecordStorageQueryFactory<I> implements EntityStatusHandlingStorage
                 .setidColumn(idColumn)
                 .setRecords(records);
         return builder.build();
+    }
+
+    public MarkEntityQuery<I> newMarkArchivedQuery(I id) {
+        return newMarkQuery(id, EntityStatusField.archived);
+    }
+
+    public MarkEntityQuery<I> newMarkDeletedQuery(I id) {
+        return newMarkQuery(id, EntityStatusField.deleted);
+    }
+
+    private MarkEntityQuery<I> newMarkQuery(I id, EntityStatusField column) {
+        final MarkEntityQuery<I> query = MarkEntityQuery.<I>newBuilder()
+                .setDataSource(dataSource)
+                .setLogger(logger)
+                .setTableName(tableName)
+                .setColumn(column)
+                .setIdColumn(idColumn)
+                .setId(id)
+                .build();
+        return query;
     }
 }

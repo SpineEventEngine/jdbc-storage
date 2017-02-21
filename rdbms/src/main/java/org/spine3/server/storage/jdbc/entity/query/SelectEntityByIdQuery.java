@@ -20,12 +20,19 @@
 
 package org.spine3.server.storage.jdbc.entity.query;
 
+import org.spine3.server.entity.status.EntityStatus;
+import org.spine3.server.storage.EntityStatusField;
 import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.jdbc.query.SelectByIdQuery;
+
+import javax.annotation.Nullable;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import static java.lang.String.format;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
+import static org.spine3.server.storage.jdbc.Sql.Query.ALL_ATTRIBUTES;
 import static org.spine3.server.storage.jdbc.Sql.Query.FROM;
 import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
 import static org.spine3.server.storage.jdbc.Sql.Query.SELECT;
@@ -42,7 +49,7 @@ import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
 public class SelectEntityByIdQuery<I> extends SelectByIdQuery<I, EntityStorageRecord> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String QUERY_TEMPLATE = SELECT + ENTITY_COL + FROM + " %s" + WHERE
+    private static final String QUERY_TEMPLATE = SELECT.toString() + ALL_ATTRIBUTES + FROM + " %s" + WHERE
             + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
 
     public SelectEntityByIdQuery(Builder<I> builder) {
@@ -56,6 +63,28 @@ public class SelectEntityByIdQuery<I> extends SelectByIdQuery<I, EntityStorageRe
                 .setMessageColumnName(ENTITY_COL)
                 .setMessageDescriptor(EntityStorageRecord.getDescriptor());
         return builder;
+    }
+
+    @Nullable
+    @Override
+    protected EntityStorageRecord readMessage(ResultSet resultSet) throws SQLException {
+        final EntityStorageRecord record = super.readMessage(resultSet);
+        if (record == null) {
+            return null;
+        }
+        final boolean archived = resultSet.getBoolean(EntityStatusField.archived.toString());
+        final boolean deleted = resultSet.getBoolean(EntityStatusField.deleted.toString());
+        if (!(archived || deleted)) {
+            return record;
+        }
+        final EntityStatus status = EntityStatus.newBuilder()
+                                                .setArchived(archived)
+                                                .setDeleted(deleted)
+                                                .build();
+        final EntityStorageRecord result = record.toBuilder()
+                                                 .setEntityStatus(status)
+                                                 .build();
+        return result;
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")

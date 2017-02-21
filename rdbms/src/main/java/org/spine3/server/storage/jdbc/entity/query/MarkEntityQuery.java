@@ -22,9 +22,9 @@ package org.spine3.server.storage.jdbc.entity.query;
 
 import org.spine3.server.storage.EntityStatusField;
 import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.entity.status.query.UpdateEntityStatusQuery;
 import org.spine3.server.storage.jdbc.query.StorageQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
+import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -33,7 +33,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static org.spine3.base.Stringifiers.idToString;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
 import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
@@ -46,33 +45,31 @@ import static org.spine3.server.storage.jdbc.entity.status.table.EntityStatusTab
 /**
  * @author Dmytro Dashenkov.
  */
-public class MarkEntityQuery extends StorageQuery {
+public class MarkEntityQuery<I> extends StorageQuery {
 
     private static final String SQL_TEMPLATE = UPDATE + "%s" + SET +
             "%s" + EQUAL + TRUE +
             WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
 
-    private final String id;
+    private final I id;
+    private final IdColumn<I> idColumn;
 
-    protected MarkEntityQuery(Builder builder) {
+    protected MarkEntityQuery(Builder<I> builder) {
         super(builder);
         this.id = builder.id;
+        this.idColumn = builder.idColumn;
     }
 
     @Override
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
         final PreparedStatement statement = super.prepareStatement(connection);
-        try {
-            statement.setString(1, id);
-        } catch (SQLException e) {
-            throw new DatabaseException(e);
-        }
+        idColumn.setId(1, id, statement);
 
         return statement;
     }
 
     public boolean execute() {
-        try (PreparedStatement statement = prepareStatement(getConnection(false))) {
+        try (PreparedStatement statement = prepareStatement(getConnection(true))) {
             final int rowsAffected = statement.executeUpdate();
             checkState(rowsAffected <= 1,
                        "Mark query affected more then one row: " + getQuery());
@@ -82,49 +79,56 @@ public class MarkEntityQuery extends StorageQuery {
         }
     }
 
-    public static UpdateEntityStatusQuery.Builder newBuilder() {
-        final UpdateEntityStatusQuery.Builder builder = new UpdateEntityStatusQuery.Builder();
+    public static <I> MarkEntityQuery.Builder<I> newBuilder() {
+        final Builder<I> builder = new Builder<>();
         return builder;
     }
 
-    public static class Builder extends StorageQuery.Builder<MarkEntityQuery.Builder, MarkEntityQuery> {
+    public static class Builder<I> extends StorageQuery.Builder<Builder<I>, MarkEntityQuery> {
 
-        private String id;
+        private I id;
         private String column;
         private String tableName;
+        private IdColumn<I> idColumn;
 
-        public Builder setId(Object id) {
+        public Builder<I> setId(I id) {
             checkNotNull(id);
-            this.id = idToString(id);
+            this.id = id;
             return getThis();
         }
 
-        public Builder setColumn(EntityStatusField column) {
+        public Builder<I> setColumn(EntityStatusField column) {
             checkNotNull(column);
             this.column = column.toString();
             return getThis();
         }
 
-        public Builder setTableName(String tableName) {
+        public Builder<I> setTableName(String tableName) {
             checkNotNull(tableName);
             checkArgument(!tableName.isEmpty());
             this.tableName = tableName;
             return getThis();
         }
 
+        public Builder<I> setIdColumn(IdColumn<I> idColumn) {
+            checkNotNull(idColumn);
+            this.idColumn = idColumn;
+            return getThis();
+        }
+
         @Override
-        public MarkEntityQuery build() {
+        public MarkEntityQuery<I> build() {
             checkState(id != null, "Record ID is not set.");
             checkState(!isNullOrEmpty(column), "Column to mark is not set.");
             checkState(!isNullOrEmpty(tableName), "Table is not set.");
 
             final String sql = String.format(SQL_TEMPLATE, tableName, column);
             setQuery(sql);
-            return new MarkEntityQuery(this);
+            return new MarkEntityQuery<>(this);
         }
 
         @Override
-        protected Builder getThis() {
+        protected Builder<I> getThis() {
             return this;
         }
     }
