@@ -45,9 +45,7 @@ import static org.mockito.Mockito.mock;
 @SuppressWarnings({"InstanceMethodNamingConvention", "MagicNumber", "DuplicateStringLiteralInspection"})
 public class JdbcStorageFactoryShould {
 
-
-
-    private JdbcStorageFactory factory;
+    private JdbcStorageFactory<String> factory;
 
     @Before
     public void setUpTest() {
@@ -58,7 +56,7 @@ public class JdbcStorageFactoryShould {
                 .setPassword("pwd")
                 .setMaxPoolSize(12)
                 .build();
-        factory = JdbcStorageFactory.newBuilder()
+        factory = JdbcStorageFactory.<String>newBuilder()
                 .setDataSource(config)
                 .setMultitenant(false)
                 .setEntityClass(TestAggregate.class)
@@ -68,7 +66,7 @@ public class JdbcStorageFactoryShould {
 
     @Test
     public void allow_to_use_custom_data_source(){
-        final JdbcStorageFactory factory = JdbcStorageFactory.newBuilder()
+        final JdbcStorageFactory factory = JdbcStorageFactory.<String>newBuilder()
                 .setDataSource(mock(DataSource.class))
                 .setEntityClass(TestProjection.class)
                 .setEntityStateDescriptor(Project.getDescriptor())

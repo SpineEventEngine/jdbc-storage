@@ -35,10 +35,6 @@ final class EntityTable {
     /** Entity ID column name. */
     static final String ID_COL = "id";
 
-    static final String ARCHIVED_COL = "archived";
-
-    static final String DELETED_COL = "deleted";
-
     private EntityTable() {
     }
 }

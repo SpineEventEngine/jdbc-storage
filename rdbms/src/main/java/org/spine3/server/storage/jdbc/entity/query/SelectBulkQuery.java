@@ -38,6 +38,8 @@ import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.spine3.server.storage.EntityStatusField.archived;
+import static org.spine3.server.storage.EntityStatusField.deleted;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.NOT_EQUAL;
@@ -49,8 +51,6 @@ import static org.spine3.server.storage.jdbc.Sql.Query.IN;
 import static org.spine3.server.storage.jdbc.Sql.Query.SELECT;
 import static org.spine3.server.storage.jdbc.Sql.Query.TRUE;
 import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
-import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ARCHIVED_COL;
-import static org.spine3.server.storage.jdbc.entity.query.EntityTable.DELETED_COL;
 
 /**
  * Implementation of {@link StorageQuery} for bulk selection.
@@ -72,8 +72,8 @@ public class SelectBulkQuery extends StorageQuery {
 
     private static final String COMMON_TEMPLATE = SELECT.toString() + ALL_ATTRIBUTES +
             FROM + "%s" +
-            WHERE + ARCHIVED_COL + NOT_EQUAL + TRUE +
-            AND + DELETED_COL + NOT_EQUAL + TRUE;
+            WHERE + archived + NOT_EQUAL + TRUE +
+            AND + deleted + NOT_EQUAL + TRUE;
     private static final String ALL_TEMPLATE = COMMON_TEMPLATE + ';';
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String IDS_TEMPLATE = COMMON_TEMPLATE + AND + EntityTable.ID_COL + IN

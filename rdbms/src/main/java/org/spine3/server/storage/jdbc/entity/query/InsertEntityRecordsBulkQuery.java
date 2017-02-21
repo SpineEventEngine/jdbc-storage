@@ -40,6 +40,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.lang.String.format;
+import static org.spine3.server.storage.EntityStatusField.archived;
+import static org.spine3.server.storage.EntityStatusField.deleted;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.COMMA;
@@ -47,8 +49,6 @@ import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
 import static org.spine3.server.storage.jdbc.Sql.Query.INSERT_INTO;
 import static org.spine3.server.storage.jdbc.Sql.Query.VALUES;
 import static org.spine3.server.storage.jdbc.Sql.nPlaceholders;
-import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ARCHIVED_COL;
-import static org.spine3.server.storage.jdbc.entity.query.EntityTable.DELETED_COL;
 import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ENTITY_COL;
 import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
 
@@ -59,7 +59,7 @@ public class InsertEntityRecordsBulkQuery<I> extends WriteQuery {
 
     private static final int COLUMNS_COUNT = 4;
     private static final String SQL_TEMPLATE = INSERT_INTO + "%s" +
-            BRACKET_OPEN + ID_COL + COMMA + ENTITY_COL + COMMA + ARCHIVED_COL + COMMA + DELETED_COL + BRACKET_CLOSE +
+            BRACKET_OPEN + ID_COL + COMMA + ENTITY_COL + COMMA + archived + COMMA + deleted + BRACKET_CLOSE +
             VALUES + "%s";
     private static final String SQL_VALUES_TEMPLATE = nPlaceholders(COLUMNS_COUNT);
 

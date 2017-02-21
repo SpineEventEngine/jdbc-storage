@@ -200,7 +200,7 @@ public class JdbcStandStorage extends StandStorage {
         /**
          * Sets optional field {@code isMultitenant}. {@code false} is the default value.
          */
-        public Builder setMultitenant(boolean multitenant) {
+        public Builder<I> setMultitenant(boolean multitenant) {
             isMultitenant = multitenant;
             return this;
         }
@@ -208,7 +208,7 @@ public class JdbcStandStorage extends StandStorage {
         /**
          * Sets required field {@code dataSource}.
          */
-        public Builder setDataSource(DataSourceWrapper dataSource) {
+        public Builder<I> setDataSource(DataSourceWrapper dataSource) {
             this.dataSource = dataSource;
             return this;
         }
@@ -218,7 +218,7 @@ public class JdbcStandStorage extends StandStorage {
          *
          * @param stateDescriptor {@link com.google.protobuf.Descriptors.Descriptor} of the {@link org.spine3.server.entity.Entity} state.
          */
-        public Builder setStateDescriptor(Descriptors.Descriptor stateDescriptor) {
+        public Builder<I> setStateDescriptor(Descriptors.Descriptor stateDescriptor) {
             this.stateDescriptor = stateDescriptor;
             return this;
         }
@@ -226,7 +226,7 @@ public class JdbcStandStorage extends StandStorage {
         /**
          * Sets required field {@code queryFactory}.
          */
-        public Builder setRecordStorageQueryFactory(RecordStorageQueryFactory<I> queryFactory) {
+        public Builder<I> setRecordStorageQueryFactory(RecordStorageQueryFactory<I> queryFactory) {
             this.recordStorageQueryFactory = queryFactory;
             return this;
         }

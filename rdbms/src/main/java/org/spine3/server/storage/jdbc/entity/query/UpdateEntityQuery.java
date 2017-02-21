@@ -24,6 +24,8 @@ import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.jdbc.query.WriteRecordQuery;
 
 import static java.lang.String.format;
+import static org.spine3.server.storage.EntityStatusField.archived;
+import static org.spine3.server.storage.EntityStatusField.deleted;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.COMMA;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
@@ -31,8 +33,6 @@ import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
 import static org.spine3.server.storage.jdbc.Sql.Query.SET;
 import static org.spine3.server.storage.jdbc.Sql.Query.UPDATE;
 import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
-import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ARCHIVED_COL;
-import static org.spine3.server.storage.jdbc.entity.query.EntityTable.DELETED_COL;
 import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ENTITY_COL;
 import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
 
@@ -48,8 +48,8 @@ public class UpdateEntityQuery<I> extends WriteEntityQuery<I> {
     private static final String QUERY_TEMPLATE =
             UPDATE + "%s" +
                     SET + ENTITY_COL + EQUAL + PLACEHOLDER + COMMA +
-                    ARCHIVED_COL + EQUAL + PLACEHOLDER + COMMA +
-                    DELETED_COL + EQUAL + PLACEHOLDER +
+                    archived + EQUAL + PLACEHOLDER + COMMA +
+                    deleted + EQUAL + PLACEHOLDER +
                     WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
 
     private UpdateEntityQuery(Builder<I> builder) {
