@@ -31,6 +31,8 @@ import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
 import static org.spine3.server.storage.jdbc.Sql.Query.INSERT_INTO;
 import static org.spine3.server.storage.jdbc.Sql.Query.VALUES;
 import static org.spine3.server.storage.jdbc.Sql.nPlaceholders;
+import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ARCHIVED_COL;
+import static org.spine3.server.storage.jdbc.entity.query.EntityTable.DELETED_COL;
 import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ENTITY_COL;
 import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
 
@@ -40,13 +42,15 @@ import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-public class InsertEntityQuery<I> extends WriteRecordQuery<I, EntityStorageRecord> {
+public class InsertEntityQuery<I> extends WriteEntityQuery<I> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
             INSERT_INTO + " %s " +
-                    BRACKET_OPEN + ID_COL + COMMA + ENTITY_COL + BRACKET_CLOSE +
-                    VALUES + nPlaceholders(2) + SEMICOLON;
+                    BRACKET_OPEN +
+                    ENTITY_COL + COMMA + ARCHIVED_COL + COMMA + DELETED_COL + COMMA + ID_COL +
+                    BRACKET_CLOSE +
+                    VALUES + nPlaceholders(4) + SEMICOLON;
 
     private InsertEntityQuery(Builder<I> builder) {
         super(builder);
@@ -54,8 +58,8 @@ public class InsertEntityQuery<I> extends WriteRecordQuery<I, EntityStorageRecor
 
     public static <I> Builder<I> newBuilder(String tableName) {
         final Builder<I> builder = new Builder<>();
-        builder.setIdIndexInQuery(1)
-                .setRecordIndexInQuery(2)
+        builder.setIdIndexInQuery(ID_COL_POSITION)
+                .setRecordIndexInQuery(RECORD_COL_POSITION)
                 .setQuery(format(QUERY_TEMPLATE, tableName));
         return builder;
     }

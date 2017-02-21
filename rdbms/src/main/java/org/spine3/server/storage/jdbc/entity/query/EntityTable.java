@@ -24,6 +24,7 @@ package org.spine3.server.storage.jdbc.entity.query;
  * A utility class representing constants which are necessary for working with entity table.
  *
  * @author Andrey Lavrov
+ * @author Dmytro Dashenkov
  */
 @SuppressWarnings("UtilityClass")
 final class EntityTable {
@@ -33,6 +34,10 @@ final class EntityTable {
 
     /** Entity ID column name. */
     static final String ID_COL = "id";
+
+    static final String ARCHIVED_COL = "archived";
+
+    static final String DELETED_COL = "deleted";
 
     private EntityTable() {
     }

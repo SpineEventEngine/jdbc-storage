@@ -122,6 +122,8 @@ public class Sql {
         IN,
         EXISTS,
         BETWEEN,
+        TRUE,
+        FALSE,
 
         PLACEHOLDER("?"),
 

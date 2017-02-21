@@ -21,6 +21,7 @@
 package org.spine3.server.storage.jdbc.entity.query;
 
 import com.google.common.base.Joiner;
+import org.spine3.server.entity.status.EntityStatus;
 import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.WriteQuery;
@@ -46,6 +47,8 @@ import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
 import static org.spine3.server.storage.jdbc.Sql.Query.INSERT_INTO;
 import static org.spine3.server.storage.jdbc.Sql.Query.VALUES;
 import static org.spine3.server.storage.jdbc.Sql.nPlaceholders;
+import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ARCHIVED_COL;
+import static org.spine3.server.storage.jdbc.entity.query.EntityTable.DELETED_COL;
 import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ENTITY_COL;
 import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
 
@@ -54,9 +57,9 @@ import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
  */
 public class InsertEntityRecordsBulkQuery<I> extends WriteQuery {
 
-    private static final int COLUMNS_COUNT = 2;
+    private static final int COLUMNS_COUNT = 4;
     private static final String SQL_TEMPLATE = INSERT_INTO + "%s" +
-            BRACKET_OPEN + ID_COL + COMMA + ENTITY_COL + BRACKET_CLOSE +
+            BRACKET_OPEN + ID_COL + COMMA + ENTITY_COL + COMMA + ARCHIVED_COL + COMMA + DELETED_COL + BRACKET_CLOSE +
             VALUES + "%s";
     private static final String SQL_VALUES_TEMPLATE = nPlaceholders(COLUMNS_COUNT);
 
@@ -87,10 +90,19 @@ public class InsertEntityRecordsBulkQuery<I> extends WriteQuery {
     }
 
     private void addParam(PreparedStatement statement, int firstParamIndex, I id, EntityStorageRecord record) {
+        int paramIndex = firstParamIndex;
         try {
-            idColumn.setId(firstParamIndex, id, statement);
+            idColumn.setId(paramIndex, id, statement);
+            paramIndex++;
             final byte[] bytes = Serializer.serialize(record);
-            statement.setBytes(firstParamIndex + 1, bytes);
+            statement.setBytes(paramIndex, bytes);
+            paramIndex++;
+            final EntityStatus status = record.getEntityStatus();
+            final boolean archived = status.getArchived();
+            final boolean deleted = status.getDeleted();
+            statement.setBoolean(paramIndex, archived);
+            paramIndex++;
+            statement.setBoolean(paramIndex, deleted);
         } catch (SQLException e) {
             logWriteError(id, e);
             throw new DatabaseException(e);
