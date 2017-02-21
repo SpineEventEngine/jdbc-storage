@@ -20,6 +20,8 @@
 
 package org.spine3.server.storage.jdbc.aggregate.query;
 
+import org.spine3.server.storage.EntityField;
+
 /**
  * A utility class representing constants which are necessary for working with aggregate tables.
  *
@@ -42,11 +44,11 @@ final class Table {
 
         /** Aggregate event seconds column name. */
         @SuppressWarnings("DuplicateStringLiteralInspection")
-        static final String SECONDS_COL = "seconds";
+        static final String SECONDS_COL = EntityField.timestamp.toString();
 
         /** Aggregate event nanoseconds column name. */
         @SuppressWarnings("DuplicateStringLiteralInspection")
-        static final String NANOS_COL = "nanoseconds";
+        static final String NANOS_COL = EntityField.timestamp_nanos.toString();
 
         private AggregateRecord() {
         }

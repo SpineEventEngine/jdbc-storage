@@ -21,6 +21,7 @@
 package org.spine3.server.storage.jdbc.entity.status.query;
 
 import org.spine3.server.entity.status.EntityStatus;
+import org.spine3.server.storage.EntityStatusField;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.StorageQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
@@ -31,6 +32,8 @@ import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.spine3.base.Stringifiers.idToString;
+import static org.spine3.server.storage.EntityStatusField.archived;
+import static org.spine3.server.storage.EntityStatusField.deleted;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.COMMA;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
@@ -38,8 +41,6 @@ import static org.spine3.server.storage.jdbc.Sql.Query.FROM;
 import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
 import static org.spine3.server.storage.jdbc.Sql.Query.SELECT;
 import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
-import static org.spine3.server.storage.jdbc.entity.status.table.EntityStatusTable.ARCHIVED_COL;
-import static org.spine3.server.storage.jdbc.entity.status.table.EntityStatusTable.DELETED_COL;
 import static org.spine3.server.storage.jdbc.entity.status.table.EntityStatusTable.ID_COL;
 import static org.spine3.server.storage.jdbc.entity.status.table.EntityStatusTable.TABLE_NAME;
 
@@ -49,7 +50,7 @@ import static org.spine3.server.storage.jdbc.entity.status.table.EntityStatusTab
 public class SelectEntityStatusQuery extends StorageQuery {
 
     private static final String SQL =
-            SELECT.toString() + ARCHIVED_COL + COMMA + DELETED_COL +
+            SELECT.toString() + archived + COMMA + deleted +
                     FROM + TABLE_NAME +
                     WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
 
@@ -71,8 +72,8 @@ public class SelectEntityStatusQuery extends StorageQuery {
             if (empty) {
                 return EntityStatus.getDefaultInstance();
             }
-            archived = resultSet.getBoolean(ARCHIVED_COL);
-            deleted = resultSet.getBoolean(DELETED_COL);
+            archived = resultSet.getBoolean(EntityStatusField.archived.toString());
+            deleted = resultSet.getBoolean(EntityStatusField.deleted.toString());
             statement.close();
             resultSet.close();
         } catch (SQLException e) {

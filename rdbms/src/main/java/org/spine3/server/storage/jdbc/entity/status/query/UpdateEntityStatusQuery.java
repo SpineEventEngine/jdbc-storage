@@ -31,6 +31,8 @@ import java.sql.SQLException;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static org.spine3.base.Stringifiers.idToString;
+import static org.spine3.server.storage.EntityStatusField.archived;
+import static org.spine3.server.storage.EntityStatusField.deleted;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.COMMA;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
@@ -38,8 +40,6 @@ import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
 import static org.spine3.server.storage.jdbc.Sql.Query.SET;
 import static org.spine3.server.storage.jdbc.Sql.Query.UPDATE;
 import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
-import static org.spine3.server.storage.jdbc.entity.status.table.EntityStatusTable.ARCHIVED_COL;
-import static org.spine3.server.storage.jdbc.entity.status.table.EntityStatusTable.DELETED_COL;
 import static org.spine3.server.storage.jdbc.entity.status.table.EntityStatusTable.ID_COL;
 import static org.spine3.server.storage.jdbc.entity.status.table.EntityStatusTable.TABLE_NAME;
 
@@ -49,8 +49,8 @@ import static org.spine3.server.storage.jdbc.entity.status.table.EntityStatusTab
 public class UpdateEntityStatusQuery extends WriteQuery {
 
     private static final String SQL = UPDATE + TABLE_NAME + SET +
-            ARCHIVED_COL + EQUAL + PLACEHOLDER + COMMA +
-            DELETED_COL + EQUAL + PLACEHOLDER +
+            archived + EQUAL + PLACEHOLDER + COMMA +
+            deleted + EQUAL + PLACEHOLDER +
             WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
 
     private final String id;

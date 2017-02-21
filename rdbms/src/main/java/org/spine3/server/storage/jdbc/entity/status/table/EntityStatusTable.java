@@ -35,10 +35,8 @@ public class EntityStatusTable {
     public static final String ID_COL = "id";
     public static final int ID_COL_INDEX = 1;
 
-    public static final String ARCHIVED_COL = "archived";
     public static final int ARCHIVED_COL_INDEX = 2;
 
-    public static final String DELETED_COL = "deleted";
     public static final int DELETED_COL_INDEX = 3;
 
     private EntityStatusTable() {

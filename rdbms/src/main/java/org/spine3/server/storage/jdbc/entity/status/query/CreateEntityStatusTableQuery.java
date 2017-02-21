@@ -23,6 +23,8 @@ package org.spine3.server.storage.jdbc.entity.status.query;
 import org.spine3.server.storage.jdbc.query.CreateTableQuery;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
+import static org.spine3.server.storage.EntityStatusField.archived;
+import static org.spine3.server.storage.EntityStatusField.deleted;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.COMMA;
@@ -30,8 +32,6 @@ import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
 import static org.spine3.server.storage.jdbc.Sql.Query.CREATE_IF_MISSING;
 import static org.spine3.server.storage.jdbc.Sql.Type.BOOLEAN;
 import static org.spine3.server.storage.jdbc.Sql.Type.VARCHAR_512;
-import static org.spine3.server.storage.jdbc.entity.status.table.EntityStatusTable.ARCHIVED_COL;
-import static org.spine3.server.storage.jdbc.entity.status.table.EntityStatusTable.DELETED_COL;
 import static org.spine3.server.storage.jdbc.entity.status.table.EntityStatusTable.ID_COL;
 
 /**
@@ -41,8 +41,8 @@ public class CreateEntityStatusTableQuery extends CreateTableQuery<String> {
 
     private static final String SQL_TEMPLATE = CREATE_IF_MISSING + "%s" + BRACKET_OPEN +
             ID_COL + VARCHAR_512 + COMMA +
-            ARCHIVED_COL + BOOLEAN + COMMA +
-            DELETED_COL + BOOLEAN + BRACKET_CLOSE + SEMICOLON;
+            archived + BOOLEAN + COMMA +
+            deleted + BOOLEAN + BRACKET_CLOSE + SEMICOLON;
 
 
     protected CreateEntityStatusTableQuery(Builder builder) {
