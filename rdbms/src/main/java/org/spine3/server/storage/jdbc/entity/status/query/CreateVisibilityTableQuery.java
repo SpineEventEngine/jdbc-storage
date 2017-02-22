@@ -23,8 +23,8 @@ package org.spine3.server.storage.jdbc.entity.status.query;
 import org.spine3.server.storage.jdbc.query.CreateTableQuery;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
-import static org.spine3.server.storage.EntityStatusField.archived;
-import static org.spine3.server.storage.EntityStatusField.deleted;
+import static org.spine3.server.storage.VisibilityField.archived;
+import static org.spine3.server.storage.VisibilityField.deleted;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.COMMA;
@@ -32,19 +32,19 @@ import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
 import static org.spine3.server.storage.jdbc.Sql.Query.CREATE_IF_MISSING;
 import static org.spine3.server.storage.jdbc.Sql.Type.BOOLEAN;
 import static org.spine3.server.storage.jdbc.Sql.Type.VARCHAR_512;
-import static org.spine3.server.storage.jdbc.entity.status.table.EntityStatusTable.ID_COL;
+import static org.spine3.server.storage.jdbc.entity.status.table.VisibilityTable.ID_COL;
 
 /**
  * @author Dmytro Dashenkov.
  */
-public class CreateEntityStatusTableQuery extends CreateTableQuery<String> {
+public class CreateVisibilityTableQuery extends CreateTableQuery<String> {
 
     private static final String SQL_TEMPLATE = CREATE_IF_MISSING + "%s" + BRACKET_OPEN +
                                                ID_COL + VARCHAR_512 + COMMA +
                                                archived + BOOLEAN + COMMA +
                                                deleted + BOOLEAN + BRACKET_CLOSE + SEMICOLON;
 
-    protected CreateEntityStatusTableQuery(Builder builder) {
+    protected CreateVisibilityTableQuery(Builder builder) {
         super(builder);
     }
 
@@ -54,7 +54,7 @@ public class CreateEntityStatusTableQuery extends CreateTableQuery<String> {
         return builder;
     }
 
-    public static class Builder extends CreateTableQuery.Builder<Builder, CreateEntityStatusTableQuery, String> {
+    public static class Builder extends CreateTableQuery.Builder<Builder, CreateVisibilityTableQuery, String> {
 
         @SuppressWarnings("MethodDoesntCallSuperMethod")
 // We don't want to override the {@code idColumn} field.
@@ -66,8 +66,8 @@ public class CreateEntityStatusTableQuery extends CreateTableQuery<String> {
         }
 
         @Override
-        public CreateEntityStatusTableQuery build() {
-            return new CreateEntityStatusTableQuery(this);
+        public CreateVisibilityTableQuery build() {
+            return new CreateVisibilityTableQuery(this);
         }
 
         @Override

@@ -21,8 +21,8 @@
 package org.spine3.server.storage.jdbc.entity.status;
 
 import com.google.common.base.Optional;
-import org.spine3.server.entity.status.EntityStatus;
-import org.spine3.server.storage.jdbc.entity.status.query.SelectEntityStatusQuery;
+import org.spine3.server.entity.Visibility;
+import org.spine3.server.storage.jdbc.entity.status.query.SelectVisibilityQuery;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.spine3.validate.Validate.isDefault;
@@ -30,22 +30,22 @@ import static org.spine3.validate.Validate.isDefault;
 /**
  * @author Dmytro Dashenkov.
  */
-public class EntityStatusHandler<I> {
+public class VisibilityHandler<I> {
 
-    private final EntityStatusHandlingStorageQueryFactory<I> queryFactory;
+    private final VisibilityHandlingStorageQueryFactory<I> queryFactory;
 
-    public EntityStatusHandler(EntityStatusHandlingStorageQueryFactory<I> queryFactory) {
+    public VisibilityHandler(VisibilityHandlingStorageQueryFactory<I> queryFactory) {
         this.queryFactory = checkNotNull(queryFactory);
     }
 
     public void initialize() {
-        queryFactory.newCreateEntityStatusTableQuery()
+        queryFactory.newCreateVisibilityTableQuery()
                     .execute();
     }
 
-    public Optional<EntityStatus> readStatus(I id) {
-        final SelectEntityStatusQuery query = queryFactory.newSelectEntityStatusQuery(id);
-        final EntityStatus status = query.execute();
+    public Optional<Visibility> readStatus(I id) {
+        final SelectVisibilityQuery query = queryFactory.newSelectVisibilityQuery(id);
+        final Visibility status = query.execute();
         final boolean absent = isDefault(status);
         if (absent) {
             return Optional.absent();
@@ -53,13 +53,13 @@ public class EntityStatusHandler<I> {
         return Optional.of(status);
     }
 
-    public void writeStatus(I id, EntityStatus status) {
-        final Optional<EntityStatus> currentStatus = readStatus(id);
+    public void writeStatus(I id, Visibility status) {
+        final Optional<Visibility> currentStatus = readStatus(id);
         final boolean exists = currentStatus.isPresent();
         writeStatus(id, status, exists);
     }
 
-    private void writeStatus(I id, EntityStatus status, boolean updateExisting) {
+    private void writeStatus(I id, Visibility status, boolean updateExisting) {
         if (updateExisting) {
             updateStatus(id, status);
         } else {
@@ -67,25 +67,23 @@ public class EntityStatusHandler<I> {
         }
     }
 
-    private void updateStatus(I id, EntityStatus status) {
-        queryFactory.newUpdateEntityStatusQuery(id, status)
+    private void updateStatus(I id, Visibility status) {
+        queryFactory.newUpdateVisibilityQuery(id, status)
                     .execute();
     }
 
-    private void insertStatus(I id, EntityStatus status) {
-        queryFactory.newInsertEntityStatusQuery(id, status)
+    private void insertStatus(I id, Visibility status) {
+        queryFactory.newInsertVisibilityQuery(id, status)
                     .execute();
     }
 
-    public boolean markArchived(I id) {
-        final boolean result = queryFactory.newMarkArchivedQuery(id)
-                                           .execute();
-        return result;
+    public void markArchived(I id) {
+        queryFactory.newMarkArchivedQuery(id)
+                    .execute();
     }
 
-    public boolean markDeleted(I id) {
-        final boolean result = queryFactory.newMarkDeletedQuery(id)
-                                           .execute();
-        return result;
+    public void markDeleted(I id) {
+        queryFactory.newMarkDeletedQuery(id)
+                    .execute();
     }
 }

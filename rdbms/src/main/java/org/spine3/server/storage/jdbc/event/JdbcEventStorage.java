@@ -36,11 +36,11 @@ import org.spine3.base.Event;
 import org.spine3.base.EventContext;
 import org.spine3.base.EventId;
 import org.spine3.base.FieldFilter;
+import org.spine3.base.Stringifiers;
 import org.spine3.protobuf.AnyPacker;
 import org.spine3.server.event.EventFilter;
 import org.spine3.server.event.EventStorage;
 import org.spine3.server.event.EventStreamQuery;
-import org.spine3.server.event.storage.EventStorageRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.JdbcStorageFactory;
 import org.spine3.server.storage.jdbc.event.query.EventStorageQueryFactory;
@@ -111,7 +111,7 @@ public class JdbcEventStorage extends EventStorage {
      */
     @Override
     public Iterator<Event> iterator(EventStreamQuery query) throws DatabaseException {
-        final Iterator<EventStorageRecord> iterator = queryFactory.newFilterAndSortQuery(query)
+        final Iterator<Event> iterator = queryFactory.newFilterAndSortQuery(query)
                                                                   .execute();
 
         iterators.add((DbIterator) iterator);
@@ -124,10 +124,9 @@ public class JdbcEventStorage extends EventStorage {
          */
 
         final List<EventFilter> filterList = query.getFilterList();
-        final UnmodifiableIterator<EventStorageRecord> filtered =
+        final UnmodifiableIterator<Event> filtered =
                 Iterators.filter(iterator, new EventRecordPredicate(filterList));
-        final Iterator<Event> result = toEventIterator(filtered);
-        return result;
+        return filtered;
     }
 
     /**
@@ -136,12 +135,13 @@ public class JdbcEventStorage extends EventStorage {
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     @Override
-    protected void writeRecord(EventStorageRecord record) throws DatabaseException {
-        if (containsRecord(record.getEventId())) {
-            queryFactory.newUpdateEventQuery(record)
+    public void write(EventId id, Event event) throws DatabaseException {
+        final String eventId = Stringifiers.idToString(id);
+        if (containsRecord(eventId)) {
+            queryFactory.newUpdateEventQuery(event)
                         .execute();
         } else {
-            queryFactory.newInsertEventQuery(record)
+            queryFactory.newInsertEventQuery(event)
                         .execute();
         }
     }
@@ -151,17 +151,16 @@ public class JdbcEventStorage extends EventStorage {
      *
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
-    @Nullable
     @Override
-    protected Optional<EventStorageRecord> readRecord(EventId eventId) throws DatabaseException {
+    public Optional<Event> read(EventId eventId) throws DatabaseException {
         final String id = eventId.getUuid();
-        final EventStorageRecord record = queryFactory.newSelectEventByIdQuery(id)
+        final Event record = queryFactory.newSelectEventByIdQuery(id)
                                                       .execute();
         return Optional.fromNullable(record);
     }
 
     private boolean containsRecord(String id) {
-        final EventStorageRecord record = queryFactory.newSelectEventByIdQuery(id)
+        final Event record = queryFactory.newSelectEventByIdQuery(id)
                                                       .execute();
         final boolean contains = record != null;
         return contains;
@@ -180,10 +179,10 @@ public class JdbcEventStorage extends EventStorage {
     }
 
     /**
-     * Predicate matching an {@link EventStorageRecord} to a number of {@link EventFilter} instances.
+     * Predicate matching an {@link Event} to a number of {@link EventFilter} instances.
      */
     @VisibleForTesting
-    static class EventRecordPredicate implements Predicate<EventStorageRecord> {
+    static class EventRecordPredicate implements Predicate<Event> {
 
         private final Collection<EventFilter> eventFilters;
 
@@ -193,7 +192,7 @@ public class JdbcEventStorage extends EventStorage {
         }
 
         @Override
-        public boolean apply(@Nullable EventStorageRecord eventRecord) {
+        public boolean apply(@Nullable Event eventRecord) {
             if (eventRecord == null) {
                 return false;
             }
@@ -220,9 +219,9 @@ public class JdbcEventStorage extends EventStorage {
     }
 
     /**
-     * Predicate matching an {@link Event} stored as {@link EventStorageRecord} to a single {@link EventFilter}.
+     * Predicate matching an {@link Event} stored as {@link Event} to a single {@link EventFilter}.
      */
-    private static class EventFilterChecker implements Predicate<EventStorageRecord> {
+    private static class EventFilterChecker implements Predicate<Event> {
 
         private final Collection<FieldFilter> eventFieldFilters;
         private final Collection<FieldFilter> contextFieldFilters;
@@ -251,7 +250,7 @@ public class JdbcEventStorage extends EventStorage {
         // Defined as nullable, parameter `event` is actually non null.
         @SuppressWarnings({"MethodWithMoreThanThreeNegations", "MethodWithMultipleLoops"})
         @Override
-        public boolean apply(@Nullable EventStorageRecord event) {
+        public boolean apply(@Nullable Event event) {
             if (event == null) {
                 return false;
             }

@@ -20,8 +20,8 @@
 
 package org.spine3.server.storage.jdbc.entity.query;
 
-import org.spine3.server.entity.status.EntityStatus;
-import org.spine3.server.storage.EntityStorageRecord;
+import org.spine3.server.entity.EntityRecord;
+import org.spine3.server.entity.Visibility;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.WriteRecordQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
@@ -32,7 +32,7 @@ import java.sql.SQLException;
 /**
  * @author Dmytro Dashenkov.
  */
-public class WriteEntityQuery<I> extends WriteRecordQuery<I, EntityStorageRecord> {
+public class WriteEntityQuery<I> extends WriteRecordQuery<I, EntityRecord> {
 
     protected static final int RECORD_COL_POSITION = 1;
 
@@ -43,15 +43,15 @@ public class WriteEntityQuery<I> extends WriteRecordQuery<I, EntityStorageRecord
     protected static final int ID_COL_POSITION = 4;
 
     protected WriteEntityQuery(
-            Builder<? extends Builder, ? extends WriteRecordQuery, I, EntityStorageRecord> builder) {
+            Builder<? extends Builder, ? extends WriteRecordQuery, I, EntityRecord> builder) {
         super(builder);
     }
 
     @Override
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
         final PreparedStatement statement = super.prepareStatement(connection);
-        final EntityStorageRecord record = getRecord();
-        final EntityStatus status = record.getEntityStatus();
+        final EntityRecord record = getRecord();
+        final Visibility status = record.getVisibility();
         final boolean archived = status.getArchived();
         final boolean deleted = status.getDeleted();
         try {

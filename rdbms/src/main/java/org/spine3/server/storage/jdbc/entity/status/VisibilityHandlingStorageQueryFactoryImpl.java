@@ -22,14 +22,14 @@ package org.spine3.server.storage.jdbc.entity.status;
 
 import org.slf4j.Logger;
 import org.spine3.Internal;
-import org.spine3.server.entity.status.EntityStatus;
-import org.spine3.server.storage.EntityStatusField;
+import org.spine3.server.entity.Visibility;
+import org.spine3.server.storage.VisibilityField;
 import org.spine3.server.storage.jdbc.entity.query.MarkEntityQuery;
-import org.spine3.server.storage.jdbc.entity.status.query.CreateEntityStatusTableQuery;
-import org.spine3.server.storage.jdbc.entity.status.query.InsertEntityStatusQuery;
-import org.spine3.server.storage.jdbc.entity.status.query.SelectEntityStatusQuery;
-import org.spine3.server.storage.jdbc.entity.status.query.UpdateEntityStatusQuery;
-import org.spine3.server.storage.jdbc.entity.status.table.EntityStatusTable;
+import org.spine3.server.storage.jdbc.entity.status.query.CreateVisibilityTableQuery;
+import org.spine3.server.storage.jdbc.entity.status.query.InsertVisibilityQuery;
+import org.spine3.server.storage.jdbc.entity.status.query.SelectVisibilityQuery;
+import org.spine3.server.storage.jdbc.entity.status.query.UpdateVisibilityQuery;
+import org.spine3.server.storage.jdbc.entity.status.table.VisibilityTable;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
@@ -39,16 +39,16 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author Dmytro Dashenkov.
  */
 @Internal
-public class EntityStatusHandlingStorageQueryFactoryImpl<I> implements EntityStatusHandlingStorageQueryFactory<I> {
+public class VisibilityHandlingStorageQueryFactoryImpl<I> implements VisibilityHandlingStorageQueryFactory<I> {
 
     private final DataSourceWrapper dataSource;
     private final String tableName;
     private final IdColumn<I> idColumn;
     private Logger logger;
 
-    EntityStatusHandlingStorageQueryFactoryImpl(DataSourceWrapper dataSource,
-                                                String tableName,
-                                                IdColumn<I> idColumn) {
+    VisibilityHandlingStorageQueryFactoryImpl(DataSourceWrapper dataSource,
+                                              String tableName,
+                                              IdColumn<I> idColumn) {
         this.dataSource = checkNotNull(dataSource);
         this.tableName = checkNotNull(tableName);
         this.idColumn = checkNotNull(idColumn);
@@ -60,30 +60,30 @@ public class EntityStatusHandlingStorageQueryFactoryImpl<I> implements EntitySta
     }
 
     @Override
-    public CreateEntityStatusTableQuery newCreateEntityStatusTableQuery() {
-        final CreateEntityStatusTableQuery.Builder builder =
-                CreateEntityStatusTableQuery.newBuilder()
+    public CreateVisibilityTableQuery newCreateVisibilityTableQuery() {
+        final CreateVisibilityTableQuery.Builder builder =
+                CreateVisibilityTableQuery.newBuilder()
                                             .setDataSource(dataSource)
                                             .setLogger(logger)
-                                            .setTableName(EntityStatusTable.TABLE_NAME);
+                                            .setTableName(VisibilityTable.TABLE_NAME);
         return builder.build();
     }
 
     @Override
-    public InsertEntityStatusQuery newInsertEntityStatusQuery(I id, EntityStatus entityStatus) {
-        final InsertEntityStatusQuery.Builder builder =
-                InsertEntityStatusQuery.newBuilder()
+    public InsertVisibilityQuery newInsertVisibilityQuery(I id, Visibility entityStatus) {
+        final InsertVisibilityQuery.Builder builder =
+                InsertVisibilityQuery.newBuilder()
                                        .setDataSource(dataSource)
                                        .setLogger(logger)
                                        .setId(id)
-                                       .setEntityStatus(entityStatus);
+                                       .setVisibility(entityStatus);
         return builder.build();
     }
 
     @Override
-    public SelectEntityStatusQuery newSelectEntityStatusQuery(I id) {
-        final SelectEntityStatusQuery.Builder builder =
-                SelectEntityStatusQuery.newBuilder()
+    public SelectVisibilityQuery newSelectVisibilityQuery(I id) {
+        final SelectVisibilityQuery.Builder builder =
+                SelectVisibilityQuery.newBuilder()
                                        .setDataSource(dataSource)
                                        .setLogger(logger)
                                        .setId(id);
@@ -91,26 +91,26 @@ public class EntityStatusHandlingStorageQueryFactoryImpl<I> implements EntitySta
     }
 
     @Override
-    public UpdateEntityStatusQuery newUpdateEntityStatusQuery(I id, EntityStatus status) {
-        final UpdateEntityStatusQuery.Builder builder = UpdateEntityStatusQuery.<I>newBuilder()
+    public UpdateVisibilityQuery newUpdateVisibilityQuery(I id, Visibility status) {
+        final UpdateVisibilityQuery.Builder builder = UpdateVisibilityQuery.<I>newBuilder()
                 .setDataSource(dataSource)
                 .setLogger(logger)
                 .setId(id)
-                .setEntityStatus(status);
+                .setVisibility(status);
         return builder.build();
     }
 
     @Override
     public MarkEntityQuery<I> newMarkArchivedQuery(I id) {
-        return newMarkQuery(id, EntityStatusField.archived);
+        return newMarkQuery(id, VisibilityField.archived);
     }
 
     @Override
     public MarkEntityQuery<I> newMarkDeletedQuery(I id) {
-        return newMarkQuery(id, EntityStatusField.deleted);
+        return newMarkQuery(id, VisibilityField.deleted);
     }
 
-    private MarkEntityQuery<I> newMarkQuery(I id, EntityStatusField column) {
+    private MarkEntityQuery<I> newMarkQuery(I id, VisibilityField column) {
         final MarkEntityQuery<I> query = MarkEntityQuery.<I>newBuilder()
                 .setDataSource(dataSource)
                 .setLogger(logger)

@@ -21,7 +21,7 @@
 package org.spine3.server.storage.jdbc.command.query;
 
 import org.spine3.base.CommandStatus;
-import org.spine3.server.command.storage.CommandStorageRecord;
+import org.spine3.server.command.CommandRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.StorageQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
@@ -42,7 +42,7 @@ import static org.spine3.server.storage.jdbc.command.query.CommandTable.COMMAND_
 import static org.spine3.server.storage.jdbc.command.query.CommandTable.TABLE_NAME;
 
 /**
- * Query that selects {@link CommandStorageRecord} by {@link CommandStatus}.
+ * Query that selects {@link CommandRecord} by {@link CommandStatus}.
  *
  * @author Alexander Litus
  * @author Andrey Lavrov
@@ -89,10 +89,10 @@ public class SelectCommandByStatusQuery extends StorageQuery {
         return statement;
     }
 
-    public Iterator<CommandStorageRecord> execute() throws DatabaseException {
+    public Iterator<CommandRecord> execute() throws DatabaseException {
         try (ConnectionWrapper connection = getConnection(true)) {
             final PreparedStatement statement = prepareStatement(connection);
-            return new DbIterator<>(statement, COMMAND_COL, CommandStorageRecord.getDescriptor());
+            return new DbIterator<>(statement, COMMAND_COL, CommandRecord.getDescriptor());
         }
     }
 

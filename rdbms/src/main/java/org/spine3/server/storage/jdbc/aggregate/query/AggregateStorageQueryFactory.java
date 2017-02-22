@@ -23,15 +23,15 @@ package org.spine3.server.storage.jdbc.aggregate.query;
 import org.slf4j.Logger;
 import org.spine3.server.aggregate.Aggregate;
 import org.spine3.server.aggregate.AggregateStorage;
-import org.spine3.server.aggregate.storage.AggregateStorageRecord;
-import org.spine3.server.entity.status.EntityStatus;
+import org.spine3.server.aggregate.AggregateEventRecord;
+import org.spine3.server.entity.Visibility;
 import org.spine3.server.storage.jdbc.entity.query.MarkEntityQuery;
-import org.spine3.server.storage.jdbc.entity.status.EntityStatusHandlingStorageQueryFactory;
+import org.spine3.server.storage.jdbc.entity.status.VisibilityHandlingStorageQueryFactory;
 import org.spine3.server.storage.jdbc.entity.status.QueryFactories;
-import org.spine3.server.storage.jdbc.entity.status.query.CreateEntityStatusTableQuery;
-import org.spine3.server.storage.jdbc.entity.status.query.InsertEntityStatusQuery;
-import org.spine3.server.storage.jdbc.entity.status.query.SelectEntityStatusQuery;
-import org.spine3.server.storage.jdbc.entity.status.query.UpdateEntityStatusQuery;
+import org.spine3.server.storage.jdbc.entity.status.query.CreateVisibilityTableQuery;
+import org.spine3.server.storage.jdbc.entity.status.query.InsertVisibilityQuery;
+import org.spine3.server.storage.jdbc.entity.status.query.SelectVisibilityQuery;
+import org.spine3.server.storage.jdbc.entity.status.query.UpdateVisibilityQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbTableNameFactory;
 import org.spine3.server.storage.jdbc.util.IdColumn;
@@ -44,13 +44,13 @@ import static org.spine3.server.storage.jdbc.aggregate.query.Table.EventCount.EV
  * @param <I> the type of IDs used in the storage
  * @author Andrey Lavrov
  */
-public class AggregateStorageQueryFactory<I> implements EntityStatusHandlingStorageQueryFactory<I> {
+public class AggregateStorageQueryFactory<I> implements VisibilityHandlingStorageQueryFactory<I> {
 
     private final IdColumn<I> idColumn;
     private final String mainTableName;
     private final String eventCountTableName;
     private final DataSourceWrapper dataSource;
-    private final EntityStatusHandlingStorageQueryFactory statusTableQueryFactory;
+    private final VisibilityHandlingStorageQueryFactory statusTableQueryFactory;
     private Logger logger;
 
     /**
@@ -69,23 +69,23 @@ public class AggregateStorageQueryFactory<I> implements EntityStatusHandlingStor
     }
 
     @Override
-    public CreateEntityStatusTableQuery newCreateEntityStatusTableQuery() {
-        return statusTableQueryFactory.newCreateEntityStatusTableQuery();
+    public CreateVisibilityTableQuery newCreateVisibilityTableQuery() {
+        return statusTableQueryFactory.newCreateVisibilityTableQuery();
     }
 
     @Override
-    public InsertEntityStatusQuery newInsertEntityStatusQuery(I id, EntityStatus entityStatus) {
-        return statusTableQueryFactory.newInsertEntityStatusQuery(id, entityStatus);
+    public InsertVisibilityQuery newInsertVisibilityQuery(I id, Visibility entityStatus) {
+        return statusTableQueryFactory.newInsertVisibilityQuery(id, entityStatus);
     }
 
     @Override
-    public SelectEntityStatusQuery newSelectEntityStatusQuery(I id) {
-        return statusTableQueryFactory.newSelectEntityStatusQuery(id);
+    public SelectVisibilityQuery newSelectVisibilityQuery(I id) {
+        return statusTableQueryFactory.newSelectVisibilityQuery(id);
     }
 
     @Override
-    public UpdateEntityStatusQuery newUpdateEntityStatusQuery(I id, EntityStatus status) {
-        return statusTableQueryFactory.newUpdateEntityStatusQuery(id, status);
+    public UpdateVisibilityQuery newUpdateVisibilityQuery(I id, Visibility status) {
+        return statusTableQueryFactory.newUpdateVisibilityQuery(id, status);
     }
 
     @Override
@@ -160,12 +160,12 @@ public class AggregateStorageQueryFactory<I> implements EntityStatusHandlingStor
     }
 
     /**
-     * Returns a query that inserts a new {@link AggregateStorageRecord} to the {@link Table.AggregateRecord}.
+     * Returns a query that inserts a new {@link AggregateEventRecord} to the {@link Table.AggregateRecord}.
      *
      * @param id     aggregate id
      * @param record new aggregate record
      */
-    public InsertAggregateRecordQuery newInsertRecordQuery(I id, AggregateStorageRecord record) {
+    public InsertAggregateRecordQuery newInsertRecordQuery(I id, AggregateEventRecord record) {
         final InsertAggregateRecordQuery.Builder<I> builder = InsertAggregateRecordQuery.<I>newBuilder(
                 mainTableName)
                 .setDataSource(dataSource)

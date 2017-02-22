@@ -24,6 +24,7 @@ import com.google.protobuf.Message;
 import org.spine3.Internal;
 import org.spine3.server.aggregate.Aggregate;
 import org.spine3.server.entity.Entity;
+import org.spine3.server.reflect.Classes;
 import org.spine3.server.storage.jdbc.DatabaseException;
 
 import java.sql.PreparedStatement;
@@ -52,7 +53,8 @@ public abstract class IdColumn<I> {
      */
     public static <I> IdColumn<I> newInstance(Class<? extends Entity<I, ?>> entityClass) {
         final IdColumn<I> helper;
-        final Class<I> idClass = Entity.getIdClass(entityClass);
+        final Class<I> idClass = Classes.getGenericParameterType(entityClass,
+                                                                 Entity.GenericParameter.ID.getIndex());
         if (idClass.equals(Long.class)) {
             @SuppressWarnings("unchecked") // is checked already
             final IdColumn<I> longIdColumn = (IdColumn<I>) new LongIdColumn();

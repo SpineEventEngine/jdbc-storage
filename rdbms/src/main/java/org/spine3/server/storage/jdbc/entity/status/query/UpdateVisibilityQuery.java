@@ -20,71 +20,62 @@
 
 package org.spine3.server.storage.jdbc.entity.status.query;
 
-import org.spine3.server.entity.status.EntityStatus;
-import org.spine3.server.storage.EntityStatusField;
+import org.spine3.server.entity.Visibility;
 import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.query.StorageQuery;
+import org.spine3.server.storage.jdbc.query.WriteQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 import static org.spine3.base.Stringifiers.idToString;
-import static org.spine3.server.storage.EntityStatusField.archived;
-import static org.spine3.server.storage.EntityStatusField.deleted;
+import static org.spine3.server.storage.VisibilityField.archived;
+import static org.spine3.server.storage.VisibilityField.deleted;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.COMMA;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
-import static org.spine3.server.storage.jdbc.Sql.Query.FROM;
 import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
-import static org.spine3.server.storage.jdbc.Sql.Query.SELECT;
+import static org.spine3.server.storage.jdbc.Sql.Query.SET;
+import static org.spine3.server.storage.jdbc.Sql.Query.UPDATE;
 import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
-import static org.spine3.server.storage.jdbc.entity.status.table.EntityStatusTable.ID_COL;
-import static org.spine3.server.storage.jdbc.entity.status.table.EntityStatusTable.TABLE_NAME;
+import static org.spine3.server.storage.jdbc.entity.status.table.VisibilityTable.ID_COL;
+import static org.spine3.server.storage.jdbc.entity.status.table.VisibilityTable.TABLE_NAME;
 
 /**
  * @author Dmytro Dashenkov.
  */
-public class SelectEntityStatusQuery extends StorageQuery {
+public class UpdateVisibilityQuery extends WriteQuery {
 
-    private static final String SQL =
-            SELECT.toString() + archived + COMMA + deleted +
-            FROM + TABLE_NAME +
-            WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
+    private static final String SQL = UPDATE + TABLE_NAME + SET +
+                                      archived + EQUAL + PLACEHOLDER + COMMA +
+                                      deleted + EQUAL + PLACEHOLDER +
+                                      WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
 
     private final String id;
+    private final Visibility entityStatus;
 
-    protected SelectEntityStatusQuery(Builder builder) {
+    protected UpdateVisibilityQuery(Builder builder) {
         super(builder);
         this.id = builder.id;
+        this.entityStatus = builder.entityStatus;
     }
 
-    public EntityStatus execute() {
-        final boolean archived;
-        final boolean deleted;
-        try (ConnectionWrapper connection = getConnection(false)) {
-            final PreparedStatement statement = prepareStatement(connection);
-            statement.setString(1, id);
-            final ResultSet resultSet = statement.executeQuery();
-            final boolean empty = !resultSet.next();
-            if (empty) {
-                return EntityStatus.getDefaultInstance();
-            }
-            archived = resultSet.getBoolean(EntityStatusField.archived.toString());
-            deleted = resultSet.getBoolean(EntityStatusField.deleted.toString());
-            statement.close();
-            resultSet.close();
+    @Override
+    protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
+        final PreparedStatement statement = super.prepareStatement(connection);
+        final boolean archived = entityStatus.getArchived();
+        final boolean deleted = entityStatus.getDeleted();
+        try {
+            statement.setBoolean(1, archived);
+            statement.setBoolean(2, deleted);
+            statement.setString(3, id);
         } catch (SQLException e) {
-            getLogger().error("Failed to read EntityStatus.", e);
             throw new DatabaseException(e);
         }
-        final EntityStatus status = EntityStatus.newBuilder()
-                                                .setArchived(archived)
-                                                .setDeleted(deleted)
-                                                .build();
-        return status;
+
+        return statement;
     }
 
     public static Builder newBuilder() {
@@ -93,9 +84,10 @@ public class SelectEntityStatusQuery extends StorageQuery {
         return builder;
     }
 
-    public static class Builder extends StorageQuery.Builder<Builder, SelectEntityStatusQuery> {
+    public static class Builder extends WriteQuery.Builder<Builder, UpdateVisibilityQuery> {
 
         private String id;
+        private Visibility entityStatus;
 
         public Builder setId(Object id) {
             checkNotNull(id);
@@ -104,9 +96,16 @@ public class SelectEntityStatusQuery extends StorageQuery {
             return getThis();
         }
 
+        public Builder setVisibility(Visibility status) {
+            this.entityStatus = checkNotNull(status);
+            return getThis();
+        }
+
         @Override
-        public SelectEntityStatusQuery build() {
-            return new SelectEntityStatusQuery(this);
+        public UpdateVisibilityQuery build() {
+            checkState(id != null, "ID is not set.");
+            checkState(entityStatus != null, "Entity status is not set.");
+            return new UpdateVisibilityQuery(this);
         }
 
         @Override

@@ -34,7 +34,7 @@ import static org.spine3.server.storage.jdbc.command.query.CommandTable.ID_COL;
 import static org.spine3.server.storage.jdbc.command.query.CommandTable.TABLE_NAME;
 
 /**
- * Query that updates {@link org.spine3.server.command.storage.CommandStorageRecord} with
+ * Query that updates {@link org.spine3.server.command.CommandRecord} with
  * a new {@link Error}.
  *
  * @author Alexander Litus

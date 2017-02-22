@@ -26,7 +26,7 @@ import org.junit.Test;
 import org.spine3.server.aggregate.Aggregate;
 import org.spine3.server.aggregate.AggregateStorage;
 import org.spine3.server.command.CommandStorage;
-import org.spine3.server.entity.Entity;
+import org.spine3.server.entity.AbstractEntity;
 import org.spine3.server.event.EventStorage;
 import org.spine3.server.projection.Projection;
 import org.spine3.server.projection.ProjectionStorage;
@@ -113,7 +113,7 @@ public class JdbcStorageFactoryShould {
         assertNotNull(storage);
     }
 
-    private static class TestEntity extends Entity<String, StringValue> {
+    private static class TestEntity extends AbstractEntity<String, StringValue> {
 
         private TestEntity(String id) {
             super(id);

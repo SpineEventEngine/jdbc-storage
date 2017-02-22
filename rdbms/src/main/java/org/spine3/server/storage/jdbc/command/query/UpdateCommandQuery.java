@@ -20,7 +20,7 @@
 
 package org.spine3.server.storage.jdbc.command.query;
 
-import org.spine3.server.command.storage.CommandStorageRecord;
+import org.spine3.server.command.CommandRecord;
 
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.COMMA;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
@@ -35,7 +35,7 @@ import static org.spine3.server.storage.jdbc.command.query.CommandTable.ID_COL;
 import static org.spine3.server.storage.jdbc.command.query.CommandTable.TABLE_NAME;
 
 /**
- * Query that updates {@link CommandStorageRecord} in the {@link CommandTable}.
+ * Query that updates {@link CommandRecord} in the {@link CommandTable}.
  *
  * @author Andrey Lavrov
  */

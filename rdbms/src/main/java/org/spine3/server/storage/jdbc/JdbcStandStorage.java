@@ -34,7 +34,7 @@ import com.google.protobuf.FieldMask;
 import org.spine3.protobuf.TypeUrl;
 import org.spine3.server.stand.AggregateStateId;
 import org.spine3.server.stand.StandStorage;
-import org.spine3.server.storage.EntityStorageRecord;
+import org.spine3.server.entity.EntityRecord;
 import org.spine3.server.storage.jdbc.entity.JdbcRecordStorage;
 import org.spine3.server.storage.jdbc.entity.query.RecordStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
@@ -76,15 +76,15 @@ public class JdbcStandStorage extends StandStorage {
     }
 
     @Override
-    public ImmutableCollection<EntityStorageRecord> readAllByType(TypeUrl type) {
+    public ImmutableCollection<EntityRecord> readAllByType(TypeUrl type) {
         return readAllByType(type, FieldMask.getDefaultInstance());
     }
 
     @Override
-    public ImmutableCollection<EntityStorageRecord> readAllByType(final TypeUrl type,
+    public ImmutableCollection<EntityRecord> readAllByType(final TypeUrl type,
                                                                   FieldMask fieldMask) {
-        final Map<AggregateStateId, EntityStorageRecord> allRecords = readAll(fieldMask);
-        final Map<AggregateStateId, EntityStorageRecord> resultMap = Maps.filterKeys(allRecords,
+        final Map<AggregateStateId, EntityRecord> allRecords = readAll(fieldMask);
+        final Map<AggregateStateId, EntityRecord> resultMap = Maps.filterKeys(allRecords,
                                                                                      new Predicate<AggregateStateId>() {
                                                                                          @Override
                                                                                          public boolean apply(
@@ -97,63 +97,64 @@ public class JdbcStandStorage extends StandStorage {
                                                                                          }
                                                                                      });
 
-        final ImmutableList<EntityStorageRecord> result = ImmutableList.copyOf(resultMap.values());
+        final ImmutableList<EntityRecord> result = ImmutableList.copyOf(resultMap.values());
         return result;
     }
 
     @Override
-    public boolean markArchived(AggregateStateId id) {
-        return false;
+    public void markArchived(AggregateStateId id) {
+        // TODO:2017-02-22:dmytro.dashenkov: Implement.
     }
 
     @Override
-    public boolean markDeleted(AggregateStateId id) {
-        return false;
+    public void markDeleted(AggregateStateId id) {
+        // TODO:2017-02-22:dmytro.dashenkov: Implement.
     }
 
     @Override
     public boolean delete(AggregateStateId id) {
+        // TODO:2017-02-22:dmytro.dashenkov: Implement.
         return false;
     }
 
     @Nullable
     @Override
-    protected Optional<EntityStorageRecord> readRecord(AggregateStateId id) {
+    protected Optional<EntityRecord> readRecord(AggregateStateId id) {
         return recordStorage.read(id.getAggregateId());
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    protected Iterable<EntityStorageRecord> readMultipleRecords(Iterable<AggregateStateId> ids) {
+    protected Iterable<EntityRecord> readMultipleRecords(Iterable<AggregateStateId> ids) {
         final Collection pureIds = Collections2.transform(Lists.newArrayList(ids), ID_MAPPER);
         return recordStorage.readMultiple(pureIds);
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    protected Iterable<EntityStorageRecord> readMultipleRecords(Iterable<AggregateStateId> ids,
+    protected Iterable<EntityRecord> readMultipleRecords(Iterable<AggregateStateId> ids,
                                                                 FieldMask fieldMask) {
         final Collection pureIds = Collections2.transform(Lists.newArrayList(ids), ID_MAPPER);
         return recordStorage.readMultiple(pureIds, fieldMask);
     }
 
     @Override
-    protected Map<AggregateStateId, EntityStorageRecord> readAllRecords() {
+    protected Map<AggregateStateId, EntityRecord> readAllRecords() {
         return retrieveRecordsWithValidIds(recordStorage.readAll());
     }
 
     @Override
-    protected Map<AggregateStateId, EntityStorageRecord> readAllRecords(FieldMask fieldMask) {
+    protected Map<AggregateStateId, EntityRecord> readAllRecords(FieldMask fieldMask) {
         return retrieveRecordsWithValidIds(recordStorage.readAll(fieldMask));
     }
 
     @Override
-    protected void writeRecord(AggregateStateId id, EntityStorageRecord record) {
+    protected void writeRecord(AggregateStateId id, EntityRecord record) {
         recordStorage.write(id.getAggregateId(), record);
     }
 
     @Override
-    protected void writeRecords(Map<AggregateStateId, EntityStorageRecord> records) {
+    protected void writeRecords(Map<AggregateStateId, EntityRecord> records) {
 
     }
 
@@ -166,11 +167,11 @@ public class JdbcStandStorage extends StandStorage {
         recordStorage.close();
     }
 
-    private static Map<AggregateStateId, EntityStorageRecord> retrieveRecordsWithValidIds(
-            Map<?, EntityStorageRecord> records) {
-        final ImmutableMap.Builder<AggregateStateId, EntityStorageRecord> result = new ImmutableMap.Builder<>();
+    private static Map<AggregateStateId, EntityRecord> retrieveRecordsWithValidIds(
+            Map<?, EntityRecord> records) {
+        final ImmutableMap.Builder<AggregateStateId, EntityRecord> result = new ImmutableMap.Builder<>();
 
-        for (Map.Entry<?, EntityStorageRecord> entry : records.entrySet()) {
+        for (Map.Entry<?, EntityRecord> entry : records.entrySet()) {
             final AggregateStateId id = AggregateStateId.of(entry.getKey(), TypeUrl.of(
                     entry.getValue()
                          .getState()

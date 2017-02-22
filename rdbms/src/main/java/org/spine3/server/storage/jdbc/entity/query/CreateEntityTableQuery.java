@@ -22,8 +22,8 @@ package org.spine3.server.storage.jdbc.entity.query;
 
 import org.spine3.server.storage.jdbc.query.CreateTableQuery;
 
-import static org.spine3.server.storage.EntityStatusField.archived;
-import static org.spine3.server.storage.EntityStatusField.deleted;
+import static org.spine3.server.storage.VisibilityField.archived;
+import static org.spine3.server.storage.VisibilityField.deleted;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.COMMA;

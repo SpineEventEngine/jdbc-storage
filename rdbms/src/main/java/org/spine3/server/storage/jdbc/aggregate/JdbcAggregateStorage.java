@@ -24,12 +24,12 @@ import com.google.common.base.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spine3.server.aggregate.AggregateStorage;
-import org.spine3.server.aggregate.storage.AggregateStorageRecord;
-import org.spine3.server.entity.status.EntityStatus;
+import org.spine3.server.aggregate.AggregateEventRecord;
+import org.spine3.server.entity.Visibility;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.JdbcStorageFactory;
 import org.spine3.server.storage.jdbc.aggregate.query.AggregateStorageQueryFactory;
-import org.spine3.server.storage.jdbc.entity.status.EntityStatusHandler;
+import org.spine3.server.storage.jdbc.entity.status.VisibilityHandler;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbIterator;
 
@@ -59,7 +59,7 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     /** Creates queries for interaction with database. */
     private final AggregateStorageQueryFactory<I> queryFactory;
 
-    private final EntityStatusHandler<I> entityStatusHandler;
+    private final VisibilityHandler<I> entityStatusHandler;
 
     /**
      * Creates a new storage instance.
@@ -88,7 +88,7 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
                     .execute();
         queryFactory.newCreateEventCountTableQuery()
                     .execute();
-        this.entityStatusHandler = new EntityStatusHandler<>(queryFactory);
+        this.entityStatusHandler = new VisibilityHandler<>(queryFactory);
         entityStatusHandler.initialize();
     }
 
@@ -104,23 +104,23 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     }
 
     @Override
-    protected Optional<EntityStatus> readStatus(I id) {
+    protected Optional<Visibility> readVisibility(I id) {
         return entityStatusHandler.readStatus(id);
     }
 
     @Override
-    protected void writeStatus(I id, EntityStatus status) {
+    protected void writeVisibility(I id, Visibility status) {
         entityStatusHandler.writeStatus(id, status);
     }
 
     @Override
-    protected boolean markArchived(I id) {
-        return entityStatusHandler.markArchived(id);
+    protected void markArchived(I id) {
+        entityStatusHandler.markArchived(id);
     }
 
     @Override
-    protected boolean markDeleted(I id) {
-        return entityStatusHandler.markDeleted(id);
+    protected void markDeleted(I id) {
+        entityStatusHandler.markDeleted(id);
     }
 
     @Override
@@ -148,7 +148,7 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     @Override
-    protected void writeRecord(I id, AggregateStorageRecord record) throws DatabaseException {
+    protected void writeRecord(I id, AggregateEventRecord record) throws DatabaseException {
         queryFactory.newInsertRecordQuery(id, record)
                     .execute();
     }
@@ -162,9 +162,9 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     @Override
-    protected Iterator<AggregateStorageRecord> historyBackward(I id) throws DatabaseException {
+    protected Iterator<AggregateEventRecord> historyBackward(I id) throws DatabaseException {
         checkNotNull(id);
-        final Iterator<AggregateStorageRecord> iterator = queryFactory.newSelectByIdSortedByTimeDescQuery(
+        final Iterator<AggregateEventRecord> iterator = queryFactory.newSelectByIdSortedByTimeDescQuery(
                 id)
                                                                       .execute();
         iterators.add((DbIterator) iterator);

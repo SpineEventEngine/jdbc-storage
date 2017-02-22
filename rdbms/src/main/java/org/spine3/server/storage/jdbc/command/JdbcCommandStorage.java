@@ -28,7 +28,7 @@ import org.spine3.base.CommandStatus;
 import org.spine3.base.Error;
 import org.spine3.base.Failure;
 import org.spine3.server.command.CommandStorage;
-import org.spine3.server.command.storage.CommandStorageRecord;
+import org.spine3.server.command.CommandRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.JdbcStorageFactory;
 import org.spine3.server.storage.jdbc.command.query.CommandStorageQueryFactory;
@@ -87,10 +87,10 @@ public class JdbcCommandStorage extends CommandStorage {
      * @throws DatabaseException     if an error occurs during an interaction with the DB
      */
     @Override
-    public Optional<CommandStorageRecord> read(CommandId commandId) throws DatabaseException {
+    public Optional<CommandRecord> read(CommandId commandId) throws DatabaseException {
         checkNotClosed();
 
-        final CommandStorageRecord record = queryFactory.newSelectCommandByIdQuery(commandId)
+        final CommandRecord record = queryFactory.newSelectCommandByIdQuery(commandId)
                                                         .execute();
 
         return Optional.fromNullable(record);
@@ -103,9 +103,9 @@ public class JdbcCommandStorage extends CommandStorage {
      * @throws DatabaseException     if an error occurs during an interaction with the DB
      */
     @Override
-    public Iterator<CommandStorageRecord> read(CommandStatus status) {
+    public Iterator<CommandRecord> read(CommandStatus status) {
         checkNotNull(status);
-        final Iterator<CommandStorageRecord> iterator = queryFactory.newSelectCommandByStatusQuery(
+        final Iterator<CommandRecord> iterator = queryFactory.newSelectCommandByStatusQuery(
                 status)
                                                                     .execute();
         return iterator;
@@ -118,7 +118,7 @@ public class JdbcCommandStorage extends CommandStorage {
      * @throws DatabaseException     if an error occurs during an interaction with the DB
      */
     @Override
-    public void write(CommandId commandId, CommandStorageRecord record) throws DatabaseException {
+    public void write(CommandId commandId, CommandRecord record) throws DatabaseException {
         checkNotDefault(commandId);
         checkNotDefault(record);
         checkNotClosed();
@@ -133,7 +133,7 @@ public class JdbcCommandStorage extends CommandStorage {
     }
 
     private boolean containsRecord(CommandId commandId) {
-        final Optional<CommandStorageRecord> record = read(commandId);
+        final Optional<CommandRecord> record = read(commandId);
         final boolean contains = record.isPresent();
         return contains;
     }

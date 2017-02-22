@@ -24,7 +24,7 @@ import com.google.common.collect.Lists;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.FieldMask;
 import org.spine3.protobuf.TypeUrl;
-import org.spine3.server.storage.EntityStorageRecord;
+import org.spine3.server.entity.EntityRecord;
 import org.spine3.server.storage.jdbc.Sql;
 import org.spine3.server.storage.jdbc.query.StorageQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
@@ -38,8 +38,8 @@ import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.spine3.server.storage.EntityStatusField.archived;
-import static org.spine3.server.storage.EntityStatusField.deleted;
+import static org.spine3.server.storage.VisibilityField.archived;
+import static org.spine3.server.storage.VisibilityField.deleted;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.NOT_EQUAL;
@@ -90,10 +90,10 @@ public class SelectBulkQuery extends StorageQuery {
     /**
      * Executes the query.
      *
-     * @return ID-to-{@link EntityStorageRecord} {@link Map} as the result of the query.
+     * @return ID-to-{@link EntityRecord} {@link Map} as the result of the query.
      * @throws SQLException if the input data contained SQL errors or the table does not exist.
      */
-    public Map<Object, EntityStorageRecord> execute() throws SQLException {
+    public Map<Object, EntityRecord> execute() throws SQLException {
         final ConnectionWrapper connection = getConnection(true);
         final PreparedStatement sqlStatement = connection.prepareStatement(getQuery());
 

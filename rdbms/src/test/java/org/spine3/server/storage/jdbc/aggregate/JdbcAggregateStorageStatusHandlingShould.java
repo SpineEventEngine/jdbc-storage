@@ -22,7 +22,7 @@ package org.spine3.server.storage.jdbc.aggregate;
 
 import org.spine3.server.aggregate.Aggregate;
 import org.spine3.server.aggregate.AggregateStorage;
-import org.spine3.server.aggregate.AggregateStorageStatusHandlingShould;
+import org.spine3.server.aggregate.AggregateStorageVisibilityHandlingShould;
 import org.spine3.server.storage.jdbc.GivenDataSource;
 import org.spine3.server.storage.jdbc.aggregate.query.AggregateStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
@@ -31,7 +31,7 @@ import org.spine3.test.aggregate.ProjectId;
 /**
  * @author Dmytro Dashenkov.
  */
-public class JdbcAggregateStorageStatusHandlingShould extends AggregateStorageStatusHandlingShould {
+public class JdbcAggregateStorageStatusHandlingShould extends AggregateStorageVisibilityHandlingShould {
 
     @Override
     protected AggregateStorage<ProjectId> getAggregateStorage(

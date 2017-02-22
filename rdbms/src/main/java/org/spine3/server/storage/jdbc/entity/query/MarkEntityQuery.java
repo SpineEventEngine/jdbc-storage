@@ -20,7 +20,7 @@
 
 package org.spine3.server.storage.jdbc.entity.query;
 
-import org.spine3.server.storage.EntityStatusField;
+import org.spine3.server.storage.VisibilityField;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.StorageQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
@@ -40,7 +40,7 @@ import static org.spine3.server.storage.jdbc.Sql.Query.SET;
 import static org.spine3.server.storage.jdbc.Sql.Query.TRUE;
 import static org.spine3.server.storage.jdbc.Sql.Query.UPDATE;
 import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
-import static org.spine3.server.storage.jdbc.entity.status.table.EntityStatusTable.ID_COL;
+import static org.spine3.server.storage.jdbc.entity.status.table.VisibilityTable.ID_COL;
 
 /**
  * @author Dmytro Dashenkov.
@@ -68,12 +68,11 @@ public class MarkEntityQuery<I> extends StorageQuery {
         return statement;
     }
 
-    public boolean execute() {
+    public void execute() {
         try (PreparedStatement statement = prepareStatement(getConnection(true))) {
             final int rowsAffected = statement.executeUpdate();
             checkState(rowsAffected <= 1,
                        "Mark query affected more then one row: " + getQuery());
-            return rowsAffected > 0;
         } catch (SQLException e) {
             throw new DatabaseException(e);
         }
@@ -97,7 +96,7 @@ public class MarkEntityQuery<I> extends StorageQuery {
             return getThis();
         }
 
-        public Builder<I> setColumn(EntityStatusField column) {
+        public Builder<I> setColumn(VisibilityField column) {
             checkNotNull(column);
             this.column = column.toString();
             return getThis();

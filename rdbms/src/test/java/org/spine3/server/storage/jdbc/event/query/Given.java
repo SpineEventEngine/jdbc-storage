@@ -21,7 +21,7 @@
 package org.spine3.server.storage.jdbc.event.query;
 
 import org.slf4j.Logger;
-import org.spine3.server.event.storage.EventStorageRecord;
+import org.spine3.base.Event;
 import org.spine3.server.storage.jdbc.GivenDataSource;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
@@ -53,7 +53,7 @@ class Given {
                                                                              .setIdColumn(
                                                                                      idColumnMock)
                                                                              .setRecord(
-                                                                                     EventStorageRecord.getDefaultInstance());
+                                                                                     Event.getDefaultInstance());
         return builder.build();
     }
 
@@ -67,7 +67,7 @@ class Given {
                                                                              .setIdColumn(
                                                                                      idColumnMock)
                                                                              .setRecord(
-                                                                                     EventStorageRecord.getDefaultInstance());
+                                                                                     Event.getDefaultInstance());
         return builder.build();
     }
 

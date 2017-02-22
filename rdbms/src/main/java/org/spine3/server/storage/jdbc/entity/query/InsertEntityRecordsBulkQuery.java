@@ -21,8 +21,8 @@
 package org.spine3.server.storage.jdbc.entity.query;
 
 import com.google.common.base.Joiner;
-import org.spine3.server.entity.status.EntityStatus;
-import org.spine3.server.storage.EntityStorageRecord;
+import org.spine3.server.entity.Visibility;
+import org.spine3.server.entity.EntityRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.WriteQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
@@ -40,8 +40,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.lang.String.format;
-import static org.spine3.server.storage.EntityStatusField.archived;
-import static org.spine3.server.storage.EntityStatusField.deleted;
+import static org.spine3.server.storage.VisibilityField.archived;
+import static org.spine3.server.storage.VisibilityField.deleted;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.COMMA;
@@ -64,7 +64,7 @@ public class InsertEntityRecordsBulkQuery<I> extends WriteQuery {
                                                VALUES + "%s";
     private static final String SQL_VALUES_TEMPLATE = nPlaceholders(COLUMNS_COUNT);
 
-    private final Map<I, EntityStorageRecord> records;
+    private final Map<I, EntityRecord> records;
     private final IdColumn<I> idColumn;
 
     protected InsertEntityRecordsBulkQuery(Builder<I> builder) {
@@ -81,9 +81,9 @@ public class InsertEntityRecordsBulkQuery<I> extends WriteQuery {
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
         final PreparedStatement statement = super.prepareStatement(connection);
         int parameterCounter = 1;
-        for (Map.Entry<I, EntityStorageRecord> record : records.entrySet()) {
+        for (Map.Entry<I, EntityRecord> record : records.entrySet()) {
             final I id = record.getKey();
-            final EntityStorageRecord storageRecord = record.getValue();
+            final EntityRecord storageRecord = record.getValue();
             addParam(statement, parameterCounter, id, storageRecord);
             parameterCounter += COLUMNS_COUNT;
         }
@@ -91,7 +91,7 @@ public class InsertEntityRecordsBulkQuery<I> extends WriteQuery {
     }
 
     private void addParam(PreparedStatement statement, int firstParamIndex, I id,
-                          EntityStorageRecord record) {
+                          EntityRecord record) {
         int paramIndex = firstParamIndex;
         try {
             idColumn.setId(paramIndex, id, statement);
@@ -99,7 +99,7 @@ public class InsertEntityRecordsBulkQuery<I> extends WriteQuery {
             final byte[] bytes = Serializer.serialize(record);
             statement.setBytes(paramIndex, bytes);
             paramIndex++;
-            final EntityStatus status = record.getEntityStatus();
+            final Visibility status = record.getVisibility();
             final boolean archived = status.getArchived();
             final boolean deleted = status.getDeleted();
             statement.setBoolean(paramIndex, archived);
@@ -113,11 +113,11 @@ public class InsertEntityRecordsBulkQuery<I> extends WriteQuery {
 
     public static class Builder<I> extends WriteQuery.Builder<Builder<I>, InsertEntityRecordsBulkQuery> {
 
-        private Map<I, EntityStorageRecord> records;
+        private Map<I, EntityRecord> records;
         private String tableName;
         private IdColumn<I> idColumn;
 
-        public Builder<I> setRecords(Map<I, EntityStorageRecord> records) {
+        public Builder<I> setRecords(Map<I, EntityRecord> records) {
             this.records = checkNotNull(records);
             return getThis();
         }

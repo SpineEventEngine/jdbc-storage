@@ -18,27 +18,32 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.spine3.server.storage.jdbc.entity.status.table;
+package org.spine3.server.storage.jdbc.entity.status;
 
-import org.spine3.server.entity.status.EntityStatus;
+import org.slf4j.Logger;
+import org.spine3.server.entity.Visibility;
+import org.spine3.server.storage.jdbc.entity.query.MarkEntityQuery;
+import org.spine3.server.storage.jdbc.entity.status.query.CreateVisibilityTableQuery;
+import org.spine3.server.storage.jdbc.entity.status.query.InsertVisibilityQuery;
+import org.spine3.server.storage.jdbc.entity.status.query.SelectVisibilityQuery;
+import org.spine3.server.storage.jdbc.entity.status.query.UpdateVisibilityQuery;
 
 /**
  * @author Dmytro Dashenkov.
  */
-public class EntityStatusTable {
+public interface VisibilityHandlingStorageQueryFactory<I> {
 
-    public static final String TABLE_NAME = EntityStatus.class.getCanonicalName()
-                                                              .replace('.', '_');
+    CreateVisibilityTableQuery newCreateVisibilityTableQuery();
 
-    public static final int COLUMN_COUNT = 3;
+    InsertVisibilityQuery newInsertVisibilityQuery(I id, Visibility entityStatus);
 
-    public static final String ID_COL = "id";
-    public static final int ID_COL_INDEX = 1;
+    SelectVisibilityQuery newSelectVisibilityQuery(I id);
 
-    public static final int ARCHIVED_COL_INDEX = 2;
+    UpdateVisibilityQuery newUpdateVisibilityQuery(I id, Visibility status);
 
-    public static final int DELETED_COL_INDEX = 3;
+    MarkEntityQuery<I> newMarkArchivedQuery(I id);
 
-    private EntityStatusTable() {
-    }
+    MarkEntityQuery<I> newMarkDeletedQuery(I id);
+
+    void setLogger(Logger logger);
 }

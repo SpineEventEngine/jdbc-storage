@@ -21,7 +21,7 @@
 package org.spine3.server.storage.jdbc.aggregate.query;
 
 import com.google.protobuf.Timestamp;
-import org.spine3.server.aggregate.storage.AggregateStorageRecord;
+import org.spine3.server.aggregate.AggregateEventRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.Sql;
 import org.spine3.server.storage.jdbc.query.WriteRecordQuery;
@@ -43,12 +43,12 @@ import static org.spine3.server.storage.jdbc.aggregate.query.Table.AggregateReco
 import static org.spine3.server.storage.jdbc.aggregate.query.Table.AggregateRecord.SECONDS_COL;
 
 /**
- * Query that inserts a new {@link AggregateStorageRecord} to the {@link Table.AggregateRecord}.
+ * Query that inserts a new {@link AggregateEventRecord} to the {@link Table.AggregateRecord}.
  *
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-public class InsertAggregateRecordQuery<I> extends WriteRecordQuery<I, AggregateStorageRecord> {
+public class InsertAggregateRecordQuery<I> extends WriteRecordQuery<I, AggregateEventRecord> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
@@ -86,7 +86,7 @@ public class InsertAggregateRecordQuery<I> extends WriteRecordQuery<I, Aggregate
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder<I> extends WriteRecordQuery.Builder<Builder<I>, InsertAggregateRecordQuery, I, AggregateStorageRecord> {
+    public static class Builder<I> extends WriteRecordQuery.Builder<Builder<I>, InsertAggregateRecordQuery, I, AggregateEventRecord> {
 
         @Override
         public InsertAggregateRecordQuery build() {

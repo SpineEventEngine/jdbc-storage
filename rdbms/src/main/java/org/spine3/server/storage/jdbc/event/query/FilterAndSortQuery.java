@@ -23,10 +23,10 @@ package org.spine3.server.storage.jdbc.event.query;
 import com.google.protobuf.Any;
 import com.google.protobuf.Message;
 import com.google.protobuf.Timestamp;
+import org.spine3.base.Event;
 import org.spine3.protobuf.AnyPacker;
 import org.spine3.server.event.EventFilter;
 import org.spine3.server.event.EventStreamQuery;
-import org.spine3.server.event.storage.EventStorageRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.StorageQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
@@ -56,7 +56,7 @@ import static org.spine3.server.storage.jdbc.event.query.EventTable.SECONDS_COL;
 import static org.spine3.server.storage.jdbc.event.query.EventTable.SELECT_EVENT_FROM_TABLE;
 
 /**
- * Query that selects {@link EventStorageRecord} by specified {@link EventStreamQuery}.
+ * Query that selects {@linkplain Event events} by specified {@link EventStreamQuery}.
  *
  * @author Alexander Litus
  * @author Andrey Lavrov
@@ -187,10 +187,10 @@ public class FilterAndSortQuery extends StorageQuery {
         return builder;
     }
 
-    public Iterator<EventStorageRecord> execute() throws DatabaseException {
+    public Iterator<Event> execute() throws DatabaseException {
         try (ConnectionWrapper connection = this.getConnection(true)) {
             final PreparedStatement statement = prepareStatement(connection, streamQuery);
-            return new DbIterator<>(statement, EVENT_COL, EventStorageRecord.getDescriptor());
+            return new DbIterator<>(statement, EVENT_COL, Event.getDescriptor());
         }
     }
 

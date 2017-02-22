@@ -24,15 +24,15 @@ import com.google.protobuf.Descriptors;
 import com.google.protobuf.FieldMask;
 import org.slf4j.Logger;
 import org.spine3.server.entity.Entity;
-import org.spine3.server.entity.status.EntityStatus;
-import org.spine3.server.storage.EntityStorageRecord;
+import org.spine3.server.entity.Visibility;
+import org.spine3.server.entity.EntityRecord;
 import org.spine3.server.storage.RecordStorage;
-import org.spine3.server.storage.jdbc.entity.status.EntityStatusHandlingStorageQueryFactory;
+import org.spine3.server.storage.jdbc.entity.status.VisibilityHandlingStorageQueryFactory;
 import org.spine3.server.storage.jdbc.entity.status.QueryFactories;
-import org.spine3.server.storage.jdbc.entity.status.query.CreateEntityStatusTableQuery;
-import org.spine3.server.storage.jdbc.entity.status.query.InsertEntityStatusQuery;
-import org.spine3.server.storage.jdbc.entity.status.query.SelectEntityStatusQuery;
-import org.spine3.server.storage.jdbc.entity.status.query.UpdateEntityStatusQuery;
+import org.spine3.server.storage.jdbc.entity.status.query.CreateVisibilityTableQuery;
+import org.spine3.server.storage.jdbc.entity.status.query.InsertVisibilityQuery;
+import org.spine3.server.storage.jdbc.entity.status.query.SelectVisibilityQuery;
+import org.spine3.server.storage.jdbc.entity.status.query.UpdateVisibilityQuery;
 import org.spine3.server.storage.jdbc.query.DeleteRowQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbTableNameFactory;
@@ -48,12 +48,12 @@ import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
  * @author Andrey Lavrov
  * @author Dmytro Dashenkov
  */
-public class RecordStorageQueryFactory<I> implements EntityStatusHandlingStorageQueryFactory<I> {
+public class RecordStorageQueryFactory<I> implements VisibilityHandlingStorageQueryFactory<I> {
 
     private final IdColumn<I> idColumn;
     private final DataSourceWrapper dataSource;
     private final String tableName;
-    private final EntityStatusHandlingStorageQueryFactory<I> statusTableQueryFactory;
+    private final VisibilityHandlingStorageQueryFactory<I> statusTableQueryFactory;
     private Logger logger;
 
     /**
@@ -74,23 +74,23 @@ public class RecordStorageQueryFactory<I> implements EntityStatusHandlingStorage
     }
 
     @Override
-    public CreateEntityStatusTableQuery newCreateEntityStatusTableQuery() {
-        return statusTableQueryFactory.newCreateEntityStatusTableQuery();
+    public CreateVisibilityTableQuery newCreateVisibilityTableQuery() {
+        return statusTableQueryFactory.newCreateVisibilityTableQuery();
     }
 
     @Override
-    public InsertEntityStatusQuery newInsertEntityStatusQuery(I id, EntityStatus entityStatus) {
-        return statusTableQueryFactory.newInsertEntityStatusQuery(id, entityStatus);
+    public InsertVisibilityQuery newInsertVisibilityQuery(I id, Visibility entityStatus) {
+        return statusTableQueryFactory.newInsertVisibilityQuery(id, entityStatus);
     }
 
     @Override
-    public SelectEntityStatusQuery newSelectEntityStatusQuery(I id) {
-        return statusTableQueryFactory.newSelectEntityStatusQuery(id);
+    public SelectVisibilityQuery newSelectVisibilityQuery(I id) {
+        return statusTableQueryFactory.newSelectVisibilityQuery(id);
     }
 
     @Override
-    public UpdateEntityStatusQuery newUpdateEntityStatusQuery(I id, EntityStatus status) {
-        return statusTableQueryFactory.newUpdateEntityStatusQuery(id, status);
+    public UpdateVisibilityQuery newUpdateVisibilityQuery(I id, Visibility status) {
+        return statusTableQueryFactory.newUpdateVisibilityQuery(id, status);
     }
 
     @Override
@@ -121,12 +121,12 @@ public class RecordStorageQueryFactory<I> implements EntityStatusHandlingStorage
     }
 
     /**
-     * Returns a query that inserts a new {@link EntityStorageRecord} to the {@link EntityTable}.
+     * Returns a query that inserts a new {@link EntityRecord} to the {@link EntityTable}.
      *
      * @param id     new entity record id
      * @param record new entity record
      */
-    public InsertEntityQuery newInsertEntityQuery(I id, EntityStorageRecord record) {
+    public InsertEntityQuery newInsertEntityQuery(I id, EntityRecord record) {
         final InsertEntityQuery.Builder<I> builder = InsertEntityQuery.<I>newBuilder(tableName)
                 .setDataSource(dataSource)
                 .setLogger(logger)
@@ -137,12 +137,12 @@ public class RecordStorageQueryFactory<I> implements EntityStatusHandlingStorage
     }
 
     /**
-     * Returns a query that updates {@link EntityStorageRecord} in the {@link EntityTable}.
+     * Returns a query that updates {@link EntityRecord} in the {@link EntityTable}.
      *
      * @param id     entity id
      * @param record updated record state
      */
-    public UpdateEntityQuery newUpdateEntityQuery(I id, EntityStorageRecord record) {
+    public UpdateEntityQuery newUpdateEntityQuery(I id, EntityRecord record) {
         final UpdateEntityQuery.Builder<I> builder = UpdateEntityQuery.<I>newBuilder(tableName)
                 .setDataSource(dataSource)
                 .setLogger(logger)
@@ -152,7 +152,7 @@ public class RecordStorageQueryFactory<I> implements EntityStatusHandlingStorage
         return builder.build();
     }
 
-    /** Returns a query that selects {@link EntityStorageRecord} by ID. */
+    /** Returns a query that selects {@link EntityRecord} by ID. */
     public SelectEntityByIdQuery<I> newSelectEntityByIdQuery(I id) {
         final SelectEntityByIdQuery.Builder<I> builder = SelectEntityByIdQuery.<I>newBuilder(
                 tableName)
@@ -206,7 +206,7 @@ public class RecordStorageQueryFactory<I> implements EntityStatusHandlingStorage
     }
 
     public InsertEntityRecordsBulkQuery<I> newInsertEntityRecordsBulkQuery(
-            Map<I, EntityStorageRecord> records) {
+            Map<I, EntityRecord> records) {
         final InsertEntityRecordsBulkQuery.Builder<I> builder = InsertEntityRecordsBulkQuery.<I>newBuilder()
                 .setLogger(logger)
                 .setDataSource(dataSource)

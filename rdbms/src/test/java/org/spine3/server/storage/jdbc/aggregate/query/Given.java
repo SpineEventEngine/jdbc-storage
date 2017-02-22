@@ -21,7 +21,7 @@
 package org.spine3.server.storage.jdbc.aggregate.query;
 
 import org.slf4j.Logger;
-import org.spine3.server.aggregate.storage.AggregateStorageRecord;
+import org.spine3.server.aggregate.AggregateEventRecord;
 import org.spine3.server.storage.jdbc.GivenDataSource;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
@@ -52,7 +52,7 @@ class Given {
                 .setDataSource(dataSourceMock)
                 .setLogger(loggerMock)
                 .setIdColumn(idColumnMock)
-                .setRecord(AggregateStorageRecord.getDefaultInstance()
+                .setRecord(AggregateEventRecord.getDefaultInstance()
                                                  .getDefaultInstanceForType());
         return builder.build();
     }

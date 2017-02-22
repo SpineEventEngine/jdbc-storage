@@ -21,7 +21,11 @@
 package org.spine3.server.storage.jdbc.event.query;
 
 import com.google.protobuf.Timestamp;
-import org.spine3.server.event.storage.EventStorageRecord;
+import org.spine3.base.Event;
+import org.spine3.base.EventContext;
+import org.spine3.base.Stringifiers;
+import org.spine3.protobuf.AnyPacker;
+import org.spine3.protobuf.TypeName;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.Sql;
 import org.spine3.server.storage.jdbc.query.WriteRecordQuery;
@@ -46,12 +50,12 @@ import static org.spine3.server.storage.jdbc.event.query.EventTable.TABLE_NAME;
 import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
 /**
- * Query that inserts a new {@link EventStorageRecord} to the {@link EventTable}.
+ * Query that inserts a new {@link Event} to the {@link EventTable}.
  *
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-public class InsertEventRecordQuery extends WriteRecordQuery<String, EventStorageRecord> {
+public class InsertEventRecordQuery extends WriteRecordQuery<String, Event> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
@@ -72,18 +76,19 @@ public class InsertEventRecordQuery extends WriteRecordQuery<String, EventStorag
     @SuppressWarnings("DuplicateStringLiteralInspection")
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
         final PreparedStatement statement = connection.prepareStatement(QUERY_TEMPLATE);
-        final Timestamp timestamp = getRecord().getTimestamp();
+        final EventContext context = getRecord().getContext();
+        final Timestamp timestamp = context.getTimestamp();
         try {
-            final String eventId = getRecord().getEventId();
+            final String eventId = Stringifiers.idToString(context.getEventId());
             statement.setString(1, eventId);
 
             final byte[] serializedRecord = serialize(getRecord());
             statement.setBytes(2, serializedRecord);
 
-            final String eventType = getRecord().getEventType();
+            final String eventType = TypeName.of(getRecord().getMessage());
             statement.setString(3, eventType);
 
-            final String producerId = getRecord().getProducerId();
+            final String producerId = Stringifiers.idToString(AnyPacker.unpack(context.getProducerId()));
             statement.setString(4, producerId);
 
             final long seconds = timestamp.getSeconds();
@@ -105,7 +110,7 @@ public class InsertEventRecordQuery extends WriteRecordQuery<String, EventStorag
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder extends WriteRecordQuery.Builder<Builder, InsertEventRecordQuery, String, EventStorageRecord> {
+    public static class Builder extends WriteRecordQuery.Builder<Builder, InsertEventRecordQuery, String, Event> {
 
         @Override
         public InsertEventRecordQuery build() {

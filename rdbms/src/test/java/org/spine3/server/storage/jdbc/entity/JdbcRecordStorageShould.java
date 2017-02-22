@@ -23,8 +23,8 @@ package org.spine3.server.storage.jdbc.entity;
 import com.google.common.base.Optional;
 import com.google.protobuf.Message;
 import org.junit.Test;
-import org.spine3.server.entity.Entity;
-import org.spine3.server.storage.EntityStorageRecord;
+import org.spine3.server.entity.AbstractEntity;
+import org.spine3.server.entity.EntityRecord;
 import org.spine3.server.storage.RecordStorage;
 import org.spine3.server.storage.RecordStorageShould;
 import org.spine3.server.storage.jdbc.DatabaseException;
@@ -80,11 +80,11 @@ public class JdbcRecordStorageShould extends RecordStorageShould<String, JdbcRec
     public void clear_itself() {
         final JdbcRecordStorage<String> storage = getStorage();
         final String id = newUuid();
-        final EntityStorageRecord record = newStorageRecord();
+        final EntityRecord record = newStorageRecord();
         storage.writeRecord(id, record);
         storage.clear();
 
-        final Optional<EntityStorageRecord> actual = storage.readRecord(id);
+        final Optional<EntityRecord> actual = storage.readRecord(id);
         assertNotNull(actual);
         assertFalse(actual.isPresent());
     }
@@ -104,7 +104,7 @@ public class JdbcRecordStorageShould extends RecordStorageShould<String, JdbcRec
         return builder.build();
     }
 
-    private static class TestEntityWithStringId extends Entity<String, Project> {
+    private static class TestEntityWithStringId extends AbstractEntity<String, Project> {
 
         private TestEntityWithStringId(String id) {
             super(id);

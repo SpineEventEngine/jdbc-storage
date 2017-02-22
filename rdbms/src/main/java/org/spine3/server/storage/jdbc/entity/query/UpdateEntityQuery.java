@@ -20,12 +20,12 @@
 
 package org.spine3.server.storage.jdbc.entity.query;
 
-import org.spine3.server.storage.EntityStorageRecord;
+import org.spine3.server.entity.EntityRecord;
 import org.spine3.server.storage.jdbc.query.WriteRecordQuery;
 
 import static java.lang.String.format;
-import static org.spine3.server.storage.EntityStatusField.archived;
-import static org.spine3.server.storage.EntityStatusField.deleted;
+import static org.spine3.server.storage.VisibilityField.archived;
+import static org.spine3.server.storage.VisibilityField.deleted;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.COMMA;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
@@ -37,7 +37,7 @@ import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ENTITY_COL
 import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
 
 /**
- * Query that updates {@link EntityStorageRecord} in the {@link EntityTable}.
+ * Query that updates {@link EntityRecord} in the {@link EntityTable}.
  *
  * @author Alexander Litus
  * @author Andrey Lavrov
@@ -65,7 +65,7 @@ public class UpdateEntityQuery<I> extends WriteEntityQuery<I> {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder<I> extends WriteRecordQuery.Builder<Builder<I>, UpdateEntityQuery, I, EntityStorageRecord> {
+    public static class Builder<I> extends WriteRecordQuery.Builder<Builder<I>, UpdateEntityQuery, I, EntityRecord> {
 
         @Override
         public UpdateEntityQuery build() {

@@ -20,9 +20,9 @@
 
 package org.spine3.server.storage.jdbc.entity.query;
 
-import org.spine3.server.entity.status.EntityStatus;
-import org.spine3.server.storage.EntityStatusField;
-import org.spine3.server.storage.EntityStorageRecord;
+import org.spine3.server.entity.Visibility;
+import org.spine3.server.storage.VisibilityField;
+import org.spine3.server.entity.EntityRecord;
 import org.spine3.server.storage.jdbc.query.SelectByIdQuery;
 
 import javax.annotation.Nullable;
@@ -41,12 +41,12 @@ import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ENTITY_COL
 import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
 
 /**
- * Query that selects {@link EntityStorageRecord} by ID.
+ * Query that selects {@link EntityRecord} by ID.
  *
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-public class SelectEntityByIdQuery<I> extends SelectByIdQuery<I, EntityStorageRecord> {
+public class SelectEntityByIdQuery<I> extends SelectByIdQuery<I, EntityRecord> {
 
     private static final String QUERY_TEMPLATE =
             SELECT.toString() + ALL_ATTRIBUTES + FROM + " %s" + WHERE
@@ -61,28 +61,28 @@ public class SelectEntityByIdQuery<I> extends SelectByIdQuery<I, EntityStorageRe
         builder.setIdIndexInQuery(1)
                .setQuery(format(QUERY_TEMPLATE, tableName))
                .setMessageColumnName(ENTITY_COL)
-               .setMessageDescriptor(EntityStorageRecord.getDescriptor());
+               .setMessageDescriptor(EntityRecord.getDescriptor());
         return builder;
     }
 
     @Nullable
     @Override
-    protected EntityStorageRecord readMessage(ResultSet resultSet) throws SQLException {
-        final EntityStorageRecord record = super.readMessage(resultSet);
+    protected EntityRecord readMessage(ResultSet resultSet) throws SQLException {
+        final EntityRecord record = super.readMessage(resultSet);
         if (record == null) {
             return null;
         }
-        final boolean archived = resultSet.getBoolean(EntityStatusField.archived.toString());
-        final boolean deleted = resultSet.getBoolean(EntityStatusField.deleted.toString());
+        final boolean archived = resultSet.getBoolean(VisibilityField.archived.toString());
+        final boolean deleted = resultSet.getBoolean(VisibilityField.deleted.toString());
         if (!(archived || deleted)) {
             return record;
         }
-        final EntityStatus status = EntityStatus.newBuilder()
+        final Visibility status = Visibility.newBuilder()
                                                 .setArchived(archived)
                                                 .setDeleted(deleted)
                                                 .build();
-        final EntityStorageRecord result = record.toBuilder()
-                                                 .setEntityStatus(status)
+        final EntityRecord result = record.toBuilder()
+                                                 .setVisibility(status)
                                                  .build();
         return result;
     }
@@ -91,7 +91,7 @@ public class SelectEntityByIdQuery<I> extends SelectByIdQuery<I, EntityStorageRe
     public static class Builder<I> extends SelectByIdQuery.Builder<Builder<I>,
             SelectEntityByIdQuery<I>,
             I,
-            EntityStorageRecord> {
+            EntityRecord> {
 
         @Override
         public SelectEntityByIdQuery<I> build() {

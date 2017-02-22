@@ -22,7 +22,7 @@ package org.spine3.server.storage.jdbc.util;
 
 import com.google.protobuf.StringValue;
 import org.junit.Test;
-import org.spine3.server.entity.Entity;
+import org.spine3.server.entity.AbstractEntity;
 
 import static org.junit.Assert.assertEquals;
 
@@ -47,7 +47,7 @@ public class DbTableNameFactoryShould {
                      tableName);
     }
 
-    private static class TestEntity extends Entity<String, StringValue> {
+    private static class TestEntity extends AbstractEntity<String, StringValue> {
 
         private TestEntity(String id) {
             super(id);

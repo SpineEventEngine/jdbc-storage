@@ -25,7 +25,7 @@ import org.spine3.base.CommandId;
 import org.spine3.base.CommandStatus;
 import org.spine3.base.Error;
 import org.spine3.base.Failure;
-import org.spine3.server.command.storage.CommandStorageRecord;
+import org.spine3.server.command.CommandRecord;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
@@ -72,45 +72,41 @@ public class CommandStorageQueryFactory {
     }
 
     /**
-     * Returns a query that inserts a new {@link CommandStorageRecord} to the {@link CommandTable}.
+     * Returns a query that inserts a new {@link CommandRecord} to the {@link CommandTable}.
      *
      * @param id     new command record id
      * @param record new command record
      */
-    public InsertCommandQuery newInsertCommandQuery(CommandId id, CommandStorageRecord record) {
+    public InsertCommandQuery newInsertCommandQuery(CommandId id, CommandRecord record) {
         final InsertCommandQuery.Builder builder = InsertCommandQuery.newBuilder()
                                                                      .setDataSource(dataSource)
                                                                      .setLogger(logger)
                                                                      .setIdColumn(idColumn)
                                                                      .setId(id.getUuid())
                                                                      .setRecord(record)
-                                                                     .setStatus(
-                                                                             CommandStatus.forNumber(
-                                                                                     record.getStatusValue()));
+                                                                     .setStatus(record.getStatus().getCode());
         return builder.build();
     }
 
     /**
-     * Returns a query that updates {@link CommandStorageRecord} in the {@link CommandTable}.
+     * Returns a query that updates {@link CommandRecord} in the {@link CommandTable}.
      *
      * @param id     command id
      * @param record updated record state
      */
-    public UpdateCommandQuery newUpdateCommandQuery(CommandId id, CommandStorageRecord record) {
+    public UpdateCommandQuery newUpdateCommandQuery(CommandId id, CommandRecord record) {
         final UpdateCommandQuery.Builder builder = UpdateCommandQuery.newBuilder()
                                                                      .setDataSource(dataSource)
                                                                      .setLogger(logger)
                                                                      .setIdColumn(idColumn)
                                                                      .setId(id.getUuid())
                                                                      .setRecord(record)
-                                                                     .setStatus(
-                                                                             CommandStatus.forNumber(
-                                                                                     record.getStatusValue()));
+                                                                     .setStatus(record.getStatus().getCode());
         return builder.build();
     }
 
     /**
-     * Returns a query that updates {@link CommandStorageRecord} with a new {@link Error}.
+     * Returns a query that updates {@link CommandRecord} with a new {@link Error}.
      *
      * @param id    command record id
      * @param error a technical error occurred during command handling
@@ -126,7 +122,7 @@ public class CommandStorageQueryFactory {
     }
 
     /**
-     * Returns a query that updates {@link CommandStorageRecord} with a new {@link Failure}.
+     * Returns a query that updates {@link CommandRecord} with a new {@link Failure}.
      *
      * @param id      command record id
      * @param failure a business failure occurred during command handling
@@ -155,7 +151,7 @@ public class CommandStorageQueryFactory {
         return builder.build();
     }
 
-    /** Returns a query that selects {@link CommandStorageRecord} by ID. */
+    /** Returns a query that selects {@link CommandRecord} by ID. */
     public SelectCommandByIdQuery newSelectCommandByIdQuery(CommandId id) {
         final SelectCommandByIdQuery.Builder builder = SelectCommandByIdQuery.newBuilder()
                                                                              .setDataSource(
@@ -166,7 +162,7 @@ public class CommandStorageQueryFactory {
         return builder.build();
     }
 
-    /** Returns a query that {@link CommandStorageRecord} selects record by {@link CommandStatus}. */
+    /** Returns a query that {@link CommandRecord} selects record by {@link CommandStatus}. */
     public SelectCommandByStatusQuery newSelectCommandByStatusQuery(CommandStatus status) {
         final SelectCommandByStatusQuery.Builder builder = SelectCommandByStatusQuery.newBuilder()
                                                                                      .setDataSource(

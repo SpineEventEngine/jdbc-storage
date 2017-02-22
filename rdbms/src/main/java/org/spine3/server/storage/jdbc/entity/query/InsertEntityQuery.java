@@ -20,12 +20,12 @@
 
 package org.spine3.server.storage.jdbc.entity.query;
 
-import org.spine3.server.storage.EntityStorageRecord;
+import org.spine3.server.entity.EntityRecord;
 import org.spine3.server.storage.jdbc.query.WriteRecordQuery;
 
 import static java.lang.String.format;
-import static org.spine3.server.storage.EntityStatusField.archived;
-import static org.spine3.server.storage.EntityStatusField.deleted;
+import static org.spine3.server.storage.VisibilityField.archived;
+import static org.spine3.server.storage.VisibilityField.deleted;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.COMMA;
@@ -37,7 +37,7 @@ import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ENTITY_COL
 import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
 
 /**
- * Query that inserts a new {@link EntityStorageRecord} to the {@link EntityTable}.
+ * Query that inserts a new {@link EntityRecord} to the {@link EntityTable}.
  *
  * @author Alexander Litus
  * @author Andrey Lavrov
@@ -65,7 +65,7 @@ public class InsertEntityQuery<I> extends WriteEntityQuery<I> {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder<I> extends WriteRecordQuery.Builder<Builder<I>, InsertEntityQuery, I, EntityStorageRecord> {
+    public static class Builder<I> extends WriteRecordQuery.Builder<Builder<I>, InsertEntityQuery, I, EntityRecord> {
 
         @Override
         public InsertEntityQuery build() {

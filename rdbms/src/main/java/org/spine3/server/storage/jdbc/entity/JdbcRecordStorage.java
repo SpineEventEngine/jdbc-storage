@@ -28,7 +28,7 @@ import com.google.protobuf.Descriptors;
 import com.google.protobuf.FieldMask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.spine3.server.storage.EntityStorageRecord;
+import org.spine3.server.entity.EntityRecord;
 import org.spine3.server.storage.RecordStorage;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.JdbcStorageFactory;
@@ -94,19 +94,17 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     }
 
     @Override
-    public boolean markArchived(I id) {
+    public void markArchived(I id) {
         checkNotNull(id);
-        final boolean result = queryFactory.newMarkArchivedQuery(id)
-                                           .execute();
-        return result;
+        queryFactory.newMarkArchivedQuery(id)
+                    .execute();
     }
 
     @Override
-    public boolean markDeleted(I id) {
+    public void markDeleted(I id) {
         checkNotNull(id);
-        final boolean result = queryFactory.newMarkDeletedQuery(id)
-                                           .execute();
-        return result;
+        queryFactory.newMarkDeletedQuery(id)
+                    .execute();
     }
 
     @Override
@@ -124,23 +122,23 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     @Override
-    protected Optional<EntityStorageRecord> readRecord(I id) throws DatabaseException {
-        final EntityStorageRecord record = queryFactory.newSelectEntityByIdQuery(id)
-                                                       .execute();
+    protected Optional<EntityRecord> readRecord(I id) throws DatabaseException {
+        final EntityRecord record = queryFactory.newSelectEntityByIdQuery(id)
+                                                .execute();
         return Optional.fromNullable(record);
     }
 
     @Override
-    protected Iterable<EntityStorageRecord> readMultipleRecords(Iterable<I> ids) {
+    protected Iterable<EntityRecord> readMultipleRecords(Iterable<I> ids) {
         return readMultipleRecords(ids, FieldMask.getDefaultInstance());
     }
 
     @Override
-    protected Iterable<EntityStorageRecord> readMultipleRecords(Iterable<I> ids,
-                                                                FieldMask fieldMask) {
+    protected Iterable<EntityRecord> readMultipleRecords(Iterable<I> ids,
+                                                         FieldMask fieldMask) {
         final SelectBulkQuery query = queryFactory.newSelectBulkQuery(ids, fieldMask,
                                                                       stateDescriptor);
-        final Map<?, EntityStorageRecord> recordMap;
+        final Map<?, EntityRecord> recordMap;
         try {
             recordMap = query.execute();
         } catch (SQLException e) {
@@ -150,18 +148,18 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     }
 
     @Override
-    protected Map<I, EntityStorageRecord> readAllRecords() {
+    protected Map<I, EntityRecord> readAllRecords() {
         return readAllRecords(FieldMask.getDefaultInstance());
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    protected Map<I, EntityStorageRecord> readAllRecords(FieldMask fieldMask) {
+    protected Map<I, EntityRecord> readAllRecords(FieldMask fieldMask) {
         final SelectBulkQuery query = queryFactory.newSelectAllQuery(fieldMask, stateDescriptor);
-        final Map<I, EntityStorageRecord> records;
+        final Map<I, EntityRecord> records;
 
         try {
-            records = (Map<I, EntityStorageRecord>) query.execute();
+            records = (Map<I, EntityRecord>) query.execute();
         } catch (SQLException e) {
             throw new DatabaseException(e);
         }
@@ -176,7 +174,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
      */
     @VisibleForTesting
     @Override
-    protected void writeRecord(I id, EntityStorageRecord record) throws DatabaseException {
+    protected void writeRecord(I id, EntityRecord record) throws DatabaseException {
         checkArgument(record.hasState(), "entity state");
 
         if (containsRecord(id)) {
@@ -189,13 +187,13 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     }
 
     @Override
-    protected void writeRecords(Map<I, EntityStorageRecord> records) {
+    protected void writeRecords(Map<I, EntityRecord> records) {
         // Map's initial capacity is maximum meaning no records exist in the storage yet
-        final Map<I, EntityStorageRecord> newRecords = new HashMap<>(records.size());
+        final Map<I, EntityRecord> newRecords = new HashMap<>(records.size());
 
-        for (Map.Entry<I, EntityStorageRecord> unclassifiedRecord : records.entrySet()) {
+        for (Map.Entry<I, EntityRecord> unclassifiedRecord : records.entrySet()) {
             final I id = unclassifiedRecord.getKey();
-            final EntityStorageRecord record = unclassifiedRecord.getValue();
+            final EntityRecord record = unclassifiedRecord.getValue();
             if (containsRecord(id)) {
                 queryFactory.newUpdateEntityQuery(id, record)
                             .execute();
@@ -208,8 +206,8 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     }
 
     private boolean containsRecord(I id) throws DatabaseException {
-        final EntityStorageRecord record = queryFactory.newSelectEntityByIdQuery(id)
-                                                       .execute();
+        final EntityRecord record = queryFactory.newSelectEntityByIdQuery(id)
+                                                .execute();
         final boolean contains = record != null;
         return contains;
     }

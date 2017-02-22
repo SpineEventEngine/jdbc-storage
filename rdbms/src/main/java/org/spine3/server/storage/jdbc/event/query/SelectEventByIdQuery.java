@@ -20,7 +20,7 @@
 
 package org.spine3.server.storage.jdbc.event.query;
 
-import org.spine3.server.event.storage.EventStorageRecord;
+import org.spine3.base.Event;
 import org.spine3.server.storage.jdbc.query.SelectByIdQuery;
 
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
@@ -32,12 +32,12 @@ import static org.spine3.server.storage.jdbc.event.query.EventTable.EVENT_ID_COL
 import static org.spine3.server.storage.jdbc.event.query.EventTable.SELECT_EVENT_FROM_TABLE;
 
 /**
- * Query that selects {@link EventStorageRecord} by ID.
+ * Query that selects {@link Event} by ID.
  *
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-public class SelectEventByIdQuery extends SelectByIdQuery<String, EventStorageRecord> {
+public class SelectEventByIdQuery extends SelectByIdQuery<String, Event> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE = SELECT_EVENT_FROM_TABLE +
@@ -53,12 +53,12 @@ public class SelectEventByIdQuery extends SelectByIdQuery<String, EventStorageRe
         builder.setIdIndexInQuery(1)
                .setQuery(QUERY_TEMPLATE)
                .setMessageColumnName(EVENT_COL)
-               .setMessageDescriptor(EventStorageRecord.getDescriptor());
+               .setMessageDescriptor(Event.getDescriptor());
         return builder;
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder extends SelectByIdQuery.Builder<Builder, SelectEventByIdQuery, String, EventStorageRecord> {
+    public static class Builder extends SelectByIdQuery.Builder<Builder, SelectEventByIdQuery, String, Event> {
 
         @Override
         public SelectEventByIdQuery build() {

@@ -20,7 +20,7 @@
 
 package org.spine3.server.storage.jdbc.entity.status;
 
-import org.spine3.server.storage.jdbc.entity.status.table.EntityStatusTable;
+import org.spine3.server.storage.jdbc.entity.status.table.VisibilityTable;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
@@ -29,19 +29,19 @@ import org.spine3.server.storage.jdbc.util.IdColumn;
  */
 public class QueryFactories {
 
-    public static <I> EntityStatusHandlingStorageQueryFactory<I> forTable(
+    public static <I> VisibilityHandlingStorageQueryFactory<I> forTable(
             DataSourceWrapper dataSource,
             String tableName,
             IdColumn<I> idColumn) {
-        return new EntityStatusHandlingStorageQueryFactoryImpl<>(dataSource,
+        return new VisibilityHandlingStorageQueryFactoryImpl<>(dataSource,
                                                                  tableName,
                                                                  idColumn);
     }
 
-    public static EntityStatusHandlingStorageQueryFactory<?> forSeparateTable(
+    public static VisibilityHandlingStorageQueryFactory<?> forSeparateTable(
             DataSourceWrapper dataSource) {
-        return new EntityStatusHandlingStorageQueryFactoryImpl<>(dataSource,
-                                                                 EntityStatusTable.TABLE_NAME,
+        return new VisibilityHandlingStorageQueryFactoryImpl<>(dataSource,
+                                                                 VisibilityTable.TABLE_NAME,
                                                                  new IdColumn.StringIdColumn());
     }
 }

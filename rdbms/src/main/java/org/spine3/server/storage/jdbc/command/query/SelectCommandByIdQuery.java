@@ -23,7 +23,8 @@ package org.spine3.server.storage.jdbc.command.query;
 import org.spine3.base.CommandStatus;
 import org.spine3.base.Error;
 import org.spine3.base.Failure;
-import org.spine3.server.command.storage.CommandStorageRecord;
+import org.spine3.server.command.CommandRecord;
+import org.spine3.server.command.ProcessingStatus;
 import org.spine3.server.storage.jdbc.query.SelectByIdQuery;
 
 import javax.annotation.Nullable;
@@ -46,12 +47,12 @@ import static org.spine3.server.storage.jdbc.command.query.CommandTable.TABLE_NA
 import static org.spine3.server.storage.jdbc.util.Serializer.deserialize;
 
 /**
- * Query that selects {@link CommandStorageRecord} by ID.
+ * Query that selects {@link CommandRecord} by ID.
  *
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-public class SelectCommandByIdQuery extends SelectByIdQuery<String, CommandStorageRecord> {
+public class SelectCommandByIdQuery extends SelectByIdQuery<String, CommandRecord> {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
@@ -65,32 +66,39 @@ public class SelectCommandByIdQuery extends SelectByIdQuery<String, CommandStora
     @Nullable
     @Override
     @SuppressWarnings("RefusedBequest")
-    protected CommandStorageRecord readMessage(ResultSet resultSet) throws SQLException {
+    protected CommandRecord readMessage(ResultSet resultSet) throws SQLException {
         final byte[] recordBytes = resultSet.getBytes(COMMAND_COL);
         if (recordBytes == null) {
             return null;
         }
-        final CommandStorageRecord record = deserialize(recordBytes,
-                                                        CommandStorageRecord.getDescriptor());
-        final CommandStorageRecord.Builder builder = record.toBuilder();
+        final CommandRecord record = deserialize(recordBytes,
+                                                        CommandRecord.getDescriptor());
+        final CommandRecord.Builder builder = record.toBuilder();
         final String status = resultSet.getString(COMMAND_STATUS_COL);
         if (status.equals(CommandStatus.forNumber(CommandStatus.OK_VALUE)
                                        .name())) {
-            return builder.setStatus(CommandStatus.OK)
+            final ProcessingStatus statusOk = ProcessingStatus.newBuilder().setCode(CommandStatus.OK).build();
+            return builder.setStatus(statusOk)
                           .build();
         }
         final byte[] errorBytes = resultSet.getBytes(ERROR_COL);
         if (errorBytes != null) {
             final Error error = deserialize(errorBytes, Error.getDescriptor());
-            return builder.setError(error)
-                          .setStatus(CommandStatus.ERROR)
+            final ProcessingStatus statusError = ProcessingStatus.newBuilder()
+                                                              .setCode(CommandStatus.ERROR)
+                                                              .setError(error)
+                                                              .build();
+            return builder.setStatus(statusError)
                           .build();
         }
         final byte[] failureBytes = resultSet.getBytes(FAILURE_COL);
         if (failureBytes != null) {
             final Failure failure = deserialize(failureBytes, Failure.getDescriptor());
-            return builder.setFailure(failure)
-                          .setStatus(CommandStatus.FAILURE)
+            final ProcessingStatus statusFailure = ProcessingStatus.newBuilder()
+                                                              .setCode(CommandStatus.FAILURE)
+                                                              .setFailure(failure)
+                                                              .build();
+            return builder.setStatus(statusFailure)
                           .build();
         }
         return builder.build();
@@ -104,7 +112,7 @@ public class SelectCommandByIdQuery extends SelectByIdQuery<String, CommandStora
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder extends SelectByIdQuery.Builder<Builder, SelectCommandByIdQuery, String, CommandStorageRecord> {
+    public static class Builder extends SelectByIdQuery.Builder<Builder, SelectCommandByIdQuery, String, CommandRecord> {
 
         @Override
         public SelectCommandByIdQuery build() {

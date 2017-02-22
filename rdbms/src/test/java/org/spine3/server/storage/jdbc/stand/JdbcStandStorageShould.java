@@ -26,18 +26,18 @@ import com.google.protobuf.FieldMask;
 import com.google.protobuf.Message;
 import org.junit.Test;
 import org.spine3.protobuf.AnyPacker;
-import org.spine3.protobuf.Timestamps;
+import org.spine3.protobuf.Timestamps2;
 import org.spine3.protobuf.TypeUrl;
 import org.spine3.server.aggregate.Aggregate;
+import org.spine3.server.entity.EntityRecord;
 import org.spine3.server.stand.AggregateStateId;
 import org.spine3.server.stand.StandStorage;
-import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.GivenDataSource;
 import org.spine3.server.storage.jdbc.JdbcStandStorage;
 import org.spine3.server.storage.jdbc.entity.query.CreateEntityTableQuery;
 import org.spine3.server.storage.jdbc.entity.query.RecordStorageQueryFactory;
-import org.spine3.server.storage.jdbc.entity.status.query.CreateEntityStatusTableQuery;
+import org.spine3.server.storage.jdbc.entity.status.query.CreateVisibilityTableQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.test.aggregate.Project;
 import org.spine3.test.aggregate.ProjectId;
@@ -80,11 +80,11 @@ public class JdbcStandStorageShould {
 
         final CreateEntityTableQuery<String> queryMock = (CreateEntityTableQuery<String>) mock(
                 CreateEntityTableQuery.class);
-        final CreateEntityStatusTableQuery statusQueryMock = mock(
-                CreateEntityStatusTableQuery.class);
+        final CreateVisibilityTableQuery statusQueryMock = mock(
+                CreateVisibilityTableQuery.class);
 
         when(queryFactoryMock.newCreateEntityTableQuery()).thenReturn(queryMock);
-        when(queryFactoryMock.newCreateEntityStatusTableQuery()).thenReturn(statusQueryMock);
+        when(queryFactoryMock.newCreateVisibilityTableQuery()).thenReturn(statusQueryMock);
         doNothing().when(queryMock)
                    .execute();
         doNothing().when(statusQueryMock)
@@ -113,10 +113,10 @@ public class JdbcStandStorageShould {
 
         final CreateEntityTableQuery<String> queryMock = (CreateEntityTableQuery<String>) mock(
                 CreateEntityTableQuery.class);
-        final CreateEntityStatusTableQuery statusQueryMock = mock(
-                CreateEntityStatusTableQuery.class);
+        final CreateVisibilityTableQuery statusQueryMock = mock(
+                CreateVisibilityTableQuery.class);
         when(queryFactoryMock.newCreateEntityTableQuery()).thenReturn(queryMock);
-        when(queryFactoryMock.newCreateEntityStatusTableQuery()).thenReturn(statusQueryMock);
+        when(queryFactoryMock.newCreateVisibilityTableQuery()).thenReturn(statusQueryMock);
         doNothing().when(queryMock)
                    .execute();
         doNothing().when(statusQueryMock)
@@ -198,13 +198,13 @@ public class JdbcStandStorageShould {
 
         final Given.TestAggregate aggregate = new Given.TestAggregate("some_id");
 
-        final EntityStorageRecord record = writeToStorage(aggregate, storage, Project.class);
+        final EntityRecord record = writeToStorage(aggregate, storage, Project.class);
 
-        final Optional<EntityStorageRecord> readRecord = storage.read(
+        final Optional<EntityRecord> readRecord = storage.read(
                 AggregateStateId.of(aggregate.getId(),
                                     TypeUrl.of(Project.class)));
         assertTrue(readRecord.isPresent());
-        final EntityStorageRecord actualRecord = readRecord.get();
+        final EntityRecord actualRecord = readRecord.get();
         assertEquals(actualRecord, record);
     }
 
@@ -214,7 +214,7 @@ public class JdbcStandStorageShould {
 
         final Collection<Given.TestAggregate> testData = Given.testAggregates(10);
 
-        final List<EntityStorageRecord> records = new ArrayList<>();
+        final List<EntityRecord> records = new ArrayList<>();
 
         for (Aggregate aggregate : testData) {
             records.add(writeToStorage(aggregate, storage, Project.class));
@@ -228,7 +228,7 @@ public class JdbcStandStorageShould {
         ids.add(AggregateStateId.of("5", typeUrl));
         ids.add(AggregateStateId.of("8", typeUrl));
 
-        final Collection<EntityStorageRecord> readRecords = (Collection<EntityStorageRecord>) storage.readMultiple(
+        final Collection<EntityRecord> readRecords = (Collection<EntityRecord>) storage.readMultiple(
                 ids);
         assertEquals(ids.size(), readRecords.size());
 
@@ -251,7 +251,7 @@ public class JdbcStandStorageShould {
         ids.add(AggregateStateId.of("invalid-id-2", typeUrl));
         ids.add(AggregateStateId.of(repeatingInvalidId, typeUrl));
 
-        final Collection<EntityStorageRecord> records = (Collection<EntityStorageRecord>) storage.readMultiple(
+        final Collection<EntityRecord> records = (Collection<EntityRecord>) storage.readMultiple(
                 ids);
 
         assertNotNull(records);
@@ -265,17 +265,17 @@ public class JdbcStandStorageShould {
 
         final Collection<Given.TestAggregate> testData = Given.testAggregates(10);
 
-        final List<EntityStorageRecord> records = new ArrayList<>();
+        final List<EntityRecord> records = new ArrayList<>();
 
         for (Aggregate aggregate : testData) {
             records.add(writeToStorage(aggregate, storage, Project.class));
         }
 
-        final Map<AggregateStateId, EntityStorageRecord> readRecords = storage.readAll();
+        final Map<AggregateStateId, EntityRecord> readRecords = storage.readAll();
         assertEquals(records.size(), readRecords.size());
 
-        final Collection<EntityStorageRecord> readValues = readRecords.values();
-        for (EntityStorageRecord record : records) {
+        final Collection<EntityRecord> readValues = readRecords.values();
+        for (EntityRecord record : records) {
             assertContains(record, readValues);
         }
     }
@@ -319,9 +319,9 @@ public class JdbcStandStorageShould {
                                                                  .getFullName())
                                                  .build();
 
-        final Optional<EntityStorageRecord> recordOptional = storage.read(id, idOnly);
+        final Optional<EntityRecord> recordOptional = storage.read(id, idOnly);
         assertTrue(recordOptional.isPresent());
-        final EntityStorageRecord record = recordOptional.get();
+        final EntityRecord record = recordOptional.get();
         final Project withIdOnly = AnyPacker.unpack(record.getState());
         final Project withIdAndName = AnyPacker.unpack(
                 storage.readMultiple(Collections.singleton(id), idAndName)
@@ -349,10 +349,10 @@ public class JdbcStandStorageShould {
             writeToStorage(aggregate, storage, Project.class);
         }
 
-        final EntityStorageRecord differentRecord = writeToStorage(differentAggregate, storage,
+        final EntityRecord differentRecord = writeToStorage(differentAggregate, storage,
                                                                    Customer.class);
 
-        final Collection<EntityStorageRecord> records = storage.readAllByType(
+        final Collection<EntityRecord> records = storage.readAllByType(
                 TypeUrl.of(Project.class));
         assertSize(aggregatesCount, records);
         assertFalse(records.contains(differentRecord));
@@ -376,10 +376,10 @@ public class JdbcStandStorageShould {
                                                               .getFullName())
                                              .build();
 
-        final Collection<EntityStorageRecord> records = storage.readAllByType(
+        final Collection<EntityRecord> records = storage.readAllByType(
                 TypeUrl.of(Project.class), namesMask);
 
-        for (EntityStorageRecord record : records) {
+        for (EntityRecord record : records) {
             final Project project = AnyPacker.unpack(record.getState());
             assertMatches(project, namesMask);
         }
@@ -446,16 +446,15 @@ public class JdbcStandStorageShould {
         }
     }
 
-    private static EntityStorageRecord writeToStorage(Aggregate<?, ?, ?> aggregate,
+    private static EntityRecord writeToStorage(Aggregate<?, ?, ?> aggregate,
                                                       StandStorage storage,
                                                       Class<? extends Message> stateClass) {
         final AggregateStateId id = AggregateStateId.of(aggregate.getId(), TypeUrl.of(stateClass));
-        final EntityStorageRecord record = EntityStorageRecord.newBuilder()
+        final EntityRecord record = EntityRecord.newBuilder()
                                                               .setState(AnyPacker.pack(
                                                                       aggregate.getState()))
-                                                              .setWhenModified(
-                                                                      Timestamps.getCurrentTime())
-                                                              .setVersion(1)
+                                                              .setVersion(org.spine3.base.Version.newBuilder().setNumber(1).setTimestamp(
+                                                                      Timestamps2.getCurrentTime()))
                                                               .build();
 
         storage.write(id, record);
