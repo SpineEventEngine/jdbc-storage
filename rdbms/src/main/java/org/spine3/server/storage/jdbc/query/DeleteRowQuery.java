@@ -41,8 +41,11 @@ import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
  */
 public class DeleteRowQuery<I> extends StorageQuery {
 
+    private static final String FORMAT_PLACEHOLDER = "%s";
+
     private static final String TEMPLATE =
-            DELETE_FROM + "%s" + WHERE + "%s" + EQUAL + PLACEHOLDER;
+            DELETE_FROM + FORMAT_PLACEHOLDER + WHERE + FORMAT_PLACEHOLDER + EQUAL + PLACEHOLDER;
+
     private static final int COLUMN_VALUE_PARAM_INDEX = 1;
 
     private final I id;
@@ -106,7 +109,7 @@ public class DeleteRowQuery<I> extends StorageQuery {
         public DeleteRowQuery<I> build() {
             checkNotNull(column, "ID column name must be set first");
             checkNotNull(idColumn, "ID column must be set first");
-            checkNotNull(columnValue, "ID id must be set first");
+            checkNotNull(columnValue, "ID must be set first");
             checkNotNull(table, "Table must be set first");
             final String sql = composeSql();
             setQuery(sql);

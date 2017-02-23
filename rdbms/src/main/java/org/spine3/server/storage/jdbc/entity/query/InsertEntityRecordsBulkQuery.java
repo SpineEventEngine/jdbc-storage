@@ -57,11 +57,14 @@ import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
  */
 public class InsertEntityRecordsBulkQuery<I> extends WriteQuery {
 
+    private static final String FORMAT_PLACEHOLDER = "%s";
+
     private static final int COLUMNS_COUNT = 4;
-    private static final String SQL_TEMPLATE = INSERT_INTO + "%s" +
+
+    private static final String SQL_TEMPLATE = INSERT_INTO + FORMAT_PLACEHOLDER +
                                                BRACKET_OPEN + ID_COL + COMMA + ENTITY_COL + COMMA +
                                                archived + COMMA + deleted + BRACKET_CLOSE +
-                                               VALUES + "%s";
+                                               VALUES + FORMAT_PLACEHOLDER;
     private static final String SQL_VALUES_TEMPLATE = nPlaceholders(COLUMNS_COUNT);
 
     private final Map<I, EntityRecord> records;
