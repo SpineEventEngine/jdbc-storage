@@ -145,10 +145,10 @@ public class JdbcEventStorage extends EventStorage {
 
         final String eventId = id.getUuid();
         if (containsRecord(eventId)) {
-            queryFactory.newUpdateEventQuery(event)
+            queryFactory.newUpdateEventQuery(eventId, event)
                         .execute();
         } else {
-            queryFactory.newInsertEventQuery(event)
+            queryFactory.newInsertEventQuery(eventId, event)
                         .execute();
         }
     }

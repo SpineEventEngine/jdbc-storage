@@ -101,7 +101,7 @@ public class UpdateEventRecordQuery extends WriteRecordQuery<String, Event> {
             final int nanos = timestamp.getNanos();
             statement.setInt(5, nanos);
 
-            final String eventId = context.getEventId().getUuid();
+            final String eventId = getId();
             statement.setString(6, eventId);
         } catch (SQLException e) {
             getLogger().error("Failed to prepare statement ", e);

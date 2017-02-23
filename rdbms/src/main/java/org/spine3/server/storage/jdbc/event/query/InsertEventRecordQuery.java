@@ -82,7 +82,7 @@ public class InsertEventRecordQuery extends WriteRecordQuery<String, Event> {
         final EventContext context = event.getContext();
         final Timestamp timestamp = context.getTimestamp();
         try {
-            final String eventId = context.getEventId().getUuid();
+            final String eventId = getId();
             statement.setString(1, eventId);
 
             final byte[] serializedEvent = serialize(event);

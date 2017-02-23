@@ -41,6 +41,10 @@ public abstract class WriteRecordQuery<I, Record extends Message> extends WriteQ
         return record;
     }
 
+    public I getId() {
+        return id;
+    }
+
     protected WriteRecordQuery(
             Builder<? extends Builder, ? extends WriteRecordQuery, I, Record> builder) {
         super(builder);
