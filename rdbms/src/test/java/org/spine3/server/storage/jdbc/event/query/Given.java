@@ -20,11 +20,15 @@
 
 package org.spine3.server.storage.jdbc.event.query;
 
+import com.google.protobuf.Message;
 import org.slf4j.Logger;
 import org.spine3.base.Event;
+import org.spine3.base.EventContext;
+import org.spine3.base.Events;
 import org.spine3.server.storage.jdbc.GivenDataSource;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
+import org.spine3.test.event.ProjectCreated;
 
 import java.sql.SQLException;
 
@@ -45,34 +49,43 @@ class Given {
 
     static InsertEventRecordQuery getInsertEventRecordQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnSettingStatementParam();
-        final InsertEventRecordQuery.Builder builder = InsertEventRecordQuery.newBuilder()
-                                                                             .setDataSource(
-                                                                                     dataSourceMock)
-                                                                             .setLogger(loggerMock)
-                                                                             .setIdColumn(
-                                                                                     idColumnMock)
-                                                                             .setRecord(
-                                                                                     Event.getDefaultInstance());
+        final DataSourceWrapper dataSourceMock =
+                GivenDataSource.whichThrowsExceptionOnSettingStatementParam();
+        final InsertEventRecordQuery.Builder builder =
+                InsertEventRecordQuery.newBuilder()
+                                      .setDataSource(
+                                              dataSourceMock)
+                                      .setLogger(loggerMock)
+                                      .setIdColumn(
+                                              idColumnMock)
+                                      .setRecord(
+                                              nonEmptyEvent());
         return builder.build();
     }
 
     static UpdateEventRecordQuery getUpdateEventRecordQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnSettingStatementParam();
-        final UpdateEventRecordQuery.Builder builder = UpdateEventRecordQuery.newBuilder()
-                                                                             .setDataSource(
-                                                                                     dataSourceMock)
-                                                                             .setLogger(loggerMock)
-                                                                             .setIdColumn(
-                                                                                     idColumnMock)
-                                                                             .setRecord(
-                                                                                     Event.getDefaultInstance());
+        final DataSourceWrapper dataSourceMock =
+                GivenDataSource.whichThrowsExceptionOnSettingStatementParam();
+        final UpdateEventRecordQuery.Builder builder =
+                UpdateEventRecordQuery.newBuilder()
+                                      .setDataSource(
+                                              dataSourceMock)
+                                      .setLogger(loggerMock)
+                                      .setIdColumn(
+                                              idColumnMock)
+                                      .setRecord(
+                                              nonEmptyEvent());
         return builder.build();
     }
 
     @SuppressWarnings("StaticVariableUsedBeforeInitialization")
     static Logger getLoggerMock() {
         return loggerMock;
+    }
+
+    private static Event nonEmptyEvent() {
+        final Message eventMessage = ProjectCreated.getDefaultInstance();
+        return Events.createEvent(eventMessage, EventContext.getDefaultInstance());
     }
 }

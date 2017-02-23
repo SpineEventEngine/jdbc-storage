@@ -54,6 +54,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Lists.newLinkedList;
 import static org.spine3.server.storage.jdbc.util.Closeables.closeAll;
 
@@ -136,6 +137,10 @@ public class JdbcEventStorage extends EventStorage {
      */
     @Override
     public void write(EventId id, Event event) throws DatabaseException {
+        checkNotClosed();
+        checkNotNull(id);
+        checkNotNull(event);
+
         final String eventId = Stringifiers.idToString(id);
         if (containsRecord(eventId)) {
             queryFactory.newUpdateEventQuery(event)
@@ -153,6 +158,9 @@ public class JdbcEventStorage extends EventStorage {
      */
     @Override
     public Optional<Event> read(EventId eventId) throws DatabaseException {
+        checkNotClosed();
+        checkNotNull(eventId);
+
         final String id = eventId.getUuid();
         final Event record = queryFactory.newSelectEventByIdQuery(id)
                                                       .execute();

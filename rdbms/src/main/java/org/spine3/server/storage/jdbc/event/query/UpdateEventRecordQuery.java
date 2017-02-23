@@ -85,7 +85,7 @@ public class UpdateEventRecordQuery extends WriteRecordQuery<String, Event> {
             final String eventType = TypeName.of(AnyPacker.unpack(getRecord().getMessage()));
             statement.setString(2, eventType);
 
-            final String producerId = Stringifiers.idToString(context.getProducerId());
+            final String producerId = Stringifiers.idToString(AnyPacker.unpack(context.getProducerId()));
             statement.setString(3, producerId);
 
             final long seconds = timestamp.getSeconds();
@@ -94,7 +94,7 @@ public class UpdateEventRecordQuery extends WriteRecordQuery<String, Event> {
             final int nanos = timestamp.getNanos();
             statement.setInt(5, nanos);
 
-            final String eventId = Stringifiers.idToString(context.getEventId());
+            final String eventId = context.getEventId().getUuid();
             statement.setString(6, eventId);
         } catch (SQLException e) {
             getLogger().error("Failed to prepare statement ", e);
