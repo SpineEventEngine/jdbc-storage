@@ -21,7 +21,6 @@
 package org.spine3.server.storage.jdbc.entity.status.query;
 
 import org.spine3.server.storage.jdbc.query.CreateTableQuery;
-import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import static org.spine3.server.storage.VisibilityField.archived;
 import static org.spine3.server.storage.VisibilityField.deleted;
@@ -55,15 +54,6 @@ public class CreateVisibilityTableQuery extends CreateTableQuery<String> {
     }
 
     public static class Builder extends CreateTableQuery.Builder<Builder, CreateVisibilityTableQuery, String> {
-
-        @SuppressWarnings("MethodDoesntCallSuperMethod")
-// We don't want to override the {@code idColumn} field.
-        @Deprecated
-        @Override
-        public Builder setIdColumn(IdColumn<String> idColumn) {
-            throw new UnsupportedOperationException(
-                    "Entity Status table has predefined id type: String.");
-        }
 
         @Override
         public CreateVisibilityTableQuery build() {

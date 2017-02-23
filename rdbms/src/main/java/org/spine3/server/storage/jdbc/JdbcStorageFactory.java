@@ -20,7 +20,6 @@
 
 package org.spine3.server.storage.jdbc;
 
-import com.google.protobuf.Descriptors;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.spine3.server.aggregate.Aggregate;
@@ -52,21 +51,19 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Creates storages based on JDBC-compliant RDBMS.
  *
- * @param <ID> ID type if the {@link Entity} that will be stored in the storages created by this factory.
+ * @param <I> T type if the {@link Entity} that will be stored in the storages created by this factory.
  * @author Alexander Litus
  * @author Andrey Lavrov
  * @author Dmytro Dashenkov
  */
-public class JdbcStorageFactory<ID> implements StorageFactory {
+public class JdbcStorageFactory<I> implements StorageFactory {
 
     private final DataSourceWrapper dataSource;
     private final boolean multitenant;
-    private final Class<? extends Entity<ID, ?>> entityClass;
-    private final Descriptors.Descriptor entityStateDescriptor;
+    private final Class<? extends Entity<I, ?>> entityClass;
 
-    private JdbcStorageFactory(Builder<ID> builder) {
+    private JdbcStorageFactory(Builder<I> builder) {
         this.entityClass = checkNotNull(builder.entityClass);
-        this.entityStateDescriptor = checkNotNull(builder.entityStateDescriptor);
         this.dataSource = checkNotNull(builder.dataSource);
         this.multitenant = builder.multitenant;
     }
@@ -90,9 +87,9 @@ public class JdbcStorageFactory<ID> implements StorageFactory {
 
     @Override
     public StandStorage createStandStorage() {
-        final RecordStorageQueryFactory<ID> recordStorageQueryFactory =
+        final RecordStorageQueryFactory<I> recordStorageQueryFactory =
                 getEntityStorageQueryFactory(dataSource, entityClass);
-        return JdbcStandStorage.<ID>newBuilder()
+        return JdbcStandStorage.<I>newBuilder()
                 .setDataSource(dataSource)
                 .setMultitenant(isMultitenant())
                 .setRecordStorageQueryFactory(recordStorageQueryFactory)
@@ -135,11 +132,11 @@ public class JdbcStorageFactory<ID> implements StorageFactory {
      *
      * @param dataSource     {@link DataSource} on which corresponding {@link JdbcAggregateStorage} is based
      * @param aggregateClass class of aggregates which are stored in the corresponding {@link JdbcAggregateStorage}
-     * @param <I>            a type of IDs of stored aggregates
+     * @param <T>            a type of IDs of stored aggregates
      */
-    protected <I> AggregateStorageQueryFactory<I> getAggregateStorageQueryFactory(
+    protected <T> AggregateStorageQueryFactory<T> getAggregateStorageQueryFactory(
             DataSourceWrapper dataSource,
-            Class<? extends Aggregate<I, ?, ?>> aggregateClass) {
+            Class<? extends Aggregate<T, ?, ?>> aggregateClass) {
         return new AggregateStorageQueryFactory<>(dataSource, aggregateClass);
     }
 
@@ -148,11 +145,11 @@ public class JdbcStorageFactory<ID> implements StorageFactory {
      *
      * @param dataSource  {@link DataSource} on which corresponding {@link JdbcRecordStorage} is based
      * @param entityClass class of entities which are stored in the corresponding {@link JdbcRecordStorage}
-     * @param <I>         a type of IDs of stored entities
+     * @param <T>         a type of IDs of stored entities
      */
-    protected <I> RecordStorageQueryFactory<I> getEntityStorageQueryFactory(
+    protected <T> RecordStorageQueryFactory<T> getEntityStorageQueryFactory(
             DataSourceWrapper dataSource,
-            Class<? extends Entity<I, ?>> entityClass) {
+            Class<? extends Entity<T, ?>> entityClass) {
         return new RecordStorageQueryFactory<>(dataSource, entityClass);
     }
 
@@ -161,11 +158,11 @@ public class JdbcStorageFactory<ID> implements StorageFactory {
      *
      * @param dataSource  {@link DataSource} on which corresponding {@link JdbcProjectionStorage} is based
      * @param entityClass class of entities which are stored in the corresponding {@link JdbcRecordStorage}
-     * @param <I>         a type of IDs of entities from the corresponding {@link JdbcRecordStorage}
+     * @param <T>         a type of IDs of entities from the corresponding {@link JdbcRecordStorage}
      */
-    protected <I> ProjectionStorageQueryFactory<I> getProjectionStorageQueryFactory(
+    protected <T> ProjectionStorageQueryFactory<T> getProjectionStorageQueryFactory(
             DataSourceWrapper dataSource,
-            Class<? extends Entity<I, ?>> entityClass) {
+            Class<? extends Entity<T, ?>> entityClass) {
         return new ProjectionStorageQueryFactory<>(dataSource, entityClass);
     }
 
@@ -208,7 +205,6 @@ public class JdbcStorageFactory<ID> implements StorageFactory {
         private DataSourceWrapper dataSource;
         private boolean multitenant;
         private Class<? extends Entity<I, ?>> entityClass;
-        private Descriptors.Descriptor entityStateDescriptor;
 
         private Builder() {
         }
@@ -226,14 +222,6 @@ public class JdbcStorageFactory<ID> implements StorageFactory {
          */
         public Builder<I> setEntityClass(Class<? extends Entity<I, ?>> entityClass) {
             this.entityClass = entityClass;
-            return this;
-        }
-
-        /**
-         * Sets required field {@code entityStateDescriptor}.
-         */
-        public Builder<I> setEntityStateDescriptor(Descriptors.Descriptor descriptor) {
-            this.entityStateDescriptor = descriptor;
             return this;
         }
 

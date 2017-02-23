@@ -60,7 +60,6 @@ public class JdbcStorageFactoryShould {
                 .setDataSource(config)
                 .setMultitenant(false)
                 .setEntityClass(TestAggregate.class)
-                .setEntityStateDescriptor(StringValue.getDescriptor())
                 .build();
     }
 
@@ -69,7 +68,6 @@ public class JdbcStorageFactoryShould {
         final JdbcStorageFactory factory = JdbcStorageFactory.<String>newBuilder()
                 .setDataSource(mock(DataSource.class))
                 .setEntityClass(TestProjection.class)
-                .setEntityStateDescriptor(Project.getDescriptor())
                 .build();
 
         assertNotNull(factory);
