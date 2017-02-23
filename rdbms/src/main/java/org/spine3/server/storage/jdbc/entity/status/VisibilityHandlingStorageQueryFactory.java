@@ -46,9 +46,9 @@ public interface VisibilityHandlingStorageQueryFactory<I> {
 
     MarkEntityQuery<I> newMarkDeletedQuery(I id);
 
-    InsertAndMarkEntityQuery<I> newInsertAndMarkArchivedEntityQuery(I id);
+    InsertAndMarkEntityQuery<I> newMarkArchivedNewEntityQuery(I id);
 
-    InsertAndMarkEntityQuery<I> newInsertAndMarkDeletedEntityQuery(I id);
+    InsertAndMarkEntityQuery<I> newMarkDeletedNewEntityQuery(I id);
 
     void setLogger(Logger logger);
 }

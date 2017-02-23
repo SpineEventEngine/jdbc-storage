@@ -28,7 +28,7 @@ import org.spine3.server.entity.Visibility;
 import org.spine3.server.entity.EntityRecord;
 import org.spine3.server.storage.RecordStorage;
 import org.spine3.server.storage.jdbc.entity.status.VisibilityHandlingStorageQueryFactory;
-import org.spine3.server.storage.jdbc.entity.status.QueryFactories;
+import org.spine3.server.storage.jdbc.entity.status.VisibilityQueryFactories;
 import org.spine3.server.storage.jdbc.entity.status.query.CreateVisibilityTableQuery;
 import org.spine3.server.storage.jdbc.entity.status.query.InsertVisibilityQuery;
 import org.spine3.server.storage.jdbc.entity.status.query.SelectVisibilityQuery;
@@ -67,7 +67,7 @@ public class RecordStorageQueryFactory<I> implements VisibilityHandlingStorageQu
         this.idColumn = IdColumn.newInstance(entityClass);
         this.dataSource = dataSource;
         this.tableName = DbTableNameFactory.newTableName(entityClass);
-        this.statusTableQueryFactory = QueryFactories.forTable(
+        this.statusTableQueryFactory = VisibilityQueryFactories.forTable(
                 dataSource,
                 tableName,
                 idColumn);
@@ -104,12 +104,12 @@ public class RecordStorageQueryFactory<I> implements VisibilityHandlingStorageQu
     }
 
     @Override
-    public InsertAndMarkEntityQuery<I> newInsertAndMarkArchivedEntityQuery(I id) {
+    public InsertAndMarkEntityQuery<I> newMarkArchivedNewEntityQuery(I id) {
         throw new UnsupportedOperationException("The record must be present to mark it archived.");
     }
 
     @Override
-    public InsertAndMarkEntityQuery<I> newInsertAndMarkDeletedEntityQuery(I id) {
+    public InsertAndMarkEntityQuery<I> newMarkDeletedNewEntityQuery(I id) {
         throw new UnsupportedOperationException("The record must be present to mark it deleted.");
     }
 

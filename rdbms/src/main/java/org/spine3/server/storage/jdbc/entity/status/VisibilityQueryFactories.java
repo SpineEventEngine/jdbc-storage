@@ -27,7 +27,10 @@ import org.spine3.server.storage.jdbc.util.IdColumn;
 /**
  * @author Dmytro Dashenkov.
  */
-public class QueryFactories {
+public class VisibilityQueryFactories {
+
+    private VisibilityQueryFactories() {
+    }
 
     public static <I> VisibilityHandlingStorageQueryFactory<I> forTable(
             DataSourceWrapper dataSource,

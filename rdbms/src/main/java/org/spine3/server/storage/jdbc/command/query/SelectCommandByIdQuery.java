@@ -65,7 +65,8 @@ public class SelectCommandByIdQuery extends SelectByIdQuery<String, CommandRecor
 
     @Nullable
     @Override
-    @SuppressWarnings("RefusedBequest")
+    @SuppressWarnings("MethodDoesntCallSuperMethod")
+    // We store the Commands not the same way as other records
     protected CommandRecord readMessage(ResultSet resultSet) throws SQLException {
         final byte[] recordBytes = resultSet.getBytes(COMMAND_COL);
         if (recordBytes == null) {

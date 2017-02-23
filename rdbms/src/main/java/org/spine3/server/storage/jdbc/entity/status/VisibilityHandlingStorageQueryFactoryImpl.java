@@ -114,12 +114,12 @@ public class VisibilityHandlingStorageQueryFactoryImpl<I> implements VisibilityH
     }
 
     @Override
-    public InsertAndMarkEntityQuery<I> newInsertAndMarkArchivedEntityQuery(I id) {
+    public InsertAndMarkEntityQuery<I> newMarkArchivedNewEntityQuery(I id) {
         return newInsertAndMarkEntityQuery(id, archived);
     }
 
     @Override
-    public InsertAndMarkEntityQuery<I> newInsertAndMarkDeletedEntityQuery(I id) {
+    public InsertAndMarkEntityQuery<I> newMarkDeletedNewEntityQuery(I id) {
         return newInsertAndMarkEntityQuery(id, deleted);
     }
 

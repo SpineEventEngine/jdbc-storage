@@ -22,13 +22,13 @@ package org.spine3.server.storage.jdbc.aggregate.query;
 
 import org.slf4j.Logger;
 import org.spine3.server.aggregate.Aggregate;
-import org.spine3.server.aggregate.AggregateStorage;
 import org.spine3.server.aggregate.AggregateEventRecord;
+import org.spine3.server.aggregate.AggregateStorage;
 import org.spine3.server.entity.Visibility;
 import org.spine3.server.storage.jdbc.entity.query.InsertAndMarkEntityQuery;
 import org.spine3.server.storage.jdbc.entity.query.MarkEntityQuery;
 import org.spine3.server.storage.jdbc.entity.status.VisibilityHandlingStorageQueryFactory;
-import org.spine3.server.storage.jdbc.entity.status.QueryFactories;
+import org.spine3.server.storage.jdbc.entity.status.VisibilityQueryFactories;
 import org.spine3.server.storage.jdbc.entity.status.query.CreateVisibilityTableQuery;
 import org.spine3.server.storage.jdbc.entity.status.query.InsertVisibilityQuery;
 import org.spine3.server.storage.jdbc.entity.status.query.SelectVisibilityQuery;
@@ -51,7 +51,7 @@ public class AggregateStorageQueryFactory<I> implements VisibilityHandlingStorag
     private final String mainTableName;
     private final String eventCountTableName;
     private final DataSourceWrapper dataSource;
-    private final VisibilityHandlingStorageQueryFactory statusTableQueryFactory;
+    private final VisibilityHandlingStorageQueryFactory<I> statusTableQueryFactory;
     private Logger logger;
 
     /**
@@ -60,13 +60,17 @@ public class AggregateStorageQueryFactory<I> implements VisibilityHandlingStorag
      * @param dataSource     instance of {@link DataSourceWrapper}
      * @param aggregateClass aggregate class of corresponding {@link AggregateStorage} instance
      */
+    @SuppressWarnings("unchecked")
+    // The aux visibility handling query factory has a hardcoded type param
     public AggregateStorageQueryFactory(DataSourceWrapper dataSource,
                                         Class<? extends Aggregate<I, ?, ?>> aggregateClass) {
         this.idColumn = IdColumn.newInstance(aggregateClass);
         this.mainTableName = DbTableNameFactory.newTableName(aggregateClass);
         this.eventCountTableName = mainTableName + EVENT_COUNT_TABLE_NAME_SUFFIX;
         this.dataSource = dataSource;
-        this.statusTableQueryFactory = QueryFactories.forSeparateTable(dataSource);
+        this.statusTableQueryFactory =
+                (VisibilityHandlingStorageQueryFactory<I>) VisibilityQueryFactories
+                        .forSeparateTable(dataSource);
     }
 
     @Override
@@ -100,13 +104,13 @@ public class AggregateStorageQueryFactory<I> implements VisibilityHandlingStorag
     }
 
     @Override
-    public InsertAndMarkEntityQuery<I> newInsertAndMarkArchivedEntityQuery(I id) {
-        return statusTableQueryFactory.newInsertAndMarkArchivedEntityQuery(id);
+    public InsertAndMarkEntityQuery<I> newMarkArchivedNewEntityQuery(I id) {
+        return statusTableQueryFactory.newMarkArchivedNewEntityQuery(id);
     }
 
     @Override
-    public InsertAndMarkEntityQuery<I> newInsertAndMarkDeletedEntityQuery(I id) {
-        return statusTableQueryFactory.newInsertAndMarkDeletedEntityQuery(id);
+    public InsertAndMarkEntityQuery<I> newMarkDeletedNewEntityQuery(I id) {
+        return statusTableQueryFactory.newMarkDeletedNewEntityQuery(id);
     }
 
     /** Sets the logger for logging exceptions during queries execution. */

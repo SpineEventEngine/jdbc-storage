@@ -75,7 +75,6 @@ public class InsertEventRecordQuery extends WriteRecordQuery<String, Event> {
     }
 
     @Override
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
         final PreparedStatement statement = connection.prepareStatement(QUERY_TEMPLATE);
         final Event event = getRecord();

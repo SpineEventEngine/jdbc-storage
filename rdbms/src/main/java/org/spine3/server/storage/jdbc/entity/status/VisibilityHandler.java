@@ -81,7 +81,7 @@ public class VisibilityHandler<I> {
     public void markArchived(I id) {
         final MarkEntityQuery query;
         if (!containsRecord(id)) {
-            query = queryFactory.newInsertAndMarkArchivedEntityQuery(id);
+            query = queryFactory.newMarkArchivedNewEntityQuery(id);
         } else {
             query = queryFactory.newMarkArchivedQuery(id);
         }
@@ -91,7 +91,7 @@ public class VisibilityHandler<I> {
     public void markDeleted(I id) {
         final MarkEntityQuery query;
         if (!containsRecord(id)) {
-            query = queryFactory.newInsertAndMarkDeletedEntityQuery(id);
+            query = queryFactory.newMarkDeletedNewEntityQuery(id);
         } else {
             query = queryFactory.newMarkDeletedQuery(id);
         }
