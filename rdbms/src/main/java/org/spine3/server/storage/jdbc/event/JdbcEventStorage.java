@@ -112,6 +112,9 @@ public class JdbcEventStorage extends EventStorage {
      */
     @Override
     public Iterator<Event> iterator(EventStreamQuery query) throws DatabaseException {
+        checkNotClosed();
+        checkNotNull(query);
+
         final Iterator<Event> iterator = queryFactory.newFilterAndSortQuery(query)
                                                                   .execute();
 
@@ -176,6 +179,8 @@ public class JdbcEventStorage extends EventStorage {
 
     @Override
     public void close() throws DatabaseException {
+        checkNotClosed();
+
         try {
             super.close();
         } catch (Exception e) {
