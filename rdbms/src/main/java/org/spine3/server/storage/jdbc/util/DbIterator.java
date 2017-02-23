@@ -42,11 +42,11 @@ import static org.spine3.server.storage.jdbc.util.Serializer.deserialize;
  *
  * <p><b>NOTE:</b> {@code remove} operation is not supported.
  *
- * @param <Record> type of storage records
+ * @param <R> type of storage records
  * @author Alexander Litus
  */
 @Internal
-public class DbIterator<Record extends Message> implements Iterator<Record>, AutoCloseable {
+public class DbIterator<R extends Message> implements Iterator<R>, AutoCloseable {
 
     private final ResultSet resultSet;
     private final PreparedStatement statement;
@@ -90,7 +90,7 @@ public class DbIterator<Record extends Message> implements Iterator<Record>, Aut
     }
 
     @Override
-    public Record next() {
+    public R next() {
         if (!isHasNextCalledBeforeNext) {
             throw new IllegalStateException(
                     "It is required to call hasNext() before next() method.");
@@ -100,7 +100,7 @@ public class DbIterator<Record extends Message> implements Iterator<Record>, Aut
             throw new NoSuchElementException("No elements remained.");
         }
         final byte[] bytes = readBytes();
-        final Record record = deserialize(bytes, recordDescriptor);
+        final R record = deserialize(bytes, recordDescriptor);
         return record;
     }
 

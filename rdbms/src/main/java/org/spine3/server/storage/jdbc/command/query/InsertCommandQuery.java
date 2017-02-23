@@ -22,6 +22,13 @@ package org.spine3.server.storage.jdbc.command.query;
 
 import org.spine3.server.command.CommandRecord;
 
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.COMMA;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
+import static org.spine3.server.storage.jdbc.Sql.Query.INSERT_INTO;
+import static org.spine3.server.storage.jdbc.Sql.Query.VALUES;
+import static org.spine3.server.storage.jdbc.Sql.nPlaceholders;
 import static org.spine3.server.storage.jdbc.command.query.CommandTable.COMMAND_COL;
 import static org.spine3.server.storage.jdbc.command.query.CommandTable.COMMAND_STATUS_COL;
 import static org.spine3.server.storage.jdbc.command.query.CommandTable.ID_COL;
@@ -37,11 +44,11 @@ public class InsertCommandQuery extends WriteCommandRecordQuery {
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
-            "INSERT INTO " + TABLE_NAME + " (" +
-            ID_COL + ", " +
-            COMMAND_STATUS_COL + ", " +
-            COMMAND_COL +
-            ") VALUES (?, ?, ?);";
+            INSERT_INTO + TABLE_NAME + BRACKET_OPEN +
+            ID_COL + COMMA +
+            COMMAND_STATUS_COL + COMMA +
+            COMMAND_COL + BRACKET_CLOSE +
+            VALUES + nPlaceholders(3) + SEMICOLON;
 
     private InsertCommandQuery(Builder builder) {
         super(builder);

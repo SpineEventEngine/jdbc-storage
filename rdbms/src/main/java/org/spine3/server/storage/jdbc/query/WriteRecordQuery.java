@@ -29,15 +29,15 @@ import org.spine3.server.storage.jdbc.util.Serializer;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public abstract class WriteRecordQuery<I, Record extends Message> extends WriteQuery {
+public abstract class WriteRecordQuery<I, R extends Message> extends WriteQuery {
 
     private final I id;
-    private final Record record;
+    private final R record;
     private final int idIndexInQuery;
     private final int recordIndexInQuery;
     private final IdColumn<I> idColumn;
 
-    public Record getRecord() {
+    public R getRecord() {
         return record;
     }
 
@@ -46,7 +46,7 @@ public abstract class WriteRecordQuery<I, Record extends Message> extends WriteQ
     }
 
     protected WriteRecordQuery(
-            Builder<? extends Builder, ? extends WriteRecordQuery, I, Record> builder) {
+            Builder<? extends Builder, ? extends WriteRecordQuery, I, R> builder) {
         super(builder);
         this.idIndexInQuery = builder.idIndexInQuery;
         this.recordIndexInQuery = builder.recordIndexInQuery;
