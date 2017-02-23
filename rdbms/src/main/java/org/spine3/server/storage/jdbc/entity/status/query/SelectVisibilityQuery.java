@@ -70,8 +70,7 @@ public class SelectVisibilityQuery extends StorageQuery {
              PreparedStatement statement = prepareStatement(connection)) {
             statement.setString(1, id);
             final ResultSet resultSet = statement.executeQuery();
-            final boolean empty = !resultSet.next();
-            if (empty) {
+            if (!resultSet.next()) { // Empty result set
                 return null;
             }
             archived = resultSet.getBoolean(VisibilityField.archived.toString());
