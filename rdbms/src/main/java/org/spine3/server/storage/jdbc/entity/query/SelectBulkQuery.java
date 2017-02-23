@@ -21,9 +21,7 @@
 package org.spine3.server.storage.jdbc.entity.query;
 
 import com.google.common.collect.Lists;
-import com.google.protobuf.Descriptors;
 import com.google.protobuf.FieldMask;
-import org.spine3.protobuf.TypeUrl;
 import org.spine3.server.entity.EntityRecord;
 import org.spine3.server.storage.jdbc.Sql;
 import org.spine3.server.storage.jdbc.query.StorageQuery;
@@ -38,7 +36,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static org.spine3.server.storage.VisibilityField.archived;
 import static org.spine3.server.storage.VisibilityField.deleted;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
@@ -70,7 +67,6 @@ import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
  */
 public class SelectBulkQuery<I> extends StorageQuery {
 
-    private final TypeUrl typeUrl;
     private final FieldMask fieldMask;
     private final List<I> arguments;
     private final IdColumn<I> idColumn;
@@ -90,8 +86,6 @@ public class SelectBulkQuery<I> extends StorageQuery {
 
     protected SelectBulkQuery(Builder<I> builder) {
         super(builder);
-        final Descriptors.Descriptor messageDescriptor = checkNotNull(builder.messageDescriptor);
-        this.typeUrl = TypeUrl.from(messageDescriptor);
         this.fieldMask = builder.fieldMask;
         this.arguments = builder.arguments;
         this.idColumn = builder.idColumn;
@@ -116,7 +110,7 @@ public class SelectBulkQuery<I> extends StorageQuery {
 
         connection.close();
 
-        return QueryResults.parse(resultSet, fieldMask, typeUrl);
+        return QueryResults.parse(resultSet, fieldMask);
     }
 
     /**
@@ -144,18 +138,12 @@ public class SelectBulkQuery<I> extends StorageQuery {
     @SuppressWarnings("ClassNameSameAsAncestorName")
     public static class Builder<I> extends StorageQuery.Builder<Builder<I>, SelectBulkQuery> {
 
-        private Descriptors.Descriptor messageDescriptor;
         private FieldMask fieldMask;
         private final List<I> arguments = new ArrayList<>();
         private IdColumn<I> idColumn;
 
         private Builder() {
             super();
-        }
-
-        public Builder<I> setMessageDescriptor(Descriptors.Descriptor messageDescriptor) {
-            this.messageDescriptor = messageDescriptor;
-            return getThis();
         }
 
         public Builder<I> setFieldMask(FieldMask fieldMask) {
@@ -210,7 +198,7 @@ public class SelectBulkQuery<I> extends StorageQuery {
          * @return new instance of {@code SelectBulkQuery}.
          */
         @Override
-        public SelectBulkQuery build() {
+        public SelectBulkQuery<I> build() {
             return new SelectBulkQuery<>(this);
         }
 

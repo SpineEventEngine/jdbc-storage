@@ -49,7 +49,6 @@ class QueryResults {
      *
      * @param resultSet Results of the query.
      * @param fieldMask {@code FieldMask} to apply to the results.
-     * @param typeUrl   Type of retrieved {@link org.spine3.server.entity.Entity} states.
      * @param <Id>      ID type of the {@link org.spine3.server.entity.Entity}.
      * @param <State>   State type of the {@link org.spine3.server.entity.Entity}.
      * @return ID-to-{@link EntityRecord} {@link Map} representing the query results.
@@ -58,14 +57,14 @@ class QueryResults {
      */
     static <Id, State extends Message> Map<Id, EntityRecord> parse(
             ResultSet resultSet,
-            FieldMask fieldMask,
-            TypeUrl typeUrl)
+            FieldMask fieldMask)
             throws SQLException {
         final ImmutableMap.Builder<Id, EntityRecord> resultBuilder = new ImmutableMap.Builder<>();
 
         while (resultSet.next()) {
             final EntityRecord record = readSingleMessage(resultSet);
-            final State maskedMessage = maskFields(record, fieldMask, typeUrl);
+
+            final State maskedMessage = maskFields(record, fieldMask);
 
             @SuppressWarnings("unchecked")
             final Id id = (Id) resultSet.getObject(EntityTable.ID_COL);
@@ -85,9 +84,9 @@ class QueryResults {
                                       EntityRecord.getDescriptor());
     }
 
-    private static <M extends Message> M maskFields(EntityRecord record, FieldMask fieldMask,
-                                                    TypeUrl typeUrl) {
+    private static <M extends Message> M maskFields(EntityRecord record, FieldMask fieldMask) {
         final M message = AnyPacker.unpack(record.getState());
+        final TypeUrl typeUrl = TypeUrl.from(message.getDescriptorForType());
         return FieldMasks.applyMask(fieldMask, message, typeUrl);
     }
 }

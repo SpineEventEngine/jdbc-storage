@@ -54,8 +54,7 @@ public class JdbcRecordStorageShould extends RecordStorageShould<String, JdbcRec
                                              false,
                                              new RecordStorageQueryFactory<>(
                                                      dataSource,
-                                                     TestEntityWithStringId.class),
-                                             Project.getDescriptor());
+                                                     TestEntityWithStringId.class));
     }
 
     @Override

@@ -29,7 +29,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.protobuf.Descriptors;
 import com.google.protobuf.FieldMask;
 import org.spine3.protobuf.TypeUrl;
 import org.spine3.server.entity.EntityRecord;
@@ -89,8 +88,7 @@ public class JdbcStandStorage extends StandStorage {
         recordStorage = JdbcRecordStorage.newInstance(
                 checkNotNull(builder.dataSource),
                 builder.isMultitenant,
-                checkNotNull(builder.recordStorageQueryFactory),
-                checkNotNull(builder.stateDescriptor));
+                checkNotNull(builder.recordStorageQueryFactory));
     }
 
     @Override
@@ -106,10 +104,8 @@ public class JdbcStandStorage extends StandStorage {
                 = Maps.filterKeys(allRecords,
                                   new Predicate<AggregateStateId>() {
                                       @Override
-                                      public boolean apply(
-                                              @Nullable AggregateStateId stateId) {
-                                          checkNotNull(
-                                                  stateId);
+                                      public boolean apply(@Nullable AggregateStateId stateId) {
+                                          checkNotNull(stateId);
                                           final boolean typeMatches = stateId.getStateType()
                                                                              .equals(type);
                                           return typeMatches;
@@ -229,7 +225,6 @@ public class JdbcStandStorage extends StandStorage {
 
         private boolean isMultitenant;
         private DataSourceWrapper dataSource;
-        private Descriptors.Descriptor stateDescriptor;
         private RecordStorageQueryFactory<I> recordStorageQueryFactory;
 
         private Builder() {
@@ -248,16 +243,6 @@ public class JdbcStandStorage extends StandStorage {
          */
         public Builder<I> setDataSource(DataSourceWrapper dataSource) {
             this.dataSource = dataSource;
-            return this;
-        }
-
-        /**
-         * Sets required field {@code stateDescriptor}.
-         *
-         * @param stateDescriptor {@link com.google.protobuf.Descriptors.Descriptor} of the {@link org.spine3.server.entity.Entity} state.
-         */
-        public Builder<I> setStateDescriptor(Descriptors.Descriptor stateDescriptor) {
-            this.stateDescriptor = stateDescriptor;
             return this;
         }
 

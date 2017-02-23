@@ -20,12 +20,11 @@
 
 package org.spine3.server.storage.jdbc.entity.query;
 
-import com.google.protobuf.Descriptors;
 import com.google.protobuf.FieldMask;
 import org.slf4j.Logger;
 import org.spine3.server.entity.Entity;
-import org.spine3.server.entity.Visibility;
 import org.spine3.server.entity.EntityRecord;
+import org.spine3.server.entity.Visibility;
 import org.spine3.server.storage.RecordStorage;
 import org.spine3.server.storage.jdbc.entity.status.VisibilityHandlingStorageQueryFactory;
 import org.spine3.server.storage.jdbc.entity.status.VisibilityQueryFactories;
@@ -192,24 +191,20 @@ public class RecordStorageQueryFactory<I> implements VisibilityHandlingStorageQu
         return builder.build();
     }
 
-    public SelectBulkQuery newSelectAllQuery(FieldMask fieldMask,
-                                             Descriptors.Descriptor descriptor) {
+    public SelectBulkQuery newSelectAllQuery(FieldMask fieldMask) {
         final SelectBulkQuery.Builder<I> builder = SelectBulkQuery.<I>newBuilder(tableName)
                                                                .setFieldMask(fieldMask)
-                                                               .setMessageDescriptor(descriptor)
                                                                .setLogger(logger)
                                                                .setDataSource(dataSource);
 
         return builder.build();
     }
 
-    public SelectBulkQuery newSelectBulkQuery(Iterable<I> ids, FieldMask fieldMask,
-                                              Descriptors.Descriptor descriptor) {
-        final SelectBulkQuery.Builder builder = SelectBulkQuery.<I>newBuilder()
+    public SelectBulkQuery<I> newSelectBulkQuery(Iterable<I> ids, FieldMask fieldMask) {
+        final SelectBulkQuery.Builder<I> builder = SelectBulkQuery.<I>newBuilder()
                                                                .setIdColumn(idColumn)
                                                                .setIdsQuery(tableName, ids)
                                                                .setFieldMask(fieldMask)
-                                                               .setMessageDescriptor(descriptor)
                                                                .setLogger(logger)
                                                                .setDataSource(dataSource);
 

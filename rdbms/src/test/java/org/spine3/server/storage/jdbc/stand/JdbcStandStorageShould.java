@@ -78,7 +78,6 @@ public class JdbcStandStorageShould extends StandStorageShould {
                                        new RecordStorageQueryFactory<>(dataSource,
                                                                        StandStorageRecord.class))
                                .setMultitenant(false)
-                               .setStateDescriptor(Project.getDescriptor())
                                .build();
     }
 
@@ -109,7 +108,6 @@ public class JdbcStandStorageShould extends StandStorageShould {
         final StandStorage standStorage = JdbcStandStorage.<String>newBuilder()
                 .setRecordStorageQueryFactory(queryFactoryMock)
                 .setDataSource(dataSourceMock)
-                .setStateDescriptor(Project.getDescriptor())
                 .setMultitenant(false)
                 .build();
 
@@ -141,7 +139,6 @@ public class JdbcStandStorageShould extends StandStorageShould {
         final StandStorage standStorage = JdbcStandStorage.<String>newBuilder()
                 .setRecordStorageQueryFactory(queryFactoryMock)
                 .setDataSource(dataSourceMock)
-                .setStateDescriptor(Project.getDescriptor())
                 .build();
 
         assertNotNull(standStorage);
@@ -168,7 +165,6 @@ public class JdbcStandStorageShould extends StandStorageShould {
 
         JdbcStandStorage.<String>newBuilder()
                 .setRecordStorageQueryFactory(queryFactoryMock)
-                .setStateDescriptor(Project.getDescriptor())
                 .setMultitenant(false)
                 .build();
     }
@@ -179,28 +175,8 @@ public class JdbcStandStorageShould extends StandStorageShould {
 
         JdbcStandStorage.newBuilder()
                         .setDataSource(dataSourceMock)
-                        .setStateDescriptor(Project.getDescriptor())
                         .setMultitenant(false)
                         .build();
-    }
-
-    @SuppressWarnings("unchecked") // For mocks
-    @Test(expected = NullPointerException.class)
-    public void fail_to_initialize_without_entity_state_descriptor() {
-        final DataSourceWrapper dataSourceMock = mock(DataSourceWrapper.class);
-        final RecordStorageQueryFactory<String> queryFactoryMock = (RecordStorageQueryFactory<String>) mock(
-                RecordStorageQueryFactory.class);
-
-        final CreateEntityTableQuery<String> queryMock = (CreateEntityTableQuery<String>) mock(
-                CreateEntityTableQuery.class);
-        when(queryFactoryMock.newCreateEntityTableQuery()).thenReturn(queryMock);
-        doNothing().when(queryMock)
-                   .execute();
-
-        JdbcStandStorage.<String>newBuilder()
-                .setRecordStorageQueryFactory(queryFactoryMock)
-                .setDataSource(dataSourceMock)
-                .build();
     }
 
     /*
@@ -498,7 +474,6 @@ public class JdbcStandStorageShould extends StandStorageShould {
             final StandStorage storage = JdbcStandStorage.<String>newBuilder()
                     .setRecordStorageQueryFactory(queryFactory)
                     .setDataSource(dataSource)
-                    .setStateDescriptor(Project.getDescriptor())
                     .build();
 
             return storage;

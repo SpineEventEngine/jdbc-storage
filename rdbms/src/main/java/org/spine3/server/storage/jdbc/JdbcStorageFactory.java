@@ -96,7 +96,6 @@ public class JdbcStorageFactory<ID> implements StorageFactory {
                 .setDataSource(dataSource)
                 .setMultitenant(isMultitenant())
                 .setRecordStorageQueryFactory(recordStorageQueryFactory)
-                .setStateDescriptor(entityStateDescriptor)
                 .build();
     }
 
@@ -114,8 +113,7 @@ public class JdbcStorageFactory<ID> implements StorageFactory {
         return JdbcRecordStorage.newInstance(
                 dataSource,
                 false,
-                getEntityStorageQueryFactory(dataSource, entityClass),
-                entityStateDescriptor);
+                getEntityStorageQueryFactory(dataSource, entityClass));
     }
 
     @Override
@@ -124,8 +122,7 @@ public class JdbcStorageFactory<ID> implements StorageFactory {
         final JdbcRecordStorage<I> entityStorage = JdbcRecordStorage.newInstance(
                 dataSource,
                 false,
-                getEntityStorageQueryFactory(dataSource, projectionClass),
-                entityStateDescriptor);
+                getEntityStorageQueryFactory(dataSource, projectionClass));
 
         return JdbcProjectionStorage.newInstance(
                 entityStorage,
