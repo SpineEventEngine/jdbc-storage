@@ -32,16 +32,19 @@ import com.google.common.collect.Maps;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.FieldMask;
 import org.spine3.protobuf.TypeUrl;
+import org.spine3.server.entity.EntityRecord;
 import org.spine3.server.stand.AggregateStateId;
 import org.spine3.server.stand.StandStorage;
-import org.spine3.server.entity.EntityRecord;
 import org.spine3.server.storage.jdbc.entity.JdbcRecordStorage;
 import org.spine3.server.storage.jdbc.entity.query.RecordStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
 import javax.annotation.Nullable;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -65,6 +68,21 @@ public class JdbcStandStorage extends StandStorage {
         }
     };
 
+    private static final Function<Map.Entry<AggregateStateId, EntityRecord>, Map.Entry<Object, EntityRecord>> MAP_TARNSFORMER
+            = new Function<Map.Entry<AggregateStateId, EntityRecord>, Map.Entry<Object, EntityRecord>>() {
+        @Override
+        public Map.Entry<Object, EntityRecord> apply(
+                @Nullable Map.Entry<AggregateStateId, EntityRecord> entry) {
+            checkNotNull(entry);
+            final Object newKey = entry.getKey()
+                                       .getAggregateId();
+            final Map.Entry<Object, EntityRecord> newEntry = new SimpleEntry<>(
+                    newKey,
+                    entry.getValue());
+            return newEntry;
+        }
+    };
+
     @SuppressWarnings("unchecked")
     protected JdbcStandStorage(Builder builder) {
         super(builder.isMultitenant);
@@ -82,20 +100,21 @@ public class JdbcStandStorage extends StandStorage {
 
     @Override
     public ImmutableCollection<EntityRecord> readAllByType(final TypeUrl type,
-                                                                  FieldMask fieldMask) {
+                                                           FieldMask fieldMask) {
         final Map<AggregateStateId, EntityRecord> allRecords = readAll(fieldMask);
-        final Map<AggregateStateId, EntityRecord> resultMap = Maps.filterKeys(allRecords,
-                                                                                     new Predicate<AggregateStateId>() {
-                                                                                         @Override
-                                                                                         public boolean apply(
-                                                                                                 @Nullable AggregateStateId stateId) {
-                                                                                             checkNotNull(
-                                                                                                     stateId);
-                                                                                             final boolean typeMatches = stateId.getStateType()
-                                                                                                                                .equals(type);
-                                                                                             return typeMatches;
-                                                                                         }
-                                                                                     });
+        final Map<AggregateStateId, EntityRecord> resultMap
+                = Maps.filterKeys(allRecords,
+                                  new Predicate<AggregateStateId>() {
+                                      @Override
+                                      public boolean apply(
+                                              @Nullable AggregateStateId stateId) {
+                                          checkNotNull(
+                                                  stateId);
+                                          final boolean typeMatches = stateId.getStateType()
+                                                                             .equals(type);
+                                          return typeMatches;
+                                      }
+                                  });
 
         final ImmutableList<EntityRecord> result = ImmutableList.copyOf(resultMap.values());
         return result;
@@ -103,18 +122,20 @@ public class JdbcStandStorage extends StandStorage {
 
     @Override
     public void markArchived(AggregateStateId id) {
-        // TODO:2017-02-22:dmytro.dashenkov: Implement.
+        final Object aggregateId = id.getAggregateId();
+        recordStorage.markArchived(aggregateId);
     }
 
     @Override
     public void markDeleted(AggregateStateId id) {
-        // TODO:2017-02-22:dmytro.dashenkov: Implement.
+        final Object aggregateId = id.getAggregateId();
+        recordStorage.markDeleted(aggregateId);
     }
 
     @Override
     public boolean delete(AggregateStateId id) {
-        // TODO:2017-02-22:dmytro.dashenkov: Implement.
-        return false;
+        final Object aggregateId = id.getAggregateId();
+        return recordStorage.delete(aggregateId);
     }
 
     @Nullable
@@ -133,7 +154,7 @@ public class JdbcStandStorage extends StandStorage {
     @SuppressWarnings("unchecked")
     @Override
     protected Iterable<EntityRecord> readMultipleRecords(Iterable<AggregateStateId> ids,
-                                                                FieldMask fieldMask) {
+                                                         FieldMask fieldMask) {
         final Collection pureIds = Collections2.transform(Lists.newArrayList(ids), ID_MAPPER);
         return recordStorage.readMultiple(pureIds, fieldMask);
     }
@@ -155,7 +176,14 @@ public class JdbcStandStorage extends StandStorage {
 
     @Override
     protected void writeRecords(Map<AggregateStateId, EntityRecord> records) {
-
+        final Set<Map.Entry<AggregateStateId, EntityRecord>> entrySet = records.entrySet();
+        final Collection<Map.Entry<Object, EntityRecord>> transformedEntries =
+                Collections2.transform(entrySet, MAP_TARNSFORMER);
+        final Map<Object, EntityRecord> transformedMap = new HashMap<>(transformedEntries.size());
+        for (Map.Entry<Object, EntityRecord> entry : transformedEntries) {
+            transformedMap.put(entry.getKey(), entry.getValue());
+        }
+        recordStorage.write(transformedMap);
     }
 
     /**

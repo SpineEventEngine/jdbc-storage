@@ -194,7 +194,7 @@ public class RecordStorageQueryFactory<I> implements VisibilityHandlingStorageQu
 
     public SelectBulkQuery newSelectAllQuery(FieldMask fieldMask,
                                              Descriptors.Descriptor descriptor) {
-        final SelectBulkQuery.Builder builder = SelectBulkQuery.newBuilder(tableName)
+        final SelectBulkQuery.Builder<I> builder = SelectBulkQuery.<I>newBuilder(tableName)
                                                                .setFieldMask(fieldMask)
                                                                .setMessageDescriptor(descriptor)
                                                                .setLogger(logger)
@@ -203,9 +203,10 @@ public class RecordStorageQueryFactory<I> implements VisibilityHandlingStorageQu
         return builder.build();
     }
 
-    public SelectBulkQuery newSelectBulkQuery(Iterable<?> ids, FieldMask fieldMask,
+    public SelectBulkQuery newSelectBulkQuery(Iterable<I> ids, FieldMask fieldMask,
                                               Descriptors.Descriptor descriptor) {
-        final SelectBulkQuery.Builder builder = SelectBulkQuery.newBuilder()
+        final SelectBulkQuery.Builder builder = SelectBulkQuery.<I>newBuilder()
+                                                               .setIdColumn(idColumn)
                                                                .setIdsQuery(tableName, ids)
                                                                .setFieldMask(fieldMask)
                                                                .setMessageDescriptor(descriptor)

@@ -29,9 +29,11 @@ import org.spine3.protobuf.AnyPacker;
 import org.spine3.protobuf.Timestamps2;
 import org.spine3.protobuf.TypeUrl;
 import org.spine3.server.aggregate.Aggregate;
+import org.spine3.server.entity.AbstractEntity;
 import org.spine3.server.entity.EntityRecord;
 import org.spine3.server.stand.AggregateStateId;
 import org.spine3.server.stand.StandStorage;
+import org.spine3.server.stand.StandStorageShould;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.GivenDataSource;
 import org.spine3.server.storage.jdbc.JdbcStandStorage;
@@ -39,9 +41,9 @@ import org.spine3.server.storage.jdbc.entity.query.CreateEntityTableQuery;
 import org.spine3.server.storage.jdbc.entity.query.RecordStorageQueryFactory;
 import org.spine3.server.storage.jdbc.entity.status.query.CreateVisibilityTableQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.test.aggregate.Project;
-import org.spine3.test.aggregate.ProjectId;
 import org.spine3.test.commandservice.customer.Customer;
+import org.spine3.test.storage.Project;
+import org.spine3.test.storage.ProjectId;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -64,7 +66,21 @@ import static org.spine3.test.Verify.assertSize;
 /**
  * @author Dmytro Dashenkov
  */
-public class JdbcStandStorageShould {
+public class JdbcStandStorageShould extends StandStorageShould {
+
+    @Override
+    protected StandStorage getStorage() {
+        final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(
+                "StandStorageTests");
+        return JdbcStandStorage.newBuilder()
+                               .setDataSource(dataSource)
+                               .setRecordStorageQueryFactory(
+                                       new RecordStorageQueryFactory<>(dataSource,
+                                                                       StandStorageRecord.class))
+                               .setMultitenant(false)
+                               .setStateDescriptor(Project.getDescriptor())
+                               .build();
+    }
 
     /*
      * Initialize tests
@@ -460,6 +476,13 @@ public class JdbcStandStorageShould {
         storage.write(id, record);
 
         return record;
+    }
+
+    private static class StandStorageRecord extends AbstractEntity<Object, Project> {
+
+        protected StandStorageRecord(AggregateStateId id) {
+            super(id);
+        }
     }
 
     private static class Given {

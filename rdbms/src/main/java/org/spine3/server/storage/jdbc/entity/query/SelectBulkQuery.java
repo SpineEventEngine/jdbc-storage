@@ -28,6 +28,7 @@ import org.spine3.server.entity.EntityRecord;
 import org.spine3.server.storage.jdbc.Sql;
 import org.spine3.server.storage.jdbc.query.StorageQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
+import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -42,14 +43,17 @@ import static org.spine3.server.storage.VisibilityField.archived;
 import static org.spine3.server.storage.VisibilityField.deleted;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
-import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.NOT_EQUAL;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
 import static org.spine3.server.storage.jdbc.Sql.Query.ALL_ATTRIBUTES;
 import static org.spine3.server.storage.jdbc.Sql.Query.AND;
+import static org.spine3.server.storage.jdbc.Sql.Query.FALSE;
 import static org.spine3.server.storage.jdbc.Sql.Query.FROM;
 import static org.spine3.server.storage.jdbc.Sql.Query.IN;
+import static org.spine3.server.storage.jdbc.Sql.Query.IS;
+import static org.spine3.server.storage.jdbc.Sql.Query.NULL;
+import static org.spine3.server.storage.jdbc.Sql.Query.OR;
 import static org.spine3.server.storage.jdbc.Sql.Query.SELECT;
-import static org.spine3.server.storage.jdbc.Sql.Query.TRUE;
 import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
 
 /**
@@ -64,27 +68,33 @@ import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
  *
  * @author Dmytro Dashenkov
  */
-public class SelectBulkQuery extends StorageQuery {
+public class SelectBulkQuery<I> extends StorageQuery {
 
     private final TypeUrl typeUrl;
     private final FieldMask fieldMask;
-    private final List arguments;
+    private final List<I> arguments;
+    private final IdColumn<I> idColumn;
 
-    private static final String COMMON_TEMPLATE = SELECT.toString() + ALL_ATTRIBUTES +
-                                                  FROM + "%s" +
-                                                  WHERE + archived + NOT_EQUAL + TRUE +
-                                                  AND + deleted + NOT_EQUAL + TRUE;
+    private static final String COMMON_TEMPLATE =
+            SELECT.toString() + ALL_ATTRIBUTES +
+            FROM + "%s" +
+            WHERE + BRACKET_OPEN + archived + IS + NULL + OR +
+            archived + EQUAL + FALSE + BRACKET_CLOSE + AND +
+            BRACKET_OPEN + deleted + IS + NULL + OR +
+            deleted + EQUAL + FALSE + BRACKET_CLOSE;
+
     private static final String ALL_TEMPLATE = COMMON_TEMPLATE + ';';
     @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String IDS_TEMPLATE = COMMON_TEMPLATE + AND + EntityTable.ID_COL + IN
                                                + " %s" + SEMICOLON;
 
-    protected SelectBulkQuery(Builder builder) {
+    protected SelectBulkQuery(Builder<I> builder) {
         super(builder);
         final Descriptors.Descriptor messageDescriptor = checkNotNull(builder.messageDescriptor);
         this.typeUrl = TypeUrl.from(messageDescriptor);
         this.fieldMask = builder.fieldMask;
         this.arguments = builder.arguments;
+        this.idColumn = builder.idColumn;
     }
 
     /**
@@ -98,7 +108,8 @@ public class SelectBulkQuery extends StorageQuery {
         final PreparedStatement sqlStatement = connection.prepareStatement(getQuery());
 
         for (int i = 0; i < arguments.size(); i++) {
-            sqlStatement.setObject(i + 1, arguments.get(i));
+            idColumn.setId(i + 1, arguments.get(i), sqlStatement);
+            //sqlStatement.setObject(i + 1, arguments.get(i));
         }
 
         final ResultSet resultSet = sqlStatement.executeQuery();
@@ -111,16 +122,16 @@ public class SelectBulkQuery extends StorageQuery {
     /**
      * @return New instance of the {@link Builder} set to "query all" by default.
      */
-    public static Builder newBuilder(String tableName) {
-        return newBuilder()
+    public static <I> Builder<I> newBuilder(String tableName) {
+        return SelectBulkQuery.<I>newBuilder()
                 .setAllQuery(tableName);
     }
 
     /**
      * @return new instance of the {@link Builder}.
      */
-    public static Builder newBuilder() {
-        return new Builder();
+    public static <I> Builder<I> newBuilder() {
+        return new Builder<>();
     }
 
     /**
@@ -131,23 +142,29 @@ public class SelectBulkQuery extends StorageQuery {
      * before {@link #build()}.
      */
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder extends StorageQuery.Builder<Builder, SelectBulkQuery> {
+    public static class Builder<I> extends StorageQuery.Builder<Builder<I>, SelectBulkQuery> {
 
         private Descriptors.Descriptor messageDescriptor;
         private FieldMask fieldMask;
-        private final List<Object> arguments = new ArrayList<>();
+        private final List<I> arguments = new ArrayList<>();
+        private IdColumn<I> idColumn;
 
         private Builder() {
             super();
         }
 
-        public Builder setMessageDescriptor(Descriptors.Descriptor messageDescriptor) {
+        public Builder<I> setMessageDescriptor(Descriptors.Descriptor messageDescriptor) {
             this.messageDescriptor = messageDescriptor;
             return getThis();
         }
 
-        public Builder setFieldMask(FieldMask fieldMask) {
+        public Builder<I> setFieldMask(FieldMask fieldMask) {
             this.fieldMask = fieldMask;
+            return getThis();
+        }
+
+        public Builder<I> setIdColumn(IdColumn<I> idColumn) {
+            this.idColumn = idColumn;
             return getThis();
         }
 
@@ -158,7 +175,7 @@ public class SelectBulkQuery extends StorageQuery {
          *
          * @param tableName Name of the table to query.
          */
-        public Builder setAllQuery(String tableName) {
+        public Builder<I> setAllQuery(String tableName) {
             setQuery(String.format(ALL_TEMPLATE, tableName));
             return getThis();
         }
@@ -171,8 +188,8 @@ public class SelectBulkQuery extends StorageQuery {
          * @param tableName Name of the table to query.
          * @param ids       IDs to search for.
          */
-        public Builder setIdsQuery(String tableName, Iterable<?> ids) {
-            final Collection<?> idsCollection = Lists.newArrayList(ids);
+        public Builder<I> setIdsQuery(String tableName, Iterable<I> ids) {
+            final Collection<I> idsCollection = Lists.newArrayList(ids);
             final int idsCount = idsCollection.size();
 
             final String placeholders;
@@ -181,7 +198,7 @@ public class SelectBulkQuery extends StorageQuery {
             } else {
                 placeholders = Sql.nPlaceholders(idsCount);
             }
-            for (Object id : ids) {
+            for (I id : ids) {
                 arguments.add(id);
             }
 
@@ -194,11 +211,11 @@ public class SelectBulkQuery extends StorageQuery {
          */
         @Override
         public SelectBulkQuery build() {
-            return new SelectBulkQuery(this);
+            return new SelectBulkQuery<>(this);
         }
 
         @Override
-        protected Builder getThis() {
+        protected Builder<I> getThis() {
             return this;
         }
     }

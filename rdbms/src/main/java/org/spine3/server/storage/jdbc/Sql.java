@@ -119,6 +119,7 @@ public class Sql {
         LIKE,
         NOT,
         IN,
+        IS,
         EXISTS,
         BETWEEN,
         TRUE,
