@@ -103,6 +103,16 @@ public class RecordStorageQueryFactory<I> implements VisibilityHandlingStorageQu
         return statusTableQueryFactory.newMarkDeletedQuery(id);
     }
 
+    @Override
+    public InsertAndMarkEntityQuery<I> newInsertAndMarkArchivedEntityQuery(I id) {
+        throw new UnsupportedOperationException("The record must be present to mark it archived.");
+    }
+
+    @Override
+    public InsertAndMarkEntityQuery<I> newInsertAndMarkDeletedEntityQuery(I id) {
+        throw new UnsupportedOperationException("The record must be present to mark it deleted.");
+    }
+
     /** Sets the logger for logging exceptions during queries execution. */
     @Override
     public void setLogger(Logger logger) {

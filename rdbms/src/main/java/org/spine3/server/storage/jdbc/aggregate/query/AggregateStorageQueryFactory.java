@@ -25,6 +25,7 @@ import org.spine3.server.aggregate.Aggregate;
 import org.spine3.server.aggregate.AggregateStorage;
 import org.spine3.server.aggregate.AggregateEventRecord;
 import org.spine3.server.entity.Visibility;
+import org.spine3.server.storage.jdbc.entity.query.InsertAndMarkEntityQuery;
 import org.spine3.server.storage.jdbc.entity.query.MarkEntityQuery;
 import org.spine3.server.storage.jdbc.entity.status.VisibilityHandlingStorageQueryFactory;
 import org.spine3.server.storage.jdbc.entity.status.QueryFactories;
@@ -90,12 +91,22 @@ public class AggregateStorageQueryFactory<I> implements VisibilityHandlingStorag
 
     @Override
     public MarkEntityQuery<I> newMarkArchivedQuery(I id) {
-        return statusTableQueryFactory.newMarkDeletedQuery(id);
+        return statusTableQueryFactory.newMarkArchivedQuery(id);
     }
 
     @Override
     public MarkEntityQuery<I> newMarkDeletedQuery(I id) {
         return statusTableQueryFactory.newMarkDeletedQuery(id);
+    }
+
+    @Override
+    public InsertAndMarkEntityQuery<I> newInsertAndMarkArchivedEntityQuery(I id) {
+        return statusTableQueryFactory.newInsertAndMarkArchivedEntityQuery(id);
+    }
+
+    @Override
+    public InsertAndMarkEntityQuery<I> newInsertAndMarkDeletedEntityQuery(I id) {
+        return statusTableQueryFactory.newInsertAndMarkDeletedEntityQuery(id);
     }
 
     /** Sets the logger for logging exceptions during queries execution. */

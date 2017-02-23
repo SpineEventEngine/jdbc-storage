@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.spine3.Internal;
 import org.spine3.server.entity.Visibility;
 import org.spine3.server.storage.VisibilityField;
+import org.spine3.server.storage.jdbc.entity.query.InsertAndMarkEntityQuery;
 import org.spine3.server.storage.jdbc.entity.query.MarkEntityQuery;
 import org.spine3.server.storage.jdbc.entity.status.query.CreateVisibilityTableQuery;
 import org.spine3.server.storage.jdbc.entity.status.query.InsertVisibilityQuery;
@@ -34,6 +35,8 @@ import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.spine3.server.storage.VisibilityField.archived;
+import static org.spine3.server.storage.VisibilityField.deleted;
 
 /**
  * @author Dmytro Dashenkov.
@@ -102,12 +105,34 @@ public class VisibilityHandlingStorageQueryFactoryImpl<I> implements VisibilityH
 
     @Override
     public MarkEntityQuery<I> newMarkArchivedQuery(I id) {
-        return newMarkQuery(id, VisibilityField.archived);
+        return newMarkQuery(id, archived);
     }
 
     @Override
     public MarkEntityQuery<I> newMarkDeletedQuery(I id) {
-        return newMarkQuery(id, VisibilityField.deleted);
+        return newMarkQuery(id, deleted);
+    }
+
+    @Override
+    public InsertAndMarkEntityQuery<I> newInsertAndMarkArchivedEntityQuery(I id) {
+        return newInsertAndMarkEntityQuery(id, archived);
+    }
+
+    @Override
+    public InsertAndMarkEntityQuery<I> newInsertAndMarkDeletedEntityQuery(I id) {
+        return newInsertAndMarkEntityQuery(id, deleted);
+    }
+
+    private InsertAndMarkEntityQuery<I> newInsertAndMarkEntityQuery(I id, VisibilityField column) {
+        final InsertAndMarkEntityQuery<I> query = InsertAndMarkEntityQuery.<I>newInsertBuilder()
+                .setDataSource(dataSource)
+                .setLogger(logger)
+                .setTableName(tableName)
+                .setColumn(column)
+                .setIdColumn(idColumn)
+                .setId(id)
+                .build();
+        return query;
     }
 
     private MarkEntityQuery<I> newMarkQuery(I id, VisibilityField column) {

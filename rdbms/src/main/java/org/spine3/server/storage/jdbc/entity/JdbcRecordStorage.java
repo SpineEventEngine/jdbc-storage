@@ -53,10 +53,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class JdbcRecordStorage<I> extends RecordStorage<I> {
 
-    private static final String CONTRADICTORY_ARCHIVED_STATUS_ERROR_MESSAGE =
-            "Entity Storage and Entity Status Storage contain contradictory info about record with ID %s archived status.";
-    private static final String CONTRADICTORY_DELETED_STATUS_ERROR_MESSAGE =
-            "Entity Storage and Entity Status Storage contain contradictory info about record with ID %s deleted status.";
 
     private final DataSourceWrapper dataSource;
 

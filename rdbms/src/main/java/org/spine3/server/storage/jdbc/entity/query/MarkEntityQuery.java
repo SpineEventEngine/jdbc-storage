@@ -29,7 +29,6 @@ import org.spine3.server.storage.jdbc.util.IdColumn;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -54,10 +53,10 @@ public class MarkEntityQuery<I> extends StorageQuery {
     private final I id;
     private final IdColumn<I> idColumn;
 
-    protected MarkEntityQuery(Builder<I> builder) {
+    protected MarkEntityQuery(AbstractMarkQueryBuilder<I, ?, ?> builder) {
         super(builder);
-        this.id = builder.id;
-        this.idColumn = builder.idColumn;
+        this.id = builder.getId();
+        this.idColumn = builder.getIdColumn();
     }
 
     @Override
@@ -84,52 +83,83 @@ public class MarkEntityQuery<I> extends StorageQuery {
         return builder;
     }
 
-    public static class Builder<I> extends StorageQuery.Builder<Builder<I>, MarkEntityQuery> {
+    protected abstract static class AbstractMarkQueryBuilder<I, B extends AbstractMarkQueryBuilder<I, B, Q>, Q extends StorageQuery> extends StorageQuery.Builder<B, Q> {
 
         private I id;
         private String column;
         private String tableName;
         private IdColumn<I> idColumn;
 
-        public Builder<I> setId(I id) {
+        protected abstract Q newQuery();
+
+        protected abstract String buildSql();
+
+        public B setId(I id) {
             checkNotNull(id);
             this.id = id;
             return getThis();
         }
 
-        public Builder<I> setColumn(VisibilityField column) {
+        public B setColumn(VisibilityField column) {
             checkNotNull(column);
             this.column = column.toString();
             return getThis();
         }
 
-        public Builder<I> setTableName(String tableName) {
-            checkNotNull(tableName);
-            checkArgument(!tableName.isEmpty());
-            this.tableName = tableName;
+        public B setTableName(String tableName) {
+            this.tableName = checkNotNull(tableName);
             return getThis();
         }
 
-        public Builder<I> setIdColumn(IdColumn<I> idColumn) {
+        public B setIdColumn(IdColumn<I> idColumn) {
             checkNotNull(idColumn);
             this.idColumn = idColumn;
             return getThis();
         }
 
+        public I getId() {
+            return id;
+        }
+
+        public String getColumn() {
+            return column;
+        }
+
+        public String getTableName() {
+            return tableName;
+        }
+
+        public IdColumn<I> getIdColumn() {
+            return idColumn;
+        }
+
         @Override
-        public MarkEntityQuery<I> build() {
+        public Q build() {
             checkState(id != null, "Record ID is not set.");
             checkState(!isNullOrEmpty(column), "Column to mark is not set.");
             checkState(!isNullOrEmpty(tableName), "Table is not set.");
 
-            final String sql = String.format(SQL_TEMPLATE, tableName, column);
+            final String sql = buildSql();
             setQuery(sql);
-            return new MarkEntityQuery<>(this);
+            return newQuery();
         }
+    }
+
+    public static class Builder<I> extends AbstractMarkQueryBuilder<I, Builder<I>, MarkEntityQuery<I>> {
 
         @Override
         protected Builder<I> getThis() {
             return this;
+        }
+
+        @Override
+        protected MarkEntityQuery<I> newQuery() {
+            return new MarkEntityQuery<>(this);
+        }
+
+        @Override
+        protected String buildSql() {
+            return String.format(SQL_TEMPLATE, getTableName(), getColumn());
         }
     }
 }

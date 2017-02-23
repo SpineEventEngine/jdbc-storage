@@ -59,7 +59,7 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     /** Creates queries for interaction with database. */
     private final AggregateStorageQueryFactory<I> queryFactory;
 
-    private final VisibilityHandler<I> entityStatusHandler;
+    private final VisibilityHandler<I> visibilityHandler;
 
     /**
      * Creates a new storage instance.
@@ -88,8 +88,8 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
                     .execute();
         queryFactory.newCreateEventCountTableQuery()
                     .execute();
-        this.entityStatusHandler = new VisibilityHandler<>(queryFactory);
-        entityStatusHandler.initialize();
+        this.visibilityHandler = new VisibilityHandler<>(queryFactory);
+        visibilityHandler.initialize();
     }
 
     @Override
@@ -105,22 +105,22 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
 
     @Override
     protected Optional<Visibility> readVisibility(I id) {
-        return entityStatusHandler.readStatus(id);
+        return visibilityHandler.readStatus(id);
     }
 
     @Override
     protected void writeVisibility(I id, Visibility status) {
-        entityStatusHandler.writeStatus(id, status);
+        visibilityHandler.writeStatus(id, status);
     }
 
     @Override
     protected void markArchived(I id) {
-        entityStatusHandler.markArchived(id);
+        visibilityHandler.markArchived(id);
     }
 
     @Override
     protected void markDeleted(I id) {
-        entityStatusHandler.markDeleted(id);
+        visibilityHandler.markDeleted(id);
     }
 
     @Override

@@ -22,6 +22,7 @@ package org.spine3.server.storage.jdbc.entity.status;
 
 import com.google.common.base.Optional;
 import org.spine3.server.entity.Visibility;
+import org.spine3.server.storage.jdbc.entity.query.MarkEntityQuery;
 import org.spine3.server.storage.jdbc.entity.status.query.SelectVisibilityQuery;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -46,7 +47,7 @@ public class VisibilityHandler<I> {
     public Optional<Visibility> readStatus(I id) {
         final SelectVisibilityQuery query = queryFactory.newSelectVisibilityQuery(id);
         final Visibility status = query.execute();
-        final boolean absent = isDefault(status);
+        final boolean absent = status == null || isDefault(status);
         if (absent) {
             return Optional.absent();
         }
@@ -78,12 +79,28 @@ public class VisibilityHandler<I> {
     }
 
     public void markArchived(I id) {
-        queryFactory.newMarkArchivedQuery(id)
-                    .execute();
+        final MarkEntityQuery query;
+        if (!containsRecord(id)) {
+            query = queryFactory.newInsertAndMarkArchivedEntityQuery(id);
+        } else {
+            query = queryFactory.newMarkArchivedQuery(id);
+        }
+        query.execute();
     }
 
     public void markDeleted(I id) {
-        queryFactory.newMarkDeletedQuery(id)
-                    .execute();
+        final MarkEntityQuery query;
+        if (!containsRecord(id)) {
+            query = queryFactory.newInsertAndMarkDeletedEntityQuery(id);
+        } else {
+            query = queryFactory.newMarkDeletedQuery(id);
+        }
+        query.execute();
+    }
+
+    private boolean containsRecord(I id) {
+        final SelectVisibilityQuery selectQuery = queryFactory.newSelectVisibilityQuery(id);
+        final Visibility visibility = selectQuery.execute();
+        return visibility != null;
     }
 }
