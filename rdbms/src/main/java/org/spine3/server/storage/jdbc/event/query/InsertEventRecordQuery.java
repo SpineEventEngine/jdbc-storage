@@ -20,6 +20,8 @@
 
 package org.spine3.server.storage.jdbc.event.query;
 
+import com.google.protobuf.Any;
+import com.google.protobuf.Message;
 import com.google.protobuf.Timestamp;
 import org.spine3.base.Event;
 import org.spine3.base.EventContext;
@@ -76,20 +78,25 @@ public class InsertEventRecordQuery extends WriteRecordQuery<String, Event> {
     @SuppressWarnings("DuplicateStringLiteralInspection")
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
         final PreparedStatement statement = connection.prepareStatement(QUERY_TEMPLATE);
-        final EventContext context = getRecord().getContext();
+        final Event event = getRecord();
+        final EventContext context = event.getContext();
         final Timestamp timestamp = context.getTimestamp();
         try {
-            final String eventId = Stringifiers.idToString(context.getEventId());
+            final String eventId = context.getEventId().getUuid();
             statement.setString(1, eventId);
 
-            final byte[] serializedRecord = serialize(getRecord());
-            statement.setBytes(2, serializedRecord);
+            final byte[] serializedEvent = serialize(event);
+            statement.setBytes(2, serializedEvent);
 
-            final String eventType = TypeName.of(getRecord().getMessage());
+            final Any eventMessageAny = event.getMessage();
+            final Message eventMessage = AnyPacker.unpack(eventMessageAny);
+            final String eventType = TypeName.of(eventMessage);
             statement.setString(3, eventType);
 
-            final String producerId = Stringifiers.idToString(AnyPacker.unpack(context.getProducerId()));
-            statement.setString(4, producerId);
+            final Any producerIdAny = context.getProducerId();
+            final Message producerId = AnyPacker.unpack(producerIdAny);
+            final String producerIdString = Stringifiers.idToString(producerId);
+            statement.setString(4, producerIdString);
 
             final long seconds = timestamp.getSeconds();
             statement.setLong(5, seconds);

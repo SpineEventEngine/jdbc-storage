@@ -36,7 +36,6 @@ import org.spine3.base.Event;
 import org.spine3.base.EventContext;
 import org.spine3.base.EventId;
 import org.spine3.base.FieldFilter;
-import org.spine3.base.Stringifiers;
 import org.spine3.protobuf.AnyPacker;
 import org.spine3.server.event.EventFilter;
 import org.spine3.server.event.EventStorage;
@@ -144,7 +143,7 @@ public class JdbcEventStorage extends EventStorage {
         checkNotNull(id);
         checkNotNull(event);
 
-        final String eventId = Stringifiers.idToString(id);
+        final String eventId = id.getUuid();
         if (containsRecord(eventId)) {
             queryFactory.newUpdateEventQuery(event)
                         .execute();

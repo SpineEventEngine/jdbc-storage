@@ -68,11 +68,12 @@ public class MarkEntityQuery<I> extends StorageQuery {
         return statement;
     }
 
-    public void execute() {
+    public boolean execute() {
         try (PreparedStatement statement = prepareStatement(getConnection(true))) {
             final int rowsAffected = statement.executeUpdate();
             checkState(rowsAffected <= 1,
                        "Mark query affected more then one row: " + getQuery());
+            return rowsAffected > 0;
         } catch (SQLException e) {
             throw new DatabaseException(e);
         }

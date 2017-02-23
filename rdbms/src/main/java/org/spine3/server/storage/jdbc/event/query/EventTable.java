@@ -20,6 +20,8 @@
 
 package org.spine3.server.storage.jdbc.event.query;
 
+import static org.spine3.server.event.storage.EventField.event_id;
+import static org.spine3.server.event.storage.EventField.event_type;
 import static org.spine3.server.storage.jdbc.Sql.Query.FROM;
 import static org.spine3.server.storage.jdbc.Sql.Query.SELECT;
 
@@ -35,13 +37,13 @@ final class EventTable {
     static final String TABLE_NAME = "events";
 
     /** Event ID column name. */
-    static final String EVENT_ID_COL = "event_id";
+    static final String EVENT_ID_COL = event_id.toString();
 
     /** Event record column name. */
     static final String EVENT_COL = "event";
 
     /** Protobuf type name of the event column name. */
-    static final String EVENT_TYPE_COL = "event_type";
+    static final String EVENT_TYPE_COL = event_type.toString();
 
     /** Producer ID column name. */
     static final String PRODUCER_ID_COL = "producer_id";

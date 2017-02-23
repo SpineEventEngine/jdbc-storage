@@ -93,18 +93,28 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
                     .execute();
     }
 
+    @SuppressWarnings("ProhibitedExceptionThrown") // NPE by the contract
     @Override
     public void markArchived(I id) {
         checkNotNull(id);
-        queryFactory.newMarkArchivedQuery(id)
+        final boolean recordExists = queryFactory.newMarkArchivedQuery(id)
                     .execute();
+        if (!recordExists) {
+            throw new NullPointerException(
+                    String.format("Trying to mark not existing record with id %s archived.", id));
+        }
     }
 
+    @SuppressWarnings("ProhibitedExceptionThrown") // NPE by the contract
     @Override
     public void markDeleted(I id) {
         checkNotNull(id);
-        queryFactory.newMarkDeletedQuery(id)
+        final boolean recordExists = queryFactory.newMarkDeletedQuery(id)
                     .execute();
+        if (!recordExists) {
+            throw new NullPointerException(
+                    String.format("Trying to mark not existing record with id %s deleted.", id));
+        }
     }
 
     @Override
