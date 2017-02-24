@@ -25,12 +25,19 @@ import org.junit.Test;
 import org.spine3.server.entity.AbstractEntity;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.spine3.test.Tests.hasPrivateParameterlessCtor;
 
 /**
  * @author Alexander Litus
  */
 @SuppressWarnings("InstanceMethodNamingConvention")
 public class DbTableNameFactoryShould {
+
+    @Test
+    public void have_private_utility_constrctor() {
+        assertTrue(hasPrivateParameterlessCtor(DbTableNameFactory.class));
+    }
 
     @Test
     public void provide_table_name_for_class() {

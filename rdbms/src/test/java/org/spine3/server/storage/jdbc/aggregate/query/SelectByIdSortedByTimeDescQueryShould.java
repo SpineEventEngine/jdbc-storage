@@ -18,43 +18,45 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.spine3.server.storage.jdbc.command.query;
+package org.spine3.server.storage.jdbc.aggregate.query;
 
 import org.junit.Test;
-import org.spine3.server.command.CommandRecord;
+import org.slf4j.Logger;
 import org.spine3.server.storage.jdbc.DatabaseException;
+import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyString;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
- * @author Andrey Lavrov
+ * @author Dmytro Dashenkov.
  */
-public class SelectCommandByIdQueryShould {
+public class SelectByIdSortedByTimeDescQueryShould {
 
     @Test
-    public void handle_sql_exception() throws SQLException {
-        final SelectCommandByIdQuery query = Given.getSelectCommandByIdQueryMock();
+    public void throw_DatabaseException_upon_SQL_failure() {
+        final DataSourceWrapper dataSourceMock = mock(DataSourceWrapper.class);
+        when(dataSourceMock.getConnection(anyBoolean())).thenThrow(SQLException.class);
+        final Logger loggerMock = mock(Logger.class);
+
+        final SelectByIdSortedByTimeDescQuery query =
+                SelectByIdSortedByTimeDescQuery.newBuilder("table-name")
+                                               .setDataSource(dataSourceMock)
+                                               .setLogger(loggerMock)
+                                               .build();
         try {
             query.execute();
             fail();
-        } catch (DatabaseException expected) {
-            verify(Given.getLoggerMock()).error(anyString(), any(SQLException.class));
+        } catch (DatabaseException dbe) {
+            verify(loggerMock).error(anyString(), eq(dbe.getCause()));
         }
-    }
 
-    @Test
-    public void return_null_if_result_set_contains_NO_column_COMMAND() throws SQLException {
-        final SelectCommandByIdQuery query = Given.getSelectCommandByIdQueryMock();
-        final ResultSet resultSet = mock(ResultSet.class);
-        final CommandRecord readMessage = query.readMessage(resultSet);
-        assertNull(readMessage);
     }
 }

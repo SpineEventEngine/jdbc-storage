@@ -20,18 +20,26 @@
 
 package org.spine3.server.storage.jdbc.aggregate;
 
+import com.google.common.base.Optional;
+import org.junit.Test;
 import org.spine3.server.aggregate.Aggregate;
 import org.spine3.server.aggregate.AggregateStorage;
 import org.spine3.server.aggregate.AggregateStorageVisibilityHandlingShould;
+import org.spine3.server.entity.Visibility;
 import org.spine3.server.storage.jdbc.GivenDataSource;
 import org.spine3.server.storage.jdbc.aggregate.query.AggregateStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
+import org.spine3.test.aggregate.Project;
 import org.spine3.test.aggregate.ProjectId;
+import org.spine3.testdata.Sample;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Dmytro Dashenkov.
  */
-public class JdbcAggregateStorageStatusHandlingShould extends AggregateStorageVisibilityHandlingShould {
+public class JdbcAggregateStorageVisibilityHandlingShould extends AggregateStorageVisibilityHandlingShould {
 
     @Override
     protected AggregateStorage<ProjectId> getAggregateStorage(
@@ -42,5 +50,38 @@ public class JdbcAggregateStorageStatusHandlingShould extends AggregateStorageVi
                                                 new AggregateStorageQueryFactory<>(
                                                         dataSource,
                                                         aggregateClass));
+    }
+
+    @SuppressWarnings("OptionalGetWithoutIsPresent") // We do check
+    @Test
+    public void update_entity_visibility() {
+        final ProjectId id = Sample.messageOfType(ProjectId.class);
+        final Visibility archived = Visibility.newBuilder()
+                                              .setArchived(true)
+                                              .build();
+        final JdbcAggregateStorage<ProjectId> storage =
+                (JdbcAggregateStorage<ProjectId>) getAggregateStorage(TestAggregate.class);
+        storage.writeVisibility(id, archived);
+
+        final Optional<Visibility> actualArchived = storage.readVisibility(id);
+        assertTrue(actualArchived.isPresent());
+        assertEquals(archived, actualArchived.get());
+
+        final Visibility archivedAndDeleted = Visibility.newBuilder()
+                                                        .setArchived(true)
+                                                        .setDeleted(true)
+                                                        .build();
+        storage.writeVisibility(id, archivedAndDeleted);
+
+        final Optional<Visibility> actualArchivedAndDeleted = storage.readVisibility(id);
+        assertTrue(actualArchivedAndDeleted.isPresent());
+        assertEquals(archivedAndDeleted, actualArchivedAndDeleted.get());
+    }
+
+    private static class TestAggregate extends Aggregate<ProjectId, Project, Project.Builder> {
+
+        protected TestAggregate(ProjectId id) {
+            super(id);
+        }
     }
 }
