@@ -44,6 +44,8 @@ import static org.spine3.server.storage.jdbc.entity.visibility.table.VisibilityT
 import static org.spine3.server.storage.jdbc.entity.visibility.table.VisibilityTable.TABLE_NAME;
 
 /**
+ * The query updating an {@linkplain org.spine3.server.entity.Visibility entity visibility}.
+ *
  * @author Dmytro Dashenkov.
  */
 public class UpdateVisibilityQuery extends WriteQuery {

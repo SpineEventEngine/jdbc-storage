@@ -41,6 +41,9 @@ import static org.spine3.server.storage.jdbc.entity.visibility.table.VisibilityT
 import static org.spine3.server.storage.jdbc.entity.visibility.table.VisibilityTable.TABLE_NAME;
 
 /**
+ * The query for creating a new record in the table storing
+ * the {@linkplain org.spine3.server.entity.Visibility entity visibility}.
+ *
  * @author Dmytro Dashenkov.
  */
 public class InsertVisibilityQuery extends WriteQuery {

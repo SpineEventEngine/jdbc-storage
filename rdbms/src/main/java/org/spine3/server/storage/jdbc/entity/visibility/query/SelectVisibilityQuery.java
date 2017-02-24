@@ -46,6 +46,8 @@ import static org.spine3.server.storage.jdbc.entity.visibility.table.VisibilityT
 import static org.spine3.server.storage.jdbc.entity.visibility.table.VisibilityTable.TABLE_NAME;
 
 /**
+ * The query selecting one {@linkplain org.spine3.server.entity.Visibility entity visibility} by ID.
+ *
  * @author Dmytro Dashenkov.
  */
 public class SelectVisibilityQuery extends StorageQuery {

@@ -34,6 +34,8 @@ import static org.spine3.server.storage.jdbc.Sql.Type.VARCHAR_512;
 import static org.spine3.server.storage.jdbc.entity.visibility.table.VisibilityTable.ID_COL;
 
 /**
+ * The query creating the {@linkplain org.spine3.server.entity.Visibility} table.
+ *
  * @author Dmytro Dashenkov.
  */
 public class CreateVisibilityTableQuery extends CreateTableQuery<String> {

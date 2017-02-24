@@ -42,6 +42,9 @@ import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
 import static org.spine3.server.storage.jdbc.entity.visibility.table.VisibilityTable.ID_COL;
 
 /**
+ * The query to the {@linkplain org.spine3.server.entity.Visibility entity visibility} setting one
+ * of the columns {@code true}.
+ *
  * @author Dmytro Dashenkov.
  */
 public class MarkEntityQuery<I> extends StorageQuery {
