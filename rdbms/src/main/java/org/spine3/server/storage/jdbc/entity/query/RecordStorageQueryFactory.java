@@ -78,8 +78,8 @@ public class RecordStorageQueryFactory<I> implements VisibilityHandlingStorageQu
     }
 
     @Override
-    public InsertVisibilityQuery newInsertVisibilityQuery(I id, Visibility entityStatus) {
-        return statusTableQueryFactory.newInsertVisibilityQuery(id, entityStatus);
+    public InsertVisibilityQuery newInsertVisibilityQuery(I id, Visibility visibility) {
+        return statusTableQueryFactory.newInsertVisibilityQuery(id, visibility);
     }
 
     @Override
@@ -88,8 +88,8 @@ public class RecordStorageQueryFactory<I> implements VisibilityHandlingStorageQu
     }
 
     @Override
-    public UpdateVisibilityQuery newUpdateVisibilityQuery(I id, Visibility status) {
-        return statusTableQueryFactory.newUpdateVisibilityQuery(id, status);
+    public UpdateVisibilityQuery newUpdateVisibilityQuery(I id, Visibility visibility) {
+        return statusTableQueryFactory.newUpdateVisibilityQuery(id, visibility);
     }
 
     @Override

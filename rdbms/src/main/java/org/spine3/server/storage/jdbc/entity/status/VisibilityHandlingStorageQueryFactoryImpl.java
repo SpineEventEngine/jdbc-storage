@@ -73,13 +73,13 @@ public class VisibilityHandlingStorageQueryFactoryImpl<I> implements VisibilityH
     }
 
     @Override
-    public InsertVisibilityQuery newInsertVisibilityQuery(I id, Visibility entityStatus) {
+    public InsertVisibilityQuery newInsertVisibilityQuery(I id, Visibility visibility) {
         final InsertVisibilityQuery.Builder builder =
                 InsertVisibilityQuery.newBuilder()
                                        .setDataSource(dataSource)
                                        .setLogger(logger)
                                        .setId(id)
-                                       .setVisibility(entityStatus);
+                                       .setVisibility(visibility);
         return builder.build();
     }
 
@@ -94,12 +94,12 @@ public class VisibilityHandlingStorageQueryFactoryImpl<I> implements VisibilityH
     }
 
     @Override
-    public UpdateVisibilityQuery newUpdateVisibilityQuery(I id, Visibility status) {
+    public UpdateVisibilityQuery newUpdateVisibilityQuery(I id, Visibility visibility) {
         final UpdateVisibilityQuery.Builder builder = UpdateVisibilityQuery.<I>newBuilder()
                 .setDataSource(dataSource)
                 .setLogger(logger)
                 .setId(id)
-                .setVisibility(status);
+                .setVisibility(visibility);
         return builder.build();
     }
 

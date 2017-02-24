@@ -30,25 +30,87 @@ import org.spine3.server.storage.jdbc.entity.status.query.SelectVisibilityQuery;
 import org.spine3.server.storage.jdbc.entity.status.query.UpdateVisibilityQuery;
 
 /**
+ * And interface for managing a table for storing the {@linkplain Visibility entity visibility}.
+ *
+ * @param <I> ID type of the entity visibility of which is stored
  * @author Dmytro Dashenkov.
  */
 public interface VisibilityHandlingStorageQueryFactory<I> {
 
+    /**
+     * Generates a query for creating a new table of given name for storing
+     * the {@linkplain Visibility entity visibility} if the table does not exist yet.
+     *
+     * @return a {@code CREATE TABLE IF NOT EXISTS} query
+     */
     CreateVisibilityTableQuery newCreateVisibilityTableQuery();
 
-    InsertVisibilityQuery newInsertVisibilityQuery(I id, Visibility entityStatus);
+    /**
+     * Generates a query for inserting a new record of
+     * the {@linkplain Visibility entity visibility}.
+     *
+     * @param id         ID of the new record
+     * @param visibility the {@linkplain Visibility} to store
+     * @return an {@code INSERT INTO} query
+     */
+    InsertVisibilityQuery newInsertVisibilityQuery(I id, Visibility visibility);
 
+    /**
+     * Generates a query for selecting the {@linkplain Visibility} by ID.
+     *
+     * @param id ID to look for
+     * @return a {@code SELECT} query
+     */
     SelectVisibilityQuery newSelectVisibilityQuery(I id);
 
-    UpdateVisibilityQuery newUpdateVisibilityQuery(I id, Visibility status);
+    /**
+     * Generates a query for updating an existing record of
+     * the {@linkplain Visibility entity visibility}.
+     *
+     * @param id         ID of the record
+     * @param visibility new {@linkplain Visibility} to store
+     * @return an {@code UPDATE} query
+     */
+    UpdateVisibilityQuery newUpdateVisibilityQuery(I id, Visibility visibility);
 
+    /**
+     * Generates a new query setting an existing {@linkplain Visibility} with the passed ID to
+     * {@code archived}.
+     *
+     * @param id ID of an existing record
+     * @return an {@code UPDATE} query
+     */
     MarkEntityQuery<I> newMarkArchivedQuery(I id);
 
+    /**
+     * Generates a new query setting an existing {@linkplain Visibility} with the passed ID to
+     * {@code deleted}.
+     *
+     * @param id ID of an existing record
+     * @return an {@code UPDATE} query
+     */
     MarkEntityQuery<I> newMarkDeletedQuery(I id);
 
+    /**
+     * Generates a new query creating a new {@linkplain Visibility} record with the passed ID and
+     * set to {@code archived}.
+     *
+     * @param id ID of the new record
+     * @return an {@code INSERT INTO} query
+     */
     InsertAndMarkEntityQuery<I> newMarkArchivedNewEntityQuery(I id);
 
+    /**
+     * Generates a new query creating a new {@linkplain Visibility} record with the passed ID and
+     * set to {@code deleted}.
+     *
+     * @param id ID of the new record
+     * @return an {@code INSERT INTO} query
+     */
     InsertAndMarkEntityQuery<I> newMarkDeletedNewEntityQuery(I id);
 
+    /**
+     * Sets the {@link Logger} to use in the generated queries.
+     */
     void setLogger(Logger logger);
 }
