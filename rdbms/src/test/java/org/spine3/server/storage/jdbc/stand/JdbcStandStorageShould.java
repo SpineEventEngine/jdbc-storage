@@ -39,7 +39,7 @@ import org.spine3.server.storage.jdbc.GivenDataSource;
 import org.spine3.server.storage.jdbc.JdbcStandStorage;
 import org.spine3.server.storage.jdbc.entity.query.CreateEntityTableQuery;
 import org.spine3.server.storage.jdbc.entity.query.RecordStorageQueryFactory;
-import org.spine3.server.storage.jdbc.entity.status.query.CreateVisibilityTableQuery;
+import org.spine3.server.storage.jdbc.entity.visibility.query.CreateVisibilityTableQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.test.commandservice.customer.Customer;
 import org.spine3.test.storage.Project;

@@ -18,7 +18,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.spine3.server.storage.jdbc.entity.status.table;
+package org.spine3.server.storage.jdbc.entity.visibility.table;
 
 import org.spine3.server.entity.Visibility;
 

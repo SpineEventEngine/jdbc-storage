@@ -18,7 +18,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.spine3.server.storage.jdbc.entity.status.query;
+package org.spine3.server.storage.jdbc.entity.visibility.query;
 
 import org.spine3.server.storage.jdbc.query.CreateTableQuery;
 
@@ -31,7 +31,7 @@ import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
 import static org.spine3.server.storage.jdbc.Sql.Query.CREATE_IF_MISSING;
 import static org.spine3.server.storage.jdbc.Sql.Type.BOOLEAN;
 import static org.spine3.server.storage.jdbc.Sql.Type.VARCHAR_512;
-import static org.spine3.server.storage.jdbc.entity.status.table.VisibilityTable.ID_COL;
+import static org.spine3.server.storage.jdbc.entity.visibility.table.VisibilityTable.ID_COL;
 
 /**
  * @author Dmytro Dashenkov.

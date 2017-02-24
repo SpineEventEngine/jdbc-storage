@@ -18,13 +18,13 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.spine3.server.storage.jdbc.entity.status;
+package org.spine3.server.storage.jdbc.entity.visibility;
 
 import com.google.common.base.Optional;
 import com.google.protobuf.Message;
 import org.spine3.server.entity.Visibility;
 import org.spine3.server.storage.jdbc.entity.query.MarkEntityQuery;
-import org.spine3.server.storage.jdbc.entity.status.query.SelectVisibilityQuery;
+import org.spine3.server.storage.jdbc.entity.visibility.query.SelectVisibilityQuery;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.spine3.validate.Validate.isDefault;

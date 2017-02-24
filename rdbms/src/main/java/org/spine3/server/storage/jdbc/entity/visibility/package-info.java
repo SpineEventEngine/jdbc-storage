@@ -22,6 +22,6 @@
  * @author Dmytro Dashenkov.
  */
 @ParametersAreNonnullByDefault
-package org.spine3.server.storage.jdbc.entity.status.table;
+package org.spine3.server.storage.jdbc.entity.visibility;
 
 import javax.annotation.ParametersAreNonnullByDefault;

@@ -28,8 +28,8 @@ import static org.spine3.server.storage.jdbc.Sql.Query.INSERT_INTO;
 import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
 import static org.spine3.server.storage.jdbc.Sql.Query.TRUE;
 import static org.spine3.server.storage.jdbc.Sql.Query.VALUES;
-import static org.spine3.server.storage.jdbc.entity.status.table.VisibilityTable.ID_COL;
-import static org.spine3.server.storage.jdbc.entity.status.table.VisibilityTable.TABLE_NAME;
+import static org.spine3.server.storage.jdbc.entity.visibility.table.VisibilityTable.ID_COL;
+import static org.spine3.server.storage.jdbc.entity.visibility.table.VisibilityTable.TABLE_NAME;
 
 /**
  * @author Dmytro Dashenkov.

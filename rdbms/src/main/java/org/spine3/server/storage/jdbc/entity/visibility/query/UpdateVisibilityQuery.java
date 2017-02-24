@@ -18,9 +18,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.spine3.server.storage.jdbc.entity.status.query;
+package org.spine3.server.storage.jdbc.entity.visibility.query;
 
-import org.spine3.base.Stringifiers;
 import org.spine3.server.entity.Visibility;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.WriteQuery;
@@ -30,28 +29,34 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+import static org.spine3.base.Stringifiers.idToString;
+import static org.spine3.server.storage.VisibilityField.archived;
+import static org.spine3.server.storage.VisibilityField.deleted;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.COMMA;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
-import static org.spine3.server.storage.jdbc.Sql.Query.INSERT_INTO;
-import static org.spine3.server.storage.jdbc.Sql.Query.VALUES;
-import static org.spine3.server.storage.jdbc.Sql.nPlaceholders;
-import static org.spine3.server.storage.jdbc.entity.status.table.VisibilityTable.ARCHIVED_COL_INDEX;
-import static org.spine3.server.storage.jdbc.entity.status.table.VisibilityTable.COLUMN_COUNT;
-import static org.spine3.server.storage.jdbc.entity.status.table.VisibilityTable.DELETED_COL_INDEX;
-import static org.spine3.server.storage.jdbc.entity.status.table.VisibilityTable.ID_COL_INDEX;
-import static org.spine3.server.storage.jdbc.entity.status.table.VisibilityTable.TABLE_NAME;
+import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
+import static org.spine3.server.storage.jdbc.Sql.Query.SET;
+import static org.spine3.server.storage.jdbc.Sql.Query.UPDATE;
+import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
+import static org.spine3.server.storage.jdbc.entity.visibility.table.VisibilityTable.ID_COL;
+import static org.spine3.server.storage.jdbc.entity.visibility.table.VisibilityTable.TABLE_NAME;
 
 /**
  * @author Dmytro Dashenkov.
  */
-public class InsertVisibilityQuery extends WriteQuery {
+public class UpdateVisibilityQuery extends WriteQuery {
 
-    private static final String SQL = INSERT_INTO + TABLE_NAME +
-                                      VALUES + nPlaceholders(COLUMN_COUNT) + SEMICOLON;
+    private static final String SQL = UPDATE + TABLE_NAME + SET +
+                                      archived + EQUAL + PLACEHOLDER + COMMA +
+                                      deleted + EQUAL + PLACEHOLDER +
+                                      WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
 
     private final String id;
     private final Visibility entityStatus;
 
-    protected InsertVisibilityQuery(Builder builder) {
+    protected UpdateVisibilityQuery(Builder builder) {
         super(builder);
         this.id = builder.id;
         this.entityStatus = builder.entityStatus;
@@ -63,13 +68,13 @@ public class InsertVisibilityQuery extends WriteQuery {
         final boolean archived = entityStatus.getArchived();
         final boolean deleted = entityStatus.getDeleted();
         try {
-            statement.setString(ID_COL_INDEX, id);
-            statement.setBoolean(ARCHIVED_COL_INDEX, archived);
-            statement.setBoolean(DELETED_COL_INDEX, deleted);
+            statement.setBoolean(1, archived);
+            statement.setBoolean(2, deleted);
+            statement.setString(3, id);
         } catch (SQLException e) {
-            logWriteError(id, e);
             throw new DatabaseException(e);
         }
+
         return statement;
     }
 
@@ -79,28 +84,28 @@ public class InsertVisibilityQuery extends WriteQuery {
         return builder;
     }
 
-    public static class Builder extends WriteQuery.Builder<Builder, InsertVisibilityQuery> {
+    public static class Builder extends WriteQuery.Builder<Builder, UpdateVisibilityQuery> {
 
         private String id;
         private Visibility entityStatus;
+
+        public Builder setId(Object id) {
+            checkNotNull(id);
+            final String stringId = idToString(id);
+            this.id = stringId;
+            return getThis();
+        }
 
         public Builder setVisibility(Visibility status) {
             this.entityStatus = checkNotNull(status);
             return getThis();
         }
 
-        public Builder setId(Object id) {
-            checkNotNull(id);
-            final String stringId = Stringifiers.idToString(id);
-            this.id = stringId;
-            return getThis();
-        }
-
         @Override
-        public InsertVisibilityQuery build() {
-            checkNotNull(id, "ID is not set.");
-            checkNotNull(entityStatus, "Entity status is not set.");
-            return new InsertVisibilityQuery(this);
+        public UpdateVisibilityQuery build() {
+            checkState(id != null, "ID is not set.");
+            checkState(entityStatus != null, "Entity status is not set.");
+            return new UpdateVisibilityQuery(this);
         }
 
         @Override

@@ -18,7 +18,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.spine3.server.storage.jdbc.entity.status.query;
+package org.spine3.server.storage.jdbc.entity.visibility.query;
 
 import org.spine3.server.entity.Visibility;
 import org.spine3.server.storage.VisibilityField;
@@ -42,8 +42,8 @@ import static org.spine3.server.storage.jdbc.Sql.Query.FROM;
 import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
 import static org.spine3.server.storage.jdbc.Sql.Query.SELECT;
 import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
-import static org.spine3.server.storage.jdbc.entity.status.table.VisibilityTable.ID_COL;
-import static org.spine3.server.storage.jdbc.entity.status.table.VisibilityTable.TABLE_NAME;
+import static org.spine3.server.storage.jdbc.entity.visibility.table.VisibilityTable.ID_COL;
+import static org.spine3.server.storage.jdbc.entity.visibility.table.VisibilityTable.TABLE_NAME;
 
 /**
  * @author Dmytro Dashenkov.
