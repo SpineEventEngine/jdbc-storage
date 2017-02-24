@@ -25,6 +25,9 @@ import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
 /**
+ * A utility helping to initialize a {@link VisibilityHandlingStorageQueryFactory} with the required
+ * configuration.
+ *
  * @author Dmytro Dashenkov.
  */
 public class VisibilityQueryFactories {
@@ -32,19 +35,36 @@ public class VisibilityQueryFactories {
     private VisibilityQueryFactories() {
     }
 
+    /**
+     * Creates an instance of {@link VisibilityHandlingStorageQueryFactory} which stores its data
+     * in the given table.
+     *
+     * @param dataSource {@linkplain DataSourceWrapper} to use
+     * @param tableName  the name of the table to use
+     * @param idColumn   the {@linkplain IdColumn column} of the table which stores its IDs
+     * @param <I>        the Java type of the ID
+     * @return new instance of the query factory
+     */
     public static <I> VisibilityHandlingStorageQueryFactory<I> forTable(
             DataSourceWrapper dataSource,
             String tableName,
             IdColumn<I> idColumn) {
         return new VisibilityHandlingStorageQueryFactoryImpl<>(dataSource,
-                                                                 tableName,
-                                                                 idColumn);
+                                                               tableName,
+                                                               idColumn);
     }
 
+    /**
+     * Creates an instance of {@link VisibilityHandlingStorageQueryFactory} which stores its data
+     * in a separate table.
+     *
+     * @param dataSource {@linkplain DataSourceWrapper} to use
+     * @return new instance of the query factory
+     */
     public static VisibilityHandlingStorageQueryFactory<?> forSeparateTable(
             DataSourceWrapper dataSource) {
         return new VisibilityHandlingStorageQueryFactoryImpl<>(dataSource,
-                                                                 VisibilityTable.TABLE_NAME,
-                                                                 new IdColumn.StringIdColumn());
+                                                               VisibilityTable.TABLE_NAME,
+                                                               new IdColumn.StringIdColumn());
     }
 }

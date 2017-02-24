@@ -19,6 +19,9 @@
  */
 
 /**
+ * This package contains the {@linkplain org.spine3.server.storage.jdbc.query.StorageQuery queries}
+ * connected with the {@linkplain org.spine3.server.entity.Visibility entity visibility}.
+ *
  * @author Dmytro Dashenkov.
  */
 @ParametersAreNonnullByDefault

@@ -20,6 +20,7 @@
 
 package org.spine3.server.storage.jdbc.entity.visibility;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;
 import org.spine3.Internal;
 import org.spine3.server.entity.Visibility;
@@ -42,7 +43,7 @@ import static org.spine3.server.storage.VisibilityField.deleted;
  * @author Dmytro Dashenkov.
  */
 @Internal
-public class VisibilityHandlingStorageQueryFactoryImpl<I> implements VisibilityHandlingStorageQueryFactory<I> {
+class VisibilityHandlingStorageQueryFactoryImpl<I> implements VisibilityHandlingStorageQueryFactory<I> {
 
     private final DataSourceWrapper dataSource;
     private final String tableName;
@@ -121,6 +122,11 @@ public class VisibilityHandlingStorageQueryFactoryImpl<I> implements VisibilityH
     @Override
     public InsertAndMarkEntityQuery<I> newMarkDeletedNewEntityQuery(I id) {
         return newInsertAndMarkEntityQuery(id, deleted);
+    }
+
+    @VisibleForTesting
+    String getTableName() {
+        return tableName;
     }
 
     private InsertAndMarkEntityQuery<I> newInsertAndMarkEntityQuery(I id, VisibilityField column) {

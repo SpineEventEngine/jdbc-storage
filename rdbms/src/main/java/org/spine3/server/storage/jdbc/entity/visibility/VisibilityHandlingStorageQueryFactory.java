@@ -22,10 +22,10 @@ package org.spine3.server.storage.jdbc.entity.visibility;
 
 import org.slf4j.Logger;
 import org.spine3.server.entity.Visibility;
-import org.spine3.server.storage.jdbc.entity.visibility.query.InsertAndMarkEntityQuery;
-import org.spine3.server.storage.jdbc.entity.visibility.query.MarkEntityQuery;
 import org.spine3.server.storage.jdbc.entity.visibility.query.CreateVisibilityTableQuery;
+import org.spine3.server.storage.jdbc.entity.visibility.query.InsertAndMarkEntityQuery;
 import org.spine3.server.storage.jdbc.entity.visibility.query.InsertVisibilityQuery;
+import org.spine3.server.storage.jdbc.entity.visibility.query.MarkEntityQuery;
 import org.spine3.server.storage.jdbc.entity.visibility.query.SelectVisibilityQuery;
 import org.spine3.server.storage.jdbc.entity.visibility.query.UpdateVisibilityQuery;
 
@@ -34,6 +34,7 @@ import org.spine3.server.storage.jdbc.entity.visibility.query.UpdateVisibilityQu
  *
  * @param <I> ID type of the entity visibility of which is stored
  * @author Dmytro Dashenkov.
+ * @see VisibilityQueryFactories
  */
 public interface VisibilityHandlingStorageQueryFactory<I> {
 
