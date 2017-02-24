@@ -105,12 +105,12 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
 
     @Override
     protected Optional<Visibility> readVisibility(I id) {
-        return visibilityHandler.readStatus(id);
+        return visibilityHandler.readVisibility(id);
     }
 
     @Override
     protected void writeVisibility(I id, Visibility status) {
-        visibilityHandler.writeStatus(id, status);
+        visibilityHandler.writeVisibility(id, status);
     }
 
     @Override
