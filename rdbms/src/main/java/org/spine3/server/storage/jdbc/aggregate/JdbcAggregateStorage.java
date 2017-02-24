@@ -23,8 +23,8 @@ package org.spine3.server.storage.jdbc.aggregate;
 import com.google.common.base.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.spine3.server.aggregate.AggregateStorage;
 import org.spine3.server.aggregate.AggregateEventRecord;
+import org.spine3.server.aggregate.AggregateStorage;
 import org.spine3.server.entity.Visibility;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.JdbcStorageFactory;
@@ -43,7 +43,8 @@ import static org.spine3.server.storage.jdbc.util.Closeables.closeAll;
 /**
  * The implementation of the aggregate storage based on the RDBMS.
  *
- * <p> This storage contains 2 tables by default, they are described in {@link org.spine3.server.storage.jdbc.aggregate.query.Table}.
+ * <p> This storage contains 2 tables by default, they are described
+ * in {@link org.spine3.server.storage.jdbc.aggregate.query.Table}.
  *
  * @param <I> the type of aggregate IDs
  * @author Alexander Litus
@@ -156,7 +157,8 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     /**
      * {@inheritDoc}
      *
-     * <p><b>NOTE:</b> it is required to call {@link Iterator#hasNext()} before {@link Iterator#next()}.
+     * <p><b>NOTE:</b> it is required to call {@link Iterator#hasNext()} before
+     * {@link Iterator#next()}.
      *
      * @return a new {@link DbIterator} instance
      * @throws DatabaseException if an error occurs during an interaction with the DB
@@ -164,9 +166,9 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     @Override
     protected Iterator<AggregateEventRecord> historyBackward(I id) throws DatabaseException {
         checkNotNull(id);
-        final Iterator<AggregateEventRecord> iterator = queryFactory.newSelectByIdSortedByTimeDescQuery(
-                id)
-                                                                      .execute();
+        final Iterator<AggregateEventRecord> iterator =
+                queryFactory.newSelectByIdSortedByTimeDescQuery(id)
+                            .execute();
         iterators.add((DbIterator) iterator);
         return iterator;
     }
