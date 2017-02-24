@@ -22,8 +22,8 @@ package org.spine3.server.storage.jdbc.entity.visibility;
 
 import org.slf4j.Logger;
 import org.spine3.server.entity.Visibility;
-import org.spine3.server.storage.jdbc.entity.query.InsertAndMarkEntityQuery;
-import org.spine3.server.storage.jdbc.entity.query.MarkEntityQuery;
+import org.spine3.server.storage.jdbc.entity.visibility.query.InsertAndMarkEntityQuery;
+import org.spine3.server.storage.jdbc.entity.visibility.query.MarkEntityQuery;
 import org.spine3.server.storage.jdbc.entity.visibility.query.CreateVisibilityTableQuery;
 import org.spine3.server.storage.jdbc.entity.visibility.query.InsertVisibilityQuery;
 import org.spine3.server.storage.jdbc.entity.visibility.query.SelectVisibilityQuery;

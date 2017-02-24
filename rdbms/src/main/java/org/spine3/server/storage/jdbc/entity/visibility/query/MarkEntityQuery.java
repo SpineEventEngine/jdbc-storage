@@ -18,7 +18,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.spine3.server.storage.jdbc.entity.query;
+package org.spine3.server.storage.jdbc.entity.visibility.query;
 
 import org.spine3.server.storage.VisibilityField;
 import org.spine3.server.storage.jdbc.DatabaseException;

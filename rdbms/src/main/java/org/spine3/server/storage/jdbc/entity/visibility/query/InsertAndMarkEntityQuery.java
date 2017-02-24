@@ -18,7 +18,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.spine3.server.storage.jdbc.entity.query;
+package org.spine3.server.storage.jdbc.entity.visibility.query;
 
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
@@ -32,6 +32,8 @@ import static org.spine3.server.storage.jdbc.entity.visibility.table.VisibilityT
 import static org.spine3.server.storage.jdbc.entity.visibility.table.VisibilityTable.TABLE_NAME;
 
 /**
+ *
+ *
  * @author Dmytro Dashenkov.
  */
 public class InsertAndMarkEntityQuery<I> extends MarkEntityQuery<I> {
