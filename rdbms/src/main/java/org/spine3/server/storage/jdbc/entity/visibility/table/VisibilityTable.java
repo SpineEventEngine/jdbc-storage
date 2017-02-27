@@ -21,26 +21,19 @@
 package org.spine3.server.storage.jdbc.entity.visibility.table;
 
 import org.spine3.server.entity.Visibility;
+import org.spine3.server.storage.jdbc.util.DbTableNameFactory;
 
 /**
- * A container for the constants adjacent to the table storing the {@linkplain Visibility}.
+ * A container for the common constants for all the queries to the table storing
+ * the {@linkplain Visibility}.
  *
  * @author Dmytro Dashenkov.
  */
 public class VisibilityTable {
 
-    public static final String TABLE_NAME = Visibility.class.getCanonicalName()
-                                                              .replace('.', '_');
-
-    public static final int COLUMN_COUNT = 3;
+    public static final String TABLE_NAME = DbTableNameFactory.newTableName(Visibility.class);
 
     public static final String ID_COL = "id";
-
-    public static final int ID_COL_INDEX = 1;
-
-    public static final int ARCHIVED_COL_INDEX = 2;
-
-    public static final int DELETED_COL_INDEX = 3;
 
     private VisibilityTable() {
     }

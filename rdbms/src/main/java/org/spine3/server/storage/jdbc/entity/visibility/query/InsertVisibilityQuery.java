@@ -34,10 +34,6 @@ import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
 import static org.spine3.server.storage.jdbc.Sql.Query.INSERT_INTO;
 import static org.spine3.server.storage.jdbc.Sql.Query.VALUES;
 import static org.spine3.server.storage.jdbc.Sql.nPlaceholders;
-import static org.spine3.server.storage.jdbc.entity.visibility.table.VisibilityTable.ARCHIVED_COL_INDEX;
-import static org.spine3.server.storage.jdbc.entity.visibility.table.VisibilityTable.COLUMN_COUNT;
-import static org.spine3.server.storage.jdbc.entity.visibility.table.VisibilityTable.DELETED_COL_INDEX;
-import static org.spine3.server.storage.jdbc.entity.visibility.table.VisibilityTable.ID_COL_INDEX;
 import static org.spine3.server.storage.jdbc.entity.visibility.table.VisibilityTable.TABLE_NAME;
 
 /**
@@ -48,6 +44,7 @@ import static org.spine3.server.storage.jdbc.entity.visibility.table.VisibilityT
  */
 public class InsertVisibilityQuery extends WriteQuery {
 
+    private static final int COLUMN_COUNT = 3;
     private static final String SQL = INSERT_INTO + TABLE_NAME +
                                       VALUES + nPlaceholders(COLUMN_COUNT) + SEMICOLON;
 
@@ -66,9 +63,9 @@ public class InsertVisibilityQuery extends WriteQuery {
         final boolean archived = entityStatus.getArchived();
         final boolean deleted = entityStatus.getDeleted();
         try {
-            statement.setString(ID_COL_INDEX, id);
-            statement.setBoolean(ARCHIVED_COL_INDEX, archived);
-            statement.setBoolean(DELETED_COL_INDEX, deleted);
+            statement.setString(TableColumn.ID.index, id);
+            statement.setBoolean(TableColumn.ARCHIVED.index, archived);
+            statement.setBoolean(TableColumn.DELETED.index, deleted);
         } catch (SQLException e) {
             logWriteError(id, e);
             throw new DatabaseException(e);
@@ -109,6 +106,19 @@ public class InsertVisibilityQuery extends WriteQuery {
         @Override
         protected Builder getThis() {
             return this;
+        }
+    }
+
+    private enum TableColumn {
+
+        ID(1),
+        ARCHIVED(2),
+        DELETED(3);
+
+        private final int index;
+
+        TableColumn(int index) {
+            this.index = index;
         }
     }
 }

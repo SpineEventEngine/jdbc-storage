@@ -53,13 +53,10 @@ class Given {
                 GivenDataSource.whichThrowsExceptionOnSettingStatementParam();
         final InsertEventRecordQuery.Builder builder =
                 InsertEventRecordQuery.newBuilder()
-                                      .setDataSource(
-                                              dataSourceMock)
+                                      .setDataSource(dataSourceMock)
                                       .setLogger(loggerMock)
-                                      .setIdColumn(
-                                              idColumnMock)
-                                      .setRecord(
-                                              nonEmptyEvent());
+                                      .setIdColumn(idColumnMock)
+                                      .setRecord(nonEmptyEvent());
         return builder.build();
     }
 
@@ -69,13 +66,10 @@ class Given {
                 GivenDataSource.whichThrowsExceptionOnSettingStatementParam();
         final UpdateEventRecordQuery.Builder builder =
                 UpdateEventRecordQuery.newBuilder()
-                                      .setDataSource(
-                                              dataSourceMock)
+                                      .setDataSource(dataSourceMock)
                                       .setLogger(loggerMock)
-                                      .setIdColumn(
-                                              idColumnMock)
-                                      .setRecord(
-                                              nonEmptyEvent());
+                                      .setIdColumn(idColumnMock)
+                                      .setRecord(nonEmptyEvent());
         return builder.build();
     }
 
