@@ -34,14 +34,6 @@ import java.sql.SQLException;
  */
 public class WriteEntityQuery<I> extends WriteRecordQuery<I, EntityRecord> {
 
-    protected static final int RECORD_COL_POSITION = 1;
-
-    protected static final int ARCHIVED_COL_POSITION = 2;
-
-    protected static final int DELETED_COL_POSITION = 3;
-
-    protected static final int ID_COL_POSITION = 4;
-
     protected WriteEntityQuery(
             Builder<? extends Builder, ? extends WriteRecordQuery, I, EntityRecord> builder) {
         super(builder);
@@ -55,11 +47,25 @@ public class WriteEntityQuery<I> extends WriteRecordQuery<I, EntityRecord> {
         final boolean archived = status.getArchived();
         final boolean deleted = status.getDeleted();
         try {
-            statement.setBoolean(ARCHIVED_COL_POSITION, archived);
-            statement.setBoolean(DELETED_COL_POSITION, deleted);
+            statement.setBoolean(QueryParameter.ARCHIVED.index, archived);
+            statement.setBoolean(QueryParameter.DELETED.index, deleted);
         } catch (SQLException e) {
             throw new DatabaseException(e);
         }
         return statement;
+    }
+
+    protected enum QueryParameter {
+
+        RECORD(1),
+        ARCHIVED(2),
+        DELETED(3),
+        ID(4);
+
+        public final int index;
+
+        QueryParameter(int index) {
+            this.index = index;
+        }
     }
 }
