@@ -65,6 +65,7 @@ public class AggregateStorageQueryFactory<I>
     // The aux visibility handling query factory has a hardcoded type param
     public AggregateStorageQueryFactory(DataSourceWrapper dataSource,
                                         Class<? extends Aggregate<I, ?, ?>> aggregateClass) {
+        super();
         this.idColumn = IdColumn.newInstance(aggregateClass);
         this.mainTableName = DbTableNameFactory.newTableName(aggregateClass);
         this.eventCountTableName = mainTableName + EVENT_COUNT_TABLE_NAME_SUFFIX;

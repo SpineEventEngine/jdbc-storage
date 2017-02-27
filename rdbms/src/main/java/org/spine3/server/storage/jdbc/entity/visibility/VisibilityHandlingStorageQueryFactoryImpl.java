@@ -51,6 +51,7 @@ class VisibilityHandlingStorageQueryFactoryImpl<I> extends AbstractVisibilityHan
     VisibilityHandlingStorageQueryFactoryImpl(DataSourceWrapper dataSource,
                                               String tableName,
                                               IdColumn<I> idColumn) {
+        super();
         this.dataSource = checkNotNull(dataSource);
         this.tableName = checkNotNull(tableName);
         this.idColumn = checkNotNull(idColumn);

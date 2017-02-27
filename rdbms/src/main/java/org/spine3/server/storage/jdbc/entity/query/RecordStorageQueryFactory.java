@@ -65,6 +65,7 @@ public class RecordStorageQueryFactory<I> extends AbstractVisibilityHandlingStor
      */
     public RecordStorageQueryFactory(DataSourceWrapper dataSource,
                                      Class<? extends Entity<I, ?>> entityClass) {
+        super();
         this.idColumn = IdColumn.newInstance(entityClass);
         this.dataSource = dataSource;
         this.tableName = DbTableNameFactory.newTableName(entityClass);
