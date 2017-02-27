@@ -55,8 +55,8 @@ public class JdbcCommandStorage extends CommandStorage {
     /**
      * Creates a new storage instance.
      *
-     * @param dataSource   a data source to use to obtain connections
-     * @param multitenant  defines is this storage multitenant
+     * @param dataSource   a data source to obtain connections to
+     * @param multitenant  defines if this storage is multitenant or not
      * @param queryFactory factory that generates queries for interaction with command table
      * @return a new storage instance
      * @throws DatabaseException if an error occurs during an interaction with the DB

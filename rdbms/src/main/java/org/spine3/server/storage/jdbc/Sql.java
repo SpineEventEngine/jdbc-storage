@@ -153,11 +153,11 @@ public class Sql {
      * Set of SQL keywords representing 5 aggregating functions:
      *
      * <ul>
-     * <li>MIN
-     * <li>MAX
-     * <li>COUNT
-     * <li>AVG
-     * <li>SUM
+     *     <li>MIN
+     *     <li>MAX
+     *     <li>COUNT
+     *     <li>AVG
+     *     <li>SUM
      * </ul>
      */
     public enum Function {
@@ -178,8 +178,8 @@ public class Sql {
      * Set of punctuation signs used in SQL:
      *
      * <ul>
-     * <li>Operators: equal, not equal, comparison operators;
-     * <li>Punctuation: comma, brackets, semicolon.
+     *     <li>Operators: equal, not equal, comparison operators;
+     *     <li>Punctuation: comma, brackets, semicolon.
      * </ul>
      */
     public enum BuildingBlock {

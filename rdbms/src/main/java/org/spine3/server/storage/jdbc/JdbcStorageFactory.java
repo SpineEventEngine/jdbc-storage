@@ -51,7 +51,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Creates storages based on JDBC-compliant RDBMS.
  *
- * @param <I> T type if the {@link Entity} that will be stored in the storages created by this factory.
+ * @param <I> T type if the {@link Entity} that will be stored in the storages created by
+ *           this factory.
  * @author Alexander Litus
  * @author Andrey Lavrov
  * @author Dmytro Dashenkov
@@ -128,10 +129,13 @@ public class JdbcStorageFactory<I> implements StorageFactory {
     }
 
     /**
-     * Creates a new {@link AggregateStorageQueryFactory} which produces database queries for corresponding {@link JdbcAggregateStorage}.
+     * Creates a new {@link AggregateStorageQueryFactory} which produces database queries for
+     * corresponding {@link JdbcAggregateStorage}.
      *
-     * @param dataSource     {@link DataSource} on which corresponding {@link JdbcAggregateStorage} is based
-     * @param aggregateClass class of aggregates which are stored in the corresponding {@link JdbcAggregateStorage}
+     * @param dataSource     {@link DataSource} on which corresponding {@link JdbcAggregateStorage}
+     *                                         is based
+     * @param aggregateClass class of aggregates which are stored in the corresponding
+     * {@link JdbcAggregateStorage}
      * @param <T>            a type of IDs of stored aggregates
      */
     protected <T> AggregateStorageQueryFactory<T> getAggregateStorageQueryFactory(
@@ -141,10 +145,13 @@ public class JdbcStorageFactory<I> implements StorageFactory {
     }
 
     /**
-     * Creates a new {@link RecordStorageQueryFactory} which produces database queries for corresponding {@link JdbcRecordStorage}.
+     * Creates a new {@link RecordStorageQueryFactory} which produces database queries for
+     * corresponding {@link JdbcRecordStorage}.
      *
-     * @param dataSource  {@link DataSource} on which corresponding {@link JdbcRecordStorage} is based
-     * @param entityClass class of entities which are stored in the corresponding {@link JdbcRecordStorage}
+     * @param dataSource  {@link DataSource} on which corresponding {@link JdbcRecordStorage}
+     *                                      is based
+     * @param entityClass class of entities which are stored in the corresponding
+     * {@link JdbcRecordStorage}
      * @param <T>         a type of IDs of stored entities
      */
     protected <T> RecordStorageQueryFactory<T> getEntityStorageQueryFactory(
@@ -154,10 +161,13 @@ public class JdbcStorageFactory<I> implements StorageFactory {
     }
 
     /**
-     * Creates a new {@link ProjectionStorageQueryFactory} which produces database queries for corresponding {@link JdbcProjectionStorage}.
+     * Creates a new {@link ProjectionStorageQueryFactory} which produces database queries for
+     * corresponding {@link JdbcProjectionStorage}.
      *
-     * @param dataSource  {@link DataSource} on which corresponding {@link JdbcProjectionStorage} is based
-     * @param entityClass class of entities which are stored in the corresponding {@link JdbcRecordStorage}
+     * @param dataSource  {@link DataSource} on which corresponding {@link JdbcProjectionStorage}
+     *                                      is based
+     * @param entityClass class of entities which are stored in the corresponding
+     * {@link JdbcRecordStorage}
      * @param <T>         a type of IDs of entities from the corresponding {@link JdbcRecordStorage}
      */
     protected <T> ProjectionStorageQueryFactory<T> getProjectionStorageQueryFactory(
@@ -167,7 +177,8 @@ public class JdbcStorageFactory<I> implements StorageFactory {
     }
 
     /**
-     * Creates a new {@link EventStorageQueryFactory} which produces database queries for corresponding {@link JdbcEventStorage}.
+     * Creates a new {@link EventStorageQueryFactory} which produces database queries for
+     * corresponding {@link JdbcEventStorage}.
      *
      * @param dataSource {@link DataSource} on which corresponding {@link JdbcEventStorage} is based
      */
@@ -176,9 +187,11 @@ public class JdbcStorageFactory<I> implements StorageFactory {
     }
 
     /**
-     * Creates a new {@link CommandStorageQueryFactory} which produces database queries for corresponding {@link JdbcCommandStorage}.
+     * Creates a new {@link CommandStorageQueryFactory} which produces database queries for
+     * corresponding {@link JdbcCommandStorage}.
      *
-     * @param dataSource {@link DataSource} on which corresponding {@link JdbcCommandStorage} is based
+     * @param dataSource {@link DataSource} on which corresponding {@link JdbcCommandStorage}
+     *                                     is based
      */
     protected CommandStorageQueryFactory getCommandStorageQueryFactory(
             DataSourceWrapper dataSource) {

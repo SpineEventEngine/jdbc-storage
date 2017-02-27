@@ -191,7 +191,8 @@ public class JdbcStandStorage extends StandStorage {
     /**
      * Creates new instance of {@link Builder}.
      *
-     * @param <I> ID type of the {@link org.spine3.server.entity.Entity} that will be stored in the {@code JdbcStandStorage}.
+     * @param <I> ID type of the {@link org.spine3.server.entity.Entity} that will be stored in
+     *           the {@code JdbcStandStorage}.
      * @return New parametrized instance of {@link Builder}.
      */
     public static <I> Builder<I> newBuilder() {
@@ -201,7 +202,8 @@ public class JdbcStandStorage extends StandStorage {
     /**
      * Builds instances of {@code JdbcStandStorage}.
      *
-     * @param <I> ID type of the {@link org.spine3.server.entity.Entity} that will be stored in the {@code JdbcStandStorage}.
+     * @param <I> ID type of the {@link org.spine3.server.entity.Entity} that will be stored in
+     *           the {@code JdbcStandStorage}.
      */
     public static class Builder<I> {
 
