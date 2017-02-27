@@ -78,7 +78,7 @@ public class JdbcEventStorage extends EventStorage {
      * Creates a new storage instance.
      *
      * @param dataSource   the dataSource wrapper
-     * @param multitenant  defines is this storage multitenant
+     * @param multitenant  defines if this is storage multitenant or not
      * @param queryFactory factory that will generate queries for interaction with event table
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
