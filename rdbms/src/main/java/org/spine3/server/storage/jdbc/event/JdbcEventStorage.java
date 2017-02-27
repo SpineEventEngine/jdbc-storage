@@ -104,7 +104,8 @@ public class JdbcEventStorage extends EventStorage {
     /**
      * {@inheritDoc}
      *
-     * <p><b>NOTE:</b> it is required to call {@link Iterator#hasNext()} before {@link Iterator#next()}.
+     * <p><b>NOTE:</b> it is required to call {@link Iterator#hasNext()} before
+     * {@link Iterator#next()}.
      *
      * @return a wrapped {@link DbIterator} instance
      * @throws DatabaseException if an error occurs during an interaction with the DB
@@ -115,20 +116,25 @@ public class JdbcEventStorage extends EventStorage {
         checkNotNull(query);
 
         final Iterator<Event> iterator = queryFactory.newFilterAndSortQuery(query)
-                                                                  .execute();
-
+                                                     .execute();
         iterators.add((DbIterator) iterator);
 
-        /**
-         * As each {@code event} data is stored as a single serialized {@code Message}, it is not possible to query
-         * the JDBC storage for {@code Event} or {@code EventContext} field values directly.
-         *
-         * <p>Therefore, we perform in-memory post-filtering according to {@code Event} field and context filters.
-         */
+        final UnmodifiableIterator<Event> filtered = filterEvents(iterator, query);
+        return filtered;
+    }
 
+    /**
+     * Filters the Recieved {@linkplain Event Events} by the {@code FieldFilter}s for
+     * the event message and {@linkplain EventContext}.
+     *
+     * <p>As each {@code event} data is stored as a single serialized {@code Message}, it
+     * is not possible to perform this filtering directly within an SQL query.
+     */
+    private static UnmodifiableIterator<Event> filterEvents(Iterator<Event> unfilteredEvents,
+                                                            EventStreamQuery query) {
         final List<EventFilter> filterList = query.getFilterList();
         final UnmodifiableIterator<Event> filtered =
-                Iterators.filter(iterator, new EventRecordPredicate(filterList));
+                Iterators.filter(unfilteredEvents, new EventRecordPredicate(filterList));
         return filtered;
     }
 
@@ -165,13 +171,13 @@ public class JdbcEventStorage extends EventStorage {
 
         final String id = eventId.getUuid();
         final Event record = queryFactory.newSelectEventByIdQuery(id)
-                                                      .execute();
+                                         .execute();
         return Optional.fromNullable(record);
     }
 
     private boolean containsRecord(String id) {
         final Event record = queryFactory.newSelectEventByIdQuery(id)
-                                                      .execute();
+                                         .execute();
         final boolean contains = record != null;
         return contains;
     }
