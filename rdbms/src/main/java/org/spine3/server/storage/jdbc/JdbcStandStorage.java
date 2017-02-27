@@ -39,11 +39,9 @@ import org.spine3.server.storage.jdbc.entity.query.RecordStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
 import javax.annotation.Nullable;
-import java.util.AbstractMap.SimpleEntry;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -64,21 +62,6 @@ public class JdbcStandStorage extends StandStorage {
                 return null;
             }
             return input.getAggregateId();
-        }
-    };
-
-    private static final Function<Map.Entry<AggregateStateId, EntityRecord>, Map.Entry<Object, EntityRecord>> MAP_TARNSFORMER
-            = new Function<Map.Entry<AggregateStateId, EntityRecord>, Map.Entry<Object, EntityRecord>>() {
-        @Override
-        public Map.Entry<Object, EntityRecord> apply(
-                @Nullable Map.Entry<AggregateStateId, EntityRecord> entry) {
-            checkNotNull(entry);
-            final Object newKey = entry.getKey()
-                                       .getAggregateId();
-            final Map.Entry<Object, EntityRecord> newEntry = new SimpleEntry<>(
-                    newKey,
-                    entry.getValue());
-            return newEntry;
         }
     };
 
@@ -172,14 +155,13 @@ public class JdbcStandStorage extends StandStorage {
 
     @Override
     protected void writeRecords(Map<AggregateStateId, EntityRecord> records) {
-        final Set<Map.Entry<AggregateStateId, EntityRecord>> entrySet = records.entrySet();
-        final Collection<Map.Entry<Object, EntityRecord>> transformedEntries =
-                Collections2.transform(entrySet, MAP_TARNSFORMER);
-        final Map<Object, EntityRecord> transformedMap = new HashMap<>(transformedEntries.size());
-        for (Map.Entry<Object, EntityRecord> entry : transformedEntries) {
-            transformedMap.put(entry.getKey(), entry.getValue());
+        final Map<Object, EntityRecord> genericIdRecords = new HashMap<>(records.size());
+        for (Map.Entry<AggregateStateId, EntityRecord> record : records.entrySet()) {
+            final Object genericId = record.getKey().getAggregateId();
+            final EntityRecord recordValue = record.getValue();
+            genericIdRecords.put(genericId, recordValue);
         }
-        recordStorage.write(transformedMap);
+        recordStorage.write(genericIdRecords);
     }
 
     /**
