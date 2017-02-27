@@ -52,7 +52,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class JdbcRecordStorage<I> extends RecordStorage<I> {
 
-
     private final DataSourceWrapper dataSource;
 
     private final RecordStorageQueryFactory<I> queryFactory;
@@ -88,8 +87,9 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     public void markArchived(I id) {
         checkNotNull(id);
         final boolean recordExists = queryFactory.newMarkArchivedQuery(id)
-                    .execute();
+                                                 .execute();
         if (!recordExists) {
+            // The NPE is required by the contract of the method
             throw new NullPointerException(
                     String.format("Trying to mark not existing record with id %s archived.", id));
         }
@@ -100,8 +100,9 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     public void markDeleted(I id) {
         checkNotNull(id);
         final boolean recordExists = queryFactory.newMarkDeletedQuery(id)
-                    .execute();
+                                                 .execute();
         if (!recordExists) {
+            // The NPE is required by the contract of the method
             throw new NullPointerException(
                     String.format("Trying to mark not existing record with id %s deleted.", id));
         }
@@ -187,7 +188,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
 
     @Override
     protected void writeRecords(Map<I, EntityRecord> records) {
-        // Map's initial capacity is maximum meaning no records exist in the storage yet
+        // Map's initial capacity is maximum, meaning no records exist in the storage yet
         final Map<I, EntityRecord> newRecords = new HashMap<>(records.size());
 
         for (Map.Entry<I, EntityRecord> unclassifiedRecord : records.entrySet()) {

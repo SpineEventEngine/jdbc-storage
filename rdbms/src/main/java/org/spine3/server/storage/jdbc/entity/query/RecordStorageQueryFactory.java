@@ -68,10 +68,9 @@ public class RecordStorageQueryFactory<I> implements VisibilityHandlingStorageQu
         this.idColumn = IdColumn.newInstance(entityClass);
         this.dataSource = dataSource;
         this.tableName = DbTableNameFactory.newTableName(entityClass);
-        this.statusTableQueryFactory = VisibilityQueryFactories.forTable(
-                dataSource,
-                tableName,
-                idColumn);
+        this.statusTableQueryFactory = VisibilityQueryFactories.forTable(dataSource,
+                                                                         tableName,
+                                                                         idColumn);
     }
 
     @Override
@@ -123,11 +122,12 @@ public class RecordStorageQueryFactory<I> implements VisibilityHandlingStorageQu
 
     /** Returns a query that creates a new {@link EntityTable} if it does not exist. */
     public CreateEntityTableQuery newCreateEntityTableQuery() {
-        final CreateEntityTableQuery.Builder<I> builder = CreateEntityTableQuery.<I>newBuilder()
-                .setDataSource(dataSource)
-                .setLogger(logger)
-                .setIdColumn(idColumn)
-                .setTableName(tableName);
+        final CreateEntityTableQuery.Builder<I> builder =
+                CreateEntityTableQuery.<I>newBuilder()
+                                      .setDataSource(dataSource)
+                                      .setLogger(logger)
+                                      .setIdColumn(idColumn)
+                                      .setTableName(tableName);
         return builder.build();
     }
 
@@ -139,11 +139,11 @@ public class RecordStorageQueryFactory<I> implements VisibilityHandlingStorageQu
      */
     public InsertEntityQuery newInsertEntityQuery(I id, EntityRecord record) {
         final InsertEntityQuery.Builder<I> builder = InsertEntityQuery.<I>newBuilder(tableName)
-                .setDataSource(dataSource)
-                .setLogger(logger)
-                .setId(id)
-                .setIdColumn(idColumn)
-                .setRecord(record);
+                                                                      .setDataSource(dataSource)
+                                                                      .setLogger(logger)
+                                                                      .setId(id)
+                                                                      .setIdColumn(idColumn)
+                                                                      .setRecord(record);
         return builder.build();
     }
 
@@ -155,33 +155,33 @@ public class RecordStorageQueryFactory<I> implements VisibilityHandlingStorageQu
      */
     public UpdateEntityQuery newUpdateEntityQuery(I id, EntityRecord record) {
         final UpdateEntityQuery.Builder<I> builder = UpdateEntityQuery.<I>newBuilder(tableName)
-                .setDataSource(dataSource)
-                .setLogger(logger)
-                .setIdColumn(idColumn)
-                .setId(id)
-                .setRecord(record);
+                                                                     .setDataSource(dataSource)
+                                                                     .setLogger(logger)
+                                                                     .setIdColumn(idColumn)
+                                                                     .setId(id)
+                                                                     .setRecord(record);
         return builder.build();
     }
 
     /** Returns a query that selects {@link EntityRecord} by ID. */
     public SelectEntityByIdQuery<I> newSelectEntityByIdQuery(I id) {
-        final SelectEntityByIdQuery.Builder<I> builder = SelectEntityByIdQuery.<I>newBuilder(
-                tableName)
-                .setDataSource(dataSource)
-                .setLogger(logger)
-                .setIdColumn(idColumn)
-                .setId(id);
+        final SelectEntityByIdQuery.Builder<I> builder =
+                SelectEntityByIdQuery.<I>newBuilder(tableName)
+                                     .setDataSource(dataSource)
+                                     .setLogger(logger)
+                                     .setIdColumn(idColumn)
+                                     .setId(id);
         return builder.build();
     }
 
     public DeleteRowQuery<I> newDeleteRowQuery(I id) {
         final DeleteRowQuery.Builder<I> builder = DeleteRowQuery.<I>newBuilder()
-                .setDataSource(dataSource)
-                .setLogger(logger)
-                .setTableName(tableName)
-                .setIdColumn(idColumn)
-                .setIdColumnName(ID_COL)
-                .setIdValue(id);
+                                                                .setDataSource(dataSource)
+                                                                .setLogger(logger)
+                                                                .setTableName(tableName)
+                                                                .setIdColumn(idColumn)
+                                                                .setIdColumnName(ID_COL)
+                                                                .setIdValue(id);
         return builder.build();
     }
 
@@ -195,32 +195,33 @@ public class RecordStorageQueryFactory<I> implements VisibilityHandlingStorageQu
 
     public SelectBulkQuery newSelectAllQuery(FieldMask fieldMask) {
         final SelectBulkQuery.Builder<I> builder = SelectBulkQuery.<I>newBuilder(tableName)
-                                                               .setFieldMask(fieldMask)
-                                                               .setLogger(logger)
-                                                               .setDataSource(dataSource);
+                                                                 .setFieldMask(fieldMask)
+                                                                 .setLogger(logger)
+                                                                 .setDataSource(dataSource);
 
         return builder.build();
     }
 
     public SelectBulkQuery<I> newSelectBulkQuery(Iterable<I> ids, FieldMask fieldMask) {
         final SelectBulkQuery.Builder<I> builder = SelectBulkQuery.<I>newBuilder()
-                                                               .setIdColumn(idColumn)
-                                                               .setIdsQuery(tableName, ids)
-                                                               .setFieldMask(fieldMask)
-                                                               .setLogger(logger)
-                                                               .setDataSource(dataSource);
+                                                                 .setIdColumn(idColumn)
+                                                                 .setIdsQuery(tableName, ids)
+                                                                 .setFieldMask(fieldMask)
+                                                                 .setLogger(logger)
+                                                                 .setDataSource(dataSource);
 
         return builder.build();
     }
 
     public InsertEntityRecordsBulkQuery<I> newInsertEntityRecordsBulkQuery(
             Map<I, EntityRecord> records) {
-        final InsertEntityRecordsBulkQuery.Builder<I> builder = InsertEntityRecordsBulkQuery.<I>newBuilder()
-                .setLogger(logger)
-                .setDataSource(dataSource)
-                .setTableName(tableName)
-                .setidColumn(idColumn)
-                .setRecords(records);
+        final InsertEntityRecordsBulkQuery.Builder<I> builder =
+                InsertEntityRecordsBulkQuery.<I>newBuilder()
+                                            .setLogger(logger)
+                                            .setDataSource(dataSource)
+                                            .setTableName(tableName)
+                                            .setidColumn(idColumn)
+                                            .setRecords(records);
         return builder.build();
     }
 }

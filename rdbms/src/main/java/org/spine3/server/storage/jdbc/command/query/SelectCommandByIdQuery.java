@@ -73,12 +73,14 @@ public class SelectCommandByIdQuery extends SelectByIdQuery<String, CommandRecor
             return null;
         }
         final CommandRecord record = deserialize(recordBytes,
-                                                        CommandRecord.getDescriptor());
+                                                 CommandRecord.getDescriptor());
         final CommandRecord.Builder builder = record.toBuilder();
         final String status = resultSet.getString(COMMAND_STATUS_COL);
         if (status.equals(CommandStatus.forNumber(CommandStatus.OK_VALUE)
                                        .name())) {
-            final ProcessingStatus statusOk = ProcessingStatus.newBuilder().setCode(CommandStatus.OK).build();
+            final ProcessingStatus statusOk = ProcessingStatus.newBuilder()
+                                                              .setCode(CommandStatus.OK)
+                                                              .build();
             return builder.setStatus(statusOk)
                           .build();
         }
@@ -86,9 +88,9 @@ public class SelectCommandByIdQuery extends SelectByIdQuery<String, CommandRecor
         if (errorBytes != null) {
             final Error error = deserialize(errorBytes, Error.getDescriptor());
             final ProcessingStatus statusError = ProcessingStatus.newBuilder()
-                                                              .setCode(CommandStatus.ERROR)
-                                                              .setError(error)
-                                                              .build();
+                                                                 .setCode(CommandStatus.ERROR)
+                                                                 .setError(error)
+                                                                 .build();
             return builder.setStatus(statusError)
                           .build();
         }
@@ -96,9 +98,9 @@ public class SelectCommandByIdQuery extends SelectByIdQuery<String, CommandRecor
         if (failureBytes != null) {
             final Failure failure = deserialize(failureBytes, Failure.getDescriptor());
             final ProcessingStatus statusFailure = ProcessingStatus.newBuilder()
-                                                              .setCode(CommandStatus.FAILURE)
-                                                              .setFailure(failure)
-                                                              .build();
+                                                                   .setCode(CommandStatus.FAILURE)
+                                                                   .setFailure(failure)
+                                                                   .build();
             return builder.setStatus(statusFailure)
                           .build();
         }
@@ -113,7 +115,10 @@ public class SelectCommandByIdQuery extends SelectByIdQuery<String, CommandRecor
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder extends SelectByIdQuery.Builder<Builder, SelectCommandByIdQuery, String, CommandRecord> {
+    public static class Builder extends SelectByIdQuery.Builder<Builder,
+                                                                SelectCommandByIdQuery,
+                                                                String,
+                                                                CommandRecord> {
 
         @Override
         public SelectCommandByIdQuery build() {

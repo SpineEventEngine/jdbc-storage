@@ -21,8 +21,8 @@
 package org.spine3.server.storage.jdbc.entity.query;
 
 import com.google.common.base.Joiner;
-import org.spine3.server.entity.Visibility;
 import org.spine3.server.entity.EntityRecord;
+import org.spine3.server.entity.Visibility;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.WriteQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
@@ -87,14 +87,31 @@ public class InsertEntityRecordsBulkQuery<I> extends WriteQuery {
         for (Map.Entry<I, EntityRecord> record : records.entrySet()) {
             final I id = record.getKey();
             final EntityRecord storageRecord = record.getValue();
-            addParam(statement, parameterCounter, id, storageRecord);
+            addRecordsParams(statement, parameterCounter, id, storageRecord);
             parameterCounter += COLUMNS_COUNT;
         }
         return statement;
     }
 
-    private void addParam(PreparedStatement statement, int firstParamIndex, I id,
-                          EntityRecord record) {
+    /**
+     * Adds an {@link EntityRecord} to the query.
+     *
+     * <p>This includes following items:
+     * <ul>
+     *     <li>ID;
+     *     <li>Serialized record by itself;
+     *     <li>Boolean columns for the record visibility (archived and deleted fields).
+     * </ul>
+     *
+     * @param statement       the {@linkplain PreparedStatement} to add the query parameters to
+     * @param firstParamIndex index of the first query parameter which must be assigned;
+     *                        after this operation there will be added {@linkplain #COLUMNS_COUNT}
+     *                        params starting with this index
+     * @param id              the ID of the record
+     * @param record          the record to store
+     */
+    private void addRecordsParams(PreparedStatement statement, int firstParamIndex, I id,
+                                  EntityRecord record) {
         int paramIndex = firstParamIndex;
         try {
             idColumn.setId(paramIndex, id, statement);
