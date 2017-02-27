@@ -30,6 +30,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 /**
  * @author Dmytro Dashenkov.
@@ -64,6 +65,14 @@ public class ConnectionWrapperShould {
         final Connection connection = mockConnection();
         final ConnectionWrapper wrapper = ConnectionWrapper.wrap(connection);
         wrapper.close();
+    }
+
+    @Test
+    public void rollback_transaction_successfully() throws SQLException {
+        final Connection connection = mock(Connection.class);
+        final ConnectionWrapper wrapper = ConnectionWrapper.wrap(connection);
+        wrapper.rollback();
+        verify(connection).rollback();
     }
 
     private static Connection mockConnection() {

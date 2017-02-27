@@ -21,50 +21,28 @@
 package org.spine3.server.storage.jdbc.util;
 
 import com.google.common.testing.NullPointerTester;
-import com.google.protobuf.StringValue;
 import org.junit.Test;
-import org.spine3.server.entity.AbstractEntity;
+import org.spine3.server.storage.jdbc.DataSourceConfig;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 import static org.spine3.test.Tests.hasPrivateParameterlessCtor;
 
 /**
- * @author Alexander Litus
+ * @author Dmytro Dashenkov.
  */
-@SuppressWarnings("InstanceMethodNamingConvention")
-public class DbTableNameFactoryShould {
+public class DefaultDataSourceConfigConverterShould {
 
     @Test
-    public void have_private_utility_constrctor() {
-        assertTrue(hasPrivateParameterlessCtor(DbTableNameFactory.class));
+    public void have_private_utility_constructor() {
+        assertTrue(hasPrivateParameterlessCtor(DefaultDataSourceConfigConverter.class));
     }
 
     @Test
-    public void pass_null_tolerance_check() {
+    public void pass_null_tolerance_test() {
         final NullPointerTester tester = new NullPointerTester();
-        tester.testStaticMethods(DbTableNameFactory.class, NullPointerTester.Visibility.PACKAGE);
-    }
-
-    @Test
-    public void provide_table_name_for_class() {
-        final String tableName = DbTableNameFactory.newTableName(String.class);
-
-        assertEquals("java_lang_string", tableName);
-    }
-
-    @Test
-    public void provide_table_name_for_inner_class() {
-        final String tableName = DbTableNameFactory.newTableName(TestEntity.class);
-
-        assertEquals("org_spine3_server_storage_jdbc_util_dbtablenamefactoryshould_testentity",
-                     tableName);
-    }
-
-    private static class TestEntity extends AbstractEntity<String, StringValue> {
-
-        private TestEntity(String id) {
-            super(id);
-        }
+        tester.setDefault(DataSourceConfig.class, mock(DataSourceConfig.class));
+        tester.testStaticMethods(DefaultDataSourceConfigConverter.class,
+                                 NullPointerTester.Visibility.PACKAGE);
     }
 }
