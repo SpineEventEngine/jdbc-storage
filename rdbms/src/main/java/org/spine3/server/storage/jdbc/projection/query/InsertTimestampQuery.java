@@ -26,7 +26,8 @@ import static java.lang.String.format;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
-import static org.spine3.server.storage.jdbc.Sql.Query.SELECT;
+import static org.spine3.server.storage.jdbc.Sql.Query.INSERT_INTO;
+import static org.spine3.server.storage.jdbc.Sql.Query.VALUES;
 import static org.spine3.server.storage.jdbc.Sql.nPlaceholders;
 import static org.spine3.server.storage.jdbc.projection.query.ProjectionTable.NANOS_COL;
 import static org.spine3.server.storage.jdbc.projection.query.ProjectionTable.SECONDS_COL;
@@ -40,9 +41,9 @@ import static org.spine3.server.storage.jdbc.projection.query.ProjectionTable.SE
 public class InsertTimestampQuery extends WriteTimestampQuery {
 
     private static final String QUERY_TEMPLATE =
-            SELECT + "%s" +
+            INSERT_INTO + "%s" +
             BRACKET_OPEN + SECONDS_COL + ", " + NANOS_COL + BRACKET_CLOSE +
-            nPlaceholders(2) + SEMICOLON;
+            VALUES + nPlaceholders(2) + SEMICOLON;
 
     private InsertTimestampQuery(Builder builder) {
         super(builder);

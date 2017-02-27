@@ -64,7 +64,7 @@ public abstract class WriteTimestampQuery extends WriteQuery {
 
         private Timestamp timestamp;
 
-        public Builder setTimestamp(Timestamp timestamp) {
+        public B setTimestamp(Timestamp timestamp) {
             this.timestamp = timestamp;
             return getThis();
         }
