@@ -59,7 +59,6 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
  */
 public class InsertEventRecordQuery extends WriteRecordQuery<String, Event> {
 
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
             INSERT_INTO + TABLE_NAME + BRACKET_OPEN +
             EVENT_ID_COL + COMMA +

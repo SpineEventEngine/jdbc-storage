@@ -43,7 +43,6 @@ import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
  */
 public class CreateEntityTableQuery<I> extends CreateTableQuery<I> {
 
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
             CREATE_IF_MISSING + " %s " + BRACKET_OPEN +
             ID_COL + " %s, " +

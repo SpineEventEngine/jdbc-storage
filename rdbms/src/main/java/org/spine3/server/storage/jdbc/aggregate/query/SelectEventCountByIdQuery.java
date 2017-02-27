@@ -31,6 +31,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static java.lang.String.format;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
+import static org.spine3.server.storage.jdbc.Sql.Query.FROM;
+import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
+import static org.spine3.server.storage.jdbc.Sql.Query.SELECT;
+import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
 import static org.spine3.server.storage.jdbc.aggregate.query.Table.EventCount.EVENT_COUNT_COL;
 import static org.spine3.server.storage.jdbc.aggregate.query.Table.EventCount.ID_COL;
 
@@ -42,11 +48,10 @@ import static org.spine3.server.storage.jdbc.aggregate.query.Table.EventCount.ID
  */
 public class SelectEventCountByIdQuery<I> extends StorageQuery {
 
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
-            "SELECT " + EVENT_COUNT_COL +
-            " FROM %s " +
-            " WHERE " + ID_COL + " = ?;";
+            SELECT + EVENT_COUNT_COL +
+            FROM + "%s" +
+            WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
 
     private final IdColumn<I> idColumn;
     private final I id;

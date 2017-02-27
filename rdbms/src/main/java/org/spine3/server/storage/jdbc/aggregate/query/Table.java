@@ -43,11 +43,9 @@ final class Table {
         static final String AGGREGATE_COL = "aggregate";
 
         /** Aggregate event seconds column name. */
-        @SuppressWarnings("DuplicateStringLiteralInspection")
         static final String SECONDS_COL = EntityField.timestamp.toString();
 
         /** Aggregate event nanoseconds column name. */
-        @SuppressWarnings("DuplicateStringLiteralInspection")
         static final String NANOS_COL = EntityField.timestamp_nanos.toString();
 
         private AggregateRecord() {

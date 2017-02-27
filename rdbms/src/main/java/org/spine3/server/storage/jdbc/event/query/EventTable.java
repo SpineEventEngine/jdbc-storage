@@ -56,7 +56,6 @@ final class EventTable {
     @SuppressWarnings("DuplicateStringLiteralInspection")
     static final String NANOSECONDS_COL = "nanoseconds";
 
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     static final String SELECT_EVENT_FROM_TABLE = SELECT + EVENT_COL + FROM + TABLE_NAME + ' ';
 
     private EventTable() {

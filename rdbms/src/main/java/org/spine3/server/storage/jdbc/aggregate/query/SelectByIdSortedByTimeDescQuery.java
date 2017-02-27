@@ -54,14 +54,13 @@ import static org.spine3.server.storage.jdbc.aggregate.query.Table.AggregateReco
  */
 public class SelectByIdSortedByTimeDescQuery<I> extends StorageQuery {
 
-    private final IdColumn<I> idColumn;
-    private final I id;
-
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
             SELECT + AGGREGATE_COL + FROM + "%s" +
             WHERE + ID_COL + EQUAL + PLACEHOLDER +
             ORDER_BY + SECONDS_COL + DESC + COMMA + NANOS_COL + DESC + SEMICOLON;
+
+    private final IdColumn<I> idColumn;
+    private final I id;
 
     private SelectByIdSortedByTimeDescQuery(Builder<I> builder) {
         super(builder);

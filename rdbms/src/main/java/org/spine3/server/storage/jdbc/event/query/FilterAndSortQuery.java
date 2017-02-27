@@ -63,7 +63,6 @@ import static org.spine3.server.storage.jdbc.event.query.EventTable.SELECT_EVENT
  */
 public class FilterAndSortQuery extends StorageQuery {
 
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE = ORDER_BY + SECONDS_COL + ASC + COMMA
                                                  + NANOSECONDS_COL + ASC + SEMICOLON;
     private static final String ESCAPED_EQUAL_START = " = \'";
@@ -108,7 +107,6 @@ public class FilterAndSortQuery extends StorageQuery {
         }
     }
 
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     private static String whereOrOr(StringBuilder builder) {
         final String result = builder.indexOf(WHERE.toString()
                                                    .trim()) >= 0
@@ -117,7 +115,6 @@ public class FilterAndSortQuery extends StorageQuery {
         return result;
     }
 
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     private static StringBuilder appendTimeConditionSql(StringBuilder builder,
                                                         EventStreamQuery query) {
         final boolean afterSpecified = query.hasAfter();
@@ -136,7 +133,6 @@ public class FilterAndSortQuery extends StorageQuery {
         return builder;
     }
 
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     private static StringBuilder appendIsAfterSql(StringBuilder builder, EventStreamQuery query) {
         final Timestamp after = query.getAfter();
         final long seconds = after.getSeconds();
@@ -150,7 +146,6 @@ public class FilterAndSortQuery extends StorageQuery {
         return builder;
     }
 
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     private static StringBuilder appendIsBeforeSql(StringBuilder builder, EventStreamQuery query) {
         final Timestamp before = query.getBefore();
         final long seconds = before.getSeconds();

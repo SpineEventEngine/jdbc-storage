@@ -41,7 +41,6 @@ import static org.spine3.server.storage.jdbc.command.query.CommandTable.TABLE_NA
  */
 public class UpdateCommandQuery extends WriteCommandRecordQuery {
 
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
             UPDATE + TABLE_NAME +
             SET + COMMAND_COL + EQUAL + PLACEHOLDER +

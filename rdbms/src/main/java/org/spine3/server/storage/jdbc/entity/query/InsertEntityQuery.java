@@ -44,7 +44,6 @@ import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
  */
 public class InsertEntityQuery<I> extends WriteEntityQuery<I> {
 
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
             INSERT_INTO + " %s " +
             BRACKET_OPEN +

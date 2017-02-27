@@ -43,7 +43,6 @@ import static org.spine3.server.storage.jdbc.aggregate.query.Table.AggregateReco
  */
 public class CreateMainTableQuery<I> extends CreateTableQuery<I> {
 
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
             CREATE_IF_MISSING + "%s " + BRACKET_OPEN +
             ID_COL + " %s " + COMMA +

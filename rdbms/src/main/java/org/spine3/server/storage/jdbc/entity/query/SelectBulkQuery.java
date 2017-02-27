@@ -67,10 +67,6 @@ import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
  */
 public class SelectBulkQuery<I> extends StorageQuery {
 
-    private final FieldMask fieldMask;
-    private final List<I> arguments;
-    private final IdColumn<I> idColumn;
-
     private static final String COMMON_TEMPLATE =
             SELECT.toString() + ALL_ATTRIBUTES +
             FROM + "%s" +
@@ -80,9 +76,12 @@ public class SelectBulkQuery<I> extends StorageQuery {
             deleted + EQUAL + FALSE + BRACKET_CLOSE;
 
     private static final String ALL_TEMPLATE = COMMON_TEMPLATE + ';';
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String IDS_TEMPLATE = COMMON_TEMPLATE + AND + EntityTable.ID_COL + IN
                                                + " %s" + SEMICOLON;
+
+    private final FieldMask fieldMask;
+    private final List<I> arguments;
+    private final IdColumn<I> idColumn;
 
     protected SelectBulkQuery(Builder<I> builder) {
         super(builder);

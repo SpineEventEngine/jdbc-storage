@@ -51,7 +51,6 @@ public class SelectCommandByStatusQuery extends StorageQuery {
 
     private final CommandStatus status;
 
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
             SELECT + COMMAND_COL + FROM + TABLE_NAME +
             WHERE + COMMAND_STATUS_COL + EQUAL + PLACEHOLDER + SEMICOLON;
@@ -77,13 +76,12 @@ public class SelectCommandByStatusQuery extends StorageQuery {
      * Prepares SQL statement using the connection.
      */
     @Override
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     public PreparedStatement prepareStatement(ConnectionWrapper connection) {
         final PreparedStatement statement = super.prepareStatement(connection);
         try {
             statement.setString(1, status.toString());
         } catch (SQLException e) {
-            getLogger().error("Failed to prepare statement ", e);
+            logFailedToPrepareStatement(e);
             throw new DatabaseException(e);
         }
         return statement;

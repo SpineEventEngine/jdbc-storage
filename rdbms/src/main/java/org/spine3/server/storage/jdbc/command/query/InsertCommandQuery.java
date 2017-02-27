@@ -42,7 +42,6 @@ import static org.spine3.server.storage.jdbc.command.query.CommandTable.TABLE_NA
  */
 public class InsertCommandQuery extends WriteCommandRecordQuery {
 
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
             INSERT_INTO + TABLE_NAME + BRACKET_OPEN +
             ID_COL + COMMA +

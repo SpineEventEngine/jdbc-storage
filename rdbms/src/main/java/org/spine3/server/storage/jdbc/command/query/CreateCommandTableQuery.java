@@ -44,7 +44,6 @@ import static org.spine3.server.storage.jdbc.command.query.CommandTable.ID_COL;
  */
 public class CreateCommandTableQuery extends CreateTableQuery<String> {
 
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
             CREATE_IF_MISSING + "%s" + BRACKET_OPEN +
             ID_COL + " %s" + COMMA +

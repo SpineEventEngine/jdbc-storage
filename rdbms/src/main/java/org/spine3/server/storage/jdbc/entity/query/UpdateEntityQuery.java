@@ -44,7 +44,6 @@ import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
  */
 public class UpdateEntityQuery<I> extends WriteEntityQuery<I> {
 
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
             UPDATE + "%s" +
             SET + ENTITY_COL + EQUAL + PLACEHOLDER + COMMA +

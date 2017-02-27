@@ -21,14 +21,13 @@
 package org.spine3.server.storage.jdbc.projection.query;
 
 import com.google.protobuf.Timestamp;
-import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.query.WriteQuery;
-import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
-
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 
 import static java.lang.String.format;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
+import static org.spine3.server.storage.jdbc.Sql.Query.SELECT;
+import static org.spine3.server.storage.jdbc.Sql.nPlaceholders;
 import static org.spine3.server.storage.jdbc.projection.query.ProjectionTable.NANOS_COL;
 import static org.spine3.server.storage.jdbc.projection.query.ProjectionTable.SECONDS_COL;
 
@@ -38,19 +37,15 @@ import static org.spine3.server.storage.jdbc.projection.query.ProjectionTable.SE
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-public class InsertTimestampQuery extends WriteQuery {
+public class InsertTimestampQuery extends WriteTimestampQuery {
 
-    private final Timestamp timestamp;
-
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
-            "INSERT INTO %s " +
-            " (" + SECONDS_COL + ", " + NANOS_COL + ')' +
-            " VALUES (?, ?);";
+            SELECT + "%s" +
+            BRACKET_OPEN + SECONDS_COL + ", " + NANOS_COL + BRACKET_CLOSE +
+            nPlaceholders(2) + SEMICOLON;
 
     private InsertTimestampQuery(Builder builder) {
         super(builder);
-        this.timestamp = builder.timestamp;
     }
 
     public static Builder newBuilder(String tableName) {
@@ -59,35 +54,12 @@ public class InsertTimestampQuery extends WriteQuery {
         return builder;
     }
 
-    @Override
-    @SuppressWarnings("DuplicateStringLiteralInspection")
-    protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
-        final PreparedStatement statement = super.prepareStatement(connection);
-        final long seconds = timestamp.getSeconds();
-        final int nanos = timestamp.getNanos();
-        try {
-            statement.setLong(1, seconds);
-            statement.setInt(2, nanos);
-            return statement;
-        } catch (SQLException e) {
-            getLogger().error("Failed to prepare statement.", e);
-            throw new DatabaseException(e);
-        }
-    }
-
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder extends WriteQuery.Builder<Builder, InsertTimestampQuery> {
-
-        private Timestamp timestamp;
+    public static class Builder extends WriteTimestampQuery.Builder<Builder, InsertTimestampQuery> {
 
         @Override
         public InsertTimestampQuery build() {
             return new InsertTimestampQuery(this);
-        }
-
-        public Builder setTimestamp(Timestamp timestamp) {
-            this.timestamp = timestamp;
-            return getThis();
         }
 
         @Override

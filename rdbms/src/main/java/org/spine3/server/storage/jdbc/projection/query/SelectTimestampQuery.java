@@ -46,7 +46,7 @@ import static org.spine3.validate.Validate.isDefault;
  * @author Andrey Lavrov
  */
 public class SelectTimestampQuery extends StorageQuery {
-    @SuppressWarnings("DuplicateStringLiteralInspection")
+
     private static final String QUERY_TEMPLATE = SELECT +
                                                  SECONDS_COL + COMMA +
                                                  NANOS_COL + FROM + "%s" +

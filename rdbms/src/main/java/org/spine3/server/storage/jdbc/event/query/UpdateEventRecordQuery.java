@@ -59,7 +59,6 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
  */
 public class UpdateEventRecordQuery extends WriteRecordQuery<String, Event> {
 
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
             UPDATE + TABLE_NAME +
             SET +
@@ -75,7 +74,6 @@ public class UpdateEventRecordQuery extends WriteRecordQuery<String, Event> {
     }
 
     @Override
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
         final PreparedStatement statement = connection.prepareStatement(QUERY_TEMPLATE);
         final Event event = getRecord();
@@ -104,7 +102,7 @@ public class UpdateEventRecordQuery extends WriteRecordQuery<String, Event> {
             final String eventId = getId();
             statement.setString(6, eventId);
         } catch (SQLException e) {
-            getLogger().error("Failed to prepare statement ", e);
+            logFailedToPrepareStatement(e);
             throw new DatabaseException(e);
         }
         return statement;

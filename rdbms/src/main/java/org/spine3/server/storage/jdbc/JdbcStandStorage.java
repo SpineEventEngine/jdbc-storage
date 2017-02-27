@@ -117,25 +117,24 @@ public class JdbcStandStorage extends StandStorage {
         return recordStorage.delete(aggregateId);
     }
 
-    @Nullable
     @Override
     protected Optional<EntityRecord> readRecord(AggregateStateId id) {
         return recordStorage.read(id.getAggregateId());
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     protected Iterable<EntityRecord> readMultipleRecords(Iterable<AggregateStateId> ids) {
-        final Collection pureIds = Collections2.transform(Lists.newArrayList(ids), ID_MAPPER);
-        return recordStorage.readMultiple(pureIds);
+        final Collection<Object> genericIds = Collections2.transform(Lists.newArrayList(ids),
+                                                                     ID_MAPPER);
+        return recordStorage.readMultiple(genericIds);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     protected Iterable<EntityRecord> readMultipleRecords(Iterable<AggregateStateId> ids,
                                                          FieldMask fieldMask) {
-        final Collection pureIds = Collections2.transform(Lists.newArrayList(ids), ID_MAPPER);
-        return recordStorage.readMultiple(pureIds, fieldMask);
+        final Collection<Object> genericIds = Collections2.transform(Lists.newArrayList(ids),
+                                                                     ID_MAPPER);
+        return recordStorage.readMultiple(genericIds, fieldMask);
     }
 
     @Override
@@ -157,7 +156,8 @@ public class JdbcStandStorage extends StandStorage {
     protected void writeRecords(Map<AggregateStateId, EntityRecord> records) {
         final Map<Object, EntityRecord> genericIdRecords = new HashMap<>(records.size());
         for (Map.Entry<AggregateStateId, EntityRecord> record : records.entrySet()) {
-            final Object genericId = record.getKey().getAggregateId();
+            final Object genericId = record.getKey()
+                                           .getAggregateId();
             final EntityRecord recordValue = record.getValue();
             genericIdRecords.put(genericId, recordValue);
         }
@@ -175,7 +175,8 @@ public class JdbcStandStorage extends StandStorage {
 
     private static Map<AggregateStateId, EntityRecord> retrieveRecordsWithValidIds(
             Map<?, EntityRecord> records) {
-        final ImmutableMap.Builder<AggregateStateId, EntityRecord> result = new ImmutableMap.Builder<>();
+        final ImmutableMap.Builder<AggregateStateId, EntityRecord> result =
+                new ImmutableMap.Builder<>();
 
         for (Map.Entry<?, EntityRecord> entry : records.entrySet()) {
             final AggregateStateId id = AggregateStateId.of(entry.getKey(), TypeUrl.of(
@@ -192,7 +193,7 @@ public class JdbcStandStorage extends StandStorage {
      * Creates new instance of {@link Builder}.
      *
      * @param <I> ID type of the {@link org.spine3.server.entity.Entity} that will be stored in
-     *           the {@code JdbcStandStorage}.
+     *            the {@code JdbcStandStorage}.
      * @return New parametrized instance of {@link Builder}.
      */
     public static <I> Builder<I> newBuilder() {
@@ -203,7 +204,7 @@ public class JdbcStandStorage extends StandStorage {
      * Builds instances of {@code JdbcStandStorage}.
      *
      * @param <I> ID type of the {@link org.spine3.server.entity.Entity} that will be stored in
-     *           the {@code JdbcStandStorage}.
+     *            the {@code JdbcStandStorage}.
      */
     public static class Builder<I> {
 

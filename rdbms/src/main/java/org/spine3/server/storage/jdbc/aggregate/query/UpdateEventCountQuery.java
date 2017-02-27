@@ -47,7 +47,6 @@ public class UpdateEventCountQuery<I> extends UpdateRecordQuery<I> {
 
     private final int count;
 
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
             UPDATE + "%s" +
             SET + EVENT_COUNT_COL + EQUAL + PLACEHOLDER +
@@ -59,7 +58,6 @@ public class UpdateEventCountQuery<I> extends UpdateRecordQuery<I> {
     }
 
     @Override
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
         final PreparedStatement statement = super.prepareStatement(connection);
 
@@ -67,7 +65,7 @@ public class UpdateEventCountQuery<I> extends UpdateRecordQuery<I> {
             statement.setInt(1, count);
             return statement;
         } catch (SQLException e) {
-            getLogger().error("Failed to prepare statement ", e);
+            logFailedToPrepareStatement(e);
             throw new DatabaseException(e);
         }
     }

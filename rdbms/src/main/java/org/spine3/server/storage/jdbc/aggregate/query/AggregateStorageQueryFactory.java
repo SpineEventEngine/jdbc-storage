@@ -26,12 +26,12 @@ import org.spine3.server.aggregate.AggregateEventRecord;
 import org.spine3.server.aggregate.AggregateStorage;
 import org.spine3.server.entity.Visibility;
 import org.spine3.server.storage.jdbc.entity.visibility.AbstractVisibilityHandlingStorageQueryFactory;
-import org.spine3.server.storage.jdbc.entity.visibility.query.InsertAndMarkEntityQuery;
-import org.spine3.server.storage.jdbc.entity.visibility.query.MarkEntityQuery;
 import org.spine3.server.storage.jdbc.entity.visibility.VisibilityHandlingStorageQueryFactory;
 import org.spine3.server.storage.jdbc.entity.visibility.VisibilityQueryFactories;
 import org.spine3.server.storage.jdbc.entity.visibility.query.CreateVisibilityTableQuery;
+import org.spine3.server.storage.jdbc.entity.visibility.query.InsertAndMarkEntityQuery;
 import org.spine3.server.storage.jdbc.entity.visibility.query.InsertVisibilityQuery;
+import org.spine3.server.storage.jdbc.entity.visibility.query.MarkEntityQuery;
 import org.spine3.server.storage.jdbc.entity.visibility.query.SelectVisibilityQuery;
 import org.spine3.server.storage.jdbc.entity.visibility.query.UpdateVisibilityQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
@@ -148,19 +148,20 @@ public class AggregateStorageQueryFactory<I>
     }
 
     /**
-     * Returns a  query that inserts a new aggregate event count after the last snapshot to the {@link Table.EventCount}.
+     * Returns a  query that inserts a new aggregate event count after the last snapshot
+     * to the {@link Table.EventCount}.
      *
      * @param id    corresponding aggregate id
      * @param count event count
      */
     public InsertEventCountQuery newInsertEventCountQuery(I id, int count) {
-        final InsertEventCountQuery.Builder<I> builder = InsertEventCountQuery.<I>newBuilder(
-                eventCountTableName)
-                .setDataSource(dataSource)
-                .setLogger(getLogger())
-                .setIdColumn(idColumn)
-                .setId(id)
-                .setCount(count);
+        final InsertEventCountQuery.Builder<I> builder =
+                InsertEventCountQuery.<I>newBuilder(eventCountTableName)
+                        .setDataSource(dataSource)
+                        .setLogger(getLogger())
+                        .setIdColumn(idColumn)
+                        .setId(id)
+                        .setCount(count);
         return builder.build();
     }
 
@@ -171,13 +172,13 @@ public class AggregateStorageQueryFactory<I>
      * @param count new event count
      */
     public UpdateEventCountQuery newUpdateEventCountQuery(I id, int count) {
-        final UpdateEventCountQuery.Builder<I> builder = UpdateEventCountQuery.<I>newBuilder(
-                eventCountTableName)
-                .setDataSource(dataSource)
-                .setLogger(getLogger())
-                .setIdColumn(idColumn)
-                .setId(id)
-                .setCount(count);
+        final UpdateEventCountQuery.Builder<I> builder =
+                UpdateEventCountQuery.<I>newBuilder(eventCountTableName)
+                        .setDataSource(dataSource)
+                        .setLogger(getLogger())
+                        .setIdColumn(idColumn)
+                        .setId(id)
+                        .setCount(count);
         return builder.build();
     }
 
@@ -188,36 +189,36 @@ public class AggregateStorageQueryFactory<I>
      * @param record new aggregate record
      */
     public InsertAggregateRecordQuery newInsertRecordQuery(I id, AggregateEventRecord record) {
-        final InsertAggregateRecordQuery.Builder<I> builder = InsertAggregateRecordQuery.<I>newBuilder(
-                mainTableName)
-                .setDataSource(dataSource)
-                .setLogger(getLogger())
-                .setIdColumn(idColumn)
-                .setId(id)
-                .setRecord(record);
+        final InsertAggregateRecordQuery.Builder<I> builder =
+                InsertAggregateRecordQuery.<I>newBuilder(mainTableName)
+                        .setDataSource(dataSource)
+                        .setLogger(getLogger())
+                        .setIdColumn(idColumn)
+                        .setId(id)
+                        .setRecord(record);
         return builder.build();
     }
 
     /** Returns a query that selects event count by corresponding aggregate ID. */
     public SelectEventCountByIdQuery<I> newSelectEventCountByIdQuery(I id) {
-        final SelectEventCountByIdQuery.Builder<I> builder = SelectEventCountByIdQuery.<I>newBuilder(
-                eventCountTableName)
-                .setDataSource(dataSource)
-                .setLogger(getLogger())
-                .setIdColumn(idColumn)
-                .setId(id);
+        final SelectEventCountByIdQuery.Builder<I> builder =
+                SelectEventCountByIdQuery.<I>newBuilder(eventCountTableName)
+                        .setDataSource(dataSource)
+                        .setLogger(getLogger())
+                        .setIdColumn(idColumn)
+                        .setId(id);
         return builder.build();
     }
 
     /** Returns a query that selects aggregate records by ID sorted by time descending. */
     @SuppressWarnings("InstanceMethodNamingConvention")
     public SelectByIdSortedByTimeDescQuery<I> newSelectByIdSortedByTimeDescQuery(I id) {
-        final SelectByIdSortedByTimeDescQuery.Builder<I> builder = SelectByIdSortedByTimeDescQuery.<I>newBuilder(
-                mainTableName)
-                .setDataSource(dataSource)
-                .setLogger(getLogger())
-                .setIdColumn(idColumn)
-                .setId(id);
+        final SelectByIdSortedByTimeDescQuery.Builder<I> builder =
+                SelectByIdSortedByTimeDescQuery.<I>newBuilder(mainTableName)
+                        .setDataSource(dataSource)
+                        .setLogger(getLogger())
+                        .setIdColumn(idColumn)
+                        .setId(id);
         return builder.build();
     }
 }

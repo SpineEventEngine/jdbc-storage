@@ -18,61 +18,51 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.spine3.server.storage.jdbc.command.query;
+package org.spine3.server.storage.jdbc.projection.query;
 
-import org.spine3.base.CommandStatus;
-import org.spine3.server.command.CommandRecord;
+import com.google.protobuf.Timestamp;
 import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.query.WriteRecordQuery;
+import org.spine3.server.storage.jdbc.query.WriteQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 /**
- * Query which inserts or updates {@link CommandRecord}.
- *
- * @author Andrey Lavrov
+ * @author Dmytro Dashenkov.
  */
-public class WriteCommandRecordQuery
-        extends WriteRecordQuery<String, CommandRecord> {
+public abstract class WriteTimestampQuery extends WriteQuery {
 
-    private final int statusIndexInQuery;
-    private final CommandStatus status;
+    private final Timestamp timestamp;
 
-    protected WriteCommandRecordQuery(
-            Builder<? extends Builder, ? extends WriteCommandRecordQuery> builder) {
+    protected WriteTimestampQuery(Builder<? extends Builder,
+                                          ? extends WriteTimestampQuery> builder) {
         super(builder);
-        this.statusIndexInQuery = builder.statusIndexInQuery;
-        this.status = builder.status;
+        this.timestamp = builder.timestamp;
     }
 
     @Override
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
         final PreparedStatement statement = super.prepareStatement(connection);
+        final long seconds = timestamp.getSeconds();
+        final int nanos = timestamp.getNanos();
         try {
-            statement.setString(statusIndexInQuery, status.name());
+            statement.setLong(1, seconds);
+            statement.setInt(2, nanos);
+            return statement;
         } catch (SQLException e) {
             logFailedToPrepareStatement(e);
             throw new DatabaseException(e);
         }
-        return statement;
     }
 
-    @SuppressWarnings("ClassNameSameAsAncestorName")
-    public abstract static class Builder<B extends Builder<B, Q>, Q extends WriteCommandRecordQuery>
-            extends WriteRecordQuery.Builder<B, Q, String, CommandRecord> {
+    public abstract static class Builder<B extends Builder<B, Q>, Q extends WriteTimestampQuery>
+            extends WriteQuery.Builder<B, Q> {
 
-        private int statusIndexInQuery;
-        private CommandStatus status;
+        private Timestamp timestamp;
 
-        public B setStatusIndexInQuery(int statusIndexInQuery) {
-            this.statusIndexInQuery = statusIndexInQuery;
-            return getThis();
-        }
-
-        public B setStatus(CommandStatus status) {
-            this.status = status;
+        public Builder setTimestamp(Timestamp timestamp) {
+            this.timestamp = timestamp;
             return getThis();
         }
     }

@@ -50,7 +50,6 @@ import static org.spine3.server.storage.jdbc.aggregate.query.Table.AggregateReco
  */
 public class InsertAggregateRecordQuery<I> extends WriteRecordQuery<I, AggregateEventRecord> {
 
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
             INSERT_INTO + " %s " + BRACKET_OPEN
             + ID_COL + COMMA + AGGREGATE_COL + COMMA + SECONDS_COL + COMMA + NANOS_COL +
@@ -62,7 +61,6 @@ public class InsertAggregateRecordQuery<I> extends WriteRecordQuery<I, Aggregate
     }
 
     @Override
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
         final PreparedStatement statement = super.prepareStatement(connection);
 
@@ -72,7 +70,7 @@ public class InsertAggregateRecordQuery<I> extends WriteRecordQuery<I, Aggregate
             statement.setInt(4, timestamp.getNanos());
             return statement;
         } catch (SQLException e) {
-            getLogger().error("Failed to prepare statement ", e);
+            logFailedToPrepareStatement(e);
             throw new DatabaseException(e);
         }
     }

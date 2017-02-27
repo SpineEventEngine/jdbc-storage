@@ -54,7 +54,6 @@ import static org.spine3.server.storage.jdbc.util.Serializer.deserialize;
  */
 public class SelectCommandByIdQuery extends SelectByIdQuery<String, CommandRecord> {
 
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
             SELECT.toString() + ALL_ATTRIBUTES + FROM + TABLE_NAME +
             WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;

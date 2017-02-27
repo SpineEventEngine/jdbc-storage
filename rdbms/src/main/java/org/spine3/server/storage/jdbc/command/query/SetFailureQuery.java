@@ -42,7 +42,6 @@ import static org.spine3.server.storage.jdbc.command.query.CommandTable.TABLE_NA
  */
 public class SetFailureQuery extends WriteRecordQuery<String, Failure> {
 
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
             UPDATE + TABLE_NAME +
             SET +

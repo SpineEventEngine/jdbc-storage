@@ -39,7 +39,6 @@ import static org.spine3.server.storage.jdbc.event.query.EventTable.SELECT_EVENT
  */
 public class SelectEventByIdQuery extends SelectByIdQuery<String, Event> {
 
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE = SELECT_EVENT_FROM_TABLE +
                                                  WHERE + EVENT_ID_COL + EQUAL + PLACEHOLDER +
                                                  SEMICOLON;

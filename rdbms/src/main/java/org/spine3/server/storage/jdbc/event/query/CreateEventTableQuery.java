@@ -47,7 +47,6 @@ import static org.spine3.server.storage.jdbc.event.query.EventTable.SECONDS_COL;
  */
 public class CreateEventTableQuery extends CreateTableQuery<String> {
 
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
             CREATE_IF_MISSING + "%s" + BRACKET_OPEN +
             EVENT_ID_COL + " %s" + COMMA +
