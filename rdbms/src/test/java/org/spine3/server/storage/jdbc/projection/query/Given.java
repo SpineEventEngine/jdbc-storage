@@ -44,34 +44,32 @@ class Given {
     static InsertTimestampQuery getInsertTimestampQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
         final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnSettingStatementParam();
-        final InsertTimestampQuery.Builder builder = InsertTimestampQuery.newBuilder(anyString())
-                                                                         .setDataSource(
-                                                                                 dataSourceMock)
-                                                                         .setLogger(loggerMock)
-                                                                         .setTimestamp(
-                                                                                 Timestamp.getDefaultInstance());
+        final InsertTimestampQuery.Builder builder =
+                InsertTimestampQuery.newBuilder(anyString())
+                                    .setDataSource(dataSourceMock)
+                                    .setLogger(loggerMock)
+                                    .setTimestamp(Timestamp.getDefaultInstance());
         return builder.build();
     }
 
     static SelectTimestampQuery getSelectTimestampQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
         final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnExecuteStatement();
-        final SelectTimestampQuery.Builder builder = SelectTimestampQuery.newBuilder(anyString())
-                                                                         .setDataSource(
-                                                                                 dataSourceMock)
-                                                                         .setLogger(loggerMock);
+        final SelectTimestampQuery.Builder builder =
+                SelectTimestampQuery.newBuilder(anyString())
+                                    .setDataSource(dataSourceMock)
+                                    .setLogger(loggerMock);
         return builder.build();
     }
 
     static UpdateTimestampQuery getUpdateTimestampQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
         final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnSettingStatementParam();
-        final UpdateTimestampQuery.Builder builder = UpdateTimestampQuery.newBuilder(anyString())
-                                                                         .setDataSource(
-                                                                                 dataSourceMock)
-                                                                         .setLogger(loggerMock)
-                                                                         .setTimestamp(
-                                                                                 Timestamp.getDefaultInstance());
+        final UpdateTimestampQuery.Builder builder =
+                UpdateTimestampQuery.newBuilder(anyString())
+                                    .setDataSource(dataSourceMock)
+                                    .setLogger(loggerMock)
+                                    .setTimestamp(Timestamp.getDefaultInstance());
         return builder.build();
     }
 

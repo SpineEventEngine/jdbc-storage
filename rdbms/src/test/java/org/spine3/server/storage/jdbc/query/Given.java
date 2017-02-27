@@ -49,7 +49,8 @@ class Given {
     // TODO:2016-08-02:alexander.litus: rename all such methods to `createTableQueryWhichThrows`.
     static CreateTableQuery getCreateTableQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnExecuteStatement();
+        final DataSourceWrapper dataSourceMock =
+                GivenDataSource.whichThrowsExceptionOnExecuteStatement();
         final CreateTableMock.Builder builder = CreateTableMock.newBuilder()
                                                                .setDataSource(dataSourceMock)
                                                                .setLogger(loggerMock);
@@ -58,12 +59,13 @@ class Given {
 
     static SelectByIdQueryMock getSelectByIdQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnExecuteStatement();
-        final SelectByIdQueryMock.Builder builder = SelectByIdQueryMock.newBuilder()
-                                                                       .setDataSource(
-                                                                               dataSourceMock)
-                                                                       .setLogger(loggerMock)
-                                                                       .setIdColumn(idColumnMock);
+        final DataSourceWrapper dataSourceMock =
+                GivenDataSource.whichThrowsExceptionOnExecuteStatement();
+        final SelectByIdQueryMock.Builder builder =
+                SelectByIdQueryMock.newBuilder()
+                                   .setDataSource(dataSourceMock)
+                                   .setLogger(loggerMock)
+                                   .setIdColumn(idColumnMock);
         return builder.build();
     }
 
@@ -82,21 +84,20 @@ class Given {
         when(resultSetMock.next()).thenReturn(true);
         when(resultSetMock.getBytes(anyString())).thenReturn(null);
 
-        final SelectByIdQueryMock.Builder builder = SelectByIdQueryMock.newBuilder()
-                                                                       .setDataSource(
-                                                                               dataSourceMock)
-                                                                       .setLogger(loggerMock)
-                                                                       .setIdColumn(idColumnMock)
-                                                                       .setMessageColumnName(
-                                                                               anyString())
-                                                                       .setMessageDescriptor(
-                                                                               Any.getDescriptor());
+        final SelectByIdQueryMock.Builder builder =
+                SelectByIdQueryMock.newBuilder()
+                                   .setDataSource(dataSourceMock)
+                                   .setLogger(loggerMock)
+                                   .setIdColumn(idColumnMock)
+                                   .setMessageColumnName(anyString())
+                                   .setMessageDescriptor(Any.getDescriptor());
         return builder.build();
     }
 
     static WriteQueryMock getWriteQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnExecuteStatement();
+        final DataSourceWrapper dataSourceMock =
+                GivenDataSource.whichThrowsExceptionOnExecuteStatement();
         final WriteQueryMock.Builder builder = WriteQueryMock.newBuilder()
                                                              .setDataSource(dataSourceMock)
                                                              .setLogger(loggerMock);
@@ -105,13 +106,14 @@ class Given {
 
     static WriteRecordQueryMock getWriteRecordQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnExecuteStatement();
-        final WriteRecordQueryMock.Builder builder = WriteRecordQueryMock.newBuilder()
-                                                                         .setDataSource(
-                                                                                 dataSourceMock)
-                                                                         .setLogger(loggerMock)
-                                                                         .setIdColumn(idColumnMock)
-                                                                         .setRecord(recordMock);
+        final DataSourceWrapper dataSourceMock =
+                GivenDataSource.whichThrowsExceptionOnExecuteStatement();
+        final WriteRecordQueryMock.Builder builder =
+                WriteRecordQueryMock.newBuilder()
+                                    .setDataSource(dataSourceMock)
+                                    .setLogger(loggerMock)
+                                    .setIdColumn(idColumnMock)
+                                    .setRecord(recordMock);
         return builder.build();
     }
 
@@ -130,7 +132,9 @@ class Given {
         }
 
         @SuppressWarnings("ClassNameSameAsAncestorName")
-        public static class Builder extends CreateTableQuery.Builder<Builder, CreateTableMock, String> {
+        public static class Builder extends CreateTableQuery.Builder<Builder,
+                                                                     CreateTableMock,
+                                                                     String> {
 
             @Override
             public CreateTableMock build() {
@@ -157,7 +161,10 @@ class Given {
         }
 
         @SuppressWarnings("ClassNameSameAsAncestorName")
-        public static class Builder extends SelectByIdQuery.Builder<Builder, SelectByIdQueryMock, String, Message> {
+        public static class Builder extends SelectByIdQuery.Builder<Builder,
+                                                                    SelectByIdQueryMock,
+                                                                    String,
+                                                                    Message> {
 
             @Override
             public SelectByIdQueryMock build() {
@@ -184,7 +191,10 @@ class Given {
         }
 
         @SuppressWarnings("ClassNameSameAsAncestorName")
-        public static class Builder extends WriteRecordQuery.Builder<Builder, WriteRecordQueryMock, String, Message> {
+        public static class Builder extends WriteRecordQuery.Builder<Builder,
+                                                                     WriteRecordQueryMock,
+                                                                     String,
+                                                                     Message> {
 
             @Override
             public WriteRecordQueryMock build() {

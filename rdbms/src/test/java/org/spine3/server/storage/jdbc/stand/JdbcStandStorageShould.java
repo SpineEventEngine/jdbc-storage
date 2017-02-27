@@ -25,6 +25,7 @@ import com.google.protobuf.Descriptors;
 import com.google.protobuf.FieldMask;
 import com.google.protobuf.Message;
 import org.junit.Test;
+import org.spine3.base.Version;
 import org.spine3.protobuf.AnyPacker;
 import org.spine3.protobuf.Timestamps2;
 import org.spine3.protobuf.TypeUrl;
@@ -72,13 +73,14 @@ public class JdbcStandStorageShould extends StandStorageShould {
     protected StandStorage getStorage() {
         final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(
                 "StandStorageTests");
-        return JdbcStandStorage.newBuilder()
-                               .setDataSource(dataSource)
-                               .setRecordStorageQueryFactory(
-                                       new RecordStorageQueryFactory<>(dataSource,
-                                                                       StandStorageRecord.class))
-                               .setMultitenant(false)
-                               .build();
+        final RecordStorageQueryFactory<Object> queryFactory =
+                new RecordStorageQueryFactory<>(dataSource, StandStorageRecord.class);
+        final StandStorage storage = JdbcStandStorage.newBuilder()
+                                                     .setDataSource(dataSource)
+                                                     .setRecordStorageQueryFactory(queryFactory)
+                                                     .setMultitenant(false)
+                                                     .build();
+        return storage;
     }
 
     /*
@@ -90,13 +92,12 @@ public class JdbcStandStorageShould extends StandStorageShould {
     @Test
     public void initialize_properly_with_all_builder_fields() {
         final DataSourceWrapper dataSourceMock = mock(DataSourceWrapper.class);
-        final RecordStorageQueryFactory<String> queryFactoryMock = (RecordStorageQueryFactory<String>) mock(
-                RecordStorageQueryFactory.class);
-
-        final CreateEntityTableQuery<String> queryMock = (CreateEntityTableQuery<String>) mock(
-                CreateEntityTableQuery.class);
-        final CreateVisibilityTableQuery statusQueryMock = mock(
-                CreateVisibilityTableQuery.class);
+        final RecordStorageQueryFactory<String> queryFactoryMock =
+                (RecordStorageQueryFactory<String>) mock(RecordStorageQueryFactory.class);
+        final CreateEntityTableQuery<String> queryMock = (CreateEntityTableQuery<String>)
+                mock(CreateEntityTableQuery.class);
+        final CreateVisibilityTableQuery statusQueryMock =
+                mock(CreateVisibilityTableQuery.class);
 
         when(queryFactoryMock.newCreateEntityTableQuery()).thenReturn(queryMock);
         when(queryFactoryMock.newCreateVisibilityTableQuery()).thenReturn(statusQueryMock);
@@ -442,12 +443,15 @@ public class JdbcStandStorageShould extends StandStorageShould {
                                                       StandStorage storage,
                                                       Class<? extends Message> stateClass) {
         final AggregateStateId id = AggregateStateId.of(aggregate.getId(), TypeUrl.of(stateClass));
-        final EntityRecord record = EntityRecord.newBuilder()
-                                                              .setState(AnyPacker.pack(
-                                                                      aggregate.getState()))
-                                                              .setVersion(org.spine3.base.Version.newBuilder().setNumber(1).setTimestamp(
-                                                                      Timestamps2.getCurrentTime()))
-                                                              .build();
+        final Version version = Version.newBuilder()
+                                       .setNumber(1)
+                                       .setTimestamp(Timestamps2.getCurrentTime())
+                                       .build();
+        final EntityRecord record =
+                EntityRecord.newBuilder()
+                            .setState(AnyPacker.pack(aggregate.getState()))
+                            .setVersion(version)
+                            .build();
 
         storage.write(id, record);
 
