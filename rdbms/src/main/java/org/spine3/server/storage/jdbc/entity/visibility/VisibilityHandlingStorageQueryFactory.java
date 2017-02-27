@@ -20,7 +20,6 @@
 
 package org.spine3.server.storage.jdbc.entity.visibility;
 
-import org.slf4j.Logger;
 import org.spine3.server.entity.Visibility;
 import org.spine3.server.storage.jdbc.entity.visibility.query.CreateVisibilityTableQuery;
 import org.spine3.server.storage.jdbc.entity.visibility.query.InsertAndMarkEntityQuery;
@@ -109,9 +108,4 @@ public interface VisibilityHandlingStorageQueryFactory<I> {
      * @return an {@code INSERT INTO} query
      */
     InsertAndMarkEntityQuery<I> newMarkDeletedNewEntityQuery(I id);
-
-    /**
-     * Sets the {@link Logger} to use in the generated queries.
-     */
-    void setLogger(Logger logger);
 }

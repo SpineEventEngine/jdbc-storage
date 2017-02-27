@@ -21,14 +21,13 @@
 package org.spine3.server.storage.jdbc.entity.visibility;
 
 import com.google.common.annotations.VisibleForTesting;
-import org.slf4j.Logger;
 import org.spine3.Internal;
 import org.spine3.server.entity.Visibility;
 import org.spine3.server.storage.VisibilityField;
-import org.spine3.server.storage.jdbc.entity.visibility.query.InsertAndMarkEntityQuery;
-import org.spine3.server.storage.jdbc.entity.visibility.query.MarkEntityQuery;
 import org.spine3.server.storage.jdbc.entity.visibility.query.CreateVisibilityTableQuery;
+import org.spine3.server.storage.jdbc.entity.visibility.query.InsertAndMarkEntityQuery;
 import org.spine3.server.storage.jdbc.entity.visibility.query.InsertVisibilityQuery;
+import org.spine3.server.storage.jdbc.entity.visibility.query.MarkEntityQuery;
 import org.spine3.server.storage.jdbc.entity.visibility.query.SelectVisibilityQuery;
 import org.spine3.server.storage.jdbc.entity.visibility.query.UpdateVisibilityQuery;
 import org.spine3.server.storage.jdbc.entity.visibility.table.VisibilityTable;
@@ -43,12 +42,11 @@ import static org.spine3.server.storage.VisibilityField.deleted;
  * @author Dmytro Dashenkov.
  */
 @Internal
-class VisibilityHandlingStorageQueryFactoryImpl<I> implements VisibilityHandlingStorageQueryFactory<I> {
+class VisibilityHandlingStorageQueryFactoryImpl<I> extends AbstractVisibilityHandlingStorageQueryFactory<I> {
 
     private final DataSourceWrapper dataSource;
     private final String tableName;
     private final IdColumn<I> idColumn;
-    private Logger logger;
 
     VisibilityHandlingStorageQueryFactoryImpl(DataSourceWrapper dataSource,
                                               String tableName,
@@ -59,16 +57,11 @@ class VisibilityHandlingStorageQueryFactoryImpl<I> implements VisibilityHandling
     }
 
     @Override
-    public void setLogger(Logger logger) {
-        this.logger = checkNotNull(logger);
-    }
-
-    @Override
     public CreateVisibilityTableQuery newCreateVisibilityTableQuery() {
         final CreateVisibilityTableQuery.Builder builder =
                 CreateVisibilityTableQuery.newBuilder()
                                             .setDataSource(dataSource)
-                                            .setLogger(logger)
+                                            .setLogger(getLogger())
                                             .setTableName(VisibilityTable.TABLE_NAME);
         return builder.build();
     }
@@ -78,7 +71,7 @@ class VisibilityHandlingStorageQueryFactoryImpl<I> implements VisibilityHandling
         final InsertVisibilityQuery.Builder builder =
                 InsertVisibilityQuery.newBuilder()
                                        .setDataSource(dataSource)
-                                       .setLogger(logger)
+                                       .setLogger(getLogger())
                                        .setId(id)
                                        .setVisibility(visibility);
         return builder.build();
@@ -89,7 +82,7 @@ class VisibilityHandlingStorageQueryFactoryImpl<I> implements VisibilityHandling
         final SelectVisibilityQuery.Builder builder =
                 SelectVisibilityQuery.newBuilder()
                                        .setDataSource(dataSource)
-                                       .setLogger(logger)
+                                       .setLogger(getLogger())
                                        .setId(id);
         return builder.build();
     }
@@ -98,7 +91,7 @@ class VisibilityHandlingStorageQueryFactoryImpl<I> implements VisibilityHandling
     public UpdateVisibilityQuery newUpdateVisibilityQuery(I id, Visibility visibility) {
         final UpdateVisibilityQuery.Builder builder = UpdateVisibilityQuery.<I>newBuilder()
                 .setDataSource(dataSource)
-                .setLogger(logger)
+                .setLogger(getLogger())
                 .setId(id)
                 .setVisibility(visibility);
         return builder.build();
@@ -132,7 +125,7 @@ class VisibilityHandlingStorageQueryFactoryImpl<I> implements VisibilityHandling
     private InsertAndMarkEntityQuery<I> newInsertAndMarkEntityQuery(I id, VisibilityField column) {
         final InsertAndMarkEntityQuery<I> query = InsertAndMarkEntityQuery.<I>newInsertBuilder()
                 .setDataSource(dataSource)
-                .setLogger(logger)
+                .setLogger(getLogger())
                 .setTableName(tableName)
                 .setColumn(column)
                 .setIdColumn(idColumn)
@@ -144,7 +137,7 @@ class VisibilityHandlingStorageQueryFactoryImpl<I> implements VisibilityHandling
     private MarkEntityQuery<I> newMarkQuery(I id, VisibilityField column) {
         final MarkEntityQuery<I> query = MarkEntityQuery.<I>newBuilder()
                 .setDataSource(dataSource)
-                .setLogger(logger)
+                .setLogger(getLogger())
                 .setTableName(tableName)
                 .setColumn(column)
                 .setIdColumn(idColumn)

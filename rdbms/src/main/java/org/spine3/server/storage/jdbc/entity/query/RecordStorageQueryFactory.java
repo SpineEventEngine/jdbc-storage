@@ -26,6 +26,7 @@ import org.spine3.server.entity.Entity;
 import org.spine3.server.entity.EntityRecord;
 import org.spine3.server.entity.Visibility;
 import org.spine3.server.storage.RecordStorage;
+import org.spine3.server.storage.jdbc.entity.visibility.AbstractVisibilityHandlingStorageQueryFactory;
 import org.spine3.server.storage.jdbc.entity.visibility.VisibilityHandlingStorageQueryFactory;
 import org.spine3.server.storage.jdbc.entity.visibility.VisibilityQueryFactories;
 import org.spine3.server.storage.jdbc.entity.visibility.query.CreateVisibilityTableQuery;
@@ -49,13 +50,12 @@ import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
  * @author Andrey Lavrov
  * @author Dmytro Dashenkov
  */
-public class RecordStorageQueryFactory<I> implements VisibilityHandlingStorageQueryFactory<I> {
+public class RecordStorageQueryFactory<I> extends AbstractVisibilityHandlingStorageQueryFactory<I> {
 
     private final IdColumn<I> idColumn;
     private final DataSourceWrapper dataSource;
     private final String tableName;
     private final VisibilityHandlingStorageQueryFactory<I> statusTableQueryFactory;
-    private Logger logger;
 
     /**
      * Creates a new instance.
@@ -116,8 +116,13 @@ public class RecordStorageQueryFactory<I> implements VisibilityHandlingStorageQu
     /** Sets the logger for logging exceptions during queries execution. */
     @Override
     public void setLogger(Logger logger) {
-        this.logger = logger;
-        statusTableQueryFactory.setLogger(logger);
+        super.setLogger(logger);
+        if (statusTableQueryFactory instanceof AbstractVisibilityHandlingStorageQueryFactory) {
+            // Overriding implementations might want to use their own query factory
+            final AbstractVisibilityHandlingStorageQueryFactory<I> abstractQueryFactory =
+                    (AbstractVisibilityHandlingStorageQueryFactory<I>) statusTableQueryFactory;
+            abstractQueryFactory.setLogger(logger);
+        }
     }
 
     /** Returns a query that creates a new {@link EntityTable} if it does not exist. */
@@ -125,7 +130,7 @@ public class RecordStorageQueryFactory<I> implements VisibilityHandlingStorageQu
         final CreateEntityTableQuery.Builder<I> builder =
                 CreateEntityTableQuery.<I>newBuilder()
                                       .setDataSource(dataSource)
-                                      .setLogger(logger)
+                                      .setLogger(getLogger())
                                       .setIdColumn(idColumn)
                                       .setTableName(tableName);
         return builder.build();
@@ -140,7 +145,7 @@ public class RecordStorageQueryFactory<I> implements VisibilityHandlingStorageQu
     public InsertEntityQuery newInsertEntityQuery(I id, EntityRecord record) {
         final InsertEntityQuery.Builder<I> builder = InsertEntityQuery.<I>newBuilder(tableName)
                                                                       .setDataSource(dataSource)
-                                                                      .setLogger(logger)
+                                                                      .setLogger(getLogger())
                                                                       .setId(id)
                                                                       .setIdColumn(idColumn)
                                                                       .setRecord(record);
@@ -156,7 +161,7 @@ public class RecordStorageQueryFactory<I> implements VisibilityHandlingStorageQu
     public UpdateEntityQuery newUpdateEntityQuery(I id, EntityRecord record) {
         final UpdateEntityQuery.Builder<I> builder = UpdateEntityQuery.<I>newBuilder(tableName)
                                                                      .setDataSource(dataSource)
-                                                                     .setLogger(logger)
+                                                                     .setLogger(getLogger())
                                                                      .setIdColumn(idColumn)
                                                                      .setId(id)
                                                                      .setRecord(record);
@@ -168,7 +173,7 @@ public class RecordStorageQueryFactory<I> implements VisibilityHandlingStorageQu
         final SelectEntityByIdQuery.Builder<I> builder =
                 SelectEntityByIdQuery.<I>newBuilder(tableName)
                                      .setDataSource(dataSource)
-                                     .setLogger(logger)
+                                     .setLogger(getLogger())
                                      .setIdColumn(idColumn)
                                      .setId(id);
         return builder.build();
@@ -177,7 +182,7 @@ public class RecordStorageQueryFactory<I> implements VisibilityHandlingStorageQu
     public DeleteRowQuery<I> newDeleteRowQuery(I id) {
         final DeleteRowQuery.Builder<I> builder = DeleteRowQuery.<I>newBuilder()
                                                                 .setDataSource(dataSource)
-                                                                .setLogger(logger)
+                                                                .setLogger(getLogger())
                                                                 .setTableName(tableName)
                                                                 .setIdColumn(idColumn)
                                                                 .setIdColumnName(ID_COL)
@@ -189,14 +194,14 @@ public class RecordStorageQueryFactory<I> implements VisibilityHandlingStorageQu
     public DeleteAllQuery newDeleteAllQuery() {
         final DeleteAllQuery.Builder builder = DeleteAllQuery.newBuilder(tableName)
                                                              .setDataSource(dataSource)
-                                                             .setLogger(logger);
+                                                             .setLogger(getLogger());
         return builder.build();
     }
 
     public SelectBulkQuery newSelectAllQuery(FieldMask fieldMask) {
         final SelectBulkQuery.Builder<I> builder = SelectBulkQuery.<I>newBuilder(tableName)
                                                                  .setFieldMask(fieldMask)
-                                                                 .setLogger(logger)
+                                                                 .setLogger(getLogger())
                                                                  .setDataSource(dataSource);
 
         return builder.build();
@@ -207,7 +212,7 @@ public class RecordStorageQueryFactory<I> implements VisibilityHandlingStorageQu
                                                                  .setIdColumn(idColumn)
                                                                  .setIdsQuery(tableName, ids)
                                                                  .setFieldMask(fieldMask)
-                                                                 .setLogger(logger)
+                                                                 .setLogger(getLogger())
                                                                  .setDataSource(dataSource);
 
         return builder.build();
@@ -217,7 +222,7 @@ public class RecordStorageQueryFactory<I> implements VisibilityHandlingStorageQu
             Map<I, EntityRecord> records) {
         final InsertEntityRecordsBulkQuery.Builder<I> builder =
                 InsertEntityRecordsBulkQuery.<I>newBuilder()
-                                            .setLogger(logger)
+                                            .setLogger(getLogger())
                                             .setDataSource(dataSource)
                                             .setTableName(tableName)
                                             .setidColumn(idColumn)

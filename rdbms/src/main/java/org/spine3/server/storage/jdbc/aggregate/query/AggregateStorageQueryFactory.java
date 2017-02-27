@@ -25,6 +25,7 @@ import org.spine3.server.aggregate.Aggregate;
 import org.spine3.server.aggregate.AggregateEventRecord;
 import org.spine3.server.aggregate.AggregateStorage;
 import org.spine3.server.entity.Visibility;
+import org.spine3.server.storage.jdbc.entity.visibility.AbstractVisibilityHandlingStorageQueryFactory;
 import org.spine3.server.storage.jdbc.entity.visibility.query.InsertAndMarkEntityQuery;
 import org.spine3.server.storage.jdbc.entity.visibility.query.MarkEntityQuery;
 import org.spine3.server.storage.jdbc.entity.visibility.VisibilityHandlingStorageQueryFactory;
@@ -45,14 +46,14 @@ import static org.spine3.server.storage.jdbc.aggregate.query.Table.EventCount.EV
  * @param <I> the type of IDs used in the storage
  * @author Andrey Lavrov
  */
-public class AggregateStorageQueryFactory<I> implements VisibilityHandlingStorageQueryFactory<I> {
+public class AggregateStorageQueryFactory<I>
+        extends AbstractVisibilityHandlingStorageQueryFactory<I> {
 
     private final IdColumn<I> idColumn;
     private final String mainTableName;
     private final String eventCountTableName;
     private final DataSourceWrapper dataSource;
     private final VisibilityHandlingStorageQueryFactory<I> statusTableQueryFactory;
-    private Logger logger;
 
     /**
      * Creates a new instance.
@@ -116,15 +117,20 @@ public class AggregateStorageQueryFactory<I> implements VisibilityHandlingStorag
     /** Sets the logger for logging exceptions during queries execution. */
     @Override
     public void setLogger(Logger logger) {
-        this.logger = logger;
-        statusTableQueryFactory.setLogger(logger);
+        super.setLogger(logger);
+        if (statusTableQueryFactory instanceof AbstractVisibilityHandlingStorageQueryFactory) {
+            // Overriding implementations might want to use their own query factory
+            final AbstractVisibilityHandlingStorageQueryFactory<I> abstractQueryFactory =
+                    (AbstractVisibilityHandlingStorageQueryFactory<I>) statusTableQueryFactory;
+            abstractQueryFactory.setLogger(logger);
+        }
     }
 
     /** Returns a query that creates a new {@link Table.AggregateRecord} if it does not exist. */
     public CreateMainTableQuery newCreateMainTableQuery() {
         final CreateMainTableQuery.Builder<I> builder = CreateMainTableQuery.<I>newBuilder()
                 .setDataSource(dataSource)
-                .setLogger(logger)
+                .setLogger(getLogger())
                 .setTableName(mainTableName)
                 .setIdColumn(idColumn);
         return builder.build();
@@ -134,7 +140,7 @@ public class AggregateStorageQueryFactory<I> implements VisibilityHandlingStorag
     public CreateEventCountTableQuery newCreateEventCountTableQuery() {
         final CreateEventCountTableQuery.Builder<I> builder = CreateEventCountTableQuery.<I>newBuilder()
                 .setDataSource(dataSource)
-                .setLogger(logger)
+                .setLogger(getLogger())
                 .setTableName(eventCountTableName)
                 .setIdColumn(idColumn);
         return builder.build();
@@ -150,7 +156,7 @@ public class AggregateStorageQueryFactory<I> implements VisibilityHandlingStorag
         final InsertEventCountQuery.Builder<I> builder = InsertEventCountQuery.<I>newBuilder(
                 eventCountTableName)
                 .setDataSource(dataSource)
-                .setLogger(logger)
+                .setLogger(getLogger())
                 .setIdColumn(idColumn)
                 .setId(id)
                 .setCount(count);
@@ -167,7 +173,7 @@ public class AggregateStorageQueryFactory<I> implements VisibilityHandlingStorag
         final UpdateEventCountQuery.Builder<I> builder = UpdateEventCountQuery.<I>newBuilder(
                 eventCountTableName)
                 .setDataSource(dataSource)
-                .setLogger(logger)
+                .setLogger(getLogger())
                 .setIdColumn(idColumn)
                 .setId(id)
                 .setCount(count);
@@ -184,7 +190,7 @@ public class AggregateStorageQueryFactory<I> implements VisibilityHandlingStorag
         final InsertAggregateRecordQuery.Builder<I> builder = InsertAggregateRecordQuery.<I>newBuilder(
                 mainTableName)
                 .setDataSource(dataSource)
-                .setLogger(logger)
+                .setLogger(getLogger())
                 .setIdColumn(idColumn)
                 .setId(id)
                 .setRecord(record);
@@ -196,7 +202,7 @@ public class AggregateStorageQueryFactory<I> implements VisibilityHandlingStorag
         final SelectEventCountByIdQuery.Builder<I> builder = SelectEventCountByIdQuery.<I>newBuilder(
                 eventCountTableName)
                 .setDataSource(dataSource)
-                .setLogger(logger)
+                .setLogger(getLogger())
                 .setIdColumn(idColumn)
                 .setId(id);
         return builder.build();
@@ -208,7 +214,7 @@ public class AggregateStorageQueryFactory<I> implements VisibilityHandlingStorag
         final SelectByIdSortedByTimeDescQuery.Builder<I> builder = SelectByIdSortedByTimeDescQuery.<I>newBuilder(
                 mainTableName)
                 .setDataSource(dataSource)
-                .setLogger(logger)
+                .setLogger(getLogger())
                 .setIdColumn(idColumn)
                 .setId(id);
         return builder.build();
