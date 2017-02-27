@@ -125,7 +125,7 @@ public class VisibilityHandler<I> {
     /**
      * Creates a new record as archived or updates an existing one to become archived.
      *
-     * <p>Effectively performs no action if the record exists and is archived.
+     * <p>Has no effect if the record exists and has been marked archived previously.
      *
      * @param id ID of the record to store
      */
@@ -142,7 +142,7 @@ public class VisibilityHandler<I> {
     /**
      * Creates a new record as deleted or updates an existing one to become deleted.
      *
-     * <p>Effectively performs no action if the record exists and is deleted.
+     * <p>Has no effect if the record exists and has been marked deleted previously.
      *
      * @param id ID of the record to store
      */

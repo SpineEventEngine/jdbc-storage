@@ -88,7 +88,11 @@ public class MarkEntityQuery<I> extends StorageQuery {
         return builder;
     }
 
-    protected abstract static class AbstractMarkQueryBuilder<I, B extends AbstractMarkQueryBuilder<I, B, Q>, Q extends StorageQuery> extends StorageQuery.Builder<B, Q> {
+    protected abstract static class AbstractMarkQueryBuilder<
+            I,
+            B extends AbstractMarkQueryBuilder<I, B, Q>,
+            Q extends StorageQuery>
+            extends StorageQuery.Builder<B, Q> {
 
         private I id;
         private String column;
@@ -150,7 +154,8 @@ public class MarkEntityQuery<I> extends StorageQuery {
         }
     }
 
-    public static class Builder<I> extends AbstractMarkQueryBuilder<I, Builder<I>, MarkEntityQuery<I>> {
+    public static class Builder<I>
+            extends AbstractMarkQueryBuilder<I, Builder<I>, MarkEntityQuery<I>> {
 
         @Override
         protected Builder<I> getThis() {

@@ -20,10 +20,12 @@
 
 package org.spine3.server.storage.jdbc.entity.visibility;
 
+import com.google.common.testing.NullPointerTester;
 import org.junit.Test;
 import org.spine3.server.storage.jdbc.GivenDataSource;
 import org.spine3.server.storage.jdbc.entity.visibility.table.VisibilityTable;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
+import org.spine3.server.storage.jdbc.util.IdColumn;
 import org.spine3.test.Tests;
 
 import static org.hamcrest.Matchers.instanceOf;
@@ -39,6 +41,19 @@ public class VisibilityQueryFactoriesShould {
     @Test
     public void have_private_utility_constructor() {
         assertTrue(Tests.hasPrivateParameterlessCtor(VisibilityQueryFactories.class));
+    }
+
+    @Test
+    public void pass_null_tolerance_test() {
+        final NullPointerTester tester = new NullPointerTester();
+        final IdColumn defaultIdColumn = new IdColumn.StringIdColumn();
+        final DataSourceWrapper defaultWrapper = DataSourceWrapper.wrap(
+                GivenDataSource.whichIsAutoCloseable());
+
+        tester.setDefault(DataSourceWrapper.class, defaultWrapper);
+        tester.setDefault(IdColumn.class, defaultIdColumn);
+        tester.testStaticMethods(VisibilityQueryFactories.class,
+                                 NullPointerTester.Visibility.PACKAGE);
     }
 
     @Test

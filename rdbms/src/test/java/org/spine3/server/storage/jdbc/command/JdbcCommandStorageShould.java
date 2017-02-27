@@ -36,9 +36,10 @@ public class JdbcCommandStorageShould extends CommandStorageShould {
     protected CommandStorage getStorage() {
         final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(
                 "commandStorageTests");
-        final CommandStorage storage = JdbcCommandStorage.newInstance(dataSource, false,
-                                                                      new CommandStorageQueryFactory(
-                                                                              dataSource));
+        final CommandStorageQueryFactory queryFactory = new CommandStorageQueryFactory(dataSource);
+        final CommandStorage storage = JdbcCommandStorage.newInstance(dataSource,
+                                                                      false,
+                                                                      queryFactory);
         return storage;
     }
 

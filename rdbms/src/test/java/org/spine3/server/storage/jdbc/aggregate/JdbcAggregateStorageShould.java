@@ -52,10 +52,9 @@ public class JdbcAggregateStorageShould extends AggregateStorageShould {
             Class<? extends Aggregate<I, ? extends Message, ?>> aggregateClass) {
         final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(
                 "aggregateStorageTests");
-        return JdbcAggregateStorage.newInstance(dataSource, false,
-                                                new AggregateStorageQueryFactory<>(
-                                                        dataSource,
-                                                        aggregateClass));
+        final AggregateStorageQueryFactory<I> queryFactory =
+                new AggregateStorageQueryFactory<>(dataSource, aggregateClass);
+        return JdbcAggregateStorage.newInstance(dataSource, false, queryFactory);
     }
 
     @Test

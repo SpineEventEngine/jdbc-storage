@@ -52,7 +52,7 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
      * Creates a new storage instance.
      *
      * @param entityStorage an entity storage to use
-     * @param multitenant   defines is this storage multitenant
+     * @param multitenant   defines if this storage is multitenant or not
      * @param queryFactory  factory that will generate queries for interaction with projection table
      * @param <I>           a type of projection IDs
      * @return a new storage instance
