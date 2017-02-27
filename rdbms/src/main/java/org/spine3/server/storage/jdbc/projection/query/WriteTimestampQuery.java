@@ -29,6 +29,9 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 /**
+ * A base for the {@linkplain org.spine3.server.storage.jdbc.query.StorageQuery} implementations
+ * which write a {@link Timestamp} in the {@link ProjectionTable}.
+ *
  * @author Dmytro Dashenkov.
  */
 public abstract class WriteTimestampQuery extends WriteQuery {

@@ -84,7 +84,10 @@ public class InsertAggregateRecordQuery<I> extends WriteRecordQuery<I, Aggregate
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder<I> extends WriteRecordQuery.Builder<Builder<I>, InsertAggregateRecordQuery, I, AggregateEventRecord> {
+    public static class Builder<I> extends WriteRecordQuery.Builder<Builder<I>,
+                                                                    InsertAggregateRecordQuery,
+                                                                    I,
+                                                                    AggregateEventRecord> {
 
         @Override
         public InsertAggregateRecordQuery build() {
