@@ -56,13 +56,12 @@ public class EventStorageQueryFactory {
 
     /** Returns a query that creates a new {@link EventTable} if it does not exist. */
     public CreateEventTableQuery newCreateEventTableQuery() {
-        final CreateEventTableQuery.Builder builder = CreateEventTableQuery.newBuilder()
-                                                                           .setDataSource(
-                                                                                   dataSource)
-                                                                           .setLogger(logger)
-                                                                           .setIdColumn(idColumn)
-                                                                           .setTableName(
-                                                                                   TABLE_NAME);
+        final CreateEventTableQuery.Builder builder =
+                CreateEventTableQuery.newBuilder()
+                                     .setDataSource(dataSource)
+                                     .setLogger(logger)
+                                     .setIdColumn(idColumn)
+                                     .setTableName(TABLE_NAME);
         return builder.build();
     }
 
@@ -72,12 +71,12 @@ public class EventStorageQueryFactory {
      * @param record new event record
      */
     public InsertEventRecordQuery newInsertEventQuery(String id, Event record) {
-        final InsertEventRecordQuery.Builder builder = InsertEventRecordQuery.newBuilder()
-                                                                             .setDataSource(
-                                                                                     dataSource)
-                                                                             .setLogger(logger)
-                                                                             .setId(id)
-                                                                             .setRecord(record);
+        final InsertEventRecordQuery.Builder builder =
+                InsertEventRecordQuery.newBuilder()
+                                      .setDataSource(dataSource)
+                                      .setLogger(logger)
+                                      .setId(id)
+                                      .setRecord(record);
         return builder.build();
     }
 
@@ -87,12 +86,12 @@ public class EventStorageQueryFactory {
      * @param record updated record state
      */
     public UpdateEventRecordQuery newUpdateEventQuery(String id, Event record) {
-        final UpdateEventRecordQuery.Builder builder = UpdateEventRecordQuery.newBuilder()
-                                                                             .setDataSource(
-                                                                                     dataSource)
-                                                                             .setLogger(logger)
-                                                                             .setId(id)
-                                                                             .setRecord(record);
+        final UpdateEventRecordQuery.Builder builder =
+                UpdateEventRecordQuery.newBuilder()
+                                      .setDataSource(dataSource)
+                                      .setLogger(logger)
+                                      .setId(id)
+                                      .setRecord(record);
         return builder.build();
     }
 

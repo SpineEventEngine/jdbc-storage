@@ -57,7 +57,10 @@ public class SelectEventByIdQuery extends SelectByIdQuery<String, Event> {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder extends SelectByIdQuery.Builder<Builder, SelectEventByIdQuery, String, Event> {
+    public static class Builder extends SelectByIdQuery.Builder<Builder,
+                                                                SelectEventByIdQuery,
+                                                                String,
+                                                                Event> {
 
         @Override
         public SelectEventByIdQuery build() {

@@ -115,7 +115,10 @@ public class SelectByIdQuery<I, M extends Message> extends StorageQuery {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public abstract static class Builder<B extends Builder<B, Q, I, Record>, Q extends StorageQuery, I, Record extends Message>
+    public abstract static class Builder<B extends Builder<B, Q, I, R>,
+                                         Q extends StorageQuery,
+                                         I,
+                                         R extends Message>
             extends StorageQuery.Builder<B, Q> {
 
         private int idIndexInQuery;

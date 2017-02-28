@@ -59,6 +59,8 @@ import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
  */
 public class InsertEventRecordQuery extends WriteRecordQuery<String, Event> {
 
+    private static final int PARAMETER_COUNT = QueryParameter.values().length;
+
     private static final String QUERY_TEMPLATE =
             INSERT_INTO + TABLE_NAME + BRACKET_OPEN +
             EVENT_ID_COL + COMMA +
@@ -67,7 +69,7 @@ public class InsertEventRecordQuery extends WriteRecordQuery<String, Event> {
             PRODUCER_ID_COL + COMMA +
             SECONDS_COL + COMMA +
             NANOSECONDS_COL + BRACKET_CLOSE +
-            VALUES + Sql.nPlaceholders(6) + SEMICOLON;
+            VALUES + Sql.nPlaceholders(PARAMETER_COUNT) + SEMICOLON;
 
     private InsertEventRecordQuery(Builder builder) {
         super(builder);
@@ -81,26 +83,26 @@ public class InsertEventRecordQuery extends WriteRecordQuery<String, Event> {
         final Timestamp timestamp = context.getTimestamp();
         try {
             final String eventId = getId();
-            statement.setString(1, eventId);
+            statement.setString(QueryParameter.EVENT_ID.index, eventId);
 
             final byte[] serializedEvent = serialize(event);
-            statement.setBytes(2, serializedEvent);
+            statement.setBytes(QueryParameter.EVENT.index, serializedEvent);
 
             final Any eventMessageAny = event.getMessage();
             final Message eventMessage = AnyPacker.unpack(eventMessageAny);
             final String eventType = TypeName.of(eventMessage);
-            statement.setString(3, eventType);
+            statement.setString(QueryParameter.EVENT_TYPE.index, eventType);
 
             final Any producerIdAny = context.getProducerId();
             final Message producerId = AnyPacker.unpack(producerIdAny);
             final String producerIdString = Stringifiers.idToString(producerId);
-            statement.setString(4, producerIdString);
+            statement.setString(QueryParameter.PRODUCER_ID.index, producerIdString);
 
             final long seconds = timestamp.getSeconds();
-            statement.setLong(5, seconds);
+            statement.setLong(QueryParameter.SECONDS.index, seconds);
 
             final int nanos = timestamp.getNanos();
-            statement.setInt(6, nanos);
+            statement.setInt(QueryParameter.NANOS.index, nanos);
         } catch (SQLException e) {
             getLogger().error("Failed to build statement", e);
             throw new DatabaseException(e);
@@ -125,6 +127,22 @@ public class InsertEventRecordQuery extends WriteRecordQuery<String, Event> {
         @Override
         protected Builder getThis() {
             return this;
+        }
+    }
+
+    private enum QueryParameter {
+
+        EVENT_ID(1),
+        EVENT(2),
+        EVENT_TYPE(3),
+        PRODUCER_ID(4),
+        SECONDS(5),
+        NANOS(6);
+
+        private final int index;
+
+        QueryParameter(int index) {
+            this.index = index;
         }
     }
 }

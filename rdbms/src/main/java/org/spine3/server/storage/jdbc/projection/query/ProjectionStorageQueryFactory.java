@@ -59,13 +59,11 @@ public class ProjectionStorageQueryFactory<I> {
 
     /** Returns a query that creates a new {@link ProjectionTable} if it does not exist. */
     public CreateProjectionTableQuery newCreateTableQuery() {
-        final CreateProjectionTableQuery.Builder builder = CreateProjectionTableQuery.newBuilder()
-                                                                                     .setDataSource(
-                                                                                             dataSource)
-                                                                                     .setLogger(
-                                                                                             logger)
-                                                                                     .setTableName(
-                                                                                             tableName);
+        final CreateProjectionTableQuery.Builder builder =
+                CreateProjectionTableQuery.newBuilder()
+                                          .setDataSource(dataSource)
+                                          .setLogger(logger)
+                                          .setTableName(tableName);
         return builder.build();
     }
 

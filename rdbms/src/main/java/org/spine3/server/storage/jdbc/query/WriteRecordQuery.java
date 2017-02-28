@@ -70,20 +70,23 @@ public abstract class WriteRecordQuery<I, R extends Message> extends WriteQuery 
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public abstract static class Builder<B extends Builder<B, Q, I, Record>, Q extends WriteRecordQuery, I, Record extends Message>
+    public abstract static class Builder<B extends Builder<B, Q, I, R>,
+                                         Q extends WriteRecordQuery,
+                                         I,
+                                         R extends Message>
             extends WriteQuery.Builder<B, Q> {
         private int idIndexInQuery;
         private int recordIndexInQuery;
         private IdColumn<I> idColumn;
         private I id;
-        private Record record;
+        private R record;
 
         public B setId(I id) {
             this.id = id;
             return getThis();
         }
 
-        public B setRecord(Record record) {
+        public B setRecord(R record) {
             this.record = record;
             return getThis();
         }

@@ -80,27 +80,27 @@ public class UpdateEventRecordQuery extends WriteRecordQuery<String, Event> {
         final EventContext context = event.getContext();
         final Timestamp timestamp = context.getTimestamp();
         try {
-            final byte[] serializedRecord = serialize(event);
-            statement.setBytes(1, serializedRecord);
+            final byte[] serializedEvent = serialize(event);
+            statement.setBytes(QueryParameter.EVENT.index, serializedEvent);
 
             final Any eventMessageAny = event.getMessage();
             final Message eventMessage = AnyPacker.unpack(eventMessageAny);
             final String eventType = TypeName.of(eventMessage);
-            statement.setString(2, eventType);
+            statement.setString(QueryParameter.EVENT_TYPE.index, eventType);
 
             final Any producerIdAny = context.getProducerId();
             final Message producerId = AnyPacker.unpack(producerIdAny);
             final String producerIdString = Stringifiers.idToString(producerId);
-            statement.setString(3, producerIdString);
+            statement.setString(QueryParameter.PRODUCER_ID.index, producerIdString);
 
             final long seconds = timestamp.getSeconds();
-            statement.setLong(4, seconds);
+            statement.setLong(QueryParameter.SECONDS.index, seconds);
 
             final int nanos = timestamp.getNanos();
-            statement.setInt(5, nanos);
+            statement.setInt(QueryParameter.NANOS.index, nanos);
 
             final String eventId = getId();
-            statement.setString(6, eventId);
+            statement.setString(QueryParameter.EVENT_ID.index, eventId);
         } catch (SQLException e) {
             logFailedToPrepareStatement(e);
             throw new DatabaseException(e);
@@ -115,7 +115,10 @@ public class UpdateEventRecordQuery extends WriteRecordQuery<String, Event> {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder extends WriteRecordQuery.Builder<Builder, UpdateEventRecordQuery, String, Event> {
+    public static class Builder extends WriteRecordQuery.Builder<Builder,
+                                                                 UpdateEventRecordQuery,
+                                                                 String,
+                                                                 Event> {
 
         @Override
         public UpdateEventRecordQuery build() {
@@ -125,6 +128,22 @@ public class UpdateEventRecordQuery extends WriteRecordQuery<String, Event> {
         @Override
         protected Builder getThis() {
             return this;
+        }
+    }
+
+    private enum QueryParameter {
+
+        EVENT(1),
+        EVENT_TYPE(2),
+        PRODUCER_ID(3),
+        SECONDS(4),
+        NANOS(5),
+        EVENT_ID(6);
+
+        private final int index;
+
+        QueryParameter(int index) {
+            this.index = index;
         }
     }
 }
