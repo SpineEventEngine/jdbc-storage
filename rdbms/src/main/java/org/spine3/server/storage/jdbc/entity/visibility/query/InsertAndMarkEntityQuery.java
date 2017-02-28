@@ -55,7 +55,9 @@ public class InsertAndMarkEntityQuery<I> extends MarkEntityQuery<I> {
         return new Builder<>();
     }
 
-    public static class Builder<I> extends AbstractMarkQueryBuilder<I, Builder<I>, InsertAndMarkEntityQuery<I>> {
+    public static class Builder<I> extends AbstractMarkQueryBuilder<I,
+                                                                    Builder<I>,
+                                                                    InsertAndMarkEntityQuery<I>> {
 
         @Override
         protected Builder<I> getThis() {

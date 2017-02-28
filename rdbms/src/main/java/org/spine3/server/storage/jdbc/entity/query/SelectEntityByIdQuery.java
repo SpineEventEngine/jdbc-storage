@@ -20,9 +20,9 @@
 
 package org.spine3.server.storage.jdbc.entity.query;
 
+import org.spine3.server.entity.EntityRecord;
 import org.spine3.server.entity.Visibility;
 import org.spine3.server.storage.VisibilityField;
-import org.spine3.server.entity.EntityRecord;
 import org.spine3.server.storage.jdbc.query.SelectByIdQuery;
 
 import javax.annotation.Nullable;
@@ -78,20 +78,20 @@ public class SelectEntityByIdQuery<I> extends SelectByIdQuery<I, EntityRecord> {
             return record;
         }
         final Visibility status = Visibility.newBuilder()
-                                                .setArchived(archived)
-                                                .setDeleted(deleted)
-                                                .build();
+                                            .setArchived(archived)
+                                            .setDeleted(deleted)
+                                            .build();
         final EntityRecord result = record.toBuilder()
-                                                 .setVisibility(status)
-                                                 .build();
+                                          .setVisibility(status)
+                                          .build();
         return result;
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
     public static class Builder<I> extends SelectByIdQuery.Builder<Builder<I>,
-            SelectEntityByIdQuery<I>,
-            I,
-            EntityRecord> {
+                                                                   SelectEntityByIdQuery<I>,
+                                                                   I,
+                                                                   EntityRecord> {
 
         @Override
         public SelectEntityByIdQuery<I> build() {

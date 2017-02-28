@@ -63,12 +63,9 @@ class QueryResults {
 
         while (resultSet.next()) {
             final EntityRecord record = readSingleMessage(resultSet);
-
             final S maskedMessage = maskFields(record, fieldMask);
-
             @SuppressWarnings("unchecked")
             final I id = (I) resultSet.getObject(EntityTable.ID_COL);
-
             resultBuilder.put(id, EntityRecord.newBuilder(record)
                                               .setState(AnyPacker.pack(maskedMessage))
                                               .build());

@@ -64,7 +64,10 @@ public class UpdateEntityQuery<I> extends WriteEntityQuery<I> {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder<I> extends WriteRecordQuery.Builder<Builder<I>, UpdateEntityQuery, I, EntityRecord> {
+    public static class Builder<I> extends WriteRecordQuery.Builder<Builder<I>,
+                                                                    UpdateEntityQuery,
+                                                                    I,
+                                                                    EntityRecord> {
 
         @Override
         public UpdateEntityQuery build() {

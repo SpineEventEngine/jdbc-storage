@@ -55,7 +55,9 @@ public class CreateVisibilityTableQuery extends CreateTableQuery<String> {
         return builder;
     }
 
-    public static class Builder extends CreateTableQuery.Builder<Builder, CreateVisibilityTableQuery, String> {
+    public static class Builder extends CreateTableQuery.Builder<Builder,
+                                                                 CreateVisibilityTableQuery,
+                                                                 String> {
 
         @Override
         public CreateVisibilityTableQuery build() {

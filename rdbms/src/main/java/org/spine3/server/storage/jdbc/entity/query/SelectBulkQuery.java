@@ -102,7 +102,6 @@ public class SelectBulkQuery<I> extends StorageQuery {
 
         for (int i = 0; i < arguments.size(); i++) {
             idColumn.setId(i + 1, arguments.get(i), sqlStatement);
-            //sqlStatement.setObject(i + 1, arguments.get(i));
         }
 
         final ResultSet resultSet = sqlStatement.executeQuery();
