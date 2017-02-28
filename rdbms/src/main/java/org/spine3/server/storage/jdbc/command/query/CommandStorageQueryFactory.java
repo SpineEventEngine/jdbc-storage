@@ -60,14 +60,12 @@ public class CommandStorageQueryFactory {
 
     /** Returns a query that creates a new {@link CommandTable} if it does not exist. */
     public CreateCommandTableQuery newCreateCommandTableQuery() {
-        final CreateCommandTableQuery.Builder builder = CreateCommandTableQuery.newBuilder()
-                                                                               .setDataSource(
-                                                                                       dataSource)
-                                                                               .setLogger(logger)
-                                                                               .setIdColumn(
-                                                                                       idColumn)
-                                                                               .setTableName(
-                                                                                       TABLE_NAME);
+        final CreateCommandTableQuery.Builder builder =
+                CreateCommandTableQuery.newBuilder()
+                                       .setDataSource(dataSource)
+                                       .setLogger(logger)
+                                       .setIdColumn(idColumn)
+                                       .setTableName(TABLE_NAME);
         return builder.build();
     }
 
@@ -78,13 +76,14 @@ public class CommandStorageQueryFactory {
      * @param record new command record
      */
     public InsertCommandQuery newInsertCommandQuery(CommandId id, CommandRecord record) {
-        final InsertCommandQuery.Builder builder = InsertCommandQuery.newBuilder()
-                                                                     .setDataSource(dataSource)
-                                                                     .setLogger(logger)
-                                                                     .setIdColumn(idColumn)
-                                                                     .setId(id.getUuid())
-                                                                     .setRecord(record)
-                                                                     .setStatus(record.getStatus().getCode());
+        final InsertCommandQuery.Builder builder =
+                InsertCommandQuery.newBuilder()
+                                  .setDataSource(dataSource)
+                                  .setLogger(logger)
+                                  .setIdColumn(idColumn)
+                                  .setId(id.getUuid())
+                                  .setRecord(record)
+                                  .setStatus(record.getStatus().getCode());
         return builder.build();
     }
 
@@ -95,13 +94,14 @@ public class CommandStorageQueryFactory {
      * @param record updated record state
      */
     public UpdateCommandQuery newUpdateCommandQuery(CommandId id, CommandRecord record) {
-        final UpdateCommandQuery.Builder builder = UpdateCommandQuery.newBuilder()
-                                                                     .setDataSource(dataSource)
-                                                                     .setLogger(logger)
-                                                                     .setIdColumn(idColumn)
-                                                                     .setId(id.getUuid())
-                                                                     .setRecord(record)
-                                                                     .setStatus(record.getStatus().getCode());
+        final UpdateCommandQuery.Builder builder =
+                UpdateCommandQuery.newBuilder()
+                                  .setDataSource(dataSource)
+                                  .setLogger(logger)
+                                  .setIdColumn(idColumn)
+                                  .setId(id.getUuid())
+                                  .setRecord(record)
+                                  .setStatus(record.getStatus().getCode());
         return builder.build();
     }
 
@@ -153,24 +153,22 @@ public class CommandStorageQueryFactory {
 
     /** Returns a query that selects {@link CommandRecord} by ID. */
     public SelectCommandByIdQuery newSelectCommandByIdQuery(CommandId id) {
-        final SelectCommandByIdQuery.Builder builder = SelectCommandByIdQuery.newBuilder()
-                                                                             .setDataSource(
-                                                                                     dataSource)
-                                                                             .setLogger(logger)
-                                                                             .setIdColumn(idColumn)
-                                                                             .setId(id.getUuid());
+        final SelectCommandByIdQuery.Builder builder =
+                SelectCommandByIdQuery.newBuilder()
+                                      .setDataSource(dataSource)
+                                      .setLogger(logger)
+                                      .setIdColumn(idColumn)
+                                      .setId(id.getUuid());
         return builder.build();
     }
 
     /** Returns a query that {@link CommandRecord} selects record by {@link CommandStatus}. */
     public SelectCommandByStatusQuery newSelectCommandByStatusQuery(CommandStatus status) {
-        final SelectCommandByStatusQuery.Builder builder = SelectCommandByStatusQuery.newBuilder()
-                                                                                     .setDataSource(
-                                                                                             dataSource)
-                                                                                     .setLogger(
-                                                                                             logger)
-                                                                                     .setStatus(
-                                                                                             status);
+        final SelectCommandByStatusQuery.Builder builder =
+                SelectCommandByStatusQuery.newBuilder()
+                                          .setDataSource(dataSource)
+                                          .setLogger(logger)
+                                          .setStatus(status);
         return builder.build();
     }
 }

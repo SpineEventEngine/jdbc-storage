@@ -25,8 +25,8 @@ import com.google.protobuf.FieldMask;
 import com.google.protobuf.Message;
 import org.spine3.protobuf.AnyPacker;
 import org.spine3.protobuf.TypeUrl;
-import org.spine3.server.entity.FieldMasks;
 import org.spine3.server.entity.EntityRecord;
+import org.spine3.server.entity.FieldMasks;
 import org.spine3.server.storage.jdbc.util.Serializer;
 
 import java.sql.ResultSet;
@@ -49,29 +49,29 @@ class QueryResults {
      *
      * @param resultSet Results of the query.
      * @param fieldMask {@code FieldMask} to apply to the results.
-     * @param <Id>      ID type of the {@link org.spine3.server.entity.Entity}.
-     * @param <State>   State type of the {@link org.spine3.server.entity.Entity}.
+     * @param <I>      ID type of the {@link org.spine3.server.entity.Entity}.
+     * @param <S>   S type of the {@link org.spine3.server.entity.Entity}.
      * @return ID-to-{@link EntityRecord} {@link Map} representing the query results.
      * @throws SQLException if read results contain no ID column or entity column.
      * @see EntityTable
      */
-    static <Id, State extends Message> Map<Id, EntityRecord> parse(
+    static <I, S extends Message> Map<I, EntityRecord> parse(
             ResultSet resultSet,
             FieldMask fieldMask)
             throws SQLException {
-        final ImmutableMap.Builder<Id, EntityRecord> resultBuilder = new ImmutableMap.Builder<>();
+        final ImmutableMap.Builder<I, EntityRecord> resultBuilder = new ImmutableMap.Builder<>();
 
         while (resultSet.next()) {
             final EntityRecord record = readSingleMessage(resultSet);
 
-            final State maskedMessage = maskFields(record, fieldMask);
+            final S maskedMessage = maskFields(record, fieldMask);
 
             @SuppressWarnings("unchecked")
-            final Id id = (Id) resultSet.getObject(EntityTable.ID_COL);
+            final I id = (I) resultSet.getObject(EntityTable.ID_COL);
 
             resultBuilder.put(id, EntityRecord.newBuilder(record)
-                                                     .setState(AnyPacker.pack(maskedMessage))
-                                                     .build());
+                                              .setState(AnyPacker.pack(maskedMessage))
+                                              .build());
         }
 
         resultSet.close();

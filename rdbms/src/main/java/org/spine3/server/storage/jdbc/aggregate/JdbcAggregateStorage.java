@@ -66,7 +66,7 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
      * Creates a new storage instance.
      *
      * @param dataSource   the dataSource wrapper
-     * @param multitenant  defines if this is storage multitenant or not
+     * @param multitenant  defines if this storage is multitenant or not
      * @param queryFactory factory that generates queries for interaction with aggregate tables
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */

@@ -53,6 +53,8 @@ import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ENTITY_COL
 import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
 
 /**
+ * A query for {@code INSERT}-ing multiple {@linkplain EntityRecord entity records} as a bulk.
+ *
  * @author Dmytro Dashenkov.
  */
 public class InsertEntityRecordsBulkQuery<I> extends WriteQuery {

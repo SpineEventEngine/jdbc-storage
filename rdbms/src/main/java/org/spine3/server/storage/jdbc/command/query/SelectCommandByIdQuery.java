@@ -75,13 +75,13 @@ public class SelectCommandByIdQuery extends SelectByIdQuery<String, CommandRecor
                                                  CommandRecord.getDescriptor());
         final CommandRecord.Builder builder = record.toBuilder();
         final String status = resultSet.getString(COMMAND_STATUS_COL);
-        if (status.equals(CommandStatus.forNumber(CommandStatus.OK_VALUE)
-                                       .name())) {
+        if (status.equals(CommandStatus.OK.name())) {
             final ProcessingStatus statusOk = ProcessingStatus.newBuilder()
                                                               .setCode(CommandStatus.OK)
                                                               .build();
-            return builder.setStatus(statusOk)
-                          .build();
+            final CommandRecord result = builder.setStatus(statusOk)
+                                                .build();
+            return result;
         }
         final byte[] errorBytes = resultSet.getBytes(ERROR_COL);
         if (errorBytes != null) {
@@ -90,8 +90,9 @@ public class SelectCommandByIdQuery extends SelectByIdQuery<String, CommandRecor
                                                                  .setCode(CommandStatus.ERROR)
                                                                  .setError(error)
                                                                  .build();
-            return builder.setStatus(statusError)
-                          .build();
+            final CommandRecord result = builder.setStatus(statusError)
+                                                .build();
+            return result;
         }
         final byte[] failureBytes = resultSet.getBytes(FAILURE_COL);
         if (failureBytes != null) {
@@ -100,8 +101,9 @@ public class SelectCommandByIdQuery extends SelectByIdQuery<String, CommandRecor
                                                                    .setCode(CommandStatus.FAILURE)
                                                                    .setFailure(failure)
                                                                    .build();
-            return builder.setStatus(statusFailure)
-                          .build();
+            final CommandRecord result = builder.setStatus(statusFailure)
+                                                .build();
+            return result;
         }
         return builder.build();
     }
