@@ -42,16 +42,16 @@ public class JdbcAggregateStorageShould extends AggregateStorageShould {
 
     @Override
     protected AggregateStorage<org.spine3.test.aggregate.ProjectId> getStorage() {
-        final JdbcAggregateStorage<ProjectId> storage = getStorage(
-                TestAggregateWithMessageId.class);
+        final JdbcAggregateStorage<ProjectId> storage =
+                getStorage(TestAggregateWithMessageId.class);
         return storage;
     }
 
     @Override
     protected <I> JdbcAggregateStorage<I> getStorage(
             Class<? extends Aggregate<I, ? extends Message, ?>> aggregateClass) {
-        final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(
-                "aggregateStorageTests");
+        final DataSourceWrapper dataSource =
+                GivenDataSource.whichIsStoredInMemory("aggregateStorageTests");
         final AggregateStorageQueryFactory<I> queryFactory =
                 new AggregateStorageQueryFactory<>(dataSource, aggregateClass);
         return JdbcAggregateStorage.newInstance(dataSource, false, queryFactory);
@@ -78,7 +78,9 @@ public class JdbcAggregateStorageShould extends AggregateStorageShould {
         storage.close();
     }
 
-    private static class TestAggregateWithMessageId extends Aggregate<ProjectId, Project, Project.Builder> {
+    private static class TestAggregateWithMessageId extends Aggregate<ProjectId,
+                                                                      Project,
+                                                                      Project.Builder> {
         private TestAggregateWithMessageId(ProjectId id) {
             super(id);
         }

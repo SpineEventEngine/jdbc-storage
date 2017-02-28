@@ -123,13 +123,13 @@ public class JdbcStandStorageShould extends StandStorageShould {
     @Test
     public void initialize_properly_without_multitenancy() {
         final DataSourceWrapper dataSourceMock = mock(DataSourceWrapper.class);
-        final RecordStorageQueryFactory<String> queryFactoryMock = (RecordStorageQueryFactory<String>) mock(
-                RecordStorageQueryFactory.class);
+        final RecordStorageQueryFactory<String> queryFactoryMock =
+                (RecordStorageQueryFactory<String>) mock(RecordStorageQueryFactory.class);
 
-        final CreateEntityTableQuery<String> queryMock = (CreateEntityTableQuery<String>) mock(
-                CreateEntityTableQuery.class);
-        final CreateVisibilityTableQuery statusQueryMock = mock(
-                CreateVisibilityTableQuery.class);
+        final CreateEntityTableQuery<String> queryMock =
+                (CreateEntityTableQuery<String>) mock(CreateEntityTableQuery.class);
+        final CreateVisibilityTableQuery statusQueryMock =
+                mock(CreateVisibilityTableQuery.class);
         when(queryFactoryMock.newCreateEntityTableQuery()).thenReturn(queryMock);
         when(queryFactoryMock.newCreateVisibilityTableQuery()).thenReturn(statusQueryMock);
         doNothing().when(queryMock)
@@ -155,11 +155,11 @@ public class JdbcStandStorageShould extends StandStorageShould {
     @SuppressWarnings("unchecked") // For mocks
     @Test(expected = NullPointerException.class)
     public void fail_to_initialize_without_data_source() {
-        final RecordStorageQueryFactory<String> queryFactoryMock = (RecordStorageQueryFactory<String>) mock(
-                RecordStorageQueryFactory.class);
+        final RecordStorageQueryFactory<String> queryFactoryMock =
+                (RecordStorageQueryFactory<String>) mock(RecordStorageQueryFactory.class);
 
-        final CreateEntityTableQuery<String> queryMock = (CreateEntityTableQuery<String>) mock(
-                CreateEntityTableQuery.class);
+        final CreateEntityTableQuery<String> queryMock = (CreateEntityTableQuery<String>)
+                mock(CreateEntityTableQuery.class);
         when(queryFactoryMock.newCreateEntityTableQuery()).thenReturn(queryMock);
         doNothing().when(queryMock)
                    .execute();
@@ -221,8 +221,8 @@ public class JdbcStandStorageShould extends StandStorageShould {
         ids.add(AggregateStateId.of("5", typeUrl));
         ids.add(AggregateStateId.of("8", typeUrl));
 
-        final Collection<EntityRecord> readRecords = (Collection<EntityRecord>) storage.readMultiple(
-                ids);
+        final Collection<EntityRecord> readRecords =
+                (Collection<EntityRecord>) storage.readMultiple(ids);
         assertEquals(ids.size(), readRecords.size());
 
         assertContains(records.get(1), readRecords);
@@ -244,8 +244,8 @@ public class JdbcStandStorageShould extends StandStorageShould {
         ids.add(AggregateStateId.of("invalid-id-2", typeUrl));
         ids.add(AggregateStateId.of(repeatingInvalidId, typeUrl));
 
-        final Collection<EntityRecord> records = (Collection<EntityRecord>) storage.readMultiple(
-                ids);
+        final Collection<EntityRecord> records = (Collection<EntityRecord>)
+                storage.readMultiple(ids);
 
         assertNotNull(records);
         assertSize(0, records);

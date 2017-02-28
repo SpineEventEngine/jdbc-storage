@@ -34,8 +34,8 @@ public class JdbcEventStorageShould extends EventStorageShould {
 
     @Override
     protected EventStorage getStorage() {
-        final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(
-                "eventStorageTests");
+        final DataSourceWrapper dataSource =
+                GivenDataSource.whichIsStoredInMemory("eventStorageTests");
         return JdbcEventStorage.newInstance(dataSource, false,
                                             new EventStorageQueryFactory(dataSource));
     }

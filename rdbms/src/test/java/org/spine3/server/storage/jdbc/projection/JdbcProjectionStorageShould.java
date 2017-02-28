@@ -43,15 +43,15 @@ public class JdbcProjectionStorageShould extends ProjectionStorageShould<String>
         final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(
                 "projectionStorageTests");
         final Class<TestProjection> projectionClass = TestProjection.class;
+        final ProjectionStorageQueryFactory<String> queryFactory =
+                new ProjectionStorageQueryFactory<>(dataSource, projectionClass);
+        final RecordStorageQueryFactory<String> recordQueryFactory =
+                new RecordStorageQueryFactory<>(dataSource, projectionClass);
         final JdbcRecordStorage<String> entityStorage = JdbcRecordStorage.newInstance(
                 dataSource,
                 false,
-                new RecordStorageQueryFactory<>(
-                        dataSource,
-                        projectionClass));
-        return JdbcProjectionStorage.newInstance(entityStorage, false,
-                                                 new ProjectionStorageQueryFactory<>(dataSource,
-                                                                                     projectionClass));
+                recordQueryFactory);
+        return JdbcProjectionStorage.newInstance(entityStorage, false, queryFactory);
     }
 
     @Override

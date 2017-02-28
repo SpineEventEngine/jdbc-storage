@@ -84,8 +84,8 @@ public class CloseablesShould {
         final AutoCloseable faulty = new FaultyClosable();
         final StatefulClosable stateful = new StatefulClosable();
 
-        final Collection<AutoCloseable> closeables = Lists.newArrayList(faulty,
-                                                                        stateful); // Needs to be ordered
+        final Collection<AutoCloseable> closeables =
+                Lists.newArrayList(faulty, stateful); // Needs to be ordered
         boolean success;
         try {
             Closeables.closeAll(closeables);

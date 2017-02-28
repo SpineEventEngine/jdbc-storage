@@ -53,8 +53,8 @@ public class GivenDataSource {
     private GivenDataSource() {
     }
 
-    public static DataSourceWrapper whichThrowsExceptionOnSettingStatementParam() throws
-                                                                                  SQLException {
+    public static DataSourceWrapper whichThrowsExceptionOnSettingStatementParam()
+            throws SQLException {
         final PreparedStatement preparedStatement = mock(PreparedStatement.class);
         final ConnectionWrapper connection = mock(ConnectionWrapper.class);
         final DataSourceWrapper dataSource = mock(DataSourceWrapper.class);
