@@ -39,7 +39,12 @@ import static org.spine3.server.storage.VisibilityField.archived;
 import static org.spine3.server.storage.VisibilityField.deleted;
 
 /**
+ * A default implementation of the {@link VisibilityHandlingStorageQueryFactory}.
+ *
+ * <p>The factory generates queries to the given table.
+ *
  * @author Dmytro Dashenkov.
+ * @see VisibilityQueryFactories
  */
 @Internal
 class VisibilityHandlingStorageQueryFactoryImpl<I> extends AbstractVisibilityHandlingStorageQueryFactory<I> {
@@ -61,9 +66,9 @@ class VisibilityHandlingStorageQueryFactoryImpl<I> extends AbstractVisibilityHan
     public CreateVisibilityTableQuery newCreateVisibilityTableQuery() {
         final CreateVisibilityTableQuery.Builder builder =
                 CreateVisibilityTableQuery.newBuilder()
-                                            .setDataSource(dataSource)
-                                            .setLogger(getLogger())
-                                            .setTableName(VisibilityTable.TABLE_NAME);
+                                          .setDataSource(dataSource)
+                                          .setLogger(getLogger())
+                                          .setTableName(VisibilityTable.TABLE_NAME);
         return builder.build();
     }
 
@@ -71,10 +76,10 @@ class VisibilityHandlingStorageQueryFactoryImpl<I> extends AbstractVisibilityHan
     public InsertVisibilityQuery newInsertVisibilityQuery(I id, Visibility visibility) {
         final InsertVisibilityQuery.Builder builder =
                 InsertVisibilityQuery.newBuilder()
-                                       .setDataSource(dataSource)
-                                       .setLogger(getLogger())
-                                       .setId(id)
-                                       .setVisibility(visibility);
+                                     .setDataSource(dataSource)
+                                     .setLogger(getLogger())
+                                     .setId(id)
+                                     .setVisibility(visibility);
         return builder.build();
     }
 
@@ -82,19 +87,20 @@ class VisibilityHandlingStorageQueryFactoryImpl<I> extends AbstractVisibilityHan
     public SelectVisibilityQuery newSelectVisibilityQuery(I id) {
         final SelectVisibilityQuery.Builder builder =
                 SelectVisibilityQuery.newBuilder()
-                                       .setDataSource(dataSource)
-                                       .setLogger(getLogger())
-                                       .setId(id);
+                                     .setDataSource(dataSource)
+                                     .setLogger(getLogger())
+                                     .setId(id);
         return builder.build();
     }
 
     @Override
     public UpdateVisibilityQuery newUpdateVisibilityQuery(I id, Visibility visibility) {
-        final UpdateVisibilityQuery.Builder builder = UpdateVisibilityQuery.<I>newBuilder()
-                .setDataSource(dataSource)
-                .setLogger(getLogger())
-                .setId(id)
-                .setVisibility(visibility);
+        final UpdateVisibilityQuery.Builder builder =
+                UpdateVisibilityQuery.<I>newBuilder()
+                                     .setDataSource(dataSource)
+                                     .setLogger(getLogger())
+                                     .setId(id)
+                                     .setVisibility(visibility);
         return builder.build();
     }
 
