@@ -195,6 +195,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
             final I id = unclassifiedRecord.getKey();
             final EntityRecord record = unclassifiedRecord.getValue();
             if (containsRecord(id)) {
+                // TODO:2017-03-01:dmytro.dashenkov: Improve testing for this branch.
                 queryFactory.newUpdateEntityQuery(id, record)
                             .execute();
             } else {
