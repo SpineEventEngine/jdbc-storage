@@ -83,26 +83,26 @@ public class InsertEventRecordQuery extends WriteRecordQuery<String, Event> {
         final Timestamp timestamp = context.getTimestamp();
         try {
             final String eventId = getId();
-            statement.setString(QueryParameter.EVENT_ID.index, eventId);
+            statement.setString(QueryParameter.EVENT_ID.getIndex(), eventId);
 
             final byte[] serializedEvent = serialize(event);
-            statement.setBytes(QueryParameter.EVENT.index, serializedEvent);
+            statement.setBytes(QueryParameter.EVENT.getIndex(), serializedEvent);
 
             final Any eventMessageAny = event.getMessage();
             final Message eventMessage = AnyPacker.unpack(eventMessageAny);
             final String eventType = TypeName.of(eventMessage);
-            statement.setString(QueryParameter.EVENT_TYPE.index, eventType);
+            statement.setString(QueryParameter.EVENT_TYPE.getIndex(), eventType);
 
             final Any producerIdAny = context.getProducerId();
             final Message producerId = AnyPacker.unpack(producerIdAny);
             final String producerIdString = Stringifiers.idToString(producerId);
-            statement.setString(QueryParameter.PRODUCER_ID.index, producerIdString);
+            statement.setString(QueryParameter.PRODUCER_ID.getIndex(), producerIdString);
 
             final long seconds = timestamp.getSeconds();
-            statement.setLong(QueryParameter.SECONDS.index, seconds);
+            statement.setLong(QueryParameter.SECONDS.getIndex(), seconds);
 
             final int nanos = timestamp.getNanos();
-            statement.setInt(QueryParameter.NANOS.index, nanos);
+            statement.setInt(QueryParameter.NANOS.getIndex(), nanos);
         } catch (SQLException e) {
             getLogger().error("Failed to build statement", e);
             throw new DatabaseException(e);
@@ -143,6 +143,10 @@ public class InsertEventRecordQuery extends WriteRecordQuery<String, Event> {
 
         QueryParameter(int index) {
             this.index = index;
+        }
+
+        public int getIndex() {
+            return index;
         }
     }
 }

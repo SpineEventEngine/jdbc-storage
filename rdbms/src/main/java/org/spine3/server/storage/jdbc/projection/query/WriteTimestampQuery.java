@@ -50,8 +50,8 @@ public abstract class WriteTimestampQuery extends WriteQuery {
         final long seconds = timestamp.getSeconds();
         final int nanos = timestamp.getNanos();
         try {
-            statement.setLong(QueryParameter.SECONDS.index, seconds);
-            statement.setInt(QueryParameter.NANOS.index, nanos);
+            statement.setLong(QueryParameter.SECONDS.getIndex(), seconds);
+            statement.setInt(QueryParameter.NANOS.getIndex(), nanos);
             return statement;
         } catch (SQLException e) {
             logFailedToPrepareStatement(e);
@@ -79,6 +79,10 @@ public abstract class WriteTimestampQuery extends WriteQuery {
 
         QueryParameter(int index) {
             this.index = index;
+        }
+
+        public int getIndex() {
+            return index;
         }
     }
 }

@@ -53,9 +53,9 @@ public class UpdateCommandQuery extends WriteCommandRecordQuery {
 
     public static Builder newBuilder() {
         final Builder builder = new Builder();
-        builder.setStatusIndexInQuery(QueryParameter.STATUS.index)
-               .setIdIndexInQuery(QueryParameter.ID.index)
-               .setRecordIndexInQuery(QueryParameter.RECORD.index)
+        builder.setStatusIndexInQuery(QueryParameter.STATUS.getIndex())
+               .setIdIndexInQuery(QueryParameter.ID.getIndex())
+               .setRecordIndexInQuery(QueryParameter.RECORD.getIndex())
                .setQuery(QUERY_TEMPLATE);
         return builder;
     }
@@ -84,6 +84,10 @@ public class UpdateCommandQuery extends WriteCommandRecordQuery {
 
         QueryParameter(int index) {
             this.index = index;
+        }
+
+        public int getIndex() {
+            return index;
         }
     }
 }

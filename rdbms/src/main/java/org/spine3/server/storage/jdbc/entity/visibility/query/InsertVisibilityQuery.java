@@ -63,9 +63,9 @@ public class InsertVisibilityQuery extends WriteQuery {
         final boolean archived = entityStatus.getArchived();
         final boolean deleted = entityStatus.getDeleted();
         try {
-            statement.setString(TableColumn.ID.index, id);
-            statement.setBoolean(TableColumn.ARCHIVED.index, archived);
-            statement.setBoolean(TableColumn.DELETED.index, deleted);
+            statement.setString(TableColumn.ID.getIndex(), id);
+            statement.setBoolean(TableColumn.ARCHIVED.getIndex(), archived);
+            statement.setBoolean(TableColumn.DELETED.getIndex(), deleted);
         } catch (SQLException e) {
             logWriteError(id, e);
             throw new DatabaseException(e);
