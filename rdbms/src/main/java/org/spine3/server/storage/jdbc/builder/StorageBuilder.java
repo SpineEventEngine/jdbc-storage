@@ -43,15 +43,15 @@ public abstract class StorageBuilder<B extends StorageBuilder<B, S, F>,
                                      S extends Storage,
                                      F extends QueryFactory> {
 
-    protected StorageBuilder() {
-        // Prevent accidental direct initialization
-    }
-
     private boolean multitenant;
 
     private DataSourceWrapper dataSource;
 
     private F queryFactory;
+
+    protected StorageBuilder() {
+        // Prevent accidental direct initialization
+    }
 
     public boolean isMultitenant() {
         return multitenant;
