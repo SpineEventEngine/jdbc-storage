@@ -54,7 +54,12 @@ public class JdbcAggregateStorageShould extends AggregateStorageShould {
                 GivenDataSource.whichIsStoredInMemory("aggregateStorageTests");
         final AggregateStorageQueryFactory<I> queryFactory =
                 new AggregateStorageQueryFactory<>(dataSource, aggregateClass);
-        return JdbcAggregateStorage.newInstance(dataSource, false, queryFactory);
+        final JdbcAggregateStorage<I> storage = JdbcAggregateStorage.<I>newBuilder()
+                                                                    .setQueryFactory(queryFactory)
+                                                                    .setMultitenant(false)
+                                                                    .setDataSource(dataSource)
+                                                                    .build();
+        return storage;
     }
 
     @Test

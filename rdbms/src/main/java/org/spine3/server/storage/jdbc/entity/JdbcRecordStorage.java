@@ -31,6 +31,7 @@ import org.spine3.server.entity.EntityRecord;
 import org.spine3.server.storage.RecordStorage;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.JdbcStorageFactory;
+import org.spine3.server.storage.jdbc.builder.StorageBuilder;
 import org.spine3.server.storage.jdbc.entity.query.RecordStorageQueryFactory;
 import org.spine3.server.storage.jdbc.entity.query.SelectBulkQuery;
 import org.spine3.server.storage.jdbc.query.DeleteRecordQuery;
@@ -56,21 +57,6 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
 
     private final RecordStorageQueryFactory<I> queryFactory;
 
-    /**
-     * Creates a new storage instance.
-     *
-     * @param dataSource   the data source wrapper
-     * @param multitenant  defines if this storage is multitenant or not
-     * @param queryFactory factory that generates queries for interaction with entity table
-     * @throws DatabaseException if an error occurs during an interaction with the DB
-     */
-    public static <I> JdbcRecordStorage<I> newInstance(DataSourceWrapper dataSource,
-                                                       boolean multitenant,
-                                                       RecordStorageQueryFactory<I> queryFactory)
-            throws DatabaseException {
-        return new JdbcRecordStorage<>(dataSource, multitenant, queryFactory);
-    }
-
     protected JdbcRecordStorage(DataSourceWrapper dataSource, boolean multitenant,
                                 RecordStorageQueryFactory<I> queryFactory)
             throws DatabaseException {
@@ -80,6 +66,10 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
         queryFactory.setLogger(LogSingleton.INSTANCE.value);
         queryFactory.newCreateEntityTableQuery()
                     .execute();
+    }
+
+    private JdbcRecordStorage(Builder<I> builder) {
+        this(builder.getDataSource(), builder.isMultitenant(), builder.getQueryFactory());
     }
 
     @SuppressWarnings("ProhibitedExceptionThrown") // NPE by the contract
@@ -231,6 +221,27 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     void clear() throws DatabaseException {
         queryFactory.newDeleteAllQuery()
                     .execute();
+    }
+
+    public static <I> Builder<I> newBuilder() {
+        return new Builder<>();
+    }
+
+    public static class Builder<I>
+            extends StorageBuilder<Builder<I>, JdbcRecordStorage<I>, RecordStorageQueryFactory<I>> {
+
+        private Builder() {
+        }
+
+        @Override
+        protected Builder<I> getThis() {
+            return this;
+        }
+
+        @Override
+        public JdbcRecordStorage<I> doBuild() {
+            return new JdbcRecordStorage<>(this);
+        }
     }
 
     private enum LogSingleton {

@@ -42,6 +42,7 @@ import org.spine3.server.event.EventStorage;
 import org.spine3.server.event.EventStreamQuery;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.JdbcStorageFactory;
+import org.spine3.server.storage.jdbc.builder.StorageBuilder;
 import org.spine3.server.storage.jdbc.event.query.EventStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbIterator;
@@ -99,6 +100,10 @@ public class JdbcEventStorage extends EventStorage {
         queryFactory.setLogger(LogSingleton.INSTANCE.value);
         queryFactory.newCreateEventTableQuery()
                     .execute();
+    }
+
+    private JdbcEventStorage(Builder builder) {
+        this(builder.getDataSource(), builder.isMultitenant(), builder.getQueryFactory());
     }
 
     /**
@@ -194,6 +199,19 @@ public class JdbcEventStorage extends EventStorage {
         closeAll(iterators);
         iterators.clear();
         dataSource.close();
+    }
+
+    public static class Builder extends StorageBuilder<Builder, JdbcEventStorage, EventStorageQueryFactory> {
+
+        @Override
+        protected Builder getThis() {
+            return this;
+        }
+
+        @Override
+        public JdbcEventStorage doBuild() {
+            return new JdbcEventStorage(this);
+        }
     }
 
     /**

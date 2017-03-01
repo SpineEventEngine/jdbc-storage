@@ -51,8 +51,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Creates storages based on JDBC-compliant RDBMS.
  *
- * @param <I> T type if the {@link Entity} that will be stored in the storages created by
- *           this factory.
+ * @param <I> ID type of the {@link Entity} that will be stored in the storages created by
+ *            this factory.
  * @author Alexander Litus
  * @author Andrey Lavrov
  * @author Dmytro Dashenkov
@@ -76,8 +76,13 @@ public class JdbcStorageFactory<I> implements StorageFactory {
 
     @Override
     public CommandStorage createCommandStorage() {
-        return JdbcCommandStorage.newInstance(dataSource, false,
-                                              getCommandStorageQueryFactory(dataSource));
+        final CommandStorageQueryFactory queryFactory = getCommandStorageQueryFactory(dataSource);
+        final CommandStorage storage = JdbcCommandStorage.newBuilder()
+                                                         .setQueryFactory(queryFactory)
+                                                         .setDataSource(dataSource)
+                                                         .setMultitenant(multitenant)
+                                                         .build();
+        return storage;
     }
 
     @Override
@@ -91,41 +96,51 @@ public class JdbcStorageFactory<I> implements StorageFactory {
         final RecordStorageQueryFactory<I> recordStorageQueryFactory =
                 getEntityStorageQueryFactory(dataSource, entityClass);
         return JdbcStandStorage.<I>newBuilder()
-                .setDataSource(dataSource)
-                .setMultitenant(isMultitenant())
-                .setRecordStorageQueryFactory(recordStorageQueryFactory)
-                .build();
+                               .setDataSource(dataSource)
+                               .setMultitenant(isMultitenant())
+                               .setQueryFactory(recordStorageQueryFactory)
+                               .build();
     }
 
     @Override
     public <I> AggregateStorage<I> createAggregateStorage(
             Class<? extends Aggregate<I, ?, ?>> aggregateClass) {
-        return JdbcAggregateStorage.newInstance(dataSource,
-                                                false,
-                                                getAggregateStorageQueryFactory(dataSource,
-                                                                                aggregateClass));
+        final AggregateStorageQueryFactory<I> queryFactory =
+                getAggregateStorageQueryFactory(dataSource, aggregateClass);
+        final JdbcAggregateStorage<I> storage = JdbcAggregateStorage.<I>newBuilder()
+                                                                    .setQueryFactory(queryFactory)
+                                                                    .setMultitenant(false)
+                                                                    .setDataSource(dataSource)
+                                                                    .build();
+        return storage;
     }
 
     @Override
     public <I> RecordStorage<I> createRecordStorage(Class<? extends Entity<I, ?>> entityClass) {
-        return JdbcRecordStorage.newInstance(
-                dataSource,
-                false,
-                getEntityStorageQueryFactory(dataSource, entityClass));
+        final RecordStorageQueryFactory<I> queryFactory = getEntityStorageQueryFactory(dataSource,
+                                                                                       entityClass);
+        final RecordStorage<I> recordStorage = JdbcRecordStorage.<I>newBuilder()
+                                                                .setDataSource(dataSource)
+                                                                .setMultitenant(false)
+                                                                .setQueryFactory(queryFactory)
+                                                                .build();
+        return recordStorage;
     }
 
     @Override
     public <I> ProjectionStorage<I> createProjectionStorage(
             Class<? extends Entity<I, ?>> projectionClass) {
-        final JdbcRecordStorage<I> entityStorage = JdbcRecordStorage.newInstance(
-                dataSource,
-                false,
-                getEntityStorageQueryFactory(dataSource, projectionClass));
+        final JdbcRecordStorage<I> entityStorage =
+                (JdbcRecordStorage<I>) createRecordStorage(projectionClass);
+        final ProjectionStorageQueryFactory<I> queryFactory =
+                getProjectionStorageQueryFactory(dataSource, projectionClass);
 
-        return JdbcProjectionStorage.newInstance(
-                entityStorage,
-                false,
-                getProjectionStorageQueryFactory(dataSource, projectionClass));
+        final ProjectionStorage<I> storage = JdbcProjectionStorage.<I>newBuilder()
+                                                                  .setMultitenant(multitenant)
+                                                                  .setQueryFactory(queryFactory)
+                                                                  .setRecordStorage(entityStorage)
+                                                                  .build();
+        return storage;
     }
 
     /**

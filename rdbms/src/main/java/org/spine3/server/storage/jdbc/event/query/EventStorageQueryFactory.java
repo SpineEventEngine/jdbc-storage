@@ -23,6 +23,7 @@ package org.spine3.server.storage.jdbc.event.query;
 import org.slf4j.Logger;
 import org.spine3.base.Event;
 import org.spine3.server.event.EventStreamQuery;
+import org.spine3.server.storage.jdbc.query.QueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
@@ -33,7 +34,7 @@ import static org.spine3.server.storage.jdbc.event.query.EventTable.TABLE_NAME;
  *
  * @author Andrey Lavrov
  */
-public class EventStorageQueryFactory {
+public class EventStorageQueryFactory implements QueryFactory {
 
     private final DataSourceWrapper dataSource;
     private final IdColumn<String> idColumn;

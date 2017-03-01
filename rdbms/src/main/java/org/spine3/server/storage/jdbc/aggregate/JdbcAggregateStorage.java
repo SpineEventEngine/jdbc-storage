@@ -28,6 +28,7 @@ import org.spine3.server.aggregate.AggregateStorage;
 import org.spine3.server.entity.Visibility;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.JdbcStorageFactory;
+import org.spine3.server.storage.jdbc.builder.StorageBuilder;
 import org.spine3.server.storage.jdbc.aggregate.query.AggregateStorageQueryFactory;
 import org.spine3.server.storage.jdbc.entity.visibility.VisibilityHandler;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
@@ -62,21 +63,6 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
 
     private final VisibilityHandler<I> visibilityHandler;
 
-    /**
-     * Creates a new storage instance.
-     *
-     * @param dataSource   the dataSource wrapper
-     * @param multitenant  defines if this storage is multitenant or not
-     * @param queryFactory factory that generates queries for interaction with aggregate tables
-     * @throws DatabaseException if an error occurs during an interaction with the DB
-     */
-    public static <I> JdbcAggregateStorage<I> newInstance(DataSourceWrapper dataSource,
-                                                          boolean multitenant,
-                                                          AggregateStorageQueryFactory<I> queryFactory)
-            throws DatabaseException {
-        return new JdbcAggregateStorage<>(dataSource, multitenant, queryFactory);
-    }
-
     protected JdbcAggregateStorage(DataSourceWrapper dataSource,
                                    boolean multitenant,
                                    AggregateStorageQueryFactory<I> queryFactory)
@@ -91,6 +77,10 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
                     .execute();
         this.visibilityHandler = new VisibilityHandler<>(queryFactory);
         visibilityHandler.initialize();
+    }
+
+    private JdbcAggregateStorage(Builder<I> builder) {
+        this(builder.getDataSource(), builder.isMultitenant(), builder.getQueryFactory());
     }
 
     @Override
@@ -183,6 +173,27 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
         closeAll(iterators);
         iterators.clear();
         dataSource.close();
+    }
+
+    public static <I> Builder<I> newBuilder() {
+        return new Builder<>();
+    }
+
+    public static class Builder<I> extends StorageBuilder<Builder<I>,
+                                                          JdbcAggregateStorage<I>,
+                                                          AggregateStorageQueryFactory<I>> {
+        private Builder() {
+        }
+
+        @Override
+        protected Builder<I> getThis() {
+            return this;
+        }
+
+        @Override
+        public JdbcAggregateStorage<I> doBuild() {
+            return new JdbcAggregateStorage<>(this);
+        }
     }
 
     private enum LogSingleton {

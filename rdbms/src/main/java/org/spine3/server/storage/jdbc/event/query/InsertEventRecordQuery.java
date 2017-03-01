@@ -104,7 +104,7 @@ public class InsertEventRecordQuery extends WriteRecordQuery<String, Event> {
             final int nanos = timestamp.getNanos();
             statement.setInt(QueryParameter.NANOS.getIndex(), nanos);
         } catch (SQLException e) {
-            getLogger().error("Failed to build statement", e);
+            getLogger().error("Failed to doBuild statement", e);
             throw new DatabaseException(e);
         }
         return statement;

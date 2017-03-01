@@ -46,10 +46,14 @@ public class JdbcAggregateStorageVisibilityHandlingShould extends AggregateStora
             Class<? extends Aggregate<ProjectId, ?, ?>> aggregateClass) {
         final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(
                 "aggregateStorageStatusHandlingTests");
-        return JdbcAggregateStorage.newInstance(dataSource, false,
-                                                new AggregateStorageQueryFactory<>(
-                                                        dataSource,
-                                                        aggregateClass));
+        final AggregateStorageQueryFactory<ProjectId> queryFactory =
+                new AggregateStorageQueryFactory<>(dataSource, TestAggregate.class);
+        final JdbcAggregateStorage<ProjectId> storage = JdbcAggregateStorage.<ProjectId>newBuilder()
+                                                                 .setQueryFactory(queryFactory)
+                                                                 .setMultitenant(false)
+                                                                 .setDataSource(dataSource)
+                                                                 .build();
+        return storage;
     }
 
     @SuppressWarnings("OptionalGetWithoutIsPresent") // We do check

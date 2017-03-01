@@ -34,9 +34,9 @@ import org.spine3.protobuf.TypeUrl;
 import org.spine3.server.entity.EntityRecord;
 import org.spine3.server.stand.AggregateStateId;
 import org.spine3.server.stand.StandStorage;
+import org.spine3.server.storage.jdbc.builder.StorageBuilder;
 import org.spine3.server.storage.jdbc.entity.JdbcRecordStorage;
 import org.spine3.server.storage.jdbc.entity.query.RecordStorageQueryFactory;
-import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
@@ -67,11 +67,16 @@ public class JdbcStandStorage extends StandStorage {
 
     @SuppressWarnings("unchecked")
     protected JdbcStandStorage(Builder builder) {
-        super(builder.isMultitenant);
-        recordStorage = JdbcRecordStorage.newInstance(
-                checkNotNull(builder.dataSource),
-                builder.isMultitenant,
-                checkNotNull(builder.recordStorageQueryFactory));
+        super(builder.isMultitenant());
+        // TODO:2017-03-01:dmytro.dashenkov: Fix redundant cast.
+        recordStorage =
+                (JdbcRecordStorage<Object>) JdbcRecordStorage.newBuilder()
+                                                             .setQueryFactory(
+                                                                     builder.getQueryFactory())
+                                                             .setDataSource(builder.getDataSource())
+                                                             .setMultitenant(
+                                                                     builder.isMultitenant())
+                                                             .build();
     }
 
     @Override
@@ -206,43 +211,27 @@ public class JdbcStandStorage extends StandStorage {
      * @param <I> ID type of the {@link org.spine3.server.entity.Entity} that will be stored in
      *            the {@code JdbcStandStorage}.
      */
-    public static class Builder<I> {
+    public static class Builder<I> extends StorageBuilder<Builder<I>,
+                                                              JdbcStandStorage,
+                                                              RecordStorageQueryFactory<I>> {
 
-        private boolean isMultitenant;
-        private DataSourceWrapper dataSource;
-        private RecordStorageQueryFactory<I> recordStorageQueryFactory;
-
-        private Builder() {
-        }
-
-        /**
-         * Sets optional field {@code isMultitenant}. {@code false} is the default value.
-         */
-        public Builder<I> setMultitenant(boolean multitenant) {
-            isMultitenant = multitenant;
+        @Override
+        protected Builder<I> getThis() {
             return this;
         }
 
         /**
-         * Sets required field {@code dataSource}.
+         * {@inheritDoc}
+         *
+         * <p>Overrides to guarantee the type compliance.
          */
-        public Builder<I> setDataSource(DataSourceWrapper dataSource) {
-            this.dataSource = dataSource;
-            return this;
+        @Override
+        public RecordStorageQueryFactory<I> getQueryFactory() {
+            return super.getQueryFactory();
         }
 
-        /**
-         * Sets required field {@code queryFactory}.
-         */
-        public Builder<I> setRecordStorageQueryFactory(RecordStorageQueryFactory<I> queryFactory) {
-            this.recordStorageQueryFactory = queryFactory;
-            return this;
-        }
-
-        /**
-         * @return New instance of {@code JdbcStandStorage}.
-         */
-        public JdbcStandStorage build() {
+        @Override
+        public JdbcStandStorage doBuild() {
             return new JdbcStandStorage(this);
         }
     }

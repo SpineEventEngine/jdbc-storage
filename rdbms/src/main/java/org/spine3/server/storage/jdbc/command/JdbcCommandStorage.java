@@ -27,10 +27,11 @@ import org.spine3.base.CommandId;
 import org.spine3.base.CommandStatus;
 import org.spine3.base.Error;
 import org.spine3.base.Failure;
-import org.spine3.server.command.CommandStorage;
 import org.spine3.server.command.CommandRecord;
+import org.spine3.server.command.CommandStorage;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.JdbcStorageFactory;
+import org.spine3.server.storage.jdbc.builder.StorageBuilder;
 import org.spine3.server.storage.jdbc.command.query.CommandStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
@@ -52,22 +53,6 @@ public class JdbcCommandStorage extends CommandStorage {
 
     private final CommandStorageQueryFactory queryFactory;
 
-    /**
-     * Creates a new storage instance.
-     *
-     * @param dataSource   a data source to obtain connections to
-     * @param multitenant  defines if this storage is multitenant or not
-     * @param queryFactory factory that generates queries for interaction with command table
-     * @return a new storage instance
-     * @throws DatabaseException if an error occurs during an interaction with the DB
-     */
-    public static CommandStorage newInstance(DataSourceWrapper dataSource,
-                                             boolean multitenant,
-                                             CommandStorageQueryFactory queryFactory)
-            throws DatabaseException {
-        return new JdbcCommandStorage(dataSource, multitenant, queryFactory);
-    }
-
     protected JdbcCommandStorage(DataSourceWrapper dataSource,
                                  boolean multitenant,
                                  CommandStorageQueryFactory queryFactory)
@@ -78,6 +63,10 @@ public class JdbcCommandStorage extends CommandStorage {
         queryFactory.setLogger(LogSingleton.INSTANCE.value);
         queryFactory.newCreateCommandTableQuery()
                     .execute();
+    }
+
+    private JdbcCommandStorage(Builder builder) throws DatabaseException {
+        this(builder.getDataSource(), builder.isMultitenant(), builder.getQueryFactory());
     }
 
     /**
@@ -193,6 +182,28 @@ public class JdbcCommandStorage extends CommandStorage {
             throw new IllegalStateException(e);
         }
         dataSource.close();
+    }
+
+    public static Builder newBuilder() {
+        return new Builder();
+    }
+
+    public static class Builder extends StorageBuilder<Builder,
+                                                       JdbcCommandStorage,
+                                                       CommandStorageQueryFactory> {
+
+        private Builder() {
+        }
+
+        @Override
+        protected Builder getThis() {
+            return this;
+        }
+
+        @Override
+        public JdbcCommandStorage doBuild() throws DatabaseException {
+            return new JdbcCommandStorage(this);
+        }
     }
 
     private enum LogSingleton {

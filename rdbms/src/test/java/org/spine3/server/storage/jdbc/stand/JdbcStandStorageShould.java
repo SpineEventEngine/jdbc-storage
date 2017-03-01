@@ -77,7 +77,7 @@ public class JdbcStandStorageShould extends StandStorageShould {
                 new RecordStorageQueryFactory<>(dataSource, StandStorageRecord.class);
         final StandStorage storage = JdbcStandStorage.newBuilder()
                                                      .setDataSource(dataSource)
-                                                     .setRecordStorageQueryFactory(queryFactory)
+                                                     .setQueryFactory(queryFactory)
                                                      .setMultitenant(false)
                                                      .build();
         return storage;
@@ -107,7 +107,7 @@ public class JdbcStandStorageShould extends StandStorageShould {
                    .execute();
 
         final StandStorage standStorage = JdbcStandStorage.<String>newBuilder()
-                .setRecordStorageQueryFactory(queryFactoryMock)
+                .setQueryFactory(queryFactoryMock)
                 .setDataSource(dataSourceMock)
                 .setMultitenant(false)
                 .build();
@@ -138,7 +138,7 @@ public class JdbcStandStorageShould extends StandStorageShould {
                    .execute();
 
         final StandStorage standStorage = JdbcStandStorage.<String>newBuilder()
-                .setRecordStorageQueryFactory(queryFactoryMock)
+                .setQueryFactory(queryFactoryMock)
                 .setDataSource(dataSourceMock)
                 .build();
 
@@ -146,14 +146,14 @@ public class JdbcStandStorageShould extends StandStorageShould {
         assertFalse(standStorage.isMultitenant());
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test(expected = IllegalStateException.class)
     public void fail_to_initialize_with_empty_builder() {
         JdbcStandStorage.newBuilder()
                         .build();
     }
 
     @SuppressWarnings("unchecked") // For mocks
-    @Test(expected = NullPointerException.class)
+    @Test(expected = IllegalStateException.class)
     public void fail_to_initialize_without_data_source() {
         final RecordStorageQueryFactory<String> queryFactoryMock =
                 (RecordStorageQueryFactory<String>) mock(RecordStorageQueryFactory.class);
@@ -165,12 +165,12 @@ public class JdbcStandStorageShould extends StandStorageShould {
                    .execute();
 
         JdbcStandStorage.<String>newBuilder()
-                .setRecordStorageQueryFactory(queryFactoryMock)
+                .setQueryFactory(queryFactoryMock)
                 .setMultitenant(false)
                 .build();
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test(expected = IllegalStateException.class)
     public void fail_to_initialize_without_query_factory() {
         final DataSourceWrapper dataSourceMock = mock(DataSourceWrapper.class);
 
@@ -476,7 +476,7 @@ public class JdbcStandStorageShould extends StandStorageShould {
                     TestAggregate.class);
 
             final StandStorage storage = JdbcStandStorage.<String>newBuilder()
-                    .setRecordStorageQueryFactory(queryFactory)
+                    .setQueryFactory(queryFactory)
                     .setDataSource(dataSource)
                     .build();
 

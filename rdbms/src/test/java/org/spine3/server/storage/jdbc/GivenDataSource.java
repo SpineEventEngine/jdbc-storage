@@ -53,6 +53,10 @@ public class GivenDataSource {
     private GivenDataSource() {
     }
 
+    public static DataSourceWrapper withoutSuperpowers() {
+        return mock(DataSourceWrapper.class);
+    }
+
     public static DataSourceWrapper whichThrowsExceptionOnSettingStatementParam()
             throws SQLException {
         final PreparedStatement preparedStatement = mock(PreparedStatement.class);

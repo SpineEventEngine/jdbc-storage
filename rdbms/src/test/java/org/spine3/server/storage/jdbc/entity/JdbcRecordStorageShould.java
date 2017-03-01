@@ -50,11 +50,15 @@ public class JdbcRecordStorageShould extends RecordStorageShould<String, JdbcRec
     protected JdbcRecordStorage<String> getStorage() {
         final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(
                 "entityStorageTests");
-        return JdbcRecordStorage.newInstance(dataSource,
-                                             false,
-                                             new RecordStorageQueryFactory<>(
-                                                     dataSource,
-                                                     TestEntityWithStringId.class));
+        final RecordStorageQueryFactory<String> queryFactory =
+                new RecordStorageQueryFactory<>(dataSource, TestEntityWithStringId.class);
+        final JdbcRecordStorage<String> storage =
+                JdbcRecordStorage.<String>newBuilder()
+                                 .setQueryFactory(queryFactory)
+                                 .setDataSource(dataSource)
+                                 .setMultitenant(false)
+                                 .build();
+        return storage;
     }
 
     @Override

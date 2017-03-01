@@ -23,6 +23,7 @@ package org.spine3.server.storage.jdbc.projection.query;
 import com.google.protobuf.Timestamp;
 import org.slf4j.Logger;
 import org.spine3.server.entity.Entity;
+import org.spine3.server.storage.jdbc.query.QueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
 import static org.spine3.server.storage.jdbc.projection.query.ProjectionTable.LAST_EVENT_TIME_TABLE_NAME_SUFFIX;
@@ -33,7 +34,7 @@ import static org.spine3.server.storage.jdbc.util.DbTableNameFactory.newTableNam
  *
  * @author Andrey Lavrov
  */
-public class ProjectionStorageQueryFactory<I> {
+public class ProjectionStorageQueryFactory<I> implements QueryFactory {
 
     private final String tableName;
     private final DataSourceWrapper dataSource;
