@@ -21,6 +21,7 @@
 package org.spine3.server.storage.jdbc.entity.visibility;
 
 import com.google.common.base.Optional;
+import com.google.protobuf.Message;
 import org.spine3.server.entity.Visibility;
 import org.spine3.server.storage.jdbc.entity.visibility.query.MarkEntityQuery;
 import org.spine3.server.storage.jdbc.entity.visibility.query.SelectVisibilityQuery;
@@ -78,7 +79,7 @@ public class VisibilityHandler<I> {
      *
      * @param id ID of the record
      * @return {@code Optional.absent()} if the {@linkplain Visibility} was not found or was
-     * {@linkplain org.spine3.validate.Validate#isDefault(com.google.protobuf.Message) default},
+     * {@linkplain org.spine3.validate.Validate#isDefault(Message) default},
      * {@code Optional.of)} otherwise
      * the record otherwise
      */
