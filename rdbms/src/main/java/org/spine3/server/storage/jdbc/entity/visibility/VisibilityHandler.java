@@ -22,6 +22,7 @@ package org.spine3.server.storage.jdbc.entity.visibility;
 
 import com.google.common.base.Optional;
 import org.spine3.server.entity.Visibility;
+import org.spine3.server.storage.jdbc.aggregate.query.AggregateStorageQueryFactory;
 import org.spine3.server.storage.jdbc.entity.visibility.query.MarkEntityQuery;
 import org.spine3.server.storage.jdbc.entity.visibility.query.SelectVisibilityQuery;
 
@@ -29,7 +30,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.spine3.validate.Validate.isDefault;
 
 /**
- * A helper component for handling operations with {@linkplain Visibility entity visibility}.
+ * A helper component for the
+ * {@linkplain org.spine3.server.storage.jdbc.aggregate.JdbcAggregateStorage} for handling
+ * operations with the {@linkplain Visibility entity visibility}.
  *
  * <p>To store the info about the {@linkplain Visibility entity visibility}
  * {@code VisibilityHandler} uses a separate table.
@@ -39,7 +42,7 @@ import static org.spine3.validate.Validate.isDefault;
  */
 public class VisibilityHandler<I> {
 
-    private final VisibilityHandlingStorageQueryFactory<I> queryFactory;
+    private final AggregateStorageQueryFactory<I> queryFactory;
 
     /**
      * Creates a new instance of the {@code VisibilityHandler}
@@ -47,7 +50,7 @@ public class VisibilityHandler<I> {
      * @param queryFactory a factory for generating the queries to the table in which the visibility
      *                     is stored
      */
-    public VisibilityHandler(VisibilityHandlingStorageQueryFactory<I> queryFactory) {
+    public VisibilityHandler(AggregateStorageQueryFactory<I> queryFactory) {
         this.queryFactory = checkNotNull(queryFactory);
     }
 

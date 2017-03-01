@@ -40,7 +40,6 @@ import org.spine3.server.storage.jdbc.GivenDataSource;
 import org.spine3.server.storage.jdbc.JdbcStandStorage;
 import org.spine3.server.storage.jdbc.entity.query.CreateEntityTableQuery;
 import org.spine3.server.storage.jdbc.entity.query.RecordStorageQueryFactory;
-import org.spine3.server.storage.jdbc.entity.visibility.query.CreateVisibilityTableQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.test.commandservice.customer.Customer;
 import org.spine3.test.storage.Project;
@@ -96,14 +95,8 @@ public class JdbcStandStorageShould extends StandStorageShould {
                 (RecordStorageQueryFactory<String>) mock(RecordStorageQueryFactory.class);
         final CreateEntityTableQuery<String> queryMock = (CreateEntityTableQuery<String>)
                 mock(CreateEntityTableQuery.class);
-        final CreateVisibilityTableQuery statusQueryMock =
-                mock(CreateVisibilityTableQuery.class);
-
         when(queryFactoryMock.newCreateEntityTableQuery()).thenReturn(queryMock);
-        when(queryFactoryMock.newCreateVisibilityTableQuery()).thenReturn(statusQueryMock);
         doNothing().when(queryMock)
-                   .execute();
-        doNothing().when(statusQueryMock)
                    .execute();
 
         final StandStorage standStorage = JdbcStandStorage.<String>newBuilder()
@@ -128,13 +121,8 @@ public class JdbcStandStorageShould extends StandStorageShould {
 
         final CreateEntityTableQuery<String> queryMock =
                 (CreateEntityTableQuery<String>) mock(CreateEntityTableQuery.class);
-        final CreateVisibilityTableQuery statusQueryMock =
-                mock(CreateVisibilityTableQuery.class);
         when(queryFactoryMock.newCreateEntityTableQuery()).thenReturn(queryMock);
-        when(queryFactoryMock.newCreateVisibilityTableQuery()).thenReturn(statusQueryMock);
         doNothing().when(queryMock)
-                   .execute();
-        doNothing().when(statusQueryMock)
                    .execute();
 
         final StandStorage standStorage = JdbcStandStorage.<String>newBuilder()

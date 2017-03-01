@@ -24,17 +24,9 @@ import com.google.protobuf.FieldMask;
 import org.slf4j.Logger;
 import org.spine3.server.entity.Entity;
 import org.spine3.server.entity.EntityRecord;
-import org.spine3.server.entity.Visibility;
 import org.spine3.server.storage.RecordStorage;
-import org.spine3.server.storage.jdbc.entity.visibility.AbstractVisibilityHandlingStorageQueryFactory;
-import org.spine3.server.storage.jdbc.entity.visibility.VisibilityHandlingStorageQueryFactory;
-import org.spine3.server.storage.jdbc.entity.visibility.VisibilityQueryFactories;
-import org.spine3.server.storage.jdbc.entity.visibility.query.CreateVisibilityTableQuery;
-import org.spine3.server.storage.jdbc.entity.visibility.query.InsertAndMarkEntityQuery;
-import org.spine3.server.storage.jdbc.entity.visibility.query.InsertVisibilityQuery;
+import org.spine3.server.storage.VisibilityField;
 import org.spine3.server.storage.jdbc.entity.visibility.query.MarkEntityQuery;
-import org.spine3.server.storage.jdbc.entity.visibility.query.SelectVisibilityQuery;
-import org.spine3.server.storage.jdbc.entity.visibility.query.UpdateVisibilityQuery;
 import org.spine3.server.storage.jdbc.query.DeleteRecordQuery;
 import org.spine3.server.storage.jdbc.query.QueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
@@ -43,6 +35,7 @@ import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import java.util.Map;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
 
 /**
@@ -51,13 +44,12 @@ import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
  * @author Andrey Lavrov
  * @author Dmytro Dashenkov
  */
-public class RecordStorageQueryFactory<I> extends AbstractVisibilityHandlingStorageQueryFactory<I>
-        implements QueryFactory{
+public class RecordStorageQueryFactory<I> implements QueryFactory {
 
     private final IdColumn<I> idColumn;
     private final DataSourceWrapper dataSource;
     private final String tableName;
-    private final VisibilityHandlingStorageQueryFactory<I> statusTableQueryFactory;
+    private Logger logger;
 
     /**
      * Creates a new instance.
@@ -71,64 +63,42 @@ public class RecordStorageQueryFactory<I> extends AbstractVisibilityHandlingStor
         this.idColumn = IdColumn.newInstance(entityClass);
         this.dataSource = dataSource;
         this.tableName = DbTableNameFactory.newTableName(entityClass);
-        this.statusTableQueryFactory = VisibilityQueryFactories.forTable(dataSource,
-                                                                         tableName,
-                                                                         idColumn);
     }
 
-    @Override
-    public CreateVisibilityTableQuery newCreateVisibilityTableQuery() {
-        return statusTableQueryFactory.newCreateVisibilityTableQuery();
-    }
-
-    @Override
-    public InsertVisibilityQuery newInsertVisibilityQuery(I id, Visibility visibility) {
-        return statusTableQueryFactory.newInsertVisibilityQuery(id, visibility);
-    }
-
-    @Override
-    public SelectVisibilityQuery newSelectVisibilityQuery(I id) {
-        return statusTableQueryFactory.newSelectVisibilityQuery(id);
-    }
-
-    @Override
-    public UpdateVisibilityQuery newUpdateVisibilityQuery(I id, Visibility visibility) {
-        return statusTableQueryFactory.newUpdateVisibilityQuery(id, visibility);
-    }
-
-    @Override
     public MarkEntityQuery<I> newMarkArchivedQuery(I id) {
-        return statusTableQueryFactory.newMarkArchivedQuery(id);
+        return newMarkQuery(id, VisibilityField.archived);
     }
 
-    @Override
     public MarkEntityQuery<I> newMarkDeletedQuery(I id) {
-        return statusTableQueryFactory.newMarkDeletedQuery(id);
+        return newMarkQuery(id, VisibilityField.deleted);
     }
 
-    @Override
-    public InsertAndMarkEntityQuery<I> newMarkArchivedNewEntityQuery(I id) {
-        throw new UnsupportedOperationException("The record must be present to mark it archived.");
+    private MarkEntityQuery<I> newMarkQuery(I id, VisibilityField column) {
+        final MarkEntityQuery<I> query = MarkEntityQuery.<I>newBuilder()
+                .setDataSource(dataSource)
+                .setLogger(getLogger())
+                .setTableName(tableName)
+                .setColumn(column)
+                .setIdColumn(idColumn)
+                .setId(id)
+                .build();
+        return query;
     }
 
-    @Override
-    public InsertAndMarkEntityQuery<I> newMarkDeletedNewEntityQuery(I id) {
-        throw new UnsupportedOperationException("The record must be present to mark it deleted.");
-    }
-
-    /** Sets the logger for logging exceptions during queries execution. */
-    @Override
+    /**
+     * Sets the logger for logging exceptions during queries execution.
+     */
     public void setLogger(Logger logger) {
-        super.setLogger(logger);
-        if (statusTableQueryFactory instanceof AbstractVisibilityHandlingStorageQueryFactory) {
-            // Overriding implementations might want to use their own query factory
-            final AbstractVisibilityHandlingStorageQueryFactory<I> abstractQueryFactory =
-                    (AbstractVisibilityHandlingStorageQueryFactory<I>) statusTableQueryFactory;
-            abstractQueryFactory.setLogger(logger);
-        }
+        this.logger = checkNotNull(logger);
     }
 
-    /** Returns a query that creates a new {@link EntityTable} if it does not exist. */
+    public Logger getLogger() {
+        return logger;
+    }
+
+    /**
+     * Returns a query that creates a new {@link EntityTable} if it does not exist.
+     */
     public CreateEntityTableQuery newCreateEntityTableQuery() {
         final CreateEntityTableQuery.Builder<I> builder =
                 CreateEntityTableQuery.<I>newBuilder()
@@ -171,7 +141,9 @@ public class RecordStorageQueryFactory<I> extends AbstractVisibilityHandlingStor
         return builder.build();
     }
 
-    /** Returns a query that selects {@link EntityRecord} by ID. */
+    /**
+     * Returns a query that selects {@link EntityRecord} by ID.
+     */
     public SelectEntityByIdQuery<I> newSelectEntityByIdQuery(I id) {
         final SelectEntityByIdQuery.Builder<I> builder =
                 SelectEntityByIdQuery.<I>newBuilder(tableName)
@@ -193,7 +165,9 @@ public class RecordStorageQueryFactory<I> extends AbstractVisibilityHandlingStor
         return builder.build();
     }
 
-    /** Returns a query that deletes all from {@link EntityTable}. */
+    /**
+     * Returns a query that deletes all from {@link EntityTable}.
+     */
     public DeleteAllQuery newDeleteAllQuery() {
         final DeleteAllQuery.Builder builder = DeleteAllQuery.newBuilder(tableName)
                                                              .setDataSource(dataSource)

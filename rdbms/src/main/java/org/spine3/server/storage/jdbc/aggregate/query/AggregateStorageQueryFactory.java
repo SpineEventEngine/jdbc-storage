@@ -25,20 +25,22 @@ import org.spine3.server.aggregate.Aggregate;
 import org.spine3.server.aggregate.AggregateEventRecord;
 import org.spine3.server.aggregate.AggregateStorage;
 import org.spine3.server.entity.Visibility;
-import org.spine3.server.storage.jdbc.entity.visibility.AbstractVisibilityHandlingStorageQueryFactory;
-import org.spine3.server.storage.jdbc.entity.visibility.VisibilityHandlingStorageQueryFactory;
-import org.spine3.server.storage.jdbc.entity.visibility.VisibilityQueryFactories;
+import org.spine3.server.storage.VisibilityField;
 import org.spine3.server.storage.jdbc.entity.visibility.query.CreateVisibilityTableQuery;
 import org.spine3.server.storage.jdbc.entity.visibility.query.InsertAndMarkEntityQuery;
 import org.spine3.server.storage.jdbc.entity.visibility.query.InsertVisibilityQuery;
 import org.spine3.server.storage.jdbc.entity.visibility.query.MarkEntityQuery;
 import org.spine3.server.storage.jdbc.entity.visibility.query.SelectVisibilityQuery;
 import org.spine3.server.storage.jdbc.entity.visibility.query.UpdateVisibilityQuery;
+import org.spine3.server.storage.jdbc.entity.visibility.table.VisibilityTable;
 import org.spine3.server.storage.jdbc.query.QueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbTableNameFactory;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.spine3.server.storage.VisibilityField.archived;
+import static org.spine3.server.storage.VisibilityField.deleted;
 import static org.spine3.server.storage.jdbc.aggregate.query.Table.EventCount.EVENT_COUNT_TABLE_NAME_SUFFIX;
 
 /**
@@ -47,14 +49,14 @@ import static org.spine3.server.storage.jdbc.aggregate.query.Table.EventCount.EV
  * @param <I> the type of IDs used in the storage
  * @author Andrey Lavrov
  */
-public class AggregateStorageQueryFactory<I>
-        extends AbstractVisibilityHandlingStorageQueryFactory<I> implements QueryFactory {
+public class AggregateStorageQueryFactory<I> implements QueryFactory {
 
     private final IdColumn<I> idColumn;
     private final String mainTableName;
     private final String eventCountTableName;
     private final DataSourceWrapper dataSource;
-    private final VisibilityHandlingStorageQueryFactory<I> statusTableQueryFactory;
+
+    private Logger logger;
 
     /**
      * Creates a new instance.
@@ -71,61 +73,93 @@ public class AggregateStorageQueryFactory<I>
         this.mainTableName = DbTableNameFactory.newTableName(aggregateClass);
         this.eventCountTableName = mainTableName + EVENT_COUNT_TABLE_NAME_SUFFIX;
         this.dataSource = dataSource;
-        this.statusTableQueryFactory =
-                (VisibilityHandlingStorageQueryFactory<I>) VisibilityQueryFactories
-                        .forSeparateTable(dataSource);
     }
 
-    @Override
     public CreateVisibilityTableQuery newCreateVisibilityTableQuery() {
-        return statusTableQueryFactory.newCreateVisibilityTableQuery();
+        final CreateVisibilityTableQuery.Builder builder =
+                CreateVisibilityTableQuery.newBuilder()
+                                          .setDataSource(dataSource)
+                                          .setLogger(getLogger())
+                                          .setTableName(VisibilityTable.TABLE_NAME);
+        return builder.build();
     }
 
-    @Override
     public InsertVisibilityQuery newInsertVisibilityQuery(I id, Visibility visibility) {
-        return statusTableQueryFactory.newInsertVisibilityQuery(id, visibility);
+        final InsertVisibilityQuery.Builder builder =
+                InsertVisibilityQuery.newBuilder()
+                                     .setDataSource(dataSource)
+                                     .setLogger(getLogger())
+                                     .setId(id)
+                                     .setVisibility(visibility);
+        return builder.build();
     }
 
-    @Override
     public SelectVisibilityQuery newSelectVisibilityQuery(I id) {
-        return statusTableQueryFactory.newSelectVisibilityQuery(id);
+        final SelectVisibilityQuery.Builder builder =
+                SelectVisibilityQuery.newBuilder()
+                                     .setDataSource(dataSource)
+                                     .setLogger(getLogger())
+                                     .setId(id);
+        return builder.build();
     }
 
-    @Override
     public UpdateVisibilityQuery newUpdateVisibilityQuery(I id, Visibility visibility) {
-        return statusTableQueryFactory.newUpdateVisibilityQuery(id, visibility);
+        final UpdateVisibilityQuery.Builder builder =
+                UpdateVisibilityQuery.<I>newBuilder()
+                        .setDataSource(dataSource)
+                        .setLogger(getLogger())
+                        .setId(id)
+                        .setVisibility(visibility);
+        return builder.build();
     }
 
-    @Override
     public MarkEntityQuery<I> newMarkArchivedQuery(I id) {
-        return statusTableQueryFactory.newMarkArchivedQuery(id);
+        return newMarkQuery(id, archived);
     }
 
-    @Override
     public MarkEntityQuery<I> newMarkDeletedQuery(I id) {
-        return statusTableQueryFactory.newMarkDeletedQuery(id);
+        return newMarkQuery(id, deleted);
     }
 
-    @Override
     public InsertAndMarkEntityQuery<I> newMarkArchivedNewEntityQuery(I id) {
-        return statusTableQueryFactory.newMarkArchivedNewEntityQuery(id);
+        return newInsertAndMarkEntityQuery(id, archived);
     }
 
-    @Override
     public InsertAndMarkEntityQuery<I> newMarkDeletedNewEntityQuery(I id) {
-        return statusTableQueryFactory.newMarkDeletedNewEntityQuery(id);
+        return newInsertAndMarkEntityQuery(id, deleted);
+    }
+
+    private InsertAndMarkEntityQuery<I> newInsertAndMarkEntityQuery(I id, VisibilityField column) {
+        final InsertAndMarkEntityQuery<I> query = InsertAndMarkEntityQuery.<I>newInsertBuilder()
+                .setDataSource(dataSource)
+                .setLogger(getLogger())
+                .setTableName(VisibilityTable.TABLE_NAME)
+                .setColumn(column)
+                .setIdColumn(idColumn)
+                .setId(id)
+                .build();
+        return query;
+    }
+
+    private MarkEntityQuery<I> newMarkQuery(I id, VisibilityField column) {
+        final MarkEntityQuery<I> query = MarkEntityQuery.<I>newBuilder()
+                .setDataSource(dataSource)
+                .setLogger(getLogger())
+                .setTableName(VisibilityTable.TABLE_NAME)
+                .setColumn(column)
+                .setIdColumn(idColumn)
+                .setId(id)
+                .build();
+        return query;
     }
 
     /** Sets the logger for logging exceptions during queries execution. */
-    @Override
     public void setLogger(Logger logger) {
-        super.setLogger(logger);
-        if (statusTableQueryFactory instanceof AbstractVisibilityHandlingStorageQueryFactory) {
-            // Overriding implementations might want to use their own query factory
-            final AbstractVisibilityHandlingStorageQueryFactory<I> abstractQueryFactory =
-                    (AbstractVisibilityHandlingStorageQueryFactory<I>) statusTableQueryFactory;
-            abstractQueryFactory.setLogger(logger);
-        }
+        this.logger = checkNotNull(logger);
+    }
+
+    public Logger getLogger() {
+        return logger;
     }
 
     /** Returns a query that creates a new {@link Table.AggregateRecord} if it does not exist. */
