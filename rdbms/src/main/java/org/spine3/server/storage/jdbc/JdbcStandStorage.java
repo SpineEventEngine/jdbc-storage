@@ -68,15 +68,13 @@ public class JdbcStandStorage extends StandStorage {
     @SuppressWarnings("unchecked")
     protected JdbcStandStorage(Builder builder) {
         super(builder.isMultitenant());
-        // TODO:2017-03-01:dmytro.dashenkov: Fix redundant cast.
-        recordStorage =
-                (JdbcRecordStorage<Object>) JdbcRecordStorage.newBuilder()
-                                                             .setQueryFactory(
-                                                                     builder.getQueryFactory())
-                                                             .setDataSource(builder.getDataSource())
-                                                             .setMultitenant(
-                                                                     builder.isMultitenant())
-                                                             .build();
+        final RecordStorageQueryFactory<Object> recordStorageQueryFactory =
+                builder.getQueryFactory();
+        recordStorage = JdbcRecordStorage.newBuilder()
+                                         .setDataSource(builder.getDataSource())
+                                         .setMultitenant(builder.isMultitenant())
+                                         .setQueryFactory(recordStorageQueryFactory)
+                                         .build();
     }
 
     @Override
