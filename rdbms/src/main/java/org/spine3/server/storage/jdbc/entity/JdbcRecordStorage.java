@@ -80,8 +80,9 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
                                                  .execute();
         if (!recordExists) {
             // The NPE is required by the contract of the method
-            throw new NullPointerException(
-                    String.format("Trying to mark not existing record with id %s archived.", id));
+            final String errorMessage =
+                    String.format("Trying to mark not existing record with id %s archived.", id);
+            throw new NullPointerException(errorMessage); // NOPMD
         }
     }
 
@@ -93,8 +94,9 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
                                                  .execute();
         if (!recordExists) {
             // The NPE is required by the contract of the method
-            throw new NullPointerException(
-                    String.format("Trying to mark not existing record with id %s deleted.", id));
+            final String errorMessage =
+                    String.format("Trying to mark not existing record with id %s deleted.", id);
+            throw new NullPointerException(errorMessage); // NOPMD
         }
     }
 
