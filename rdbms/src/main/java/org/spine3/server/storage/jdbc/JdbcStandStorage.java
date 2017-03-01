@@ -179,10 +179,10 @@ public class JdbcStandStorage extends StandStorage {
                 new ImmutableMap.Builder<>();
 
         for (Map.Entry<?, EntityRecord> entry : records.entrySet()) {
-            final AggregateStateId id = AggregateStateId.of(entry.getKey(), TypeUrl.of(
-                    entry.getValue()
-                         .getState()
-                         .getTypeUrl()));
+            final TypeUrl typeUrl = TypeUrl.of(entry.getValue()
+                                                    .getState()
+                                                    .getTypeUrl());
+            final AggregateStateId id = AggregateStateId.of(entry.getKey(), typeUrl);
             result.put(id, entry.getValue());
         }
 

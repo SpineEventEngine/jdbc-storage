@@ -51,6 +51,8 @@ public class MarkEntityQuery<I> extends StorageQuery {
 
     private static final String FORMAT_PLACEHOLDER = "%s";
 
+    private static final int ID_PARAM_INDEX = 1;
+
     private static final String SQL_TEMPLATE = UPDATE + FORMAT_PLACEHOLDER + SET +
                                                FORMAT_PLACEHOLDER + EQUAL + TRUE +
                                                WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
@@ -67,7 +69,7 @@ public class MarkEntityQuery<I> extends StorageQuery {
     @Override
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
         final PreparedStatement statement = super.prepareStatement(connection);
-        idColumn.setId(1, id, statement);
+        idColumn.setId(ID_PARAM_INDEX, id, statement);
 
         return statement;
     }

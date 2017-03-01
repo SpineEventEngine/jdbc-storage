@@ -35,7 +35,7 @@ import org.spine3.server.storage.jdbc.entity.visibility.query.InsertVisibilityQu
 import org.spine3.server.storage.jdbc.entity.visibility.query.MarkEntityQuery;
 import org.spine3.server.storage.jdbc.entity.visibility.query.SelectVisibilityQuery;
 import org.spine3.server.storage.jdbc.entity.visibility.query.UpdateVisibilityQuery;
-import org.spine3.server.storage.jdbc.query.DeleteRowQuery;
+import org.spine3.server.storage.jdbc.query.DeleteRecordQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbTableNameFactory;
 import org.spine3.server.storage.jdbc.util.IdColumn;
@@ -161,11 +161,11 @@ public class RecordStorageQueryFactory<I> extends AbstractVisibilityHandlingStor
      */
     public UpdateEntityQuery newUpdateEntityQuery(I id, EntityRecord record) {
         final UpdateEntityQuery.Builder<I> builder = UpdateEntityQuery.<I>newBuilder(tableName)
-                                                                     .setDataSource(dataSource)
-                                                                     .setLogger(getLogger())
-                                                                     .setIdColumn(idColumn)
-                                                                     .setId(id)
-                                                                     .setRecord(record);
+                                                                      .setDataSource(dataSource)
+                                                                      .setLogger(getLogger())
+                                                                      .setIdColumn(idColumn)
+                                                                      .setId(id)
+                                                                      .setRecord(record);
         return builder.build();
     }
 
@@ -180,8 +180,8 @@ public class RecordStorageQueryFactory<I> extends AbstractVisibilityHandlingStor
         return builder.build();
     }
 
-    public DeleteRowQuery<I> newDeleteRowQuery(I id) {
-        final DeleteRowQuery.Builder<I> builder = DeleteRowQuery.<I>newBuilder()
+    public DeleteRecordQuery<I> newDeleteRowQuery(I id) {
+        final DeleteRecordQuery.Builder<I> builder = DeleteRecordQuery.<I>newBuilder()
                                                                 .setDataSource(dataSource)
                                                                 .setLogger(getLogger())
                                                                 .setTableName(tableName)
@@ -201,20 +201,20 @@ public class RecordStorageQueryFactory<I> extends AbstractVisibilityHandlingStor
 
     public SelectBulkQuery newSelectAllQuery(FieldMask fieldMask) {
         final SelectBulkQuery.Builder<I> builder = SelectBulkQuery.<I>newBuilder(tableName)
-                                                                 .setFieldMask(fieldMask)
-                                                                 .setLogger(getLogger())
-                                                                 .setDataSource(dataSource);
+                                                                  .setFieldMask(fieldMask)
+                                                                  .setLogger(getLogger())
+                                                                  .setDataSource(dataSource);
 
         return builder.build();
     }
 
     public SelectBulkQuery<I> newSelectBulkQuery(Iterable<I> ids, FieldMask fieldMask) {
         final SelectBulkQuery.Builder<I> builder = SelectBulkQuery.<I>newBuilder()
-                                                                 .setIdColumn(idColumn)
-                                                                 .setIdsQuery(tableName, ids)
-                                                                 .setFieldMask(fieldMask)
-                                                                 .setLogger(getLogger())
-                                                                 .setDataSource(dataSource);
+                                                                  .setIdColumn(idColumn)
+                                                                  .setIdsQuery(tableName, ids)
+                                                                  .setFieldMask(fieldMask)
+                                                                  .setLogger(getLogger())
+                                                                  .setDataSource(dataSource);
 
         return builder.build();
     }

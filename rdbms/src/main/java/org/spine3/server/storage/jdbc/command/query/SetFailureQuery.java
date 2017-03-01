@@ -54,8 +54,8 @@ public class SetFailureQuery extends WriteRecordQuery<String, Failure> {
 
     public static Builder newBuilder() {
         final Builder builder = new Builder();
-        builder.setIdIndexInQuery(2)
-               .setRecordIndexInQuery(1)
+        builder.setIdIndexInQuery(QueryParameter.ID.getIndex())
+               .setRecordIndexInQuery(QueryParameter.RECORD.getIndex())
                .setQuery(QUERY_TEMPLATE);
         return builder;
     }
@@ -71,6 +71,22 @@ public class SetFailureQuery extends WriteRecordQuery<String, Failure> {
         @Override
         protected Builder getThis() {
             return this;
+        }
+    }
+
+    private enum QueryParameter {
+
+        RECORD(1),
+        ID(2);
+
+        private final int index;
+
+        QueryParameter(int index) {
+            this.index = index;
+        }
+
+        public int getIndex() {
+            return index;
         }
     }
 }

@@ -39,7 +39,7 @@ import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
  *
  * @author Dmytro Dashenkov.
  */
-public class DeleteRowQuery<I> extends StorageQuery {
+public class DeleteRecordQuery<I> extends StorageQuery {
 
     private static final String FORMAT_PLACEHOLDER = "%s";
 
@@ -51,7 +51,7 @@ public class DeleteRowQuery<I> extends StorageQuery {
     private final I id;
     private final IdColumn<I> idColumn;
 
-    protected DeleteRowQuery(Builder<I> builder) {
+    protected DeleteRecordQuery(Builder<I> builder) {
         super(builder);
         this.id = builder.columnValue;
         this.idColumn = builder.idColumn;
@@ -79,7 +79,7 @@ public class DeleteRowQuery<I> extends StorageQuery {
         return new Builder<>();
     }
 
-    public static class Builder<I> extends StorageQuery.Builder<Builder<I>, DeleteRowQuery> {
+    public static class Builder<I> extends StorageQuery.Builder<Builder<I>, DeleteRecordQuery> {
 
         private String column;
         private I columnValue;
@@ -106,14 +106,14 @@ public class DeleteRowQuery<I> extends StorageQuery {
         }
 
         @Override
-        public DeleteRowQuery<I> build() {
-            checkNotNull(column, "ID column name must be set first");
-            checkNotNull(idColumn, "ID column must be set first");
-            checkNotNull(columnValue, "ID must be set first");
-            checkNotNull(table, "Table must be set first");
+        public DeleteRecordQuery<I> build() {
+            checkNotNull(column, "ID column name must be set");
+            checkNotNull(idColumn, "ID column must be set");
+            checkNotNull(columnValue, "ID must be set");
+            checkNotNull(table, "Table must be set");
             final String sql = composeSql();
             setQuery(sql);
-            return new DeleteRowQuery<>(this);
+            return new DeleteRecordQuery<>(this);
         }
 
         @Override

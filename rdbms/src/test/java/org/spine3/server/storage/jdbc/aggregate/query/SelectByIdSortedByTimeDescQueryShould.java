@@ -57,6 +57,5 @@ public class SelectByIdSortedByTimeDescQueryShould {
         } catch (DatabaseException dbe) {
             verify(loggerMock).error(anyString(), eq(dbe.getCause()));
         }
-
     }
 }

@@ -44,7 +44,7 @@ import static org.spine3.server.storage.jdbc.entity.visibility.table.VisibilityT
  */
 public class InsertVisibilityQuery extends WriteQuery {
 
-    private static final int COLUMN_COUNT = 3;
+    private static final int COLUMN_COUNT = TableColumn.values().length;
     private static final String SQL = INSERT_INTO + TABLE_NAME +
                                       VALUES + nPlaceholders(COLUMN_COUNT) + SEMICOLON;
 
@@ -119,6 +119,10 @@ public class InsertVisibilityQuery extends WriteQuery {
 
         TableColumn(int index) {
             this.index = index;
+        }
+
+        public int getIndex() {
+            return index;
         }
     }
 }

@@ -33,7 +33,7 @@ import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.JdbcStorageFactory;
 import org.spine3.server.storage.jdbc.entity.query.RecordStorageQueryFactory;
 import org.spine3.server.storage.jdbc.entity.query.SelectBulkQuery;
-import org.spine3.server.storage.jdbc.query.DeleteRowQuery;
+import org.spine3.server.storage.jdbc.query.DeleteRecordQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
 import java.sql.SQLException;
@@ -112,7 +112,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     public boolean delete(I id) {
         checkNotNull(id);
 
-        final DeleteRowQuery<I> query = queryFactory.newDeleteRowQuery(id);
+        final DeleteRecordQuery<I> query = queryFactory.newDeleteRowQuery(id);
         final boolean result = query.execute();
         return result;
     }

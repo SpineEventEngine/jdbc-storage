@@ -29,7 +29,8 @@ import org.spine3.server.storage.jdbc.entity.visibility.query.SelectVisibilityQu
 import org.spine3.server.storage.jdbc.entity.visibility.query.UpdateVisibilityQuery;
 
 /**
- * And interface for managing a table for storing the {@linkplain Visibility entity visibility}.
+ * An interface for generating queries to a table storing the
+ * {@linkplain Visibility entity visibility}.
  *
  * @param <I> ID type of the entity visibility of which is stored
  * @author Dmytro Dashenkov.

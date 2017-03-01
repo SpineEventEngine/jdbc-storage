@@ -55,9 +55,9 @@ public class InsertCommandQuery extends WriteCommandRecordQuery {
 
     public static Builder newBuilder() {
         final Builder builder = new Builder();
-        builder.setStatusIndexInQuery(2)
-               .setIdIndexInQuery(1)
-               .setRecordIndexInQuery(3)
+        builder.setStatusIndexInQuery(QueryParameter.STATUS.getIndex())
+               .setIdIndexInQuery(QueryParameter.ID.getIndex())
+               .setRecordIndexInQuery(QueryParameter.RECORD.getIndex())
                .setQuery(QUERY_TEMPLATE);
         return builder;
     }
@@ -73,6 +73,23 @@ public class InsertCommandQuery extends WriteCommandRecordQuery {
         @Override
         protected Builder getThis() {
             return this;
+        }
+    }
+
+    private enum QueryParameter {
+
+        ID(1),
+        STATUS(2),
+        RECORD(3);
+
+        private final int index;
+
+        QueryParameter(int index) {
+            this.index = index;
+        }
+
+        public int getIndex() {
+            return index;
         }
     }
 }

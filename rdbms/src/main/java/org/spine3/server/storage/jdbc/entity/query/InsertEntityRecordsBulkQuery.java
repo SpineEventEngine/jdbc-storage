@@ -101,8 +101,8 @@ public class InsertEntityRecordsBulkQuery<I> extends WriteQuery {
      * <p>This includes following items:
      * <ul>
      *     <li>ID;
-     *     <li>Serialized record by itself;
-     *     <li>Boolean columns for the record visibility (archived and deleted fields).
+     *     <li>serialized record by itself;
+     *     <li>{@code Boolean} columns for the record visibility (archived and deleted fields).
      * </ul>
      *
      * @param statement       the {@linkplain PreparedStatement} to add the query parameters to
