@@ -183,6 +183,7 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
                                                           JdbcAggregateStorage<I>,
                                                           AggregateStorageQueryFactory<I>> {
         private Builder() {
+            super();
         }
 
         @Override

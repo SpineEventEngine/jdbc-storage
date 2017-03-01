@@ -214,6 +214,9 @@ public class JdbcStandStorage extends StandStorage {
     public static class Builder<I> extends StorageBuilder<Builder<I>,
                                                               JdbcStandStorage,
                                                               RecordStorageQueryFactory<I>> {
+        private Builder() {
+            super();
+        }
 
         @Override
         protected Builder<I> getThis() {

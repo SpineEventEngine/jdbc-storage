@@ -159,6 +159,7 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
         private JdbcRecordStorage<I> recordStorage;
 
         private Builder() {
+            super();
         }
 
         @Override

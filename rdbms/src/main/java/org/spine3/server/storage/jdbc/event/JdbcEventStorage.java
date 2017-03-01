@@ -203,6 +203,10 @@ public class JdbcEventStorage extends EventStorage {
 
     public static class Builder extends StorageBuilder<Builder, JdbcEventStorage, EventStorageQueryFactory> {
 
+        private Builder() {
+            super();
+        }
+
         @Override
         protected Builder getThis() {
             return this;

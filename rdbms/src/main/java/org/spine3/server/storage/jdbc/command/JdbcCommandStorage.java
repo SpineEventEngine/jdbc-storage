@@ -193,6 +193,7 @@ public class JdbcCommandStorage extends CommandStorage {
                                                        CommandStorageQueryFactory> {
 
         private Builder() {
+            super();
         }
 
         @Override

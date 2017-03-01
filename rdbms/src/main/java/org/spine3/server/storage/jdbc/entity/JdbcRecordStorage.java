@@ -231,6 +231,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
             extends StorageBuilder<Builder<I>, JdbcRecordStorage<I>, RecordStorageQueryFactory<I>> {
 
         private Builder() {
+            super();
         }
 
         @Override
