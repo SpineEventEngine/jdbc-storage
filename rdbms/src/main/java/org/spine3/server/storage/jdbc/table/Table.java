@@ -126,7 +126,6 @@ public class Table<I> {
         sql.append(CREATE_IF_MISSING)
            .append(getName())
            .append(BRACKET_OPEN);
-        //  .append(columnNames())
         for (Column column : columns) {
             sql.append(column.getName())
                .append(column.getType())
