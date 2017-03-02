@@ -96,7 +96,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
             // The NPE is required by the contract of the method
             final String errorMessage =
                     String.format("Trying to mark not existing record with id %s deleted.", id);
-            throw new NullPointerException(errorMessage); // NOPMD
+            throw new NullPointerException(errorMessage);
         }
     }
 
