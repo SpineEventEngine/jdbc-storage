@@ -162,7 +162,7 @@ public abstract class AbstractTable<I, C extends Enum & TableColumn> {
         idColumn.setId(position, id, sqlStatement);
     }
 
-    privat void setParameter(PreparedStatement sqlStatement,
+    private void setParameter(PreparedStatement sqlStatement,
                                      C column,
                                      @Nullable Object value,
                                      int position) throws SQLException {
