@@ -143,22 +143,28 @@ public class Table<I> {
 
     public void fillDerectOrderParams(PreparedStatement sqlStatement, Object... queryParams)
             throws SQLException {
+        final int paramsCount = queryParams.length;
         for (int i = 0; i < columns.size(); i++) {
             final Column column = columns.get(i);
-            final Object parameter = queryParams[i];
+            final Object parameter = i < paramsCount
+                                     ? queryParams[i]
+                                     : null;
             setParameter(sqlStatement, column, parameter, i);
         }
     }
 
     public void fillParamsWithIdAtTheEnd(PreparedStatement sqlStatement, Object... queryParams)
             throws SQLException {
+        final int paramsCount = queryParams.length;
         int position = 1;
         for (final Column column : columns) {
             if (column.getName()
                       .equals(idColumnName)) {
                 continue;
             }
-            final Object parameter = queryParams[position];
+            final Object parameter = position < paramsCount
+                                     ? queryParams[position]
+                                     : null;
             setParameter(sqlStatement, column, parameter, position);
             ++position;
         }
@@ -170,9 +176,14 @@ public class Table<I> {
 
     private static void setParameter(PreparedStatement sqlStatement,
                                      Column column,
-                                     Object value,
+                                     @Nullable Object value,
                                      int position) throws SQLException {
         final Sql.Type type = column.getType();
+        if (value == null) {
+            final int sqlTypeIndex = type.getSqlType();
+            sqlStatement.setNull(position, sqlTypeIndex);
+            return;
+        }
         switch (type) {
             case BLOB:
                 final byte[] bytes = (byte[]) value;
