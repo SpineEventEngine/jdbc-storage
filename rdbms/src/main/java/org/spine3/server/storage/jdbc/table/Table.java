@@ -20,6 +20,7 @@
 
 package org.spine3.server.storage.jdbc.table;
 
+import org.spine3.server.entity.Entity;
 import org.spine3.server.storage.jdbc.Sql;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
@@ -34,6 +35,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.lang.String.format;
+import static org.spine3.server.storage.jdbc.util.DbTableNameFactory.newTableName;
 
 /**
  * @author Dmytro Dashenkov.
@@ -121,8 +123,13 @@ public class Table<I> {
             return this;
         }
 
-        public Builder<I> addColumn(String name, Sql.Type type) {
+        public Builder<I> setName(Class<? extends Entity<I, ?>> entityClass) {
+            checkNotNull(entityClass);
+            this.name = newTableName(entityClass);
+            return this;
+        }
 
+        public Builder<I> addColumn(String name, Sql.Type type) {
             final Column column = new Column(
                     checkNotNull(name),
                     checkNotNull(type));
