@@ -20,9 +20,15 @@
 
 package org.spine3.server.storage.jdbc.table;
 
+import org.spine3.base.Event;
+import org.spine3.server.event.EventStreamQuery;
 import org.spine3.server.storage.jdbc.Sql.Type;
+import org.spine3.server.storage.jdbc.event.query.EventStorageQueryFactory;
+import org.spine3.server.storage.jdbc.event.query.FilterAndSortQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
+
+import java.util.Iterator;
 
 import static org.spine3.server.storage.jdbc.Sql.Type.*;
 
@@ -33,8 +39,11 @@ public class EventTable extends AbstractTable<String, EventTable.Column> {
 
     private static final String TABLE_NAME = "events";
 
+    private final EventStorageQueryFactory queryFactory;
+
     public EventTable(DataSourceWrapper dataSource) {
         super(TABLE_NAME, new IdColumn.StringIdColumn(), dataSource);
+        this.queryFactory = new EventStorageQueryFactory(dataSource);
     }
 
     @Override
@@ -45,6 +54,35 @@ public class EventTable extends AbstractTable<String, EventTable.Column> {
     @Override
     protected Class<Column> getTableColumnType() {
         return Column.class;
+    }
+
+    public Iterator<Event> getEventStream(EventStreamQuery query) {
+        final FilterAndSortQuery sqlQuery = queryFactory.newFilterAndSortQuery(query);
+        final Iterator<Event> result = sqlQuery.execute();
+        return result;
+    }
+
+    public void write(String eventId, Event event) {
+        if (containsRecord(eventId)) {
+            queryFactory.newUpdateEventQuery(eventId, event)
+                        .execute();
+        } else {
+            queryFactory.newInsertEventQuery(eventId, event)
+                        .execute();
+        }
+    }
+
+    private boolean containsRecord(String id) {
+        final Event record = queryFactory.newSelectEventByIdQuery(id)
+                                         .execute();
+        final boolean contains = record != null;
+        return contains;
+    }
+
+    public Event read(String id) {
+        final Event event = queryFactory.newSelectEventByIdQuery(id)
+                                         .execute();
+        return event;
     }
 
     enum Column implements TableColumn {

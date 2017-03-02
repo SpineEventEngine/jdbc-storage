@@ -87,8 +87,11 @@ public class JdbcStorageFactory<I> implements StorageFactory {
 
     @Override
     public EventStorage createEventStorage() {
-        return JdbcEventStorage.newInstance(dataSource, false,
-                                            getEventStorageQueryFactory(dataSource));
+        final EventStorage storage = JdbcEventStorage.newBuilder()
+                                                     .setDataSource(dataSource)
+                                                     .setMultitenant(multitenant)
+                                                     .build();
+        return storage;
     }
 
     @Override

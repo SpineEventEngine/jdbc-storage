@@ -56,7 +56,7 @@ public abstract class AbstractTable<I, C extends Enum & TableColumn> {
 
     private ImmutableList<C> columns;
 
-    protected AbstractTable(String name,
+    AbstractTable(String name,
                             IdColumn<I> idColumn,
                             DataSourceWrapper dataSource) {
         super();
@@ -76,7 +76,7 @@ public abstract class AbstractTable<I, C extends Enum & TableColumn> {
                                          .setLogger(log())
                                          .setQuery(sql)
                                          .build();
-
+        query.execute();
     }
 
     @SuppressWarnings("ReturnOfCollectionOrArrayField") // Returns immutable collection
