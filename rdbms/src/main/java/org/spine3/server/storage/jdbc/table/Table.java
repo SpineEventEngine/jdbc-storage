@@ -125,10 +125,15 @@ public class Table<I> {
         final StringBuilder sql = new StringBuilder(DEFAULT_SQL_QUERY_LENGTH);
         sql.append(CREATE_IF_MISSING)
            .append(getName())
-           .append(BRACKET_OPEN)
-           .append(columnNames())
-           .append(COMMA)
-           .append(PRIMARY_KEY)
+           .append(BRACKET_OPEN);
+        //  .append(columnNames())
+        for (Column column : columns) {
+            sql.append(column.getName())
+               .append(column.getType())
+               .append(COMMA);
+            // Comma after the last column declaration is required since we add PRIMARY KEY after
+        }
+        sql.append(PRIMARY_KEY)
            .append(idColumnName)
            .append(BRACKET_CLOSE)
            .append(SEMICOLON);
@@ -149,7 +154,8 @@ public class Table<I> {
             throws SQLException {
         int position = 1;
         for (final Column column : columns) {
-            if (column.getName().equals(idColumnName)) {
+            if (column.getName()
+                      .equals(idColumnName)) {
                 continue;
             }
             final Object parameter = queryParams[position];
@@ -158,7 +164,7 @@ public class Table<I> {
         }
 
         @SuppressWarnings("unchecked")
-        final I id = (I)  queryParams[queryParams.length - 1];
+        final I id = (I) queryParams[queryParams.length - 1];
         idColumn.setId(position, id, sqlStatement);
     }
 
