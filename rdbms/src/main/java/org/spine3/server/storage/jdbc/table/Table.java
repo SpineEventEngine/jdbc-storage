@@ -20,14 +20,19 @@
 
 package org.spine3.server.storage.jdbc.table;
 
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Collections2;
 import org.spine3.server.entity.Entity;
 import org.spine3.server.storage.jdbc.Sql;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
+import javax.annotation.Nullable;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkElementIndex;
@@ -35,6 +40,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.lang.String.format;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.COMMA;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
+import static org.spine3.server.storage.jdbc.Sql.Query.CREATE_IF_MISSING;
+import static org.spine3.server.storage.jdbc.Sql.Query.PRIMARY_KEY;
 import static org.spine3.server.storage.jdbc.util.DbTableNameFactory.newTableName;
 
 /**
@@ -42,15 +53,20 @@ import static org.spine3.server.storage.jdbc.util.DbTableNameFactory.newTableNam
  */
 public class Table<I> {
 
+    private static final int DEFAULT_SQL_QUERY_LENGTH = 128;
+
     private final String name;
 
     private final List<Column> columns;
+
+    private final String idColumnName;
 
     private final IdColumn<I> idColumn;
 
     private Table(Builder<I> builder) {
         this.name = builder.name;
         this.columns = builder.columns;
+        this.idColumnName = builder.idColumnName;
         this.idColumn = builder.idColumn;
     }
 
@@ -60,6 +76,14 @@ public class Table<I> {
                           "Column index unavailable: " + String.valueOf(index));
         final Column result = columns.get(index);
         return result;
+    }
+
+    public IdColumn<I> getIdColumn() {
+        return idColumn;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public int getColumnIndex(String columnName) throws IllegalArgumentException {
@@ -81,12 +105,94 @@ public class Table<I> {
         return columns.size();
     }
 
-    public void addAgruments(PreparedStatement sqlStatement, Map<Column, Object> argumentValues) {
-        checkNotNull(sqlStatement, "sqlStatement");
-        checkNotNull(argumentValues, "argumentValues");
-        checkArgument(!argumentValues.isEmpty(), "Argument values Map must not be empty.");
+    public String columnNames() {
+        final Function<Column, String> nameUnPacker = new Function<Column, String>() {
+            @Override
+            public String apply(@Nullable Column column) {
+                checkNotNull(column);
+                return column.getName();
+            }
+        };
 
+        final Collection<String> names = Collections2.transform(columns, nameUnPacker);
+        final String joinedNames = Joiner.on(COMMA.toString())
+                                         .join(names);
+        return joinedNames;
+    }
 
+    public String createTableSql() {
+        @SuppressWarnings("StringBufferReplaceableByString")
+        final StringBuilder sql = new StringBuilder(DEFAULT_SQL_QUERY_LENGTH);
+        sql.append(CREATE_IF_MISSING)
+           .append(getName())
+           .append(BRACKET_OPEN)
+           .append(columnNames())
+           .append(COMMA)
+           .append(PRIMARY_KEY)
+           .append(idColumnName)
+           .append(BRACKET_CLOSE)
+           .append(SEMICOLON);
+        final String result = sql.toString();
+        return result;
+    }
+
+    public void fillDerectOrderParams(PreparedStatement sqlStatement, Object... queryParams)
+            throws SQLException {
+        for (int i = 0; i < columns.size(); i++) {
+            final Column column = columns.get(i);
+            final Object parameter = queryParams[i];
+            setParameter(sqlStatement, column, parameter, i);
+        }
+    }
+
+    public void fillParamsWithIdAtTheEnd(PreparedStatement sqlStatement, Object... queryParams)
+            throws SQLException {
+        int position = 1;
+        for (final Column column : columns) {
+            if (column.getName().equals(idColumnName)) {
+                continue;
+            }
+            final Object parameter = queryParams[position];
+            setParameter(sqlStatement, column, parameter, position);
+            ++position;
+        }
+
+        @SuppressWarnings("unchecked")
+        final I id = (I)  queryParams[queryParams.length - 1];
+        idColumn.setId(position, id, sqlStatement);
+    }
+
+    private static void setParameter(PreparedStatement sqlStatement,
+                                     Column column,
+                                     Object value,
+                                     int position) throws SQLException {
+        final Sql.Type type = column.getType();
+        switch (type) {
+            case BLOB:
+                final byte[] bytes = (byte[]) value;
+                sqlStatement.setBytes(position, bytes);
+                break;
+            case INT:
+                final int number = (int) value;
+                sqlStatement.setInt(position, number);
+                break;
+            case BIGINT:
+                final long longNumber = (long) value;
+                sqlStatement.setLong(position, longNumber);
+                break;
+            case VARCHAR_512: // All VARCHAR types are Java Strings
+            case VARCHAR_999:
+                final String stringValue = (String) value;
+                sqlStatement.setString(position, stringValue);
+                break;
+            case BOOLEAN:
+                final boolean logicalValue = (boolean) value;
+                sqlStatement.setBoolean(position, logicalValue);
+                break;
+            default:
+                throw new IllegalArgumentException(
+                        "Unhandled SQL type \"" + type.toString() + '\"');
+        }
     }
 
     public static class Column {
@@ -113,9 +219,12 @@ public class Table<I> {
 
         private static final int DEFAULT_COLUMNS_COUNT = 5;
 
+        private static final String DEFAULT_ID_COLUMN_NAME = "id";
+
         private final List<Column> columns = new ArrayList<>(DEFAULT_COLUMNS_COUNT);
         private String name;
         private IdColumn<I> idColumn;
+        private String idColumnName = DEFAULT_ID_COLUMN_NAME;
 
         public Builder<I> setName(String name) {
             checkArgument(!isNullOrEmpty(name), "Table name must not be null or empty.");
@@ -138,11 +247,20 @@ public class Table<I> {
         }
 
         public Builder<I> setIdColumn(IdColumn<I> idColumn) {
+            return setIdColumn(DEFAULT_ID_COLUMN_NAME, idColumn);
+        }
+
+        public Builder<I> setIdColumn(String idColumnName, IdColumn<I> idColumn) {
+            checkArgument(!isNullOrEmpty(idColumnName), "ID column cannot be null or empty");
             this.idColumn = checkNotNull(idColumn);
+            this.idColumnName = idColumnName;
+            final Column column = new Column(idColumnName,
+                                             Sql.Type.valueOf(idColumn.getColumnDataType()));
+            columns.add(column);
             return this;
         }
 
-        public Table<I> createTable() {
+        public Table<I> build() {
             checkPreconditions();
             return new Table<>(this);
         }
