@@ -73,6 +73,7 @@ public class Sql {
      */
     public enum Type {
 
+        UNKNOWN("unknown type", Types.NULL),
         BLOB("BLOB", Types.BLOB),
         INT("INT", Types.INTEGER),
         BIGINT("BIGINT", Types.BIGINT),

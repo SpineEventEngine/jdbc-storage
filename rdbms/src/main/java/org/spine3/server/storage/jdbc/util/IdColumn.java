@@ -26,6 +26,7 @@ import org.spine3.server.aggregate.Aggregate;
 import org.spine3.server.entity.Entity;
 import org.spine3.server.reflect.Classes;
 import org.spine3.server.storage.jdbc.DatabaseException;
+import org.spine3.server.storage.jdbc.Sql;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -73,7 +74,7 @@ public abstract class IdColumn<I> {
      * Returns the SQL data type string of the ID column, e.g. {@code "BIGINT"},
      * {@code "VARCHAR(999)"}, etc.
      */
-    public abstract String getColumnDataType();
+    public abstract Sql.Type getColumnDataType();
 
     /**
      * Sets an ID parameter to the given value.
@@ -92,8 +93,8 @@ public abstract class IdColumn<I> {
     private static class LongIdColumn extends IdColumn<Long> {
 
         @Override
-        public String getColumnDataType() {
-            return BIGINT.toString();
+        public Sql.Type getColumnDataType() {
+            return BIGINT;
         }
 
         @Override
@@ -113,8 +114,8 @@ public abstract class IdColumn<I> {
     private static class IntIdColumn extends IdColumn<Integer> {
 
         @Override
-        public String getColumnDataType() {
-            return INT.toString();
+        public Sql.Type getColumnDataType() {
+            return INT;
         }
 
         @Override
@@ -135,8 +136,8 @@ public abstract class IdColumn<I> {
     private static class StringOrMessageIdColumn<I> extends IdColumn<I> {
 
         @Override
-        public String getColumnDataType() {
-            return VARCHAR_999.toString();
+        public Sql.Type getColumnDataType() {
+            return VARCHAR_999;
         }
 
         @Override

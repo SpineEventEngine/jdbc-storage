@@ -56,7 +56,8 @@ public class CreateTableQuery<I> extends StorageQuery {
     public void execute() {
         final String sql;
         if (idColumn != null) {
-            final String idColumnType = idColumn.getColumnDataType();
+            final String idColumnType = idColumn.getColumnDataType()
+                                                .toString();
             sql = format(getQuery(), tableName, idColumnType);
         } else {
             sql = format(getQuery(), tableName);

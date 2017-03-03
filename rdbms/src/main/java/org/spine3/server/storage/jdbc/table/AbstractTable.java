@@ -42,7 +42,7 @@ import static org.spine3.server.storage.jdbc.Sql.Query.PRIMARY_KEY;
 /**
  * @author Dmytro Dashenkov.
  */
-public abstract class AbstractTable<I, C extends Enum & TableColumn> {
+public abstract class AbstractTable<I, C extends Enum<C> & TableColumn> {
 
     private static final int DEFAULT_SQL_QUERY_LENGTH = 128;
 
@@ -56,7 +56,7 @@ public abstract class AbstractTable<I, C extends Enum & TableColumn> {
 
     private ImmutableList<C> columns;
 
-    AbstractTable(String name,
+    protected AbstractTable(String name,
                             IdColumn<I> idColumn,
                             DataSourceWrapper dataSource) {
         super();
@@ -70,7 +70,7 @@ public abstract class AbstractTable<I, C extends Enum & TableColumn> {
     protected abstract Class<C> getTableColumnType();
 
     public void createIfNotExists() {
-        final String sql = createTableSql();
+        final String sql = composeCreateTableSql();
         final VoidQuery query = VoidQuery.newBuilder()
                                          .setDataSource(dataSource)
                                          .setLogger(log())
@@ -105,7 +105,7 @@ public abstract class AbstractTable<I, C extends Enum & TableColumn> {
         return logger;
     }
 
-    private String createTableSql() {
+    private String composeCreateTableSql() {
         final String idColumnName = getIdColumnDeclaration().name();
         @SuppressWarnings("StringBufferReplaceableByString")
         final StringBuilder sql = new StringBuilder(DEFAULT_SQL_QUERY_LENGTH);
@@ -113,8 +113,10 @@ public abstract class AbstractTable<I, C extends Enum & TableColumn> {
            .append(getName())
            .append(BRACKET_OPEN);
         for (C column : getColumns()) {
-            sql.append(column.name())
-               .append(column.type())
+            final String  name = column.name();
+            final Sql.Type type = ensureType(column);
+            sql.append(name)
+               .append(type)
                .append(COMMA);
             // Comma after the last column declaration is required since we add PRIMARY KEY after
         }
@@ -162,11 +164,12 @@ public abstract class AbstractTable<I, C extends Enum & TableColumn> {
         idColumn.setId(position, id, sqlStatement);
     }
 
+    @SuppressWarnings("EnumSwitchStatementWhichMissesCases") // UNKNOWN case handled separately
     private void setParameter(PreparedStatement sqlStatement,
-                                     C column,
-                                     @Nullable Object value,
-                                     int position) throws SQLException {
-        final Sql.Type type = column.type();
+                              C column,
+                              @Nullable Object value,
+                              int position) throws SQLException {
+        final Sql.Type type = ensureType(column);
         if (value == null) {
             final int sqlTypeIndex = type.getSqlType();
             sqlStatement.setNull(position, sqlTypeIndex);
@@ -198,5 +201,23 @@ public abstract class AbstractTable<I, C extends Enum & TableColumn> {
                 throw new IllegalArgumentException(
                         "Unhandled SQL type \"" + type.toString() + '\"');
         }
+    }
+
+    private Sql.Type getIdType() {
+        Sql.Type type = getIdColumnDeclaration().type();
+        if (type == Sql.Type.UNKNOWN) {
+            type = getIdColumn().getColumnDataType();
+        }
+        return type;
+    }
+
+    private Sql.Type ensureType(C column) {
+        Sql.Type type = column.type();
+        if (type == Sql.Type.UNKNOWN) {
+            type = getIdType();
+        } else {
+            throw new IllegalStateException("UNKNOWN type of a non-ID column " + column.name());
+        }
+        return type;
     }
 }
