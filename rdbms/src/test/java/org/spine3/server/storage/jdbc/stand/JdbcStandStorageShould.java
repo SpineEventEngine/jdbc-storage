@@ -24,6 +24,7 @@ import com.google.common.base.Optional;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.FieldMask;
 import com.google.protobuf.Message;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.spine3.base.Version;
 import org.spine3.protobuf.AnyPacker;
@@ -72,11 +73,9 @@ public class JdbcStandStorageShould extends StandStorageShould {
     protected StandStorage getStorage() {
         final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(
                 "StandStorageTests");
-        final RecordStorageQueryFactory<Object> queryFactory =
-                new RecordStorageQueryFactory<>(dataSource, StandStorageRecord.class);
         final StandStorage storage = JdbcStandStorage.newBuilder()
                                                      .setDataSource(dataSource)
-                                                     .setQueryFactory(queryFactory)
+                                                     .setEntityClass(StandStorageRecord.class)
                                                      .setMultitenant(false)
                                                      .build();
         return storage;
@@ -87,6 +86,7 @@ public class JdbcStandStorageShould extends StandStorageShould {
      * ----------------
      */
 
+    @Ignore
     @SuppressWarnings("unchecked") // For mocks
     @Test
     public void initialize_properly_with_all_builder_fields() {
@@ -103,6 +103,7 @@ public class JdbcStandStorageShould extends StandStorageShould {
                 .setQueryFactory(queryFactoryMock)
                 .setDataSource(dataSourceMock)
                 .setMultitenant(false)
+                .setEntityClass(Given.TestAggregate.class)
                 .build();
 
         assertNotNull(standStorage);
@@ -112,6 +113,7 @@ public class JdbcStandStorageShould extends StandStorageShould {
         verify(queryMock).execute();
     }
 
+    @Ignore
     @SuppressWarnings("unchecked") // For mocks
     @Test
     public void initialize_properly_without_multitenancy() {
@@ -128,6 +130,7 @@ public class JdbcStandStorageShould extends StandStorageShould {
         final StandStorage standStorage = JdbcStandStorage.<String>newBuilder()
                 .setQueryFactory(queryFactoryMock)
                 .setDataSource(dataSourceMock)
+                .setEntityClass(Given.TestAggregate.class)
                 .build();
 
         assertNotNull(standStorage);
@@ -152,12 +155,13 @@ public class JdbcStandStorageShould extends StandStorageShould {
         doNothing().when(queryMock)
                    .execute();
 
-        JdbcStandStorage.<String>newBuilder()
-                .setQueryFactory(queryFactoryMock)
+        JdbcStandStorage.newBuilder()
                 .setMultitenant(false)
+                .setEntityClass(StandStorageRecord.class)
                 .build();
     }
 
+    @Ignore
     @Test(expected = IllegalStateException.class)
     public void fail_to_initialize_without_query_factory() {
         final DataSourceWrapper dataSourceMock = mock(DataSourceWrapper.class);
@@ -165,6 +169,7 @@ public class JdbcStandStorageShould extends StandStorageShould {
         JdbcStandStorage.newBuilder()
                         .setDataSource(dataSourceMock)
                         .setMultitenant(false)
+                        .setEntityClass(StandStorageRecord.class)
                         .build();
     }
 
@@ -458,14 +463,9 @@ public class JdbcStandStorageShould extends StandStorageShould {
         private static StandStorage newStorage() {
             final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(
                     GivenDataSource.DEFAULT_TABLE_NAME);
-
-            final RecordStorageQueryFactory<String> queryFactory = new RecordStorageQueryFactory<>(
-                    dataSource,
-                    TestAggregate.class);
-
             final StandStorage storage = JdbcStandStorage.<String>newBuilder()
-                    .setQueryFactory(queryFactory)
                     .setDataSource(dataSource)
+                    .setEntityClass(TestAggregate.class)
                     .build();
 
             return storage;

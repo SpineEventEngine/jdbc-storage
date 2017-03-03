@@ -27,8 +27,6 @@ import org.spine3.server.projection.ProjectionStorageShould;
 import org.spine3.server.storage.jdbc.GivenDataSource;
 import org.spine3.server.storage.jdbc.builder.StorageBuilder;
 import org.spine3.server.storage.jdbc.entity.JdbcRecordStorage;
-import org.spine3.server.storage.jdbc.entity.query.RecordStorageQueryFactory;
-import org.spine3.server.storage.jdbc.projection.query.ProjectionStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.test.projection.Project;
 
@@ -45,21 +43,17 @@ public class JdbcProjectionStorageShould extends ProjectionStorageShould<String>
         final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(
                 "projectionStorageTests");
         final Class<TestProjection> projectionClass = TestProjection.class;
-        final ProjectionStorageQueryFactory<String> queryFactory =
-                new ProjectionStorageQueryFactory<>(dataSource, projectionClass);
-        final RecordStorageQueryFactory<String> recordQueryFactory =
-                new RecordStorageQueryFactory<>(dataSource, projectionClass);
         final JdbcRecordStorage<String> entityStorage =
                 JdbcRecordStorage.<String>newBuilder()
                                  .setDataSource(dataSource)
                                  .setMultitenant(false)
-                                 .setQueryFactory(recordQueryFactory)
+                                 .setEntityClass(projectionClass)
                                  .build();
         final ProjectionStorage<String> storage =
                 JdbcProjectionStorage.<String>newBuilder()
                                      .setRecordStorage(entityStorage)
                                      .setMultitenant(false)
-                                     .setQueryFactory(queryFactory)
+                                     .setProjectionClass(projectionClass)
                                      .build();
         return storage;
     }

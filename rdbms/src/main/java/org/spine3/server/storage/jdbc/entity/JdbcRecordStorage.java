@@ -27,18 +27,16 @@ import com.google.common.collect.ImmutableMap;
 import com.google.protobuf.FieldMask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.spine3.server.entity.Entity;
 import org.spine3.server.entity.EntityRecord;
 import org.spine3.server.storage.RecordStorage;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.JdbcStorageFactory;
 import org.spine3.server.storage.jdbc.builder.StorageBuilder;
 import org.spine3.server.storage.jdbc.entity.query.RecordStorageQueryFactory;
-import org.spine3.server.storage.jdbc.entity.query.SelectBulkQuery;
-import org.spine3.server.storage.jdbc.query.DeleteRecordQuery;
+import org.spine3.server.storage.jdbc.table.entity.RecordTable;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
-import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -55,29 +53,26 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
 
     private final DataSourceWrapper dataSource;
 
-    private final RecordStorageQueryFactory<I> queryFactory;
+    private final RecordTable<I> table;
 
     protected JdbcRecordStorage(DataSourceWrapper dataSource, boolean multitenant,
-                                RecordStorageQueryFactory<I> queryFactory)
+                                Class<Entity<I, ?>> entityClass)
             throws DatabaseException {
         super(multitenant);
         this.dataSource = dataSource;
-        this.queryFactory = queryFactory;
-        queryFactory.setLogger(LogSingleton.INSTANCE.value);
-        queryFactory.newCreateEntityTableQuery()
-                    .execute();
+        this.table = new RecordTable<>(entityClass, dataSource);
+        table.createIfNotExists();
     }
 
     private JdbcRecordStorage(Builder<I> builder) {
-        this(builder.getDataSource(), builder.isMultitenant(), builder.getQueryFactory());
+        this(builder.getDataSource(), builder.isMultitenant(), builder.getEntityClass());
     }
 
     @SuppressWarnings("ProhibitedExceptionThrown") // NPE by the contract
     @Override
     public void markArchived(I id) {
         checkNotNull(id);
-        final boolean recordExists = queryFactory.newMarkArchivedQuery(id)
-                                                 .execute();
+        final boolean recordExists = table.markArchived(id);
         if (!recordExists) {
             // The NPE is required by the contract of the method
             final String errorMessage =
@@ -90,8 +85,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     @Override
     public void markDeleted(I id) {
         checkNotNull(id);
-        final boolean recordExists = queryFactory.newMarkDeletedQuery(id)
-                                                 .execute();
+        final boolean recordExists = table.markDeleted(id);
         if (!recordExists) {
             // The NPE is required by the contract of the method
             final String errorMessage =
@@ -104,8 +98,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     public boolean delete(I id) {
         checkNotNull(id);
 
-        final DeleteRecordQuery<I> query = queryFactory.newDeleteRowQuery(id);
-        final boolean result = query.execute();
+        final boolean result = table.delete(id);
         return result;
     }
 
@@ -116,8 +109,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
      */
     @Override
     protected Optional<EntityRecord> readRecord(I id) throws DatabaseException {
-        final EntityRecord record = queryFactory.newSelectEntityByIdQuery(id)
-                                                .execute();
+        final EntityRecord record = table.read(id);
         return Optional.fromNullable(record);
     }
 
@@ -129,13 +121,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     @Override
     protected Iterable<EntityRecord> readMultipleRecords(Iterable<I> ids,
                                                          FieldMask fieldMask) {
-        final SelectBulkQuery<I> query = queryFactory.newSelectBulkQuery(ids, fieldMask);
-        final Map<?, EntityRecord> recordMap;
-        try {
-            recordMap = query.execute();
-        } catch (SQLException e) {
-            throw new DatabaseException(e);
-        }
+        final Map<?, EntityRecord> recordMap = table.read(ids, fieldMask);
         return ImmutableList.copyOf(recordMap.values());
     }
 
@@ -147,15 +133,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     @SuppressWarnings("unchecked")
     @Override
     protected Map<I, EntityRecord> readAllRecords(FieldMask fieldMask) {
-        final SelectBulkQuery query = queryFactory.newSelectAllQuery(fieldMask);
-        final Map<I, EntityRecord> records;
-
-        try {
-            records = (Map<I, EntityRecord>) query.execute();
-        } catch (SQLException e) {
-            throw new DatabaseException(e);
-        }
-
+        final Map<I, EntityRecord> records = table.read(fieldMask);
         return ImmutableMap.copyOf(records);
     }
 
@@ -169,40 +147,12 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     protected void writeRecord(I id, EntityRecord record) throws DatabaseException {
         checkArgument(record.hasState(), "entity state");
 
-        if (containsRecord(id)) {
-            queryFactory.newUpdateEntityQuery(id, record)
-                        .execute();
-        } else {
-            queryFactory.newInsertEntityQuery(id, record)
-                        .execute();
-        }
+        table.write(id, record);
     }
 
     @Override
     protected void writeRecords(Map<I, EntityRecord> records) {
-        // Map's initial capacity is maximum, meaning no records exist in the storage yet
-        final Map<I, EntityRecord> newRecords = new HashMap<>(records.size());
-
-        for (Map.Entry<I, EntityRecord> unclassifiedRecord : records.entrySet()) {
-            final I id = unclassifiedRecord.getKey();
-            final EntityRecord record = unclassifiedRecord.getValue();
-            if (containsRecord(id)) {
-                // TODO:2017-03-01:dmytro.dashenkov: Improve testing for this branch.
-                queryFactory.newUpdateEntityQuery(id, record)
-                            .execute();
-            } else {
-                newRecords.put(id, record);
-            }
-        }
-        queryFactory.newInsertEntityRecordsBulkQuery(newRecords)
-                    .execute();
-    }
-
-    private boolean containsRecord(I id) throws DatabaseException {
-        final EntityRecord record = queryFactory.newSelectEntityByIdQuery(id)
-                                                .execute();
-        final boolean contains = record != null;
-        return contains;
+        table.write(records);
     }
 
     @Override
@@ -221,8 +171,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     void clear() throws DatabaseException {
-        queryFactory.newDeleteAllQuery()
-                    .execute();
+        table.deleteAll();
     }
 
     public static <I> Builder<I> newBuilder() {
@@ -232,6 +181,8 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     public static class Builder<I>
             extends StorageBuilder<Builder<I>, JdbcRecordStorage<I>, RecordStorageQueryFactory<I>> {
 
+        private Class<? extends Entity<I, ?>> entityClass;
+
         private Builder() {
             super();
         }
@@ -239,6 +190,22 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
         @Override
         protected Builder<I> getThis() {
             return this;
+        }
+
+        @SuppressWarnings("unchecked") // cast Class object to an object of its superclass Class
+        public Class<Entity<I, ?>> getEntityClass() {
+            return (Class<Entity<I, ?>>) entityClass;
+        }
+
+        public Builder<I> setEntityClass(Class<? extends Entity<I, ?>> entityClass) {
+            this.entityClass = checkNotNull(entityClass);
+            return this;
+        }
+
+        @Override
+        protected void checkPreconditions() throws IllegalStateException {
+            super.checkPreconditions();
+            checkNotNull(entityClass, "Entity class must be set");
         }
 
         @Override

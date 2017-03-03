@@ -24,7 +24,9 @@ import com.google.common.collect.ImmutableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spine3.server.storage.jdbc.Sql;
+import org.spine3.server.storage.jdbc.entity.query.DeleteAllQuery;
 import org.spine3.server.storage.jdbc.query.ContainsQuery;
+import org.spine3.server.storage.jdbc.query.DeleteRecordQuery;
 import org.spine3.server.storage.jdbc.query.VoidQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
@@ -80,15 +82,15 @@ public abstract class AbstractTable<I, C extends Enum<C> & TableColumn> {
         query.execute();
     }
 
-    protected boolean containsRecord(I id) {
+    public boolean containsRecord(I id) {
         final ContainsQuery<I> query = ContainsQuery.<I>newBuilder()
-                                                    .setIdColumn(getIdColumn())
-                                                    .setId(id)
-                                                    .setTableName(getName())
-                                                    .setKeyColumn(getIdColumnDeclaration())
-                                                    .setDataSource(dataSource)
-                                                    .setLogger(log())
-                                                    .build();
+                .setIdColumn(getIdColumn())
+                .setId(id)
+                .setTableName(getName())
+                .setKeyColumn(getIdColumnDeclaration())
+                .setDataSource(dataSource)
+                .setLogger(log())
+                .build();
         final boolean result = query.execute();
         return result;
     }
@@ -232,5 +234,26 @@ public abstract class AbstractTable<I, C extends Enum<C> & TableColumn> {
             }
         }
         return type;
+    }
+
+    public boolean delete(I id) {
+        final DeleteRecordQuery<I> query = DeleteRecordQuery.<I>newBuilder()
+                                                            .setTableName(getName())
+                                                            .setIdColumn(getIdColumn())
+                                                            .setIdColumnName(
+                                                                    getIdColumnDeclaration().name())
+                                                            .setIdValue(id)
+                                                            .setLogger(log())
+                                                            .setDataSource(dataSource)
+                                                            .build();
+        return query.execute();
+    }
+
+    public void deleteAll() {
+        final DeleteAllQuery query = DeleteAllQuery.newBuilder(getName())
+                                                   .setDataSource(dataSource)
+                                                   .setLogger(log())
+                                                   .build();
+        query.execute();
     }
 }

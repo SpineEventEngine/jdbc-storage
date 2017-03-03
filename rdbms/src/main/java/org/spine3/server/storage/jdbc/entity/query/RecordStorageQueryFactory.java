@@ -175,7 +175,7 @@ public class RecordStorageQueryFactory<I> extends AbstractQueryFactory {
         return builder.build();
     }
 
-    public SelectBulkQuery newSelectAllQuery(FieldMask fieldMask) {
+    public SelectBulkQuery<I> newSelectAllQuery(FieldMask fieldMask) {
         final SelectBulkQuery.Builder<I> builder = SelectBulkQuery.<I>newBuilder(tableName)
                                                                   .setFieldMask(fieldMask)
                                                                   .setLogger(getLogger())

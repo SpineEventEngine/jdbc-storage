@@ -96,7 +96,7 @@ public class SelectBulkQuery<I> extends StorageQuery {
      * @return ID-to-{@link EntityRecord} {@link Map} as the result of the query.
      * @throws SQLException if the input data contained SQL errors or the table does not exist.
      */
-    public Map<Object, EntityRecord> execute() throws SQLException {
+    public Map<I, EntityRecord> execute() throws SQLException {
         final ConnectionWrapper connection = getConnection(true);
         final PreparedStatement sqlStatement = connection.prepareStatement(getQuery());
 

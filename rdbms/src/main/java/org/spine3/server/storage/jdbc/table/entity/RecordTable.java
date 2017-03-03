@@ -20,13 +20,23 @@
 
 package org.spine3.server.storage.jdbc.table.entity;
 
+import com.google.protobuf.FieldMask;
 import org.spine3.server.entity.Entity;
+import org.spine3.server.entity.EntityRecord;
+import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.Sql;
+import org.spine3.server.storage.jdbc.entity.query.RecordStorageQueryFactory;
+import org.spine3.server.storage.jdbc.query.WriteQuery;
 import org.spine3.server.storage.jdbc.table.TableColumn;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.spine3.server.storage.jdbc.Sql.Type.BLOB;
+import static org.spine3.server.storage.jdbc.Sql.Type.BOOLEAN;
 import static org.spine3.server.storage.jdbc.Sql.Type.UNKNOWN;
 
 /**
@@ -34,10 +44,12 @@ import static org.spine3.server.storage.jdbc.Sql.Type.UNKNOWN;
  */
 public class RecordTable<I> extends EntityTable<I, RecordTable.Column> {
 
-    protected RecordTable(Class<Entity<I, ?>> entityClass,
-                          IdColumn<I> idColumn,
-                          DataSourceWrapper dataSource) {
-        super(entityClass, idColumn, dataSource);
+    private final RecordStorageQueryFactory<I> queryFactory;
+
+    public RecordTable(Class<Entity<I, ?>> entityClass,
+                       DataSourceWrapper dataSource) {
+        super(entityClass, IdColumn.newInstance(entityClass), dataSource);
+        queryFactory = new RecordStorageQueryFactory<>(dataSource, entityClass);
     }
 
     @Override
@@ -50,10 +62,76 @@ public class RecordTable<I> extends EntityTable<I, RecordTable.Column> {
         return Column.class;
     }
 
+    public boolean markDeleted(I id) {
+        return queryFactory.newMarkArchivedQuery(id)
+                           .execute();
+    }
+
+    public boolean markArchived(I id) {
+        return queryFactory.newMarkDeletedQuery(id)
+                           .execute();
+    }
+
+    public EntityRecord read(I id) {
+        return queryFactory.newSelectEntityByIdQuery(id)
+                           .execute();
+    }
+
+    public Map<?, EntityRecord> read(Iterable<I> ids, FieldMask fieldMask) {
+        try {
+            final Map<?, EntityRecord> recordMap = queryFactory.newSelectBulkQuery(ids, fieldMask)
+                                                               .execute();
+            return recordMap;
+        } catch (SQLException e) {
+            throw new DatabaseException(e);
+        }
+    }
+
+    public Map<I, EntityRecord> read(FieldMask fieldMask) {
+        try {
+            final Map<I, EntityRecord> recordMap = queryFactory.newSelectAllQuery(fieldMask)
+                                                               .execute();
+            return recordMap;
+        } catch (SQLException e) {
+            throw new DatabaseException(e);
+        }
+    }
+
+    public void write(I id, EntityRecord record) {
+        final WriteQuery query;
+        if (containsRecord(id)) {
+            query = queryFactory.newUpdateEntityQuery(id, record);
+        } else {
+            query = queryFactory.newInsertEntityQuery(id, record);
+        }
+        query.execute();
+    }
+
+    public void write(Map<I, EntityRecord> records) {
+        // Map's initial capacity is maximum, meaning no records exist in the storage yet
+        final Map<I, EntityRecord> newRecords = new HashMap<>(records.size());
+
+        for (Map.Entry<I, EntityRecord> unclassifiedRecord : records.entrySet()) {
+            final I id = unclassifiedRecord.getKey();
+            final EntityRecord record = unclassifiedRecord.getValue();
+            if (containsRecord(id)) {
+                // TODO:2017-03-01:dmytro.dashenkov: Improve testing for this branch.
+                queryFactory.newUpdateEntityQuery(id, record)
+                            .execute();
+            } else {
+                newRecords.put(id, record);
+            }
+        }
+        queryFactory.newInsertEntityRecordsBulkQuery(newRecords)
+                    .execute();
+    }
+
     enum Column implements TableColumn, Cloneable {
 
         id(UNKNOWN),
-        entity_record(BLOB);
+        entity(BLOB),
+        archived(BOOLEAN),
+        deleted(BOOLEAN);
 
         private final Sql.Type type;
 

@@ -20,6 +20,8 @@
 
 package org.spine3.server.storage.jdbc.table;
 
+import com.google.protobuf.Timestamp;
+import org.spine3.server.storage.jdbc.projection.query.ProjectionStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
@@ -36,8 +38,11 @@ public class LastHandledEventTimeTable extends AbstractTable<String,
 
     private static final String TABLE_NAME = "projection_last_handled_event_time";
 
-    protected LastHandledEventTimeTable(DataSourceWrapper dataSource) {
+    private final ProjectionStorageQueryFactory queryFactory;
+
+    public LastHandledEventTimeTable(DataSourceWrapper dataSource) {
         super(TABLE_NAME, new IdColumn.StringIdColumn(), dataSource);
+        this.queryFactory = new ProjectionStorageQueryFactory(dataSource);
     }
 
     @Override
@@ -48,6 +53,20 @@ public class LastHandledEventTimeTable extends AbstractTable<String,
     @Override
     protected Class<Column> getTableColumnType() {
         return Column.class;
+    }
+
+    public void write(String key, Timestamp time) {
+        if (containsRecord(key)) {
+            queryFactory.newUpdateTimestampQuery(key, time)
+                        .execute();
+        } else {
+            queryFactory.newInsertTimestampQuery(key, time)
+                        .execute();
+        }
+    }
+
+    public Timestamp read(String key) {
+        return queryFactory.newSelectTimestampQuery(key).execute();
     }
 
     enum Column implements TableColumn {

@@ -101,6 +101,7 @@ public class JdbcStorageFactory<I> implements StorageFactory {
         return JdbcStandStorage.<I>newBuilder()
                                .setDataSource(dataSource)
                                .setMultitenant(isMultitenant())
+                               .setEntityClass(entityClass)
                                .setQueryFactory(recordStorageQueryFactory)
                                .build();
     }
@@ -123,9 +124,9 @@ public class JdbcStorageFactory<I> implements StorageFactory {
         final RecordStorageQueryFactory<I> queryFactory = getEntityStorageQueryFactory(dataSource,
                                                                                        entityClass);
         final RecordStorage<I> recordStorage = JdbcRecordStorage.<I>newBuilder()
-                                                                .setDataSource(dataSource)
                                                                 .setMultitenant(false)
-                                                                .setQueryFactory(queryFactory)
+                                                                .setEntityClass(entityClass)
+                                                                .setDataSource(dataSource)
                                                                 .build();
         return recordStorage;
     }
@@ -141,6 +142,7 @@ public class JdbcStorageFactory<I> implements StorageFactory {
         final ProjectionStorage<I> storage = JdbcProjectionStorage.<I>newBuilder()
                                                                   .setMultitenant(multitenant)
                                                                   .setQueryFactory(queryFactory)
+                                                                  .setDataSource(dataSource)
                                                                   .setRecordStorage(entityStorage)
                                                                   .build();
         return storage;
@@ -191,7 +193,7 @@ public class JdbcStorageFactory<I> implements StorageFactory {
     protected <T> ProjectionStorageQueryFactory<T> getProjectionStorageQueryFactory(
             DataSourceWrapper dataSource,
             Class<? extends Entity<T, ?>> entityClass) {
-        return new ProjectionStorageQueryFactory<>(dataSource, entityClass);
+        return new ProjectionStorageQueryFactory<>(dataSource);
     }
 
     /**

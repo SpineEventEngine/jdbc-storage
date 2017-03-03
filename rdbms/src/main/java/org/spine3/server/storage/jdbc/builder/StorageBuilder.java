@@ -114,7 +114,7 @@ public abstract class StorageBuilder<B extends StorageBuilder<B, S, F>,
      */
     protected void checkPreconditions() throws IllegalStateException {
         checkState(dataSource != null, "Data source must not be null");
-        checkState(queryFactory != null, "Query factory must not be null");
+       // checkState(queryFactory != null, "Query factory must not be null");
     }
 
     /**

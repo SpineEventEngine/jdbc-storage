@@ -31,6 +31,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.protobuf.FieldMask;
 import org.spine3.protobuf.TypeUrl;
+import org.spine3.server.entity.Entity;
 import org.spine3.server.entity.EntityRecord;
 import org.spine3.server.stand.AggregateStateId;
 import org.spine3.server.stand.StandStorage;
@@ -68,13 +69,12 @@ public class JdbcStandStorage extends StandStorage {
     @SuppressWarnings("unchecked")
     protected JdbcStandStorage(Builder builder) {
         super(builder.isMultitenant());
-        final RecordStorageQueryFactory<Object> recordStorageQueryFactory =
-                builder.getQueryFactory();
-        recordStorage = JdbcRecordStorage.newBuilder()
-                                         .setDataSource(builder.getDataSource())
-                                         .setMultitenant(builder.isMultitenant())
-                                         .setQueryFactory(recordStorageQueryFactory)
-                                         .build();
+        recordStorage = (JdbcRecordStorage<Object>)
+                JdbcRecordStorage.newBuilder()
+                                 .setDataSource(builder.getDataSource())
+                                 .setMultitenant(builder.isMultitenant())
+                                 .setEntityClass(builder.getEntityClass())
+                                 .build();
     }
 
     @Override
@@ -210,14 +210,25 @@ public class JdbcStandStorage extends StandStorage {
      *            the {@code JdbcStandStorage}.
      */
     public static class Builder<I> extends StorageBuilder<Builder<I>,
-                                                              JdbcStandStorage,
-                                                              RecordStorageQueryFactory<I>> {
+            JdbcStandStorage,
+            RecordStorageQueryFactory<I>> {
+        private Class<? extends Entity<I, ?>> entityClass;
+
         private Builder() {
             super();
         }
 
         @Override
         protected Builder<I> getThis() {
+            return this;
+        }
+
+        public Class<? extends Entity<I, ?>> getEntityClass() {
+            return entityClass;
+        }
+
+        public Builder<I> setEntityClass(Class<? extends Entity<I, ?>> entityClass) {
+            this.entityClass = entityClass;
             return this;
         }
 

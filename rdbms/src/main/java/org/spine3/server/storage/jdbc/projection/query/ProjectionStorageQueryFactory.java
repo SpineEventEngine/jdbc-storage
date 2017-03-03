@@ -22,12 +22,8 @@ package org.spine3.server.storage.jdbc.projection.query;
 
 import com.google.protobuf.Timestamp;
 import org.slf4j.Logger;
-import org.spine3.server.entity.Entity;
 import org.spine3.server.storage.jdbc.query.AbstractQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-
-import static org.spine3.server.storage.jdbc.projection.query.ProjectionTable.LAST_EVENT_TIME_TABLE_NAME_SUFFIX;
-import static org.spine3.server.storage.jdbc.util.DbTableNameFactory.newTableName;
 
 /**
  * This class creates queries for interaction with {@link ProjectionTable}.
@@ -36,7 +32,6 @@ import static org.spine3.server.storage.jdbc.util.DbTableNameFactory.newTableNam
  */
 public class ProjectionStorageQueryFactory<I> extends AbstractQueryFactory {
 
-    private final String tableName;
     private final DataSourceWrapper dataSource;
     private Logger logger;
 
@@ -44,12 +39,8 @@ public class ProjectionStorageQueryFactory<I> extends AbstractQueryFactory {
      * Creates a new instance.
      *
      * @param dataSource      instance of {@link DataSourceWrapper}
-     * @param projectionClass entity class of corresponding
-     *                        {@link org.spine3.server.projection.ProjectionStorage} instance
      */
-    public ProjectionStorageQueryFactory(DataSourceWrapper dataSource,
-                                         Class<? extends Entity<I, ?>> projectionClass) {
-        this.tableName = newTableName(projectionClass) + LAST_EVENT_TIME_TABLE_NAME_SUFFIX;
+    public ProjectionStorageQueryFactory(DataSourceWrapper dataSource) {
         this.dataSource = dataSource;
     }
 
@@ -58,19 +49,9 @@ public class ProjectionStorageQueryFactory<I> extends AbstractQueryFactory {
         this.logger = logger;
     }
 
-    /** Returns a query that creates a new {@link ProjectionTable} if it does not exist. */
-    public CreateProjectionTableQuery newCreateTableQuery() {
-        final CreateProjectionTableQuery.Builder builder =
-                CreateProjectionTableQuery.newBuilder()
-                                          .setDataSource(dataSource)
-                                          .setLogger(logger)
-                                          .setTableName(tableName);
-        return builder.build();
-    }
-
     /** Returns a query that inserts a new {@link Timestamp} to the {@link ProjectionTable}. */
-    public InsertTimestampQuery newInsertTimestampQuery(Timestamp time) {
-        final InsertTimestampQuery.Builder builder = InsertTimestampQuery.newBuilder(tableName)
+    public InsertTimestampQuery newInsertTimestampQuery(String key, Timestamp time) {
+        final InsertTimestampQuery.Builder builder = InsertTimestampQuery.newBuilder(key)
                                                                          .setDataSource(dataSource)
                                                                          .setLogger(logger)
                                                                          .setTimestamp(time);
@@ -78,8 +59,8 @@ public class ProjectionStorageQueryFactory<I> extends AbstractQueryFactory {
     }
 
     /** Returns a query that updates {@link Timestamp} in the {@link ProjectionTable}. */
-    public UpdateTimestampQuery newUpdateTimestampQuery(Timestamp time) {
-        final UpdateTimestampQuery.Builder builder = UpdateTimestampQuery.newBuilder(tableName)
+    public UpdateTimestampQuery newUpdateTimestampQuery(String key, Timestamp time) {
+        final UpdateTimestampQuery.Builder builder = UpdateTimestampQuery.newBuilder(key)
                                                                          .setDataSource(dataSource)
                                                                          .setLogger(logger)
                                                                          .setTimestamp(time);
@@ -87,8 +68,8 @@ public class ProjectionStorageQueryFactory<I> extends AbstractQueryFactory {
     }
 
     /** Returns a query that selects timestamp from the {@link ProjectionTable}. */
-    public SelectTimestampQuery newSelectTimestampQuery() {
-        final SelectTimestampQuery.Builder builder = SelectTimestampQuery.newBuilder(tableName)
+    public SelectTimestampQuery newSelectTimestampQuery(String key) {
+        final SelectTimestampQuery.Builder builder = SelectTimestampQuery.newBuilder(key)
                                                                          .setDataSource(dataSource)
                                                                          .setLogger(logger);
         return builder.build();

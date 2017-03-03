@@ -25,6 +25,7 @@ import com.google.protobuf.Timestamp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spine3.server.entity.EntityRecord;
+import org.spine3.server.projection.Projection;
 import org.spine3.server.projection.ProjectionStorage;
 import org.spine3.server.storage.RecordStorage;
 import org.spine3.server.storage.jdbc.DatabaseException;
@@ -32,12 +33,14 @@ import org.spine3.server.storage.jdbc.JdbcStorageFactory;
 import org.spine3.server.storage.jdbc.builder.StorageBuilder;
 import org.spine3.server.storage.jdbc.entity.JdbcRecordStorage;
 import org.spine3.server.storage.jdbc.projection.query.ProjectionStorageQueryFactory;
+import org.spine3.server.storage.jdbc.table.LastHandledEventTimeTable;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
 import javax.annotation.Nullable;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkState;
+import static org.spine3.server.storage.jdbc.util.DbTableNameFactory.newTableName;
 
 /**
  * The implementation of the projection storage based on the RDBMS.
@@ -50,47 +53,39 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
 
     private final JdbcRecordStorage<I> recordStorage;
 
-    private final ProjectionStorageQueryFactory queryFactory;
+    private final LastHandledEventTimeTable table;
+
+    private final Class<? extends Projection<I, ?>> projectionClass;
 
     protected JdbcProjectionStorage(JdbcRecordStorage<I> recordStorage,
                                     boolean multitenant,
-                                    ProjectionStorageQueryFactory<I> queryFactory) throws
-                                                                                   DatabaseException {
+                                    Class<? extends Projection<I, ?>> projectionClass,
+                                    DataSourceWrapper dataSource)
+            throws
+            DatabaseException {
         super(multitenant);
         this.recordStorage = recordStorage;
-        this.queryFactory = queryFactory;
-        queryFactory.setLogger(log());
-
-        queryFactory.newCreateTableQuery()
-                    .execute();
+        this.projectionClass = projectionClass;
+        this.table = new LastHandledEventTimeTable(dataSource);
     }
 
     private JdbcProjectionStorage(Builder<I> builder) {
-        this(builder.getRecordStorage(), builder.isMultitenant(), builder.getQueryFactory());
+        this(builder.getRecordStorage(),
+             builder.isMultitenant(),
+             builder.getProjectionClass(),
+             builder.getDataSource());
     }
 
     @Override
     public void writeLastHandledEventTime(Timestamp time) throws DatabaseException {
-        if (containsLastEventTime()) {
-            queryFactory.newUpdateTimestampQuery(time)
-                        .execute();
-        } else {
-            queryFactory.newInsertTimestampQuery(time)
-                        .execute();
-        }
-    }
-
-    private boolean containsLastEventTime() throws DatabaseException {
-        final Timestamp time = readLastHandledEventTime();
-        final boolean containsEventTime = time != null;
-        return containsEventTime;
+        table.write(newTableName(projectionClass), time);
     }
 
     @Override
     @Nullable
     public Timestamp readLastHandledEventTime() throws DatabaseException {
-        final Timestamp timestamp = queryFactory.newSelectTimestampQuery()
-                                                .execute();
+        final Timestamp timestamp = table.read(newTableName(projectionClass));
+        ///queryFactory.newSelectTimestampQuery().execute();
         return timestamp;
     }
 
@@ -132,7 +127,7 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
 
     @Override
     protected Iterable<EntityRecord> readMultipleRecords(Iterable<I> ids,
-                                                                FieldMask fieldMask) {
+                                                         FieldMask fieldMask) {
         return recordStorage.readMultiple(ids, fieldMask);
     }
 
@@ -157,6 +152,7 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
                 "Data source is never used directly by org.spine3.server.storage.jdbc.projection.JdbcProjectionStorage";
 
         private JdbcRecordStorage<I> recordStorage;
+        private Class<? extends Projection<I, ?>> projectionClass;
 
         private Builder() {
             super();
@@ -192,12 +188,21 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
         @Override
         protected void checkPreconditions() throws IllegalStateException {
             checkState(getRecordStorage() != null, "Record Storage must not be null.");
-            checkState(getQueryFactory() != null, "Query factory must not be null.");
+            //       checkState(getQueryFactory() != null, "Query factory must not be null.");
         }
 
         @Override
         public JdbcProjectionStorage<I> doBuild() {
             return new JdbcProjectionStorage<>(this);
+        }
+
+        public Builder<I> setProjectionClass(Class<? extends Projection<I, ?>> projectionClass) {
+            this.projectionClass = projectionClass;
+            return this;
+        }
+
+        public Class<? extends Projection<I,?>> getProjectionClass() {
+            return projectionClass;
         }
     }
 
