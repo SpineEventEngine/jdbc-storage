@@ -33,6 +33,7 @@ import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.JdbcStorageFactory;
 import org.spine3.server.storage.jdbc.builder.StorageBuilder;
 import org.spine3.server.storage.jdbc.command.query.CommandStorageQueryFactory;
+import org.spine3.server.storage.jdbc.table.CommandTable;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
 import java.util.Iterator;
@@ -53,6 +54,8 @@ public class JdbcCommandStorage extends CommandStorage {
 
     private final CommandStorageQueryFactory queryFactory;
 
+    private final CommandTable table;
+
     protected JdbcCommandStorage(DataSourceWrapper dataSource,
                                  boolean multitenant,
                                  CommandStorageQueryFactory queryFactory)
@@ -63,6 +66,8 @@ public class JdbcCommandStorage extends CommandStorage {
         queryFactory.setLogger(LogSingleton.INSTANCE.value);
         queryFactory.newCreateCommandTableQuery()
                     .execute();
+        table = new CommandTable(dataSource);
+        table.createIfNotExists();
     }
 
     private JdbcCommandStorage(Builder builder) throws DatabaseException {
@@ -79,8 +84,8 @@ public class JdbcCommandStorage extends CommandStorage {
     public Optional<CommandRecord> read(CommandId commandId) throws DatabaseException {
         checkNotClosed();
 
-        final CommandRecord record = queryFactory.newSelectCommandByIdQuery(commandId)
-                                                        .execute();
+        final String id = commandId.getUuid();
+        final CommandRecord record = table.read(id); //queryFactory.newSelectCommandByIdQuery(commandId).execute();
 
         return Optional.fromNullable(record);
     }
@@ -94,9 +99,7 @@ public class JdbcCommandStorage extends CommandStorage {
     @Override
     public Iterator<CommandRecord> read(CommandStatus status) {
         checkNotNull(status);
-        final Iterator<CommandRecord> iterator = queryFactory.newSelectCommandByStatusQuery(
-                status)
-                                                                    .execute();
+        final Iterator<CommandRecord> iterator = table.readByStatus(status); //queryFactory.newSelectCommandByStatusQuery(status).execute();
         return iterator;
     }
 
@@ -112,13 +115,16 @@ public class JdbcCommandStorage extends CommandStorage {
         checkNotDefault(record);
         checkNotClosed();
 
-        if (containsRecord(commandId)) {
-            queryFactory.newUpdateCommandQuery(commandId, record)
-                        .execute();
-        } else {
-            queryFactory.newInsertCommandQuery(commandId, record)
-                        .execute();
-        }
+        final String id = commandId.getUuid();
+        table.write(id, record);
+
+//        if (containsRecord(commandId)) {
+//            queryFactory.newUpdateCommandQuery(commandId, record)
+//                        .execute();
+//        } else {
+//            queryFactory.newInsertCommandQuery(commandId, record)
+//                        .execute();
+//        }
     }
 
     private boolean containsRecord(CommandId commandId) {
@@ -138,8 +144,9 @@ public class JdbcCommandStorage extends CommandStorage {
         checkNotNull(commandId);
         checkNotClosed();
 
-        queryFactory.newSetOkStatusQuery(commandId)
-                    .execute();
+        final String id = commandId.getUuid();
+        table.setOkStatus(id);
+        //queryFactory.newSetOkStatusQuery(commandId).execute();
     }
 
     /**
@@ -154,8 +161,10 @@ public class JdbcCommandStorage extends CommandStorage {
         checkNotNull(error);
         checkNotClosed();
 
-        queryFactory.newSetErrorQuery(commandId, error)
-                    .execute();
+        final String id = commandId.getUuid();
+        table.setError(id, error);
+
+//        queryFactory.newSetErrorQuery(commandId, error).execute();
     }
 
     /**
@@ -170,8 +179,9 @@ public class JdbcCommandStorage extends CommandStorage {
         checkNotNull(failure);
         checkNotClosed();
 
-        queryFactory.newSetFailureQuery(commandId, failure)
-                    .execute();
+        final String id = commandId.getUuid();
+        table.setFailure(id, failure);
+//        queryFactory.newSetFailureQuery(commandId, failure).execute();
     }
 
     @Override

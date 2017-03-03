@@ -26,7 +26,7 @@ import org.spine3.base.CommandStatus;
 import org.spine3.base.Error;
 import org.spine3.base.Failure;
 import org.spine3.server.command.CommandRecord;
-import org.spine3.server.storage.jdbc.query.QueryFactory;
+import org.spine3.server.storage.jdbc.query.AbstractQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
@@ -38,7 +38,7 @@ import static org.spine3.server.storage.jdbc.command.query.CommandTable.TABLE_NA
  * @author Andrey Lavrov
  */
 @SuppressWarnings("TypeMayBeWeakened")
-public class CommandStorageQueryFactory implements QueryFactory {
+public class CommandStorageQueryFactory extends AbstractQueryFactory {
 
     private final IdColumn<String> idColumn;
     private final DataSourceWrapper dataSource;

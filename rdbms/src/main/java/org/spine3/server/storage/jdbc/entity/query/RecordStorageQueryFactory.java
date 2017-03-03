@@ -27,8 +27,8 @@ import org.spine3.server.entity.EntityRecord;
 import org.spine3.server.storage.RecordStorage;
 import org.spine3.server.storage.VisibilityField;
 import org.spine3.server.storage.jdbc.entity.visibility.query.MarkEntityQuery;
+import org.spine3.server.storage.jdbc.query.AbstractQueryFactory;
 import org.spine3.server.storage.jdbc.query.DeleteRecordQuery;
-import org.spine3.server.storage.jdbc.query.QueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbTableNameFactory;
 import org.spine3.server.storage.jdbc.util.IdColumn;
@@ -44,7 +44,7 @@ import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
  * @author Andrey Lavrov
  * @author Dmytro Dashenkov
  */
-public class RecordStorageQueryFactory<I> implements QueryFactory {
+public class RecordStorageQueryFactory<I> extends AbstractQueryFactory {
 
     private final IdColumn<I> idColumn;
     private final DataSourceWrapper dataSource;

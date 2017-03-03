@@ -24,6 +24,7 @@ import com.google.common.collect.ImmutableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spine3.server.storage.jdbc.Sql;
+import org.spine3.server.storage.jdbc.query.ContainsQuery;
 import org.spine3.server.storage.jdbc.query.VoidQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
@@ -79,6 +80,19 @@ public abstract class AbstractTable<I, C extends Enum<C> & TableColumn> {
         query.execute();
     }
 
+    protected boolean containsRecord(I id) {
+        final ContainsQuery<I> query = ContainsQuery.<I>newBuilder()
+                                                    .setIdColumn(getIdColumn())
+                                                    .setId(id)
+                                                    .setTableName(getName())
+                                                    .setKeyColumn(getIdColumnDeclaration())
+                                                    .setDataSource(dataSource)
+                                                    .setLogger(log())
+                                                    .build();
+        final boolean result = query.execute();
+        return result;
+    }
+
     @SuppressWarnings("ReturnOfCollectionOrArrayField") // Returns immutable collection
     public ImmutableList<C> getColumns() {
         if (columns == null) {
@@ -113,7 +127,7 @@ public abstract class AbstractTable<I, C extends Enum<C> & TableColumn> {
            .append(getName())
            .append(BRACKET_OPEN);
         for (C column : getColumns()) {
-            final String  name = column.name();
+            final String name = column.name();
             final Sql.Type type = ensureType(column);
             sql.append(name)
                .append(type)
@@ -211,9 +225,11 @@ public abstract class AbstractTable<I, C extends Enum<C> & TableColumn> {
     private Sql.Type ensureType(C column) {
         Sql.Type type = column.type();
         if (type == Sql.Type.UNKNOWN) {
-            type = getIdType();
-        } else {
-            throw new IllegalStateException("UNKNOWN type of a non-ID column " + column.name());
+            if (column == getIdColumnDeclaration()) {
+                type = getIdType();
+            } else {
+                throw new IllegalStateException("UNKNOWN type of a non-ID column " + column.name());
+            }
         }
         return type;
     }

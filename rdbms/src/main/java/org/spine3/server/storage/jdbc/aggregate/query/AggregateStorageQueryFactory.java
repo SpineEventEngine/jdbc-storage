@@ -33,7 +33,7 @@ import org.spine3.server.storage.jdbc.entity.visibility.query.MarkEntityQuery;
 import org.spine3.server.storage.jdbc.entity.visibility.query.SelectVisibilityQuery;
 import org.spine3.server.storage.jdbc.entity.visibility.query.UpdateVisibilityQuery;
 import org.spine3.server.storage.jdbc.entity.visibility.table.VisibilityTable;
-import org.spine3.server.storage.jdbc.query.QueryFactory;
+import org.spine3.server.storage.jdbc.query.AbstractQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbTableNameFactory;
 import org.spine3.server.storage.jdbc.util.IdColumn;
@@ -49,7 +49,7 @@ import static org.spine3.server.storage.jdbc.aggregate.query.Table.EventCount.EV
  * @param <I> the type of IDs used in the storage
  * @author Andrey Lavrov
  */
-public class AggregateStorageQueryFactory<I> implements QueryFactory {
+public class AggregateStorageQueryFactory<I> extends AbstractQueryFactory {
 
     private final IdColumn<I> idColumn;
     private final String mainTableName;

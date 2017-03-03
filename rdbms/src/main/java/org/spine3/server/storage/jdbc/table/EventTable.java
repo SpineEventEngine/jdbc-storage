@@ -72,13 +72,6 @@ public class EventTable extends AbstractTable<String, EventTable.Column> {
         }
     }
 
-    private boolean containsRecord(String id) {
-        final Event record = queryFactory.newSelectEventByIdQuery(id)
-                                         .execute();
-        final boolean contains = record != null;
-        return contains;
-    }
-
     public Event read(String id) {
         final Event event = queryFactory.newSelectEventByIdQuery(id)
                                          .execute();

@@ -21,12 +21,13 @@
 package org.spine3.server.storage.jdbc.query;
 
 /**
- * A marker interface common for all the query factories.
+ * An abstract {@linkplain StorageQuery query} factory.
  *
- * <p>Each JDBC-based {@linkplain org.spine3.server.storage.Storage} uses an instance of
- * {@code QueryFactory} implementation to construct its SQL queries to the database.
+ * <p>Each JDBC {@linkplain org.spine3.server.storage.jdbc.table.AbstractTable table} uses an
+ * instance of {@code AbstractQueryFactory} subclass to construct its SQL queries to the database.
  *
  * @author Dmytro Dashenkov.
  */
-public interface QueryFactory {
+public class AbstractQueryFactory {
+
 }

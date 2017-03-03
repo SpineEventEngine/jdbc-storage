@@ -20,9 +20,15 @@
 
 package org.spine3.server.storage.jdbc.table;
 
+import org.spine3.base.CommandStatus;
+import org.spine3.base.Error;
+import org.spine3.base.Failure;
+import org.spine3.server.command.CommandRecord;
 import org.spine3.server.storage.jdbc.Sql.Type;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
+
+import java.util.Iterator;
 
 import static org.spine3.server.storage.jdbc.Sql.Type.BLOB;
 import static org.spine3.server.storage.jdbc.Sql.Type.VARCHAR_512;
@@ -47,6 +53,30 @@ public class CommandTable extends AbstractTable<String, CommandTable.Column> {
     @Override
     protected Class<Column> getTableColumnType() {
         return Column.class;
+    }
+
+    public CommandRecord read(String id) {
+        return null;
+    }
+
+    public Iterator<CommandRecord> readByStatus(CommandStatus status) {
+        return null;
+    }
+
+    public void write(String id, CommandRecord record) {
+
+    }
+
+    public void setOkStatus(String id) {
+
+    }
+
+    public void setError(String id, Error error) {
+
+    }
+
+    public void setFailure(String id, Failure failure) {
+
     }
 
     enum Column implements TableColumn {
