@@ -18,38 +18,29 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.spine3.server.storage.jdbc.table.entity;
+package org.spine3.server.storage.jdbc.table.entity.aggregate;
 
 import org.spine3.server.entity.Entity;
-import org.spine3.server.storage.jdbc.table.AbstractTable;
 import org.spine3.server.storage.jdbc.table.TableColumn;
+import org.spine3.server.storage.jdbc.table.entity.EntityTable;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
-
-import static org.spine3.server.storage.jdbc.util.DbTableNameFactory.newTableName;
 
 /**
  * @author Dmytro Dashenkov.
  */
-public abstract class EntityTable<I, C extends Enum<C> & TableColumn> extends AbstractTable<I, C> {
+public abstract class AggregateTable<I, C extends Enum<C> & TableColumn> extends EntityTable<I, C> {
 
-    private final Class<Entity<I, ?>> entityClass;
-
-    protected EntityTable(Class<Entity<I, ?>> entityClass,
-                          IdColumn<I> idColumn,
-                          DataSourceWrapper dataSource) {
-        this(newTableName(entityClass), entityClass, idColumn, dataSource);
+    protected AggregateTable(Class<Entity<I, ?>> entityClass,
+                             IdColumn<I> idColumn,
+                             DataSourceWrapper dataSource) {
+        super(entityClass, idColumn, dataSource);
     }
 
-    protected EntityTable(String tableName,
-                          Class<Entity<I, ?>> entityClass,
-                          IdColumn<I> idColumn,
-                          DataSourceWrapper dataSource) {
-        super(tableName, idColumn, dataSource);
-        this.entityClass = entityClass;
-    }
-
-    public Class<Entity<I, ?>> getEntityClass() {
-        return entityClass;
+    protected AggregateTable(String tableName,
+                             Class<Entity<I, ?>> entityClass,
+                             IdColumn<I> idColumn,
+                             DataSourceWrapper dataSource) {
+        super(tableName, entityClass, idColumn, dataSource);
     }
 }

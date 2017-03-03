@@ -30,7 +30,7 @@ import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.COMMA;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
 import static org.spine3.server.storage.jdbc.Sql.Query.CREATE_IF_MISSING;
 import static org.spine3.server.storage.jdbc.Sql.Type.BOOLEAN;
-import static org.spine3.server.storage.jdbc.Sql.Type.VARCHAR_512;
+import static org.spine3.server.storage.jdbc.Sql.Type.VARCHAR_999;
 import static org.spine3.server.storage.jdbc.entity.visibility.table.VisibilityTable.ID_COL;
 
 /**
@@ -41,7 +41,7 @@ import static org.spine3.server.storage.jdbc.entity.visibility.table.VisibilityT
 public class CreateVisibilityTableQuery extends CreateTableQuery<String> {
 
     private static final String SQL_TEMPLATE = CREATE_IF_MISSING + "%s" + BRACKET_OPEN +
-                                               ID_COL + VARCHAR_512 + COMMA +
+                                               ID_COL + VARCHAR_999 + COMMA +
                                                archived + BOOLEAN + COMMA +
                                                deleted + BOOLEAN + BRACKET_CLOSE + SEMICOLON;
 

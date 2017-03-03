@@ -204,11 +204,8 @@ public abstract class AbstractTable<I, C extends Enum<C> & TableColumn> {
     }
 
     private Sql.Type getIdType() {
-        Sql.Type type = getIdColumnDeclaration().type();
-        if (type == Sql.Type.UNKNOWN) {
-            type = getIdColumn().getColumnDataType();
-        }
-        return type;
+        final Sql.Type idType = getIdColumn().getColumnDataType();
+        return idType;
     }
 
     private Sql.Type ensureType(C column) {

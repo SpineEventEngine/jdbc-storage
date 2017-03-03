@@ -18,38 +18,58 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.spine3.server.storage.jdbc.table.entity;
+package org.spine3.server.storage.jdbc.table.entity.aggregate;
 
 import org.spine3.server.entity.Entity;
-import org.spine3.server.storage.jdbc.table.AbstractTable;
+import org.spine3.server.storage.jdbc.Sql;
 import org.spine3.server.storage.jdbc.table.TableColumn;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
+import static org.spine3.server.storage.jdbc.Sql.Type.BIGINT;
+import static org.spine3.server.storage.jdbc.Sql.Type.UNKNOWN;
 import static org.spine3.server.storage.jdbc.util.DbTableNameFactory.newTableName;
 
 /**
  * @author Dmytro Dashenkov.
  */
-public abstract class EntityTable<I, C extends Enum<C> & TableColumn> extends AbstractTable<I, C> {
+public class EventCountTable<I> extends AggregateTable<I, EventCountTable.Column> {
 
-    private final Class<Entity<I, ?>> entityClass;
+    private static final String TABLE_NAME_POSTFIX = "event_count";
 
-    protected EntityTable(Class<Entity<I, ?>> entityClass,
-                          IdColumn<I> idColumn,
-                          DataSourceWrapper dataSource) {
-        this(newTableName(entityClass), entityClass, idColumn, dataSource);
+    protected EventCountTable(Class<Entity<I, ?>> entityClass,
+                              IdColumn<I> idColumn,
+                              DataSourceWrapper dataSource) {
+        super(newTableName(entityClass) + (TABLE_NAME_POSTFIX),
+              entityClass,
+              idColumn,
+              dataSource);
     }
 
-    protected EntityTable(String tableName,
-                          Class<Entity<I, ?>> entityClass,
-                          IdColumn<I> idColumn,
-                          DataSourceWrapper dataSource) {
-        super(tableName, idColumn, dataSource);
-        this.entityClass = entityClass;
+    @Override
+    public Column getIdColumnDeclaration() {
+        return Column.id;
     }
 
-    public Class<Entity<I, ?>> getEntityClass() {
-        return entityClass;
+    @Override
+    protected Class<Column> getTableColumnType() {
+        return Column.class;
+    }
+
+    enum Column implements TableColumn {
+
+        id(UNKNOWN),
+        event_count(BIGINT);
+
+        private final Sql.Type type;
+
+        Column(Sql.Type type) {
+            this.type = type;
+        }
+
+        @Override
+        public Sql.Type type() {
+            return type;
+        }
     }
 }
