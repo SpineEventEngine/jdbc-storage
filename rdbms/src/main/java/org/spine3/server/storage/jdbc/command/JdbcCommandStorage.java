@@ -21,8 +21,6 @@
 package org.spine3.server.storage.jdbc.command;
 
 import com.google.common.base.Optional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.spine3.base.CommandId;
 import org.spine3.base.CommandStatus;
 import org.spine3.base.Error;
@@ -52,26 +50,19 @@ public class JdbcCommandStorage extends CommandStorage {
 
     private final DataSourceWrapper dataSource;
 
-    private final CommandStorageQueryFactory queryFactory;
-
     private final CommandTable table;
 
     protected JdbcCommandStorage(DataSourceWrapper dataSource,
-                                 boolean multitenant,
-                                 CommandStorageQueryFactory queryFactory)
+                                 boolean multitenant)
             throws DatabaseException {
         super(multitenant);
         this.dataSource = dataSource;
-        this.queryFactory = queryFactory;
-        queryFactory.setLogger(LogSingleton.INSTANCE.value);
-        queryFactory.newCreateCommandTableQuery()
-                    .execute();
         table = new CommandTable(dataSource);
         table.createIfNotExists();
     }
 
     private JdbcCommandStorage(Builder builder) throws DatabaseException {
-        this(builder.getDataSource(), builder.isMultitenant(), builder.getQueryFactory());
+        this(builder.getDataSource(), builder.isMultitenant());
     }
 
     /**
@@ -85,7 +76,7 @@ public class JdbcCommandStorage extends CommandStorage {
         checkNotClosed();
 
         final String id = commandId.getUuid();
-        final CommandRecord record = table.read(id); //queryFactory.newSelectCommandByIdQuery(commandId).execute();
+        final CommandRecord record = table.read(id);
 
         return Optional.fromNullable(record);
     }
@@ -99,7 +90,7 @@ public class JdbcCommandStorage extends CommandStorage {
     @Override
     public Iterator<CommandRecord> read(CommandStatus status) {
         checkNotNull(status);
-        final Iterator<CommandRecord> iterator = table.readByStatus(status); //queryFactory.newSelectCommandByStatusQuery(status).execute();
+        final Iterator<CommandRecord> iterator = table.readByStatus(status);
         return iterator;
     }
 
@@ -117,20 +108,6 @@ public class JdbcCommandStorage extends CommandStorage {
 
         final String id = commandId.getUuid();
         table.write(id, record);
-
-//        if (containsRecord(commandId)) {
-//            queryFactory.newUpdateCommandQuery(commandId, record)
-//                        .execute();
-//        } else {
-//            queryFactory.newInsertCommandQuery(commandId, record)
-//                        .execute();
-//        }
-    }
-
-    private boolean containsRecord(CommandId commandId) {
-        final Optional<CommandRecord> record = read(commandId);
-        final boolean contains = record.isPresent();
-        return contains;
     }
 
     /**
@@ -146,7 +123,6 @@ public class JdbcCommandStorage extends CommandStorage {
 
         final String id = commandId.getUuid();
         table.setOkStatus(id);
-        //queryFactory.newSetOkStatusQuery(commandId).execute();
     }
 
     /**
@@ -163,8 +139,6 @@ public class JdbcCommandStorage extends CommandStorage {
 
         final String id = commandId.getUuid();
         table.setError(id, error);
-
-//        queryFactory.newSetErrorQuery(commandId, error).execute();
     }
 
     /**
@@ -181,7 +155,6 @@ public class JdbcCommandStorage extends CommandStorage {
 
         final String id = commandId.getUuid();
         table.setFailure(id, failure);
-//        queryFactory.newSetFailureQuery(commandId, failure).execute();
     }
 
     @Override
@@ -215,11 +188,5 @@ public class JdbcCommandStorage extends CommandStorage {
         public JdbcCommandStorage doBuild() throws DatabaseException {
             return new JdbcCommandStorage(this);
         }
-    }
-
-    private enum LogSingleton {
-        INSTANCE;
-        @SuppressWarnings("NonSerializableFieldInSerializableClass")
-        private final Logger value = LoggerFactory.getLogger(JdbcCommandStorage.class);
     }
 }

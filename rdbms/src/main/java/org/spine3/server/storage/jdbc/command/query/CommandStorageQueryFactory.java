@@ -21,7 +21,6 @@
 package org.spine3.server.storage.jdbc.command.query;
 
 import org.slf4j.Logger;
-import org.spine3.base.CommandId;
 import org.spine3.base.CommandStatus;
 import org.spine3.base.Error;
 import org.spine3.base.Failure;
@@ -76,13 +75,13 @@ public class CommandStorageQueryFactory extends AbstractQueryFactory {
      * @param id     new command record id
      * @param record new command record
      */
-    public InsertCommandQuery newInsertCommandQuery(CommandId id, CommandRecord record) {
+    public InsertCommandQuery newInsertCommandQuery(String id, CommandRecord record) {
         final InsertCommandQuery.Builder builder =
                 InsertCommandQuery.newBuilder()
                                   .setDataSource(dataSource)
                                   .setLogger(logger)
                                   .setIdColumn(idColumn)
-                                  .setId(id.getUuid())
+                                  .setId(id)
                                   .setRecord(record)
                                   .setStatus(record.getStatus().getCode());
         return builder.build();
@@ -94,13 +93,13 @@ public class CommandStorageQueryFactory extends AbstractQueryFactory {
      * @param id     command id
      * @param record updated record state
      */
-    public UpdateCommandQuery newUpdateCommandQuery(CommandId id, CommandRecord record) {
+    public UpdateCommandQuery newUpdateCommandQuery(String id, CommandRecord record) {
         final UpdateCommandQuery.Builder builder =
                 UpdateCommandQuery.newBuilder()
                                   .setDataSource(dataSource)
                                   .setLogger(logger)
                                   .setIdColumn(idColumn)
-                                  .setId(id.getUuid())
+                                  .setId(id)
                                   .setRecord(record)
                                   .setStatus(record.getStatus().getCode());
         return builder.build();
@@ -112,12 +111,12 @@ public class CommandStorageQueryFactory extends AbstractQueryFactory {
      * @param id    command record id
      * @param error a technical error occurred during command handling
      */
-    public SetErrorQuery newSetErrorQuery(CommandId id, Error error) {
+    public SetErrorQuery newSetErrorQuery(String id, Error error) {
         final SetErrorQuery.Builder builder = SetErrorQuery.newBuilder()
                                                            .setDataSource(dataSource)
                                                            .setLogger(logger)
                                                            .setIdColumn(idColumn)
-                                                           .setId(id.getUuid())
+                                                           .setId(id)
                                                            .setRecord(error);
         return builder.build();
     }
@@ -128,12 +127,12 @@ public class CommandStorageQueryFactory extends AbstractQueryFactory {
      * @param id      command record id
      * @param failure a business failure occurred during command handling
      */
-    public SetFailureQuery newSetFailureQuery(CommandId id, Failure failure) {
+    public SetFailureQuery newSetFailureQuery(String id, Failure failure) {
         final SetFailureQuery.Builder builder = SetFailureQuery.newBuilder()
                                                                .setDataSource(dataSource)
                                                                .setLogger(logger)
                                                                .setIdColumn(idColumn)
-                                                               .setId(id.getUuid())
+                                                               .setId(id)
                                                                .setRecord(failure);
         return builder.build();
     }
@@ -143,23 +142,23 @@ public class CommandStorageQueryFactory extends AbstractQueryFactory {
      *
      * @param id command record id
      */
-    public SetOkStatusQuery newSetOkStatusQuery(CommandId id) {
+    public SetOkStatusQuery newSetOkStatusQuery(String id) {
         final SetOkStatusQuery.Builder builder = SetOkStatusQuery.newBuilder()
                                                                  .setDataSource(dataSource)
                                                                  .setLogger(logger)
                                                                  .setIdColumn(idColumn)
-                                                                 .setId(id.getUuid());
+                                                                 .setId(id);
         return builder.build();
     }
 
     /** Returns a query that selects {@link CommandRecord} by ID. */
-    public SelectCommandByIdQuery newSelectCommandByIdQuery(CommandId id) {
+    public SelectCommandByIdQuery newSelectCommandByIdQuery(String id) {
         final SelectCommandByIdQuery.Builder builder =
                 SelectCommandByIdQuery.newBuilder()
                                       .setDataSource(dataSource)
                                       .setLogger(logger)
                                       .setIdColumn(idColumn)
-                                      .setId(id.getUuid());
+                                      .setId(id);
         return builder.build();
     }
 

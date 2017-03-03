@@ -25,6 +25,13 @@ import org.spine3.base.Error;
 import org.spine3.base.Failure;
 import org.spine3.server.command.CommandRecord;
 import org.spine3.server.storage.jdbc.Sql.Type;
+import org.spine3.server.storage.jdbc.command.query.CommandStorageQueryFactory;
+import org.spine3.server.storage.jdbc.command.query.SelectCommandByIdQuery;
+import org.spine3.server.storage.jdbc.command.query.SelectCommandByStatusQuery;
+import org.spine3.server.storage.jdbc.command.query.SetErrorQuery;
+import org.spine3.server.storage.jdbc.command.query.SetFailureQuery;
+import org.spine3.server.storage.jdbc.command.query.SetOkStatusQuery;
+import org.spine3.server.storage.jdbc.query.WriteQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
@@ -41,8 +48,11 @@ public class CommandTable extends AbstractTable<String, CommandTable.Column> {
 
     private static final String TABLE_NAME = "commands";
 
+    private final CommandStorageQueryFactory queryFactory;
+
     public CommandTable(DataSourceWrapper dataSource) {
         super(TABLE_NAME, new IdColumn.StringIdColumn(), dataSource);
+        this.queryFactory = new CommandStorageQueryFactory(dataSource);
     }
 
     @Override
@@ -56,27 +66,41 @@ public class CommandTable extends AbstractTable<String, CommandTable.Column> {
     }
 
     public CommandRecord read(String id) {
-        return null;
+        final SelectCommandByIdQuery query = queryFactory.newSelectCommandByIdQuery(id);
+        final CommandRecord result = query.execute();
+        return result;
     }
 
     public Iterator<CommandRecord> readByStatus(CommandStatus status) {
-        return null;
+        final SelectCommandByStatusQuery query = queryFactory.newSelectCommandByStatusQuery(status);
+        final Iterator<CommandRecord> result = query.execute();
+        return result;
     }
 
     public void write(String id, CommandRecord record) {
+        final WriteQuery query;
+        if (containsRecord(id)) {
+            query = queryFactory.newUpdateCommandQuery(id, record);
+        } else {
+            query = queryFactory.newInsertCommandQuery(id, record);
+        }
 
+        query.execute();
     }
 
     public void setOkStatus(String id) {
-
+        final SetOkStatusQuery query = queryFactory.newSetOkStatusQuery(id);
+        query.execute();
     }
 
     public void setError(String id, Error error) {
-
+        final SetErrorQuery query = queryFactory.newSetErrorQuery(id, error);
+        query.execute();
     }
 
     public void setFailure(String id, Failure failure) {
-
+        final SetFailureQuery query = queryFactory.newSetFailureQuery(id, failure);
+        query.execute();
     }
 
     enum Column implements TableColumn {
