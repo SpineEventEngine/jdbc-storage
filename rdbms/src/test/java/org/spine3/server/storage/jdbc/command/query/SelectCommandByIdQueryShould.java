@@ -21,13 +21,17 @@
 package org.spine3.server.storage.jdbc.command.query;
 
 import org.junit.Test;
+import org.spine3.server.command.CommandRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -44,5 +48,13 @@ public class SelectCommandByIdQueryShould {
         } catch (DatabaseException expected) {
             verify(Given.getLoggerMock()).error(anyString(), any(SQLException.class));
         }
+    }
+
+    @Test
+    public void return_null_if_result_set_contains_NO_column_COMMAND() throws SQLException {
+        final SelectCommandByIdQuery query = Given.getSelectCommandByIdQueryMock();
+        final ResultSet resultSet = mock(ResultSet.class);
+        final CommandRecord readMessage = query.readMessage(resultSet);
+        assertNull(readMessage);
     }
 }

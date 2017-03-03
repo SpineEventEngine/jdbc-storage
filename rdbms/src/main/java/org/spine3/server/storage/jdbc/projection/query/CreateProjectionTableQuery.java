@@ -40,12 +40,11 @@ import static org.spine3.server.storage.jdbc.projection.query.ProjectionTable.SE
  */
 public class CreateProjectionTableQuery extends CreateTableQuery<String> {
 
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
             CREATE_IF_MISSING + "%s " + BRACKET_OPEN +
-                    SECONDS_COL + BIGINT + COMMA +
-                    NANOS_COL + INT + COMMA +
-                    BRACKET_CLOSE + SEMICOLON;
+            SECONDS_COL + BIGINT + COMMA +
+            NANOS_COL + INT + COMMA +
+            BRACKET_CLOSE + SEMICOLON;
 
     protected CreateProjectionTableQuery(Builder builder) {
         super(builder);

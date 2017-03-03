@@ -20,10 +20,13 @@
 
 package org.spine3.server.storage.jdbc.entity.query;
 
-import org.spine3.server.storage.EntityStorageRecord;
+import org.spine3.server.entity.EntityRecord;
 import org.spine3.server.storage.jdbc.query.WriteRecordQuery;
 
 import static java.lang.String.format;
+import static org.spine3.server.storage.VisibilityField.archived;
+import static org.spine3.server.storage.VisibilityField.deleted;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.COMMA;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
 import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
@@ -34,33 +37,37 @@ import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ENTITY_COL
 import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
 
 /**
- * Query that updates {@link EntityStorageRecord} in the {@link EntityTable}.
+ * Query that updates {@link EntityRecord} in the {@link EntityTable}.
  *
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-public class UpdateEntityQuery<I> extends WriteRecordQuery<I, EntityStorageRecord> {
+public class UpdateEntityQuery<I> extends WriteEntityQuery<I> {
 
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
             UPDATE + "%s" +
-                    SET + ENTITY_COL + EQUAL + PLACEHOLDER +
-                    WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
+            SET + ENTITY_COL + EQUAL + PLACEHOLDER + COMMA +
+            archived + EQUAL + PLACEHOLDER + COMMA +
+            deleted + EQUAL + PLACEHOLDER +
+            WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
 
     private UpdateEntityQuery(Builder<I> builder) {
         super(builder);
     }
 
-    public static <I> Builder <I> newBuilder(String tableName) {
+    public static <I> Builder<I> newBuilder(String tableName) {
         final Builder<I> builder = new Builder<>();
-        builder.setIdIndexInQuery(2)
-                .setRecordIndexInQuery(1)
-                .setQuery(format(QUERY_TEMPLATE, tableName));
+        builder.setIdIndexInQuery(QueryParameter.ID.index)
+               .setRecordIndexInQuery(QueryParameter.RECORD.index)
+               .setQuery(format(QUERY_TEMPLATE, tableName));
         return builder;
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder<I> extends WriteRecordQuery.Builder<Builder<I>, UpdateEntityQuery, I, EntityStorageRecord> {
+    public static class Builder<I> extends WriteRecordQuery.Builder<Builder<I>,
+                                                                    UpdateEntityQuery,
+                                                                    I,
+                                                                    EntityRecord> {
 
         @Override
         public UpdateEntityQuery build() {

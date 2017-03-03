@@ -68,15 +68,18 @@ public class SqlShould {
     @Test
     public void provide_valid_sql_tokens() {
         final String createTableExpected = "CREATE TABLE";
-        final String createTableActual = Sql.Query.CREATE_TABLE.toString().trim();
+        final String createTableActual = Sql.Query.CREATE_TABLE.toString()
+                                                               .trim();
         assertEquals(createTableExpected, createTableActual);
 
         final String countExpected = "COUNT";
-        final String countActual = Sql.Function.COUNT.toString().trim();
+        final String countActual = Sql.Function.COUNT.toString()
+                                                     .trim();
         assertEquals(countExpected, countActual);
 
         final String varcharExpected = "VARCHAR(512)";
-        final String varcharActual = Sql.Type.VARCHAR_512.toString().trim();
+        final String varcharActual = Sql.Type.VARCHAR_512.toString()
+                                                         .trim();
         assertEquals(varcharExpected, varcharActual);
     }
 

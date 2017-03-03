@@ -21,12 +21,6 @@
 package org.spine3.server.storage.jdbc.projection.query;
 
 import com.google.protobuf.Timestamp;
-import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.query.WriteQuery;
-import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
-
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 
 import static java.lang.String.format;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.COMMA;
@@ -44,56 +38,29 @@ import static org.spine3.server.storage.jdbc.projection.query.ProjectionTable.SE
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-public class UpdateTimestampQuery extends WriteQuery{
+public class UpdateTimestampQuery extends WriteTimestampQuery {
 
-    private final Timestamp timestamp;
-
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
-            UPDATE + "%s" + SET+
-                    SECONDS_COL + EQUAL + PLACEHOLDER + COMMA +
-                    NANOS_COL + EQUAL + PLACEHOLDER + SEMICOLON;
+            UPDATE + "%s" + SET +
+            SECONDS_COL + EQUAL + PLACEHOLDER + COMMA +
+            NANOS_COL + EQUAL + PLACEHOLDER + SEMICOLON;
 
     private UpdateTimestampQuery(Builder builder) {
         super(builder);
-        this.timestamp = builder.timestamp;
     }
 
-    public static  Builder  newBuilder(String tableName) {
+    public static Builder newBuilder(String tableName) {
         final Builder builder = new Builder();
         builder.setQuery(format(QUERY_TEMPLATE, tableName));
         return builder;
     }
 
-    @Override
-    @SuppressWarnings("DuplicateStringLiteralInspection")
-    protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
-        final PreparedStatement statement = super.prepareStatement(connection);
-        final long seconds = timestamp.getSeconds();
-        final int nanos = timestamp.getNanos();
-        try {
-            statement.setLong(1, seconds);
-            statement.setInt(2, nanos);
-            return statement;
-        } catch (SQLException e) {
-            getLogger().error("Failed to prepare statement.", e);
-            throw new DatabaseException(e);
-        }
-    }
-
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder extends WriteQuery.Builder<Builder, UpdateTimestampQuery> {
-
-        private Timestamp timestamp;
+    public static class Builder extends WriteTimestampQuery.Builder<Builder, UpdateTimestampQuery> {
 
         @Override
         public UpdateTimestampQuery build() {
             return new UpdateTimestampQuery(this);
-        }
-
-        public Builder setTimestamp(Timestamp timestamp){
-            this.timestamp = timestamp;
-            return getThis();
         }
 
         @Override

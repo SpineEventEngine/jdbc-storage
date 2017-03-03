@@ -20,7 +20,7 @@
 
 package org.spine3.server.storage.jdbc.command.query;
 
-import org.spine3.server.command.storage.CommandStorageRecord;
+import org.spine3.server.command.CommandRecord;
 
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.COMMA;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
@@ -35,18 +35,17 @@ import static org.spine3.server.storage.jdbc.command.query.CommandTable.ID_COL;
 import static org.spine3.server.storage.jdbc.command.query.CommandTable.TABLE_NAME;
 
 /**
- * Query that updates {@link CommandStorageRecord} in the {@link CommandTable}.
+ * Query that updates {@link CommandRecord} in the {@link CommandTable}.
  *
  * @author Andrey Lavrov
  */
 public class UpdateCommandQuery extends WriteCommandRecordQuery {
 
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
             UPDATE + TABLE_NAME +
-                    SET + COMMAND_COL + EQUAL + PLACEHOLDER +
-                    COMMA + COMMAND_STATUS_COL + EQUAL + PLACEHOLDER +
-                    WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
+            SET + COMMAND_COL + EQUAL + PLACEHOLDER +
+            COMMA + COMMAND_STATUS_COL + EQUAL + PLACEHOLDER +
+            WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
 
     private UpdateCommandQuery(Builder builder) {
         super(builder);
@@ -54,10 +53,10 @@ public class UpdateCommandQuery extends WriteCommandRecordQuery {
 
     public static Builder newBuilder() {
         final Builder builder = new Builder();
-        builder.setStatusIndexInQuery(2)
-                .setIdIndexInQuery(3)
-                .setRecordIndexInQuery(1)
-                .setQuery(QUERY_TEMPLATE);
+        builder.setStatusIndexInQuery(QueryParameter.STATUS.getIndex())
+               .setIdIndexInQuery(QueryParameter.ID.getIndex())
+               .setRecordIndexInQuery(QueryParameter.RECORD.getIndex())
+               .setQuery(QUERY_TEMPLATE);
         return builder;
     }
 
@@ -72,6 +71,23 @@ public class UpdateCommandQuery extends WriteCommandRecordQuery {
         @Override
         protected Builder getThis() {
             return this;
+        }
+    }
+
+    private enum QueryParameter {
+
+        RECORD(1),
+        STATUS(2),
+        ID(3);
+
+        private final int index;
+
+        QueryParameter(int index) {
+            this.index = index;
+        }
+
+        public int getIndex() {
+            return index;
         }
     }
 }

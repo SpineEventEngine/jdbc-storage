@@ -54,7 +54,6 @@ public class SelectByIdQuery<I, M extends Message> extends StorageQuery {
     private final String messageColumnName;
     private final Descriptor messageDescriptor;
 
-
     protected SelectByIdQuery(Builder<? extends Builder, ? extends SelectByIdQuery, I, M> builder) {
         super(builder);
         this.idColumn = builder.idColumn;
@@ -73,7 +72,7 @@ public class SelectByIdQuery<I, M extends Message> extends StorageQuery {
      */
     @Nullable
     public M execute() throws DatabaseException {
-        try (ConnectionWrapper connection = this.getConnection(true);
+        try (ConnectionWrapper connection = getConnection(true);
              PreparedStatement statement = prepareStatement(connection, id);
              ResultSet resultSet = statement.executeQuery()) {
             if (!resultSet.next()) {
@@ -82,7 +81,8 @@ public class SelectByIdQuery<I, M extends Message> extends StorageQuery {
             final M message = readMessage(resultSet);
             return message;
         } catch (SQLException e) {
-            this.getLogger().error("Error during reading a message, ID = " + idToString(id), e);
+            this.getLogger()
+                .error("Error during reading a message, ID = " + idToString(id), e);
             throw new DatabaseException(e);
         }
     }
@@ -115,8 +115,11 @@ public class SelectByIdQuery<I, M extends Message> extends StorageQuery {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public abstract static class Builder<B extends Builder<B, Q, I, Record>, Q extends StorageQuery, I, Record extends Message>
-            extends StorageQuery.Builder<B, Q>{
+    public abstract static class Builder<B extends Builder<B, Q, I, R>,
+                                         Q extends StorageQuery,
+                                         I,
+                                         R extends Message>
+            extends StorageQuery.Builder<B, Q> {
 
         private int idIndexInQuery;
         private IdColumn<I> idColumn;

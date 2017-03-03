@@ -26,7 +26,7 @@ import org.junit.Test;
 import org.spine3.server.aggregate.Aggregate;
 import org.spine3.server.aggregate.AggregateStorage;
 import org.spine3.server.command.CommandStorage;
-import org.spine3.server.entity.Entity;
+import org.spine3.server.entity.AbstractEntity;
 import org.spine3.server.event.EventStorage;
 import org.spine3.server.projection.Projection;
 import org.spine3.server.projection.ProjectionStorage;
@@ -45,33 +45,29 @@ import static org.mockito.Mockito.mock;
 @SuppressWarnings({"InstanceMethodNamingConvention", "MagicNumber", "DuplicateStringLiteralInspection"})
 public class JdbcStorageFactoryShould {
 
-
-
-    private JdbcStorageFactory factory;
+    private JdbcStorageFactory<String> factory;
 
     @Before
     public void setUpTest() {
         final String dbUrl = GivenDataSource.prefix("factoryTests");
         final DataSourceConfig config = DataSourceConfig.newBuilder()
-                .setJdbcUrl(dbUrl)
-                .setUsername("SA")
-                .setPassword("pwd")
-                .setMaxPoolSize(12)
-                .build();
-        factory = JdbcStorageFactory.newBuilder()
+                                                        .setJdbcUrl(dbUrl)
+                                                        .setUsername("SA")
+                                                        .setPassword("pwd")
+                                                        .setMaxPoolSize(12)
+                                                        .build();
+        factory = JdbcStorageFactory.<String>newBuilder()
                 .setDataSource(config)
                 .setMultitenant(false)
                 .setEntityClass(TestAggregate.class)
-                .setEntityStateDescriptor(StringValue.getDescriptor())
                 .build();
     }
 
     @Test
-    public void allow_to_use_custom_data_source(){
-        final JdbcStorageFactory factory = JdbcStorageFactory.newBuilder()
+    public void allow_to_use_custom_data_source() {
+        final JdbcStorageFactory factory = JdbcStorageFactory.<String>newBuilder()
                 .setDataSource(mock(DataSource.class))
                 .setEntityClass(TestProjection.class)
-                .setEntityStateDescriptor(Project.getDescriptor())
                 .build();
 
         assertNotNull(factory);
@@ -85,7 +81,8 @@ public class JdbcStorageFactoryShould {
 
     @Test
     public void create_aggregate_storage() {
-        final AggregateStorage<String> storage = factory.createAggregateStorage(TestAggregate.class);
+        final AggregateStorage<String> storage = factory.createAggregateStorage(
+                TestAggregate.class);
         assertNotNull(storage);
     }
 
@@ -103,7 +100,8 @@ public class JdbcStorageFactoryShould {
 
     @Test
     public void create_projection_storage() {
-        final ProjectionStorage<String> storage = factory.createProjectionStorage(TestProjection.class);
+        final ProjectionStorage<String> storage = factory.createProjectionStorage(
+                TestProjection.class);
         assertNotNull(storage);
     }
 
@@ -113,9 +111,7 @@ public class JdbcStorageFactoryShould {
         assertNotNull(storage);
     }
 
-
-
-    private static class TestEntity extends Entity<String, StringValue> {
+    private static class TestEntity extends AbstractEntity<String, StringValue> {
 
         private TestEntity(String id) {
             super(id);

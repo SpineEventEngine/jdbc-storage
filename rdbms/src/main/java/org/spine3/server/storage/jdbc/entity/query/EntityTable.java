@@ -24,6 +24,7 @@ package org.spine3.server.storage.jdbc.entity.query;
  * A utility class representing constants which are necessary for working with entity table.
  *
  * @author Andrey Lavrov
+ * @author Dmytro Dashenkov
  */
 @SuppressWarnings("UtilityClass")
 final class EntityTable {

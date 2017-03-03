@@ -24,17 +24,20 @@ import com.google.protobuf.FieldMask;
 import com.google.protobuf.Timestamp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.spine3.server.entity.EntityRecord;
 import org.spine3.server.projection.ProjectionStorage;
-import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.RecordStorage;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.JdbcStorageFactory;
+import org.spine3.server.storage.jdbc.builder.StorageBuilder;
 import org.spine3.server.storage.jdbc.entity.JdbcRecordStorage;
 import org.spine3.server.storage.jdbc.projection.query.ProjectionStorageQueryFactory;
+import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
 import javax.annotation.Nullable;
 import java.util.Map;
 
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * The implementation of the projection storage based on the RDBMS.
@@ -45,43 +48,35 @@ import java.util.Map;
  */
 public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
 
-    private final JdbcRecordStorage<I> entityStorage;
+    private final JdbcRecordStorage<I> recordStorage;
 
     private final ProjectionStorageQueryFactory queryFactory;
 
-    /**
-     * Creates a new storage instance.
-     *
-     * @param entityStorage   an entity storage to use
-     * @param multitenant     defines is this storage multitenant
-     * @param queryFactory    factory that will generate queries for interaction with projection table
-     * @param <I>             a type of projection IDs
-     * @return a new storage instance
-     */
-    public static <I> ProjectionStorage<I> newInstance(JdbcRecordStorage<I> entityStorage,
-                                                       boolean multitenant,
-                                                       ProjectionStorageQueryFactory<I> queryFactory)
-            throws DatabaseException {
-        return new JdbcProjectionStorage<>(entityStorage, multitenant, queryFactory);
+    protected JdbcProjectionStorage(JdbcRecordStorage<I> recordStorage,
+                                    boolean multitenant,
+                                    ProjectionStorageQueryFactory<I> queryFactory) throws
+                                                                                   DatabaseException {
+        super(multitenant);
+        this.recordStorage = recordStorage;
+        this.queryFactory = queryFactory;
+        queryFactory.setLogger(log());
+
+        queryFactory.newCreateTableQuery()
+                    .execute();
     }
 
-    protected JdbcProjectionStorage(JdbcRecordStorage<I> entityStorage,
-                                    boolean multitenant,
-                                    ProjectionStorageQueryFactory<I> queryFactory) throws DatabaseException {
-        super(multitenant);
-        this.entityStorage = entityStorage;
-        this.queryFactory = queryFactory;
-        queryFactory.setLogger(LogSingleton.INSTANCE.value);
-
-       queryFactory.newCreateTableQuery().execute();
+    private JdbcProjectionStorage(Builder<I> builder) {
+        this(builder.getRecordStorage(), builder.isMultitenant(), builder.getQueryFactory());
     }
 
     @Override
     public void writeLastHandledEventTime(Timestamp time) throws DatabaseException {
         if (containsLastEventTime()) {
-           queryFactory.newUpdateTimestampQuery(time).execute();
+            queryFactory.newUpdateTimestampQuery(time)
+                        .execute();
         } else {
-            queryFactory.newInsertTimestampQuery(time).execute();
+            queryFactory.newInsertTimestampQuery(time)
+                        .execute();
         }
     }
 
@@ -94,13 +89,14 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
     @Override
     @Nullable
     public Timestamp readLastHandledEventTime() throws DatabaseException {
-        final Timestamp timestamp = queryFactory.newSelectTimestampQuery().execute();
+        final Timestamp timestamp = queryFactory.newSelectTimestampQuery()
+                                                .execute();
         return timestamp;
     }
 
     @Override
-    public RecordStorage<I> getRecordStorage() {
-        return entityStorage;
+    public RecordStorage<I> recordStorage() {
+        return recordStorage;
     }
 
     @Override
@@ -110,28 +106,103 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
-        // close only entityStorage because it must close dataSource by itself
-        entityStorage.close();
+        // close only recordStorage because it must close dataSource by itself
+        recordStorage.close();
     }
 
     @Override
-    protected Iterable<EntityStorageRecord> readMultipleRecords(Iterable<I> ids) {
-        return entityStorage.readMultiple(ids);
+    public void markArchived(I id) {
+        recordStorage.markArchived(id);
     }
 
     @Override
-    protected Iterable<EntityStorageRecord> readMultipleRecords(Iterable<I> ids, FieldMask fieldMask) {
-        return entityStorage.readMultiple(ids, fieldMask);
+    public void markDeleted(I id) {
+        recordStorage.markDeleted(id);
     }
 
     @Override
-    protected Map<I, EntityStorageRecord> readAllRecords() {
-        return entityStorage.readAll();
+    public boolean delete(I id) {
+        return recordStorage.delete(id);
     }
 
     @Override
-    protected Map<I, EntityStorageRecord> readAllRecords(FieldMask fieldMask) {
-        return entityStorage.readAll(fieldMask);
+    protected Iterable<EntityRecord> readMultipleRecords(Iterable<I> ids) {
+        return recordStorage.readMultiple(ids);
+    }
+
+    @Override
+    protected Iterable<EntityRecord> readMultipleRecords(Iterable<I> ids,
+                                                                FieldMask fieldMask) {
+        return recordStorage.readMultiple(ids, fieldMask);
+    }
+
+    @Override
+    protected Map<I, EntityRecord> readAllRecords() {
+        return recordStorage.readAll();
+    }
+
+    @Override
+    protected Map<I, EntityRecord> readAllRecords(FieldMask fieldMask) {
+        return recordStorage.readAll(fieldMask);
+    }
+
+    public static <I> Builder<I> newBuilder() {
+        return new Builder<>();
+    }
+
+    public static class Builder<I> extends StorageBuilder<Builder<I>,
+                                                          JdbcProjectionStorage<I>,
+                                                          ProjectionStorageQueryFactory<I>> {
+        private static final String DATA_SOURCE_WARN =
+                "Data source is never used directly by org.spine3.server.storage.jdbc.projection.JdbcProjectionStorage";
+
+        private JdbcRecordStorage<I> recordStorage;
+
+        private Builder() {
+            super();
+        }
+
+        @Override
+        protected Builder<I> getThis() {
+            return this;
+        }
+
+        @Override
+        public Builder<I> setDataSource(DataSourceWrapper dataSource) {
+            log().warn(DATA_SOURCE_WARN);
+            return super.setDataSource(dataSource);
+        }
+
+        public JdbcRecordStorage<I> getRecordStorage() {
+            return recordStorage;
+        }
+
+        public Builder<I> setRecordStorage(JdbcRecordStorage<I> recordStorage) {
+            this.recordStorage = recordStorage;
+            return this;
+        }
+
+        /**
+         * {@inheritDoc}
+         *
+         * <p>The {@link JdbcProjectionStorage.Builder} checks the {@code recordStorage} and
+         * {@code queryFactory} fields to be set.
+         */
+        @SuppressWarnings("MethodDoesntCallSuperMethod")
+        @Override
+        protected void checkPreconditions() throws IllegalStateException {
+            checkState(getRecordStorage() != null, "Record Storage must not be null.");
+            checkState(getQueryFactory() != null, "Query factory must not be null.");
+        }
+
+        @Override
+        public JdbcProjectionStorage<I> doBuild() {
+            return new JdbcProjectionStorage<>(this);
+        }
+    }
+
+    private static Logger log() {
+        return LogSingleton.INSTANCE.value;
     }
 
     private enum LogSingleton {

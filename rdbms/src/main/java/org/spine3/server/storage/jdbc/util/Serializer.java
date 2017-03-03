@@ -39,34 +39,37 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @SuppressWarnings("UtilityClass")
 public class Serializer {
 
-    private Serializer() {}
+    private Serializer() {
+    }
 
     /**
      * Serializes a message to an array of bytes.
      *
      * @param message a message to serialize
-     * @param <M> a message type
+     * @param <M>     a message type
      * @return a byte array
      */
     public static <M extends Message> byte[] serialize(M message) {
         checkNotNull(message);
         final Any any = AnyPacker.pack(message);
-        final byte[] bytes = any.getValue().toByteArray();
+        final byte[] bytes = any.getValue()
+                                .toByteArray();
         return bytes;
     }
 
     /**
      * Deserializes a {@link Message}.
      *
-     * @param bytes a serialized message
+     * @param bytes             a serialized message
      * @param messageDescriptor a descriptor of a message
-     * @param <M> a type of message expected
+     * @param <M>               a type of message expected
      * @return a message instance
      */
     public static <M extends Message> M deserialize(byte[] bytes, Descriptor messageDescriptor) {
         checkNotNull(bytes);
         final Any.Builder builder = Any.newBuilder();
-        final String typeUrl = TypeUrl.from(messageDescriptor).value();
+        final String typeUrl = TypeUrl.from(messageDescriptor)
+                                      .value();
         builder.setTypeUrl(typeUrl);
         final ByteString byteString = ByteString.copyFrom(bytes);
         builder.setValue(byteString);

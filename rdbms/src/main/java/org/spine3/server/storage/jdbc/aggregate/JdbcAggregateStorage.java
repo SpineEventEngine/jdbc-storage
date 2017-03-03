@@ -20,13 +20,17 @@
 
 package org.spine3.server.storage.jdbc.aggregate;
 
+import com.google.common.base.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.spine3.server.aggregate.AggregateEventRecord;
 import org.spine3.server.aggregate.AggregateStorage;
-import org.spine3.server.aggregate.storage.AggregateStorageRecord;
+import org.spine3.server.entity.Visibility;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.JdbcStorageFactory;
+import org.spine3.server.storage.jdbc.builder.StorageBuilder;
 import org.spine3.server.storage.jdbc.aggregate.query.AggregateStorageQueryFactory;
+import org.spine3.server.storage.jdbc.entity.visibility.VisibilityHandler;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbIterator;
 
@@ -40,11 +44,12 @@ import static org.spine3.server.storage.jdbc.util.Closeables.closeAll;
 /**
  * The implementation of the aggregate storage based on the RDBMS.
  *
- * <p> This storage contains 2 tables by default, they are described in {@link org.spine3.server.storage.jdbc.aggregate.query.Table}.
+ * <p> This storage contains 2 tables by default, they are described
+ * in {@link org.spine3.server.storage.jdbc.aggregate.query.Table}.
  *
- * @param <I>   the type of aggregate IDs
- * @see         JdbcStorageFactory
- * @author      Alexander Litus
+ * @param <I> the type of aggregate IDs
+ * @author Alexander Litus
+ * @see JdbcStorageFactory
  */
 public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
 
@@ -56,20 +61,7 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     /** Creates queries for interaction with database. */
     private final AggregateStorageQueryFactory<I> queryFactory;
 
-    /**
-     * Creates a new storage instance.
-     *
-     * @param dataSource            the dataSource wrapper
-     * @param multitenant           defines is this storage multitenant
-     * @param queryFactory          factory that generates queries for interaction with aggregate tables
-     * @throws DatabaseException    if an error occurs during an interaction with the DB
-     */
-    public static <I> JdbcAggregateStorage<I> newInstance(DataSourceWrapper dataSource,
-                                                          boolean multitenant,
-                                                          AggregateStorageQueryFactory<I> queryFactory)
-            throws DatabaseException {
-        return new JdbcAggregateStorage<>(dataSource, multitenant, queryFactory);
-    }
+    private final VisibilityHandler<I> visibilityHandler;
 
     protected JdbcAggregateStorage(DataSourceWrapper dataSource,
                                    boolean multitenant,
@@ -79,14 +71,23 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
         this.dataSource = dataSource;
         this.queryFactory = queryFactory;
         queryFactory.setLogger(LogSingleton.INSTANCE.value);
-        queryFactory.newCreateMainTableQuery().execute();
-        queryFactory.newCreateEventCountTableQuery().execute();
+        queryFactory.newCreateMainTableQuery()
+                    .execute();
+        queryFactory.newCreateEventCountTableQuery()
+                    .execute();
+        this.visibilityHandler = new VisibilityHandler<>(queryFactory);
+        visibilityHandler.initialize();
+    }
+
+    private JdbcAggregateStorage(Builder<I> builder) {
+        this(builder.getDataSource(), builder.isMultitenant(), builder.getQueryFactory());
     }
 
     @Override
     public int readEventCountAfterLastSnapshot(I id) {
         checkNotClosed();
-        final Integer count = queryFactory.newSelectEventCountByIdQuery(id).execute();
+        final Integer count = queryFactory.newSelectEventCountByIdQuery(id)
+                                          .execute();
         if (count == null) {
             return 0;
         }
@@ -94,17 +95,40 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     }
 
     @Override
+    protected Optional<Visibility> readVisibility(I id) {
+        return visibilityHandler.readVisibility(id);
+    }
+
+    @Override
+    protected void writeVisibility(I id, Visibility status) {
+        visibilityHandler.writeVisibility(id, status);
+    }
+
+    @Override
+    protected void markArchived(I id) {
+        visibilityHandler.markArchived(id);
+    }
+
+    @Override
+    protected void markDeleted(I id) {
+        visibilityHandler.markDeleted(id);
+    }
+
+    @Override
     public void writeEventCountAfterLastSnapshot(I id, int count) {
         checkNotClosed();
         if (containsEventCount(id)) {
-            queryFactory.newUpdateEventCountQuery(id, count).execute();
+            queryFactory.newUpdateEventCountQuery(id, count)
+                        .execute();
         } else {
-            queryFactory.newInsertEventCountQuery(id, count).execute();
+            queryFactory.newInsertEventCountQuery(id, count)
+                        .execute();
         }
     }
 
     private boolean containsEventCount(I id) {
-        final Integer count = queryFactory.newSelectEventCountByIdQuery(id).execute();
+        final Integer count = queryFactory.newSelectEventCountByIdQuery(id)
+                                          .execute();
         final boolean contains = count != null;
         return contains;
     }
@@ -115,22 +139,26 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     @Override
-    protected void writeRecord(I id, AggregateStorageRecord record) throws DatabaseException {
-        queryFactory.newInsertRecordQuery(id, record).execute();
+    protected void writeRecord(I id, AggregateEventRecord record) throws DatabaseException {
+        queryFactory.newInsertRecordQuery(id, record)
+                    .execute();
     }
 
     /**
      * {@inheritDoc}
      *
-     * <p><b>NOTE:</b> it is required to call {@link Iterator#hasNext()} before {@link Iterator#next()}.
+     * <p><b>NOTE:</b> it is required to call {@link Iterator#hasNext()} before
+     * {@link Iterator#next()}.
      *
      * @return a new {@link DbIterator} instance
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     @Override
-    protected Iterator<AggregateStorageRecord> historyBackward(I id) throws DatabaseException {
+    protected Iterator<AggregateEventRecord> historyBackward(I id) throws DatabaseException {
         checkNotNull(id);
-        final Iterator<AggregateStorageRecord> iterator = queryFactory.newSelectByIdSortedByTimeDescQuery(id).execute();
+        final Iterator<AggregateEventRecord> iterator =
+                queryFactory.newSelectByIdSortedByTimeDescQuery(id)
+                            .execute();
         iterators.add((DbIterator) iterator);
         return iterator;
     }
@@ -145,6 +173,28 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
         closeAll(iterators);
         iterators.clear();
         dataSource.close();
+    }
+
+    public static <I> Builder<I> newBuilder() {
+        return new Builder<>();
+    }
+
+    public static class Builder<I> extends StorageBuilder<Builder<I>,
+                                                          JdbcAggregateStorage<I>,
+                                                          AggregateStorageQueryFactory<I>> {
+        private Builder() {
+            super();
+        }
+
+        @Override
+        protected Builder<I> getThis() {
+            return this;
+        }
+
+        @Override
+        public JdbcAggregateStorage<I> doBuild() {
+            return new JdbcAggregateStorage<>(this);
+        }
     }
 
     private enum LogSingleton {

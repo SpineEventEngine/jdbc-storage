@@ -21,7 +21,7 @@
 package org.spine3.server.storage.jdbc.command.query;
 
 import org.spine3.base.CommandStatus;
-import org.spine3.server.command.storage.CommandStorageRecord;
+import org.spine3.server.command.CommandRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.StorageQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
@@ -41,9 +41,8 @@ import static org.spine3.server.storage.jdbc.command.query.CommandTable.COMMAND_
 import static org.spine3.server.storage.jdbc.command.query.CommandTable.COMMAND_STATUS_COL;
 import static org.spine3.server.storage.jdbc.command.query.CommandTable.TABLE_NAME;
 
-
 /**
- * Query that selects {@link CommandStorageRecord} by {@link CommandStatus}.
+ * Query that selects {@link CommandRecord} by {@link CommandStatus}.
  *
  * @author Alexander Litus
  * @author Andrey Lavrov
@@ -52,7 +51,6 @@ public class SelectCommandByStatusQuery extends StorageQuery {
 
     private final CommandStatus status;
 
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
             SELECT + COMMAND_COL + FROM + TABLE_NAME +
             WHERE + COMMAND_STATUS_COL + EQUAL + PLACEHOLDER + SEMICOLON;
@@ -78,22 +76,21 @@ public class SelectCommandByStatusQuery extends StorageQuery {
      * Prepares SQL statement using the connection.
      */
     @Override
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     public PreparedStatement prepareStatement(ConnectionWrapper connection) {
         final PreparedStatement statement = super.prepareStatement(connection);
         try {
             statement.setString(1, status.toString());
         } catch (SQLException e) {
-            this.getLogger().error("Failed to prepare statement ", e);
+            logFailedToPrepareStatement(e);
             throw new DatabaseException(e);
         }
         return statement;
     }
 
-    public Iterator<CommandStorageRecord> execute() throws DatabaseException {
-        try (ConnectionWrapper connection = this.getConnection(true)) {
-            final PreparedStatement statement = this.prepareStatement(connection);
-            return new DbIterator<>(statement, COMMAND_COL, CommandStorageRecord.getDescriptor());
+    public Iterator<CommandRecord> execute() throws DatabaseException {
+        try (ConnectionWrapper connection = getConnection(true)) {
+            final PreparedStatement statement = prepareStatement(connection);
+            return new DbIterator<>(statement, COMMAND_COL, CommandRecord.getDescriptor());
         }
     }
 

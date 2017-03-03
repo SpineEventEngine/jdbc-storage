@@ -25,6 +25,7 @@ import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 /**
  * @author Andrey Lavrov
@@ -43,6 +44,10 @@ public class StorageQuery {
 
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
         return connection.prepareStatement(query);
+    }
+
+    protected void logFailedToPrepareStatement(SQLException e) {
+        getLogger().error("Failed to prepare statement ", e);
     }
 
     public String getQuery() {

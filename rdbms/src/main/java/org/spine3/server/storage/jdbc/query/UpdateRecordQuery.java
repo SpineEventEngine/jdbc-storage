@@ -31,7 +31,8 @@ public class UpdateRecordQuery<I> extends WriteQuery {
     private final int idIndexInQuery;
     private final IdColumn<I> idColumn;
 
-    protected UpdateRecordQuery(Builder<? extends Builder, ? extends UpdateRecordQuery, I> builder) {
+    protected UpdateRecordQuery(
+            Builder<? extends Builder, ? extends UpdateRecordQuery, I> builder) {
         super(builder);
         this.idIndexInQuery = builder.idIndexInQuery;
         this.idColumn = builder.idColumn;
@@ -47,7 +48,7 @@ public class UpdateRecordQuery<I> extends WriteQuery {
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
     public abstract static class Builder<B extends Builder<B, Q, I>, Q extends UpdateRecordQuery, I>
-            extends WriteQuery.Builder<B, Q>{
+            extends WriteQuery.Builder<B, Q> {
         private int idIndexInQuery;
         private IdColumn<I> idColumn;
         private I id;

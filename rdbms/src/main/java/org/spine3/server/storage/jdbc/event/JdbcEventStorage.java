@@ -22,6 +22,7 @@ package org.spine3.server.storage.jdbc.event;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
+import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
 import com.google.common.collect.Collections2;
@@ -39,9 +40,9 @@ import org.spine3.protobuf.AnyPacker;
 import org.spine3.server.event.EventFilter;
 import org.spine3.server.event.EventStorage;
 import org.spine3.server.event.EventStreamQuery;
-import org.spine3.server.event.storage.EventStorageRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.JdbcStorageFactory;
+import org.spine3.server.storage.jdbc.builder.StorageBuilder;
 import org.spine3.server.storage.jdbc.event.query.EventStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbIterator;
@@ -53,14 +54,15 @@ import java.util.Iterator;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Lists.newLinkedList;
 import static org.spine3.server.storage.jdbc.util.Closeables.closeAll;
 
 /**
  * The implementation of the event storage based on the RDBMS.
  *
- * @see JdbcStorageFactory
  * @author Alexander Litus
+ * @see JdbcStorageFactory
  */
 public class JdbcEventStorage extends EventStorage {
 
@@ -76,10 +78,10 @@ public class JdbcEventStorage extends EventStorage {
     /**
      * Creates a new storage instance.
      *
-     * @param dataSource            the dataSource wrapper
-     * @param multitenant           defines is this storage multitenant
-     * @param queryFactory          factory that will generate queries for interaction with event table
-     * @throws DatabaseException    if an error occurs during an interaction with the DB
+     * @param dataSource   the dataSource wrapper
+     * @param multitenant  defines if this storage is multitenant or not
+     * @param queryFactory factory that will generate queries for interaction with event table
+     * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     public static JdbcEventStorage newInstance(DataSourceWrapper dataSource,
                                                boolean multitenant,
@@ -96,35 +98,49 @@ public class JdbcEventStorage extends EventStorage {
         this.dataSource = dataSource;
         this.queryFactory = queryFactory;
         queryFactory.setLogger(LogSingleton.INSTANCE.value);
-        queryFactory.newCreateEventTableQuery().execute();
+        queryFactory.newCreateEventTableQuery()
+                    .execute();
+    }
+
+    private JdbcEventStorage(Builder builder) {
+        this(builder.getDataSource(), builder.isMultitenant(), builder.getQueryFactory());
     }
 
     /**
      * {@inheritDoc}
      *
-     * <p><b>NOTE:</b> it is required to call {@link Iterator#hasNext()} before {@link Iterator#next()}.
+     * <p><b>NOTE:</b> it is required to call {@link Iterator#hasNext()} before
+     * {@link Iterator#next()}.
      *
      * @return a wrapped {@link DbIterator} instance
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     @Override
     public Iterator<Event> iterator(EventStreamQuery query) throws DatabaseException {
-        final Iterator<EventStorageRecord> iterator = queryFactory.newFilterAndSortQuery(query).execute();
+        checkNotClosed();
+        checkNotNull(query);
 
+        final Iterator<Event> iterator = queryFactory.newFilterAndSortQuery(query)
+                                                     .execute();
         iterators.add((DbIterator) iterator);
 
-        /**
-         * As each {@code event} data is stored as a single serialized {@code Message}, it is not possible to query
-         * the JDBC storage for {@code Event} or {@code EventContext} field values directly.
-         *
-         * <p>Therefore, we perform in-memory post-filtering according to {@code Event} field and context filters.
-         */
+        final UnmodifiableIterator<Event> filtered = filterEvents(iterator, query);
+        return filtered;
+    }
 
+    /**
+     * Filters the Recieved {@linkplain Event Events} by the {@code FieldFilter}s for
+     * the event message and {@linkplain EventContext}.
+     *
+     * <p>As each {@code event} data is stored as a single serialized {@code Message}, it
+     * is not possible to perform this filtering directly within an SQL query.
+     */
+    private static UnmodifiableIterator<Event> filterEvents(Iterator<Event> unfilteredEvents,
+                                                            EventStreamQuery query) {
         final List<EventFilter> filterList = query.getFilterList();
-        final UnmodifiableIterator<EventStorageRecord> filtered =
-                Iterators.filter(iterator, new EventRecordPredicate(filterList));
-        final Iterator<Event> result = toEventIterator(filtered);
-        return result;
+        final UnmodifiableIterator<Event> filtered =
+                Iterators.filter(unfilteredEvents, new EventRecordPredicate(filterList));
+        return filtered;
     }
 
     /**
@@ -133,11 +149,18 @@ public class JdbcEventStorage extends EventStorage {
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     @Override
-    protected void writeRecord(EventStorageRecord record) throws DatabaseException {
-        if (containsRecord(record.getEventId())) {
-            queryFactory.newUpdateEventQuery(record).execute();
+    public void write(EventId id, Event event) throws DatabaseException {
+        checkNotClosed();
+        checkNotNull(id);
+        checkNotNull(event);
+
+        final String eventId = id.getUuid();
+        if (containsRecord(eventId)) {
+            queryFactory.newUpdateEventQuery(eventId, event)
+                        .execute();
         } else {
-            queryFactory.newInsertEventQuery(record).execute();
+            queryFactory.newInsertEventQuery(eventId, event)
+                        .execute();
         }
     }
 
@@ -146,22 +169,28 @@ public class JdbcEventStorage extends EventStorage {
      *
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
-    @Nullable
     @Override
-    protected EventStorageRecord readRecord(EventId eventId) throws DatabaseException {
+    public Optional<Event> read(EventId eventId) throws DatabaseException {
+        checkNotClosed();
+        checkNotNull(eventId);
+
         final String id = eventId.getUuid();
-        final EventStorageRecord record = queryFactory.newSelectEventByIdQuery(id).execute();
-        return record;
+        final Event record = queryFactory.newSelectEventByIdQuery(id)
+                                         .execute();
+        return Optional.fromNullable(record);
     }
 
     private boolean containsRecord(String id) {
-        final EventStorageRecord record = queryFactory.newSelectEventByIdQuery(id).execute();
+        final Event record = queryFactory.newSelectEventByIdQuery(id)
+                                         .execute();
         final boolean contains = record != null;
         return contains;
     }
 
     @Override
     public void close() throws DatabaseException {
+        checkNotClosed();
+
         try {
             super.close();
         } catch (Exception e) {
@@ -172,11 +201,28 @@ public class JdbcEventStorage extends EventStorage {
         dataSource.close();
     }
 
+    public static class Builder extends StorageBuilder<Builder, JdbcEventStorage, EventStorageQueryFactory> {
+
+        private Builder() {
+            super();
+        }
+
+        @Override
+        protected Builder getThis() {
+            return this;
+        }
+
+        @Override
+        public JdbcEventStorage doBuild() {
+            return new JdbcEventStorage(this);
+        }
+    }
+
     /**
-     * Predicate matching an {@link EventStorageRecord} to a number of {@link EventFilter} instances.
+     * Predicate matching an {@link Event} to a number of {@link EventFilter} instances.
      */
     @VisibleForTesting
-    static class EventRecordPredicate implements Predicate<EventStorageRecord> {
+    static class EventRecordPredicate implements Predicate<Event> {
 
         private final Collection<EventFilter> eventFilters;
 
@@ -186,7 +232,7 @@ public class JdbcEventStorage extends EventStorage {
         }
 
         @Override
-        public boolean apply(@Nullable EventStorageRecord eventRecord) {
+        public boolean apply(@Nullable Event eventRecord) {
             if (eventRecord == null) {
                 return false;
             }
@@ -213,9 +259,9 @@ public class JdbcEventStorage extends EventStorage {
     }
 
     /**
-     * Predicate matching an {@link Event} stored as {@link EventStorageRecord} to a single {@link EventFilter}.
+     * Predicate matching an {@link Event} stored as {@link Event} to a single {@link EventFilter}.
      */
-    private static class EventFilterChecker implements Predicate<EventStorageRecord> {
+    private static class EventFilterChecker implements Predicate<Event> {
 
         private final Collection<FieldFilter> eventFieldFilters;
         private final Collection<FieldFilter> contextFieldFilters;
@@ -244,7 +290,7 @@ public class JdbcEventStorage extends EventStorage {
         // Defined as nullable, parameter `event` is actually non null.
         @SuppressWarnings({"MethodWithMoreThanThreeNegations", "MethodWithMultipleLoops"})
         @Override
-        public boolean apply(@Nullable EventStorageRecord event) {
+        public boolean apply(@Nullable Event event) {
             if (event == null) {
                 return false;
             }
@@ -252,7 +298,6 @@ public class JdbcEventStorage extends EventStorage {
             if (!eventFieldFilters.isEmpty()) {
                 final Any eventWrapped = event.getMessage();
                 final Message eventMessage = AnyPacker.unpack(eventWrapped);
-
 
                 // Check event fields
                 for (FieldFilter filter : eventFieldFilters) {
@@ -278,12 +323,14 @@ public class JdbcEventStorage extends EventStorage {
         private static boolean checkFields(Message object, FieldFilter filter) {
             final String fieldPath = filter.getFieldPath();
             final String fieldName = fieldPath.substring(fieldPath.lastIndexOf('.') + 1);
-            checkArgument(!Strings.isNullOrEmpty(fieldName), "Field filter " + filter.toString() + " is invalid");
+            checkArgument(!Strings.isNullOrEmpty(fieldName),
+                          "Field filter " + filter.toString() + " is invalid");
             final String fieldGetterName = "get" + fieldName.substring(0, 1)
-                    .toUpperCase() + fieldName.substring(1);
+                                                            .toUpperCase() + fieldName.substring(1);
 
             final Collection<Any> expectedAnys = filter.getValueList();
-            final Collection<Message> expectedValues = Collections2.transform(expectedAnys, ANY_UNPACKER);
+            final Collection<Message> expectedValues = Collections2.transform(expectedAnys,
+                                                                              ANY_UNPACKER);
             Message actualValue;
             try {
                 final Class<?> messageClass = object.getClass();

@@ -37,7 +37,8 @@ public class DbTableNameFactory {
     private static final Pattern PATTERN_DOLLAR = Pattern.compile("\\$");
     private static final String UNDERSCORE = "_";
 
-    private DbTableNameFactory() {}
+    private DbTableNameFactory() {
+    }
 
     /**
      * Retrieves a name of a class and escapes it so that it is valid to use as a DB table name. For example:
@@ -49,8 +50,11 @@ public class DbTableNameFactory {
      */
     public static String newTableName(Class clazz) {
         final String className = clazz.getName();
-        final String tableNameTmp = PATTERN_DOT.matcher(className).replaceAll(UNDERSCORE);
-        final String result = PATTERN_DOLLAR.matcher(tableNameTmp).replaceAll(UNDERSCORE).toLowerCase();
+        final String tableNameTmp = PATTERN_DOT.matcher(className)
+                                               .replaceAll(UNDERSCORE);
+        final String result = PATTERN_DOLLAR.matcher(tableNameTmp)
+                                            .replaceAll(UNDERSCORE)
+                                            .toLowerCase();
         return result;
     }
 }

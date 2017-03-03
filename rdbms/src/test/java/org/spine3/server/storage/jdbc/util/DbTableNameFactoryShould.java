@@ -20,17 +20,31 @@
 
 package org.spine3.server.storage.jdbc.util;
 
+import com.google.common.testing.NullPointerTester;
 import com.google.protobuf.StringValue;
 import org.junit.Test;
-import org.spine3.server.entity.Entity;
+import org.spine3.server.entity.AbstractEntity;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.spine3.test.Tests.hasPrivateParameterlessCtor;
 
 /**
  * @author Alexander Litus
  */
 @SuppressWarnings("InstanceMethodNamingConvention")
 public class DbTableNameFactoryShould {
+
+    @Test
+    public void have_private_utility_constrctor() {
+        assertTrue(hasPrivateParameterlessCtor(DbTableNameFactory.class));
+    }
+
+    @Test
+    public void pass_null_tolerance_check() {
+        final NullPointerTester tester = new NullPointerTester();
+        tester.testStaticMethods(DbTableNameFactory.class, NullPointerTester.Visibility.PACKAGE);
+    }
 
     @Test
     public void provide_table_name_for_class() {
@@ -43,10 +57,11 @@ public class DbTableNameFactoryShould {
     public void provide_table_name_for_inner_class() {
         final String tableName = DbTableNameFactory.newTableName(TestEntity.class);
 
-        assertEquals("org_spine3_server_storage_jdbc_util_dbtablenamefactoryshould_testentity", tableName);
+        assertEquals("org_spine3_server_storage_jdbc_util_dbtablenamefactoryshould_testentity",
+                     tableName);
     }
 
-    private static class TestEntity extends Entity<String, StringValue> {
+    private static class TestEntity extends AbstractEntity<String, StringValue> {
 
         private TestEntity(String id) {
             super(id);

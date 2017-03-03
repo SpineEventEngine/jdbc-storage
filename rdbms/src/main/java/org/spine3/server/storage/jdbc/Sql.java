@@ -33,7 +33,7 @@ import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
 /**
  * Set of enums and utilities for constructing the SQL sentences.
  *
- * <p>Defines the common SQL keywords, operators and punctuation. They serve as reusable parts to build SQL expressions.
+ * <p>Defines the common SQL keywords, operators and punctuation. They serve as reusable parts to doBuild SQL expressions.
  *
  * <p>All the {@code enum} values have a valid token string representation, i.e. {@link Enum#toString() toString()}
  * method returns a valid SQL token wrapped into the whitespaces.
@@ -62,7 +62,7 @@ public class Sql {
         checkArgument(count > 0, "Count of placeholders should be > 0");
 
         final String placeholders = Joiner.on(COMMA.toString())
-                .join(Collections.nCopies(count, PLACEHOLDER));
+                                          .join(Collections.nCopies(count, PLACEHOLDER));
         final String wrappedPlaceholders = BRACKET_OPEN + placeholders + BRACKET_CLOSE;
         return wrappedPlaceholders;
     }
@@ -76,7 +76,8 @@ public class Sql {
         INT("INT"),
         BIGINT("BIGINT"),
         VARCHAR_512("VARCHAR(512)"),
-        VARCHAR_999("VARCHAR(999)");
+        VARCHAR_999("VARCHAR(999)"),
+        BOOLEAN("BOOLEAN");
 
         private final String token;
 
@@ -105,7 +106,6 @@ public class Sql {
         UPDATE,
         DELETE_FROM("DELETE FROM"),
 
-
         ALL_ATTRIBUTES("*"),
         FROM,
         DISTINCT,
@@ -119,8 +119,11 @@ public class Sql {
         LIKE,
         NOT,
         IN,
+        IS,
         EXISTS,
         BETWEEN,
+        TRUE,
+        FALSE,
 
         PLACEHOLDER("?"),
 

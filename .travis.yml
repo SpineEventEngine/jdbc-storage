@@ -4,6 +4,9 @@ before_install:
   - chmod +x gradlew
   - pip install --user codecov
 
+script:
+  - ./gradlew build --debug
+
 after_success:
   - codecov
   - chmod +x ./scripts/publish_artifacts.sh

@@ -20,7 +20,6 @@
 
 package org.spine3.server.storage.jdbc;
 
-import com.google.protobuf.Descriptors;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.spine3.server.aggregate.Aggregate;
@@ -37,7 +36,7 @@ import org.spine3.server.storage.jdbc.aggregate.query.AggregateStorageQueryFacto
 import org.spine3.server.storage.jdbc.command.JdbcCommandStorage;
 import org.spine3.server.storage.jdbc.command.query.CommandStorageQueryFactory;
 import org.spine3.server.storage.jdbc.entity.JdbcRecordStorage;
-import org.spine3.server.storage.jdbc.entity.query.EntityStorageQueryFactory;
+import org.spine3.server.storage.jdbc.entity.query.RecordStorageQueryFactory;
 import org.spine3.server.storage.jdbc.event.JdbcEventStorage;
 import org.spine3.server.storage.jdbc.event.query.EventStorageQueryFactory;
 import org.spine3.server.storage.jdbc.projection.JdbcProjectionStorage;
@@ -52,8 +51,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Creates storages based on JDBC-compliant RDBMS.
  *
- * @param <I> ID type if the {@link Entity} that will be stored in the storages created by this factory.
- *
+ * @param <I> ID type of the {@link Entity} that will be stored in the storages created by
+ *            this factory.
  * @author Alexander Litus
  * @author Andrey Lavrov
  * @author Dmytro Dashenkov
@@ -63,11 +62,9 @@ public class JdbcStorageFactory<I> implements StorageFactory {
     private final DataSourceWrapper dataSource;
     private final boolean multitenant;
     private final Class<? extends Entity<I, ?>> entityClass;
-    private final Descriptors.Descriptor entityStateDescriptor;
 
     private JdbcStorageFactory(Builder<I> builder) {
         this.entityClass = checkNotNull(builder.entityClass);
-        this.entityStateDescriptor = checkNotNull(builder.entityStateDescriptor);
         this.dataSource = checkNotNull(builder.dataSource);
         this.multitenant = builder.multitenant;
     }
@@ -79,105 +76,140 @@ public class JdbcStorageFactory<I> implements StorageFactory {
 
     @Override
     public CommandStorage createCommandStorage() {
-        return JdbcCommandStorage.newInstance(dataSource, false, getCommandStorageQueryFactory(dataSource));
+        final CommandStorageQueryFactory queryFactory = getCommandStorageQueryFactory(dataSource);
+        final CommandStorage storage = JdbcCommandStorage.newBuilder()
+                                                         .setQueryFactory(queryFactory)
+                                                         .setDataSource(dataSource)
+                                                         .setMultitenant(multitenant)
+                                                         .build();
+        return storage;
     }
 
     @Override
     public EventStorage createEventStorage() {
-        return JdbcEventStorage.newInstance(dataSource, false, getEventStorageQueryFactory(dataSource));
+        return JdbcEventStorage.newInstance(dataSource, false,
+                                            getEventStorageQueryFactory(dataSource));
     }
 
     @Override
     public StandStorage createStandStorage() {
-        return JdbcStandStorage.newBuilder()
-                .setDataSource(dataSource)
-                .setMultitenant(isMultitenant())
-                .setEntityStorageQueryFactory(getEntityStorageQueryFactory(dataSource, entityClass))
-                .setStateDescriptor(entityStateDescriptor)
-                .build();
+        final RecordStorageQueryFactory<I> recordStorageQueryFactory =
+                getEntityStorageQueryFactory(dataSource, entityClass);
+        return JdbcStandStorage.<I>newBuilder()
+                               .setDataSource(dataSource)
+                               .setMultitenant(isMultitenant())
+                               .setQueryFactory(recordStorageQueryFactory)
+                               .build();
     }
 
     @Override
-    public <I> AggregateStorage<I> createAggregateStorage(Class<? extends Aggregate<I, ?, ?>> aggregateClass) {
-        return JdbcAggregateStorage.newInstance(dataSource,
-                false,
-                getAggregateStorageQueryFactory(dataSource, aggregateClass));
+    public <I> AggregateStorage<I> createAggregateStorage(
+            Class<? extends Aggregate<I, ?, ?>> aggregateClass) {
+        final AggregateStorageQueryFactory<I> queryFactory =
+                getAggregateStorageQueryFactory(dataSource, aggregateClass);
+        final JdbcAggregateStorage<I> storage = JdbcAggregateStorage.<I>newBuilder()
+                                                                    .setQueryFactory(queryFactory)
+                                                                    .setMultitenant(false)
+                                                                    .setDataSource(dataSource)
+                                                                    .build();
+        return storage;
     }
 
     @Override
     public <I> RecordStorage<I> createRecordStorage(Class<? extends Entity<I, ?>> entityClass) {
-        return JdbcRecordStorage.newInstance(
-                dataSource,
-                false,
-                getEntityStorageQueryFactory(dataSource, entityClass),
-                entityStateDescriptor);
+        final RecordStorageQueryFactory<I> queryFactory = getEntityStorageQueryFactory(dataSource,
+                                                                                       entityClass);
+        final RecordStorage<I> recordStorage = JdbcRecordStorage.<I>newBuilder()
+                                                                .setDataSource(dataSource)
+                                                                .setMultitenant(false)
+                                                                .setQueryFactory(queryFactory)
+                                                                .build();
+        return recordStorage;
     }
 
     @Override
-    public <I> ProjectionStorage<I> createProjectionStorage(Class<? extends Entity<I, ?>> projectionClass) {
-        final JdbcRecordStorage<I> entityStorage = JdbcRecordStorage.newInstance(
-                dataSource,
-                false,
-                getEntityStorageQueryFactory(dataSource, projectionClass),
-                entityStateDescriptor);
+    public <I> ProjectionStorage<I> createProjectionStorage(
+            Class<? extends Entity<I, ?>> projectionClass) {
+        final JdbcRecordStorage<I> entityStorage =
+                (JdbcRecordStorage<I>) createRecordStorage(projectionClass);
+        final ProjectionStorageQueryFactory<I> queryFactory =
+                getProjectionStorageQueryFactory(dataSource, projectionClass);
 
-        return JdbcProjectionStorage.newInstance(
-                entityStorage,
-                false,
-                getProjectionStorageQueryFactory(dataSource, projectionClass));
+        final ProjectionStorage<I> storage = JdbcProjectionStorage.<I>newBuilder()
+                                                                  .setMultitenant(multitenant)
+                                                                  .setQueryFactory(queryFactory)
+                                                                  .setRecordStorage(entityStorage)
+                                                                  .build();
+        return storage;
     }
 
     /**
-     * Creates a new {@link AggregateStorageQueryFactory} which produces database queries for corresponding {@link JdbcAggregateStorage}.
+     * Creates a new {@link AggregateStorageQueryFactory} which produces database queries for
+     * corresponding {@link JdbcAggregateStorage}.
      *
-     * @param dataSource        {@link DataSource} on which corresponding {@link JdbcAggregateStorage} is based
-     * @param aggregateClass    class of aggregates which are stored in the corresponding {@link JdbcAggregateStorage}
-     * @param <I>               a type of IDs of stored aggregates
+     * @param dataSource     {@link DataSource} on which corresponding {@link JdbcAggregateStorage}
+     *                                         is based
+     * @param aggregateClass class of aggregates which are stored in the corresponding
+     * {@link JdbcAggregateStorage}
+     * @param <T>            a type of IDs of stored aggregates
      */
-    protected  <I> AggregateStorageQueryFactory<I> getAggregateStorageQueryFactory(DataSourceWrapper dataSource,
-                                                                                   Class<? extends Aggregate<I, ?, ?>> aggregateClass){
+    protected <T> AggregateStorageQueryFactory<T> getAggregateStorageQueryFactory(
+            DataSourceWrapper dataSource,
+            Class<? extends Aggregate<T, ?, ?>> aggregateClass) {
         return new AggregateStorageQueryFactory<>(dataSource, aggregateClass);
     }
 
     /**
-     * Creates a new {@link EntityStorageQueryFactory} which produces database queries for corresponding {@link JdbcRecordStorage}.
+     * Creates a new {@link RecordStorageQueryFactory} which produces database queries for
+     * corresponding {@link JdbcRecordStorage}.
      *
-     * @param dataSource        {@link DataSource} on which corresponding {@link JdbcRecordStorage} is based
-     * @param entityClass       class of entities which are stored in the corresponding {@link JdbcRecordStorage}
-     * @param <I>               a type of IDs of stored entities
+     * @param dataSource  {@link DataSource} on which corresponding {@link JdbcRecordStorage}
+     *                                      is based
+     * @param entityClass class of entities which are stored in the corresponding
+     * {@link JdbcRecordStorage}
+     * @param <T>         a type of IDs of stored entities
      */
-    protected <I> EntityStorageQueryFactory<I> getEntityStorageQueryFactory(DataSourceWrapper dataSource,
-                                                                            Class<? extends Entity<I, ?>> entityClass){
-        return new EntityStorageQueryFactory<>(dataSource, entityClass);
+    protected <T> RecordStorageQueryFactory<T> getEntityStorageQueryFactory(
+            DataSourceWrapper dataSource,
+            Class<? extends Entity<T, ?>> entityClass) {
+        return new RecordStorageQueryFactory<>(dataSource, entityClass);
     }
 
     /**
-     * Creates a new {@link ProjectionStorageQueryFactory} which produces database queries for corresponding {@link JdbcProjectionStorage}.
+     * Creates a new {@link ProjectionStorageQueryFactory} which produces database queries for
+     * corresponding {@link JdbcProjectionStorage}.
      *
-     * @param dataSource        {@link DataSource} on which corresponding {@link JdbcProjectionStorage} is based
-     * @param entityClass       class of entities which are stored in the corresponding {@link JdbcRecordStorage}
-     * @param <I>               a type of IDs of entities from the corresponding {@link JdbcRecordStorage}
+     * @param dataSource  {@link DataSource} on which corresponding {@link JdbcProjectionStorage}
+     *                                      is based
+     * @param entityClass class of entities which are stored in the corresponding
+     * {@link JdbcRecordStorage}
+     * @param <T>         a type of IDs of entities from the corresponding {@link JdbcRecordStorage}
      */
-    protected <I> ProjectionStorageQueryFactory<I> getProjectionStorageQueryFactory(DataSourceWrapper dataSource,
-                                                                                    Class<? extends Entity<I, ?>> entityClass){
+    protected <T> ProjectionStorageQueryFactory<T> getProjectionStorageQueryFactory(
+            DataSourceWrapper dataSource,
+            Class<? extends Entity<T, ?>> entityClass) {
         return new ProjectionStorageQueryFactory<>(dataSource, entityClass);
     }
 
     /**
-     * Creates a new {@link EventStorageQueryFactory} which produces database queries for corresponding {@link JdbcEventStorage}.
+     * Creates a new {@link EventStorageQueryFactory} which produces database queries for
+     * corresponding {@link JdbcEventStorage}.
      *
-     * @param dataSource        {@link DataSource} on which corresponding {@link JdbcEventStorage} is based
+     * @param dataSource {@link DataSource} on which corresponding {@link JdbcEventStorage} is based
      */
-    protected EventStorageQueryFactory getEventStorageQueryFactory(DataSourceWrapper dataSource){
+    protected EventStorageQueryFactory getEventStorageQueryFactory(DataSourceWrapper dataSource) {
         return new EventStorageQueryFactory(dataSource);
     }
 
     /**
-     * Creates a new {@link CommandStorageQueryFactory} which produces database queries for corresponding {@link JdbcCommandStorage}.
+     * Creates a new {@link CommandStorageQueryFactory} which produces database queries for
+     * corresponding {@link JdbcCommandStorage}.
      *
-     * @param dataSource        {@link DataSource} on which corresponding {@link JdbcCommandStorage} is based
+     * @param dataSource {@link DataSource} on which corresponding {@link JdbcCommandStorage}
+     *                                     is based
      */
-    protected CommandStorageQueryFactory getCommandStorageQueryFactory(DataSourceWrapper dataSource){
+    protected CommandStorageQueryFactory getCommandStorageQueryFactory(
+            DataSourceWrapper dataSource) {
         return new CommandStorageQueryFactory(dataSource);
     }
 
@@ -194,14 +226,13 @@ public class JdbcStorageFactory<I> implements StorageFactory {
     }
 
     /**
-     * Buildes instances of {@code JdbcStorageFactory}.
+     * Builds instances of {@code JdbcStorageFactory}.
      */
     public static class Builder<I> {
 
         private DataSourceWrapper dataSource;
         private boolean multitenant;
         private Class<? extends Entity<I, ?>> entityClass;
-        private Descriptors.Descriptor entityStateDescriptor;
 
         private Builder() {
         }
@@ -209,7 +240,7 @@ public class JdbcStorageFactory<I> implements StorageFactory {
         /**
          * Sets optional field {@code isMultitenant}. {@code false} is used by default.
          */
-        public Builder setMultitenant(boolean multitenant) {
+        public Builder<I> setMultitenant(boolean multitenant) {
             this.multitenant = multitenant;
             return this;
         }
@@ -217,42 +248,36 @@ public class JdbcStorageFactory<I> implements StorageFactory {
         /**
          * Sets required field {@code entityClass}.
          */
-        public Builder setEntityClass(Class<? extends Entity<I, ?>> entityClass) {
+        public Builder<I> setEntityClass(Class<? extends Entity<I, ?>> entityClass) {
             this.entityClass = entityClass;
-            return this;
-        }
-
-        /**
-         * Sets required field {@code entityStateDescriptor}.
-         */
-        public Builder setEntityStateDescriptor(Descriptors.Descriptor descriptor) {
-            this.entityStateDescriptor = descriptor;
             return this;
         }
 
         /**
          * Sets required field {@code dataSource}.
          */
-        public Builder setDataSource(DataSourceWrapper dataSource) {
+        public Builder<I> setDataSource(DataSourceWrapper dataSource) {
             this.dataSource = dataSource;
             return this;
         }
 
         /**
          * Sets required field {@code dataSource} from wrapped {@link DataSource}.
+         *
          * @see DataSourceWrapper#wrap(DataSource)
          */
-        public Builder setDataSource(DataSource dataSource) {
+        public Builder<I> setDataSource(DataSource dataSource) {
             this.dataSource = DataSourceWrapper.wrap(dataSource);
             return this;
         }
 
         /**
          * Sets required field {@code dataSource} from {@link DataSourceConfig}.
+         *
          * @see HikariConfig
          * @see DefaultDataSourceConfigConverter#convert(DataSourceConfig)
          */
-        public Builder setDataSource(DataSourceConfig dataSource) {
+        public Builder<I> setDataSource(DataSourceConfig dataSource) {
             final HikariConfig hikariConfig = DefaultDataSourceConfigConverter.convert(dataSource);
             this.dataSource = DataSourceWrapper.wrap(new HikariDataSource(hikariConfig));
             return this;

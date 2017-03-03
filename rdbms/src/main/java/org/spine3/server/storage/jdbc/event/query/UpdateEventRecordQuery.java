@@ -20,8 +20,14 @@
 
 package org.spine3.server.storage.jdbc.event.query;
 
+import com.google.protobuf.Any;
+import com.google.protobuf.Message;
 import com.google.protobuf.Timestamp;
-import org.spine3.server.event.storage.EventStorageRecord;
+import org.spine3.base.Event;
+import org.spine3.base.EventContext;
+import org.spine3.base.Stringifiers;
+import org.spine3.protobuf.AnyPacker;
+import org.spine3.protobuf.TypeName;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.WriteRecordQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
@@ -46,53 +52,57 @@ import static org.spine3.server.storage.jdbc.event.query.EventTable.TABLE_NAME;
 import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
 /**
- * Query that updates {@link EventStorageRecord} in the {@link EventTable}.
+ * Query that updates {@link Event} in the {@link EventTable}.
  *
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-public class UpdateEventRecordQuery extends WriteRecordQuery<String, EventStorageRecord> {
+public class UpdateEventRecordQuery extends WriteRecordQuery<String, Event> {
 
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
             UPDATE + TABLE_NAME +
-                    SET +
-                    EVENT_COL + EQUAL + PLACEHOLDER + COMMA +
-                    EVENT_TYPE_COL + EQUAL + PLACEHOLDER + COMMA +
-                    PRODUCER_ID_COL + EQUAL + PLACEHOLDER + COMMA +
-                    SECONDS_COL + EQUAL + PLACEHOLDER + COMMA +
-                    NANOSECONDS_COL + EQUAL + PLACEHOLDER +
-                    WHERE + EVENT_ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
+            SET +
+            EVENT_COL + EQUAL + PLACEHOLDER + COMMA +
+            EVENT_TYPE_COL + EQUAL + PLACEHOLDER + COMMA +
+            PRODUCER_ID_COL + EQUAL + PLACEHOLDER + COMMA +
+            SECONDS_COL + EQUAL + PLACEHOLDER + COMMA +
+            NANOSECONDS_COL + EQUAL + PLACEHOLDER +
+            WHERE + EVENT_ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
 
     private UpdateEventRecordQuery(Builder builder) {
         super(builder);
     }
 
     @Override
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
         final PreparedStatement statement = connection.prepareStatement(QUERY_TEMPLATE);
-        final Timestamp timestamp = this.getRecord().getTimestamp();
+        final Event event = getRecord();
+        final EventContext context = event.getContext();
+        final Timestamp timestamp = context.getTimestamp();
         try {
-            final byte[] serializedRecord = serialize(this.getRecord());
-            statement.setBytes(1, serializedRecord);
+            final byte[] serializedEvent = serialize(event);
+            statement.setBytes(QueryParameter.EVENT.getIndex(), serializedEvent);
 
-            final String eventType = this.getRecord().getEventType();
-            statement.setString(2, eventType);
+            final Any eventMessageAny = event.getMessage();
+            final Message eventMessage = AnyPacker.unpack(eventMessageAny);
+            final String eventType = TypeName.of(eventMessage);
+            statement.setString(QueryParameter.EVENT_TYPE.getIndex(), eventType);
 
-            final String producerId = this.getRecord().getProducerId();
-            statement.setString(3, producerId);
+            final Any producerIdAny = context.getProducerId();
+            final Message producerId = AnyPacker.unpack(producerIdAny);
+            final String producerIdString = Stringifiers.idToString(producerId);
+            statement.setString(QueryParameter.PRODUCER_ID.getIndex(), producerIdString);
 
             final long seconds = timestamp.getSeconds();
-            statement.setLong(4, seconds);
+            statement.setLong(QueryParameter.SECONDS.getIndex(), seconds);
 
             final int nanos = timestamp.getNanos();
-            statement.setInt(5, nanos);
+            statement.setInt(QueryParameter.NANOS.getIndex(), nanos);
 
-            final String eventId = this.getRecord().getEventId();
-            statement.setString(6, eventId);
+            final String eventId = getId();
+            statement.setString(QueryParameter.EVENT_ID.getIndex(), eventId);
         } catch (SQLException e) {
-            this.getLogger().error("Failed to prepare statement ", e);
+            logFailedToPrepareStatement(e);
             throw new DatabaseException(e);
         }
         return statement;
@@ -105,7 +115,10 @@ public class UpdateEventRecordQuery extends WriteRecordQuery<String, EventStorag
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder extends WriteRecordQuery.Builder<Builder, UpdateEventRecordQuery, String, EventStorageRecord> {
+    public static class Builder extends WriteRecordQuery.Builder<Builder,
+                                                                 UpdateEventRecordQuery,
+                                                                 String,
+                                                                 Event> {
 
         @Override
         public UpdateEventRecordQuery build() {
@@ -115,6 +128,26 @@ public class UpdateEventRecordQuery extends WriteRecordQuery<String, EventStorag
         @Override
         protected Builder getThis() {
             return this;
+        }
+    }
+
+    private enum QueryParameter {
+
+        EVENT(1),
+        EVENT_TYPE(2),
+        PRODUCER_ID(3),
+        SECONDS(4),
+        NANOS(5),
+        EVENT_ID(6);
+
+        private final int index;
+
+        QueryParameter(int index) {
+            this.index = index;
+        }
+
+        public int getIndex() {
+            return index;
         }
     }
 }

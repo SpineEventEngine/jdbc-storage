@@ -22,7 +22,7 @@ package org.spine3.server.storage.jdbc.command.query;
 
 import org.slf4j.Logger;
 import org.spine3.base.CommandStatus;
-import org.spine3.server.command.storage.CommandStorageRecord;
+import org.spine3.server.command.CommandRecord;
 import org.spine3.server.storage.jdbc.GivenDataSource;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
@@ -47,32 +47,35 @@ class Given {
     static SelectCommandByIdQuery getSelectCommandByIdQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
         final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnExecuteStatement();
-        final SelectCommandByIdQuery.Builder builder = SelectCommandByIdQuery.newBuilder()
-                .setDataSource(dataSourceMock)
-                .setLogger(loggerMock)
-                .setIdColumn(idColumnMock);
+        final SelectCommandByIdQuery.Builder builder =
+                SelectCommandByIdQuery.newBuilder()
+                                      .setDataSource(dataSourceMock)
+                                      .setLogger(loggerMock)
+                                      .setIdColumn(idColumnMock);
         return builder.build();
     }
 
     static SelectCommandByStatusQuery getSelectCommandByStatusQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
         final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnSettingStatementParam();
-        final SelectCommandByStatusQuery.Builder builder = SelectCommandByStatusQuery.newBuilder()
-                .setDataSource(dataSourceMock)
-                .setLogger(loggerMock)
-                .setStatus(CommandStatus.UNDEFINED);
+        final SelectCommandByStatusQuery.Builder builder =
+                SelectCommandByStatusQuery.newBuilder()
+                                          .setDataSource(dataSourceMock)
+                                          .setLogger(loggerMock)
+                                          .setStatus(CommandStatus.UNDEFINED);
         return builder.build();
     }
 
     static WriteCommandRecordQuery getWriteCommandRecordQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
         final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnSettingStatementParam();
-        final InsertCommandQuery.Builder builder = InsertCommandQuery.newBuilder()
-                .setDataSource(dataSourceMock)
-                .setLogger(loggerMock)
-                .setIdColumn(idColumnMock)
-                .setRecord(CommandStorageRecord.getDefaultInstance())
-                .setStatus(CommandStatus.UNDEFINED);
+        final InsertCommandQuery.Builder builder =
+                InsertCommandQuery.newBuilder()
+                                  .setDataSource(dataSourceMock)
+                                  .setLogger(loggerMock)
+                                  .setIdColumn(idColumnMock)
+                                  .setRecord(CommandRecord.getDefaultInstance())
+                                  .setStatus(CommandStatus.UNDEFINED);
         return builder.build();
     }
 

@@ -20,15 +20,18 @@
 
 package org.spine3.server.storage.jdbc.entity.query;
 
-import org.spine3.server.storage.jdbc.Sql;
 import org.spine3.server.storage.jdbc.query.CreateTableQuery;
 
+import static org.spine3.server.storage.VisibilityField.archived;
+import static org.spine3.server.storage.VisibilityField.deleted;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.COMMA;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
 import static org.spine3.server.storage.jdbc.Sql.Query.CREATE_IF_MISSING;
 import static org.spine3.server.storage.jdbc.Sql.Query.PRIMARY_KEY;
+import static org.spine3.server.storage.jdbc.Sql.Type.BLOB;
+import static org.spine3.server.storage.jdbc.Sql.Type.BOOLEAN;
 import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ENTITY_COL;
 import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
 
@@ -40,20 +43,21 @@ import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
  */
 public class CreateEntityTableQuery<I> extends CreateTableQuery<I> {
 
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
             CREATE_IF_MISSING + " %s " + BRACKET_OPEN +
-                    ID_COL + " %s, " +
-                    ENTITY_COL + Sql.Type.BLOB + COMMA +
-                    PRIMARY_KEY + BRACKET_OPEN + ID_COL + BRACKET_CLOSE +
-                    BRACKET_CLOSE + SEMICOLON;
+            ID_COL + " %s, " +
+            ENTITY_COL + BLOB + COMMA +
+            archived + BOOLEAN + COMMA +
+            deleted + BOOLEAN + COMMA +
+            PRIMARY_KEY + BRACKET_OPEN + ID_COL + BRACKET_CLOSE +
+            BRACKET_CLOSE + SEMICOLON;
 
     protected CreateEntityTableQuery(Builder<I> builder) {
         super(builder);
     }
 
-    public static <I>Builder<I> newBuilder() {
-        final Builder <I> builder = new Builder<>();
+    public static <I> Builder<I> newBuilder() {
+        final Builder<I> builder = new Builder<>();
         builder.setQuery(QUERY_TEMPLATE);
         return builder;
     }

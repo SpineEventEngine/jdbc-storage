@@ -20,7 +20,6 @@
 
 package org.spine3.server.storage.jdbc.aggregate.query;
 
-
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.StorageQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
@@ -32,6 +31,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static java.lang.String.format;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
+import static org.spine3.server.storage.jdbc.Sql.Query.FROM;
+import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
+import static org.spine3.server.storage.jdbc.Sql.Query.SELECT;
+import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
 import static org.spine3.server.storage.jdbc.aggregate.query.Table.EventCount.EVENT_COUNT_COL;
 import static org.spine3.server.storage.jdbc.aggregate.query.Table.EventCount.ID_COL;
 
@@ -43,11 +48,10 @@ import static org.spine3.server.storage.jdbc.aggregate.query.Table.EventCount.ID
  */
 public class SelectEventCountByIdQuery<I> extends StorageQuery {
 
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
-            "SELECT " + EVENT_COUNT_COL +
-                    " FROM %s " +
-                    " WHERE " + ID_COL + " = ?;";
+            SELECT + EVENT_COUNT_COL +
+            FROM + "%s" +
+            WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
 
     private final IdColumn<I> idColumn;
     private final I id;
@@ -60,7 +64,7 @@ public class SelectEventCountByIdQuery<I> extends StorageQuery {
 
     @Nullable
     public Integer execute() throws DatabaseException {
-        try (ConnectionWrapper connection = this.getConnection(true);
+        try (ConnectionWrapper connection = getConnection(true);
              PreparedStatement statement = prepareStatement(connection);
              ResultSet resultSet = statement.executeQuery()) {
             if (!resultSet.next()) {
@@ -69,7 +73,7 @@ public class SelectEventCountByIdQuery<I> extends StorageQuery {
             final int eventCount = resultSet.getInt(EVENT_COUNT_COL);
             return eventCount;
         } catch (SQLException e) {
-            this.getLogger().error("Failed to read an event count after the last snapshot.", e);
+            getLogger().error("Failed to read an event count after the last snapshot.", e);
             throw new DatabaseException(e);
         }
     }
@@ -88,7 +92,8 @@ public class SelectEventCountByIdQuery<I> extends StorageQuery {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder<I> extends StorageQuery.Builder<Builder<I>, SelectEventCountByIdQuery> {
+    public static class Builder<I> extends StorageQuery.Builder<Builder<I>,
+            SelectEventCountByIdQuery> {
 
         private IdColumn<I> idColumn;
         private I id;
@@ -98,12 +103,12 @@ public class SelectEventCountByIdQuery<I> extends StorageQuery {
             return new SelectEventCountByIdQuery<>(this);
         }
 
-        public Builder<I> setIdColumn(IdColumn<I> idColumn){
+        public Builder<I> setIdColumn(IdColumn<I> idColumn) {
             this.idColumn = idColumn;
             return getThis();
         }
 
-        public Builder<I> setId(I id){
+        public Builder<I> setId(I id) {
             this.id = id;
             return getThis();
         }

@@ -21,7 +21,7 @@
 package org.spine3.server.storage.jdbc.command.query;
 
 import org.spine3.base.CommandStatus;
-import org.spine3.server.command.storage.CommandStorageRecord;
+import org.spine3.server.command.CommandRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.WriteRecordQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
@@ -30,30 +30,30 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 /**
- * Query which inserts or updates {@link CommandStorageRecord}.
+ * Query which inserts or updates {@link CommandRecord}.
  *
  * @author Andrey Lavrov
  */
 public class WriteCommandRecordQuery
-        extends WriteRecordQuery<String, CommandStorageRecord> {
+        extends WriteRecordQuery<String, CommandRecord> {
 
     private final int statusIndexInQuery;
     private final CommandStatus status;
 
-    protected WriteCommandRecordQuery(Builder<? extends Builder, ? extends WriteCommandRecordQuery> builder) {
+    protected WriteCommandRecordQuery(
+            Builder<? extends Builder, ? extends WriteCommandRecordQuery> builder) {
         super(builder);
         this.statusIndexInQuery = builder.statusIndexInQuery;
         this.status = builder.status;
     }
 
     @Override
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
         final PreparedStatement statement = super.prepareStatement(connection);
         try {
             statement.setString(statusIndexInQuery, status.name());
         } catch (SQLException e) {
-            this.getLogger().error("Failed to prepare statement ", e);
+            logFailedToPrepareStatement(e);
             throw new DatabaseException(e);
         }
         return statement;
@@ -61,19 +61,19 @@ public class WriteCommandRecordQuery
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
     public abstract static class Builder<B extends Builder<B, Q>, Q extends WriteCommandRecordQuery>
-            extends WriteRecordQuery.Builder<B, Q, String, CommandStorageRecord> {
+            extends WriteRecordQuery.Builder<B, Q, String, CommandRecord> {
 
         private int statusIndexInQuery;
         private CommandStatus status;
 
         public B setStatusIndexInQuery(int statusIndexInQuery) {
             this.statusIndexInQuery = statusIndexInQuery;
-            return this.getThis();
+            return getThis();
         }
 
         public B setStatus(CommandStatus status) {
             this.status = status;
-            return this.getThis();
+            return getThis();
         }
     }
 }

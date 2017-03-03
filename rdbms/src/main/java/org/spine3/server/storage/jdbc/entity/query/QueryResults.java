@@ -25,8 +25,8 @@ import com.google.protobuf.FieldMask;
 import com.google.protobuf.Message;
 import org.spine3.protobuf.AnyPacker;
 import org.spine3.protobuf.TypeUrl;
+import org.spine3.server.entity.EntityRecord;
 import org.spine3.server.entity.FieldMasks;
-import org.spine3.server.storage.EntityStorageRecord;
 import org.spine3.server.storage.jdbc.util.Serializer;
 
 import java.sql.ResultSet;
@@ -45,32 +45,30 @@ class QueryResults {
     }
 
     /**
-     * Transforms results of SQL query into ID-to-{@link EntityStorageRecord} {@link Map}.
+     * Transforms results of SQL query into ID-to-{@link EntityRecord} {@link Map}.
      *
      * @param resultSet Results of the query.
      * @param fieldMask {@code FieldMask} to apply to the results.
-     * @param typeUrl Type of retrieved {@link org.spine3.server.entity.Entity} states.
-     * @param <Id> ID type of the {@link org.spine3.server.entity.Entity}.
-     * @param <State> State type of the {@link org.spine3.server.entity.Entity}.
-     * @return ID-to-{@link EntityStorageRecord} {@link Map} representing the query results.
+     * @param <I>      ID type of the {@link org.spine3.server.entity.Entity}.
+     * @param <S>   S type of the {@link org.spine3.server.entity.Entity}.
+     * @return ID-to-{@link EntityRecord} {@link Map} representing the query results.
      * @throws SQLException if read results contain no ID column or entity column.
      * @see EntityTable
      */
-    static <Id, State extends Message> Map<Id, EntityStorageRecord> parse(
+    static <I, S extends Message> Map<I, EntityRecord> parse(
             ResultSet resultSet,
-            FieldMask fieldMask,
-            TypeUrl typeUrl)
+            FieldMask fieldMask)
             throws SQLException {
-        final ImmutableMap.Builder<Id, EntityStorageRecord> resultBuilder = new ImmutableMap.Builder<>();
+        final ImmutableMap.Builder<I, EntityRecord> resultBuilder = new ImmutableMap.Builder<>();
 
         while (resultSet.next()) {
-            final EntityStorageRecord record = readSingleMessage(resultSet);
-            final State maskedMessage = maskFields(record, fieldMask, typeUrl);
-
+            final EntityRecord record = readSingleMessage(resultSet);
+            final S maskedMessage = maskFields(record, fieldMask);
             @SuppressWarnings("unchecked")
-            final Id id = (Id) resultSet.getObject(EntityTable.ID_COL);
-
-            resultBuilder.put(id, EntityStorageRecord.newBuilder(record).setState(AnyPacker.pack(maskedMessage)).build());
+            final I id = (I) resultSet.getObject(EntityTable.ID_COL);
+            resultBuilder.put(id, EntityRecord.newBuilder(record)
+                                              .setState(AnyPacker.pack(maskedMessage))
+                                              .build());
         }
 
         resultSet.close();
@@ -78,12 +76,14 @@ class QueryResults {
         return resultBuilder.build();
     }
 
-    private static EntityStorageRecord readSingleMessage(ResultSet resultSet) throws SQLException {
-        return Serializer.deserialize(resultSet.getBytes(EntityTable.ENTITY_COL), EntityStorageRecord.getDescriptor());
+    private static EntityRecord readSingleMessage(ResultSet resultSet) throws SQLException {
+        return Serializer.deserialize(resultSet.getBytes(EntityTable.ENTITY_COL),
+                                      EntityRecord.getDescriptor());
     }
 
-    private static <M extends Message> M maskFields(EntityStorageRecord record, FieldMask fieldMask, TypeUrl typeUrl) {
+    private static <M extends Message> M maskFields(EntityRecord record, FieldMask fieldMask) {
         final M message = AnyPacker.unpack(record.getState());
+        final TypeUrl typeUrl = TypeUrl.from(message.getDescriptorForType());
         return FieldMasks.applyMask(fieldMask, message, typeUrl);
     }
 }

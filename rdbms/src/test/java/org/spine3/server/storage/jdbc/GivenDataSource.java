@@ -29,7 +29,13 @@ import javax.sql.DataSource;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyBoolean;
+import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.spine3.base.Identifiers.newUuid;
 
 public class GivenDataSource {
@@ -44,9 +50,15 @@ public class GivenDataSource {
     @SuppressWarnings("ThrowableInstanceNeverThrown")
     private static final SQLException EXCEPTION = new SQLException("");
 
-    private GivenDataSource() {}
+    private GivenDataSource() {
+    }
 
-    public static DataSourceWrapper whichThrowsExceptionOnSettingStatementParam() throws SQLException {
+    public static DataSourceWrapper withoutSuperpowers() {
+        return mock(DataSourceWrapper.class);
+    }
+
+    public static DataSourceWrapper whichThrowsExceptionOnSettingStatementParam()
+            throws SQLException {
         final PreparedStatement preparedStatement = mock(PreparedStatement.class);
         final ConnectionWrapper connection = mock(ConnectionWrapper.class);
         final DataSourceWrapper dataSource = mock(DataSourceWrapper.class);
@@ -54,9 +66,12 @@ public class GivenDataSource {
         when(dataSource.getConnection(anyBoolean())).thenReturn(connection);
         when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
 
-        doThrow(EXCEPTION).when(preparedStatement).setInt(anyInt(), anyInt());
-        doThrow(EXCEPTION).when(preparedStatement).setLong(anyInt(), anyLong());
-        doThrow(EXCEPTION).when(preparedStatement).setString(anyInt(), anyString());
+        doThrow(EXCEPTION).when(preparedStatement)
+                          .setInt(anyInt(), anyInt());
+        doThrow(EXCEPTION).when(preparedStatement)
+                          .setLong(anyInt(), anyLong());
+        doThrow(EXCEPTION).when(preparedStatement)
+                          .setString(anyInt(), anyString());
 
         return dataSource;
     }
@@ -69,13 +84,15 @@ public class GivenDataSource {
         when(dataSource.getConnection(anyBoolean())).thenReturn(connection);
         when(connection.prepareStatement(anyString())).thenReturn(statement);
 
-        doThrow(EXCEPTION).when(statement).execute();
-        doThrow(EXCEPTION).when(statement).executeQuery();
+        doThrow(EXCEPTION).when(statement)
+                          .execute();
+        doThrow(EXCEPTION).when(statement)
+                          .executeQuery();
 
         return dataSource;
     }
 
-    public static ClosableDataSource whichIsAutoCloseable(){
+    public static ClosableDataSource whichIsAutoCloseable() {
         return mock(ClosableDataSource.class);
     }
 

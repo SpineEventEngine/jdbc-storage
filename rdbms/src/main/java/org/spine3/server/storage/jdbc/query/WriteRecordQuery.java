@@ -29,19 +29,24 @@ import org.spine3.server.storage.jdbc.util.Serializer;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public abstract class WriteRecordQuery<I, Record extends Message> extends WriteQuery{
+public abstract class WriteRecordQuery<I, R extends Message> extends WriteQuery {
 
     private final I id;
-    private final Record record;
+    private final R record;
     private final int idIndexInQuery;
     private final int recordIndexInQuery;
     private final IdColumn<I> idColumn;
 
-    public Record getRecord() {
+    public R getRecord() {
         return record;
     }
 
-    protected WriteRecordQuery(Builder<? extends Builder, ? extends WriteRecordQuery, I, Record> builder) {
+    public I getId() {
+        return id;
+    }
+
+    protected WriteRecordQuery(
+            Builder<? extends Builder, ? extends WriteRecordQuery, I, R> builder) {
         super(builder);
         this.idIndexInQuery = builder.idIndexInQuery;
         this.recordIndexInQuery = builder.recordIndexInQuery;
@@ -59,27 +64,29 @@ public abstract class WriteRecordQuery<I, Record extends Message> extends WriteQ
             statement.setBytes(recordIndexInQuery, bytes);
             return statement;
         } catch (SQLException e) {
-            getLogger().error("Failed to write record with id " + id, e);
+            logWriteError(id, e);
             throw new DatabaseException(e);
         }
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public abstract static class Builder<B extends Builder<B, Q, I, Record>, Q extends WriteRecordQuery, I, Record extends Message>
-            extends WriteQuery.Builder<B, Q>{
+    public abstract static class Builder<B extends Builder<B, Q, I, R>,
+                                         Q extends WriteRecordQuery,
+                                         I,
+                                         R extends Message>
+            extends WriteQuery.Builder<B, Q> {
         private int idIndexInQuery;
         private int recordIndexInQuery;
         private IdColumn<I> idColumn;
         private I id;
-        private Record record;
-
+        private R record;
 
         public B setId(I id) {
             this.id = id;
             return getThis();
         }
 
-        public B setRecord(Record record) {
+        public B setRecord(R record) {
             this.record = record;
             return getThis();
         }

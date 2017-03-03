@@ -20,19 +20,20 @@
 
 package org.spine3.server.storage.jdbc.command;
 
+import com.google.common.base.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spine3.base.CommandId;
 import org.spine3.base.CommandStatus;
 import org.spine3.base.Error;
 import org.spine3.base.Failure;
+import org.spine3.server.command.CommandRecord;
 import org.spine3.server.command.CommandStorage;
-import org.spine3.server.command.storage.CommandStorageRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.JdbcStorageFactory;
+import org.spine3.server.storage.jdbc.builder.StorageBuilder;
 import org.spine3.server.storage.jdbc.command.query.CommandStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.validate.Validate;
 
 import java.util.Iterator;
 
@@ -52,31 +53,20 @@ public class JdbcCommandStorage extends CommandStorage {
 
     private final CommandStorageQueryFactory queryFactory;
 
-    /**
-     * Creates a new storage instance.
-     *
-     * @param dataSource            a data source to use to obtain connections
-     * @param multitenant           defines is this storage multitenant
-     * @param queryFactory          factory that generates queries for interaction with command table
-     * @return                      a new storage instance
-     * @throws DatabaseException    if an error occurs during an interaction with the DB
-     */
-    public static CommandStorage newInstance(DataSourceWrapper dataSource,
-                                             boolean multitenant,
-                                             CommandStorageQueryFactory queryFactory)
-            throws DatabaseException {
-        return new JdbcCommandStorage(dataSource, multitenant, queryFactory);
-    }
-
     protected JdbcCommandStorage(DataSourceWrapper dataSource,
-                               boolean multitenant,
-                               CommandStorageQueryFactory queryFactory)
+                                 boolean multitenant,
+                                 CommandStorageQueryFactory queryFactory)
             throws DatabaseException {
         super(multitenant);
         this.dataSource = dataSource;
         this.queryFactory = queryFactory;
         queryFactory.setLogger(LogSingleton.INSTANCE.value);
-        queryFactory.newCreateCommandTableQuery().execute();
+        queryFactory.newCreateCommandTableQuery()
+                    .execute();
+    }
+
+    private JdbcCommandStorage(Builder builder) throws DatabaseException {
+        this(builder.getDataSource(), builder.isMultitenant(), builder.getQueryFactory());
     }
 
     /**
@@ -86,15 +76,13 @@ public class JdbcCommandStorage extends CommandStorage {
      * @throws DatabaseException     if an error occurs during an interaction with the DB
      */
     @Override
-    public CommandStorageRecord read(CommandId commandId) throws DatabaseException {
+    public Optional<CommandRecord> read(CommandId commandId) throws DatabaseException {
         checkNotClosed();
 
-        final CommandStorageRecord record = queryFactory.newSelectCommandByIdQuery(commandId).execute();
+        final CommandRecord record = queryFactory.newSelectCommandByIdQuery(commandId)
+                                                        .execute();
 
-        if (record == null) {
-            return CommandStorageRecord.getDefaultInstance();
-        }
-        return record;
+        return Optional.fromNullable(record);
     }
 
     /**
@@ -104,9 +92,11 @@ public class JdbcCommandStorage extends CommandStorage {
      * @throws DatabaseException     if an error occurs during an interaction with the DB
      */
     @Override
-    public Iterator<CommandStorageRecord> read(CommandStatus status) {
+    public Iterator<CommandRecord> read(CommandStatus status) {
         checkNotNull(status);
-        final Iterator<CommandStorageRecord> iterator = queryFactory.newSelectCommandByStatusQuery(status).execute();
+        final Iterator<CommandRecord> iterator = queryFactory.newSelectCommandByStatusQuery(
+                status)
+                                                                    .execute();
         return iterator;
     }
 
@@ -117,21 +107,23 @@ public class JdbcCommandStorage extends CommandStorage {
      * @throws DatabaseException     if an error occurs during an interaction with the DB
      */
     @Override
-    public void write(CommandId commandId, CommandStorageRecord record) throws DatabaseException {
+    public void write(CommandId commandId, CommandRecord record) throws DatabaseException {
         checkNotDefault(commandId);
         checkNotDefault(record);
         checkNotClosed();
 
         if (containsRecord(commandId)) {
-            queryFactory.newUpdateCommandQuery(commandId, record).execute();
+            queryFactory.newUpdateCommandQuery(commandId, record)
+                        .execute();
         } else {
-            queryFactory.newInsertCommandQuery(commandId, record).execute();
+            queryFactory.newInsertCommandQuery(commandId, record)
+                        .execute();
         }
     }
 
     private boolean containsRecord(CommandId commandId) {
-        final CommandStorageRecord record = read(commandId);
-        final boolean contains = Validate.isNotDefault(record);
+        final Optional<CommandRecord> record = read(commandId);
+        final boolean contains = record.isPresent();
         return contains;
     }
 
@@ -146,7 +138,8 @@ public class JdbcCommandStorage extends CommandStorage {
         checkNotNull(commandId);
         checkNotClosed();
 
-        queryFactory.newSetOkStatusQuery(commandId).execute();
+        queryFactory.newSetOkStatusQuery(commandId)
+                    .execute();
     }
 
     /**
@@ -161,7 +154,8 @@ public class JdbcCommandStorage extends CommandStorage {
         checkNotNull(error);
         checkNotClosed();
 
-        queryFactory.newSetErrorQuery(commandId, error).execute();
+        queryFactory.newSetErrorQuery(commandId, error)
+                    .execute();
     }
 
     /**
@@ -176,7 +170,8 @@ public class JdbcCommandStorage extends CommandStorage {
         checkNotNull(failure);
         checkNotClosed();
 
-        queryFactory.newSetFailureQuery(commandId, failure).execute();
+        queryFactory.newSetFailureQuery(commandId, failure)
+                    .execute();
     }
 
     @Override
@@ -187,6 +182,29 @@ public class JdbcCommandStorage extends CommandStorage {
             throw new IllegalStateException(e);
         }
         dataSource.close();
+    }
+
+    public static Builder newBuilder() {
+        return new Builder();
+    }
+
+    public static class Builder extends StorageBuilder<Builder,
+                                                       JdbcCommandStorage,
+                                                       CommandStorageQueryFactory> {
+
+        private Builder() {
+            super();
+        }
+
+        @Override
+        protected Builder getThis() {
+            return this;
+        }
+
+        @Override
+        public JdbcCommandStorage doBuild() throws DatabaseException {
+            return new JdbcCommandStorage(this);
+        }
     }
 
     private enum LogSingleton {

@@ -46,13 +46,12 @@ import static org.spine3.server.storage.jdbc.aggregate.query.Table.EventCount.ID
  */
 public class InsertEventCountQuery<I> extends UpdateRecordQuery<I> {
 
-    private final int count;
-
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     private static final String QUERY_TEMPLATE =
-            INSERT_INTO +" %s " +
-                    BRACKET_OPEN + ID_COL + COMMA + EVENT_COUNT_COL + BRACKET_CLOSE +
-                    VALUES + Sql.nPlaceholders(2) + SEMICOLON;
+            INSERT_INTO + " %s " +
+            BRACKET_OPEN + ID_COL + COMMA + EVENT_COUNT_COL + BRACKET_CLOSE +
+            VALUES + Sql.nPlaceholders(2) + SEMICOLON;
+
+    private final int count;
 
     private InsertEventCountQuery(Builder<I> builder) {
         super(builder);
@@ -60,7 +59,6 @@ public class InsertEventCountQuery<I> extends UpdateRecordQuery<I> {
     }
 
     @Override
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
         final PreparedStatement statement = super.prepareStatement(connection);
 
@@ -68,7 +66,7 @@ public class InsertEventCountQuery<I> extends UpdateRecordQuery<I> {
             statement.setInt(2, count);
             return statement;
         } catch (SQLException e) {
-            this.getLogger().error("Failed to prepare statement ", e);
+            logFailedToPrepareStatement(e);
             throw new DatabaseException(e);
         }
     }
@@ -76,7 +74,7 @@ public class InsertEventCountQuery<I> extends UpdateRecordQuery<I> {
     public static <I> Builder<I> newBuilder(String tableName) {
         final Builder<I> builder = new Builder<>();
         builder.setQuery(format(QUERY_TEMPLATE, tableName))
-                .setIdIndexInQuery(1);
+               .setIdIndexInQuery(1);
         return builder;
     }
 

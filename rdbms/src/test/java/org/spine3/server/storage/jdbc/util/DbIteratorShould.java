@@ -40,7 +40,8 @@ import static org.mockito.Mockito.when;
  */
 public class DbIteratorShould {
 
-    @SuppressWarnings("ResultOfObjectAllocationIgnored") // Need to call a constructor and fail in it
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
+    // Need to call a constructor and fail in it
     @Test(expected = DatabaseException.class)
     public void throw_DatabaseException_on_sql_execution_failure() throws SQLException {
         final PreparedStatement statement = mock(PreparedStatement.class);

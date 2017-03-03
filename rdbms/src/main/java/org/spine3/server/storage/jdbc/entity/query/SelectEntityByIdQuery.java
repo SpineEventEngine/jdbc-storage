@@ -20,12 +20,19 @@
 
 package org.spine3.server.storage.jdbc.entity.query;
 
-import org.spine3.server.storage.EntityStorageRecord;
+import org.spine3.server.entity.EntityRecord;
+import org.spine3.server.entity.Visibility;
+import org.spine3.server.storage.VisibilityField;
 import org.spine3.server.storage.jdbc.query.SelectByIdQuery;
+
+import javax.annotation.Nullable;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import static java.lang.String.format;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
+import static org.spine3.server.storage.jdbc.Sql.Query.ALL_ATTRIBUTES;
 import static org.spine3.server.storage.jdbc.Sql.Query.FROM;
 import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
 import static org.spine3.server.storage.jdbc.Sql.Query.SELECT;
@@ -34,15 +41,15 @@ import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ENTITY_COL
 import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
 
 /**
- * Query that selects {@link EntityStorageRecord} by ID.
+ * Query that selects {@link EntityRecord} by ID.
  *
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-public class SelectEntityByIdQuery<I> extends SelectByIdQuery<I, EntityStorageRecord> {
+public class SelectEntityByIdQuery<I> extends SelectByIdQuery<I, EntityRecord> {
 
-    @SuppressWarnings("DuplicateStringLiteralInspection")
-    private static final String QUERY_TEMPLATE = SELECT + ENTITY_COL + FROM + " %s" + WHERE
+    private static final String QUERY_TEMPLATE =
+            SELECT.toString() + ALL_ATTRIBUTES + FROM + " %s" + WHERE
             + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
 
     public SelectEntityByIdQuery(Builder<I> builder) {
@@ -52,17 +59,39 @@ public class SelectEntityByIdQuery<I> extends SelectByIdQuery<I, EntityStorageRe
     public static <I> Builder<I> newBuilder(String tableName) {
         final Builder<I> builder = new Builder<>();
         builder.setIdIndexInQuery(1)
-                .setQuery(format(QUERY_TEMPLATE, tableName))
-                .setMessageColumnName(ENTITY_COL)
-                .setMessageDescriptor(EntityStorageRecord.getDescriptor());
+               .setQuery(format(QUERY_TEMPLATE, tableName))
+               .setMessageColumnName(ENTITY_COL)
+               .setMessageDescriptor(EntityRecord.getDescriptor());
         return builder;
+    }
+
+    @Nullable
+    @Override
+    protected EntityRecord readMessage(ResultSet resultSet) throws SQLException {
+        final EntityRecord record = super.readMessage(resultSet);
+        if (record == null) {
+            return null;
+        }
+        final boolean archived = resultSet.getBoolean(VisibilityField.archived.toString());
+        final boolean deleted = resultSet.getBoolean(VisibilityField.deleted.toString());
+        if (!(archived || deleted)) {
+            return record;
+        }
+        final Visibility status = Visibility.newBuilder()
+                                            .setArchived(archived)
+                                            .setDeleted(deleted)
+                                            .build();
+        final EntityRecord result = record.toBuilder()
+                                          .setVisibility(status)
+                                          .build();
+        return result;
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
     public static class Builder<I> extends SelectByIdQuery.Builder<Builder<I>,
                                                                    SelectEntityByIdQuery<I>,
                                                                    I,
-                                                                   EntityStorageRecord> {
+                                                                   EntityRecord> {
 
         @Override
         public SelectEntityByIdQuery<I> build() {

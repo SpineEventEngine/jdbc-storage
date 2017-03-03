@@ -28,7 +28,9 @@ import java.sql.SQLException;
 
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.verify;
 
 /**
  * @author Andrey Lavrov
@@ -50,6 +52,7 @@ public class SelectByIdQueryShould {
     public void return_null_if_nothing_was_read_from_db() throws SQLException {
         final SelectByIdQuery query = Given.getSelectByIdQueryReturningEmptyResultSetMock();
         final Message result = query.execute();
-        assertNull("If nothing is read from the database the result of the query must be null", result);
+        assertNull("If nothing is read from the database the result of the query must be null",
+                   result);
     }
 }

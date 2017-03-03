@@ -27,7 +27,8 @@ import javax.sql.DataSource;
 
 /**
  * A converter for the default {@link DataSource} config.
- * The default implementation is: <a href="https://github.com/brettwooldridge/HikariCP">HikariCP</a> connection pool.
+ * The default implementation is:
+ * <a href="https://github.com/brettwooldridge/HikariCP">HikariCP</a> connection pool.
  *
  * @author Alexander Litus
  * @author Andrey Lavrov
@@ -38,7 +39,7 @@ public class DefaultDataSourceConfigConverter {
     }
 
     @SuppressWarnings("MethodWithMoreThanThreeNegations") // is OK in this case
-    public static HikariConfig convert (DataSourceConfig config) {
+    public static HikariConfig convert(DataSourceConfig config) {
         final HikariConfig result = new HikariConfig();
 
         /** Required fields */
