@@ -24,7 +24,6 @@ import org.spine3.server.entity.Entity;
 import org.spine3.server.storage.jdbc.Sql;
 import org.spine3.server.storage.jdbc.table.TableColumn;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import static org.spine3.server.storage.jdbc.Sql.Type.BIGINT;
 import static org.spine3.server.storage.jdbc.Sql.Type.UNKNOWN;
@@ -37,12 +36,10 @@ public class EventCountTable<I> extends AggregateTable<I, EventCountTable.Column
 
     private static final String TABLE_NAME_POSTFIX = "event_count";
 
-    protected EventCountTable(Class<Entity<I, ?>> entityClass,
-                              IdColumn<I> idColumn,
+    public EventCountTable(Class<? extends Entity<I, ?>> entityClass,
                               DataSourceWrapper dataSource) {
         super(newTableName(entityClass) + (TABLE_NAME_POSTFIX),
               entityClass,
-              idColumn,
               dataSource);
     }
 
@@ -54,6 +51,14 @@ public class EventCountTable<I> extends AggregateTable<I, EventCountTable.Column
     @Override
     protected Class<Column> getTableColumnType() {
         return Column.class;
+    }
+
+    public int read(I id) {
+        return 0;
+    }
+
+    public void write(I id, int count) {
+
     }
 
     enum Column implements TableColumn {

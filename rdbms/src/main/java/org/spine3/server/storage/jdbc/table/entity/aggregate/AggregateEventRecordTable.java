@@ -20,11 +20,13 @@
 
 package org.spine3.server.storage.jdbc.table.entity.aggregate;
 
+import org.spine3.server.aggregate.AggregateEventRecord;
 import org.spine3.server.entity.Entity;
 import org.spine3.server.storage.jdbc.Sql;
 import org.spine3.server.storage.jdbc.table.TableColumn;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.server.storage.jdbc.util.IdColumn;
+
+import java.util.Iterator;
 
 import static org.spine3.server.storage.jdbc.Sql.Type.BIGINT;
 import static org.spine3.server.storage.jdbc.Sql.Type.BLOB;
@@ -37,10 +39,9 @@ import static org.spine3.server.storage.jdbc.Sql.Type.UNKNOWN;
 public class AggregateEventRecordTable<I>
         extends AggregateTable<I, AggregateEventRecordTable.Column> {
 
-    protected AggregateEventRecordTable(Class<Entity<I, ?>> entityClass,
-                                        IdColumn<I> idColumn,
+    public AggregateEventRecordTable(Class<? extends Entity<I, ?>> entityClass,
                                         DataSourceWrapper dataSource) {
-        super(entityClass, idColumn, dataSource);
+        super(entityClass, dataSource);
     }
 
     @Override
@@ -51,6 +52,14 @@ public class AggregateEventRecordTable<I>
     @Override
     protected Class<Column> getTableColumnType() {
         return Column.class;
+    }
+
+    public void write(I id, AggregateEventRecord record) {
+
+    }
+
+    public Iterator<AggregateEventRecord> historyBackward(I id) {
+        return null;
     }
 
     enum Column implements TableColumn {

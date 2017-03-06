@@ -23,14 +23,17 @@ package org.spine3.server.storage.jdbc.aggregate;
 import com.google.common.base.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.spine3.server.aggregate.Aggregate;
 import org.spine3.server.aggregate.AggregateEventRecord;
 import org.spine3.server.aggregate.AggregateStorage;
 import org.spine3.server.entity.Visibility;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.JdbcStorageFactory;
-import org.spine3.server.storage.jdbc.builder.StorageBuilder;
 import org.spine3.server.storage.jdbc.aggregate.query.AggregateStorageQueryFactory;
-import org.spine3.server.storage.jdbc.entity.visibility.VisibilityHandler;
+import org.spine3.server.storage.jdbc.builder.StorageBuilder;
+import org.spine3.server.storage.jdbc.table.entity.aggregate.AggregateEventRecordTable;
+import org.spine3.server.storage.jdbc.table.entity.aggregate.EventCountTable;
+import org.spine3.server.storage.jdbc.table.entity.aggregate.VisibilityTable;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbIterator;
 
@@ -58,79 +61,75 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     /** Iterators which are not closed yet. */
     private final Collection<DbIterator> iterators = newLinkedList();
 
-    /** Creates queries for interaction with database. */
-    private final AggregateStorageQueryFactory<I> queryFactory;
+    private final AggregateEventRecordTable<I> mainTable;
 
-    private final VisibilityHandler<I> visibilityHandler;
+    private final VisibilityTable<I> visibilityTable;
+
+    private final EventCountTable<I> eventCountTable;
 
     protected JdbcAggregateStorage(DataSourceWrapper dataSource,
                                    boolean multitenant,
-                                   AggregateStorageQueryFactory<I> queryFactory)
+                                   Class<Aggregate<I, ?, ?>> aggregateClass)
             throws DatabaseException {
         super(multitenant);
         this.dataSource = dataSource;
-        this.queryFactory = queryFactory;
-        queryFactory.setLogger(LogSingleton.INSTANCE.value);
-        queryFactory.newCreateMainTableQuery()
-                    .execute();
-        queryFactory.newCreateEventCountTableQuery()
-                    .execute();
-        this.visibilityHandler = new VisibilityHandler<>(queryFactory);
-        visibilityHandler.initialize();
+        this.mainTable = new AggregateEventRecordTable<>(aggregateClass, dataSource);
+        this.visibilityTable = new VisibilityTable<>(aggregateClass, dataSource);
+        this.eventCountTable = new EventCountTable<>(aggregateClass, dataSource);
+        mainTable.createIfNotExists();
+        visibilityTable.createIfNotExists();
+        eventCountTable.createIfNotExists();
     }
 
     private JdbcAggregateStorage(Builder<I> builder) {
-        this(builder.getDataSource(), builder.isMultitenant(), builder.getQueryFactory());
+        this(builder.getDataSource(), builder.isMultitenant(), builder.getAggregateClass());
     }
 
     @Override
     public int readEventCountAfterLastSnapshot(I id) {
         checkNotClosed();
-        final Integer count = queryFactory.newSelectEventCountByIdQuery(id)
-                                          .execute();
-        if (count == null) {
-            return 0;
-        }
-        return count;
+        final int result = eventCountTable.read(id);
+        return result;
+
+//        final Integer count = queryFactory.newSelectEventCountByIdQuery(id)
+//                                          .execute();
+//        if (count == null) {
+//            return 0;
+//        }
+//        return count;
     }
 
     @Override
     protected Optional<Visibility> readVisibility(I id) {
-        return visibilityHandler.readVisibility(id);
+        return Optional.fromNullable(visibilityTable.read(id));
     }
 
     @Override
     protected void writeVisibility(I id, Visibility status) {
-        visibilityHandler.writeVisibility(id, status);
+        visibilityTable.write(id, status);
     }
 
     @Override
     protected void markArchived(I id) {
-        visibilityHandler.markArchived(id);
+        visibilityTable.markArchived(id);
     }
 
     @Override
     protected void markDeleted(I id) {
-        visibilityHandler.markDeleted(id);
+        visibilityTable.markDeleted(id);
     }
 
     @Override
     public void writeEventCountAfterLastSnapshot(I id, int count) {
         checkNotClosed();
-        if (containsEventCount(id)) {
-            queryFactory.newUpdateEventCountQuery(id, count)
-                        .execute();
-        } else {
-            queryFactory.newInsertEventCountQuery(id, count)
-                        .execute();
-        }
-    }
-
-    private boolean containsEventCount(I id) {
-        final Integer count = queryFactory.newSelectEventCountByIdQuery(id)
-                                          .execute();
-        final boolean contains = count != null;
-        return contains;
+        eventCountTable.write(id, count);
+//        if (containsEventCount(id)) {
+//            queryFactory.newUpdateEventCountQuery(id, count)
+//                        .execute();
+//        } else {
+//            queryFactory.newInsertEventCountQuery(id, count)
+//                        .execute();
+//        }
     }
 
     /**
@@ -140,8 +139,10 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
      */
     @Override
     protected void writeRecord(I id, AggregateEventRecord record) throws DatabaseException {
-        queryFactory.newInsertRecordQuery(id, record)
-                    .execute();
+        checkNotClosed();
+        checkNotNull(id);
+        checkNotNull(record);
+        mainTable.write(id, record);
     }
 
     /**
@@ -156,11 +157,13 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     @Override
     protected Iterator<AggregateEventRecord> historyBackward(I id) throws DatabaseException {
         checkNotNull(id);
-        final Iterator<AggregateEventRecord> iterator =
-                queryFactory.newSelectByIdSortedByTimeDescQuery(id)
-                            .execute();
-        iterators.add((DbIterator) iterator);
-        return iterator;
+//        final Iterator<AggregateEventRecord> iterator =
+//                queryFactory.newSelectByIdSortedByTimeDescQuery(id)
+//                            .execute();
+//        iterators.add((DbIterator) iterator);
+//        return iterator;
+        final Iterator<AggregateEventRecord> result = mainTable.historyBackward(id);
+        return result;
     }
 
     @Override
@@ -182,6 +185,8 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     public static class Builder<I> extends StorageBuilder<Builder<I>,
                                                           JdbcAggregateStorage<I>,
                                                           AggregateStorageQueryFactory<I>> {
+        private Class<Aggregate<I, ?, ?>> aggregateClass;
+
         private Builder() {
             super();
         }
@@ -194,6 +199,15 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
         @Override
         public JdbcAggregateStorage<I> doBuild() {
             return new JdbcAggregateStorage<>(this);
+        }
+
+        public Class<Aggregate<I,?,?>> getAggregateClass() {
+            return aggregateClass;
+        }
+
+        public Builder<I> setAggregateClass(Class<Aggregate<I, ?, ?>> aggregateClass) {
+            this.aggregateClass = aggregateClass;
+            return this;
         }
     }
 

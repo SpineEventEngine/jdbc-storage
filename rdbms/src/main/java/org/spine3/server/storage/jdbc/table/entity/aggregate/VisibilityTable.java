@@ -21,11 +21,11 @@
 package org.spine3.server.storage.jdbc.table.entity.aggregate;
 
 import org.spine3.server.entity.Entity;
+import org.spine3.server.entity.Visibility;
 import org.spine3.server.storage.jdbc.Sql;
 import org.spine3.server.storage.jdbc.table.TableColumn;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbTableNameFactory;
-import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import static org.spine3.server.storage.jdbc.Sql.Type.BOOLEAN;
 import static org.spine3.server.storage.jdbc.Sql.Type.UNKNOWN;
@@ -37,12 +37,10 @@ public class VisibilityTable<I> extends AggregateTable<I, VisibilityTable.Column
 
     private static final String TABLE_NAME_POSTFIX = "visibility";
 
-    protected VisibilityTable(Class<Entity<I, ?>> entityClass,
-                              IdColumn<I> idColumn,
+    public VisibilityTable(Class<? extends Entity<I, ?>> entityClass,
                               DataSourceWrapper dataSource) {
         super(DbTableNameFactory.newTableName(entityClass) + TABLE_NAME_POSTFIX,
               entityClass,
-              idColumn,
               dataSource);
     }
 
@@ -54,6 +52,22 @@ public class VisibilityTable<I> extends AggregateTable<I, VisibilityTable.Column
     @Override
     protected Class<Column> getTableColumnType() {
         return Column.class;
+    }
+
+    public Visibility read(I id) {
+        return null;
+    }
+
+    public void write(I id, Visibility status) {
+
+    }
+
+    public void markArchived(I id) {
+
+    }
+
+    public void markDeleted(I id) {
+
     }
 
     enum Column implements TableColumn {

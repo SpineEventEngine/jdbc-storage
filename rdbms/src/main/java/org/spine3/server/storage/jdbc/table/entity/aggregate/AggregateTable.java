@@ -31,16 +31,14 @@ import org.spine3.server.storage.jdbc.util.IdColumn;
  */
 public abstract class AggregateTable<I, C extends Enum<C> & TableColumn> extends EntityTable<I, C> {
 
-    protected AggregateTable(Class<Entity<I, ?>> entityClass,
-                             IdColumn<I> idColumn,
+    protected AggregateTable(Class<? extends Entity<I, ?>> entityClass,
                              DataSourceWrapper dataSource) {
-        super(entityClass, idColumn, dataSource);
+        super(entityClass, IdColumn.newInstance(entityClass), dataSource);
     }
 
     protected AggregateTable(String tableName,
-                             Class<Entity<I, ?>> entityClass,
-                             IdColumn<I> idColumn,
+                             Class<? extends Entity<I, ?>> entityClass,
                              DataSourceWrapper dataSource) {
-        super(tableName, entityClass, idColumn, dataSource);
+        super(tableName, entityClass, IdColumn.newInstance(entityClass), dataSource);
     }
 }

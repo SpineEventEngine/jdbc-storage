@@ -33,23 +33,23 @@ import static org.spine3.server.storage.jdbc.util.DbTableNameFactory.newTableNam
  */
 public abstract class EntityTable<I, C extends Enum<C> & TableColumn> extends AbstractTable<I, C> {
 
-    private final Class<Entity<I, ?>> entityClass;
+    private final Class<? extends Entity<I, ?>> entityClass;
 
-    protected EntityTable(Class<Entity<I, ?>> entityClass,
+    protected EntityTable(Class<? extends Entity<I, ?>> entityClass,
                           IdColumn<I> idColumn,
                           DataSourceWrapper dataSource) {
         this(newTableName(entityClass), entityClass, idColumn, dataSource);
     }
 
     protected EntityTable(String tableName,
-                          Class<Entity<I, ?>> entityClass,
+                          Class<? extends Entity<I, ?>> entityClass,
                           IdColumn<I> idColumn,
                           DataSourceWrapper dataSource) {
         super(tableName, idColumn, dataSource);
         this.entityClass = entityClass;
     }
 
-    public Class<Entity<I, ?>> getEntityClass() {
+    public Class<? extends Entity<I, ?>> getEntityClass() {
         return entityClass;
     }
 }
