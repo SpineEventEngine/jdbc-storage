@@ -69,7 +69,7 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
 
     protected JdbcAggregateStorage(DataSourceWrapper dataSource,
                                    boolean multitenant,
-                                   Class<Aggregate<I, ?, ?>> aggregateClass)
+                                   Class<? extends Aggregate<I, ?, ?>> aggregateClass)
             throws DatabaseException {
         super(multitenant);
         this.dataSource = dataSource;
@@ -185,7 +185,7 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     public static class Builder<I> extends StorageBuilder<Builder<I>,
                                                           JdbcAggregateStorage<I>,
                                                           AggregateStorageQueryFactory<I>> {
-        private Class<Aggregate<I, ?, ?>> aggregateClass;
+        private Class<? extends Aggregate<I, ?, ?>> aggregateClass;
 
         private Builder() {
             super();
@@ -201,11 +201,11 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
             return new JdbcAggregateStorage<>(this);
         }
 
-        public Class<Aggregate<I,?,?>> getAggregateClass() {
+        public Class<? extends Aggregate<I,?,?>> getAggregateClass() {
             return aggregateClass;
         }
 
-        public Builder<I> setAggregateClass(Class<Aggregate<I, ?, ?>> aggregateClass) {
+        public Builder<I> setAggregateClass(Class<? extends Aggregate<I, ?, ?>> aggregateClass) {
             this.aggregateClass = aggregateClass;
             return this;
         }

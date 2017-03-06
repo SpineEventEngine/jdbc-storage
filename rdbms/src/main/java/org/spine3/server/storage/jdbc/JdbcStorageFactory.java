@@ -113,6 +113,7 @@ public class JdbcStorageFactory<I> implements StorageFactory {
                 getAggregateStorageQueryFactory(dataSource, aggregateClass);
         final JdbcAggregateStorage<I> storage = JdbcAggregateStorage.<I>newBuilder()
                                                                     .setQueryFactory(queryFactory)
+                                                                    .setAggregateClass(aggregateClass)
                                                                     .setMultitenant(false)
                                                                     .setDataSource(dataSource)
                                                                     .build();
