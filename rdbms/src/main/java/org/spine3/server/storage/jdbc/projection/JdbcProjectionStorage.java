@@ -32,7 +32,6 @@ import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.JdbcStorageFactory;
 import org.spine3.server.storage.jdbc.builder.StorageBuilder;
 import org.spine3.server.storage.jdbc.entity.JdbcRecordStorage;
-import org.spine3.server.storage.jdbc.projection.query.LastHandledEventTimeQueryFactory;
 import org.spine3.server.storage.jdbc.table.LastHandledEventTimeTable;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
@@ -147,8 +146,7 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
     }
 
     public static class Builder<I> extends StorageBuilder<Builder<I>,
-                                                          JdbcProjectionStorage<I>,
-            LastHandledEventTimeQueryFactory> {
+                                                          JdbcProjectionStorage<I>> {
         private static final String DATA_SOURCE_WARN =
                 "Data source is never used directly by org.spine3.server.storage.jdbc.projection.JdbcProjectionStorage";
 
@@ -189,7 +187,6 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
         @Override
         protected void checkPreconditions() throws IllegalStateException {
             checkState(getRecordStorage() != null, "Record Storage must not be null.");
-            //       checkState(getQueryFactory() != null, "Query factory must not be null.");
         }
 
         @Override

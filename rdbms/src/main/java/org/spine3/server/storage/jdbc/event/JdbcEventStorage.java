@@ -30,8 +30,6 @@ import com.google.common.collect.Iterators;
 import com.google.common.collect.UnmodifiableIterator;
 import com.google.protobuf.Any;
 import com.google.protobuf.Message;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.spine3.base.Event;
 import org.spine3.base.EventContext;
 import org.spine3.base.EventId;
@@ -43,7 +41,6 @@ import org.spine3.server.event.EventStreamQuery;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.JdbcStorageFactory;
 import org.spine3.server.storage.jdbc.builder.StorageBuilder;
-import org.spine3.server.storage.jdbc.query.QueryFactory;
 import org.spine3.server.storage.jdbc.table.EventTable;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbIterator;
@@ -56,7 +53,6 @@ import java.util.List;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.Lists.newLinkedList;
 import static org.spine3.server.storage.jdbc.util.Closeables.closeAll;
 
@@ -174,34 +170,10 @@ public class JdbcEventStorage extends EventStorage {
         return new Builder();
     }
 
-    public static class Builder extends StorageBuilder<Builder, JdbcEventStorage, QueryFactory> {
-
-        private static final String QUERY_FACTIRY_WARN =
-                "Query factory is never used directly by org.spine3.server.storage.jdbc.event.JdbcEventStorage";
+    public static class Builder extends StorageBuilder<Builder, JdbcEventStorage> {
 
         private Builder() {
             super();
-        }
-
-        @Override
-        public Builder setQueryFactory(QueryFactory queryFactory) {
-            log().warn(QUERY_FACTIRY_WARN);
-            return super.setQueryFactory(queryFactory);
-        }
-
-        /**
-         * {@inheritDoc}
-         *
-         * <p>{@linkplain JdbcEventStorage.Builder} implementation only checks the presence of
-         * Data Source
-         *
-         * @throws IllegalStateException
-         */
-        @SuppressWarnings("MethodDoesntCallSuperMethod")
-        @Override
-        protected void checkPreconditions() throws IllegalStateException {
-            checkState(getDataSource() != null,
-                       "Event storage data source must not be null");
         }
 
         @Override
@@ -285,7 +257,7 @@ public class JdbcEventStorage extends EventStorage {
         }
 
         // Defined as nullable, parameter `event` is actually non null.
-        @SuppressWarnings({"MethodWithMultipleLoops"})
+        @SuppressWarnings("MethodWithMultipleLoops")
         @Override
         public boolean apply(@Nullable Event event) {
             if (event == null) {
@@ -344,15 +316,5 @@ public class JdbcEventStorage extends EventStorage {
             final boolean result = expectedValues.contains(actualValue);
             return result;
         }
-    }
-
-    private static Logger log() {
-        return LogSingleton.INSTANCE.value;
-    }
-
-    private enum LogSingleton {
-        INSTANCE;
-        @SuppressWarnings("NonSerializableFieldInSerializableClass")
-        private final Logger value = LoggerFactory.getLogger(JdbcEventStorage.class);
     }
 }

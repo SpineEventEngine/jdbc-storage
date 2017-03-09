@@ -37,7 +37,6 @@ import org.spine3.server.stand.AggregateStateId;
 import org.spine3.server.stand.StandStorage;
 import org.spine3.server.storage.jdbc.builder.StorageBuilder;
 import org.spine3.server.storage.jdbc.entity.JdbcRecordStorage;
-import org.spine3.server.storage.jdbc.entity.query.RecordStorageQueryFactory;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
@@ -210,8 +209,7 @@ public class JdbcStandStorage extends StandStorage {
      *            the {@code JdbcStandStorage}.
      */
     public static class Builder<I> extends StorageBuilder<Builder<I>,
-            JdbcStandStorage,
-            RecordStorageQueryFactory<I>> {
+            JdbcStandStorage> {
         private Class<? extends Entity<I, ?>> entityClass;
 
         private Builder() {
@@ -230,16 +228,6 @@ public class JdbcStandStorage extends StandStorage {
         public Builder<I> setEntityClass(Class<? extends Entity<I, ?>> entityClass) {
             this.entityClass = entityClass;
             return this;
-        }
-
-        /**
-         * {@inheritDoc}
-         *
-         * <p>Overrides to guarantee the type compliance.
-         */
-        @Override
-        public RecordStorageQueryFactory<I> getQueryFactory() {
-            return super.getQueryFactory();
         }
 
         @Override

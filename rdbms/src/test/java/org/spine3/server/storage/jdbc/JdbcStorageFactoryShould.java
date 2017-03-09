@@ -32,12 +32,14 @@ import org.spine3.server.projection.Projection;
 import org.spine3.server.projection.ProjectionStorage;
 import org.spine3.server.stand.StandStorage;
 import org.spine3.server.storage.RecordStorage;
+import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.test.storage.Project;
 
 import javax.sql.DataSource;
 
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 /**
  * @author Alexander Litus
@@ -109,6 +111,18 @@ public class JdbcStorageFactoryShould {
     public void create_stand_storage() {
         final StandStorage storage = factory.createStandStorage();
         assertNotNull(storage);
+    }
+
+    @Test
+    public void close_datastore_on_close() {
+        final DataSourceWrapper mock = GivenDataSource.withoutSuperpowers();
+        factory = JdbcStorageFactory.<String>newBuilder()
+                                    .setDataSource(mock)
+                                    .setMultitenant(false)
+                                    .setEntityClass(TestAggregate.class)
+                                    .build();
+        factory.close();
+        verify(mock).close();
     }
 
     private static class TestEntity extends AbstractEntity<String, StringValue> {

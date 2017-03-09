@@ -30,7 +30,6 @@ import org.spine3.server.command.CommandStorage;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.JdbcStorageFactory;
 import org.spine3.server.storage.jdbc.builder.StorageBuilder;
-import org.spine3.server.storage.jdbc.command.query.CommandStorageQueryFactory;
 import org.spine3.server.storage.jdbc.table.CommandTable;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
@@ -171,8 +170,7 @@ public class JdbcCommandStorage extends CommandStorage {
     }
 
     public static class Builder extends StorageBuilder<Builder,
-                                                       JdbcCommandStorage,
-                                                       CommandStorageQueryFactory> {
+                                                       JdbcCommandStorage> {
 
         private Builder() {
             super();

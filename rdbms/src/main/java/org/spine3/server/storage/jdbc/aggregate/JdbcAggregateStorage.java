@@ -27,8 +27,6 @@ import org.spine3.server.aggregate.AggregateEventRecord;
 import org.spine3.server.aggregate.AggregateStorage;
 import org.spine3.server.entity.Visibility;
 import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.JdbcStorageFactory;
-import org.spine3.server.storage.jdbc.aggregate.query.AggregateStorageQueryFactory;
 import org.spine3.server.storage.jdbc.builder.StorageBuilder;
 import org.spine3.server.storage.jdbc.table.entity.aggregate.AggregateEventRecordTable;
 import org.spine3.server.storage.jdbc.table.entity.aggregate.EventCountTable;
@@ -46,12 +44,16 @@ import static org.spine3.server.storage.jdbc.util.Closeables.closeAll;
 /**
  * The implementation of the aggregate storage based on the RDBMS.
  *
- * <p> This storage contains 2 tables by default, they are described
- * in {@link org.spine3.server.storage.jdbc.aggregate.query.Table}.
+ * <p>This storage contains 3 tables by default:
+ * <ul>
+ *     <li>{@link AggregateEventRecordTable}
+ *     <li>{@link VisibilityTable}
+ *     <li>{@link EventCountTable}
+ * </ul>
  *
  * @param <I> the type of aggregate IDs
  * @author Alexander Litus
- * @see JdbcStorageFactory
+ * @author Dmytro Dashenkov
  */
 public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
 
@@ -170,8 +172,7 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     }
 
     public static class Builder<I> extends StorageBuilder<Builder<I>,
-                                                          JdbcAggregateStorage<I>,
-                                                          AggregateStorageQueryFactory<I>> {
+                                                          JdbcAggregateStorage<I>> {
         private Class<? extends Aggregate<I, ?, ?>> aggregateClass;
 
         private Builder() {

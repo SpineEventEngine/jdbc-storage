@@ -73,7 +73,7 @@ public class JdbcProjectionStorageShould extends ProjectionStorageShould<String>
 
     @Test
     public void accept_datasource_in_builder_event_though_not_uses_it() {
-        final StorageBuilder<?, ?, ?> builder =
+        final StorageBuilder<?, ?> builder =
                 JdbcProjectionStorage.newBuilder()
                                      .setDataSource(GivenDataSource.withoutSuperpowers());
         assertNotNull(builder);

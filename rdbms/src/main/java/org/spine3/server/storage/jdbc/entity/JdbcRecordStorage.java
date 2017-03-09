@@ -25,15 +25,12 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.protobuf.FieldMask;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.spine3.server.entity.Entity;
 import org.spine3.server.entity.EntityRecord;
 import org.spine3.server.storage.RecordStorage;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.JdbcStorageFactory;
 import org.spine3.server.storage.jdbc.builder.StorageBuilder;
-import org.spine3.server.storage.jdbc.entity.query.RecordStorageQueryFactory;
 import org.spine3.server.storage.jdbc.table.entity.RecordTable;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
@@ -178,7 +175,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     }
 
     public static class Builder<I>
-            extends StorageBuilder<Builder<I>, JdbcRecordStorage<I>, RecordStorageQueryFactory<I>> {
+            extends StorageBuilder<Builder<I>, JdbcRecordStorage<I>> {
 
         private Class<? extends Entity<I, ?>> entityClass;
 
@@ -211,11 +208,5 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
         public JdbcRecordStorage<I> doBuild() {
             return new JdbcRecordStorage<>(this);
         }
-    }
-
-    private enum LogSingleton {
-        INSTANCE;
-        @SuppressWarnings("NonSerializableFieldInSerializableClass")
-        private final Logger value = LoggerFactory.getLogger(JdbcRecordStorage.class);
     }
 }

@@ -27,7 +27,6 @@ import org.spine3.server.aggregate.AggregateStorage;
 import org.spine3.server.aggregate.AggregateStorageShould;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.GivenDataSource;
-import org.spine3.server.storage.jdbc.aggregate.query.AggregateStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.test.aggregate.Project;
 import org.spine3.test.aggregate.ProjectId;
@@ -52,10 +51,7 @@ public class JdbcAggregateStorageShould extends AggregateStorageShould {
             Class<? extends Aggregate<I, ? extends Message, ?>> aggregateClass) {
         final DataSourceWrapper dataSource =
                 GivenDataSource.whichIsStoredInMemory("aggregateStorageTests");
-        final AggregateStorageQueryFactory<I> queryFactory =
-                new AggregateStorageQueryFactory<>(dataSource, aggregateClass);
         final JdbcAggregateStorage<I> storage = JdbcAggregateStorage.<I>newBuilder()
-                                                                    .setQueryFactory(queryFactory)
                                                                     .setMultitenant(false)
                                                                     .setDataSource(dataSource)
                                                                     .setAggregateClass(aggregateClass)

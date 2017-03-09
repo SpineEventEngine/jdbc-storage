@@ -24,7 +24,6 @@ import org.junit.Test;
 import org.spine3.server.command.CommandStorage;
 import org.spine3.server.command.CommandStorageShould;
 import org.spine3.server.storage.jdbc.GivenDataSource;
-import org.spine3.server.storage.jdbc.command.query.CommandStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
 /**
@@ -36,11 +35,9 @@ public class JdbcCommandStorageShould extends CommandStorageShould {
     protected CommandStorage getStorage() {
         final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(
                 "commandStorageTests");
-        final CommandStorageQueryFactory queryFactory = new CommandStorageQueryFactory(dataSource);
         final CommandStorage storage = JdbcCommandStorage.newBuilder()
                                                          .setDataSource(dataSource)
                                                          .setMultitenant(false)
-                                                         .setQueryFactory(queryFactory)
                                                          .build();
         return storage;
     }
