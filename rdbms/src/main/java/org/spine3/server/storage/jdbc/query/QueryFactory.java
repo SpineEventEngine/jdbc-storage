@@ -20,14 +20,23 @@
 
 package org.spine3.server.storage.jdbc.query;
 
+import com.google.protobuf.Message;
+
 /**
- * An abstract {@linkplain StorageQuery query} factory.
+ * An interface of a {@linkplain StorageQuery query} factory.
  *
  * <p>Each JDBC {@linkplain org.spine3.server.storage.jdbc.table.AbstractTable table} uses an
- * instance of {@code AbstractQueryFactory} subclass to construct its SQL queries to the database.
+ * instance of {@code QueryFactory} implementation to construct its SQL queries to the
+ * database.
  *
  * @author Dmytro Dashenkov.
  */
-public class AbstractQueryFactory {
+public interface QueryFactory<I, R extends Message> {
+
+    SelectByIdQuery<I, R> newSelectByIdQuery(I id);
+
+    WriteQuery newInsertQuery(I id, R record);
+
+    WriteQuery newUpdateQuery(I id, R record);
 
 }

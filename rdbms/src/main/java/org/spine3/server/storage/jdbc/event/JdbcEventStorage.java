@@ -43,7 +43,7 @@ import org.spine3.server.event.EventStreamQuery;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.JdbcStorageFactory;
 import org.spine3.server.storage.jdbc.builder.StorageBuilder;
-import org.spine3.server.storage.jdbc.query.AbstractQueryFactory;
+import org.spine3.server.storage.jdbc.query.QueryFactory;
 import org.spine3.server.storage.jdbc.table.EventTable;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbIterator;
@@ -174,7 +174,7 @@ public class JdbcEventStorage extends EventStorage {
         return new Builder();
     }
 
-    public static class Builder extends StorageBuilder<Builder, JdbcEventStorage, AbstractQueryFactory> {
+    public static class Builder extends StorageBuilder<Builder, JdbcEventStorage, QueryFactory> {
 
         private static final String QUERY_FACTIRY_WARN =
                 "Query factory is never used directly by org.spine3.server.storage.jdbc.event.JdbcEventStorage";
@@ -184,7 +184,7 @@ public class JdbcEventStorage extends EventStorage {
         }
 
         @Override
-        public Builder setQueryFactory(AbstractQueryFactory queryFactory) {
+        public Builder setQueryFactory(QueryFactory queryFactory) {
             log().warn(QUERY_FACTIRY_WARN);
             return super.setQueryFactory(queryFactory);
         }

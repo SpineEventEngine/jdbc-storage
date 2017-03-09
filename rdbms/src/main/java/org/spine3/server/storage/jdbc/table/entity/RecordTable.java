@@ -26,7 +26,8 @@ import org.spine3.server.entity.EntityRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.Sql;
 import org.spine3.server.storage.jdbc.entity.query.RecordStorageQueryFactory;
-import org.spine3.server.storage.jdbc.query.WriteQuery;
+import org.spine3.server.storage.jdbc.entity.query.SelectBulkQuery;
+import org.spine3.server.storage.jdbc.query.QueryFactory;
 import org.spine3.server.storage.jdbc.table.TableColumn;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
@@ -42,7 +43,7 @@ import static org.spine3.server.storage.jdbc.Sql.Type.UNKNOWN;
 /**
  * @author Dmytro Dashenkov.
  */
-public class RecordTable<I> extends EntityTable<I, RecordTable.Column> {
+public class RecordTable<I> extends EntityTable<I, EntityRecord, RecordTable.Column> {
 
     private final RecordStorageQueryFactory<I> queryFactory;
 
@@ -62,6 +63,11 @@ public class RecordTable<I> extends EntityTable<I, RecordTable.Column> {
         return Column.class;
     }
 
+    @Override
+    protected QueryFactory<I, EntityRecord> getQueryFactory() {
+        return queryFactory;
+    }
+
     public boolean markDeleted(I id) {
         return queryFactory.newMarkArchivedQuery(id)
                            .execute();
@@ -69,11 +75,6 @@ public class RecordTable<I> extends EntityTable<I, RecordTable.Column> {
 
     public boolean markArchived(I id) {
         return queryFactory.newMarkDeletedQuery(id)
-                           .execute();
-    }
-
-    public EntityRecord read(I id) {
-        return queryFactory.newSelectEntityByIdQuery(id)
                            .execute();
     }
 
@@ -87,25 +88,6 @@ public class RecordTable<I> extends EntityTable<I, RecordTable.Column> {
         }
     }
 
-    public Map<I, EntityRecord> read(FieldMask fieldMask) {
-        try {
-            final Map<I, EntityRecord> recordMap = queryFactory.newSelectAllQuery(fieldMask)
-                                                               .execute();
-            return recordMap;
-        } catch (SQLException e) {
-            throw new DatabaseException(e);
-        }
-    }
-
-    public void write(I id, EntityRecord record) {
-        final WriteQuery query;
-        if (containsRecord(id)) {
-            query = queryFactory.newUpdateEntityQuery(id, record);
-        } else {
-            query = queryFactory.newInsertEntityQuery(id, record);
-        }
-        query.execute();
-    }
 
     public void write(Map<I, EntityRecord> records) {
         // Map's initial capacity is maximum, meaning no records exist in the storage yet
@@ -116,7 +98,7 @@ public class RecordTable<I> extends EntityTable<I, RecordTable.Column> {
             final EntityRecord record = unclassifiedRecord.getValue();
             if (containsRecord(id)) {
                 // TODO:2017-03-01:dmytro.dashenkov: Improve testing for this branch.
-                queryFactory.newUpdateEntityQuery(id, record)
+                queryFactory.newUpdateQuery(id, record)
                             .execute();
             } else {
                 newRecords.put(id, record);
@@ -124,6 +106,21 @@ public class RecordTable<I> extends EntityTable<I, RecordTable.Column> {
         }
         queryFactory.newInsertEntityRecordsBulkQuery(newRecords)
                     .execute();
+    }
+
+    public Map<I, EntityRecord> readAll(FieldMask fieldMask) {
+        final SelectBulkQuery<I> query = SelectBulkQuery.<I>newBuilder()
+                                                        .setAllQuery(getName())
+                                                        .setLogger(log())
+                                                        .setDataSource(getDataSource())
+                                                        .setFieldMask(fieldMask)
+                                                        .build();
+        try {
+            final Map<I, EntityRecord> result = query.execute();
+            return result;
+        } catch (SQLException e) {
+            throw new DatabaseException(e);
+        }
     }
 
     enum Column implements TableColumn, Cloneable {

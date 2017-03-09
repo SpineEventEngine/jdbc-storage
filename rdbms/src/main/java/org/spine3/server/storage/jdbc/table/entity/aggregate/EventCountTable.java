@@ -20,8 +20,11 @@
 
 package org.spine3.server.storage.jdbc.table.entity.aggregate;
 
+import com.google.protobuf.Int32Value;
 import org.spine3.server.entity.Entity;
 import org.spine3.server.storage.jdbc.Sql;
+import org.spine3.server.storage.jdbc.aggregate.query.EventCountQueryFactory;
+import org.spine3.server.storage.jdbc.query.QueryFactory;
 import org.spine3.server.storage.jdbc.table.TableColumn;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
@@ -32,15 +35,21 @@ import static org.spine3.server.storage.jdbc.util.DbTableNameFactory.newTableNam
 /**
  * @author Dmytro Dashenkov.
  */
-public class EventCountTable<I> extends AggregateTable<I, EventCountTable.Column> {
+public class EventCountTable<I> extends AggregateTable<I, Int32Value, EventCountTable.Column> {
 
     private static final String TABLE_NAME_POSTFIX = "event_count";
+
+    private final EventCountQueryFactory<I> queryFactory;
 
     public EventCountTable(Class<? extends Entity<I, ?>> entityClass,
                               DataSourceWrapper dataSource) {
         super(newTableName(entityClass) + (TABLE_NAME_POSTFIX),
               entityClass,
               dataSource);
+        this.queryFactory = new EventCountQueryFactory<I>(getDataSource(),
+                                                          getName(),
+                                                          getIdColumn(),
+                                                          log());
     }
 
     @Override
@@ -53,12 +62,9 @@ public class EventCountTable<I> extends AggregateTable<I, EventCountTable.Column
         return Column.class;
     }
 
-    public int read(I id) {
-        return 0;
-    }
-
-    public void write(I id, int count) {
-
+    @Override
+    protected QueryFactory<I, Int32Value> getQueryFactory() {
+        return queryFactory;
     }
 
     enum Column implements TableColumn {

@@ -51,6 +51,7 @@ public class JdbcAggregateStorageVisibilityHandlingShould extends AggregateStora
         final JdbcAggregateStorage<ProjectId> storage = JdbcAggregateStorage.<ProjectId>newBuilder()
                                                                  .setQueryFactory(queryFactory)
                                                                  .setMultitenant(false)
+                                                                 .setAggregateClass(TestAggregate.class)
                                                                  .setDataSource(dataSource)
                                                                  .build();
         return storage;

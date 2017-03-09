@@ -78,7 +78,9 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
 
     @Override
     public void writeLastHandledEventTime(Timestamp time) throws DatabaseException {
-        table.write(newTableName(projectionClass), time);
+        // Use type as an ID, since the records are mapped to entity types 1:1
+        final String id = newTableName(projectionClass);
+        table.write(id, time);
     }
 
     @Override
@@ -147,7 +149,7 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
 
     public static class Builder<I> extends StorageBuilder<Builder<I>,
                                                           JdbcProjectionStorage<I>,
-                                                          ProjectionStorageQueryFactory<I>> {
+                                                          ProjectionStorageQueryFactory> {
         private static final String DATA_SOURCE_WARN =
                 "Data source is never used directly by org.spine3.server.storage.jdbc.projection.JdbcProjectionStorage";
 

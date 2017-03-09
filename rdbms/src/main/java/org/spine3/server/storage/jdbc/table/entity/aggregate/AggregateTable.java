@@ -20,6 +20,7 @@
 
 package org.spine3.server.storage.jdbc.table.entity.aggregate;
 
+import com.google.protobuf.Message;
 import org.spine3.server.entity.Entity;
 import org.spine3.server.storage.jdbc.table.TableColumn;
 import org.spine3.server.storage.jdbc.table.entity.EntityTable;
@@ -29,7 +30,7 @@ import org.spine3.server.storage.jdbc.util.IdColumn;
 /**
  * @author Dmytro Dashenkov.
  */
-public abstract class AggregateTable<I, C extends Enum<C> & TableColumn> extends EntityTable<I, C> {
+public abstract class AggregateTable<I, R extends Message, C extends Enum<C> & TableColumn> extends EntityTable<I, R, C> {
 
     protected AggregateTable(Class<? extends Entity<I, ?>> entityClass,
                              DataSourceWrapper dataSource) {

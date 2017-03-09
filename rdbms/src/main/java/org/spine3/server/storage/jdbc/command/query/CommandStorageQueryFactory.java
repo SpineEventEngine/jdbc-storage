@@ -25,11 +25,11 @@ import org.spine3.base.CommandStatus;
 import org.spine3.base.Error;
 import org.spine3.base.Failure;
 import org.spine3.server.command.CommandRecord;
-import org.spine3.server.storage.jdbc.query.AbstractQueryFactory;
+import org.spine3.server.storage.jdbc.query.QueryFactory;
+import org.spine3.server.storage.jdbc.query.SelectByIdQuery;
+import org.spine3.server.storage.jdbc.query.WriteQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
-
-import static org.spine3.server.storage.jdbc.command.query.CommandTable.TABLE_NAME;
 
 /**
  * This class creates queries for interaction with {@link CommandTable}.
@@ -37,7 +37,7 @@ import static org.spine3.server.storage.jdbc.command.query.CommandTable.TABLE_NA
  * @author Andrey Lavrov
  */
 @SuppressWarnings("TypeMayBeWeakened")
-public class CommandStorageQueryFactory extends AbstractQueryFactory {
+public class CommandStorageQueryFactory implements QueryFactory<String, CommandRecord> {
 
     private final IdColumn<String> idColumn;
     private final DataSourceWrapper dataSource;
@@ -56,53 +56,6 @@ public class CommandStorageQueryFactory extends AbstractQueryFactory {
     /** Sets the logger for logging exceptions during queries execution. */
     public void setLogger(Logger logger) {
         this.logger = logger;
-    }
-
-    /** Returns a query that creates a new {@link CommandTable} if it does not exist. */
-    public CreateCommandTableQuery newCreateCommandTableQuery() {
-        final CreateCommandTableQuery.Builder builder =
-                CreateCommandTableQuery.newBuilder()
-                                       .setDataSource(dataSource)
-                                       .setLogger(logger)
-                                       .setIdColumn(idColumn)
-                                       .setTableName(TABLE_NAME);
-        return builder.build();
-    }
-
-    /**
-     * Returns a query that inserts a new {@link CommandRecord} to the {@link CommandTable}.
-     *
-     * @param id     new command record id
-     * @param record new command record
-     */
-    public InsertCommandQuery newInsertCommandQuery(String id, CommandRecord record) {
-        final InsertCommandQuery.Builder builder =
-                InsertCommandQuery.newBuilder()
-                                  .setDataSource(dataSource)
-                                  .setLogger(logger)
-                                  .setIdColumn(idColumn)
-                                  .setId(id)
-                                  .setRecord(record)
-                                  .setStatus(record.getStatus().getCode());
-        return builder.build();
-    }
-
-    /**
-     * Returns a query that updates {@link CommandRecord} in the {@link CommandTable}.
-     *
-     * @param id     command id
-     * @param record updated record state
-     */
-    public UpdateCommandQuery newUpdateCommandQuery(String id, CommandRecord record) {
-        final UpdateCommandQuery.Builder builder =
-                UpdateCommandQuery.newBuilder()
-                                  .setDataSource(dataSource)
-                                  .setLogger(logger)
-                                  .setIdColumn(idColumn)
-                                  .setId(id)
-                                  .setRecord(record)
-                                  .setStatus(record.getStatus().getCode());
-        return builder.build();
     }
 
     /**
@@ -151,8 +104,18 @@ public class CommandStorageQueryFactory extends AbstractQueryFactory {
         return builder.build();
     }
 
-    /** Returns a query that selects {@link CommandRecord} by ID. */
-    public SelectCommandByIdQuery newSelectCommandByIdQuery(String id) {
+    /** Returns a query that {@link CommandRecord} selects record by {@link CommandStatus}. */
+    public SelectCommandByStatusQuery newSelectCommandByStatusQuery(CommandStatus status) {
+        final SelectCommandByStatusQuery.Builder builder =
+                SelectCommandByStatusQuery.newBuilder()
+                                          .setDataSource(dataSource)
+                                          .setLogger(logger)
+                                          .setStatus(status);
+        return builder.build();
+    }
+
+    @Override
+    public SelectByIdQuery<String, CommandRecord> newSelectByIdQuery(String id) {
         final SelectCommandByIdQuery.Builder builder =
                 SelectCommandByIdQuery.newBuilder()
                                       .setDataSource(dataSource)
@@ -162,13 +125,29 @@ public class CommandStorageQueryFactory extends AbstractQueryFactory {
         return builder.build();
     }
 
-    /** Returns a query that {@link CommandRecord} selects record by {@link CommandStatus}. */
-    public SelectCommandByStatusQuery newSelectCommandByStatusQuery(CommandStatus status) {
-        final SelectCommandByStatusQuery.Builder builder =
-                SelectCommandByStatusQuery.newBuilder()
-                                          .setDataSource(dataSource)
-                                          .setLogger(logger)
-                                          .setStatus(status);
+    @Override
+    public WriteQuery newInsertQuery(String id, CommandRecord record) {
+        final InsertCommandQuery.Builder builder =
+                InsertCommandQuery.newBuilder()
+                                  .setDataSource(dataSource)
+                                  .setLogger(logger)
+                                  .setIdColumn(idColumn)
+                                  .setId(id)
+                                  .setRecord(record)
+                                  .setStatus(record.getStatus().getCode());
+        return builder.build();
+    }
+
+    @Override
+    public WriteQuery newUpdateQuery(String id, CommandRecord record) {
+        final UpdateCommandQuery.Builder builder =
+                UpdateCommandQuery.newBuilder()
+                                  .setDataSource(dataSource)
+                                  .setLogger(logger)
+                                  .setIdColumn(idColumn)
+                                  .setId(id)
+                                  .setRecord(record)
+                                  .setStatus(record.getStatus().getCode());
         return builder.build();
     }
 }

@@ -22,17 +22,11 @@ package org.spine3.server.storage.jdbc.entity.visibility.query;
 
 import org.spine3.server.entity.Visibility;
 import org.spine3.server.storage.VisibilityField;
-import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.query.StorageQuery;
-import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
+import org.spine3.server.storage.jdbc.query.SelectByIdQuery;
 
-import javax.annotation.Nullable;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static org.spine3.base.Stringifiers.idToString;
 import static org.spine3.server.storage.VisibilityField.archived;
 import static org.spine3.server.storage.VisibilityField.deleted;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.COMMA;
@@ -50,69 +44,48 @@ import static org.spine3.server.storage.jdbc.entity.visibility.table.VisibilityT
  *
  * @author Dmytro Dashenkov.
  */
-public class SelectVisibilityQuery extends StorageQuery {
+public class SelectVisibilityQuery<I> extends SelectByIdQuery<I, Visibility> {
 
     private static final String SQL =
             SELECT.toString() + archived + COMMA + deleted +
             FROM + TABLE_NAME +
             WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
 
-    private final String id;
-
-    protected SelectVisibilityQuery(Builder builder) {
+    protected SelectVisibilityQuery(Builder<I> builder) {
         super(builder);
-        this.id = builder.id;
     }
 
-    @Nullable
-    public Visibility execute() {
-        final boolean archived;
-        final boolean deleted;
-        try (ConnectionWrapper connection = getConnection(false);
-             PreparedStatement statement = prepareStatement(connection)) {
-            statement.setString(1, id);
-            final ResultSet resultSet = statement.executeQuery();
-            if (!resultSet.next()) { // Empty result set
-                return null;
-            }
-            archived = resultSet.getBoolean(VisibilityField.archived.toString());
-            deleted = resultSet.getBoolean(VisibilityField.deleted.toString());
-            resultSet.close();
-        } catch (SQLException e) {
-            getLogger().error("Failed to read Visibility.", e);
-            throw new DatabaseException(e);
-        }
-        final Visibility status = Visibility.newBuilder()
+    @SuppressWarnings("MethodDoesntCallSuperMethod")
+    // Override the mechanism of the Message restoring
+    @Override
+    protected Visibility readMessage(ResultSet resultSet) throws SQLException {
+        final boolean archived = resultSet.getBoolean(VisibilityField.archived.toString());
+        final boolean deleted = resultSet.getBoolean(VisibilityField.deleted.toString());
+        final Visibility visibility = Visibility.newBuilder()
                                                 .setArchived(archived)
                                                 .setDeleted(deleted)
                                                 .build();
-        return status;
+        return visibility;
     }
 
-    public static Builder newBuilder() {
-        final Builder builder = new Builder();
-        builder.setQuery(SQL);
+    public static <I> Builder<I> newBuilder() {
+        final Builder<I> builder = new Builder<>();
+        builder.setQuery(SQL)
+               .setIdIndexInQuery(1);
         return builder;
     }
 
-    public static class Builder extends StorageQuery.Builder<Builder, SelectVisibilityQuery> {
-
-        private String id;
-
-        public Builder setId(Object id) {
-            checkNotNull(id);
-            final String stringId = idToString(id);
-            this.id = stringId;
-            return getThis();
+    public static class Builder<I> extends SelectByIdQuery.Builder<Builder<I>,
+                                                                   SelectVisibilityQuery,
+                                                                   I,
+                                                                   Visibility> {
+        @Override
+        public SelectVisibilityQuery<I> build() {
+            return new SelectVisibilityQuery<>(this);
         }
 
         @Override
-        public SelectVisibilityQuery build() {
-            return new SelectVisibilityQuery(this);
-        }
-
-        @Override
-        protected Builder getThis() {
+        protected Builder<I> getThis() {
             return this;
         }
     }

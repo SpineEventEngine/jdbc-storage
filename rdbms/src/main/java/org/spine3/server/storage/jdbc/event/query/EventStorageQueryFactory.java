@@ -23,18 +23,18 @@ package org.spine3.server.storage.jdbc.event.query;
 import org.slf4j.Logger;
 import org.spine3.base.Event;
 import org.spine3.server.event.EventStreamQuery;
-import org.spine3.server.storage.jdbc.query.AbstractQueryFactory;
+import org.spine3.server.storage.jdbc.query.QueryFactory;
+import org.spine3.server.storage.jdbc.query.SelectByIdQuery;
+import org.spine3.server.storage.jdbc.query.WriteQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
-
-import static org.spine3.server.storage.jdbc.event.query.EventTable.TABLE_NAME;
 
 /**
  * This class creates queries for interaction with {@link EventTable}.
  *
  * @author Andrey Lavrov
  */
-public class EventStorageQueryFactory extends AbstractQueryFactory {
+public class EventStorageQueryFactory implements QueryFactory<String, Event> {
 
     private final DataSourceWrapper dataSource;
     private final IdColumn<String> idColumn;
@@ -55,23 +55,27 @@ public class EventStorageQueryFactory extends AbstractQueryFactory {
         this.logger = logger;
     }
 
-    /** Returns a query that creates a new {@link EventTable} if it does not exist. */
-    public CreateEventTableQuery newCreateEventTableQuery() {
-        final CreateEventTableQuery.Builder builder =
-                CreateEventTableQuery.newBuilder()
-                                     .setDataSource(dataSource)
-                                     .setLogger(logger)
-                                     .setIdColumn(idColumn)
-                                     .setTableName(TABLE_NAME);
+    /** Returns a query that selects {@link Event} by specified {@link EventStreamQuery}. */
+    public FilterAndSortQuery newFilterAndSortQuery(EventStreamQuery streamQuery) {
+        final FilterAndSortQuery.Builder builder = FilterAndSortQuery.newBuilder()
+                                                                     .setDataSource(dataSource)
+                                                                     .setLogger(logger)
+                                                                     .setStreamQuery(streamQuery);
         return builder.build();
     }
 
-    /**
-     * Returns a query that inserts a new {@link Event} to the {@link EventTable}.
-     *
-     * @param record new event record
-     */
-    public InsertEventRecordQuery newInsertEventQuery(String id, Event record) {
+    @Override
+    public SelectByIdQuery<String, Event> newSelectByIdQuery(String id) {
+        final SelectEventByIdQuery.Builder builder = SelectEventByIdQuery.newBuilder()
+                                                                         .setDataSource(dataSource)
+                                                                         .setLogger(logger)
+                                                                         .setIdColumn(idColumn)
+                                                                         .setId(id);
+        return builder.build();
+    }
+
+    @Override
+    public WriteQuery newInsertQuery(String id, Event record) {
         final InsertEventRecordQuery.Builder builder =
                 InsertEventRecordQuery.newBuilder()
                                       .setDataSource(dataSource)
@@ -81,37 +85,14 @@ public class EventStorageQueryFactory extends AbstractQueryFactory {
         return builder.build();
     }
 
-    /**
-     * Returns a query that updates {@link Event} in the {@link EventTable}.
-     *
-     * @param record updated record state
-     */
-    public UpdateEventRecordQuery newUpdateEventQuery(String id, Event record) {
+    @Override
+    public WriteQuery newUpdateQuery(String id, Event record) {
         final UpdateEventRecordQuery.Builder builder =
                 UpdateEventRecordQuery.newBuilder()
                                       .setDataSource(dataSource)
                                       .setLogger(logger)
                                       .setId(id)
                                       .setRecord(record);
-        return builder.build();
-    }
-
-    /** Returns a query that selects {@link Event} by ID. */
-    public SelectEventByIdQuery newSelectEventByIdQuery(String id) {
-        final SelectEventByIdQuery.Builder builder = SelectEventByIdQuery.newBuilder()
-                                                                         .setDataSource(dataSource)
-                                                                         .setLogger(logger)
-                                                                         .setIdColumn(idColumn)
-                                                                         .setId(id);
-        return builder.build();
-    }
-
-    /** Returns a query that selects {@link Event} by specified {@link EventStreamQuery}. */
-    public FilterAndSortQuery newFilterAndSortQuery(EventStreamQuery streamQuery) {
-        final FilterAndSortQuery.Builder builder = FilterAndSortQuery.newBuilder()
-                                                                     .setDataSource(dataSource)
-                                                                     .setLogger(logger)
-                                                                     .setStreamQuery(streamQuery);
         return builder.build();
     }
 }

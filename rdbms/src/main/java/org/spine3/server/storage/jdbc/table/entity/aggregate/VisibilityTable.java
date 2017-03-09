@@ -20,28 +20,35 @@
 
 package org.spine3.server.storage.jdbc.table.entity.aggregate;
 
-import org.spine3.server.entity.Entity;
+import org.spine3.server.aggregate.Aggregate;
 import org.spine3.server.entity.Visibility;
 import org.spine3.server.storage.jdbc.Sql;
+import org.spine3.server.storage.jdbc.aggregate.query.VisibilityQueryFactory;
+import org.spine3.server.storage.jdbc.entity.visibility.query.MarkEntityQuery;
+import org.spine3.server.storage.jdbc.query.QueryFactory;
 import org.spine3.server.storage.jdbc.table.TableColumn;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbTableNameFactory;
 
+import static org.spine3.base.Stringifiers.idToString;
 import static org.spine3.server.storage.jdbc.Sql.Type.BOOLEAN;
 import static org.spine3.server.storage.jdbc.Sql.Type.UNKNOWN;
 
 /**
  * @author Dmytro Dashenkov.
  */
-public class VisibilityTable<I> extends AggregateTable<I, VisibilityTable.Column> {
+public class VisibilityTable<I> extends AggregateTable<I, Visibility, VisibilityTable.Column> {
 
     private static final String TABLE_NAME_POSTFIX = "visibility";
 
-    public VisibilityTable(Class<? extends Entity<I, ?>> entityClass,
+    private final VisibilityQueryFactory queryFactory;
+
+    public VisibilityTable(Class<? extends Aggregate<I, ?, ?>> aggregateClass,
                               DataSourceWrapper dataSource) {
-        super(DbTableNameFactory.newTableName(entityClass) + TABLE_NAME_POSTFIX,
-              entityClass,
+        super(DbTableNameFactory.newTableName(aggregateClass) + TABLE_NAME_POSTFIX,
+              aggregateClass,
               dataSource);
+        this.queryFactory = new VisibilityQueryFactory(dataSource, log());
     }
 
     @Override
@@ -54,20 +61,32 @@ public class VisibilityTable<I> extends AggregateTable<I, VisibilityTable.Column
         return Column.class;
     }
 
-    public Visibility read(I id) {
-        return null;
-    }
-
-    public void write(I id, Visibility status) {
-
+    @SuppressWarnings("unchecked") // Storing records under string IDs instead of generic
+    @Override
+    protected QueryFactory<I, Visibility> getQueryFactory() {
+        return (QueryFactory<I, Visibility>) queryFactory;
     }
 
     public void markArchived(I id) {
-
+        final String stringId = idToString(id);
+        final MarkEntityQuery query;
+        if (!containsRecord(id)) {
+            query = queryFactory.newMarkArchivedNewEntityQuery(stringId);
+        } else {
+            query = queryFactory.newMarkArchivedQuery(stringId);
+        }
+        query.execute();
     }
 
     public void markDeleted(I id) {
-
+        final String stringId = idToString(id);
+        final MarkEntityQuery query;
+        if (!containsRecord(id)) {
+            query = queryFactory.newMarkDeletedNewEntityQuery(stringId);
+        } else {
+            query = queryFactory.newMarkDeletedQuery(stringId);
+        }
+        query.execute();
     }
 
     enum Column implements TableColumn {

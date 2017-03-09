@@ -20,13 +20,14 @@
 
 package org.spine3.server.storage.jdbc.table.entity.aggregate;
 
+import org.spine3.server.aggregate.Aggregate;
 import org.spine3.server.aggregate.AggregateEventRecord;
-import org.spine3.server.entity.Entity;
 import org.spine3.server.storage.jdbc.Sql;
+import org.spine3.server.storage.jdbc.aggregate.query.AggregateStorageQueryFactory;
+import org.spine3.server.storage.jdbc.query.QueryFactory;
 import org.spine3.server.storage.jdbc.table.TableColumn;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-
-import java.util.Iterator;
+import org.spine3.server.storage.jdbc.util.DbIterator;
 
 import static org.spine3.server.storage.jdbc.Sql.Type.BIGINT;
 import static org.spine3.server.storage.jdbc.Sql.Type.BLOB;
@@ -37,11 +38,14 @@ import static org.spine3.server.storage.jdbc.Sql.Type.UNKNOWN;
  * @author Dmytro Dashenkov.
  */
 public class AggregateEventRecordTable<I>
-        extends AggregateTable<I, AggregateEventRecordTable.Column> {
+        extends AggregateTable<I, AggregateEventRecord, AggregateEventRecordTable.Column> {
 
-    public AggregateEventRecordTable(Class<? extends Entity<I, ?>> entityClass,
-                                        DataSourceWrapper dataSource) {
+    private final AggregateStorageQueryFactory<I> queryFactory;
+
+    public AggregateEventRecordTable(Class<? extends Aggregate<I, ?, ?>> entityClass,
+                                     DataSourceWrapper dataSource) {
         super(entityClass, dataSource);
+        queryFactory = new AggregateStorageQueryFactory<>(dataSource, entityClass);
     }
 
     @Override
@@ -54,12 +58,23 @@ public class AggregateEventRecordTable<I>
         return Column.class;
     }
 
-    public void write(I id, AggregateEventRecord record) {
-
+    @Override
+    protected QueryFactory<I, AggregateEventRecord> getQueryFactory() {
+        return queryFactory;
     }
 
-    public Iterator<AggregateEventRecord> historyBackward(I id) {
-        return null;
+    @SuppressWarnings("MethodDoesntCallSuperMethod") // No extra presence checks are required
+    @Override
+    public void write(I id, AggregateEventRecord record) {
+        queryFactory.newInsertQuery(id, record)
+                    .execute();
+    }
+
+    public DbIterator<AggregateEventRecord> historyBackward(I id) {
+        final DbIterator<AggregateEventRecord> result =
+                queryFactory.newSelectByIdSortedByTimeDescQuery(id)
+                            .execute();
+        return result;
     }
 
     enum Column implements TableColumn {

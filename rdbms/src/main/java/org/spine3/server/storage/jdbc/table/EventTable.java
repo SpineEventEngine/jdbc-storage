@@ -25,6 +25,7 @@ import org.spine3.server.event.EventStreamQuery;
 import org.spine3.server.storage.jdbc.Sql.Type;
 import org.spine3.server.storage.jdbc.event.query.EventStorageQueryFactory;
 import org.spine3.server.storage.jdbc.event.query.FilterAndSortQuery;
+import org.spine3.server.storage.jdbc.query.QueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
@@ -35,7 +36,7 @@ import static org.spine3.server.storage.jdbc.Sql.Type.*;
 /**
  * @author Dmytro Dashenkov.
  */
-public class EventTable extends AbstractTable<String, EventTable.Column> {
+public class EventTable extends AbstractTable<String, Event, EventTable.Column> {
 
     private static final String TABLE_NAME = "events";
 
@@ -56,26 +57,15 @@ public class EventTable extends AbstractTable<String, EventTable.Column> {
         return Column.class;
     }
 
+    @Override
+    protected QueryFactory<String, Event> getQueryFactory() {
+        return queryFactory;
+    }
+
     public Iterator<Event> getEventStream(EventStreamQuery query) {
         final FilterAndSortQuery sqlQuery = queryFactory.newFilterAndSortQuery(query);
         final Iterator<Event> result = sqlQuery.execute();
         return result;
-    }
-
-    public void write(String eventId, Event event) {
-        if (containsRecord(eventId)) {
-            queryFactory.newUpdateEventQuery(eventId, event)
-                        .execute();
-        } else {
-            queryFactory.newInsertEventQuery(eventId, event)
-                        .execute();
-        }
-    }
-
-    public Event read(String id) {
-        final Event event = queryFactory.newSelectEventByIdQuery(id)
-                                         .execute();
-        return event;
     }
 
     enum Column implements TableColumn {

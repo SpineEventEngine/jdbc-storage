@@ -133,7 +133,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     @SuppressWarnings("unchecked")
     @Override
     protected Map<I, EntityRecord> readAllRecords(FieldMask fieldMask) {
-        final Map<I, EntityRecord> records = table.read(fieldMask);
+        final Map<I, EntityRecord> records = table.readAll(fieldMask);
         return ImmutableMap.copyOf(records);
     }
 

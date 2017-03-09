@@ -26,12 +26,11 @@ import org.spine3.base.Failure;
 import org.spine3.server.command.CommandRecord;
 import org.spine3.server.storage.jdbc.Sql.Type;
 import org.spine3.server.storage.jdbc.command.query.CommandStorageQueryFactory;
-import org.spine3.server.storage.jdbc.command.query.SelectCommandByIdQuery;
 import org.spine3.server.storage.jdbc.command.query.SelectCommandByStatusQuery;
 import org.spine3.server.storage.jdbc.command.query.SetErrorQuery;
 import org.spine3.server.storage.jdbc.command.query.SetFailureQuery;
 import org.spine3.server.storage.jdbc.command.query.SetOkStatusQuery;
-import org.spine3.server.storage.jdbc.query.WriteQuery;
+import org.spine3.server.storage.jdbc.query.QueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
@@ -44,7 +43,7 @@ import static org.spine3.server.storage.jdbc.Sql.Type.VARCHAR_999;
 /**
  * @author Dmytro Dashenkov.
  */
-public class CommandTable extends AbstractTable<String, CommandTable.Column> {
+public class CommandTable extends AbstractTable<String, CommandRecord, CommandTable.Column> {
 
     private static final String TABLE_NAME = "commands";
 
@@ -65,27 +64,15 @@ public class CommandTable extends AbstractTable<String, CommandTable.Column> {
         return Column.class;
     }
 
-    public CommandRecord read(String id) {
-        final SelectCommandByIdQuery query = queryFactory.newSelectCommandByIdQuery(id);
-        final CommandRecord result = query.execute();
-        return result;
+    @Override
+    protected QueryFactory<String, CommandRecord> getQueryFactory() {
+        return queryFactory;
     }
 
     public Iterator<CommandRecord> readByStatus(CommandStatus status) {
         final SelectCommandByStatusQuery query = queryFactory.newSelectCommandByStatusQuery(status);
         final Iterator<CommandRecord> result = query.execute();
         return result;
-    }
-
-    public void write(String id, CommandRecord record) {
-        final WriteQuery query;
-        if (containsRecord(id)) {
-            query = queryFactory.newUpdateCommandQuery(id, record);
-        } else {
-            query = queryFactory.newInsertCommandQuery(id, record);
-        }
-
-        query.execute();
     }
 
     public void setOkStatus(String id) {

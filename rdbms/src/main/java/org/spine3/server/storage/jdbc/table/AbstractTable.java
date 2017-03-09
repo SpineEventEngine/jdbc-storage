@@ -21,13 +21,17 @@
 package org.spine3.server.storage.jdbc.table;
 
 import com.google.common.collect.ImmutableList;
+import com.google.protobuf.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spine3.server.storage.jdbc.Sql;
 import org.spine3.server.storage.jdbc.entity.query.DeleteAllQuery;
+import org.spine3.server.storage.jdbc.query.QueryFactory;
 import org.spine3.server.storage.jdbc.query.ContainsQuery;
 import org.spine3.server.storage.jdbc.query.DeleteRecordQuery;
+import org.spine3.server.storage.jdbc.query.SelectByIdQuery;
 import org.spine3.server.storage.jdbc.query.VoidQuery;
+import org.spine3.server.storage.jdbc.query.WriteQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
@@ -45,7 +49,7 @@ import static org.spine3.server.storage.jdbc.Sql.Query.PRIMARY_KEY;
 /**
  * @author Dmytro Dashenkov.
  */
-public abstract class AbstractTable<I, C extends Enum<C> & TableColumn> {
+public abstract class AbstractTable<I, R extends Message, C extends Enum<C> & TableColumn> {
 
     private static final int DEFAULT_SQL_QUERY_LENGTH = 128;
 
@@ -72,6 +76,8 @@ public abstract class AbstractTable<I, C extends Enum<C> & TableColumn> {
 
     protected abstract Class<C> getTableColumnType();
 
+    protected abstract QueryFactory<I, R> getQueryFactory();
+
     public void createIfNotExists() {
         final String sql = composeCreateTableSql();
         final VoidQuery query = VoidQuery.newBuilder()
@@ -95,6 +101,31 @@ public abstract class AbstractTable<I, C extends Enum<C> & TableColumn> {
         return result;
     }
 
+    @Nullable
+    public R read(I id) {
+        final SelectByIdQuery<I, R> query = composeSelectQuery(id);
+        final R result = query.execute();
+        return result;
+    }
+
+    public void write(I id, R record) {
+        if (containsRecord(id)) {
+            update(id, record);
+        } else {
+            insert(id, record);
+        }
+    }
+
+    protected void insert(I id, R record) {
+        final WriteQuery query = composeInsertQuery(id, record);
+        query.execute();
+    }
+
+    protected void update(I id, R record) {
+        final WriteQuery query = composeUpdateQuery(id, record);
+        query.execute();
+    }
+
     @SuppressWarnings("ReturnOfCollectionOrArrayField") // Returns immutable collection
     public ImmutableList<C> getColumns() {
         if (columns == null) {
@@ -115,6 +146,21 @@ public abstract class AbstractTable<I, C extends Enum<C> & TableColumn> {
 
     public DataSourceWrapper getDataSource() {
         return dataSource;
+    }
+
+    protected WriteQuery composeInsertQuery(I id, R record) {
+        final WriteQuery query = getQueryFactory().newInsertQuery(id, record);
+        return query;
+    }
+
+    protected WriteQuery composeUpdateQuery(I id, R record) {
+        final WriteQuery query = getQueryFactory().newUpdateQuery(id, record);
+        return query;
+    }
+
+    protected SelectByIdQuery<I, R> composeSelectQuery(I id) {
+        final SelectByIdQuery<I, R> query = getQueryFactory().newSelectByIdQuery(id);
+        return query;
     }
 
     protected Logger log() {

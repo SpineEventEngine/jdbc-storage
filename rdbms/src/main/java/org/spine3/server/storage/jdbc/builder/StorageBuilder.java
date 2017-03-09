@@ -21,7 +21,7 @@
 package org.spine3.server.storage.jdbc.builder;
 
 import org.spine3.server.storage.Storage;
-import org.spine3.server.storage.jdbc.query.AbstractQueryFactory;
+import org.spine3.server.storage.jdbc.query.QueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -36,12 +36,12 @@ import static com.google.common.base.Preconditions.checkState;
  *
  * @param <B> type of the builder itself; used to construct call chains
  * @param <S> type of the built storage
- * @param <F> type of the {@linkplain AbstractQueryFactory} used by the storage
+ * @param <F> type of the {@linkplain QueryFactory} used by the storage
  * @author Dmytro Dashenkov.
  */
 public abstract class StorageBuilder<B extends StorageBuilder<B, S, F>,
                                      S extends Storage,
-                                     F extends AbstractQueryFactory> {
+                                     F extends QueryFactory> {
 
     private boolean multitenant;
 
@@ -83,7 +83,7 @@ public abstract class StorageBuilder<B extends StorageBuilder<B, S, F>,
     }
 
     /**
-     * @param queryFactory an implementation of the {@linkplain AbstractQueryFactory} used by the storage
+     * @param queryFactory an implementation of the {@linkplain QueryFactory} used by the storage
      *                     to generate SQL queries
      */
     public B setQueryFactory(F queryFactory) {

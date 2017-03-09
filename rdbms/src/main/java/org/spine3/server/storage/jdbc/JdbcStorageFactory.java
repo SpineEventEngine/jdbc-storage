@@ -137,7 +137,7 @@ public class JdbcStorageFactory<I> implements StorageFactory {
             Class<? extends Entity<I, ?>> projectionClass) {
         final JdbcRecordStorage<I> entityStorage =
                 (JdbcRecordStorage<I>) createRecordStorage(projectionClass);
-        final ProjectionStorageQueryFactory<I> queryFactory =
+        final ProjectionStorageQueryFactory queryFactory =
                 getProjectionStorageQueryFactory(dataSource, projectionClass);
 
         final ProjectionStorage<I> storage = JdbcProjectionStorage.<I>newBuilder()
@@ -191,10 +191,10 @@ public class JdbcStorageFactory<I> implements StorageFactory {
      * {@link JdbcRecordStorage}
      * @param <T>         a type of IDs of entities from the corresponding {@link JdbcRecordStorage}
      */
-    protected <T> ProjectionStorageQueryFactory<T> getProjectionStorageQueryFactory(
+    protected <T> ProjectionStorageQueryFactory getProjectionStorageQueryFactory(
             DataSourceWrapper dataSource,
             Class<? extends Entity<T, ?>> entityClass) {
-        return new ProjectionStorageQueryFactory<>(dataSource);
+        return new ProjectionStorageQueryFactory(dataSource);
     }
 
     /**

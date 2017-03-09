@@ -29,7 +29,6 @@ import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.Iterator;
 
 import static java.lang.String.format;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.COMMA;
@@ -68,7 +67,7 @@ public class SelectByIdSortedByTimeDescQuery<I> extends StorageQuery {
         this.id = builder.id;
     }
 
-    public Iterator<AggregateEventRecord> execute() throws DatabaseException {
+    public DbIterator<AggregateEventRecord> execute() throws DatabaseException {
         try (ConnectionWrapper connection = getConnection(true);
              PreparedStatement statement = prepareStatement(connection)) {
             idColumn.setId(1, id, statement);

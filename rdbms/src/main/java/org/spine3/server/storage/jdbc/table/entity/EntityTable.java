@@ -20,6 +20,7 @@
 
 package org.spine3.server.storage.jdbc.table.entity;
 
+import com.google.protobuf.Message;
 import org.spine3.server.entity.Entity;
 import org.spine3.server.storage.jdbc.table.AbstractTable;
 import org.spine3.server.storage.jdbc.table.TableColumn;
@@ -31,7 +32,7 @@ import static org.spine3.server.storage.jdbc.util.DbTableNameFactory.newTableNam
 /**
  * @author Dmytro Dashenkov.
  */
-public abstract class EntityTable<I, C extends Enum<C> & TableColumn> extends AbstractTable<I, C> {
+public abstract class EntityTable<I, R extends Message, C extends Enum<C> & TableColumn> extends AbstractTable<I, R, C> {
 
     private final Class<? extends Entity<I, ?>> entityClass;
 

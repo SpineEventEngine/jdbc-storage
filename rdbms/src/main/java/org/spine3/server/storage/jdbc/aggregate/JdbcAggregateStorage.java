@@ -21,8 +21,7 @@
 package org.spine3.server.storage.jdbc.aggregate;
 
 import com.google.common.base.Optional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.google.protobuf.Int32Value;
 import org.spine3.server.aggregate.Aggregate;
 import org.spine3.server.aggregate.AggregateEventRecord;
 import org.spine3.server.aggregate.AggregateStorage;
@@ -88,15 +87,11 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     @Override
     public int readEventCountAfterLastSnapshot(I id) {
         checkNotClosed();
-        final int result = eventCountTable.read(id);
+        final Int32Value value = eventCountTable.read(id);
+        final int result = value == null
+                           ? 0
+                           : value.getValue();
         return result;
-
-//        final Integer count = queryFactory.newSelectEventCountByIdQuery(id)
-//                                          .execute();
-//        if (count == null) {
-//            return 0;
-//        }
-//        return count;
     }
 
     @Override
@@ -122,14 +117,10 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     @Override
     public void writeEventCountAfterLastSnapshot(I id, int count) {
         checkNotClosed();
-        eventCountTable.write(id, count);
-//        if (containsEventCount(id)) {
-//            queryFactory.newUpdateEventCountQuery(id, count)
-//                        .execute();
-//        } else {
-//            queryFactory.newInsertEventCountQuery(id, count)
-//                        .execute();
-//        }
+        final Int32Value record = Int32Value.newBuilder()
+                                            .setValue(count)
+                                            .build();
+        eventCountTable.write(id, record);
     }
 
     /**
@@ -157,12 +148,8 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     @Override
     protected Iterator<AggregateEventRecord> historyBackward(I id) throws DatabaseException {
         checkNotNull(id);
-//        final Iterator<AggregateEventRecord> iterator =
-//                queryFactory.newSelectByIdSortedByTimeDescQuery(id)
-//                            .execute();
-//        iterators.add((DbIterator) iterator);
-//        return iterator;
-        final Iterator<AggregateEventRecord> result = mainTable.historyBackward(id);
+        final DbIterator<AggregateEventRecord> result = mainTable.historyBackward(id);
+        iterators.add(result);
         return result;
     }
 
@@ -209,11 +196,5 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
             this.aggregateClass = aggregateClass;
             return this;
         }
-    }
-
-    private enum LogSingleton {
-        INSTANCE;
-        @SuppressWarnings("NonSerializableFieldInSerializableClass")
-        private final Logger value = LoggerFactory.getLogger(JdbcAggregateStorage.class);
     }
 }

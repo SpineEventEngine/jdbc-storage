@@ -22,7 +22,9 @@ package org.spine3.server.storage.jdbc.projection.query;
 
 import com.google.protobuf.Timestamp;
 import org.slf4j.Logger;
-import org.spine3.server.storage.jdbc.query.AbstractQueryFactory;
+import org.spine3.server.storage.jdbc.query.QueryFactory;
+import org.spine3.server.storage.jdbc.query.SelectByIdQuery;
+import org.spine3.server.storage.jdbc.query.WriteQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
 /**
@@ -30,7 +32,7 @@ import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
  *
  * @author Andrey Lavrov
  */
-public class ProjectionStorageQueryFactory<I> extends AbstractQueryFactory {
+public class ProjectionStorageQueryFactory implements QueryFactory<String, Timestamp> {
 
     private final DataSourceWrapper dataSource;
     private Logger logger;
@@ -44,34 +46,29 @@ public class ProjectionStorageQueryFactory<I> extends AbstractQueryFactory {
         this.dataSource = dataSource;
     }
 
-    /** Sets the logger for logging exceptions during queries execution. */
-    public void setLogger(Logger logger) {
-        this.logger = logger;
-    }
-
-    /** Returns a query that inserts a new {@link Timestamp} to the {@link ProjectionTable}. */
-    public InsertTimestampQuery newInsertTimestampQuery(String key, Timestamp time) {
-        final InsertTimestampQuery.Builder builder = InsertTimestampQuery.newBuilder(key)
-                                                                         .setDataSource(dataSource)
-                                                                         .setLogger(logger)
-                                                                         .setTimestamp(time);
-        return builder.build();
-    }
-
-    /** Returns a query that updates {@link Timestamp} in the {@link ProjectionTable}. */
-    public UpdateTimestampQuery newUpdateTimestampQuery(String key, Timestamp time) {
-        final UpdateTimestampQuery.Builder builder = UpdateTimestampQuery.newBuilder(key)
-                                                                         .setDataSource(dataSource)
-                                                                         .setLogger(logger)
-                                                                         .setTimestamp(time);
-        return builder.build();
-    }
-
-    /** Returns a query that selects timestamp from the {@link ProjectionTable}. */
-    public SelectTimestampQuery newSelectTimestampQuery(String key) {
-        final SelectTimestampQuery.Builder builder = SelectTimestampQuery.newBuilder(key)
+    @Override
+    public SelectByIdQuery<String, Timestamp> newSelectByIdQuery(String id) {
+        final SelectTimestampQuery.Builder builder = SelectTimestampQuery.newBuilder(id)
                                                                          .setDataSource(dataSource)
                                                                          .setLogger(logger);
+        return builder.build();
+    }
+
+    @Override
+    public WriteQuery newInsertQuery(String id, Timestamp record) {
+        final InsertTimestampQuery.Builder builder = InsertTimestampQuery.newBuilder(id)
+                                                                         .setDataSource(dataSource)
+                                                                         .setLogger(logger)
+                                                                         .setTimestamp(record);
+        return builder.build();
+    }
+
+    @Override
+    public WriteQuery newUpdateQuery(String id, Timestamp record) {
+        final UpdateTimestampQuery.Builder builder = UpdateTimestampQuery.newBuilder(id)
+                                                                         .setDataSource(dataSource)
+                                                                         .setLogger(logger)
+                                                                         .setTimestamp(record);
         return builder.build();
     }
 }

@@ -21,13 +21,10 @@
 package org.spine3.server.storage.jdbc.projection.query;
 
 import com.google.protobuf.Timestamp;
-import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.Sql;
-import org.spine3.server.storage.jdbc.query.StorageQuery;
-import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
+import org.spine3.server.storage.jdbc.query.SelectByIdQuery;
 
 import javax.annotation.Nullable;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -45,7 +42,7 @@ import static org.spine3.validate.Validate.isDefault;
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-public class SelectTimestampQuery extends StorageQuery {
+public class SelectTimestampQuery extends SelectByIdQuery<String, Timestamp> {
 
     private static final String QUERY_TEMPLATE = SELECT +
                                                  SECONDS_COL + COMMA +
@@ -56,39 +53,34 @@ public class SelectTimestampQuery extends StorageQuery {
         super(builder);
     }
 
+    @SuppressWarnings("MethodDoesntCallSuperMethod") // Override default Message storing policy
     @Nullable
-    public Timestamp execute() throws DatabaseException {
-        try (ConnectionWrapper connection = getConnection(true);
-             PreparedStatement statement = prepareStatement(connection);
-             ResultSet resultSet = statement.executeQuery()) {
-            if (!resultSet.next()) {
-                return null;
-            }
-            final long seconds = resultSet.getLong(SECONDS_COL);
-            final int nanos = resultSet.getInt(NANOS_COL);
-            final Timestamp time = Timestamp.newBuilder()
-                                            .setSeconds(seconds)
-                                            .setNanos(nanos)
-                                            .build();
-            if (isDefault(time)) {
-                return null;
-            }
-            return time;
-        } catch (SQLException e) {
-            getLogger().error("Failed to read last event time.", e);
-            throw new DatabaseException(e);
+    @Override
+    protected Timestamp readMessage(ResultSet resultSet) throws SQLException {
+        final long seconds = resultSet.getLong(SECONDS_COL);
+        final int nanos = resultSet.getInt(NANOS_COL);
+        final Timestamp time = Timestamp.newBuilder()
+                                        .setSeconds(seconds)
+                                        .setNanos(nanos)
+                                        .build();
+        if (isDefault(time)) {
+            return null;
         }
+        return time;
     }
 
     public static Builder newBuilder(String tableName) {
         final Builder builder = new Builder();
-        builder.setQuery(format(QUERY_TEMPLATE, tableName));
+        builder.setQuery(format(QUERY_TEMPLATE, tableName))
+               .setIdIndexInQuery(1);
         return builder;
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder extends StorageQuery.Builder<Builder, SelectTimestampQuery> {
-
+    public static class Builder extends SelectByIdQuery.Builder<Builder,
+                                                                SelectTimestampQuery,
+                                                                String,
+                                                                Timestamp> {
         @Override
         public SelectTimestampQuery build() {
             return new SelectTimestampQuery(this);
