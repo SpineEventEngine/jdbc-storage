@@ -22,14 +22,16 @@ package org.spine3.server.storage.jdbc.event.query;
 
 import org.spine3.base.Event;
 import org.spine3.server.storage.jdbc.query.SelectByIdQuery;
+import org.spine3.server.storage.jdbc.table.EventTable;
 
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
+import static org.spine3.server.storage.jdbc.Sql.Query.FROM;
 import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
+import static org.spine3.server.storage.jdbc.Sql.Query.SELECT;
 import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
-import static org.spine3.server.storage.jdbc.event.query.EventTable.EVENT_COL;
-import static org.spine3.server.storage.jdbc.event.query.EventTable.EVENT_ID_COL;
-import static org.spine3.server.storage.jdbc.event.query.EventTable.SELECT_EVENT_FROM_TABLE;
+import static org.spine3.server.storage.jdbc.table.EventTable.Column.event;
+import static org.spine3.server.storage.jdbc.table.EventTable.Column.event_id;
 
 /**
  * Query that selects {@link Event} by ID.
@@ -39,8 +41,9 @@ import static org.spine3.server.storage.jdbc.event.query.EventTable.SELECT_EVENT
  */
 public class SelectEventByIdQuery extends SelectByIdQuery<String, Event> {
 
-    private static final String QUERY_TEMPLATE = SELECT_EVENT_FROM_TABLE +
-                                                 WHERE + EVENT_ID_COL + EQUAL + PLACEHOLDER +
+    private static final String QUERY_TEMPLATE = SELECT.toString() + event +
+                                                 FROM + EventTable.TABLE_NAME +
+                                                 WHERE + event_id + EQUAL + PLACEHOLDER +
                                                  SEMICOLON;
 
     public SelectEventByIdQuery(Builder builder) {
@@ -51,7 +54,7 @@ public class SelectEventByIdQuery extends SelectByIdQuery<String, Event> {
         final Builder builder = new Builder();
         builder.setIdIndexInQuery(1)
                .setQuery(QUERY_TEMPLATE)
-               .setMessageColumnName(EVENT_COL)
+               .setMessageColumnName(event.name())
                .setMessageDescriptor(Event.getDescriptor());
         return builder;
     }

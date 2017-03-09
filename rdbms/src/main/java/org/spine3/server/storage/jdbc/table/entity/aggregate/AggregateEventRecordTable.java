@@ -89,7 +89,7 @@ public class AggregateEventRecordTable<I>
         return false;
     }
 
-    enum Column implements TableColumn {
+    public enum Column implements TableColumn {
 
         id(UNKNOWN),
         aggregate(BLOB),

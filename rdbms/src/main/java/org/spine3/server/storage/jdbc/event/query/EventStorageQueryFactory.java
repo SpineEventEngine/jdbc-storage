@@ -30,14 +30,14 @@ import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
 /**
- * This class creates queries for interaction with {@link EventTable}.
+ * This class creates queries for interaction with
+ * {@link org.spine3.server.storage.jdbc.table.EventTable}.
  *
  * @author Andrey Lavrov
  */
 public class EventStorageQueryFactory implements QueryFactory<String, Event> {
 
     private final DataSourceWrapper dataSource;
-    private final IdColumn<String> idColumn;
     private Logger logger;
 
     /**
@@ -47,7 +47,6 @@ public class EventStorageQueryFactory implements QueryFactory<String, Event> {
      */
     public EventStorageQueryFactory(DataSourceWrapper dataSource) {
         this.dataSource = dataSource;
-        this.idColumn = new IdColumn.StringIdColumn();
     }
 
     /** Sets the logger for logging exceptions during queries execution. */
@@ -66,11 +65,12 @@ public class EventStorageQueryFactory implements QueryFactory<String, Event> {
 
     @Override
     public SelectByIdQuery<String, Event> newSelectByIdQuery(String id) {
-        final SelectEventByIdQuery.Builder builder = SelectEventByIdQuery.newBuilder()
-                                                                         .setDataSource(dataSource)
-                                                                         .setLogger(logger)
-                                                                         .setIdColumn(idColumn)
-                                                                         .setId(id);
+        final SelectEventByIdQuery.Builder builder =
+                SelectEventByIdQuery.newBuilder()
+                                    .setDataSource(dataSource)
+                                    .setLogger(logger)
+                                    .setIdColumn(new IdColumn.StringIdColumn())
+                                    .setId(id);
         return builder.build();
     }
 

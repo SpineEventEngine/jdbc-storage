@@ -23,6 +23,7 @@ package org.spine3.server.storage.jdbc.aggregate.query;
 import org.spine3.server.aggregate.AggregateEventRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.StorageQuery;
+import org.spine3.server.storage.jdbc.table.entity.aggregate.AggregateEventRecordTable.Column;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.DbIterator;
 import org.spine3.server.storage.jdbc.util.IdColumn;
@@ -40,10 +41,9 @@ import static org.spine3.server.storage.jdbc.Sql.Query.ORDER_BY;
 import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
 import static org.spine3.server.storage.jdbc.Sql.Query.SELECT;
 import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
-import static org.spine3.server.storage.jdbc.aggregate.query.Table.AggregateRecord.AGGREGATE_COL;
-import static org.spine3.server.storage.jdbc.aggregate.query.Table.AggregateRecord.ID_COL;
-import static org.spine3.server.storage.jdbc.aggregate.query.Table.AggregateRecord.NANOS_COL;
-import static org.spine3.server.storage.jdbc.aggregate.query.Table.AggregateRecord.SECONDS_COL;
+import static org.spine3.server.storage.jdbc.table.entity.aggregate.AggregateEventRecordTable.Column.aggregate;
+import static org.spine3.server.storage.jdbc.table.entity.aggregate.AggregateEventRecordTable.Column.timestamp;
+import static org.spine3.server.storage.jdbc.table.entity.aggregate.AggregateEventRecordTable.Column.timestamp_nanos;
 
 /**
  * Query that selects {@link AggregateEventRecord} by corresponding aggregate ID sorted by time descending.
@@ -54,9 +54,9 @@ import static org.spine3.server.storage.jdbc.aggregate.query.Table.AggregateReco
 public class SelectByIdSortedByTimeDescQuery<I> extends StorageQuery {
 
     private static final String QUERY_TEMPLATE =
-            SELECT + AGGREGATE_COL + FROM + "%s" +
-            WHERE + ID_COL + EQUAL + PLACEHOLDER +
-            ORDER_BY + SECONDS_COL + DESC + COMMA + NANOS_COL + DESC + SEMICOLON;
+            SELECT.toString() + aggregate + FROM + "%s" +
+            WHERE + Column.id + EQUAL + PLACEHOLDER +
+            ORDER_BY + timestamp + DESC + COMMA + timestamp_nanos + DESC + SEMICOLON;
 
     private final IdColumn<I> idColumn;
     private final I id;
@@ -71,7 +71,7 @@ public class SelectByIdSortedByTimeDescQuery<I> extends StorageQuery {
         try (ConnectionWrapper connection = getConnection(true);
              PreparedStatement statement = prepareStatement(connection)) {
             idColumn.setId(1, id, statement);
-            return new DbIterator<>(statement, AGGREGATE_COL,
+            return new DbIterator<>(statement, aggregate.toString(),
                                     AggregateEventRecord.getDescriptor());
         } catch (SQLException e) {
             getLogger().error("Error while selecting entity by aggregate id sorted by time: ", e);

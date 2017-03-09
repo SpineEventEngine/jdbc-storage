@@ -38,7 +38,7 @@ import static org.spine3.server.storage.jdbc.Sql.Type.*;
  */
 public class EventTable extends AbstractTable<String, Event, EventTable.Column> {
 
-    private static final String TABLE_NAME = "events";
+    public static final String TABLE_NAME = "events";
 
     private final EventStorageQueryFactory queryFactory;
 
@@ -68,7 +68,7 @@ public class EventTable extends AbstractTable<String, Event, EventTable.Column> 
         return result;
     }
 
-    enum Column implements TableColumn {
+    public enum Column implements TableColumn {
 
         event_id(VARCHAR_999),
         event(BLOB),
