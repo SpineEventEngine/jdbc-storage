@@ -29,9 +29,9 @@ import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
 import static org.spine3.server.storage.jdbc.Sql.Query.SET;
 import static org.spine3.server.storage.jdbc.Sql.Query.UPDATE;
 import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
-import static org.spine3.server.storage.jdbc.command.query.CommandTable.ERROR_COL;
-import static org.spine3.server.storage.jdbc.command.query.CommandTable.ID_COL;
-import static org.spine3.server.storage.jdbc.command.query.CommandTable.TABLE_NAME;
+import static org.spine3.server.storage.jdbc.table.CommandTable.Column;
+import static org.spine3.server.storage.jdbc.table.CommandTable.Column.error;
+import static org.spine3.server.storage.jdbc.table.CommandTable.TABLE_NAME;
 
 /**
  * Query that updates {@link org.spine3.server.command.CommandRecord} with
@@ -45,8 +45,8 @@ public class SetErrorQuery extends WriteRecordQuery<String, Error> {
     private static final String QUERY_TEMPLATE =
             UPDATE + TABLE_NAME +
             SET +
-            ERROR_COL + EQUAL + PLACEHOLDER +
-            WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
+            error + EQUAL + PLACEHOLDER +
+            WHERE + Column.id + EQUAL + PLACEHOLDER + SEMICOLON;
 
     private SetErrorQuery(Builder builder) {
         super(builder);

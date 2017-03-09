@@ -27,10 +27,12 @@ import org.spine3.server.entity.EntityRecord;
 import org.spine3.server.storage.RecordStorage;
 import org.spine3.server.storage.VisibilityField;
 import org.spine3.server.storage.jdbc.entity.visibility.query.MarkEntityQuery;
-import org.spine3.server.storage.jdbc.query.QueryFactory;
 import org.spine3.server.storage.jdbc.query.DeleteRecordQuery;
+import org.spine3.server.storage.jdbc.query.QueryFactory;
 import org.spine3.server.storage.jdbc.query.SelectByIdQuery;
 import org.spine3.server.storage.jdbc.query.WriteQuery;
+import org.spine3.server.storage.jdbc.table.entity.RecordTable;
+import org.spine3.server.storage.jdbc.table.entity.RecordTable.Column;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbTableNameFactory;
 import org.spine3.server.storage.jdbc.util.IdColumn;
@@ -38,10 +40,9 @@ import org.spine3.server.storage.jdbc.util.IdColumn;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
 
 /**
- * This class creates queries for interaction with {@link EntityTable}.
+ * This class creates queries for interaction with the {@link RecordTable}.
  *
  * @author Andrey Lavrov
  * @author Dmytro Dashenkov
@@ -104,13 +105,13 @@ public class RecordStorageQueryFactory<I> implements QueryFactory<I,EntityRecord
                                                                 .setLogger(getLogger())
                                                                 .setTableName(tableName)
                                                                 .setIdColumn(idColumn)
-                                                                .setIdColumnName(ID_COL)
+                                                                .setIdColumnName(Column.id.name())
                                                                 .setIdValue(id);
         return builder.build();
     }
 
     /**
-     * Returns a query that deletes all from {@link EntityTable}.
+     * Returns a query that deletes all from {@link RecordTable}.
      */
     public DeleteAllQuery newDeleteAllQuery() {
         final DeleteAllQuery.Builder builder = DeleteAllQuery.newBuilder(tableName)

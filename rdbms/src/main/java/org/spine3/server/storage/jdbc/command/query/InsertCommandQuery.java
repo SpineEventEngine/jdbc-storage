@@ -21,6 +21,7 @@
 package org.spine3.server.storage.jdbc.command.query;
 
 import org.spine3.server.command.CommandRecord;
+import org.spine3.server.storage.jdbc.table.CommandTable;
 
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
@@ -29,13 +30,14 @@ import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
 import static org.spine3.server.storage.jdbc.Sql.Query.INSERT_INTO;
 import static org.spine3.server.storage.jdbc.Sql.Query.VALUES;
 import static org.spine3.server.storage.jdbc.Sql.nPlaceholders;
-import static org.spine3.server.storage.jdbc.command.query.CommandTable.COMMAND_COL;
-import static org.spine3.server.storage.jdbc.command.query.CommandTable.COMMAND_STATUS_COL;
-import static org.spine3.server.storage.jdbc.command.query.CommandTable.ID_COL;
-import static org.spine3.server.storage.jdbc.command.query.CommandTable.TABLE_NAME;
+import static org.spine3.server.storage.jdbc.table.CommandTable.Column.command;
+import static org.spine3.server.storage.jdbc.table.CommandTable.Column.command_status;
+import static org.spine3.server.storage.jdbc.table.CommandTable.Column.id;
+import static org.spine3.server.storage.jdbc.table.TableColumns.getIndex;
 
 /**
- * Query that inserts a new {@link CommandRecord} to the {@link CommandTable}.
+ * Query that inserts a new {@link CommandRecord} to
+ * the {@link org.spine3.server.storage.jdbc.table.CommandTable}.
  *
  * @author Alexander Litus
  * @author Andrey Lavrov
@@ -43,10 +45,10 @@ import static org.spine3.server.storage.jdbc.command.query.CommandTable.TABLE_NA
 public class InsertCommandQuery extends WriteCommandRecordQuery {
 
     private static final String QUERY_TEMPLATE =
-            INSERT_INTO + TABLE_NAME + BRACKET_OPEN +
-            ID_COL + COMMA +
-            COMMAND_STATUS_COL + COMMA +
-            COMMAND_COL + BRACKET_CLOSE +
+            INSERT_INTO + CommandTable.TABLE_NAME + BRACKET_OPEN +
+            id + COMMA +
+            command + COMMA +
+            command_status + BRACKET_CLOSE +
             VALUES + nPlaceholders(3) + SEMICOLON;
 
     private InsertCommandQuery(Builder builder) {
@@ -55,9 +57,9 @@ public class InsertCommandQuery extends WriteCommandRecordQuery {
 
     public static Builder newBuilder() {
         final Builder builder = new Builder();
-        builder.setStatusIndexInQuery(QueryParameter.STATUS.getIndex())
-               .setIdIndexInQuery(QueryParameter.ID.getIndex())
-               .setRecordIndexInQuery(QueryParameter.RECORD.getIndex())
+        builder.setStatusIndexInQuery(getIndex(command_status))
+               .setIdIndexInQuery(getIndex(id))
+               .setRecordIndexInQuery(getIndex(command))
                .setQuery(QUERY_TEMPLATE);
         return builder;
     }
@@ -73,23 +75,6 @@ public class InsertCommandQuery extends WriteCommandRecordQuery {
         @Override
         protected Builder getThis() {
             return this;
-        }
-    }
-
-    private enum QueryParameter {
-
-        ID(1),
-        STATUS(2),
-        RECORD(3);
-
-        private final int index;
-
-        QueryParameter(int index) {
-            this.index = index;
-        }
-
-        public int getIndex() {
-            return index;
         }
     }
 }

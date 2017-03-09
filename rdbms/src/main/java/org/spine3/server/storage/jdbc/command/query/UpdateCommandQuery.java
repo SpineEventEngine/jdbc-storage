@@ -29,13 +29,14 @@ import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
 import static org.spine3.server.storage.jdbc.Sql.Query.SET;
 import static org.spine3.server.storage.jdbc.Sql.Query.UPDATE;
 import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
-import static org.spine3.server.storage.jdbc.command.query.CommandTable.COMMAND_COL;
-import static org.spine3.server.storage.jdbc.command.query.CommandTable.COMMAND_STATUS_COL;
-import static org.spine3.server.storage.jdbc.command.query.CommandTable.ID_COL;
-import static org.spine3.server.storage.jdbc.command.query.CommandTable.TABLE_NAME;
+import static org.spine3.server.storage.jdbc.table.CommandTable.Column.command;
+import static org.spine3.server.storage.jdbc.table.CommandTable.Column.command_status;
+import static org.spine3.server.storage.jdbc.table.CommandTable.Column.id;
+import static org.spine3.server.storage.jdbc.table.CommandTable.TABLE_NAME;
 
 /**
- * Query that updates {@link CommandRecord} in the {@link CommandTable}.
+ * Query that updates {@link CommandRecord} in
+ * the {@link org.spine3.server.storage.jdbc.table.CommandTable}.
  *
  * @author Andrey Lavrov
  */
@@ -43,9 +44,9 @@ public class UpdateCommandQuery extends WriteCommandRecordQuery {
 
     private static final String QUERY_TEMPLATE =
             UPDATE + TABLE_NAME +
-            SET + COMMAND_COL + EQUAL + PLACEHOLDER +
-            COMMA + COMMAND_STATUS_COL + EQUAL + PLACEHOLDER +
-            WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
+            SET + command + EQUAL + PLACEHOLDER +
+            COMMA + command_status + EQUAL + PLACEHOLDER +
+            WHERE + id + EQUAL + PLACEHOLDER + SEMICOLON;
 
     private UpdateCommandQuery(Builder builder) {
         super(builder);

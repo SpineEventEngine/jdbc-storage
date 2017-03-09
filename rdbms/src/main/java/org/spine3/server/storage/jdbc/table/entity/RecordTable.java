@@ -118,7 +118,7 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, RecordTable.Col
         }
     }
 
-    enum Column implements TableColumn, Cloneable {
+    public enum Column implements TableColumn, Cloneable {
 
         id(UNKNOWN),
         entity(BLOB),

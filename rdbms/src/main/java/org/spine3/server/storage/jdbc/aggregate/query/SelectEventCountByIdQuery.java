@@ -33,8 +33,8 @@ import static org.spine3.server.storage.jdbc.Sql.Query.FROM;
 import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
 import static org.spine3.server.storage.jdbc.Sql.Query.SELECT;
 import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
-import static org.spine3.server.storage.jdbc.aggregate.query.Table.EventCount.EVENT_COUNT_COL;
-import static org.spine3.server.storage.jdbc.aggregate.query.Table.EventCount.ID_COL;
+import static org.spine3.server.storage.jdbc.table.entity.aggregate.EventCountTable.Column.event_count;
+import static org.spine3.server.storage.jdbc.table.entity.aggregate.EventCountTable.Column.id;
 
 /**
  * Query that selects event count by corresponding aggregate ID.
@@ -45,9 +45,9 @@ import static org.spine3.server.storage.jdbc.aggregate.query.Table.EventCount.ID
 public class SelectEventCountByIdQuery<I> extends SelectByIdQuery<I, Int32Value> {
 
     private static final String QUERY_TEMPLATE =
-            SELECT + EVENT_COUNT_COL +
+            SELECT.toString() + event_count +
             FROM + "%s" +
-            WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
+            WHERE + id + EQUAL + PLACEHOLDER + SEMICOLON;
 
     private SelectEventCountByIdQuery(Builder<I> builder) {
         super(builder);
@@ -56,7 +56,7 @@ public class SelectEventCountByIdQuery<I> extends SelectByIdQuery<I, Int32Value>
     @SuppressWarnings("MethodDoesntCallSuperMethod") // Override default message storing policy
     @Override
     protected Int32Value readMessage(ResultSet resultSet) throws SQLException {
-        final int eventCount = resultSet.getInt(EVENT_COUNT_COL);
+        final int eventCount = resultSet.getInt(event_count.name());
         return Int32Value.newBuilder()
                          .setValue(eventCount)
                          .build();

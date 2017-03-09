@@ -25,6 +25,7 @@ import org.spine3.server.entity.EntityRecord;
 import org.spine3.server.entity.Visibility;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.WriteQuery;
+import org.spine3.server.storage.jdbc.table.entity.RecordTable.Column;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 import org.spine3.server.storage.jdbc.util.Serializer;
@@ -32,7 +33,6 @@ import org.spine3.server.storage.jdbc.util.Serializer;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -40,6 +40,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.lang.String.format;
+import static java.util.Collections.nCopies;
 import static org.spine3.server.storage.VisibilityField.archived;
 import static org.spine3.server.storage.VisibilityField.deleted;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
@@ -49,8 +50,7 @@ import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
 import static org.spine3.server.storage.jdbc.Sql.Query.INSERT_INTO;
 import static org.spine3.server.storage.jdbc.Sql.Query.VALUES;
 import static org.spine3.server.storage.jdbc.Sql.nPlaceholders;
-import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ENTITY_COL;
-import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
+import static org.spine3.server.storage.jdbc.table.entity.RecordTable.Column.entity;
 
 /**
  * A query for {@code INSERT}-ing multiple {@linkplain EntityRecord entity records} as a bulk.
@@ -64,7 +64,7 @@ public class InsertEntityRecordsBulkQuery<I> extends WriteQuery {
     private static final int COLUMNS_COUNT = 4;
 
     private static final String SQL_TEMPLATE = INSERT_INTO + FORMAT_PLACEHOLDER +
-                                               BRACKET_OPEN + ID_COL + COMMA + ENTITY_COL + COMMA +
+                                               BRACKET_OPEN + Column.id + COMMA + entity + COMMA +
                                                archived + COMMA + deleted + BRACKET_CLOSE +
                                                VALUES + FORMAT_PLACEHOLDER;
     private static final String SQL_VALUES_TEMPLATE = nPlaceholders(COLUMNS_COUNT);
@@ -133,7 +133,8 @@ public class InsertEntityRecordsBulkQuery<I> extends WriteQuery {
         }
     }
 
-    public static class Builder<I> extends WriteQuery.Builder<Builder<I>, InsertEntityRecordsBulkQuery> {
+    public static class Builder<I>
+            extends WriteQuery.Builder<Builder<I>, InsertEntityRecordsBulkQuery> {
 
         private Map<I, EntityRecord> records;
         private String tableName;
@@ -160,10 +161,10 @@ public class InsertEntityRecordsBulkQuery<I> extends WriteQuery {
             checkState(!isNullOrEmpty(tableName), "Table name is not set.");
             checkState(records != null, "Records field is not set.");
 
-            final Collection<String> sqlvalues = Collections.nCopies(records.size(),
-                                                                     SQL_VALUES_TEMPLATE);
+            final Collection<String> sqlValues = nCopies(records.size(),
+                                                         SQL_VALUES_TEMPLATE);
             final String sqlValuesJoined = Joiner.on(COMMA.toString())
-                                                 .join(sqlvalues);
+                                                 .join(sqlValues);
             final String sql = format(SQL_TEMPLATE, tableName, sqlValuesJoined) + SEMICOLON;
             setQuery(sql);
             return new InsertEntityRecordsBulkQuery<>(this);

@@ -67,7 +67,7 @@ public class EventCountTable<I> extends AggregateTable<I, Int32Value, EventCount
         return queryFactory;
     }
 
-    enum Column implements TableColumn {
+    public enum Column implements TableColumn {
 
         id(UNKNOWN),
         event_count(BIGINT);

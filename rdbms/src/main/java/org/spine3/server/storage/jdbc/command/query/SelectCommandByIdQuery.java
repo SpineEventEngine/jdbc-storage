@@ -26,6 +26,7 @@ import org.spine3.base.Failure;
 import org.spine3.server.command.CommandRecord;
 import org.spine3.server.command.ProcessingStatus;
 import org.spine3.server.storage.jdbc.query.SelectByIdQuery;
+import org.spine3.server.storage.jdbc.table.CommandTable;
 
 import javax.annotation.Nullable;
 import java.sql.ResultSet;
@@ -38,12 +39,11 @@ import static org.spine3.server.storage.jdbc.Sql.Query.FROM;
 import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
 import static org.spine3.server.storage.jdbc.Sql.Query.SELECT;
 import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
-import static org.spine3.server.storage.jdbc.command.query.CommandTable.COMMAND_COL;
-import static org.spine3.server.storage.jdbc.command.query.CommandTable.COMMAND_STATUS_COL;
-import static org.spine3.server.storage.jdbc.command.query.CommandTable.ERROR_COL;
-import static org.spine3.server.storage.jdbc.command.query.CommandTable.FAILURE_COL;
-import static org.spine3.server.storage.jdbc.command.query.CommandTable.ID_COL;
-import static org.spine3.server.storage.jdbc.command.query.CommandTable.TABLE_NAME;
+import static org.spine3.server.storage.jdbc.table.CommandTable.Column.command;
+import static org.spine3.server.storage.jdbc.table.CommandTable.Column.command_status;
+import static org.spine3.server.storage.jdbc.table.CommandTable.Column.error;
+import static org.spine3.server.storage.jdbc.table.CommandTable.Column.failure;
+import static org.spine3.server.storage.jdbc.table.CommandTable.Column.id;
 import static org.spine3.server.storage.jdbc.util.Serializer.deserialize;
 
 /**
@@ -55,8 +55,8 @@ import static org.spine3.server.storage.jdbc.util.Serializer.deserialize;
 public class SelectCommandByIdQuery extends SelectByIdQuery<String, CommandRecord> {
 
     private static final String QUERY_TEMPLATE =
-            SELECT.toString() + ALL_ATTRIBUTES + FROM + TABLE_NAME +
-            WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
+            SELECT.toString() + ALL_ATTRIBUTES + FROM + CommandTable.TABLE_NAME +
+            WHERE + id + EQUAL + PLACEHOLDER + SEMICOLON;
 
     public SelectCommandByIdQuery(Builder builder) {
         super(builder);
@@ -67,14 +67,14 @@ public class SelectCommandByIdQuery extends SelectByIdQuery<String, CommandRecor
     @SuppressWarnings("MethodDoesntCallSuperMethod")
     // We store the Commands not the same way as other records
     protected CommandRecord readMessage(ResultSet resultSet) throws SQLException {
-        final byte[] recordBytes = resultSet.getBytes(COMMAND_COL);
+        final byte[] recordBytes = resultSet.getBytes(command.name());
         if (recordBytes == null) {
             return null;
         }
         final CommandRecord record = deserialize(recordBytes,
                                                  CommandRecord.getDescriptor());
         final CommandRecord.Builder builder = record.toBuilder();
-        final String status = resultSet.getString(COMMAND_STATUS_COL);
+        final String status = resultSet.getString(command_status.name());
         if (status.equals(CommandStatus.OK.name())) {
             final ProcessingStatus statusOk = ProcessingStatus.newBuilder()
                                                               .setCode(CommandStatus.OK)
@@ -83,7 +83,7 @@ public class SelectCommandByIdQuery extends SelectByIdQuery<String, CommandRecor
                                                 .build();
             return result;
         }
-        final byte[] errorBytes = resultSet.getBytes(ERROR_COL);
+        final byte[] errorBytes = resultSet.getBytes(error.name());
         if (errorBytes != null) {
             final Error error = deserialize(errorBytes, Error.getDescriptor());
             final ProcessingStatus statusError = ProcessingStatus.newBuilder()
@@ -94,7 +94,7 @@ public class SelectCommandByIdQuery extends SelectByIdQuery<String, CommandRecor
                                                 .build();
             return result;
         }
-        final byte[] failureBytes = resultSet.getBytes(FAILURE_COL);
+        final byte[] failureBytes = resultSet.getBytes(failure.name());
         if (failureBytes != null) {
             final Failure failure = deserialize(failureBytes, Failure.getDescriptor());
             final ProcessingStatus statusFailure = ProcessingStatus.newBuilder()

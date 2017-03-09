@@ -24,6 +24,7 @@ import org.spine3.server.entity.EntityRecord;
 import org.spine3.server.entity.Visibility;
 import org.spine3.server.storage.VisibilityField;
 import org.spine3.server.storage.jdbc.query.SelectByIdQuery;
+import org.spine3.server.storage.jdbc.table.entity.RecordTable.Column;
 
 import javax.annotation.Nullable;
 import java.sql.ResultSet;
@@ -37,8 +38,7 @@ import static org.spine3.server.storage.jdbc.Sql.Query.FROM;
 import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
 import static org.spine3.server.storage.jdbc.Sql.Query.SELECT;
 import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
-import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ENTITY_COL;
-import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
+import static org.spine3.server.storage.jdbc.table.entity.RecordTable.Column.entity;
 
 /**
  * Query that selects {@link EntityRecord} by ID.
@@ -49,8 +49,8 @@ import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
 public class SelectEntityByIdQuery<I> extends SelectByIdQuery<I, EntityRecord> {
 
     private static final String QUERY_TEMPLATE =
-            SELECT.toString() + ALL_ATTRIBUTES + FROM + " %s" + WHERE
-            + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
+            SELECT.toString() + ALL_ATTRIBUTES + FROM + " %s" + WHERE +
+            Column.id + EQUAL + PLACEHOLDER + SEMICOLON;
 
     public SelectEntityByIdQuery(Builder<I> builder) {
         super(builder);
@@ -60,7 +60,7 @@ public class SelectEntityByIdQuery<I> extends SelectByIdQuery<I, EntityRecord> {
         final Builder<I> builder = new Builder<>();
         builder.setIdIndexInQuery(1)
                .setQuery(format(QUERY_TEMPLATE, tableName))
-               .setMessageColumnName(ENTITY_COL)
+               .setMessageColumnName(entity.name())
                .setMessageDescriptor(EntityRecord.getDescriptor());
         return builder;
     }

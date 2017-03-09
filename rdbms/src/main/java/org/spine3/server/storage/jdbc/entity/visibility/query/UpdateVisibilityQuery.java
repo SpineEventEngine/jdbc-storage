@@ -23,6 +23,7 @@ package org.spine3.server.storage.jdbc.entity.visibility.query;
 import org.spine3.server.entity.Visibility;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.WriteQuery;
+import org.spine3.server.storage.jdbc.table.entity.aggregate.VisibilityTable.Column;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
@@ -40,7 +41,6 @@ import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
 import static org.spine3.server.storage.jdbc.Sql.Query.SET;
 import static org.spine3.server.storage.jdbc.Sql.Query.UPDATE;
 import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
-import static org.spine3.server.storage.jdbc.entity.visibility.table.VisibilityTable.ID_COL;
 
 /**
  * The query updating an {@linkplain org.spine3.server.entity.Visibility entity visibility}.
@@ -52,7 +52,7 @@ public class UpdateVisibilityQuery<I> extends WriteQuery {
     private static final String SQL = UPDATE + "%s" + SET +
                                       archived + EQUAL + PLACEHOLDER + COMMA +
                                       deleted + EQUAL + PLACEHOLDER +
-                                      WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
+                                      WHERE + Column.id + EQUAL + PLACEHOLDER + SEMICOLON;
 
     private final I id;
     private final Visibility entityStatus;

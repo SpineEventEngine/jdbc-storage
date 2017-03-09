@@ -34,11 +34,12 @@ import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
 import static org.spine3.server.storage.jdbc.Sql.Query.SET;
 import static org.spine3.server.storage.jdbc.Sql.Query.UPDATE;
 import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
-import static org.spine3.server.storage.jdbc.aggregate.query.Table.EventCount.EVENT_COUNT_COL;
-import static org.spine3.server.storage.jdbc.aggregate.query.Table.EventCount.ID_COL;
+import static org.spine3.server.storage.jdbc.table.entity.aggregate.EventCountTable.Column.event_count;
+import static org.spine3.server.storage.jdbc.table.entity.aggregate.EventCountTable.Column.id;
 
 /**
- * Query that updates event count in the {@link Table.EventCount}.
+ * Query that updates event count in
+ * the {@link org.spine3.server.storage.jdbc.table.entity.aggregate.EventCountTable}.
  *
  * @author Alexander Litus
  * @author Andrey Lavrov
@@ -49,8 +50,8 @@ public class UpdateEventCountQuery<I> extends UpdateRecordQuery<I> {
 
     private static final String QUERY_TEMPLATE =
             UPDATE + "%s" +
-            SET + EVENT_COUNT_COL + EQUAL + PLACEHOLDER +
-            WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
+            SET + event_count + EQUAL + PLACEHOLDER +
+            WHERE + id + EQUAL + PLACEHOLDER + SEMICOLON;
 
     private UpdateEventCountQuery(Builder<I> builder) {
         super(builder);

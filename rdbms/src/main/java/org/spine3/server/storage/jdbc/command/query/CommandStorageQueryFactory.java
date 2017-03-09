@@ -32,7 +32,8 @@ import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
 /**
- * This class creates queries for interaction with {@link CommandTable}.
+ * This class creates queries for interaction with
+ * the {@link org.spine3.server.storage.jdbc.table.CommandTable}.
  *
  * @author Andrey Lavrov
  */

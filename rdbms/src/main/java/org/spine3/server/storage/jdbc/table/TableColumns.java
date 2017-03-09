@@ -20,15 +20,13 @@
 
 package org.spine3.server.storage.jdbc.table;
 
-import org.spine3.server.storage.StorageField;
-import org.spine3.server.storage.jdbc.Sql;
-
 /**
  * @author Dmytro Dashenkov.
  */
-public interface TableColumn extends StorageField {
+public class TableColumns {
 
-    String name();
-    Sql.Type type();
-    int ordinal();
+    public static int getIndex(TableColumn column) {
+        // SQL column indexes always start with 1, not with 0
+        return column.ordinal() + 1;
+    }
 }

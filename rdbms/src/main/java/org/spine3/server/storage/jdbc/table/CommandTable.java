@@ -45,13 +45,14 @@ import static org.spine3.server.storage.jdbc.Sql.Type.VARCHAR_999;
  */
 public class CommandTable extends AbstractTable<String, CommandRecord, CommandTable.Column> {
 
-    private static final String TABLE_NAME = "commands";
+    public static final String TABLE_NAME = "commands";
 
     private final CommandStorageQueryFactory queryFactory;
 
     public CommandTable(DataSourceWrapper dataSource) {
         super(TABLE_NAME, new IdColumn.StringIdColumn(), dataSource);
         this.queryFactory = new CommandStorageQueryFactory(dataSource);
+        queryFactory.setLogger(log());
     }
 
     @Override
@@ -90,7 +91,7 @@ public class CommandTable extends AbstractTable<String, CommandRecord, CommandTa
         query.execute();
     }
 
-    enum Column implements TableColumn {
+    public enum Column implements TableColumn {
 
         id(VARCHAR_999),
         command(BLOB),

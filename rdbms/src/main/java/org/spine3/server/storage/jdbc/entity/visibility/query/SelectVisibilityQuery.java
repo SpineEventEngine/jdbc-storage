@@ -37,7 +37,7 @@ import static org.spine3.server.storage.jdbc.Sql.Query.FROM;
 import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
 import static org.spine3.server.storage.jdbc.Sql.Query.SELECT;
 import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
-import static org.spine3.server.storage.jdbc.entity.visibility.table.VisibilityTable.ID_COL;
+import static org.spine3.server.storage.jdbc.table.entity.aggregate.VisibilityTable.Column;
 
 /**
  * The query selecting one {@linkplain org.spine3.server.entity.Visibility entity visibility} by ID.
@@ -49,7 +49,7 @@ public class SelectVisibilityQuery<I> extends SelectByIdQuery<I, Visibility> {
     private static final String SQL =
             SELECT.toString() + archived + COMMA + deleted +
             FROM + "%s" +
-            WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
+            WHERE + Column.id + EQUAL + PLACEHOLDER + SEMICOLON;
 
     protected SelectVisibilityQuery(Builder<I> builder) {
         super(builder);

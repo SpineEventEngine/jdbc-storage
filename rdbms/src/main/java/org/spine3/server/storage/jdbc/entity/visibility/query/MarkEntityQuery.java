@@ -23,6 +23,7 @@ package org.spine3.server.storage.jdbc.entity.visibility.query;
 import org.spine3.server.storage.VisibilityField;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.StorageQuery;
+import org.spine3.server.storage.jdbc.table.entity.aggregate.VisibilityTable.Column;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
@@ -40,7 +41,6 @@ import static org.spine3.server.storage.jdbc.Sql.Query.SET;
 import static org.spine3.server.storage.jdbc.Sql.Query.TRUE;
 import static org.spine3.server.storage.jdbc.Sql.Query.UPDATE;
 import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
-import static org.spine3.server.storage.jdbc.entity.visibility.table.VisibilityTable.ID_COL;
 
 /**
  * The query to the {@linkplain org.spine3.server.entity.Visibility entity visibility} setting one
@@ -56,7 +56,7 @@ public class MarkEntityQuery<I> extends StorageQuery {
 
     private static final String SQL_TEMPLATE = UPDATE + FORMAT_PLACEHOLDER + SET +
                                                FORMAT_PLACEHOLDER + EQUAL + TRUE +
-                                               WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
+                                               WHERE + Column.id + EQUAL + PLACEHOLDER + SEMICOLON;
 
     private final I id;
     private final IdColumn<I> idColumn;
