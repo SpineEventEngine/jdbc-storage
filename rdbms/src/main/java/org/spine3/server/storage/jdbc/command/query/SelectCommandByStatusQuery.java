@@ -90,7 +90,7 @@ public class SelectCommandByStatusQuery extends StorageQuery {
     public Iterator<CommandRecord> execute() throws DatabaseException {
         try (ConnectionWrapper connection = getConnection(true)) {
             final PreparedStatement statement = prepareStatement(connection);
-            return new DbIterator<>(statement, command_status.name(), CommandRecord.getDescriptor());
+            return new DbIterator<>(statement, command.name(), CommandRecord.getDescriptor());
         }
     }
 
