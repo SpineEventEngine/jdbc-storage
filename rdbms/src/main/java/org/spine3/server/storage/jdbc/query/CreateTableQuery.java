@@ -29,9 +29,9 @@ import java.sql.SQLException;
 /**
  * @author Dmytro Dashenkov.
  */
-public class VoidQuery extends StorageQuery {
+public class CreateTableQuery extends StorageQuery {
 
-    private VoidQuery(Builder builder) {
+    private CreateTableQuery(Builder builder) {
         super(builder);
     }
 
@@ -49,14 +49,15 @@ public class VoidQuery extends StorageQuery {
         return new Builder();
     }
 
-    public static class Builder extends StorageQuery.Builder<Builder, VoidQuery> {
+    public static class Builder extends StorageQuery.Builder<Builder, CreateTableQuery> {
 
         private Builder() {
+            super();
         }
 
         @Override
-        public VoidQuery build() {
-            return new VoidQuery(this);
+        public CreateTableQuery build() {
+            return new CreateTableQuery(this);
         }
 
         @Override

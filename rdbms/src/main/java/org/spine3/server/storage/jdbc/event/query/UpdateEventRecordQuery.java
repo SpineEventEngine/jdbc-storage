@@ -43,8 +43,13 @@ import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
 import static org.spine3.server.storage.jdbc.Sql.Query.SET;
 import static org.spine3.server.storage.jdbc.Sql.Query.UPDATE;
 import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
-import static org.spine3.server.storage.jdbc.table.EventTable.*;
-import static org.spine3.server.storage.jdbc.table.EventTable.Column.*;
+import static org.spine3.server.storage.jdbc.table.EventTable.Column.event;
+import static org.spine3.server.storage.jdbc.table.EventTable.Column.event_id;
+import static org.spine3.server.storage.jdbc.table.EventTable.Column.event_type;
+import static org.spine3.server.storage.jdbc.table.EventTable.Column.nanoseconds;
+import static org.spine3.server.storage.jdbc.table.EventTable.Column.producer_id;
+import static org.spine3.server.storage.jdbc.table.EventTable.Column.seconds;
+import static org.spine3.server.storage.jdbc.table.EventTable.TABLE_NAME;
 import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
 /**

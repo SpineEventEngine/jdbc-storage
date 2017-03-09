@@ -29,7 +29,7 @@ import static org.spine3.server.storage.jdbc.Sql.Query.INSERT_INTO;
 import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
 import static org.spine3.server.storage.jdbc.Sql.Query.TRUE;
 import static org.spine3.server.storage.jdbc.Sql.Query.VALUES;
-import static org.spine3.server.storage.jdbc.entity.visibility.table.VisibilityTable.ID_COL;
+import static org.spine3.server.storage.jdbc.table.entity.aggregate.VisibilityTable.Column;
 
 /**
  * The query for creating a new record in the table storing
@@ -40,8 +40,11 @@ import static org.spine3.server.storage.jdbc.entity.visibility.table.VisibilityT
  */
 public class InsertAndMarkEntityQuery<I> extends MarkEntityQuery<I> {
 
-    private static final String SQL_TEMPLATE = INSERT_INTO + "%s" +
-                                               BRACKET_OPEN + ID_COL + COMMA + "%s" +
+    private static final String FORMAT_PLACEHOLDER = "%s";
+
+    private static final String SQL_TEMPLATE = INSERT_INTO + FORMAT_PLACEHOLDER +
+                                               BRACKET_OPEN +
+                                               Column.id + COMMA + FORMAT_PLACEHOLDER +
                                                BRACKET_CLOSE +
                                                VALUES + BRACKET_OPEN +
                                                PLACEHOLDER + COMMA + TRUE +

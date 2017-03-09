@@ -31,7 +31,11 @@ import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import java.util.Iterator;
 
-import static org.spine3.server.storage.jdbc.Sql.Type.*;
+import static org.spine3.server.storage.jdbc.Sql.Type.BIGINT;
+import static org.spine3.server.storage.jdbc.Sql.Type.BLOB;
+import static org.spine3.server.storage.jdbc.Sql.Type.INT;
+import static org.spine3.server.storage.jdbc.Sql.Type.VARCHAR_512;
+import static org.spine3.server.storage.jdbc.Sql.Type.VARCHAR_999;
 
 /**
  * @author Dmytro Dashenkov.

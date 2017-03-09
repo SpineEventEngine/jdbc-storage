@@ -86,7 +86,7 @@ public class VisibilityTable<I> extends AggregateTable<I, Visibility, Visibility
         query.execute();
     }
 
-    enum Column implements TableColumn {
+    public enum Column implements TableColumn {
 
         id(UNKNOWN),
         archived(BOOLEAN),

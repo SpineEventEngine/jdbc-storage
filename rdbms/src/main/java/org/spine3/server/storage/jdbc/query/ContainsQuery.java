@@ -43,8 +43,10 @@ import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
  */
 public class ContainsQuery<I> extends StorageQuery {
 
-    private static final String SQL_TEMPLATE = SELECT.toString() + ALL_ATTRIBUTES + FROM + "%s" +
-                                               WHERE + "%s" + EQUAL + PLACEHOLDER;
+    private static final String FORMAT_PLACEHOLDER = "%s";
+    private static final String SQL_TEMPLATE = SELECT.toString() + ALL_ATTRIBUTES +
+                                               FROM + FORMAT_PLACEHOLDER +
+                                               WHERE + FORMAT_PLACEHOLDER + EQUAL + PLACEHOLDER;
 
     private final IdColumn<I> idColumn;
     private final I id;

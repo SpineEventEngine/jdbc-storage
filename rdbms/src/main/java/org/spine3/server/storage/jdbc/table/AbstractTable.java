@@ -30,14 +30,12 @@ import org.spine3.server.storage.jdbc.query.ContainsQuery;
 import org.spine3.server.storage.jdbc.query.DeleteRecordQuery;
 import org.spine3.server.storage.jdbc.query.QueryFactory;
 import org.spine3.server.storage.jdbc.query.SelectByIdQuery;
-import org.spine3.server.storage.jdbc.query.VoidQuery;
+import org.spine3.server.storage.jdbc.query.CreateTableQuery;
 import org.spine3.server.storage.jdbc.query.WriteQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import javax.annotation.Nullable;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
@@ -81,11 +79,11 @@ public abstract class AbstractTable<I, R extends Message, C extends Enum<C> & Ta
 
     public void createIfNotExists() {
         final String sql = composeCreateTableSql();
-        final VoidQuery query = VoidQuery.newBuilder()
-                                         .setDataSource(dataSource)
-                                         .setLogger(log())
-                                         .setQuery(sql)
-                                         .build();
+        final CreateTableQuery query = CreateTableQuery.newBuilder()
+                                                       .setDataSource(dataSource)
+                                                       .setLogger(log())
+                                                       .setQuery(sql)
+                                                       .build();
         query.execute();
     }
 
@@ -205,79 +203,6 @@ public abstract class AbstractTable<I, R extends Message, C extends Enum<C> & Ta
            .append(SEMICOLON);
         final String result = sql.toString();
         return result;
-    }
-
-    private void fillDerectOrderParams(PreparedStatement sqlStatement, Object... queryParams)
-            throws SQLException {
-        final int paramsCount = queryParams.length;
-        for (int i = 0; i < getColumns().size(); i++) {
-            final C column = columns.get(i);
-            final Object parameter = i < paramsCount
-                                     ? queryParams[i]
-                                     : null;
-            setParameter(sqlStatement, column, parameter, i);
-        }
-    }
-
-    private void fillParamsWithIdAtTheEnd(PreparedStatement sqlStatement, Object... queryParams)
-            throws SQLException {
-        final int paramsCount = queryParams.length;
-        final String idColumnName = getIdColumnDeclaration().name();
-        int position = 1;
-        for (final C column : getColumns()) {
-            if (column.name()
-                      .equals(idColumnName)) {
-                continue;
-            }
-            final Object parameter = position < paramsCount
-                                     ? queryParams[position]
-                                     : null;
-            setParameter(sqlStatement, column, parameter, position);
-            ++position;
-        }
-
-        @SuppressWarnings("unchecked")
-        final I id = (I) queryParams[queryParams.length - 1];
-        idColumn.setId(position, id, sqlStatement);
-    }
-
-    @SuppressWarnings("EnumSwitchStatementWhichMissesCases") // UNKNOWN case handled separately
-    private void setParameter(PreparedStatement sqlStatement,
-                              C column,
-                              @Nullable Object value,
-                              int position) throws SQLException {
-        final Sql.Type type = ensureType(column);
-        if (value == null) {
-            final int sqlTypeIndex = type.getSqlType();
-            sqlStatement.setNull(position, sqlTypeIndex);
-            return;
-        }
-        switch (type) {
-            case BLOB:
-                final byte[] bytes = (byte[]) value;
-                sqlStatement.setBytes(position, bytes);
-                break;
-            case INT:
-                final int number = (int) value;
-                sqlStatement.setInt(position, number);
-                break;
-            case BIGINT:
-                final long longNumber = (long) value;
-                sqlStatement.setLong(position, longNumber);
-                break;
-            case VARCHAR_512: // All VARCHAR types are Java Strings
-            case VARCHAR_999:
-                final String stringValue = (String) value;
-                sqlStatement.setString(position, stringValue);
-                break;
-            case BOOLEAN:
-                final boolean logicalValue = (boolean) value;
-                sqlStatement.setBoolean(position, logicalValue);
-                break;
-            default:
-                throw new IllegalArgumentException(
-                        "Unhandled SQL type \"" + type.toString() + '\"');
-        }
     }
 
     private Sql.Type getIdType() {
