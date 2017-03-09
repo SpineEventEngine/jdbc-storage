@@ -52,6 +52,7 @@ import static org.spine3.server.storage.jdbc.Sql.Query.NULL;
 import static org.spine3.server.storage.jdbc.Sql.Query.OR;
 import static org.spine3.server.storage.jdbc.Sql.Query.SELECT;
 import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
+import static org.spine3.server.storage.jdbc.table.entity.RecordTable.Column.id;
 
 /**
  * Implementation of {@link StorageQuery} for bulk selection.
@@ -76,7 +77,7 @@ public class SelectBulkQuery<I> extends StorageQuery {
             deleted + EQUAL + FALSE + BRACKET_CLOSE;
 
     private static final String ALL_TEMPLATE = COMMON_TEMPLATE + ';';
-    private static final String IDS_TEMPLATE = COMMON_TEMPLATE + AND + EntityTable.ID_COL + IN
+    private static final String IDS_TEMPLATE = COMMON_TEMPLATE + AND + id + IN
                                                + " %s" + SEMICOLON;
 
     private final FieldMask fieldMask;
