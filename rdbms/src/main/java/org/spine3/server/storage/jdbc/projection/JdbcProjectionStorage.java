@@ -32,7 +32,7 @@ import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.JdbcStorageFactory;
 import org.spine3.server.storage.jdbc.builder.StorageBuilder;
 import org.spine3.server.storage.jdbc.entity.JdbcRecordStorage;
-import org.spine3.server.storage.jdbc.projection.query.ProjectionStorageQueryFactory;
+import org.spine3.server.storage.jdbc.projection.query.LastHandledEventTimeQueryFactory;
 import org.spine3.server.storage.jdbc.table.LastHandledEventTimeTable;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
@@ -67,6 +67,7 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
         this.recordStorage = recordStorage;
         this.projectionClass = projectionClass;
         this.table = new LastHandledEventTimeTable(dataSource);
+        table.createIfNotExists();
     }
 
     private JdbcProjectionStorage(Builder<I> builder) {
@@ -87,7 +88,6 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
     @Nullable
     public Timestamp readLastHandledEventTime() throws DatabaseException {
         final Timestamp timestamp = table.read(newTableName(projectionClass));
-        ///queryFactory.newSelectTimestampQuery().execute();
         return timestamp;
     }
 
@@ -149,7 +149,7 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
 
     public static class Builder<I> extends StorageBuilder<Builder<I>,
                                                           JdbcProjectionStorage<I>,
-                                                          ProjectionStorageQueryFactory> {
+            LastHandledEventTimeQueryFactory> {
         private static final String DATA_SOURCE_WARN =
                 "Data source is never used directly by org.spine3.server.storage.jdbc.projection.JdbcProjectionStorage";
 

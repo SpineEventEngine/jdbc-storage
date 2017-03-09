@@ -52,6 +52,7 @@ public class JdbcProjectionStorageShould extends ProjectionStorageShould<String>
         final ProjectionStorage<String> storage =
                 JdbcProjectionStorage.<String>newBuilder()
                                      .setRecordStorage(entityStorage)
+                                     .setDataSource(dataSource)
                                      .setMultitenant(false)
                                      .setProjectionClass(projectionClass)
                                      .build();

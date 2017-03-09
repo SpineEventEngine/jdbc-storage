@@ -27,6 +27,7 @@ import org.spine3.server.storage.jdbc.query.SelectByIdQuery;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import static java.lang.String.format;
 import static org.spine3.server.storage.VisibilityField.archived;
 import static org.spine3.server.storage.VisibilityField.deleted;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.COMMA;
@@ -37,7 +38,6 @@ import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
 import static org.spine3.server.storage.jdbc.Sql.Query.SELECT;
 import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
 import static org.spine3.server.storage.jdbc.entity.visibility.table.VisibilityTable.ID_COL;
-import static org.spine3.server.storage.jdbc.entity.visibility.table.VisibilityTable.TABLE_NAME;
 
 /**
  * The query selecting one {@linkplain org.spine3.server.entity.Visibility entity visibility} by ID.
@@ -48,7 +48,7 @@ public class SelectVisibilityQuery<I> extends SelectByIdQuery<I, Visibility> {
 
     private static final String SQL =
             SELECT.toString() + archived + COMMA + deleted +
-            FROM + TABLE_NAME +
+            FROM + "%s" +
             WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
 
     protected SelectVisibilityQuery(Builder<I> builder) {
@@ -68,9 +68,9 @@ public class SelectVisibilityQuery<I> extends SelectByIdQuery<I, Visibility> {
         return visibility;
     }
 
-    public static <I> Builder<I> newBuilder() {
+    public static <I> Builder<I> newBuilder(String tableName) {
         final Builder<I> builder = new Builder<>();
-        builder.setQuery(SQL)
+        builder.setQuery(format(SQL, tableName))
                .setIdIndexInQuery(1);
         return builder;
     }

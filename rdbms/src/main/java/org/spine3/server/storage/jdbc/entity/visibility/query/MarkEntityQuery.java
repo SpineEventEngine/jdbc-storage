@@ -32,6 +32,7 @@ import java.sql.SQLException;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static java.lang.String.format;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
 import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
@@ -171,7 +172,7 @@ public class MarkEntityQuery<I> extends StorageQuery {
 
         @Override
         protected String buildSql() {
-            return String.format(SQL_TEMPLATE, getTableName(), getColumn());
+            return format(SQL_TEMPLATE, getTableName(), getColumn());
         }
     }
 }

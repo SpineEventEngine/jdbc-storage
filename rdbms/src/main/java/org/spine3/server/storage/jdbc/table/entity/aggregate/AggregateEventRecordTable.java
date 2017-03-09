@@ -46,6 +46,7 @@ public class AggregateEventRecordTable<I>
                                      DataSourceWrapper dataSource) {
         super(entityClass, dataSource);
         queryFactory = new AggregateStorageQueryFactory<>(dataSource, entityClass);
+        queryFactory.setLogger(log());
     }
 
     @Override
@@ -77,12 +78,23 @@ public class AggregateEventRecordTable<I>
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@code false} for the {@code AggregateEventRecordTable}.
+     */
+    @SuppressWarnings("MethodDoesntCallSuperMethod") // Flag method
+    @Override
+    protected boolean idIsPrimaryKey() {
+        return false;
+    }
+
     enum Column implements TableColumn {
 
         id(UNKNOWN),
         aggregate(BLOB),
-        SECONDS(BIGINT),
-        NANOS(INT);
+        timestamp(BIGINT),
+        timestamp_nanos(INT);
 
         private final Sql.Type type;
 

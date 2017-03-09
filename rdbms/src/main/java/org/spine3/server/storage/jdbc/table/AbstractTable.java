@@ -26,9 +26,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spine3.server.storage.jdbc.Sql;
 import org.spine3.server.storage.jdbc.entity.query.DeleteAllQuery;
-import org.spine3.server.storage.jdbc.query.QueryFactory;
 import org.spine3.server.storage.jdbc.query.ContainsQuery;
 import org.spine3.server.storage.jdbc.query.DeleteRecordQuery;
+import org.spine3.server.storage.jdbc.query.QueryFactory;
 import org.spine3.server.storage.jdbc.query.SelectByIdQuery;
 import org.spine3.server.storage.jdbc.query.VoidQuery;
 import org.spine3.server.storage.jdbc.query.WriteQuery;
@@ -39,6 +39,7 @@ import javax.annotation.Nullable;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.COMMA;
@@ -67,9 +68,9 @@ public abstract class AbstractTable<I, R extends Message, C extends Enum<C> & Ta
                             IdColumn<I> idColumn,
                             DataSourceWrapper dataSource) {
         super();
-        this.name = name;
-        this.idColumn = idColumn;
-        this.dataSource = dataSource;
+        this.name = checkNotNull(name);
+        this.idColumn = checkNotNull(idColumn);
+        this.dataSource = checkNotNull(dataSource);
     }
 
     public abstract C getIdColumnDeclaration();
@@ -163,6 +164,18 @@ public abstract class AbstractTable<I, R extends Message, C extends Enum<C> & Ta
         return query;
     }
 
+    /**
+     * Flags that the {@linkplain #getIdColumnDeclaration() ID column} should be declared as
+     * a {@code PRIMARY KEY}.
+     *
+     * <p>Override to change the table creation behavior.
+     *
+     * @return {@code true} by default
+     */
+    protected boolean idIsPrimaryKey() {
+        return true;
+    }
+
     protected Logger log() {
         return logger;
     }
@@ -182,11 +195,13 @@ public abstract class AbstractTable<I, R extends Message, C extends Enum<C> & Ta
                .append(COMMA);
             // Comma after the last column declaration is required since we add PRIMARY KEY after
         }
-        sql.append(PRIMARY_KEY)
-           .append(BRACKET_OPEN)
-           .append(idColumnName)
-           .append(BRACKET_CLOSE)
-           .append(BRACKET_CLOSE)
+        if (idIsPrimaryKey()) {
+            sql.append(PRIMARY_KEY)
+               .append(BRACKET_OPEN)
+               .append(idColumnName)
+               .append(BRACKET_CLOSE);
+        }
+        sql.append(BRACKET_CLOSE)
            .append(SEMICOLON);
         final String result = sql.toString();
         return result;

@@ -28,7 +28,6 @@ import org.spine3.server.storage.jdbc.entity.visibility.query.InsertVisibilityQu
 import org.spine3.server.storage.jdbc.entity.visibility.query.MarkEntityQuery;
 import org.spine3.server.storage.jdbc.entity.visibility.query.SelectVisibilityQuery;
 import org.spine3.server.storage.jdbc.entity.visibility.query.UpdateVisibilityQuery;
-import org.spine3.server.storage.jdbc.entity.visibility.table.VisibilityTable;
 import org.spine3.server.storage.jdbc.query.QueryFactory;
 import org.spine3.server.storage.jdbc.query.SelectByIdQuery;
 import org.spine3.server.storage.jdbc.query.WriteQuery;
@@ -41,88 +40,97 @@ import static org.spine3.server.storage.VisibilityField.deleted;
 /**
  * @author Dmytro Dashenkov.
  */
-public class VisibilityQueryFactory implements QueryFactory<String, Visibility> {
+public class VisibilityQueryFactory<I> implements QueryFactory<I, Visibility> {
 
     private final Logger logger;
     private final DataSourceWrapper dataSource;
+    private final IdColumn<I> idColumn;
+    private final String tableName;
 
-    public VisibilityQueryFactory(DataSourceWrapper dataSource, Logger logger) {
+    public VisibilityQueryFactory(DataSourceWrapper dataSource,
+                                  Logger logger,
+                                  IdColumn<I> idColumn,
+                                  String tableName) {
         this.logger = logger;
         this.dataSource = dataSource;
+        this.idColumn = idColumn;
+        this.tableName = tableName;
     }
 
     @Override
-    public SelectByIdQuery<String, Visibility> newSelectByIdQuery(String id) {
-        final SelectByIdQuery<String, Visibility> query =
-                SelectVisibilityQuery.<String>newBuilder()
+    public SelectByIdQuery<I, Visibility> newSelectByIdQuery(I id) {
+        final SelectByIdQuery<I, Visibility> query =
+                SelectVisibilityQuery.<I>newBuilder(tableName)
                                      .setDataSource(dataSource)
                                      .setLogger(logger)
-                                     .setIdColumn(new IdColumn.StringIdColumn())
+                                     .setIdColumn(idColumn)
                                      .setId(id)
                                      .build();
         return query;
     }
 
     @Override
-    public WriteQuery newInsertQuery(String id, Visibility record) {
-        final WriteQuery query = InsertVisibilityQuery.newBuilder()
+    public WriteQuery newInsertQuery(I id, Visibility record) {
+        final WriteQuery query = InsertVisibilityQuery.<I>newBuilder(tableName)
                                                       .setId(id)
                                                       .setVisibility(record)
                                                       .setLogger(logger)
                                                       .setDataSource(dataSource)
+                                                      .setIdColumn(idColumn)
                                                       .build();
         return query;
     }
 
     @Override
-    public WriteQuery newUpdateQuery(String id, Visibility record) {
-        final WriteQuery query = UpdateVisibilityQuery.newBuilder()
+    public WriteQuery newUpdateQuery(I id, Visibility record) {
+        final WriteQuery query = UpdateVisibilityQuery.<I>newBuilder(tableName)
                                                       .setLogger(logger)
                                                       .setDataSource(dataSource)
                                                       .setId(id)
                                                       .setVisibility(record)
+                                                      .setIdColumn(idColumn)
                                                       .build();
         return query;
     }
 
-    public MarkEntityQuery<String> newMarkArchivedQuery(String id) {
+    public MarkEntityQuery<I> newMarkArchivedQuery(I id) {
         return newMarkQuery(id, archived);
     }
 
-    public MarkEntityQuery<String> newMarkDeletedQuery(String id) {
+    public MarkEntityQuery<I> newMarkDeletedQuery(I id) {
         return newMarkQuery(id, deleted);
     }
 
-    public InsertAndMarkEntityQuery<String> newMarkArchivedNewEntityQuery(String id) {
+    public InsertAndMarkEntityQuery<I> newMarkArchivedNewEntityQuery(I id) {
         return newInsertAndMarkEntityQuery(id, archived);
     }
 
-    public InsertAndMarkEntityQuery<String> newMarkDeletedNewEntityQuery(String id) {
+    public InsertAndMarkEntityQuery<I> newMarkDeletedNewEntityQuery(I id) {
         return newInsertAndMarkEntityQuery(id, deleted);
     }
 
-    private InsertAndMarkEntityQuery<String> newInsertAndMarkEntityQuery(String id,
+    private InsertAndMarkEntityQuery<I> newInsertAndMarkEntityQuery(I id,
                                                                          VisibilityField column) {
-        final InsertAndMarkEntityQuery<String> query =
-                InsertAndMarkEntityQuery.<String>newInsertBuilder()
+        final InsertAndMarkEntityQuery<I> query =
+                InsertAndMarkEntityQuery.<I>newInsertBuilder()
                                         .setDataSource(dataSource)
+                                        .setTableName(tableName)
                                         .setLogger(logger)
-                                        .setTableName(VisibilityTable.TABLE_NAME)
                                         .setColumn(column)
-                                        .setIdColumn(new IdColumn.StringIdColumn())
+                                        .setIdColumn(idColumn)
                                         .setId(id)
                                         .build();
         return query;
     }
 
-    private MarkEntityQuery<String> newMarkQuery(String id, VisibilityField column) {
-        final MarkEntityQuery<String> query =
-                MarkEntityQuery.<String>newBuilder()
+    private MarkEntityQuery<I> newMarkQuery(I id, VisibilityField column) {
+        final MarkEntityQuery<I> query =
+                MarkEntityQuery.<I>newBuilder()
                                .setDataSource(dataSource)
                                .setLogger(logger)
-                               .setTableName(VisibilityTable.TABLE_NAME)
+                               .setTableName(tableName)
                                .setColumn(column)
-                               .setIdColumn(new IdColumn.StringIdColumn())
+                               .setIdColumn(idColumn)
                                .setId(id)
                                .build();
         return query;

@@ -40,7 +40,7 @@ import org.spine3.server.storage.jdbc.entity.query.RecordStorageQueryFactory;
 import org.spine3.server.storage.jdbc.event.JdbcEventStorage;
 import org.spine3.server.storage.jdbc.event.query.EventStorageQueryFactory;
 import org.spine3.server.storage.jdbc.projection.JdbcProjectionStorage;
-import org.spine3.server.storage.jdbc.projection.query.ProjectionStorageQueryFactory;
+import org.spine3.server.storage.jdbc.projection.query.LastHandledEventTimeQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DefaultDataSourceConfigConverter;
 
@@ -137,7 +137,7 @@ public class JdbcStorageFactory<I> implements StorageFactory {
             Class<? extends Entity<I, ?>> projectionClass) {
         final JdbcRecordStorage<I> entityStorage =
                 (JdbcRecordStorage<I>) createRecordStorage(projectionClass);
-        final ProjectionStorageQueryFactory queryFactory =
+        final LastHandledEventTimeQueryFactory queryFactory =
                 getProjectionStorageQueryFactory(dataSource, projectionClass);
 
         final ProjectionStorage<I> storage = JdbcProjectionStorage.<I>newBuilder()
@@ -182,7 +182,7 @@ public class JdbcStorageFactory<I> implements StorageFactory {
     }
 
     /**
-     * Creates a new {@link ProjectionStorageQueryFactory} which produces database queries for
+     * Creates a new {@link LastHandledEventTimeQueryFactory} which produces database queries for
      * corresponding {@link JdbcProjectionStorage}.
      *
      * @param dataSource  {@link DataSource} on which corresponding {@link JdbcProjectionStorage}
@@ -191,10 +191,10 @@ public class JdbcStorageFactory<I> implements StorageFactory {
      * {@link JdbcRecordStorage}
      * @param <T>         a type of IDs of entities from the corresponding {@link JdbcRecordStorage}
      */
-    protected <T> ProjectionStorageQueryFactory getProjectionStorageQueryFactory(
+    protected <T> LastHandledEventTimeQueryFactory getProjectionStorageQueryFactory(
             DataSourceWrapper dataSource,
             Class<? extends Entity<T, ?>> entityClass) {
-        return new ProjectionStorageQueryFactory(dataSource);
+        return new LastHandledEventTimeQueryFactory(dataSource);
     }
 
     /**

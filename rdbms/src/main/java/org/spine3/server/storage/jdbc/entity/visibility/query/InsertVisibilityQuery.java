@@ -20,21 +20,21 @@
 
 package org.spine3.server.storage.jdbc.entity.visibility.query;
 
-import org.spine3.base.Stringifiers;
 import org.spine3.server.entity.Visibility;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.WriteQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
+import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.lang.String.format;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
 import static org.spine3.server.storage.jdbc.Sql.Query.INSERT_INTO;
 import static org.spine3.server.storage.jdbc.Sql.Query.VALUES;
 import static org.spine3.server.storage.jdbc.Sql.nPlaceholders;
-import static org.spine3.server.storage.jdbc.entity.visibility.table.VisibilityTable.TABLE_NAME;
 
 /**
  * The query for creating a new record in the table storing
@@ -42,19 +42,21 @@ import static org.spine3.server.storage.jdbc.entity.visibility.table.VisibilityT
  *
  * @author Dmytro Dashenkov.
  */
-public class InsertVisibilityQuery extends WriteQuery {
+public class InsertVisibilityQuery<I> extends WriteQuery {
 
     private static final int COLUMN_COUNT = TableColumn.values().length;
-    private static final String SQL = INSERT_INTO + TABLE_NAME +
+    private static final String SQL = INSERT_INTO + "%s" +
                                       VALUES + nPlaceholders(COLUMN_COUNT) + SEMICOLON;
 
-    private final String id;
+    private final I id;
     private final Visibility entityStatus;
+    private final IdColumn<I> idColumn;
 
-    protected InsertVisibilityQuery(Builder builder) {
+    protected InsertVisibilityQuery(Builder<I> builder) {
         super(builder);
         this.id = builder.id;
         this.entityStatus = builder.entityStatus;
+        this.idColumn = builder.idColumn;
     }
 
     @Override
@@ -63,7 +65,7 @@ public class InsertVisibilityQuery extends WriteQuery {
         final boolean archived = entityStatus.getArchived();
         final boolean deleted = entityStatus.getDeleted();
         try {
-            statement.setString(TableColumn.ID.getIndex(), id);
+            idColumn.setId(TableColumn.ID.index, id, statement);
             statement.setBoolean(TableColumn.ARCHIVED.getIndex(), archived);
             statement.setBoolean(TableColumn.DELETED.getIndex(), deleted);
         } catch (SQLException e) {
@@ -73,26 +75,25 @@ public class InsertVisibilityQuery extends WriteQuery {
         return statement;
     }
 
-    public static Builder newBuilder() {
-        final Builder builder = new Builder();
-        builder.setQuery(SQL);
+    public static <I> Builder<I> newBuilder(String tableName) {
+        final Builder<I> builder = new Builder<>();
+        builder.setQuery(format(SQL, tableName));
         return builder;
     }
 
-    public static class Builder extends WriteQuery.Builder<Builder, InsertVisibilityQuery> {
+    public static class Builder<I> extends WriteQuery.Builder<Builder<I>, InsertVisibilityQuery> {
 
-        private String id;
+        private I id;
         private Visibility entityStatus;
+        private IdColumn<I> idColumn;
 
-        public Builder setVisibility(Visibility status) {
+        public Builder<I> setVisibility(Visibility status) {
             this.entityStatus = checkNotNull(status);
             return getThis();
         }
 
-        public Builder setId(Object id) {
-            checkNotNull(id);
-            final String stringId = Stringifiers.idToString(id);
-            this.id = stringId;
+        public Builder<I> setId(I id) {
+            this.id = checkNotNull(id);
             return getThis();
         }
 
@@ -100,12 +101,17 @@ public class InsertVisibilityQuery extends WriteQuery {
         public InsertVisibilityQuery build() {
             checkNotNull(id, "ID is not set.");
             checkNotNull(entityStatus, "Entity status is not set.");
-            return new InsertVisibilityQuery(this);
+            return new InsertVisibilityQuery<>(this);
         }
 
         @Override
-        protected Builder getThis() {
+        protected Builder<I> getThis() {
             return this;
+        }
+
+        public Builder<I> setIdColumn(IdColumn<I> idColumn) {
+            this.idColumn = idColumn;
+            return getThis();
         }
     }
 

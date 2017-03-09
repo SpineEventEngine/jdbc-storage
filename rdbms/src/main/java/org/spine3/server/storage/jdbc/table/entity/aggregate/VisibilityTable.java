@@ -30,7 +30,6 @@ import org.spine3.server.storage.jdbc.table.TableColumn;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbTableNameFactory;
 
-import static org.spine3.base.Stringifiers.idToString;
 import static org.spine3.server.storage.jdbc.Sql.Type.BOOLEAN;
 import static org.spine3.server.storage.jdbc.Sql.Type.UNKNOWN;
 
@@ -41,14 +40,14 @@ public class VisibilityTable<I> extends AggregateTable<I, Visibility, Visibility
 
     private static final String TABLE_NAME_POSTFIX = "visibility";
 
-    private final VisibilityQueryFactory queryFactory;
+    private final VisibilityQueryFactory<I> queryFactory;
 
     public VisibilityTable(Class<? extends Aggregate<I, ?, ?>> aggregateClass,
                               DataSourceWrapper dataSource) {
         super(DbTableNameFactory.newTableName(aggregateClass) + TABLE_NAME_POSTFIX,
               aggregateClass,
               dataSource);
-        this.queryFactory = new VisibilityQueryFactory(dataSource, log());
+        this.queryFactory = new VisibilityQueryFactory<>(dataSource, log(), getIdColumn(), getName());
     }
 
     @Override
@@ -64,27 +63,25 @@ public class VisibilityTable<I> extends AggregateTable<I, Visibility, Visibility
     @SuppressWarnings("unchecked") // Storing records under string IDs instead of generic
     @Override
     protected QueryFactory<I, Visibility> getQueryFactory() {
-        return (QueryFactory<I, Visibility>) queryFactory;
+        return queryFactory;
     }
 
     public void markArchived(I id) {
-        final String stringId = idToString(id);
         final MarkEntityQuery query;
         if (!containsRecord(id)) {
-            query = queryFactory.newMarkArchivedNewEntityQuery(stringId);
+            query = queryFactory.newMarkArchivedNewEntityQuery(id);
         } else {
-            query = queryFactory.newMarkArchivedQuery(stringId);
+            query = queryFactory.newMarkArchivedQuery(id);
         }
         query.execute();
     }
 
     public void markDeleted(I id) {
-        final String stringId = idToString(id);
         final MarkEntityQuery query;
         if (!containsRecord(id)) {
-            query = queryFactory.newMarkDeletedNewEntityQuery(stringId);
+            query = queryFactory.newMarkDeletedNewEntityQuery(id);
         } else {
-            query = queryFactory.newMarkDeletedQuery(stringId);
+            query = queryFactory.newMarkDeletedQuery(id);
         }
         query.execute();
     }

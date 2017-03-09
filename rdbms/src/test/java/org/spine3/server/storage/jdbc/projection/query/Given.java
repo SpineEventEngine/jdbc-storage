@@ -24,6 +24,7 @@ import com.google.protobuf.Timestamp;
 import org.slf4j.Logger;
 import org.spine3.server.storage.jdbc.GivenDataSource;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
+import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import java.sql.SQLException;
 
@@ -58,6 +59,7 @@ class Given {
         final SelectTimestampQuery.Builder builder =
                 SelectTimestampQuery.newBuilder(anyString())
                                     .setDataSource(dataSourceMock)
+                                    .setIdColumn(new IdColumn.StringIdColumn())
                                     .setLogger(loggerMock);
         return builder.build();
     }

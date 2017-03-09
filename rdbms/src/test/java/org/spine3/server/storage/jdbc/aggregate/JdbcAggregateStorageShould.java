@@ -58,6 +58,7 @@ public class JdbcAggregateStorageShould extends AggregateStorageShould {
                                                                     .setQueryFactory(queryFactory)
                                                                     .setMultitenant(false)
                                                                     .setDataSource(dataSource)
+                                                                    .setAggregateClass(aggregateClass)
                                                                     .build();
         return storage;
     }

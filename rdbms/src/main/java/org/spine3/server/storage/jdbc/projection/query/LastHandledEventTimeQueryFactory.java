@@ -27,12 +27,14 @@ import org.spine3.server.storage.jdbc.query.SelectByIdQuery;
 import org.spine3.server.storage.jdbc.query.WriteQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * This class creates queries for interaction with {@link ProjectionTable}.
  *
  * @author Andrey Lavrov
  */
-public class ProjectionStorageQueryFactory implements QueryFactory<String, Timestamp> {
+public class LastHandledEventTimeQueryFactory implements QueryFactory<String, Timestamp> {
 
     private final DataSourceWrapper dataSource;
     private Logger logger;
@@ -42,7 +44,7 @@ public class ProjectionStorageQueryFactory implements QueryFactory<String, Times
      *
      * @param dataSource      instance of {@link DataSourceWrapper}
      */
-    public ProjectionStorageQueryFactory(DataSourceWrapper dataSource) {
+    public LastHandledEventTimeQueryFactory(DataSourceWrapper dataSource) {
         this.dataSource = dataSource;
     }
 
@@ -70,5 +72,9 @@ public class ProjectionStorageQueryFactory implements QueryFactory<String, Times
                                                                          .setLogger(logger)
                                                                          .setTimestamp(record);
         return builder.build();
+    }
+
+    public void setLogger(Logger logger) {
+        this.logger = checkNotNull(logger);
     }
 }

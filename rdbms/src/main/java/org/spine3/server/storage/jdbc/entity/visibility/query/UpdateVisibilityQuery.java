@@ -24,13 +24,13 @@ import org.spine3.server.entity.Visibility;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.WriteQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
+import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
-import static org.spine3.base.Stringifiers.idToString;
 import static org.spine3.server.storage.VisibilityField.archived;
 import static org.spine3.server.storage.VisibilityField.deleted;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.COMMA;
@@ -41,27 +41,28 @@ import static org.spine3.server.storage.jdbc.Sql.Query.SET;
 import static org.spine3.server.storage.jdbc.Sql.Query.UPDATE;
 import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
 import static org.spine3.server.storage.jdbc.entity.visibility.table.VisibilityTable.ID_COL;
-import static org.spine3.server.storage.jdbc.entity.visibility.table.VisibilityTable.TABLE_NAME;
 
 /**
  * The query updating an {@linkplain org.spine3.server.entity.Visibility entity visibility}.
  *
  * @author Dmytro Dashenkov.
  */
-public class UpdateVisibilityQuery extends WriteQuery {
+public class UpdateVisibilityQuery<I> extends WriteQuery {
 
-    private static final String SQL = UPDATE + TABLE_NAME + SET +
+    private static final String SQL = UPDATE + "%s" + SET +
                                       archived + EQUAL + PLACEHOLDER + COMMA +
                                       deleted + EQUAL + PLACEHOLDER +
                                       WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
 
-    private final String id;
+    private final I id;
     private final Visibility entityStatus;
+    private final IdColumn<I> idColumn;
 
-    protected UpdateVisibilityQuery(Builder builder) {
+    protected UpdateVisibilityQuery(Builder<I> builder) {
         super(builder);
         this.id = builder.id;
         this.entityStatus = builder.entityStatus;
+        this.idColumn = builder.idColumn;
     }
 
     @Override
@@ -72,7 +73,7 @@ public class UpdateVisibilityQuery extends WriteQuery {
         try {
             statement.setBoolean(1, archived);
             statement.setBoolean(2, deleted);
-            statement.setString(3, id);
+            idColumn.setId(3, id, statement);
         } catch (SQLException e) {
             throw new DatabaseException(e);
         }
@@ -80,25 +81,24 @@ public class UpdateVisibilityQuery extends WriteQuery {
         return statement;
     }
 
-    public static Builder newBuilder() {
-        final Builder builder = new Builder();
-        builder.setQuery(SQL);
+    public static <I> Builder<I> newBuilder(String tableName) {
+        final Builder<I> builder = new Builder<>();
+        builder.setQuery(String.format(SQL, tableName));
         return builder;
     }
 
-    public static class Builder extends WriteQuery.Builder<Builder, UpdateVisibilityQuery> {
+    public static class Builder<I> extends WriteQuery.Builder<Builder<I>, UpdateVisibilityQuery> {
 
-        private String id;
+        private I id;
         private Visibility entityStatus;
+        private IdColumn<I> idColumn;
 
-        public Builder setId(Object id) {
-            checkNotNull(id);
-            final String stringId = idToString(id);
-            this.id = stringId;
+        public Builder<I> setId(I id) {
+            this.id = checkNotNull(id);
             return getThis();
         }
 
-        public Builder setVisibility(Visibility status) {
+        public Builder<I> setVisibility(Visibility status) {
             this.entityStatus = checkNotNull(status);
             return getThis();
         }
@@ -107,12 +107,17 @@ public class UpdateVisibilityQuery extends WriteQuery {
         public UpdateVisibilityQuery build() {
             checkState(id != null, "ID is not set.");
             checkState(entityStatus != null, "Entity status is not set.");
-            return new UpdateVisibilityQuery(this);
+            return new UpdateVisibilityQuery<>(this);
         }
 
         @Override
-        protected Builder getThis() {
+        protected Builder<I> getThis() {
             return this;
+        }
+
+        public Builder<I> setIdColumn(IdColumn<I> idColumn) {
+            this.idColumn = idColumn;
+            return getThis();
         }
     }
 }

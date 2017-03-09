@@ -21,7 +21,6 @@
 package org.spine3.server.storage.jdbc.entity.visibility.table;
 
 import org.spine3.server.entity.Visibility;
-import org.spine3.server.storage.jdbc.util.DbTableNameFactory;
 
 /**
  * A container for the common constants for all the queries to the table storing
@@ -31,7 +30,6 @@ import org.spine3.server.storage.jdbc.util.DbTableNameFactory;
  */
 public class VisibilityTable {
 
-    public static final String TABLE_NAME = DbTableNameFactory.newTableName(Visibility.class);
 
     public static final String ID_COL = "id";
 
