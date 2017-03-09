@@ -69,12 +69,12 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, RecordTable.Col
     }
 
     public boolean markDeleted(I id) {
-        return queryFactory.newMarkArchivedQuery(id)
+        return queryFactory.newMarkDeletedQuery(id)
                            .execute();
     }
 
     public boolean markArchived(I id) {
-        return queryFactory.newMarkDeletedQuery(id)
+        return queryFactory.newMarkArchivedQuery(id)
                            .execute();
     }
 
@@ -109,12 +109,7 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, RecordTable.Col
     }
 
     public Map<I, EntityRecord> readAll(FieldMask fieldMask) {
-        final SelectBulkQuery<I> query = SelectBulkQuery.<I>newBuilder()
-                                                        .setAllQuery(getName())
-                                                        .setLogger(log())
-                                                        .setDataSource(getDataSource())
-                                                        .setFieldMask(fieldMask)
-                                                        .build();
+        final SelectBulkQuery<I> query = queryFactory.newSelectAllQuery(fieldMask);
         try {
             final Map<I, EntityRecord> result = query.execute();
             return result;

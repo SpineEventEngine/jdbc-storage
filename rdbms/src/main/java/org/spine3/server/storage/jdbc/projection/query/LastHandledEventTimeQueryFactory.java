@@ -26,17 +26,20 @@ import org.spine3.server.storage.jdbc.query.QueryFactory;
 import org.spine3.server.storage.jdbc.query.SelectByIdQuery;
 import org.spine3.server.storage.jdbc.query.WriteQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
+import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * This class creates queries for interaction with {@link ProjectionTable}.
+ * This class creates queries for interaction with
+ * {@link org.spine3.server.storage.jdbc.table.LastHandledEventTimeTable}.
  *
  * @author Andrey Lavrov
  */
 public class LastHandledEventTimeQueryFactory implements QueryFactory<String, Timestamp> {
 
     private final DataSourceWrapper dataSource;
+    private final String tableName;
     private Logger logger;
 
     /**
@@ -44,31 +47,37 @@ public class LastHandledEventTimeQueryFactory implements QueryFactory<String, Ti
      *
      * @param dataSource      instance of {@link DataSourceWrapper}
      */
-    public LastHandledEventTimeQueryFactory(DataSourceWrapper dataSource) {
+    public LastHandledEventTimeQueryFactory(DataSourceWrapper dataSource, String tableName) {
         this.dataSource = dataSource;
+        this.tableName = tableName;
     }
 
     @Override
     public SelectByIdQuery<String, Timestamp> newSelectByIdQuery(String id) {
-        final SelectTimestampQuery.Builder builder = SelectTimestampQuery.newBuilder(id)
-                                                                         .setDataSource(dataSource)
-                                                                         .setLogger(logger);
+        final SelectTimestampQuery.Builder builder =
+                SelectTimestampQuery.newBuilder(tableName)
+                                    .setDataSource(dataSource)
+                                    .setId(id)
+                                    .setIdColumn(new IdColumn.StringIdColumn())
+                                    .setLogger(logger);
         return builder.build();
     }
 
     @Override
     public WriteQuery newInsertQuery(String id, Timestamp record) {
-        final InsertTimestampQuery.Builder builder = InsertTimestampQuery.newBuilder(id)
+        final InsertTimestampQuery.Builder builder = InsertTimestampQuery.newBuilder(tableName)
                                                                          .setDataSource(dataSource)
                                                                          .setLogger(logger)
+                                                                         .setId(id)
                                                                          .setTimestamp(record);
         return builder.build();
     }
 
     @Override
     public WriteQuery newUpdateQuery(String id, Timestamp record) {
-        final UpdateTimestampQuery.Builder builder = UpdateTimestampQuery.newBuilder(id)
+        final UpdateTimestampQuery.Builder builder = UpdateTimestampQuery.newBuilder(tableName)
                                                                          .setDataSource(dataSource)
+                                                                         .setId(id)
                                                                          .setLogger(logger)
                                                                          .setTimestamp(record);
         return builder.build();

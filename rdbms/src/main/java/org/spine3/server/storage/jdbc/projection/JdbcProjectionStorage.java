@@ -61,8 +61,7 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
                                     boolean multitenant,
                                     Class<? extends Projection<I, ?>> projectionClass,
                                     DataSourceWrapper dataSource)
-            throws
-            DatabaseException {
+            throws DatabaseException {
         super(multitenant);
         this.recordStorage = recordStorage;
         this.projectionClass = projectionClass;

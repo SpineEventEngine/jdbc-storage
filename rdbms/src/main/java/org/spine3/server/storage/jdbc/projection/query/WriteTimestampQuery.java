@@ -30,18 +30,21 @@ import java.sql.SQLException;
 
 /**
  * A base for the {@linkplain org.spine3.server.storage.jdbc.query.StorageQuery} implementations
- * which write a {@link Timestamp} in the {@link ProjectionTable}.
+ * which write a {@link Timestamp} in the
+ * {@link org.spine3.server.storage.jdbc.table.LastHandledEventTimeTable}.
  *
  * @author Dmytro Dashenkov.
  */
 public abstract class WriteTimestampQuery extends WriteQuery {
 
     private final Timestamp timestamp;
+    private final String id;
 
     protected WriteTimestampQuery(Builder<? extends Builder,
                                           ? extends WriteTimestampQuery> builder) {
         super(builder);
         this.timestamp = builder.timestamp;
+        this.id = builder.getId();
     }
 
     @Override
@@ -52,6 +55,7 @@ public abstract class WriteTimestampQuery extends WriteQuery {
         try {
             statement.setLong(QueryParameter.SECONDS.getIndex(), seconds);
             statement.setInt(QueryParameter.NANOS.getIndex(), nanos);
+            statement.setString(QueryParameter.PROJECTION_TYPE.getIndex(), id);
             return statement;
         } catch (SQLException e) {
             logFailedToPrepareStatement(e);
@@ -63,17 +67,28 @@ public abstract class WriteTimestampQuery extends WriteQuery {
             extends WriteQuery.Builder<B, Q> {
 
         private Timestamp timestamp;
+        private String id;
 
         public B setTimestamp(Timestamp timestamp) {
             this.timestamp = timestamp;
             return getThis();
+        }
+
+        public B setId(String id) {
+            this.id = id;
+            return getThis();
+        }
+
+        public String getId() {
+            return id;
         }
     }
 
     private enum QueryParameter {
 
         SECONDS(1),
-        NANOS(2);
+        NANOS(2),
+        PROJECTION_TYPE(3);
 
         private final int index;
 

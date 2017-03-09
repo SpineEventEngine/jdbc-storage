@@ -40,7 +40,6 @@ import org.spine3.server.storage.jdbc.entity.query.RecordStorageQueryFactory;
 import org.spine3.server.storage.jdbc.event.JdbcEventStorage;
 import org.spine3.server.storage.jdbc.event.query.EventStorageQueryFactory;
 import org.spine3.server.storage.jdbc.projection.JdbcProjectionStorage;
-import org.spine3.server.storage.jdbc.projection.query.LastHandledEventTimeQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DefaultDataSourceConfigConverter;
 
@@ -137,12 +136,9 @@ public class JdbcStorageFactory<I> implements StorageFactory {
             Class<? extends Entity<I, ?>> projectionClass) {
         final JdbcRecordStorage<I> entityStorage =
                 (JdbcRecordStorage<I>) createRecordStorage(projectionClass);
-        final LastHandledEventTimeQueryFactory queryFactory =
-                getProjectionStorageQueryFactory(dataSource, projectionClass);
 
         final ProjectionStorage<I> storage = JdbcProjectionStorage.<I>newBuilder()
                                                                   .setMultitenant(multitenant)
-                                                                  .setQueryFactory(queryFactory)
                                                                   .setDataSource(dataSource)
                                                                   .setRecordStorage(entityStorage)
                                                                   .build();
@@ -179,22 +175,6 @@ public class JdbcStorageFactory<I> implements StorageFactory {
             DataSourceWrapper dataSource,
             Class<? extends Entity<T, ?>> entityClass) {
         return new RecordStorageQueryFactory<>(dataSource, entityClass);
-    }
-
-    /**
-     * Creates a new {@link LastHandledEventTimeQueryFactory} which produces database queries for
-     * corresponding {@link JdbcProjectionStorage}.
-     *
-     * @param dataSource  {@link DataSource} on which corresponding {@link JdbcProjectionStorage}
-     *                                      is based
-     * @param entityClass class of entities which are stored in the corresponding
-     * {@link JdbcRecordStorage}
-     * @param <T>         a type of IDs of entities from the corresponding {@link JdbcRecordStorage}
-     */
-    protected <T> LastHandledEventTimeQueryFactory getProjectionStorageQueryFactory(
-            DataSourceWrapper dataSource,
-            Class<? extends Entity<T, ?>> entityClass) {
-        return new LastHandledEventTimeQueryFactory(dataSource);
     }
 
     /**

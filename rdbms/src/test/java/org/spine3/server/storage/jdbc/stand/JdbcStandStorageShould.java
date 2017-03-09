@@ -24,7 +24,6 @@ import com.google.common.base.Optional;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.FieldMask;
 import com.google.protobuf.Message;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.spine3.base.Version;
 import org.spine3.protobuf.AnyPacker;
@@ -39,13 +38,14 @@ import org.spine3.server.stand.StandStorageShould;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.GivenDataSource;
 import org.spine3.server.storage.jdbc.JdbcStandStorage;
-import org.spine3.server.storage.jdbc.entity.query.CreateEntityTableQuery;
 import org.spine3.server.storage.jdbc.entity.query.RecordStorageQueryFactory;
+import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.test.commandservice.customer.Customer;
 import org.spine3.test.storage.Project;
 import org.spine3.test.storage.ProjectId;
 
+import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -57,7 +57,8 @@ import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.doNothing;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -86,18 +87,17 @@ public class JdbcStandStorageShould extends StandStorageShould {
      * ----------------
      */
 
-    @Ignore
     @SuppressWarnings("unchecked") // For mocks
     @Test
     public void initialize_properly_with_all_builder_fields() {
         final DataSourceWrapper dataSourceMock = mock(DataSourceWrapper.class);
+        final ConnectionWrapper connectionMock = mock(ConnectionWrapper.class);
         final RecordStorageQueryFactory<String> queryFactoryMock =
                 (RecordStorageQueryFactory<String>) mock(RecordStorageQueryFactory.class);
-        final CreateEntityTableQuery<String> queryMock = (CreateEntityTableQuery<String>)
-                mock(CreateEntityTableQuery.class);
-        when(queryFactoryMock.newCreateEntityTableQuery()).thenReturn(queryMock);
-        doNothing().when(queryMock)
-                   .execute();
+        final PreparedStatement statementMock = mock(PreparedStatement.class);
+
+        when(connectionMock.prepareStatement(anyString())).thenReturn(statementMock);
+        when(dataSourceMock.getConnection(anyBoolean())).thenReturn(connectionMock);
 
         final StandStorage standStorage = JdbcStandStorage.<String>newBuilder()
                 .setQueryFactory(queryFactoryMock)
@@ -107,25 +107,21 @@ public class JdbcStandStorageShould extends StandStorageShould {
                 .build();
 
         assertNotNull(standStorage);
-
-        // Check table is created
-        verify(queryFactoryMock).newCreateEntityTableQuery();
-        verify(queryMock).execute();
+        // Established connection with the DB
+        verify(dataSourceMock).getConnection(anyBoolean());
     }
 
-    @Ignore
     @SuppressWarnings("unchecked") // For mocks
     @Test
     public void initialize_properly_without_multitenancy() {
         final DataSourceWrapper dataSourceMock = mock(DataSourceWrapper.class);
+        final ConnectionWrapper connectionMock = mock(ConnectionWrapper.class);
         final RecordStorageQueryFactory<String> queryFactoryMock =
                 (RecordStorageQueryFactory<String>) mock(RecordStorageQueryFactory.class);
+        final PreparedStatement statementMock = mock(PreparedStatement.class);
 
-        final CreateEntityTableQuery<String> queryMock =
-                (CreateEntityTableQuery<String>) mock(CreateEntityTableQuery.class);
-        when(queryFactoryMock.newCreateEntityTableQuery()).thenReturn(queryMock);
-        doNothing().when(queryMock)
-                   .execute();
+        when(connectionMock.prepareStatement(anyString())).thenReturn(statementMock);
+        when(dataSourceMock.getConnection(anyBoolean())).thenReturn(connectionMock);
 
         final StandStorage standStorage = JdbcStandStorage.<String>newBuilder()
                 .setQueryFactory(queryFactoryMock)
@@ -146,31 +142,10 @@ public class JdbcStandStorageShould extends StandStorageShould {
     @SuppressWarnings("unchecked") // For mocks
     @Test(expected = IllegalStateException.class)
     public void fail_to_initialize_without_data_source() {
-        final RecordStorageQueryFactory<String> queryFactoryMock =
-                (RecordStorageQueryFactory<String>) mock(RecordStorageQueryFactory.class);
-
-        final CreateEntityTableQuery<String> queryMock = (CreateEntityTableQuery<String>)
-                mock(CreateEntityTableQuery.class);
-        when(queryFactoryMock.newCreateEntityTableQuery()).thenReturn(queryMock);
-        doNothing().when(queryMock)
-                   .execute();
-
         JdbcStandStorage.newBuilder()
                 .setMultitenant(false)
                 .setEntityClass(StandStorageRecord.class)
                 .build();
-    }
-
-    @Ignore
-    @Test(expected = IllegalStateException.class)
-    public void fail_to_initialize_without_query_factory() {
-        final DataSourceWrapper dataSourceMock = mock(DataSourceWrapper.class);
-
-        JdbcStandStorage.newBuilder()
-                        .setDataSource(dataSourceMock)
-                        .setMultitenant(false)
-                        .setEntityClass(StandStorageRecord.class)
-                        .build();
     }
 
     /*

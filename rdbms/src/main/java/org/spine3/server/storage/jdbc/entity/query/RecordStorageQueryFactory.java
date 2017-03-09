@@ -98,19 +98,6 @@ public class RecordStorageQueryFactory<I> implements QueryFactory<I,EntityRecord
         return logger;
     }
 
-    /**
-     * Returns a query that creates a new {@link EntityTable} if it does not exist.
-     */
-    public CreateEntityTableQuery newCreateEntityTableQuery() {
-        final CreateEntityTableQuery.Builder<I> builder =
-                CreateEntityTableQuery.<I>newBuilder()
-                                      .setDataSource(dataSource)
-                                      .setLogger(getLogger())
-                                      .setIdColumn(idColumn)
-                                      .setTableName(tableName);
-        return builder.build();
-    }
-
     public DeleteRecordQuery<I> newDeleteRowQuery(I id) {
         final DeleteRecordQuery.Builder<I> builder = DeleteRecordQuery.<I>newBuilder()
                                                                 .setDataSource(dataSource)

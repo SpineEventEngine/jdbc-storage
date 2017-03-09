@@ -44,7 +44,7 @@ public class LastHandledEventTimeTable extends AbstractTable<String,
 
     public LastHandledEventTimeTable(DataSourceWrapper dataSource) {
         super(TABLE_NAME, new IdColumn.StringIdColumn(), dataSource);
-        this.queryFactory = new LastHandledEventTimeQueryFactory(dataSource);
+        this.queryFactory = new LastHandledEventTimeQueryFactory(dataSource, TABLE_NAME);
         queryFactory.setLogger(log());
     }
 
@@ -63,7 +63,7 @@ public class LastHandledEventTimeTable extends AbstractTable<String,
         return queryFactory;
     }
 
-    enum Column implements TableColumn {
+    public enum Column implements TableColumn {
 
         projection_type(VARCHAR_999),
         seconds(BIGINT),
