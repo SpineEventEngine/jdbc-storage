@@ -34,7 +34,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
-import static org.spine3.server.storage.jdbc.table.entity.RecordTable.Column.*;
+import static org.spine3.server.storage.jdbc.table.entity.RecordTable.Column.entity;
 
 /**
  * Utility class for parsing the results of a DB query ({@link ResultSet}) into the required in-memory representation.

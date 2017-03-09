@@ -25,6 +25,10 @@ package org.spine3.server.storage.jdbc.table;
  */
 public class TableColumns {
 
+    private TableColumns() {
+        super();
+    }
+
     public static int getIndex(TableColumn column) {
         // SQL column indexes always start with 1, not with 0
         return column.ordinal() + 1;
