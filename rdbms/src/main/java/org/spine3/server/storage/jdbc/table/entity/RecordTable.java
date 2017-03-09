@@ -97,7 +97,6 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, RecordTable.Col
             final I id = unclassifiedRecord.getKey();
             final EntityRecord record = unclassifiedRecord.getValue();
             if (containsRecord(id)) {
-                // TODO:2017-03-01:dmytro.dashenkov: Improve testing for this branch.
                 queryFactory.newUpdateQuery(id, record)
                             .execute();
             } else {
