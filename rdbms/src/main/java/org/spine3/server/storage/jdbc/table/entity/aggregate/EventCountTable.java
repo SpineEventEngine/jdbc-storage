@@ -46,7 +46,7 @@ public class EventCountTable<I> extends AggregateTable<I, Int32Value, EventCount
         super(newTableName(entityClass) + (TABLE_NAME_POSTFIX),
               entityClass,
               dataSource);
-        this.queryFactory = new EventCountQueryFactory<I>(getDataSource(),
+        this.queryFactory = new EventCountQueryFactory<>(getDataSource(),
                                                           getName(),
                                                           getIdColumn(),
                                                           log());

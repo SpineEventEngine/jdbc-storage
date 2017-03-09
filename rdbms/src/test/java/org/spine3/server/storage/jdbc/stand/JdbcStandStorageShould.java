@@ -165,6 +165,7 @@ public class JdbcStandStorageShould extends StandStorageShould {
                 AggregateStateId.of(aggregate.getId(),
                                     TypeUrl.of(Project.class)));
         assertTrue(readRecord.isPresent());
+        @SuppressWarnings("OptionalGetWithoutIsPresent") // We do check if present
         final EntityRecord actualRecord = readRecord.get();
         assertEquals(actualRecord, record);
     }
@@ -282,6 +283,7 @@ public class JdbcStandStorageShould extends StandStorageShould {
 
         final Optional<EntityRecord> recordOptional = storage.read(id, idOnly);
         assertTrue(recordOptional.isPresent());
+        @SuppressWarnings("OptionalGetWithoutIsPresent") // We do check is present
         final EntityRecord record = recordOptional.get();
         final Project withIdOnly = AnyPacker.unpack(record.getState());
         final Project withIdAndName = AnyPacker.unpack(
