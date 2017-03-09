@@ -39,7 +39,6 @@ import static org.mockito.Mockito.when;
 
 class Given {
 
-    @SuppressWarnings("StaticNonFinalField")
     private static Logger loggerMock = null;
     private static final IdColumn<String> idColumnMock = mock(IdColumn.StringIdColumn.class);
 
@@ -198,7 +197,6 @@ class Given {
     private Given() {
     }
 
-    @SuppressWarnings("StaticVariableUsedBeforeInitialization")
     static Logger getLoggerMock() {
         return loggerMock;
     }

@@ -31,7 +31,6 @@ import static org.spine3.test.Verify.assertContains;
  */
 public class MultipleExceptionsOnCloseShould {
 
-    @SuppressWarnings("ThrowableNotThrown")
     @Test
     public void describe_all_given_exceptions_in_toString() {
         final String message1 = "message1";

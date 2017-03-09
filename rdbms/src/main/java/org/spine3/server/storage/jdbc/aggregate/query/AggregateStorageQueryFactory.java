@@ -53,7 +53,6 @@ public class AggregateStorageQueryFactory<I> implements QueryFactory<I, Aggregat
      * @param dataSource     instance of {@link DataSourceWrapper}
      * @param aggregateClass aggregate class of corresponding {@link AggregateStorage} instance
      */
-    @SuppressWarnings("unchecked")
     // The aux visibility handling query factory has a hardcoded type param
     public AggregateStorageQueryFactory(DataSourceWrapper dataSource,
                                         Class<? extends Aggregate<I, ?, ?>> aggregateClass) {

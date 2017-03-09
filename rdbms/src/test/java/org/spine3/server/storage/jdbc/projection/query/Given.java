@@ -36,7 +36,6 @@ import static org.mockito.Mockito.mock;
  */
 class Given {
 
-    @SuppressWarnings("StaticNonFinalField")
     private static Logger loggerMock = null;
 
     private Given() {
@@ -75,7 +74,6 @@ class Given {
         return builder.build();
     }
 
-    @SuppressWarnings("StaticVariableUsedBeforeInitialization")
     static Logger getLoggerMock() {
         return loggerMock;
     }

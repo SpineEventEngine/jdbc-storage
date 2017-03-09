@@ -60,7 +60,7 @@ public class VisibilityTable<I> extends AggregateTable<I, Visibility, Visibility
         return Column.class;
     }
 
-    @SuppressWarnings("unchecked") // Storing records under string IDs instead of generic
+    // Storing records under string IDs instead of generic
     @Override
     protected QueryFactory<I, Visibility> getQueryFactory() {
         return queryFactory;

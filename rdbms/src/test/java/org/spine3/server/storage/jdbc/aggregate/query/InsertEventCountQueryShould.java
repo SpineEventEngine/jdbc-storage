@@ -36,7 +36,6 @@ import static org.mockito.Mockito.verify;
 public class InsertEventCountQueryShould {
 
     @Test
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     public void handle_sql_exception() throws SQLException {
         final InsertEventCountQuery query = Given.getInsertEventCountQueryMock();
         try {

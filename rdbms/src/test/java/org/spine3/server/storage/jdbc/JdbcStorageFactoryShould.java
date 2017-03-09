@@ -42,7 +42,7 @@ import static org.mockito.Mockito.mock;
 /**
  * @author Alexander Litus
  */
-@SuppressWarnings({"InstanceMethodNamingConvention", "MagicNumber", "DuplicateStringLiteralInspection"})
+@SuppressWarnings({"InstanceMethodNamingConvention", "DuplicateStringLiteralInspection"})
 public class JdbcStorageFactoryShould {
 
     private JdbcStorageFactory<String> factory;

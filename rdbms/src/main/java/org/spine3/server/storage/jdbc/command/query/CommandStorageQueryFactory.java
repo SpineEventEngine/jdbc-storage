@@ -36,7 +36,6 @@ import org.spine3.server.storage.jdbc.util.IdColumn;
  *
  * @author Andrey Lavrov
  */
-@SuppressWarnings("TypeMayBeWeakened")
 public class CommandStorageQueryFactory implements QueryFactory<String, CommandRecord> {
 
     private final IdColumn<String> idColumn;

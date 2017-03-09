@@ -31,7 +31,6 @@ import static org.spine3.test.Tests.hasPrivateParameterlessCtor;
 public class TableShould {
 
     @Test
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     public void have_private_constructors() {
         assertTrue(hasPrivateParameterlessCtor(Table.class));
         assertTrue(hasPrivateParameterlessCtor(Table.AggregateRecord.class));

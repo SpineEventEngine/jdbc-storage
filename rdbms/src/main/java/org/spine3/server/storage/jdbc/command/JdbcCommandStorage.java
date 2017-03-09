@@ -45,7 +45,6 @@ import static org.spine3.validate.Validate.checkNotDefault;
  * @author Alexander Litus
  * @see JdbcStorageFactory
  */
-@SuppressWarnings("UtilityClass")
 public class JdbcCommandStorage extends CommandStorage {
 
     private final DataSourceWrapper dataSource;

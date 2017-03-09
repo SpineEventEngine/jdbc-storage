@@ -285,7 +285,7 @@ public class JdbcEventStorage extends EventStorage {
         }
 
         // Defined as nullable, parameter `event` is actually non null.
-        @SuppressWarnings({"MethodWithMoreThanThreeNegations", "MethodWithMultipleLoops"})
+        @SuppressWarnings({"MethodWithMultipleLoops"})
         @Override
         public boolean apply(@Nullable Event event) {
             if (event == null) {
