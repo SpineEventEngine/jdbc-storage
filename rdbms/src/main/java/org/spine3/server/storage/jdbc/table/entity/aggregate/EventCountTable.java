@@ -29,7 +29,7 @@ import org.spine3.server.storage.jdbc.table.TableColumn;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
 import static org.spine3.server.storage.jdbc.Sql.Type.BIGINT;
-import static org.spine3.server.storage.jdbc.Sql.Type.UNKNOWN;
+import static org.spine3.server.storage.jdbc.Sql.Type.ID;
 import static org.spine3.server.storage.jdbc.util.DbTableNameFactory.newTableName;
 
 /**
@@ -73,7 +73,7 @@ public class EventCountTable<I> extends AggregateTable<I, Int32Value, EventCount
 
     public enum Column implements TableColumn {
 
-        id(UNKNOWN),
+        id(ID),
         event_count(BIGINT);
 
         private final Sql.Type type;

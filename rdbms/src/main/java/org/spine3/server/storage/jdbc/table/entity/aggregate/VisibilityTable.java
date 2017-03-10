@@ -31,7 +31,7 @@ import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbTableNameFactory;
 
 import static org.spine3.server.storage.jdbc.Sql.Type.BOOLEAN;
-import static org.spine3.server.storage.jdbc.Sql.Type.UNKNOWN;
+import static org.spine3.server.storage.jdbc.Sql.Type.ID;
 
 /**
  * A table for storing the {@link Visibility} of an {@link Aggregate}.
@@ -90,7 +90,7 @@ public class VisibilityTable<I> extends AggregateTable<I, Visibility, Visibility
 
     public enum Column implements TableColumn {
 
-        id(UNKNOWN),
+        id(ID),
         archived(BOOLEAN),
         deleted(BOOLEAN);
 

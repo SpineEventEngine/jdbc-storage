@@ -32,7 +32,7 @@ import org.spine3.server.storage.jdbc.util.DbIterator;
 import static org.spine3.server.storage.jdbc.Sql.Type.BIGINT;
 import static org.spine3.server.storage.jdbc.Sql.Type.BLOB;
 import static org.spine3.server.storage.jdbc.Sql.Type.INT;
-import static org.spine3.server.storage.jdbc.Sql.Type.UNKNOWN;
+import static org.spine3.server.storage.jdbc.Sql.Type.ID;
 
 /**
  * A table for storing the {@linkplain AggregateEventRecord aggregate event records}.
@@ -93,7 +93,7 @@ public class AggregateEventRecordTable<I>
 
     public enum Column implements TableColumn {
 
-        id(UNKNOWN),
+        id(ID),
         aggregate(BLOB),
         timestamp(BIGINT),
         timestamp_nanos(INT);

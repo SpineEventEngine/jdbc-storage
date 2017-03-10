@@ -283,7 +283,7 @@ public abstract class AbstractTable<I, R extends Message, C extends Enum<C> & Ta
 
     /**
      * For the ID column checks the {@link Sql.Type} and returns the type of the ID column if
-     * the ID type is {@linkplain Sql.Type#UNKNOWN}.
+     * the ID type is {@linkplain Sql.Type#ID}.
      *
      * <p>If the column does not represent an ID of the table, this method throws
      * an {@link IllegalStateException}.
@@ -293,11 +293,11 @@ public abstract class AbstractTable<I, R extends Message, C extends Enum<C> & Ta
      */
     private Sql.Type ensureType(C column) throws IllegalStateException {
         Sql.Type type = column.type();
-        if (type == Sql.Type.UNKNOWN) {
+        if (type == Sql.Type.ID) {
             if (column == getIdColumnDeclaration()) {
                 type = getIdType();
             } else {
-                throw new IllegalStateException("UNKNOWN type of a non-ID column " + column.name());
+                throw new IllegalStateException("ID type of a non-ID column " + column.name());
             }
         }
         return type;

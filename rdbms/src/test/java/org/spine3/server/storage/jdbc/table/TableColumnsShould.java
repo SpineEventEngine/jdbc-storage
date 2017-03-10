@@ -51,7 +51,7 @@ public class TableColumnsShould {
 
         @Override
         public Sql.Type type() {
-            return Sql.Type.UNKNOWN;
+            return Sql.Type.ID;
         }
     }
 }

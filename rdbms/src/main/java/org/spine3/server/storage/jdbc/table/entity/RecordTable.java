@@ -37,7 +37,7 @@ import java.util.Map;
 
 import static org.spine3.server.storage.jdbc.Sql.Type.BLOB;
 import static org.spine3.server.storage.jdbc.Sql.Type.BOOLEAN;
-import static org.spine3.server.storage.jdbc.Sql.Type.UNKNOWN;
+import static org.spine3.server.storage.jdbc.Sql.Type.ID;
 
 /**
  * A table for storing the {@link EntityRecord entity records}.
@@ -122,7 +122,7 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, RecordTable.Col
 
     public enum Column implements TableColumn, Cloneable {
 
-        id(UNKNOWN),
+        id(ID),
         entity(BLOB),
         archived(BOOLEAN),
         deleted(BOOLEAN);

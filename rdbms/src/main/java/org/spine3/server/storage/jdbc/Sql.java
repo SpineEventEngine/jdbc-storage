@@ -75,7 +75,7 @@ public class Sql {
         /**
          * The type that cannot be determined in compile time.
          */
-        UNKNOWN("unknown type"),
+        ID("generic id type"),
         BLOB("BLOB"),
         INT("INT"),
         BIGINT("BIGINT"),
