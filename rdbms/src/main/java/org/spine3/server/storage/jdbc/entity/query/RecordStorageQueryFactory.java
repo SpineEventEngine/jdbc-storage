@@ -27,19 +27,15 @@ import org.spine3.server.entity.EntityRecord;
 import org.spine3.server.storage.RecordStorage;
 import org.spine3.server.storage.VisibilityField;
 import org.spine3.server.storage.jdbc.entity.visibility.query.MarkEntityQuery;
-import org.spine3.server.storage.jdbc.query.DeleteRecordQuery;
 import org.spine3.server.storage.jdbc.query.QueryFactory;
 import org.spine3.server.storage.jdbc.query.SelectByIdQuery;
 import org.spine3.server.storage.jdbc.query.WriteQuery;
 import org.spine3.server.storage.jdbc.table.entity.RecordTable;
-import org.spine3.server.storage.jdbc.table.entity.RecordTable.Column;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbTableNameFactory;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import java.util.Map;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * This class creates queries for interaction with the {@link RecordTable}.
@@ -52,7 +48,7 @@ public class RecordStorageQueryFactory<I> implements QueryFactory<I,EntityRecord
     private final IdColumn<I> idColumn;
     private final DataSourceWrapper dataSource;
     private final String tableName;
-    private Logger logger;
+    private final Logger logger;
 
     /**
      * Creates a new instance.
@@ -61,11 +57,13 @@ public class RecordStorageQueryFactory<I> implements QueryFactory<I,EntityRecord
      * @param entityClass entity class of corresponding {@link RecordStorage} instance
      */
     public RecordStorageQueryFactory(DataSourceWrapper dataSource,
-                                     Class<? extends Entity<I, ?>> entityClass) {
+                                     Class<? extends Entity<I, ?>> entityClass,
+                                     Logger logger) {
         super();
         this.idColumn = IdColumn.newInstance(entityClass);
         this.dataSource = dataSource;
         this.tableName = DbTableNameFactory.newTableName(entityClass);
+        this.logger = logger;
     }
 
     public MarkEntityQuery<I> newMarkArchivedQuery(I id) {
@@ -88,36 +86,8 @@ public class RecordStorageQueryFactory<I> implements QueryFactory<I,EntityRecord
         return query;
     }
 
-    /**
-     * Sets the logger for logging exceptions during queries execution.
-     */
-    public void setLogger(Logger logger) {
-        this.logger = checkNotNull(logger);
-    }
-
     public Logger getLogger() {
         return logger;
-    }
-
-    public DeleteRecordQuery<I> newDeleteRowQuery(I id) {
-        final DeleteRecordQuery.Builder<I> builder = DeleteRecordQuery.<I>newBuilder()
-                                                                .setDataSource(dataSource)
-                                                                .setLogger(getLogger())
-                                                                .setTableName(tableName)
-                                                                .setIdColumn(idColumn)
-                                                                .setIdColumnName(Column.id.name())
-                                                                .setIdValue(id);
-        return builder.build();
-    }
-
-    /**
-     * Returns a query that deletes all from {@link RecordTable}.
-     */
-    public DeleteAllQuery newDeleteAllQuery() {
-        final DeleteAllQuery.Builder builder = DeleteAllQuery.newBuilder(tableName)
-                                                             .setDataSource(dataSource)
-                                                             .setLogger(getLogger());
-        return builder.build();
     }
 
     public SelectBulkQuery<I> newSelectAllQuery(FieldMask fieldMask) {

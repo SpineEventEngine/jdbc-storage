@@ -22,8 +22,6 @@ package org.spine3.server.storage.jdbc.projection;
 
 import com.google.protobuf.FieldMask;
 import com.google.protobuf.Timestamp;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.spine3.server.entity.EntityRecord;
 import org.spine3.server.projection.Projection;
 import org.spine3.server.projection.ProjectionStorage;
@@ -193,15 +191,5 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
         public Class<? extends Projection<I,?>> getProjectionClass() {
             return projectionClass;
         }
-    }
-
-    private static Logger log() {
-        return LogSingleton.INSTANCE.value;
-    }
-
-    private enum LogSingleton {
-        INSTANCE;
-        @SuppressWarnings("NonSerializableFieldInSerializableClass")
-        private final Logger value = LoggerFactory.getLogger(JdbcProjectionStorage.class);
     }
 }

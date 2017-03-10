@@ -53,7 +53,7 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, RecordTable.Col
     public RecordTable(Class<Entity<I, ?>> entityClass,
                        DataSourceWrapper dataSource) {
         super(entityClass, dataSource);
-        queryFactory = new RecordStorageQueryFactory<>(dataSource, entityClass);
+        queryFactory = new RecordStorageQueryFactory<>(dataSource, entityClass, log());
     }
 
     @Override
