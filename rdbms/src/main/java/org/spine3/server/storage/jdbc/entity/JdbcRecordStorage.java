@@ -38,6 +38,7 @@ import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.lang.String.format;
 
 /**
  * The implementation of the entity storage based on the RDBMS.
@@ -73,7 +74,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
         if (!recordExists) {
             // The NPE is required by the contract of the method
             final String errorMessage =
-                    String.format("Trying to mark not existing record with id %s archived.", id);
+                    format("Trying to mark not existing record with id %s archived.", id);
             throw new NullPointerException(errorMessage);
         }
     }
@@ -86,7 +87,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
         if (!recordExists) {
             // The NPE is required by the contract of the method
             final String errorMessage =
-                    String.format("Trying to mark not existing record with id %s deleted.", id);
+                    format("Trying to mark not existing record with id %s deleted.", id);
             throw new NullPointerException(errorMessage);
         }
     }

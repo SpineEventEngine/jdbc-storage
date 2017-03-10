@@ -147,9 +147,6 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
 
     public static class Builder<I> extends StorageBuilder<Builder<I>,
                                                           JdbcProjectionStorage<I>> {
-        private static final String DATA_SOURCE_WARN =
-                "Data source is never used directly by org.spine3.server.storage.jdbc.projection.JdbcProjectionStorage";
-
         private JdbcRecordStorage<I> recordStorage;
         private Class<? extends Projection<I, ?>> projectionClass;
 
@@ -160,12 +157,6 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
         @Override
         protected Builder<I> getThis() {
             return this;
-        }
-
-        @Override
-        public Builder<I> setDataSource(DataSourceWrapper dataSource) {
-            log().warn(DATA_SOURCE_WARN);
-            return super.setDataSource(dataSource);
         }
 
         public JdbcRecordStorage<I> getRecordStorage() {
@@ -183,9 +174,9 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
          * <p>The {@link JdbcProjectionStorage.Builder} checks the {@code recordStorage} and
          * {@code queryFactory} fields to be set.
          */
-        @SuppressWarnings("MethodDoesntCallSuperMethod")
         @Override
         protected void checkPreconditions() throws IllegalStateException {
+            super.checkPreconditions();
             checkState(getRecordStorage() != null, "Record Storage must not be null.");
         }
 

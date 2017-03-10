@@ -35,7 +35,7 @@ import org.spine3.server.storage.jdbc.util.IdColumn;
  *
  * @author Andrey Lavrov
  */
-public class EventStorageQueryFactory implements QueryFactory<String, Event> {
+public class EventTableQueryFactory implements QueryFactory<String, Event> {
 
     private final DataSourceWrapper dataSource;
     private Logger logger;
@@ -45,7 +45,7 @@ public class EventStorageQueryFactory implements QueryFactory<String, Event> {
      *
      * @param dataSource instance of {@link DataSourceWrapper}
      */
-    public EventStorageQueryFactory(DataSourceWrapper dataSource) {
+    public EventTableQueryFactory(DataSourceWrapper dataSource) {
         this.dataSource = dataSource;
     }
 

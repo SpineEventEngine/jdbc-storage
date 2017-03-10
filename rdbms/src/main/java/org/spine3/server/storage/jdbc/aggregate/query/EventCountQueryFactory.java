@@ -29,6 +29,9 @@ import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
 /**
+ * An implementation of {@link QueryFactory} generating queries for
+ * the {@link org.spine3.server.storage.jdbc.table.entity.aggregate.EventCountTable}.
+ *
  * @author Dmytro Dashenkov.
  */
 public class EventCountQueryFactory<I> implements QueryFactory<I, Int32Value> {

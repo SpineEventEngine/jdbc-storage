@@ -25,7 +25,7 @@ import org.spine3.base.Error;
 import org.spine3.base.Failure;
 import org.spine3.server.command.CommandRecord;
 import org.spine3.server.storage.jdbc.Sql.Type;
-import org.spine3.server.storage.jdbc.command.query.CommandStorageQueryFactory;
+import org.spine3.server.storage.jdbc.command.query.CommandTableQueryFactory;
 import org.spine3.server.storage.jdbc.command.query.SelectCommandByStatusQuery;
 import org.spine3.server.storage.jdbc.command.query.SetErrorQuery;
 import org.spine3.server.storage.jdbc.command.query.SetFailureQuery;
@@ -49,11 +49,11 @@ public class CommandTable extends AbstractTable<String, CommandRecord, CommandTa
 
     public static final String TABLE_NAME = "commands";
 
-    private final CommandStorageQueryFactory queryFactory;
+    private final CommandTableQueryFactory queryFactory;
 
     public CommandTable(DataSourceWrapper dataSource) {
         super(TABLE_NAME, new IdColumn.StringIdColumn(), dataSource);
-        this.queryFactory = new CommandStorageQueryFactory(dataSource);
+        this.queryFactory = new CommandTableQueryFactory(dataSource);
         queryFactory.setLogger(log());
     }
 

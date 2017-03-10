@@ -28,10 +28,10 @@ import org.slf4j.LoggerFactory;
 import org.spine3.server.storage.jdbc.Sql;
 import org.spine3.server.storage.jdbc.entity.query.DeleteAllQuery;
 import org.spine3.server.storage.jdbc.query.ContainsQuery;
-import org.spine3.server.storage.jdbc.query.CreateTableQuery;
 import org.spine3.server.storage.jdbc.query.DeleteRecordQuery;
 import org.spine3.server.storage.jdbc.query.QueryFactory;
 import org.spine3.server.storage.jdbc.query.SelectByIdQuery;
+import org.spine3.server.storage.jdbc.query.SimpleQuery;
 import org.spine3.server.storage.jdbc.query.WriteQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
@@ -129,11 +129,11 @@ public abstract class AbstractTable<I, R extends Message, C extends Enum<C> & Ta
      */
     public void createIfNotExists() {
         final String sql = composeCreateTableSql();
-        final CreateTableQuery query = CreateTableQuery.newBuilder()
-                                                       .setDataSource(dataSource)
-                                                       .setLogger(log())
-                                                       .setQuery(sql)
-                                                       .build();
+        final SimpleQuery query = SimpleQuery.newBuilder()
+                                             .setDataSource(dataSource)
+                                             .setLogger(log())
+                                             .setQuery(sql)
+                                             .build();
         query.execute();
     }
 
@@ -145,13 +145,13 @@ public abstract class AbstractTable<I, R extends Message, C extends Enum<C> & Ta
      */
     public boolean containsRecord(I id) {
         final ContainsQuery<I> query = ContainsQuery.<I>newBuilder()
-                .setIdColumn(getIdColumn())
-                .setId(id)
-                .setTableName(getName())
-                .setKeyColumn(getIdColumnDeclaration())
-                .setDataSource(dataSource)
-                .setLogger(log())
-                .build();
+                                                    .setIdColumn(getIdColumn())
+                                                    .setId(id)
+                                                    .setTableName(getName())
+                                                    .setKeyColumn(getIdColumnDeclaration())
+                                                    .setDataSource(dataSource)
+                                                    .setLogger(log())
+                                                    .build();
         final boolean result = query.execute();
         return result;
     }
@@ -311,15 +311,16 @@ public abstract class AbstractTable<I, R extends Message, C extends Enum<C> & Ta
      * not found
      */
     public boolean delete(I id) {
-        final DeleteRecordQuery<I> query = DeleteRecordQuery.<I>newBuilder()
-                                                            .setTableName(getName())
-                                                            .setIdColumn(getIdColumn())
-                                                            .setIdColumnName(
-                                                                    getIdColumnDeclaration().name())
-                                                            .setIdValue(id)
-                                                            .setLogger(log())
-                                                            .setDataSource(dataSource)
-                                                            .build();
+        final DeleteRecordQuery<I> query =
+                DeleteRecordQuery.<I>newBuilder()
+                                 .setTableName(getName())
+                                 .setIdColumn(getIdColumn())
+                                 .setIdColumnName(
+                                         getIdColumnDeclaration().name())
+                                 .setIdValue(id)
+                                 .setLogger(log())
+                                 .setDataSource(dataSource)
+                                 .build();
         return query.execute();
     }
 

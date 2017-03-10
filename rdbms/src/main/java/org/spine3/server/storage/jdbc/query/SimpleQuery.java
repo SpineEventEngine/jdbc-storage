@@ -27,14 +27,19 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 /**
+ * A query for executing a generic SQL.
+ *
  * @author Dmytro Dashenkov.
  */
-public class CreateTableQuery extends StorageQuery {
+public class SimpleQuery extends StorageQuery {
 
-    private CreateTableQuery(Builder builder) {
+    private SimpleQuery(Builder builder) {
         super(builder);
     }
 
+    /**
+     * Executes the given SQL query and ignores the result.
+     */
     public void execute() {
         try (ConnectionWrapper connection = getConnection(true);
              PreparedStatement statement = prepareStatement(connection)) {
@@ -49,15 +54,15 @@ public class CreateTableQuery extends StorageQuery {
         return new Builder();
     }
 
-    public static class Builder extends StorageQuery.Builder<Builder, CreateTableQuery> {
+    public static class Builder extends StorageQuery.Builder<Builder, SimpleQuery> {
 
         private Builder() {
             super();
         }
 
         @Override
-        public CreateTableQuery build() {
-            return new CreateTableQuery(this);
+        public SimpleQuery build() {
+            return new SimpleQuery(this);
         }
 
         @Override

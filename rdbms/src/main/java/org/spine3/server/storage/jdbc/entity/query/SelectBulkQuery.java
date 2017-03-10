@@ -36,6 +36,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import static java.lang.String.format;
 import static org.spine3.server.storage.VisibilityField.archived;
 import static org.spine3.server.storage.VisibilityField.deleted;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
@@ -163,7 +164,7 @@ public class SelectBulkQuery<I> extends StorageQuery {
          * @param tableName Name of the table to query.
          */
         public Builder<I> setAllQuery(String tableName) {
-            setQuery(String.format(ALL_TEMPLATE, tableName));
+            setQuery(format(ALL_TEMPLATE, tableName));
             return getThis();
         }
 
@@ -189,7 +190,7 @@ public class SelectBulkQuery<I> extends StorageQuery {
                 arguments.add(id);
             }
 
-            setQuery(String.format(IDS_TEMPLATE, tableName, placeholders));
+            setQuery(format(IDS_TEMPLATE, tableName, placeholders));
             return getThis();
         }
 

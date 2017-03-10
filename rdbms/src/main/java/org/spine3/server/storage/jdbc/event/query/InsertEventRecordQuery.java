@@ -75,7 +75,8 @@ public class InsertEventRecordQuery extends WriteRecordQuery<String, Event> {
         super(builder);
     }
 
-    @SuppressWarnings("MethodDoesntCallSuperMethod") //
+    @SuppressWarnings("MethodDoesntCallSuperMethod")
+    // Overriding the default wat o storing the messages
     @Override
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
         final PreparedStatement statement = connection.prepareStatement(QUERY_TEMPLATE);

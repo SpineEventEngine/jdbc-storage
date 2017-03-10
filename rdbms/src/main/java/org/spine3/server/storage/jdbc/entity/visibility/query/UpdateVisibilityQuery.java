@@ -32,6 +32,7 @@ import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+import static java.lang.String.*;
 import static org.spine3.server.storage.VisibilityField.archived;
 import static org.spine3.server.storage.VisibilityField.deleted;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.COMMA;
@@ -83,7 +84,7 @@ public class UpdateVisibilityQuery<I> extends WriteQuery {
 
     public static <I> Builder<I> newBuilder(String tableName) {
         final Builder<I> builder = new Builder<>();
-        builder.setQuery(String.format(SQL, tableName));
+        builder.setQuery(format(SQL, tableName));
         return builder;
     }
 

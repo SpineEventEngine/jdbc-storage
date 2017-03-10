@@ -22,7 +22,6 @@ package org.spine3.server.storage.jdbc;
 
 import com.google.common.base.Joiner;
 
-import java.sql.Types;
 import java.util.Collections;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -76,28 +75,18 @@ public class Sql {
         /**
          * The type that cannot be determined in compile time.
          */
-        UNKNOWN("unknown type", Types.NULL),
-        BLOB("BLOB", Types.BLOB),
-        INT("INT", Types.INTEGER),
-        BIGINT("BIGINT", Types.BIGINT),
-        VARCHAR_512("VARCHAR(512)", Types.VARCHAR),
-        VARCHAR_999("VARCHAR(999)", Types.VARCHAR),
-        BOOLEAN("BOOLEAN", Types.BOOLEAN);
+        UNKNOWN("unknown type"),
+        BLOB("BLOB"),
+        INT("INT"),
+        BIGINT("BIGINT"),
+        VARCHAR_512("VARCHAR(512)"),
+        VARCHAR_999("VARCHAR(999)"),
+        BOOLEAN("BOOLEAN");
 
         private final String token;
-        private final int sqlType;
 
-        Type(String token, int sqlType) {
+        Type(String token) {
             this.token = token;
-            this.sqlType = sqlType;
-        }
-
-        /**
-         * @return an {@code int} constant declared in {@linkplain Types java.sql.Types}
-         * representing given data type
-         */
-        public int getSqlType() {
-            return sqlType;
         }
 
         @Override

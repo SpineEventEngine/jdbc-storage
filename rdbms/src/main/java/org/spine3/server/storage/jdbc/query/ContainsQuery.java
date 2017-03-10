@@ -39,6 +39,8 @@ import static org.spine3.server.storage.jdbc.Sql.Query.SELECT;
 import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
 
 /**
+ * A query that checks if the table contains a record with given ID.
+ *
  * @author Dmytro Dashenkov.
  */
 public class ContainsQuery<I> extends StorageQuery {
@@ -64,6 +66,9 @@ public class ContainsQuery<I> extends StorageQuery {
         return statement;
     }
 
+    /**
+     * @return {@code true} if there is at least one record with given ID, {@code} false otherwise
+     */
     public boolean execute() {
         try (ConnectionWrapper connection = getConnection(false);
              PreparedStatement statement = prepareStatement(connection)) {

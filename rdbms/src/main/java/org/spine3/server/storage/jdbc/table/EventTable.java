@@ -23,7 +23,7 @@ package org.spine3.server.storage.jdbc.table;
 import org.spine3.base.Event;
 import org.spine3.server.event.EventStreamQuery;
 import org.spine3.server.storage.jdbc.Sql.Type;
-import org.spine3.server.storage.jdbc.event.query.EventStorageQueryFactory;
+import org.spine3.server.storage.jdbc.event.query.EventTableQueryFactory;
 import org.spine3.server.storage.jdbc.event.query.FilterAndSortQuery;
 import org.spine3.server.storage.jdbc.query.QueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
@@ -46,11 +46,11 @@ public class EventTable extends AbstractTable<String, Event, EventTable.Column> 
 
     public static final String TABLE_NAME = "events";
 
-    private final EventStorageQueryFactory queryFactory;
+    private final EventTableQueryFactory queryFactory;
 
     public EventTable(DataSourceWrapper dataSource) {
         super(TABLE_NAME, new IdColumn.StringIdColumn(), dataSource);
-        this.queryFactory = new EventStorageQueryFactory(dataSource);
+        this.queryFactory = new EventTableQueryFactory(dataSource);
     }
 
     @Override

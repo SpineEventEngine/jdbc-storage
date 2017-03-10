@@ -34,7 +34,8 @@ import org.spine3.server.storage.jdbc.util.IdColumn;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * This class creates queries for interaction with {@link Table.AggregateRecord} and {@link Table.EventCount}.
+ * This class creates queries for interaction with
+ * {@link org.spine3.server.storage.jdbc.table.entity.aggregate.AggregateEventRecordTable}.
  *
  * @param <I> the type of IDs used in the storage
  * @author Andrey Lavrov
@@ -53,7 +54,6 @@ public class AggregateStorageQueryFactory<I> implements QueryFactory<I, Aggregat
      * @param dataSource     instance of {@link DataSourceWrapper}
      * @param aggregateClass aggregate class of corresponding {@link AggregateStorage} instance
      */
-    // The aux visibility handling query factory has a hardcoded type param
     public AggregateStorageQueryFactory(DataSourceWrapper dataSource,
                                         Class<? extends Aggregate<I, ?, ?>> aggregateClass) {
         super();
@@ -84,7 +84,7 @@ public class AggregateStorageQueryFactory<I> implements QueryFactory<I, Aggregat
     }
 
     /**
-     * {@inheritDoc}
+     * Thrown an {@link UnsupportedOperationException}.
      *
      * @deprecated multiple records correspond to a single ID in
      * {@link org.spine3.server.storage.jdbc.table.entity.aggregate.AggregateEventRecordTable};
@@ -108,6 +108,16 @@ public class AggregateStorageQueryFactory<I> implements QueryFactory<I, Aggregat
         return builder.build();
     }
 
+    /**
+     * Generates new {@code INSERT} query.
+     *
+     * <p>{@linkplain AggregateEventRecord aggregate records} are never updated, and ID does not act
+     * as a {@code PRIMARY KEY} in the table. That's why this method redirects to the
+     * {@link #newInsertQuery(Object, AggregateEventRecord)} method.
+     *
+     * @return the result of
+     * the {@linkplain #newInsertQuery(Object, AggregateEventRecord) newInsertQuery} method
+     */
     @Override
     public WriteQuery newUpdateQuery(I id, AggregateEventRecord record) {
         logger.warn("UPDATE operation is not possible within the AggregateEventRecordTable. Performing an INSERT instead.");

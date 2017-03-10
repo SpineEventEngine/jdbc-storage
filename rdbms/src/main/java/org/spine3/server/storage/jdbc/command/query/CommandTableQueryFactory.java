@@ -32,12 +32,13 @@ import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
 /**
- * This class creates queries for interaction with
+ * An implementation of the {@link QueryFactory} for generating queries to
  * the {@link org.spine3.server.storage.jdbc.table.CommandTable}.
  *
  * @author Andrey Lavrov
+ * @author Dmytro Dashenkov
  */
-public class CommandStorageQueryFactory implements QueryFactory<String, CommandRecord> {
+public class CommandTableQueryFactory implements QueryFactory<String, CommandRecord> {
 
     private final IdColumn<String> idColumn;
     private final DataSourceWrapper dataSource;
@@ -48,7 +49,7 @@ public class CommandStorageQueryFactory implements QueryFactory<String, CommandR
      *
      * @param dataSource the dataSource wrapper
      */
-    public CommandStorageQueryFactory(DataSourceWrapper dataSource) {
+    public CommandTableQueryFactory(DataSourceWrapper dataSource) {
         this.idColumn = new IdColumn.StringIdColumn();
         this.dataSource = dataSource;
     }

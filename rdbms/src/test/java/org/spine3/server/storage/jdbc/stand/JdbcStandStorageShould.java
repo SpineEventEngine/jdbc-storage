@@ -132,7 +132,6 @@ public class JdbcStandStorageShould extends StandStorageShould {
                         .build();
     }
 
-    // For mocks
     @Test(expected = IllegalStateException.class)
     public void fail_to_initialize_without_data_source() {
         JdbcStandStorage.newBuilder()
@@ -235,7 +234,6 @@ public class JdbcStandStorageShould extends StandStorageShould {
         }
     }
 
-    // Some field paths may repeat
     @Test
     public void apply_field_mask_to_read_values() {
         final StandStorage storage = Given.newStorage();

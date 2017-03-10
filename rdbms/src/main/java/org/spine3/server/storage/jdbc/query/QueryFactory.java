@@ -29,14 +29,26 @@ import com.google.protobuf.Message;
  * instance of {@code QueryFactory} implementation to construct its SQL queries to the
  * database.
  *
+ * @param <I> type of the ID of the record
+ * @param <R> type of the record
+ *
  * @author Dmytro Dashenkov.
  */
 public interface QueryFactory<I, R extends Message> {
 
+    /**
+     * @return a query for selecting a record by given ID
+     */
     SelectByIdQuery<I, R> newSelectByIdQuery(I id);
 
+    /**
+     * @return a query inserting a the given record under the given ID
+     */
     WriteQuery newInsertQuery(I id, R record);
 
+    /**
+     * @return a query for updating the record under the given ID with new value
+     */
     WriteQuery newUpdateQuery(I id, R record);
 
 }

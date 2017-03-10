@@ -37,7 +37,6 @@ import org.spine3.server.storage.jdbc.util.DbIterator;
 import java.util.Collection;
 import java.util.Iterator;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Lists.newLinkedList;
 import static org.spine3.server.storage.jdbc.util.Closeables.closeAll;
 
@@ -132,9 +131,6 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
      */
     @Override
     protected void writeRecord(I id, AggregateEventRecord record) throws DatabaseException {
-        checkNotClosed();
-        checkNotNull(id);
-        checkNotNull(record);
         mainTable.write(id, record);
     }
 
@@ -149,7 +145,6 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
      */
     @Override
     protected Iterator<AggregateEventRecord> historyBackward(I id) throws DatabaseException {
-        checkNotNull(id);
         final DbIterator<AggregateEventRecord> result = mainTable.historyBackward(id);
         iterators.add(result);
         return result;
@@ -157,14 +152,15 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
 
     @Override
     public void close() throws DatabaseException {
+        checkNotClosed();
         try {
             super.close();
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
+        dataSource.close();
         closeAll(iterators);
         iterators.clear();
-        dataSource.close();
     }
 
     public static <I> Builder<I> newBuilder() {
