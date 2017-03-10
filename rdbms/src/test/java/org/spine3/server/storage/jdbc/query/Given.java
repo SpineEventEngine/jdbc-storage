@@ -26,7 +26,7 @@ import org.slf4j.Logger;
 import org.spine3.server.storage.jdbc.GivenDataSource;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.server.storage.jdbc.util.IdColumn;
+import org.spine3.server.storage.jdbc.util.IdColumnSetter;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -40,7 +40,7 @@ import static org.mockito.Mockito.when;
 class Given {
 
     private static Logger loggerMock = null;
-    private static final IdColumn<String> idColumnMock = mock(IdColumn.StringIdColumn.class);
+    private static final IdColumnSetter<String> ID_COLUMN_QUERY_SETTER_MOCK = mock(IdColumnSetter.StringIdColumnSetter.class);
 
     // TODO:2016-08-02:alexander.litus: these methods are used in one place only (each), so move them there.
     // Apply this for all such cases in all Given classes.
@@ -53,7 +53,7 @@ class Given {
                 SelectByIdQueryMock.newBuilder()
                                    .setDataSource(dataSourceMock)
                                    .setLogger(loggerMock)
-                                   .setIdColumn(idColumnMock);
+                                   .setIdColumnSetter(ID_COLUMN_QUERY_SETTER_MOCK);
         return builder.build();
     }
 
@@ -63,7 +63,7 @@ class Given {
         final DataSourceWrapper dataSourceMock = mock(DataSourceWrapper.class);
         final ConnectionWrapper connectionMock = mock(ConnectionWrapper.class);
         final PreparedStatement preparedStatementMock = mock(PreparedStatement.class);
-        final IdColumn<String> idColumnMock = mock(IdColumn.StringIdColumn.class);
+        final IdColumnSetter<String> idColumnSetterMock = mock(IdColumnSetter.StringIdColumnSetter.class);
         final ResultSet resultSetMock = mock(ResultSet.class);
 
         when(dataSourceMock.getConnection(anyBoolean())).thenReturn(connectionMock);
@@ -76,7 +76,7 @@ class Given {
                 SelectByIdQueryMock.newBuilder()
                                    .setDataSource(dataSourceMock)
                                    .setLogger(loggerMock)
-                                   .setIdColumn(idColumnMock)
+                                   .setIdColumnSetter(idColumnSetterMock)
                                    .setMessageColumnName(anyString())
                                    .setMessageDescriptor(Any.getDescriptor());
         return builder.build();
@@ -100,7 +100,7 @@ class Given {
                 WriteRecordQueryMock.newBuilder()
                                     .setDataSource(dataSourceMock)
                                     .setLogger(loggerMock)
-                                    .setIdColumn(idColumnMock)
+                                    .setIdColumnSetter(ID_COLUMN_QUERY_SETTER_MOCK)
                                     .setRecord(recordMock);
         return builder.build();
     }

@@ -29,7 +29,7 @@ import org.spine3.server.storage.jdbc.query.SelectByIdQuery;
 import org.spine3.server.storage.jdbc.query.WriteQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbTableNameFactory;
-import org.spine3.server.storage.jdbc.util.IdColumn;
+import org.spine3.server.storage.jdbc.util.IdColumnSetter;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -42,7 +42,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class AggregateStorageQueryFactory<I> implements QueryFactory<I, AggregateEventRecord> {
 
-    private final IdColumn<I> idColumn;
+    private final IdColumnSetter<I> idColumnSetter;
     private final String mainTableName;
     private final DataSourceWrapper dataSource;
 
@@ -57,7 +57,7 @@ public class AggregateStorageQueryFactory<I> implements QueryFactory<I, Aggregat
     public AggregateStorageQueryFactory(DataSourceWrapper dataSource,
                                         Class<? extends Aggregate<I, ?, ?>> aggregateClass) {
         super();
-        this.idColumn = IdColumn.newInstance(aggregateClass);
+        this.idColumnSetter = IdColumnSetter.newInstance(aggregateClass);
         this.mainTableName = DbTableNameFactory.newTableName(aggregateClass);
         this.dataSource = dataSource;
     }
@@ -78,7 +78,7 @@ public class AggregateStorageQueryFactory<I> implements QueryFactory<I, Aggregat
                 SelectByIdSortedByTimeDescQuery.<I>newBuilder(mainTableName)
                         .setDataSource(dataSource)
                         .setLogger(getLogger())
-                        .setIdColumn(idColumn)
+                        .setIdColumnSetter(idColumnSetter)
                         .setId(id);
         return builder.build();
     }
@@ -102,7 +102,7 @@ public class AggregateStorageQueryFactory<I> implements QueryFactory<I, Aggregat
                 InsertAggregateRecordQuery.<I>newBuilder(mainTableName)
                         .setDataSource(dataSource)
                         .setLogger(getLogger())
-                        .setIdColumn(idColumn)
+                        .setIdColumnSetter(idColumnSetter)
                         .setId(id)
                         .setRecord(record);
         return builder.build();

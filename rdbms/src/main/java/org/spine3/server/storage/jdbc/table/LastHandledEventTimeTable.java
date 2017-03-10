@@ -24,7 +24,7 @@ import com.google.protobuf.Timestamp;
 import org.spine3.server.storage.jdbc.projection.query.LastHandledEventTimeQueryFactory;
 import org.spine3.server.storage.jdbc.query.QueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.server.storage.jdbc.util.IdColumn;
+import org.spine3.server.storage.jdbc.util.IdColumnSetter;
 
 import static org.spine3.server.storage.jdbc.Sql.Type;
 import static org.spine3.server.storage.jdbc.Sql.Type.BIGINT;
@@ -47,7 +47,7 @@ public class LastHandledEventTimeTable extends AbstractTable<String,
     private final LastHandledEventTimeQueryFactory queryFactory;
 
     public LastHandledEventTimeTable(DataSourceWrapper dataSource) {
-        super(TABLE_NAME, new IdColumn.StringIdColumn(), dataSource);
+        super(TABLE_NAME, new IdColumnSetter.StringIdColumnSetter(), dataSource);
         this.queryFactory = new LastHandledEventTimeQueryFactory(dataSource, TABLE_NAME);
         queryFactory.setLogger(log());
     }

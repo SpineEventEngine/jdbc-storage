@@ -32,7 +32,7 @@ import org.spine3.server.storage.jdbc.query.QueryFactory;
 import org.spine3.server.storage.jdbc.query.SelectByIdQuery;
 import org.spine3.server.storage.jdbc.query.WriteQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.server.storage.jdbc.util.IdColumn;
+import org.spine3.server.storage.jdbc.util.IdColumnSetter;
 
 import static org.spine3.server.storage.VisibilityField.archived;
 import static org.spine3.server.storage.VisibilityField.deleted;
@@ -47,16 +47,16 @@ public class VisibilityQueryFactory<I> implements QueryFactory<I, Visibility> {
 
     private final Logger logger;
     private final DataSourceWrapper dataSource;
-    private final IdColumn<I> idColumn;
+    private final IdColumnSetter<I> idColumnSetter;
     private final String tableName;
 
     public VisibilityQueryFactory(DataSourceWrapper dataSource,
                                   Logger logger,
-                                  IdColumn<I> idColumn,
+                                  IdColumnSetter<I> idColumnSetter,
                                   String tableName) {
         this.logger = logger;
         this.dataSource = dataSource;
-        this.idColumn = idColumn;
+        this.idColumnSetter = idColumnSetter;
         this.tableName = tableName;
     }
 
@@ -66,7 +66,7 @@ public class VisibilityQueryFactory<I> implements QueryFactory<I, Visibility> {
                 SelectVisibilityQuery.<I>newBuilder(tableName)
                                      .setDataSource(dataSource)
                                      .setLogger(logger)
-                                     .setIdColumn(idColumn)
+                                     .setIdColumnSetter(idColumnSetter)
                                      .setId(id)
                                      .build();
         return query;
@@ -79,7 +79,7 @@ public class VisibilityQueryFactory<I> implements QueryFactory<I, Visibility> {
                                                       .setVisibility(record)
                                                       .setLogger(logger)
                                                       .setDataSource(dataSource)
-                                                      .setIdColumn(idColumn)
+                                                      .setIdColumnSetter(idColumnSetter)
                                                       .build();
         return query;
     }
@@ -91,7 +91,7 @@ public class VisibilityQueryFactory<I> implements QueryFactory<I, Visibility> {
                                                       .setDataSource(dataSource)
                                                       .setId(id)
                                                       .setVisibility(record)
-                                                      .setIdColumn(idColumn)
+                                                      .setIdColumnSetter(idColumnSetter)
                                                       .build();
         return query;
     }
@@ -120,7 +120,7 @@ public class VisibilityQueryFactory<I> implements QueryFactory<I, Visibility> {
                                         .setTableName(tableName)
                                         .setLogger(logger)
                                         .setColumn(column)
-                                        .setIdColumn(idColumn)
+                                        .setIdColumnSetter(idColumnSetter)
                                         .setId(id)
                                         .build();
         return query;
@@ -133,7 +133,7 @@ public class VisibilityQueryFactory<I> implements QueryFactory<I, Visibility> {
                                .setLogger(logger)
                                .setTableName(tableName)
                                .setColumn(column)
-                               .setIdColumn(idColumn)
+                               .setIdColumnSetter(idColumnSetter)
                                .setId(id)
                                .build();
         return query;

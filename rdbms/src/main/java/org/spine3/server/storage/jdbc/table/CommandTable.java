@@ -32,7 +32,7 @@ import org.spine3.server.storage.jdbc.command.query.SetFailureQuery;
 import org.spine3.server.storage.jdbc.command.query.SetOkStatusQuery;
 import org.spine3.server.storage.jdbc.query.QueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.server.storage.jdbc.util.IdColumn;
+import org.spine3.server.storage.jdbc.util.IdColumnSetter;
 
 import java.util.Iterator;
 
@@ -51,7 +51,7 @@ public class CommandTable extends AbstractTable<String, CommandRecord, CommandTa
     private final CommandTableQueryFactory queryFactory;
 
     public CommandTable(DataSourceWrapper dataSource) {
-        super(TABLE_NAME, new IdColumn.StringIdColumn(), dataSource);
+        super(TABLE_NAME, new IdColumnSetter.StringIdColumnSetter(), dataSource);
         this.queryFactory = new CommandTableQueryFactory(dataSource);
         queryFactory.setLogger(log());
     }

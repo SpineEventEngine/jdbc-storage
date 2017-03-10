@@ -33,7 +33,7 @@ import org.spine3.server.storage.jdbc.query.WriteQuery;
 import org.spine3.server.storage.jdbc.table.entity.RecordTable;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbTableNameFactory;
-import org.spine3.server.storage.jdbc.util.IdColumn;
+import org.spine3.server.storage.jdbc.util.IdColumnSetter;
 
 import java.util.Map;
 
@@ -45,7 +45,7 @@ import java.util.Map;
  */
 public class RecordStorageQueryFactory<I> implements QueryFactory<I,EntityRecord> {
 
-    private final IdColumn<I> idColumn;
+    private final IdColumnSetter<I> idColumnSetter;
     private final DataSourceWrapper dataSource;
     private final String tableName;
     private final Logger logger;
@@ -60,7 +60,7 @@ public class RecordStorageQueryFactory<I> implements QueryFactory<I,EntityRecord
                                      Class<? extends Entity<I, ?>> entityClass,
                                      Logger logger) {
         super();
-        this.idColumn = IdColumn.newInstance(entityClass);
+        this.idColumnSetter = IdColumnSetter.newInstance(entityClass);
         this.dataSource = dataSource;
         this.tableName = DbTableNameFactory.newTableName(entityClass);
         this.logger = logger;
@@ -80,7 +80,7 @@ public class RecordStorageQueryFactory<I> implements QueryFactory<I,EntityRecord
                 .setLogger(getLogger())
                 .setTableName(tableName)
                 .setColumn(column)
-                .setIdColumn(idColumn)
+                .setIdColumnSetter(idColumnSetter)
                 .setId(id)
                 .build();
         return query;
@@ -101,7 +101,8 @@ public class RecordStorageQueryFactory<I> implements QueryFactory<I,EntityRecord
 
     public SelectBulkQuery<I> newSelectBulkQuery(Iterable<I> ids, FieldMask fieldMask) {
         final SelectBulkQuery.Builder<I> builder = SelectBulkQuery.<I>newBuilder()
-                                                                  .setIdColumn(idColumn)
+                                                                  .setIdColumnSetter(
+                                                                          idColumnSetter)
                                                                   .setIdsQuery(tableName, ids)
                                                                   .setFieldMask(fieldMask)
                                                                   .setLogger(getLogger())
@@ -117,7 +118,7 @@ public class RecordStorageQueryFactory<I> implements QueryFactory<I,EntityRecord
                                             .setLogger(getLogger())
                                             .setDataSource(dataSource)
                                             .setTableName(tableName)
-                                            .setidColumn(idColumn)
+                                            .setidColumn(idColumnSetter)
                                             .setRecords(records);
         return builder.build();
     }
@@ -128,7 +129,7 @@ public class RecordStorageQueryFactory<I> implements QueryFactory<I,EntityRecord
                 SelectEntityByIdQuery.<I>newBuilder(tableName)
                         .setDataSource(dataSource)
                         .setLogger(getLogger())
-                        .setIdColumn(idColumn)
+                        .setIdColumnSetter(idColumnSetter)
                         .setId(id);
         return builder.build();
     }
@@ -139,7 +140,7 @@ public class RecordStorageQueryFactory<I> implements QueryFactory<I,EntityRecord
                 .setDataSource(dataSource)
                 .setLogger(getLogger())
                 .setId(id)
-                .setIdColumn(idColumn)
+                .setIdColumnSetter(idColumnSetter)
                 .setRecord(record);
         return builder.build();
     }
@@ -149,7 +150,7 @@ public class RecordStorageQueryFactory<I> implements QueryFactory<I,EntityRecord
         final UpdateEntityQuery.Builder<I> builder = UpdateEntityQuery.<I>newBuilder(tableName)
                 .setDataSource(dataSource)
                 .setLogger(getLogger())
-                .setIdColumn(idColumn)
+                .setIdColumnSetter(idColumnSetter)
                 .setId(id)
                 .setRecord(record);
         return builder.build();

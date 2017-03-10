@@ -25,7 +25,7 @@ import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.StorageQuery;
 import org.spine3.server.storage.jdbc.table.entity.aggregate.VisibilityTable.Column;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
-import org.spine3.server.storage.jdbc.util.IdColumn;
+import org.spine3.server.storage.jdbc.util.IdColumnSetter;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -59,18 +59,18 @@ public class MarkEntityQuery<I> extends StorageQuery {
                                                WHERE + Column.id + EQUAL + PLACEHOLDER + SEMICOLON;
 
     private final I id;
-    private final IdColumn<I> idColumn;
+    private final IdColumnSetter<I> idColumnSetter;
 
     protected MarkEntityQuery(AbstractMarkQueryBuilder<I, ?, ?> builder) {
         super(builder);
         this.id = builder.getId();
-        this.idColumn = builder.getIdColumn();
+        this.idColumnSetter = builder.getIdColumnSetter();
     }
 
     @Override
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
         final PreparedStatement statement = super.prepareStatement(connection);
-        idColumn.setId(ID_PARAM_INDEX, id, statement);
+        idColumnSetter.setId(ID_PARAM_INDEX, id, statement);
 
         return statement;
     }
@@ -100,7 +100,7 @@ public class MarkEntityQuery<I> extends StorageQuery {
         private I id;
         private String column;
         private String tableName;
-        private IdColumn<I> idColumn;
+        private IdColumnSetter<I> idColumnSetter;
 
         protected abstract Q newQuery();
 
@@ -123,9 +123,9 @@ public class MarkEntityQuery<I> extends StorageQuery {
             return getThis();
         }
 
-        public B setIdColumn(IdColumn<I> idColumn) {
-            checkNotNull(idColumn);
-            this.idColumn = idColumn;
+        public B setIdColumnSetter(IdColumnSetter<I> idColumnSetter) {
+            checkNotNull(idColumnSetter);
+            this.idColumnSetter = idColumnSetter;
             return getThis();
         }
 
@@ -141,8 +141,8 @@ public class MarkEntityQuery<I> extends StorageQuery {
             return tableName;
         }
 
-        public IdColumn<I> getIdColumn() {
-            return idColumn;
+        public IdColumnSetter<I> getIdColumnSetter() {
+            return idColumnSetter;
         }
 
         @Override

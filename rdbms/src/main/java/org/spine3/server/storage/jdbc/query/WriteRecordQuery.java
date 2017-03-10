@@ -23,7 +23,7 @@ package org.spine3.server.storage.jdbc.query;
 import com.google.protobuf.Message;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
-import org.spine3.server.storage.jdbc.util.IdColumn;
+import org.spine3.server.storage.jdbc.util.IdColumnSetter;
 import org.spine3.server.storage.jdbc.util.Serializer;
 
 import java.sql.PreparedStatement;
@@ -35,7 +35,7 @@ public abstract class WriteRecordQuery<I, R extends Message> extends WriteQuery 
     private final R record;
     private final int idIndexInQuery;
     private final int recordIndexInQuery;
-    private final IdColumn<I> idColumn;
+    private final IdColumnSetter<I> idColumnSetter;
 
     public R getRecord() {
         return record;
@@ -50,7 +50,7 @@ public abstract class WriteRecordQuery<I, R extends Message> extends WriteQuery 
         super(builder);
         this.idIndexInQuery = builder.idIndexInQuery;
         this.recordIndexInQuery = builder.recordIndexInQuery;
-        this.idColumn = builder.idColumn;
+        this.idColumnSetter = builder.idColumnSetter;
         this.id = builder.id;
         this.record = builder.record;
     }
@@ -59,7 +59,7 @@ public abstract class WriteRecordQuery<I, R extends Message> extends WriteQuery 
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
         final PreparedStatement statement = super.prepareStatement(connection);
         try {
-            idColumn.setId(idIndexInQuery, id, statement);
+            idColumnSetter.setId(idIndexInQuery, id, statement);
             final byte[] bytes = Serializer.serialize(record);
             statement.setBytes(recordIndexInQuery, bytes);
             return statement;
@@ -77,7 +77,7 @@ public abstract class WriteRecordQuery<I, R extends Message> extends WriteQuery 
             extends WriteQuery.Builder<B, Q> {
         private int idIndexInQuery;
         private int recordIndexInQuery;
-        private IdColumn<I> idColumn;
+        private IdColumnSetter<I> idColumnSetter;
         private I id;
         private R record;
 
@@ -91,8 +91,8 @@ public abstract class WriteRecordQuery<I, R extends Message> extends WriteQuery 
             return getThis();
         }
 
-        public B setIdColumn(IdColumn<I> idColumn) {
-            this.idColumn = idColumn;
+        public B setIdColumnSetter(IdColumnSetter<I> idColumnSetter) {
+            this.idColumnSetter = idColumnSetter;
             return getThis();
         }
 

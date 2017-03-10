@@ -34,7 +34,7 @@ import org.spine3.server.storage.jdbc.query.SelectByIdQuery;
 import org.spine3.server.storage.jdbc.query.SimpleQuery;
 import org.spine3.server.storage.jdbc.query.WriteQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.server.storage.jdbc.util.IdColumn;
+import org.spine3.server.storage.jdbc.util.IdColumnSetter;
 
 import javax.annotation.Nullable;
 
@@ -79,7 +79,7 @@ public abstract class AbstractTable<I, R extends Message, C extends Enum<C> & Ta
 
     private final String name;
 
-    private final IdColumn<I> idColumn;
+    private final IdColumnSetter<I> idColumnSetter;
 
     private final DataSourceWrapper dataSource;
 
@@ -88,11 +88,11 @@ public abstract class AbstractTable<I, R extends Message, C extends Enum<C> & Ta
     private ImmutableList<C> columns;
 
     protected AbstractTable(String name,
-                            IdColumn<I> idColumn,
+                            IdColumnSetter<I> idColumnSetter,
                             DataSourceWrapper dataSource) {
         super();
         this.name = checkNotNull(name);
-        this.idColumn = checkNotNull(idColumn);
+        this.idColumnSetter = checkNotNull(idColumnSetter);
         this.dataSource = checkNotNull(dataSource);
     }
 
@@ -145,7 +145,7 @@ public abstract class AbstractTable<I, R extends Message, C extends Enum<C> & Ta
      */
     public boolean containsRecord(I id) {
         final ContainsQuery<I> query = ContainsQuery.<I>newBuilder()
-                                                    .setIdColumn(getIdColumn())
+                                                    .setIdColumnSetter(getIdColumnSetter())
                                                     .setId(id)
                                                     .setTableName(getName())
                                                     .setKeyColumn(getIdColumnDeclaration())
@@ -210,8 +210,8 @@ public abstract class AbstractTable<I, R extends Message, C extends Enum<C> & Ta
         return name;
     }
 
-    public IdColumn<I> getIdColumn() {
-        return idColumn;
+    public IdColumnSetter<I> getIdColumnSetter() {
+        return idColumnSetter;
     }
 
     public DataSourceWrapper getDataSource() {
@@ -277,7 +277,7 @@ public abstract class AbstractTable<I, R extends Message, C extends Enum<C> & Ta
     }
 
     private Sql.Type getIdType() {
-        final Sql.Type idType = getIdColumn().getColumnDataType();
+        final Sql.Type idType = getIdColumnSetter().getColumnDataType();
         return idType;
     }
 
@@ -314,7 +314,7 @@ public abstract class AbstractTable<I, R extends Message, C extends Enum<C> & Ta
         final DeleteRecordQuery<I> query =
                 DeleteRecordQuery.<I>newBuilder()
                                  .setTableName(getName())
-                                 .setIdColumn(getIdColumn())
+                                 .setIdColumnSetter(getIdColumnSetter())
                                  .setIdColumnName(
                                          getIdColumnDeclaration().name())
                                  .setIdValue(id)

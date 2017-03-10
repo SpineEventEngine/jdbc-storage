@@ -46,49 +46,49 @@ public class IdColumnShould {
 
     @Test
     public void have_bigint_impl() {
-        final IdColumn<?> column = IdColumn.newInstance(LongIdEntity.class);
+        final IdColumnSetter<?> column = IdColumnSetter.newInstance(LongIdEntity.class);
         assertEquals(BIGINT, column.getColumnDataType());
     }
 
     @Test
     public void have_int_impl() {
-        final IdColumn<?> column = IdColumn.newInstance(IntIdEntity.class);
+        final IdColumnSetter<?> column = IdColumnSetter.newInstance(IntIdEntity.class);
         assertEquals(INT, column.getColumnDataType());
     }
 
     @Test
     public void have_varchar255_impl() {
-        final IdColumn<?> column = IdColumn.newInstance(StringIdEntity.class);
+        final IdColumnSetter<?> column = IdColumnSetter.newInstance(StringIdEntity.class);
         assertEquals(VARCHAR_255, column.getColumnDataType());
     }
 
     @Test
     public void cast_message_IDs_to_string() {
-        final IdColumn<?> column = IdColumn.newInstance(MessageIdEntity.class);
+        final IdColumnSetter<?> column = IdColumnSetter.newInstance(MessageIdEntity.class);
         assertEquals(VARCHAR_255, column.getColumnDataType());
     }
 
     @Test(expected = DatabaseException.class)
     public void throw_DatabaseException_on_fail_to_set_int_id() throws SQLException {
-        final IdColumn<Integer> column = IdColumn.newInstance(IntIdEntity.class);
+        final IdColumnSetter<Integer> column = IdColumnSetter.newInstance(IntIdEntity.class);
         column.setId(1, 1, faultyStatement());
     }
 
     @Test(expected = DatabaseException.class)
     public void throw_DatabaseException_on_fail_to_set_long_id() throws SQLException {
-        final IdColumn<Long> column = IdColumn.newInstance(LongIdEntity.class);
+        final IdColumnSetter<Long> column = IdColumnSetter.newInstance(LongIdEntity.class);
         column.setId(1, 1L, faultyStatement());
     }
 
     @Test(expected = DatabaseException.class)
     public void throw_DatabaseException_on_fail_to_set_string_id() throws SQLException {
-        final IdColumn<String> column = IdColumn.newInstance(StringIdEntity.class);
+        final IdColumnSetter<String> column = IdColumnSetter.newInstance(StringIdEntity.class);
         column.setId(1, "bazinga!", faultyStatement());
     }
 
     @Test(expected = DatabaseException.class)
     public void throw_DatabaseException_on_fail_to_set_message_id() throws SQLException {
-        final IdColumn<ProjectId> column = IdColumn.newInstance(MessageIdEntity.class);
+        final IdColumnSetter<ProjectId> column = IdColumnSetter.newInstance(MessageIdEntity.class);
         column.setId(1, ProjectId.getDefaultInstance(), faultyStatement());
     }
 

@@ -49,7 +49,7 @@ public class VisibilityTable<I> extends AggregateTable<I, Visibility, Visibility
         super(DbTableNameFactory.newTableName(aggregateClass) + TABLE_NAME_POSTFIX,
               aggregateClass,
               dataSource);
-        this.queryFactory = new VisibilityQueryFactory<>(dataSource, log(), getIdColumn(), getName());
+        this.queryFactory = new VisibilityQueryFactory<>(dataSource, log(), getIdColumnSetter(), getName());
     }
 
     @Override

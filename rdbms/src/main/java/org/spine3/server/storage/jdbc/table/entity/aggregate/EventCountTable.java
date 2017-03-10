@@ -51,9 +51,9 @@ public class EventCountTable<I> extends AggregateTable<I, Int32Value, EventCount
               entityClass,
               dataSource);
         this.queryFactory = new EventCountQueryFactory<>(getDataSource(),
-                                                          getName(),
-                                                          getIdColumn(),
-                                                          log());
+                                                         getName(),
+                                                         getIdColumnSetter(),
+                                                         log());
     }
 
     @Override
