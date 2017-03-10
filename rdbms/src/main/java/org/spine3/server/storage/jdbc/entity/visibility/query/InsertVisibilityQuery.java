@@ -24,7 +24,7 @@ import org.spine3.server.entity.Visibility;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.WriteQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
-import org.spine3.server.storage.jdbc.util.IdColumnSetter;
+import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -50,13 +50,13 @@ public class InsertVisibilityQuery<I> extends WriteQuery {
 
     private final I id;
     private final Visibility entityStatus;
-    private final IdColumnSetter<I> idColumnSetter;
+    private final IdColumn<I> idColumn;
 
     protected InsertVisibilityQuery(Builder<I> builder) {
         super(builder);
         this.id = builder.id;
         this.entityStatus = builder.entityStatus;
-        this.idColumnSetter = builder.idColumnSetter;
+        this.idColumn = builder.idColumn;
     }
 
     @Override
@@ -65,7 +65,7 @@ public class InsertVisibilityQuery<I> extends WriteQuery {
         final boolean archived = entityStatus.getArchived();
         final boolean deleted = entityStatus.getDeleted();
         try {
-            idColumnSetter.setId(TableColumn.ID.index, id, statement);
+            idColumn.setId(TableColumn.ID.index, id, statement);
             statement.setBoolean(TableColumn.ARCHIVED.getIndex(), archived);
             statement.setBoolean(TableColumn.DELETED.getIndex(), deleted);
         } catch (SQLException e) {
@@ -85,7 +85,7 @@ public class InsertVisibilityQuery<I> extends WriteQuery {
 
         private I id;
         private Visibility entityStatus;
-        private IdColumnSetter<I> idColumnSetter;
+        private IdColumn<I> idColumn;
 
         public Builder<I> setVisibility(Visibility status) {
             this.entityStatus = checkNotNull(status);
@@ -109,8 +109,8 @@ public class InsertVisibilityQuery<I> extends WriteQuery {
             return this;
         }
 
-        public Builder<I> setIdColumnSetter(IdColumnSetter<I> idColumnSetter) {
-            this.idColumnSetter = idColumnSetter;
+        public Builder<I> setIdColumn(IdColumn<I> idColumn) {
+            this.idColumn = idColumn;
             return getThis();
         }
     }

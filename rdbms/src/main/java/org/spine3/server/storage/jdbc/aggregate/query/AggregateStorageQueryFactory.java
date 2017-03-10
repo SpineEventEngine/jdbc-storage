@@ -29,7 +29,7 @@ import org.spine3.server.storage.jdbc.query.SelectByIdQuery;
 import org.spine3.server.storage.jdbc.query.WriteQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbTableNameFactory;
-import org.spine3.server.storage.jdbc.util.IdColumnSetter;
+import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -42,7 +42,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class AggregateStorageQueryFactory<I> implements QueryFactory<I, AggregateEventRecord> {
 
-    private final IdColumnSetter<I> idColumnSetter;
+    private final IdColumn<I> idColumn;
     private final String mainTableName;
     private final DataSourceWrapper dataSource;
 
@@ -55,9 +55,10 @@ public class AggregateStorageQueryFactory<I> implements QueryFactory<I, Aggregat
      * @param aggregateClass aggregate class of corresponding {@link AggregateStorage} instance
      */
     public AggregateStorageQueryFactory(DataSourceWrapper dataSource,
-                                        Class<? extends Aggregate<I, ?, ?>> aggregateClass) {
+                                        Class<? extends Aggregate<I, ?, ?>> aggregateClass,
+                                        IdColumn<I> idColumn) {
         super();
-        this.idColumnSetter = IdColumnSetter.newInstance(aggregateClass);
+        this.idColumn = checkNotNull(idColumn);
         this.mainTableName = DbTableNameFactory.newTableName(aggregateClass);
         this.dataSource = dataSource;
     }
@@ -78,7 +79,7 @@ public class AggregateStorageQueryFactory<I> implements QueryFactory<I, Aggregat
                 SelectByIdSortedByTimeDescQuery.<I>newBuilder(mainTableName)
                         .setDataSource(dataSource)
                         .setLogger(getLogger())
-                        .setIdColumnSetter(idColumnSetter)
+                        .setIdColumn(idColumn)
                         .setId(id);
         return builder.build();
     }
@@ -102,7 +103,7 @@ public class AggregateStorageQueryFactory<I> implements QueryFactory<I, Aggregat
                 InsertAggregateRecordQuery.<I>newBuilder(mainTableName)
                         .setDataSource(dataSource)
                         .setLogger(getLogger())
-                        .setIdColumnSetter(idColumnSetter)
+                        .setIdColumn(idColumn)
                         .setId(id)
                         .setRecord(record);
         return builder.build();

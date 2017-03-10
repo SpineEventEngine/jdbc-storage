@@ -46,8 +46,8 @@ public class AggregateEventRecordTable<I>
 
     public AggregateEventRecordTable(Class<? extends Aggregate<I, ?, ?>> entityClass,
                                      DataSourceWrapper dataSource) {
-        super(entityClass, dataSource);
-        queryFactory = new AggregateStorageQueryFactory<>(dataSource, entityClass);
+        super(entityClass, Column.id.name(), dataSource);
+        queryFactory = new AggregateStorageQueryFactory<>(dataSource, entityClass, getIdColumn());
         queryFactory.setLogger(log());
     }
 

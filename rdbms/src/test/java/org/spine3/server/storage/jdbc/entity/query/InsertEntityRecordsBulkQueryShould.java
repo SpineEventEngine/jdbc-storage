@@ -27,7 +27,7 @@ import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.GivenDataSource;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.server.storage.jdbc.util.IdColumnSetter;
+import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -65,7 +65,7 @@ public class InsertEntityRecordsBulkQueryShould {
                         .setLogger(logger)
                         .setDataSource(dataSource)
                         .setRecords(recordMap)
-                        .setidColumn(new IdColumnSetter.StringIdColumnSetter())
+                        .setidColumn(new IdColumn.StringIdColumn("id"))
                         .setTableName("random-table")
                         .build();
 

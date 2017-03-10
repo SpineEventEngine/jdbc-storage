@@ -25,7 +25,7 @@ import com.google.protobuf.Message;
 import org.spine3.Internal;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
-import org.spine3.server.storage.jdbc.util.IdColumnSetter;
+import org.spine3.server.storage.jdbc.util.IdColumn;
 import org.spine3.server.storage.jdbc.util.Serializer;
 
 import javax.annotation.Nullable;
@@ -47,7 +47,7 @@ import static org.spine3.server.storage.jdbc.util.Serializer.deserialize;
 @Internal
 public class SelectByIdQuery<I, M extends Message> extends StorageQuery {
 
-    private final IdColumnSetter<I> idColumnSetter;
+    private final IdColumn<I> idColumn;
     private final I id;
     private final int idIndexInQuery;
 
@@ -56,7 +56,7 @@ public class SelectByIdQuery<I, M extends Message> extends StorageQuery {
 
     protected SelectByIdQuery(Builder<? extends Builder, ? extends SelectByIdQuery, I, M> builder) {
         super(builder);
-        this.idColumnSetter = builder.idColumnSetter;
+        this.idColumn = builder.idColumn;
         this.id = builder.id;
         this.idIndexInQuery = builder.idIndexInQuery;
         this.messageColumnName = builder.messageColumnName;
@@ -110,7 +110,7 @@ public class SelectByIdQuery<I, M extends Message> extends StorageQuery {
 
     protected PreparedStatement prepareStatement(ConnectionWrapper connection, I id) {
         final PreparedStatement statement = prepareStatement(connection);
-        idColumnSetter.setId(idIndexInQuery, id, statement);
+        idColumn.setId(idIndexInQuery, id, statement);
         return statement;
     }
 
@@ -122,7 +122,7 @@ public class SelectByIdQuery<I, M extends Message> extends StorageQuery {
             extends StorageQuery.Builder<B, Q> {
 
         private int idIndexInQuery;
-        private IdColumnSetter<I> idColumnSetter;
+        private IdColumn<I> idColumn;
         private I id;
 
         private String messageColumnName;
@@ -133,8 +133,8 @@ public class SelectByIdQuery<I, M extends Message> extends StorageQuery {
             return getThis();
         }
 
-        public B setIdColumnSetter(IdColumnSetter<I> idColumnSetter) {
-            this.idColumnSetter = idColumnSetter;
+        public B setIdColumn(IdColumn<I> idColumn) {
+            this.idColumn = idColumn;
             return getThis();
         }
 

@@ -25,7 +25,7 @@ import org.spine3.server.entity.Entity;
 import org.spine3.server.storage.jdbc.table.AbstractTable;
 import org.spine3.server.storage.jdbc.table.TableColumn;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.server.storage.jdbc.util.IdColumnSetter;
+import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import static org.spine3.server.storage.jdbc.util.DbTableNameFactory.newTableName;
 
@@ -49,8 +49,9 @@ public abstract class EntityTable<I, R extends Message, C extends Enum<C> & Tabl
      * @param dataSource  an instance of {@link DataSourceWrapper} to use
      */
     protected EntityTable(Class<? extends Entity<I, ?>> entityClass,
+                          String idColumnName,
                           DataSourceWrapper dataSource) {
-        this(newTableName(entityClass), entityClass, dataSource);
+        this(newTableName(entityClass), entityClass, idColumnName, dataSource);
     }
 
     /**
@@ -62,8 +63,9 @@ public abstract class EntityTable<I, R extends Message, C extends Enum<C> & Tabl
      */
     protected EntityTable(String tableName,
                           Class<? extends Entity<I, ?>> entityClass,
+                          String idColumnName,
                           DataSourceWrapper dataSource) {
-        super(tableName, IdColumnSetter.newInstance(entityClass), dataSource);
+        super(tableName, IdColumn.newInstance(entityClass, idColumnName), dataSource);
         this.entityClass = entityClass;
     }
 

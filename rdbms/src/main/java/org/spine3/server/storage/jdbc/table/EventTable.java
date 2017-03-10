@@ -27,7 +27,7 @@ import org.spine3.server.storage.jdbc.event.query.EventTableQueryFactory;
 import org.spine3.server.storage.jdbc.event.query.FilterAndSortQuery;
 import org.spine3.server.storage.jdbc.query.QueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.server.storage.jdbc.util.IdColumnSetter;
+import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import java.util.Iterator;
 
@@ -49,7 +49,7 @@ public class EventTable extends AbstractTable<String, Event, EventTable.Column> 
     private final EventTableQueryFactory queryFactory;
 
     public EventTable(DataSourceWrapper dataSource) {
-        super(TABLE_NAME, new IdColumnSetter.StringIdColumnSetter(), dataSource);
+        super(TABLE_NAME, new IdColumn.StringIdColumn(Column.event_id.name()), dataSource);
         this.queryFactory = new EventTableQueryFactory(dataSource);
     }
 

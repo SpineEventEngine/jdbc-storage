@@ -25,7 +25,7 @@ import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.WriteQuery;
 import org.spine3.server.storage.jdbc.table.entity.aggregate.VisibilityTable.Column;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
-import org.spine3.server.storage.jdbc.util.IdColumnSetter;
+import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -57,13 +57,13 @@ public class UpdateVisibilityQuery<I> extends WriteQuery {
 
     private final I id;
     private final Visibility entityStatus;
-    private final IdColumnSetter<I> idColumnSetter;
+    private final IdColumn<I> idColumn;
 
     protected UpdateVisibilityQuery(Builder<I> builder) {
         super(builder);
         this.id = builder.id;
         this.entityStatus = builder.entityStatus;
-        this.idColumnSetter = builder.idColumnSetter;
+        this.idColumn = builder.idColumn;
     }
 
     @Override
@@ -74,7 +74,7 @@ public class UpdateVisibilityQuery<I> extends WriteQuery {
         try {
             statement.setBoolean(1, archived);
             statement.setBoolean(2, deleted);
-            idColumnSetter.setId(3, id, statement);
+            idColumn.setId(3, id, statement);
         } catch (SQLException e) {
             throw new DatabaseException(e);
         }
@@ -92,7 +92,7 @@ public class UpdateVisibilityQuery<I> extends WriteQuery {
 
         private I id;
         private Visibility entityStatus;
-        private IdColumnSetter<I> idColumnSetter;
+        private IdColumn<I> idColumn;
 
         public Builder<I> setId(I id) {
             this.id = checkNotNull(id);
@@ -116,8 +116,8 @@ public class UpdateVisibilityQuery<I> extends WriteQuery {
             return this;
         }
 
-        public Builder<I> setIdColumnSetter(IdColumnSetter<I> idColumnSetter) {
-            this.idColumnSetter = idColumnSetter;
+        public Builder<I> setIdColumn(IdColumn<I> idColumn) {
+            this.idColumn = idColumn;
             return getThis();
         }
     }

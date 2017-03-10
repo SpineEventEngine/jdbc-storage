@@ -48,8 +48,9 @@ public class VisibilityTable<I> extends AggregateTable<I, Visibility, Visibility
                               DataSourceWrapper dataSource) {
         super(DbTableNameFactory.newTableName(aggregateClass) + TABLE_NAME_POSTFIX,
               aggregateClass,
+              Column.id.name(),
               dataSource);
-        this.queryFactory = new VisibilityQueryFactory<>(dataSource, log(), getIdColumnSetter(), getName());
+        this.queryFactory = new VisibilityQueryFactory<>(dataSource, log(), getIdColumn(), getName());
     }
 
     @Override

@@ -26,7 +26,7 @@ import org.spine3.server.entity.EntityRecord;
 import org.spine3.server.storage.jdbc.Sql;
 import org.spine3.server.storage.jdbc.query.StorageQuery;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
-import org.spine3.server.storage.jdbc.util.IdColumnSetter;
+import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -83,13 +83,13 @@ public class SelectBulkQuery<I> extends StorageQuery {
 
     private final FieldMask fieldMask;
     private final List<I> arguments;
-    private final IdColumnSetter<I> idColumnSetter;
+    private final IdColumn<I> idColumn;
 
     protected SelectBulkQuery(Builder<I> builder) {
         super(builder);
         this.fieldMask = builder.fieldMask;
         this.arguments = builder.arguments;
-        this.idColumnSetter = builder.idColumnSetter;
+        this.idColumn = builder.idColumn;
     }
 
     /**
@@ -103,7 +103,7 @@ public class SelectBulkQuery<I> extends StorageQuery {
         final PreparedStatement sqlStatement = connection.prepareStatement(getQuery());
 
         for (int i = 0; i < arguments.size(); i++) {
-            idColumnSetter.setId(i + 1, arguments.get(i), sqlStatement);
+            idColumn.setId(i + 1, arguments.get(i), sqlStatement);
         }
 
         final ResultSet resultSet = sqlStatement.executeQuery();
@@ -140,7 +140,7 @@ public class SelectBulkQuery<I> extends StorageQuery {
 
         private FieldMask fieldMask;
         private final List<I> arguments = new ArrayList<>();
-        private IdColumnSetter<I> idColumnSetter;
+        private IdColumn<I> idColumn;
 
         private Builder() {
             super();
@@ -151,8 +151,8 @@ public class SelectBulkQuery<I> extends StorageQuery {
             return getThis();
         }
 
-        public Builder<I> setIdColumnSetter(IdColumnSetter<I> idColumnSetter) {
-            this.idColumnSetter = idColumnSetter;
+        public Builder<I> setIdColumn(IdColumn<I> idColumn) {
+            this.idColumn = idColumn;
             return getThis();
         }
 

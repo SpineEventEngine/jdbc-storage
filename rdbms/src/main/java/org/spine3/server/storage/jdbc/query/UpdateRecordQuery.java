@@ -21,7 +21,7 @@
 package org.spine3.server.storage.jdbc.query;
 
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
-import org.spine3.server.storage.jdbc.util.IdColumnSetter;
+import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import java.sql.PreparedStatement;
 
@@ -29,20 +29,20 @@ public class UpdateRecordQuery<I> extends WriteQuery {
 
     private final I id;
     private final int idIndexInQuery;
-    private final IdColumnSetter<I> idColumnSetter;
+    private final IdColumn<I> idColumn;
 
     protected UpdateRecordQuery(
             Builder<? extends Builder, ? extends UpdateRecordQuery, I> builder) {
         super(builder);
         this.idIndexInQuery = builder.idIndexInQuery;
-        this.idColumnSetter = builder.idColumnSetter;
+        this.idColumn = builder.idColumn;
         this.id = builder.id;
     }
 
     @Override
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
         final PreparedStatement statement = super.prepareStatement(connection);
-        idColumnSetter.setId(idIndexInQuery, id, statement);
+        idColumn.setId(idIndexInQuery, id, statement);
         return statement;
     }
 
@@ -50,7 +50,7 @@ public class UpdateRecordQuery<I> extends WriteQuery {
     public abstract static class Builder<B extends Builder<B, Q, I>, Q extends UpdateRecordQuery, I>
             extends WriteQuery.Builder<B, Q> {
         private int idIndexInQuery;
-        private IdColumnSetter<I> idColumnSetter;
+        private IdColumn<I> idColumn;
         private I id;
 
         public B setId(I id) {
@@ -58,8 +58,8 @@ public class UpdateRecordQuery<I> extends WriteQuery {
             return getThis();
         }
 
-        public B setIdColumnSetter(IdColumnSetter<I> idColumnSetter) {
-            this.idColumnSetter = idColumnSetter;
+        public B setIdColumn(IdColumn<I> idColumn) {
+            this.idColumn = idColumn;
             return getThis();
         }
 

@@ -26,7 +26,7 @@ import org.spine3.server.storage.jdbc.query.QueryFactory;
 import org.spine3.server.storage.jdbc.query.SelectByIdQuery;
 import org.spine3.server.storage.jdbc.query.WriteQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.server.storage.jdbc.util.IdColumnSetter;
+import org.spine3.server.storage.jdbc.util.IdColumn;
 
 /**
  * An implementation of {@link QueryFactory} generating queries for
@@ -37,16 +37,16 @@ import org.spine3.server.storage.jdbc.util.IdColumnSetter;
 public class EventCountQueryFactory<I> implements QueryFactory<I, Int32Value> {
 
     private final String tableName;
-    private final IdColumnSetter<I> idColumnSetter;
+    private final IdColumn<I> idColumn;
     private final DataSourceWrapper dataSource;
     private final Logger logger;
 
     public EventCountQueryFactory(DataSourceWrapper dataSource,
                                   String tableName,
-                                  IdColumnSetter<I> idColumnSetter,
+                                  IdColumn<I> idColumn,
                                   Logger logger) {
         this.tableName = tableName;
-        this.idColumnSetter = idColumnSetter;
+        this.idColumn = idColumn;
         this.dataSource = dataSource;
         this.logger = logger;
     }
@@ -58,7 +58,7 @@ public class EventCountQueryFactory<I> implements QueryFactory<I, Int32Value> {
                                          .setDataSource(dataSource)
                                          .setLogger(logger)
                                          .setId(id)
-                                         .setIdColumnSetter(idColumnSetter)
+                                         .setIdColumn(idColumn)
                                          .build();
         return query;
     }
@@ -67,7 +67,7 @@ public class EventCountQueryFactory<I> implements QueryFactory<I, Int32Value> {
     public WriteQuery newInsertQuery(I id, Int32Value record) {
         final WriteQuery query = InsertEventCountQuery.<I>newBuilder(tableName)
                                                       .setId(id)
-                                                      .setIdColumnSetter(idColumnSetter)
+                                                      .setIdColumn(idColumn)
                                                       .setLogger(logger)
                                                       .setDataSource(dataSource)
                                                       .setCount(record.getValue())
@@ -81,7 +81,7 @@ public class EventCountQueryFactory<I> implements QueryFactory<I, Int32Value> {
                                                       .setDataSource(dataSource)
                                                       .setLogger(logger)
                                                       .setId(id)
-                                                      .setIdColumnSetter(idColumnSetter)
+                                                      .setIdColumn(idColumn)
                                                       .setCount(record.getValue())
                                                       .build();
         return query;

@@ -27,7 +27,7 @@ import org.spine3.base.EventContext;
 import org.spine3.base.Events;
 import org.spine3.server.storage.jdbc.GivenDataSource;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.server.storage.jdbc.util.IdColumnSetter;
+import org.spine3.server.storage.jdbc.util.IdColumn;
 import org.spine3.test.event.ProjectCreated;
 
 import java.sql.SQLException;
@@ -41,7 +41,7 @@ import static org.mockito.Mockito.mock;
 class Given {
 
     private static Logger loggerMock = null;
-    private static final IdColumnSetter<String> ID_COLUMN_QUERY_SETTER_MOCK = mock(IdColumnSetter.StringIdColumnSetter.class);
+    private static final IdColumn<String> ID_COLUMN_QUERY_SETTER_MOCK = mock(IdColumn.StringIdColumn.class);
 
     private Given() {
     }
@@ -54,7 +54,7 @@ class Given {
                 InsertEventRecordQuery.newBuilder()
                                       .setDataSource(dataSourceMock)
                                       .setLogger(loggerMock)
-                                      .setIdColumnSetter(ID_COLUMN_QUERY_SETTER_MOCK)
+                                      .setIdColumn(ID_COLUMN_QUERY_SETTER_MOCK)
                                       .setRecord(nonEmptyEvent());
         return builder.build();
     }
@@ -67,7 +67,7 @@ class Given {
                 UpdateEventRecordQuery.newBuilder()
                                       .setDataSource(dataSourceMock)
                                       .setLogger(loggerMock)
-                                      .setIdColumnSetter(ID_COLUMN_QUERY_SETTER_MOCK)
+                                      .setIdColumn(ID_COLUMN_QUERY_SETTER_MOCK)
                                       .setRecord(nonEmptyEvent());
         return builder.build();
     }

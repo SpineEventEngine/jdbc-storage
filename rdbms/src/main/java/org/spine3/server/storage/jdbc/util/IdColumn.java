@@ -31,6 +31,7 @@ import org.spine3.server.storage.jdbc.Sql;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.spine3.base.Stringifiers.idToString;
 import static org.spine3.server.storage.jdbc.Sql.Type.BIGINT;
 import static org.spine3.server.storage.jdbc.Sql.Type.INT;
@@ -52,7 +53,9 @@ import static org.spine3.server.storage.jdbc.Sql.Type.VARCHAR_255;
  * @author Alexander Litus
  */
 @Internal
-public abstract class IdColumnSetter<I> {
+public abstract class IdColumn<I> {
+
+    private final String columnName;
 
     /**
      * Creates a new instance.
@@ -61,30 +64,39 @@ public abstract class IdColumnSetter<I> {
      * @param <I>         the type of {@link Entity} IDs
      * @return a new helper instance
      */
-    public static <I> IdColumnSetter<I> newInstance(Class<? extends Entity<I, ?>> entityClass) {
-        final IdColumnSetter<I> helper;
+    public static <I> IdColumn<I> newInstance(Class<? extends Entity<I, ?>> entityClass,
+                                              String columnName) {
+        final IdColumn<I> helper;
         final Class<I> idClass =
                 Classes.getGenericParameterType(entityClass, Entity.GenericParameter.ID.getIndex());
         if (idClass.equals(Long.class)) {
             @SuppressWarnings("unchecked") // is checked already
-            final IdColumnSetter<I> longIdColumnSetter =
-                    (IdColumnSetter<I>) new LongIdColumnSetter();
-            helper = longIdColumnSetter;
+            final IdColumn<I> longIdColumn =
+                    (IdColumn<I>) new LongIdColumn(columnName);
+            helper = longIdColumn;
         } else if (idClass.equals(Integer.class)) {
             @SuppressWarnings("unchecked") // is checked already
-            final IdColumnSetter<I> intIdColumnSetter =
-                    (IdColumnSetter<I>) new IntIdColumnSetter();
-            helper = intIdColumnSetter;
+            final IdColumn<I> intIdColumn =
+                    (IdColumn<I>) new IntIdColumn(columnName);
+            helper = intIdColumn;
         } else {
-            helper = new StringOrMessageIdColumnSetter<>();
+            helper = new StringOrMessageIdColumn<>(columnName);
         }
         return helper;
+    }
+
+    protected IdColumn(String columnName) {
+        this.columnName = checkNotNull(columnName);
     }
 
     /**
      * Returns the {@link Sql.Type} of the column with which this helper instance works.
      */
     public abstract Sql.Type getColumnDataType();
+
+    public String getColumnName() {
+        return columnName;
+    }
 
     /**
      * Sets an ID parameter to the given value.
@@ -100,7 +112,11 @@ public abstract class IdColumnSetter<I> {
     /**
      * Helps to work with columns which contain {@code long} {@link Entity} IDs.
      */
-    private static class LongIdColumnSetter extends IdColumnSetter<Long> {
+    private static class LongIdColumn extends IdColumn<Long> {
+
+        private LongIdColumn(String columnName) {
+            super(columnName);
+        }
 
         @Override
         public Sql.Type getColumnDataType() {
@@ -121,7 +137,11 @@ public abstract class IdColumnSetter<I> {
     /**
      * Helps to work with columns which contain {@code integer} {@link Entity} IDs.
      */
-    private static class IntIdColumnSetter extends IdColumnSetter<Integer> {
+    private static class IntIdColumn extends IdColumn<Integer> {
+
+        private IntIdColumn(String columnName) {
+            super(columnName);
+        }
 
         @Override
         public Sql.Type getColumnDataType() {
@@ -143,7 +163,11 @@ public abstract class IdColumnSetter<I> {
      * Helps to work with columns which contain either {@link Message} or {@code string}
      * {@link Entity} IDs.
      */
-    private static class StringOrMessageIdColumnSetter<I> extends IdColumnSetter<I> {
+    private static class StringOrMessageIdColumn<I> extends IdColumn<I> {
+
+        private StringOrMessageIdColumn(String columnName) {
+            super(columnName);
+        }
 
         @Override
         public Sql.Type getColumnDataType() {
@@ -164,6 +188,9 @@ public abstract class IdColumnSetter<I> {
     /**
      * Helps to work with columns which contain {@code string} {@link Entity} IDs.
      */
-    public static class StringIdColumnSetter extends StringOrMessageIdColumnSetter<String> {
+    public static class StringIdColumn extends StringOrMessageIdColumn<String> {
+        public StringIdColumn(String columnName) {
+            super(columnName);
+        }
     }
 }

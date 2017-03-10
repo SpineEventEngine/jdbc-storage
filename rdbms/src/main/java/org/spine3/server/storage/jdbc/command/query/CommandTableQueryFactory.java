@@ -29,7 +29,9 @@ import org.spine3.server.storage.jdbc.query.QueryFactory;
 import org.spine3.server.storage.jdbc.query.SelectByIdQuery;
 import org.spine3.server.storage.jdbc.query.WriteQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.server.storage.jdbc.util.IdColumnSetter;
+import org.spine3.server.storage.jdbc.util.IdColumn;
+
+import static org.spine3.server.storage.jdbc.table.CommandTable.Column.id;
 
 /**
  * An implementation of the {@link QueryFactory} for generating queries to
@@ -40,7 +42,7 @@ import org.spine3.server.storage.jdbc.util.IdColumnSetter;
  */
 public class CommandTableQueryFactory implements QueryFactory<String, CommandRecord> {
 
-    private final IdColumnSetter<String> idColumnSetter;
+    private final IdColumn<String> idColumn;
     private final DataSourceWrapper dataSource;
     private Logger logger;
 
@@ -50,7 +52,7 @@ public class CommandTableQueryFactory implements QueryFactory<String, CommandRec
      * @param dataSource the dataSource wrapper
      */
     public CommandTableQueryFactory(DataSourceWrapper dataSource) {
-        this.idColumnSetter = new IdColumnSetter.StringIdColumnSetter();
+        this.idColumn = new IdColumn.StringIdColumn(id.name());
         this.dataSource = dataSource;
     }
 
@@ -69,8 +71,8 @@ public class CommandTableQueryFactory implements QueryFactory<String, CommandRec
         final SetErrorQuery.Builder builder = SetErrorQuery.newBuilder()
                                                            .setDataSource(dataSource)
                                                            .setLogger(logger)
-                                                           .setIdColumnSetter(
-                                                                   idColumnSetter)
+                                                           .setIdColumn(
+                                                                   idColumn)
                                                            .setId(id)
                                                            .setRecord(error);
         return builder.build();
@@ -86,8 +88,8 @@ public class CommandTableQueryFactory implements QueryFactory<String, CommandRec
         final SetFailureQuery.Builder builder = SetFailureQuery.newBuilder()
                                                                .setDataSource(dataSource)
                                                                .setLogger(logger)
-                                                               .setIdColumnSetter(
-                                                                       idColumnSetter)
+                                                               .setIdColumn(
+                                                                       idColumn)
                                                                .setId(id)
                                                                .setRecord(failure);
         return builder.build();
@@ -102,8 +104,8 @@ public class CommandTableQueryFactory implements QueryFactory<String, CommandRec
         final SetOkStatusQuery.Builder builder = SetOkStatusQuery.newBuilder()
                                                                  .setDataSource(dataSource)
                                                                  .setLogger(logger)
-                                                                 .setIdColumnSetter(
-                                                                         idColumnSetter)
+                                                                 .setIdColumn(
+                                                                         idColumn)
                                                                  .setId(id);
         return builder.build();
     }
@@ -124,7 +126,7 @@ public class CommandTableQueryFactory implements QueryFactory<String, CommandRec
                 SelectCommandByIdQuery.newBuilder()
                                       .setDataSource(dataSource)
                                       .setLogger(logger)
-                                      .setIdColumnSetter(idColumnSetter)
+                                      .setIdColumn(idColumn)
                                       .setId(id);
         return builder.build();
     }
@@ -135,7 +137,7 @@ public class CommandTableQueryFactory implements QueryFactory<String, CommandRec
                 InsertCommandQuery.newBuilder()
                                   .setDataSource(dataSource)
                                   .setLogger(logger)
-                                  .setIdColumnSetter(idColumnSetter)
+                                  .setIdColumn(idColumn)
                                   .setId(id)
                                   .setRecord(record)
                                   .setStatus(record.getStatus().getCode());
@@ -148,7 +150,7 @@ public class CommandTableQueryFactory implements QueryFactory<String, CommandRec
                 UpdateCommandQuery.newBuilder()
                                   .setDataSource(dataSource)
                                   .setLogger(logger)
-                                  .setIdColumnSetter(idColumnSetter)
+                                  .setIdColumn(idColumn)
                                   .setId(id)
                                   .setRecord(record)
                                   .setStatus(record.getStatus().getCode());

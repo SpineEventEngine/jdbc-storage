@@ -21,7 +21,7 @@
 package org.spine3.server.storage.jdbc.query;
 
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
-import org.spine3.server.storage.jdbc.util.IdColumnSetter;
+import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -49,12 +49,12 @@ public class DeleteRecordQuery<I> extends StorageQuery {
     private static final int COLUMN_VALUE_PARAM_INDEX = 1;
 
     private final I id;
-    private final IdColumnSetter<I> idColumnSetter;
+    private final IdColumn<I> idColumn;
 
     protected DeleteRecordQuery(Builder<I> builder) {
         super(builder);
         this.id = builder.columnValue;
-        this.idColumnSetter = builder.idColumnSetter;
+        this.idColumn = builder.idColumn;
     }
 
     /**
@@ -65,7 +65,7 @@ public class DeleteRecordQuery<I> extends StorageQuery {
     public boolean execute() {
         try (ConnectionWrapper connection = getConnection(false)) {
             final PreparedStatement statement = prepareStatement(connection);
-            idColumnSetter.setId(COLUMN_VALUE_PARAM_INDEX, id, statement);
+            idColumn.setId(COLUMN_VALUE_PARAM_INDEX, id, statement);
             final int rowsAffected = statement.executeUpdate();
             connection.commit();
             final boolean result = rowsAffected != 0;
@@ -81,15 +81,9 @@ public class DeleteRecordQuery<I> extends StorageQuery {
 
     public static class Builder<I> extends StorageQuery.Builder<Builder<I>, DeleteRecordQuery> {
 
-        private String column;
         private I columnValue;
         private String table;
-        private IdColumnSetter<I> idColumnSetter;
-
-        public Builder<I> setIdColumnName(String column) {
-            this.column = checkNotNull(column);
-            return getThis();
-        }
+        private IdColumn<I> idColumn;
 
         public Builder<I> setIdValue(I value) {
             this.columnValue = checkNotNull(value);
@@ -102,13 +96,12 @@ public class DeleteRecordQuery<I> extends StorageQuery {
         }
 
         private String composeSql() {
-            return format(TEMPLATE, table, column, idToString(columnValue));
+            return format(TEMPLATE, table, idColumn.getColumnName(), idToString(columnValue));
         }
 
         @Override
         public DeleteRecordQuery<I> build() {
-            checkNotNull(column, "ID column name must be set");
-            checkNotNull(idColumnSetter, "ID column must be set");
+            checkNotNull(idColumn, "ID column must be set");
             checkNotNull(columnValue, "ID must be set");
             checkNotNull(table, "Table must be set");
             final String sql = composeSql();
@@ -121,8 +114,8 @@ public class DeleteRecordQuery<I> extends StorageQuery {
             return this;
         }
 
-        public Builder<I> setIdColumnSetter(IdColumnSetter<I> idColumnSetter) {
-            this.idColumnSetter = idColumnSetter;
+        public Builder<I> setIdColumn(IdColumn<I> idColumn) {
+            this.idColumn = idColumn;
             return getThis();
         }
     }

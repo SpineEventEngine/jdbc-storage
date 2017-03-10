@@ -27,7 +27,9 @@ import org.spine3.server.storage.jdbc.query.QueryFactory;
 import org.spine3.server.storage.jdbc.query.SelectByIdQuery;
 import org.spine3.server.storage.jdbc.query.WriteQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.server.storage.jdbc.util.IdColumnSetter;
+import org.spine3.server.storage.jdbc.util.IdColumn;
+
+import static org.spine3.server.storage.jdbc.table.EventTable.Column.event_id;
 
 /**
  * This class creates queries for interaction with
@@ -69,7 +71,7 @@ public class EventTableQueryFactory implements QueryFactory<String, Event> {
                 SelectEventByIdQuery.newBuilder()
                                     .setDataSource(dataSource)
                                     .setLogger(logger)
-                                    .setIdColumnSetter(new IdColumnSetter.StringIdColumnSetter())
+                                    .setIdColumn(new IdColumn.StringIdColumn(event_id.name()))
                                     .setId(id);
         return builder.build();
     }

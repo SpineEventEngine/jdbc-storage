@@ -33,9 +33,11 @@ import org.spine3.server.storage.jdbc.query.WriteQuery;
 import org.spine3.server.storage.jdbc.table.entity.RecordTable;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbTableNameFactory;
-import org.spine3.server.storage.jdbc.util.IdColumnSetter;
+import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import java.util.Map;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * This class creates queries for interaction with the {@link RecordTable}.
@@ -45,7 +47,7 @@ import java.util.Map;
  */
 public class RecordStorageQueryFactory<I> implements QueryFactory<I,EntityRecord> {
 
-    private final IdColumnSetter<I> idColumnSetter;
+    private final IdColumn<I> idColumn;
     private final DataSourceWrapper dataSource;
     private final String tableName;
     private final Logger logger;
@@ -58,9 +60,10 @@ public class RecordStorageQueryFactory<I> implements QueryFactory<I,EntityRecord
      */
     public RecordStorageQueryFactory(DataSourceWrapper dataSource,
                                      Class<? extends Entity<I, ?>> entityClass,
-                                     Logger logger) {
+                                     Logger logger,
+                                     IdColumn<I> idColumn) {
         super();
-        this.idColumnSetter = IdColumnSetter.newInstance(entityClass);
+        this.idColumn = checkNotNull(idColumn);
         this.dataSource = dataSource;
         this.tableName = DbTableNameFactory.newTableName(entityClass);
         this.logger = logger;
@@ -80,7 +83,7 @@ public class RecordStorageQueryFactory<I> implements QueryFactory<I,EntityRecord
                 .setLogger(getLogger())
                 .setTableName(tableName)
                 .setColumn(column)
-                .setIdColumnSetter(idColumnSetter)
+                .setIdColumn(idColumn)
                 .setId(id)
                 .build();
         return query;
@@ -101,8 +104,8 @@ public class RecordStorageQueryFactory<I> implements QueryFactory<I,EntityRecord
 
     public SelectBulkQuery<I> newSelectBulkQuery(Iterable<I> ids, FieldMask fieldMask) {
         final SelectBulkQuery.Builder<I> builder = SelectBulkQuery.<I>newBuilder()
-                                                                  .setIdColumnSetter(
-                                                                          idColumnSetter)
+                                                                  .setIdColumn(
+                                                                          idColumn)
                                                                   .setIdsQuery(tableName, ids)
                                                                   .setFieldMask(fieldMask)
                                                                   .setLogger(getLogger())
@@ -118,7 +121,7 @@ public class RecordStorageQueryFactory<I> implements QueryFactory<I,EntityRecord
                                             .setLogger(getLogger())
                                             .setDataSource(dataSource)
                                             .setTableName(tableName)
-                                            .setidColumn(idColumnSetter)
+                                            .setidColumn(idColumn)
                                             .setRecords(records);
         return builder.build();
     }
@@ -129,7 +132,7 @@ public class RecordStorageQueryFactory<I> implements QueryFactory<I,EntityRecord
                 SelectEntityByIdQuery.<I>newBuilder(tableName)
                         .setDataSource(dataSource)
                         .setLogger(getLogger())
-                        .setIdColumnSetter(idColumnSetter)
+                        .setIdColumn(idColumn)
                         .setId(id);
         return builder.build();
     }
@@ -140,7 +143,7 @@ public class RecordStorageQueryFactory<I> implements QueryFactory<I,EntityRecord
                 .setDataSource(dataSource)
                 .setLogger(getLogger())
                 .setId(id)
-                .setIdColumnSetter(idColumnSetter)
+                .setIdColumn(idColumn)
                 .setRecord(record);
         return builder.build();
     }
@@ -150,7 +153,7 @@ public class RecordStorageQueryFactory<I> implements QueryFactory<I,EntityRecord
         final UpdateEntityQuery.Builder<I> builder = UpdateEntityQuery.<I>newBuilder(tableName)
                 .setDataSource(dataSource)
                 .setLogger(getLogger())
-                .setIdColumnSetter(idColumnSetter)
+                .setIdColumn(idColumn)
                 .setId(id)
                 .setRecord(record);
         return builder.build();

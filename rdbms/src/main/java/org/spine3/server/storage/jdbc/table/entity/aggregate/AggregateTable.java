@@ -37,13 +37,15 @@ abstract class AggregateTable<I, R extends Message, C extends Enum<C> & TableCol
         extends EntityTable<I, R, C> {
 
     protected AggregateTable(Class<? extends Entity<I, ?>> entityClass,
+                             String idColumnName,
                              DataSourceWrapper dataSource) {
-        super(entityClass, dataSource);
+        super(entityClass, idColumnName, dataSource);
     }
 
     protected AggregateTable(String tableName,
                              Class<? extends Entity<I, ?>> entityClass,
+                             String idColumnName,
                              DataSourceWrapper dataSource) {
-        super(tableName, entityClass, dataSource);
+        super(tableName, entityClass, idColumnName, dataSource);
     }
 }

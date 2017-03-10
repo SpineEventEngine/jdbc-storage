@@ -27,7 +27,7 @@ import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.WriteQuery;
 import org.spine3.server.storage.jdbc.table.entity.RecordTable.Column;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
-import org.spine3.server.storage.jdbc.util.IdColumnSetter;
+import org.spine3.server.storage.jdbc.util.IdColumn;
 import org.spine3.server.storage.jdbc.util.Serializer;
 
 import java.sql.PreparedStatement;
@@ -70,12 +70,12 @@ public class InsertEntityRecordsBulkQuery<I> extends WriteQuery {
     private static final String SQL_VALUES_TEMPLATE = nPlaceholders(COLUMNS_COUNT);
 
     private final Map<I, EntityRecord> records;
-    private final IdColumnSetter<I> idColumnSetter;
+    private final IdColumn<I> idColumn;
 
     protected InsertEntityRecordsBulkQuery(Builder<I> builder) {
         super(builder);
         this.records = builder.records;
-        this.idColumnSetter = builder.idColumnSetter;
+        this.idColumn = builder.idColumn;
     }
 
     public static <I> Builder<I> newBuilder() {
@@ -116,7 +116,7 @@ public class InsertEntityRecordsBulkQuery<I> extends WriteQuery {
                                   EntityRecord record) {
         int paramIndex = firstParamIndex;
         try {
-            idColumnSetter.setId(paramIndex, id, statement);
+            idColumn.setId(paramIndex, id, statement);
             paramIndex++;
             final byte[] bytes = Serializer.serialize(record);
             statement.setBytes(paramIndex, bytes);
@@ -138,7 +138,7 @@ public class InsertEntityRecordsBulkQuery<I> extends WriteQuery {
 
         private Map<I, EntityRecord> records;
         private String tableName;
-        private IdColumnSetter<I> idColumnSetter;
+        private IdColumn<I> idColumn;
 
         public Builder<I> setRecords(Map<I, EntityRecord> records) {
             this.records = checkNotNull(records);
@@ -151,8 +151,8 @@ public class InsertEntityRecordsBulkQuery<I> extends WriteQuery {
             return getThis();
         }
 
-        public Builder<I> setidColumn(IdColumnSetter<I> idColumnSetter) {
-            this.idColumnSetter = checkNotNull(idColumnSetter);
+        public Builder<I> setidColumn(IdColumn<I> idColumn) {
+            this.idColumn = checkNotNull(idColumn);
             return getThis();
         }
 

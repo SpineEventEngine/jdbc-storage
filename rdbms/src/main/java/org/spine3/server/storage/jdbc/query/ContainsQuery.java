@@ -23,7 +23,7 @@ package org.spine3.server.storage.jdbc.query;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.table.TableColumn;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
-import org.spine3.server.storage.jdbc.util.IdColumnSetter;
+import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -50,19 +50,19 @@ public class ContainsQuery<I> extends StorageQuery {
                                                FROM + FORMAT_PLACEHOLDER +
                                                WHERE + FORMAT_PLACEHOLDER + EQUAL + PLACEHOLDER;
 
-    private final IdColumnSetter<I> idColumnSetter;
+    private final IdColumn<I> idColumn;
     private final I id;
 
     protected ContainsQuery(Builder<I> builder) {
         super(builder);
-        this.idColumnSetter = builder.idColumnSetter;
+        this.idColumn = builder.idColumn;
         this.id = builder.id;
     }
 
     @Override
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
         final PreparedStatement statement = super.prepareStatement(connection);
-        idColumnSetter.setId(1, id, statement);
+        idColumn.setId(1, id, statement);
         return statement;
     }
 
@@ -89,7 +89,7 @@ public class ContainsQuery<I> extends StorageQuery {
     public static class Builder<I> extends StorageQuery.Builder<Builder<I>, ContainsQuery<I>> {
 
         private String tableName;
-        private IdColumnSetter<I> idColumnSetter;
+        private IdColumn<I> idColumn;
         private I id;
         private TableColumn keyColumn;
 
@@ -98,8 +98,8 @@ public class ContainsQuery<I> extends StorageQuery {
             return this;
         }
 
-        public Builder<I> setIdColumnSetter(IdColumnSetter<I> idColumnSetter) {
-            this.idColumnSetter = idColumnSetter;
+        public Builder<I> setIdColumn(IdColumn<I> idColumn) {
+            this.idColumn = idColumn;
             return this;
         }
 

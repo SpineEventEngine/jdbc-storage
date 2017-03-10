@@ -26,9 +26,10 @@ import org.spine3.server.storage.jdbc.query.QueryFactory;
 import org.spine3.server.storage.jdbc.query.SelectByIdQuery;
 import org.spine3.server.storage.jdbc.query.WriteQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.server.storage.jdbc.util.IdColumnSetter;
+import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.spine3.server.storage.jdbc.table.LastHandledEventTimeTable.Column.projection_type;
 
 /**
  * This class creates queries for interaction with
@@ -58,7 +59,8 @@ public class LastHandledEventTimeQueryFactory implements QueryFactory<String, Ti
                 SelectTimestampQuery.newBuilder(tableName)
                                     .setDataSource(dataSource)
                                     .setId(id)
-                                    .setIdColumnSetter(new IdColumnSetter.StringIdColumnSetter())
+                                    .setIdColumn(new IdColumn.StringIdColumn(
+                                            projection_type.name()))
                                     .setLogger(logger);
         return builder.build();
     }

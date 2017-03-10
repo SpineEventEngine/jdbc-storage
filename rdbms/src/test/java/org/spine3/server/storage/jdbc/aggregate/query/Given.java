@@ -24,7 +24,7 @@ import org.slf4j.Logger;
 import org.spine3.server.aggregate.AggregateEventRecord;
 import org.spine3.server.storage.jdbc.GivenDataSource;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.server.storage.jdbc.util.IdColumnSetter;
+import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import java.sql.SQLException;
 
@@ -38,7 +38,7 @@ import static org.mockito.Mockito.mock;
 class Given {
 
     private static Logger loggerMock = null;
-    private static final IdColumnSetter<String> ID_COLUMN_QUERY_SETTER_MOCK = mock(IdColumnSetter.StringIdColumnSetter.class);
+    private static final IdColumn<String> ID_COLUMN_QUERY_SETTER_MOCK = mock(IdColumn.StringIdColumn.class);
 
     private Given() {
     }
@@ -51,7 +51,7 @@ class Given {
                 InsertAggregateRecordQuery.<String>newBuilder(anyString())
                         .setDataSource(dataSourceMock)
                         .setLogger(loggerMock)
-                        .setIdColumnSetter(ID_COLUMN_QUERY_SETTER_MOCK)
+                        .setIdColumn(ID_COLUMN_QUERY_SETTER_MOCK)
                         .setRecord(AggregateEventRecord.getDefaultInstance()
                                                        .getDefaultInstanceForType());
         return builder.build();
@@ -64,7 +64,7 @@ class Given {
                 InsertEventCountQuery.<String>newBuilder(anyString())
                         .setDataSource(dataSourceMock)
                         .setLogger(loggerMock)
-                        .setIdColumnSetter(ID_COLUMN_QUERY_SETTER_MOCK);
+                        .setIdColumn(ID_COLUMN_QUERY_SETTER_MOCK);
         return builder.build();
     }
 
@@ -75,7 +75,7 @@ class Given {
                 SelectEventCountByIdQuery.<String>newBuilder(anyString())
                         .setDataSource(dataSourceMock)
                         .setLogger(loggerMock)
-                        .setIdColumnSetter(ID_COLUMN_QUERY_SETTER_MOCK);
+                        .setIdColumn(ID_COLUMN_QUERY_SETTER_MOCK);
         return builder.build();
     }
 
@@ -86,7 +86,7 @@ class Given {
                 UpdateEventCountQuery.<String>newBuilder(anyString())
                         .setDataSource(dataSourceMock)
                         .setLogger(loggerMock)
-                        .setIdColumnSetter(ID_COLUMN_QUERY_SETTER_MOCK);
+                        .setIdColumn(ID_COLUMN_QUERY_SETTER_MOCK);
         return builder.build();
     }
 

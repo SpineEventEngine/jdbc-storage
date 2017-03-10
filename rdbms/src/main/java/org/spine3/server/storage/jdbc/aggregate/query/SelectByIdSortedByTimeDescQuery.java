@@ -26,7 +26,7 @@ import org.spine3.server.storage.jdbc.query.StorageQuery;
 import org.spine3.server.storage.jdbc.table.entity.aggregate.AggregateEventRecordTable.Column;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.DbIterator;
-import org.spine3.server.storage.jdbc.util.IdColumnSetter;
+import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -58,19 +58,19 @@ public class SelectByIdSortedByTimeDescQuery<I> extends StorageQuery {
             WHERE + Column.id + EQUAL + PLACEHOLDER +
             ORDER_BY + timestamp + DESC + COMMA + timestamp_nanos + DESC + SEMICOLON;
 
-    private final IdColumnSetter<I> idColumnSetter;
+    private final IdColumn<I> idColumn;
     private final I id;
 
     private SelectByIdSortedByTimeDescQuery(Builder<I> builder) {
         super(builder);
-        this.idColumnSetter = builder.idColumnSetter;
+        this.idColumn = builder.idColumn;
         this.id = builder.id;
     }
 
     public DbIterator<AggregateEventRecord> execute() throws DatabaseException {
         try (ConnectionWrapper connection = getConnection(true);
              PreparedStatement statement = prepareStatement(connection)) {
-            idColumnSetter.setId(1, id, statement);
+            idColumn.setId(1, id, statement);
             return new DbIterator<>(statement, aggregate.toString(),
                                     AggregateEventRecord.getDescriptor());
         } catch (SQLException e) {
@@ -88,7 +88,7 @@ public class SelectByIdSortedByTimeDescQuery<I> extends StorageQuery {
     @SuppressWarnings("ClassNameSameAsAncestorName")
     public static class Builder<I> extends StorageQuery.Builder<Builder<I>, SelectByIdSortedByTimeDescQuery> {
 
-        private IdColumnSetter<I> idColumnSetter;
+        private IdColumn<I> idColumn;
         private I id;
 
         @Override
@@ -96,8 +96,8 @@ public class SelectByIdSortedByTimeDescQuery<I> extends StorageQuery {
             return new SelectByIdSortedByTimeDescQuery<>(this);
         }
 
-        public Builder<I> setIdColumnSetter(IdColumnSetter<I> idColumnSetter) {
-            this.idColumnSetter = idColumnSetter;
+        public Builder<I> setIdColumn(IdColumn<I> idColumn) {
+            this.idColumn = idColumn;
             return getThis();
         }
 
