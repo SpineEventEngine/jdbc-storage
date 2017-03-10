@@ -32,7 +32,7 @@ import com.google.protobuf.Message;
  * @param <I> type of the ID of the record
  * @param <R> type of the record
  *
- * @author Dmytro Dashenkov.
+ * @author Dmytro Dashenkov
  */
 public interface QueryFactory<I, R extends Message> {
 

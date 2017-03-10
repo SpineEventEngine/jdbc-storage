@@ -40,7 +40,7 @@ import static org.spine3.server.storage.jdbc.Sql.nPlaceholders;
  * The query for creating a new record in the table storing
  * the {@linkplain org.spine3.server.entity.Visibility entity visibility}.
  *
- * @author Dmytro Dashenkov.
+ * @author Dmytro Dashenkov
  */
 public class InsertVisibilityQuery<I> extends WriteQuery {
 

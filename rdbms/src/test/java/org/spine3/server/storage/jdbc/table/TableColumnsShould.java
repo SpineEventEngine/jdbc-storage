@@ -28,7 +28,7 @@ import static org.junit.Assert.assertTrue;
 import static org.spine3.test.Tests.hasPrivateParameterlessCtor;
 
 /**
- * @author Dmytro Dashenkov.
+ * @author Dmytro Dashenkov
  */
 public class TableColumnsShould {
 

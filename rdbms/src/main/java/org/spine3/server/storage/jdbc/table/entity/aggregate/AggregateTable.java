@@ -31,7 +31,7 @@ import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
  * {@linkplain org.spine3.server.storage.jdbc.table.AbstractTable tables} working with
  * the {@linkplain org.spine3.server.storage.jdbc.aggregate.JdbcAggregateStorage aggregate storage}.
  *
- * @author Dmytro Dashenkov.
+ * @author Dmytro Dashenkov
  */
 abstract class AggregateTable<I, R extends Message, C extends Enum<C> & TableColumn>
         extends EntityTable<I, R, C> {

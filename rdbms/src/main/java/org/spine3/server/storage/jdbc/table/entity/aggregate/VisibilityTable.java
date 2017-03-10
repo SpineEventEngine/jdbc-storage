@@ -36,7 +36,7 @@ import static org.spine3.server.storage.jdbc.Sql.Type.ID;
 /**
  * A table for storing the {@link Visibility} of an {@link Aggregate}.
  *
- * @author Dmytro Dashenkov.
+ * @author Dmytro Dashenkov
  */
 public class VisibilityTable<I> extends AggregateTable<I, Visibility, VisibilityTable.Column> {
 

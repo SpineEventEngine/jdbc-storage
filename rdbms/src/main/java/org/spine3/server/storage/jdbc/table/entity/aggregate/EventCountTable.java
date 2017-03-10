@@ -37,7 +37,7 @@ import static org.spine3.server.storage.jdbc.util.DbTableNameFactory.newTableNam
  *
  * <p>Used in the {@link org.spine3.server.storage.jdbc.aggregate.JdbcAggregateStorage}.
  *
- * @author Dmytro Dashenkov.
+ * @author Dmytro Dashenkov
  */
 public class EventCountTable<I> extends AggregateTable<I, Int32Value, EventCountTable.Column> {
 

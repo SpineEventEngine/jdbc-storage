@@ -33,7 +33,7 @@ import java.sql.SQLException;
  * which write a {@link Timestamp} in the
  * {@link org.spine3.server.storage.jdbc.table.LastHandledEventTimeTable}.
  *
- * @author Dmytro Dashenkov.
+ * @author Dmytro Dashenkov
  */
 public abstract class WriteTimestampQuery extends WriteQuery {
 

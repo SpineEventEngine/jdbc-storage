@@ -44,7 +44,7 @@ import static org.spine3.server.storage.jdbc.Sql.Type.ID;
  *
  * <p>Used in the {@link org.spine3.server.storage.jdbc.entity.JdbcRecordStorage}.
  *
- * @author Dmytro Dashenkov.
+ * @author Dmytro Dashenkov
  */
 public class RecordTable<I> extends EntityTable<I, EntityRecord, RecordTable.Column> {
 

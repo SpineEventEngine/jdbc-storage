@@ -46,7 +46,7 @@ import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
 /**
  * The query updating an {@linkplain org.spine3.server.entity.Visibility entity visibility}.
  *
- * @author Dmytro Dashenkov.
+ * @author Dmytro Dashenkov
  */
 public class UpdateVisibilityQuery<I> extends WriteQuery {
 

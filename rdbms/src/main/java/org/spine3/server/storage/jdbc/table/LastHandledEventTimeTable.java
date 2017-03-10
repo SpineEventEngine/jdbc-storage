@@ -36,7 +36,7 @@ import static org.spine3.server.storage.jdbc.Sql.Type.VARCHAR_999;
  * a {@link org.spine3.server.projection.ProjectionRepository} event time.
  *
  * @see org.spine3.server.projection.ProjectionRepository#catchUp
- * @author Dmytro Dashenkov.
+ * @author Dmytro Dashenkov
  */
 public class LastHandledEventTimeTable extends AbstractTable<String,
                                                              Timestamp,

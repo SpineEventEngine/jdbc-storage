@@ -41,7 +41,7 @@ import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
 /**
  * A query that checks if the table contains a record with given ID.
  *
- * @author Dmytro Dashenkov.
+ * @author Dmytro Dashenkov
  */
 public class ContainsQuery<I> extends StorageQuery {
 

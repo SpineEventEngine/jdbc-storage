@@ -37,7 +37,7 @@ import static org.spine3.server.storage.jdbc.Sql.Type.ID;
 /**
  * A table for storing the {@linkplain AggregateEventRecord aggregate event records}.
  *
- * @author Dmytro Dashenkov.
+ * @author Dmytro Dashenkov
  */
 public class AggregateEventRecordTable<I>
         extends AggregateTable<I, AggregateEventRecord, AggregateEventRecordTable.Column> {

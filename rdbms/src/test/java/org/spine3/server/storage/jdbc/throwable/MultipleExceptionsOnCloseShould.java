@@ -27,7 +27,7 @@ import static org.junit.Assert.assertEquals;
 import static org.spine3.test.Verify.assertContains;
 
 /**
- * @author Dmytro Dashenkov.
+ * @author Dmytro Dashenkov
  */
 public class MultipleExceptionsOnCloseShould {
 

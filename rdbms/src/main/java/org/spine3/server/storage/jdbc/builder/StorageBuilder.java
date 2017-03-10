@@ -35,7 +35,7 @@ import static com.google.common.base.Preconditions.checkState;
  *
  * @param <B> type of the builder itself; used to construct call chains
  * @param <S> type of the built storage
- * @author Dmytro Dashenkov.
+ * @author Dmytro Dashenkov
  */
 public abstract class StorageBuilder<B extends StorageBuilder<B, S>,
                                      S extends Storage> {

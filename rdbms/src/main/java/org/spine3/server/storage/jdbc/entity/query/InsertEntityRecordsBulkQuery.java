@@ -55,7 +55,7 @@ import static org.spine3.server.storage.jdbc.table.entity.RecordTable.Column.ent
 /**
  * A query for {@code INSERT}-ing multiple {@linkplain EntityRecord entity records} as a bulk.
  *
- * @author Dmytro Dashenkov.
+ * @author Dmytro Dashenkov
  */
 public class InsertEntityRecordsBulkQuery<I> extends WriteQuery {
 

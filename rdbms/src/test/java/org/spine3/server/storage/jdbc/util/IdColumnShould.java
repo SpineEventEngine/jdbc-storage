@@ -40,7 +40,7 @@ import static org.spine3.server.storage.jdbc.Sql.Type.INT;
 import static org.spine3.server.storage.jdbc.Sql.Type.VARCHAR_999;
 
 /**
- * @author Dmytro Dashenkov.
+ * @author Dmytro Dashenkov
  */
 public class IdColumnShould {
 

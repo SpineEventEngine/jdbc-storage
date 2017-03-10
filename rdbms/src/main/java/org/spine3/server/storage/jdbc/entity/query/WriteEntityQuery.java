@@ -30,7 +30,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 /**
- * @author Dmytro Dashenkov.
+ * @author Dmytro Dashenkov
  */
 public class WriteEntityQuery<I> extends WriteRecordQuery<I, EntityRecord> {
 

@@ -32,7 +32,7 @@ import static java.lang.System.lineSeparator;
  * {@link org.spine3.server.storage.jdbc.util.Closeables#closeAll(Iterable)} close} multiple
  * closeables.
  *
- * @author Dmytro Dashenkov.
+ * @author Dmytro Dashenkov
  */
 public class MultipleExceptionsOnClose extends Throwable {
 

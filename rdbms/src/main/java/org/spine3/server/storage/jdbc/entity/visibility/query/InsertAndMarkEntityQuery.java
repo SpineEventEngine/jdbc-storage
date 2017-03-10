@@ -36,7 +36,7 @@ import static org.spine3.server.storage.jdbc.table.entity.aggregate.VisibilityTa
  * the {@linkplain org.spine3.server.entity.Visibility entity visibility} with one of the columns
  * set to {@code true}.
  *
- * @author Dmytro Dashenkov.
+ * @author Dmytro Dashenkov
  */
 public class InsertAndMarkEntityQuery<I> extends MarkEntityQuery<I> {
 

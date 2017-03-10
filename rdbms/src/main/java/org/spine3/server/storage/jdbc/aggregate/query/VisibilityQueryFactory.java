@@ -41,7 +41,7 @@ import static org.spine3.server.storage.VisibilityField.deleted;
  * An implementation of the {@link QueryFactory} for generating queries fot
  * the {@link org.spine3.server.storage.jdbc.table.entity.aggregate.VisibilityTable}.
  *
- * @author Dmytro Dashenkov.
+ * @author Dmytro Dashenkov
  */
 public class VisibilityQueryFactory<I> implements QueryFactory<I, Visibility> {
 

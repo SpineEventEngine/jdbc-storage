@@ -29,7 +29,7 @@ import org.spine3.server.storage.jdbc.Sql;
  * <p>It's recommended to implement this interface in an {@code enum}, since it's API is sharpened
  * to be overridden with the {@code enum} default methods.
  *
- * @author Dmytro Dashenkov.
+ * @author Dmytro Dashenkov
  */
 public interface TableColumn extends StorageField {
 

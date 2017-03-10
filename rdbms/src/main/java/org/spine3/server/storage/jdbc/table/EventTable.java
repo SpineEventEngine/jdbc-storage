@@ -40,7 +40,7 @@ import static org.spine3.server.storage.jdbc.Sql.Type.VARCHAR_999;
 /**
  * A table for storing {@link Event events}.
  *
- * @author Dmytro Dashenkov.
+ * @author Dmytro Dashenkov
  */
 public class EventTable extends AbstractTable<String, Event, EventTable.Column> {
 

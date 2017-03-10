@@ -29,7 +29,7 @@ import java.sql.SQLException;
 /**
  * A query for executing a generic SQL.
  *
- * @author Dmytro Dashenkov.
+ * @author Dmytro Dashenkov
  */
 public class SimpleQuery extends StorageQuery {
 

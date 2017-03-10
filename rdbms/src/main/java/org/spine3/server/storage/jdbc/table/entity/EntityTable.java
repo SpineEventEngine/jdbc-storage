@@ -33,7 +33,7 @@ import static org.spine3.server.storage.jdbc.util.DbTableNameFactory.newTableNam
  * A common superclass for the {@linkplain AbstractTable tables} working with the storages which
  * store {@linkplain Entity entities}.
  *
- * @author Dmytro Dashenkov.
+ * @author Dmytro Dashenkov
  */
 public abstract class EntityTable<I, R extends Message, C extends Enum<C> & TableColumn>
         extends AbstractTable<I, R, C> {

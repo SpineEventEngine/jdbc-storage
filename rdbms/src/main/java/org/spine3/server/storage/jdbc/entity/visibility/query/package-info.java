@@ -19,7 +19,7 @@
  */
 
 /**
- * @author Dmytro Dashenkov.
+ * @author Dmytro Dashenkov
  */
 @ParametersAreNonnullByDefault
 package org.spine3.server.storage.jdbc.entity.visibility.query;

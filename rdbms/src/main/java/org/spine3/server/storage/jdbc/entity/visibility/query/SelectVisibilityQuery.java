@@ -42,7 +42,7 @@ import static org.spine3.server.storage.jdbc.table.entity.aggregate.VisibilityTa
 /**
  * The query selecting one {@linkplain org.spine3.server.entity.Visibility entity visibility} by ID.
  *
- * @author Dmytro Dashenkov.
+ * @author Dmytro Dashenkov
  */
 public class SelectVisibilityQuery<I> extends SelectByIdQuery<I, Visibility> {
 

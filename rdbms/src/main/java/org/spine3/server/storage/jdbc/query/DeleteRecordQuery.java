@@ -37,7 +37,7 @@ import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
 /**
  * A query for deleting one or many items by a id of a given column.
  *
- * @author Dmytro Dashenkov.
+ * @author Dmytro Dashenkov
  */
 public class DeleteRecordQuery<I> extends StorageQuery {
 

@@ -36,7 +36,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * @author Dmytro Dashenkov.
+ * @author Dmytro Dashenkov
  */
 public class JdbcAggregateStorageVisibilityHandlingShould extends AggregateStorageVisibilityHandlingShould {
 
