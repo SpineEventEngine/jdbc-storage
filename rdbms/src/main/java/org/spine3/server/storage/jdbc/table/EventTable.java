@@ -34,8 +34,8 @@ import java.util.Iterator;
 import static org.spine3.server.storage.jdbc.Sql.Type.BIGINT;
 import static org.spine3.server.storage.jdbc.Sql.Type.BLOB;
 import static org.spine3.server.storage.jdbc.Sql.Type.INT;
+import static org.spine3.server.storage.jdbc.Sql.Type.VARCHAR_255;
 import static org.spine3.server.storage.jdbc.Sql.Type.VARCHAR_512;
-import static org.spine3.server.storage.jdbc.Sql.Type.VARCHAR_999;
 
 /**
  * A table for storing {@link Event events}.
@@ -76,10 +76,10 @@ public class EventTable extends AbstractTable<String, Event, EventTable.Column> 
 
     public enum Column implements TableColumn {
 
-        event_id(VARCHAR_999),
+        event_id(VARCHAR_255),
         event(BLOB),
         event_type(VARCHAR_512),
-        producer_id(VARCHAR_512),
+        producer_id(VARCHAR_255),
         seconds(BIGINT),
         nanoseconds(INT);
 

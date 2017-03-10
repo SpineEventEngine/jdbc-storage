@@ -37,8 +37,7 @@ import org.spine3.server.storage.jdbc.util.IdColumn;
 import java.util.Iterator;
 
 import static org.spine3.server.storage.jdbc.Sql.Type.BLOB;
-import static org.spine3.server.storage.jdbc.Sql.Type.VARCHAR_512;
-import static org.spine3.server.storage.jdbc.Sql.Type.VARCHAR_999;
+import static org.spine3.server.storage.jdbc.Sql.Type.VARCHAR_255;
 
 /**
  * A table for storing {@link CommandRecord commands}.
@@ -95,9 +94,9 @@ public class CommandTable extends AbstractTable<String, CommandRecord, CommandTa
 
     public enum Column implements TableColumn {
 
-        id(VARCHAR_999),
+        id(VARCHAR_255),
         command(BLOB),
-        command_status(VARCHAR_512),
+        command_status(VARCHAR_255),
         error(BLOB),
         failure(BLOB);
 

@@ -37,7 +37,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.spine3.server.storage.jdbc.Sql.Type.BIGINT;
 import static org.spine3.server.storage.jdbc.Sql.Type.INT;
-import static org.spine3.server.storage.jdbc.Sql.Type.VARCHAR_999;
+import static org.spine3.server.storage.jdbc.Sql.Type.VARCHAR_255;
 
 /**
  * @author Dmytro Dashenkov
@@ -57,15 +57,15 @@ public class IdColumnShould {
     }
 
     @Test
-    public void have_varchar999_impl() {
+    public void have_varchar255_impl() {
         final IdColumn<?> column = IdColumn.newInstance(StringIdEntity.class);
-        assertEquals(VARCHAR_999, column.getColumnDataType());
+        assertEquals(VARCHAR_255, column.getColumnDataType());
     }
 
     @Test
     public void cast_message_IDs_to_string() {
         final IdColumn<?> column = IdColumn.newInstance(MessageIdEntity.class);
-        assertEquals(VARCHAR_999, column.getColumnDataType());
+        assertEquals(VARCHAR_255, column.getColumnDataType());
     }
 
     @Test(expected = DatabaseException.class)

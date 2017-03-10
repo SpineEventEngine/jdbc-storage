@@ -29,7 +29,7 @@ import org.spine3.server.storage.jdbc.util.IdColumn;
 import static org.spine3.server.storage.jdbc.Sql.Type;
 import static org.spine3.server.storage.jdbc.Sql.Type.BIGINT;
 import static org.spine3.server.storage.jdbc.Sql.Type.INT;
-import static org.spine3.server.storage.jdbc.Sql.Type.VARCHAR_999;
+import static org.spine3.server.storage.jdbc.Sql.Type.VARCHAR_255;
 
 /**
  * A table for storing the last handled by
@@ -69,7 +69,7 @@ public class LastHandledEventTimeTable extends AbstractTable<String,
 
     public enum Column implements TableColumn {
 
-        projection_type(VARCHAR_999),
+        projection_type(VARCHAR_255),
         seconds(BIGINT),
         nanos(INT);
 

@@ -34,7 +34,7 @@ import java.sql.SQLException;
 import static org.spine3.base.Stringifiers.idToString;
 import static org.spine3.server.storage.jdbc.Sql.Type.BIGINT;
 import static org.spine3.server.storage.jdbc.Sql.Type.INT;
-import static org.spine3.server.storage.jdbc.Sql.Type.VARCHAR_999;
+import static org.spine3.server.storage.jdbc.Sql.Type.VARCHAR_255;
 
 /**
  * Helps to work with {@link Entity} ID columns.
@@ -137,7 +137,7 @@ public abstract class IdColumn<I> {
 
         @Override
         public Sql.Type getColumnDataType() {
-            return VARCHAR_999;
+            return VARCHAR_255;
         }
 
         @Override

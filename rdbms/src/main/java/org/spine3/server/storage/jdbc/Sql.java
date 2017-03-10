@@ -88,6 +88,7 @@ public class Sql {
         BLOB("BLOB"),
         INT("INT"),
         BIGINT("BIGINT"),
+        VARCHAR_255("VARCHAR(255)"),
         VARCHAR_512("VARCHAR(512)"),
         VARCHAR_999("VARCHAR(999)"),
         BOOLEAN("BOOLEAN");
