@@ -37,7 +37,16 @@ import static org.spine3.server.storage.jdbc.Sql.Type.INT;
 import static org.spine3.server.storage.jdbc.Sql.Type.VARCHAR_255;
 
 /**
- * Helps to work with {@link Entity} ID columns.
+ * A helper class for setting the {@link Entity} ID into a {@link PreparedStatement}as a query
+ * parameter.
+ *
+ * <p>Depending on what type ID is, {@linkplain #setId(int, Object, PreparedStatement) setId} method
+ * will call one of the setters:
+ * <ul>
+ *     <li>{@link PreparedStatement#setInt}
+ *     <li>{@link PreparedStatement#setLong}
+ *     <li>{@link PreparedStatement#setString}
+ * </ul>
  *
  * @param <I> the type of {@link Entity} IDs
  * @author Alexander Litus
@@ -73,8 +82,7 @@ public abstract class IdColumnSetter<I> {
     }
 
     /**
-     * Returns the SQL data type string of the ID column, e.g. {@code "BIGINT"},
-     * {@code "VARCHAR(999)"}, etc.
+     * Returns the {@link Sql.Type} of the column with which this helper instance works.
      */
     public abstract Sql.Type getColumnDataType();
 
