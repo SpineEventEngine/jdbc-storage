@@ -30,7 +30,6 @@ import org.spine3.server.storage.jdbc.entity.query.SelectBulkQuery;
 import org.spine3.server.storage.jdbc.query.QueryFactory;
 import org.spine3.server.storage.jdbc.table.TableColumn;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -41,6 +40,10 @@ import static org.spine3.server.storage.jdbc.Sql.Type.BOOLEAN;
 import static org.spine3.server.storage.jdbc.Sql.Type.UNKNOWN;
 
 /**
+ * A table for storing the {@link EntityRecord entity records}.
+ *
+ * <p>Used in the {@link org.spine3.server.storage.jdbc.entity.JdbcRecordStorage}.
+ *
  * @author Dmytro Dashenkov.
  */
 public class RecordTable<I> extends EntityTable<I, EntityRecord, RecordTable.Column> {
@@ -49,7 +52,7 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, RecordTable.Col
 
     public RecordTable(Class<Entity<I, ?>> entityClass,
                        DataSourceWrapper dataSource) {
-        super(entityClass, IdColumn.newInstance(entityClass), dataSource);
+        super(entityClass, dataSource);
         queryFactory = new RecordStorageQueryFactory<>(dataSource, entityClass);
     }
 

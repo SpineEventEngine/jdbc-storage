@@ -33,6 +33,10 @@ import static org.spine3.server.storage.jdbc.Sql.Type.UNKNOWN;
 import static org.spine3.server.storage.jdbc.util.DbTableNameFactory.newTableName;
 
 /**
+ * A table for storing the event count after the last snapshot.
+ *
+ * <p>Used in the {@link org.spine3.server.storage.jdbc.aggregate.JdbcAggregateStorage}.
+ *
  * @author Dmytro Dashenkov.
  */
 public class EventCountTable<I> extends AggregateTable<I, Int32Value, EventCountTable.Column> {

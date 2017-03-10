@@ -38,6 +38,8 @@ import static org.spine3.server.storage.jdbc.Sql.Type.VARCHAR_512;
 import static org.spine3.server.storage.jdbc.Sql.Type.VARCHAR_999;
 
 /**
+ * A table for storing {@link Event events}.
+ *
  * @author Dmytro Dashenkov.
  */
 public class EventTable extends AbstractTable<String, Event, EventTable.Column> {
@@ -66,7 +68,7 @@ public class EventTable extends AbstractTable<String, Event, EventTable.Column> 
         return queryFactory;
     }
 
-    public Iterator<Event> getEventStream(EventStreamQuery query) {
+    public Iterator<Event> eventStream(EventStreamQuery query) {
         final FilterAndSortQuery sqlQuery = queryFactory.newFilterAndSortQuery(query);
         final Iterator<Event> result = sqlQuery.execute();
         return result;

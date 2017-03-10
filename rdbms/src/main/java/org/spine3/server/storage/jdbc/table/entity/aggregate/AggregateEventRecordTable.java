@@ -35,6 +35,8 @@ import static org.spine3.server.storage.jdbc.Sql.Type.INT;
 import static org.spine3.server.storage.jdbc.Sql.Type.UNKNOWN;
 
 /**
+ * A table for storing the {@linkplain AggregateEventRecord aggregate event records}.
+ *
  * @author Dmytro Dashenkov.
  */
 public class AggregateEventRecordTable<I>

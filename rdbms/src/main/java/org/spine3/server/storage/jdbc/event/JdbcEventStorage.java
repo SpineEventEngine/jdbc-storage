@@ -100,7 +100,7 @@ public class JdbcEventStorage extends EventStorage {
         checkNotClosed();
         checkNotNull(query);
 
-        final Iterator<Event> iterator = eventTable.getEventStream(query);
+        final Iterator<Event> iterator = eventTable.eventStream(query);
         iterators.add((DbIterator) iterator);
 
         final UnmodifiableIterator<Event> filtered = filterEvents(iterator, query);

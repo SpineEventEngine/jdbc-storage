@@ -30,23 +30,40 @@ import org.spine3.server.storage.jdbc.util.IdColumn;
 import static org.spine3.server.storage.jdbc.util.DbTableNameFactory.newTableName;
 
 /**
+ * A common superclass for the {@linkplain AbstractTable tables} working with the storages which
+ * store {@linkplain Entity entities}.
+ *
  * @author Dmytro Dashenkov.
  */
-public abstract class EntityTable<I, R extends Message, C extends Enum<C> & TableColumn> extends AbstractTable<I, R, C> {
+public abstract class EntityTable<I, R extends Message, C extends Enum<C> & TableColumn>
+        extends AbstractTable<I, R, C> {
 
     private final Class<? extends Entity<I, ?>> entityClass;
 
+    /**
+     * Creates a new instance of the {@code EntityTable}.
+     *
+     * <p>The table will have a name based on the FQN name of the given {@link Entity} class.
+     *
+     * @param entityClass the {@link Class} of the {@link Entity} to store
+     * @param dataSource  an instance of {@link DataSourceWrapper} to use
+     */
     protected EntityTable(Class<? extends Entity<I, ?>> entityClass,
-                          IdColumn<I> idColumn,
                           DataSourceWrapper dataSource) {
-        this(newTableName(entityClass), entityClass, idColumn, dataSource);
+        this(newTableName(entityClass), entityClass, dataSource);
     }
 
+    /**
+     * Creates a new instance of the {@code EntityTable}.
+     *
+     * @param tableName   the name of the table
+     * @param entityClass the {@link Class} of the {@link Entity} to store
+     * @param dataSource  an instance of {@link DataSourceWrapper} to use
+     */
     protected EntityTable(String tableName,
                           Class<? extends Entity<I, ?>> entityClass,
-                          IdColumn<I> idColumn,
                           DataSourceWrapper dataSource) {
-        super(tableName, idColumn, dataSource);
+        super(tableName, IdColumn.newInstance(entityClass), dataSource);
         this.entityClass = entityClass;
     }
 

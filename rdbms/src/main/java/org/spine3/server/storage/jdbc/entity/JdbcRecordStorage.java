@@ -164,6 +164,8 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     /**
      * Clears all data in the storage.
      *
+     * <p>Used for testing purposes.
+     *
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     void clear() throws DatabaseException {

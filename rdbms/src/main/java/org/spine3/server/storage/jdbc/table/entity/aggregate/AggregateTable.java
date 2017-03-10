@@ -25,21 +25,25 @@ import org.spine3.server.entity.Entity;
 import org.spine3.server.storage.jdbc.table.TableColumn;
 import org.spine3.server.storage.jdbc.table.entity.EntityTable;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
-import org.spine3.server.storage.jdbc.util.IdColumn;
 
 /**
+ * A common superclass for the
+ * {@linkplain org.spine3.server.storage.jdbc.table.AbstractTable tables} working with
+ * the {@linkplain org.spine3.server.storage.jdbc.aggregate.JdbcAggregateStorage aggregate storage}.
+ *
  * @author Dmytro Dashenkov.
  */
-public abstract class AggregateTable<I, R extends Message, C extends Enum<C> & TableColumn> extends EntityTable<I, R, C> {
+abstract class AggregateTable<I, R extends Message, C extends Enum<C> & TableColumn>
+        extends EntityTable<I, R, C> {
 
     protected AggregateTable(Class<? extends Entity<I, ?>> entityClass,
                              DataSourceWrapper dataSource) {
-        super(entityClass, IdColumn.newInstance(entityClass), dataSource);
+        super(entityClass, dataSource);
     }
 
     protected AggregateTable(String tableName,
                              Class<? extends Entity<I, ?>> entityClass,
                              DataSourceWrapper dataSource) {
-        super(tableName, entityClass, IdColumn.newInstance(entityClass), dataSource);
+        super(tableName, entityClass, dataSource);
     }
 }

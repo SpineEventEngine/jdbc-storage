@@ -73,6 +73,9 @@ public class Sql {
      */
     public enum Type {
 
+        /**
+         * The type that cannot be determined in compile time.
+         */
         UNKNOWN("unknown type", Types.NULL),
         BLOB("BLOB", Types.BLOB),
         INT("INT", Types.INTEGER),

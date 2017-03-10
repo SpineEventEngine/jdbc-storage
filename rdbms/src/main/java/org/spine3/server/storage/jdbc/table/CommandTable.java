@@ -41,6 +41,8 @@ import static org.spine3.server.storage.jdbc.Sql.Type.VARCHAR_512;
 import static org.spine3.server.storage.jdbc.Sql.Type.VARCHAR_999;
 
 /**
+ * A table for storing {@link CommandRecord commands}.
+ *
  * @author Dmytro Dashenkov.
  */
 public class CommandTable extends AbstractTable<String, CommandRecord, CommandTable.Column> {
