@@ -73,7 +73,16 @@ public class Sql {
     public enum Type {
 
         /**
-         * The type that cannot be determined in compile time.
+         * The type of a generic ID.
+         *
+         * <p>Use this type for an ID column, type of which cannot be determined in compile time,
+         * but only in runtime.
+         *
+         * <p>When required this type is converter into a valid SQL type of the ID column.
+         *
+         * <p>This is not designed to serve as a "dynamic" type which can be replaced in any time,
+         * but only to solve the problem if identifiers with unknown types. Using this type for
+         * a non-ID column may lead to a failure.
          */
         ID("generic id type"),
         BLOB("BLOB"),
