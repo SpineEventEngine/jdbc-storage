@@ -20,31 +20,38 @@
 
 package org.spine3.server.storage.jdbc.table;
 
-import org.spine3.server.storage.StorageField;
+import org.junit.Test;
 import org.spine3.server.storage.jdbc.Sql;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.spine3.test.Tests.hasPrivateParameterlessCtor;
+
 /**
- * An interface for the database table columns representation.
- *
- * <p>It's recommended to implement this interface in an {@code enum}, since it's API is sharpened
- * to be overridden with the {@code enum} default methods.
- *
  * @author Dmytro Dashenkov.
  */
-public interface TableColumn extends StorageField {
+public class TableColumnsShould {
 
-    /**
-     * @return the name of the column
-     */
-    String name();
+    @Test
+    public void have_private_utility_constructor() {
+        assertTrue(hasPrivateParameterlessCtor(TableColumns.class));
+    }
 
-    /**
-     * @return the {@link Sql.Type} of the column
-     */
-    Sql.Type type();
+    @Test
+    public void return_index_of_column_as_ordinal_plus_one() {
+        final TableColumn column = Column.INSTANCE;
+        final int ordinal = column.ordinal();
+        final int index = TableColumns.getIndex(column);
+        assertEquals(ordinal + 1, index);
+    }
 
-    /**
-     * @return the position of the column in the {@code CREATE TABLE} query starting from 0
-     */
-    int ordinal();
+    private enum Column implements TableColumn {
+
+        INSTANCE;
+
+        @Override
+        public Sql.Type type() {
+            return Sql.Type.UNKNOWN;
+        }
+    }
 }
