@@ -18,20 +18,26 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.spine3.server.storage.jdbc.command.query;
-
-import org.junit.Test;
-
-import static org.junit.Assert.assertTrue;
-import static org.spine3.test.Tests.hasPrivateParameterlessCtor;
+package org.spine3.server.storage.jdbc.table;
 
 /**
- * @author Andrey Lavrov
+ * A utility for working with the {@link TableColumn} instances.
+ *
+ * @see TableColumn
+ * @author Dmytro Dashenkov
  */
-public class CommandTableShould {
+public class TableColumns {
 
-    @Test
-    public void have_private_constructors() {
-        assertTrue(hasPrivateParameterlessCtor(CommandTable.class));
+    private TableColumns() {
+        super();
+    }
+
+    /**
+     * @return an index of the given column in the table; by convention this is the column's
+     * {@code {@linkplain TableColumn#ordinal() ordinal} + 1}
+     */
+    public static int getIndex(TableColumn column) {
+        // SQL column indexes always start with 1, not with 0
+        return column.ordinal() + 1;
     }
 }

@@ -27,7 +27,6 @@ import org.spine3.server.aggregate.AggregateStorage;
 import org.spine3.server.aggregate.AggregateStorageVisibilityHandlingShould;
 import org.spine3.server.entity.Visibility;
 import org.spine3.server.storage.jdbc.GivenDataSource;
-import org.spine3.server.storage.jdbc.aggregate.query.AggregateStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.test.aggregate.Project;
 import org.spine3.test.aggregate.ProjectId;
@@ -37,7 +36,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * @author Dmytro Dashenkov.
+ * @author Dmytro Dashenkov
  */
 public class JdbcAggregateStorageVisibilityHandlingShould extends AggregateStorageVisibilityHandlingShould {
 
@@ -46,11 +45,9 @@ public class JdbcAggregateStorageVisibilityHandlingShould extends AggregateStora
             Class<? extends Aggregate<ProjectId, ?, ?>> aggregateClass) {
         final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(
                 "aggregateStorageStatusHandlingTests");
-        final AggregateStorageQueryFactory<ProjectId> queryFactory =
-                new AggregateStorageQueryFactory<>(dataSource, TestAggregate.class);
         final JdbcAggregateStorage<ProjectId> storage = JdbcAggregateStorage.<ProjectId>newBuilder()
-                                                                 .setQueryFactory(queryFactory)
                                                                  .setMultitenant(false)
+                                                                 .setAggregateClass(TestAggregate.class)
                                                                  .setDataSource(dataSource)
                                                                  .build();
         return storage;

@@ -37,9 +37,8 @@ import static org.mockito.Mockito.mock;
 @SuppressWarnings("UtilityClass")
 class Given {
 
-    @SuppressWarnings("StaticNonFinalField")
     private static Logger loggerMock = null;
-    private static final IdColumn<String> idColumnMock = mock(IdColumn.StringIdColumn.class);
+    private static final IdColumn<String> ID_COLUMN_QUERY_SETTER_MOCK = mock(IdColumn.StringIdColumn.class);
 
     private Given() {
     }
@@ -51,7 +50,7 @@ class Given {
                 SelectCommandByIdQuery.newBuilder()
                                       .setDataSource(dataSourceMock)
                                       .setLogger(loggerMock)
-                                      .setIdColumn(idColumnMock);
+                                      .setIdColumn(ID_COLUMN_QUERY_SETTER_MOCK);
         return builder.build();
     }
 
@@ -73,7 +72,7 @@ class Given {
                 InsertCommandQuery.newBuilder()
                                   .setDataSource(dataSourceMock)
                                   .setLogger(loggerMock)
-                                  .setIdColumn(idColumnMock)
+                                  .setIdColumn(ID_COLUMN_QUERY_SETTER_MOCK)
                                   .setRecord(CommandRecord.getDefaultInstance())
                                   .setStatus(CommandStatus.UNDEFINED);
         return builder.build();

@@ -27,11 +27,14 @@ import org.spine3.protobuf.AnyPacker;
 import org.spine3.protobuf.TypeUrl;
 import org.spine3.server.entity.EntityRecord;
 import org.spine3.server.entity.FieldMasks;
+import org.spine3.server.storage.jdbc.table.entity.RecordTable.Column;
 import org.spine3.server.storage.jdbc.util.Serializer;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
+
+import static org.spine3.server.storage.jdbc.table.entity.RecordTable.Column.entity;
 
 /**
  * Utility class for parsing the results of a DB query ({@link ResultSet}) into the required in-memory representation.
@@ -53,7 +56,7 @@ class QueryResults {
      * @param <S>   S type of the {@link org.spine3.server.entity.Entity}.
      * @return ID-to-{@link EntityRecord} {@link Map} representing the query results.
      * @throws SQLException if read results contain no ID column or entity column.
-     * @see EntityTable
+     * @see org.spine3.server.storage.jdbc.table.entity.RecordTable
      */
     static <I, S extends Message> Map<I, EntityRecord> parse(
             ResultSet resultSet,
@@ -65,7 +68,7 @@ class QueryResults {
             final EntityRecord record = readSingleMessage(resultSet);
             final S maskedMessage = maskFields(record, fieldMask);
             @SuppressWarnings("unchecked")
-            final I id = (I) resultSet.getObject(EntityTable.ID_COL);
+            final I id = (I) resultSet.getObject(Column.id.name());
             resultBuilder.put(id, EntityRecord.newBuilder(record)
                                               .setState(AnyPacker.pack(maskedMessage))
                                               .build());
@@ -77,7 +80,7 @@ class QueryResults {
     }
 
     private static EntityRecord readSingleMessage(ResultSet resultSet) throws SQLException {
-        return Serializer.deserialize(resultSet.getBytes(EntityTable.ENTITY_COL),
+        return Serializer.deserialize(resultSet.getBytes(entity.name()),
                                       EntityRecord.getDescriptor());
     }
 

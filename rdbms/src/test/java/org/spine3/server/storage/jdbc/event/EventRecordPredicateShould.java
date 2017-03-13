@@ -33,7 +33,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
- * @author Dmytro Dashenkov.
+ * @author Dmytro Dashenkov
  */
 public class EventRecordPredicateShould {
 

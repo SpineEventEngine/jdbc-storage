@@ -20,13 +20,35 @@
 
 package org.spine3.server.storage.jdbc.query;
 
+import com.google.protobuf.Message;
+
 /**
- * A marker interface common for all the query factories.
+ * An interface of a {@linkplain StorageQuery query} factory.
  *
- * <p>Each JDBC-based {@linkplain org.spine3.server.storage.Storage} uses an instance of
- * {@code QueryFactory} implementation to construct its SQL queries to the database.
+ * <p>Each JDBC {@linkplain org.spine3.server.storage.jdbc.table.AbstractTable table} uses an
+ * instance of {@code QueryFactory} implementation to construct its SQL queries to the
+ * database.
  *
- * @author Dmytro Dashenkov.
+ * @param <I> type of the ID of the record
+ * @param <R> type of the record
+ *
+ * @author Dmytro Dashenkov
  */
-public interface QueryFactory {
+public interface QueryFactory<I, R extends Message> {
+
+    /**
+     * @return a query for selecting a record by given ID
+     */
+    SelectByIdQuery<I, R> newSelectByIdQuery(I id);
+
+    /**
+     * @return a query inserting a the given record under the given ID
+     */
+    WriteQuery newInsertQuery(I id, R record);
+
+    /**
+     * @return a query for updating the record under the given ID with new value
+     */
+    WriteQuery newUpdateQuery(I id, R record);
+
 }

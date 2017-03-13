@@ -27,8 +27,10 @@ import org.spine3.server.entity.EntityRecord;
 import org.spine3.server.storage.RecordStorage;
 import org.spine3.server.storage.VisibilityField;
 import org.spine3.server.storage.jdbc.entity.visibility.query.MarkEntityQuery;
-import org.spine3.server.storage.jdbc.query.DeleteRecordQuery;
 import org.spine3.server.storage.jdbc.query.QueryFactory;
+import org.spine3.server.storage.jdbc.query.SelectByIdQuery;
+import org.spine3.server.storage.jdbc.query.WriteQuery;
+import org.spine3.server.storage.jdbc.table.entity.RecordTable;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbTableNameFactory;
 import org.spine3.server.storage.jdbc.util.IdColumn;
@@ -36,20 +38,19 @@ import org.spine3.server.storage.jdbc.util.IdColumn;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
 
 /**
- * This class creates queries for interaction with {@link EntityTable}.
+ * This class creates queries for interaction with the {@link RecordTable}.
  *
  * @author Andrey Lavrov
  * @author Dmytro Dashenkov
  */
-public class RecordStorageQueryFactory<I> implements QueryFactory {
+public class RecordStorageQueryFactory<I> implements QueryFactory<I,EntityRecord> {
 
     private final IdColumn<I> idColumn;
     private final DataSourceWrapper dataSource;
     private final String tableName;
-    private Logger logger;
+    private final Logger logger;
 
     /**
      * Creates a new instance.
@@ -58,11 +59,14 @@ public class RecordStorageQueryFactory<I> implements QueryFactory {
      * @param entityClass entity class of corresponding {@link RecordStorage} instance
      */
     public RecordStorageQueryFactory(DataSourceWrapper dataSource,
-                                     Class<? extends Entity<I, ?>> entityClass) {
+                                     Class<? extends Entity<I, ?>> entityClass,
+                                     Logger logger,
+                                     IdColumn<I> idColumn) {
         super();
-        this.idColumn = IdColumn.newInstance(entityClass);
+        this.idColumn = checkNotNull(idColumn);
         this.dataSource = dataSource;
         this.tableName = DbTableNameFactory.newTableName(entityClass);
+        this.logger = logger;
     }
 
     public MarkEntityQuery<I> newMarkArchivedQuery(I id) {
@@ -85,97 +89,11 @@ public class RecordStorageQueryFactory<I> implements QueryFactory {
         return query;
     }
 
-    /**
-     * Sets the logger for logging exceptions during queries execution.
-     */
-    public void setLogger(Logger logger) {
-        this.logger = checkNotNull(logger);
-    }
-
     public Logger getLogger() {
         return logger;
     }
 
-    /**
-     * Returns a query that creates a new {@link EntityTable} if it does not exist.
-     */
-    public CreateEntityTableQuery newCreateEntityTableQuery() {
-        final CreateEntityTableQuery.Builder<I> builder =
-                CreateEntityTableQuery.<I>newBuilder()
-                                      .setDataSource(dataSource)
-                                      .setLogger(getLogger())
-                                      .setIdColumn(idColumn)
-                                      .setTableName(tableName);
-        return builder.build();
-    }
-
-    /**
-     * Returns a query that inserts a new {@link EntityRecord} to the {@link EntityTable}.
-     *
-     * @param id     new entity record id
-     * @param record new entity record
-     */
-    public InsertEntityQuery newInsertEntityQuery(I id, EntityRecord record) {
-        final InsertEntityQuery.Builder<I> builder = InsertEntityQuery.<I>newBuilder(tableName)
-                                                                      .setDataSource(dataSource)
-                                                                      .setLogger(getLogger())
-                                                                      .setId(id)
-                                                                      .setIdColumn(idColumn)
-                                                                      .setRecord(record);
-        return builder.build();
-    }
-
-    /**
-     * Returns a query that updates {@link EntityRecord} in the {@link EntityTable}.
-     *
-     * @param id     entity id
-     * @param record updated record state
-     */
-    public UpdateEntityQuery newUpdateEntityQuery(I id, EntityRecord record) {
-        final UpdateEntityQuery.Builder<I> builder = UpdateEntityQuery.<I>newBuilder(tableName)
-                                                                      .setDataSource(dataSource)
-                                                                      .setLogger(getLogger())
-                                                                      .setIdColumn(idColumn)
-                                                                      .setId(id)
-                                                                      .setRecord(record);
-        return builder.build();
-    }
-
-    /**
-     * Returns a query that selects {@link EntityRecord} by ID.
-     */
-    public SelectEntityByIdQuery<I> newSelectEntityByIdQuery(I id) {
-        final SelectEntityByIdQuery.Builder<I> builder =
-                SelectEntityByIdQuery.<I>newBuilder(tableName)
-                                     .setDataSource(dataSource)
-                                     .setLogger(getLogger())
-                                     .setIdColumn(idColumn)
-                                     .setId(id);
-        return builder.build();
-    }
-
-    public DeleteRecordQuery<I> newDeleteRowQuery(I id) {
-        final DeleteRecordQuery.Builder<I> builder = DeleteRecordQuery.<I>newBuilder()
-                                                                .setDataSource(dataSource)
-                                                                .setLogger(getLogger())
-                                                                .setTableName(tableName)
-                                                                .setIdColumn(idColumn)
-                                                                .setIdColumnName(ID_COL)
-                                                                .setIdValue(id);
-        return builder.build();
-    }
-
-    /**
-     * Returns a query that deletes all from {@link EntityTable}.
-     */
-    public DeleteAllQuery newDeleteAllQuery() {
-        final DeleteAllQuery.Builder builder = DeleteAllQuery.newBuilder(tableName)
-                                                             .setDataSource(dataSource)
-                                                             .setLogger(getLogger());
-        return builder.build();
-    }
-
-    public SelectBulkQuery newSelectAllQuery(FieldMask fieldMask) {
+    public SelectBulkQuery<I> newSelectAllQuery(FieldMask fieldMask) {
         final SelectBulkQuery.Builder<I> builder = SelectBulkQuery.<I>newBuilder(tableName)
                                                                   .setFieldMask(fieldMask)
                                                                   .setLogger(getLogger())
@@ -186,7 +104,8 @@ public class RecordStorageQueryFactory<I> implements QueryFactory {
 
     public SelectBulkQuery<I> newSelectBulkQuery(Iterable<I> ids, FieldMask fieldMask) {
         final SelectBulkQuery.Builder<I> builder = SelectBulkQuery.<I>newBuilder()
-                                                                  .setIdColumn(idColumn)
+                                                                  .setIdColumn(
+                                                                          idColumn)
                                                                   .setIdsQuery(tableName, ids)
                                                                   .setFieldMask(fieldMask)
                                                                   .setLogger(getLogger())
@@ -204,6 +123,39 @@ public class RecordStorageQueryFactory<I> implements QueryFactory {
                                             .setTableName(tableName)
                                             .setidColumn(idColumn)
                                             .setRecords(records);
+        return builder.build();
+    }
+
+    @Override
+    public SelectByIdQuery<I, EntityRecord> newSelectByIdQuery(I id) {
+        final SelectEntityByIdQuery.Builder<I> builder =
+                SelectEntityByIdQuery.<I>newBuilder(tableName)
+                        .setDataSource(dataSource)
+                        .setLogger(getLogger())
+                        .setIdColumn(idColumn)
+                        .setId(id);
+        return builder.build();
+    }
+
+    @Override
+    public WriteQuery newInsertQuery(I id, EntityRecord record) {
+        final InsertEntityQuery.Builder<I> builder = InsertEntityQuery.<I>newBuilder(tableName)
+                .setDataSource(dataSource)
+                .setLogger(getLogger())
+                .setId(id)
+                .setIdColumn(idColumn)
+                .setRecord(record);
+        return builder.build();
+    }
+
+    @Override
+    public WriteQuery newUpdateQuery(I id, EntityRecord record) {
+        final UpdateEntityQuery.Builder<I> builder = UpdateEntityQuery.<I>newBuilder(tableName)
+                .setDataSource(dataSource)
+                .setLogger(getLogger())
+                .setIdColumn(idColumn)
+                .setId(id)
+                .setRecord(record);
         return builder.build();
     }
 }

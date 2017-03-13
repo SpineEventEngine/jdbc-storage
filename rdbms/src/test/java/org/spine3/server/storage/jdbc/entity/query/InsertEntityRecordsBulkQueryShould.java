@@ -45,7 +45,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * @author Dmytro Dashenkov.
+ * @author Dmytro Dashenkov
  */
 public class InsertEntityRecordsBulkQueryShould {
 
@@ -65,7 +65,7 @@ public class InsertEntityRecordsBulkQueryShould {
                         .setLogger(logger)
                         .setDataSource(dataSource)
                         .setRecords(recordMap)
-                        .setidColumn(new IdColumn.StringIdColumn())
+                        .setidColumn(IdColumn.typeString("id"))
                         .setTableName("random-table")
                         .build();
 

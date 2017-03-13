@@ -36,6 +36,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import static java.lang.String.format;
 import static org.spine3.server.storage.VisibilityField.archived;
 import static org.spine3.server.storage.VisibilityField.deleted;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
@@ -52,6 +53,7 @@ import static org.spine3.server.storage.jdbc.Sql.Query.NULL;
 import static org.spine3.server.storage.jdbc.Sql.Query.OR;
 import static org.spine3.server.storage.jdbc.Sql.Query.SELECT;
 import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
+import static org.spine3.server.storage.jdbc.table.entity.RecordTable.Column.id;
 
 /**
  * Implementation of {@link StorageQuery} for bulk selection.
@@ -76,7 +78,7 @@ public class SelectBulkQuery<I> extends StorageQuery {
             deleted + EQUAL + FALSE + BRACKET_CLOSE;
 
     private static final String ALL_TEMPLATE = COMMON_TEMPLATE + ';';
-    private static final String IDS_TEMPLATE = COMMON_TEMPLATE + AND + EntityTable.ID_COL + IN
+    private static final String IDS_TEMPLATE = COMMON_TEMPLATE + AND + id + IN
                                                + " %s" + SEMICOLON;
 
     private final FieldMask fieldMask;
@@ -96,7 +98,7 @@ public class SelectBulkQuery<I> extends StorageQuery {
      * @return ID-to-{@link EntityRecord} {@link Map} as the result of the query.
      * @throws SQLException if the input data contained SQL errors or the table does not exist.
      */
-    public Map<Object, EntityRecord> execute() throws SQLException {
+    public Map<I, EntityRecord> execute() throws SQLException {
         final ConnectionWrapper connection = getConnection(true);
         final PreparedStatement sqlStatement = connection.prepareStatement(getQuery());
 
@@ -162,7 +164,7 @@ public class SelectBulkQuery<I> extends StorageQuery {
          * @param tableName Name of the table to query.
          */
         public Builder<I> setAllQuery(String tableName) {
-            setQuery(String.format(ALL_TEMPLATE, tableName));
+            setQuery(format(ALL_TEMPLATE, tableName));
             return getThis();
         }
 
@@ -188,7 +190,7 @@ public class SelectBulkQuery<I> extends StorageQuery {
                 arguments.add(id);
             }
 
-            setQuery(String.format(IDS_TEMPLATE, tableName, placeholders));
+            setQuery(format(IDS_TEMPLATE, tableName, placeholders));
             return getThis();
         }
 

@@ -29,6 +29,8 @@ import org.spine3.server.event.EventFilter;
 import org.spine3.server.event.EventStreamQuery;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.StorageQuery;
+import org.spine3.server.storage.jdbc.table.EventTable;
+import org.spine3.server.storage.jdbc.table.EventTable.Column;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.DbIterator;
 
@@ -45,15 +47,14 @@ import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.LT;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
 import static org.spine3.server.storage.jdbc.Sql.Query.AND;
 import static org.spine3.server.storage.jdbc.Sql.Query.ASC;
+import static org.spine3.server.storage.jdbc.Sql.Query.FROM;
 import static org.spine3.server.storage.jdbc.Sql.Query.OR;
 import static org.spine3.server.storage.jdbc.Sql.Query.ORDER_BY;
+import static org.spine3.server.storage.jdbc.Sql.Query.SELECT;
 import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
-import static org.spine3.server.storage.jdbc.event.query.EventTable.EVENT_COL;
-import static org.spine3.server.storage.jdbc.event.query.EventTable.EVENT_TYPE_COL;
-import static org.spine3.server.storage.jdbc.event.query.EventTable.NANOSECONDS_COL;
-import static org.spine3.server.storage.jdbc.event.query.EventTable.PRODUCER_ID_COL;
-import static org.spine3.server.storage.jdbc.event.query.EventTable.SECONDS_COL;
-import static org.spine3.server.storage.jdbc.event.query.EventTable.SELECT_EVENT_FROM_TABLE;
+import static org.spine3.server.storage.jdbc.table.EventTable.Column.event;
+import static org.spine3.server.storage.jdbc.table.EventTable.Column.nanoseconds;
+import static org.spine3.server.storage.jdbc.table.EventTable.Column.seconds;
 
 /**
  * Query that selects {@linkplain Event events} by specified {@link EventStreamQuery}.
@@ -63,8 +64,10 @@ import static org.spine3.server.storage.jdbc.event.query.EventTable.SELECT_EVENT
  */
 public class FilterAndSortQuery extends StorageQuery {
 
-    private static final String QUERY_TEMPLATE = ORDER_BY + SECONDS_COL + ASC + COMMA
-                                                 + NANOSECONDS_COL + ASC + SEMICOLON;
+    private static final String SELECT_EVENT_FROM_TABLE = SELECT + event.name() +
+                                                          FROM + EventTable.TABLE_NAME;
+    private static final String QUERY_TEMPLATE = ORDER_BY.toString() + seconds + ASC + COMMA
+                                                 + nanoseconds + ASC + SEMICOLON;
     private static final String ESCAPED_EQUAL_START = " = \'";
     private static final String ESCAPED_EQUAL_END = "\' ";
 
@@ -94,7 +97,7 @@ public class FilterAndSortQuery extends StorageQuery {
     private static void appendFilterByEventTypeSql(StringBuilder builder, String eventType) {
         appendTo(builder,
                  whereOrOr(builder),
-                 EVENT_TYPE_COL, ESCAPED_EQUAL_START, eventType, ESCAPED_EQUAL_END);
+                 Column.event_type.name(), ESCAPED_EQUAL_START, eventType, ESCAPED_EQUAL_END);
     }
 
     private static void appendFilterByAggregateIdsSql(StringBuilder builder, EventFilter filter) {
@@ -103,7 +106,7 @@ public class FilterAndSortQuery extends StorageQuery {
             final String aggregateIdStr = idToString(aggregateId);
             appendTo(builder,
                      whereOrOr(builder),
-                     PRODUCER_ID_COL, ESCAPED_EQUAL_START, aggregateIdStr, ESCAPED_EQUAL_END);
+                     Column.producer_id.name(), ESCAPED_EQUAL_START, aggregateIdStr, ESCAPED_EQUAL_END);
         }
     }
 
@@ -138,10 +141,10 @@ public class FilterAndSortQuery extends StorageQuery {
         final long seconds = after.getSeconds();
         final int nanos = after.getNanos();
         appendTo(builder, ' ',
-                 SECONDS_COL, GT, seconds,
+                 Column.seconds.name(), GT, seconds,
                  OR, BRACKET_OPEN,
-                 SECONDS_COL, EQUAL, seconds, AND,
-                 NANOSECONDS_COL, GT, nanos,
+                 Column.seconds.name(), EQUAL, seconds, AND,
+                 Column.nanoseconds.name(), GT, nanos,
                  BRACKET_CLOSE.toString());
         return builder;
     }
@@ -151,10 +154,10 @@ public class FilterAndSortQuery extends StorageQuery {
         final long seconds = before.getSeconds();
         final int nanos = before.getNanos();
         appendTo(builder, ' ',
-                 SECONDS_COL, LT, seconds,
+                 Column.seconds.name(), LT, seconds,
                  OR, BRACKET_OPEN,
-                 SECONDS_COL, EQUAL, seconds, AND,
-                 NANOSECONDS_COL, LT, nanos,
+                 Column.seconds.name(), EQUAL, seconds, AND,
+                 Column.nanoseconds.name(), LT, nanos,
                  BRACKET_CLOSE);
         return builder;
     }
@@ -185,7 +188,7 @@ public class FilterAndSortQuery extends StorageQuery {
     public Iterator<Event> execute() throws DatabaseException {
         try (ConnectionWrapper connection = this.getConnection(true)) {
             final PreparedStatement statement = prepareStatement(connection, streamQuery);
-            return new DbIterator<>(statement, EVENT_COL, Event.getDescriptor());
+            return new DbIterator<>(statement, Column.event.name(), Event.getDescriptor());
         }
     }
 

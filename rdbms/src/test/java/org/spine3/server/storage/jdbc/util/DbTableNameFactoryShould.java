@@ -48,16 +48,9 @@ public class DbTableNameFactoryShould {
 
     @Test
     public void provide_table_name_for_class() {
-        final String tableName = DbTableNameFactory.newTableName(String.class);
-
-        assertEquals("java_lang_string", tableName);
-    }
-
-    @Test
-    public void provide_table_name_for_inner_class() {
         final String tableName = DbTableNameFactory.newTableName(TestEntity.class);
 
-        assertEquals("org_spine3_server_storage_jdbc_util_dbtablenamefactoryshould_testentity",
+        assertEquals("google_protobuf_stringvalue",
                      tableName);
     }
 

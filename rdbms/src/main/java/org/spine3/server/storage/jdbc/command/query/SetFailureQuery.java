@@ -29,9 +29,9 @@ import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
 import static org.spine3.server.storage.jdbc.Sql.Query.SET;
 import static org.spine3.server.storage.jdbc.Sql.Query.UPDATE;
 import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
-import static org.spine3.server.storage.jdbc.command.query.CommandTable.FAILURE_COL;
-import static org.spine3.server.storage.jdbc.command.query.CommandTable.ID_COL;
-import static org.spine3.server.storage.jdbc.command.query.CommandTable.TABLE_NAME;
+import static org.spine3.server.storage.jdbc.table.CommandTable.Column.failure;
+import static org.spine3.server.storage.jdbc.table.CommandTable.Column.id;
+import static org.spine3.server.storage.jdbc.table.CommandTable.TABLE_NAME;
 
 /**
  * Query that updates {@link org.spine3.server.command.CommandRecord} with
@@ -45,8 +45,8 @@ public class SetFailureQuery extends WriteRecordQuery<String, Failure> {
     private static final String QUERY_TEMPLATE =
             UPDATE + TABLE_NAME +
             SET +
-            FAILURE_COL + EQUAL + PLACEHOLDER +
-            WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
+            failure + EQUAL + PLACEHOLDER +
+            WHERE + id + EQUAL + PLACEHOLDER + SEMICOLON;
 
     private SetFailureQuery(Builder builder) {
         super(builder);

@@ -39,23 +39,11 @@ import static org.mockito.Mockito.when;
 
 class Given {
 
-    @SuppressWarnings("StaticNonFinalField")
     private static Logger loggerMock = null;
     private static final IdColumn<String> idColumnMock = mock(IdColumn.StringIdColumn.class);
 
     // TODO:2016-08-02:alexander.litus: these methods are used in one place only (each), so move them there.
     // Apply this for all such cases in all Given classes.
-
-    // TODO:2016-08-02:alexander.litus: rename all such methods to `createTableQueryWhichThrows`.
-    static CreateTableQuery getCreateTableQueryMock() throws SQLException {
-        loggerMock = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock =
-                GivenDataSource.whichThrowsExceptionOnExecuteStatement();
-        final CreateTableMock.Builder builder = CreateTableMock.newBuilder()
-                                                               .setDataSource(dataSourceMock)
-                                                               .setLogger(loggerMock);
-        return builder.build();
-    }
 
     static SelectByIdQueryMock getSelectByIdQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
@@ -118,35 +106,6 @@ class Given {
     }
 
     private static final Any recordMock = Any.getDefaultInstance();
-
-    private static class CreateTableMock extends CreateTableQuery<String> {
-
-        protected CreateTableMock(Builder builder) {
-            super(builder);
-        }
-
-        public static Builder newBuilder() {
-            final Builder builder = new Builder();
-            builder.setQuery("");
-            return builder;
-        }
-
-        @SuppressWarnings("ClassNameSameAsAncestorName")
-        public static class Builder extends CreateTableQuery.Builder<Builder,
-                                                                     CreateTableMock,
-                                                                     String> {
-
-            @Override
-            public CreateTableMock build() {
-                return new CreateTableMock(this);
-            }
-
-            @Override
-            protected Builder getThis() {
-                return this;
-            }
-        }
-    }
 
     private static class SelectByIdQueryMock extends SelectByIdQuery<String, Message> {
 
@@ -238,7 +197,6 @@ class Given {
     private Given() {
     }
 
-    @SuppressWarnings("StaticVariableUsedBeforeInitialization")
     static Logger getLoggerMock() {
         return loggerMock;
     }

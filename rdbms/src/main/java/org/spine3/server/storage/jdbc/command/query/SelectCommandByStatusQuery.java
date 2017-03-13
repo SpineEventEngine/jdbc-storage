@@ -24,6 +24,7 @@ import org.spine3.base.CommandStatus;
 import org.spine3.server.command.CommandRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.StorageQuery;
+import org.spine3.server.storage.jdbc.table.CommandTable;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 import org.spine3.server.storage.jdbc.util.DbIterator;
 
@@ -37,9 +38,8 @@ import static org.spine3.server.storage.jdbc.Sql.Query.FROM;
 import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
 import static org.spine3.server.storage.jdbc.Sql.Query.SELECT;
 import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
-import static org.spine3.server.storage.jdbc.command.query.CommandTable.COMMAND_COL;
-import static org.spine3.server.storage.jdbc.command.query.CommandTable.COMMAND_STATUS_COL;
-import static org.spine3.server.storage.jdbc.command.query.CommandTable.TABLE_NAME;
+import static org.spine3.server.storage.jdbc.table.CommandTable.Column.command;
+import static org.spine3.server.storage.jdbc.table.CommandTable.Column.command_status;
 
 /**
  * Query that selects {@link CommandRecord} by {@link CommandStatus}.
@@ -52,8 +52,8 @@ public class SelectCommandByStatusQuery extends StorageQuery {
     private final CommandStatus status;
 
     private static final String QUERY_TEMPLATE =
-            SELECT + COMMAND_COL + FROM + TABLE_NAME +
-            WHERE + COMMAND_STATUS_COL + EQUAL + PLACEHOLDER + SEMICOLON;
+            SELECT.toString() + command + FROM + CommandTable.TABLE_NAME +
+            WHERE + command_status + EQUAL + PLACEHOLDER + SEMICOLON;
 
     /**
      * Creates a new query instance.
@@ -90,7 +90,7 @@ public class SelectCommandByStatusQuery extends StorageQuery {
     public Iterator<CommandRecord> execute() throws DatabaseException {
         try (ConnectionWrapper connection = getConnection(true)) {
             final PreparedStatement statement = prepareStatement(connection);
-            return new DbIterator<>(statement, COMMAND_COL, CommandRecord.getDescriptor());
+            return new DbIterator<>(statement, command.name(), CommandRecord.getDescriptor());
         }
     }
 

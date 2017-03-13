@@ -29,11 +29,13 @@ import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
 import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
 import static org.spine3.server.storage.jdbc.Sql.Query.SET;
 import static org.spine3.server.storage.jdbc.Sql.Query.UPDATE;
-import static org.spine3.server.storage.jdbc.projection.query.ProjectionTable.NANOS_COL;
-import static org.spine3.server.storage.jdbc.projection.query.ProjectionTable.SECONDS_COL;
+import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
+import static org.spine3.server.storage.jdbc.table.LastHandledEventTimeTable.Column.nanos;
+import static org.spine3.server.storage.jdbc.table.LastHandledEventTimeTable.Column.projection_type;
+import static org.spine3.server.storage.jdbc.table.LastHandledEventTimeTable.Column.seconds;
 
 /**
- * Query that updates {@link Timestamp} in the {@link ProjectionTable}.
+ * Query that updates {@link Timestamp} in the {@link LastHandledEventTimeQueryFactory}.
  *
  * @author Alexander Litus
  * @author Andrey Lavrov
@@ -42,8 +44,9 @@ public class UpdateTimestampQuery extends WriteTimestampQuery {
 
     private static final String QUERY_TEMPLATE =
             UPDATE + "%s" + SET +
-            SECONDS_COL + EQUAL + PLACEHOLDER + COMMA +
-            NANOS_COL + EQUAL + PLACEHOLDER + SEMICOLON;
+            seconds + EQUAL + PLACEHOLDER + COMMA +
+            nanos + EQUAL + PLACEHOLDER +
+            WHERE + projection_type + EQUAL + PLACEHOLDER + SEMICOLON;
 
     private UpdateTimestampQuery(Builder builder) {
         super(builder);

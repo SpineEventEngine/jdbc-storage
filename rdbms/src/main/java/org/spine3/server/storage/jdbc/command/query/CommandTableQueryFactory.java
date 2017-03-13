@@ -21,24 +21,26 @@
 package org.spine3.server.storage.jdbc.command.query;
 
 import org.slf4j.Logger;
-import org.spine3.base.CommandId;
 import org.spine3.base.CommandStatus;
 import org.spine3.base.Error;
 import org.spine3.base.Failure;
 import org.spine3.server.command.CommandRecord;
 import org.spine3.server.storage.jdbc.query.QueryFactory;
+import org.spine3.server.storage.jdbc.query.SelectByIdQuery;
+import org.spine3.server.storage.jdbc.query.WriteQuery;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
-import static org.spine3.server.storage.jdbc.command.query.CommandTable.TABLE_NAME;
+import static org.spine3.server.storage.jdbc.table.CommandTable.Column.id;
 
 /**
- * This class creates queries for interaction with {@link CommandTable}.
+ * An implementation of the {@link QueryFactory} for generating queries to
+ * the {@link org.spine3.server.storage.jdbc.table.CommandTable}.
  *
  * @author Andrey Lavrov
+ * @author Dmytro Dashenkov
  */
-@SuppressWarnings("TypeMayBeWeakened")
-public class CommandStorageQueryFactory implements QueryFactory {
+public class CommandTableQueryFactory implements QueryFactory<String, CommandRecord> {
 
     private final IdColumn<String> idColumn;
     private final DataSourceWrapper dataSource;
@@ -49,8 +51,8 @@ public class CommandStorageQueryFactory implements QueryFactory {
      *
      * @param dataSource the dataSource wrapper
      */
-    public CommandStorageQueryFactory(DataSourceWrapper dataSource) {
-        this.idColumn = new IdColumn.StringIdColumn();
+    public CommandTableQueryFactory(DataSourceWrapper dataSource) {
+        this.idColumn = IdColumn.typeString(id.name());
         this.dataSource = dataSource;
     }
 
@@ -59,65 +61,18 @@ public class CommandStorageQueryFactory implements QueryFactory {
         this.logger = logger;
     }
 
-    /** Returns a query that creates a new {@link CommandTable} if it does not exist. */
-    public CreateCommandTableQuery newCreateCommandTableQuery() {
-        final CreateCommandTableQuery.Builder builder =
-                CreateCommandTableQuery.newBuilder()
-                                       .setDataSource(dataSource)
-                                       .setLogger(logger)
-                                       .setIdColumn(idColumn)
-                                       .setTableName(TABLE_NAME);
-        return builder.build();
-    }
-
-    /**
-     * Returns a query that inserts a new {@link CommandRecord} to the {@link CommandTable}.
-     *
-     * @param id     new command record id
-     * @param record new command record
-     */
-    public InsertCommandQuery newInsertCommandQuery(CommandId id, CommandRecord record) {
-        final InsertCommandQuery.Builder builder =
-                InsertCommandQuery.newBuilder()
-                                  .setDataSource(dataSource)
-                                  .setLogger(logger)
-                                  .setIdColumn(idColumn)
-                                  .setId(id.getUuid())
-                                  .setRecord(record)
-                                  .setStatus(record.getStatus().getCode());
-        return builder.build();
-    }
-
-    /**
-     * Returns a query that updates {@link CommandRecord} in the {@link CommandTable}.
-     *
-     * @param id     command id
-     * @param record updated record state
-     */
-    public UpdateCommandQuery newUpdateCommandQuery(CommandId id, CommandRecord record) {
-        final UpdateCommandQuery.Builder builder =
-                UpdateCommandQuery.newBuilder()
-                                  .setDataSource(dataSource)
-                                  .setLogger(logger)
-                                  .setIdColumn(idColumn)
-                                  .setId(id.getUuid())
-                                  .setRecord(record)
-                                  .setStatus(record.getStatus().getCode());
-        return builder.build();
-    }
-
     /**
      * Returns a query that updates {@link CommandRecord} with a new {@link Error}.
      *
      * @param id    command record id
      * @param error a technical error occurred during command handling
      */
-    public SetErrorQuery newSetErrorQuery(CommandId id, Error error) {
+    public SetErrorQuery newSetErrorQuery(String id, Error error) {
         final SetErrorQuery.Builder builder = SetErrorQuery.newBuilder()
                                                            .setDataSource(dataSource)
                                                            .setLogger(logger)
                                                            .setIdColumn(idColumn)
-                                                           .setId(id.getUuid())
+                                                           .setId(id)
                                                            .setRecord(error);
         return builder.build();
     }
@@ -128,12 +83,13 @@ public class CommandStorageQueryFactory implements QueryFactory {
      * @param id      command record id
      * @param failure a business failure occurred during command handling
      */
-    public SetFailureQuery newSetFailureQuery(CommandId id, Failure failure) {
+    public SetFailureQuery newSetFailureQuery(String id, Failure failure) {
         final SetFailureQuery.Builder builder = SetFailureQuery.newBuilder()
                                                                .setDataSource(dataSource)
                                                                .setLogger(logger)
-                                                               .setIdColumn(idColumn)
-                                                               .setId(id.getUuid())
+                                                               .setIdColumn(
+                                                                       idColumn)
+                                                               .setId(id)
                                                                .setRecord(failure);
         return builder.build();
     }
@@ -143,23 +99,12 @@ public class CommandStorageQueryFactory implements QueryFactory {
      *
      * @param id command record id
      */
-    public SetOkStatusQuery newSetOkStatusQuery(CommandId id) {
+    public SetOkStatusQuery newSetOkStatusQuery(String id) {
         final SetOkStatusQuery.Builder builder = SetOkStatusQuery.newBuilder()
                                                                  .setDataSource(dataSource)
                                                                  .setLogger(logger)
                                                                  .setIdColumn(idColumn)
-                                                                 .setId(id.getUuid());
-        return builder.build();
-    }
-
-    /** Returns a query that selects {@link CommandRecord} by ID. */
-    public SelectCommandByIdQuery newSelectCommandByIdQuery(CommandId id) {
-        final SelectCommandByIdQuery.Builder builder =
-                SelectCommandByIdQuery.newBuilder()
-                                      .setDataSource(dataSource)
-                                      .setLogger(logger)
-                                      .setIdColumn(idColumn)
-                                      .setId(id.getUuid());
+                                                                 .setId(id);
         return builder.build();
     }
 
@@ -170,6 +115,43 @@ public class CommandStorageQueryFactory implements QueryFactory {
                                           .setDataSource(dataSource)
                                           .setLogger(logger)
                                           .setStatus(status);
+        return builder.build();
+    }
+
+    @Override
+    public SelectByIdQuery<String, CommandRecord> newSelectByIdQuery(String id) {
+        final SelectCommandByIdQuery.Builder builder =
+                SelectCommandByIdQuery.newBuilder()
+                                      .setDataSource(dataSource)
+                                      .setLogger(logger)
+                                      .setIdColumn(idColumn)
+                                      .setId(id);
+        return builder.build();
+    }
+
+    @Override
+    public WriteQuery newInsertQuery(String id, CommandRecord record) {
+        final InsertCommandQuery.Builder builder =
+                InsertCommandQuery.newBuilder()
+                                  .setDataSource(dataSource)
+                                  .setLogger(logger)
+                                  .setIdColumn(idColumn)
+                                  .setId(id)
+                                  .setRecord(record)
+                                  .setStatus(record.getStatus().getCode());
+        return builder.build();
+    }
+
+    @Override
+    public WriteQuery newUpdateQuery(String id, CommandRecord record) {
+        final UpdateCommandQuery.Builder builder =
+                UpdateCommandQuery.newBuilder()
+                                  .setDataSource(dataSource)
+                                  .setLogger(logger)
+                                  .setIdColumn(idColumn)
+                                  .setId(id)
+                                  .setRecord(record)
+                                  .setStatus(record.getStatus().getCode());
         return builder.build();
     }
 }

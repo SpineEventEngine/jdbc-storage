@@ -30,6 +30,7 @@ import org.spine3.protobuf.AnyPacker;
 import org.spine3.protobuf.TypeName;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.query.WriteRecordQuery;
+import org.spine3.server.storage.jdbc.table.EventTable;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 
 import java.sql.PreparedStatement;
@@ -42,13 +43,13 @@ import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
 import static org.spine3.server.storage.jdbc.Sql.Query.SET;
 import static org.spine3.server.storage.jdbc.Sql.Query.UPDATE;
 import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
-import static org.spine3.server.storage.jdbc.event.query.EventTable.EVENT_COL;
-import static org.spine3.server.storage.jdbc.event.query.EventTable.EVENT_ID_COL;
-import static org.spine3.server.storage.jdbc.event.query.EventTable.EVENT_TYPE_COL;
-import static org.spine3.server.storage.jdbc.event.query.EventTable.NANOSECONDS_COL;
-import static org.spine3.server.storage.jdbc.event.query.EventTable.PRODUCER_ID_COL;
-import static org.spine3.server.storage.jdbc.event.query.EventTable.SECONDS_COL;
-import static org.spine3.server.storage.jdbc.event.query.EventTable.TABLE_NAME;
+import static org.spine3.server.storage.jdbc.table.EventTable.Column.event;
+import static org.spine3.server.storage.jdbc.table.EventTable.Column.event_id;
+import static org.spine3.server.storage.jdbc.table.EventTable.Column.event_type;
+import static org.spine3.server.storage.jdbc.table.EventTable.Column.nanoseconds;
+import static org.spine3.server.storage.jdbc.table.EventTable.Column.producer_id;
+import static org.spine3.server.storage.jdbc.table.EventTable.Column.seconds;
+import static org.spine3.server.storage.jdbc.table.EventTable.TABLE_NAME;
 import static org.spine3.server.storage.jdbc.util.Serializer.serialize;
 
 /**
@@ -62,12 +63,12 @@ public class UpdateEventRecordQuery extends WriteRecordQuery<String, Event> {
     private static final String QUERY_TEMPLATE =
             UPDATE + TABLE_NAME +
             SET +
-            EVENT_COL + EQUAL + PLACEHOLDER + COMMA +
-            EVENT_TYPE_COL + EQUAL + PLACEHOLDER + COMMA +
-            PRODUCER_ID_COL + EQUAL + PLACEHOLDER + COMMA +
-            SECONDS_COL + EQUAL + PLACEHOLDER + COMMA +
-            NANOSECONDS_COL + EQUAL + PLACEHOLDER +
-            WHERE + EVENT_ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
+            event + EQUAL + PLACEHOLDER + COMMA +
+            event_type + EQUAL + PLACEHOLDER + COMMA +
+            producer_id + EQUAL + PLACEHOLDER + COMMA +
+            seconds + EQUAL + PLACEHOLDER + COMMA +
+            nanoseconds + EQUAL + PLACEHOLDER +
+            WHERE + event_id + EQUAL + PLACEHOLDER + SEMICOLON;
 
     private UpdateEventRecordQuery(Builder builder) {
         super(builder);

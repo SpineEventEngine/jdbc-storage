@@ -37,7 +37,7 @@ import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
 /**
  * A query for deleting one or many items by a id of a given column.
  *
- * @author Dmytro Dashenkov.
+ * @author Dmytro Dashenkov
  */
 public class DeleteRecordQuery<I> extends StorageQuery {
 
@@ -81,15 +81,9 @@ public class DeleteRecordQuery<I> extends StorageQuery {
 
     public static class Builder<I> extends StorageQuery.Builder<Builder<I>, DeleteRecordQuery> {
 
-        private String column;
         private I columnValue;
         private String table;
         private IdColumn<I> idColumn;
-
-        public Builder<I> setIdColumnName(String column) {
-            this.column = checkNotNull(column);
-            return getThis();
-        }
 
         public Builder<I> setIdValue(I value) {
             this.columnValue = checkNotNull(value);
@@ -102,12 +96,11 @@ public class DeleteRecordQuery<I> extends StorageQuery {
         }
 
         private String composeSql() {
-            return format(TEMPLATE, table, column, idToString(columnValue));
+            return format(TEMPLATE, table, idColumn.getColumnName(), idToString(columnValue));
         }
 
         @Override
         public DeleteRecordQuery<I> build() {
-            checkNotNull(column, "ID column name must be set");
             checkNotNull(idColumn, "ID column must be set");
             checkNotNull(columnValue, "ID must be set");
             checkNotNull(table, "Table must be set");

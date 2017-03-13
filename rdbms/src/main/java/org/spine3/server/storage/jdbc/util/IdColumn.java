@@ -26,23 +26,36 @@ import org.spine3.server.aggregate.Aggregate;
 import org.spine3.server.entity.Entity;
 import org.spine3.server.reflect.Classes;
 import org.spine3.server.storage.jdbc.DatabaseException;
+import org.spine3.server.storage.jdbc.Sql;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.spine3.base.Stringifiers.idToString;
 import static org.spine3.server.storage.jdbc.Sql.Type.BIGINT;
 import static org.spine3.server.storage.jdbc.Sql.Type.INT;
-import static org.spine3.server.storage.jdbc.Sql.Type.VARCHAR_999;
+import static org.spine3.server.storage.jdbc.Sql.Type.VARCHAR_255;
 
 /**
- * Helps to work with {@link Entity} ID columns.
+ * A helper class for setting the {@link Entity} ID into a {@link PreparedStatement}as a query
+ * parameter.
+ *
+ * <p>Depending on what type ID is, {@linkplain #setId(int, Object, PreparedStatement) setId} method
+ * will call one of the setters:
+ * <ul>
+ *     <li>{@link PreparedStatement#setInt}
+ *     <li>{@link PreparedStatement#setLong}
+ *     <li>{@link PreparedStatement#setString}
+ * </ul>
  *
  * @param <I> the type of {@link Entity} IDs
  * @author Alexander Litus
  */
 @Internal
 public abstract class IdColumn<I> {
+
+    private final String columnName;
 
     /**
      * Creates a new instance.
@@ -51,29 +64,43 @@ public abstract class IdColumn<I> {
      * @param <I>         the type of {@link Entity} IDs
      * @return a new helper instance
      */
-    public static <I> IdColumn<I> newInstance(Class<? extends Entity<I, ?>> entityClass) {
+    public static <I> IdColumn<I> newInstance(Class<? extends Entity<I, ?>> entityClass,
+                                              String columnName) {
         final IdColumn<I> helper;
         final Class<I> idClass =
                 Classes.getGenericParameterType(entityClass, Entity.GenericParameter.ID.getIndex());
         if (idClass.equals(Long.class)) {
             @SuppressWarnings("unchecked") // is checked already
-            final IdColumn<I> longIdColumn = (IdColumn<I>) new LongIdColumn();
+            final IdColumn<I> longIdColumn =
+                    (IdColumn<I>) new LongIdColumn(columnName);
             helper = longIdColumn;
         } else if (idClass.equals(Integer.class)) {
             @SuppressWarnings("unchecked") // is checked already
-            final IdColumn<I> intIdColumn = (IdColumn<I>) new IntIdColumn();
+            final IdColumn<I> intIdColumn =
+                    (IdColumn<I>) new IntIdColumn(columnName);
             helper = intIdColumn;
         } else {
-            helper = new StringOrMessageIdColumn<>();
+            helper = new StringOrMessageIdColumn<>(columnName);
         }
         return helper;
     }
 
+    public static IdColumn<String> typeString(String columnName) {
+        return new StringIdColumn(columnName);
+    }
+
+    protected IdColumn(String columnName) {
+        this.columnName = checkNotNull(columnName);
+    }
+
     /**
-     * Returns the SQL data type string of the ID column, e.g. {@code "BIGINT"},
-     * {@code "VARCHAR(999)"}, etc.
+     * Returns the {@link Sql.Type} of the column with which this helper instance works.
      */
-    public abstract String getColumnDataType();
+    public abstract Sql.Type getColumnDataType();
+
+    public String getColumnName() {
+        return columnName;
+    }
 
     /**
      * Sets an ID parameter to the given value.
@@ -91,9 +118,13 @@ public abstract class IdColumn<I> {
      */
     private static class LongIdColumn extends IdColumn<Long> {
 
+        private LongIdColumn(String columnName) {
+            super(columnName);
+        }
+
         @Override
-        public String getColumnDataType() {
-            return BIGINT.toString();
+        public Sql.Type getColumnDataType() {
+            return BIGINT;
         }
 
         @Override
@@ -112,9 +143,13 @@ public abstract class IdColumn<I> {
      */
     private static class IntIdColumn extends IdColumn<Integer> {
 
+        private IntIdColumn(String columnName) {
+            super(columnName);
+        }
+
         @Override
-        public String getColumnDataType() {
-            return INT.toString();
+        public Sql.Type getColumnDataType() {
+            return INT;
         }
 
         @Override
@@ -134,9 +169,13 @@ public abstract class IdColumn<I> {
      */
     private static class StringOrMessageIdColumn<I> extends IdColumn<I> {
 
+        private StringOrMessageIdColumn(String columnName) {
+            super(columnName);
+        }
+
         @Override
-        public String getColumnDataType() {
-            return VARCHAR_999.toString();
+        public Sql.Type getColumnDataType() {
+            return VARCHAR_255;
         }
 
         @Override
@@ -154,5 +193,9 @@ public abstract class IdColumn<I> {
      * Helps to work with columns which contain {@code string} {@link Entity} IDs.
      */
     public static class StringIdColumn extends StringOrMessageIdColumn<String> {
+
+        private StringIdColumn(String columnName) {
+            super(columnName);
+        }
     }
 }

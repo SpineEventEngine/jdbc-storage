@@ -20,13 +20,9 @@
 
 package org.spine3.server.storage.jdbc.aggregate.query;
 
-import org.spine3.server.storage.jdbc.DatabaseException;
-import org.spine3.server.storage.jdbc.query.StorageQuery;
-import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
-import org.spine3.server.storage.jdbc.util.IdColumn;
+import com.google.protobuf.Int32Value;
+import org.spine3.server.storage.jdbc.query.SelectByIdQuery;
 
-import javax.annotation.Nullable;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -37,8 +33,8 @@ import static org.spine3.server.storage.jdbc.Sql.Query.FROM;
 import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
 import static org.spine3.server.storage.jdbc.Sql.Query.SELECT;
 import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
-import static org.spine3.server.storage.jdbc.aggregate.query.Table.EventCount.EVENT_COUNT_COL;
-import static org.spine3.server.storage.jdbc.aggregate.query.Table.EventCount.ID_COL;
+import static org.spine3.server.storage.jdbc.table.entity.aggregate.EventCountTable.Column.event_count;
+import static org.spine3.server.storage.jdbc.table.entity.aggregate.EventCountTable.Column.id;
 
 /**
  * Query that selects event count by corresponding aggregate ID.
@@ -46,71 +42,41 @@ import static org.spine3.server.storage.jdbc.aggregate.query.Table.EventCount.ID
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-public class SelectEventCountByIdQuery<I> extends StorageQuery {
+public class SelectEventCountByIdQuery<I> extends SelectByIdQuery<I, Int32Value> {
 
     private static final String QUERY_TEMPLATE =
-            SELECT + EVENT_COUNT_COL +
+            SELECT.toString() + event_count +
             FROM + "%s" +
-            WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
-
-    private final IdColumn<I> idColumn;
-    private final I id;
+            WHERE + id + EQUAL + PLACEHOLDER + SEMICOLON;
 
     private SelectEventCountByIdQuery(Builder<I> builder) {
         super(builder);
-        this.idColumn = builder.idColumn;
-        this.id = builder.id;
     }
 
-    @Nullable
-    public Integer execute() throws DatabaseException {
-        try (ConnectionWrapper connection = getConnection(true);
-             PreparedStatement statement = prepareStatement(connection);
-             ResultSet resultSet = statement.executeQuery()) {
-            if (!resultSet.next()) {
-                return null;
-            }
-            final int eventCount = resultSet.getInt(EVENT_COUNT_COL);
-            return eventCount;
-        } catch (SQLException e) {
-            getLogger().error("Failed to read an event count after the last snapshot.", e);
-            throw new DatabaseException(e);
-        }
-    }
-
+    @SuppressWarnings("MethodDoesntCallSuperMethod") // Override default message storing policy
     @Override
-    protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
-        final PreparedStatement statement = super.prepareStatement(connection);
-        idColumn.setId(1, id, statement);
-        return statement;
+    protected Int32Value readMessage(ResultSet resultSet) throws SQLException {
+        final int eventCount = resultSet.getInt(event_count.name());
+        return Int32Value.newBuilder()
+                         .setValue(eventCount)
+                         .build();
     }
 
     public static <I> Builder<I> newBuilder(String tableName) {
         final Builder<I> builder = new Builder<>();
-        builder.setQuery(format(QUERY_TEMPLATE, tableName));
+        builder.setQuery(format(QUERY_TEMPLATE, tableName))
+               .setIdIndexInQuery(1);
         return builder;
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder<I> extends StorageQuery.Builder<Builder<I>,
-            SelectEventCountByIdQuery> {
-
-        private IdColumn<I> idColumn;
-        private I id;
-
+    public static class Builder<I> extends SelectByIdQuery.Builder<Builder<I>,
+                                                                   SelectEventCountByIdQuery,
+                                                                   I,
+                                                                   Int32Value> {
         @Override
         public SelectEventCountByIdQuery<I> build() {
             return new SelectEventCountByIdQuery<>(this);
-        }
-
-        public Builder<I> setIdColumn(IdColumn<I> idColumn) {
-            this.idColumn = idColumn;
-            return getThis();
-        }
-
-        public Builder<I> setId(I id) {
-            this.id = id;
-            return getThis();
         }
 
         @Override

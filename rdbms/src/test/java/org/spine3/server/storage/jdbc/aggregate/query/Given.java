@@ -37,9 +37,8 @@ import static org.mockito.Mockito.mock;
 @SuppressWarnings("UtilityClass")
 class Given {
 
-    @SuppressWarnings("StaticNonFinalField")
     private static Logger loggerMock = null;
-    private static final IdColumn<String> idColumnMock = mock(IdColumn.StringIdColumn.class);
+    private static final IdColumn<String> ID_COLUMN_QUERY_SETTER_MOCK = mock(IdColumn.StringIdColumn.class);
 
     private Given() {
     }
@@ -52,7 +51,7 @@ class Given {
                 InsertAggregateRecordQuery.<String>newBuilder(anyString())
                         .setDataSource(dataSourceMock)
                         .setLogger(loggerMock)
-                        .setIdColumn(idColumnMock)
+                        .setIdColumn(ID_COLUMN_QUERY_SETTER_MOCK)
                         .setRecord(AggregateEventRecord.getDefaultInstance()
                                                        .getDefaultInstanceForType());
         return builder.build();
@@ -65,7 +64,7 @@ class Given {
                 InsertEventCountQuery.<String>newBuilder(anyString())
                         .setDataSource(dataSourceMock)
                         .setLogger(loggerMock)
-                        .setIdColumn(idColumnMock);
+                        .setIdColumn(ID_COLUMN_QUERY_SETTER_MOCK);
         return builder.build();
     }
 
@@ -76,7 +75,7 @@ class Given {
                 SelectEventCountByIdQuery.<String>newBuilder(anyString())
                         .setDataSource(dataSourceMock)
                         .setLogger(loggerMock)
-                        .setIdColumn(idColumnMock);
+                        .setIdColumn(ID_COLUMN_QUERY_SETTER_MOCK);
         return builder.build();
     }
 
@@ -87,7 +86,7 @@ class Given {
                 UpdateEventCountQuery.<String>newBuilder(anyString())
                         .setDataSource(dataSourceMock)
                         .setLogger(loggerMock)
-                        .setIdColumn(idColumnMock);
+                        .setIdColumn(ID_COLUMN_QUERY_SETTER_MOCK);
         return builder.build();
     }
 

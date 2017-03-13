@@ -30,7 +30,7 @@ import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 
 /**
- * @author Dmytro Dashenkov.
+ * @author Dmytro Dashenkov
  */
 public class SelectEntityByIdQueryShould {
 

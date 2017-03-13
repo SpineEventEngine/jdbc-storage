@@ -20,29 +20,54 @@
 
 package org.spine3.server.storage.jdbc.query;
 
-import org.junit.Test;
 import org.spine3.server.storage.jdbc.DatabaseException;
+import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.verify;
-
 /**
- * @author Andrey Lavrov
+ * A query for executing a generic SQL.
+ *
+ * @author Dmytro Dashenkov
  */
-public class CreateTableQueryShould {
+public class SimpleQuery extends StorageQuery {
 
-    @Test
-    public void handle_sql_exception() throws SQLException {
-        final CreateTableQuery query = Given.getCreateTableQueryMock();
-        try {
-            query.execute();
-            fail();
-        } catch (DatabaseException expected) {
-            verify(Given.getLoggerMock()).error(anyString(), any(SQLException.class));
+    private SimpleQuery(Builder builder) {
+        super(builder);
+    }
+
+    /**
+     * Executes the given SQL query and ignores the result.
+     */
+    public void execute() {
+        try (ConnectionWrapper connection = getConnection(true);
+             PreparedStatement statement = prepareStatement(connection)) {
+            statement.execute();
+        } catch (SQLException e) {
+            getLogger().error("Error executing statement " + getQuery(), e);
+            throw new DatabaseException(e);
+        }
+    }
+
+    public static Builder newBuilder() {
+        return new Builder();
+    }
+
+    public static class Builder extends StorageQuery.Builder<Builder, SimpleQuery> {
+
+        private Builder() {
+            super();
+        }
+
+        @Override
+        public SimpleQuery build() {
+            return new SimpleQuery(this);
+        }
+
+        @Override
+        protected Builder getThis() {
+            return this;
         }
     }
 }

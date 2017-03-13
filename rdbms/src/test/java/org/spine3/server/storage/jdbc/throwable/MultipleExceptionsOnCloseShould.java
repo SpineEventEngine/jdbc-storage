@@ -27,11 +27,10 @@ import static org.junit.Assert.assertEquals;
 import static org.spine3.test.Verify.assertContains;
 
 /**
- * @author Dmytro Dashenkov.
+ * @author Dmytro Dashenkov
  */
 public class MultipleExceptionsOnCloseShould {
 
-    @SuppressWarnings("ThrowableNotThrown")
     @Test
     public void describe_all_given_exceptions_in_toString() {
         final String message1 = "message1";

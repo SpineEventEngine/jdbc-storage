@@ -40,9 +40,8 @@ import static org.mockito.Mockito.mock;
 @SuppressWarnings("UtilityClass")
 class Given {
 
-    @SuppressWarnings("StaticNonFinalField")
     private static Logger loggerMock = null;
-    private static final IdColumn<String> idColumnMock = mock(IdColumn.StringIdColumn.class);
+    private static final IdColumn<String> ID_COLUMN_QUERY_SETTER_MOCK = mock(IdColumn.StringIdColumn.class);
 
     private Given() {
     }
@@ -55,7 +54,7 @@ class Given {
                 InsertEventRecordQuery.newBuilder()
                                       .setDataSource(dataSourceMock)
                                       .setLogger(loggerMock)
-                                      .setIdColumn(idColumnMock)
+                                      .setIdColumn(ID_COLUMN_QUERY_SETTER_MOCK)
                                       .setRecord(nonEmptyEvent());
         return builder.build();
     }
@@ -68,12 +67,11 @@ class Given {
                 UpdateEventRecordQuery.newBuilder()
                                       .setDataSource(dataSourceMock)
                                       .setLogger(loggerMock)
-                                      .setIdColumn(idColumnMock)
+                                      .setIdColumn(ID_COLUMN_QUERY_SETTER_MOCK)
                                       .setRecord(nonEmptyEvent());
         return builder.build();
     }
 
-    @SuppressWarnings("StaticVariableUsedBeforeInitialization")
     static Logger getLoggerMock() {
         return loggerMock;
     }

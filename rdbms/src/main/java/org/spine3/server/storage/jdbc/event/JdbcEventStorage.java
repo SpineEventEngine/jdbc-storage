@@ -30,8 +30,6 @@ import com.google.common.collect.Iterators;
 import com.google.common.collect.UnmodifiableIterator;
 import com.google.protobuf.Any;
 import com.google.protobuf.Message;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.spine3.base.Event;
 import org.spine3.base.EventContext;
 import org.spine3.base.EventId;
@@ -43,7 +41,7 @@ import org.spine3.server.event.EventStreamQuery;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.JdbcStorageFactory;
 import org.spine3.server.storage.jdbc.builder.StorageBuilder;
-import org.spine3.server.storage.jdbc.event.query.EventStorageQueryFactory;
+import org.spine3.server.storage.jdbc.table.EventTable;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.DbIterator;
 
@@ -68,42 +66,24 @@ public class JdbcEventStorage extends EventStorage {
 
     private final DataSourceWrapper dataSource;
 
-    private final EventStorageQueryFactory queryFactory;
+    private final EventTable eventTable;
 
     /**
      * Iterators which are not closed yet.
      */
     private final Collection<DbIterator> iterators = newLinkedList();
 
-    /**
-     * Creates a new storage instance.
-     *
-     * @param dataSource   the dataSource wrapper
-     * @param multitenant  defines if this storage is multitenant or not
-     * @param queryFactory factory that will generate queries for interaction with event table
-     * @throws DatabaseException if an error occurs during an interaction with the DB
-     */
-    public static JdbcEventStorage newInstance(DataSourceWrapper dataSource,
-                                               boolean multitenant,
-                                               EventStorageQueryFactory queryFactory)
-            throws DatabaseException {
-        return new JdbcEventStorage(dataSource, multitenant, queryFactory);
-    }
-
     protected JdbcEventStorage(DataSourceWrapper dataSource,
-                               boolean multitenant,
-                               EventStorageQueryFactory queryFactory)
+                               boolean multitenant)
             throws DatabaseException {
         super(multitenant);
         this.dataSource = dataSource;
-        this.queryFactory = queryFactory;
-        queryFactory.setLogger(LogSingleton.INSTANCE.value);
-        queryFactory.newCreateEventTableQuery()
-                    .execute();
+        this.eventTable = new EventTable(dataSource);
+        eventTable.createIfNotExists();
     }
 
     private JdbcEventStorage(Builder builder) {
-        this(builder.getDataSource(), builder.isMultitenant(), builder.getQueryFactory());
+        this(builder.getDataSource(), builder.isMultitenant());
     }
 
     /**
@@ -120,8 +100,7 @@ public class JdbcEventStorage extends EventStorage {
         checkNotClosed();
         checkNotNull(query);
 
-        final Iterator<Event> iterator = queryFactory.newFilterAndSortQuery(query)
-                                                     .execute();
+        final Iterator<Event> iterator = eventTable.eventStream(query);
         iterators.add((DbIterator) iterator);
 
         final UnmodifiableIterator<Event> filtered = filterEvents(iterator, query);
@@ -155,13 +134,7 @@ public class JdbcEventStorage extends EventStorage {
         checkNotNull(event);
 
         final String eventId = id.getUuid();
-        if (containsRecord(eventId)) {
-            queryFactory.newUpdateEventQuery(eventId, event)
-                        .execute();
-        } else {
-            queryFactory.newInsertEventQuery(eventId, event)
-                        .execute();
-        }
+        eventTable.write(eventId, event);
     }
 
     /**
@@ -175,16 +148,8 @@ public class JdbcEventStorage extends EventStorage {
         checkNotNull(eventId);
 
         final String id = eventId.getUuid();
-        final Event record = queryFactory.newSelectEventByIdQuery(id)
-                                         .execute();
-        return Optional.fromNullable(record);
-    }
-
-    private boolean containsRecord(String id) {
-        final Event record = queryFactory.newSelectEventByIdQuery(id)
-                                         .execute();
-        final boolean contains = record != null;
-        return contains;
+        final Event event = eventTable.read(id);
+        return Optional.fromNullable(event);
     }
 
     @Override
@@ -201,7 +166,11 @@ public class JdbcEventStorage extends EventStorage {
         dataSource.close();
     }
 
-    public static class Builder extends StorageBuilder<Builder, JdbcEventStorage, EventStorageQueryFactory> {
+    public static Builder newBuilder() {
+        return new Builder();
+    }
+
+    public static class Builder extends StorageBuilder<Builder, JdbcEventStorage> {
 
         private Builder() {
             super();
@@ -288,7 +257,7 @@ public class JdbcEventStorage extends EventStorage {
         }
 
         // Defined as nullable, parameter `event` is actually non null.
-        @SuppressWarnings({"MethodWithMoreThanThreeNegations", "MethodWithMultipleLoops"})
+        @SuppressWarnings("MethodWithMultipleLoops")
         @Override
         public boolean apply(@Nullable Event event) {
             if (event == null) {
@@ -347,11 +316,5 @@ public class JdbcEventStorage extends EventStorage {
             final boolean result = expectedValues.contains(actualValue);
             return result;
         }
-    }
-
-    private enum LogSingleton {
-        INSTANCE;
-        @SuppressWarnings("NonSerializableFieldInSerializableClass")
-        private final Logger value = LoggerFactory.getLogger(JdbcEventStorage.class);
     }
 }

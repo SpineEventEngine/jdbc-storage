@@ -25,15 +25,18 @@ import com.google.protobuf.Timestamp;
 import static java.lang.String.format;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
+import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.COMMA;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
 import static org.spine3.server.storage.jdbc.Sql.Query.INSERT_INTO;
 import static org.spine3.server.storage.jdbc.Sql.Query.VALUES;
 import static org.spine3.server.storage.jdbc.Sql.nPlaceholders;
-import static org.spine3.server.storage.jdbc.projection.query.ProjectionTable.NANOS_COL;
-import static org.spine3.server.storage.jdbc.projection.query.ProjectionTable.SECONDS_COL;
+import static org.spine3.server.storage.jdbc.table.LastHandledEventTimeTable.Column.nanos;
+import static org.spine3.server.storage.jdbc.table.LastHandledEventTimeTable.Column.projection_type;
+import static org.spine3.server.storage.jdbc.table.LastHandledEventTimeTable.Column.seconds;
 
 /**
- * Query that inserts a new {@link Timestamp} to the {@link ProjectionTable}.
+ * Query that inserts a new {@link Timestamp} to the
+ * {@link org.spine3.server.storage.jdbc.table.LastHandledEventTimeTable}.
  *
  * @author Alexander Litus
  * @author Andrey Lavrov
@@ -42,8 +45,8 @@ public class InsertTimestampQuery extends WriteTimestampQuery {
 
     private static final String QUERY_TEMPLATE =
             INSERT_INTO + "%s" +
-            BRACKET_OPEN + SECONDS_COL + ", " + NANOS_COL + BRACKET_CLOSE +
-            VALUES + nPlaceholders(2) + SEMICOLON;
+            BRACKET_OPEN + seconds + COMMA + nanos + COMMA + projection_type + BRACKET_CLOSE +
+            VALUES + nPlaceholders(3) + SEMICOLON;
 
     private InsertTimestampQuery(Builder builder) {
         super(builder);

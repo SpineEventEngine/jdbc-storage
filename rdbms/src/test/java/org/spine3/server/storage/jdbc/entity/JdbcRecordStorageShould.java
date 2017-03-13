@@ -29,7 +29,6 @@ import org.spine3.server.storage.RecordStorage;
 import org.spine3.server.storage.RecordStorageShould;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.GivenDataSource;
-import org.spine3.server.storage.jdbc.entity.query.RecordStorageQueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.test.storage.Project;
 import org.spine3.test.storage.ProjectId;
@@ -50,12 +49,10 @@ public class JdbcRecordStorageShould extends RecordStorageShould<String, JdbcRec
     protected JdbcRecordStorage<String> getStorage() {
         final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(
                 "entityStorageTests");
-        final RecordStorageQueryFactory<String> queryFactory =
-                new RecordStorageQueryFactory<>(dataSource, TestEntityWithStringId.class);
         final JdbcRecordStorage<String> storage =
                 JdbcRecordStorage.<String>newBuilder()
-                                 .setQueryFactory(queryFactory)
                                  .setDataSource(dataSource)
+                                 .setEntityClass(TestEntityWithStringId.class)
                                  .setMultitenant(false)
                                  .build();
         return storage;

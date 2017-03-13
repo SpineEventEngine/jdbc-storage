@@ -18,20 +18,40 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.spine3.server.storage.jdbc.entity.query;
+package org.spine3.server.storage.jdbc.table;
 
 import org.junit.Test;
+import org.spine3.server.storage.jdbc.Sql;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.spine3.test.Tests.hasPrivateParameterlessCtor;
 
 /**
- * @author Andrey Lavrov
+ * @author Dmytro Dashenkov
  */
-public class EntityTableShould {
+public class TableColumnsShould {
 
     @Test
-    public void have_private_constructor() {
-        assertTrue(hasPrivateParameterlessCtor(EntityTable.class));
+    public void have_private_utility_constructor() {
+        assertTrue(hasPrivateParameterlessCtor(TableColumns.class));
+    }
+
+    @Test
+    public void return_index_of_column_as_ordinal_plus_one() {
+        final TableColumn column = Column.INSTANCE;
+        final int ordinal = column.ordinal();
+        final int index = TableColumns.getIndex(column);
+        assertEquals(ordinal + 1, index);
+    }
+
+    private enum Column implements TableColumn {
+
+        INSTANCE;
+
+        @Override
+        public Sql.Type type() {
+            return Sql.Type.ID;
+        }
     }
 }

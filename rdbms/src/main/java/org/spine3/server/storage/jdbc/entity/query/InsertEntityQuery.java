@@ -33,11 +33,11 @@ import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
 import static org.spine3.server.storage.jdbc.Sql.Query.INSERT_INTO;
 import static org.spine3.server.storage.jdbc.Sql.Query.VALUES;
 import static org.spine3.server.storage.jdbc.Sql.nPlaceholders;
-import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ENTITY_COL;
-import static org.spine3.server.storage.jdbc.entity.query.EntityTable.ID_COL;
+import static org.spine3.server.storage.jdbc.table.entity.RecordTable.Column;
 
 /**
- * Query that inserts a new {@link EntityRecord} to the {@link EntityTable}.
+ * Query that inserts a new {@link EntityRecord} to
+ * the {@link org.spine3.server.storage.jdbc.table.entity.RecordTable}.
  *
  * @author Alexander Litus
  * @author Andrey Lavrov
@@ -47,7 +47,7 @@ public class InsertEntityQuery<I> extends WriteEntityQuery<I> {
     private static final String QUERY_TEMPLATE =
             INSERT_INTO + " %s " +
             BRACKET_OPEN +
-            ENTITY_COL + COMMA + archived + COMMA + deleted + COMMA + ID_COL +
+            Column.entity + COMMA + archived + COMMA + deleted + COMMA + Column.id +
             BRACKET_CLOSE +
             VALUES + nPlaceholders(4) + SEMICOLON;
 

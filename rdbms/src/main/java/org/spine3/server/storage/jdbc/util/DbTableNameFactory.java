@@ -20,9 +20,15 @@
 
 package org.spine3.server.storage.jdbc.util;
 
+import com.google.protobuf.Message;
 import org.spine3.Internal;
+import org.spine3.protobuf.TypeName;
+import org.spine3.server.entity.Entity;
+import org.spine3.server.reflect.Classes;
 
 import java.util.regex.Pattern;
+
+import static org.spine3.server.entity.Entity.GenericParameter.STATE;
 
 /**
  * A utility class which provides strings valid for DB table names.
@@ -41,16 +47,17 @@ public class DbTableNameFactory {
     }
 
     /**
-     * Retrieves a name of a class and escapes it so that it is valid to use as a DB table name. For example:
+     * Retrieves the type name of the state of the {@linkplain Entity}, whose {@linkplain Class}
+     * instance is passed.
      *
-     * <p>{@code com.example.Order -> com_example_order}
-     *
-     * @param clazz a class which name to use
+     * @param clazz a class of an {@linkplain Entity} whose state type name to use
      * @return a valid DB table name
      */
-    public static String newTableName(Class clazz) {
-        final String className = clazz.getName();
-        final String tableNameTmp = PATTERN_DOT.matcher(className)
+    public static String newTableName(Class<? extends Entity<?, ?>> clazz) {
+        final Class<? extends Message> stateType = Classes.getGenericParameterType(clazz,
+                                                                                   STATE.getIndex());
+        final String typeName = TypeName.of(stateType);
+        final String tableNameTmp = PATTERN_DOT.matcher(typeName)
                                                .replaceAll(UNDERSCORE);
         final String result = PATTERN_DOLLAR.matcher(tableNameTmp)
                                             .replaceAll(UNDERSCORE)

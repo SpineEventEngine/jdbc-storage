@@ -20,6 +20,7 @@
 
 package org.spine3.server.storage.jdbc.entity.visibility.query;
 
+import static java.lang.String.format;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.COMMA;
@@ -28,20 +29,22 @@ import static org.spine3.server.storage.jdbc.Sql.Query.INSERT_INTO;
 import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
 import static org.spine3.server.storage.jdbc.Sql.Query.TRUE;
 import static org.spine3.server.storage.jdbc.Sql.Query.VALUES;
-import static org.spine3.server.storage.jdbc.entity.visibility.table.VisibilityTable.ID_COL;
-import static org.spine3.server.storage.jdbc.entity.visibility.table.VisibilityTable.TABLE_NAME;
+import static org.spine3.server.storage.jdbc.table.entity.aggregate.VisibilityTable.Column;
 
 /**
  * The query for creating a new record in the table storing
  * the {@linkplain org.spine3.server.entity.Visibility entity visibility} with one of the columns
  * set to {@code true}.
  *
- * @author Dmytro Dashenkov.
+ * @author Dmytro Dashenkov
  */
 public class InsertAndMarkEntityQuery<I> extends MarkEntityQuery<I> {
 
-    private static final String SQL_TEMPLATE = INSERT_INTO + TABLE_NAME +
-                                               BRACKET_OPEN + ID_COL + COMMA + "%s" +
+    private static final String FORMAT_PLACEHOLDER = "%s";
+
+    private static final String SQL_TEMPLATE = INSERT_INTO + FORMAT_PLACEHOLDER +
+                                               BRACKET_OPEN +
+                                               Column.id + COMMA + FORMAT_PLACEHOLDER +
                                                BRACKET_CLOSE +
                                                VALUES + BRACKET_OPEN +
                                                PLACEHOLDER + COMMA + TRUE +
@@ -71,7 +74,7 @@ public class InsertAndMarkEntityQuery<I> extends MarkEntityQuery<I> {
 
         @Override
         protected String buildSql() {
-            return String.format(SQL_TEMPLATE, getColumn());
+            return format(SQL_TEMPLATE, getTableName(), getColumn());
         }
     }
 }

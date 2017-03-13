@@ -47,7 +47,6 @@ public class GivenDataSource {
      */
     private static final String HSQL_IN_MEMORY_DB_URL_PREFIX = "jdbc:hsqldb:mem:";
 
-    @SuppressWarnings("ThrowableInstanceNeverThrown")
     private static final SQLException EXCEPTION = new SQLException("");
 
     private GivenDataSource() {

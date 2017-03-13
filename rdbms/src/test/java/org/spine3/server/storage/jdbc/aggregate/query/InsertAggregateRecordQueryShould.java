@@ -36,7 +36,6 @@ import static org.mockito.Mockito.verify;
 public class InsertAggregateRecordQueryShould {
 
     @Test
-    @SuppressWarnings("DuplicateStringLiteralInspection")
     public void handle_sql_exception() throws SQLException {
         final InsertAggregateRecordQuery query = Given.getInsertAggregateRecordQueryMock();
         try {

@@ -37,59 +37,67 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.spine3.server.storage.jdbc.Sql.Type.BIGINT;
 import static org.spine3.server.storage.jdbc.Sql.Type.INT;
-import static org.spine3.server.storage.jdbc.Sql.Type.VARCHAR_999;
+import static org.spine3.server.storage.jdbc.Sql.Type.VARCHAR_255;
 
 /**
- * @author Dmytro Dashenkov.
+ * @author Dmytro Dashenkov
  */
 public class IdColumnShould {
 
+    private final String ID = "id";
+
     @Test
     public void have_bigint_impl() {
-        final IdColumn<?> column = IdColumn.newInstance(LongIdEntity.class);
-        assertEquals(BIGINT.toString(), column.getColumnDataType());
+        final IdColumn<?> column = IdColumn.newInstance(LongIdEntity.class, ID);
+        assertEquals(BIGINT, column.getColumnDataType());
     }
 
     @Test
     public void have_int_impl() {
-        final IdColumn<?> column = IdColumn.newInstance(IntIdEntity.class);
-        assertEquals(INT.toString(), column.getColumnDataType());
+        final IdColumn<?> column = IdColumn.newInstance(IntIdEntity.class, ID);
+        assertEquals(INT, column.getColumnDataType());
     }
 
     @Test
-    public void have_varchar999_impl() {
-        final IdColumn<?> column = IdColumn.newInstance(StringIdEntity.class);
-        assertEquals(VARCHAR_999.toString(), column.getColumnDataType());
+    public void have_varchar255_impl() {
+        final IdColumn<?> column = IdColumn.newInstance(StringIdEntity.class, ID);
+        assertEquals(VARCHAR_255, column.getColumnDataType());
     }
 
     @Test
     public void cast_message_IDs_to_string() {
-        final IdColumn<?> column = IdColumn.newInstance(MessageIdEntity.class);
-        assertEquals(VARCHAR_999.toString(), column.getColumnDataType());
+        final IdColumn<?> column = IdColumn.newInstance(MessageIdEntity.class, ID);
+        assertEquals(VARCHAR_255, column.getColumnDataType());
     }
 
     @Test(expected = DatabaseException.class)
     public void throw_DatabaseException_on_fail_to_set_int_id() throws SQLException {
-        final IdColumn<Integer> column = IdColumn.newInstance(IntIdEntity.class);
+        final IdColumn<Integer> column = IdColumn.newInstance(IntIdEntity.class, ID);
         column.setId(1, 1, faultyStatement());
     }
 
     @Test(expected = DatabaseException.class)
     public void throw_DatabaseException_on_fail_to_set_long_id() throws SQLException {
-        final IdColumn<Long> column = IdColumn.newInstance(LongIdEntity.class);
+        final IdColumn<Long> column = IdColumn.newInstance(LongIdEntity.class, ID);
         column.setId(1, 1L, faultyStatement());
     }
 
     @Test(expected = DatabaseException.class)
     public void throw_DatabaseException_on_fail_to_set_string_id() throws SQLException {
-        final IdColumn<String> column = IdColumn.newInstance(StringIdEntity.class);
+        final IdColumn<String> column = IdColumn.newInstance(StringIdEntity.class, ID);
         column.setId(1, "bazinga!", faultyStatement());
     }
 
     @Test(expected = DatabaseException.class)
     public void throw_DatabaseException_on_fail_to_set_message_id() throws SQLException {
-        final IdColumn<ProjectId> column = IdColumn.newInstance(MessageIdEntity.class);
+        final IdColumn<ProjectId> column = IdColumn.newInstance(MessageIdEntity.class, ID);
         column.setId(1, ProjectId.getDefaultInstance(), faultyStatement());
+    }
+
+    @Test
+    public void store_column_name() {
+        final IdColumn<String> column = IdColumn.newInstance(StringIdEntity.class, ID);
+        assertEquals(ID, column.getColumnName());
     }
 
     private static PreparedStatement faultyStatement() throws SQLException {

@@ -35,11 +35,13 @@ import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.COMMA;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
 import static org.spine3.server.storage.jdbc.Sql.Query.INSERT_INTO;
 import static org.spine3.server.storage.jdbc.Sql.Query.VALUES;
-import static org.spine3.server.storage.jdbc.aggregate.query.Table.EventCount.EVENT_COUNT_COL;
-import static org.spine3.server.storage.jdbc.aggregate.query.Table.EventCount.ID_COL;
+import static org.spine3.server.storage.jdbc.table.TableColumns.getIndex;
+import static org.spine3.server.storage.jdbc.table.entity.aggregate.EventCountTable.Column.event_count;
+import static org.spine3.server.storage.jdbc.table.entity.aggregate.EventCountTable.Column.id;
 
 /**
- * Query that inserts a new aggregate event count after the last snapshot to the {@link Table.EventCount}.
+ * Query that inserts a new aggregate event count after the last snapshot to the
+ * {@link org.spine3.server.storage.jdbc.table.entity.aggregate.EventCountTable}.
  *
  * @author Alexander Litus
  * @author Andrey Lavrov
@@ -48,7 +50,7 @@ public class InsertEventCountQuery<I> extends UpdateRecordQuery<I> {
 
     private static final String QUERY_TEMPLATE =
             INSERT_INTO + " %s " +
-            BRACKET_OPEN + ID_COL + COMMA + EVENT_COUNT_COL + BRACKET_CLOSE +
+            BRACKET_OPEN + id + COMMA + event_count + BRACKET_CLOSE +
             VALUES + Sql.nPlaceholders(2) + SEMICOLON;
 
     private final int count;
@@ -63,7 +65,7 @@ public class InsertEventCountQuery<I> extends UpdateRecordQuery<I> {
         final PreparedStatement statement = super.prepareStatement(connection);
 
         try {
-            statement.setInt(2, count);
+            statement.setInt(getIndex(event_count), count);
             return statement;
         } catch (SQLException e) {
             logFailedToPrepareStatement(e);
@@ -74,7 +76,7 @@ public class InsertEventCountQuery<I> extends UpdateRecordQuery<I> {
     public static <I> Builder<I> newBuilder(String tableName) {
         final Builder<I> builder = new Builder<>();
         builder.setQuery(format(QUERY_TEMPLATE, tableName))
-               .setIdIndexInQuery(1);
+               .setIdIndexInQuery(getIndex(id));
         return builder;
     }
 

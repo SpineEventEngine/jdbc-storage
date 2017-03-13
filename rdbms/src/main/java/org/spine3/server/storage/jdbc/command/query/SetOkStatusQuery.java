@@ -22,6 +22,8 @@ package org.spine3.server.storage.jdbc.command.query;
 
 import org.spine3.base.CommandStatus;
 import org.spine3.server.storage.jdbc.query.UpdateRecordQuery;
+import org.spine3.server.storage.jdbc.table.CommandTable;
+import org.spine3.server.storage.jdbc.table.CommandTable.Column;
 
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
@@ -29,9 +31,7 @@ import static org.spine3.server.storage.jdbc.Sql.Query.PLACEHOLDER;
 import static org.spine3.server.storage.jdbc.Sql.Query.SET;
 import static org.spine3.server.storage.jdbc.Sql.Query.UPDATE;
 import static org.spine3.server.storage.jdbc.Sql.Query.WHERE;
-import static org.spine3.server.storage.jdbc.command.query.CommandTable.COMMAND_STATUS_COL;
-import static org.spine3.server.storage.jdbc.command.query.CommandTable.ID_COL;
-import static org.spine3.server.storage.jdbc.command.query.CommandTable.TABLE_NAME;
+import static org.spine3.server.storage.jdbc.table.CommandTable.Column.command_status;
 
 /**
  * Query that sets {@link CommandStatus} to OK state.
@@ -42,10 +42,10 @@ import static org.spine3.server.storage.jdbc.command.query.CommandTable.TABLE_NA
 public class SetOkStatusQuery extends UpdateRecordQuery<String> {
 
     private static final String QUERY_TEMPLATE =
-            UPDATE + TABLE_NAME +
-            SET + COMMAND_STATUS_COL + EQUAL + '\'' +
+            UPDATE + CommandTable.TABLE_NAME +
+            SET + command_status + EQUAL + '\'' +
             CommandStatus.OK.name() + '\'' +
-            WHERE + ID_COL + EQUAL + PLACEHOLDER + SEMICOLON;
+            WHERE + Column.id + EQUAL + PLACEHOLDER + SEMICOLON;
 
     private SetOkStatusQuery(Builder builder) {
         super(builder);

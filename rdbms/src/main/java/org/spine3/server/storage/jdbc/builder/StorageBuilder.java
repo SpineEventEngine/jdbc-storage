@@ -21,7 +21,6 @@
 package org.spine3.server.storage.jdbc.builder;
 
 import org.spine3.server.storage.Storage;
-import org.spine3.server.storage.jdbc.query.QueryFactory;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -36,18 +35,14 @@ import static com.google.common.base.Preconditions.checkState;
  *
  * @param <B> type of the builder itself; used to construct call chains
  * @param <S> type of the built storage
- * @param <F> type of the {@linkplain QueryFactory} used by the storage
- * @author Dmytro Dashenkov.
+ * @author Dmytro Dashenkov
  */
-public abstract class StorageBuilder<B extends StorageBuilder<B, S, F>,
-                                     S extends Storage,
-                                     F extends QueryFactory> {
+public abstract class StorageBuilder<B extends StorageBuilder<B, S>,
+                                     S extends Storage> {
 
     private boolean multitenant;
 
     private DataSourceWrapper dataSource;
-
-    private F queryFactory;
 
     protected StorageBuilder() {
         // Prevent accidental direct initialization
@@ -78,19 +73,6 @@ public abstract class StorageBuilder<B extends StorageBuilder<B, S, F>,
         return getThis();
     }
 
-    public F getQueryFactory() {
-        return queryFactory;
-    }
-
-    /**
-     * @param queryFactory an implementation of the {@linkplain QueryFactory} used by the storage
-     *                     to generate SQL queries
-     */
-    public B setQueryFactory(F queryFactory) {
-        this.queryFactory = queryFactory;
-        return getThis();
-    }
-
     /**
      * Creates a new instance of the {@link Storage} with respect to the preconditions.
      *
@@ -107,14 +89,15 @@ public abstract class StorageBuilder<B extends StorageBuilder<B, S, F>,
     /**
      * Checks the preconditions of the storage construction.
      *
-     * <p>Default implementation checks that fields {@link #dataSource} and {@link #queryFactory}
-     * were set to a non-null values. Override this method to modify these preconditions.
+     * <p>Default implementation checks that the field {@link #dataSource}
+     * was set to a non-null value.
+     *
+     * <p>Override this method to modify these preconditions.
      *
      * @throws IllegalStateException upon a precondition violation
      */
     protected void checkPreconditions() throws IllegalStateException {
         checkState(dataSource != null, "Data source must not be null");
-        checkState(queryFactory != null, "Query factory must not be null");
     }
 
     /**

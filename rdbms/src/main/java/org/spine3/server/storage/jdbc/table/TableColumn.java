@@ -18,28 +18,33 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.spine3.server.storage.jdbc.projection.query;
+package org.spine3.server.storage.jdbc.table;
+
+import org.spine3.server.storage.StorageField;
+import org.spine3.server.storage.jdbc.Sql;
 
 /**
- * A utility class representing constants which are necessary for working with projection table.
+ * An interface for the database table columns representation.
  *
- * @author Andrey Lavrov
+ * <p>It's recommended to implement this interface in an {@code enum}, since it's API is sharpened
+ * to be overridden with the {@code enum} default methods.
+ *
+ * @author Dmytro Dashenkov
  */
-@SuppressWarnings("UtilityClass")
-/* This table is a single row which represents timestamp of the last handled event. */
-final class ProjectionTable {
+public interface TableColumn extends StorageField {
 
-    /** Last event time seconds column name. */
-    @SuppressWarnings("DuplicateStringLiteralInspection")
-    static final String SECONDS_COL = "seconds";
+    /**
+     * @return the name of the column
+     */
+    String name();
 
-    /** Last event time nanoseconds column name. */
-    @SuppressWarnings("DuplicateStringLiteralInspection")
-    static final String NANOS_COL = "nanoseconds";
+    /**
+     * @return the {@link Sql.Type} of the column
+     */
+    Sql.Type type();
 
-    /** A suffix of a table name where the last event time is stored. */
-    static final String LAST_EVENT_TIME_TABLE_NAME_SUFFIX = "_last_event_time";
-
-    private ProjectionTable() {
-    }
+    /**
+     * @return the position of the column in the {@code CREATE TABLE} query starting from 0
+     */
+    int ordinal();
 }

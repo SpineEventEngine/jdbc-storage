@@ -25,6 +25,7 @@ import org.spine3.server.aggregate.AggregateEventRecord;
 import org.spine3.server.storage.jdbc.DatabaseException;
 import org.spine3.server.storage.jdbc.Sql;
 import org.spine3.server.storage.jdbc.query.WriteRecordQuery;
+import org.spine3.server.storage.jdbc.table.entity.aggregate.AggregateEventRecordTable.Column;
 import org.spine3.server.storage.jdbc.util.ConnectionWrapper;
 
 import java.sql.PreparedStatement;
@@ -37,13 +38,13 @@ import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.COMMA;
 import static org.spine3.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
 import static org.spine3.server.storage.jdbc.Sql.Query.INSERT_INTO;
 import static org.spine3.server.storage.jdbc.Sql.Query.VALUES;
-import static org.spine3.server.storage.jdbc.aggregate.query.Table.AggregateRecord.AGGREGATE_COL;
-import static org.spine3.server.storage.jdbc.aggregate.query.Table.AggregateRecord.ID_COL;
-import static org.spine3.server.storage.jdbc.aggregate.query.Table.AggregateRecord.NANOS_COL;
-import static org.spine3.server.storage.jdbc.aggregate.query.Table.AggregateRecord.SECONDS_COL;
+import static org.spine3.server.storage.jdbc.table.entity.aggregate.AggregateEventRecordTable.Column.aggregate;
+import static org.spine3.server.storage.jdbc.table.entity.aggregate.AggregateEventRecordTable.Column.timestamp;
+import static org.spine3.server.storage.jdbc.table.entity.aggregate.AggregateEventRecordTable.Column.timestamp_nanos;
 
 /**
- * Query that inserts a new {@link AggregateEventRecord} to the {@link Table.AggregateRecord}.
+ * Query that inserts a new {@link AggregateEventRecord} to the
+ * {@link org.spine3.server.storage.jdbc.table.entity.aggregate.AggregateEventRecordTable}.
  *
  * @author Alexander Litus
  * @author Andrey Lavrov
@@ -52,7 +53,7 @@ public class InsertAggregateRecordQuery<I> extends WriteRecordQuery<I, Aggregate
 
     private static final String QUERY_TEMPLATE =
             INSERT_INTO + " %s " + BRACKET_OPEN
-            + ID_COL + COMMA + AGGREGATE_COL + COMMA + SECONDS_COL + COMMA + NANOS_COL +
+            + Column.id + COMMA + aggregate + COMMA + timestamp + COMMA + timestamp_nanos +
             BRACKET_CLOSE
             + VALUES + Sql.nPlaceholders(4) + SEMICOLON;
 
