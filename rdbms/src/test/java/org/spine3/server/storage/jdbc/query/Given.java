@@ -40,7 +40,7 @@ import static org.mockito.Mockito.when;
 class Given {
 
     private static Logger loggerMock = null;
-    private static final IdColumn<String> ID_COLUMN_QUERY_SETTER_MOCK = mock(IdColumn.StringIdColumn.class);
+    private static final IdColumn<String> idColumnMock = mock(IdColumn.StringIdColumn.class);
 
     // TODO:2016-08-02:alexander.litus: these methods are used in one place only (each), so move them there.
     // Apply this for all such cases in all Given classes.
@@ -53,7 +53,7 @@ class Given {
                 SelectByIdQueryMock.newBuilder()
                                    .setDataSource(dataSourceMock)
                                    .setLogger(loggerMock)
-                                   .setIdColumn(ID_COLUMN_QUERY_SETTER_MOCK);
+                                   .setIdColumn(idColumnMock);
         return builder.build();
     }
 
@@ -100,7 +100,7 @@ class Given {
                 WriteRecordQueryMock.newBuilder()
                                     .setDataSource(dataSourceMock)
                                     .setLogger(loggerMock)
-                                    .setIdColumn(ID_COLUMN_QUERY_SETTER_MOCK)
+                                    .setIdColumn(idColumnMock)
                                     .setRecord(recordMock);
         return builder.build();
     }

@@ -71,8 +71,7 @@ public class CommandTableQueryFactory implements QueryFactory<String, CommandRec
         final SetErrorQuery.Builder builder = SetErrorQuery.newBuilder()
                                                            .setDataSource(dataSource)
                                                            .setLogger(logger)
-                                                           .setIdColumn(
-                                                                   idColumn)
+                                                           .setIdColumn(idColumn)
                                                            .setId(id)
                                                            .setRecord(error);
         return builder.build();
@@ -104,8 +103,7 @@ public class CommandTableQueryFactory implements QueryFactory<String, CommandRec
         final SetOkStatusQuery.Builder builder = SetOkStatusQuery.newBuilder()
                                                                  .setDataSource(dataSource)
                                                                  .setLogger(logger)
-                                                                 .setIdColumn(
-                                                                         idColumn)
+                                                                 .setIdColumn(idColumn)
                                                                  .setId(id);
         return builder.build();
     }
