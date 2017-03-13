@@ -73,7 +73,7 @@ public class ContainsQuery<I> extends StorageQuery {
         try (ConnectionWrapper connection = getConnection(false);
              PreparedStatement statement = prepareStatement(connection)) {
             final ResultSet results = statement.executeQuery();
-            boolean result = results.next();
+            final boolean result = results.next();
             results.close();
             return result;
         } catch (SQLException e) {
