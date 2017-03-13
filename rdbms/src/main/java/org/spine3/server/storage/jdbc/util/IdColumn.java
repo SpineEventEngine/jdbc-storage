@@ -85,6 +85,10 @@ public abstract class IdColumn<I> {
         return helper;
     }
 
+    public static IdColumn<String> typeString(String columnName) {
+        return new StringIdColumn(columnName);
+    }
+
     protected IdColumn(String columnName) {
         this.columnName = checkNotNull(columnName);
     }
@@ -189,7 +193,8 @@ public abstract class IdColumn<I> {
      * Helps to work with columns which contain {@code string} {@link Entity} IDs.
      */
     public static class StringIdColumn extends StringOrMessageIdColumn<String> {
-        public StringIdColumn(String columnName) {
+
+        private StringIdColumn(String columnName) {
             super(columnName);
         }
     }

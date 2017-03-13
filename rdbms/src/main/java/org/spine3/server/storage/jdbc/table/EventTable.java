@@ -49,7 +49,7 @@ public class EventTable extends AbstractTable<String, Event, EventTable.Column> 
     private final EventTableQueryFactory queryFactory;
 
     public EventTable(DataSourceWrapper dataSource) {
-        super(TABLE_NAME, new IdColumn.StringIdColumn(Column.event_id.name()), dataSource);
+        super(TABLE_NAME, IdColumn.typeString(Column.event_id.name()), dataSource);
         this.queryFactory = new EventTableQueryFactory(dataSource);
     }
 

@@ -51,7 +51,7 @@ public class CommandTable extends AbstractTable<String, CommandRecord, CommandTa
     private final CommandTableQueryFactory queryFactory;
 
     public CommandTable(DataSourceWrapper dataSource) {
-        super(TABLE_NAME, new IdColumn.StringIdColumn(Column.id.name()), dataSource);
+        super(TABLE_NAME, IdColumn.typeString(Column.id.name()), dataSource);
         this.queryFactory = new CommandTableQueryFactory(dataSource);
         queryFactory.setLogger(log());
     }

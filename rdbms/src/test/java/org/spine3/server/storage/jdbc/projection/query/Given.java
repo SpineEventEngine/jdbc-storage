@@ -58,7 +58,7 @@ class Given {
         final SelectTimestampQuery.Builder builder =
                 SelectTimestampQuery.newBuilder(anyString())
                                     .setDataSource(dataSourceMock)
-                                    .setIdColumn(new IdColumn.StringIdColumn("id"))
+                                    .setIdColumn(IdColumn.typeString("id"))
                                     .setLogger(loggerMock);
         return builder.build();
     }

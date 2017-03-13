@@ -48,7 +48,7 @@ public class LastHandledEventTimeTable extends AbstractTable<String,
 
     public LastHandledEventTimeTable(DataSourceWrapper dataSource) {
         super(TABLE_NAME,
-              new IdColumn.StringIdColumn(Column.projection_type.name()),
+              IdColumn.typeString(Column.projection_type.name()),
               dataSource);
         this.queryFactory = new LastHandledEventTimeQueryFactory(dataSource, TABLE_NAME);
         queryFactory.setLogger(log());

@@ -65,7 +65,7 @@ public class InsertEntityRecordsBulkQueryShould {
                         .setLogger(logger)
                         .setDataSource(dataSource)
                         .setRecords(recordMap)
-                        .setidColumn(new IdColumn.StringIdColumn("id"))
+                        .setidColumn(IdColumn.typeString("id"))
                         .setTableName("random-table")
                         .build();
 

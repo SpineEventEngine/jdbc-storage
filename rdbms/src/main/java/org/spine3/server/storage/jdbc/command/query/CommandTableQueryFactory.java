@@ -52,7 +52,7 @@ public class CommandTableQueryFactory implements QueryFactory<String, CommandRec
      * @param dataSource the dataSource wrapper
      */
     public CommandTableQueryFactory(DataSourceWrapper dataSource) {
-        this.idColumn = new IdColumn.StringIdColumn(id.name());
+        this.idColumn = IdColumn.typeString(id.name());
         this.dataSource = dataSource;
     }
 

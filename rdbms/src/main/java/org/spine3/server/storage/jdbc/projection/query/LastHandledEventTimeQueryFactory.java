@@ -59,8 +59,7 @@ public class LastHandledEventTimeQueryFactory implements QueryFactory<String, Ti
                 SelectTimestampQuery.newBuilder(tableName)
                                     .setDataSource(dataSource)
                                     .setId(id)
-                                    .setIdColumn(new IdColumn.StringIdColumn(
-                                            projection_type.name()))
+                                    .setIdColumn(IdColumn.typeString(projection_type.name()))
                                     .setLogger(logger);
         return builder.build();
     }

@@ -71,7 +71,7 @@ public class EventTableQueryFactory implements QueryFactory<String, Event> {
                 SelectEventByIdQuery.newBuilder()
                                     .setDataSource(dataSource)
                                     .setLogger(logger)
-                                    .setIdColumn(new IdColumn.StringIdColumn(event_id.name()))
+                                    .setIdColumn(IdColumn.typeString(event_id.name()))
                                     .setId(id);
         return builder.build();
     }
