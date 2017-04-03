@@ -51,11 +51,12 @@ public class JdbcAggregateStorageShould extends AggregateStorageShould {
             Class<? extends Aggregate<I, ? extends Message, ?>> aggregateClass) {
         final DataSourceWrapper dataSource =
                 GivenDataSource.whichIsStoredInMemory("aggregateStorageTests");
-        final JdbcAggregateStorage<I> storage = JdbcAggregateStorage.<I>newBuilder()
-                                                                    .setMultitenant(false)
-                                                                    .setDataSource(dataSource)
-                                                                    .setAggregateClass(aggregateClass)
-                                                                    .build();
+        final JdbcAggregateStorage<I> storage =
+                JdbcAggregateStorage.<I>newBuilder()
+                        .setMultitenant(false)
+                        .setDataSource(dataSource)
+                        .setAggregateClass(aggregateClass)
+                        .build();
         return storage;
     }
 
@@ -81,8 +82,8 @@ public class JdbcAggregateStorageShould extends AggregateStorageShould {
     }
 
     private static class TestAggregateWithMessageId extends Aggregate<ProjectId,
-                                                                      Project,
-                                                                      Project.Builder> {
+            Project,
+            Project.Builder> {
         private TestAggregateWithMessageId(ProjectId id) {
             super(id);
         }

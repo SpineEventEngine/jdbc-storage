@@ -22,7 +22,6 @@ package org.spine3.server.storage.jdbc.aggregate.query;
 
 import org.slf4j.Logger;
 import org.spine3.server.aggregate.AggregateEventRecord;
-import org.spine3.server.storage.jdbc.GivenDataSource;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
@@ -30,6 +29,8 @@ import java.sql.SQLException;
 
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.mock;
+import static org.spine3.server.storage.jdbc.GivenDataSource.whichThrowsExceptionOnExecuteStatement;
+import static org.spine3.server.storage.jdbc.GivenDataSource.whichThrowsExceptionOnSettingStatementParam;
 
 /**
  * @author Andrey Lavrov
@@ -38,15 +39,15 @@ import static org.mockito.Mockito.mock;
 class Given {
 
     private static Logger loggerMock = null;
-    private static final IdColumn<String> ID_COLUMN_QUERY_SETTER_MOCK = mock(IdColumn.StringIdColumn.class);
+    private static final IdColumn<String> ID_COLUMN_QUERY_SETTER_MOCK =
+            mock(IdColumn.StringIdColumn.class);
 
     private Given() {
     }
 
     static InsertAggregateRecordQuery getInsertAggregateRecordQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock =
-                GivenDataSource.whichThrowsExceptionOnSettingStatementParam();
+        final DataSourceWrapper dataSourceMock = whichThrowsExceptionOnSettingStatementParam();
         final InsertAggregateRecordQuery.Builder<String> builder =
                 InsertAggregateRecordQuery.<String>newBuilder(anyString())
                         .setDataSource(dataSourceMock)
@@ -59,7 +60,7 @@ class Given {
 
     static InsertEventCountQuery getInsertEventCountQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnSettingStatementParam();
+        final DataSourceWrapper dataSourceMock = whichThrowsExceptionOnSettingStatementParam();
         final InsertEventCountQuery.Builder<String> builder =
                 InsertEventCountQuery.<String>newBuilder(anyString())
                         .setDataSource(dataSourceMock)
@@ -70,7 +71,7 @@ class Given {
 
     static SelectEventCountByIdQuery getSelectEventCountByIdQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnExecuteStatement();
+        final DataSourceWrapper dataSourceMock = whichThrowsExceptionOnExecuteStatement();
         final SelectEventCountByIdQuery.Builder<String> builder =
                 SelectEventCountByIdQuery.<String>newBuilder(anyString())
                         .setDataSource(dataSourceMock)
@@ -81,7 +82,7 @@ class Given {
 
     static UpdateEventCountQuery getUpdateEventCountQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnSettingStatementParam();
+        final DataSourceWrapper dataSourceMock = whichThrowsExceptionOnSettingStatementParam();
         final UpdateEventCountQuery.Builder<String> builder =
                 UpdateEventCountQuery.<String>newBuilder(anyString())
                         .setDataSource(dataSourceMock)

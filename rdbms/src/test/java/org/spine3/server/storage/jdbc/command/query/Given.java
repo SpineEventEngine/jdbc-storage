@@ -23,13 +23,14 @@ package org.spine3.server.storage.jdbc.command.query;
 import org.slf4j.Logger;
 import org.spine3.base.CommandStatus;
 import org.spine3.server.command.CommandRecord;
-import org.spine3.server.storage.jdbc.GivenDataSource;
 import org.spine3.server.storage.jdbc.util.DataSourceWrapper;
 import org.spine3.server.storage.jdbc.util.IdColumn;
 
 import java.sql.SQLException;
 
 import static org.mockito.Mockito.mock;
+import static org.spine3.server.storage.jdbc.GivenDataSource.whichThrowsExceptionOnExecuteStatement;
+import static org.spine3.server.storage.jdbc.GivenDataSource.whichThrowsExceptionOnSettingStatementParam;
 
 /**
  * @author Andrey Lavrov
@@ -38,14 +39,15 @@ import static org.mockito.Mockito.mock;
 class Given {
 
     private static Logger loggerMock = null;
-    private static final IdColumn<String> ID_COLUMN_QUERY_SETTER_MOCK = mock(IdColumn.StringIdColumn.class);
+    private static final IdColumn<String> ID_COLUMN_QUERY_SETTER_MOCK =
+            mock(IdColumn.StringIdColumn.class);
 
     private Given() {
     }
 
     static SelectCommandByIdQuery getSelectCommandByIdQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnExecuteStatement();
+        final DataSourceWrapper dataSourceMock = whichThrowsExceptionOnExecuteStatement();
         final SelectCommandByIdQuery.Builder builder =
                 SelectCommandByIdQuery.newBuilder()
                                       .setDataSource(dataSourceMock)
@@ -56,7 +58,7 @@ class Given {
 
     static SelectCommandByStatusQuery getSelectCommandByStatusQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnSettingStatementParam();
+        final DataSourceWrapper dataSourceMock = whichThrowsExceptionOnSettingStatementParam();
         final SelectCommandByStatusQuery.Builder builder =
                 SelectCommandByStatusQuery.newBuilder()
                                           .setDataSource(dataSourceMock)
@@ -67,7 +69,7 @@ class Given {
 
     static WriteCommandRecordQuery getWriteCommandRecordQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock = GivenDataSource.whichThrowsExceptionOnSettingStatementParam();
+        final DataSourceWrapper dataSourceMock = whichThrowsExceptionOnSettingStatementParam();
         final InsertCommandQuery.Builder builder =
                 InsertCommandQuery.newBuilder()
                                   .setDataSource(dataSourceMock)
