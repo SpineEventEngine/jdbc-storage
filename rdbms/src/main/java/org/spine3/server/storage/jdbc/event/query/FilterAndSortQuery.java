@@ -106,7 +106,8 @@ public class FilterAndSortQuery extends StorageQuery {
             final String aggregateIdStr = idToString(aggregateId);
             appendTo(builder,
                      whereOrOr(builder),
-                     Column.producer_id.name(), ESCAPED_EQUAL_START, aggregateIdStr, ESCAPED_EQUAL_END);
+                     Column.producer_id.name(),
+                     ESCAPED_EQUAL_START, aggregateIdStr, ESCAPED_EQUAL_END);
         }
     }
 

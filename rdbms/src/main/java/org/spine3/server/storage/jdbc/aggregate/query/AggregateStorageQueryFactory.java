@@ -121,7 +121,8 @@ public class AggregateStorageQueryFactory<I> implements QueryFactory<I, Aggregat
      */
     @Override
     public WriteQuery newUpdateQuery(I id, AggregateEventRecord record) {
-        logger.warn("UPDATE operation is not possible within the AggregateEventRecordTable. Performing an INSERT instead.");
+        logger.warn("UPDATE operation is not possible within the AggregateEventRecordTable. " +
+                    "Performing an INSERT instead.");
         return newInsertQuery(id, record);
     }
 }

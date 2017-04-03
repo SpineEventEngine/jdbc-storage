@@ -24,11 +24,11 @@ import com.google.protobuf.Message;
 import org.spine3.Internal;
 import org.spine3.protobuf.TypeName;
 import org.spine3.server.entity.Entity;
-import org.spine3.server.reflect.Classes;
 
 import java.util.regex.Pattern;
 
 import static org.spine3.server.entity.Entity.GenericParameter.STATE;
+import static org.spine3.server.reflect.Classes.getGenericParameterType;
 
 /**
  * A utility class which provides strings valid for DB table names.
@@ -54,8 +54,7 @@ public class DbTableNameFactory {
      * @return a valid DB table name
      */
     public static String newTableName(Class<? extends Entity<?, ?>> clazz) {
-        final Class<? extends Message> stateType = Classes.getGenericParameterType(clazz,
-                                                                                   STATE.getIndex());
+        final Class<? extends Message> stateType = getGenericParameterType(clazz, STATE.getIndex());
         final String typeName = TypeName.of(stateType);
         final String tableNameTmp = PATTERN_DOT.matcher(typeName)
                                                .replaceAll(UNDERSCORE);

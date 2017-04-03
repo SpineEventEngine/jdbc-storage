@@ -119,7 +119,8 @@ public class InsertEventRecordQuery extends WriteRecordQuery<String, Event> {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder extends WriteRecordQuery.Builder<Builder, InsertEventRecordQuery, String, Event> {
+    public static class Builder
+            extends WriteRecordQuery.Builder<Builder, InsertEventRecordQuery, String, Event> {
 
         @Override
         public InsertEventRecordQuery build() {
