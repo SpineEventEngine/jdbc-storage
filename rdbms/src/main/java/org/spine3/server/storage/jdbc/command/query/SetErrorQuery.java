@@ -61,7 +61,8 @@ public class SetErrorQuery extends WriteRecordQuery<String, Error> {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder extends WriteRecordQuery.Builder<Builder, SetErrorQuery, String, Error> {
+    public static class Builder
+            extends WriteRecordQuery.Builder<Builder, SetErrorQuery, String, Error> {
 
         @Override
         public SetErrorQuery build() {

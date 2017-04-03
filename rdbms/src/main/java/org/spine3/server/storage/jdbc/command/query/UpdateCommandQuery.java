@@ -62,7 +62,8 @@ public class UpdateCommandQuery extends WriteCommandRecordQuery {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder extends WriteCommandRecordQuery.Builder<Builder, UpdateCommandQuery> {
+    public static class Builder
+            extends WriteCommandRecordQuery.Builder<Builder, UpdateCommandQuery> {
 
         @Override
         public UpdateCommandQuery build() {
