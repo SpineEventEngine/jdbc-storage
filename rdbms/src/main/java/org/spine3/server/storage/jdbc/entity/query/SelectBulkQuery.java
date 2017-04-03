@@ -132,8 +132,8 @@ public class SelectBulkQuery<I> extends StorageQuery {
      * <p>Builds instances of {@code SelectBulkQuery}.
      * <p>All fields are required.
      *
-     * <p>One of methods {@link #setAllQuery(String)} and {@link #setIdsQuery(String, Iterable)} should be called
-     * before {@link #build()}.
+     * <p>One of methods {@link #setAllQuery(String)} and {@link #setIdsQuery(String, Iterable)}
+     * should be called before {@link #build()}.
      */
     @SuppressWarnings("ClassNameSameAsAncestorName")
     public static class Builder<I> extends StorageQuery.Builder<Builder<I>, SelectBulkQuery> {
@@ -158,8 +158,8 @@ public class SelectBulkQuery<I> extends StorageQuery {
 
         /**
          * Sets {@code SelectBulkQuery} into "query all" mode and sets the table name.
-         * Either this method or {@link Builder#setIdsQuery(String, Iterable)} should be called before
-         * the {@code SelectBulkQuery} is built.
+         * Either this method or {@link Builder#setIdsQuery(String, Iterable)}
+         * should be called before the {@code SelectBulkQuery} is built.
          *
          * @param tableName Name of the table to query.
          */

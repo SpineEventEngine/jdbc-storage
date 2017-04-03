@@ -38,18 +38,20 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Dmytro Dashenkov
  */
-public class JdbcAggregateStorageVisibilityHandlingShould extends AggregateStorageVisibilityHandlingShould {
+public class JdbcAggregateStorageVisibilityHandlingShould
+        extends AggregateStorageVisibilityHandlingShould {
 
     @Override
     protected AggregateStorage<ProjectId> getAggregateStorage(
             Class<? extends Aggregate<ProjectId, ?, ?>> aggregateClass) {
         final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(
                 "aggregateStorageStatusHandlingTests");
-        final JdbcAggregateStorage<ProjectId> storage = JdbcAggregateStorage.<ProjectId>newBuilder()
-                                                                 .setMultitenant(false)
-                                                                 .setAggregateClass(TestAggregate.class)
-                                                                 .setDataSource(dataSource)
-                                                                 .build();
+        final JdbcAggregateStorage<ProjectId> storage =
+                JdbcAggregateStorage.<ProjectId>newBuilder()
+                        .setMultitenant(false)
+                        .setAggregateClass(TestAggregate.class)
+                        .setDataSource(dataSource)
+                        .build();
         return storage;
     }
 

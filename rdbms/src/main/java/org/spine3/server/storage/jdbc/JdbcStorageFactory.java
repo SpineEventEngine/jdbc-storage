@@ -90,30 +90,31 @@ public class JdbcStorageFactory<I> implements StorageFactory {
     @Override
     public StandStorage createStandStorage() {
         return JdbcStandStorage.<I>newBuilder()
-                               .setDataSource(dataSource)
-                               .setMultitenant(isMultitenant())
-                               .setEntityClass(entityClass)
-                               .build();
+                .setDataSource(dataSource)
+                .setMultitenant(isMultitenant())
+                .setEntityClass(entityClass)
+                .build();
     }
 
     @Override
     public <I> AggregateStorage<I> createAggregateStorage(
             Class<? extends Aggregate<I, ?, ?>> aggregateClass) {
-        final JdbcAggregateStorage<I> storage = JdbcAggregateStorage.<I>newBuilder()
-                                                                    .setAggregateClass(aggregateClass)
-                                                                    .setMultitenant(false)
-                                                                    .setDataSource(dataSource)
-                                                                    .build();
+        final JdbcAggregateStorage<I> storage =
+                JdbcAggregateStorage.<I>newBuilder()
+                        .setAggregateClass(aggregateClass)
+                        .setMultitenant(false)
+                        .setDataSource(dataSource)
+                        .build();
         return storage;
     }
 
     @Override
     public <I> RecordStorage<I> createRecordStorage(Class<? extends Entity<I, ?>> entityClass) {
         final RecordStorage<I> recordStorage = JdbcRecordStorage.<I>newBuilder()
-                                                                .setMultitenant(false)
-                                                                .setEntityClass(entityClass)
-                                                                .setDataSource(dataSource)
-                                                                .build();
+                .setMultitenant(false)
+                .setEntityClass(entityClass)
+                .setDataSource(dataSource)
+                .build();
         return recordStorage;
     }
 
@@ -123,10 +124,10 @@ public class JdbcStorageFactory<I> implements StorageFactory {
         final JdbcRecordStorage<I> entityStorage =
                 (JdbcRecordStorage<I>) createRecordStorage(projectionClass);
         final ProjectionStorage<I> storage = JdbcProjectionStorage.<I>newBuilder()
-                                                                  .setMultitenant(multitenant)
-                                                                  .setDataSource(dataSource)
-                                                                  .setRecordStorage(entityStorage)
-                                                                  .build();
+                .setMultitenant(multitenant)
+                .setDataSource(dataSource)
+                .setRecordStorage(entityStorage)
+                .build();
         return storage;
     }
 

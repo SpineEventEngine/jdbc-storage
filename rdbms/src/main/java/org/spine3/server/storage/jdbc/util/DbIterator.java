@@ -80,7 +80,9 @@ public class DbIterator<R extends Message> implements Iterator<R>, AutoCloseable
     public boolean hasNext() {
         try {
             final boolean hasNextElem = resultSet.next();
-            /** {@link ResultSet#previous()} is not used here because some JDBC drivers do not support it. */
+            /** {@link ResultSet#previous()} is not used here because some JDBC drivers
+             * do not support it.
+             */
             hasNext = hasNextElem;
             isHasNextCalledBeforeNext = true;
             return hasNextElem;

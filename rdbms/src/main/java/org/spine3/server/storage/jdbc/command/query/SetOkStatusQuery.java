@@ -59,7 +59,8 @@ public class SetOkStatusQuery extends UpdateRecordQuery<String> {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder extends UpdateRecordQuery.Builder<Builder, SetOkStatusQuery, String> {
+    public static class Builder
+            extends UpdateRecordQuery.Builder<Builder, SetOkStatusQuery, String> {
 
         @Override
         public SetOkStatusQuery build() {

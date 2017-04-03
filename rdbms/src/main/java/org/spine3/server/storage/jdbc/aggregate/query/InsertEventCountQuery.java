@@ -81,7 +81,8 @@ public class InsertEventCountQuery<I> extends UpdateRecordQuery<I> {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder<I> extends UpdateRecordQuery.Builder<Builder<I>, InsertEventCountQuery, I> {
+    public static class Builder<I>
+            extends UpdateRecordQuery.Builder<Builder<I>, InsertEventCountQuery, I> {
 
         private int count;
 

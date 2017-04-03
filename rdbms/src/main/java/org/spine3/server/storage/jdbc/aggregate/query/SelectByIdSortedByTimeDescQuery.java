@@ -46,7 +46,8 @@ import static org.spine3.server.storage.jdbc.table.entity.aggregate.AggregateEve
 import static org.spine3.server.storage.jdbc.table.entity.aggregate.AggregateEventRecordTable.Column.timestamp_nanos;
 
 /**
- * Query that selects {@link AggregateEventRecord} by corresponding aggregate ID sorted by time descending.
+ * Query that selects {@link AggregateEventRecord} by corresponding aggregate ID sorted by
+ * time descending.
  *
  * @author Alexander Litus
  * @author Andrey Lavrov
@@ -86,7 +87,8 @@ public class SelectByIdSortedByTimeDescQuery<I> extends StorageQuery {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder<I> extends StorageQuery.Builder<Builder<I>, SelectByIdSortedByTimeDescQuery> {
+    public static class Builder<I>
+            extends StorageQuery.Builder<Builder<I>, SelectByIdSortedByTimeDescQuery> {
 
         private IdColumn<I> idColumn;
         private I id;

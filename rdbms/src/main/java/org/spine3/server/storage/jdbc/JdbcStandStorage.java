@@ -54,7 +54,8 @@ public class JdbcStandStorage extends StandStorage {
 
     private final JdbcRecordStorage<Object> recordStorage;
 
-    private static final Function<AggregateStateId, Object> ID_MAPPER = new Function<AggregateStateId, Object>() {
+    private static final Function<AggregateStateId, Object> ID_MAPPER =
+            new Function<AggregateStateId, Object>() {
         @Nullable
         @Override
         public Object apply(@Nullable AggregateStateId input) {

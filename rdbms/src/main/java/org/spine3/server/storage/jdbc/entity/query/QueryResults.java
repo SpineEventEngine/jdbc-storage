@@ -37,7 +37,8 @@ import java.util.Map;
 import static org.spine3.server.storage.jdbc.table.entity.RecordTable.Column.entity;
 
 /**
- * Utility class for parsing the results of a DB query ({@link ResultSet}) into the required in-memory representation.
+ * Utility class for parsing the results of a DB query ({@link ResultSet}) into the
+ * required in-memory representation.
  *
  * @author Dmytro Dashenkov
  */
