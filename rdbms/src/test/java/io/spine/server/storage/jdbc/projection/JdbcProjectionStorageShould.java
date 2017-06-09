@@ -20,7 +20,6 @@
 
 package io.spine.server.storage.jdbc.projection;
 
-import org.junit.Test;
 import io.spine.server.projection.Projection;
 import io.spine.server.projection.ProjectionStorage;
 import io.spine.server.projection.ProjectionStorageShould;
@@ -29,9 +28,11 @@ import io.spine.server.storage.jdbc.builder.StorageBuilder;
 import io.spine.server.storage.jdbc.entity.JdbcRecordStorage;
 import io.spine.server.storage.jdbc.util.DataSourceWrapper;
 import io.spine.test.projection.Project;
+import io.spine.validate.ValidatingBuilder;
+import org.junit.Test;
 
+import static io.spine.base.Identifier.newUuid;
 import static org.junit.Assert.assertNotNull;
-import static io.spine.base.Identifiers.newUuid;
 
 /**
  * @author Alexander Litus
@@ -79,7 +80,7 @@ public class JdbcProjectionStorageShould extends ProjectionStorageShould<String>
         assertNotNull(builder);
     }
 
-    private static class TestProjection extends Projection<String, Project> {
+    private static class TestProjection extends Projection<String, Project, ValidatingBuilder<Project, Project.Builder>> {
 
         private TestProjection(String id) {
             super(id);

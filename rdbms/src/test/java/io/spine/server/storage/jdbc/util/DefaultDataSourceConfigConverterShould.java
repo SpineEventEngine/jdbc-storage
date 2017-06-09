@@ -21,12 +21,11 @@
 package io.spine.server.storage.jdbc.util;
 
 import com.google.common.testing.NullPointerTester;
-import org.junit.Test;
 import io.spine.server.storage.jdbc.DataSourceConfig;
+import org.junit.Test;
 
-import static org.junit.Assert.assertTrue;
+import static io.spine.test.Tests.assertHasPrivateParameterlessCtor;
 import static org.mockito.Mockito.mock;
-import static io.spine.test.Tests.hasPrivateParameterlessCtor;
 
 /**
  * @author Dmytro Dashenkov
@@ -35,7 +34,7 @@ public class DefaultDataSourceConfigConverterShould {
 
     @Test
     public void have_private_utility_constructor() {
-        assertTrue(hasPrivateParameterlessCtor(DefaultDataSourceConfigConverter.class));
+        assertHasPrivateParameterlessCtor(DefaultDataSourceConfigConverter.class);
     }
 
     @Test

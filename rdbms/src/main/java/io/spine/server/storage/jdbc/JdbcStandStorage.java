@@ -30,6 +30,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.protobuf.FieldMask;
+import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.builder.StorageBuilder;
 import io.spine.server.storage.jdbc.entity.JdbcRecordStorage;
 import io.spine.type.TypeUrl;
@@ -109,18 +110,6 @@ public class JdbcStandStorage extends StandStorage {
     }
 
     @Override
-    public void markArchived(AggregateStateId id) {
-        final Object aggregateId = id.getAggregateId();
-        recordStorage.markArchived(aggregateId);
-    }
-
-    @Override
-    public void markDeleted(AggregateStateId id) {
-        final Object aggregateId = id.getAggregateId();
-        recordStorage.markDeleted(aggregateId);
-    }
-
-    @Override
     public boolean delete(AggregateStateId id) {
         final Object aggregateId = id.getAggregateId();
         return recordStorage.delete(aggregateId);
@@ -157,17 +146,17 @@ public class JdbcStandStorage extends StandStorage {
     }
 
     @Override
-    protected void writeRecord(AggregateStateId id, EntityRecord record) {
+    protected void writeRecord(AggregateStateId id, EntityRecordWithColumns record) {
         recordStorage.write(id.getAggregateId(), record);
     }
 
     @Override
-    protected void writeRecords(Map<AggregateStateId, EntityRecord> records) {
-        final Map<Object, EntityRecord> genericIdRecords = new HashMap<>(records.size());
-        for (Map.Entry<AggregateStateId, EntityRecord> record : records.entrySet()) {
+    protected void writeRecords(Map<AggregateStateId, EntityRecordWithColumns> records) {
+        final Map<Object, EntityRecordWithColumns> genericIdRecords = new HashMap<>(records.size());
+        for (Map.Entry<AggregateStateId, EntityRecordWithColumns> record : records.entrySet()) {
             final Object genericId = record.getKey()
                                            .getAggregateId();
-            final EntityRecord recordValue = record.getValue();
+            final EntityRecordWithColumns recordValue = record.getValue();
             genericIdRecords.put(genericId, recordValue);
         }
         recordStorage.write(genericIdRecords);

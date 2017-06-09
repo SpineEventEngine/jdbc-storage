@@ -22,13 +22,12 @@ package io.spine.server.storage.jdbc.util;
 
 import com.google.protobuf.Message;
 import io.spine.annotation.Internal;
-import io.spine.type.TypeName;
 import io.spine.server.entity.Entity;
+import io.spine.type.TypeName;
 
 import java.util.regex.Pattern;
 
 import static io.spine.server.entity.Entity.GenericParameter.STATE;
-import static io.spine.server.reflect.Classes.getGenericParameterType;
 
 /**
  * A utility class which provides strings valid for DB table names.
@@ -54,7 +53,7 @@ public class DbTableNameFactory {
      * @return a valid DB table name
      */
     public static String newTableName(Class<? extends Entity<?, ?>> clazz) {
-        final Class<? extends Message> stateType = getGenericParameterType(clazz, STATE.getIndex());
+        final Class<? extends Message> stateType = Entity.TypeInfo.getIdClass(clazz);
         final String typeName = TypeName.of(stateType).toString();
         final String tableNameTmp = PATTERN_DOT.matcher(typeName)
                                                .replaceAll(UNDERSCORE);

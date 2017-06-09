@@ -25,20 +25,22 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.protobuf.FieldMask;
-import io.spine.server.storage.jdbc.DatabaseException;
-import io.spine.server.storage.jdbc.table.entity.RecordTable;
-import io.spine.server.storage.jdbc.util.DataSourceWrapper;
 import io.spine.server.entity.Entity;
 import io.spine.server.entity.EntityRecord;
+import io.spine.server.entity.storage.EntityQuery;
+import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.RecordStorage;
+import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.JdbcStorageFactory;
 import io.spine.server.storage.jdbc.builder.StorageBuilder;
+import io.spine.server.storage.jdbc.table.entity.RecordTable;
+import io.spine.server.storage.jdbc.util.DataSourceWrapper;
 
+import java.util.Iterator;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static java.lang.String.format;
 
 /**
  * The implementation of the entity storage based on the RDBMS.
@@ -66,30 +68,19 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
         this(builder.getDataSource(), builder.isMultitenant(), builder.getEntityClass());
     }
 
-    @SuppressWarnings("ProhibitedExceptionThrown") // NPE by the contract
     @Override
-    public void markArchived(I id) {
-        checkNotNull(id);
-        final boolean recordExists = table.markArchived(id);
-        if (!recordExists) {
-            // The NPE is required by the contract of the method
-            final String errorMessage =
-                    format("Trying to mark not existing record with id %s archived.", id);
-            throw new NullPointerException(errorMessage);
-        }
+    protected Map<I, EntityRecord> readAllRecords(EntityQuery<I> query, FieldMask fieldMask) {
+        return null;
     }
 
-    @SuppressWarnings("ProhibitedExceptionThrown") // NPE by the contract
     @Override
-    public void markDeleted(I id) {
-        checkNotNull(id);
-        final boolean recordExists = table.markDeleted(id);
-        if (!recordExists) {
-            // The NPE is required by the contract of the method
-            final String errorMessage =
-                    format("Trying to mark not existing record with id %s deleted.", id);
-            throw new NullPointerException(errorMessage);
-        }
+    protected void writeRecord(I id, EntityRecordWithColumns record) {
+
+    }
+
+    @Override
+    public Iterator<I> index() {
+        return null;
     }
 
     @Override
@@ -134,22 +125,22 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
         return ImmutableMap.copyOf(records);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @throws DatabaseException if an error occurs during an interaction with the DB
-     */
-    @VisibleForTesting
-    @Override
-    protected void writeRecord(I id, EntityRecord record) throws DatabaseException {
-        checkArgument(record.hasState(), "entity state");
+//    /**
+//     * {@inheritDoc}
+//     *
+//     * @throws DatabaseException if an error occurs during an interaction with the DB
+//     */
+//    @VisibleForTesting
+//    @Override
+//    protected void writeRecord(I id, EntityRecord record) throws DatabaseException {
+//        checkArgument(record.hasState(), "entity state");
+//
+//        table.write(id, record);
+//    }
 
-        table.write(id, record);
-    }
-
     @Override
-    protected void writeRecords(Map<I, EntityRecord> records) {
-        table.write(records);
+    protected void writeRecords(Map<I, EntityRecordWithColumns> records) {
+//        table.write(records);
     }
 
     @Override

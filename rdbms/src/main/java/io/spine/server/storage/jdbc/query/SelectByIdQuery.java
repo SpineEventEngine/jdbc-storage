@@ -22,11 +22,12 @@ package io.spine.server.storage.jdbc.query;
 
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Message;
-import io.spine.server.storage.jdbc.DatabaseException;
-import io.spine.server.storage.jdbc.util.Serializer;
 import io.spine.annotation.Internal;
+import io.spine.base.Identifier;
+import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.util.ConnectionWrapper;
 import io.spine.server.storage.jdbc.util.IdColumn;
+import io.spine.server.storage.jdbc.util.Serializer;
 
 import javax.annotation.Nullable;
 import java.sql.PreparedStatement;
@@ -34,7 +35,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static io.spine.base.Identifiers.idToString;
 
 /**
  * A query which obtains a {@link Message} by an ID.
@@ -81,7 +81,7 @@ public class SelectByIdQuery<I, M extends Message> extends StorageQuery {
             return message;
         } catch (SQLException e) {
             this.getLogger()
-                .error("Error during reading a message, ID = " + idToString(id), e);
+                .error("Error during reading a message, ID = " + Identifier.toString(id), e);
             throw new DatabaseException(e);
         }
     }

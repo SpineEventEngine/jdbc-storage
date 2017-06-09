@@ -22,8 +22,7 @@ package io.spine.server.storage.jdbc.entity.query;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertTrue;
-import static io.spine.test.Tests.hasPrivateParameterlessCtor;
+import static io.spine.test.Tests.assertHasPrivateParameterlessCtor;
 
 /**
  * @author Dmytro Dashenkov
@@ -32,7 +31,7 @@ public class QueryResultsShould {
 
     @Test
     public void have_private_utility_constructor() {
-        assertTrue(hasPrivateParameterlessCtor(QueryResults.class));
+        assertHasPrivateParameterlessCtor(QueryResults.class);
     }
 
 }

@@ -22,20 +22,20 @@ package io.spine.server.storage.jdbc.util;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import org.junit.Test;
+import com.google.common.testing.NullPointerTester;
 import io.spine.server.storage.jdbc.throwable.MultipleExceptionsOnClose;
-import io.spine.test.NullToleranceTest;
+import org.junit.Test;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import static io.spine.test.Tests.assertHasPrivateParameterlessCtor;
 import static java.util.Collections.singleton;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static io.spine.test.Tests.hasPrivateParameterlessCtor;
 
 /**
  * @author Dmytro Dashenkov
@@ -44,16 +44,13 @@ public class CloseablesShould {
 
     @Test
     public void have_private_constructor() {
-        assertTrue(hasPrivateParameterlessCtor(Closeables.class));
+        assertHasPrivateParameterlessCtor(Closeables.class);
     }
 
     @Test
-    public void pass_null_tolerance_test() {
-        final boolean passed = NullToleranceTest.newBuilder()
-                                                .setClass(Closeables.class)
-                                                .build()
-                                                .check();
-        assertTrue(passed);
+    public void pass_null_tolerance_check() {
+        new NullPointerTester()
+                .testAllPublicStaticMethods(Closeables.class);
     }
 
     @SuppressWarnings("MethodWithMultipleLoops")

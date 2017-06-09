@@ -24,11 +24,12 @@ import com.google.common.base.Optional;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.FieldMask;
 import com.google.protobuf.Message;
+import io.spine.time.Time;
 import org.junit.Test;
 import io.spine.base.Version;
 import io.spine.protobuf.AnyPacker;
-import io.spine.protobuf.Timestamps2;
-import io.spine.protobuf.TypeUrl;
+import io.spine.time.Timestamps2;
+import io.spine.type.TypeUrl;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.entity.AbstractEntity;
 import io.spine.server.entity.EntityRecord;
@@ -52,6 +53,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import static io.spine.server.storage.jdbc.stand.Given.*;
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -99,7 +101,7 @@ public class JdbcStandStorageShould extends StandStorageShould {
         final StandStorage standStorage = JdbcStandStorage.<String>newBuilder()
                 .setDataSource(dataSourceMock)
                 .setMultitenant(false)
-                .setEntityClass(Given.TestAggregate.class)
+                .setEntityClass(TestAggregate.class)
                 .build();
 
         assertNotNull(standStorage);
@@ -119,7 +121,7 @@ public class JdbcStandStorageShould extends StandStorageShould {
 
         final StandStorage standStorage = JdbcStandStorage.<String>newBuilder()
                 .setDataSource(dataSourceMock)
-                .setEntityClass(Given.TestAggregate.class)
+                .setEntityClass(TestAggregate.class)
                 .build();
 
         assertNotNull(standStorage);
@@ -147,9 +149,9 @@ public class JdbcStandStorageShould extends StandStorageShould {
 
     @Test
     public void write_data_to_store() {
-        final StandStorage storage = Given.newStorage();
+        final StandStorage storage = newStorage();
 
-        final Given.TestAggregate aggregate = new Given.TestAggregate("some_id");
+        final TestAggregate aggregate = new TestAggregate("some_id");
 
         final EntityRecord record = writeToStorage(aggregate, storage, Project.class);
 
@@ -164,9 +166,9 @@ public class JdbcStandStorageShould extends StandStorageShould {
 
     @Test
     public void perform_bulk_read_operations() {
-        final StandStorage storage = Given.newStorage();
+        final StandStorage storage = newStorage();
 
-        final Collection<Given.TestAggregate> testData = Given.testAggregates(10);
+        final Collection<Given.TestAggregate> testData = testAggregates(10);
 
         final List<EntityRecord> records = new ArrayList<>();
 
@@ -195,7 +197,7 @@ public class JdbcStandStorageShould extends StandStorageShould {
 
     @Test
     public void handle_wrong_ids_silently() {
-        final StandStorage storage = Given.newStorage();
+        final StandStorage storage = newStorage();
 
         final TypeUrl typeUrl = TypeUrl.of(Project.class);
         final String repeatingInvalidId = "invalid-id-1";
@@ -215,9 +217,9 @@ public class JdbcStandStorageShould extends StandStorageShould {
     @SuppressWarnings("MethodWithMultipleLoops")
     @Test
     public void read_all_from_database() {
-        final StandStorage storage = Given.newStorage();
+        final StandStorage storage = newStorage();
 
-        final Collection<Given.TestAggregate> testData = Given.testAggregates(10);
+        final Collection<Given.TestAggregate> testData = testAggregates(10);
 
         final List<EntityRecord> records = new ArrayList<>();
 
@@ -236,7 +238,7 @@ public class JdbcStandStorageShould extends StandStorageShould {
 
     @Test
     public void apply_field_mask_to_read_values() {
-        final StandStorage storage = Given.newStorage();
+        final StandStorage storage = newStorage();
 
         final String stringId = "42";
         final AggregateStateId id = AggregateStateId.of(stringId, TypeUrl.of(Project.class));
@@ -248,7 +250,7 @@ public class JdbcStandStorageShould extends StandStorageShould {
                                        .setStatus(Project.Status.DONE)
                                        .build();
 
-        final Given.TestAggregate aggregate = new Given.TestAggregate(stringId);
+        final TestAggregate aggregate = new TestAggregate(stringId);
         aggregate.setState(project);
 
         writeToStorage(aggregate, storage, Project.class);
@@ -293,11 +295,11 @@ public class JdbcStandStorageShould extends StandStorageShould {
 
     @Test
     public void read_all_by_type_url() {
-        final StandStorage storage = Given.newStorage();
+        final StandStorage storage = newStorage();
 
         final int aggregatesCount = 5;
-        final List<Given.TestAggregate> aggregates = Given.testAggregates(aggregatesCount);
-        final Given.TestAggregate2 differentAggregate = new Given.TestAggregate2("i_am_different");
+        final List<Given.TestAggregate> aggregates = testAggregates(aggregatesCount);
+        final TestAggregate2 differentAggregate = new TestAggregate2("i_am_different");
 
         for (Aggregate aggregate : aggregates) {
             writeToStorage(aggregate, storage, Project.class);
@@ -315,9 +317,9 @@ public class JdbcStandStorageShould extends StandStorageShould {
     @SuppressWarnings("MethodWithMultipleLoops")
     @Test
     public void read_by_type_and_apply_field_mask() {
-        final StandStorage storage = Given.newStorage();
+        final StandStorage storage = newStorage();
 
-        final List<Given.TestAggregate> aggregates = Given.testAggregatesWithState(5);
+        final List<Given.TestAggregate> aggregates = testAggregatesWithState(5);
 
         for (Aggregate aggregate : aggregates) {
             writeToStorage(aggregate, storage, Project.class);
@@ -346,7 +348,7 @@ public class JdbcStandStorageShould extends StandStorageShould {
 
     @Test(expected = DatabaseException.class)
     public void fail_to_fetch_records_by_zero_ids() {
-        final StandStorage storage = Given.newStorage();
+        final StandStorage storage = newStorage();
 
         storage.readMultiple(Collections.<AggregateStateId>emptyList());
     }
@@ -358,7 +360,7 @@ public class JdbcStandStorageShould extends StandStorageShould {
 
     @Test
     public void be_auto_closable() throws Exception {
-        try (StandStorage storage = Given.newStorage()) {
+        try (StandStorage storage = newStorage()) {
             assertTrue(storage.isOpen());
             assertFalse(storage.isClosed());
         }
@@ -366,18 +368,18 @@ public class JdbcStandStorageShould extends StandStorageShould {
 
     @Test(expected = IllegalStateException.class)
     public void fail_to_write_data_after_closed() throws Exception {
-        final StandStorage storage = Given.newStorage();
+        final StandStorage storage = newStorage();
 
         assertTrue(storage.isOpen());
         storage.close();
         assertTrue(storage.isClosed());
 
-        writeToStorage(new Given.TestAggregate("42"), storage, Project.class);
+        writeToStorage(new TestAggregate("42"), storage, Project.class);
     }
 
     @Test(expected = IllegalStateException.class)
     public void fail_to_read_data_after_closed() throws Exception {
-        final StandStorage storage = Given.newStorage();
+        final StandStorage storage = newStorage();
 
         assertTrue(storage.isOpen());
         storage.close();
@@ -406,7 +408,7 @@ public class JdbcStandStorageShould extends StandStorageShould {
         final AggregateStateId id = AggregateStateId.of(aggregate.getId(), TypeUrl.of(stateClass));
         final Version version = Version.newBuilder()
                                        .setNumber(1)
-                                       .setTimestamp(Timestamps2.getCurrentTime())
+                                       .setTimestamp(Time.getCurrentTime())
                                        .build();
         final EntityRecord record =
                 EntityRecord.newBuilder()
@@ -423,84 +425,6 @@ public class JdbcStandStorageShould extends StandStorageShould {
 
         protected StandStorageRecord(AggregateStateId id) {
             super(id);
-        }
-    }
-
-    private static class Given {
-
-        private static StandStorage newStorage() {
-            final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(
-                    GivenDataSource.DEFAULT_TABLE_NAME);
-            final StandStorage storage = JdbcStandStorage.<String>newBuilder()
-                    .setDataSource(dataSource)
-                    .setEntityClass(TestAggregate.class)
-                    .build();
-
-            return storage;
-        }
-
-        private static class TestAggregate extends Aggregate<String, Project, Project.Builder> {
-
-            /**
-             * Creates a new aggregate instance.
-             *
-             * @param id the ID for the new aggregate
-             * @throws IllegalArgumentException if the ID is not of one of the supported types
-             */
-            private TestAggregate(String id) {
-                super(id);
-            }
-
-            private void setState(Project state) {
-                incrementState(state);
-            }
-        }
-
-        private static class TestAggregate2 extends Aggregate<String, Customer, Customer.Builder> {
-
-            /**
-             * Creates a new aggregate instance.
-             *
-             * @param id the ID for the new aggregate
-             * @throws IllegalArgumentException if the ID is not of one of the supported types
-             */
-            private TestAggregate2(String id) {
-                super(id);
-            }
-
-            private void setState(Customer state) {
-                incrementState(state);
-            }
-        }
-
-        private static List<TestAggregate> testAggregates(int amount) {
-            final List<TestAggregate> aggregates = new LinkedList<>();
-
-            for (int i = 0; i < amount; i++) {
-                aggregates.add(new TestAggregate(String.valueOf(i)));
-            }
-
-            return aggregates;
-        }
-
-        private static List<TestAggregate> testAggregatesWithState(int amount) {
-            final List<TestAggregate> aggregates = new LinkedList<>();
-
-            for (int i = 0; i < amount; i++) {
-                final TestAggregate aggregate = new TestAggregate(String.valueOf(i));
-                final Project state = Project.newBuilder()
-                                             .setId(ProjectId.newBuilder()
-                                                             .setId(aggregate.getId()))
-                                             .setName("Some project")
-                                             .setStatus(Project.Status.CREATED)
-                                             .build();
-
-                aggregate.setState(state);
-
-                aggregates.add(aggregate);
-            }
-
-            return aggregates;
         }
     }
 }

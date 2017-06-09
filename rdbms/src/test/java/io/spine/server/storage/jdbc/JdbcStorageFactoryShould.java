@@ -21,19 +21,18 @@
 package io.spine.server.storage.jdbc;
 
 import com.google.protobuf.StringValue;
-import org.junit.Before;
-import org.junit.Test;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateStorage;
-import io.spine.server.command.CommandStorage;
 import io.spine.server.entity.AbstractEntity;
-import io.spine.server.event.EventStorage;
 import io.spine.server.projection.Projection;
 import io.spine.server.projection.ProjectionStorage;
 import io.spine.server.stand.StandStorage;
 import io.spine.server.storage.RecordStorage;
 import io.spine.server.storage.jdbc.util.DataSourceWrapper;
 import io.spine.test.storage.Project;
+import io.spine.validate.ValidatingBuilder;
+import org.junit.Before;
+import org.junit.Test;
 
 import javax.sql.DataSource;
 
@@ -88,17 +87,6 @@ public class JdbcStorageFactoryShould {
         assertNotNull(storage);
     }
 
-    @Test
-    public void create_event_storage() {
-        final EventStorage storage = factory.createEventStorage();
-        assertNotNull(storage);
-    }
-
-    @Test
-    public void create_command_storage() {
-        final CommandStorage storage = factory.createCommandStorage();
-        assertNotNull(storage);
-    }
 
     @Test
     public void create_projection_storage() {
@@ -132,14 +120,14 @@ public class JdbcStorageFactoryShould {
         }
     }
 
-    private static class TestAggregate extends Aggregate<String, StringValue, StringValue.Builder> {
+    private static class TestAggregate extends Aggregate<String, StringValue, ValidatingBuilder<StringValue, StringValue.Builder>> {
 
         private TestAggregate(String id) {
             super(id);
         }
     }
 
-    private static class TestProjection extends Projection<String, Project> {
+    private static class TestProjection extends Projection<String, Project, ValidatingBuilder<Project, Project.Builder>> {
 
         private TestProjection(String id) {
             super(id);

@@ -23,11 +23,10 @@ package io.spine.server.storage.jdbc.util;
 import com.google.protobuf.StringValue;
 import org.junit.Test;
 
+import static io.spine.base.Identifier.newUuid;
+import static io.spine.test.Tests.assertHasPrivateParameterlessCtor;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static io.spine.base.Identifiers.newUuid;
-import static io.spine.protobuf.Values.newStringValue;
-import static io.spine.test.Tests.hasPrivateParameterlessCtor;
 
 /**
  * @author Alexander Litus
@@ -37,12 +36,13 @@ public class SerializerShould {
 
     @Test
     public void have_private_utility_constructor() {
-        assertTrue(hasPrivateParameterlessCtor(Serializer.class));
+        assertHasPrivateParameterlessCtor(Serializer.class);
     }
 
     @Test
     public void serialize_and_deserialize_message() {
-        final StringValue expected = newStringValue(newUuid());
+        final StringValue expected = StringValue
+                .getDefaultInstance().toBuilder().setValue(newUuid()).build();
 
         final byte[] bytes = Serializer.serialize(expected);
         assertTrue(bytes.length > 0);

@@ -21,19 +21,18 @@
 package io.spine.server.storage.jdbc.util;
 
 import com.google.protobuf.Message;
-import io.spine.reflect.GenericTypeIndex;
-import io.spine.server.storage.jdbc.DatabaseException;
-import io.spine.server.storage.jdbc.Sql;
 import io.spine.annotation.Internal;
+import io.spine.base.Identifier;
+import io.spine.reflect.GenericTypeIndex;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.entity.Entity;
-
+import io.spine.server.storage.jdbc.DatabaseException;
+import io.spine.server.storage.jdbc.Sql;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static io.spine.base.Identifiers.idToString;
 
 /**
  * A helper class for setting the {@link Entity} ID into a {@link PreparedStatement}as a query
@@ -65,8 +64,7 @@ public abstract class IdColumn<I> {
     public static <I> IdColumn<I> newInstance(Class<? extends Entity<I, ?>> entityClass,
                                               String columnName) {
         final IdColumn<I> helper;
-        final Class<I> idClass =
-                GenericTypeIndex.Default.getArgument(columnName, entityClass, Entity.GenericParameter.ID.getIndex());
+        final Class<I> idClass = Entity.TypeInfo.getIdClass(entityClass);
         if (idClass.equals(Long.class)) {
             @SuppressWarnings("unchecked") // is checked already
             final IdColumn<I> longIdColumn =
@@ -178,7 +176,7 @@ public abstract class IdColumn<I> {
 
         @Override
         public void setId(int index, I id, PreparedStatement statement) throws DatabaseException {
-            final String idString = idToString(id);
+            final String idString = Identifier.toString(id);
             try {
                 statement.setString(index, idString);
             } catch (SQLException e) {

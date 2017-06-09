@@ -20,6 +20,7 @@
 
 package io.spine.server.storage.jdbc.query;
 
+import io.spine.base.Identifier;
 import io.spine.server.storage.jdbc.util.ConnectionWrapper;
 import io.spine.server.storage.jdbc.util.IdColumn;
 
@@ -27,7 +28,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static io.spine.base.Identifiers.idToString;
 import static java.lang.String.format;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
 import static io.spine.server.storage.jdbc.Sql.Query.DELETE_FROM;
@@ -96,7 +96,7 @@ public class DeleteRecordQuery<I> extends StorageQuery {
         }
 
         private String composeSql() {
-            return format(TEMPLATE, table, idColumn.getColumnName(), idToString(columnValue));
+            return format(TEMPLATE, table, idColumn.getColumnName(), Identifier.toString(columnValue));
         }
 
         @Override

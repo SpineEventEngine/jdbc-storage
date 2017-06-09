@@ -21,6 +21,8 @@
 package io.spine.server.storage.jdbc.aggregate;
 
 import com.google.common.base.Optional;
+import com.google.protobuf.StringValue;
+import io.spine.validate.ValidatingBuilder;
 import org.junit.Test;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateStorage;
@@ -81,7 +83,7 @@ public class JdbcAggregateStorageVisibilityHandlingShould
         assertEquals(archivedAndDeleted, actualArchivedAndDeleted.get());
     }
 
-    private static class TestAggregate extends Aggregate<ProjectId, Project, Project.Builder> {
+    private static class TestAggregate extends Aggregate<ProjectId, Project, ValidatingBuilder<Project, Project.Builder>> {
 
         protected TestAggregate(ProjectId id) {
             super(id);

@@ -22,6 +22,7 @@ package io.spine.server.storage.jdbc.aggregate;
 
 import com.google.protobuf.Message;
 import io.spine.server.storage.jdbc.GivenDataSource;
+import io.spine.validate.ValidatingBuilder;
 import org.junit.Test;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateStorage;
@@ -83,7 +84,7 @@ public class JdbcAggregateStorageShould extends AggregateStorageShould {
 
     private static class TestAggregateWithMessageId extends Aggregate<ProjectId,
             Project,
-            Project.Builder> {
+            ValidatingBuilder<Project, Project.Builder>> {
         private TestAggregateWithMessageId(ProjectId id) {
             super(id);
         }

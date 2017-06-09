@@ -22,20 +22,19 @@ package io.spine.server.storage.jdbc;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import io.spine.server.aggregate.Aggregate;
+import io.spine.server.aggregate.AggregateStorage;
+import io.spine.server.entity.Entity;
+import io.spine.server.entity.storage.ColumnTypeRegistry;
+import io.spine.server.projection.ProjectionStorage;
+import io.spine.server.stand.StandStorage;
+import io.spine.server.storage.RecordStorage;
+import io.spine.server.storage.StorageFactory;
 import io.spine.server.storage.jdbc.aggregate.JdbcAggregateStorage;
 import io.spine.server.storage.jdbc.entity.JdbcRecordStorage;
 import io.spine.server.storage.jdbc.projection.JdbcProjectionStorage;
 import io.spine.server.storage.jdbc.util.DataSourceWrapper;
 import io.spine.server.storage.jdbc.util.DefaultDataSourceConfigConverter;
-import io.spine.server.aggregate.Aggregate;
-import io.spine.server.aggregate.AggregateStorage;
-import io.spine.server.command.CommandStorage;
-import io.spine.server.entity.Entity;
-import io.spine.server.event.EventStorage;
-import io.spine.server.projection.ProjectionStorage;
-import io.spine.server.stand.StandStorage;
-import io.spine.server.storage.RecordStorage;
-import io.spine.server.storage.StorageFactory;
 
 import javax.sql.DataSource;
 
@@ -63,26 +62,18 @@ public class JdbcStorageFactory<I> implements StorageFactory {
     }
 
     @Override
+    public ColumnTypeRegistry getTypeRegistry() {
+        return null;
+    }
+
+    @Override
+    public StorageFactory toSingleTenant() {
+        return null;
+    }
+
+    @Override
     public boolean isMultitenant() {
         return multitenant;
-    }
-
-    @Override
-    public CommandStorage createCommandStorage() {
-        final CommandStorage storage = JdbcCommandStorage.newBuilder()
-                                                         .setDataSource(dataSource)
-                                                         .setMultitenant(multitenant)
-                                                         .build();
-        return storage;
-    }
-
-    @Override
-    public EventStorage createEventStorage() {
-        final EventStorage storage = JdbcEventStorage.newBuilder()
-                                                     .setDataSource(dataSource)
-                                                     .setMultitenant(multitenant)
-                                                     .build();
-        return storage;
     }
 
     @Override

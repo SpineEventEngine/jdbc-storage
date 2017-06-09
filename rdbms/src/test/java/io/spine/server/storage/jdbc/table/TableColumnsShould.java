@@ -20,22 +20,15 @@
 
 package io.spine.server.storage.jdbc.table;
 
-import org.junit.Test;
 import io.spine.server.storage.jdbc.Sql;
+import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static io.spine.test.Tests.hasPrivateParameterlessCtor;
 
 /**
  * @author Dmytro Dashenkov
  */
 public class TableColumnsShould {
-
-    @Test
-    public void have_private_utility_constructor() {
-        assertTrue(hasPrivateParameterlessCtor(TableColumns.class));
-    }
 
     @Test
     public void return_index_of_column_as_ordinal_plus_one() {
