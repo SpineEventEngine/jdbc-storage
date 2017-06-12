@@ -20,13 +20,14 @@
 
 package io.spine.server.storage.jdbc.entity;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.protobuf.FieldMask;
 import io.spine.server.entity.Entity;
 import io.spine.server.entity.EntityRecord;
+import io.spine.server.entity.storage.ColumnType;
+import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.entity.storage.EntityQuery;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.RecordStorage;
@@ -34,12 +35,12 @@ import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.JdbcStorageFactory;
 import io.spine.server.storage.jdbc.builder.StorageBuilder;
 import io.spine.server.storage.jdbc.table.entity.RecordTable;
+import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.util.DataSourceWrapper;
 
 import java.util.Iterator;
 import java.util.Map;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -52,30 +53,26 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class JdbcRecordStorage<I> extends RecordStorage<I> {
 
     private final DataSourceWrapper dataSource;
-
     private final RecordTable<I> table;
+    private final ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry;
 
-    protected JdbcRecordStorage(DataSourceWrapper dataSource, boolean multitenant,
-                                Class<Entity<I, ?>> entityClass)
+    protected JdbcRecordStorage(DataSourceWrapper dataSource,
+                                boolean multitenant,
+                                Class<Entity<I, ?>> entityClass,
+                                ColumnTypeRegistry<?
+                                        extends JdbcColumnType<?, ?>> columnTypeRegistry)
             throws DatabaseException {
         super(multitenant);
         this.dataSource = dataSource;
-        this.table = new RecordTable<>(entityClass, dataSource);
-        table.createIfNotExists();
+        this.table = new RecordTable<>(entityClass, dataSource, );
+        this.columnTypeRegistry = columnTypeRegistry;
     }
+
+
 
     private JdbcRecordStorage(Builder<I> builder) {
-        this(builder.getDataSource(), builder.isMultitenant(), builder.getEntityClass());
-    }
-
-    @Override
-    protected Map<I, EntityRecord> readAllRecords(EntityQuery<I> query, FieldMask fieldMask) {
-        return null;
-    }
-
-    @Override
-    protected void writeRecord(I id, EntityRecordWithColumns record) {
-
+        this(builder.getDataSource(), builder.isMultitenant(),
+             builder.getEntityClass(), builder.getColumnTypeRegistry());
     }
 
     @Override
@@ -125,22 +122,21 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
         return ImmutableMap.copyOf(records);
     }
 
-//    /**
-//     * {@inheritDoc}
-//     *
-//     * @throws DatabaseException if an error occurs during an interaction with the DB
-//     */
-//    @VisibleForTesting
-//    @Override
-//    protected void writeRecord(I id, EntityRecord record) throws DatabaseException {
-//        checkArgument(record.hasState(), "entity state");
-//
-//        table.write(id, record);
-//    }
+    @Override
+    protected Map<I, EntityRecord> readAllRecords(EntityQuery<I> query, FieldMask fieldMask) {
+
+        return null;
+    }
+
+    @Override
+    protected void writeRecord(I id, EntityRecordWithColumns record) {
+        table.write(id, record);
+    }
+
 
     @Override
     protected void writeRecords(Map<I, EntityRecordWithColumns> records) {
-//        table.write(records);
+        table.write(records);
     }
 
     @Override
@@ -172,6 +168,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
             extends StorageBuilder<Builder<I>, JdbcRecordStorage<I>> {
 
         private Class<? extends Entity<I, ?>> entityClass;
+        private ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry;
 
         private Builder() {
             super();
@@ -190,6 +187,16 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
         public Builder<I> setEntityClass(Class<? extends Entity<I, ?>> entityClass) {
             this.entityClass = checkNotNull(entityClass);
             return this;
+        }
+
+        public Builder<I> setColumnTypeRegistry(
+                ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry) {
+            this.columnTypeRegistry = columnTypeRegistry;
+            return this;
+        }
+
+        public ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> getColumnTypeRegistry() {
+            return columnTypeRegistry;
         }
 
         @Override

@@ -23,6 +23,7 @@ package io.spine.server.storage.jdbc.table;
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.google.protobuf.Message;
+import io.spine.server.entity.storage.Column;
 import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.entity.query.DeleteAllQuery;
 import io.spine.server.storage.jdbc.query.DeleteRecordQuery;
@@ -37,6 +38,8 @@ import io.spine.server.storage.jdbc.query.WriteQuery;
 import io.spine.server.storage.jdbc.util.IdColumn;
 
 import javax.annotation.Nullable;
+
+import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -123,6 +126,16 @@ public abstract class AbstractTable<I, R extends Message, C extends Enum<C> & Ta
      */
     public void createIfNotExists() {
         final String sql = composeCreateTableSql();
+        final SimpleQuery query = SimpleQuery.newBuilder()
+                                             .setDataSource(dataSource)
+                                             .setLogger(log())
+                                             .setQuery(sql)
+                                             .build();
+        query.execute();
+    }
+
+    public void createIfNotExists(Map<String, Column> columns) {
+        final String sql = composeCreateTableSql(columns);
         final SimpleQuery query = SimpleQuery.newBuilder()
                                              .setDataSource(dataSource)
                                              .setLogger(log())
@@ -270,6 +283,33 @@ public abstract class AbstractTable<I, R extends Message, C extends Enum<C> & Ta
         return result;
     }
 
+    private String composeCreateTableSql(Map<String, Column> columns) {
+        final String idColumnName = getIdColumnDeclaration().name();
+        @SuppressWarnings("StringBufferReplaceableByString")
+        final StringBuilder sql = new StringBuilder(MEAN_SQL_QUERY_LENGTH);
+        sql.append(Sql.Query.CREATE_IF_MISSING)
+           .append(getName())
+           .append(Sql.BuildingBlock.BRACKET_OPEN);
+        for (Map.Entry<String, Column> entry: columns.entrySet()) {
+            final String name = entry.getValue().getName();
+            final Sql.Type type = ensureType(entry.getValue());
+            sql.append(name)
+               .append(type)
+               .append(Sql.BuildingBlock.COMMA);
+            // Comma after the last column declaration is required since we add PRIMARY KEY after
+        }
+        if (idIsPrimaryKey()) {
+            sql.append(Sql.Query.PRIMARY_KEY)
+               .append(Sql.BuildingBlock.BRACKET_OPEN)
+               .append(idColumnName)
+               .append(Sql.BuildingBlock.BRACKET_CLOSE);
+        }
+        sql.append(Sql.BuildingBlock.BRACKET_CLOSE)
+           .append(Sql.BuildingBlock.SEMICOLON);
+        final String result = sql.toString();
+        return result;
+    }
+
     private Sql.Type getIdType() {
         final Sql.Type idType = getIdColumn().getColumnDataType();
         return idType;
@@ -295,6 +335,10 @@ public abstract class AbstractTable<I, R extends Message, C extends Enum<C> & Ta
             }
         }
         return type;
+    }
+
+    private Sql.Type ensureType(Column column) throws IllegalStateException {
+        return column.;
     }
 
     /**

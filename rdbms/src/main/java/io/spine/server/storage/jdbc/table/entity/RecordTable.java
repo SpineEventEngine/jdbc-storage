@@ -21,6 +21,8 @@
 package io.spine.server.storage.jdbc.table.entity;
 
 import com.google.protobuf.FieldMask;
+import io.spine.server.entity.storage.Column;
+import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.entity.JdbcRecordStorage;
 import io.spine.server.storage.jdbc.entity.query.RecordStorageQueryFactory;
@@ -41,7 +43,7 @@ import static io.spine.server.storage.jdbc.Sql.Type.BOOLEAN;
 import static io.spine.server.storage.jdbc.Sql.Type.ID;
 
 /**
- * A table for storing the {@link EntityRecord entity records}.
+ * A table for storing the {@linkplain EntityRecord entity records}.
  *
  * <p>Used in the {@link JdbcRecordStorage}.
  *
@@ -75,16 +77,6 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, RecordTable.Col
         return queryFactory;
     }
 
-    public boolean markDeleted(I id) {
-        return queryFactory.newMarkDeletedQuery(id)
-                           .execute();
-    }
-
-    public boolean markArchived(I id) {
-        return queryFactory.newMarkArchivedQuery(id)
-                           .execute();
-    }
-
     public Map<?, EntityRecord> read(Iterable<I> ids, FieldMask fieldMask) {
         try {
             final Map<?, EntityRecord> recordMap = queryFactory.newSelectBulkQuery(ids, fieldMask)
@@ -95,14 +87,18 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, RecordTable.Col
         }
     }
 
+    public void write(I id, EntityRecordWithColumns record) {
+        final Map<String, io.spine.server.entity.storage.Column> columns = record.getColumns();
+        createIfNotExists(columns);
+    }
 
-    public void write(Map<I, EntityRecord> records) {
+    public void write(Map<I, EntityRecordWithColumns> records) {
         // Map's initial capacity is maximum, meaning no records exist in the storage yet
-        final Map<I, EntityRecord> newRecords = new HashMap<>(records.size());
+        final Map<I, EntityRecordWithColumns> newRecords = new HashMap<>(records.size());
 
-        for (Map.Entry<I, EntityRecord> unclassifiedRecord : records.entrySet()) {
+        for (Map.Entry<I, EntityRecordWithColumns> unclassifiedRecord : records.entrySet()) {
             final I id = unclassifiedRecord.getKey();
-            final EntityRecord record = unclassifiedRecord.getValue();
+            final EntityRecordWithColumns record = unclassifiedRecord.getValue();
             if (containsRecord(id)) {
                 queryFactory.newUpdateQuery(id, record)
                             .execute();

@@ -17,11 +17,22 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package io.spine.server.storage.jdbc.type;
+
+import java.sql.PreparedStatement;
 
 /**
- * @author Dmytro Dashenkov
+ * @author Alexander Aleksandrov
  */
-@ParametersAreNonnullByDefault
-package io.spine.server.storage.jdbc.entity.lifecycleflags.table;
+public abstract class AbstractJdbcColumnType<J, C > implements JdbcColumnType<J, C> {
 
-import javax.annotation.ParametersAreNonnullByDefault;
+    @Override
+    public void setColumnValue(PreparedStatement storageRecord, C value, Integer columnIdentifier) {
+
+    }
+
+    @Override
+    public void setNull(PreparedStatement storageRecord, Integer columnIdentifier) {
+
+    }
+}

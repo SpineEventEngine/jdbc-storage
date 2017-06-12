@@ -21,6 +21,7 @@
 package io.spine.server.storage.jdbc.entity.query;
 
 import com.google.protobuf.FieldMask;
+import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.query.QueryFactory;
 import org.slf4j.Logger;
 import io.spine.server.entity.Entity;

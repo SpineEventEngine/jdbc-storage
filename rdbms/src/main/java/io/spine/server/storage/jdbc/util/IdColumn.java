@@ -23,7 +23,6 @@ package io.spine.server.storage.jdbc.util;
 import com.google.protobuf.Message;
 import io.spine.annotation.Internal;
 import io.spine.base.Identifier;
-import io.spine.reflect.GenericTypeIndex;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.entity.Entity;
 import io.spine.server.storage.jdbc.DatabaseException;

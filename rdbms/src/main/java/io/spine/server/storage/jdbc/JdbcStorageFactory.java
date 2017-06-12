@@ -25,6 +25,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateStorage;
 import io.spine.server.entity.Entity;
+import io.spine.server.entity.storage.ColumnType;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.projection.ProjectionStorage;
 import io.spine.server.stand.StandStorage;
@@ -33,6 +34,7 @@ import io.spine.server.storage.StorageFactory;
 import io.spine.server.storage.jdbc.aggregate.JdbcAggregateStorage;
 import io.spine.server.storage.jdbc.entity.JdbcRecordStorage;
 import io.spine.server.storage.jdbc.projection.JdbcProjectionStorage;
+import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.util.DataSourceWrapper;
 import io.spine.server.storage.jdbc.util.DefaultDataSourceConfigConverter;
 
@@ -54,16 +56,18 @@ public class JdbcStorageFactory<I> implements StorageFactory {
     private final DataSourceWrapper dataSource;
     private final boolean multitenant;
     private final Class<? extends Entity<I, ?>> entityClass;
+    private final ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry;
 
     private JdbcStorageFactory(Builder<I> builder) {
         this.entityClass = checkNotNull(builder.entityClass);
         this.dataSource = checkNotNull(builder.dataSource);
         this.multitenant = builder.multitenant;
+        this.columnTypeRegistry = builder.columnTypeRegistry;
     }
 
     @Override
     public ColumnTypeRegistry getTypeRegistry() {
-        return null;
+        return columnTypeRegistry;
     }
 
     @Override
@@ -103,6 +107,7 @@ public class JdbcStorageFactory<I> implements StorageFactory {
                 .setMultitenant(false)
                 .setEntityClass(entityClass)
                 .setDataSource(dataSource)
+                .setColumnTypeRegistry(columnTypeRegistry)
                 .build();
         return recordStorage;
     }
@@ -140,8 +145,15 @@ public class JdbcStorageFactory<I> implements StorageFactory {
         private DataSourceWrapper dataSource;
         private boolean multitenant;
         private Class<? extends Entity<I, ?>> entityClass;
+        private ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry;
 
         private Builder() {
+        }
+
+        public Builder<I> setColumnTypeRegistry(
+                ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry) {
+            this.columnTypeRegistry = columnTypeRegistry;
+            return this;
         }
 
         /**

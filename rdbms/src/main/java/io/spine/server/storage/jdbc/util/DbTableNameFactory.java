@@ -27,8 +27,6 @@ import io.spine.type.TypeName;
 
 import java.util.regex.Pattern;
 
-import static io.spine.server.entity.Entity.GenericParameter.STATE;
-
 /**
  * A utility class which provides strings valid for DB table names.
  *
