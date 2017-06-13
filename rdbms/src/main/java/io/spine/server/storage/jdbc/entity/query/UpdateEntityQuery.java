@@ -40,10 +40,12 @@ public class UpdateEntityQuery<I> extends WriteEntityQuery<I> {
 
     private static final String QUERY_TEMPLATE =
             Sql.Query.UPDATE + "%s" +
-            Sql.Query.SET + RecordTable.Column.entity + Sql.BuildingBlock.EQUAL + Sql.Query.PLACEHOLDER + Sql.BuildingBlock.COMMA +
+            Sql.Query.SET + RecordTable.Column.entity + Sql.BuildingBlock.EQUAL +
+            Sql.Query.PLACEHOLDER + Sql.BuildingBlock.COMMA +
             archived + Sql.BuildingBlock.EQUAL + Sql.Query.PLACEHOLDER + Sql.BuildingBlock.COMMA +
             deleted + Sql.BuildingBlock.EQUAL + Sql.Query.PLACEHOLDER +
-            Sql.Query.WHERE + RecordTable.Column.id + Sql.BuildingBlock.EQUAL + Sql.Query.PLACEHOLDER + Sql.BuildingBlock.SEMICOLON;
+            Sql.Query.WHERE + RecordTable.Column.id + Sql.BuildingBlock.EQUAL +
+            Sql.Query.PLACEHOLDER + Sql.BuildingBlock.SEMICOLON;
 
     private UpdateEntityQuery(Builder<I> builder) {
         super(builder);
@@ -59,10 +61,9 @@ public class UpdateEntityQuery<I> extends WriteEntityQuery<I> {
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
     public static class Builder<I> extends WriteRecordQuery.Builder<Builder<I>,
-                                                                        UpdateEntityQuery,
-                                                                        I,
-                                                                        EntityRecord> {
-
+                                                                    UpdateEntityQuery,
+                                                                    I,
+                                                                    EntityRecord> {
         @Override
         public UpdateEntityQuery build() {
             return new UpdateEntityQuery<>(this);

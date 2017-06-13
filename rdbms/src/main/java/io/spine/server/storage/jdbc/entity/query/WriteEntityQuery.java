@@ -20,14 +20,17 @@
 
 package io.spine.server.storage.jdbc.entity.query;
 
-import io.spine.server.storage.jdbc.DatabaseException;
-import io.spine.server.storage.jdbc.query.WriteRecordQuery;
+import com.google.common.base.Function;
+import com.google.common.base.Functions;
 import io.spine.server.entity.EntityRecord;
-import io.spine.server.entity.LifecycleFlags;
+import io.spine.server.entity.storage.Column;
+import io.spine.server.entity.storage.ColumnRecords;
+import io.spine.server.storage.jdbc.query.WriteRecordQuery;
 import io.spine.server.storage.jdbc.util.ConnectionWrapper;
 
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.util.Collections;
+import java.util.Map;
 
 /**
  * @author Dmytro Dashenkov
@@ -42,17 +45,24 @@ public class WriteEntityQuery<I> extends WriteRecordQuery<I, EntityRecord> {
     @Override
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
         final PreparedStatement statement = super.prepareStatement(connection);
-        final EntityRecord record = getRecord();
-        final LifecycleFlags status = record.getLifecycleFlags();
-        final boolean archived = status.getArchived();
-        final boolean deleted = status.getDeleted();
-        try {
-            statement.setBoolean(QueryParameter.ARCHIVED.index, archived);
-            statement.setBoolean(QueryParameter.DELETED.index, deleted);
-        } catch (SQLException e) {
-            throw new DatabaseException(e);
-        }
+        ColumnRecords.feedColumnsTo(statement,
+                                    getRecord(),
+                                    getColumnTypeRegistry(),
+                                    getTransformer());
         return statement;
+    }
+
+    protected Function<String, Integer> getTransformer() {
+        final Function<String, Integer> function;
+        final Map<String, Column> columns = getRecord().getColumns();
+        final Map<String, Integer> result = Collections.emptyMap();
+        for(Map.Entry<String, Column> entry: columns.entrySet()) {
+            Integer index = 1;
+            result.put(entry.getKey(), index);
+            index++;
+        }
+        function = Functions.forMap(result);
+        return function;
     }
 
     protected enum QueryParameter {

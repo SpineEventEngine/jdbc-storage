@@ -23,6 +23,7 @@ package io.spine.server.storage.jdbc.aggregate.query;
 import com.google.protobuf.Timestamp;
 import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.Sql;
+import io.spine.server.storage.jdbc.query.WriteAggregateQuery;
 import io.spine.server.storage.jdbc.query.WriteRecordQuery;
 import io.spine.server.storage.jdbc.table.entity.aggregate.AggregateEventRecordTable;
 import io.spine.server.aggregate.AggregateEventRecord;
@@ -40,7 +41,7 @@ import static java.lang.String.format;
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-public class InsertAggregateRecordQuery<I> extends WriteRecordQuery<I, AggregateEventRecord> {
+public class InsertAggregateRecordQuery<I> extends WriteAggregateQuery<I, AggregateEventRecord> {
 
     private static final String QUERY_TEMPLATE =
             Sql.Query.INSERT_INTO + " %s " + Sql.BuildingBlock.BRACKET_OPEN
@@ -76,7 +77,7 @@ public class InsertAggregateRecordQuery<I> extends WriteRecordQuery<I, Aggregate
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder<I> extends WriteRecordQuery.Builder<Builder<I>,
+    public static class Builder<I> extends WriteAggregateQuery.Builder<Builder<I>,
                                                                     InsertAggregateRecordQuery,
                                                                     I,
                                                                     AggregateEventRecord> {

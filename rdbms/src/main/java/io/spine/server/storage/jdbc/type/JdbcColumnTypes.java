@@ -44,4 +44,64 @@ final class JdbcColumnTypes {
             return Sql.Type.BOOLEAN;
         }
     }
+
+    /**
+     * @return new instance of {@link IntegerColumnType}
+     */
+    static SimpleJdbcColumnType<Boolean> integerType() {
+        return new IntegerColumnType();
+    }
+
+    private static class IntegerColumnType extends SimpleJdbcColumnType<Boolean>{
+
+        @Override
+        public Sql.Type getSqlType() {
+            return Sql.Type.INT;
+        }
+    }
+
+    /**
+     * @return new instance of {@link BigIntegerColumnType}
+     */
+    static SimpleJdbcColumnType<Boolean> bigIntegerType() {
+        return new BigIntegerColumnType();
+    }
+
+    private static class BigIntegerColumnType extends SimpleJdbcColumnType<Boolean>{
+
+        @Override
+        public Sql.Type getSqlType() {
+            return Sql.Type.BIGINT;
+        }
+    }
+
+    /**
+     * @return new instance of {@link EntityColumnType}
+     */
+    static SimpleJdbcColumnType<Boolean> entityType() {
+        return new EntityColumnType();
+    }
+
+    private static class EntityColumnType extends SimpleJdbcColumnType<Boolean>{
+
+        @Override
+        public Sql.Type getSqlType() {
+            return Sql.Type.BLOB;
+        }
+    }
+
+    /**
+     * @return new instance of {@link ProjectionColumnType}
+     */
+    static SimpleJdbcColumnType<Boolean> projectionType() {
+        return new ProjectionColumnType();
+    }
+
+    private static class ProjectionColumnType extends SimpleJdbcColumnType<Boolean>{
+
+        @Override
+        public Sql.Type getSqlType() {
+            return Sql.Type.VARCHAR_255;
+        }
+    }
 }

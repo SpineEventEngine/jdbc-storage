@@ -21,8 +21,11 @@
 package io.spine.server.storage.jdbc.table;
 
 import com.google.protobuf.Timestamp;
-import io.spine.server.storage.jdbc.query.QueryFactory;
+import io.spine.server.entity.storage.ColumnTypeRegistry;
+import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.projection.query.LastHandledEventTimeQueryFactory;
+import io.spine.server.storage.jdbc.query.WriteQueryFactory;
+import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.util.DataSourceWrapper;
 import io.spine.server.storage.jdbc.util.IdColumn;
 
@@ -46,10 +49,13 @@ public class LastHandledEventTimeTable extends AbstractTable<String,
 
     private final LastHandledEventTimeQueryFactory queryFactory;
 
-    public LastHandledEventTimeTable(DataSourceWrapper dataSource) {
+    public LastHandledEventTimeTable(DataSourceWrapper dataSource,
+                                     ColumnTypeRegistry<? extends
+                                             JdbcColumnType<?, ?>> columnTypeRegistry) {
         super(TABLE_NAME,
               IdColumn.typeString(Column.projection_type.name()),
-              dataSource);
+              dataSource,
+              columnTypeRegistry);
         this.queryFactory = new LastHandledEventTimeQueryFactory(dataSource, TABLE_NAME);
         queryFactory.setLogger(log());
     }
@@ -65,8 +71,13 @@ public class LastHandledEventTimeTable extends AbstractTable<String,
     }
 
     @Override
-    protected QueryFactory<String, Timestamp> getQueryFactory() {
+    protected ReadQueryFactory<String, Timestamp> getReadQueryFactory() {
         return queryFactory;
+    }
+
+    @Override
+    protected WriteQueryFactory<String, Timestamp> getWriteQueryFactory() {
+        return null;
     }
 
     public enum Column implements TableColumn {

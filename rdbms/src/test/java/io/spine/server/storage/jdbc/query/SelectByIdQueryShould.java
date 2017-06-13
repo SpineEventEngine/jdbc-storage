@@ -48,11 +48,11 @@ public class SelectByIdQueryShould {
         }
     }
 
-    @Test
-    public void return_null_if_nothing_was_read_from_db() throws SQLException {
-        final SelectByIdQuery query = Given.getSelectByIdQueryReturningEmptyResultSetMock();
-        final Message result = query.execute();
-        assertNull("If nothing is read from the database the result of the query must be null",
-                   result);
-    }
+//    @Test
+//    public void return_null_if_nothing_was_read_from_db() throws SQLException {
+//        final SelectByIdQuery query = Given.getSelectByIdQueryReturningEmptyResultSetMock();
+//        final Message result = query.execute();
+//        assertNull("If nothing is read from the database the result of the query must be null",
+//                   result);
+//    }
 }

@@ -21,12 +21,15 @@
 package io.spine.server.storage.jdbc.table.entity.aggregate;
 
 import com.google.protobuf.Int32Value;
+import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.storage.jdbc.aggregate.JdbcAggregateStorage;
-import io.spine.server.storage.jdbc.query.QueryFactory;
+import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.entity.Entity;
 import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.aggregate.query.EventCountQueryFactory;
+import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 import io.spine.server.storage.jdbc.table.TableColumn;
+import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.util.DataSourceWrapper;
 
 import static io.spine.server.storage.jdbc.Sql.Type.BIGINT;
@@ -47,11 +50,13 @@ public class EventCountTable<I> extends AggregateTable<I, Int32Value, EventCount
     private final EventCountQueryFactory<I> queryFactory;
 
     public EventCountTable(Class<? extends Entity<I, ?>> entityClass,
-                              DataSourceWrapper dataSource) {
+                           DataSourceWrapper dataSource,
+                           ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry) {
         super(newTableName(entityClass) + (TABLE_NAME_POSTFIX),
               entityClass,
               Column.id.name(),
-              dataSource);
+              dataSource,
+              columnTypeRegistry);
         this.queryFactory = new EventCountQueryFactory<>(getDataSource(),
                                                          getName(),
                                                          getIdColumn(),
@@ -69,8 +74,13 @@ public class EventCountTable<I> extends AggregateTable<I, Int32Value, EventCount
     }
 
     @Override
-    protected QueryFactory<I, Int32Value> getQueryFactory() {
+    protected ReadQueryFactory<I, Int32Value> getReadQueryFactory() {
         return queryFactory;
+    }
+
+    @Override
+    protected WriteQueryFactory<I, Int32Value> getWriteQueryFactory() {
+        return null;
     }
 
     public enum Column implements TableColumn {

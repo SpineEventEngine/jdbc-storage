@@ -21,13 +21,15 @@
 package io.spine.server.storage.jdbc.table.entity;
 
 import com.google.protobuf.FieldMask;
-import io.spine.server.entity.storage.Column;
+import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.entity.JdbcRecordStorage;
 import io.spine.server.storage.jdbc.entity.query.RecordStorageQueryFactory;
 import io.spine.server.storage.jdbc.entity.query.SelectBulkQuery;
-import io.spine.server.storage.jdbc.query.QueryFactory;
+import io.spine.server.storage.jdbc.query.ReadQueryFactory;
+import io.spine.server.storage.jdbc.query.WriteQueryFactory;
+import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.util.DataSourceWrapper;
 import io.spine.server.entity.Entity;
 import io.spine.server.entity.EntityRecord;
@@ -53,13 +55,16 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, RecordTable.Col
 
     private final RecordStorageQueryFactory<I> queryFactory;
 
+
     public RecordTable(Class<Entity<I, ?>> entityClass,
-                       DataSourceWrapper dataSource) {
-        super(entityClass, Column.id.name(), dataSource);
+                       DataSourceWrapper dataSource,
+                       ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry) {
+        super(entityClass, Column.id.name(), dataSource, columnTypeRegistry);
         queryFactory = new RecordStorageQueryFactory<>(dataSource,
                                                        entityClass,
                                                        log(),
-                                                       getIdColumn());
+                                                       getIdColumn(),
+                                                       columnTypeRegistry);
     }
 
     @Override
@@ -73,8 +78,13 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, RecordTable.Col
     }
 
     @Override
-    protected QueryFactory<I, EntityRecord> getQueryFactory() {
+    protected ReadQueryFactory<I, EntityRecord> getReadQueryFactory() {
         return queryFactory;
+    }
+
+    @Override
+    protected WriteQueryFactory<I, EntityRecord> getWriteQueryFactory() {
+        return null;
     }
 
     public Map<?, EntityRecord> read(Iterable<I> ids, FieldMask fieldMask) {
@@ -90,17 +100,28 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, RecordTable.Col
     public void write(I id, EntityRecordWithColumns record) {
         final Map<String, io.spine.server.entity.storage.Column> columns = record.getColumns();
         createIfNotExists(columns);
+
+        if (containsRecord(id)) {
+            queryFactory.newUpdateQuery(id, record).execute();
+        } else {
+            queryFactory.newInsertQuery(id, record).execute();
+        }
     }
 
     public void write(Map<I, EntityRecordWithColumns> records) {
         // Map's initial capacity is maximum, meaning no records exist in the storage yet
-        final Map<I, EntityRecordWithColumns> newRecords = new HashMap<>(records.size());
+
+        final Map<String, io.spine.server.entity.storage.Column> columns =
+                records.values().iterator().next().getColumns();
+        createIfNotExists(columns);
+
+        final Map<I, EntityRecord> newRecords = new HashMap<>(records.size());
 
         for (Map.Entry<I, EntityRecordWithColumns> unclassifiedRecord : records.entrySet()) {
             final I id = unclassifiedRecord.getKey();
-            final EntityRecordWithColumns record = unclassifiedRecord.getValue();
+            final EntityRecord record = unclassifiedRecord.getValue().getRecord();
             if (containsRecord(id)) {
-                queryFactory.newUpdateQuery(id, record)
+                queryFactory.newUpdateQuery(id, unclassifiedRecord.getValue())
                             .execute();
             } else {
                 newRecords.put(id, record);

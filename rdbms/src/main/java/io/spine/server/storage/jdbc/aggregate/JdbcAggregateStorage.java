@@ -26,11 +26,13 @@ import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.aggregate.AggregateStorage;
 import io.spine.server.entity.LifecycleFlags;
+import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.builder.StorageBuilder;
 import io.spine.server.storage.jdbc.table.entity.aggregate.AggregateEventRecordTable;
 import io.spine.server.storage.jdbc.table.entity.aggregate.EventCountTable;
 import io.spine.server.storage.jdbc.table.entity.aggregate.LifecycleFlagsTable;
+import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.util.DataSourceWrapper;
 import io.spine.server.storage.jdbc.util.DbIterator;
 
@@ -58,32 +60,31 @@ import static io.spine.server.storage.jdbc.util.Closeables.closeAll;
 public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
 
     private final DataSourceWrapper dataSource;
-
     /** Iterators which are not closed yet. */
     private final Collection<DbIterator> iterators = newLinkedList();
-
     private final AggregateEventRecordTable<I> mainTable;
-
     private final LifecycleFlagsTable<I> lifecycleFlagsTable;
-
     private final EventCountTable<I> eventCountTable;
+    private final ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry;
 
     protected JdbcAggregateStorage(DataSourceWrapper dataSource,
                                    boolean multitenant,
-                                   Class<? extends Aggregate<I, ?, ?>> aggregateClass)
+                                   Class<? extends Aggregate<I, ?, ?>> aggregateClass,
+                                   ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry)
             throws DatabaseException {
         super(multitenant);
         this.dataSource = dataSource;
-        this.mainTable = new AggregateEventRecordTable<>(aggregateClass, dataSource);
-        this.lifecycleFlagsTable = new LifecycleFlagsTable<>(aggregateClass, dataSource);
-        this.eventCountTable = new EventCountTable<>(aggregateClass, dataSource);
+        this.mainTable = new AggregateEventRecordTable<>(aggregateClass, dataSource, columnTypeRegistry);
+        this.lifecycleFlagsTable = new LifecycleFlagsTable<>(aggregateClass, dataSource, columnTypeRegistry);
+        this.eventCountTable = new EventCountTable<>(aggregateClass, dataSource, columnTypeRegistry);
+        this.columnTypeRegistry = columnTypeRegistry;
         mainTable.createIfNotExists();
         lifecycleFlagsTable.createIfNotExists();
         eventCountTable.createIfNotExists();
     }
 
     private JdbcAggregateStorage(Builder<I> builder) {
-        this(builder.getDataSource(), builder.isMultitenant(), builder.getAggregateClass());
+        this(builder.getDataSource(), builder.isMultitenant(), builder.getAggregateClass(), builder.getColumnTypeRegistry());
     }
 
     @Override
@@ -169,9 +170,14 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     public static class Builder<I> extends StorageBuilder<Builder<I>,
             JdbcAggregateStorage<I>> {
         private Class<? extends Aggregate<I, ?, ?>> aggregateClass;
+        private ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry;
 
         private Builder() {
             super();
+        }
+
+        public ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> getColumnTypeRegistry() {
+            return columnTypeRegistry;
         }
 
         @Override

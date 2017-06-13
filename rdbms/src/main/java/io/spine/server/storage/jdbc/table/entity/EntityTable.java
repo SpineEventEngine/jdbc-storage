@@ -22,8 +22,10 @@ package io.spine.server.storage.jdbc.table.entity;
 
 import com.google.protobuf.Message;
 import io.spine.server.entity.Entity;
+import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.storage.jdbc.table.AbstractTable;
 import io.spine.server.storage.jdbc.table.TableColumn;
+import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.util.DataSourceWrapper;
 import io.spine.server.storage.jdbc.util.IdColumn;
 
@@ -39,6 +41,7 @@ public abstract class EntityTable<I, R extends Message, C extends Enum<C> & Tabl
         extends AbstractTable<I, R, C> {
 
     private final Class<? extends Entity<I, ?>> entityClass;
+    private final ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry;
 
     /**
      * Creates a new instance of the {@code EntityTable}.
@@ -50,8 +53,9 @@ public abstract class EntityTable<I, R extends Message, C extends Enum<C> & Tabl
      */
     protected EntityTable(Class<? extends Entity<I, ?>> entityClass,
                           String idColumnName,
-                          DataSourceWrapper dataSource) {
-        this(newTableName(entityClass), entityClass, idColumnName, dataSource);
+                          DataSourceWrapper dataSource,
+                          ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry) {
+        this(newTableName(entityClass), entityClass, idColumnName, dataSource, columnTypeRegistry);
     }
 
     /**
@@ -64,9 +68,11 @@ public abstract class EntityTable<I, R extends Message, C extends Enum<C> & Tabl
     protected EntityTable(String tableName,
                           Class<? extends Entity<I, ?>> entityClass,
                           String idColumnName,
-                          DataSourceWrapper dataSource) {
-        super(tableName, IdColumn.newInstance(entityClass, idColumnName), dataSource);
+                          DataSourceWrapper dataSource,
+                          ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry) {
+        super(tableName, IdColumn.newInstance(entityClass, idColumnName), dataSource, columnTypeRegistry);
         this.entityClass = entityClass;
+        this.columnTypeRegistry = columnTypeRegistry;
     }
 
     public Class<? extends Entity<I, ?>> getEntityClass() {

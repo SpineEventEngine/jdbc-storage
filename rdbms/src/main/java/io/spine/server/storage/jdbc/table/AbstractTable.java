@@ -24,11 +24,14 @@ import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.google.protobuf.Message;
 import io.spine.server.entity.storage.Column;
+import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.entity.query.DeleteAllQuery;
 import io.spine.server.storage.jdbc.query.DeleteRecordQuery;
-import io.spine.server.storage.jdbc.query.QueryFactory;
+import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.SimpleQuery;
+import io.spine.server.storage.jdbc.query.WriteQueryFactory;
+import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.util.DataSourceWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,13 +87,17 @@ public abstract class AbstractTable<I, R extends Message, C extends Enum<C> & Ta
 
     private ImmutableList<C> columns;
 
+    private final ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry;
+
     protected AbstractTable(String name,
                             IdColumn<I> idColumn,
-                            DataSourceWrapper dataSource) {
+                            DataSourceWrapper dataSource,
+                            ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry) {
         super();
         this.name = checkNotNull(name);
         this.idColumn = checkNotNull(idColumn);
         this.dataSource = checkNotNull(dataSource);
+        this.columnTypeRegistry = checkNotNull(columnTypeRegistry);
     }
 
     /**
@@ -114,9 +121,14 @@ public abstract class AbstractTable<I, R extends Message, C extends Enum<C> & Ta
     protected abstract Class<C> getTableColumnType();
 
     /**
-     * @return an instance of {@link QueryFactory} which produces queries to the given table
+     * @return an instance of {@link ReadQueryFactory} which produces queries to the given table
      */
-    protected abstract QueryFactory<I, R> getQueryFactory();
+    protected abstract ReadQueryFactory<I, R> getReadQueryFactory();
+
+    /**
+     * @return an instance of {@link WriteQueryFactory} which produces queries to the given table
+     */
+    protected abstract WriteQueryFactory<I, R> getWriteQueryFactory();
 
     /**
      * Creates current table in the database if it does not exist yet.
@@ -226,17 +238,17 @@ public abstract class AbstractTable<I, R extends Message, C extends Enum<C> & Ta
     }
 
     protected WriteQuery composeInsertQuery(I id, R record) {
-        final WriteQuery query = getQueryFactory().newInsertQuery(id, record);
+        final WriteQuery query = getWriteQueryFactory().newInsertQuery(id, record);
         return query;
     }
 
     protected WriteQuery composeUpdateQuery(I id, R record) {
-        final WriteQuery query = getQueryFactory().newUpdateQuery(id, record);
+        final WriteQuery query = getWriteQueryFactory().newUpdateQuery(id, record);
         return query;
     }
 
     protected SelectByIdQuery<I, R> composeSelectQuery(I id) {
-        final SelectByIdQuery<I, R> query = getQueryFactory().newSelectByIdQuery(id);
+        final SelectByIdQuery<I, R> query = getReadQueryFactory().newSelectByIdQuery(id);
         return query;
     }
 
@@ -292,7 +304,8 @@ public abstract class AbstractTable<I, R extends Message, C extends Enum<C> & Ta
            .append(Sql.BuildingBlock.BRACKET_OPEN);
         for (Map.Entry<String, Column> entry: columns.entrySet()) {
             final String name = entry.getValue().getName();
-            final Sql.Type type = ensureType(entry.getValue());
+            final Column column = entry.getValue();
+            final Sql.Type type = columnTypeRegistry.get(column).getSqlType();
             sql.append(name)
                .append(type)
                .append(Sql.BuildingBlock.COMMA);
@@ -335,10 +348,6 @@ public abstract class AbstractTable<I, R extends Message, C extends Enum<C> & Ta
             }
         }
         return type;
-    }
-
-    private Sql.Type ensureType(Column column) throws IllegalStateException {
-        return column.;
     }
 
     /**

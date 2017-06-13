@@ -26,6 +26,7 @@ import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Message;
 import io.spine.annotation.Internal;
 import io.spine.protobuf.AnyPacker;
+import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.type.TypeUrl;
 
 import static com.google.common.base.Preconditions.checkNotNull;

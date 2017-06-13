@@ -21,8 +21,11 @@
 package io.spine.server.storage.jdbc.entity.query;
 
 import com.google.protobuf.FieldMask;
+import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
-import io.spine.server.storage.jdbc.query.QueryFactory;
+import io.spine.server.storage.jdbc.query.ReadQueryFactory;
+import io.spine.server.storage.jdbc.query.WriteQueryFactory;
+import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import org.slf4j.Logger;
 import io.spine.server.entity.Entity;
 import io.spine.server.entity.EntityRecord;
@@ -46,12 +49,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author Andrey Lavrov
  * @author Dmytro Dashenkov
  */
-public class RecordStorageQueryFactory<I> implements QueryFactory<I, EntityRecord> {
+public class RecordStorageQueryFactory<I>
+        implements ReadQueryFactory<I, EntityRecord>,
+                   WriteQueryFactory<I, EntityRecordWithColumns> {
 
     private final IdColumn<I> idColumn;
     private final DataSourceWrapper dataSource;
     private final String tableName;
     private final Logger logger;
+    private final ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry;
 
     /**
      * Creates a new instance.
@@ -62,20 +68,15 @@ public class RecordStorageQueryFactory<I> implements QueryFactory<I, EntityRecor
     public RecordStorageQueryFactory(DataSourceWrapper dataSource,
                                      Class<? extends Entity<I, ?>> entityClass,
                                      Logger logger,
-                                     IdColumn<I> idColumn) {
+                                     IdColumn<I> idColumn,
+                                     ColumnTypeRegistry<?
+                                             extends JdbcColumnType<?, ?>> columnTypeRegistry) {
         super();
         this.idColumn = checkNotNull(idColumn);
         this.dataSource = dataSource;
         this.tableName = DbTableNameFactory.newTableName(entityClass);
         this.logger = logger;
-    }
-
-    public MarkEntityQuery<I> newMarkArchivedQuery(I id) {
-        return newMarkQuery(id, LifecycleFlagField.archived);
-    }
-
-    public MarkEntityQuery<I> newMarkDeletedQuery(I id) {
-        return newMarkQuery(id, LifecycleFlagField.deleted);
+        this.columnTypeRegistry = columnTypeRegistry;
     }
 
     private MarkEntityQuery<I> newMarkQuery(I id, LifecycleFlagField column) {
@@ -140,7 +141,7 @@ public class RecordStorageQueryFactory<I> implements QueryFactory<I, EntityRecor
     }
 
     @Override
-    public WriteQuery newInsertQuery(I id, EntityRecord record) {
+    public WriteQuery newInsertQuery(I id, EntityRecordWithColumns record) {
         final InsertEntityQuery.Builder<I> builder = InsertEntityQuery.<I>newBuilder(tableName)
                 .setDataSource(dataSource)
                 .setLogger(getLogger())
@@ -151,7 +152,7 @@ public class RecordStorageQueryFactory<I> implements QueryFactory<I, EntityRecor
     }
 
     @Override
-    public WriteQuery newUpdateQuery(I id, EntityRecord record) {
+    public WriteQuery newUpdateQuery(I id, EntityRecordWithColumns record) {
         final UpdateEntityQuery.Builder<I> builder = UpdateEntityQuery.<I>newBuilder(tableName)
                 .setDataSource(dataSource)
                 .setLogger(getLogger())

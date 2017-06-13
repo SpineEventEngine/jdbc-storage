@@ -27,9 +27,10 @@ import io.spine.server.storage.jdbc.entity.lifecycleflags.query.InsertLifecycleF
 import io.spine.server.storage.jdbc.entity.lifecycleflags.query.MarkEntityQuery;
 import io.spine.server.storage.jdbc.entity.lifecycleflags.query.SelectLifecycleFlagsQuery;
 import io.spine.server.storage.jdbc.entity.lifecycleflags.query.UpdateLifecycleFlagsQuery;
-import io.spine.server.storage.jdbc.query.QueryFactory;
+import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.SelectByIdQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
+import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 import io.spine.server.storage.jdbc.table.entity.aggregate.LifecycleFlagsTable;
 import io.spine.server.storage.jdbc.util.DataSourceWrapper;
 import io.spine.server.storage.jdbc.util.IdColumn;
@@ -39,12 +40,13 @@ import static io.spine.server.storage.LifecycleFlagField.archived;
 import static io.spine.server.storage.LifecycleFlagField.deleted;
 
 /**
- * An implementation of the {@link QueryFactory} for generating queries for
+ * An implementation of the {@link ReadQueryFactory} for generating queries for
  * the {@link LifecycleFlagsTable}.
  *
  * @author Dmytro Dashenkov
  */
-public class LifecycleFlagsQueryFactory<I> implements QueryFactory<I, LifecycleFlags> {
+public class LifecycleFlagsQueryFactory<I> implements ReadQueryFactory<I, LifecycleFlags>,
+                                                      WriteQueryFactory<I, LifecycleFlags> {
 
     private final Logger logger;
     private final DataSourceWrapper dataSource;

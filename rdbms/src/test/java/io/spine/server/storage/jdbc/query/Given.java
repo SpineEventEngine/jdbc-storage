@@ -100,8 +100,8 @@ class Given {
                 WriteRecordQueryMock.newBuilder()
                                     .setDataSource(dataSourceMock)
                                     .setLogger(loggerMock)
-                                    .setIdColumn(idColumnMock)
-                                    .setRecord(recordMock);
+                                    .setIdColumn(idColumnMock);
+//                                    .setRecord(recordMock);
         return builder.build();
     }
 

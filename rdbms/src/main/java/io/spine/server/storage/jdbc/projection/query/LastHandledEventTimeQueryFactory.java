@@ -21,9 +21,10 @@
 package io.spine.server.storage.jdbc.projection.query;
 
 import com.google.protobuf.Timestamp;
-import io.spine.server.storage.jdbc.query.QueryFactory;
+import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.SelectByIdQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
+import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 import io.spine.server.storage.jdbc.table.LastHandledEventTimeTable;
 import io.spine.server.storage.jdbc.util.DataSourceWrapper;
 import io.spine.server.storage.jdbc.util.IdColumn;
@@ -37,7 +38,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @author Andrey Lavrov
  */
-public class LastHandledEventTimeQueryFactory implements QueryFactory<String, Timestamp> {
+public class LastHandledEventTimeQueryFactory
+        implements ReadQueryFactory<String, Timestamp>,
+                   WriteQueryFactory<String, Timestamp>{
 
     private final DataSourceWrapper dataSource;
     private final String tableName;

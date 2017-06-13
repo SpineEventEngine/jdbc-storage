@@ -20,14 +20,13 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import com.google.protobuf.Message;
 import io.spine.server.storage.jdbc.table.AbstractTable;
 
 /**
  * An interface of a {@linkplain StorageQuery query} factory.
  *
  * <p>Each JDBC {@linkplain AbstractTable table} uses an
- * instance of {@code QueryFactory} implementation to construct its SQL queries to the
+ * instance of {@code ReadQueryFactory} implementation to construct its SQL queries to the
  * database.
  *
  * @param <I> type of the ID of the record
@@ -35,21 +34,10 @@ import io.spine.server.storage.jdbc.table.AbstractTable;
  *
  * @author Dmytro Dashenkov
  */
-public interface QueryFactory<I, R extends Message> {
+public interface ReadQueryFactory<I, R> {
 
     /**
      * @return a query for selecting a record by given ID
      */
     SelectByIdQuery<I, R> newSelectByIdQuery(I id);
-
-    /**
-     * @return a query inserting a the given record under the given ID
-     */
-    WriteQuery newInsertQuery(I id, R record);
-
-    /**
-     * @return a query for updating the record under the given ID with new value
-     */
-    WriteQuery newUpdateQuery(I id, R record);
-
 }

@@ -21,21 +21,23 @@
 package io.spine.server.storage.jdbc.aggregate.query;
 
 import com.google.protobuf.Int32Value;
-import io.spine.server.storage.jdbc.query.QueryFactory;
+import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.SelectByIdQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
+import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 import io.spine.server.storage.jdbc.table.entity.aggregate.EventCountTable;
 import io.spine.server.storage.jdbc.util.DataSourceWrapper;
 import io.spine.server.storage.jdbc.util.IdColumn;
 import org.slf4j.Logger;
 
 /**
- * An implementation of {@link QueryFactory} generating queries for
+ * An implementation of {@link ReadQueryFactory} generating queries for
  * the {@link EventCountTable}.
  *
  * @author Dmytro Dashenkov
  */
-public class EventCountQueryFactory<I> implements QueryFactory<I, Int32Value> {
+public class EventCountQueryFactory<I> implements ReadQueryFactory<I, Int32Value>,
+                                                  WriteQueryFactory<I, Int32Value>{
 
     private final String tableName;
     private final IdColumn<I> idColumn;

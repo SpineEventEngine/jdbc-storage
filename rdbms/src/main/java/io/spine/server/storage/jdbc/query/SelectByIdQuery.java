@@ -44,7 +44,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author Alexander Litus
  */
 @Internal
-public class SelectByIdQuery<I, M extends Message> extends StorageQuery {
+public class SelectByIdQuery<I, M> extends StorageQuery {
 
     private final IdColumn<I> idColumn;
     private final I id;
@@ -117,7 +117,7 @@ public class SelectByIdQuery<I, M extends Message> extends StorageQuery {
     public abstract static class Builder<B extends Builder<B, Q, I, R>,
                                          Q extends StorageQuery,
                                          I,
-                                         R extends Message>
+                                         R>
             extends StorageQuery.Builder<B, Q> {
 
         private int idIndexInQuery;

@@ -22,9 +22,11 @@ package io.spine.server.storage.jdbc.projection;
 
 import com.google.protobuf.FieldMask;
 import com.google.protobuf.Timestamp;
+import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.entity.JdbcRecordStorage;
 import io.spine.server.storage.jdbc.table.LastHandledEventTimeTable;
+import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.util.DataSourceWrapper;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.projection.Projection;
@@ -55,15 +57,19 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
 
     private final Class<? extends Projection<I, ?, ?>> projectionClass;
 
+    private final ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry;
+
     protected JdbcProjectionStorage(JdbcRecordStorage<I> recordStorage,
                                     boolean multitenant,
                                     Class<? extends Projection<I, ?, ?>> projectionClass,
-                                    DataSourceWrapper dataSource)
+                                    DataSourceWrapper dataSource,
+                                    ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry)
             throws DatabaseException {
         super(multitenant);
         this.recordStorage = recordStorage;
         this.projectionClass = projectionClass;
-        this.table = new LastHandledEventTimeTable(dataSource);
+        this.table = new LastHandledEventTimeTable(dataSource, columnTypeRegistry);
+        this.columnTypeRegistry = columnTypeRegistry;
         table.createIfNotExists();
     }
 
@@ -71,7 +77,8 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
         this(builder.getRecordStorage(),
              builder.isMultitenant(),
              builder.getProjectionClass(),
-             builder.getDataSource());
+             builder.getDataSource(),
+             builder.getColumnTypeRegistry());
     }
 
     @Override
@@ -143,9 +150,13 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
                                                           JdbcProjectionStorage<I>> {
         private JdbcRecordStorage<I> recordStorage;
         private Class<? extends Projection<I, ?, ?>> projectionClass;
-
+        private ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry;
         private Builder() {
             super();
+        }
+
+        public ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> getColumnTypeRegistry() {
+            return columnTypeRegistry;
         }
 
         @Override

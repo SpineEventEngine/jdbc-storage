@@ -17,14 +17,10 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package io.spine.server.storage.jdbc.query;
 
 import com.google.protobuf.Message;
-import io.spine.server.entity.storage.ColumnTypeRegistry;
-import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.DatabaseException;
-import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.util.ConnectionWrapper;
 import io.spine.server.storage.jdbc.util.IdColumn;
 import io.spine.server.storage.jdbc.util.Serializer;
@@ -32,16 +28,18 @@ import io.spine.server.storage.jdbc.util.Serializer;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public abstract class WriteRecordQuery<I, R> extends WriteQuery {
+/**
+ * @author Alexander Aleksandrov
+ */
+public abstract class WriteAggregateQuery <I, R extends Message> extends WriteQuery {
 
     private final I id;
-    private final EntityRecordWithColumns record;
+    private final R record;
     private final int idIndexInQuery;
     private final int recordIndexInQuery;
     private final IdColumn<I> idColumn;
-    private final ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry;
 
-    public EntityRecordWithColumns getRecord() {
+    public R getRecord() {
         return record;
     }
 
@@ -49,19 +47,14 @@ public abstract class WriteRecordQuery<I, R> extends WriteQuery {
         return id;
     }
 
-    public ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> getColumnTypeRegistry() {
-        return columnTypeRegistry;
-    }
-
-    protected WriteRecordQuery(
-            Builder<? extends Builder, ? extends WriteRecordQuery, I, R> builder) {
+    protected WriteAggregateQuery(
+            Builder<? extends Builder, ? extends WriteAggregateQuery, I, R> builder) {
         super(builder);
         this.idIndexInQuery = builder.idIndexInQuery;
         this.recordIndexInQuery = builder.recordIndexInQuery;
         this.idColumn = builder.idColumn;
         this.id = builder.id;
         this.record = builder.record;
-        this.columnTypeRegistry = builder.columnTypeRegistry;
     }
 
     @Override
@@ -69,7 +62,7 @@ public abstract class WriteRecordQuery<I, R> extends WriteQuery {
         final PreparedStatement statement = super.prepareStatement(connection);
         try {
             idColumn.setId(idIndexInQuery, id, statement);
-            final byte[] bytes = Serializer.serialize(record.getRecord());
+            final byte[] bytes = Serializer.serialize(record);
             statement.setBytes(recordIndexInQuery, bytes);
             return statement;
         } catch (SQLException e) {
@@ -80,29 +73,22 @@ public abstract class WriteRecordQuery<I, R> extends WriteQuery {
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
     public abstract static class Builder<B extends Builder<B, Q, I, R>,
-                                         Q extends WriteRecordQuery,
-                                         I,
-                                         R>
+            Q extends WriteAggregateQuery,
+            I,
+            R extends Message>
             extends WriteQuery.Builder<B, Q> {
         private int idIndexInQuery;
         private int recordIndexInQuery;
         private IdColumn<I> idColumn;
         private I id;
-        private EntityRecordWithColumns record;
-        private ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry;
-
-        public B setColumnTypeRegistry(
-                ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry) {
-            this.columnTypeRegistry = columnTypeRegistry;
-            return getThis();
-        }
+        private R record;
 
         public B setId(I id) {
             this.id = id;
             return getThis();
         }
 
-        public B setRecord(EntityRecordWithColumns record) {
+        public B setRecord(R record) {
             this.record = record;
             return getThis();
         }

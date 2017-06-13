@@ -64,7 +64,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
             throws DatabaseException {
         super(multitenant);
         this.dataSource = dataSource;
-        this.table = new RecordTable<>(entityClass, dataSource, );
+        this.table = new RecordTable<>(entityClass, dataSource, columnTypeRegistry);
         this.columnTypeRegistry = columnTypeRegistry;
     }
 

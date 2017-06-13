@@ -48,9 +48,11 @@ public class MarkEntityQuery<I> extends StorageQuery {
 
     private static final int ID_PARAM_INDEX = 1;
 
-    private static final String SQL_TEMPLATE = Sql.Query.UPDATE + FORMAT_PLACEHOLDER + Sql.Query.SET +
-                                               FORMAT_PLACEHOLDER + Sql.BuildingBlock.EQUAL + Sql.Query.TRUE +
-                                               Sql.Query.WHERE + LifecycleFlagsTable.Column.id + Sql.BuildingBlock.EQUAL + Sql.Query.PLACEHOLDER + Sql.BuildingBlock.SEMICOLON;
+    private static final String SQL_TEMPLATE =
+            Sql.Query.UPDATE + FORMAT_PLACEHOLDER + Sql.Query.SET +
+            FORMAT_PLACEHOLDER + Sql.BuildingBlock.EQUAL + Sql.Query.TRUE +
+            Sql.Query.WHERE + LifecycleFlagsTable.Column.id + Sql.BuildingBlock.EQUAL +
+            Sql.Query.PLACEHOLDER + Sql.BuildingBlock.SEMICOLON;
 
     private final I id;
     private final IdColumn<I> idColumn;

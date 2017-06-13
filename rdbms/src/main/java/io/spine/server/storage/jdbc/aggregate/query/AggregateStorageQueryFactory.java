@@ -20,7 +20,8 @@
 
 package io.spine.server.storage.jdbc.aggregate.query;
 
-import io.spine.server.storage.jdbc.query.QueryFactory;
+import io.spine.server.storage.jdbc.query.ReadQueryFactory;
+import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 import io.spine.server.storage.jdbc.table.entity.aggregate.AggregateEventRecordTable;
 import org.slf4j.Logger;
 import io.spine.server.aggregate.Aggregate;
@@ -41,7 +42,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @param <I> the type of IDs used in the storage
  * @author Andrey Lavrov
  */
-public class AggregateStorageQueryFactory<I> implements QueryFactory<I, AggregateEventRecord> {
+public class AggregateStorageQueryFactory<I> implements ReadQueryFactory<I, AggregateEventRecord>,
+                                                        WriteQueryFactory<I, AggregateEventRecord> {
 
     private final IdColumn<I> idColumn;
     private final String mainTableName;

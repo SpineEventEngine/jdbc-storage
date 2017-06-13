@@ -22,11 +22,14 @@ package io.spine.server.storage.jdbc.table.entity.aggregate;
 
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.entity.LifecycleFlags;
+import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.aggregate.query.LifecycleFlagsQueryFactory;
 import io.spine.server.storage.jdbc.entity.lifecycleflags.query.MarkEntityQuery;
-import io.spine.server.storage.jdbc.query.QueryFactory;
+import io.spine.server.storage.jdbc.query.ReadQueryFactory;
+import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 import io.spine.server.storage.jdbc.table.TableColumn;
+import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.util.DataSourceWrapper;
 import io.spine.server.storage.jdbc.util.DbTableNameFactory;
 
@@ -45,11 +48,12 @@ public class LifecycleFlagsTable<I> extends AggregateTable<I, LifecycleFlags, Li
     private final LifecycleFlagsQueryFactory<I> queryFactory;
 
     public LifecycleFlagsTable(Class<? extends Aggregate<I, ?, ?>> aggregateClass,
-                               DataSourceWrapper dataSource) {
+                               DataSourceWrapper dataSource,
+                               ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry) {
         super(DbTableNameFactory.newTableName(aggregateClass) + TABLE_NAME_POSTFIX,
               aggregateClass,
               Column.id.name(),
-              dataSource);
+              dataSource, columnTypeRegistry);
         this.queryFactory = new LifecycleFlagsQueryFactory<>(dataSource, log(), getIdColumn(),
                                                              getName());
     }
@@ -66,28 +70,13 @@ public class LifecycleFlagsTable<I> extends AggregateTable<I, LifecycleFlags, Li
 
     // Storing records under string IDs instead of generic
     @Override
-    protected QueryFactory<I, LifecycleFlags> getQueryFactory() {
+    protected ReadQueryFactory<I, LifecycleFlags> getReadQueryFactory() {
         return queryFactory;
     }
 
-    public void markArchived(I id) {
-        final MarkEntityQuery query;
-        if (!containsRecord(id)) {
-            query = queryFactory.newMarkArchivedNewEntityQuery(id);
-        } else {
-            query = queryFactory.newMarkArchivedQuery(id);
-        }
-        query.execute();
-    }
-
-    public void markDeleted(I id) {
-        final MarkEntityQuery query;
-        if (!containsRecord(id)) {
-            query = queryFactory.newMarkDeletedNewEntityQuery(id);
-        } else {
-            query = queryFactory.newMarkDeletedQuery(id);
-        }
-        query.execute();
+    @Override
+    protected WriteQueryFactory<I, LifecycleFlags> getWriteQueryFactory() {
+        return null;
     }
 
     public enum Column implements TableColumn {

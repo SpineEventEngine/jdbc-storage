@@ -20,12 +20,15 @@
 
 package io.spine.server.storage.jdbc.table.entity.aggregate;
 
-import io.spine.server.storage.jdbc.query.QueryFactory;
+import io.spine.server.entity.storage.ColumnTypeRegistry;
+import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.aggregate.query.AggregateStorageQueryFactory;
+import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 import io.spine.server.storage.jdbc.table.TableColumn;
+import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.util.DataSourceWrapper;
 import io.spine.server.storage.jdbc.util.DbIterator;
 
@@ -45,8 +48,9 @@ public class AggregateEventRecordTable<I>
     private final AggregateStorageQueryFactory<I> queryFactory;
 
     public AggregateEventRecordTable(Class<? extends Aggregate<I, ?, ?>> entityClass,
-                                     DataSourceWrapper dataSource) {
-        super(entityClass, Column.id.name(), dataSource);
+                                     DataSourceWrapper dataSource,
+                                     ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry) {
+        super(entityClass, Column.id.name(), dataSource, columnTypeRegistry);
         queryFactory = new AggregateStorageQueryFactory<>(dataSource, entityClass, getIdColumn());
         queryFactory.setLogger(log());
     }
@@ -62,8 +66,13 @@ public class AggregateEventRecordTable<I>
     }
 
     @Override
-    protected QueryFactory<I, AggregateEventRecord> getQueryFactory() {
+    protected ReadQueryFactory<I, AggregateEventRecord> getReadQueryFactory() {
         return queryFactory;
+    }
+
+    @Override
+    protected WriteQueryFactory<I, AggregateEventRecord> getWriteQueryFactory() {
+        return null;
     }
 
     @SuppressWarnings("MethodDoesntCallSuperMethod") // No extra presence checks are required
