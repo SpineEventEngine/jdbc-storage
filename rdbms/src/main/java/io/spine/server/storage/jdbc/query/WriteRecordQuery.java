@@ -20,7 +20,6 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import com.google.protobuf.Message;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.DatabaseException;
@@ -32,14 +31,13 @@ import io.spine.server.storage.jdbc.util.Serializer;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public abstract class WriteRecordQuery<I, R> extends WriteQuery {
+public abstract class WriteRecordQuery<I, R> extends ColumnAwareWriteQuery {
 
     private final I id;
     private final EntityRecordWithColumns record;
     private final int idIndexInQuery;
     private final int recordIndexInQuery;
     private final IdColumn<I> idColumn;
-    private final ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry;
 
     public EntityRecordWithColumns getRecord() {
         return record;
@@ -47,10 +45,6 @@ public abstract class WriteRecordQuery<I, R> extends WriteQuery {
 
     public I getId() {
         return id;
-    }
-
-    public ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> getColumnTypeRegistry() {
-        return columnTypeRegistry;
     }
 
     protected WriteRecordQuery(
@@ -61,7 +55,6 @@ public abstract class WriteRecordQuery<I, R> extends WriteQuery {
         this.idColumn = builder.idColumn;
         this.id = builder.id;
         this.record = builder.record;
-        this.columnTypeRegistry = builder.columnTypeRegistry;
     }
 
     @Override
@@ -83,7 +76,8 @@ public abstract class WriteRecordQuery<I, R> extends WriteQuery {
                                          Q extends WriteRecordQuery,
                                          I,
                                          R>
-            extends WriteQuery.Builder<B, Q> {
+            extends ColumnAwareWriteQuery.Builder<B, Q> {
+
         private int idIndexInQuery;
         private int recordIndexInQuery;
         private IdColumn<I> idColumn;

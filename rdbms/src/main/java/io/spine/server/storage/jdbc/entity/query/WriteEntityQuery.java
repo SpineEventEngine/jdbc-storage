@@ -56,11 +56,14 @@ public class WriteEntityQuery<I> extends WriteRecordQuery<I, EntityRecord> {
         final Function<String, Integer> function;
         final Map<String, Column> columns = getRecord().getColumns();
         final Map<String, Integer> result = Collections.emptyMap();
-        for(Map.Entry<String, Column> entry: columns.entrySet()) {
-            Integer index = 1;
+
+        Integer index = (Integer)getId();
+
+        for (Map.Entry<String, Column> entry : columns.entrySet()) {
             result.put(entry.getKey(), index);
             index++;
         }
+
         function = Functions.forMap(result);
         return function;
     }

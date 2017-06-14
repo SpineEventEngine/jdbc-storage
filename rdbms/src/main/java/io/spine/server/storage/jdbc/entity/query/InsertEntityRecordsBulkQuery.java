@@ -20,50 +20,63 @@
 
 package io.spine.server.storage.jdbc.entity.query;
 
+import com.google.common.base.Function;
+import com.google.common.base.Functions;
 import com.google.common.base.Joiner;
-import io.spine.server.storage.jdbc.DatabaseException;
-import io.spine.server.storage.jdbc.Sql;
-import io.spine.server.storage.jdbc.query.WriteQuery;
-import io.spine.server.storage.jdbc.table.entity.RecordTable;
-import io.spine.server.storage.jdbc.util.IdColumn;
-import io.spine.server.storage.jdbc.util.Serializer;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.LifecycleFlags;
+import io.spine.server.entity.storage.Column;
+import io.spine.server.entity.storage.ColumnRecords;
+import io.spine.server.entity.storage.EntityRecordWithColumns;
+import io.spine.server.storage.jdbc.DatabaseException;
+import io.spine.server.storage.jdbc.Sql;
+import io.spine.server.storage.jdbc.query.ColumnAwareWriteQuery;
+import io.spine.server.storage.jdbc.table.entity.RecordTable;
 import io.spine.server.storage.jdbc.util.ConnectionWrapper;
+import io.spine.server.storage.jdbc.util.IdColumn;
+import io.spine.server.storage.jdbc.util.Serializer;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static java.lang.String.format;
-import static java.util.Collections.nCopies;
 import static io.spine.server.storage.LifecycleFlagField.archived;
 import static io.spine.server.storage.LifecycleFlagField.deleted;
+import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
+import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
+import static io.spine.server.storage.jdbc.Sql.BuildingBlock.COMMA;
+import static io.spine.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
+import static java.lang.String.format;
+import static java.util.Collections.nCopies;
 
 /**
  * A query for {@code INSERT}-ing multiple {@linkplain EntityRecord entity records} as a bulk.
  *
  * @author Dmytro Dashenkov
  */
-public class InsertEntityRecordsBulkQuery<I> extends WriteQuery {
+public class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
 
     private static final String FORMAT_PLACEHOLDER = "%s";
 
     private static final int COLUMNS_COUNT = 4;
 
-    private static final String SQL_TEMPLATE = Sql.Query.INSERT_INTO + FORMAT_PLACEHOLDER +
-                                               Sql.BuildingBlock.BRACKET_OPEN + RecordTable.Column.id + Sql.BuildingBlock.COMMA + RecordTable.Column.entity + Sql.BuildingBlock.COMMA +
-                                               archived + Sql.BuildingBlock.COMMA + deleted + Sql.BuildingBlock.BRACKET_CLOSE +
-                                               Sql.Query.VALUES + FORMAT_PLACEHOLDER;
+    private static final String SQL_TEMPLATE =
+            Sql.Query.INSERT_INTO + FORMAT_PLACEHOLDER +
+            BRACKET_OPEN + RecordTable.Column.id + COMMA +
+            RecordTable.Column.entity + COMMA +
+            archived + COMMA + deleted + BRACKET_CLOSE +
+            Sql.Query.VALUES + FORMAT_PLACEHOLDER;
     private static final String SQL_VALUES_TEMPLATE = Sql.nPlaceholders(COLUMNS_COUNT);
 
-    private final Map<I, EntityRecord> records;
+    private final Map<I, EntityRecordWithColumns> records;
     private final IdColumn<I> idColumn;
+
 
     protected InsertEntityRecordsBulkQuery(Builder<I> builder) {
         super(builder);
@@ -78,24 +91,46 @@ public class InsertEntityRecordsBulkQuery<I> extends WriteQuery {
     @Override
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
         final PreparedStatement statement = super.prepareStatement(connection);
-        int parameterCounter = 1;
-        for (Map.Entry<I, EntityRecord> record : records.entrySet()) {
-            final I id = record.getKey();
-            final EntityRecord storageRecord = record.getValue();
-            addRecordsParams(statement, parameterCounter, id, storageRecord);
-            parameterCounter += COLUMNS_COUNT;
+        for (Map.Entry<I, EntityRecordWithColumns> record : records.entrySet()) {
+            ColumnRecords.feedColumnsTo(statement,
+                                        record.getValue(),
+                                        getColumnTypeRegistry(),
+                                        getTransformer(record.getKey(), record.getValue()));
+//        int parameterCounter = 1;
+//            final I id = record.getKey();
+//            final EntityRecordWithColumns storageRecord = record.getValue();
+//            addRecordsParams(statement, parameterCounter, id, storageRecord);
+//            parameterCounter += COLUMNS_COUNT;
+
+
         }
         return statement;
     }
 
+    protected Function<String, Integer> getTransformer(I id, EntityRecordWithColumns record) {
+        final Function<String, Integer> function;
+        final Map<String, Column> columns = record.getColumns();
+        final Map<String, Integer> result = Collections.emptyMap();
+
+        Integer index = (Integer) id;
+
+        for (Map.Entry<String, Column> entry : columns.entrySet()) {
+            result.put(entry.getKey(), index);
+            index++;
+        }
+
+        function = Functions.forMap(result);
+        return function;
+    }
+
     /**
-     * Adds an {@link EntityRecord} to the query.
+     * Adds an {@link EntityRecordWithColumns} to the query.
      *
      * <p>This includes following items:
      * <ul>
-     *     <li>ID;
-     *     <li>serialized record by itself;
-     *     <li>{@code Boolean} columns for the record visibility (archived and deleted fields).
+     *      <li>ID;
+     *      <li>serialized record by itself;
+     *      <li>{@code Boolean} columns for the record visibility (archived and deleted fields).
      * </ul>
      *
      * @param statement       the {@linkplain PreparedStatement} to add the query parameters to
@@ -106,15 +141,16 @@ public class InsertEntityRecordsBulkQuery<I> extends WriteQuery {
      * @param record          the record to store
      */
     private void addRecordsParams(PreparedStatement statement, int firstParamIndex, I id,
-                                  EntityRecord record) {
+                                  EntityRecordWithColumns record) {
         int paramIndex = firstParamIndex;
         try {
             idColumn.setId(paramIndex, id, statement);
             paramIndex++;
-            final byte[] bytes = Serializer.serialize(record);
+            final byte[] bytes = Serializer.serialize(record.getRecord());
             statement.setBytes(paramIndex, bytes);
             paramIndex++;
-            final LifecycleFlags status = record.getLifecycleFlags();
+            final LifecycleFlags status = record.getRecord()
+                                                .getLifecycleFlags();
             final boolean archived = status.getArchived();
             final boolean deleted = status.getDeleted();
             statement.setBoolean(paramIndex, archived);
@@ -127,13 +163,13 @@ public class InsertEntityRecordsBulkQuery<I> extends WriteQuery {
     }
 
     public static class Builder<I>
-            extends WriteQuery.Builder<Builder<I>, InsertEntityRecordsBulkQuery> {
+            extends ColumnAwareWriteQuery.Builder<Builder<I>, InsertEntityRecordsBulkQuery> {
 
-        private Map<I, EntityRecord> records;
+        private Map<I, EntityRecordWithColumns> records;
         private String tableName;
         private IdColumn<I> idColumn;
 
-        public Builder<I> setRecords(Map<I, EntityRecord> records) {
+        public Builder<I> setRecords(Map<I, EntityRecordWithColumns> records) {
             this.records = checkNotNull(records);
             return getThis();
         }
@@ -156,9 +192,10 @@ public class InsertEntityRecordsBulkQuery<I> extends WriteQuery {
 
             final Collection<String> sqlValues = nCopies(records.size(),
                                                          SQL_VALUES_TEMPLATE);
-            final String sqlValuesJoined = Joiner.on(Sql.BuildingBlock.COMMA.toString())
+            final String sqlValuesJoined = Joiner.on(COMMA.toString())
                                                  .join(sqlValues);
-            final String sql = format(SQL_TEMPLATE, tableName, sqlValuesJoined) + Sql.BuildingBlock.SEMICOLON;
+            final String sql =
+                    format(SQL_TEMPLATE, tableName, sqlValuesJoined) + SEMICOLON;
             setQuery(sql);
             return new InsertEntityRecordsBulkQuery<>(this);
         }

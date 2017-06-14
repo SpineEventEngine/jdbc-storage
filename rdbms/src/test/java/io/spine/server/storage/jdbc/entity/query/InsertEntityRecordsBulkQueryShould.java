@@ -20,6 +20,7 @@
 
 package io.spine.server.storage.jdbc.entity.query;
 
+import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.GivenDataSource;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -51,8 +52,8 @@ public class InsertEntityRecordsBulkQueryShould {
 
     @Test
     public void throw_DatabaseException_on_SqlException_and_log() throws SQLException {
-        final EntityRecord entityRecord = EntityRecord.getDefaultInstance();
-        final Map<String, EntityRecord> recordMap = new HashMap<>(1);
+        final EntityRecordWithColumns entityRecord = EntityRecordWithColumns.of(EntityRecord.getDefaultInstance());
+        final Map<String, EntityRecordWithColumns> recordMap = new HashMap<>(1);
         final String id = "fake-id";
         recordMap.put(id, entityRecord);
 

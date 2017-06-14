@@ -19,7 +19,17 @@
  */
 package io.spine.server.storage.jdbc.type;
 
+import com.google.protobuf.AbstractMessage;
+import com.google.protobuf.Timestamp;
+import io.spine.server.entity.EntityRecord;
+import io.spine.server.projection.Projection;
+import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.Sql;
+import io.spine.server.storage.jdbc.util.Serializer;
+
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 /**
  * @author Alexander Aleksandrov
@@ -37,7 +47,73 @@ final class JdbcColumnTypes {
         return new BooleanColumnType();
     }
 
+    /**
+     * @return new instance of {@link StringColumnType}
+     */
+    static SimpleJdbcColumnType<String> stringType() {
+        return new StringColumnType();
+    }
+
+    /**
+     * @return new instance of {@link IntegerColumnType}
+     */
+    static SimpleJdbcColumnType<Integer> integerType() {
+        return new IntegerColumnType();
+    }
+
+    /**
+     * @return new instance of {@link LongColumnType}
+     */
+    static SimpleJdbcColumnType<Long> longType() {
+        return new LongColumnType();
+    }
+
+    /**
+     * @return new instance of {@link TimestampColumnType}
+     */
+    static JdbcColumnType<Timestamp, Date> timestampType() {
+        return new TimestampColumnType();
+    }
+
+    /**
+     * @return new instance of {@link MessageColumnType}
+     */
+    static JdbcColumnType<AbstractMessage, String> messageType() {
+        return new MessageColumnType();
+    }
+
     private static class BooleanColumnType extends SimpleJdbcColumnType<Boolean>{
+
+        @Override
+        public void setColumnValue(PreparedStatement storageRecord, Boolean value,
+                                   Integer columnIdentifier) {
+            try {
+                storageRecord.setBoolean(columnIdentifier, value);
+            } catch (SQLException e) {
+                throw new DatabaseException(e);
+            }
+
+        }
+
+        @Override
+        public Sql.Type getSqlType() {
+            return Sql.Type.BOOLEAN;
+        }
+
+    }
+
+    private static class StringColumnType extends SimpleJdbcColumnType<String>{
+
+        @Override
+        public void setColumnValue(PreparedStatement storageRecord, String value,
+                                   Integer columnIdentifier) {
+            try {
+                storageRecord.setString(columnIdentifier, value);
+            } catch (SQLException e) {
+                throw new DatabaseException(e);
+            }
+
+        }
 
         @Override
         public Sql.Type getSqlType() {
@@ -45,63 +121,82 @@ final class JdbcColumnTypes {
         }
     }
 
-    /**
-     * @return new instance of {@link IntegerColumnType}
-     */
-    static SimpleJdbcColumnType<Boolean> integerType() {
-        return new IntegerColumnType();
-    }
+    private static class IntegerColumnType extends SimpleJdbcColumnType<Integer>{
 
-    private static class IntegerColumnType extends SimpleJdbcColumnType<Boolean>{
+        @Override
+        public void setColumnValue(PreparedStatement storageRecord, Integer value,
+                                   Integer columnIdentifier) {
+            try {
+                storageRecord.setInt(columnIdentifier, value);
+            } catch (SQLException e) {
+                throw new DatabaseException(e);
+            }
+
+        }
 
         @Override
         public Sql.Type getSqlType() {
             return Sql.Type.INT;
         }
+
     }
 
-    /**
-     * @return new instance of {@link BigIntegerColumnType}
-     */
-    static SimpleJdbcColumnType<Boolean> bigIntegerType() {
-        return new BigIntegerColumnType();
-    }
+    private static class LongColumnType extends SimpleJdbcColumnType<Long>{
 
-    private static class BigIntegerColumnType extends SimpleJdbcColumnType<Boolean>{
+        @Override
+        public void setColumnValue(PreparedStatement storageRecord, Long value,
+                                   Integer columnIdentifier) {
+            try {
+                storageRecord.setLong(columnIdentifier, value);
+            } catch (SQLException e) {
+                throw new DatabaseException(e);
+            }
+        }
 
         @Override
         public Sql.Type getSqlType() {
             return Sql.Type.BIGINT;
         }
+
     }
 
-    /**
-     * @return new instance of {@link EntityColumnType}
-     */
-    static SimpleJdbcColumnType<Boolean> entityType() {
-        return new EntityColumnType();
-    }
+    private static class TimestampColumnType extends AbstractJdbcColumnType<Timestamp, Date>{
 
-    private static class EntityColumnType extends SimpleJdbcColumnType<Boolean>{
+        @Override
+        public Date convertColumnValue(Timestamp fieldValue) {
+            return null;
+        }
+
+        @Override
+        public void setColumnValue(PreparedStatement storageRecord, Date value,
+                                   Integer columnIdentifier) {
+
+        }
 
         @Override
         public Sql.Type getSqlType() {
             return Sql.Type.BLOB;
         }
+
     }
 
-    /**
-     * @return new instance of {@link ProjectionColumnType}
-     */
-    static SimpleJdbcColumnType<Boolean> projectionType() {
-        return new ProjectionColumnType();
-    }
+    private static class MessageColumnType extends AbstractJdbcColumnType<AbstractMessage, String>{
 
-    private static class ProjectionColumnType extends SimpleJdbcColumnType<Boolean>{
+        @Override
+        public String convertColumnValue(AbstractMessage fieldValue) {
+            return null;
+        }
+
+        @Override
+        public void setColumnValue(PreparedStatement storageRecord, String value,
+                                   Integer columnIdentifier) {
+
+        }
 
         @Override
         public Sql.Type getSqlType() {
-            return Sql.Type.VARCHAR_255;
+            return Sql.Type.BLOB;
         }
+
     }
 }

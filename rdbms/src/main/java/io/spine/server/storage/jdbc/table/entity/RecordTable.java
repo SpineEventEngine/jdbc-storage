@@ -115,11 +115,11 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, RecordTable.Col
                 records.values().iterator().next().getColumns();
         createIfNotExists(columns);
 
-        final Map<I, EntityRecord> newRecords = new HashMap<>(records.size());
+        final Map<I, EntityRecordWithColumns> newRecords = new HashMap<>(records.size());
 
         for (Map.Entry<I, EntityRecordWithColumns> unclassifiedRecord : records.entrySet()) {
             final I id = unclassifiedRecord.getKey();
-            final EntityRecord record = unclassifiedRecord.getValue().getRecord();
+            final EntityRecordWithColumns record = unclassifiedRecord.getValue();
             if (containsRecord(id)) {
                 queryFactory.newUpdateQuery(id, unclassifiedRecord.getValue())
                             .execute();

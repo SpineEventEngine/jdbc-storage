@@ -19,12 +19,15 @@
  */
 package io.spine.server.storage.jdbc.type;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * @author Alexander Aleksandrov
  */
 public abstract class SimpleJdbcColumnType<T> extends AbstractJdbcColumnType<T, T> {
     @Override
     public T convertColumnValue(T fieldValue) {
-        return null;
+        checkNotNull(fieldValue);
+        return fieldValue;
     }
 }

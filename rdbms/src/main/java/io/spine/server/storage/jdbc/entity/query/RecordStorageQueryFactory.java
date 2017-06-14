@@ -118,7 +118,7 @@ public class RecordStorageQueryFactory<I>
     }
 
     public InsertEntityRecordsBulkQuery<I> newInsertEntityRecordsBulkQuery(
-            Map<I, EntityRecord> records) {
+            Map<I, EntityRecordWithColumns> records) {
         final InsertEntityRecordsBulkQuery.Builder<I> builder =
                 InsertEntityRecordsBulkQuery.<I>newBuilder()
                         .setLogger(getLogger())

@@ -17,17 +17,31 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package io.spine.server.storage.jdbc.type;
+package io.spine.server.storage.jdbc.query;
 
-import java.sql.PreparedStatement;
+import io.spine.server.entity.storage.ColumnTypeRegistry;
+import io.spine.server.storage.jdbc.type.JdbcColumnType;
 
 /**
  * @author Alexander Aleksandrov
  */
-public abstract class AbstractJdbcColumnType<J, C > implements JdbcColumnType<J, C> {
+public class ColumnAwareWriteQuery extends WriteQuery {
 
-    @Override
-    public void setNull(PreparedStatement storageRecord, Integer columnIdentifier) {
-//        storageRecord.setNull(columnIdentifier, getSqlType());
+    private final ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry;
+
+    protected ColumnAwareWriteQuery(Builder<? extends Builder, ? extends ColumnAwareWriteQuery> builder) {
+        super(builder);
+        this.columnTypeRegistry = builder.columnTypeRegistry;
+    }
+
+    public ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> getColumnTypeRegistry() {
+        return columnTypeRegistry;
+    }
+
+    @SuppressWarnings("ClassNameSameAsAncestorName")
+    public abstract static class Builder<B extends ColumnAwareWriteQuery.Builder<B, Q>, Q extends ColumnAwareWriteQuery>
+            extends WriteQuery.Builder<B, Q> {
+
+        private ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry;
     }
 }
