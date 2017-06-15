@@ -19,7 +19,10 @@
  */
 package io.spine.server.storage.jdbc.type;
 
+import io.spine.server.storage.jdbc.DatabaseException;
+
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 /**
  * @author Alexander Aleksandrov
@@ -28,6 +31,10 @@ public abstract class AbstractJdbcColumnType<J, C > implements JdbcColumnType<J,
 
     @Override
     public void setNull(PreparedStatement storageRecord, Integer columnIdentifier) {
-//        storageRecord.setNull(columnIdentifier, getSqlType());
+        try {
+        storageRecord.setNull(columnIdentifier, getSqlType().getSqlTypeIntIdentifier());
+        } catch (SQLException e) {
+            throw new DatabaseException(e);
+        }
     }
 }

@@ -20,10 +20,12 @@
 
 package io.spine.server.storage.jdbc.entity.query;
 
+import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.query.WriteRecordQuery;
 import io.spine.server.storage.jdbc.table.entity.RecordTable;
 import io.spine.server.entity.EntityRecord;
 
+import static io.spine.server.storage.jdbc.Sql.getColumnNames;
 import static java.lang.String.format;
 import static io.spine.server.storage.LifecycleFlagField.archived;
 import static io.spine.server.storage.LifecycleFlagField.deleted;
@@ -37,7 +39,7 @@ import static io.spine.server.storage.jdbc.Sql.nPlaceholders;
 import static io.spine.server.storage.jdbc.table.entity.RecordTable.Column;
 
 /**
- * Query that inserts a new {@link EntityRecord} to
+ * Query that inserts a new {@link EntityRecordWithColumns} to
  * the {@link RecordTable}.
  *
  * @author Alexander Litus
@@ -48,25 +50,28 @@ public class InsertEntityQuery<I> extends WriteEntityQuery<I> {
     private static final String QUERY_TEMPLATE =
             INSERT_INTO + " %s " +
             BRACKET_OPEN +
-            Column.entity + COMMA + archived + COMMA + deleted + COMMA + Column.id +
+            " %s " + Column.id +
             BRACKET_CLOSE +
-            VALUES + nPlaceholders(4) + SEMICOLON;
+            VALUES + " %s " + SEMICOLON;
 
     private InsertEntityQuery(Builder<I> builder) {
         super(builder);
     }
 
-    public static <I> Builder<I> newBuilder(String tableName) {
+    public static <I> Builder<I> newBuilder(String tableName, EntityRecordWithColumns record) {
         final Builder<I> builder = new Builder<>();
+        final int columnCount = record.getColumns().size() + 1;
+        final String columnNames = getColumnNames(record);
+        final String placeholders = nPlaceholders(columnCount);
         builder.setIdIndexInQuery(QueryParameter.ID.index)
                .setRecordIndexInQuery(QueryParameter.RECORD.index)
-               .setQuery(format(QUERY_TEMPLATE, tableName));
+               .setQuery(format(QUERY_TEMPLATE, tableName, columnNames, placeholders));
         return builder;
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
     public static class Builder<I>
-            extends WriteRecordQuery.Builder<Builder<I>, InsertEntityQuery, I, EntityRecord> {
+            extends WriteRecordQuery.Builder<Builder<I>, InsertEntityQuery, I, EntityRecordWithColumns> {
 
         @Override
         public InsertEntityQuery build() {

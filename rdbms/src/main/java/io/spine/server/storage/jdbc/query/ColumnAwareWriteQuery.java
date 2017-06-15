@@ -21,6 +21,7 @@ package io.spine.server.storage.jdbc.query;
 
 import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
+import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
 
 /**
  * @author Alexander Aleksandrov
@@ -42,6 +43,7 @@ public class ColumnAwareWriteQuery extends WriteQuery {
     public abstract static class Builder<B extends ColumnAwareWriteQuery.Builder<B, Q>, Q extends ColumnAwareWriteQuery>
             extends WriteQuery.Builder<B, Q> {
 
-        private ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry;
+        private ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry
+                = JdbcTypeRegistryFactory.defaultInstance();
     }
 }

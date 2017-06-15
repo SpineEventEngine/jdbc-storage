@@ -21,8 +21,13 @@
 package io.spine.server.storage.jdbc;
 
 import com.google.common.base.Joiner;
+import io.spine.server.entity.storage.Column;
+import io.spine.server.entity.storage.EntityRecordWithColumns;
+import io.spine.server.storage.jdbc.table.entity.RecordTable;
 
+import java.sql.Types;
 import java.util.Collections;
+import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
@@ -70,6 +75,20 @@ public class Sql {
         return wrappedPlaceholders;
     }
 
+    public static String getColumnNames(EntityRecordWithColumns record) {
+        final String wrappedColumnNames;
+        final String columnNames = Joiner.on(COMMA.toString())
+                                         .join(record.getColumns()
+                                                     .keySet());
+
+        if (columnNames.isEmpty()) {
+            wrappedColumnNames = columnNames;
+        } else wrappedColumnNames = columnNames + COMMA;
+
+
+        return wrappedColumnNames;
+    }
+
     /**
      * Set of SQL keywords representing basic data types used in the project.
      */
@@ -87,19 +106,25 @@ public class Sql {
          * but only to solve the problem if identifiers with unknown types. Using this type for
          * a non-ID column may lead to a failure.
          */
-        ID("generic id type"),
-        BLOB("BLOB"),
-        INT("INT"),
-        BIGINT("BIGINT"),
-        VARCHAR_255("VARCHAR(255)"),
-        VARCHAR_512("VARCHAR(512)"),
-        VARCHAR_999("VARCHAR(999)"),
-        BOOLEAN("BOOLEAN");
+        ID("generic id type", Types.OTHER),
+        BLOB("BLOB", Types.BLOB),
+        INT("INT", Types.INTEGER),
+        BIGINT("BIGINT", Types.BIGINT),
+        VARCHAR_255("VARCHAR(255)", Types.VARCHAR),
+        VARCHAR_512("VARCHAR(512)", Types.VARCHAR),
+        VARCHAR_999("VARCHAR(999)", Types.VARCHAR),
+        BOOLEAN("BOOLEAN", Types.BOOLEAN);
 
         private final String token;
+        private final int sqlTypeIntIdentifier;
 
-        Type(String token) {
+        Type(String token, int intSqlType) {
             this.token = token;
+            this.sqlTypeIntIdentifier = intSqlType;
+        }
+
+        public int getSqlTypeIntIdentifier() {
+            return sqlTypeIntIdentifier;
         }
 
         @Override

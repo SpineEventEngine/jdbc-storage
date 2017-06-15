@@ -142,7 +142,7 @@ public class RecordStorageQueryFactory<I>
 
     @Override
     public WriteQuery newInsertQuery(I id, EntityRecordWithColumns record) {
-        final InsertEntityQuery.Builder<I> builder = InsertEntityQuery.<I>newBuilder(tableName)
+        final InsertEntityQuery.Builder<I> builder = InsertEntityQuery.<I>newBuilder(tableName, record)
                 .setDataSource(dataSource)
                 .setLogger(getLogger())
                 .setId(id)

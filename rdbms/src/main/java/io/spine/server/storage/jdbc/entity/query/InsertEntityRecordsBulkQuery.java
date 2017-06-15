@@ -92,17 +92,17 @@ public class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
         final PreparedStatement statement = super.prepareStatement(connection);
         for (Map.Entry<I, EntityRecordWithColumns> record : records.entrySet()) {
+            if (record.getValue().hasColumns()){
             ColumnRecords.feedColumnsTo(statement,
                                         record.getValue(),
                                         getColumnTypeRegistry(),
                                         getTransformer(record.getKey(), record.getValue()));
+            }
 //        int parameterCounter = 1;
 //            final I id = record.getKey();
 //            final EntityRecordWithColumns storageRecord = record.getValue();
 //            addRecordsParams(statement, parameterCounter, id, storageRecord);
 //            parameterCounter += COLUMNS_COUNT;
-
-
         }
         return statement;
     }
@@ -112,7 +112,7 @@ public class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
         final Map<String, Column> columns = record.getColumns();
         final Map<String, Integer> result = Collections.emptyMap();
 
-        Integer index = (Integer) id;
+        Integer index = 3;
 
         for (Map.Entry<String, Column> entry : columns.entrySet()) {
             result.put(entry.getKey(), index);

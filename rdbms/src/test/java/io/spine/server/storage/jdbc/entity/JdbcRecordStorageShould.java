@@ -24,6 +24,8 @@ import com.google.common.base.Optional;
 import com.google.protobuf.Message;
 import io.spine.server.entity.AbstractEntity;
 import io.spine.server.entity.EntityRecord;
+import io.spine.server.entity.storage.Column;
+import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.RecordStorage;
 import io.spine.server.storage.RecordStorageShould;
 import io.spine.server.storage.jdbc.DatabaseException;
@@ -33,6 +35,9 @@ import io.spine.test.storage.Project;
 import io.spine.test.storage.ProjectId;
 import io.spine.testdata.Sample;
 import org.junit.Test;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static io.spine.base.Identifier.newUuid;
 import static org.junit.Assert.assertFalse;
@@ -81,7 +86,10 @@ public class JdbcRecordStorageShould
     public void clear_itself() {
         final JdbcRecordStorage<String> storage = getStorage();
         final String id = newUuid();
-        final EntityRecord record = newStorageRecord();
+        final String columnValue = "i'm a value";
+        final EntityRecord entityRecord = newStorageRecord();
+
+//        final EntityRecordWithColumns record = EntityRecordWithColumns(entityRecord);
 //        storage.writeRecord(id, record);
         storage.clear();
 

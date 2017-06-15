@@ -97,7 +97,7 @@ public abstract class AbstractTable<I, R extends Message, C extends Enum<C> & Ta
         this.name = checkNotNull(name);
         this.idColumn = checkNotNull(idColumn);
         this.dataSource = checkNotNull(dataSource);
-        this.columnTypeRegistry = checkNotNull(columnTypeRegistry);
+        this.columnTypeRegistry = columnTypeRegistry;
     }
 
     /**

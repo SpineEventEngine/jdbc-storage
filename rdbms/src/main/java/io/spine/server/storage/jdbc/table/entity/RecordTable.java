@@ -99,7 +99,7 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, RecordTable.Col
 
     public void write(I id, EntityRecordWithColumns record) {
         final Map<String, io.spine.server.entity.storage.Column> columns = record.getColumns();
-        createIfNotExists(columns);
+//        createIfNotExists(columns);
 
         if (containsRecord(id)) {
             queryFactory.newUpdateQuery(id, record).execute();
@@ -113,7 +113,7 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, RecordTable.Col
 
         final Map<String, io.spine.server.entity.storage.Column> columns =
                 records.values().iterator().next().getColumns();
-        createIfNotExists(columns);
+//        createIfNotExists(columns);
 
         final Map<I, EntityRecordWithColumns> newRecords = new HashMap<>(records.size());
 

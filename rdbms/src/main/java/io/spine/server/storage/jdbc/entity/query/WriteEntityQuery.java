@@ -22,42 +22,58 @@ package io.spine.server.storage.jdbc.entity.query;
 
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
+import io.spine.option.EntityOption;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.storage.Column;
 import io.spine.server.entity.storage.ColumnRecords;
+import io.spine.server.entity.storage.EntityRecordWithColumns;
+import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.query.WriteRecordQuery;
 import io.spine.server.storage.jdbc.util.ConnectionWrapper;
 
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
  * @author Dmytro Dashenkov
  */
-public class WriteEntityQuery<I> extends WriteRecordQuery<I, EntityRecord> {
+public class WriteEntityQuery<I> extends WriteRecordQuery<I, EntityRecordWithColumns> {
 
     protected WriteEntityQuery(
-            Builder<? extends Builder, ? extends WriteRecordQuery, I, EntityRecord> builder) {
+            Builder<? extends Builder, ? extends WriteRecordQuery, I, EntityRecordWithColumns> builder) {
         super(builder);
     }
 
     @Override
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
         final PreparedStatement statement = super.prepareStatement(connection);
-        ColumnRecords.feedColumnsTo(statement,
-                                    getRecord(),
-                                    getColumnTypeRegistry(),
-                                    getTransformer());
+
+        if(getRecord().hasColumns()) {
+            ColumnRecords.feedColumnsTo(statement,
+                                        getRecord(),
+                                        getColumnTypeRegistry(),
+                                        getTransformer());
+        }
+
+        try {
+            statement.setBoolean(QueryParameter.ARCHIVED.index, false);
+            statement.setBoolean(QueryParameter.DELETED.index, false);
+        } catch (SQLException e) {
+            throw new DatabaseException(e);
+        }
+
         return statement;
     }
 
     protected Function<String, Integer> getTransformer() {
         final Function<String, Integer> function;
         final Map<String, Column> columns = getRecord().getColumns();
-        final Map<String, Integer> result = Collections.emptyMap();
+        final Map<String, Integer> result = new HashMap<>();
 
-        Integer index = (Integer)getId();
+        Integer index = 3;
 
         for (Map.Entry<String, Column> entry : columns.entrySet()) {
             result.put(entry.getKey(), index);

@@ -51,7 +51,7 @@ public class DbTableNameFactory {
      * @return a valid DB table name
      */
     public static String newTableName(Class<? extends Entity<?, ?>> clazz) {
-        final Class<? extends Message> stateType = Entity.TypeInfo.getIdClass(clazz);
+        final Class<? extends Message> stateType = Entity.TypeInfo.getStateClass(clazz);
         final String typeName = TypeName.of(stateType).toString();
         final String tableNameTmp = PATTERN_DOT.matcher(typeName)
                                                .replaceAll(UNDERSCORE);

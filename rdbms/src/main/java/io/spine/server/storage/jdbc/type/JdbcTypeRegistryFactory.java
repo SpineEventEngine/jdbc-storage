@@ -20,7 +20,9 @@
 package io.spine.server.storage.jdbc.type;
 
 import com.google.protobuf.AbstractMessage;
+import com.google.protobuf.Message;
 import com.google.protobuf.Timestamp;
+import io.spine.base.Version;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
 
 import static io.spine.server.storage.jdbc.type.JdbcColumnTypes.booleanType;
@@ -29,6 +31,7 @@ import static io.spine.server.storage.jdbc.type.JdbcColumnTypes.longType;
 import static io.spine.server.storage.jdbc.type.JdbcColumnTypes.messageType;
 import static io.spine.server.storage.jdbc.type.JdbcColumnTypes.stringType;
 import static io.spine.server.storage.jdbc.type.JdbcColumnTypes.timestampType;
+import static io.spine.server.storage.jdbc.type.JdbcColumnTypes.versionType;
 
 /**
  * A factory of the Jdbc-specific {@link ColumnTypeRegistry ColumnTypeRegistries}.
@@ -47,12 +50,39 @@ public final class JdbcTypeRegistryFactory {
             .put(Integer.class, integerType())
             .put(Long.class, longType())
             .put(Boolean.class, booleanType())
+            .put(Version.class, versionType())
             .put(Timestamp.class, timestampType())
             .put(AbstractMessage.class, messageType())
             .build();
 
+    /**
+     * Retrieves a default
+     * {@link ColumnTypeRegistry ColumnTypeRegistry&lt;? extends JdbcColumnType&gt;}.
+     *
+     * The returned registry contains the
+     * {@linkplain io.spine.server.entity.storage.ColumnType column types} declarations for:
+     * <ul>
+     *     <li>{@code String}
+     *     <li>{@code Integer}
+     *     <li>{@code Long}
+     *     <li>{@code Boolean}
+     *     <li>{@link Timestamp} stored as {@link java.sql.Timestamp Timestamp}
+     *     <li>{@link AbstractMessage Message} stored as a {@code String} retrieved form a
+     *     {@link io.spine.json.Json#toCompactJson(Message)}
+     *     <li>{@link Version} stored as an {@code int} version number
+     * </ul>
+     *
+     * @return the default {@code ColumnTypeRegistry} for storing the Entity Columns in Jdbc storage
+     */
     public static ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> defaultInstance() {
         return DEFAULT_REGISTRY;
+    }
+
+    /**
+     * Retrieves a builder with all the {@linkplain #defaultInstance() predefined values} set.
+     */
+    public static ColumnTypeRegistry.Builder<? extends JdbcColumnType<?, ?>> predefinedValuesAnd() {
+        return ColumnTypeRegistry.newBuilder(DEFAULT_REGISTRY);
     }
 
 }

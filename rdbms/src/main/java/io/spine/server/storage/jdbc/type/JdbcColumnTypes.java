@@ -21,13 +21,12 @@ package io.spine.server.storage.jdbc.type;
 
 import com.google.protobuf.AbstractMessage;
 import com.google.protobuf.Timestamp;
-import io.spine.server.entity.EntityRecord;
-import io.spine.server.projection.Projection;
+import com.google.protobuf.util.Timestamps;
+import io.spine.base.Version;
+import io.spine.json.Json;
 import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.Sql;
-import io.spine.server.storage.jdbc.util.Serializer;
 
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
@@ -69,9 +68,16 @@ final class JdbcColumnTypes {
     }
 
     /**
+     * @return new instance of {@link VersionColumnType}
+     */
+    static JdbcColumnType<Version, Integer> versionType() {
+        return new VersionColumnType();
+    }
+
+    /**
      * @return new instance of {@link TimestampColumnType}
      */
-    static JdbcColumnType<Timestamp, Date> timestampType() {
+    static JdbcColumnType<Timestamp, java.sql.Timestamp> timestampType() {
         return new TimestampColumnType();
     }
 
@@ -117,7 +123,7 @@ final class JdbcColumnTypes {
 
         @Override
         public Sql.Type getSqlType() {
-            return Sql.Type.BOOLEAN;
+            return Sql.Type.VARCHAR_255;
         }
     }
 
@@ -160,17 +166,50 @@ final class JdbcColumnTypes {
 
     }
 
-    private static class TimestampColumnType extends AbstractJdbcColumnType<Timestamp, Date>{
+    private static class VersionColumnType extends AbstractJdbcColumnType<Version, Integer>{
 
         @Override
-        public Date convertColumnValue(Timestamp fieldValue) {
-            return null;
+        public Integer convertColumnValue(Version fieldValue) {
+            final Integer version = fieldValue.getNumber();
+            return version;
         }
 
         @Override
-        public void setColumnValue(PreparedStatement storageRecord, Date value,
+        public void setColumnValue(PreparedStatement storageRecord, Integer value,
                                    Integer columnIdentifier) {
+            try {
+                storageRecord.setInt(columnIdentifier, value);
+            } catch (SQLException e) {
+                throw new DatabaseException(e);
+            }
+        }
 
+        @Override
+        public Sql.Type getSqlType() {
+            return Sql.Type.INT;
+        }
+
+    }
+
+    private static class TimestampColumnType
+            extends AbstractJdbcColumnType<Timestamp, java.sql.Timestamp>{
+
+        @Override
+        public java.sql.Timestamp convertColumnValue(Timestamp fieldValue) {
+            final java.sql.Timestamp timestamp =
+                    new java.sql.Timestamp(Timestamps.toMillis(fieldValue));
+            timestamp.setNanos(fieldValue.getNanos());
+            return timestamp;
+        }
+
+        @Override
+        public void setColumnValue(PreparedStatement storageRecord, java.sql.Timestamp value,
+                                   Integer columnIdentifier) {
+            try {
+                storageRecord.setTimestamp(columnIdentifier, value);
+            } catch (SQLException e) {
+                throw new DatabaseException(e);
+            }
         }
 
         @Override
@@ -184,12 +223,18 @@ final class JdbcColumnTypes {
 
         @Override
         public String convertColumnValue(AbstractMessage fieldValue) {
-            return null;
+            final String message = Json.toCompactJson(fieldValue);
+            return message;
         }
 
         @Override
         public void setColumnValue(PreparedStatement storageRecord, String value,
                                    Integer columnIdentifier) {
+            try {
+                storageRecord.setString(columnIdentifier, value);
+            } catch (SQLException e) {
+                throw new DatabaseException(e);
+            }
 
         }
 

@@ -20,6 +20,7 @@
 
 package io.spine.server.storage.jdbc.entity.query;
 
+import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.query.WriteRecordQuery;
 import io.spine.server.storage.jdbc.table.entity.RecordTable;
@@ -63,7 +64,7 @@ public class UpdateEntityQuery<I> extends WriteEntityQuery<I> {
     public static class Builder<I> extends WriteRecordQuery.Builder<Builder<I>,
                                                                     UpdateEntityQuery,
                                                                     I,
-                                                                    EntityRecord> {
+                                                                    EntityRecordWithColumns> {
         @Override
         public UpdateEntityQuery build() {
             return new UpdateEntityQuery<>(this);

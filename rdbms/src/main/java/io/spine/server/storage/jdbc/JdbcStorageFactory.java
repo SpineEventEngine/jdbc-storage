@@ -25,7 +25,6 @@ import com.zaxxer.hikari.HikariDataSource;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateStorage;
 import io.spine.server.entity.Entity;
-import io.spine.server.entity.storage.ColumnType;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.projection.ProjectionStorage;
 import io.spine.server.stand.StandStorage;
@@ -35,6 +34,7 @@ import io.spine.server.storage.jdbc.aggregate.JdbcAggregateStorage;
 import io.spine.server.storage.jdbc.entity.JdbcRecordStorage;
 import io.spine.server.storage.jdbc.projection.JdbcProjectionStorage;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
+import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
 import io.spine.server.storage.jdbc.util.DataSourceWrapper;
 import io.spine.server.storage.jdbc.util.DefaultDataSourceConfigConverter;
 
@@ -206,6 +206,9 @@ public class JdbcStorageFactory<I> implements StorageFactory {
          * @return New instance of {@code JdbcStorageFactory}.
          */
         public JdbcStorageFactory<I> build() {
+            if (columnTypeRegistry == null) {
+                columnTypeRegistry = JdbcTypeRegistryFactory.defaultInstance();
+            }
             return new JdbcStorageFactory<>(this);
         }
 
