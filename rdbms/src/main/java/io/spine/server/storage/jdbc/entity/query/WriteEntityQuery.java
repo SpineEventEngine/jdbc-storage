@@ -58,13 +58,6 @@ public class WriteEntityQuery<I> extends WriteRecordQuery<I, EntityRecordWithCol
                                         getTransformer());
         }
 
-        try {
-            statement.setBoolean(QueryParameter.ARCHIVED.index, false);
-            statement.setBoolean(QueryParameter.DELETED.index, false);
-        } catch (SQLException e) {
-            throw new DatabaseException(e);
-        }
-
         return statement;
     }
 
@@ -87,9 +80,7 @@ public class WriteEntityQuery<I> extends WriteRecordQuery<I, EntityRecordWithCol
     protected enum QueryParameter {
 
         RECORD(1),
-        ARCHIVED(2),
-        DELETED(3),
-        ID(4);
+        ID(2);
 
         public final int index;
 

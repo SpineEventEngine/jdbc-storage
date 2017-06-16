@@ -42,9 +42,10 @@ import static java.lang.String.format;
 public class InsertLifecycleFlagsQuery<I> extends WriteQuery {
 
     private static final int COLUMN_COUNT = TableColumn.values().length;
-    private static final String SQL = Sql.Query.INSERT_INTO + "%s" +
-                                      Sql.Query.VALUES + Sql.nPlaceholders(COLUMN_COUNT) +
-                                      Sql.BuildingBlock.SEMICOLON;
+    private static final String SQL =
+            Sql.Query.INSERT_INTO + "%s" +
+            Sql.Query.VALUES + Sql.nPlaceholders(COLUMN_COUNT) +
+            Sql.BuildingBlock.SEMICOLON;
 
     private final I id;
     private final LifecycleFlags entityStatus;

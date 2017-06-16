@@ -83,7 +83,9 @@ public class Sql {
 
         if (columnNames.isEmpty()) {
             wrappedColumnNames = columnNames;
-        } else wrappedColumnNames = columnNames + COMMA;
+        } else {
+            wrappedColumnNames = columnNames + COMMA;
+        }
 
 
         return wrappedColumnNames;

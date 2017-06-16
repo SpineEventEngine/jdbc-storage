@@ -50,7 +50,7 @@ public class InsertEntityQuery<I> extends WriteEntityQuery<I> {
     private static final String QUERY_TEMPLATE =
             INSERT_INTO + " %s " +
             BRACKET_OPEN +
-            " %s " + Column.id +
+            Column.entity + COMMA + " %s " + Column.id +
             BRACKET_CLOSE +
             VALUES + " %s " + SEMICOLON;
 
@@ -60,12 +60,13 @@ public class InsertEntityQuery<I> extends WriteEntityQuery<I> {
 
     public static <I> Builder<I> newBuilder(String tableName, EntityRecordWithColumns record) {
         final Builder<I> builder = new Builder<>();
-        final int columnCount = record.getColumns().size() + 1;
+        final int columnCount = record.getColumns().size() + 2;
         final String columnNames = getColumnNames(record);
         final String placeholders = nPlaceholders(columnCount);
-        builder.setIdIndexInQuery(QueryParameter.ID.index)
+        final String query = format(QUERY_TEMPLATE, tableName, columnNames, placeholders);
+        builder.setIdIndexInQuery(columnCount)
                .setRecordIndexInQuery(QueryParameter.RECORD.index)
-               .setQuery(format(QUERY_TEMPLATE, tableName, columnNames, placeholders));
+               .setQuery(query);
         return builder;
     }
 

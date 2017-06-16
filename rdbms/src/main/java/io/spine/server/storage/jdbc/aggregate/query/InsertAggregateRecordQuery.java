@@ -32,6 +32,7 @@ import io.spine.server.storage.jdbc.util.ConnectionWrapper;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import static io.spine.server.storage.jdbc.Sql.BuildingBlock.*;
 import static java.lang.String.format;
 
 /**
@@ -44,10 +45,13 @@ import static java.lang.String.format;
 public class InsertAggregateRecordQuery<I> extends WriteAggregateQuery<I, AggregateEventRecord> {
 
     private static final String QUERY_TEMPLATE =
-            Sql.Query.INSERT_INTO + " %s " + Sql.BuildingBlock.BRACKET_OPEN
-            + AggregateEventRecordTable.Column.id + Sql.BuildingBlock.COMMA + AggregateEventRecordTable.Column.aggregate + Sql.BuildingBlock.COMMA + AggregateEventRecordTable.Column.timestamp + Sql.BuildingBlock.COMMA + AggregateEventRecordTable.Column.timestamp_nanos +
-            Sql.BuildingBlock.BRACKET_CLOSE
-            + Sql.Query.VALUES + Sql.nPlaceholders(4) + Sql.BuildingBlock.SEMICOLON;
+            Sql.Query.INSERT_INTO + " %s " + BRACKET_OPEN +
+            AggregateEventRecordTable.Column.id + COMMA +
+            AggregateEventRecordTable.Column.aggregate + COMMA +
+            AggregateEventRecordTable.Column.timestamp + COMMA +
+            AggregateEventRecordTable.Column.timestamp_nanos +
+            BRACKET_CLOSE
+            + Sql.Query.VALUES + Sql.nPlaceholders(4) + SEMICOLON;
 
     private InsertAggregateRecordQuery(Builder<I> builder) {
         super(builder);

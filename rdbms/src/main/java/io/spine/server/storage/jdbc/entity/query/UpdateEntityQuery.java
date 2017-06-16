@@ -26,6 +26,7 @@ import io.spine.server.storage.jdbc.query.WriteRecordQuery;
 import io.spine.server.storage.jdbc.table.entity.RecordTable;
 import io.spine.server.entity.EntityRecord;
 
+import static io.spine.server.storage.jdbc.Sql.BuildingBlock.*;
 import static java.lang.String.format;
 import static io.spine.server.storage.LifecycleFlagField.archived;
 import static io.spine.server.storage.LifecycleFlagField.deleted;
@@ -41,12 +42,12 @@ public class UpdateEntityQuery<I> extends WriteEntityQuery<I> {
 
     private static final String QUERY_TEMPLATE =
             Sql.Query.UPDATE + "%s" +
-            Sql.Query.SET + RecordTable.Column.entity + Sql.BuildingBlock.EQUAL +
-            Sql.Query.PLACEHOLDER + Sql.BuildingBlock.COMMA +
-            archived + Sql.BuildingBlock.EQUAL + Sql.Query.PLACEHOLDER + Sql.BuildingBlock.COMMA +
-            deleted + Sql.BuildingBlock.EQUAL + Sql.Query.PLACEHOLDER +
-            Sql.Query.WHERE + RecordTable.Column.id + Sql.BuildingBlock.EQUAL +
-            Sql.Query.PLACEHOLDER + Sql.BuildingBlock.SEMICOLON;
+            Sql.Query.SET + RecordTable.Column.entity + EQUAL +
+            Sql.Query.PLACEHOLDER + COMMA +
+            archived + EQUAL + Sql.Query.PLACEHOLDER + COMMA +
+            deleted + EQUAL + Sql.Query.PLACEHOLDER +
+            Sql.Query.WHERE + RecordTable.Column.id + EQUAL +
+            Sql.Query.PLACEHOLDER + SEMICOLON;
 
     private UpdateEntityQuery(Builder<I> builder) {
         super(builder);
