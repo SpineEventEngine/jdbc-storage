@@ -23,20 +23,17 @@ package io.spine.server.storage.jdbc.entity.query;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.query.WriteRecordQuery;
 import io.spine.server.storage.jdbc.table.entity.RecordTable;
-import io.spine.server.entity.EntityRecord;
 
-import static io.spine.server.storage.jdbc.Sql.getColumnNames;
-import static java.lang.String.format;
-import static io.spine.server.storage.LifecycleFlagField.archived;
-import static io.spine.server.storage.LifecycleFlagField.deleted;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.COMMA;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
 import static io.spine.server.storage.jdbc.Sql.Query.INSERT_INTO;
 import static io.spine.server.storage.jdbc.Sql.Query.VALUES;
+import static io.spine.server.storage.jdbc.Sql.getColumnNames;
 import static io.spine.server.storage.jdbc.Sql.nPlaceholders;
 import static io.spine.server.storage.jdbc.table.entity.RecordTable.Column;
+import static java.lang.String.format;
 
 /**
  * Query that inserts a new {@link EntityRecordWithColumns} to
@@ -44,6 +41,7 @@ import static io.spine.server.storage.jdbc.table.entity.RecordTable.Column;
  *
  * @author Alexander Litus
  * @author Andrey Lavrov
+ * @author Alexander Aleksandrov
  */
 public class InsertEntityQuery<I> extends WriteEntityQuery<I> {
 
@@ -63,10 +61,11 @@ public class InsertEntityQuery<I> extends WriteEntityQuery<I> {
         final int columnCount = record.getColumns().size() + 2;
         final String columnNames = getColumnNames(record);
         final String placeholders = nPlaceholders(columnCount);
-        final String query = format(QUERY_TEMPLATE, tableName, columnNames, placeholders);
+        final String sqlQuery = format(QUERY_TEMPLATE, tableName, columnNames, placeholders);
+
         builder.setIdIndexInQuery(columnCount)
                .setRecordIndexInQuery(QueryParameter.RECORD.index)
-               .setQuery(query);
+               .setQuery(sqlQuery);
         return builder;
     }
 

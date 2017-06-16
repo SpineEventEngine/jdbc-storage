@@ -122,23 +122,23 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
     }
 
     @Override
-    protected Iterable<EntityRecord> readMultipleRecords(Iterable<I> ids) {
+    protected Iterator<EntityRecord> readMultipleRecords(Iterable<I> ids) {
         return recordStorage.readMultiple(ids);
     }
 
     @Override
-    protected Iterable<EntityRecord> readMultipleRecords(Iterable<I> ids,
+    protected Iterator<EntityRecord> readMultipleRecords(Iterable<I> ids,
                                                          FieldMask fieldMask) {
         return recordStorage.readMultiple(ids, fieldMask);
     }
 
     @Override
-    protected Map<I, EntityRecord> readAllRecords() {
+    protected Iterator<EntityRecord> readAllRecords() {
         return recordStorage.readAll();
     }
 
     @Override
-    protected Map<I, EntityRecord> readAllRecords(FieldMask fieldMask) {
+    protected Iterator<EntityRecord> readAllRecords(FieldMask fieldMask) {
         return recordStorage.readAll(fieldMask);
     }
 
@@ -151,12 +151,18 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
         private JdbcRecordStorage<I> recordStorage;
         private Class<? extends Projection<I, ?, ?>> projectionClass;
         private ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry;
+
         private Builder() {
             super();
         }
 
         public ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> getColumnTypeRegistry() {
             return columnTypeRegistry;
+        }
+
+        public void setColumnTypeRegistry(
+                ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry) {
+            this.columnTypeRegistry = columnTypeRegistry;
         }
 
         @Override

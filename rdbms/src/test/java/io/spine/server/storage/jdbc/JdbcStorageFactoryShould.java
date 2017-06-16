@@ -46,7 +46,7 @@ import static org.mockito.Mockito.verify;
 @SuppressWarnings({"InstanceMethodNamingConvention", "DuplicateStringLiteralInspection"})
 public class JdbcStorageFactoryShould {
 
-    private JdbcStorageFactory<String> factory;
+    private JdbcStorageFactory factory;
 
     @Before
     public void setUpTest() {
@@ -60,7 +60,7 @@ public class JdbcStorageFactoryShould {
         factory = JdbcStorageFactory.<String>newBuilder()
                 .setDataSource(config)
                 .setMultitenant(false)
-                .setEntityClass(TestAggregate.class)
+//                .setEntityClass(TestAggregate.class)
                 .build();
     }
 
@@ -68,7 +68,7 @@ public class JdbcStorageFactoryShould {
     public void allow_to_use_custom_data_source() {
         final JdbcStorageFactory factory = JdbcStorageFactory.<String>newBuilder()
                 .setDataSource(mock(DataSource.class))
-                .setEntityClass(TestProjection.class)
+//                .setEntityClass(TestProjection.class)
                 .build();
 
         assertNotNull(factory);
@@ -107,7 +107,7 @@ public class JdbcStorageFactoryShould {
         factory = JdbcStorageFactory.<String>newBuilder()
                                     .setDataSource(mock)
                                     .setMultitenant(false)
-                                    .setEntityClass(TestAggregate.class)
+//                                    .setEntityClass(TestAggregate.class)
                                     .build();
         factory.close();
         verify(mock).close();

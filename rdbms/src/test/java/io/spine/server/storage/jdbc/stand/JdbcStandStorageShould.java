@@ -49,6 +49,7 @@ import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -77,7 +78,7 @@ public class JdbcStandStorageShould extends StandStorageShould {
                 "StandStorageTests");
         final StandStorage storage = JdbcStandStorage.newBuilder()
                                                      .setDataSource(dataSource)
-                                                     .setEntityClass(StandStorageRecord.class)
+//                                                     .setEntityClass(StandStorageRecord.class)
                                                      .setMultitenant(false)
                                                      .build();
         return storage;
@@ -101,7 +102,7 @@ public class JdbcStandStorageShould extends StandStorageShould {
         final StandStorage standStorage = JdbcStandStorage.<String>newBuilder()
                 .setDataSource(dataSourceMock)
                 .setMultitenant(false)
-                .setEntityClass(TestAggregate.class)
+//                .setEntityClass(TestAggregate.class)
                 .build();
 
         assertNotNull(standStorage);
@@ -121,7 +122,7 @@ public class JdbcStandStorageShould extends StandStorageShould {
 
         final StandStorage standStorage = JdbcStandStorage.<String>newBuilder()
                 .setDataSource(dataSourceMock)
-                .setEntityClass(TestAggregate.class)
+//                .setEntityClass(TestAggregate.class)
                 .build();
 
         assertNotNull(standStorage);
@@ -137,9 +138,9 @@ public class JdbcStandStorageShould extends StandStorageShould {
     @Test(expected = IllegalStateException.class)
     public void fail_to_initialize_without_data_source() {
         JdbcStandStorage.newBuilder()
-                .setMultitenant(false)
-                .setEntityClass(StandStorageRecord.class)
-                .build();
+                        .setMultitenant(false)
+//                        .setEntityClass(StandStorageRecord.class)
+                        .build();
     }
 
     /*
@@ -226,14 +227,14 @@ public class JdbcStandStorageShould extends StandStorageShould {
         for (Aggregate aggregate : testData) {
             records.add(writeToStorage(aggregate, storage, Project.class));
         }
-
-        final Map<AggregateStateId, EntityRecord> readRecords = storage.readAll();
-        assertEquals(records.size(), readRecords.size());
-
-        final Collection<EntityRecord> readValues = readRecords.values();
-        for (EntityRecord record : records) {
-            assertContains(record, readValues);
+        final Iterator<EntityRecord> readRecords = storage.readAll();
+        int iteratorCounter = 0;
+        while(readRecords.hasNext()) {
+            assertTrue(records.contains(readRecords.next()));
+            iteratorCounter++;
         }
+
+        assertEquals(records.size(), iteratorCounter);
     }
 
     @Test
@@ -281,11 +282,10 @@ public class JdbcStandStorageShould extends StandStorageShould {
         final Project withIdOnly = AnyPacker.unpack(record.getState());
         final Project withIdAndName = AnyPacker.unpack(
                 storage.readMultiple(Collections.singleton(id), idAndName)
-                       .iterator()
                        .next()
                        .getState());
         final Project withNameAndStatus = AnyPacker.unpack(storage.readAll(nameAndStatus)
-                                                                  .get(id)
+                                                                  .next()
                                                                   .getState());
 
         assertMatches(withIdOnly, idOnly);
@@ -305,13 +305,19 @@ public class JdbcStandStorageShould extends StandStorageShould {
             writeToStorage(aggregate, storage, Project.class);
         }
 
-        final EntityRecord differentRecord = writeToStorage(differentAggregate, storage,
-                                                                   Customer.class);
+        final EntityRecord differentRecord =
+                writeToStorage(differentAggregate, storage, Customer.class);
 
-        final Collection<EntityRecord> records = storage.readAllByType(
-                TypeUrl.of(Project.class));
+        final Iterator<EntityRecord> records = storage.readAllByType(TypeUrl.of(Project.class));
+        boolean hasRecord = false;
+        while (records.hasNext()) {
+            if (records.next()
+                       .equals(differentRecord)) {
+                hasRecord = true;
+            }
+        }
         assertSize(aggregatesCount, records);
-        assertFalse(records.contains(differentRecord));
+        assertFalse(hasRecord);
     }
 
     @SuppressWarnings("MethodWithMultipleLoops")
@@ -332,11 +338,12 @@ public class JdbcStandStorageShould extends StandStorageShould {
                                                               .getFullName())
                                              .build();
 
-        final Collection<EntityRecord> records = storage.readAllByType(
+        final Iterator<EntityRecord> records = storage.readAllByType(
                 TypeUrl.of(Project.class), namesMask);
 
-        for (EntityRecord record : records) {
-            final Project project = AnyPacker.unpack(record.getState());
+        while (records.hasNext()) {
+            final Project project = AnyPacker.unpack(records.next()
+                                                            .getState());
             assertMatches(project, namesMask);
         }
     }
@@ -403,8 +410,8 @@ public class JdbcStandStorageShould extends StandStorageShould {
     }
 
     private static EntityRecord writeToStorage(Aggregate<?, ?, ?> aggregate,
-                                                      StandStorage storage,
-                                                      Class<? extends Message> stateClass) {
+                                               StandStorage storage,
+                                               Class<? extends Message> stateClass) {
         final AggregateStateId id = AggregateStateId.of(aggregate.getId(), TypeUrl.of(stateClass));
         final Version version = Version.newBuilder()
                                        .setNumber(1)

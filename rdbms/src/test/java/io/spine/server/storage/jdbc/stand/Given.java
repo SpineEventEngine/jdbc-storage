@@ -47,7 +47,7 @@ class Given {
                 GivenDataSource.DEFAULT_TABLE_NAME);
         final StandStorage storage = JdbcStandStorage.<String>newBuilder()
                 .setDataSource(dataSource)
-                .setEntityClass(TestAggregate.class)
+//                .setEntityClass(TestAggregate.class)
                 .build();
 
         return storage;

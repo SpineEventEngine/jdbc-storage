@@ -26,8 +26,10 @@ import com.google.common.collect.ImmutableMap;
 import com.google.protobuf.FieldMask;
 import io.spine.server.entity.Entity;
 import io.spine.server.entity.EntityRecord;
+import io.spine.server.entity.storage.Column;
 import io.spine.server.entity.storage.ColumnType;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
+import io.spine.server.entity.storage.EntityColumns;
 import io.spine.server.entity.storage.EntityQuery;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.RecordStorage;
@@ -38,6 +40,7 @@ import io.spine.server.storage.jdbc.table.entity.RecordTable;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.util.DataSourceWrapper;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -55,6 +58,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     private final DataSourceWrapper dataSource;
     private final RecordTable<I> table;
     private final ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry;
+    private final Collection<Column> columns;
 
     protected JdbcRecordStorage(DataSourceWrapper dataSource,
                                 boolean multitenant,
@@ -63,10 +67,11 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
                                         extends JdbcColumnType<?, ?>> columnTypeRegistry)
             throws DatabaseException {
         super(multitenant);
+        this.columns = EntityColumns.getColumns(entityClass);
         this.dataSource = dataSource;
         this.table = new RecordTable<>(entityClass, dataSource, columnTypeRegistry);
         this.columnTypeRegistry = columnTypeRegistry;
-        table.createIfNotExists();
+        table.createIfNotExists(columns);
     }
 
 
@@ -101,30 +106,30 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     }
 
     @Override
-    protected Iterable<EntityRecord> readMultipleRecords(Iterable<I> ids) {
+    protected Iterator<EntityRecord> readMultipleRecords(Iterable<I> ids) {
         return readMultipleRecords(ids, FieldMask.getDefaultInstance());
     }
 
     @Override
-    protected Iterable<EntityRecord> readMultipleRecords(Iterable<I> ids,
+    protected Iterator<EntityRecord> readMultipleRecords(Iterable<I> ids,
                                                          FieldMask fieldMask) {
         final Map<?, EntityRecord> recordMap = table.read(ids, fieldMask);
-        return ImmutableList.copyOf(recordMap.values());
+        return ImmutableList.copyOf(recordMap.values()).iterator();
     }
 
     @Override
-    protected Map<I, EntityRecord> readAllRecords() {
+    protected Iterator<EntityRecord> readAllRecords() {
         return readAllRecords(FieldMask.getDefaultInstance());
     }
 
     @Override
-    protected Map<I, EntityRecord> readAllRecords(FieldMask fieldMask) {
+    protected Iterator<EntityRecord> readAllRecords(FieldMask fieldMask) {
         final Map<I, EntityRecord> records = table.readAll(fieldMask);
-        return ImmutableMap.copyOf(records);
+        return ImmutableList.copyOf(records.values()).iterator();
     }
 
     @Override
-    protected Map<I, EntityRecord> readAllRecords(EntityQuery<I> query, FieldMask fieldMask) {
+    protected Iterator<EntityRecord> readAllRecords(EntityQuery<I> query, FieldMask fieldMask) {
 
         return null;
     }

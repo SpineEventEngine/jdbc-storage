@@ -22,18 +22,13 @@ package io.spine.server.storage.jdbc.entity.query;
 
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
-import io.spine.option.EntityOption;
-import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.storage.Column;
 import io.spine.server.entity.storage.ColumnRecords;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
-import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.query.WriteRecordQuery;
 import io.spine.server.storage.jdbc.util.ConnectionWrapper;
 
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 

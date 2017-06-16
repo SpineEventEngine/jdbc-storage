@@ -26,6 +26,7 @@ import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateStorage;
 import io.spine.server.entity.Entity;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
+import io.spine.server.projection.Projection;
 import io.spine.server.projection.ProjectionStorage;
 import io.spine.server.stand.StandStorage;
 import io.spine.server.storage.RecordStorage;
@@ -51,15 +52,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author Andrey Lavrov
  * @author Dmytro Dashenkov
  */
-public class JdbcStorageFactory<I> implements StorageFactory {
+public class JdbcStorageFactory implements StorageFactory {
 
     private final DataSourceWrapper dataSource;
     private final boolean multitenant;
-    private final Class<? extends Entity<I, ?>> entityClass;
+  //  private final Class<? extends Entity<I, ?>> entityClass;
     private final ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry;
 
-    private JdbcStorageFactory(Builder<I> builder) {
-        this.entityClass = checkNotNull(builder.entityClass);
+    private JdbcStorageFactory(Builder builder) {
+      //  this.entityClass = checkNotNull(builder.entityClass);
         this.dataSource = checkNotNull(builder.dataSource);
         this.multitenant = builder.multitenant;
         this.columnTypeRegistry = builder.columnTypeRegistry;
@@ -82,10 +83,9 @@ public class JdbcStorageFactory<I> implements StorageFactory {
 
     @Override
     public StandStorage createStandStorage() {
-        return JdbcStandStorage.<I>newBuilder()
+        return JdbcStandStorage.newBuilder()
                 .setDataSource(dataSource)
                 .setMultitenant(isMultitenant())
-                .setEntityClass(entityClass)
                 .build();
     }
 
@@ -114,9 +114,8 @@ public class JdbcStorageFactory<I> implements StorageFactory {
 
     @Override
     public <I> ProjectionStorage<I> createProjectionStorage(
-            Class<? extends Entity<I, ?>> projectionClass) {
-        final JdbcRecordStorage<I> entityStorage =
-                (JdbcRecordStorage<I>) createRecordStorage(projectionClass);
+            Class<? extends Projection<I, ?, ?>> projectionClass) {
+        final JdbcRecordStorage<I> entityStorage = (JdbcRecordStorage<I>) this.<I>createRecordStorage(projectionClass);
         final ProjectionStorage<I> storage = JdbcProjectionStorage.<I>newBuilder()
                 .setMultitenant(multitenant)
                 .setDataSource(dataSource)
@@ -144,7 +143,7 @@ public class JdbcStorageFactory<I> implements StorageFactory {
 
         private DataSourceWrapper dataSource;
         private boolean multitenant;
-        private Class<? extends Entity<I, ?>> entityClass;
+      //  private Class<? extends Entity<I, ?>> entityClass;
         private ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry;
 
         private Builder() {
@@ -164,13 +163,13 @@ public class JdbcStorageFactory<I> implements StorageFactory {
             return this;
         }
 
-        /**
-         * Sets required field {@code entityClass}.
-         */
-        public Builder<I> setEntityClass(Class<? extends Entity<I, ?>> entityClass) {
-            this.entityClass = entityClass;
-            return this;
-        }
+//        /**
+//         * Sets required field {@code entityClass}.
+//         */
+//        public Builder<I> setEntityClass(Class<? extends Entity<I, ?>> entityClass) {
+//            this.entityClass = entityClass;
+//            return this;
+//        }
 
         /**
          * Sets required field {@code dataSource}.
@@ -205,11 +204,11 @@ public class JdbcStorageFactory<I> implements StorageFactory {
         /**
          * @return New instance of {@code JdbcStorageFactory}.
          */
-        public JdbcStorageFactory<I> build() {
+        public JdbcStorageFactory build() {
             if (columnTypeRegistry == null) {
                 columnTypeRegistry = JdbcTypeRegistryFactory.defaultInstance();
             }
-            return new JdbcStorageFactory<>(this);
+            return new JdbcStorageFactory(this);
         }
 
     }

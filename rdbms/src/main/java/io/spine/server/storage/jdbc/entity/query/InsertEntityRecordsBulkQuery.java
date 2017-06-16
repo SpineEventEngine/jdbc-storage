@@ -72,6 +72,7 @@ public class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
             RecordTable.Column.entity + COMMA +
             archived + COMMA + deleted + BRACKET_CLOSE +
             Sql.Query.VALUES + FORMAT_PLACEHOLDER;
+
     private static final String SQL_VALUES_TEMPLATE = Sql.nPlaceholders(COLUMNS_COUNT);
 
     private final Map<I, EntityRecordWithColumns> records;

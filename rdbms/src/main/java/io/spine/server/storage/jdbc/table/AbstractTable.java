@@ -42,6 +42,7 @@ import io.spine.server.storage.jdbc.util.IdColumn;
 
 import javax.annotation.Nullable;
 
+import java.util.Collection;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -51,10 +52,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * <p>This type is responsible for storing all the information about a table including:
  * <ul>
- *     <li>Its name
- *     <li>Columns
- *     <li>Identifier and {@code PRIMARY KEY}
- *     <li>Queries to the table
+ * <li>Its name
+ * <li>Columns
+ * <li>Identifier and {@code PRIMARY KEY}
+ * <li>Queries to the table
  * </ul>
  *
  * <p>A subclass of {@code AbstractTable} may be treated as a DAO for a particular type of
@@ -68,10 +69,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @param <I> type of ID of the records stored in the table
  * @param <R> type of the record stored in the table; must be a {@linkplain Message proto message}
  * @param <C> type of an enum representing the table columns;
- *           must implement{@linkplain TableColumn}
- *
- * @see TableColumn
+ *            must implement{@linkplain TableColumn}
  * @author Dmytro Dashenkov
+ * @see TableColumn
  */
 public abstract class AbstractTable<I, R extends Message, C extends Enum<C> & TableColumn> {
 
@@ -106,10 +106,10 @@ public abstract class AbstractTable<I, R extends Message, C extends Enum<C> & Ta
      * <p>Example:
      * <code>
      * <pre>
-          \@Override
-          public Column getIdColumnDeclaration() {
-              return Column.id;
-          }
+     * \@Override
+     * public Column getIdColumnDeclaration() {
+     * return Column.id;
+     * }
      * </pre>
      * </code>
      */
@@ -146,8 +146,11 @@ public abstract class AbstractTable<I, R extends Message, C extends Enum<C> & Ta
         query.execute();
     }
 
-    public void createIfNotExists(Map<String, Column> columns) {
-        final String sql = composeCreateTableSql(columns);
+    public void createIfNotExists(Collection<Column> columns) {
+
+        final String sql = columns.isEmpty() ? composeCreateTableSql()
+                                             : composeCreateTableSql(columns);
+
         final SimpleQuery query = SimpleQuery.newBuilder()
                                              .setDataSource(dataSource)
                                              .setLogger(log())
@@ -164,13 +167,13 @@ public abstract class AbstractTable<I, R extends Message, C extends Enum<C> & Ta
      */
     public boolean containsRecord(I id) {
         final ContainsQuery<I> query = ContainsQuery.<I>newBuilder()
-                                                    .setIdColumn(getIdColumn())
-                                                    .setId(id)
-                                                    .setTableName(getName())
-                                                    .setKeyColumn(getIdColumnDeclaration())
-                                                    .setDataSource(dataSource)
-                                                    .setLogger(log())
-                                                    .build();
+                .setIdColumn(getIdColumn())
+                .setId(id)
+                .setTableName(getName())
+                .setKeyColumn(getIdColumnDeclaration())
+                .setDataSource(dataSource)
+                .setLogger(log())
+                .build();
         final boolean result = query.execute();
         return result;
     }
@@ -295,22 +298,28 @@ public abstract class AbstractTable<I, R extends Message, C extends Enum<C> & Ta
         return result;
     }
 
-    private String composeCreateTableSql(Map<String, Column> columns) {
+    private String composeCreateTableSql(Collection<Column> columns) {
         final String idColumnName = getIdColumnDeclaration().name();
         @SuppressWarnings("StringBufferReplaceableByString")
         final StringBuilder sql = new StringBuilder(MEAN_SQL_QUERY_LENGTH);
         sql.append(Sql.Query.CREATE_IF_MISSING)
            .append(getName())
            .append(Sql.BuildingBlock.BRACKET_OPEN);
-        for (Map.Entry<String, Column> entry: columns.entrySet()) {
-            final String name = entry.getValue().getName();
-            final Column column = entry.getValue();
-            final Sql.Type type = columnTypeRegistry.get(column).getSqlType();
+        while (columns.iterator()
+                      .hasNext()) {
+            final String name = columns.iterator()
+                                       .next()
+                                       .getName();
+            final Column column = columns.iterator()
+                                         .next();
+            final Sql.Type type = columnTypeRegistry.get(column)
+                                                    .getSqlType();
             sql.append(name)
                .append(type)
                .append(Sql.BuildingBlock.COMMA);
             // Comma after the last column declaration is required since we add PRIMARY KEY after
         }
+
         if (idIsPrimaryKey()) {
             sql.append(Sql.Query.PRIMARY_KEY)
                .append(Sql.BuildingBlock.BRACKET_OPEN)
@@ -360,12 +369,12 @@ public abstract class AbstractTable<I, R extends Message, C extends Enum<C> & Ta
     public boolean delete(I id) {
         final DeleteRecordQuery<I> query =
                 DeleteRecordQuery.<I>newBuilder()
-                                 .setTableName(getName())
-                                 .setIdColumn(getIdColumn())
-                                 .setIdValue(id)
-                                 .setLogger(log())
-                                 .setDataSource(dataSource)
-                                 .build();
+                        .setTableName(getName())
+                        .setIdColumn(getIdColumn())
+                        .setIdValue(id)
+                        .setLogger(log())
+                        .setDataSource(dataSource)
+                        .build();
         return query.execute();
     }
 
