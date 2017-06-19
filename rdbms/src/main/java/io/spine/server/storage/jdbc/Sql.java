@@ -21,13 +21,10 @@
 package io.spine.server.storage.jdbc;
 
 import com.google.common.base.Joiner;
-import io.spine.server.entity.storage.Column;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
-import io.spine.server.storage.jdbc.table.entity.RecordTable;
 
 import java.sql.Types;
 import java.util.Collections;
-import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;

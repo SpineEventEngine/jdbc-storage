@@ -1,6 +1,6 @@
 
 project.ext {
-    SPINE_VERSION = '0.9.24-SNAPSHOT'
+    SPINE_VERSION = '0.9.25-SNAPSHOT'
 
     publishPlugin = "$rootDir/scripts/publish.gradle"
     credentialsPropertyFile = 'credentials.properties'

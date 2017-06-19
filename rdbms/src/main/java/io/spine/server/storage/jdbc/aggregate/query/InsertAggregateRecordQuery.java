@@ -21,18 +21,20 @@
 package io.spine.server.storage.jdbc.aggregate.query;
 
 import com.google.protobuf.Timestamp;
+import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.query.WriteAggregateQuery;
-import io.spine.server.storage.jdbc.query.WriteRecordQuery;
 import io.spine.server.storage.jdbc.table.entity.aggregate.AggregateEventRecordTable;
-import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.storage.jdbc.util.ConnectionWrapper;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import static io.spine.server.storage.jdbc.Sql.BuildingBlock.*;
+import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
+import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
+import static io.spine.server.storage.jdbc.Sql.BuildingBlock.COMMA;
+import static io.spine.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
 import static java.lang.String.format;
 
 /**
