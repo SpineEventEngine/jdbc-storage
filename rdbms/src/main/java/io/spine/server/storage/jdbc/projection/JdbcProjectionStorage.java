@@ -22,22 +22,21 @@ package io.spine.server.storage.jdbc.projection;
 
 import com.google.protobuf.FieldMask;
 import com.google.protobuf.Timestamp;
+import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
+import io.spine.server.projection.Projection;
+import io.spine.server.projection.ProjectionStorage;
+import io.spine.server.storage.RecordStorage;
 import io.spine.server.storage.jdbc.DatabaseException;
+import io.spine.server.storage.jdbc.JdbcStorageFactory;
+import io.spine.server.storage.jdbc.builder.StorageBuilder;
 import io.spine.server.storage.jdbc.entity.JdbcRecordStorage;
 import io.spine.server.storage.jdbc.table.LastHandledEventTimeTable;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.util.DataSourceWrapper;
-import io.spine.server.entity.EntityRecord;
-import io.spine.server.projection.Projection;
-import io.spine.server.projection.ProjectionStorage;
-import io.spine.server.storage.RecordStorage;
-import io.spine.server.storage.jdbc.JdbcStorageFactory;
-import io.spine.server.storage.jdbc.builder.StorageBuilder;
 
 import javax.annotation.Nullable;
 import java.util.Iterator;
-import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkState;
 import static io.spine.server.storage.jdbc.util.DbTableNameFactory.newTableName;

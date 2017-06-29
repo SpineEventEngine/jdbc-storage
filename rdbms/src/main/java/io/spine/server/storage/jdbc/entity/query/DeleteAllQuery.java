@@ -27,7 +27,7 @@ import static io.spine.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
 import static io.spine.server.storage.jdbc.Sql.Query.DELETE_FROM;
 
 /**
- * Query that deletes all from {@link EntityTable}.
+ * Query that deletes all from table.
  *
  * @author Alexander Litus
  * @author Andrey Lavrov

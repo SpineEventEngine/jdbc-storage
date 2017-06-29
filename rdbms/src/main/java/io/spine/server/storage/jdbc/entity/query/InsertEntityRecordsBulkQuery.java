@@ -42,6 +42,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -101,11 +102,6 @@ public class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
                                         getColumnTypeRegistry(),
                                         getTransformer(record.getKey(), record.getValue()));
             }
-//        int parameterCounter = 1;
-//            final I id = record.getKey();
-//            final EntityRecordWithColumns storageRecord = record.getValue();
-//            addRecordsParams(statement, parameterCounter, id, storageRecord);
-//            parameterCounter += COLUMNS_COUNT;
         }
         return statement;
     }
@@ -115,7 +111,7 @@ public class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
         final Map<String, Column> columns = record.getColumns();
         final List<String> columnList = Lists.newArrayList(columns.keySet());
         Collections.sort(columnList, Ordering.usingToString());
-        final Map<String, Integer> result = Collections.emptyMap();
+        final Map<String, Integer> result = new HashMap<>();
 
         Integer index = 2;
 

@@ -30,7 +30,6 @@ import io.spine.server.storage.RecordStorage;
 import io.spine.server.storage.RecordStorageShould;
 import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.GivenDataSource;
-import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
 import io.spine.server.storage.jdbc.util.DataSourceWrapper;
 import io.spine.test.storage.Project;

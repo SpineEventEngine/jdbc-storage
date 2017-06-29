@@ -83,7 +83,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
 
     @Override
     public Iterator<I> index() {
-        return null;
+        return null; //TODO:2017-06-29:alexander.aleksandrov: This method needs implementation
     }
 
     @Override
