@@ -22,6 +22,7 @@ package io.spine.server.storage.jdbc.entity.query;
 
 import com.google.protobuf.FieldMask;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
+import io.spine.server.entity.storage.EntityQuery;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
@@ -107,9 +108,20 @@ public class RecordStorageQueryFactory<I>
 
     public SelectBulkQuery<I> newSelectBulkQuery(Iterable<I> ids, FieldMask fieldMask) {
         final SelectBulkQuery.Builder<I> builder = SelectBulkQuery.<I>newBuilder()
-                .setIdColumn(
-                        idColumn)
+                .setIdColumn(idColumn)
                 .setIdsQuery(tableName, ids)
+                .setFieldMask(fieldMask)
+                .setLogger(getLogger())
+                .setDataSource(dataSource);
+
+        return builder.build();
+    }
+
+    public SelectByEntityQuery<I> newSelectByEntityQuery(EntityQuery<I> query, FieldMask fieldMask) {
+        final SelectByEntityQuery.Builder<I> builder =
+                SelectByEntityQuery.<I>newBuilder()
+                .setQueryByEntity(query, tableName)
+                .setIdColumn(idColumn)
                 .setFieldMask(fieldMask)
                 .setLogger(getLogger())
                 .setDataSource(dataSource);
@@ -125,6 +137,7 @@ public class RecordStorageQueryFactory<I>
                         .setDataSource(dataSource)
                         .setTableName(tableName)
                         .setidColumn(idColumn)
+                        .setQueryForBulkInsert()
                         .setRecords(records);
         return builder.build();
     }
@@ -142,7 +155,8 @@ public class RecordStorageQueryFactory<I>
 
     @Override
     public WriteQuery newInsertQuery(I id, EntityRecordWithColumns record) {
-        final InsertEntityQuery.Builder<I> builder = InsertEntityQuery.<I>newBuilder(tableName, record)
+        final InsertEntityQuery.Builder<I> builder =
+                InsertEntityQuery.<I>newBuilder(tableName, record)
                 .setDataSource(dataSource)
                 .setLogger(getLogger())
                 .setId(id)
@@ -153,7 +167,8 @@ public class RecordStorageQueryFactory<I>
 
     @Override
     public WriteQuery newUpdateQuery(I id, EntityRecordWithColumns record) {
-        final UpdateEntityQuery.Builder<I> builder = UpdateEntityQuery.<I>newBuilder(tableName)
+        final UpdateEntityQuery.Builder<I> builder =
+                UpdateEntityQuery.<I>newBuilder(tableName)
                 .setDataSource(dataSource)
                 .setLogger(getLogger())
                 .setIdColumn(idColumn)

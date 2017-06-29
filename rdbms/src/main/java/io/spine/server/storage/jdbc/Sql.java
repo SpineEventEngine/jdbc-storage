@@ -21,10 +21,14 @@
 package io.spine.server.storage.jdbc;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Ordering;
+import io.spine.server.entity.storage.Column;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 
 import java.sql.Types;
 import java.util.Collections;
+import java.util.List;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
@@ -74,9 +78,10 @@ public class Sql {
 
     public static String getColumnNames(EntityRecordWithColumns record) {
         final String wrappedColumnNames;
+        List<String> columnList = Lists.newArrayList(record.getColumns().keySet());
+        Collections.sort(columnList, Ordering.usingToString());
         final String columnNames = Joiner.on(COMMA.toString())
-                                         .join(record.getColumns()
-                                                     .keySet());
+                                         .join(columnList);
 
         if (columnNames.isEmpty()) {
             wrappedColumnNames = columnNames;
@@ -107,6 +112,7 @@ public class Sql {
          */
         ID("generic id type", Types.OTHER),
         BLOB("BLOB", Types.BLOB),
+        TIMESTAMP("TIMESTAMP", Types.TIMESTAMP),
         INT("INT", Types.INTEGER),
         BIGINT("BIGINT", Types.BIGINT),
         VARCHAR_255("VARCHAR(255)", Types.VARCHAR),
@@ -166,6 +172,8 @@ public class Sql {
         BETWEEN,
         TRUE,
         FALSE,
+        ALL("AND"),
+        EITHER("OR"),
 
         PLACEHOLDER("?"),
 
@@ -231,10 +239,10 @@ public class Sql {
         BRACKET_CLOSE(")"),
         EQUAL("="),
         NOT_EQUAL("<>"),
-        GT(">"),
-        GE(">="),
-        LT("<"),
-        LE("<="),
+        GREATER_THAN(">"),
+        GREATER_OR_EQUAL(">="),
+        LESS_THAN("<"),
+        LESS_OR_EQUAL("<="),
         SEMICOLON(";");
 
         private final String token;

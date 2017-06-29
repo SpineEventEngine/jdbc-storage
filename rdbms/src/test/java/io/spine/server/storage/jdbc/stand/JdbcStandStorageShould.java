@@ -24,6 +24,7 @@ import com.google.common.base.Optional;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.FieldMask;
 import com.google.protobuf.Message;
+import io.spine.server.entity.Entity;
 import io.spine.time.Time;
 import org.junit.Test;
 import io.spine.base.Version;
@@ -73,12 +74,12 @@ import static io.spine.test.Verify.assertSize;
 public class JdbcStandStorageShould extends StandStorageShould {
 
     @Override
-    protected StandStorage getStorage() {
+    protected StandStorage getStorage(Class<? extends Entity> aClass) {
         final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(
                 "StandStorageTests");
         final StandStorage storage = JdbcStandStorage.newBuilder()
                                                      .setDataSource(dataSource)
-//                                                     .setEntityClass(StandStorageRecord.class)
+//                                                     .setEntityClass(aClass)
                                                      .setMultitenant(false)
                                                      .build();
         return storage;

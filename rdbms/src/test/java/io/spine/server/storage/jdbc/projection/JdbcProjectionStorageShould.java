@@ -20,12 +20,14 @@
 
 package io.spine.server.storage.jdbc.projection;
 
+import io.spine.server.entity.Entity;
 import io.spine.server.projection.Projection;
 import io.spine.server.projection.ProjectionStorage;
 import io.spine.server.projection.ProjectionStorageShould;
 import io.spine.server.storage.jdbc.GivenDataSource;
 import io.spine.server.storage.jdbc.builder.StorageBuilder;
 import io.spine.server.storage.jdbc.entity.JdbcRecordStorage;
+import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
 import io.spine.server.storage.jdbc.util.DataSourceWrapper;
 import io.spine.test.projection.Project;
 import io.spine.validate.ValidatingBuilder;
@@ -40,7 +42,7 @@ import static org.junit.Assert.assertNotNull;
 public class JdbcProjectionStorageShould extends ProjectionStorageShould<String> {
 
     @Override
-    protected ProjectionStorage<String> getStorage() {
+    protected ProjectionStorage<String> getStorage(Class<? extends Entity> aClass) {
         final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(
                 "projectionStorageTests");
         final Class<TestProjection> projectionClass = TestProjection.class;
@@ -49,6 +51,7 @@ public class JdbcProjectionStorageShould extends ProjectionStorageShould<String>
                                  .setDataSource(dataSource)
                                  .setMultitenant(false)
                                  .setEntityClass(projectionClass)
+                                 .setColumnTypeRegistry(JdbcTypeRegistryFactory.defaultInstance())
                                  .build();
         final ProjectionStorage<String> storage =
                 JdbcProjectionStorage.<String>newBuilder()
@@ -67,7 +70,7 @@ public class JdbcProjectionStorageShould extends ProjectionStorageShould<String>
 
     @Test(expected = IllegalStateException.class)
     public void throw_exception_when_closing_twice() throws Exception {
-        final ProjectionStorage<?> storage = getStorage();
+        final ProjectionStorage<?> storage = getStorage(TestProjection.class);
         storage.close();
         storage.close();
     }

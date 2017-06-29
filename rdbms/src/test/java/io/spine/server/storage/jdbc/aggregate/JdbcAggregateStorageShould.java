@@ -20,17 +20,17 @@
 
 package io.spine.server.storage.jdbc.aggregate;
 
-import com.google.protobuf.Message;
-import io.spine.server.storage.jdbc.GivenDataSource;
-import io.spine.validate.ValidatingBuilder;
-import org.junit.Test;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateStorage;
 import io.spine.server.aggregate.AggregateStorageShould;
+import io.spine.server.entity.Entity;
 import io.spine.server.storage.jdbc.DatabaseException;
+import io.spine.server.storage.jdbc.GivenDataSource;
 import io.spine.server.storage.jdbc.util.DataSourceWrapper;
 import io.spine.test.aggregate.Project;
 import io.spine.test.aggregate.ProjectId;
+import io.spine.validate.ValidatingBuilder;
+import org.junit.Test;
 
 import static org.junit.Assert.fail;
 
@@ -41,15 +41,15 @@ import static org.junit.Assert.fail;
 public class JdbcAggregateStorageShould extends AggregateStorageShould {
 
     @Override
-    protected AggregateStorage<io.spine.test.aggregate.ProjectId> getStorage() {
-        final JdbcAggregateStorage<ProjectId> storage =
-                getStorage(TestAggregateWithMessageId.class);
-        return storage;
+    protected AggregateStorage<ProjectId> getStorage(Class<? extends Entity> aClass) {
+
+        return null;
     }
 
     @Override
     protected <I> JdbcAggregateStorage<I> getStorage(
-            Class<? extends Aggregate<I, ? extends Message, ?>> aggregateClass) {
+            Class<? extends I> idClass,
+            Class<? extends Aggregate<I, ?, ?>> aggregateClass) {
         final DataSourceWrapper dataSource =
                 GivenDataSource.whichIsStoredInMemory("aggregateStorageTests");
         final JdbcAggregateStorage<I> storage =
@@ -63,8 +63,8 @@ public class JdbcAggregateStorageShould extends AggregateStorageShould {
 
     @Test
     public void throw_exception_if_try_to_use_closed_storage() {
-        final JdbcAggregateStorage<ProjectId> storage = getStorage(
-                TestAggregateWithMessageId.class);
+        final JdbcAggregateStorage<ProjectId> storage = getStorage(ProjectId.class,
+                                                                   TestAggregateWithMessageId.class);
         storage.close();
         try {
             storage.historyBackward(ProjectId.getDefaultInstance());
@@ -77,7 +77,8 @@ public class JdbcAggregateStorageShould extends AggregateStorageShould {
 
     @Test(expected = IllegalStateException.class)
     public void throw_exception_when_closing_twice() throws Exception {
-        final AggregateStorage<?> storage = getStorage();
+        final AggregateStorage<?> storage = getStorage(ProjectId.class,
+                                                       TestAggregateWithMessageId.class);
         storage.close();
         storage.close();
     }

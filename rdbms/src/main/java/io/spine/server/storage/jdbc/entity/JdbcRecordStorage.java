@@ -130,8 +130,8 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
 
     @Override
     protected Iterator<EntityRecord> readAllRecords(EntityQuery<I> query, FieldMask fieldMask) {
-
-        return null;
+        final Map<I, EntityRecord> records = table.readByQuery(query, fieldMask);
+        return ImmutableList.copyOf(records.values()).iterator();
     }
 
     @Override
@@ -173,7 +173,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     public static class Builder<I>
             extends StorageBuilder<Builder<I>, JdbcRecordStorage<I>> {
 
-        private Class<? extends Entity<I, ?>> entityClass;
+        private Class<? extends Entity> entityClass;
         private ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry;
 
         private Builder() {
@@ -190,7 +190,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
             return (Class<Entity<I, ?>>) entityClass;
         }
 
-        public Builder<I> setEntityClass(Class<? extends Entity<I, ?>> entityClass) {
+        public Builder<I> setEntityClass(Class<? extends Entity> entityClass) {
             this.entityClass = checkNotNull(entityClass);
             return this;
         }

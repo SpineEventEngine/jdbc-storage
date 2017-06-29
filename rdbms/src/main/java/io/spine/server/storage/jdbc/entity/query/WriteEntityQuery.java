@@ -22,6 +22,8 @@ package io.spine.server.storage.jdbc.entity.query;
 
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Ordering;
 import io.spine.server.entity.storage.Column;
 import io.spine.server.entity.storage.ColumnRecords;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
@@ -29,7 +31,9 @@ import io.spine.server.storage.jdbc.query.WriteRecordQuery;
 import io.spine.server.storage.jdbc.util.ConnectionWrapper;
 
 import java.sql.PreparedStatement;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -59,12 +63,14 @@ public class WriteEntityQuery<I> extends WriteRecordQuery<I, EntityRecordWithCol
     protected Function<String, Integer> getTransformer() {
         final Function<String, Integer> function;
         final Map<String, Column> columns = getRecord().getColumns();
+        final List<String> columnList = Lists.newArrayList(columns.keySet());
+        Collections.sort(columnList, Ordering.usingToString());
         final Map<String, Integer> result = new HashMap<>();
 
-        Integer index = 3;
+        Integer index = 2;
 
-        for (Map.Entry<String, Column> entry : columns.entrySet()) {
-            result.put(entry.getKey(), index);
+        for (String entry : columnList) {
+            result.put(entry, index);
             index++;
         }
 

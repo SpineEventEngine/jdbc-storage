@@ -22,11 +22,13 @@ package io.spine.server.storage.jdbc.table.entity;
 
 import com.google.protobuf.FieldMask;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
+import io.spine.server.entity.storage.EntityQuery;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.entity.JdbcRecordStorage;
 import io.spine.server.storage.jdbc.entity.query.RecordStorageQueryFactory;
 import io.spine.server.storage.jdbc.entity.query.SelectBulkQuery;
+import io.spine.server.storage.jdbc.entity.query.SelectByEntityQuery;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
@@ -111,10 +113,6 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, RecordTable.Col
     public void write(Map<I, EntityRecordWithColumns> records) {
         // Map's initial capacity is maximum, meaning no records exist in the storage yet
 
-        final Map<String, io.spine.server.entity.storage.Column> columns =
-                records.values().iterator().next().getColumns();
-//        createIfNotExists(columns);
-
         final Map<I, EntityRecordWithColumns> newRecords = new HashMap<>(records.size());
 
         for (Map.Entry<I, EntityRecordWithColumns> unclassifiedRecord : records.entrySet()) {
@@ -135,6 +133,19 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, RecordTable.Col
         final SelectBulkQuery<I> query = queryFactory.newSelectAllQuery(fieldMask);
         try {
             final Map<I, EntityRecord> result = query.execute();
+            return result;
+        } catch (SQLException e) {
+            throw new DatabaseException(e);
+        }
+    }
+
+
+    public Map<I, EntityRecord> readByQuery(EntityQuery<I> query, FieldMask fieldMask) {
+        final SelectByEntityQuery<I> queryByEntity =
+                queryFactory.newSelectByEntityQuery(query, fieldMask);
+
+        try {
+            final Map<I, EntityRecord> result = queryByEntity.execute();
             return result;
         } catch (SQLException e) {
             throw new DatabaseException(e);

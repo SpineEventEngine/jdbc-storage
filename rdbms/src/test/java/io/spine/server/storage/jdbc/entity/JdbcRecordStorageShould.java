@@ -23,21 +23,20 @@ package io.spine.server.storage.jdbc.entity;
 import com.google.common.base.Optional;
 import com.google.protobuf.Message;
 import io.spine.server.entity.AbstractEntity;
+import io.spine.server.entity.Entity;
 import io.spine.server.entity.EntityRecord;
-import io.spine.server.entity.storage.Column;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.RecordStorage;
 import io.spine.server.storage.RecordStorageShould;
 import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.GivenDataSource;
+import io.spine.server.storage.jdbc.type.JdbcColumnType;
+import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
 import io.spine.server.storage.jdbc.util.DataSourceWrapper;
 import io.spine.test.storage.Project;
 import io.spine.test.storage.ProjectId;
 import io.spine.testdata.Sample;
 import org.junit.Test;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import static io.spine.base.Identifier.newUuid;
 import static org.junit.Assert.assertFalse;
@@ -52,14 +51,20 @@ public class JdbcRecordStorageShould
         extends RecordStorageShould<String, JdbcRecordStorage<String>> {
 
     @Override
-    protected JdbcRecordStorage<String> getStorage() {
+    public void setUpAbstractStorageTest() {
+        storage = getStorage(TestEntityWithStringId.class);
+    }
+
+    @Override
+    protected JdbcRecordStorage<String> getStorage(Class<? extends Entity> cls) {
         final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(
                 "entityStorageTests");
         final JdbcRecordStorage<String> storage =
                 JdbcRecordStorage.<String>newBuilder()
                                  .setDataSource(dataSource)
-                                 .setEntityClass(TestEntityWithStringId.class)
+                                 .setEntityClass(cls)
                                  .setMultitenant(false)
+                                 .setColumnTypeRegistry(JdbcTypeRegistryFactory.defaultInstance())
                                  .build();
         return storage;
     }
@@ -71,7 +76,7 @@ public class JdbcRecordStorageShould
 
     @Test
     public void close_itself_and_throw_exception_on_read() {
-        final JdbcRecordStorage<String> storage = getStorage();
+        final JdbcRecordStorage<String> storage = getStorage(TestEntityWithStringId.class);
         storage.close();
         try {
             storage.readRecord("any-id");
@@ -84,13 +89,13 @@ public class JdbcRecordStorageShould
 
     @Test
     public void clear_itself() {
-        final JdbcRecordStorage<String> storage = getStorage();
+        final JdbcRecordStorage<String> storage = getStorage(TestEntityWithStringId.class);
         final String id = newUuid();
         final String columnValue = "i'm a value";
         final EntityRecord entityRecord = newStorageRecord();
 
-//        final EntityRecordWithColumns record = EntityRecordWithColumns(entityRecord);
-//        storage.writeRecord(id, record);
+        final EntityRecordWithColumns record = EntityRecordWithColumns.of(entityRecord);
+        storage.writeRecord(id, record);
         storage.clear();
 
         final Optional<EntityRecord> actual = storage.readRecord(id);
@@ -100,7 +105,7 @@ public class JdbcRecordStorageShould
 
     @Test(expected = IllegalStateException.class)
     public void throw_exception_when_closing_twice() throws Exception {
-        final RecordStorage<?> storage = getStorage();
+        final RecordStorage<?> storage = getStorage(TestEntityWithStringId.class);
         storage.close();
         storage.close();
     }
@@ -111,6 +116,17 @@ public class JdbcRecordStorageShould
         builder.setId(ProjectId.newBuilder()
                                .setId(id));
         return builder.build();
+    }
+
+    @Override
+    protected Class<? extends TestCounterEntity> getTestEntityClass() {
+        return TestCounterEntityJdbc.class;
+    }
+
+    static class TestCounterEntityJdbc extends TestCounterEntity<String> {
+        protected TestCounterEntityJdbc(String id) {
+            super(id);
+        }
     }
 
     private static class TestEntityWithStringId extends AbstractEntity<String, Project> {

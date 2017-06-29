@@ -22,30 +22,37 @@ package io.spine.server.storage.jdbc.table;
 
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Ordering;
 import com.google.protobuf.Message;
 import io.spine.server.entity.storage.Column;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.entity.query.DeleteAllQuery;
+import io.spine.server.storage.jdbc.query.ContainsQuery;
 import io.spine.server.storage.jdbc.query.DeleteRecordQuery;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
+import io.spine.server.storage.jdbc.query.SelectByIdQuery;
 import io.spine.server.storage.jdbc.query.SimpleQuery;
+import io.spine.server.storage.jdbc.query.WriteQuery;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.util.DataSourceWrapper;
+import io.spine.server.storage.jdbc.util.IdColumn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import io.spine.server.storage.jdbc.query.ContainsQuery;
-import io.spine.server.storage.jdbc.query.SelectByIdQuery;
-import io.spine.server.storage.jdbc.query.WriteQuery;
-import io.spine.server.storage.jdbc.util.IdColumn;
 
 import javax.annotation.Nullable;
 
 import java.util.Collection;
-import java.util.Map;
+import java.util.Collections;
+import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
+import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
+import static io.spine.server.storage.jdbc.Sql.BuildingBlock.COMMA;
+import static io.spine.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
 
 /**
  * A representation of an SQL table.
@@ -277,36 +284,42 @@ public abstract class AbstractTable<I, R extends Message, C extends Enum<C> & Ta
         final StringBuilder sql = new StringBuilder(MEAN_SQL_QUERY_LENGTH);
         sql.append(Sql.Query.CREATE_IF_MISSING)
            .append(getName())
-           .append(Sql.BuildingBlock.BRACKET_OPEN);
+           .append(BRACKET_OPEN);
         for (C column : getColumns()) {
             final String name = column.name();
             final Sql.Type type = ensureType(column);
             sql.append(name)
                .append(type)
-               .append(Sql.BuildingBlock.COMMA);
+               .append(COMMA);
             // Comma after the last column declaration is required since we add PRIMARY KEY after
         }
         if (idIsPrimaryKey()) {
             sql.append(Sql.Query.PRIMARY_KEY)
-               .append(Sql.BuildingBlock.BRACKET_OPEN)
+               .append(BRACKET_OPEN)
                .append(idColumnName)
-               .append(Sql.BuildingBlock.BRACKET_CLOSE);
+               .append(BRACKET_CLOSE);
         }
-        sql.append(Sql.BuildingBlock.BRACKET_CLOSE)
-           .append(Sql.BuildingBlock.SEMICOLON);
+        sql.append(BRACKET_CLOSE)
+           .append(SEMICOLON);
         final String result = sql.toString();
         return result;
     }
 
     private String composeCreateTableSql(Collection<Column> columns) {
+        List<Column> columnList = Lists.newArrayList(columns);
+        Collections.sort(columnList, Ordering.usingToString());
         final String idColumnName = getIdColumnDeclaration().name();
         @SuppressWarnings("StringBufferReplaceableByString")
         final StringBuilder sql = new StringBuilder(MEAN_SQL_QUERY_LENGTH);
+
         sql.append(Sql.Query.CREATE_IF_MISSING)
            .append(getName())
-           .append(Sql.BuildingBlock.BRACKET_OPEN);
-        while (columns.iterator()
-                      .hasNext()) {
+           .append(BRACKET_OPEN)
+           .append(" id ")
+           .append(Sql.Type.VARCHAR_255).append(COMMA)
+           .append(" entity ").append(Sql.Type.BLOB).append(COMMA);
+
+        while (columns.iterator().hasNext()) {
             final String name = columns.iterator()
                                        .next()
                                        .getName();
@@ -316,18 +329,19 @@ public abstract class AbstractTable<I, R extends Message, C extends Enum<C> & Ta
                                                     .getSqlType();
             sql.append(name)
                .append(type)
-               .append(Sql.BuildingBlock.COMMA);
+               .append(COMMA);
+            columns.remove(columns.iterator().next());
             // Comma after the last column declaration is required since we add PRIMARY KEY after
         }
 
         if (idIsPrimaryKey()) {
             sql.append(Sql.Query.PRIMARY_KEY)
-               .append(Sql.BuildingBlock.BRACKET_OPEN)
+               .append(BRACKET_OPEN)
                .append(idColumnName)
-               .append(Sql.BuildingBlock.BRACKET_CLOSE);
+               .append(BRACKET_CLOSE);
         }
-        sql.append(Sql.BuildingBlock.BRACKET_CLOSE)
-           .append(Sql.BuildingBlock.SEMICOLON);
+        sql.append(BRACKET_CLOSE)
+           .append(SEMICOLON);
         final String result = sql.toString();
         return result;
     }
