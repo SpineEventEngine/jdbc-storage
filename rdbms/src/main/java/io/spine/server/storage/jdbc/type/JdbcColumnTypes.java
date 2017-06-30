@@ -22,7 +22,7 @@ package io.spine.server.storage.jdbc.type;
 import com.google.protobuf.AbstractMessage;
 import com.google.protobuf.Timestamp;
 import com.google.protobuf.util.Timestamps;
-import io.spine.base.Version;
+import io.spine.core.Version;
 import io.spine.json.Json;
 import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.Sql;

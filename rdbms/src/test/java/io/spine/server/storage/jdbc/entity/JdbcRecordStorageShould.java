@@ -37,7 +37,7 @@ import io.spine.test.storage.ProjectId;
 import io.spine.testdata.Sample;
 import org.junit.Test;
 
-import static io.spine.base.Identifier.newUuid;
+import static io.spine.Identifier.newUuid;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
@@ -48,11 +48,6 @@ import static org.junit.Assert.fail;
 @SuppressWarnings("InstanceMethodNamingConvention")
 public class JdbcRecordStorageShould
         extends RecordStorageShould<String, JdbcRecordStorage<String>> {
-
-    @Override
-    public void setUpAbstractStorageTest() {
-        storage = getStorage(TestEntityWithStringId.class);
-    }
 
     @Override
     protected JdbcRecordStorage<String> getStorage(Class<? extends Entity> cls) {

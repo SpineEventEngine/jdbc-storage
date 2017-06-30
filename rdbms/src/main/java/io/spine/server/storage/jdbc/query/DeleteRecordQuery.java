@@ -20,7 +20,7 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import io.spine.base.Identifier;
+import io.spine.Identifier;
 import io.spine.server.storage.jdbc.util.ConnectionWrapper;
 import io.spine.server.storage.jdbc.util.IdColumn;
 

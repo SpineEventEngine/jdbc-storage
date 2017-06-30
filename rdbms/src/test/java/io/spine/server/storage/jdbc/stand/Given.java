@@ -21,7 +21,7 @@
 package io.spine.server.storage.jdbc.stand;
 
 import com.google.protobuf.Message;
-import io.spine.base.Version;
+import io.spine.core.Version;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.entity.TestTransaction;
 import io.spine.server.stand.StandStorage;

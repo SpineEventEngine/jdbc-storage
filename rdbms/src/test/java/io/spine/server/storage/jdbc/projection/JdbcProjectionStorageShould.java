@@ -30,42 +30,37 @@ import io.spine.server.storage.jdbc.entity.JdbcRecordStorage;
 import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
 import io.spine.server.storage.jdbc.util.DataSourceWrapper;
 import io.spine.test.projection.Project;
+import io.spine.test.storage.ProjectId;
 import io.spine.validate.ValidatingBuilder;
 import org.junit.Test;
 
-import static io.spine.base.Identifier.newUuid;
 import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Alexander Litus
  */
-public class JdbcProjectionStorageShould extends ProjectionStorageShould<String> {
+public class JdbcProjectionStorageShould extends ProjectionStorageShould {
 
     @Override
-    protected ProjectionStorage<String> getStorage(Class<? extends Entity> aClass) {
+    protected ProjectionStorage<ProjectId> getStorage(Class<? extends Entity> entityClass) {
         final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(
                 "projectionStorageTests");
         final Class<TestProjection> projectionClass = TestProjection.class;
-        final JdbcRecordStorage<String> entityStorage =
-                JdbcRecordStorage.<String>newBuilder()
+        final JdbcRecordStorage<ProjectId> entityStorage =
+                JdbcRecordStorage.<ProjectId>newBuilder()
                                  .setDataSource(dataSource)
                                  .setMultitenant(false)
                                  .setEntityClass(projectionClass)
                                  .setColumnTypeRegistry(JdbcTypeRegistryFactory.defaultInstance())
                                  .build();
-        final ProjectionStorage<String> storage =
-                JdbcProjectionStorage.<String>newBuilder()
+        final ProjectionStorage<ProjectId> storage =
+                JdbcProjectionStorage.<ProjectId>newBuilder()
                                      .setRecordStorage(entityStorage)
                                      .setDataSource(dataSource)
                                      .setMultitenant(false)
                                      .setProjectionClass(projectionClass)
                                      .build();
         return storage;
-    }
-
-    @Override
-    protected String newId() {
-        return newUuid();
     }
 
     @Test(expected = IllegalStateException.class)
@@ -83,9 +78,9 @@ public class JdbcProjectionStorageShould extends ProjectionStorageShould<String>
         assertNotNull(builder);
     }
 
-    private static class TestProjection extends Projection<String, Project, ValidatingBuilder<Project, Project.Builder>> {
+    private static class TestProjection extends Projection<ProjectId, Project, ValidatingBuilder<Project, Project.Builder>> {
 
-        private TestProjection(String id) {
+        private TestProjection(ProjectId id) {
             super(id);
         }
     }

@@ -24,15 +24,10 @@ import com.google.common.base.Optional;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.FieldMask;
 import com.google.protobuf.Message;
-import io.spine.server.entity.Entity;
-import io.spine.time.Time;
-import org.junit.Test;
-import io.spine.base.Version;
+import io.spine.core.Version;
 import io.spine.protobuf.AnyPacker;
-import io.spine.time.Timestamps2;
-import io.spine.type.TypeUrl;
 import io.spine.server.aggregate.Aggregate;
-import io.spine.server.entity.AbstractEntity;
+import io.spine.server.entity.Entity;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.stand.AggregateStateId;
 import io.spine.server.stand.StandStorage;
@@ -45,6 +40,9 @@ import io.spine.server.storage.jdbc.util.DataSourceWrapper;
 import io.spine.test.commandservice.customer.Customer;
 import io.spine.test.storage.Project;
 import io.spine.test.storage.ProjectId;
+import io.spine.time.Time;
+import io.spine.type.TypeUrl;
+import org.junit.Test;
 
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
@@ -53,9 +51,15 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
-import static io.spine.server.storage.jdbc.stand.Given.*;
+import static com.google.common.collect.Lists.newArrayList;
+import static io.spine.server.storage.jdbc.stand.Given.TestAggregate;
+import static io.spine.server.storage.jdbc.stand.Given.TestAggregate2;
+import static io.spine.server.storage.jdbc.stand.Given.newStorage;
+import static io.spine.server.storage.jdbc.stand.Given.testAggregates;
+import static io.spine.server.storage.jdbc.stand.Given.testAggregatesWithState;
+import static io.spine.test.Verify.assertContains;
+import static io.spine.test.Verify.assertSize;
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -65,8 +69,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static io.spine.test.Verify.assertContains;
-import static io.spine.test.Verify.assertSize;
 
 /**
  * @author Dmytro Dashenkov
@@ -310,14 +312,14 @@ public class JdbcStandStorageShould extends StandStorageShould {
                 writeToStorage(differentAggregate, storage, Customer.class);
 
         final Iterator<EntityRecord> records = storage.readAllByType(TypeUrl.of(Project.class));
+        final Collection<EntityRecord> readRecords = newArrayList(records);
+        assertSize(aggregatesCount, readRecords);
         boolean hasRecord = false;
-        while (records.hasNext()) {
-            if (records.next()
-                       .equals(differentRecord)) {
+        for (EntityRecord record : readRecords) {
+            if (record.equals(differentRecord)) {
                 hasRecord = true;
             }
         }
-        assertSize(aggregatesCount, records);
         assertFalse(hasRecord);
     }
 
@@ -427,12 +429,5 @@ public class JdbcStandStorageShould extends StandStorageShould {
         storage.write(id, record);
 
         return record;
-    }
-
-    private static class StandStorageRecord extends AbstractEntity<Object, Project> {
-
-        protected StandStorageRecord(AggregateStateId id) {
-            super(id);
-        }
     }
 }

@@ -23,7 +23,7 @@ package io.spine.server.storage.jdbc.query;
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Message;
 import io.spine.annotation.Internal;
-import io.spine.base.Identifier;
+import io.spine.Identifier;
 import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.util.ConnectionWrapper;
 import io.spine.server.storage.jdbc.util.IdColumn;
