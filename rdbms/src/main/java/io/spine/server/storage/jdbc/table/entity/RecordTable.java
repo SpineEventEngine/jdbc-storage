@@ -20,31 +20,41 @@
 
 package io.spine.server.storage.jdbc.table.entity;
 
+import com.google.common.base.Function;
+import com.google.common.base.Objects;
 import com.google.protobuf.FieldMask;
+import io.spine.server.entity.Entity;
+import io.spine.server.entity.EntityRecord;
+import io.spine.server.entity.storage.Column;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
+import io.spine.server.entity.storage.EntityColumns;
 import io.spine.server.entity.storage.EntityQuery;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.DatabaseException;
+import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.entity.JdbcRecordStorage;
 import io.spine.server.storage.jdbc.entity.query.RecordStorageQueryFactory;
 import io.spine.server.storage.jdbc.entity.query.SelectBulkQuery;
 import io.spine.server.storage.jdbc.entity.query.SelectByEntityQuery;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
+import io.spine.server.storage.jdbc.table.TableColumn;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.util.DataSourceWrapper;
-import io.spine.server.entity.Entity;
-import io.spine.server.entity.EntityRecord;
-import io.spine.server.storage.jdbc.Sql;
-import io.spine.server.storage.jdbc.table.TableColumn;
 
+import javax.annotation.Nullable;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.Collections2.transform;
+import static com.google.common.collect.Lists.newLinkedList;
 import static io.spine.server.storage.jdbc.Sql.Type.BLOB;
-import static io.spine.server.storage.jdbc.Sql.Type.BOOLEAN;
 import static io.spine.server.storage.jdbc.Sql.Type.ID;
+import static java.util.Collections.addAll;
 
 /**
  * A table for storing the {@linkplain EntityRecord entity records}.
@@ -53,30 +63,27 @@ import static io.spine.server.storage.jdbc.Sql.Type.ID;
  *
  * @author Dmytro Dashenkov
  */
-public class RecordTable<I> extends EntityTable<I, EntityRecord, RecordTable.Column> {
+public class RecordTable<I> extends EntityTable<I, EntityRecord> {
 
     private final RecordStorageQueryFactory<I> queryFactory;
 
+    private final ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> typeRegistry;
 
     public RecordTable(Class<Entity<I, ?>> entityClass,
                        DataSourceWrapper dataSource,
                        ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry) {
-        super(entityClass, Column.id.name(), dataSource, columnTypeRegistry);
+        super(entityClass, StandardColumn.id.name(), dataSource);
         queryFactory = new RecordStorageQueryFactory<>(dataSource,
                                                        entityClass,
                                                        log(),
                                                        getIdColumn(),
                                                        columnTypeRegistry);
+        this.typeRegistry = columnTypeRegistry;
     }
 
     @Override
-    public Column getIdColumnDeclaration() {
-        return Column.id;
-    }
-
-    @Override
-    protected Class<Column> getTableColumnType() {
-        return Column.class;
+    public StandardColumn getIdColumnDeclaration() {
+        return StandardColumn.id;
     }
 
     @Override
@@ -87,6 +94,16 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, RecordTable.Col
     @Override
     protected WriteQueryFactory<I, EntityRecord> getWriteQueryFactory() {
         return null;
+    }
+
+    @Override
+    protected List<TableColumn> getTableColumns() {
+        final List<TableColumn> columns = newLinkedList();
+        addAll(columns, StandardColumn.values());
+        final Collection<Column> entityColumns = EntityColumns.getColumns(getEntityClass());
+        final Collection<TableColumn> tableColumns = transform(entityColumns, new ColumnAdapter());
+        columns.addAll(tableColumns);
+        return columns;
     }
 
     public Map<?, EntityRecord> read(Iterable<I> ids, FieldMask fieldMask) {
@@ -100,13 +117,12 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, RecordTable.Col
     }
 
     public void write(I id, EntityRecordWithColumns record) {
-        final Map<String, io.spine.server.entity.storage.Column> columns = record.getColumns();
-//        createIfNotExists(columns);
-
         if (containsRecord(id)) {
-            queryFactory.newUpdateQuery(id, record).execute();
+            queryFactory.newUpdateQuery(id, record)
+                        .execute();
         } else {
-            queryFactory.newInsertQuery(id, record).execute();
+            queryFactory.newInsertQuery(id, record)
+                        .execute();
         }
     }
 
@@ -139,7 +155,6 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, RecordTable.Col
         }
     }
 
-
     public Map<I, EntityRecord> readByQuery(EntityQuery<I> query, FieldMask fieldMask) {
         final SelectByEntityQuery<I> queryByEntity =
                 queryFactory.newSelectByEntityQuery(query, fieldMask);
@@ -152,22 +167,83 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, RecordTable.Col
         }
     }
 
-    public enum Column implements TableColumn, Cloneable {
+    private final class ColumnAdapter implements Function<Column, TableColumn> {
+
+        private int columnNumber = 1;
+
+        @Override
+        public TableColumn apply(@Nullable Column column) {
+            checkNotNull(column);
+            final TableColumn result = new EntityColumnMapping(column, typeRegistry, columnNumber);
+            columnNumber++;
+            return result;
+        }
+    }
+
+    public enum StandardColumn implements TableColumn {
 
         id(ID),
-        entity(BLOB),
-        archived(BOOLEAN),
-        deleted(BOOLEAN);
+        entity(BLOB);
 
         private final Sql.Type type;
 
-        Column(Sql.Type type) {
+        StandardColumn(Sql.Type type) {
             this.type = type;
         }
 
         @Override
         public Sql.Type type() {
             return type;
+        }
+    }
+
+    private static final class EntityColumnMapping implements TableColumn {
+
+        private final String name;
+        private final int ordinal;
+        private final Sql.Type type;
+
+        private EntityColumnMapping(Column column,
+                                    ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> typeRegistry,
+                                    int ordinal) {
+            this.name = column.getName();
+            this.ordinal = ordinal;
+            this.type = typeRegistry.get(column)
+                                    .getSqlType();
+        }
+
+        @Override
+        public String name() {
+            return name;
+        }
+
+        @Override
+        public int ordinal() {
+            return ordinal;
+        }
+
+        @Override
+        public Sql.Type type() {
+            return type;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            EntityColumnMapping that = (EntityColumnMapping) o;
+            return ordinal == that.ordinal &&
+                   Objects.equal(name, that.name) &&
+                   type == that.type;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(name, ordinal, type);
         }
     }
 }

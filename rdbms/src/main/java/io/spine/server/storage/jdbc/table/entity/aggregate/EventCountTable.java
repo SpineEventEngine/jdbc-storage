@@ -20,17 +20,18 @@
 
 package io.spine.server.storage.jdbc.table.entity.aggregate;
 
+import com.google.common.collect.ImmutableList;
 import com.google.protobuf.Int32Value;
-import io.spine.server.entity.storage.ColumnTypeRegistry;
-import io.spine.server.storage.jdbc.aggregate.JdbcAggregateStorage;
-import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.entity.Entity;
 import io.spine.server.storage.jdbc.Sql;
+import io.spine.server.storage.jdbc.aggregate.JdbcAggregateStorage;
 import io.spine.server.storage.jdbc.aggregate.query.EventCountQueryFactory;
+import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 import io.spine.server.storage.jdbc.table.TableColumn;
-import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.util.DataSourceWrapper;
+
+import java.util.List;
 
 import static io.spine.server.storage.jdbc.Sql.Type.BIGINT;
 import static io.spine.server.storage.jdbc.Sql.Type.ID;
@@ -43,20 +44,18 @@ import static io.spine.server.storage.jdbc.util.DbTableNameFactory.newTableName;
  *
  * @author Dmytro Dashenkov
  */
-public class EventCountTable<I> extends AggregateTable<I, Int32Value, EventCountTable.Column> {
+public class EventCountTable<I> extends AggregateTable<I, Int32Value> {
 
     private static final String TABLE_NAME_POSTFIX = "event_count";
 
     private final EventCountQueryFactory<I> queryFactory;
 
     public EventCountTable(Class<? extends Entity<I, ?>> entityClass,
-                           DataSourceWrapper dataSource,
-                           ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry) {
+                           DataSourceWrapper dataSource) {
         super(newTableName(entityClass) + (TABLE_NAME_POSTFIX),
               entityClass,
               Column.id.name(),
-              dataSource,
-              columnTypeRegistry);
+              dataSource);
         this.queryFactory = new EventCountQueryFactory<>(getDataSource(),
                                                          getName(),
                                                          getIdColumn(),
@@ -69,8 +68,8 @@ public class EventCountTable<I> extends AggregateTable<I, Int32Value, EventCount
     }
 
     @Override
-    protected Class<Column> getTableColumnType() {
-        return Column.class;
+    protected List<? extends TableColumn> getTableColumns() {
+        return ImmutableList.copyOf(Column.values());
     }
 
     @Override
@@ -83,6 +82,7 @@ public class EventCountTable<I> extends AggregateTable<I, Int32Value, EventCount
         return null;
     }
 
+    // TODO:2017-07-03:dmytro.dashenkov: Reduce visibility.
     public enum Column implements TableColumn {
 
         id(ID),

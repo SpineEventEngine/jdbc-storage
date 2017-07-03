@@ -21,14 +21,15 @@
 package io.spine.server.storage.jdbc.table;
 
 import com.google.protobuf.Timestamp;
-import io.spine.server.entity.storage.ColumnTypeRegistry;
-import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.projection.query.LastHandledEventTimeQueryFactory;
+import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
-import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.util.DataSourceWrapper;
 import io.spine.server.storage.jdbc.util.IdColumn;
 
+import java.util.List;
+
+import static com.google.common.collect.ImmutableList.copyOf;
 import static io.spine.server.storage.jdbc.Sql.Type;
 import static io.spine.server.storage.jdbc.Sql.Type.BIGINT;
 import static io.spine.server.storage.jdbc.Sql.Type.INT;
@@ -38,24 +39,21 @@ import static io.spine.server.storage.jdbc.Sql.Type.VARCHAR_255;
  * A table for storing the last handled by
  * a {@link io.spine.server.projection.ProjectionRepository} event time.
  *
+ * // TODO:2017-07-03:dmytro.dashenkov: Check if we still need this class after the catch up has been moved away.
+ *
  * @see io.spine.server.projection.ProjectionRepository#catchUp
  * @author Dmytro Dashenkov
  */
-public class LastHandledEventTimeTable extends AbstractTable<String,
-                                                             Timestamp,
-                                                             LastHandledEventTimeTable.Column> {
+public class LastHandledEventTimeTable extends AbstractTable<String, Timestamp> {
 
     private static final String TABLE_NAME = "projection_last_handled_event_time";
 
     private final LastHandledEventTimeQueryFactory queryFactory;
 
-    public LastHandledEventTimeTable(DataSourceWrapper dataSource,
-                                     ColumnTypeRegistry<? extends
-                                             JdbcColumnType<?, ?>> columnTypeRegistry) {
+    public LastHandledEventTimeTable(DataSourceWrapper dataSource) {
         super(TABLE_NAME,
               IdColumn.typeString(Column.projection_type.name()),
-              dataSource,
-              columnTypeRegistry);
+              dataSource);
         this.queryFactory = new LastHandledEventTimeQueryFactory(dataSource, TABLE_NAME);
         queryFactory.setLogger(log());
     }
@@ -66,8 +64,8 @@ public class LastHandledEventTimeTable extends AbstractTable<String,
     }
 
     @Override
-    protected Class<Column> getTableColumnType() {
-        return Column.class;
+    protected List<? extends TableColumn> getTableColumns() {
+        return copyOf(Column.values());
     }
 
     @Override

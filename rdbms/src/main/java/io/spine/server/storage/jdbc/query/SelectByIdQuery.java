@@ -44,7 +44,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author Alexander Litus
  */
 @Internal
-public class SelectByIdQuery<I, M> extends StorageQuery {
+public class SelectByIdQuery<I, M extends Message> extends StorageQuery {
 
     private final IdColumn<I> idColumn;
     private final I id;

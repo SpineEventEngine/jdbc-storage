@@ -39,12 +39,12 @@ public interface TableColumn extends StorageField {
     String name();
 
     /**
-     * @return the {@link Sql.Type} of the column
-     */
-    Sql.Type type();
-
-    /**
      * @return the position of the column in the {@code CREATE TABLE} query starting from 0
      */
     int ordinal();
+
+    /**
+     * @return the {@link Sql.Type} of the column
+     */
+    Sql.Type type();
 }

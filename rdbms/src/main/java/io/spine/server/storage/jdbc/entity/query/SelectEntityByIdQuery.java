@@ -24,7 +24,7 @@ import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.LifecycleFlags;
 import io.spine.server.storage.LifecycleFlagField;
 import io.spine.server.storage.jdbc.query.SelectByIdQuery;
-import io.spine.server.storage.jdbc.table.entity.RecordTable.Column;
+import io.spine.server.storage.jdbc.table.entity.RecordTable;
 
 import javax.annotation.Nullable;
 import java.sql.ResultSet;
@@ -38,7 +38,7 @@ import static io.spine.server.storage.jdbc.Sql.Query.FROM;
 import static io.spine.server.storage.jdbc.Sql.Query.PLACEHOLDER;
 import static io.spine.server.storage.jdbc.Sql.Query.SELECT;
 import static io.spine.server.storage.jdbc.Sql.Query.WHERE;
-import static io.spine.server.storage.jdbc.table.entity.RecordTable.Column.entity;
+import static io.spine.server.storage.jdbc.table.entity.RecordTable.StandardColumn.entity;
 
 /**
  * Query that selects {@link EntityRecord} by ID.
@@ -50,7 +50,7 @@ public class SelectEntityByIdQuery<I> extends SelectByIdQuery<I, EntityRecord> {
 
     private static final String QUERY_TEMPLATE =
             SELECT.toString() + ALL_ATTRIBUTES + FROM + " %s" + WHERE +
-            Column.id + EQUAL + PLACEHOLDER + SEMICOLON;
+            RecordTable.StandardColumn.id + EQUAL + PLACEHOLDER + SEMICOLON;
 
     public SelectEntityByIdQuery(Builder<I> builder) {
         super(builder);

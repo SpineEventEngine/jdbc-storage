@@ -20,37 +20,36 @@
 
 package io.spine.server.storage.jdbc.table.entity.aggregate;
 
-import io.spine.server.entity.storage.ColumnTypeRegistry;
-import io.spine.server.storage.jdbc.query.ReadQueryFactory;
+import com.google.common.collect.ImmutableList;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.aggregate.query.AggregateStorageQueryFactory;
+import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 import io.spine.server.storage.jdbc.table.TableColumn;
-import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.util.DataSourceWrapper;
 import io.spine.server.storage.jdbc.util.DbIterator;
 
+import java.util.List;
+
 import static io.spine.server.storage.jdbc.Sql.Type.BIGINT;
 import static io.spine.server.storage.jdbc.Sql.Type.BLOB;
-import static io.spine.server.storage.jdbc.Sql.Type.INT;
 import static io.spine.server.storage.jdbc.Sql.Type.ID;
+import static io.spine.server.storage.jdbc.Sql.Type.INT;
 
 /**
  * A table for storing the {@linkplain AggregateEventRecord aggregate event records}.
  *
  * @author Dmytro Dashenkov
  */
-public class AggregateEventRecordTable<I>
-        extends AggregateTable<I, AggregateEventRecord, AggregateEventRecordTable.Column> {
+public class AggregateEventRecordTable<I> extends AggregateTable<I, AggregateEventRecord> {
 
     private final AggregateStorageQueryFactory<I> queryFactory;
 
     public AggregateEventRecordTable(Class<? extends Aggregate<I, ?, ?>> entityClass,
-                                     DataSourceWrapper dataSource,
-                                     ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry) {
-        super(entityClass, Column.id.name(), dataSource, columnTypeRegistry);
+                                     DataSourceWrapper dataSource) {
+        super(entityClass, Column.id.name(), dataSource);
         queryFactory = new AggregateStorageQueryFactory<>(dataSource, entityClass, getIdColumn());
         queryFactory.setLogger(log());
     }
@@ -61,11 +60,6 @@ public class AggregateEventRecordTable<I>
     }
 
     @Override
-    protected Class<Column> getTableColumnType() {
-        return Column.class;
-    }
-
-    @Override
     protected ReadQueryFactory<I, AggregateEventRecord> getReadQueryFactory() {
         return queryFactory;
     }
@@ -73,6 +67,11 @@ public class AggregateEventRecordTable<I>
     @Override
     protected WriteQueryFactory<I, AggregateEventRecord> getWriteQueryFactory() {
         return null;
+    }
+
+    @Override
+    protected List<? extends TableColumn> getTableColumns() {
+        return ImmutableList.copyOf(Column.values());
     }
 
     @SuppressWarnings("MethodDoesntCallSuperMethod") // No extra presence checks are required
@@ -89,17 +88,7 @@ public class AggregateEventRecordTable<I>
         return result;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @return {@code false} for the {@code AggregateEventRecordTable}.
-     */
-    @SuppressWarnings("MethodDoesntCallSuperMethod") // Flag method
-    @Override
-    protected boolean idIsPrimaryKey() {
-        return false;
-    }
-
+    // TODO:2017-07-03:dmytro.dashenkov: Reduce visibility.
     public enum Column implements TableColumn {
 
         id(ID),

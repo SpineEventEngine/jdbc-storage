@@ -53,7 +53,7 @@ import static io.spine.server.storage.jdbc.Sql.Query.NULL;
 import static io.spine.server.storage.jdbc.Sql.Query.OR;
 import static io.spine.server.storage.jdbc.Sql.Query.SELECT;
 import static io.spine.server.storage.jdbc.Sql.Query.WHERE;
-import static io.spine.server.storage.jdbc.table.entity.RecordTable.Column.id;
+import static io.spine.server.storage.jdbc.table.entity.RecordTable.StandardColumn.id;
 
 /**
  * Implementation of {@link StorageQuery} for bulk selection.

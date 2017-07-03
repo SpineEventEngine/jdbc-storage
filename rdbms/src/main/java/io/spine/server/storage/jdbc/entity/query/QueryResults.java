@@ -67,7 +67,7 @@ class QueryResults {
             final EntityRecord record = readSingleMessage(resultSet);
             final S maskedMessage = maskFields(record, fieldMask);
             @SuppressWarnings("unchecked")
-            final I id = (I) resultSet.getObject(RecordTable.Column.id.name());
+            final I id = (I) resultSet.getObject(RecordTable.StandardColumn.id.name());
             resultBuilder.put(id, EntityRecord.newBuilder(record)
                                               .setState(AnyPacker.pack(maskedMessage))
                                               .build());
@@ -79,7 +79,7 @@ class QueryResults {
     }
 
     private static EntityRecord readSingleMessage(ResultSet resultSet) throws SQLException {
-        return Serializer.deserialize(resultSet.getBytes(RecordTable.Column.entity.name()),
+        return Serializer.deserialize(resultSet.getBytes(RecordTable.StandardColumn.entity.name()),
                                       EntityRecord.getDescriptor());
     }
 

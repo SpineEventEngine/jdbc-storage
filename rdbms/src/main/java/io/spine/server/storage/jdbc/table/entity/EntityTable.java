@@ -22,10 +22,7 @@ package io.spine.server.storage.jdbc.table.entity;
 
 import com.google.protobuf.Message;
 import io.spine.server.entity.Entity;
-import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.storage.jdbc.table.AbstractTable;
-import io.spine.server.storage.jdbc.table.TableColumn;
-import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.util.DataSourceWrapper;
 import io.spine.server.storage.jdbc.util.IdColumn;
 
@@ -37,11 +34,10 @@ import static io.spine.server.storage.jdbc.util.DbTableNameFactory.newTableName;
  *
  * @author Dmytro Dashenkov
  */
-public abstract class EntityTable<I, R extends Message, C extends Enum<C> & TableColumn>
-        extends AbstractTable<I, R, C> {
+public abstract class EntityTable<I, R extends Message>
+        extends AbstractTable<I, R> {
 
     private final Class<? extends Entity<I, ?>> entityClass;
-    private final ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry;
 
     /**
      * Creates a new instance of the {@code EntityTable}.
@@ -53,9 +49,8 @@ public abstract class EntityTable<I, R extends Message, C extends Enum<C> & Tabl
      */
     protected EntityTable(Class<? extends Entity<I, ?>> entityClass,
                           String idColumnName,
-                          DataSourceWrapper dataSource,
-                          ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry) {
-        this(newTableName(entityClass), entityClass, idColumnName, dataSource, columnTypeRegistry);
+                          DataSourceWrapper dataSource) {
+        this(newTableName(entityClass), entityClass, idColumnName, dataSource);
     }
 
     /**
@@ -68,11 +63,9 @@ public abstract class EntityTable<I, R extends Message, C extends Enum<C> & Tabl
     protected EntityTable(String tableName,
                           Class<? extends Entity<I, ?>> entityClass,
                           String idColumnName,
-                          DataSourceWrapper dataSource,
-                          ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry) {
-        super(tableName, IdColumn.newInstance(entityClass, idColumnName), dataSource, columnTypeRegistry);
+                          DataSourceWrapper dataSource) {
+        super(tableName, IdColumn.newInstance(entityClass, idColumnName), dataSource);
         this.entityClass = entityClass;
-        this.columnTypeRegistry = columnTypeRegistry;
     }
 
     public Class<? extends Entity<I, ?>> getEntityClass() {

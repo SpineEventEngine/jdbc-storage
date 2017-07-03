@@ -20,13 +20,8 @@
 
 package io.spine.server.storage.jdbc.table;
 
-import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Ordering;
 import com.google.protobuf.Message;
-import io.spine.server.entity.storage.Column;
-import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.entity.query.DeleteAllQuery;
 import io.spine.server.storage.jdbc.query.ContainsQuery;
@@ -36,16 +31,12 @@ import io.spine.server.storage.jdbc.query.SelectByIdQuery;
 import io.spine.server.storage.jdbc.query.SimpleQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
-import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.util.DataSourceWrapper;
 import io.spine.server.storage.jdbc.util.IdColumn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -64,25 +55,20 @@ import static io.spine.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
  * <li>Identifier and {@code PRIMARY KEY}
  * <li>Queries to the table
  * </ul>
- *
- * <p>A subclass of {@code AbstractTable} may be treated as a DAO for a particular type of
- * {@linkplain io.spine.server.entity.Entity entity} or DTO
- * (e.g. {@linkplain io.spine.base.Event events} and
- * {@linkplain io.spine.base.Command commands}).
+
+ // TODO:2017-07-03:dmytro.dashenkov: Update javadoc.
  *
  * <p>A table provides a sufficient API for performing the database interaction. However, it never
  * performs any validation or data transformation, but only invokes the appropriate queries.
  *
  * @param <I> type of ID of the records stored in the table
  * @param <R> type of the record stored in the table; must be a {@linkplain Message proto message}
- * @param <C> type of an enum representing the table columns;
- *            must implement{@linkplain TableColumn}
  * @author Dmytro Dashenkov
  * @see TableColumn
  */
-public abstract class AbstractTable<I, R extends Message, C extends Enum<C> & TableColumn> {
+public abstract class AbstractTable<I, R extends Message> {
 
-    private static final int MEAN_SQL_QUERY_LENGTH = 128;
+    private static final int MEAN_SQL_QUERY_LENGTH = 128; // TODO:2017-07-03:dmytro.dashenkov: Review the need in this constant
 
     private final String name;
 
@@ -90,42 +76,31 @@ public abstract class AbstractTable<I, R extends Message, C extends Enum<C> & Ta
 
     private final DataSourceWrapper dataSource;
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
-
-    private ImmutableList<C> columns;
-
-    private final ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry;
+    private ImmutableList<? extends TableColumn> columns;
 
     protected AbstractTable(String name,
                             IdColumn<I> idColumn,
-                            DataSourceWrapper dataSource,
-                            ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry) {
+                            DataSourceWrapper dataSource) {
         super();
         this.name = checkNotNull(name);
         this.idColumn = checkNotNull(idColumn);
         this.dataSource = checkNotNull(dataSource);
-        this.columnTypeRegistry = columnTypeRegistry;
     }
 
     /**
      * Retrieves the enum object representing the table ID column.
      *
      * <p>Example:
-     * <code>
      * <pre>
-     * \@Override
-     * public Column getIdColumnDeclaration() {
-     * return Column.id;
-     * }
+     *     {@code
+     *     \@Override
+     *      public Column getIdColumnDeclaration() {
+     *          return Column.id;
+     *      }
+     *     }
      * </pre>
-     * </code>
      */
-    public abstract C getIdColumnDeclaration();
-
-    /**
-     * @return an enum implementing {@link TableColumn} which represents the table columns
-     */
-    protected abstract Class<C> getTableColumnType();
+    public abstract TableColumn getIdColumnDeclaration();
 
     /**
      * @return an instance of {@link ReadQueryFactory} which produces queries to the given table
@@ -137,6 +112,8 @@ public abstract class AbstractTable<I, R extends Message, C extends Enum<C> & Ta
      */
     protected abstract WriteQueryFactory<I, R> getWriteQueryFactory();
 
+    protected abstract List<? extends TableColumn> getTableColumns();
+
     /**
      * Creates current table in the database if it does not exist yet.
      *
@@ -144,24 +121,11 @@ public abstract class AbstractTable<I, R extends Message, C extends Enum<C> & Ta
      * <p>{@code CREATE TABLE IF NOT EXISTS $TableName ( $Columns );}
      */
     public void createIfNotExists() {
-        final String sql = composeCreateTableSql();
+        final String rawSql = composeCreateTableSql();
         final SimpleQuery query = SimpleQuery.newBuilder()
                                              .setDataSource(dataSource)
                                              .setLogger(log())
-                                             .setQuery(sql)
-                                             .build();
-        query.execute();
-    }
-
-    public void createIfNotExists(Collection<Column> columns) {
-
-        final String sql = columns.isEmpty() ? composeCreateTableSql()
-                                             : composeCreateTableSql(columns);
-
-        final SimpleQuery query = SimpleQuery.newBuilder()
-                                             .setDataSource(dataSource)
-                                             .setLogger(log())
-                                             .setQuery(sql)
+                                             .setQuery(rawSql)
                                              .build();
         query.execute();
     }
@@ -174,13 +138,13 @@ public abstract class AbstractTable<I, R extends Message, C extends Enum<C> & Ta
      */
     public boolean containsRecord(I id) {
         final ContainsQuery<I> query = ContainsQuery.<I>newBuilder()
-                .setIdColumn(getIdColumn())
-                .setId(id)
-                .setTableName(getName())
-                .setKeyColumn(getIdColumnDeclaration())
-                .setDataSource(dataSource)
-                .setLogger(log())
-                .build();
+                                                    .setIdColumn(getIdColumn())
+                                                    .setId(id)
+                                                    .setTableName(getName())
+                                                    .setKeyColumn(getIdColumnDeclaration())
+                                                    .setDataSource(dataSource)
+                                                    .setLogger(log())
+                                                    .build();
         final boolean result = query.execute();
         return result;
     }
@@ -225,12 +189,18 @@ public abstract class AbstractTable<I, R extends Message, C extends Enum<C> & Ta
         query.execute();
     }
 
+    /**
+     * Retrieves the columns of this table.
+     *
+     * <p>When called for the first time, this method initializes the list of the columns.
+     *
+     * @return the initialized {@link List} of the table columns
+     */
     @SuppressWarnings("ReturnOfCollectionOrArrayField") // Returns immutable collection
-    private ImmutableCollection<C> getColumns() {
+    protected final ImmutableList<? extends TableColumn> getColumns() {
         if (columns == null) {
-            final Class<C> tableColumnsType = getTableColumnType();
-            final C[] columnsArray = tableColumnsType.getEnumConstants();
-            columns = ImmutableList.copyOf(columnsArray);
+            final List<? extends TableColumn> tableColumnsType = getTableColumns();
+            columns = ImmutableList.copyOf(tableColumnsType);
         }
         return columns;
     }
@@ -262,85 +232,24 @@ public abstract class AbstractTable<I, R extends Message, C extends Enum<C> & Ta
         return query;
     }
 
-    /**
-     * Flags that the {@linkplain #getIdColumnDeclaration() ID column} should be declared as
-     * a {@code PRIMARY KEY}.
-     *
-     * <p>Override to change the table creation behavior.
-     *
-     * @return {@code true} by default
-     */
-    protected boolean idIsPrimaryKey() {
-        return true;
-    }
-
-    protected Logger log() {
-        return logger;
-    }
-
     private String composeCreateTableSql() {
-        final String idColumnName = getIdColumnDeclaration().name();
-        @SuppressWarnings("StringBufferReplaceableByString")
+        final Iterable<? extends TableColumn> columns = getColumns();
         final StringBuilder sql = new StringBuilder(MEAN_SQL_QUERY_LENGTH);
         sql.append(Sql.Query.CREATE_IF_MISSING)
            .append(getName())
            .append(BRACKET_OPEN);
-        for (C column : getColumns()) {
-            final String name = column.name();
-            final Sql.Type type = ensureType(column);
-            sql.append(name)
-               .append(type)
+        for (TableColumn column : columns) {
+            sql.append(column.name())
+               .append(' ')
+               .append(ensureType(column))
                .append(COMMA);
-            // Comma after the last column declaration is required since we add PRIMARY KEY after
         }
-        if (idIsPrimaryKey()) {
-            sql.append(Sql.Query.PRIMARY_KEY)
-               .append(BRACKET_OPEN)
-               .append(idColumnName)
-               .append(BRACKET_CLOSE);
-        }
-        sql.append(BRACKET_CLOSE)
-           .append(SEMICOLON);
-        final String result = sql.toString();
-        return result;
-    }
-
-    private String composeCreateTableSql(Collection<Column> columns) {
-        List<Column> columnList = Lists.newArrayList(columns);
-        Collections.sort(columnList, Ordering.usingToString());
         final String idColumnName = getIdColumnDeclaration().name();
-        @SuppressWarnings("StringBufferReplaceableByString")
-        final StringBuilder sql = new StringBuilder(MEAN_SQL_QUERY_LENGTH);
-
-        sql.append(Sql.Query.CREATE_IF_MISSING)
-           .append(getName())
+        sql.append(Sql.Query.PRIMARY_KEY)
            .append(BRACKET_OPEN)
-           .append(" id ")
-           .append(Sql.Type.VARCHAR_255).append(COMMA)
-           .append(" entity ").append(Sql.Type.BLOB).append(COMMA);
-
-        while (columns.iterator().hasNext()) {
-            final String name = columns.iterator()
-                                       .next()
-                                       .getName();
-            final Column column = columns.iterator()
-                                         .next();
-            final Sql.Type type = columnTypeRegistry.get(column)
-                                                    .getSqlType();
-            sql.append(name)
-               .append(type)
-               .append(COMMA);
-            columns.remove(columns.iterator().next());
-            // Comma after the last column declaration is required since we add PRIMARY KEY after
-        }
-
-        if (idIsPrimaryKey()) {
-            sql.append(Sql.Query.PRIMARY_KEY)
-               .append(BRACKET_OPEN)
-               .append(idColumnName)
-               .append(BRACKET_CLOSE);
-        }
-        sql.append(BRACKET_CLOSE)
+           .append(idColumnName)
+           .append(BRACKET_CLOSE)
+           .append(BRACKET_CLOSE)
            .append(SEMICOLON);
         final String result = sql.toString();
         return result;
@@ -361,10 +270,10 @@ public abstract class AbstractTable<I, R extends Message, C extends Enum<C> & Ta
      * @param column the column the type of which will be checked
      * @return the SQL type of the column
      */
-    private Sql.Type ensureType(C column) throws IllegalStateException {
+    private Sql.Type ensureType(TableColumn column) throws IllegalStateException {
         Sql.Type type = column.type();
         if (type == Sql.Type.ID) {
-            if (column == getIdColumnDeclaration()) {
+            if (column.equals(getIdColumnDeclaration())) {
                 type = getIdType();
             } else {
                 throw new IllegalStateException("ID type of a non-ID column " + column.name());
@@ -401,5 +310,15 @@ public abstract class AbstractTable<I, R extends Message, C extends Enum<C> & Ta
                                                    .setLogger(log())
                                                    .build();
         query.execute();
+    }
+
+    protected static Logger log() {
+        return LogSingleton.INSTANCE.value;
+    }
+
+    private enum LogSingleton {
+        INSTANCE;
+        @SuppressWarnings("NonSerializableFieldInSerializableClass")
+        private final Logger value = LoggerFactory.getLogger(AbstractTable.class);
     }
 }

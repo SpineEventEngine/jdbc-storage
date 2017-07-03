@@ -32,7 +32,6 @@ import static io.spine.server.storage.jdbc.Sql.Query.INSERT_INTO;
 import static io.spine.server.storage.jdbc.Sql.Query.VALUES;
 import static io.spine.server.storage.jdbc.Sql.getColumnNames;
 import static io.spine.server.storage.jdbc.Sql.nPlaceholders;
-import static io.spine.server.storage.jdbc.table.entity.RecordTable.Column;
 import static java.lang.String.format;
 
 /**
@@ -48,7 +47,7 @@ public class InsertEntityQuery<I> extends WriteEntityQuery<I> {
     private static final String QUERY_TEMPLATE =
             INSERT_INTO + " %s " +
             BRACKET_OPEN +
-            Column.entity + COMMA + " %s " + Column.id +
+            RecordTable.StandardColumn.entity + COMMA + " %s " + RecordTable.StandardColumn.id +
             BRACKET_CLOSE +
             VALUES + " %s " + SEMICOLON;
 

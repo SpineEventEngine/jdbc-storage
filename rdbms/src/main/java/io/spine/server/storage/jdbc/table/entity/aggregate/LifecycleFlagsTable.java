@@ -20,18 +20,18 @@
 
 package io.spine.server.storage.jdbc.table.entity.aggregate;
 
+import com.google.common.collect.ImmutableList;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.entity.LifecycleFlags;
-import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.aggregate.query.LifecycleFlagsQueryFactory;
-import io.spine.server.storage.jdbc.entity.lifecycleflags.query.MarkEntityQuery;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 import io.spine.server.storage.jdbc.table.TableColumn;
-import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.util.DataSourceWrapper;
 import io.spine.server.storage.jdbc.util.DbTableNameFactory;
+
+import java.util.List;
 
 import static io.spine.server.storage.jdbc.Sql.Type.BOOLEAN;
 import static io.spine.server.storage.jdbc.Sql.Type.ID;
@@ -41,19 +41,18 @@ import static io.spine.server.storage.jdbc.Sql.Type.ID;
  *
  * @author Dmytro Dashenkov
  */
-public class LifecycleFlagsTable<I> extends AggregateTable<I, LifecycleFlags, LifecycleFlagsTable.Column> {
+public class LifecycleFlagsTable<I> extends AggregateTable<I, LifecycleFlags> {
 
     private static final String TABLE_NAME_POSTFIX = "visibility";
 
     private final LifecycleFlagsQueryFactory<I> queryFactory;
 
     public LifecycleFlagsTable(Class<? extends Aggregate<I, ?, ?>> aggregateClass,
-                               DataSourceWrapper dataSource,
-                               ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry) {
+                               DataSourceWrapper dataSource) {
         super(DbTableNameFactory.newTableName(aggregateClass) + TABLE_NAME_POSTFIX,
               aggregateClass,
               Column.id.name(),
-              dataSource, columnTypeRegistry);
+              dataSource);
         this.queryFactory = new LifecycleFlagsQueryFactory<>(dataSource, log(), getIdColumn(),
                                                              getName());
     }
@@ -64,8 +63,8 @@ public class LifecycleFlagsTable<I> extends AggregateTable<I, LifecycleFlags, Li
     }
 
     @Override
-    protected Class<Column> getTableColumnType() {
-        return Column.class;
+    protected List<? extends TableColumn> getTableColumns() {
+        return ImmutableList.copyOf(Column.values());
     }
 
     // Storing records under string IDs instead of generic
@@ -79,6 +78,7 @@ public class LifecycleFlagsTable<I> extends AggregateTable<I, LifecycleFlags, Li
         return null;
     }
 
+    // TODO:2017-07-03:dmytro.dashenkov: Reduce visibility.
     public enum Column implements TableColumn {
 
         id(ID),

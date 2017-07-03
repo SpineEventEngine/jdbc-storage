@@ -21,14 +21,11 @@
 package io.spine.server.storage.jdbc.table.entity.aggregate;
 
 import com.google.protobuf.Message;
-import io.spine.server.entity.storage.ColumnTypeRegistry;
+import io.spine.server.entity.Entity;
 import io.spine.server.storage.jdbc.aggregate.JdbcAggregateStorage;
 import io.spine.server.storage.jdbc.table.AbstractTable;
 import io.spine.server.storage.jdbc.table.entity.EntityTable;
-import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.util.DataSourceWrapper;
-import io.spine.server.entity.Entity;
-import io.spine.server.storage.jdbc.table.TableColumn;
 
 /**
  * A common superclass for the
@@ -37,21 +34,18 @@ import io.spine.server.storage.jdbc.table.TableColumn;
  *
  * @author Dmytro Dashenkov
  */
-abstract class AggregateTable<I, R extends Message, C extends Enum<C> & TableColumn>
-        extends EntityTable<I, R, C> {
+abstract class AggregateTable<I, R extends Message> extends EntityTable<I, R> {
 
     protected AggregateTable(Class<? extends Entity<I, ?>> entityClass,
                              String idColumnName,
-                             DataSourceWrapper dataSource,
-                             ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry) {
-        super(entityClass, idColumnName, dataSource, columnTypeRegistry);
+                             DataSourceWrapper dataSource) {
+        super(entityClass, idColumnName, dataSource);
     }
 
     protected AggregateTable(String tableName,
                              Class<? extends Entity<I, ?>> entityClass,
                              String idColumnName,
-                             DataSourceWrapper dataSource,
-                             ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry) {
-        super(tableName, entityClass, idColumnName, dataSource, columnTypeRegistry);
+                             DataSourceWrapper dataSource) {
+        super(tableName, entityClass, idColumnName, dataSource);
     }
 }

@@ -70,8 +70,8 @@ public class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
 
     private static final String SQL_TEMPLATE =
             Sql.Query.INSERT_INTO + FORMAT_PLACEHOLDER +
-            BRACKET_OPEN + RecordTable.Column.id + COMMA +
-            RecordTable.Column.entity + COMMA +
+            BRACKET_OPEN + RecordTable.StandardColumn.id + COMMA +
+            RecordTable.StandardColumn.entity + COMMA +
             FORMAT_PLACEHOLDER + BRACKET_CLOSE +
             Sql.Query.VALUES + FORMAT_PLACEHOLDER;
 

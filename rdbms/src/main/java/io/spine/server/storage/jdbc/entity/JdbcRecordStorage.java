@@ -22,14 +22,10 @@ package io.spine.server.storage.jdbc.entity;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.protobuf.FieldMask;
 import io.spine.server.entity.Entity;
 import io.spine.server.entity.EntityRecord;
-import io.spine.server.entity.storage.Column;
-import io.spine.server.entity.storage.ColumnType;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
-import io.spine.server.entity.storage.EntityColumns;
 import io.spine.server.entity.storage.EntityQuery;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.RecordStorage;
@@ -40,7 +36,6 @@ import io.spine.server.storage.jdbc.table.entity.RecordTable;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.util.DataSourceWrapper;
 
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -57,8 +52,6 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
 
     private final DataSourceWrapper dataSource;
     private final RecordTable<I> table;
-    private final ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry;
-    private final Collection<Column> columns;
 
     protected JdbcRecordStorage(DataSourceWrapper dataSource,
                                 boolean multitenant,
@@ -67,11 +60,9 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
                                         extends JdbcColumnType<?, ?>> columnTypeRegistry)
             throws DatabaseException {
         super(multitenant);
-        this.columns = EntityColumns.getColumns(entityClass);
         this.dataSource = dataSource;
         this.table = new RecordTable<>(entityClass, dataSource, columnTypeRegistry);
-        this.columnTypeRegistry = columnTypeRegistry;
-        table.createIfNotExists(columns);
+        table.createIfNotExists();
     }
 
 

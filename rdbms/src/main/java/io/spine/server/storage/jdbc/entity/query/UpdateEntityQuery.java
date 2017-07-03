@@ -42,11 +42,11 @@ public class UpdateEntityQuery<I> extends WriteEntityQuery<I> {
 
     private static final String QUERY_TEMPLATE =
             Sql.Query.UPDATE + "%s" +
-            Sql.Query.SET + RecordTable.Column.entity + EQUAL +
+            Sql.Query.SET + RecordTable.StandardColumn.entity + EQUAL +
             Sql.Query.PLACEHOLDER + COMMA +
             archived + EQUAL + Sql.Query.PLACEHOLDER + COMMA +
             deleted + EQUAL + Sql.Query.PLACEHOLDER +
-            Sql.Query.WHERE + RecordTable.Column.id + EQUAL +
+            Sql.Query.WHERE + RecordTable.StandardColumn.id + EQUAL +
             Sql.Query.PLACEHOLDER + SEMICOLON;
 
     private UpdateEntityQuery(Builder<I> builder) {
