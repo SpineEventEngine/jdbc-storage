@@ -246,7 +246,7 @@ public abstract class AbstractTable<I, R extends Message> {
         }
         final String idColumnName = getIdColumnDeclaration().name();
         sql.append(Sql.Query.PRIMARY_KEY)
-           .append(BRACKET_OPEN)
+           .append(BRACKET_OPEN) // TODO:2017-07-03:dmytro.dashenkov: Nullable columns.
            .append(idColumnName)
            .append(BRACKET_CLOSE)
            .append(BRACKET_CLOSE)

@@ -23,17 +23,17 @@ package io.spine.server.storage.jdbc.entity.query;
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
 import com.google.common.base.Joiner;
+import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import io.spine.server.entity.EntityRecord;
-import io.spine.server.entity.LifecycleFlags;
 import io.spine.server.entity.storage.Column;
 import io.spine.server.entity.storage.ColumnRecords;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.query.ColumnAwareWriteQuery;
-import io.spine.server.storage.jdbc.table.entity.RecordTable;
+import io.spine.server.storage.jdbc.table.entity.RecordTable.StandardColumn;
 import io.spine.server.storage.jdbc.util.ConnectionWrapper;
 import io.spine.server.storage.jdbc.util.IdColumn;
 import io.spine.server.storage.jdbc.util.Serializer;
@@ -48,12 +48,14 @@ import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static com.google.common.collect.Iterables.find;
+import static com.google.common.collect.Maps.newHashMap;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.COMMA;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
+import static io.spine.server.storage.jdbc.Sql.nPlaceholders;
 import static java.lang.String.format;
 import static java.util.Collections.nCopies;
 
@@ -66,26 +68,23 @@ public class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
 
     private static final String FORMAT_PLACEHOLDER = "%s";
 
-    private static int columnsCount;
-
     private static final String SQL_TEMPLATE =
             Sql.Query.INSERT_INTO + FORMAT_PLACEHOLDER +
-            BRACKET_OPEN + RecordTable.StandardColumn.id + COMMA +
-            RecordTable.StandardColumn.entity + COMMA +
+            BRACKET_OPEN + StandardColumn.id + COMMA +
+            StandardColumn.entity + COMMA +
             FORMAT_PLACEHOLDER + BRACKET_CLOSE +
-            Sql.Query.VALUES + FORMAT_PLACEHOLDER;
-
-    private static final String SQL_VALUES_TEMPLATE = Sql.nPlaceholders(columnsCount);
+            Sql.Query.VALUES + FORMAT_PLACEHOLDER + SEMICOLON;
 
     private final Map<I, EntityRecordWithColumns> records;
     private final IdColumn<I> idColumn;
 
+    private final int columnCount;
 
     protected InsertEntityRecordsBulkQuery(Builder<I> builder) {
         super(builder);
         this.records = builder.records;
         this.idColumn = builder.idColumn;
-        this.columnsCount = builder.columnsCount;
+        this.columnCount = builder.columnCount;
     }
 
     public static <I> Builder<I> newBuilder() {
@@ -95,25 +94,31 @@ public class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
     @Override
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
         final PreparedStatement statement = super.prepareStatement(connection);
+        int columnIndex = 1;
         for (Map.Entry<I, EntityRecordWithColumns> record : records.entrySet()) {
-            if (record.getValue().hasColumns()){
-            ColumnRecords.feedColumnsTo(statement,
-                                        record.getValue(),
-                                        getColumnTypeRegistry(),
-                                        getTransformer(record.getKey(), record.getValue()));
+            addRecordParams(statement, columnIndex, record.getKey(), record.getValue());
+            if (record.getValue().hasColumns()) { // TODO:2017-07-03:dmytro.dashenkov: What if not?
+                ColumnRecords.feedColumnsTo(statement,
+                                            record.getValue(),
+                                            getColumnTypeRegistry(),
+                                            getTransformer(record.getValue(),
+                                                           columnIndex
+                                                           + StandardColumn.values().length));
+                columnIndex += columnCount;
             }
         }
         return statement;
     }
 
-    protected Function<String, Integer> getTransformer(I id, EntityRecordWithColumns record) {
+    protected Function<String, Integer> getTransformer(EntityRecordWithColumns record,
+                                                       int fromColumnNumber) {
         final Function<String, Integer> function;
         final Map<String, Column> columns = record.getColumns();
         final List<String> columnList = Lists.newArrayList(columns.keySet());
         Collections.sort(columnList, Ordering.usingToString());
         final Map<String, Integer> result = new HashMap<>();
 
-        Integer index = 2;
+        int index = fromColumnNumber;
 
         for (String entry : columnList) {
             result.put(entry, index);
@@ -129,34 +134,26 @@ public class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
      *
      * <p>This includes following items:
      * <ul>
-     *      <li>ID;
-     *      <li>serialized record by itself;
-     *      <li>{@code Boolean} columns for the record visibility (archived and deleted fields).
+     *     <li>ID;
+     *     <li>serialized record by itself;
+     *     <li>{@code Boolean} columns for the record visibility (archived and deleted fields).
      * </ul>
      *
      * @param statement       the {@linkplain PreparedStatement} to add the query parameters to
-     * @param firstParamIndex index of the first query parameter which must be assigned;
-     *                        after this operation there will be added {@linkplain #COLUMNS_COUNT}
-     *                        params starting with this index
+     * @param firstParamIndex index of the first query parameter which must be assigned
      * @param id              the ID of the record
      * @param record          the record to store
      */
-    private void addRecordsParams(PreparedStatement statement, int firstParamIndex, I id,
-                                  EntityRecordWithColumns record) {
+    private void addRecordParams(PreparedStatement statement,
+                                 int firstParamIndex,
+                                 I id,
+                                 EntityRecordWithColumns record) {
         int paramIndex = firstParamIndex;
         try {
             idColumn.setId(paramIndex, id, statement);
             paramIndex++;
             final byte[] bytes = Serializer.serialize(record.getRecord());
             statement.setBytes(paramIndex, bytes);
-            paramIndex++;
-            final LifecycleFlags status = record.getRecord()
-                                                .getLifecycleFlags();
-            final boolean archived = status.getArchived();
-            final boolean deleted = status.getDeleted();
-            statement.setBoolean(paramIndex, archived);
-            paramIndex++;
-            statement.setBoolean(paramIndex, deleted);
         } catch (SQLException e) {
             logWriteError(id, e);
             throw new DatabaseException(e);
@@ -166,28 +163,14 @@ public class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
     public static class Builder<I>
             extends ColumnAwareWriteQuery.Builder<Builder<I>, InsertEntityRecordsBulkQuery> {
 
-        private Map<I, EntityRecordWithColumns> records;
+        private final Map<I, EntityRecordWithColumns> records = newHashMap();
         private String tableName;
         private IdColumn<I> idColumn;
-        private int columnsCount = records.get(1).getColumns().size() + 2;
-
-
-        public Builder<I> setQueryForBulkInsert() {
-            checkState(!isNullOrEmpty(tableName), "Table name is not set.");
-            checkState(records != null, "Records field is not set.");
-
-            final Collection<String> sqlValues = nCopies(records.size(),
-                                                         SQL_VALUES_TEMPLATE);
-            final String sqlValuesJoined = Joiner.on(COMMA.toString())
-                                                 .join(sqlValues);
-            final String sql =
-                    format(SQL_TEMPLATE, tableName, sqlValuesJoined) + SEMICOLON;
-            setQuery(sql);
-            return getThis();
-        }
+        private int columnCount;
 
         public Builder<I> setRecords(Map<I, EntityRecordWithColumns> records) {
-            this.records = checkNotNull(records);
+            checkNotNull(records);
+            this.records.putAll(records);
             return getThis();
         }
 
@@ -197,7 +180,7 @@ public class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
             return getThis();
         }
 
-        public Builder<I> setidColumn(IdColumn<I> idColumn) {
+        public Builder<I> setIdColumn(IdColumn<I> idColumn) {
             this.idColumn = checkNotNull(idColumn);
             return getThis();
         }
@@ -205,6 +188,19 @@ public class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
 
         @Override
         public InsertEntityRecordsBulkQuery<I> build() {
+            if (records.isEmpty()) {
+                throw new IllegalStateException("Records are not set.");
+            }
+            final EntityRecordWithColumns gaugeRecord =
+                    find(records.values(), Predicates.<EntityRecordWithColumns>notNull());
+            columnCount = StandardColumn.values().length
+                          + gaugeRecord.getColumns().size();
+            final Collection<String> sqlValues = nCopies(records.size(),
+                                                         nPlaceholders(columnCount));
+            final String sqlValuesJoined = Joiner.on(COMMA.toString())
+                                                 .join(sqlValues);
+            final String sql = format(SQL_TEMPLATE, tableName, sqlValuesJoined);
+            setQuery(sql);
             return new InsertEntityRecordsBulkQuery<>(this);
         }
 

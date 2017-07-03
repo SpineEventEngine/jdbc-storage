@@ -136,7 +136,7 @@ public class RecordStorageQueryFactory<I>
                         .setLogger(getLogger())
                         .setDataSource(dataSource)
                         .setTableName(tableName)
-                        .setidColumn(idColumn)
+                        .setIdColumn(idColumn)
                         .setQueryForBulkInsert()
                         .setRecords(records);
         return builder.build();
