@@ -21,7 +21,7 @@
 package io.spine.server.storage.jdbc.projection.query;
 
 import com.google.protobuf.Timestamp;
-import io.spine.server.storage.jdbc.query.SelectByIdQuery;
+import io.spine.server.storage.jdbc.query.SelectMessageByIdQuery;
 import io.spine.server.storage.jdbc.table.LastHandledEventTimeTable;
 
 import javax.annotation.Nullable;
@@ -48,7 +48,7 @@ import static io.spine.validate.Validate.isDefault;
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-public class SelectTimestampQuery extends SelectByIdQuery<String, Timestamp> {
+public class SelectTimestampQuery extends SelectMessageByIdQuery<String, Timestamp> {
 
     private static final String QUERY_TEMPLATE = SELECT.toString() +
                                                  seconds + COMMA +
@@ -84,7 +84,7 @@ public class SelectTimestampQuery extends SelectByIdQuery<String, Timestamp> {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder extends SelectByIdQuery.Builder<Builder,
+    public static class Builder extends SelectMessageByIdQuery.Builder<Builder,
                                                                 SelectTimestampQuery,
                                                                 String,
                                                                 Timestamp> {

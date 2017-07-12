@@ -22,7 +22,7 @@ package io.spine.server.storage.jdbc.projection.query;
 
 import com.google.protobuf.Timestamp;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
-import io.spine.server.storage.jdbc.query.SelectByIdQuery;
+import io.spine.server.storage.jdbc.query.SelectMessageByIdQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 import io.spine.server.storage.jdbc.table.LastHandledEventTimeTable;
@@ -57,7 +57,7 @@ public class LastHandledEventTimeQueryFactory
     }
 
     @Override
-    public SelectByIdQuery<String, Timestamp> newSelectByIdQuery(String id) {
+    public SelectMessageByIdQuery<String, Timestamp> newSelectByIdQuery(String id) {
         final SelectTimestampQuery.Builder builder =
                 SelectTimestampQuery.newBuilder(tableName)
                                     .setDataSource(dataSource)

@@ -25,6 +25,7 @@ import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.entity.storage.EntityQuery;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
+import io.spine.server.storage.jdbc.query.SelectMessageByIdQuery;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import org.slf4j.Logger;
@@ -33,7 +34,6 @@ import io.spine.server.entity.EntityRecord;
 import io.spine.server.storage.RecordStorage;
 import io.spine.server.storage.LifecycleFlagField;
 import io.spine.server.storage.jdbc.entity.lifecycleflags.query.MarkEntityQuery;
-import io.spine.server.storage.jdbc.query.SelectByIdQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
 import io.spine.server.storage.jdbc.table.entity.RecordTable;
 import io.spine.server.storage.jdbc.util.DataSourceWrapper;
@@ -137,13 +137,12 @@ public class RecordStorageQueryFactory<I>
                         .setDataSource(dataSource)
                         .setTableName(tableName)
                         .setIdColumn(idColumn)
-                        .setQueryForBulkInsert()
                         .setRecords(records);
         return builder.build();
     }
 
     @Override
-    public SelectByIdQuery<I, EntityRecord> newSelectByIdQuery(I id) {
+    public SelectMessageByIdQuery<I, EntityRecord> newSelectByIdQuery(I id) {
         final SelectEntityByIdQuery.Builder<I> builder =
                 SelectEntityByIdQuery.<I>newBuilder(tableName)
                         .setDataSource(dataSource)

@@ -20,112 +20,46 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import com.google.protobuf.Descriptors.Descriptor;
-import com.google.protobuf.Message;
-import io.spine.annotation.Internal;
-import io.spine.Identifier;
-import io.spine.server.storage.jdbc.DatabaseException;
-import io.spine.server.storage.jdbc.util.ConnectionWrapper;
 import io.spine.server.storage.jdbc.util.IdColumn;
-import io.spine.server.storage.jdbc.util.Serializer;
-
-import javax.annotation.Nullable;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A query which obtains a {@link Message} by an ID.
- *
- * @param <I> a type of storage message IDs
- * @param <M> a type of messages to read
- * @author Alexander Litus
+ * @author Dmytro Dashenkov
  */
-@Internal
-public class SelectByIdQuery<I, M extends Message> extends StorageQuery {
+public abstract class SelectByIdQuery<I, R> extends StorageQuery {
 
     private final IdColumn<I> idColumn;
     private final I id;
     private final int idIndexInQuery;
 
-    private final String messageColumnName;
-    private final Descriptor messageDescriptor;
-
-    protected SelectByIdQuery(Builder<? extends Builder, ? extends SelectByIdQuery, I, M> builder) {
+    protected SelectByIdQuery(Builder<I, ? extends Builder, ? extends StorageQuery> builder) {
         super(builder);
-        this.idColumn = builder.idColumn;
-        this.id = builder.id;
-        this.idIndexInQuery = builder.idIndexInQuery;
-        this.messageColumnName = builder.messageColumnName;
-        this.messageDescriptor = builder.messageDescriptor;
+        this.id = builder.getId();
+        this.idColumn = builder.getIdColumn();
+        this.idIndexInQuery = builder.getIdIndexInQuery();
     }
 
-    /**
-     * Executes a query, obtains a serialized message and deserializes it.
-     *
-     * @return a message or {@code null} if there is no needed data
-     * @throws DatabaseException if an error occurs during an interaction with the DB
-     * @see Serializer#deserialize(byte[], Descriptor)
-     */
-    @Nullable
-    public M execute() throws DatabaseException {
-        try (ConnectionWrapper connection = getConnection(true);
-             PreparedStatement statement = prepareStatement(connection, id);
-             ResultSet resultSet = statement.executeQuery()) {
-            if (!resultSet.next()) {
-                return null;
-            }
-            final M message = readMessage(resultSet);
-            return message;
-        } catch (SQLException e) {
-            this.getLogger()
-                .error("Error during reading a message, ID = " + Identifier.toString(id), e);
-            throw new DatabaseException(e);
-        }
+    public IdColumn<I> getIdColumn() {
+        return idColumn;
     }
 
-    /**
-     * Retrieves a message from a DB result set.
-     *
-     * <p>The default implementation reads a message as byte array and deserializes it.
-     *
-     * @param resultSet a data set with the cursor pointed to the first row
-     * @return a message instance or {@code null} if the row does not contain the needed data
-     * @throws SQLException if an error occurs during an interaction with the DB
-     */
-    @Nullable
-    protected M readMessage(ResultSet resultSet) throws SQLException {
-        checkNotNull(messageColumnName);
-        checkNotNull(messageDescriptor);
-        final byte[] bytes = resultSet.getBytes(messageColumnName);
-        if (bytes == null) {
-            return null;
-        }
-        final M message = Serializer.deserialize(bytes, messageDescriptor);
-        return message;
+    public I getId() {
+        return id;
     }
 
-    protected PreparedStatement prepareStatement(ConnectionWrapper connection, I id) {
-        final PreparedStatement statement = prepareStatement(connection);
-        idColumn.setId(idIndexInQuery, id, statement);
-        return statement;
+    public int getIdIndexInQuery() {
+        return idIndexInQuery;
     }
 
-    @SuppressWarnings("ClassNameSameAsAncestorName")
-    public abstract static class Builder<B extends Builder<B, Q, I, R>,
-                                         Q extends StorageQuery,
-                                         I,
-                                         R>
+    public abstract R execute();
+
+    protected abstract static class Builder<I,
+                                            B extends Builder<I, B, Q>,
+                                            Q extends SelectByIdQuery>
             extends StorageQuery.Builder<B, Q> {
 
         private int idIndexInQuery;
         private IdColumn<I> idColumn;
         private I id;
-
-        private String messageColumnName;
-        private Descriptor messageDescriptor;
 
         public B setId(I id) {
             this.id = id;
@@ -142,14 +76,16 @@ public class SelectByIdQuery<I, M extends Message> extends StorageQuery {
             return getThis();
         }
 
-        public B setMessageColumnName(String messageColumnName) {
-            this.messageColumnName = messageColumnName;
-            return getThis();
+        public int getIdIndexInQuery() {
+            return idIndexInQuery;
         }
 
-        public B setMessageDescriptor(Descriptor messageDescriptor) {
-            this.messageDescriptor = messageDescriptor;
-            return getThis();
+        public IdColumn<I> getIdColumn() {
+            return idColumn;
+        }
+
+        public I getId() {
+            return id;
         }
     }
 }

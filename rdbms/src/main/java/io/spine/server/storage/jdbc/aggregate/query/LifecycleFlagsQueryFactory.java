@@ -28,7 +28,7 @@ import io.spine.server.storage.jdbc.entity.lifecycleflags.query.MarkEntityQuery;
 import io.spine.server.storage.jdbc.entity.lifecycleflags.query.SelectLifecycleFlagsQuery;
 import io.spine.server.storage.jdbc.entity.lifecycleflags.query.UpdateLifecycleFlagsQuery;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
-import io.spine.server.storage.jdbc.query.SelectByIdQuery;
+import io.spine.server.storage.jdbc.query.SelectMessageByIdQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 import io.spine.server.storage.jdbc.table.entity.aggregate.LifecycleFlagsTable;
@@ -64,8 +64,8 @@ public class LifecycleFlagsQueryFactory<I> implements ReadQueryFactory<I, Lifecy
     }
 
     @Override
-    public SelectByIdQuery<I, LifecycleFlags> newSelectByIdQuery(I id) {
-        final SelectByIdQuery<I, LifecycleFlags> query =
+    public SelectMessageByIdQuery<I, LifecycleFlags> newSelectByIdQuery(I id) {
+        final SelectMessageByIdQuery<I, LifecycleFlags> query =
                 SelectLifecycleFlagsQuery.<I>newBuilder(tableName)
                         .setDataSource(dataSource)
                         .setLogger(logger)

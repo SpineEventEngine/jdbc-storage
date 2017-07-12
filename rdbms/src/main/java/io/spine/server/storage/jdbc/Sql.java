@@ -23,7 +23,6 @@ package io.spine.server.storage.jdbc;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
-import io.spine.server.entity.storage.Column;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 
 import java.sql.Types;
@@ -83,7 +82,7 @@ public class Sql {
         final String columnNames = Joiner.on(COMMA.toString())
                                          .join(columnList);
 
-        if (columnNames.isEmpty()) {
+        if (columnNames.isEmpty()) { // TODO:2017-07-10:dmytro.dashenkov: Review this logic.
             wrappedColumnNames = columnNames;
         } else {
             wrappedColumnNames = columnNames + COMMA;

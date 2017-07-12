@@ -20,25 +20,25 @@
 
 package io.spine.server.storage.jdbc.entity.lifecycleflags.query;
 
-import io.spine.server.storage.jdbc.Sql;
-import io.spine.server.storage.jdbc.table.entity.aggregate.LifecycleFlagsTable;
 import io.spine.server.entity.LifecycleFlags;
 import io.spine.server.storage.LifecycleFlagField;
-import io.spine.server.storage.jdbc.query.SelectByIdQuery;
+import io.spine.server.storage.jdbc.Sql;
+import io.spine.server.storage.jdbc.query.SelectMessageByIdQuery;
+import io.spine.server.storage.jdbc.table.entity.aggregate.LifecycleFlagsTable;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import static java.lang.String.format;
 import static io.spine.server.storage.LifecycleFlagField.archived;
 import static io.spine.server.storage.LifecycleFlagField.deleted;
+import static java.lang.String.format;
 
 /**
  * The query selecting one {@linkplain LifecycleFlags entity lifecycle flags} by ID.
  *
  * @author Dmytro Dashenkov
  */
-public class SelectLifecycleFlagsQuery<I> extends SelectByIdQuery<I, LifecycleFlags> {
+public class SelectLifecycleFlagsQuery<I> extends SelectMessageByIdQuery<I, LifecycleFlags> {
 
     private static final String SQL =
             Sql.Query.SELECT.toString() + archived + Sql.BuildingBlock.COMMA + deleted +
@@ -70,10 +70,11 @@ public class SelectLifecycleFlagsQuery<I> extends SelectByIdQuery<I, LifecycleFl
         return builder;
     }
 
-    public static class Builder<I> extends SelectByIdQuery.Builder<Builder<I>,
-            SelectLifecycleFlagsQuery,
-            I,
-            LifecycleFlags> {
+    public static class Builder<I>
+            extends SelectMessageByIdQuery.Builder<Builder<I>,
+                                                   SelectLifecycleFlagsQuery<I>,
+                                                   I,
+                                                   LifecycleFlags> {
         @Override
         public SelectLifecycleFlagsQuery<I> build() {
             return new SelectLifecycleFlagsQuery<>(this);

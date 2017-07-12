@@ -23,6 +23,7 @@ package io.spine.server.storage.jdbc.entity.query;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.query.WriteRecordQuery;
 import io.spine.server.storage.jdbc.table.entity.RecordTable;
+import io.spine.server.storage.jdbc.table.entity.RecordTable.StandardColumn;
 
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
@@ -32,6 +33,8 @@ import static io.spine.server.storage.jdbc.Sql.Query.INSERT_INTO;
 import static io.spine.server.storage.jdbc.Sql.Query.VALUES;
 import static io.spine.server.storage.jdbc.Sql.getColumnNames;
 import static io.spine.server.storage.jdbc.Sql.nPlaceholders;
+import static io.spine.server.storage.jdbc.table.entity.RecordTable.StandardColumn.entity;
+import static io.spine.server.storage.jdbc.table.entity.RecordTable.StandardColumn.id;
 import static java.lang.String.format;
 
 /**
@@ -44,12 +47,15 @@ import static java.lang.String.format;
  */
 public class InsertEntityQuery<I> extends WriteEntityQuery<I> {
 
+    private static final String FORMAT_PLACEHOLDER = "%s";
+
     private static final String QUERY_TEMPLATE =
-            INSERT_INTO + " %s " +
+            INSERT_INTO + FORMAT_PLACEHOLDER +
             BRACKET_OPEN +
-            RecordTable.StandardColumn.entity + COMMA + " %s " + RecordTable.StandardColumn.id +
+            entity + COMMA + id +
+            FORMAT_PLACEHOLDER +
             BRACKET_CLOSE +
-            VALUES + " %s " + SEMICOLON;
+            VALUES + FORMAT_PLACEHOLDER + SEMICOLON;
 
     private InsertEntityQuery(Builder<I> builder) {
         super(builder);
@@ -57,11 +63,20 @@ public class InsertEntityQuery<I> extends WriteEntityQuery<I> {
 
     public static <I> Builder<I> newBuilder(String tableName, EntityRecordWithColumns record) {
         final Builder<I> builder = new Builder<>();
-        final int columnCount = record.getColumns().size() + 2;
-        final String columnNames = getColumnNames(record);
-        final String placeholders = nPlaceholders(columnCount);
-        final String sqlQuery = format(QUERY_TEMPLATE, tableName, columnNames, placeholders);
-
+        final int columnCount;
+        final String entityColumnNames;
+        if (record.hasColumns()) {
+            columnCount = record.getColumns().size() + StandardColumn.values().length;
+            entityColumnNames = COMMA + getColumnNames(record);
+        } else {
+            columnCount = StandardColumn.values().length;
+            entityColumnNames = "";
+        }
+        final String valuePlaceholders = nPlaceholders(columnCount);
+        final String sqlQuery = format(QUERY_TEMPLATE,
+                                       tableName,
+                                       entityColumnNames,
+                                       valuePlaceholders);
         builder.setIdIndexInQuery(columnCount)
                .setRecordIndexInQuery(QueryParameter.RECORD.index)
                .setQuery(sqlQuery);
@@ -69,8 +84,10 @@ public class InsertEntityQuery<I> extends WriteEntityQuery<I> {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder<I>
-            extends WriteRecordQuery.Builder<Builder<I>, InsertEntityQuery, I, EntityRecordWithColumns> {
+    public static class Builder<I> extends WriteRecordQuery.Builder<Builder<I>,
+                                                                    InsertEntityQuery,
+                                                                    I,
+                                                                    EntityRecordWithColumns> {
 
         @Override
         public InsertEntityQuery build() {

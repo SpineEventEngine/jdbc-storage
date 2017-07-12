@@ -20,13 +20,11 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import com.google.protobuf.Message;
-import org.junit.Test;
 import io.spine.server.storage.jdbc.DatabaseException;
+import org.junit.Test;
 
 import java.sql.SQLException;
 
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyString;
@@ -35,11 +33,11 @@ import static org.mockito.Mockito.verify;
 /**
  * @author Andrey Lavrov
  */
-public class SelectByIdQueryShould {
+public class SelectMessageByIdQueryShould {
 
     @Test
     public void handle_database_exception() throws SQLException {
-        final SelectByIdQuery query = Given.getSelectByIdQueryMock();
+        final SelectMessageByIdQuery query = Given.getSelectByIdQueryMock();
         try {
             query.execute();
             fail();
@@ -50,7 +48,7 @@ public class SelectByIdQueryShould {
 
 //    @Test
 //    public void return_null_if_nothing_was_read_from_db() throws SQLException {
-//        final SelectByIdQuery query = Given.getSelectByIdQueryReturningEmptyResultSetMock();
+//        final SelectMessageByIdQuery query = Given.getSelectByIdQueryReturningEmptyResultSetMock();
 //        final Message result = query.execute();
 //        assertNull("If nothing is read from the database the result of the query must be null",
 //                   result);

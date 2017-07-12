@@ -21,13 +21,19 @@
 package io.spine.server.storage.jdbc.aggregate.query;
 
 import com.google.protobuf.Int32Value;
-import io.spine.server.storage.jdbc.Sql;
-import io.spine.server.storage.jdbc.query.SelectByIdQuery;
-import io.spine.server.storage.jdbc.table.entity.aggregate.EventCountTable;
+import io.spine.server.storage.jdbc.query.SelectMessageByIdQuery;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import static io.spine.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
+import static io.spine.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
+import static io.spine.server.storage.jdbc.Sql.Query.FROM;
+import static io.spine.server.storage.jdbc.Sql.Query.PLACEHOLDER;
+import static io.spine.server.storage.jdbc.Sql.Query.SELECT;
+import static io.spine.server.storage.jdbc.Sql.Query.WHERE;
+import static io.spine.server.storage.jdbc.table.entity.aggregate.EventCountTable.Column.event_count;
+import static io.spine.server.storage.jdbc.table.entity.aggregate.EventCountTable.Column.id;
 import static java.lang.String.format;
 
 /**
@@ -36,12 +42,12 @@ import static java.lang.String.format;
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-public class SelectEventCountByIdQuery<I> extends SelectByIdQuery<I, Int32Value> {
+public class SelectEventCountByIdQuery<I> extends SelectMessageByIdQuery<I, Int32Value> {
 
     private static final String QUERY_TEMPLATE =
-            Sql.Query.SELECT.toString() + EventCountTable.Column.event_count +
-            Sql.Query.FROM + "%s" +
-            Sql.Query.WHERE + EventCountTable.Column.id + Sql.BuildingBlock.EQUAL + Sql.Query.PLACEHOLDER + Sql.BuildingBlock.SEMICOLON;
+            SELECT.toString() + event_count +
+            FROM + "%s" +
+            WHERE + id + EQUAL + PLACEHOLDER + SEMICOLON;
 
     private SelectEventCountByIdQuery(Builder<I> builder) {
         super(builder);
@@ -50,7 +56,7 @@ public class SelectEventCountByIdQuery<I> extends SelectByIdQuery<I, Int32Value>
     @SuppressWarnings("MethodDoesntCallSuperMethod") // Override default message storing policy
     @Override
     protected Int32Value readMessage(ResultSet resultSet) throws SQLException {
-        final int eventCount = resultSet.getInt(EventCountTable.Column.event_count.name());
+        final int eventCount = resultSet.getInt(event_count.name());
         return Int32Value.newBuilder()
                          .setValue(eventCount)
                          .build();
@@ -64,10 +70,11 @@ public class SelectEventCountByIdQuery<I> extends SelectByIdQuery<I, Int32Value>
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder<I> extends SelectByIdQuery.Builder<Builder<I>,
-                                                                   SelectEventCountByIdQuery,
-                                                                   I,
-                                                                   Int32Value> {
+    public static class Builder<I>
+            extends SelectMessageByIdQuery.Builder<Builder<I>,
+                                                   SelectEventCountByIdQuery<I>,
+                                                   I,
+                                                   Int32Value> {
         @Override
         public SelectEventCountByIdQuery<I> build() {
             return new SelectEventCountByIdQuery<>(this);

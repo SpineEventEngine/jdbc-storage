@@ -107,7 +107,7 @@ class Given {
 
     private static final Any recordMock = Any.getDefaultInstance();
 
-    private static class SelectByIdQueryMock extends SelectByIdQuery<String, Message> {
+    private static class SelectByIdQueryMock extends SelectMessageByIdQuery<String, Message> {
 
         protected SelectByIdQueryMock(Builder builder) {
             super(builder);
@@ -120,7 +120,7 @@ class Given {
         }
 
         @SuppressWarnings("ClassNameSameAsAncestorName")
-        public static class Builder extends SelectByIdQuery.Builder<Builder,
+        public static class Builder extends SelectMessageByIdQuery.Builder<Builder,
                                                                     SelectByIdQueryMock,
                                                                     String,
                                                                     Message> {

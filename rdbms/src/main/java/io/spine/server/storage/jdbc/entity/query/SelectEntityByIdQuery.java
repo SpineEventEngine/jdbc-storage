@@ -23,7 +23,7 @@ package io.spine.server.storage.jdbc.entity.query;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.LifecycleFlags;
 import io.spine.server.storage.LifecycleFlagField;
-import io.spine.server.storage.jdbc.query.SelectByIdQuery;
+import io.spine.server.storage.jdbc.query.SelectMessageByIdQuery;
 import io.spine.server.storage.jdbc.table.entity.RecordTable;
 
 import javax.annotation.Nullable;
@@ -46,7 +46,7 @@ import static io.spine.server.storage.jdbc.table.entity.RecordTable.StandardColu
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-public class SelectEntityByIdQuery<I> extends SelectByIdQuery<I, EntityRecord> {
+public class SelectEntityByIdQuery<I> extends SelectMessageByIdQuery<I, EntityRecord> {
 
     private static final String QUERY_TEMPLATE =
             SELECT.toString() + ALL_ATTRIBUTES + FROM + " %s" + WHERE +
@@ -88,7 +88,7 @@ public class SelectEntityByIdQuery<I> extends SelectByIdQuery<I, EntityRecord> {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder<I> extends SelectByIdQuery.Builder<Builder<I>,
+    public static class Builder<I> extends SelectMessageByIdQuery.Builder<Builder<I>,
                                                                    SelectEntityByIdQuery<I>,
                                                                    I,
                                                                    EntityRecord> {
