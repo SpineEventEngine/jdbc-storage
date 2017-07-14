@@ -28,7 +28,6 @@ import io.spine.server.storage.jdbc.query.ContainsQuery;
 import io.spine.server.storage.jdbc.query.DeleteRecordQuery;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.SelectByIdQuery;
-import io.spine.server.storage.jdbc.query.SelectMessageByIdQuery;
 import io.spine.server.storage.jdbc.query.SimpleQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
@@ -67,7 +66,7 @@ import static io.spine.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
  * @author Dmytro Dashenkov
  * @see TableColumn
  */
-public abstract class AbstractTable<I, R extends Message> {
+public abstract class AbstractTable<I, R extends Message, W> {
 
     private static final int MEAN_SQL_QUERY_LENGTH = 128; // TODO:2017-07-03:dmytro.dashenkov: Review the need in this constant
 
@@ -111,7 +110,7 @@ public abstract class AbstractTable<I, R extends Message> {
     /**
      * @return an instance of {@link WriteQueryFactory} which produces queries to the given table
      */
-    protected abstract WriteQueryFactory<I, R> getWriteQueryFactory();
+    protected abstract WriteQueryFactory<I, W> getWriteQueryFactory();
 
     protected abstract List<? extends TableColumn> getTableColumns();
 
@@ -172,7 +171,7 @@ public abstract class AbstractTable<I, R extends Message> {
      * @param id     ID to write the record under
      * @param record the record to write
      */
-    public void write(I id, R record) {
+    public void write(I id, W record) {
         if (containsRecord(id)) {
             update(id, record);
         } else {
@@ -180,12 +179,12 @@ public abstract class AbstractTable<I, R extends Message> {
         }
     }
 
-    protected void insert(I id, R record) {
+    protected void insert(I id, W record) {
         final WriteQuery query = composeInsertQuery(id, record);
         query.execute();
     }
 
-    protected void update(I id, R record) {
+    protected void update(I id, W record) {
         final WriteQuery query = composeUpdateQuery(id, record);
         query.execute();
     }
@@ -218,12 +217,12 @@ public abstract class AbstractTable<I, R extends Message> {
         return dataSource;
     }
 
-    protected WriteQuery composeInsertQuery(I id, R record) {
+    protected WriteQuery composeInsertQuery(I id, W record) {
         final WriteQuery query = getWriteQueryFactory().newInsertQuery(id, record);
         return query;
     }
 
-    protected WriteQuery composeUpdateQuery(I id, R record) {
+    protected WriteQuery composeUpdateQuery(I id, W record) {
         final WriteQuery query = getWriteQueryFactory().newUpdateQuery(id, record);
         return query;
     }

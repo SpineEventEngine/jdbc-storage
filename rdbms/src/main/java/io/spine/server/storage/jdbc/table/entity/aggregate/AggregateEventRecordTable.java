@@ -66,7 +66,7 @@ public class AggregateEventRecordTable<I> extends AggregateTable<I, AggregateEve
 
     @Override
     protected WriteQueryFactory<I, AggregateEventRecord> getWriteQueryFactory() {
-        return null;
+        return queryFactory;
     }
 
     @Override

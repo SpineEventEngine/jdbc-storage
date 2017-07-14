@@ -63,7 +63,7 @@ import static java.util.Collections.addAll;
  *
  * @author Dmytro Dashenkov
  */
-public class RecordTable<I> extends EntityTable<I, EntityRecord> {
+public class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumns> {
 
     private final RecordStorageQueryFactory<I> queryFactory;
 
@@ -92,8 +92,8 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord> {
     }
 
     @Override
-    protected WriteQueryFactory<I, EntityRecord> getWriteQueryFactory() {
-        return null;
+    protected WriteQueryFactory<I, EntityRecordWithColumns> getWriteQueryFactory() {
+        return queryFactory;
     }
 
     @Override
@@ -113,16 +113,6 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord> {
             return recordMap;
         } catch (SQLException e) {
             throw new DatabaseException(e);
-        }
-    }
-
-    public void write(I id, EntityRecordWithColumns record) {
-        if (containsRecord(id)) {
-            queryFactory.newUpdateQuery(id, record)
-                        .execute();
-        } else {
-            queryFactory.newInsertQuery(id, record)
-                        .execute();
         }
     }
 

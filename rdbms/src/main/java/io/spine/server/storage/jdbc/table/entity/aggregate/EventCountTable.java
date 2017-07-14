@@ -79,7 +79,7 @@ public class EventCountTable<I> extends AggregateTable<I, Int32Value> {
 
     @Override
     protected WriteQueryFactory<I, Int32Value> getWriteQueryFactory() {
-        return null;
+        return queryFactory;
     }
 
     // TODO:2017-07-03:dmytro.dashenkov: Reduce visibility.

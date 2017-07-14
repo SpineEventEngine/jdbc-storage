@@ -44,7 +44,7 @@ import static io.spine.server.storage.jdbc.Sql.Type.VARCHAR_255;
  * @see io.spine.server.projection.ProjectionRepository#catchUp
  * @author Dmytro Dashenkov
  */
-public class LastHandledEventTimeTable extends AbstractTable<String, Timestamp> {
+public class LastHandledEventTimeTable extends AbstractTable<String, Timestamp, Timestamp> {
 
     private static final String TABLE_NAME = "projection_last_handled_event_time";
 
@@ -75,7 +75,7 @@ public class LastHandledEventTimeTable extends AbstractTable<String, Timestamp> 
 
     @Override
     protected WriteQueryFactory<String, Timestamp> getWriteQueryFactory() {
-        return null;
+        return queryFactory;
     }
 
     public enum Column implements TableColumn {

@@ -75,7 +75,7 @@ public class LifecycleFlagsTable<I> extends AggregateTable<I, LifecycleFlags> {
 
     @Override
     protected WriteQueryFactory<I, LifecycleFlags> getWriteQueryFactory() {
-        return null;
+        return queryFactory;
     }
 
     // TODO:2017-07-03:dmytro.dashenkov: Reduce visibility.

@@ -34,8 +34,8 @@ import static io.spine.server.storage.jdbc.util.DbTableNameFactory.newTableName;
  *
  * @author Dmytro Dashenkov
  */
-public abstract class EntityTable<I, R extends Message>
-        extends AbstractTable<I, R> {
+public abstract class EntityTable<I, R extends Message, W>
+        extends AbstractTable<I, R, W> {
 
     private final Class<? extends Entity<I, ?>> entityClass;
 

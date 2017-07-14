@@ -34,7 +34,7 @@ import io.spine.server.storage.jdbc.util.DataSourceWrapper;
  *
  * @author Dmytro Dashenkov
  */
-abstract class AggregateTable<I, R extends Message> extends EntityTable<I, R> {
+abstract class AggregateTable<I, T extends Message> extends EntityTable<I, T, T> {
 
     protected AggregateTable(Class<? extends Entity<I, ?>> entityClass,
                              String idColumnName,
