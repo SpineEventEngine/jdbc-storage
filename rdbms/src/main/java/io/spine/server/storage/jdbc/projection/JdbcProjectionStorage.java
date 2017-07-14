@@ -99,11 +99,8 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
 
     @Override
     public void close() throws DatabaseException {
-        try {
-            super.close();
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
+        super.close();
+
         // close only recordStorage because it must close dataSource by itself
         recordStorage.close();
     }
