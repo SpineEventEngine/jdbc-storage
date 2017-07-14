@@ -22,6 +22,8 @@ package io.spine.server.storage.jdbc.query;
 
 import com.google.protobuf.Any;
 import com.google.protobuf.Message;
+import io.spine.server.entity.EntityRecord;
+import io.spine.server.entity.storage.EntityRecordWithColumns;
 import org.slf4j.Logger;
 import io.spine.server.storage.jdbc.GivenDataSource;
 import io.spine.server.storage.jdbc.util.ConnectionWrapper;
@@ -100,12 +102,13 @@ class Given {
                 WriteRecordQueryMock.newBuilder()
                                     .setDataSource(dataSourceMock)
                                     .setLogger(loggerMock)
-                                    .setIdColumn(idColumnMock);
-//                                    .setRecord(recordMock);
+                                    .setIdColumn(idColumnMock)
+                                    .setRecord(recordMock);
         return builder.build();
     }
 
-    private static final Any recordMock = Any.getDefaultInstance();
+    private static final EntityRecordWithColumns recordMock =
+            EntityRecordWithColumns.of(EntityRecord.getDefaultInstance());
 
     private static class SelectByIdQueryMock extends SelectMessageByIdQuery<String, Message> {
 
