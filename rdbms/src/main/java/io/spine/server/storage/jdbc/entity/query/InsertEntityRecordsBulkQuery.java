@@ -74,7 +74,7 @@ public class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
     private static final String SQL_TEMPLATE =
             INSERT_INTO + FORMAT_PLACEHOLDER +
             BRACKET_OPEN + id + COMMA +
-            entity + COMMA +
+            entity +
             FORMAT_PLACEHOLDER +
             BRACKET_CLOSE +
             VALUES + FORMAT_PLACEHOLDER + SEMICOLON;
