@@ -51,9 +51,10 @@ public class DbTableNameFactory {
      * @return a valid DB table name
      */
     public static String newTableName(Class<? extends Entity<?, ?>> clazz) {
-        final String className = clazz.getSimpleName().replaceAll("(.)([A-Z])", "$1_$2");
-        final String tableNameTmp = PATTERN_DOT.matcher(className)
-                                                       .replaceAll(UNDERSCORE);
+        final Class<? extends Message> stateType = Entity.TypeInfo.getStateClass(clazz);
+        final String typeName = TypeName.of(stateType).toString();
+        final String tableNameTmp = PATTERN_DOT.matcher(typeName)
+                                               .replaceAll(UNDERSCORE);
         final String result = PATTERN_DOLLAR.matcher(tableNameTmp)
                                             .replaceAll(UNDERSCORE)
                                             .toLowerCase();
