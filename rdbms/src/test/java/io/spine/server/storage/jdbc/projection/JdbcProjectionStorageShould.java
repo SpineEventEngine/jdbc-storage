@@ -24,14 +24,13 @@ import io.spine.server.entity.Entity;
 import io.spine.server.projection.Projection;
 import io.spine.server.projection.ProjectionStorage;
 import io.spine.server.projection.ProjectionStorageShould;
+import io.spine.server.storage.RecordStorageShould;
 import io.spine.server.storage.jdbc.GivenDataSource;
 import io.spine.server.storage.jdbc.builder.StorageBuilder;
 import io.spine.server.storage.jdbc.entity.JdbcRecordStorage;
 import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
 import io.spine.server.storage.jdbc.util.DataSourceWrapper;
-import io.spine.test.projection.Project;
 import io.spine.test.storage.ProjectId;
-import io.spine.validate.ValidatingBuilder;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
@@ -45,14 +44,16 @@ public class JdbcProjectionStorageShould extends ProjectionStorageShould {
     protected ProjectionStorage<ProjectId> getStorage(Class<? extends Entity> entityClass) {
         final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(
                 "projectionStorageTests");
-        final Class<TestProjection> projectionClass = TestProjection.class;
         final JdbcRecordStorage<ProjectId> entityStorage =
                 JdbcRecordStorage.<ProjectId>newBuilder()
                                  .setDataSource(dataSource)
                                  .setMultitenant(false)
-                                 .setEntityClass(projectionClass)
+                                 .setEntityClass(entityClass)
                                  .setColumnTypeRegistry(JdbcTypeRegistryFactory.defaultInstance())
                                  .build();
+        @SuppressWarnings("unchecked") // Required for the tests
+        final Class<? extends Projection<ProjectId, ?, ?>> projectionClass =
+                (Class<? extends Projection<ProjectId, ?, ?>>) entityClass;
         final ProjectionStorage<ProjectId> storage =
                 JdbcProjectionStorage.<ProjectId>newBuilder()
                                      .setRecordStorage(entityStorage)
@@ -65,7 +66,7 @@ public class JdbcProjectionStorageShould extends ProjectionStorageShould {
 
     @Test(expected = IllegalStateException.class)
     public void throw_exception_when_closing_twice() throws Exception {
-        final ProjectionStorage<?> storage = getStorage(TestProjection.class);
+        final ProjectionStorage<?> storage = getStorage(getTestEntityClass());
         storage.close();
         storage.close();
     }
@@ -78,9 +79,13 @@ public class JdbcProjectionStorageShould extends ProjectionStorageShould {
         assertNotNull(builder);
     }
 
-    private static class TestProjection extends Projection<ProjectId, Project, ValidatingBuilder<Project, Project.Builder>> {
+    @Override
+    protected Class<? extends TestCounterEntity> getTestEntityClass() {
+        return TestEntity.class;
+    }
 
-        private TestProjection(ProjectId id) {
+    private static class TestEntity extends RecordStorageShould.TestCounterEntity<ProjectId> {
+        protected TestEntity(ProjectId id) {
             super(id);
         }
     }
