@@ -27,6 +27,7 @@ import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.query.StorageQuery;
 import io.spine.server.storage.jdbc.util.ConnectionWrapper;
 import io.spine.server.storage.jdbc.util.IdColumn;
+import io.spine.server.storage.jdbc.util.MessageDbIterator;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -69,8 +70,8 @@ public class SelectByIdSortedByTimeDescQuery<I> extends StorageQuery {
         try (ConnectionWrapper connection = getConnection(true);
              PreparedStatement statement = prepareStatement(connection)) {
             idColumn.setId(1, id, statement);
-            return new DbIterator<>(statement, AggregateEventRecordTable.Column.aggregate.toString(),
-                                    AggregateEventRecord.getDescriptor());
+            return new MessageDbIterator<>(statement, AggregateEventRecordTable.Column.aggregate.toString(),
+                                         AggregateEventRecord.getDescriptor());
         } catch (SQLException e) {
             getLogger().error("Error while selecting entity by aggregate id sorted by time: ", e);
             throw new DatabaseException(e);
