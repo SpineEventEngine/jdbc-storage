@@ -78,9 +78,14 @@ public class LifecycleFlagsQueryFactory<I> implements ReadQueryFactory<I, Lifecy
 
     @Override
     public StorageIndexQuery<I> newIndexQuery() {
-        return null;
+        return StorageIndexQuery.<I>newBuilder()
+                                .setDataSource(dataSource)
+                                .setLogger(logger)
+                                .setTableName(tableName)
+                                .setIdType(idColumn.getJavaType())
+                                .setIdColumnName(idColumn.getColumnName())
+                                .build();
     }
-
     @Override
     public WriteQuery newInsertQuery(I id, LifecycleFlags record) {
         final WriteQuery query = InsertLifecycleFlagsQuery.<I>newBuilder(tableName)

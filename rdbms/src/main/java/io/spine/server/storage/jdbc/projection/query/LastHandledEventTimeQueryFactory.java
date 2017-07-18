@@ -28,10 +28,11 @@ import io.spine.server.storage.jdbc.query.WriteQuery;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 import io.spine.server.storage.jdbc.table.LastHandledEventTimeTable;
 import io.spine.server.storage.jdbc.util.DataSourceWrapper;
-import io.spine.server.storage.jdbc.util.IdColumn;
 import org.slf4j.Logger;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static io.spine.server.storage.jdbc.table.LastHandledEventTimeTable.Column.projection_type;
+import static io.spine.server.storage.jdbc.util.IdColumn.typeString;
 
 /**
  * This class creates queries for interaction with
@@ -41,7 +42,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class LastHandledEventTimeQueryFactory
         implements ReadQueryFactory<String, Timestamp>,
-                   WriteQueryFactory<String, Timestamp>{
+                   WriteQueryFactory<String, Timestamp> {
 
     private final DataSourceWrapper dataSource;
     private final String tableName;
@@ -50,7 +51,7 @@ public class LastHandledEventTimeQueryFactory
     /**
      * Creates a new instance.
      *
-     * @param dataSource      instance of {@link DataSourceWrapper}
+     * @param dataSource instance of {@link DataSourceWrapper}
      */
     public LastHandledEventTimeQueryFactory(DataSourceWrapper dataSource, String tableName) {
         this.dataSource = dataSource;
@@ -63,15 +64,19 @@ public class LastHandledEventTimeQueryFactory
                 SelectTimestampQuery.newBuilder(tableName)
                                     .setDataSource(dataSource)
                                     .setId(id)
-                                    .setIdColumn(IdColumn.typeString(
-                                            LastHandledEventTimeTable.Column.projection_type.name()))
+                                    .setIdColumn(typeString(projection_type.name()))
                                     .setLogger(logger);
         return builder.build();
     }
 
     @Override
     public StorageIndexQuery<String> newIndexQuery() {
-        return null;
+        return StorageIndexQuery.<String>newBuilder()
+                                .setDataSource(dataSource)
+                                .setLogger(logger)
+                                .setTableName(tableName)
+                                .setIdType(String.class)
+                                .build();
     }
 
     @Override

@@ -69,7 +69,13 @@ public class EventCountQueryFactory<I> implements ReadQueryFactory<I, Int32Value
 
     @Override
     public StorageIndexQuery<I> newIndexQuery() {
-        return null;
+        return StorageIndexQuery.<I>newBuilder()
+                                .setDataSource(dataSource)
+                                .setLogger(logger)
+                                .setTableName(tableName)
+                                .setIdType(idColumn.getJavaType())
+                                .setIdColumnName(idColumn.getColumnName())
+                                .build();
     }
 
     @Override
