@@ -20,11 +20,10 @@
 
 package io.spine.server.storage.jdbc;
 
-import com.google.common.base.Function;
+import com.google.common.base.Converter;
 import com.google.common.base.Optional;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterators;
 import com.google.protobuf.FieldMask;
 import io.spine.server.entity.AbstractEntity;
 import io.spine.server.entity.EntityRecord;
@@ -33,13 +32,19 @@ import io.spine.server.stand.AggregateStateId;
 import io.spine.server.stand.StandStorage;
 import io.spine.server.storage.jdbc.builder.StorageBuilder;
 import io.spine.server.storage.jdbc.entity.JdbcRecordStorage;
+import io.spine.string.Stringifier;
+import io.spine.string.StringifierRegistry;
 import io.spine.type.TypeUrl;
 
 import javax.annotation.Nullable;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.collect.Iterators.filter;
+import static io.spine.util.Exceptions.illegalStateWithCauseOf;
 
 /**
  * JDBC-based implementation of {@link StandStorage}.
@@ -48,24 +53,27 @@ import java.util.Map;
  */
 public class JdbcStandStorage extends StandStorage {
 
-    private final JdbcRecordStorage<Object> recordStorage;
+    private final JdbcRecordStorage<String> recordStorage;
 
-    private static final Function<AggregateStateId, Object> ID_MAPPER =
-            new Function<AggregateStateId, Object>() {
-                @Nullable
-                @Override
-                public Object apply(@Nullable AggregateStateId input) {
-                    if (input == null) {
-                        return null;
-                    }
-                    return input.getAggregateId();
-                }
-            };
+    private static final Converter<AggregateStateId, String> ID_MAPPER;
+
+    static {
+        try {
+            // Ensure the AggregateStateId Stringifier is registered.
+            Class.forName(AggregateStateId.class.getCanonicalName());
+        } catch (ClassNotFoundException e) {
+            throw illegalStateWithCauseOf(e);
+        }
+        final Optional<Stringifier<AggregateStateId>> stringifier =
+                StringifierRegistry.getInstance().get(AggregateStateId.class);
+        checkState(stringifier.isPresent(), "AggregateStateId Stringifier is not registered!");
+        ID_MAPPER = stringifier.get();
+    }
 
     @SuppressWarnings("unchecked")
     protected JdbcStandStorage(Builder builder) {
         super(builder.isMultitenant());
-        recordStorage = JdbcRecordStorage.newBuilder()
+        recordStorage = JdbcRecordStorage.<String>newBuilder()
                                          .setDataSource(builder.getDataSource())
                                          .setMultitenant(builder.isMultitenant())
                                          .setEntityClass(StandEntity.class)
@@ -74,7 +82,9 @@ public class JdbcStandStorage extends StandStorage {
 
     @Override
     public Iterator<AggregateStateId> index() {
-        return null;
+        final Iterator<String> index = recordStorage.index();
+        final Iterator<AggregateStateId> result = Iterators.transform(index, ID_MAPPER.reverse());
+        return result;
     }
 
     @Override
@@ -85,40 +95,43 @@ public class JdbcStandStorage extends StandStorage {
     @Override
     public Iterator<EntityRecord> readAllByType(final TypeUrl type, FieldMask fieldMask) {
         final Iterator<EntityRecord> allRecords = readAll(fieldMask);
-        final ImmutableList<EntityRecord> filteredRecords = ImmutableList.of();
-
-        while(allRecords.hasNext()) {
-            if(allRecords.next().getState().getTypeUrl().equals(type.toString())) {
-                filteredRecords.builder().add(allRecords.next());
+        final String requiredTypeUrl = type.value();
+        final Iterator<EntityRecord> result = filter(allRecords, new Predicate<EntityRecord>() {
+            // TODO:2017-07-14:dmytro.dashenkov: Replace in-memory filtering with SQL query.
+            @Override
+            public boolean apply(@Nullable EntityRecord entityRecord) {
+                checkNotNull(entityRecord);
+                final String typeUrl = entityRecord.getState().getTypeUrl();
+                return typeUrl.equals(requiredTypeUrl);
             }
-        }
-
-        return filteredRecords.iterator();
+        });
+        return result;
     }
 
     @Override
     public boolean delete(AggregateStateId id) {
-        final Object aggregateId = id.getAggregateId();
+        final String aggregateId = ID_MAPPER.convert(id);
+        checkNotNull(aggregateId);
         return recordStorage.delete(aggregateId);
     }
 
     @Override
     protected Optional<EntityRecord> readRecord(AggregateStateId id) {
-        return recordStorage.read(id.getAggregateId());
+        final String aggregateId = ID_MAPPER.convert(id);
+        checkNotNull(aggregateId);
+        return recordStorage.read(aggregateId);
     }
 
     @Override
     protected Iterator<EntityRecord> readMultipleRecords(Iterable<AggregateStateId> ids) {
-        final Collection<Object> genericIds = Collections2.transform(Lists.newArrayList(ids),
-                                                                     ID_MAPPER);
+        final Iterable<String> genericIds = ID_MAPPER.convertAll(ids);
         return recordStorage.readMultiple(genericIds);
     }
 
     @Override
     protected Iterator<EntityRecord> readMultipleRecords(Iterable<AggregateStateId> ids,
                                                          FieldMask fieldMask) {
-        final Collection<Object> genericIds = Collections2.transform(Lists.newArrayList(ids),
-                                                                     ID_MAPPER);
+        final Iterable<String> genericIds = ID_MAPPER.convertAll(ids);
         return recordStorage.readMultiple(genericIds, fieldMask);
     }
 
@@ -134,15 +147,16 @@ public class JdbcStandStorage extends StandStorage {
 
     @Override
     protected void writeRecord(AggregateStateId id, EntityRecordWithColumns record) {
-        recordStorage.write(id.getAggregateId(), record);
+        final String aggregateId = ID_MAPPER.convert(id);
+        checkNotNull(aggregateId);
+        recordStorage.write(aggregateId, record);
     }
 
     @Override
     protected void writeRecords(Map<AggregateStateId, EntityRecordWithColumns> records) {
-        final Map<Object, EntityRecordWithColumns> genericIdRecords = new HashMap<>(records.size());
+        final Map<String, EntityRecordWithColumns> genericIdRecords = new HashMap<>(records.size());
         for (Map.Entry<AggregateStateId, EntityRecordWithColumns> record : records.entrySet()) {
-            final Object genericId = record.getKey()
-                                           .getAggregateId();
+            final String genericId = ID_MAPPER.convert(record.getKey());
             final EntityRecordWithColumns recordValue = record.getValue();
             genericIdRecords.put(genericId, recordValue);
         }
@@ -192,14 +206,12 @@ public class JdbcStandStorage extends StandStorage {
         }
     }
 
-    public static class StandEntity extends AbstractEntity<Object, EntityRecord> {
+    public static class StandEntity extends AbstractEntity<String, EntityRecord> {
 
         /**
          * Creates new instance with the passed ID.
-         *
-         * @param id
          */
-        protected StandEntity(AggregateStateId id) {
+        protected StandEntity(String id) {
             super(id);
         }
     }
