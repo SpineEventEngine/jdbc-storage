@@ -19,20 +19,31 @@
  */
 package io.spine.server.entity.storage;
 
+import io.spine.annotation.Internal;
 import io.spine.server.entity.Entity;
 
 import java.util.Collection;
 
 /**
+ * A utility for accessing the Entity Columns extraction within the JDBC
+ * {@linkplain io.spine.server.storage.Storage} implementation.
  *
  * @author Alexander Aleksandrov
  */
-public class EntityColumns {
+@Internal
+public final class EntityColumns {
 
     private EntityColumns() {
-        //
+        // Prevent utility class instantiation.
     }
 
+    /**
+     * Retrieves the {@linkplain Column Entity Columns} from the given {@linkplain Entity}
+     * {@linkplain Class class} description.
+     *
+     * @param cls the type of the {@link Entity} to get the Columns from
+     * @return the Entity Columns declared within this {@link Entity}
+     */
     public static Collection<Column> getColumns(Class<? extends Entity<?, ?>> cls) {
         final Collection<Column> result = Columns.getColumns(cls);
         return result;
