@@ -21,6 +21,7 @@
 package io.spine.server.storage.jdbc.util;
 
 import com.google.protobuf.Any;
+import io.spine.type.TypeUrl;
 import org.junit.Test;
 import io.spine.server.storage.jdbc.DatabaseException;
 
@@ -48,7 +49,7 @@ public class DbIteratorShould {
         when(statement.executeQuery()).thenThrow(new SQLException("Failure!"));
 
         // Calls to PreparedStatement#executeQuery
-        new DbIterator<>(statement, "", Any.getDescriptor());
+        new MessageDbIterator<>(statement, "", TypeUrl.of(Any.class));
     }
 
     @Test(expected = DatabaseException.class)
@@ -104,7 +105,7 @@ public class DbIteratorShould {
             fail(e.getMessage());
         }
 
-        final DbIterator iterator = new DbIterator<>(statement, "", Any.getDescriptor());
+        final DbIterator iterator = new MessageDbIterator<>(statement, "", TypeUrl.of(Any.class));
         return iterator;
     }
 
@@ -121,7 +122,7 @@ public class DbIteratorShould {
             fail(e.getMessage());
         }
 
-        final DbIterator iterator = new DbIterator<>(statement, "", Any.getDescriptor());
+        final DbIterator iterator = new MessageDbIterator<>(statement, "", TypeUrl.of(Any.class));
         return iterator;
     }
 
@@ -140,7 +141,7 @@ public class DbIteratorShould {
             fail(e.getMessage());
         }
 
-        final DbIterator iterator = new DbIterator<>(statement, "", Any.getDescriptor());
+        final DbIterator iterator = new MessageDbIterator<>(statement, "", TypeUrl.of(Any.class));
         return iterator;
     }
 }

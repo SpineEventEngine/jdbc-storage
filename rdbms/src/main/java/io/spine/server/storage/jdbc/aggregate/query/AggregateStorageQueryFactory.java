@@ -42,6 +42,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @param <I> the type of IDs used in the storage
  * @author Andrey Lavrov
+ * @author Dmytro Dashenkov
  */
 public class AggregateStorageQueryFactory<I> implements ReadQueryFactory<I, AggregateEventRecord>,
                                                         WriteQueryFactory<I, AggregateEventRecord> {
@@ -106,7 +107,6 @@ public class AggregateStorageQueryFactory<I> implements ReadQueryFactory<I, Aggr
         return StorageIndexQuery.<I>newBuilder()
                                 .setDataSource(dataSource)
                                 .setLogger(logger)
-                                .setIdColumnName(idColumn.getColumnName())
                                 .setIdType(idColumn.getJavaType())
                                 .setTableName(mainTableName)
                                 .build();

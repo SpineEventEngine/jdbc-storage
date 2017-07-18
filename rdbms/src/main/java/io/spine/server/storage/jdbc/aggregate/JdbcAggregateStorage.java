@@ -83,8 +83,7 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
 
     @Override
     public Iterator<I> index() {
-        return null;
-        //TODO:2017-06-06:alexander.aleksandrov: Look for implementation for this method
+        return mainTable.index();
     }
 
     @Override
