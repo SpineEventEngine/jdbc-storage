@@ -21,8 +21,6 @@
 package io.spine.server.storage.jdbc.entity.query;
 
 import io.spine.server.entity.EntityRecord;
-import io.spine.server.entity.LifecycleFlags;
-import io.spine.server.storage.LifecycleFlagField;
 import io.spine.server.storage.jdbc.query.SelectMessageByIdQuery;
 import io.spine.server.storage.jdbc.table.entity.RecordTable;
 
@@ -30,7 +28,6 @@ import javax.annotation.Nullable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import static java.lang.String.format;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
 import static io.spine.server.storage.jdbc.Sql.Query.ALL_ATTRIBUTES;
@@ -39,6 +36,7 @@ import static io.spine.server.storage.jdbc.Sql.Query.PLACEHOLDER;
 import static io.spine.server.storage.jdbc.Sql.Query.SELECT;
 import static io.spine.server.storage.jdbc.Sql.Query.WHERE;
 import static io.spine.server.storage.jdbc.table.entity.RecordTable.StandardColumn.entity;
+import static java.lang.String.format;
 
 /**
  * Query that selects {@link EntityRecord} by ID.
@@ -65,26 +63,12 @@ public class SelectEntityByIdQuery<I> extends SelectMessageByIdQuery<I, EntityRe
         return builder;
     }
 
+
+    // TODO:2017-07-17:dmytro.dashenkov: Document.
     @Nullable
     @Override
     protected EntityRecord readMessage(ResultSet resultSet) throws SQLException {
-        final EntityRecord record = super.readMessage(resultSet);
-        if (record == null) {
-            return null;
-        }
-        final boolean archived = resultSet.getBoolean(LifecycleFlagField.archived.toString());
-        final boolean deleted = resultSet.getBoolean(LifecycleFlagField.deleted.toString());
-        if (!(archived || deleted)) {
-            return record;
-        }
-        final LifecycleFlags status = LifecycleFlags.newBuilder()
-                                            .setArchived(archived)
-                                            .setDeleted(deleted)
-                                            .build();
-        final EntityRecord result = record.toBuilder()
-                                          .setLifecycleFlags(status)
-                                          .build();
-        return result;
+        return super.readMessage(resultSet);
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")

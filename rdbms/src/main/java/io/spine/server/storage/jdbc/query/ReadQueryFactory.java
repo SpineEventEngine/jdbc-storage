@@ -40,4 +40,6 @@ public interface ReadQueryFactory<I, R> {
      * @return a query for selecting a record by given ID
      */
     SelectByIdQuery<I, R> newSelectByIdQuery(I id);
+
+    StorageIndexQuery<I> newIndexQuery();
 }

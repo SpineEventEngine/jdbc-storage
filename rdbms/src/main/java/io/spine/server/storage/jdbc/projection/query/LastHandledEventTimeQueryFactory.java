@@ -23,6 +23,7 @@ package io.spine.server.storage.jdbc.projection.query;
 import com.google.protobuf.Timestamp;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.SelectMessageByIdQuery;
+import io.spine.server.storage.jdbc.query.StorageIndexQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 import io.spine.server.storage.jdbc.table.LastHandledEventTimeTable;
@@ -66,6 +67,11 @@ public class LastHandledEventTimeQueryFactory
                                             LastHandledEventTimeTable.Column.projection_type.name()))
                                     .setLogger(logger);
         return builder.build();
+    }
+
+    @Override
+    public StorageIndexQuery<String> newIndexQuery() {
+        return null;
     }
 
     @Override

@@ -29,6 +29,7 @@ import io.spine.server.storage.jdbc.query.DeleteRecordQuery;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.SelectByIdQuery;
 import io.spine.server.storage.jdbc.query.SimpleQuery;
+import io.spine.server.storage.jdbc.query.StorageIndexQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 import io.spine.server.storage.jdbc.util.DataSourceWrapper;
@@ -37,6 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
+import java.util.Iterator;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -179,6 +181,12 @@ public abstract class AbstractTable<I, R extends Message, W> {
         }
     }
 
+    public Iterator<I> index() {
+        final StorageIndexQuery<I> query = getReadQueryFactory().newIndexQuery();
+        final Iterator<I> result = query.execute();
+        return result;
+    }
+
     protected void insert(I id, W record) {
         final WriteQuery query = composeInsertQuery(id, record);
         query.execute();
@@ -256,7 +264,7 @@ public abstract class AbstractTable<I, R extends Message, W> {
     }
 
     private Sql.Type getIdType() {
-        final Sql.Type idType = getIdColumn().getColumnDataType();
+        final Sql.Type idType = getIdColumn().getSqlType();
         return idType;
     }
 

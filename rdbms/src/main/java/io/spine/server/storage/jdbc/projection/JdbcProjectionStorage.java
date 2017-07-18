@@ -75,7 +75,7 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
 
     @Override
     public Iterator<I> index() {
-        return null;
+        return recordStorage.index();
     }
 
     @Override

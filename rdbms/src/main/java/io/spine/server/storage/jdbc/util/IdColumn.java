@@ -91,7 +91,9 @@ public abstract class IdColumn<I> {
     /**
      * Returns the {@link Sql.Type} of the column with which this helper instance works.
      */
-    public abstract Sql.Type getColumnDataType();
+    public abstract Sql.Type getSqlType();
+
+    public abstract Class<I> getJavaType();
 
     public String getColumnName() {
         return columnName;
@@ -118,8 +120,13 @@ public abstract class IdColumn<I> {
         }
 
         @Override
-        public Sql.Type getColumnDataType() {
+        public Sql.Type getSqlType() {
             return Sql.Type.BIGINT;
+        }
+
+        @Override
+        public Class<Long> getJavaType() {
+            return Long.class;
         }
 
         @Override
@@ -143,8 +150,13 @@ public abstract class IdColumn<I> {
         }
 
         @Override
-        public Sql.Type getColumnDataType() {
+        public Sql.Type getSqlType() {
             return Sql.Type.INT;
+        }
+
+        @Override
+        public Class<Integer> getJavaType() {
+            return Integer.class;
         }
 
         @Override
@@ -169,8 +181,13 @@ public abstract class IdColumn<I> {
         }
 
         @Override
-        public Sql.Type getColumnDataType() {
+        public Sql.Type getSqlType() {
             return Sql.Type.VARCHAR_255;
+        }
+
+        @Override
+        public Class<I> getJavaType() {
+            return (Class<I>) String.class; // TODO:2017-07-18:dmytro.dashenkov: Revisit.
         }
 
         @Override

@@ -21,6 +21,7 @@
 package io.spine.server.storage.jdbc.aggregate.query;
 
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
+import io.spine.server.storage.jdbc.query.StorageIndexQuery;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 import io.spine.server.storage.jdbc.table.entity.aggregate.AggregateEventRecordTable;
 import org.slf4j.Logger;
@@ -98,6 +99,17 @@ public class AggregateStorageQueryFactory<I> implements ReadQueryFactory<I, Aggr
     @Override
     public SelectMessageByIdQuery<I, AggregateEventRecord> newSelectByIdQuery(I id) {
         throw new UnsupportedOperationException("Use newSelectByIdSortedByTimeDescQuery instead.");
+    }
+
+    @Override
+    public StorageIndexQuery<I> newIndexQuery() {
+        return StorageIndexQuery.<I>newBuilder()
+                                .setDataSource(dataSource)
+                                .setLogger(logger)
+                                .setIdColumnName(idColumn.getColumnName())
+                                .setIdType(idColumn.getJavaType())
+                                .setTableName(mainTableName)
+                                .build();
     }
 
     @Override

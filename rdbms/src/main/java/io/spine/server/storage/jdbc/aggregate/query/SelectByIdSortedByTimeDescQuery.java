@@ -20,19 +20,18 @@
 
 package io.spine.server.storage.jdbc.aggregate.query;
 
-import io.spine.server.storage.jdbc.table.entity.aggregate.AggregateEventRecordTable;
-import io.spine.server.storage.jdbc.util.DbIterator;
 import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.query.StorageQuery;
+import io.spine.server.storage.jdbc.table.entity.aggregate.AggregateEventRecordTable;
 import io.spine.server.storage.jdbc.util.ConnectionWrapper;
+import io.spine.server.storage.jdbc.util.DbIterator;
 import io.spine.server.storage.jdbc.util.IdColumn;
 import io.spine.server.storage.jdbc.util.MessageDbIterator;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import static java.lang.String.format;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.COMMA;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
@@ -42,6 +41,9 @@ import static io.spine.server.storage.jdbc.Sql.Query.ORDER_BY;
 import static io.spine.server.storage.jdbc.Sql.Query.PLACEHOLDER;
 import static io.spine.server.storage.jdbc.Sql.Query.SELECT;
 import static io.spine.server.storage.jdbc.Sql.Query.WHERE;
+import static io.spine.server.storage.jdbc.table.entity.aggregate.AggregateEventRecordTable.Column.aggregate;
+import static io.spine.type.TypeUrl.of;
+import static java.lang.String.format;
 
 /**
  * Query that selects {@link AggregateEventRecord} by corresponding aggregate ID sorted by
@@ -53,7 +55,7 @@ import static io.spine.server.storage.jdbc.Sql.Query.WHERE;
 public class SelectByIdSortedByTimeDescQuery<I> extends StorageQuery {
 
     private static final String QUERY_TEMPLATE =
-            SELECT.toString() + AggregateEventRecordTable.Column.aggregate + FROM + "%s" +
+            SELECT.toString() + aggregate + FROM + "%s" +
             WHERE + AggregateEventRecordTable.Column.id + EQUAL + PLACEHOLDER +
             ORDER_BY + AggregateEventRecordTable.Column.timestamp + DESC + COMMA + AggregateEventRecordTable.Column.timestamp_nanos + DESC + SEMICOLON;
 
@@ -70,8 +72,9 @@ public class SelectByIdSortedByTimeDescQuery<I> extends StorageQuery {
         try (ConnectionWrapper connection = getConnection(true);
              PreparedStatement statement = prepareStatement(connection)) {
             idColumn.setId(1, id, statement);
-            return new MessageDbIterator<>(statement, AggregateEventRecordTable.Column.aggregate.toString(),
-                                         AggregateEventRecord.getDescriptor());
+            return new MessageDbIterator<>(statement,
+                                           aggregate.toString(),
+                                           of(AggregateEventRecord.class));
         } catch (SQLException e) {
             getLogger().error("Error while selecting entity by aggregate id sorted by time: ", e);
             throw new DatabaseException(e);

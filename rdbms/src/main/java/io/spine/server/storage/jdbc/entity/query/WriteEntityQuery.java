@@ -77,16 +77,4 @@ public class WriteEntityQuery<I> extends WriteRecordQuery<I, EntityRecordWithCol
         function = Functions.forMap(result);
         return function;
     }
-
-    protected enum QueryParameter {
-
-        RECORD(1),
-        ID(2);
-
-        public final int index;
-
-        QueryParameter(int index) {
-            this.index = index;
-        }
-    }
 }

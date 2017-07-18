@@ -29,6 +29,7 @@ import io.spine.server.storage.jdbc.entity.lifecycleflags.query.SelectLifecycleF
 import io.spine.server.storage.jdbc.entity.lifecycleflags.query.UpdateLifecycleFlagsQuery;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.SelectMessageByIdQuery;
+import io.spine.server.storage.jdbc.query.StorageIndexQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 import io.spine.server.storage.jdbc.table.entity.aggregate.LifecycleFlagsTable;
@@ -73,6 +74,11 @@ public class LifecycleFlagsQueryFactory<I> implements ReadQueryFactory<I, Lifecy
                         .setId(id)
                         .build();
         return query;
+    }
+
+    @Override
+    public StorageIndexQuery<I> newIndexQuery() {
+        return null;
     }
 
     @Override

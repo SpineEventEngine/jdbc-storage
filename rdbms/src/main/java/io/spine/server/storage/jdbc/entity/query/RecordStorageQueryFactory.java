@@ -26,6 +26,7 @@ import io.spine.server.entity.storage.EntityQuery;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.SelectMessageByIdQuery;
+import io.spine.server.storage.jdbc.query.StorageIndexQuery;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import org.slf4j.Logger;
@@ -150,6 +151,11 @@ public class RecordStorageQueryFactory<I>
                         .setIdColumn(idColumn)
                         .setId(id);
         return builder.build();
+    }
+
+    @Override
+    public StorageIndexQuery<I> newIndexQuery() {
+        return null;
     }
 
     @Override

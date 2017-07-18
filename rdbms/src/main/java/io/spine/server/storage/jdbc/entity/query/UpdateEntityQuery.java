@@ -55,8 +55,8 @@ public class UpdateEntityQuery<I> extends WriteEntityQuery<I> {
 
     public static <I> Builder<I> newBuilder(String tableName) {
         final Builder<I> builder = new Builder<>();
-        builder.setIdIndexInQuery(QueryParameter.ID.index)
-               .setRecordIndexInQuery(QueryParameter.RECORD.index)
+        builder.setIdIndexInQuery(2) // TODO:2017-07-17:dmytro.dashenkov: Column count.
+               .setRecordIndexInQuery(1)
                .setQuery(format(QUERY_TEMPLATE, tableName));
         return builder;
     }

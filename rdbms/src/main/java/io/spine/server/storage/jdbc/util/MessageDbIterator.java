@@ -20,9 +20,9 @@
 
 package io.spine.server.storage.jdbc.util;
 
-import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Message;
 import io.spine.server.storage.jdbc.DatabaseException;
+import io.spine.type.TypeUrl;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -34,28 +34,27 @@ import static io.spine.server.storage.jdbc.util.Serializer.deserialize;
  */
 public class MessageDbIterator<M extends Message> extends DbIterator<M> {
 
-    private final Descriptor recordDescriptor;
+    private final TypeUrl recordType;
 
     /**
      * Creates a new iterator instance.
      *
      * @param statement  a statement used to retrieve a result set
      *                   (both statement and result set are closed in {@link #close()}).
-     *                        * @param recordDescriptor a descriptor of a storage record
-     * @param columnName a name of a serialized storage record column
-     * @param recordDescriptor a descriptor of a storage record
+     * @param columnName the name of a serialized storage record column
+     * @param recordType the type of the storage record
      * @throws DatabaseException if an error occurs during interaction with the DB
      */
-    protected MessageDbIterator(PreparedStatement statement, String columnName,
-                                Descriptor recordDescriptor) throws DatabaseException {
+    public MessageDbIterator(PreparedStatement statement, String columnName, TypeUrl recordType)
+            throws DatabaseException {
         super(statement, columnName);
-        this.recordDescriptor = recordDescriptor;
+        this.recordType = recordType;
     }
 
     @Override
     protected M readResult() throws SQLException {
         final byte[] bytes = getResultSet().getBytes(getColumnName());
-        final M result = deserialize(bytes, recordDescriptor);
+        final M result = deserialize(bytes, recordType);
         return result;
     }
 }

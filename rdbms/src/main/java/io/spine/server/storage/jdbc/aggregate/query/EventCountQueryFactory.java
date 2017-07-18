@@ -23,6 +23,7 @@ package io.spine.server.storage.jdbc.aggregate.query;
 import com.google.protobuf.Int32Value;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.SelectMessageByIdQuery;
+import io.spine.server.storage.jdbc.query.StorageIndexQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 import io.spine.server.storage.jdbc.table.entity.aggregate.EventCountTable;
@@ -64,6 +65,11 @@ public class EventCountQueryFactory<I> implements ReadQueryFactory<I, Int32Value
                                          .setIdColumn(idColumn)
                                          .build();
         return query;
+    }
+
+    @Override
+    public StorageIndexQuery<I> newIndexQuery() {
+        return null;
     }
 
     @Override

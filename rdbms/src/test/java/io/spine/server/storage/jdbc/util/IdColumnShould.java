@@ -49,25 +49,25 @@ public class IdColumnShould {
     @Test
     public void have_bigint_impl() {
         final IdColumn<?> column = IdColumn.newInstance(LongIdEntity.class, ID);
-        assertEquals(BIGINT, column.getColumnDataType());
+        assertEquals(BIGINT, column.getSqlType());
     }
 
     @Test
     public void have_int_impl() {
         final IdColumn<?> column = IdColumn.newInstance(IntIdEntity.class, ID);
-        assertEquals(INT, column.getColumnDataType());
+        assertEquals(INT, column.getSqlType());
     }
 
     @Test
     public void have_varchar255_impl() {
         final IdColumn<?> column = IdColumn.newInstance(StringIdEntity.class, ID);
-        assertEquals(VARCHAR_255, column.getColumnDataType());
+        assertEquals(VARCHAR_255, column.getSqlType());
     }
 
     @Test
     public void cast_message_IDs_to_string() {
         final IdColumn<?> column = IdColumn.newInstance(MessageIdEntity.class, ID);
-        assertEquals(VARCHAR_255, column.getColumnDataType());
+        assertEquals(VARCHAR_255, column.getSqlType());
     }
 
     @Test(expected = DatabaseException.class)
