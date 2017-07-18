@@ -20,8 +20,6 @@
 
 package io.spine.server.storage.jdbc.util;
 
-import com.google.protobuf.Descriptors.Descriptor;
-import com.google.protobuf.Message;
 import io.spine.annotation.Internal;
 import io.spine.server.storage.jdbc.DatabaseException;
 
@@ -30,8 +28,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-
-import static io.spine.server.storage.jdbc.util.Serializer.deserialize;
 
 /**
  * An iterator over a {@link ResultSet} of storage records.
@@ -46,12 +42,11 @@ import static io.spine.server.storage.jdbc.util.Serializer.deserialize;
  * @author Alexander Litus
  */
 @Internal
-public class DbIterator<R extends Message> implements Iterator<R>, AutoCloseable {
+public abstract class DbIterator<R> implements Iterator<R>, AutoCloseable {
 
     private final ResultSet resultSet;
     private final PreparedStatement statement;
     private final String columnName;
-    private final Descriptor recordDescriptor;
     private boolean isHasNextCalledBeforeNext = false;
     private boolean hasNext = false;
 
@@ -61,16 +56,13 @@ public class DbIterator<R extends Message> implements Iterator<R>, AutoCloseable
      * @param statement        a statement used to retrieve a result set
      *                         (both statement and result set are closed in {@link #close()}).
      * @param columnName       a name of a serialized storage record column
-     * @param recordDescriptor a descriptor of a storage record
      * @throws DatabaseException if an error occurs during interaction with the DB
      */
-    public DbIterator(PreparedStatement statement, String columnName,
-                      Descriptor recordDescriptor) throws DatabaseException {
+    protected DbIterator(PreparedStatement statement, String columnName) throws DatabaseException {
         try {
             this.resultSet = statement.executeQuery();
             this.statement = statement;
             this.columnName = columnName;
-            this.recordDescriptor = recordDescriptor;
         } catch (SQLException e) {
             throw new DatabaseException(e);
         }
@@ -80,9 +72,7 @@ public class DbIterator<R extends Message> implements Iterator<R>, AutoCloseable
     public boolean hasNext() {
         try {
             final boolean hasNextElem = resultSet.next();
-            /** {@link ResultSet#previous()} is not used here because some JDBC drivers
-             * do not support it.
-             */
+            // ResultSet.previous() is not used here because some JDBC drivers do not support it.
             hasNext = hasNextElem;
             isHasNextCalledBeforeNext = true;
             return hasNextElem;
@@ -101,22 +91,34 @@ public class DbIterator<R extends Message> implements Iterator<R>, AutoCloseable
         if (!hasNext) {
             throw new NoSuchElementException("No elements remained.");
         }
-        final byte[] bytes = readBytes();
-        final R record = deserialize(bytes, recordDescriptor);
-        return record;
-    }
-
-    private byte[] readBytes() {
+        final R result;
         try {
-            final byte[] bytes = resultSet.getBytes(columnName);
-            return bytes;
+            result = readResult();
         } catch (SQLException e) {
             throw new DatabaseException(e);
         }
+        return result;
     }
 
+    protected abstract R readResult() throws SQLException;
+
+    protected ResultSet getResultSet() {
+        return resultSet;
+    }
+
+    protected String getColumnName() {
+        return columnName;
+    }
+
+    /**
+     * Removal is unsupported.
+     *
+     * @deprecated as unsupported
+     * @throws UnsupportedOperationException always
+     */
     @Override
-    public void remove() {
+    @Deprecated
+    public final void remove() throws UnsupportedOperationException {
         throw new UnsupportedOperationException("Removing is not supported.");
     }
 

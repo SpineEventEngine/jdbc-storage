@@ -26,7 +26,6 @@ import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Message;
 import io.spine.annotation.Internal;
 import io.spine.protobuf.AnyPacker;
-import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.type.TypeUrl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -66,12 +65,16 @@ public class Serializer {
      * @param <M>               a type of message expected
      * @return a message instance
      */
+    @Deprecated
     public static <M extends Message> M deserialize(byte[] bytes, Descriptor messageDescriptor) {
+        return deserialize(bytes, TypeUrl.from(messageDescriptor));
+    }
+
+    // TODO:2017-07-18:dmytro.dashenkov: Document.
+    public static <M extends Message> M deserialize(byte[] bytes, TypeUrl typeUrl) {
         checkNotNull(bytes);
         final Any.Builder builder = Any.newBuilder();
-        final String typeUrl = TypeUrl.from(messageDescriptor)
-                                      .value();
-        builder.setTypeUrl(typeUrl);
+        builder.setTypeUrl(typeUrl.value());
         final ByteString byteString = ByteString.copyFrom(bytes);
         builder.setValue(byteString);
         final M message = AnyPacker.unpack(builder.build());
