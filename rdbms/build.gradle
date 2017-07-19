@@ -7,9 +7,5 @@ dependencies {
 
     compile group: 'com.zaxxer', name: 'HikariCP', version: '2.4.3'
 
-    // Spine tests
-    testCompile group: 'io.spine', name: 'spine-server', version: project.SPINE_VERSION, changing: true, classifier: 'test'
-    testCompile group: 'io.spine', name: 'spine-client', version: project.SPINE_VERSION, changing: true, classifier: 'test'
-
     testCompile 'org.mockito:mockito-core:2.+'
 }

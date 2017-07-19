@@ -41,14 +41,26 @@ subprojects {
     }
 
     dependencies {
+
+        // Exclude transient dependencies from Spine
+        final def excludes = {
+            exclude group: 'com.google.protobuf', module: 'protobuf-lite'
+            exclude group: 'io.grpc'
+        }
+
         // Spine
-        compile group: 'io.spine', name: 'spine-base', version: project.BASE_VERSION, changing: true
-        compile group: 'io.spine', name: 'spine-core', version: project.SPINE_VERSION, changing: true
-        compile group: 'io.spine', name: 'spine-client', version: project.SPINE_VERSION, changing: true
-        compile group: 'io.spine', name: 'spine-server', version: project.SPINE_VERSION, changing: true
-        compile group: 'io.spine', name: 'spine-testutil-base', version: project.BASE_VERSION, changing: true
-        compile group: 'io.spine', name: 'spine-testutil-client', version: project.SPINE_VERSION, changing: true
-        compile group: 'io.spine', name: 'spine-testutil-server', version: project.SPINE_VERSION, changing: true
+        compile group: 'io.spine', name: 'spine-base', version: project.BASE_VERSION, changing: true, excludes
+        compile group: 'io.spine', name: 'spine-core', version: project.SPINE_VERSION, changing: true, excludes
+        compile group: 'io.spine', name: 'spine-client', version: project.SPINE_VERSION, changing: true, excludes
+        compile group: 'io.spine', name: 'spine-server', version: project.SPINE_VERSION, changing: true, excludes
+
+
+        testCompile group: 'io.spine', name: 'spine-server', version: project.SPINE_VERSION, changing: true, classifier: 'test', excludes
+        testCompile group: 'io.spine', name: 'spine-client', version: project.SPINE_VERSION, changing: true, classifier: 'test', excludes
+
+        compile group: 'io.spine', name: 'spine-testutil-base', version: project.BASE_VERSION, changing: true, excludes
+        compile group: 'io.spine', name: 'spine-testutil-client', version: project.SPINE_VERSION, changing: true, excludes
+        compile group: 'io.spine', name: 'spine-testutil-server', version: project.SPINE_VERSION, changing: true, excludes
 
         // Guava
         compile group: 'com.google.guava', name: 'guava', version: project.guavaVersion
