@@ -40,10 +40,10 @@ import java.util.Map;
  *
  * @author Dmytro Dashenkov
  */
-@SuppressWarnings("UtilityClass")
-class QueryResults {
+final class QueryResults {
 
     private QueryResults() {
+        // Prevent utility class instantiation.
     }
 
     /**
