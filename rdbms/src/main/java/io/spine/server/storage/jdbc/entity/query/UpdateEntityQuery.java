@@ -20,16 +20,18 @@
 
 package io.spine.server.storage.jdbc.entity.query;
 
+import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
-import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.query.WriteRecordQuery;
 import io.spine.server.storage.jdbc.table.entity.RecordTable;
-import io.spine.server.entity.EntityRecord;
 
-import static io.spine.server.storage.jdbc.Sql.BuildingBlock.*;
+import static io.spine.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
+import static io.spine.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
+import static io.spine.server.storage.jdbc.Sql.Query.PLACEHOLDER;
+import static io.spine.server.storage.jdbc.Sql.Query.SET;
+import static io.spine.server.storage.jdbc.Sql.Query.UPDATE;
+import static io.spine.server.storage.jdbc.Sql.Query.WHERE;
 import static java.lang.String.format;
-import static io.spine.server.storage.LifecycleFlagField.archived;
-import static io.spine.server.storage.LifecycleFlagField.deleted;
 
 /**
  * Query that updates {@link EntityRecord} in
@@ -41,13 +43,11 @@ import static io.spine.server.storage.LifecycleFlagField.deleted;
 public class UpdateEntityQuery<I> extends WriteEntityQuery<I> {
 
     private static final String QUERY_TEMPLATE =
-            Sql.Query.UPDATE + "%s" +
-            Sql.Query.SET + RecordTable.StandardColumn.entity + EQUAL +
-            Sql.Query.PLACEHOLDER + COMMA +
-            archived + EQUAL + Sql.Query.PLACEHOLDER + COMMA +
-            deleted + EQUAL + Sql.Query.PLACEHOLDER +
-            Sql.Query.WHERE + RecordTable.StandardColumn.id + EQUAL +
-            Sql.Query.PLACEHOLDER + SEMICOLON;
+            UPDATE + "%s" +
+            SET + RecordTable.StandardColumn.entity + EQUAL +
+            PLACEHOLDER +
+            WHERE + RecordTable.StandardColumn.id + EQUAL +
+            PLACEHOLDER + SEMICOLON;
 
     private UpdateEntityQuery(Builder<I> builder) {
         super(builder);

@@ -131,8 +131,9 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWit
                 newRecords.put(id, record);
             }
         }
-        queryFactory.newInsertEntityRecordsBulkQuery(newRecords)
-                    .execute();
+        if (!newRecords.isEmpty()) {
+            queryFactory.newInsertEntityRecordsBulkQuery(newRecords).execute();
+        }
     }
 
     public Map<I, EntityRecord> readAll(FieldMask fieldMask) {

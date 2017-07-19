@@ -77,7 +77,7 @@ public class InsertEntityQuery<I> extends WriteEntityQuery<I> {
                                        tableName,
                                        entityColumnNames,
                                        valuePlaceholders);
-        builder.setIdIndexInQuery(columnCount)
+        builder.setIdIndexInQuery(2)
                .setRecordIndexInQuery(1) // TODO:2017-07-17:dmytro.dashenkov: .
                .setQuery(sqlQuery);
         return builder;

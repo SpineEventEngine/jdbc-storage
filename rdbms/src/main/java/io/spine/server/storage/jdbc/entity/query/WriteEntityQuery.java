@@ -49,7 +49,6 @@ public class WriteEntityQuery<I> extends WriteRecordQuery<I, EntityRecordWithCol
     @Override
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
         final PreparedStatement statement = super.prepareStatement(connection);
-
         if(getRecord().hasColumns()) {
             ColumnRecords.feedColumnsTo(statement,
                                         getRecord(),
@@ -67,7 +66,7 @@ public class WriteEntityQuery<I> extends WriteRecordQuery<I, EntityRecordWithCol
         Collections.sort(columnList, Ordering.usingToString());
         final Map<String, Integer> result = new HashMap<>();
 
-        Integer index = 2;
+        Integer index = 3;
 
         for (String entry : columnList) {
             result.put(entry, index);

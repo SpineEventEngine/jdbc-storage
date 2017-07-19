@@ -24,7 +24,6 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.protobuf.FieldMask;
 import io.spine.client.ColumnFilter;
-import io.spine.protobuf.TypeConverter;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.storage.Column;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
@@ -46,6 +45,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static io.spine.protobuf.TypeConverter.toObject;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
@@ -107,7 +107,7 @@ public class SelectByEntityQuery<I> extends StorageQuery {
             idColumn.setId(i + 1, arguments.get(i), sqlStatement);
         }
 
-        prepareStatement(sqlStatement);
+        appendColumnsTo(sqlStatement);
 
         final ResultSet resultSet = sqlStatement.executeQuery();
 
@@ -116,18 +116,15 @@ public class SelectByEntityQuery<I> extends StorageQuery {
         return QueryResults.parse(resultSet, fieldMask);
     }
 
-    private void prepareStatement(PreparedStatement sqlStatement) {
+    private void appendColumnsTo(PreparedStatement sqlStatement) {
         final ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry =
                 JdbcTypeRegistryFactory.defaultInstance();
-        JdbcColumnType columnType;
         int columnIdentifier = columns.size();
-        Object columnValue;
-
-        for (Map.Entry<Column, ColumnFilter> column : columns.entrySet()) {
-            columnValue = TypeConverter.toObject(column.getValue()
-                                                       .getValue(), column.getKey()
-                                                                          .getType());
-            columnType = columnTypeRegistry.get(column.getKey());
+        for (Map.Entry<Column, ColumnFilter> columnParam : columns.entrySet()) {
+            final Column column = columnParam.getKey();
+            final ColumnFilter filter = columnParam.getValue();
+            final JdbcColumnType<?, ?> columnType = columnTypeRegistry.get(column);
+            final Object columnValue = toObject(filter.getValue(), column.getType());
             setValue(columnValue, sqlStatement, columnIdentifier, columnType);
             columnIdentifier--;
         }
@@ -138,7 +135,6 @@ public class SelectByEntityQuery<I> extends StorageQuery {
                                  PreparedStatement statement,
                                  int columnIdentifier,
                                  JdbcColumnType columnType) {
-
         final Object value = columnType.convertColumnValue(columnValue);
         columnType.setColumnValue(statement, value, columnIdentifier);
     }

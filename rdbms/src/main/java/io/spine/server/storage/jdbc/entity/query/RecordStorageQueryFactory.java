@@ -183,6 +183,7 @@ public class RecordStorageQueryFactory<I>
                 .setDataSource(dataSource)
                 .setLogger(getLogger())
                 .setIdColumn(idColumn)
+                .setIdIndexInQuery(record.getColumns().size() + 2)
                 .setId(id)
                 .setRecord(record);
         return builder.build();

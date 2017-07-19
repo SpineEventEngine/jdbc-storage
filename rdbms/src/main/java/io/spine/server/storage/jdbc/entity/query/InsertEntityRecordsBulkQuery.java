@@ -99,16 +99,18 @@ public class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
         final PreparedStatement statement = super.prepareStatement(connection);
         int columnIndex = 1;
-        for (Map.Entry<I, EntityRecordWithColumns> record : records.entrySet()) {
-            addRecordParams(statement, columnIndex, record.getKey(), record.getValue());
-            if (record.getValue().hasColumns()) { // TODO:2017-07-03:dmytro.dashenkov: What if not?
+        for (Map.Entry<I, EntityRecordWithColumns> recordPair : records.entrySet()) {
+            final I id = recordPair.getKey();
+            final EntityRecordWithColumns record = recordPair.getValue();
+            addRecordParams(statement, columnIndex, id, record);
+            if (record.hasColumns()) { // TODO:2017-07-03:dmytro.dashenkov: What if not?
                 final int nextIndex = columnIndex + StandardColumn.values().length;
                 ColumnRecords.feedColumnsTo(statement,
-                                            record.getValue(),
+                                            record,
                                             getColumnTypeRegistry(),
-                                            getTransformer(record.getValue(), nextIndex));
-                columnIndex += columnCount;
+                                            getTransformer(record, nextIndex));
             }
+            columnIndex += columnCount;
         }
         return statement;
     }
