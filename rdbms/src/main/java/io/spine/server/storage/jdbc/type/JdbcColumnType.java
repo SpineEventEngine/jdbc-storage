@@ -33,5 +33,6 @@ import java.sql.PreparedStatement;
  * @author Alexander Aleksandrov
  */
 public interface JdbcColumnType<J, C> extends ColumnType<J, C, PreparedStatement, Integer> {
+
     Sql.Type getSqlType();
 }

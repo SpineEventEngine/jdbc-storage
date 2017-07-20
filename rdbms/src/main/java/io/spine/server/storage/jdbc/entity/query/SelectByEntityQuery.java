@@ -113,7 +113,7 @@ public class SelectByEntityQuery<I> extends StorageQuery {
 
         connection.close();
 
-        return QueryResults.parse(resultSet, fieldMask);
+        return null;
     }
 
     private void appendColumnsTo(PreparedStatement sqlStatement) {

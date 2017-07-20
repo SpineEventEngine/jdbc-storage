@@ -46,6 +46,7 @@ import javax.annotation.Nullable;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -106,11 +107,11 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWit
         return columns;
     }
 
-    public Map<?, EntityRecord> read(Iterable<I> ids, FieldMask fieldMask) {
+    public Iterator<EntityRecord> read(Iterable<I> ids, FieldMask fieldMask) {
         try {
-            final Map<?, EntityRecord> recordMap = queryFactory.newSelectBulkQuery(ids, fieldMask)
+            final Iterator<EntityRecord> records = queryFactory.newSelectBulkQuery(ids, fieldMask)
                                                                .execute();
-            return recordMap;
+            return records;
         } catch (SQLException e) {
             throw new DatabaseException(e);
         }
@@ -136,10 +137,10 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWit
         }
     }
 
-    public Map<I, EntityRecord> readAll(FieldMask fieldMask) {
+    public Iterator<EntityRecord> readAll(FieldMask fieldMask) {
         final SelectBulkQuery<I> query = queryFactory.newSelectAllQuery(fieldMask);
         try {
-            final Map<I, EntityRecord> result = query.execute();
+            final Iterator<EntityRecord> result = query.execute();
             return result;
         } catch (SQLException e) {
             throw new DatabaseException(e);
@@ -149,7 +150,6 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWit
     public Map<I, EntityRecord> readByQuery(EntityQuery<I> query, FieldMask fieldMask) {
         final SelectByEntityQuery<I> queryByEntity =
                 queryFactory.newSelectByEntityQuery(query, fieldMask);
-
         try {
             final Map<I, EntityRecord> result = queryByEntity.execute();
             return result;

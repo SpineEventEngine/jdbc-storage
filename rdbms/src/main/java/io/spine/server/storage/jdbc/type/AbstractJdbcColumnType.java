@@ -32,7 +32,7 @@ public abstract class AbstractJdbcColumnType<J, C > implements JdbcColumnType<J,
     @Override
     public void setNull(PreparedStatement storageRecord, Integer columnIdentifier) {
         try {
-        storageRecord.setNull(columnIdentifier, getSqlType().getSqlTypeIntIdentifier());
+            storageRecord.setNull(columnIdentifier, getSqlType().getSqlTypeIntIdentifier());
         } catch (SQLException e) {
             throw new DatabaseException(e);
         }

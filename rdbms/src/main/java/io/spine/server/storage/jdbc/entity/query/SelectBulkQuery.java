@@ -33,6 +33,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -95,10 +96,12 @@ public class SelectBulkQuery<I> extends StorageQuery {
     /**
      * Executes the query.
      *
+     * // TODO:2017-07-19:dmytro.dashenkov: Update doc.
+     *
      * @return ID-to-{@link EntityRecord} {@link Map} as the result of the query.
      * @throws SQLException if the input data contained SQL errors or the table does not exist.
      */
-    public Map<I, EntityRecord> execute() throws SQLException {
+    public Iterator<EntityRecord> execute() throws SQLException {
         final ConnectionWrapper connection = getConnection(true);
         final PreparedStatement sqlStatement = connection.prepareStatement(getQuery());
 

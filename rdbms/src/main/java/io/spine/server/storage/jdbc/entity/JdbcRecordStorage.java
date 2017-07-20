@@ -104,8 +104,8 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     @Override
     protected Iterator<EntityRecord> readMultipleRecords(Iterable<I> ids,
                                                          FieldMask fieldMask) {
-        final Map<?, EntityRecord> recordMap = table.read(ids, fieldMask);
-        return ImmutableList.copyOf(recordMap.values()).iterator();
+        final Iterator<EntityRecord> records = table.read(ids, fieldMask);
+        return records;
     }
 
     @Override
@@ -115,8 +115,8 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
 
     @Override
     protected Iterator<EntityRecord> readAllRecords(FieldMask fieldMask) {
-        final Map<I, EntityRecord> records = table.readAll(fieldMask);
-        return ImmutableList.copyOf(records.values()).iterator();
+        final Iterator<EntityRecord> records = table.readAll(fieldMask);
+        return records;
     }
 
     @Override
@@ -138,11 +138,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
 
     @Override
     public void close() throws DatabaseException {
-        try {
-            super.close();
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
+        super.close();
         dataSource.close();
     }
 

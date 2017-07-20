@@ -89,5 +89,9 @@ public class StorageQuery {
             this.logger = logger;
             return getThis();
         }
+
+        public DataSourceWrapper getDataSource() {
+            return dataSource;
+        }
     }
 }

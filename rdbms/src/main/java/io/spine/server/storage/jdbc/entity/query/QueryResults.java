@@ -20,18 +20,18 @@
 
 package io.spine.server.storage.jdbc.entity.query;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.protobuf.FieldMask;
 import com.google.protobuf.Message;
-import io.spine.server.storage.jdbc.table.entity.RecordTable;
 import io.spine.protobuf.AnyPacker;
-import io.spine.type.TypeUrl;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.FieldMasks;
+import io.spine.server.storage.jdbc.table.entity.RecordTable;
 import io.spine.server.storage.jdbc.util.Serializer;
+import io.spine.type.TypeUrl;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -47,35 +47,18 @@ final class QueryResults {
     }
 
     /**
-     * Transforms results of SQL query into ID-to-{@link EntityRecord} {@link Map}.
+     * Transforms results of SQL query results into ID-to-{@link EntityRecord} {@link Map}.
      *
-     * @param resultSet Results of the query.
-     * @param fieldMask {@code FieldMask} to apply to the results.
-     * @param <I>      ID type of the {@link io.spine.server.entity.Entity}.
-     * @param <S>   S type of the {@link io.spine.server.entity.Entity}.
-     * @return ID-to-{@link EntityRecord} {@link Map} representing the query results.
-     * @throws SQLException if read results contain no ID column or entity column.
+     * @param resultSet Results of the query
+     * @param fieldMask {@code FieldMask} to apply to the results
+     * @return ID-to-{@link EntityRecord} {@link Map} representing the query results
+     * @throws SQLException if read results contain no ID column or entity column
      * @see RecordTable
      */
-    static <I, S extends Message> Map<I, EntityRecord> parse(
-            ResultSet resultSet,
-            FieldMask fieldMask)
+    static Iterator<EntityRecord> parse(ResultSet resultSet, FieldMask fieldMask)
             throws SQLException {
-        final ImmutableMap.Builder<I, EntityRecord> resultBuilder = new ImmutableMap.Builder<>();
-
-        while (resultSet.next()) {
-            final EntityRecord record = readSingleMessage(resultSet);
-            final S maskedMessage = maskFields(record, fieldMask);
-            @SuppressWarnings("unchecked")
-            final I id = (I) resultSet.getObject(RecordTable.StandardColumn.id.name());
-            resultBuilder.put(id, EntityRecord.newBuilder(record)
-                                              .setState(AnyPacker.pack(maskedMessage))
-                                              .build());
-        }
-
-        resultSet.close();
-
-        return resultBuilder.build();
+        // TODO:2017-07-19:dmytro.dashenkov: impl.
+        return null;
     }
 
     private static EntityRecord readSingleMessage(ResultSet resultSet) throws SQLException {
