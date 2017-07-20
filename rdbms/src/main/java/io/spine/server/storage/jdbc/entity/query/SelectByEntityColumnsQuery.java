@@ -32,7 +32,6 @@ import io.spine.server.entity.storage.CompositeQueryParameter;
 import io.spine.server.entity.storage.EntityQuery;
 import io.spine.server.entity.storage.QueryParameters;
 import io.spine.server.storage.jdbc.DatabaseException;
-import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.query.StorageQuery;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.util.ConnectionWrapper;
@@ -66,6 +65,7 @@ import static io.spine.server.storage.jdbc.Sql.Query.OR;
 import static io.spine.server.storage.jdbc.Sql.Query.PLACEHOLDER;
 import static io.spine.server.storage.jdbc.Sql.Query.SELECT;
 import static io.spine.server.storage.jdbc.Sql.Query.WHERE;
+import static io.spine.server.storage.jdbc.Sql.nPlaceholders;
 import static io.spine.server.storage.jdbc.table.entity.RecordTable.StandardColumn.entity;
 import static io.spine.server.storage.jdbc.table.entity.RecordTable.StandardColumn.id;
 import static io.spine.util.Exceptions.newIllegalArgumentException;
@@ -75,7 +75,7 @@ import static io.spine.util.Exceptions.newIllegalArgumentException;
  */
 public final class SelectByEntityColumnsQuery<I> extends StorageQuery implements AutoCloseable {
 
-    private static final String COMMON_SQL = SELECT.toString() + entity + FROM + "%s";
+    private static final String COMMON_SQL = SELECT.toString() + entity + FROM + "%s ";
 
     private final PreparedStatement statement;
     private final FieldMask fieldMask;
@@ -102,10 +102,6 @@ public final class SelectByEntityColumnsQuery<I> extends StorageQuery implements
         return statement;
     }
 
-    public static <I> Builder<I> newBuilder() {
-        return new Builder<>();
-    }
-
     /**
      * Closes the underlying {@link PreparedStatement} unless {@link #execute()} has been called.
      *
@@ -116,6 +112,10 @@ public final class SelectByEntityColumnsQuery<I> extends StorageQuery implements
         statement.close();
     }
 
+    public static <I> Builder<I> newBuilder() {
+        return new Builder<>();
+    }
+
     public static class Builder<I> extends StorageQuery.Builder<Builder<I>,
                                                                 SelectByEntityColumnsQuery<I>> {
 
@@ -123,6 +123,7 @@ public final class SelectByEntityColumnsQuery<I> extends StorageQuery implements
         private FieldMask fieldMask;
         private ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> columnTypeRegistry;
         private IdColumn<I> idColumn;
+        private String tableName;
 
         private PreparedStatement statement;
 
@@ -153,17 +154,26 @@ public final class SelectByEntityColumnsQuery<I> extends StorageQuery implements
             return this;
         }
 
+        public Builder<I> setIdColumn(IdColumn<I> idColumn) {
+            this.idColumn = checkNotNull(idColumn);
+            return this;
+        }
+
+        public Builder<I> setTableName(String tableName) {
+            this.tableName = checkNotNull(tableName);
+            return this;
+        }
+
         private PreparedStatement getStatement() {
             return checkNotNull(statement);
         }
 
-        public IdColumn<I> getIdColumn() {
+        private IdColumn<I> getIdColumn() {
             return checkNotNull(idColumn);
         }
 
-        public Builder setIdColumn(IdColumn<I> idColumn) {
-            this.idColumn = checkNotNull(idColumn);
-            return this;
+        private String getTableName() {
+            return checkNotNull(tableName);
         }
 
         @Override
@@ -171,7 +181,7 @@ public final class SelectByEntityColumnsQuery<I> extends StorageQuery implements
             checkState(entityQuery != null, "EntityQuery is not set.");
             checkState(columnTypeRegistry != null, "ColumnTypeRegistry is not set.");
 
-            final StringBuilder sql = new StringBuilder(COMMON_SQL);
+            final StringBuilder sql = new StringBuilder(String.format(COMMON_SQL, getTableName()));
             final QueryParameters parameters = entityQuery.getParameters();
             final Collection<I> ids = entityQuery.getIds();
             final Iterator<CompositeQueryParameter> iterator = parameters.iterator();
@@ -184,17 +194,25 @@ public final class SelectByEntityColumnsQuery<I> extends StorageQuery implements
                     final CompositeOperator operator = param.getOperator();
                     sql.append(BRACKET_OPEN);
                     final String compositeSqlOperator = toSql(operator);
-                    for (Map.Entry<Column, ColumnFilter> filter : param.getFilters().entries()) {
+                    final Iterator<Map.Entry<Column, ColumnFilter>> filters = param.getFilters()
+                                                                                   .entries()
+                                                                                   .iterator();
+                    while (filters.hasNext()) {
+                        Map.Entry<Column, ColumnFilter> filter = filters.next();
                         final Column column = filter.getKey();
                         columnIndexes.put(new ColumnFilterIdentity(column, param),
                                           indexInStatement);
+                        indexInStatement++;
                         final String name = column.getName();
-                        final Operator columnFilterOperator = filter.getValue().getOperator();
+                        final Operator columnFilterOperator = filter.getValue()
+                                                                    .getOperator();
                         final String comparisonOperator = toSql(columnFilterOperator);
                         sql.append(name)
                            .append(comparisonOperator)
-                           .append(PLACEHOLDER)
-                           .append(compositeSqlOperator);
+                           .append(PLACEHOLDER);
+                        if (filters.hasNext()) {
+                            sql.append(compositeSqlOperator);
+                        }
                     }
                     sql.append(BRACKET_CLOSE);
                     if (iterator.hasNext()) {
@@ -205,14 +223,14 @@ public final class SelectByEntityColumnsQuery<I> extends StorageQuery implements
                     sql.append(AND);
                 }
             } else {
-                if (ids.isEmpty()) {
+                if (!ids.isEmpty()) {
                     sql.append(WHERE);
                 }
             }
             if (!ids.isEmpty()) {
                 sql.append(id)
                    .append(IN)
-                   .append(Sql.nPlaceholders(ids.size()));
+                   .append(nPlaceholders(ids.size()));
             }
             sql.append(SEMICOLON);
             final DataSourceWrapper dataSource = getDataSource();
@@ -231,7 +249,7 @@ public final class SelectByEntityColumnsQuery<I> extends StorageQuery implements
                 }
             }
 
-            int sqlParameterIndex = columnIndexes.size();
+            int sqlParameterIndex = columnIndexes.size() + 1;
             final IdColumn<I> idColumn = getIdColumn();
             for (I id : ids) {
                 idColumn.setId(sqlParameterIndex, id, statement);

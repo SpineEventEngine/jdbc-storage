@@ -21,8 +21,8 @@
 package io.spine.server.storage.jdbc.util;
 
 import com.google.protobuf.Message;
-import io.spine.annotation.Internal;
 import io.spine.Identifier;
+import io.spine.annotation.Internal;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.entity.Entity;
 import io.spine.server.storage.jdbc.DatabaseException;
@@ -32,6 +32,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.primitives.Primitives.wrap;
 
 /**
  * A helper class for setting the {@link Entity} ID into a {@link PreparedStatement}as a query
@@ -60,22 +61,24 @@ public abstract class IdColumn<I> {
      * @param <I>         the type of {@link Entity} IDs
      * @return a new helper instance
      */
+    @SuppressWarnings({
+            "unchecked", // ID runtime type is checked with if statements.
+            "IfStatementWithTooManyBranches", // OK for a factory method
+            "ChainOfInstanceofChecks"         // which depends on the built object target type.
+    })
     public static <I> IdColumn<I> newInstance(Class<? extends Entity<I, ?>> entityClass,
                                               String columnName) {
         final IdColumn<I> helper;
-        final Class<I> idClass = Entity.TypeInfo.getIdClass(entityClass);
-        if (idClass.equals(Long.class)) {
-            @SuppressWarnings("unchecked") // is checked already
-            final IdColumn<I> longIdColumn =
-                    (IdColumn<I>) new LongIdColumn(columnName);
-            helper = longIdColumn;
-        } else if (idClass.equals(Integer.class)) {
-            @SuppressWarnings("unchecked") // is checked already
-            final IdColumn<I> intIdColumn =
-                    (IdColumn<I>) new IntIdColumn(columnName);
-            helper = intIdColumn;
+        final Class<I> idClass = wrap(Entity.TypeInfo.<I>getIdClass(entityClass));
+        if (idClass == Long.class) {
+            helper = (IdColumn<I>) new LongIdColumn(columnName);
+        } else if (idClass == Integer.class) {
+            helper = (IdColumn<I>) new IntIdColumn(columnName);
+        } else if (idClass == String.class) {
+            helper = (IdColumn<I>) new StringIdColumn(columnName);
         } else {
-            helper = new StringOrMessageIdColumn<>(columnName);
+            final Class<? extends Message> messageClass = (Class<? extends Message>) idClass;
+            helper = (IdColumn<I>) new MessageIdColumn(messageClass, columnName);
         }
         return helper;
     }
@@ -174,7 +177,7 @@ public abstract class IdColumn<I> {
      * Helps to work with columns which contain either {@link Message} or {@code string}
      * {@link Entity} IDs.
      */
-    private static class StringOrMessageIdColumn<I> extends IdColumn<I> {
+    private abstract static class StringOrMessageIdColumn<I> extends IdColumn<I> {
 
         private StringOrMessageIdColumn(String columnName) {
             super(columnName);
@@ -183,11 +186,6 @@ public abstract class IdColumn<I> {
         @Override
         public Sql.Type getSqlType() {
             return Sql.Type.VARCHAR_255;
-        }
-
-        @Override
-        public Class<I> getJavaType() {
-            return (Class<I>) String.class; // TODO:2017-07-18:dmytro.dashenkov: Revisit.
         }
 
         @Override
@@ -204,10 +202,30 @@ public abstract class IdColumn<I> {
     /**
      * Helps to work with columns which contain {@code string} {@link Entity} IDs.
      */
-    public static class StringIdColumn extends StringOrMessageIdColumn<String> {
+    private static class StringIdColumn extends StringOrMessageIdColumn<String> {
 
         private StringIdColumn(String columnName) {
             super(columnName);
+        }
+
+        @Override
+        public Class<String> getJavaType() {
+            return String.class;
+        }
+    }
+
+    private static class MessageIdColumn<M extends Message> extends StringOrMessageIdColumn<M> {
+
+        private final Class<M> cls;
+
+        private MessageIdColumn(Class<M> cls, String columnName) {
+            super(columnName);
+            this.cls = cls;
+        }
+
+        @Override
+        public Class<M> getJavaType() {
+            return cls;
         }
     }
 }

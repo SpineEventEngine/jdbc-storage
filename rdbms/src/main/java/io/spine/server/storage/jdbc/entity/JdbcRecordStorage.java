@@ -21,7 +21,6 @@
 package io.spine.server.storage.jdbc.entity;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
 import com.google.protobuf.FieldMask;
 import io.spine.server.entity.Entity;
 import io.spine.server.entity.EntityRecord;
@@ -56,8 +55,8 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     protected JdbcRecordStorage(DataSourceWrapper dataSource,
                                 boolean multitenant,
                                 Class<Entity<I, ?>> entityClass,
-                                ColumnTypeRegistry<?
-                                        extends JdbcColumnType<?, ?>> columnTypeRegistry)
+                                ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>>
+                                        columnTypeRegistry)
             throws DatabaseException {
         super(multitenant);
         this.dataSource = dataSource;
@@ -121,8 +120,8 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
 
     @Override
     protected Iterator<EntityRecord> readAllRecords(EntityQuery<I> query, FieldMask fieldMask) {
-        final Map<I, EntityRecord> records = table.readByQuery(query, fieldMask);
-        return ImmutableList.copyOf(records.values()).iterator();
+        final Iterator<EntityRecord> records = table.readByQuery(query, fieldMask);
+        return records;
     }
 
     @Override
@@ -161,7 +160,8 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
             extends StorageBuilder<Builder<I>, JdbcRecordStorage<I>> {
 
         private Class<? extends Entity> entityClass;
-        private ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry;
+        private ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>>
+                columnTypeRegistry;
 
         private Builder() {
             super();
@@ -183,12 +183,14 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
         }
 
         public Builder<I> setColumnTypeRegistry(
-                ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry) {
+                ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>>
+                        columnTypeRegistry) {
             this.columnTypeRegistry = columnTypeRegistry;
             return this;
         }
 
-        public ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> getColumnTypeRegistry() {
+        public ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>>
+        getColumnTypeRegistry() {
             return columnTypeRegistry;
         }
 

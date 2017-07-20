@@ -39,8 +39,8 @@ import static io.spine.server.storage.jdbc.GivenDataSource.whichThrowsExceptionO
 class Given {
 
     private static Logger loggerMock = null;
-    private static final IdColumn<String> ID_COLUMN_QUERY_SETTER_MOCK =
-            mock(IdColumn.StringIdColumn.class);
+    @SuppressWarnings("unchecked") // OK for a mock.
+    private static final IdColumn<String> ID_COLUMN_QUERY_SETTER_MOCK = mock(IdColumn.class);
 
     private Given() {
     }

@@ -35,7 +35,7 @@ import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.entity.JdbcRecordStorage;
 import io.spine.server.storage.jdbc.entity.query.RecordStorageQueryFactory;
 import io.spine.server.storage.jdbc.entity.query.SelectBulkQuery;
-import io.spine.server.storage.jdbc.entity.query.SelectByEntityQuery;
+import io.spine.server.storage.jdbc.entity.query.SelectByEntityColumnsQuery;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 import io.spine.server.storage.jdbc.table.TableColumn;
@@ -68,11 +68,12 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWit
 
     private final RecordStorageQueryFactory<I> queryFactory;
 
-    private final ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> typeRegistry;
+    private final ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> typeRegistry;
 
     public RecordTable(Class<Entity<I, ?>> entityClass,
                        DataSourceWrapper dataSource,
-                       ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry) {
+                       ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>>
+                               columnTypeRegistry) {
         super(entityClass, StandardColumn.id.name(), dataSource);
         queryFactory = new RecordStorageQueryFactory<>(dataSource,
                                                        entityClass,
@@ -147,15 +148,11 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWit
         }
     }
 
-    public Map<I, EntityRecord> readByQuery(EntityQuery<I> query, FieldMask fieldMask) {
-        final SelectByEntityQuery<I> queryByEntity =
+    public Iterator<EntityRecord> readByQuery(EntityQuery<I> query, FieldMask fieldMask) {
+        final SelectByEntityColumnsQuery<I> queryByEntity =
                 queryFactory.newSelectByEntityQuery(query, fieldMask);
-        try {
-            final Map<I, EntityRecord> result = queryByEntity.execute();
-            return result;
-        } catch (SQLException e) {
-            throw new DatabaseException(e);
-        }
+        final Iterator<EntityRecord> result = queryByEntity.execute();
+        return result;
     }
 
     private final class ColumnAdapter implements Function<Column, TableColumn> {

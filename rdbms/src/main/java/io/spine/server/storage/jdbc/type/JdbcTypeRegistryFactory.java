@@ -44,16 +44,17 @@ public final class JdbcTypeRegistryFactory {
         // Prevent initialization of a utility class
     }
 
-    private static final ColumnTypeRegistry<? extends JdbcColumnType<?, ?>>
-            DEFAULT_REGISTRY = ColumnTypeRegistry.<JdbcColumnType<?, ?>>newBuilder()
-            .put(String.class, stringType())
-            .put(Integer.class, integerType())
-            .put(Long.class, longType())
-            .put(Boolean.class, booleanType())
-            .put(Version.class, versionType())
-            .put(Timestamp.class, timestampType())
-            .put(AbstractMessage.class, messageType())
-            .build();
+    private static final ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>>
+            DEFAULT_REGISTRY =
+            ColumnTypeRegistry.<JdbcColumnType<? super Object, ? super Object>>newBuilder()
+                              .put(String.class, stringType())
+                              .put(Integer.class, integerType())
+                              .put(Long.class, longType())
+                              .put(Boolean.class, booleanType())
+                              .put(Version.class, versionType())
+                              .put(Timestamp.class, timestampType())
+                              .put(AbstractMessage.class, messageType())
+                              .build();
 
     /**
      * Retrieves a default
@@ -74,14 +75,16 @@ public final class JdbcTypeRegistryFactory {
      *
      * @return the default {@code ColumnTypeRegistry} for storing the Entity Columns in Jdbc storage
      */
-    public static ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> defaultInstance() {
+    public static ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>>
+    defaultInstance() {
         return DEFAULT_REGISTRY;
     }
 
     /**
      * Retrieves a builder with all the {@linkplain #defaultInstance() predefined values} set.
      */
-    public static ColumnTypeRegistry.Builder<? extends JdbcColumnType<?, ?>> predefinedValuesAnd() {
+    public static ColumnTypeRegistry.Builder<? extends JdbcColumnType<? super Object, ? super Object>>
+    predefinedValuesAnd() {
         return ColumnTypeRegistry.newBuilder(DEFAULT_REGISTRY);
     }
 

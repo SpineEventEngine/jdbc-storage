@@ -20,19 +20,27 @@
 
 package io.spine.server.storage.jdbc.entity.query;
 
+import com.google.common.base.Function;
+import com.google.protobuf.Any;
 import com.google.protobuf.FieldMask;
 import com.google.protobuf.Message;
 import io.spine.protobuf.AnyPacker;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.FieldMasks;
 import io.spine.server.storage.jdbc.table.entity.RecordTable;
-import io.spine.server.storage.jdbc.util.Serializer;
+import io.spine.server.storage.jdbc.util.MessageDbIterator;
 import io.spine.type.TypeUrl;
 
+import javax.annotation.Nullable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.Map;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.Iterators.transform;
+import static io.spine.server.storage.jdbc.table.entity.RecordTable.StandardColumn.entity;
+import static io.spine.type.TypeUrl.from;
 
 /**
  * Utility class for parsing the results of a DB query ({@link ResultSet}) into the
@@ -41,6 +49,8 @@ import java.util.Map;
  * @author Dmytro Dashenkov
  */
 final class QueryResults {
+
+    private static final TypeUrl ENTITY_RECORD_TYPE_URL = from(EntityRecord.getDescriptor());
 
     private QueryResults() {
         // Prevent utility class instantiation.
@@ -57,18 +67,30 @@ final class QueryResults {
      */
     static Iterator<EntityRecord> parse(ResultSet resultSet, FieldMask fieldMask)
             throws SQLException {
-        // TODO:2017-07-19:dmytro.dashenkov: impl.
-        return null;
+        final Iterator<EntityRecord> recordIterator =
+                new MessageDbIterator<>(resultSet, entity.name(), ENTITY_RECORD_TYPE_URL);
+        final Iterator<EntityRecord> result = transform(recordIterator, maskFields(fieldMask));
+        return result;
     }
 
-    private static EntityRecord readSingleMessage(ResultSet resultSet) throws SQLException {
-        return Serializer.deserialize(resultSet.getBytes(RecordTable.StandardColumn.entity.name()),
-                                      EntityRecord.getDescriptor());
+    private static Any maskFieldsOfState(EntityRecord record, FieldMask fieldMask) {
+        final Message message = AnyPacker.unpack(record.getState());
+        final TypeUrl typeUrl = from(message.getDescriptorForType());
+        final Message result = FieldMasks.applyMask(fieldMask, message, typeUrl);
+        return AnyPacker.pack(result);
     }
 
-    private static <M extends Message> M maskFields(EntityRecord record, FieldMask fieldMask) {
-        final M message = AnyPacker.unpack(record.getState());
-        final TypeUrl typeUrl = TypeUrl.from(message.getDescriptorForType());
-        return FieldMasks.applyMask(fieldMask, message, typeUrl);
+    private static Function<EntityRecord, EntityRecord> maskFields(final FieldMask fieldMask) {
+        return new Function<EntityRecord, EntityRecord>() {
+            @Override
+            public EntityRecord apply(@Nullable EntityRecord entityRecord) {
+                checkNotNull(entityRecord);
+                final Any maskedState = maskFieldsOfState(entityRecord, fieldMask);
+                final EntityRecord result = entityRecord.toBuilder()
+                                                        .setState(maskedState)
+                                                        .build();
+                return result;
+            }
+        };
     }
 }

@@ -54,8 +54,7 @@ public class JdbcStorageFactory implements StorageFactory {
 
     private final DataSourceWrapper dataSource;
     private final boolean multitenant;
-  //  private final Class<? extends Entity<I, ?>> entityClass;
-    private final ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry;
+    private final ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> columnTypeRegistry;
 
     private JdbcStorageFactory(Builder builder) {
       //  this.entityClass = checkNotNull(builder.entityClass);
@@ -130,25 +129,25 @@ public class JdbcStorageFactory implements StorageFactory {
         dataSource.close();
     }
 
-    public static <I> Builder<I> newBuilder() {
-        return new Builder<>();
+    public static Builder newBuilder() {
+        return new Builder();
     }
 
     /**
      * Builds instances of {@code JdbcStorageFactory}.
      */
-    public static class Builder<I> {
+    public static class Builder {
 
         private DataSourceWrapper dataSource;
         private boolean multitenant;
-      //  private Class<? extends Entity<I, ?>> entityClass;
-        private ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry;
+        private ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> columnTypeRegistry;
 
         private Builder() {
         }
 
-        public Builder<I> setColumnTypeRegistry(
-                ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry) {
+        public Builder setColumnTypeRegistry(
+                ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>>
+                        columnTypeRegistry) {
             this.columnTypeRegistry = columnTypeRegistry;
             return this;
         }
@@ -156,23 +155,15 @@ public class JdbcStorageFactory implements StorageFactory {
         /**
          * Sets optional field {@code isMultitenant}. {@code false} is used by default.
          */
-        public Builder<I> setMultitenant(boolean multitenant) {
+        public Builder setMultitenant(boolean multitenant) {
             this.multitenant = multitenant;
             return this;
         }
 
-//        /**
-//         * Sets required field {@code entityClass}.
-//         */
-//        public Builder<I> setEntityClass(Class<? extends Entity<I, ?>> entityClass) {
-//            this.entityClass = entityClass;
-//            return this;
-//        }
-
         /**
          * Sets required field {@code dataSource}.
          */
-        public Builder<I> setDataSource(DataSourceWrapper dataSource) {
+        public Builder setDataSource(DataSourceWrapper dataSource) {
             this.dataSource = dataSource;
             return this;
         }
@@ -182,7 +173,7 @@ public class JdbcStorageFactory implements StorageFactory {
          *
          * @see DataSourceWrapper#wrap(DataSource)
          */
-        public Builder<I> setDataSource(DataSource dataSource) {
+        public Builder setDataSource(DataSource dataSource) {
             this.dataSource = DataSourceWrapper.wrap(dataSource);
             return this;
         }
@@ -193,7 +184,7 @@ public class JdbcStorageFactory implements StorageFactory {
          * @see HikariConfig
          * @see DefaultDataSourceConfigConverter#convert(DataSourceConfig)
          */
-        public Builder<I> setDataSource(DataSourceConfig dataSource) {
+        public Builder setDataSource(DataSourceConfig dataSource) {
             final HikariConfig hikariConfig = DefaultDataSourceConfigConverter.convert(dataSource);
             this.dataSource = DataSourceWrapper.wrap(new HikariDataSource(hikariConfig));
             return this;

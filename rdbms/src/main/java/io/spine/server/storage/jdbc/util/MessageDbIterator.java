@@ -25,6 +25,7 @@ import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.type.TypeUrl;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static io.spine.server.storage.jdbc.util.Serializer.deserialize;
@@ -48,6 +49,11 @@ public class MessageDbIterator<M extends Message> extends DbIterator<M> {
     public MessageDbIterator(PreparedStatement statement, String columnName, TypeUrl recordType)
             throws DatabaseException {
         super(statement, columnName);
+        this.recordType = recordType;
+    }
+
+    public MessageDbIterator(ResultSet resultSet, String columnName, TypeUrl recordType) {
+        super(resultSet, columnName);
         this.recordType = recordType;
     }
 

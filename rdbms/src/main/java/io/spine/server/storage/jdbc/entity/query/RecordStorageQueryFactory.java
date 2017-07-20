@@ -21,25 +21,23 @@
 package io.spine.server.storage.jdbc.entity.query;
 
 import com.google.protobuf.FieldMask;
+import io.spine.server.entity.Entity;
+import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.entity.storage.EntityQuery;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
+import io.spine.server.storage.RecordStorage;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.SelectMessageByIdQuery;
 import io.spine.server.storage.jdbc.query.StorageIndexQuery;
-import io.spine.server.storage.jdbc.query.WriteQueryFactory;
-import io.spine.server.storage.jdbc.type.JdbcColumnType;
-import org.slf4j.Logger;
-import io.spine.server.entity.Entity;
-import io.spine.server.entity.EntityRecord;
-import io.spine.server.storage.RecordStorage;
-import io.spine.server.storage.LifecycleFlagField;
-import io.spine.server.storage.jdbc.entity.lifecycleflags.query.MarkEntityQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
+import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 import io.spine.server.storage.jdbc.table.entity.RecordTable;
+import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.util.DataSourceWrapper;
 import io.spine.server.storage.jdbc.util.DbTableNameFactory;
 import io.spine.server.storage.jdbc.util.IdColumn;
+import org.slf4j.Logger;
 
 import java.util.Map;
 
@@ -59,7 +57,7 @@ public class RecordStorageQueryFactory<I>
     private final DataSourceWrapper dataSource;
     private final String tableName;
     private final Logger logger;
-    private final ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry;
+    private final ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> columnTypeRegistry;
 
     /**
      * Creates a new instance.
@@ -71,27 +69,14 @@ public class RecordStorageQueryFactory<I>
                                      Class<? extends Entity<I, ?>> entityClass,
                                      Logger logger,
                                      IdColumn<I> idColumn,
-                                     ColumnTypeRegistry<?
-                                             extends JdbcColumnType<?, ?>> columnTypeRegistry) {
+                                     ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>>
+                                             columnTypeRegistry) {
         super();
         this.idColumn = checkNotNull(idColumn);
         this.dataSource = dataSource;
         this.tableName = DbTableNameFactory.newTableName(entityClass);
         this.logger = logger;
         this.columnTypeRegistry = columnTypeRegistry;
-    }
-
-    private MarkEntityQuery<I> newMarkQuery(I id, LifecycleFlagField column) {
-        final MarkEntityQuery<I> query =
-                MarkEntityQuery.<I>newBuilder()
-                        .setDataSource(dataSource)
-                        .setLogger(getLogger())
-                        .setTableName(tableName)
-                        .setColumn(column)
-                        .setIdColumn(idColumn)
-                        .setId(id)
-                        .build();
-        return query;
     }
 
     public Logger getLogger() {
@@ -118,15 +103,16 @@ public class RecordStorageQueryFactory<I>
         return builder.build();
     }
 
-    public SelectByEntityQuery<I> newSelectByEntityQuery(EntityQuery<I> query, FieldMask fieldMask) {
-        final SelectByEntityQuery.Builder<I> builder =
-                SelectByEntityQuery.<I>newBuilder()
-                .setQueryByEntity(query, tableName)
-                .setIdColumn(idColumn)
-                .setFieldMask(fieldMask)
-                .setLogger(getLogger())
-                .setDataSource(dataSource);
-
+    public SelectByEntityColumnsQuery<I> newSelectByEntityQuery(EntityQuery<I> query, FieldMask fieldMask) {
+        final SelectByEntityColumnsQuery.Builder<I> builder =
+                SelectByEntityColumnsQuery.<I>newBuilder()
+                                          .setDataSource(dataSource)
+                                          .setLogger(logger)
+                                          .setTableName(tableName)
+                                          .setIdColumn(idColumn)
+                                          .setColumnTypeRegistry(columnTypeRegistry)
+                                          .setEntityQuery(query)
+                                          .setFieldMask(fieldMask);
         return builder.build();
     }
 

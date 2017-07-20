@@ -23,6 +23,7 @@ package io.spine.server.storage.jdbc.util;
 import io.spine.annotation.Internal;
 import io.spine.server.storage.jdbc.DatabaseException;
 
+import javax.annotation.Nullable;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -45,6 +46,7 @@ import java.util.NoSuchElementException;
 public abstract class DbIterator<R> implements Iterator<R>, AutoCloseable {
 
     private final ResultSet resultSet;
+    @Nullable
     private final PreparedStatement statement;
     private final String columnName;
     private boolean isHasNextCalledBeforeNext = false;
@@ -61,11 +63,24 @@ public abstract class DbIterator<R> implements Iterator<R>, AutoCloseable {
     protected DbIterator(PreparedStatement statement, String columnName) throws DatabaseException {
         try {
             this.resultSet = statement.executeQuery();
-            this.statement = statement;
             this.columnName = columnName;
+            this.statement = statement;
         } catch (SQLException e) {
             throw new DatabaseException(e);
         }
+    }
+
+    /**
+     * Creates a new iterator instance.
+     *
+     * @param resultSet  the results of a DB query to iterate over
+     * @param columnName a name of a serialized storage record column
+     * @throws DatabaseException if an error occurs during interaction with the DB
+     */
+    protected DbIterator(ResultSet resultSet, String columnName) {
+        this.resultSet = resultSet;
+        this.columnName = columnName;
+        this.statement = null;
     }
 
     @Override
@@ -126,7 +141,9 @@ public abstract class DbIterator<R> implements Iterator<R>, AutoCloseable {
     public void close() throws DatabaseException {
         try {
             resultSet.close();
-            statement.close();
+            if (statement != null) {
+                statement.close();
+            }
         } catch (SQLException e) {
             throw new DatabaseException(e);
         }

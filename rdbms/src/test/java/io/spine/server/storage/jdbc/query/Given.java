@@ -42,7 +42,8 @@ import static org.mockito.Mockito.when;
 class Given {
 
     private static Logger loggerMock = null;
-    private static final IdColumn<String> idColumnMock = mock(IdColumn.StringIdColumn.class);
+    @SuppressWarnings("unchecked") // OK for a mock.
+    private static final IdColumn<String> idColumnMock = mock(IdColumn.class);
 
     // TODO:2016-08-02:alexander.litus: these methods are used in one place only (each), so move them there.
     // Apply this for all such cases in all Given classes.
@@ -65,7 +66,8 @@ class Given {
         final DataSourceWrapper dataSourceMock = mock(DataSourceWrapper.class);
         final ConnectionWrapper connectionMock = mock(ConnectionWrapper.class);
         final PreparedStatement preparedStatementMock = mock(PreparedStatement.class);
-        final IdColumn<String> idColumnMock = mock(IdColumn.StringIdColumn.class);
+        @SuppressWarnings("unchecked") // OK for a mock.
+        final IdColumn<String> idColumnMock = mock(IdColumn.class);
         final ResultSet resultSetMock = mock(ResultSet.class);
 
         when(dataSourceMock.getConnection(anyBoolean())).thenReturn(connectionMock);
