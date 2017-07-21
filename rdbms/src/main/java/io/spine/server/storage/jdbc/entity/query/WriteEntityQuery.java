@@ -55,7 +55,6 @@ public class WriteEntityQuery<I> extends WriteRecordQuery<I, EntityRecordWithCol
                                         getColumnTypeRegistry(),
                                         getTransformer());
         }
-
         return statement;
     }
 

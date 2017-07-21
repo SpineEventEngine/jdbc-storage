@@ -32,7 +32,6 @@ import io.spine.server.entity.EntityRecord;
 import io.spine.server.stand.AggregateStateId;
 import io.spine.server.stand.StandStorage;
 import io.spine.server.stand.StandStorageShould;
-import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.GivenDataSource;
 import io.spine.server.storage.jdbc.JdbcStandStorage;
 import io.spine.server.storage.jdbc.util.ConnectionWrapper;
@@ -42,6 +41,7 @@ import io.spine.test.storage.Project;
 import io.spine.test.storage.ProjectId;
 import io.spine.time.Time;
 import io.spine.type.TypeUrl;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.sql.PreparedStatement;
@@ -61,8 +61,10 @@ import static io.spine.server.storage.jdbc.stand.Given.testAggregatesWithState;
 import static io.spine.test.Verify.assertContains;
 import static io.spine.test.Verify.assertSize;
 import static junit.framework.TestCase.assertEquals;
+import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -188,8 +190,7 @@ public class JdbcStandStorageShould extends StandStorageShould {
         ids.add(AggregateStateId.of("5", typeUrl));
         ids.add(AggregateStateId.of("8", typeUrl));
 
-        final Collection<EntityRecord> readRecords =
-                (Collection<EntityRecord>) storage.readMultiple(ids);
+        final Collection<EntityRecord> readRecords = newArrayList(storage.readMultiple(ids));
         assertEquals(ids.size(), readRecords.size());
 
         assertContains(records.get(1), readRecords);
@@ -211,11 +212,10 @@ public class JdbcStandStorageShould extends StandStorageShould {
         ids.add(AggregateStateId.of("invalid-id-2", typeUrl));
         ids.add(AggregateStateId.of(repeatingInvalidId, typeUrl));
 
-        final Collection<EntityRecord> records = (Collection<EntityRecord>)
-                storage.readMultiple(ids);
+        final Collection<?> records = newArrayList(storage.readMultiple(ids));
 
         assertNotNull(records);
-        assertSize(0, records);
+        assertThat(records, empty());
     }
 
     @SuppressWarnings("MethodWithMultipleLoops")
@@ -352,18 +352,6 @@ public class JdbcStandStorageShould extends StandStorageShould {
     }
 
     /*
-     * Read-write negative tests
-     * -------------------------
-     */
-
-    @Test(expected = DatabaseException.class)
-    public void fail_to_fetch_records_by_zero_ids() {
-        final StandStorage storage = newStorage();
-
-        storage.readMultiple(Collections.<AggregateStateId>emptyList());
-    }
-
-    /*
      * Misc
      * ----
      */
@@ -396,6 +384,14 @@ public class JdbcStandStorageShould extends StandStorageShould {
         assertTrue(storage.isClosed());
 
         storage.readAll();
+    }
+
+    @SuppressWarnings("MethodDoesntCallSuperMethod")
+    @Ignore
+    @Test
+    @Override
+    public void write_record_with_columns() {
+        // Ignored since stand storage does not support (explicit) entity columns.
     }
 
     private static void assertMatches(Message message, FieldMask fieldMask) {

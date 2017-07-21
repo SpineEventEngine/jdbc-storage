@@ -44,16 +44,16 @@ public class JdbcProjectionStorageShould extends ProjectionStorageShould {
     protected ProjectionStorage<ProjectId> getStorage(Class<? extends Entity> entityClass) {
         final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(
                 "projectionStorageTests");
+        @SuppressWarnings("unchecked") // Required for the tests
+        final Class<? extends Projection<ProjectId, ?, ?>> projectionClass =
+                (Class<? extends Projection<ProjectId, ?, ?>>) entityClass;
         final JdbcRecordStorage<ProjectId> entityStorage =
                 JdbcRecordStorage.<ProjectId>newBuilder()
                                  .setDataSource(dataSource)
                                  .setMultitenant(false)
-                                 .setEntityClass(entityClass)
+                                 .setEntityClass(projectionClass)
                                  .setColumnTypeRegistry(JdbcTypeRegistryFactory.defaultInstance())
                                  .build();
-        @SuppressWarnings("unchecked") // Required for the tests
-        final Class<? extends Projection<ProjectId, ?, ?>> projectionClass =
-                (Class<? extends Projection<ProjectId, ?, ?>>) entityClass;
         final ProjectionStorage<ProjectId> storage =
                 JdbcProjectionStorage.<ProjectId>newBuilder()
                                      .setRecordStorage(entityStorage)

@@ -34,7 +34,6 @@ import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.entity.JdbcRecordStorage;
 import io.spine.server.storage.jdbc.entity.query.RecordStorageQueryFactory;
-import io.spine.server.storage.jdbc.entity.query.SelectBulkQuery;
 import io.spine.server.storage.jdbc.entity.query.SelectByEntityColumnsQuery;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
@@ -70,17 +69,17 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWit
 
     private final ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> typeRegistry;
 
-    public RecordTable(Class<Entity<I, ?>> entityClass,
+    public RecordTable(Class<? extends Entity<I, ?>> entityClass,
                        DataSourceWrapper dataSource,
                        ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>>
                                columnTypeRegistry) {
         super(entityClass, StandardColumn.id.name(), dataSource);
+        this.typeRegistry = columnTypeRegistry;
         queryFactory = new RecordStorageQueryFactory<>(dataSource,
                                                        entityClass,
                                                        log(),
                                                        getIdColumn(),
                                                        columnTypeRegistry);
-        this.typeRegistry = columnTypeRegistry;
     }
 
     @Override
@@ -138,16 +137,6 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWit
         }
     }
 
-    public Iterator<EntityRecord> readAll(FieldMask fieldMask) {
-        final SelectBulkQuery<I> query = queryFactory.newSelectAllQuery(fieldMask);
-        try {
-            final Iterator<EntityRecord> result = query.execute();
-            return result;
-        } catch (SQLException e) {
-            throw new DatabaseException(e);
-        }
-    }
-
     public Iterator<EntityRecord> readByQuery(EntityQuery<I> query, FieldMask fieldMask) {
         final SelectByEntityColumnsQuery<I> queryByEntity =
                 queryFactory.newSelectByEntityQuery(query, fieldMask);
@@ -183,6 +172,11 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWit
         public Sql.Type type() {
             return type;
         }
+
+        @Override
+        public boolean isPrimaryKey() {
+            return this == id;
+        }
     }
 
     private static final class EntityColumnMapping implements TableColumn {
@@ -213,6 +207,11 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWit
         @Override
         public Sql.Type type() {
             return type;
+        }
+
+        @Override
+        public boolean isPrimaryKey() {
+            return false;
         }
 
         @Override

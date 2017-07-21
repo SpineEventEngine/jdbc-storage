@@ -47,4 +47,9 @@ public interface TableColumn extends StorageField {
      * @return the {@link Sql.Type} of the column
      */
     Sql.Type type();
+
+    /**
+     * @return {@code true} is this column is a primary key of the table
+     */
+    boolean isPrimaryKey();
 }

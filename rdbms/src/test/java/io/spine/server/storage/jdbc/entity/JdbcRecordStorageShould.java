@@ -53,10 +53,13 @@ public class JdbcRecordStorageShould
     protected JdbcRecordStorage<String> getStorage(Class<? extends Entity> cls) {
         final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(
                 "entityStorageTests");
+        @SuppressWarnings("unchecked") // Test invariant.
+        final Class<? extends Entity<String, ?>> entityClass =
+                (Class<? extends Entity<String, ?>>) cls;
         final JdbcRecordStorage<String> storage =
                 JdbcRecordStorage.<String>newBuilder()
                                  .setDataSource(dataSource)
-                                 .setEntityClass(cls)
+                                 .setEntityClass(entityClass)
                                  .setMultitenant(false)
                                  .setColumnTypeRegistry(JdbcTypeRegistryFactory.defaultInstance())
                                  .build();

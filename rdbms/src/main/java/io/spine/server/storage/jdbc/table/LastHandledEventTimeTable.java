@@ -94,5 +94,10 @@ public class LastHandledEventTimeTable extends AbstractTable<String, Timestamp, 
         public Type type() {
             return type;
         }
+
+        @Override
+        public boolean isPrimaryKey() {
+            return this == projection_type;
+        }
     }
 }

@@ -46,5 +46,10 @@ public class TableColumnsShould {
         public Sql.Type type() {
             return Sql.Type.ID;
         }
+
+        @Override
+        public boolean isPrimaryKey() {
+            return false;
+        }
     }
 }

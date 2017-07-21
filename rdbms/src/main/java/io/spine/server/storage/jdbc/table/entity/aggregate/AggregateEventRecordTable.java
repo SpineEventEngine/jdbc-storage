@@ -106,5 +106,10 @@ public class AggregateEventRecordTable<I> extends AggregateTable<I, AggregateEve
         public Sql.Type type() {
             return type;
         }
+
+        @Override
+        public boolean isPrimaryKey() {
+            return false;
+        }
     }
 }

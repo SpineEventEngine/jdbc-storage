@@ -98,5 +98,10 @@ public class EventCountTable<I> extends AggregateTable<I, Int32Value> {
         public Sql.Type type() {
             return type;
         }
+
+        @Override
+        public boolean isPrimaryKey() {
+            return this == id;
+        }
     }
 }

@@ -20,6 +20,7 @@
 
 package io.spine.server.storage.jdbc.table;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.protobuf.Message;
 import io.spine.server.storage.jdbc.Sql;
@@ -38,14 +39,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.COMMA;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
+import static io.spine.server.storage.jdbc.Sql.Query.CREATE_IF_MISSING;
+import static io.spine.server.storage.jdbc.Sql.Query.PRIMARY_KEY;
 
 /**
  * A representation of an SQL table.
@@ -243,21 +248,28 @@ public abstract class AbstractTable<I, R extends Message, W> {
     private String composeCreateTableSql() {
         final Iterable<? extends TableColumn> columns = getColumns();
         final StringBuilder sql = new StringBuilder(MEAN_SQL_QUERY_LENGTH);
-        sql.append(Sql.Query.CREATE_IF_MISSING)
+        sql.append(CREATE_IF_MISSING)
            .append(getName())
            .append(BRACKET_OPEN);
+        final Set<String> primaryKey = new HashSet<>();
         for (TableColumn column : columns) {
             sql.append(column.name())
                .append(' ')
                .append(ensureType(column))
                .append(COMMA);
+            if (column.isPrimaryKey()) {
+                primaryKey.add(column.name());
+            }
         }
-        final String idColumnName = getIdColumnDeclaration().name();
-        sql.append(Sql.Query.PRIMARY_KEY)
-           .append(BRACKET_OPEN) // TODO:2017-07-03:dmytro.dashenkov: Nullable columns.
-           .append(idColumnName)
-           .append(BRACKET_CLOSE)
-           .append(BRACKET_CLOSE)
+        if (!primaryKey.isEmpty()) {
+            final String columnNames = Joiner.on(COMMA.toString())
+                                             .join(primaryKey);
+            sql.append(PRIMARY_KEY)
+               .append(BRACKET_OPEN)
+               .append(columnNames)
+               .append(BRACKET_CLOSE);
+        }
+        sql.append(BRACKET_CLOSE)
            .append(SEMICOLON);
         final String result = sql.toString();
         return result;

@@ -95,5 +95,10 @@ public class LifecycleFlagsTable<I> extends AggregateTable<I, LifecycleFlags> {
         public Sql.Type type() {
             return type;
         }
+
+        @Override
+        public boolean isPrimaryKey() {
+            return this == id;
+        }
     }
 }

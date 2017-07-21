@@ -20,11 +20,19 @@
 
 package io.spine.server.storage.jdbc.entity;
 
+import com.google.common.base.Function;
 import com.google.common.base.Optional;
+import com.google.protobuf.Any;
 import com.google.protobuf.FieldMask;
+import io.spine.Identifier;
+import io.spine.client.EntityFilters;
+import io.spine.client.EntityId;
+import io.spine.client.EntityIdFilter;
 import io.spine.server.entity.Entity;
 import io.spine.server.entity.EntityRecord;
+import io.spine.server.entity.EntityWithLifecycle;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
+import io.spine.server.entity.storage.EntityQueries;
 import io.spine.server.entity.storage.EntityQuery;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.RecordStorage;
@@ -33,12 +41,15 @@ import io.spine.server.storage.jdbc.JdbcStorageFactory;
 import io.spine.server.storage.jdbc.builder.StorageBuilder;
 import io.spine.server.storage.jdbc.table.entity.RecordTable;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
+import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
 import io.spine.server.storage.jdbc.util.DataSourceWrapper;
 
+import javax.annotation.Nullable;
 import java.util.Iterator;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.Iterables.transform;
 
 /**
  * The implementation of the entity storage based on the RDBMS.
@@ -51,15 +62,17 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
 
     private final DataSourceWrapper dataSource;
     private final RecordTable<I> table;
+    private final Class<? extends Entity<I, ?>> entityClass;
 
     protected JdbcRecordStorage(DataSourceWrapper dataSource,
                                 boolean multitenant,
-                                Class<Entity<I, ?>> entityClass,
+                                Class<? extends Entity<I, ?>> entityClass,
                                 ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>>
                                         columnTypeRegistry)
             throws DatabaseException {
         super(multitenant);
         this.dataSource = dataSource;
+        this.entityClass = entityClass;
         this.table = new RecordTable<>(entityClass, dataSource, columnTypeRegistry);
         table.createIfNotExists();
     }
@@ -103,7 +116,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     @Override
     protected Iterator<EntityRecord> readMultipleRecords(Iterable<I> ids,
                                                          FieldMask fieldMask) {
-        final Iterator<EntityRecord> records = table.read(ids, fieldMask);
+        final Iterator<EntityRecord> records = table.readByQuery(toQuery(ids), fieldMask);
         return records;
     }
 
@@ -114,7 +127,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
 
     @Override
     protected Iterator<EntityRecord> readAllRecords(FieldMask fieldMask) {
-        final Iterator<EntityRecord> records = table.readAll(fieldMask);
+        final Iterator<EntityRecord> records = table.readByQuery(emptyQuery(), fieldMask);
         return records;
     }
 
@@ -152,6 +165,30 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
         table.deleteAll();
     }
 
+    private EntityQuery<I> emptyQuery() {
+        EntityQuery<I> query = EntityQueries.from(
+                EntityFilters.getDefaultInstance(),
+                entityClass);
+        if (EntityWithLifecycle.class.isAssignableFrom(entityClass)) {
+            @SuppressWarnings("unchecked") // Checked with the if statement.
+            final Class<EntityWithLifecycle<I, ?>> cls =
+                    (Class<EntityWithLifecycle<I, ?>>) entityClass;
+            query = query.withLifecycleFlags(cls);
+        }
+        return query;
+    }
+
+    private EntityQuery<I> toQuery(Iterable<? extends I> ids) {
+        final Iterable<EntityId> entityIds = transform(ids, AggregateStateIdToEntityId.INSTANCE);
+        final EntityIdFilter idFilter = EntityIdFilter.newBuilder()
+                                                      .addAllIds(entityIds)
+                                                      .build();
+        final EntityFilters entityFilters = EntityFilters.newBuilder()
+                                                         .setIdFilter(idFilter)
+                                                         .build();
+        return EntityQueries.from(entityFilters, Entity.class);
+    }
+
     public static <I> Builder<I> newBuilder() {
         return new Builder<>();
     }
@@ -159,9 +196,9 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     public static class Builder<I>
             extends StorageBuilder<Builder<I>, JdbcRecordStorage<I>> {
 
-        private Class<? extends Entity> entityClass;
+        private Class<? extends Entity<I, ?>> entityClass;
         private ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>>
-                columnTypeRegistry;
+                columnTypeRegistry = JdbcTypeRegistryFactory.defaultInstance();
 
         private Builder() {
             super();
@@ -173,11 +210,11 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
         }
 
         @SuppressWarnings("unchecked") // cast Class object to an object of its superclass Class
-        public Class<Entity<I, ?>> getEntityClass() {
-            return (Class<Entity<I, ?>>) entityClass;
+        public Class<? extends Entity<I, ?>> getEntityClass() {
+            return entityClass;
         }
 
-        public Builder<I> setEntityClass(Class<? extends Entity> entityClass) {
+        public Builder<I> setEntityClass(Class<? extends Entity<I, ?>> entityClass) {
             this.entityClass = checkNotNull(entityClass);
             return this;
         }
@@ -203,6 +240,20 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
         @Override
         public JdbcRecordStorage<I> doBuild() {
             return new JdbcRecordStorage<>(this);
+        }
+    }
+
+    private enum AggregateStateIdToEntityId implements Function<Object, EntityId> {
+        INSTANCE;
+
+        @Override
+        public EntityId apply(@Nullable Object genericId) {
+            checkNotNull(genericId);
+            final Any content = Identifier.pack(genericId);
+            final EntityId id = EntityId.newBuilder()
+                                        .setId(content)
+                                        .build();
+            return id;
         }
     }
 }
