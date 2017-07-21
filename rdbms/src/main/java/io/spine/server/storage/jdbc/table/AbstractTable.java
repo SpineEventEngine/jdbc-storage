@@ -62,15 +62,13 @@ import static io.spine.server.storage.jdbc.Sql.Query.PRIMARY_KEY;
 /**
  * A representation of an SQL table.
  *
- * <p>This type is responsible for storing all the information about a table including:
+ * <p>This class is responsible for storing all the information about a table including:
  * <ul>
- * <li>Its name
- * <li>Columns
- * <li>Identifier and {@code PRIMARY KEY}
- * <li>Queries to the table
+ * <li>table name;
+ * <li>columns;
+ * <li>identifier and {@code PRIMARY KEY};
+ * <li>queries to the table.
  * </ul>
-
- // TODO:2017-07-03:dmytro.dashenkov: Update javadoc.
  *
  * <p>A table provides a sufficient API for performing the database interaction. However, it never
  * performs any validation or data transformation, but only invokes the appropriate queries.
@@ -82,11 +80,20 @@ import static io.spine.server.storage.jdbc.Sql.Query.PRIMARY_KEY;
  */
 public abstract class AbstractTable<I, R extends Message, W> {
 
+    /**
+     * A map of the Spine common Entity Columns to their default values.
+     *
+     * <p>Some write operations may not include these columns. Though, they are importand for
+     * the framework to work properly. Hence, the tables which include them should make these values
+     * {@code DEFAULT} for these columns.
+     *
+     * <p>The map stores the names of the Entity Columns as a string keys for simplicity and
+     * the default values of the Columns as the map values.
+     */
     private static final ImmutableMap<String, Object> COLUMN_DEFAULTS =
             ImmutableMap.<String, Object>of(archived.name(), false,
                                             deleted.name(), false,
                                             version.name(), 0);
-
     private final String name;
 
     private final IdColumn<I> idColumn;

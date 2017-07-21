@@ -26,10 +26,10 @@ package io.spine.server.storage.jdbc.table;
  * @see TableColumn
  * @author Dmytro Dashenkov
  */
-public class TableColumns {
+public final class TableColumns {
 
     private TableColumns() {
-        super();
+        // Prevent utility class instantiation.
     }
 
     /**
