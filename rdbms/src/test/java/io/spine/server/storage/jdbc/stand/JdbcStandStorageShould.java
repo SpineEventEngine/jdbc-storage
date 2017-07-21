@@ -38,7 +38,6 @@ import io.spine.server.storage.jdbc.util.ConnectionWrapper;
 import io.spine.server.storage.jdbc.util.DataSourceWrapper;
 import io.spine.test.commandservice.customer.Customer;
 import io.spine.test.storage.Project;
-import io.spine.test.storage.ProjectId;
 import io.spine.time.Time;
 import io.spine.type.TypeUrl;
 import org.junit.Ignore;
@@ -47,7 +46,6 @@ import org.junit.Test;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -238,62 +236,6 @@ public class JdbcStandStorageShould extends StandStorageShould {
         }
 
         assertEquals(records.size(), iteratorCounter);
-    }
-
-    @Test
-    public void apply_field_mask_to_read_values() {
-        final StandStorage storage = newStorage();
-
-        final String stringId = "42";
-        final AggregateStateId id = AggregateStateId.of(stringId, TypeUrl.of(Project.class));
-
-        final Project project = Project.newBuilder()
-                                       .setId(ProjectId.newBuilder()
-                                                       .setId(stringId))
-                                       .setName("Some name")
-                                       .setStatus(Project.Status.DONE)
-                                       .build();
-
-        final TestAggregate aggregate = new TestAggregate(stringId);
-        aggregate.setState(project);
-
-        writeToStorage(aggregate, storage, Project.class);
-
-        final List<Descriptors.FieldDescriptor> fields = Project.getDescriptor()
-                                                                .getFields();
-        final FieldMask idOnly = FieldMask.newBuilder()
-                                          .addPaths(fields.get(0)
-                                                          .getFullName())
-                                          .build();
-        final FieldMask idAndName = FieldMask.newBuilder()
-                                             .addPaths(fields.get(0)
-                                                             .getFullName())
-                                             .addPaths(fields.get(1)
-                                                             .getFullName())
-                                             .build();
-        final FieldMask nameAndStatus = FieldMask.newBuilder()
-                                                 .addPaths(fields.get(1)
-                                                                 .getFullName())
-                                                 .addPaths(fields.get(3)
-                                                                 .getFullName())
-                                                 .build();
-
-        final Optional<EntityRecord> recordOptional = storage.read(id, idOnly);
-        assertTrue(recordOptional.isPresent());
-        @SuppressWarnings("OptionalGetWithoutIsPresent") // We do check is present
-        final EntityRecord record = recordOptional.get();
-        final Project withIdOnly = AnyPacker.unpack(record.getState());
-        final Project withIdAndName = AnyPacker.unpack(
-                storage.readMultiple(Collections.singleton(id), idAndName)
-                       .next()
-                       .getState());
-        final Project withNameAndStatus = AnyPacker.unpack(storage.readAll(nameAndStatus)
-                                                                  .next()
-                                                                  .getState());
-
-        assertMatches(withIdOnly, idOnly);
-        assertMatches(withIdAndName, idAndName);
-        assertMatches(withNameAndStatus, nameAndStatus);
     }
 
     @Test
