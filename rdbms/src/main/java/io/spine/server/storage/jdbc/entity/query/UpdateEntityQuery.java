@@ -31,6 +31,8 @@ import static io.spine.server.storage.jdbc.Sql.Query.PLACEHOLDER;
 import static io.spine.server.storage.jdbc.Sql.Query.SET;
 import static io.spine.server.storage.jdbc.Sql.Query.UPDATE;
 import static io.spine.server.storage.jdbc.Sql.Query.WHERE;
+import static io.spine.server.storage.jdbc.table.entity.RecordTable.StandardColumn.entity;
+import static io.spine.server.storage.jdbc.table.entity.RecordTable.StandardColumn.id;
 import static java.lang.String.format;
 
 /**
@@ -42,12 +44,14 @@ import static java.lang.String.format;
  */
 public class UpdateEntityQuery<I> extends WriteEntityQuery<I> {
 
+    private static final int ID_INDEX = 2;
+    private static final int RECORD_INDEX = 1;
+
+
     private static final String QUERY_TEMPLATE =
             UPDATE + "%s" +
-            SET + RecordTable.StandardColumn.entity + EQUAL +
-            PLACEHOLDER +
-            WHERE + RecordTable.StandardColumn.id + EQUAL +
-            PLACEHOLDER + SEMICOLON;
+            SET + entity + EQUAL + PLACEHOLDER +
+            WHERE + id + EQUAL + PLACEHOLDER + SEMICOLON;
 
     private UpdateEntityQuery(Builder<I> builder) {
         super(builder);
@@ -55,8 +59,8 @@ public class UpdateEntityQuery<I> extends WriteEntityQuery<I> {
 
     public static <I> Builder<I> newBuilder(String tableName) {
         final Builder<I> builder = new Builder<>();
-        builder.setIdIndexInQuery(2) // TODO:2017-07-17:dmytro.dashenkov: Column count.
-               .setRecordIndexInQuery(1)
+        builder.setIdIndexInQuery(ID_INDEX)
+               .setRecordIndexInQuery(RECORD_INDEX)
                .setQuery(format(QUERY_TEMPLATE, tableName));
         return builder;
     }

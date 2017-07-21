@@ -63,8 +63,12 @@ public class SelectEntityByIdQuery<I> extends SelectMessageByIdQuery<I, EntityRe
         return builder;
     }
 
-
-    // TODO:2017-07-17:dmytro.dashenkov: Document.
+    /**
+     * {@inheritDoc}
+     *
+     * <p>Overridden to expose this method to {@code io.spine.server.storage.jdbc.entity.query}
+     * package.
+     */
     @Nullable
     @Override
     protected EntityRecord readMessage(ResultSet resultSet) throws SQLException {

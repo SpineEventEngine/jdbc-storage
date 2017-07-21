@@ -28,12 +28,12 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 /**
- * // TODO:2017-07-14:dmytro.dashenkov: Document.
+ * The implementation base for the queries to an SQL database.
  *
  * @author Andrey Lavrov
  * @author Dmytro Dashenkov
  */
-public class StorageQuery {
+public abstract class StorageQuery {
 
     private final String query;
     private final DataSourceWrapper dataSource;

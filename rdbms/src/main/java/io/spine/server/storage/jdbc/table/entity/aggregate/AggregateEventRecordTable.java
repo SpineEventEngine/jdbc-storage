@@ -88,7 +88,6 @@ public class AggregateEventRecordTable<I> extends AggregateTable<I, AggregateEve
         return result;
     }
 
-    // TODO:2017-07-03:dmytro.dashenkov: Reduce visibility.
     public enum Column implements TableColumn {
 
         id(ID),

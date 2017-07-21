@@ -36,7 +36,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author Alexander Litus
  */
 @Internal
-@SuppressWarnings("UtilityClass")
 public class Serializer {
 
     private Serializer() {
@@ -45,11 +44,10 @@ public class Serializer {
     /**
      * Serializes a message to an array of bytes.
      *
-     * @param message a message to serialize
-     * @param <M>     a message type
+     * @param message the message to serialize
      * @return a byte array
      */
-    public static <M extends Message> byte[] serialize(M message) {
+    public static byte[] serialize(Message message) {
         checkNotNull(message);
         final Any any = AnyPacker.pack(message);
         final byte[] bytes = any.getValue()
@@ -60,17 +58,23 @@ public class Serializer {
     /**
      * Deserializes a {@link Message}.
      *
-     * @param bytes             a serialized message
-     * @param messageDescriptor a descriptor of a message
-     * @param <M>               a type of message expected
+     * @param bytes             the serialized message
+     * @param messageDescriptor the descriptor of a message
+     * @param <M>               the type of message expected
      * @return a message instance
      */
-    @Deprecated
     public static <M extends Message> M deserialize(byte[] bytes, Descriptor messageDescriptor) {
         return deserialize(bytes, TypeUrl.from(messageDescriptor));
     }
 
-    // TODO:2017-07-18:dmytro.dashenkov: Document.
+    /**
+     * Deserializes a {@link Message}.
+     *
+     * @param bytes   the serialized message
+     * @param typeUrl the type of the serialized message
+     * @param <M>     the type of message expected
+     * @return a message instance
+     */
     public static <M extends Message> M deserialize(byte[] bytes, TypeUrl typeUrl) {
         checkNotNull(bytes);
         final Any.Builder builder = Any.newBuilder();

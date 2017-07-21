@@ -78,7 +78,6 @@ public class LifecycleFlagsTable<I> extends AggregateTable<I, LifecycleFlags> {
         return queryFactory;
     }
 
-    // TODO:2017-07-03:dmytro.dashenkov: Reduce visibility.
     public enum Column implements TableColumn {
 
         id(ID),

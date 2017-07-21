@@ -60,7 +60,7 @@ public class SelectMessageByIdQuery<I, M extends Message> extends SelectByIdQuer
      *
      * @return a message or {@code null} if there is no needed data
      * @throws DatabaseException if an error occurs during an interaction with the DB
-     * @see Serializer#deserialize(byte[], Descriptor)
+     * @see Serializer#deserialize
      */
     @Nullable
     @Override

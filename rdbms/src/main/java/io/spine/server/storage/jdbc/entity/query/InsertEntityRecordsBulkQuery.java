@@ -103,7 +103,7 @@ public class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
             final I id = recordPair.getKey();
             final EntityRecordWithColumns record = recordPair.getValue();
             addRecordParams(statement, columnIndex, id, record);
-            if (record.hasColumns()) { // TODO:2017-07-03:dmytro.dashenkov: What if not?
+            if (record.hasColumns()) {
                 final int nextIndex = columnIndex + StandardColumn.values().length;
                 ColumnRecords.feedColumnsTo(statement,
                                             record,

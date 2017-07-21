@@ -35,9 +35,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
-import static java.lang.String.format;
 import static io.spine.server.storage.LifecycleFlagField.archived;
 import static io.spine.server.storage.LifecycleFlagField.deleted;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
@@ -55,6 +53,7 @@ import static io.spine.server.storage.jdbc.Sql.Query.OR;
 import static io.spine.server.storage.jdbc.Sql.Query.SELECT;
 import static io.spine.server.storage.jdbc.Sql.Query.WHERE;
 import static io.spine.server.storage.jdbc.table.entity.RecordTable.StandardColumn.id;
+import static java.lang.String.format;
 
 /**
  * Implementation of {@link StorageQuery} for bulk selection.
@@ -96,9 +95,7 @@ public class SelectBulkQuery<I> extends StorageQuery {
     /**
      * Executes the query.
      *
-     * // TODO:2017-07-19:dmytro.dashenkov: Update doc.
-     *
-     * @return ID-to-{@link EntityRecord} {@link Map} as the result of the query.
+     * @return {@link EntityRecord} {@link Iterator} as the result of the query.
      * @throws SQLException if the input data contained SQL errors or the table does not exist.
      */
     public Iterator<EntityRecord> execute() throws SQLException {

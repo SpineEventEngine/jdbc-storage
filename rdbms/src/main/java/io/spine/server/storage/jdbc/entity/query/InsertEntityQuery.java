@@ -47,12 +47,15 @@ import static java.lang.String.format;
  */
 public class InsertEntityQuery<I> extends WriteEntityQuery<I> {
 
+    private static final int ID_INDEX = 1;
+    private static final int RECORD_INDEX = 2;
+
     private static final String FORMAT_PLACEHOLDER = "%s";
 
     private static final String QUERY_TEMPLATE =
             INSERT_INTO + FORMAT_PLACEHOLDER +
             BRACKET_OPEN +
-            entity + COMMA + id +
+            id + COMMA + entity +
             FORMAT_PLACEHOLDER +
             BRACKET_CLOSE +
             VALUES + FORMAT_PLACEHOLDER + SEMICOLON;
@@ -77,8 +80,8 @@ public class InsertEntityQuery<I> extends WriteEntityQuery<I> {
                                        tableName,
                                        entityColumnNames,
                                        valuePlaceholders);
-        builder.setIdIndexInQuery(2)
-               .setRecordIndexInQuery(1) // TODO:2017-07-17:dmytro.dashenkov: .
+        builder.setIdIndexInQuery(ID_INDEX)
+               .setRecordIndexInQuery(RECORD_INDEX)
                .setQuery(sqlQuery);
         return builder;
     }

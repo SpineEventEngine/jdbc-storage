@@ -39,9 +39,6 @@ import static io.spine.server.storage.jdbc.Sql.Type.VARCHAR_255;
  * A table for storing the last handled by
  * a {@link io.spine.server.projection.ProjectionRepository} event time.
  *
- * // TODO:2017-07-03:dmytro.dashenkov: Check if we still need this class after the catch up has been moved away.
- *
- * @see io.spine.server.projection.ProjectionRepository#catchUp
  * @author Dmytro Dashenkov
  */
 public class LastHandledEventTimeTable extends AbstractTable<String, Timestamp, Timestamp> {

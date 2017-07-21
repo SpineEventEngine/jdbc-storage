@@ -228,7 +228,8 @@ final class JdbcColumnTypes {
         }
 
         @Override
-        public void setColumnValue(PreparedStatement storageRecord, String value,
+        public void setColumnValue(PreparedStatement storageRecord,
+                                   String value,
                                    Integer columnIdentifier) {
             try {
                 storageRecord.setString(columnIdentifier, value);
@@ -241,7 +242,6 @@ final class JdbcColumnTypes {
         @Override
         public Sql.Type getSqlType() {
             return Sql.Type.VARCHAR_999;
-            //TODO:2017-06-23:alexander.aleksandrov: Check this type latter
         }
 
     }
