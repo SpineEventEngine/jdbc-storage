@@ -23,12 +23,12 @@ package io.spine.server.storage.jdbc.util;
 import com.google.common.primitives.Primitives;
 import com.google.protobuf.Message;
 import io.spine.server.storage.jdbc.DatabaseException;
-import io.spine.type.TypeUrl;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static io.spine.json.Json.fromJson;
 import static io.spine.util.Exceptions.newIllegalArgumentException;
 
 /**
@@ -71,9 +71,7 @@ public abstract class IndexIterator<I> extends DbIterator<I> {
         } else if (Integer.class == wrapper || Long.class == wrapper) {
             result = (IndexIterator<I>) new NumberIndexIterator(statement, columnName);
         } else if (Message.class.isAssignableFrom(idType)) {
-            result = (IndexIterator<I>) new MessageIndexIterator(statement,
-                                                                 columnName,
-                                                                 (Class<? extends Message>) idType);
+            result = (IndexIterator<I>) new MessageIndexIterator(statement, columnName, idType);
         } else {
             throw newIllegalArgumentException("ID type '%s' is not supported.", idType);
         }
@@ -124,9 +122,9 @@ public abstract class IndexIterator<I> extends DbIterator<I> {
         }
     }
 
-    private static class MessageIndexIterator extends IndexIterator<Message> {
+    private static class MessageIndexIterator<M extends Message> extends IndexIterator<M> {
 
-        private final Class<? extends Message> idClass;
+        private final Class<M> idClass;
 
         /**
          * Creates a new iterator instance.
@@ -138,18 +136,17 @@ public abstract class IndexIterator<I> extends DbIterator<I> {
          */
         private MessageIndexIterator(PreparedStatement statement,
                                      String columnName,
-                                     Class<? extends Message> idClass)
+                                     Class<M> idClass)
                 throws DatabaseException {
             super(statement, columnName);
             this.idClass = idClass;
         }
 
         @Override
-        protected Message readResult() throws SQLException {
-            final byte[] bytes = getResultSet().getBytes(getColumnName());
-            final TypeUrl typeUrl = TypeUrl.of(idClass);
-            final Message message = Serializer.deserialize(bytes, typeUrl);
-            return message;
+        protected M readResult() throws SQLException {
+            final String rawId = getResultSet().getString(getColumnName());
+            final M messageId = fromJson(rawId, idClass);
+            return messageId;
         }
     }
 }

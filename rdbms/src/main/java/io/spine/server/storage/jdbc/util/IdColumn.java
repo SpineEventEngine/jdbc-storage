@@ -33,6 +33,7 @@ import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.primitives.Primitives.wrap;
+import static io.spine.json.Json.toCompactJson;
 
 /**
  * A helper class for setting the {@link Entity} ID into a {@link PreparedStatement}as a query
@@ -84,7 +85,7 @@ public abstract class IdColumn<I> {
     }
 
     public static IdColumn<String> typeString(String columnName) {
-        return new StringIdColumn(columnName);
+        return new StringIdColumn<>(columnName);
     }
 
     protected IdColumn(String columnName) {
@@ -190,27 +191,38 @@ public abstract class IdColumn<I> {
 
         @Override
         public void setId(int index, I id, PreparedStatement statement) throws DatabaseException {
-            final String idString = Identifier.toString(id);
+            final String idString = normalize(id);
             try {
                 statement.setString(index, idString);
             } catch (SQLException e) {
                 throw new DatabaseException(e);
             }
         }
+
+        protected abstract String normalize(I id);
     }
 
     /**
      * Helps to work with columns which contain {@code string} {@link Entity} IDs.
+     *
+     * <p>This class may serve as a stub for unknown ID types by considering their string
+     * representation. See {@link Identifier#toString(Object) Identifier.toString(I)}.
      */
-    private static class StringIdColumn extends StringOrMessageIdColumn<String> {
+    private static class StringIdColumn<I> extends StringOrMessageIdColumn<I> {
 
         private StringIdColumn(String columnName) {
             super(columnName);
         }
 
         @Override
-        public Class<String> getJavaType() {
-            return String.class;
+        protected String normalize(I id) {
+            return Identifier.toString(id);
+        }
+
+        @SuppressWarnings("unchecked") // Logically checked.
+        @Override
+        public Class<I> getJavaType() {
+            return (Class<I>) String.class;
         }
     }
 
@@ -221,6 +233,11 @@ public abstract class IdColumn<I> {
         private MessageIdColumn(Class<M> cls, String columnName) {
             super(columnName);
             this.cls = cls;
+        }
+
+        @Override
+        protected String normalize(M id) {
+            return toCompactJson(id);
         }
 
         @Override
