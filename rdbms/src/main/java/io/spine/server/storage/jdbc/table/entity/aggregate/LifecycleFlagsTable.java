@@ -100,5 +100,10 @@ public class LifecycleFlagsTable<I> extends AggregateTable<I, LifecycleFlags> {
         public boolean isPrimaryKey() {
             return this == id;
         }
+
+        @Override
+        public boolean isNullable() {
+            return false;
+        }
     }
 }

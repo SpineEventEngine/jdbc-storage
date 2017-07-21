@@ -22,6 +22,7 @@ package io.spine.server.storage.jdbc.table;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.protobuf.Message;
 import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.entity.query.DeleteAllQuery;
@@ -45,11 +46,17 @@ import java.util.List;
 import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static io.spine.server.storage.EntityField.version;
+import static io.spine.server.storage.LifecycleFlagField.archived;
+import static io.spine.server.storage.LifecycleFlagField.deleted;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.COMMA;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
 import static io.spine.server.storage.jdbc.Sql.Query.CREATE_IF_MISSING;
+import static io.spine.server.storage.jdbc.Sql.Query.DEFAULT;
+import static io.spine.server.storage.jdbc.Sql.Query.NOT;
+import static io.spine.server.storage.jdbc.Sql.Query.NULL;
 import static io.spine.server.storage.jdbc.Sql.Query.PRIMARY_KEY;
 
 /**
@@ -75,7 +82,10 @@ import static io.spine.server.storage.jdbc.Sql.Query.PRIMARY_KEY;
  */
 public abstract class AbstractTable<I, R extends Message, W> {
 
-    private static final int MEAN_SQL_QUERY_LENGTH = 128; // TODO:2017-07-03:dmytro.dashenkov: Review the need in this constant
+    private static final ImmutableMap<String, Object> COLUMN_DEFAULTS =
+            ImmutableMap.<String, Object>of(archived.name(), false,
+                                            deleted.name(), false,
+                                            version.name(), 0);
 
     private final String name;
 
@@ -247,18 +257,26 @@ public abstract class AbstractTable<I, R extends Message, W> {
 
     private String composeCreateTableSql() {
         final Iterable<? extends TableColumn> columns = getColumns();
-        final StringBuilder sql = new StringBuilder(MEAN_SQL_QUERY_LENGTH);
+        final StringBuilder sql = new StringBuilder();
         sql.append(CREATE_IF_MISSING)
            .append(getName())
            .append(BRACKET_OPEN);
         final Set<String> primaryKey = new HashSet<>();
         for (TableColumn column : columns) {
-            sql.append(column.name())
+            final String name = column.name();
+            sql.append(name)
                .append(' ')
-               .append(ensureType(column))
-               .append(COMMA);
+               .append(ensureType(column));
+            if (COLUMN_DEFAULTS.containsKey(name)) {
+                final Object defaultValue = COLUMN_DEFAULTS.get(name);
+                sql.append(DEFAULT).append(defaultValue);
+            }
+            if (!column.isNullable()) {
+                sql.append(NOT).append(NULL);
+            }
+            sql.append(COMMA);
             if (column.isPrimaryKey()) {
-                primaryKey.add(column.name());
+                primaryKey.add(name);
             }
         }
         if (!primaryKey.isEmpty()) {

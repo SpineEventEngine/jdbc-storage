@@ -51,5 +51,10 @@ public class TableColumnsShould {
         public boolean isPrimaryKey() {
             return false;
         }
+
+        @Override
+        public boolean isNullable() {
+            return false;
+        }
     }
 }

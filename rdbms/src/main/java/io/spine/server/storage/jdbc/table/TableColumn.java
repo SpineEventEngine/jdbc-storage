@@ -49,7 +49,12 @@ public interface TableColumn extends StorageField {
     Sql.Type type();
 
     /**
-     * @return {@code true} is this column is a primary key of the table
+     * @return {@code true} is this column is a primary key of the table, {@code false} otherwise
      */
     boolean isPrimaryKey();
+
+    /**
+     * @return {@code true} if this column may contain {@code NULL} values, {@code false} otherwise
+     */
+    boolean isNullable();
 }

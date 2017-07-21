@@ -23,7 +23,7 @@ package io.spine.server.storage.jdbc.aggregate.query;
 import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.query.StorageQuery;
-import io.spine.server.storage.jdbc.table.entity.aggregate.AggregateEventRecordTable;
+import io.spine.server.storage.jdbc.table.entity.aggregate.AggregateEventRecordTable.Column;
 import io.spine.server.storage.jdbc.util.ConnectionWrapper;
 import io.spine.server.storage.jdbc.util.DbIterator;
 import io.spine.server.storage.jdbc.util.IdColumn;
@@ -42,6 +42,8 @@ import static io.spine.server.storage.jdbc.Sql.Query.PLACEHOLDER;
 import static io.spine.server.storage.jdbc.Sql.Query.SELECT;
 import static io.spine.server.storage.jdbc.Sql.Query.WHERE;
 import static io.spine.server.storage.jdbc.table.entity.aggregate.AggregateEventRecordTable.Column.aggregate;
+import static io.spine.server.storage.jdbc.table.entity.aggregate.AggregateEventRecordTable.Column.timestamp;
+import static io.spine.server.storage.jdbc.table.entity.aggregate.AggregateEventRecordTable.Column.timestamp_nanos;
 import static io.spine.type.TypeUrl.of;
 import static java.lang.String.format;
 
@@ -56,8 +58,8 @@ public class SelectByIdSortedByTimeDescQuery<I> extends StorageQuery {
 
     private static final String QUERY_TEMPLATE =
             SELECT.toString() + aggregate + FROM + "%s" +
-            WHERE + AggregateEventRecordTable.Column.id + EQUAL + PLACEHOLDER +
-            ORDER_BY + AggregateEventRecordTable.Column.timestamp + DESC + COMMA + AggregateEventRecordTable.Column.timestamp_nanos + DESC + SEMICOLON;
+            WHERE + Column.id + EQUAL + PLACEHOLDER +
+            ORDER_BY + timestamp + DESC + COMMA + timestamp_nanos + DESC + SEMICOLON;
 
     private final IdColumn<I> idColumn;
     private final I id;

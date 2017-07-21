@@ -177,18 +177,23 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWit
         public boolean isPrimaryKey() {
             return this == id;
         }
+
+        @Override
+        public boolean isNullable() {
+            return false;
+        }
     }
 
     private static final class EntityColumnMapping implements TableColumn {
 
-        private final String name;
+        private final Column column;
         private final int ordinal;
         private final Sql.Type type;
 
         private EntityColumnMapping(Column column,
                                     ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> typeRegistry,
                                     int ordinal) {
-            this.name = column.getName();
+            this.column = column;
             this.ordinal = ordinal;
             this.type = typeRegistry.get(column)
                                     .getSqlType();
@@ -196,7 +201,7 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWit
 
         @Override
         public String name() {
-            return name;
+            return column.getName();
         }
 
         @Override
@@ -215,6 +220,11 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWit
         }
 
         @Override
+        public boolean isNullable() {
+            return true; // TODO:2017-07-21:dmytro.dashenkov: Use Column.isNullable.
+        }
+
+        @Override
         public boolean equals(Object o) {
             if (this == o) {
                 return true;
@@ -224,13 +234,13 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWit
             }
             EntityColumnMapping that = (EntityColumnMapping) o;
             return ordinal == that.ordinal &&
-                   Objects.equal(name, that.name) &&
+                   Objects.equal(column, that.column) &&
                    type == that.type;
         }
 
         @Override
         public int hashCode() {
-            return Objects.hashCode(name, ordinal, type);
+            return Objects.hashCode(column, ordinal, type);
         }
     }
 }

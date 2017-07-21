@@ -139,6 +139,7 @@ public class Sql {
         CREATE_IF_MISSING("CREATE TABLE IF NOT EXISTS"),
         DROP_TABLE("DROP TABLE"),
         PRIMARY_KEY("PRIMARY KEY"),
+        DEFAULT,
 
         INSERT_INTO("INSERT INTO"),
         SELECT,

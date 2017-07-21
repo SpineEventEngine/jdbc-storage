@@ -111,5 +111,10 @@ public class AggregateEventRecordTable<I> extends AggregateTable<I, AggregateEve
         public boolean isPrimaryKey() {
             return false;
         }
+
+        @Override
+        public boolean isNullable() {
+            return false;
+        }
     }
 }

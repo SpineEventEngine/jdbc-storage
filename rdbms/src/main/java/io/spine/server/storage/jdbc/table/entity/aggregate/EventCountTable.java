@@ -103,5 +103,10 @@ public class EventCountTable<I> extends AggregateTable<I, Int32Value> {
         public boolean isPrimaryKey() {
             return this == id;
         }
+
+        @Override
+        public boolean isNullable() {
+            return false;
+        }
     }
 }
