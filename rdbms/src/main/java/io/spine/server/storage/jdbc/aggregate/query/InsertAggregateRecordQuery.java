@@ -35,6 +35,10 @@ import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.COMMA;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
+import static io.spine.server.storage.jdbc.table.entity.aggregate.AggregateEventRecordTable.Column.aggregate;
+import static io.spine.server.storage.jdbc.table.entity.aggregate.AggregateEventRecordTable.Column.id;
+import static io.spine.server.storage.jdbc.table.entity.aggregate.AggregateEventRecordTable.Column.timestamp;
+import static io.spine.server.storage.jdbc.table.entity.aggregate.AggregateEventRecordTable.Column.timestamp_nanos;
 import static java.lang.String.format;
 
 /**
@@ -48,10 +52,10 @@ public class InsertAggregateRecordQuery<I> extends WriteAggregateQuery<I, Aggreg
 
     private static final String QUERY_TEMPLATE =
             Sql.Query.INSERT_INTO + " %s " + BRACKET_OPEN +
-            AggregateEventRecordTable.Column.id + COMMA +
-            AggregateEventRecordTable.Column.aggregate + COMMA +
-            AggregateEventRecordTable.Column.timestamp + COMMA +
-            AggregateEventRecordTable.Column.timestamp_nanos +
+            id + COMMA +
+            aggregate + COMMA +
+            timestamp + COMMA +
+            timestamp_nanos +
             BRACKET_CLOSE
             + Sql.Query.VALUES + Sql.nPlaceholders(4) + SEMICOLON;
 

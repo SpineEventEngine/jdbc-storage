@@ -47,8 +47,9 @@ public abstract class DbIterator<R> implements Iterator<R>, AutoCloseable {
     @Nullable
     private final PreparedStatement statement;
     private final String columnName;
-    private boolean isHasNextCalledBeforeNext = false;
-    private boolean hasNext = false;
+    private boolean hasNextCalled = false;
+    private boolean nextCalled = true;
+    private boolean memoizedHasNext = false;
 
     /**
      * Creates a new iterator instance.
@@ -83,11 +84,17 @@ public abstract class DbIterator<R> implements Iterator<R>, AutoCloseable {
 
     @Override
     public boolean hasNext() {
+        if (!nextCalled) {
+            return memoizedHasNext;
+        }
         try {
             final boolean hasNextElem = resultSet.next();
             // ResultSet.previous() is not used here because some JDBC drivers do not support it.
-            hasNext = hasNextElem;
-            isHasNextCalledBeforeNext = true;
+            memoizedHasNext = hasNextElem;
+
+            hasNextCalled = true;
+            nextCalled = false;
+
             return hasNextElem;
         } catch (SQLException e) {
             throw new DatabaseException(e);
@@ -96,11 +103,14 @@ public abstract class DbIterator<R> implements Iterator<R>, AutoCloseable {
 
     @Override
     public R next() {
-        if (!hasNext && (isHasNextCalledBeforeNext || !hasNext())) {
+        if (!memoizedHasNext && (hasNextCalled || !hasNext())) {
             throw noSuchElement();
         }
-        isHasNextCalledBeforeNext = false;
-        hasNext = false;
+
+        hasNextCalled = false;
+        memoizedHasNext = false;
+        nextCalled = true;
+
         final R result;
         try {
             result = readResult();
