@@ -35,8 +35,6 @@ import java.util.NoSuchElementException;
  *
  * <p>Uses {@link Serializer} to deserialize records.
  *
- * <p><b>NOTE:</b> it is required to call {@link Iterator#hasNext()} before {@link Iterator#next()}.
- *
  * <p><b>NOTE:</b> {@code remove} operation is not supported.
  *
  * @param <R> type of storage records
@@ -98,14 +96,11 @@ public abstract class DbIterator<R> implements Iterator<R>, AutoCloseable {
 
     @Override
     public R next() {
-        if (!isHasNextCalledBeforeNext) {
-            throw new IllegalStateException(
-                    "It is required to call hasNext() before next() method.");
+        if (!hasNext && (isHasNextCalledBeforeNext || !hasNext())) {
+            throw noSuchElement();
         }
         isHasNextCalledBeforeNext = false;
-        if (!hasNext) {
-            throw new NoSuchElementException("No elements remained.");
-        }
+        hasNext = false;
         final R result;
         try {
             result = readResult();
@@ -147,5 +142,9 @@ public abstract class DbIterator<R> implements Iterator<R>, AutoCloseable {
         } catch (SQLException e) {
             throw new DatabaseException(e);
         }
+    }
+
+    private static NoSuchElementException noSuchElement() {
+        throw new NoSuchElementException("No elements remained.");
     }
 }

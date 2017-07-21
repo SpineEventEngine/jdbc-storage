@@ -41,6 +41,8 @@ import static org.mockito.Mockito.when;
  */
 public class DbIteratorShould {
 
+    private static final byte[] EMPTY_BYTES = new byte[0];
+
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     // Need to call a constructor and fail in it
     @Test(expected = DatabaseException.class)
@@ -72,9 +74,9 @@ public class DbIteratorShould {
         }
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void throw_if_not_called_hasNext_before_next() {
-        final DbIterator iterator = newIterator();
+    @Test
+    public void allow_next_without_hasNext() {
+        final DbIterator iterator = nonEmptyIterator();
         iterator.next();
     }
 
@@ -134,9 +136,24 @@ public class DbIteratorShould {
                     .thenReturn(true);
             when(resultSet.getBytes(any(String.class)))
                     .thenThrow(
-                            new SQLException("Read i snot allowed; I'm sneaky"));
+                            new SQLException("Read is not allowed; I'm sneaky"));
             when(statement.executeQuery())
                     .thenReturn(resultSet);
+        } catch (SQLException e) {
+            fail(e.getMessage());
+        }
+
+        final DbIterator iterator = new MessageDbIterator<>(statement, "", TypeUrl.of(Any.class));
+        return iterator;
+    }
+
+    private static DbIterator nonEmptyIterator() {
+        final ResultSet resultSet = mock(ResultSet.class);
+        final PreparedStatement statement = mock(PreparedStatement.class);
+        try {
+            when(resultSet.next()).thenReturn(true);
+            when(resultSet.getBytes(any(String.class))).thenReturn(EMPTY_BYTES);
+            when(statement.executeQuery()).thenReturn(resultSet);
         } catch (SQLException e) {
             fail(e.getMessage());
         }

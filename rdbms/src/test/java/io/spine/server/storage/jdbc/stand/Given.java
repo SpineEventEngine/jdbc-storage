@@ -29,9 +29,10 @@ import io.spine.server.storage.jdbc.GivenDataSource;
 import io.spine.server.storage.jdbc.JdbcStandStorage;
 import io.spine.server.storage.jdbc.util.DataSourceWrapper;
 import io.spine.test.commandservice.customer.Customer;
+import io.spine.test.commandservice.customer.CustomerVBuilder;
 import io.spine.test.storage.Project;
 import io.spine.test.storage.ProjectId;
-import io.spine.validate.ValidatingBuilder;
+import io.spine.test.storage.ProjectVBuilder;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -53,7 +54,7 @@ class Given {
         return storage;
     }
 
-    static class TestAggregate extends Aggregate<String, Project, ValidatingBuilder<Project, Project.Builder>> {
+    static class TestAggregate extends Aggregate<String, Project, ProjectVBuilder> {
 
         /**
          * Creates a new aggregate instance.
@@ -70,7 +71,7 @@ class Given {
         }
     }
 
-    static class TestAggregate2 extends Aggregate<String, Customer, ValidatingBuilder<Customer, Customer.Builder>> {
+    static class TestAggregate2 extends Aggregate<String, Customer, CustomerVBuilder> {
 
         /**
          * Creates a new aggregate instance.
