@@ -216,7 +216,7 @@ public abstract class IdColumn<I> {
 
         @Override
         protected String normalize(I id) {
-            return Identifier.toString(id);
+            return (String) id;
         }
 
         @SuppressWarnings("unchecked") // Logically checked.

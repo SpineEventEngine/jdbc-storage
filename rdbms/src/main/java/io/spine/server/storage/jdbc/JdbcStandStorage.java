@@ -205,7 +205,8 @@ public class JdbcStandStorage extends StandStorage {
         final EntityFilters entityFilters = EntityFilters.newBuilder()
                                                          .setIdFilter(idFilter)
                                                          .build();
-        return EntityQueries.from(entityFilters, Entity.class);
+        final EntityQuery<String> query = EntityQueries.from(entityFilters, Entity.class);
+        return query;
     }
 
     /**
@@ -258,7 +259,9 @@ public class JdbcStandStorage extends StandStorage {
         @Override
         public EntityId apply(@Nullable AggregateStateId aggregateStateId) {
             checkNotNull(aggregateStateId);
-            final Any content = toAny(aggregateStateId.getAggregateId());
+            final String stringId = ID_MAPPER.convert(aggregateStateId);
+            checkNotNull(stringId);
+            final Any content = toAny(stringId);
             final EntityId id = EntityId.newBuilder()
                                         .setId(content)
                                         .build();
