@@ -22,21 +22,23 @@ package io.spine.server.storage.jdbc.entity.query;
 
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Ordering;
 import io.spine.server.entity.storage.Column;
 import io.spine.server.entity.storage.ColumnRecords;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.query.WriteRecordQuery;
+import io.spine.server.storage.jdbc.table.entity.RecordTable.StandardColumn;
 import io.spine.server.storage.jdbc.util.ConnectionWrapper;
 
 import java.sql.PreparedStatement;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
+import static io.spine.server.entity.storage.EntityColumns.sorted;
+
 /**
+ * The write query to the {@link io.spine.server.storage.jdbc.table.entity.RecordTable RecordTable}.
+ *
  * @author Dmytro Dashenkov
  */
 public class WriteEntityQuery<I> extends WriteRecordQuery<I, EntityRecordWithColumns> {
@@ -58,16 +60,18 @@ public class WriteEntityQuery<I> extends WriteRecordQuery<I, EntityRecordWithCol
         return statement;
     }
 
-    protected Function<String, Integer> getTransformer() {
+    /**
+     * Retrieves a {@link Function} transforming the Entity Column names into the indexes of
+     * the {@link PreparedStatement} parameters.
+     */
+    private Function<String, Integer> getTransformer() {
         final Function<String, Integer> function;
         final Map<String, Column> columns = getRecord().getColumns();
-        final List<String> columnList = Lists.newArrayList(columns.keySet());
-        Collections.sort(columnList, Ordering.usingToString());
+        final Collection<String> columnNames = sorted(columns.keySet());
         final Map<String, Integer> result = new HashMap<>();
 
-        Integer index = 3;
-
-        for (String entry : columnList) {
+        int index = StandardColumn.values().length + 1;
+        for (String entry : columnNames) {
             result.put(entry, index);
             index++;
         }

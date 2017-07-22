@@ -20,18 +20,22 @@
 
 package io.spine.server.storage.jdbc.entity.query;
 
+import com.google.common.base.Joiner;
+import io.spine.server.entity.storage.Column;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.query.WriteRecordQuery;
 import io.spine.server.storage.jdbc.table.entity.RecordTable;
 import io.spine.server.storage.jdbc.table.entity.RecordTable.StandardColumn;
 
+import java.util.Map;
+
+import static io.spine.server.entity.storage.EntityColumns.sorted;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.COMMA;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
 import static io.spine.server.storage.jdbc.Sql.Query.INSERT_INTO;
 import static io.spine.server.storage.jdbc.Sql.Query.VALUES;
-import static io.spine.server.storage.jdbc.Sql.getColumnNames;
 import static io.spine.server.storage.jdbc.Sql.nPlaceholders;
 import static io.spine.server.storage.jdbc.table.entity.RecordTable.StandardColumn.entity;
 import static io.spine.server.storage.jdbc.table.entity.RecordTable.StandardColumn.id;
@@ -69,8 +73,10 @@ public class InsertEntityQuery<I> extends WriteEntityQuery<I> {
         final int columnCount;
         final String entityColumnNames;
         if (record.hasColumns()) {
-            columnCount = record.getColumns().size() + StandardColumn.values().length;
-            entityColumnNames = COMMA + getColumnNames(record);
+            final Map<String, Column> columns = record.getColumns();
+            columnCount = columns.size() + StandardColumn.values().length;
+            entityColumnNames = COMMA + Joiner.on(COMMA.toString())
+                                              .join(sorted(columns.keySet()));
         } else {
             columnCount = StandardColumn.values().length;
             entityColumnNames = "";

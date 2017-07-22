@@ -83,7 +83,7 @@ public abstract class AbstractTable<I, R extends Message, W> {
     /**
      * A map of the Spine common Entity Columns to their default values.
      *
-     * <p>Some write operations may not include these columns. Though, they are importand for
+     * <p>Some write operations may not include these columns. Though, they are required for
      * the framework to work properly. Hence, the tables which include them should make these values
      * {@code DEFAULT} for these columns.
      *

@@ -24,8 +24,6 @@ import com.google.common.base.Function;
 import com.google.common.base.Functions;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicates;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Ordering;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.storage.Column;
 import io.spine.server.entity.storage.ColumnRecords;
@@ -40,9 +38,7 @@ import io.spine.server.storage.jdbc.util.Serializer;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -50,6 +46,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static com.google.common.collect.Iterables.find;
 import static com.google.common.collect.Maps.newHashMap;
+import static io.spine.server.entity.storage.EntityColumns.sorted;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.COMMA;
@@ -119,13 +116,12 @@ public class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
                                                        int fromColumnNumber) {
         final Function<String, Integer> function;
         final Map<String, Column> columns = record.getColumns();
-        final List<String> columnList = Lists.newArrayList(columns.keySet());
-        Collections.sort(columnList, Ordering.usingToString());
+        final Collection<String> columnNames = sorted(columns.keySet());
         final Map<String, Integer> result = new HashMap<>();
 
         int index = fromColumnNumber;
 
-        for (String entry : columnList) {
+        for (String entry : columnNames) {
             result.put(entry, index);
             index++;
         }

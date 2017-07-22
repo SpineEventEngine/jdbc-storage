@@ -21,19 +21,15 @@
 package io.spine.server.storage.jdbc;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
-import io.spine.server.entity.storage.EntityRecordWithColumns;
 
 import java.sql.Types;
 import java.util.Collections;
-import java.util.List;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.COMMA;
 import static io.spine.server.storage.jdbc.Sql.Query.PLACEHOLDER;
-import static java.util.Collections.sort;
 
 /**
  * Set of enums and utilities for constructing the SQL sentences.
@@ -73,15 +69,6 @@ public class Sql {
                                           .join(Collections.nCopies(count, PLACEHOLDER));
         final String wrappedPlaceholders = BRACKET_OPEN + placeholders + BRACKET_CLOSE;
         return wrappedPlaceholders;
-    }
-
-    public static String getColumnNames(EntityRecordWithColumns record) {
-        final String wrappedColumnNames;
-        List<String> columnList = Lists.newArrayList(record.getColumns().keySet());
-        sort(columnList);
-        final String columnNames = Joiner.on(COMMA.toString())
-                                         .join(columnList);
-        return columnNames;
     }
 
     /**
