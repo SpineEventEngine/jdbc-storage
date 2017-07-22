@@ -20,10 +20,8 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.DatabaseException;
-import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.util.ConnectionWrapper;
 import io.spine.server.storage.jdbc.util.IdColumn;
 import io.spine.server.storage.jdbc.util.Serializer;
@@ -41,10 +39,6 @@ public abstract class WriteRecordQuery<I, R> extends ColumnAwareWriteQuery {
 
     public EntityRecordWithColumns getRecord() {
         return record;
-    }
-
-    public I getId() {
-        return id;
     }
 
     protected WriteRecordQuery(
@@ -83,13 +77,6 @@ public abstract class WriteRecordQuery<I, R> extends ColumnAwareWriteQuery {
         private IdColumn<I> idColumn;
         private I id;
         private EntityRecordWithColumns record;
-        private ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry;
-
-        public B setColumnTypeRegistry(
-                ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry) {
-            this.columnTypeRegistry = columnTypeRegistry;
-            return getThis();
-        }
 
         public B setId(I id) {
             this.id = id;

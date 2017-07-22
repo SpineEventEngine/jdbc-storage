@@ -24,6 +24,8 @@ import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
 
 /**
+ * A storage write query aware of Entity Columns.
+ *
  * @author Alexander Aleksandrov
  */
 public class ColumnAwareWriteQuery extends WriteQuery {
@@ -32,10 +34,10 @@ public class ColumnAwareWriteQuery extends WriteQuery {
 
     protected ColumnAwareWriteQuery(Builder<? extends Builder, ? extends ColumnAwareWriteQuery> builder) {
         super(builder);
-        this.columnTypeRegistry = builder.columnTypeRegistry;
+        this.columnTypeRegistry = builder.getColumnTypeRegistry();
     }
 
-    public ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> getColumnTypeRegistry() {
+    protected ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> getColumnTypeRegistry() {
         return columnTypeRegistry;
     }
 
@@ -45,5 +47,15 @@ public class ColumnAwareWriteQuery extends WriteQuery {
 
         private ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry
                 = JdbcTypeRegistryFactory.defaultInstance();
+
+        public ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> getColumnTypeRegistry() {
+            return columnTypeRegistry;
+        }
+
+        public B setColumnTypeRegistry(
+                ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry) {
+            this.columnTypeRegistry = columnTypeRegistry;
+            return getThis();
+        }
     }
 }

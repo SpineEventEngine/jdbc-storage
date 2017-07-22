@@ -18,9 +18,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/**
- * @author Dmytro Dashenkov
- */
 @ParametersAreNonnullByDefault
 package io.spine.server.storage.jdbc.entity.lifecycleflags.query;
 

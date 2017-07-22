@@ -43,10 +43,6 @@ public abstract class WriteAggregateQuery <I, R extends Message> extends WriteQu
         return record;
     }
 
-    public I getId() {
-        return id;
-    }
-
     protected WriteAggregateQuery(
             Builder<? extends Builder, ? extends WriteAggregateQuery, I, R> builder) {
         super(builder);

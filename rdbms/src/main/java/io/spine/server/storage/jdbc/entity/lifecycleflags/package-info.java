@@ -20,7 +20,7 @@
 
 /**
  * This package contains the {@linkplain io.spine.server.storage.jdbc.query.StorageQuery queries}
- * connected with the {@linkplain io.spine.server.entity.Visibility entity visibility}.
+ * connected with the {@linkplain io.spine.server.entity.LifecycleFlags entity lifecycle flags}.
  *
  * @author Dmytro Dashenkov
  */

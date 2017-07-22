@@ -151,8 +151,6 @@ public class Sql {
         BETWEEN,
         TRUE,
         FALSE,
-        ALL("AND"),
-        EITHER("OR"),
 
         PLACEHOLDER("?"),
 

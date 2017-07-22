@@ -21,10 +21,7 @@
 package io.spine.server.storage.jdbc.aggregate.query;
 
 import io.spine.server.entity.LifecycleFlags;
-import io.spine.server.storage.LifecycleFlagField;
-import io.spine.server.storage.jdbc.entity.lifecycleflags.query.InsertAndMarkEntityQuery;
 import io.spine.server.storage.jdbc.entity.lifecycleflags.query.InsertLifecycleFlagsQuery;
-import io.spine.server.storage.jdbc.entity.lifecycleflags.query.MarkEntityQuery;
 import io.spine.server.storage.jdbc.entity.lifecycleflags.query.SelectLifecycleFlagsQuery;
 import io.spine.server.storage.jdbc.entity.lifecycleflags.query.UpdateLifecycleFlagsQuery;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
@@ -36,9 +33,6 @@ import io.spine.server.storage.jdbc.table.entity.aggregate.LifecycleFlagsTable;
 import io.spine.server.storage.jdbc.util.DataSourceWrapper;
 import io.spine.server.storage.jdbc.util.IdColumn;
 import org.slf4j.Logger;
-
-import static io.spine.server.storage.LifecycleFlagField.archived;
-import static io.spine.server.storage.LifecycleFlagField.deleted;
 
 /**
  * An implementation of the {@link ReadQueryFactory} for generating queries for
@@ -107,49 +101,6 @@ public class LifecycleFlagsQueryFactory<I> implements ReadQueryFactory<I, Lifecy
                 .setLifecycleFlags(record)
                 .setIdColumn(idColumn)
                 .build();
-        return query;
-    }
-
-    public MarkEntityQuery<I> newMarkArchivedQuery(I id) {
-        return newMarkQuery(id, archived);
-    }
-
-    public MarkEntityQuery<I> newMarkDeletedQuery(I id) {
-        return newMarkQuery(id, deleted);
-    }
-
-    public InsertAndMarkEntityQuery<I> newMarkArchivedNewEntityQuery(I id) {
-        return newInsertAndMarkEntityQuery(id, archived);
-    }
-
-    public InsertAndMarkEntityQuery<I> newMarkDeletedNewEntityQuery(I id) {
-        return newInsertAndMarkEntityQuery(id, deleted);
-    }
-
-    private InsertAndMarkEntityQuery<I> newInsertAndMarkEntityQuery(I id,
-                                                                    LifecycleFlagField column) {
-        final InsertAndMarkEntityQuery<I> query =
-                InsertAndMarkEntityQuery.<I>newInsertBuilder()
-                        .setDataSource(dataSource)
-                        .setTableName(tableName)
-                        .setLogger(logger)
-                        .setColumn(column)
-                        .setIdColumn(idColumn)
-                        .setId(id)
-                        .build();
-        return query;
-    }
-
-    private MarkEntityQuery<I> newMarkQuery(I id, LifecycleFlagField column) {
-        final MarkEntityQuery<I> query =
-                MarkEntityQuery.<I>newBuilder()
-                        .setDataSource(dataSource)
-                        .setLogger(logger)
-                        .setTableName(tableName)
-                        .setColumn(column)
-                        .setIdColumn(idColumn)
-                        .setId(id)
-                        .build();
         return query;
     }
 }

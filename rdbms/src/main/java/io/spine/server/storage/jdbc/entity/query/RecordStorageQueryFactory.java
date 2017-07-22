@@ -33,6 +33,7 @@ import io.spine.server.storage.jdbc.query.StorageIndexQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 import io.spine.server.storage.jdbc.table.entity.RecordTable;
+import io.spine.server.storage.jdbc.table.entity.RecordTable.StandardColumn;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.util.DataSourceWrapper;
 import io.spine.server.storage.jdbc.util.DbTableNameFactory;
@@ -83,15 +84,6 @@ public class RecordStorageQueryFactory<I>
         return logger;
     }
 
-    public SelectBulkQuery<I> newSelectAllQuery(FieldMask fieldMask) {
-        final SelectBulkQuery.Builder<I> builder = SelectBulkQuery.<I>newBuilder(tableName)
-                .setFieldMask(fieldMask)
-                .setLogger(getLogger())
-                .setDataSource(dataSource);
-
-        return builder.build();
-    }
-
     public SelectBulkQuery<I> newSelectBulkQuery(Iterable<I> ids, FieldMask fieldMask) {
         final SelectBulkQuery.Builder<I> builder = SelectBulkQuery.<I>newBuilder()
                 .setIdColumn(idColumn)
@@ -124,6 +116,7 @@ public class RecordStorageQueryFactory<I>
                         .setDataSource(dataSource)
                         .setTableName(tableName)
                         .setIdColumn(idColumn)
+                        .setColumnTypeRegistry(columnTypeRegistry)
                         .setRecords(records);
         return builder.build();
     }
@@ -158,20 +151,23 @@ public class RecordStorageQueryFactory<I>
                 .setLogger(getLogger())
                 .setId(id)
                 .setIdColumn(idColumn)
+                .setColumnTypeRegistry(columnTypeRegistry)
                 .setRecord(record);
         return builder.build();
     }
 
     @Override
     public WriteQuery newUpdateQuery(I id, EntityRecordWithColumns record) {
+        final int idIndex = record.getColumns().size() + StandardColumn.values().length;
         final UpdateEntityQuery.Builder<I> builder =
                 UpdateEntityQuery.<I>newBuilder(tableName)
-                .setDataSource(dataSource)
-                .setLogger(getLogger())
-                .setIdColumn(idColumn)
-                .setIdIndexInQuery(record.getColumns().size() + 2)
-                .setId(id)
-                .setRecord(record);
+                                 .setDataSource(dataSource)
+                                 .setLogger(getLogger())
+                                 .setIdColumn(idColumn)
+                                 .setIdIndexInQuery(idIndex)
+                                 .setId(id)
+                                 .setRecord(record)
+                                 .setColumnTypeRegistry(columnTypeRegistry);
         return builder.build();
     }
 }
