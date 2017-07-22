@@ -30,7 +30,7 @@ import java.sql.SQLException;
  *
  * @author Alexander Aleksandrov
  */
-public abstract class AbstractJdbcColumnType<J, C > implements JdbcColumnType<J, C> {
+public abstract class AbstractJdbcColumnType<J, C> implements JdbcColumnType<J, C> {
 
     @Override
     public void setNull(PreparedStatement storageRecord, Integer columnIdentifier) {

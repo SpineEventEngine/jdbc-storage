@@ -22,9 +22,12 @@ package io.spine.server.storage.jdbc.type;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
+ * An implementation base for the simple {@linkplain JdbcColumnType JdbcColumnTypes}.
+ *
  * @author Alexander Aleksandrov
  */
 public abstract class SimpleJdbcColumnType<T> extends AbstractJdbcColumnType<T, T> {
+
     @Override
     public T convertColumnValue(T fieldValue) {
         checkNotNull(fieldValue);
