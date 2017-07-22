@@ -56,7 +56,6 @@ public class JdbcStorageFactory implements StorageFactory {
     private final ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> columnTypeRegistry;
 
     private JdbcStorageFactory(Builder builder) {
-      //  this.entityClass = checkNotNull(builder.entityClass);
         this.dataSource = checkNotNull(builder.dataSource);
         this.multitenant = builder.multitenant;
         this.columnTypeRegistry = builder.columnTypeRegistry;

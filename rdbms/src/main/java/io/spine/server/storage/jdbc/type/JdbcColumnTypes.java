@@ -31,6 +31,8 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 /**
+ * A factory for basic {@link JdbcColumnType} implementations.
+ *
  * @author Alexander Aleksandrov
  */
 final class JdbcColumnTypes {
@@ -70,21 +72,21 @@ final class JdbcColumnTypes {
     /**
      * @return new instance of {@link VersionColumnType}
      */
-    static JdbcColumnType<Version, Integer> versionType() {
+    static JdbcColumnType<Version, ?> versionType() {
         return new VersionColumnType();
     }
 
     /**
      * @return new instance of {@link TimestampColumnType}
      */
-    static JdbcColumnType<Timestamp, java.sql.Timestamp> timestampType() {
+    static JdbcColumnType<Timestamp, ?> timestampType() {
         return new TimestampColumnType();
     }
 
     /**
      * @return new instance of {@link MessageColumnType}
      */
-    static JdbcColumnType<AbstractMessage, String> messageType() {
+    static JdbcColumnType<AbstractMessage, ?> messageType() {
         return new MessageColumnType();
     }
 
@@ -192,21 +194,20 @@ final class JdbcColumnTypes {
     }
 
     private static class TimestampColumnType
-            extends AbstractJdbcColumnType<Timestamp, java.sql.Timestamp>{
+            extends AbstractJdbcColumnType<Timestamp, Long>{
 
         @Override
-        public java.sql.Timestamp convertColumnValue(Timestamp fieldValue) {
-            final java.sql.Timestamp timestamp =
-                    new java.sql.Timestamp(Timestamps.toMillis(fieldValue));
-            timestamp.setNanos(fieldValue.getNanos());
-            return timestamp;
+        public Long convertColumnValue(Timestamp fieldValue) {
+            final long millis = Timestamps.toMillis(fieldValue);
+            return millis;
         }
 
         @Override
-        public void setColumnValue(PreparedStatement storageRecord, java.sql.Timestamp value,
+        public void setColumnValue(PreparedStatement storageRecord,
+                                   Long value,
                                    Integer columnIdentifier) {
             try {
-                storageRecord.setTimestamp(columnIdentifier, value);
+                storageRecord.setLong(columnIdentifier, value);
             } catch (SQLException e) {
                 throw new DatabaseException(e);
             }
@@ -214,7 +215,7 @@ final class JdbcColumnTypes {
 
         @Override
         public Sql.Type getSqlType() {
-            return Sql.Type.TIMESTAMP;
+            return Sql.Type.BIGINT;
         }
 
     }
