@@ -42,13 +42,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.collect.Maps.newHashMap;
 import static io.spine.protobuf.TypeConverter.toObject;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
@@ -69,6 +69,7 @@ import static io.spine.server.storage.jdbc.Sql.nPlaceholders;
 import static io.spine.server.storage.jdbc.table.entity.RecordTable.StandardColumn.entity;
 import static io.spine.server.storage.jdbc.table.entity.RecordTable.StandardColumn.id;
 import static io.spine.util.Exceptions.newIllegalArgumentException;
+import static java.util.Collections.emptyMap;
 
 /**
  * @author Dmytro Dashenkov
@@ -128,6 +129,7 @@ public final class SelectByEntityColumnsQuery<I> extends StorageQuery implements
         private PreparedStatement statement;
 
         private Builder() {
+            super();
             fieldMask = FieldMask.getDefaultInstance();
         }
 
@@ -172,10 +174,9 @@ public final class SelectByEntityColumnsQuery<I> extends StorageQuery implements
             return checkNotNull(tableName);
         }
 
+        @SuppressWarnings("MethodWithMoreThanThreeNegations") // OK for this method.
         @Override
         public SelectByEntityColumnsQuery<I> build() {
-            // TODO:2017-07-22:dmytro.dashenkov: Simplify.
-
             checkState(entityQuery != null, "EntityQuery is not set.");
             checkState(columnTypeRegistry != null, "ColumnTypeRegistry is not set.");
 
@@ -183,44 +184,15 @@ public final class SelectByEntityColumnsQuery<I> extends StorageQuery implements
             final QueryParameters parameters = entityQuery.getParameters();
             final Collection<I> ids = entityQuery.getIds();
             final Iterator<CompositeQueryParameter> iterator = parameters.iterator();
-            final Map<ColumnFilterIdentity, Integer> columnIndexes = new HashMap<>();
+            final Map<ColumnFilterIdentity, Integer> columnIndexes;
             if (iterator.hasNext()) {
                 sql.append(WHERE);
-                int indexInStatement = 1;
-                while (iterator.hasNext()) {
-                    final CompositeQueryParameter param = iterator.next();
-                    final CompositeOperator operator = param.getOperator();
-                    sql.append(BRACKET_OPEN);
-                    final String compositeSqlOperator = toSql(operator);
-                    final Iterator<Map.Entry<Column, ColumnFilter>> filters = param.getFilters()
-                                                                                   .entries()
-                                                                                   .iterator();
-                    while (filters.hasNext()) {
-                        Map.Entry<Column, ColumnFilter> filter = filters.next();
-                        final Column column = filter.getKey();
-                        columnIndexes.put(new ColumnFilterIdentity(column, param),
-                                          indexInStatement);
-                        indexInStatement++;
-                        final String name = column.getName();
-                        final Operator columnFilterOperator = filter.getValue()
-                                                                    .getOperator();
-                        final String comparisonOperator = toSql(columnFilterOperator);
-                        sql.append(name)
-                           .append(comparisonOperator)
-                           .append(PLACEHOLDER);
-                        if (filters.hasNext()) {
-                            sql.append(compositeSqlOperator);
-                        }
-                    }
-                    sql.append(BRACKET_CLOSE);
-                    if (iterator.hasNext()) {
-                        sql.append(AND);
-                    }
-                }
+                columnIndexes = appendColumns(sql, iterator);
                 if (!ids.isEmpty()) {
                     sql.append(AND);
                 }
             } else {
+                columnIndexes = emptyMap();
                 if (!ids.isEmpty()) {
                     sql.append(WHERE);
                 }
@@ -235,26 +207,96 @@ public final class SelectByEntityColumnsQuery<I> extends StorageQuery implements
             final ConnectionWrapper connection = dataSource.getConnection(true);
             this.statement = connection.prepareStatement(sql.toString());
 
+            populateQuery(statement, parameters, ids, columnIndexes);
+            return new SelectByEntityColumnsQuery<>(this);
+        }
+
+        private static Map<ColumnFilterIdentity, Integer> appendColumns(
+                StringBuilder sql, Iterator<CompositeQueryParameter> parameters) {
+            final Map<ColumnFilterIdentity, Integer> columnIndexes = newHashMap();
+            int indexInStatement = 1;
+            while (parameters.hasNext()) {
+                final CompositeQueryParameter param = parameters.next();
+                sql.append(BRACKET_OPEN);
+                indexInStatement = appendSingleParameter(sql,
+                                                         param,
+                                                         columnIndexes,
+                                                         indexInStatement);
+                sql.append(BRACKET_CLOSE);
+                if (parameters.hasNext()) {
+                    sql.append(AND);
+                }
+            }
+            return columnIndexes;
+        }
+
+        private static int appendSingleParameter(StringBuilder sql,
+                                                 CompositeQueryParameter parameter,
+                                                 Map<ColumnFilterIdentity, Integer> indexRegistry,
+                                                 int indexInStatement) {
+            final CompositeOperator operator = parameter.getOperator();
+            final String compositeSqlOperator = toSql(operator);
+            final Iterator<Map.Entry<Column, ColumnFilter>> filters = parameter.getFilters()
+                                                                               .entries()
+                                                                               .iterator();
+            int index = indexInStatement;
+            while (filters.hasNext()) {
+                Map.Entry<Column, ColumnFilter> filter = filters.next();
+                final Column column = filter.getKey();
+                indexRegistry.put(new ColumnFilterIdentity(column, parameter),
+                                  index);
+                index++;
+                final String name = column.getName();
+                final Operator columnFilterOperator = filter.getValue()
+                                                            .getOperator();
+                final String comparisonOperator = toSql(columnFilterOperator);
+                sql.append(name)
+                   .append(comparisonOperator)
+                   .append(PLACEHOLDER);
+                if (filters.hasNext()) {
+                    sql.append(compositeSqlOperator);
+                }
+            }
+            return index;
+        }
+
+        private void populateQuery(PreparedStatement statement,
+                                   Iterable<CompositeQueryParameter> parameters,
+                                   Iterable<I> ids,
+                                   Map<ColumnFilterIdentity, Integer> indexRegistry) {
+            populateQueryWithColumns(statement, parameters, indexRegistry);
+            int sqlParameterIndex = indexRegistry.size() + 1;
+            populateQueryWithIds(statement, ids, sqlParameterIndex);
+        }
+
+        @SuppressWarnings("MethodWithMultipleLoops") // OK in this case.
+        private void populateQueryWithColumns(PreparedStatement statement,
+                                              Iterable<CompositeQueryParameter> parameters,
+                                              Map<ColumnFilterIdentity, Integer> indexRegistry) {
             for (CompositeQueryParameter param : parameters) {
                 for (Map.Entry<Column, ColumnFilter> filter : param.getFilters().entries()) {
                     final Column column = filter.getKey();
                     final ColumnFilter columnFilter = filter.getValue();
-                    final int columnIndexInSql = columnIndexes.get(new ColumnFilterIdentity(filter.getKey(), param));
-                    final JdbcColumnType<? super Object, ? super Object> columnType = columnTypeRegistry.get(column);
+                    final ColumnFilterIdentity filterId = new ColumnFilterIdentity(column, param);
+                    final int columnIndexInSql = indexRegistry.get(filterId);
+                    final JdbcColumnType<? super Object, ? super Object> columnType =
+                            columnTypeRegistry.get(column);
                     final Object javaType = toObject(columnFilter.getValue(), column.getType());
                     final Object storedType = columnType.convertColumnValue(javaType);
                     columnType.setColumnValue(statement, storedType, columnIndexInSql);
                 }
             }
+        }
 
-            int sqlParameterIndex = columnIndexes.size() + 1;
+        private void populateQueryWithIds(PreparedStatement statement,
+                                          Iterable<I> ids,
+                                          int startIndex) {
+            int sqlParameterIndex = startIndex;
             final IdColumn<I> idColumn = getIdColumn();
             for (I id : ids) {
                 idColumn.setId(sqlParameterIndex, id, statement);
                 sqlParameterIndex++;
             }
-
-            return new SelectByEntityColumnsQuery<>(this);
         }
 
         @SuppressWarnings("EnumSwitchStatementWhichMissesCases") // OK for the Protobuf enum switch.

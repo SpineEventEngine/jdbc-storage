@@ -22,15 +22,21 @@ package io.spine.server.storage.jdbc.entity.lifecycleflags.query;
 
 import io.spine.server.entity.LifecycleFlags;
 import io.spine.server.storage.LifecycleFlagField;
-import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.query.SelectMessageByIdQuery;
-import io.spine.server.storage.jdbc.table.entity.aggregate.LifecycleFlagsTable;
+import io.spine.server.storage.jdbc.table.entity.aggregate.LifecycleFlagsTable.Column;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static io.spine.server.storage.LifecycleFlagField.archived;
 import static io.spine.server.storage.LifecycleFlagField.deleted;
+import static io.spine.server.storage.jdbc.Sql.BuildingBlock.COMMA;
+import static io.spine.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
+import static io.spine.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
+import static io.spine.server.storage.jdbc.Sql.Query.FROM;
+import static io.spine.server.storage.jdbc.Sql.Query.PLACEHOLDER;
+import static io.spine.server.storage.jdbc.Sql.Query.SELECT;
+import static io.spine.server.storage.jdbc.Sql.Query.WHERE;
 import static java.lang.String.format;
 
 /**
@@ -41,10 +47,10 @@ import static java.lang.String.format;
 public class SelectLifecycleFlagsQuery<I> extends SelectMessageByIdQuery<I, LifecycleFlags> {
 
     private static final String SQL =
-            Sql.Query.SELECT.toString() + archived + Sql.BuildingBlock.COMMA + deleted +
-            Sql.Query.FROM + "%s" +
-            Sql.Query.WHERE + LifecycleFlagsTable.Column.id + Sql.BuildingBlock.EQUAL +
-            Sql.Query.PLACEHOLDER + Sql.BuildingBlock.SEMICOLON;
+            SELECT.toString() + archived + COMMA + deleted +
+            FROM + "%s" +
+            WHERE + Column.id + EQUAL +
+            PLACEHOLDER + SEMICOLON;
 
     protected SelectLifecycleFlagsQuery(Builder<I> builder) {
         super(builder);
