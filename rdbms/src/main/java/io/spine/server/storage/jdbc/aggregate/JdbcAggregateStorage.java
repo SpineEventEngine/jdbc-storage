@@ -145,12 +145,8 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
 
     @Override
     public void close() throws DatabaseException {
-        checkNotClosed();
-        try {
-            super.close();
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
+        super.close();
+
         dataSource.close();
         closeAll(iterators);
         iterators.clear();

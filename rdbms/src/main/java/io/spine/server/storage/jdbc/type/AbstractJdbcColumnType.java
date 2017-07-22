@@ -25,6 +25,9 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 /**
+ * The implementation base for the JDBC-storage
+ * {@linkplain io.spine.server.entity.storage.ColumnType ColumnTypes}.
+ *
  * @author Alexander Aleksandrov
  */
 public abstract class AbstractJdbcColumnType<J, C > implements JdbcColumnType<J, C> {
