@@ -28,6 +28,7 @@ import org.junit.Test;
 
 import java.sql.PreparedStatement;
 
+import static io.spine.test.Tests.assertHasPrivateParameterlessCtor;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
@@ -37,6 +38,11 @@ import static org.mockito.Mockito.when;
  * @author Dmytro Dashenkov
  */
 public class JdbcTypeRegistryFactoryShould {
+
+    @Test
+    public void have_private_util_ctor() {
+        assertHasPrivateParameterlessCtor(JdbcTypeRegistryFactory.class);
+    }
 
     @Test
     public void provide_default_type_registry_for_required_types() {
