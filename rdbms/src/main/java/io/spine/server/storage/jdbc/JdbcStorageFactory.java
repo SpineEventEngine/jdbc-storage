@@ -29,7 +29,6 @@ import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.projection.Projection;
 import io.spine.server.projection.ProjectionStorage;
 import io.spine.server.stand.StandStorage;
-import io.spine.server.storage.RecordStorage;
 import io.spine.server.storage.StorageFactory;
 import io.spine.server.storage.jdbc.aggregate.JdbcAggregateStorage;
 import io.spine.server.storage.jdbc.entity.JdbcRecordStorage;
@@ -70,7 +69,14 @@ public class JdbcStorageFactory implements StorageFactory {
 
     @Override
     public StorageFactory toSingleTenant() {
-        return null;
+        if (isMultitenant()) {
+            return this;
+        } else {
+            return newBuilder().setColumnTypeRegistry(columnTypeRegistry)
+                               .setDataSource(dataSource)
+                               .setMultitenant(false)
+                               .build();
+        }
     }
 
     @Override
@@ -81,9 +87,9 @@ public class JdbcStorageFactory implements StorageFactory {
     @Override
     public StandStorage createStandStorage() {
         return JdbcStandStorage.newBuilder()
-                .setDataSource(dataSource)
-                .setMultitenant(isMultitenant())
-                .build();
+                               .setDataSource(dataSource)
+                               .setMultitenant(isMultitenant())
+                               .build();
     }
 
     @Override
@@ -91,33 +97,34 @@ public class JdbcStorageFactory implements StorageFactory {
             Class<? extends Aggregate<I, ?, ?>> aggregateClass) {
         final JdbcAggregateStorage<I> storage =
                 JdbcAggregateStorage.<I>newBuilder()
-                        .setAggregateClass(aggregateClass)
-                        .setMultitenant(false)
-                        .setDataSource(dataSource)
-                        .build();
+                                    .setAggregateClass(aggregateClass)
+                                    .setMultitenant(false)
+                                    .setDataSource(dataSource)
+                                    .build();
         return storage;
     }
 
     @Override
-    public <I> RecordStorage<I> createRecordStorage(Class<? extends Entity<I, ?>> entityClass) {
-        final RecordStorage<I> recordStorage = JdbcRecordStorage.<I>newBuilder()
-                .setMultitenant(false)
-                .setEntityClass(entityClass)
-                .setDataSource(dataSource)
-                .setColumnTypeRegistry(columnTypeRegistry)
-                .build();
+    public <I> JdbcRecordStorage<I> createRecordStorage(Class<? extends Entity<I, ?>> entityClass) {
+        final JdbcRecordStorage<I> recordStorage =
+                JdbcRecordStorage.<I>newBuilder()
+                                 .setMultitenant(false)
+                                 .setEntityClass(entityClass)
+                                 .setDataSource(dataSource)
+                                 .setColumnTypeRegistry(columnTypeRegistry)
+                                 .build();
         return recordStorage;
     }
 
     @Override
     public <I> ProjectionStorage<I> createProjectionStorage(
             Class<? extends Projection<I, ?, ?>> projectionClass) {
-        final JdbcRecordStorage<I> entityStorage = (JdbcRecordStorage<I>) this.<I>createRecordStorage(projectionClass);
+        final JdbcRecordStorage<I> entityStorage = createRecordStorage(projectionClass);
         final ProjectionStorage<I> storage = JdbcProjectionStorage.<I>newBuilder()
-                .setMultitenant(multitenant)
-                .setDataSource(dataSource)
-                .setRecordStorage(entityStorage)
-                .build();
+                                                                  .setMultitenant(multitenant)
+                                                                  .setDataSource(dataSource)
+                                                                  .setRecordStorage(entityStorage)
+                                                                  .build();
         return storage;
     }
 
