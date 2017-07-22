@@ -24,6 +24,7 @@ import com.google.protobuf.Timestamp;
 import com.google.protobuf.util.Timestamps;
 import io.spine.core.Version;
 import io.spine.json.Json;
+import io.spine.server.entity.storage.Column;
 import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.Sql;
 
@@ -42,49 +43,51 @@ final class JdbcColumnTypes {
     }
 
     /**
-     * @return new instance of {@link BooleanColumnType}
+     * @return new instance of {@link JdbcColumnType} for {@code boolean} columns
      */
-    static SimpleJdbcColumnType<Boolean> booleanType() {
+    static JdbcColumnType<Boolean, ?> booleanType() {
         return new BooleanColumnType();
     }
 
     /**
-     * @return new instance of {@link StringColumnType}
+     * @return new instance of {@link JdbcColumnType} for {@code String} columns
      */
-    static SimpleJdbcColumnType<String> stringType() {
+    static JdbcColumnType<String, ?> stringType() {
         return new StringColumnType();
     }
 
     /**
-     * @return new instance of {@link IntegerColumnType}
+     * @return new instance of {@link JdbcColumnType} for {@code int} columns
      */
-    static SimpleJdbcColumnType<Integer> integerType() {
+    static JdbcColumnType<Integer, ?> integerType() {
         return new IntegerColumnType();
     }
 
     /**
-     * @return new instance of {@link LongColumnType}
+     * @return new instance of {@link JdbcColumnType} for {@code long} columns
      */
-    static SimpleJdbcColumnType<Long> longType() {
+    static JdbcColumnType<Long, ?> longType() {
         return new LongColumnType();
     }
 
     /**
-     * @return new instance of {@link VersionColumnType}
+     * @return new instance of {@link JdbcColumnType} for {@link Version} columns
      */
     static JdbcColumnType<Version, ?> versionType() {
         return new VersionColumnType();
     }
 
     /**
-     * @return new instance of {@link TimestampColumnType}
+     * @return new instance of {@link JdbcColumnType} for {@link Timestamp} columns
      */
     static JdbcColumnType<Timestamp, ?> timestampType() {
         return new TimestampColumnType();
     }
 
     /**
-     * @return new instance of {@link MessageColumnType}
+     * @return new instance of {@link JdbcColumnType} for
+     * {@link AbstractMessage Message} columns
+     * @see io.spine.server.entity.storage.ColumnTypeRegistry#get(Column)
      */
     static JdbcColumnType<AbstractMessage, ?> messageType() {
         return new MessageColumnType();
