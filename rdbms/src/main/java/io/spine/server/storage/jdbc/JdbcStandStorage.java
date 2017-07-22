@@ -88,7 +88,6 @@ public class JdbcStandStorage extends StandStorage {
         ID_MAPPER = stringifier.get();
     }
 
-    @SuppressWarnings("unchecked")
     protected JdbcStandStorage(Builder builder) {
         super(builder.isMultitenant());
         recordStorage = JdbcRecordStorage.<String>newBuilder()

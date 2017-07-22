@@ -84,17 +84,6 @@ public class RecordStorageQueryFactory<I>
         return logger;
     }
 
-    public SelectBulkQuery<I> newSelectBulkQuery(Iterable<I> ids, FieldMask fieldMask) {
-        final SelectBulkQuery.Builder<I> builder = SelectBulkQuery.<I>newBuilder()
-                .setIdColumn(idColumn)
-                .setIdsQuery(tableName, ids)
-                .setFieldMask(fieldMask)
-                .setLogger(getLogger())
-                .setDataSource(dataSource);
-
-        return builder.build();
-    }
-
     public SelectByEntityColumnsQuery<I> newSelectByEntityQuery(EntityQuery<I> query, FieldMask fieldMask) {
         final SelectByEntityColumnsQuery.Builder<I> builder =
                 SelectByEntityColumnsQuery.<I>newBuilder()

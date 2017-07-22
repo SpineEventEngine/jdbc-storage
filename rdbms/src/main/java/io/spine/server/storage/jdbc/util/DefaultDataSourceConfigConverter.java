@@ -42,14 +42,14 @@ public class DefaultDataSourceConfigConverter {
     public static HikariConfig convert(DataSourceConfig config) {
         final HikariConfig result = new HikariConfig();
 
-        /** Required fields */
+        /* Required fields */
 
         result.setDataSourceClassName(config.getDataSourceClassName());
         result.setJdbcUrl(config.getJdbcUrl());
         result.setUsername(config.getUsername());
         result.setPassword(config.getPassword());
 
-        /** Optional fields */
+        /* Optional fields */
 
         final Boolean autoCommit = config.getAutoCommit();
         if (autoCommit != null) {

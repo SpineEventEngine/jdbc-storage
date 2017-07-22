@@ -30,7 +30,6 @@ import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.entity.storage.EntityColumns;
 import io.spine.server.entity.storage.EntityQuery;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
-import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.entity.JdbcRecordStorage;
 import io.spine.server.storage.jdbc.entity.query.RecordStorageQueryFactory;
@@ -42,7 +41,6 @@ import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.util.DataSourceWrapper;
 
 import javax.annotation.Nullable;
-import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -105,16 +103,6 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWit
         final Collection<TableColumn> tableColumns = transform(entityColumns, new ColumnAdapter());
         columns.addAll(tableColumns);
         return columns;
-    }
-
-    public Iterator<EntityRecord> read(Iterable<I> ids, FieldMask fieldMask) {
-        try {
-            final Iterator<EntityRecord> records = queryFactory.newSelectBulkQuery(ids, fieldMask)
-                                                               .execute();
-            return records;
-        } catch (SQLException e) {
-            throw new DatabaseException(e);
-        }
     }
 
     public void write(Map<I, EntityRecordWithColumns> records) {

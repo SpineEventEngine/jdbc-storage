@@ -209,7 +209,6 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
             return this;
         }
 
-        @SuppressWarnings("unchecked") // cast Class object to an object of its superclass Class
         public Class<? extends Entity<I, ?>> getEntityClass() {
             return entityClass;
         }

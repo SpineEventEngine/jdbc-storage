@@ -84,16 +84,12 @@ public class StorageIndexQuery<I> extends StorageQuery {
             return getThis();
         }
 
-        public String getTableName() {
-            return tableName;
-        }
-
         public Builder<I> setTableName(String tableName) {
             this.tableName = tableName;
             return getThis();
         }
 
-        public Class<I> getIdType() {
+        private Class<I> getIdType() {
             return idType;
         }
 

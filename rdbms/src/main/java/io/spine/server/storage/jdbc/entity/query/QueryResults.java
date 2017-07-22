@@ -33,7 +33,6 @@ import io.spine.type.TypeUrl;
 
 import javax.annotation.Nullable;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -62,11 +61,9 @@ final class QueryResults {
      * @param resultSet Results of the query
      * @param fieldMask {@code FieldMask} to apply to the results
      * @return ID-to-{@link EntityRecord} {@link Map} representing the query results
-     * @throws SQLException if read results contain no ID column or entity column
      * @see RecordTable
      */
-    static Iterator<EntityRecord> parse(ResultSet resultSet, FieldMask fieldMask)
-            throws SQLException {
+    static Iterator<EntityRecord> parse(ResultSet resultSet, FieldMask fieldMask) {
         final Iterator<EntityRecord> recordIterator =
                 new MessageDbIterator<>(resultSet, entity.name(), ENTITY_RECORD_TYPE_URL);
         final Iterator<EntityRecord> result = transform(recordIterator, maskFields(fieldMask));

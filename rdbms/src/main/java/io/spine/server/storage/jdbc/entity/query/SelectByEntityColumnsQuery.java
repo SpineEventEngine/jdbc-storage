@@ -131,16 +131,12 @@ public final class SelectByEntityColumnsQuery<I> extends StorageQuery implements
             fieldMask = FieldMask.getDefaultInstance();
         }
 
-        public EntityQuery<I> getEntityQuery() {
-            return entityQuery;
-        }
-
         public Builder<I> setEntityQuery(EntityQuery<I> entityQuery) {
             this.entityQuery = checkNotNull(entityQuery);
             return this;
         }
 
-        public FieldMask getFieldMask() {
+        private FieldMask getFieldMask() {
             return fieldMask;
         }
 
@@ -178,6 +174,8 @@ public final class SelectByEntityColumnsQuery<I> extends StorageQuery implements
 
         @Override
         public SelectByEntityColumnsQuery<I> build() {
+            // TODO:2017-07-22:dmytro.dashenkov: Simplify.
+
             checkState(entityQuery != null, "EntityQuery is not set.");
             checkState(columnTypeRegistry != null, "ColumnTypeRegistry is not set.");
 
