@@ -28,7 +28,7 @@ import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
  *
  * @author Alexander Aleksandrov
  */
-public class ColumnAwareWriteQuery extends WriteQuery {
+public abstract class ColumnAwareWriteQuery extends WriteQuery {
 
     private final ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry;
 
@@ -42,7 +42,7 @@ public class ColumnAwareWriteQuery extends WriteQuery {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public abstract static class Builder<B extends ColumnAwareWriteQuery.Builder<B, Q>, Q extends ColumnAwareWriteQuery>
+    public abstract static class Builder<B extends Builder<B, Q>, Q extends ColumnAwareWriteQuery>
             extends WriteQuery.Builder<B, Q> {
 
         private ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry
