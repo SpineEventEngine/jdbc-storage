@@ -74,6 +74,7 @@ public class StorageIndexQuery<I> extends StorageQuery {
         private Class<I> idType;
 
         private Builder() {
+            super();
             // Prevent direct instantiation.
         }
 
