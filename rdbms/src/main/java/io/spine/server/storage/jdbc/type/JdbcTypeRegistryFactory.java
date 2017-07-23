@@ -39,10 +39,6 @@ import static io.spine.server.storage.jdbc.type.JdbcColumnTypes.versionType;
  */
 public final class JdbcTypeRegistryFactory {
 
-    private JdbcTypeRegistryFactory() {
-        // Prevent initialization of a utility class
-    }
-
     private static final ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>>
             DEFAULT_REGISTRY =
             ColumnTypeRegistry.<JdbcColumnType<? super Object, ? super Object>>newBuilder()
@@ -54,6 +50,10 @@ public final class JdbcTypeRegistryFactory {
                               .put(Timestamp.class, timestampType())
                               .put(AbstractMessage.class, messageType())
                               .build();
+
+    private JdbcTypeRegistryFactory() {
+        // Prevent initialization of a utility class
+    }
 
     /**
      * Retrieves a default
