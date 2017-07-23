@@ -40,7 +40,9 @@ import static java.lang.String.format;
  */
 public class StorageIndexQuery<I> extends StorageQuery {
 
-    private static final String SQL_TEMPLATE = SELECT + "%s" + FROM + "%s" + SEMICOLON;
+    private static final String FORMAT = "%s";
+
+    private static final String SQL_TEMPLATE = SELECT + FORMAT + FROM + FORMAT + SEMICOLON;
 
     private final String idColumnName;
     private final Class<I> idType;
