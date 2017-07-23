@@ -20,7 +20,6 @@
 package io.spine.server.storage.jdbc.type;
 
 import com.google.protobuf.AbstractMessage;
-import com.google.protobuf.Message;
 import com.google.protobuf.Timestamp;
 import io.spine.core.Version;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
@@ -69,7 +68,7 @@ public final class JdbcTypeRegistryFactory {
      *     <li>{@code Boolean}
      *     <li>{@link Timestamp} stored as {@link java.sql.Timestamp Timestamp}
      *     <li>{@link AbstractMessage Message} stored as a {@code String} retrieved form a
-     *     {@link io.spine.json.Json#toCompactJson(Message)}
+     *     {@link io.spine.json.Json#toCompactJson}
      *     <li>{@link Version} stored as an {@code int} version number
      * </ul>
      *

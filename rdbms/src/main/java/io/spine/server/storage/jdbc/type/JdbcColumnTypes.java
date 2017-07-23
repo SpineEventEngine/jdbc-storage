@@ -24,7 +24,6 @@ import com.google.protobuf.Timestamp;
 import com.google.protobuf.util.Timestamps;
 import io.spine.core.Version;
 import io.spine.json.Json;
-import io.spine.server.entity.storage.Column;
 import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.Sql;
 
@@ -87,7 +86,7 @@ final class JdbcColumnTypes {
     /**
      * @return new instance of {@link JdbcColumnType} for
      * {@link AbstractMessage Message} columns
-     * @see io.spine.server.entity.storage.ColumnTypeRegistry#get(Column)
+     * @see io.spine.server.entity.storage.ColumnTypeRegistry#get
      */
     static JdbcColumnType<AbstractMessage, ?> messageType() {
         return new MessageColumnType();
