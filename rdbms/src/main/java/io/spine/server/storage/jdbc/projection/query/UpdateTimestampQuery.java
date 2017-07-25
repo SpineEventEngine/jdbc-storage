@@ -21,9 +21,17 @@
 package io.spine.server.storage.jdbc.projection.query;
 
 import com.google.protobuf.Timestamp;
-import io.spine.server.storage.jdbc.Sql;
-import io.spine.server.storage.jdbc.table.LastHandledEventTimeTable;
 
+import static io.spine.server.storage.jdbc.Sql.BuildingBlock.COMMA;
+import static io.spine.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
+import static io.spine.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
+import static io.spine.server.storage.jdbc.Sql.Query.PLACEHOLDER;
+import static io.spine.server.storage.jdbc.Sql.Query.SET;
+import static io.spine.server.storage.jdbc.Sql.Query.UPDATE;
+import static io.spine.server.storage.jdbc.Sql.Query.WHERE;
+import static io.spine.server.storage.jdbc.table.LastHandledEventTimeTable.Column.nanos;
+import static io.spine.server.storage.jdbc.table.LastHandledEventTimeTable.Column.projection_type;
+import static io.spine.server.storage.jdbc.table.LastHandledEventTimeTable.Column.seconds;
 import static java.lang.String.format;
 
 /**
@@ -35,10 +43,10 @@ import static java.lang.String.format;
 public class UpdateTimestampQuery extends WriteTimestampQuery {
 
     private static final String QUERY_TEMPLATE =
-            Sql.Query.UPDATE + "%s" + Sql.Query.SET +
-            LastHandledEventTimeTable.Column.seconds + Sql.BuildingBlock.EQUAL + Sql.Query.PLACEHOLDER + Sql.BuildingBlock.COMMA +
-            LastHandledEventTimeTable.Column.nanos + Sql.BuildingBlock.EQUAL + Sql.Query.PLACEHOLDER +
-            Sql.Query.WHERE + LastHandledEventTimeTable.Column.projection_type + Sql.BuildingBlock.EQUAL + Sql.Query.PLACEHOLDER + Sql.BuildingBlock.SEMICOLON;
+            UPDATE + "%s" + SET +
+            seconds + EQUAL + PLACEHOLDER + COMMA +
+            nanos + EQUAL + PLACEHOLDER +
+            WHERE + projection_type + EQUAL + PLACEHOLDER + SEMICOLON;
 
     private UpdateTimestampQuery(Builder builder) {
         super(builder);

@@ -21,16 +21,21 @@
 package io.spine.server.storage.jdbc.query;
 
 import io.spine.server.storage.jdbc.DatabaseException;
-import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.table.TableColumn;
-import io.spine.server.storage.jdbc.util.IdColumn;
 import io.spine.server.storage.jdbc.util.ConnectionWrapper;
+import io.spine.server.storage.jdbc.util.IdColumn;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static io.spine.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
+import static io.spine.server.storage.jdbc.Sql.Query.ALL_ATTRIBUTES;
+import static io.spine.server.storage.jdbc.Sql.Query.FROM;
+import static io.spine.server.storage.jdbc.Sql.Query.PLACEHOLDER;
+import static io.spine.server.storage.jdbc.Sql.Query.SELECT;
+import static io.spine.server.storage.jdbc.Sql.Query.WHERE;
 import static java.lang.String.format;
 
 /**
@@ -41,9 +46,9 @@ import static java.lang.String.format;
 public class ContainsQuery<I> extends StorageQuery {
 
     private static final String FORMAT_PLACEHOLDER = "%s";
-    private static final String SQL_TEMPLATE = Sql.Query.SELECT.toString() + Sql.Query.ALL_ATTRIBUTES +
-                                               Sql.Query.FROM + FORMAT_PLACEHOLDER +
-                                               Sql.Query.WHERE + FORMAT_PLACEHOLDER + Sql.BuildingBlock.EQUAL + Sql.Query.PLACEHOLDER;
+    private static final String SQL_TEMPLATE = SELECT.toString() + ALL_ATTRIBUTES +
+                                               FROM + FORMAT_PLACEHOLDER +
+                                               WHERE + FORMAT_PLACEHOLDER + EQUAL + PLACEHOLDER;
 
     private final IdColumn<I> idColumn;
     private final I id;
