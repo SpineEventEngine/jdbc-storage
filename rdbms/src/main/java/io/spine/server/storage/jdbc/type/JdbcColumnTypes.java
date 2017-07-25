@@ -102,14 +102,12 @@ final class JdbcColumnTypes {
             } catch (SQLException e) {
                 throw new DatabaseException(e);
             }
-
         }
 
         @Override
         public Sql.Type getSqlType() {
             return Sql.Type.BOOLEAN;
         }
-
     }
 
     private static class StringColumnType extends SimpleJdbcColumnType<String>{
@@ -122,7 +120,6 @@ final class JdbcColumnTypes {
             } catch (SQLException e) {
                 throw new DatabaseException(e);
             }
-
         }
 
         @Override
@@ -141,14 +138,12 @@ final class JdbcColumnTypes {
             } catch (SQLException e) {
                 throw new DatabaseException(e);
             }
-
         }
 
         @Override
         public Sql.Type getSqlType() {
             return Sql.Type.INT;
         }
-
     }
 
     private static class LongColumnType extends SimpleJdbcColumnType<Long>{
@@ -167,7 +162,6 @@ final class JdbcColumnTypes {
         public Sql.Type getSqlType() {
             return Sql.Type.BIGINT;
         }
-
     }
 
     private static class VersionColumnType extends AbstractJdbcColumnType<Version, Integer>{
@@ -192,7 +186,6 @@ final class JdbcColumnTypes {
         public Sql.Type getSqlType() {
             return Sql.Type.INT;
         }
-
     }
 
     private static class TimestampColumnType
@@ -219,7 +212,6 @@ final class JdbcColumnTypes {
         public Sql.Type getSqlType() {
             return Sql.Type.BIGINT;
         }
-
     }
 
     private static class MessageColumnType extends AbstractJdbcColumnType<AbstractMessage, String>{
@@ -246,6 +238,5 @@ final class JdbcColumnTypes {
         public Sql.Type getSqlType() {
             return Sql.Type.VARCHAR_999;
         }
-
     }
 }
