@@ -97,6 +97,10 @@ public abstract class IdColumn<I> {
      */
     public abstract Sql.Type getSqlType();
 
+    /**
+     * Retrieves the {@linkplain Class Java class} of the ID when it's being set to
+     * the {@link PreparedStatement}.
+     */
     public abstract Class<I> getJavaType();
 
     public String getColumnName() {
@@ -199,6 +203,15 @@ public abstract class IdColumn<I> {
             }
         }
 
+        /**
+         * Normalizes the identifier before setting it to a {@link PreparedStatement}.
+         *
+         * <p>The method may perform a {@code String} conversion, validation or no action for
+         * a {@code String} input.
+         *
+         * @param id the identifier to convert normalize
+         * @return the normalized {@code String} ID
+         */
         protected abstract String normalize(I id);
     }
 
@@ -235,6 +248,12 @@ public abstract class IdColumn<I> {
             this.cls = cls;
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * <p>Converts the given {@link Message} ID into its
+         * {@linkplain io.spine.json.Json#toCompactJson JSON representation}.
+         */
         @Override
         protected String normalize(M id) {
             return toCompactJson(id);
