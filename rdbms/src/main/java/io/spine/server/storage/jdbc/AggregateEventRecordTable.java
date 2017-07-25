@@ -29,6 +29,7 @@ import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 
 import java.util.List;
 
+import static io.spine.server.storage.jdbc.DbTableNameFactory.newTableName;
 import static io.spine.server.storage.jdbc.Sql.Type.BIGINT;
 import static io.spine.server.storage.jdbc.Sql.Type.BLOB;
 import static io.spine.server.storage.jdbc.Sql.Type.ID;
@@ -39,19 +40,21 @@ import static io.spine.server.storage.jdbc.Sql.Type.INT;
  *
  * @author Dmytro Dashenkov
  */
-public class AggregateEventRecordTable<I> extends AggregateTable<I, AggregateEventRecord> {
+class AggregateEventRecordTable<I> extends AggregateTable<I, AggregateEventRecord> {
 
     private final AggregateStorageQueryFactory<I> queryFactory;
 
-    public AggregateEventRecordTable(Class<? extends Aggregate<I, ?, ?>> entityClass,
+    AggregateEventRecordTable(Class<? extends Aggregate<I, ?, ?>> entityClass,
                                      DataSourceWrapper dataSource) {
         super(entityClass, Column.id.name(), dataSource);
-        queryFactory = new AggregateStorageQueryFactory<>(dataSource, entityClass, getIdColumn());
+        queryFactory = new AggregateStorageQueryFactory<>(dataSource,
+                                                          newTableName(entityClass),
+                                                          getIdColumn());
         queryFactory.setLogger(log());
     }
 
     @Override
-    public Column getIdColumnDeclaration() {
+    protected Column getIdColumnDeclaration() {
         return Column.id;
     }
 
@@ -77,7 +80,7 @@ public class AggregateEventRecordTable<I> extends AggregateTable<I, AggregateEve
                     .execute();
     }
 
-    public DbIterator<AggregateEventRecord> historyBackward(I id) {
+    DbIterator<AggregateEventRecord> historyBackward(I id) {
         final DbIterator<AggregateEventRecord> result =
                 queryFactory.newSelectByIdSortedByTimeDescQuery(id)
                             .execute();
@@ -87,7 +90,7 @@ public class AggregateEventRecordTable<I> extends AggregateTable<I, AggregateEve
     /**
      * The enumeration of the columns of an {@link AggregateEventRecordTable}.
      */
-    public enum Column implements TableColumn {
+    private enum Column implements TableColumn {
 
         id(ID),
         aggregate(BLOB),

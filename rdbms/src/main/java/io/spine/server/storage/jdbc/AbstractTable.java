@@ -75,7 +75,7 @@ import static io.spine.server.storage.jdbc.Sql.Query.PRIMARY_KEY;
  * @author Dmytro Dashenkov
  * @see TableColumn
  */
-public abstract class AbstractTable<I, R extends Message, W> {
+abstract class AbstractTable<I, R extends Message, W> {
 
     /**
      * A map of the Spine common Entity Columns to their default values.
@@ -99,7 +99,7 @@ public abstract class AbstractTable<I, R extends Message, W> {
 
     private ImmutableList<? extends TableColumn> columns;
 
-    protected AbstractTable(String name,
+    AbstractTable(String name,
                             IdColumn<I> idColumn,
                             DataSourceWrapper dataSource) {
         super();
@@ -121,7 +121,7 @@ public abstract class AbstractTable<I, R extends Message, W> {
      *     }
      * </pre>
      */
-    public abstract TableColumn getIdColumnDeclaration();
+    protected abstract TableColumn getIdColumnDeclaration();
 
     /**
      * @return an instance of {@link ReadQueryFactory} which produces queries to the given table
@@ -141,7 +141,7 @@ public abstract class AbstractTable<I, R extends Message, W> {
      * <p>Equivalent to an SQL expression:
      * <p>{@code CREATE TABLE IF NOT EXISTS $TableName ( $Columns );}
      */
-    public void createIfNotExists() {
+    void createIfNotExists() {
         final String rawSql = composeCreateTableSql();
         final SimpleQuery query = SimpleQuery.newBuilder()
                                              .setDataSource(dataSource)
@@ -157,7 +157,7 @@ public abstract class AbstractTable<I, R extends Message, W> {
      * @param id ID to check
      * @return {@code true} if there is a record with such ID in the table, {@code false} otherwise
      */
-    public boolean containsRecord(I id) {
+    boolean containsRecord(I id) {
         final ContainsQuery<I> query = ContainsQuery.<I>newBuilder()
                                                     .setIdColumn(getIdColumn())
                                                     .setId(id)
@@ -177,7 +177,7 @@ public abstract class AbstractTable<I, R extends Message, W> {
      * @return table record or {@code null} if there is no record with given ID
      */
     @Nullable
-    public R read(I id) {
+    R read(I id) {
         final SelectByIdQuery<I, R> query = composeSelectQuery(id);
         final R result = query.execute();
         return result;
@@ -192,7 +192,7 @@ public abstract class AbstractTable<I, R extends Message, W> {
      * @param id     ID to write the record under
      * @param record the record to write
      */
-    public void write(I id, W record) {
+    void write(I id, W record) {
         if (containsRecord(id)) {
             update(id, record);
         } else {
@@ -200,18 +200,18 @@ public abstract class AbstractTable<I, R extends Message, W> {
         }
     }
 
-    public Iterator<I> index() {
+    Iterator<I> index() {
         final StorageIndexQuery<I> query = getReadQueryFactory().newIndexQuery();
         final Iterator<I> result = query.execute();
         return result;
     }
 
-    protected void insert(I id, W record) {
+    private void insert(I id, W record) {
         final WriteQuery query = composeInsertQuery(id, record);
         query.execute();
     }
 
-    protected void update(I id, W record) {
+    private void update(I id, W record) {
         final WriteQuery query = composeUpdateQuery(id, record);
         query.execute();
     }
@@ -224,7 +224,7 @@ public abstract class AbstractTable<I, R extends Message, W> {
      * @return the initialized {@link List} of the table columns
      */
     @SuppressWarnings("ReturnOfCollectionOrArrayField") // Returns immutable collection
-    protected final ImmutableList<? extends TableColumn> getColumns() {
+    final ImmutableList<? extends TableColumn> getColumns() {
         if (columns == null) {
             final List<? extends TableColumn> tableColumnsType = getTableColumns();
             columns = ImmutableList.copyOf(tableColumnsType);
@@ -232,29 +232,29 @@ public abstract class AbstractTable<I, R extends Message, W> {
         return columns;
     }
 
-    public String getName() {
+    String getName() {
         return name;
     }
 
-    public IdColumn<I> getIdColumn() {
+    IdColumn<I> getIdColumn() {
         return idColumn;
     }
 
-    public DataSourceWrapper getDataSource() {
+    DataSourceWrapper getDataSource() {
         return dataSource;
     }
 
-    protected WriteQuery composeInsertQuery(I id, W record) {
+    private WriteQuery composeInsertQuery(I id, W record) {
         final WriteQuery query = getWriteQueryFactory().newInsertQuery(id, record);
         return query;
     }
 
-    protected WriteQuery composeUpdateQuery(I id, W record) {
+    private WriteQuery composeUpdateQuery(I id, W record) {
         final WriteQuery query = getWriteQueryFactory().newUpdateQuery(id, record);
         return query;
     }
 
-    protected SelectByIdQuery<I, R> composeSelectQuery(I id) {
+    private SelectByIdQuery<I, R> composeSelectQuery(I id) {
         final SelectByIdQuery<I, R> query = getReadQueryFactory().newSelectByIdQuery(id);
         return query;
     }
@@ -331,7 +331,7 @@ public abstract class AbstractTable<I, R extends Message, W> {
      * @return {@code true} if the row was deleted successfully, {@code false} if the row was
      * not found
      */
-    public boolean delete(I id) {
+    boolean delete(I id) {
         final DeleteRecordQuery<I> query = DeleteRecordQuery.<I>newBuilder()
                                                             .setTableName(getName())
                                                             .setIdColumn(getIdColumn())
@@ -345,7 +345,7 @@ public abstract class AbstractTable<I, R extends Message, W> {
     /**
      * Deletes all the records from the table.
      */
-    public void deleteAll() {
+    void deleteAll() {
         final DeleteAllQuery query = DeleteAllQuery.newBuilder(getName())
                                                    .setDataSource(dataSource)
                                                    .setLogger(log())
@@ -353,7 +353,7 @@ public abstract class AbstractTable<I, R extends Message, W> {
         query.execute();
     }
 
-    protected static Logger log() {
+    static Logger log() {
         return LogSingleton.INSTANCE.value;
     }
 

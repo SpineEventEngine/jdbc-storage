@@ -22,10 +22,6 @@ package io.spine.server.storage.jdbc;
 
 import com.google.protobuf.Message;
 import io.spine.server.entity.Entity;
-import io.spine.server.storage.jdbc.JdbcAggregateStorage;
-import io.spine.server.storage.jdbc.AbstractTable;
-import io.spine.server.storage.jdbc.EntityTable;
-import io.spine.server.storage.jdbc.DataSourceWrapper;
 
 /**
  * A common superclass for the
@@ -36,13 +32,13 @@ import io.spine.server.storage.jdbc.DataSourceWrapper;
  */
 abstract class AggregateTable<I, T extends Message> extends EntityTable<I, T, T> {
 
-    protected AggregateTable(Class<? extends Entity<I, ?>> entityClass,
+    AggregateTable(Class<? extends Entity<I, ?>> entityClass,
                              String idColumnName,
                              DataSourceWrapper dataSource) {
         super(entityClass, idColumnName, dataSource);
     }
 
-    protected AggregateTable(String tableName,
+    AggregateTable(String tableName,
                              Class<? extends Entity<I, ?>> entityClass,
                              String idColumnName,
                              DataSourceWrapper dataSource) {

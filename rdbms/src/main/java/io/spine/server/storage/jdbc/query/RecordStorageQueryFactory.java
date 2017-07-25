@@ -21,18 +21,15 @@
 package io.spine.server.storage.jdbc.query;
 
 import com.google.protobuf.FieldMask;
-import io.spine.server.entity.Entity;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.entity.storage.EntityQuery;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
-import io.spine.server.storage.RecordStorage;
+import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.IdColumn;
 import io.spine.server.storage.jdbc.RecordTable;
 import io.spine.server.storage.jdbc.RecordTable.StandardColumn;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
-import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.DbTableNameFactory;
-import io.spine.server.storage.jdbc.IdColumn;
 import org.slf4j.Logger;
 
 import java.util.Map;
@@ -58,11 +55,11 @@ public class RecordStorageQueryFactory<I>
     /**
      * Creates a new instance.
      *
-     * @param dataSource  instance of {@link DataSourceWrapper}
-     * @param entityClass entity class of corresponding {@link RecordStorage} instance
+     * @param dataSource instance of {@link DataSourceWrapper}
+     * @param tableName  the name of the table to generate queries for
      */
     public RecordStorageQueryFactory(DataSourceWrapper dataSource,
-                                     Class<? extends Entity<I, ?>> entityClass,
+                                     String tableName,
                                      Logger logger,
                                      IdColumn<I> idColumn,
                                      ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>>
@@ -70,7 +67,7 @@ public class RecordStorageQueryFactory<I>
         super();
         this.idColumn = checkNotNull(idColumn);
         this.dataSource = dataSource;
-        this.tableName = DbTableNameFactory.newTableName(entityClass);
+        this.tableName = tableName;
         this.logger = logger;
         this.columnTypeRegistry = columnTypeRegistry;
     }

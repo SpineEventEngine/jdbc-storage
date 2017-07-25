@@ -23,6 +23,7 @@ package io.spine.server.storage.jdbc;
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.protobuf.FieldMask;
+import io.spine.annotation.Internal;
 import io.spine.server.entity.Entity;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.storage.Column;
@@ -46,6 +47,7 @@ import java.util.Map;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Collections2.transform;
 import static com.google.common.collect.Lists.newLinkedList;
+import static io.spine.server.storage.jdbc.DbTableNameFactory.newTableName;
 import static io.spine.server.storage.jdbc.Sql.Type.BLOB;
 import static io.spine.server.storage.jdbc.Sql.Type.ID;
 import static java.util.Collections.addAll;
@@ -57,27 +59,28 @@ import static java.util.Collections.addAll;
  *
  * @author Dmytro Dashenkov
  */
+@Internal
 public class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumns> {
 
     private final RecordStorageQueryFactory<I> queryFactory;
 
     private final ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> typeRegistry;
 
-    public RecordTable(Class<? extends Entity<I, ?>> entityClass,
+    RecordTable(Class<? extends Entity<I, ?>> entityClass,
                        DataSourceWrapper dataSource,
                        ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>>
                                columnTypeRegistry) {
         super(entityClass, StandardColumn.id.name(), dataSource);
         this.typeRegistry = columnTypeRegistry;
         queryFactory = new RecordStorageQueryFactory<>(dataSource,
-                                                       entityClass,
+                                                       newTableName(entityClass),
                                                        log(),
                                                        getIdColumn(),
                                                        columnTypeRegistry);
     }
 
     @Override
-    public StandardColumn getIdColumnDeclaration() {
+    protected StandardColumn getIdColumnDeclaration() {
         return StandardColumn.id;
     }
 
@@ -101,7 +104,7 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWit
         return columns;
     }
 
-    public void write(Map<I, EntityRecordWithColumns> records) {
+    void write(Map<I, EntityRecordWithColumns> records) {
         // Map's initial capacity is maximum, meaning no records exist in the storage yet
 
         final Map<I, EntityRecordWithColumns> newRecords = new HashMap<>(records.size());
@@ -121,25 +124,11 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWit
         }
     }
 
-    public Iterator<EntityRecord> readByQuery(EntityQuery<I> query, FieldMask fieldMask) {
+    Iterator<EntityRecord> readByQuery(EntityQuery<I> query, FieldMask fieldMask) {
         final SelectByEntityColumnsQuery<I> queryByEntity =
                 queryFactory.newSelectByEntityQuery(query, fieldMask);
         final Iterator<EntityRecord> result = queryByEntity.execute();
         return result;
-    }
-
-    /**
-     * An adapter converting the {@linkplain Column Entity Columns} into the {@link TableColumn}
-     * instances.
-     */
-    private final class ColumnAdapter implements Function<Column, TableColumn> {
-
-        @Override
-        public TableColumn apply(@Nullable Column column) {
-            checkNotNull(column);
-            final TableColumn result = new EntityColumnWrapper(column, typeRegistry);
-            return result;
-        }
     }
 
     /**
@@ -151,6 +140,7 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWit
      *
      * @see EntityColumnWrapper
      */
+    @Internal
     public enum StandardColumn implements TableColumn {
 
         id(ID),
@@ -176,6 +166,21 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWit
         public boolean isNullable() {
             return false;
         }
+
+    }
+
+    /**
+     * An adapter converting the {@linkplain Column Entity Columns} into the {@link TableColumn}
+     * instances.
+     */
+    private final class ColumnAdapter implements Function<Column, TableColumn> {
+
+        @Override
+        public TableColumn apply(@Nullable Column column) {
+            checkNotNull(column);
+            final TableColumn result = new EntityColumnWrapper(column, typeRegistry);
+            return result;
+        }
     }
 
     /**
@@ -185,6 +190,7 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWit
      * @see StandardColumn
      */
     private static final class EntityColumnWrapper implements TableColumn {
+
 
         private final Column column;
         private final Sql.Type type;

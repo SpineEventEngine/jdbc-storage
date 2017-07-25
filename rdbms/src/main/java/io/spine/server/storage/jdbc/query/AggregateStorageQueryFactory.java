@@ -20,19 +20,16 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import io.spine.server.storage.jdbc.AggregateEventRecordTable;
-import org.slf4j.Logger;
-import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateEventRecord;
-import io.spine.server.aggregate.AggregateStorage;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.DbTableNameFactory;
 import io.spine.server.storage.jdbc.IdColumn;
+import org.slf4j.Logger;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * The query factory for interaction with {@link AggregateEventRecordTable}.
+ * The query factory for interaction with
+ * {@link io.spine.server.storage.jdbc.AggregateEventRecordTable AggregateEventRecordTable}.
  *
  * @param <I> the type of IDs used in the storage
  * @author Andrey Lavrov
@@ -50,15 +47,14 @@ public class AggregateStorageQueryFactory<I> implements ReadQueryFactory<I, Aggr
     /**
      * Creates a new instance.
      *
-     * @param dataSource     instance of {@link DataSourceWrapper}
-     * @param aggregateClass aggregate class of corresponding {@link AggregateStorage} instance
+     * @param dataSource instance of {@link DataSourceWrapper}
      */
     public AggregateStorageQueryFactory(DataSourceWrapper dataSource,
-                                        Class<? extends Aggregate<I, ?, ?>> aggregateClass,
+                                        String tableName,
                                         IdColumn<I> idColumn) {
         super();
         this.idColumn = checkNotNull(idColumn);
-        this.mainTableName = DbTableNameFactory.newTableName(aggregateClass);
+        this.mainTableName = tableName;
         this.dataSource = dataSource;
     }
 
@@ -87,7 +83,7 @@ public class AggregateStorageQueryFactory<I> implements ReadQueryFactory<I, Aggr
      * Thrown an {@link UnsupportedOperationException}.
      *
      * @deprecated multiple records correspond to a single ID in
-     * {@link AggregateEventRecordTable};
+     * {@link io.spine.server.storage.jdbc.AggregateEventRecordTable AggregateEventRecordTable};
      * please use {@link #newSelectByIdSortedByTimeDescQuery(Object)} to read the records.
      */
     @Deprecated
