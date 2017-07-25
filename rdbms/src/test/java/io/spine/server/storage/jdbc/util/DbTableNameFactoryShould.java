@@ -23,6 +23,7 @@ package io.spine.server.storage.jdbc.util;
 import com.google.common.testing.NullPointerTester;
 import com.google.protobuf.StringValue;
 import io.spine.server.entity.AbstractEntity;
+import io.spine.server.storage.jdbc.DbTableNameFactory;
 import org.junit.Test;
 
 import static io.spine.test.Tests.assertHasPrivateParameterlessCtor;

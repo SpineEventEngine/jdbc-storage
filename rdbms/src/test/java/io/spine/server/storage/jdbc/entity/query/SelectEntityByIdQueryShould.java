@@ -21,6 +21,7 @@
 package io.spine.server.storage.jdbc.entity.query;
 
 import com.google.protobuf.Message;
+import io.spine.server.storage.jdbc.query.SelectEntityByIdQuery;
 import org.junit.Test;
 
 import java.sql.ResultSet;

@@ -22,13 +22,14 @@ package io.spine.server.storage.jdbc.entity.query;
 
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.GivenDataSource;
+import io.spine.server.storage.jdbc.query.InsertEntityRecordsBulkQuery;
 import org.junit.Test;
 import org.slf4j.Logger;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.storage.jdbc.DatabaseException;
-import io.spine.server.storage.jdbc.util.ConnectionWrapper;
-import io.spine.server.storage.jdbc.util.DataSourceWrapper;
-import io.spine.server.storage.jdbc.util.IdColumn;
+import io.spine.server.storage.jdbc.ConnectionWrapper;
+import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.IdColumn;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;

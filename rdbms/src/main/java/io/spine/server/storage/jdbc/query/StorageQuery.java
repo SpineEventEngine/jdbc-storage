@@ -20,9 +20,9 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import io.spine.server.storage.jdbc.util.DataSourceWrapper;
+import io.spine.server.storage.jdbc.DataSourceWrapper;
 import org.slf4j.Logger;
-import io.spine.server.storage.jdbc.util.ConnectionWrapper;
+import io.spine.server.storage.jdbc.ConnectionWrapper;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;

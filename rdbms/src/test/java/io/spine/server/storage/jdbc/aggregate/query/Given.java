@@ -20,10 +20,14 @@
 
 package io.spine.server.storage.jdbc.aggregate.query;
 
+import io.spine.server.storage.jdbc.query.InsertAggregateRecordQuery;
+import io.spine.server.storage.jdbc.query.InsertEventCountQuery;
+import io.spine.server.storage.jdbc.query.SelectEventCountByIdQuery;
+import io.spine.server.storage.jdbc.query.UpdateEventCountQuery;
 import org.slf4j.Logger;
 import io.spine.server.aggregate.AggregateEventRecord;
-import io.spine.server.storage.jdbc.util.DataSourceWrapper;
-import io.spine.server.storage.jdbc.util.IdColumn;
+import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.IdColumn;
 
 import java.sql.SQLException;
 

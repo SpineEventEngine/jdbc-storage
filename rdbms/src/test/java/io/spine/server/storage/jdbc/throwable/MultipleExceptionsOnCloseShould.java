@@ -21,6 +21,7 @@
 package io.spine.server.storage.jdbc.throwable;
 
 import com.google.common.collect.Lists;
+import io.spine.server.storage.jdbc.MultipleExceptionsOnClose;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

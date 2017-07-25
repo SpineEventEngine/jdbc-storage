@@ -21,9 +21,9 @@
 package io.spine.server.storage.jdbc.query;
 
 import io.spine.server.storage.jdbc.DatabaseException;
-import io.spine.server.storage.jdbc.table.TableColumn;
-import io.spine.server.storage.jdbc.util.ConnectionWrapper;
-import io.spine.server.storage.jdbc.util.IdColumn;
+import io.spine.server.storage.jdbc.TableColumn;
+import io.spine.server.storage.jdbc.ConnectionWrapper;
+import io.spine.server.storage.jdbc.IdColumn;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

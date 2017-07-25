@@ -20,6 +20,7 @@
 
 package io.spine.server.storage.jdbc.projection.query;
 
+import io.spine.server.storage.jdbc.query.UpdateTimestampQuery;
 import org.junit.Test;
 import io.spine.server.storage.jdbc.DatabaseException;
 

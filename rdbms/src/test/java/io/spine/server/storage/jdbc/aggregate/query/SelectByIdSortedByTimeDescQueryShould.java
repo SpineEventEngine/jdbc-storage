@@ -20,10 +20,11 @@
 
 package io.spine.server.storage.jdbc.aggregate.query;
 
+import io.spine.server.storage.jdbc.query.SelectByIdSortedByTimeDescQuery;
 import org.junit.Test;
 import org.slf4j.Logger;
 import io.spine.server.storage.jdbc.DatabaseException;
-import io.spine.server.storage.jdbc.util.DataSourceWrapper;
+import io.spine.server.storage.jdbc.DataSourceWrapper;
 
 import java.sql.SQLException;
 

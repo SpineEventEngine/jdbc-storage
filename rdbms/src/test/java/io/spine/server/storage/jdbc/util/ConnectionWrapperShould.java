@@ -20,6 +20,7 @@
 
 package io.spine.server.storage.jdbc.util;
 
+import io.spine.server.storage.jdbc.ConnectionWrapper;
 import org.junit.Test;
 import io.spine.server.storage.jdbc.DatabaseException;
 

@@ -22,7 +22,7 @@ package io.spine.server.storage.jdbc.query;
 
 import org.junit.Test;
 import io.spine.server.storage.jdbc.DatabaseException;
-import io.spine.server.storage.jdbc.util.ConnectionWrapper;
+import io.spine.server.storage.jdbc.ConnectionWrapper;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;

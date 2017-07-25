@@ -22,8 +22,6 @@ package io.spine.server.storage.jdbc;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import io.spine.server.storage.jdbc.util.ConnectionWrapper;
-import io.spine.server.storage.jdbc.util.DataSourceWrapper;
 
 import javax.sql.DataSource;
 import java.sql.PreparedStatement;

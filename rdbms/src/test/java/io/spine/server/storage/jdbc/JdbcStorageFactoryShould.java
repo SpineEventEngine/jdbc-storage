@@ -28,7 +28,6 @@ import io.spine.server.projection.Projection;
 import io.spine.server.projection.ProjectionStorage;
 import io.spine.server.stand.StandStorage;
 import io.spine.server.storage.RecordStorage;
-import io.spine.server.storage.jdbc.util.DataSourceWrapper;
 import io.spine.test.storage.Project;
 import io.spine.test.storage.ProjectVBuilder;
 import io.spine.validate.StringValueVBuilder;

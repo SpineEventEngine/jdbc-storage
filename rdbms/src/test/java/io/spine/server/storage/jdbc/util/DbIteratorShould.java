@@ -21,6 +21,8 @@
 package io.spine.server.storage.jdbc.util;
 
 import com.google.protobuf.Any;
+import io.spine.server.storage.jdbc.DbIterator;
+import io.spine.server.storage.jdbc.MessageDbIterator;
 import io.spine.type.TypeUrl;
 import org.junit.Test;
 import io.spine.server.storage.jdbc.DatabaseException;

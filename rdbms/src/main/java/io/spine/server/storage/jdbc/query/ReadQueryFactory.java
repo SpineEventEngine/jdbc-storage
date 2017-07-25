@@ -20,7 +20,7 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import io.spine.server.storage.jdbc.table.AbstractTable;
+import io.spine.server.storage.jdbc.AbstractTable;
 
 /**
  * An interface of a {@linkplain StorageQuery query} factory for the read queries.

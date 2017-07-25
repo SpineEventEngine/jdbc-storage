@@ -23,7 +23,8 @@ package io.spine.server.storage.jdbc.util;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.testing.NullPointerTester;
-import io.spine.server.storage.jdbc.throwable.MultipleExceptionsOnClose;
+import io.spine.server.storage.jdbc.Closeables;
+import io.spine.server.storage.jdbc.MultipleExceptionsOnClose;
 import org.junit.Test;
 
 import java.util.Collection;

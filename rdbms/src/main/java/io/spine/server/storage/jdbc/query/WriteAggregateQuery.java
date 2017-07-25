@@ -21,9 +21,9 @@ package io.spine.server.storage.jdbc.query;
 
 import com.google.protobuf.Message;
 import io.spine.server.storage.jdbc.DatabaseException;
-import io.spine.server.storage.jdbc.util.ConnectionWrapper;
-import io.spine.server.storage.jdbc.util.IdColumn;
-import io.spine.server.storage.jdbc.util.Serializer;
+import io.spine.server.storage.jdbc.ConnectionWrapper;
+import io.spine.server.storage.jdbc.IdColumn;
+import io.spine.server.storage.jdbc.Serializer;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;

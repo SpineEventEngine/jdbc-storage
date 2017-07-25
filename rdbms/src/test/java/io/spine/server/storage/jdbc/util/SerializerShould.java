@@ -21,6 +21,7 @@
 package io.spine.server.storage.jdbc.util;
 
 import com.google.protobuf.StringValue;
+import io.spine.server.storage.jdbc.Serializer;
 import org.junit.Test;
 
 import static io.spine.Identifier.newUuid;

@@ -30,13 +30,8 @@ import io.spine.server.projection.Projection;
 import io.spine.server.projection.ProjectionStorage;
 import io.spine.server.stand.StandStorage;
 import io.spine.server.storage.StorageFactory;
-import io.spine.server.storage.jdbc.aggregate.JdbcAggregateStorage;
-import io.spine.server.storage.jdbc.entity.JdbcRecordStorage;
-import io.spine.server.storage.jdbc.projection.JdbcProjectionStorage;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
-import io.spine.server.storage.jdbc.util.DataSourceWrapper;
-import io.spine.server.storage.jdbc.util.DefaultDataSourceConfigConverter;
 
 import javax.sql.DataSource;
 

@@ -22,6 +22,7 @@ package io.spine.server.storage.jdbc.util;
 
 import com.google.common.testing.NullPointerTester;
 import io.spine.server.storage.jdbc.DataSourceConfig;
+import io.spine.server.storage.jdbc.DefaultDataSourceConfigConverter;
 import org.junit.Test;
 
 import static io.spine.test.Tests.assertHasPrivateParameterlessCtor;

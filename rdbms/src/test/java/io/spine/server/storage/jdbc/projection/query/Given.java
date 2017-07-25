@@ -21,9 +21,12 @@
 package io.spine.server.storage.jdbc.projection.query;
 
 import com.google.protobuf.Timestamp;
+import io.spine.server.storage.jdbc.query.InsertTimestampQuery;
+import io.spine.server.storage.jdbc.query.SelectTimestampQuery;
+import io.spine.server.storage.jdbc.query.UpdateTimestampQuery;
 import org.slf4j.Logger;
-import io.spine.server.storage.jdbc.util.DataSourceWrapper;
-import io.spine.server.storage.jdbc.util.IdColumn;
+import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.IdColumn;
 
 import java.sql.SQLException;
 

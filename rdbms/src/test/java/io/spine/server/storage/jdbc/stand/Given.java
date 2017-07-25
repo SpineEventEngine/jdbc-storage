@@ -27,7 +27,7 @@ import io.spine.server.entity.TestTransaction;
 import io.spine.server.stand.StandStorage;
 import io.spine.server.storage.jdbc.GivenDataSource;
 import io.spine.server.storage.jdbc.JdbcStandStorage;
-import io.spine.server.storage.jdbc.util.DataSourceWrapper;
+import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.test.commandservice.customer.Customer;
 import io.spine.test.commandservice.customer.CustomerVBuilder;
 import io.spine.test.storage.Project;

@@ -26,9 +26,9 @@ import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import org.slf4j.Logger;
 import io.spine.server.storage.jdbc.GivenDataSource;
-import io.spine.server.storage.jdbc.util.ConnectionWrapper;
-import io.spine.server.storage.jdbc.util.DataSourceWrapper;
-import io.spine.server.storage.jdbc.util.IdColumn;
+import io.spine.server.storage.jdbc.ConnectionWrapper;
+import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.IdColumn;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

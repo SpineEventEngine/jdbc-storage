@@ -21,6 +21,7 @@
 package io.spine.server.storage.jdbc.util;
 
 import com.google.protobuf.Message;
+import io.spine.server.storage.jdbc.IdColumn;
 import org.junit.Test;
 import io.spine.server.entity.AbstractEntity;
 import io.spine.server.storage.jdbc.DatabaseException;

@@ -20,6 +20,7 @@
 
 package io.spine.server.storage.jdbc.aggregate.query;
 
+import io.spine.server.storage.jdbc.query.InsertEventCountQuery;
 import org.junit.Test;
 import io.spine.server.storage.jdbc.DatabaseException;
 

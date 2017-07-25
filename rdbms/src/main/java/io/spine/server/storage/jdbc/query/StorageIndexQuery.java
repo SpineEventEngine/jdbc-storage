@@ -20,8 +20,8 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import io.spine.server.storage.jdbc.util.ConnectionWrapper;
-import io.spine.server.storage.jdbc.util.IndexIterator;
+import io.spine.server.storage.jdbc.ConnectionWrapper;
+import io.spine.server.storage.jdbc.IndexIterator;
 
 import java.sql.PreparedStatement;
 import java.util.Iterator;

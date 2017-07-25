@@ -20,7 +20,7 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import io.spine.server.storage.jdbc.util.IdColumn;
+import io.spine.server.storage.jdbc.IdColumn;
 
 /**
  * An abstract base for the queries which read a single record by ID.

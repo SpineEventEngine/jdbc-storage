@@ -20,6 +20,7 @@
 
 package io.spine.server.storage.jdbc.entity.query;
 
+import io.spine.server.storage.jdbc.query.QueryResults;
 import org.junit.Test;
 
 import static io.spine.test.Tests.assertHasPrivateParameterlessCtor;
