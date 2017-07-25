@@ -92,6 +92,9 @@ final class JdbcColumnTypes {
         return new MessageColumnType();
     }
 
+    /**
+     * A {@link SimpleJdbcColumnType} for {@code boolean} Entity Columns.
+     */
     private static class BooleanColumnType extends SimpleJdbcColumnType<Boolean>{
 
         @Override
@@ -110,6 +113,9 @@ final class JdbcColumnTypes {
         }
     }
 
+    /**
+     * A {@link SimpleJdbcColumnType} for {@code String} Entity Columns.
+     */
     private static class StringColumnType extends SimpleJdbcColumnType<String>{
 
         @Override
@@ -128,6 +134,9 @@ final class JdbcColumnTypes {
         }
     }
 
+    /**
+     * A {@link SimpleJdbcColumnType} for {@code int} Entity Columns.
+     */
     private static class IntegerColumnType extends SimpleJdbcColumnType<Integer>{
 
         @Override
@@ -146,6 +155,9 @@ final class JdbcColumnTypes {
         }
     }
 
+    /**
+     * A {@link SimpleJdbcColumnType} for {@code long} Entity Columns.
+     */
     private static class LongColumnType extends SimpleJdbcColumnType<Long>{
 
         @Override
@@ -164,6 +176,10 @@ final class JdbcColumnTypes {
         }
     }
 
+    /**
+     * A {@link JdbcColumnType} for {@link Version} Entity Columns storing versions as
+     * {@code int} values.
+     */
     private static class VersionColumnType extends AbstractJdbcColumnType<Version, Integer>{
 
         @Override
@@ -188,6 +204,12 @@ final class JdbcColumnTypes {
         }
     }
 
+    /**
+     * A {@link JdbcColumnType} for {@link Timestamp} Entity Columns storing timestamps as
+     * {@code long} count of millis.
+     *
+     * @see Timestamps#toMillis(Timestamp)
+     */
     private static class TimestampColumnType
             extends AbstractJdbcColumnType<Timestamp, Long>{
 
@@ -214,6 +236,10 @@ final class JdbcColumnTypes {
         }
     }
 
+    /**
+     * A {@link JdbcColumnType} for {@link com.google.protobuf.Message Message} Entity Columns
+     * storing messages as {@code String} values in the {@linkplain Json#toCompactJson JSON format}.
+     */
     private static class MessageColumnType extends AbstractJdbcColumnType<AbstractMessage, String>{
 
         @Override
