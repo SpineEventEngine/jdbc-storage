@@ -18,6 +18,13 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/**
+ * This package contains the types representing the queries to a relational Database.
+ *
+ * <p>The package is {@linkplain io.spine.annotation.Internal internal} to Spine code and should not
+ * be used outside of the library.
+ */
+
 @Internal
 @ParametersAreNonnullByDefault
 package io.spine.server.storage.jdbc.query;
