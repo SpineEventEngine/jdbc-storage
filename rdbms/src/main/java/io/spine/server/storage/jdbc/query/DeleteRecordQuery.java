@@ -96,7 +96,10 @@ public class DeleteRecordQuery<I> extends StorageQuery {
         }
 
         private String composeSql() {
-            return format(TEMPLATE, table, idColumn.getColumnName(), Identifier.toString(columnValue));
+            return format(TEMPLATE,
+                          table,
+                          idColumn.getColumnName(),
+                          Identifier.toString(columnValue));
         }
 
         @Override

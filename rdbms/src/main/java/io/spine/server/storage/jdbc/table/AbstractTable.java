@@ -335,14 +335,13 @@ public abstract class AbstractTable<I, R extends Message, W> {
      * not found
      */
     public boolean delete(I id) {
-        final DeleteRecordQuery<I> query =
-                DeleteRecordQuery.<I>newBuilder()
-                        .setTableName(getName())
-                        .setIdColumn(getIdColumn())
-                        .setIdValue(id)
-                        .setLogger(log())
-                        .setDataSource(dataSource)
-                        .build();
+        final DeleteRecordQuery<I> query = DeleteRecordQuery.<I>newBuilder()
+                                                            .setTableName(getName())
+                                                            .setIdColumn(getIdColumn())
+                                                            .setIdValue(id)
+                                                            .setLogger(log())
+                                                            .setDataSource(dataSource)
+                                                            .build();
         return query.execute();
     }
 

@@ -23,23 +23,30 @@ package io.spine.server.storage.jdbc.query;
 import io.spine.server.storage.jdbc.table.AbstractTable;
 
 /**
- * An interface of a {@linkplain StorageQuery query} factory.
+ * An interface of a {@linkplain StorageQuery query} factory for the read queries.
  *
- * <p>Each JDBC {@linkplain AbstractTable table} uses an
- * instance of {@code ReadQueryFactory} implementation to construct its SQL queries to the
- * database.
+ * <p>Each JDBC {@linkplain AbstractTable table} uses a query factory to construct its SQL queries
+ * to the database.
  *
  * @param <I> type of the ID of the record
  * @param <R> type of the record
  *
  * @author Dmytro Dashenkov
+ * @see WriteQueryFactory
  */
 public interface ReadQueryFactory<I, R> {
 
     /**
+     * Creates an {@linkplain SelectByIdQuery read by ID query}.
+     *
      * @return a query for selecting a record by given ID
      */
     SelectByIdQuery<I, R> newSelectByIdQuery(I id);
 
+    /**
+     * Creates an {@linkplain StorageIndexQuery index query} for the given table.
+     *
+     * @return a query retrieving all the IDs of a table
+     */
     StorageIndexQuery<I> newIndexQuery();
 }

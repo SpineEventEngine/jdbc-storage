@@ -67,7 +67,6 @@ public class LifecycleFlagsTable<I> extends AggregateTable<I, LifecycleFlags> {
         return ImmutableList.copyOf(Column.values());
     }
 
-    // Storing records under string IDs instead of generic
     @Override
     protected ReadQueryFactory<I, LifecycleFlags> getReadQueryFactory() {
         return queryFactory;

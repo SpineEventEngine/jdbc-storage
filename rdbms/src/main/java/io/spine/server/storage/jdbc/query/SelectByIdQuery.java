@@ -23,6 +23,8 @@ package io.spine.server.storage.jdbc.query;
 import io.spine.server.storage.jdbc.util.IdColumn;
 
 /**
+ * An abstract base for the queries which read a single record by ID.
+ *
  * @author Dmytro Dashenkov
  */
 public abstract class SelectByIdQuery<I, R> extends StorageQuery {

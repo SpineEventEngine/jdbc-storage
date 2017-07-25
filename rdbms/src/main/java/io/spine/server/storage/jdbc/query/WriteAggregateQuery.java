@@ -31,7 +31,7 @@ import java.sql.SQLException;
 /**
  * @author Alexander Aleksandrov
  */
-public abstract class WriteAggregateQuery <I, R extends Message> extends WriteQuery {
+public abstract class WriteAggregateQuery<I, R extends Message> extends WriteQuery {
 
     private final I id;
     private final R record;
@@ -69,9 +69,9 @@ public abstract class WriteAggregateQuery <I, R extends Message> extends WriteQu
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
     public abstract static class Builder<B extends Builder<B, Q, I, R>,
-            Q extends WriteAggregateQuery,
-            I,
-            R extends Message>
+                                         Q extends WriteAggregateQuery,
+                                         I,
+                                         R extends Message>
             extends WriteQuery.Builder<B, Q> {
         private int idIndexInQuery;
         private int recordIndexInQuery;

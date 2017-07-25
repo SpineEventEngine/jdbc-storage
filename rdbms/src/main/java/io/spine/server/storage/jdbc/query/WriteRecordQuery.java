@@ -37,10 +37,6 @@ public abstract class WriteRecordQuery<I, R> extends ColumnAwareWriteQuery {
     private final int recordIndexInQuery;
     private final IdColumn<I> idColumn;
 
-    public EntityRecordWithColumns getRecord() {
-        return record;
-    }
-
     protected WriteRecordQuery(
             Builder<? extends Builder, ? extends WriteRecordQuery, I, R> builder) {
         super(builder);
@@ -63,6 +59,10 @@ public abstract class WriteRecordQuery<I, R> extends ColumnAwareWriteQuery {
             logWriteError(id, e);
             throw new DatabaseException(e);
         }
+    }
+
+    public EntityRecordWithColumns getRecord() {
+        return record;
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
