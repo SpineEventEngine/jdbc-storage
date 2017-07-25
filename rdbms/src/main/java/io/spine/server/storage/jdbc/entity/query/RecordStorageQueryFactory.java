@@ -45,7 +45,7 @@ import java.util.Map;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * This class creates queries for interaction with the {@link RecordTable}.
+ * The query factory for interaction with the {@link RecordTable}.
  *
  * @author Andrey Lavrov
  * @author Dmytro Dashenkov

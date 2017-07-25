@@ -37,8 +37,7 @@ import io.spine.server.storage.jdbc.util.IdColumn;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * This class creates queries for interaction with
- * {@link AggregateEventRecordTable}.
+ * The query factory for interaction with {@link AggregateEventRecordTable}.
  *
  * @param <I> the type of IDs used in the storage
  * @author Andrey Lavrov

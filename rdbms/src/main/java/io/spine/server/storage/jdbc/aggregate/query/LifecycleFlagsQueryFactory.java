@@ -35,7 +35,7 @@ import io.spine.server.storage.jdbc.util.IdColumn;
 import org.slf4j.Logger;
 
 /**
- * An implementation of the {@link ReadQueryFactory} for generating queries for
+ * An implementation of the query factory for generating queries for
  * the {@link LifecycleFlagsTable}.
  *
  * @author Dmytro Dashenkov

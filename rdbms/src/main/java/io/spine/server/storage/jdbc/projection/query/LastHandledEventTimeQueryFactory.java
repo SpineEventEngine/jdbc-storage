@@ -35,8 +35,7 @@ import static io.spine.server.storage.jdbc.table.LastHandledEventTimeTable.Colum
 import static io.spine.server.storage.jdbc.util.IdColumn.typeString;
 
 /**
- * This class creates queries for interaction with
- * {@link LastHandledEventTimeTable}.
+ * The query factory for interaction with the {@link LastHandledEventTimeTable}.
  *
  * @author Andrey Lavrov
  */

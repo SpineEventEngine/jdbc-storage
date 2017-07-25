@@ -32,8 +32,7 @@ import io.spine.server.storage.jdbc.util.IdColumn;
 import org.slf4j.Logger;
 
 /**
- * An implementation of {@link ReadQueryFactory} generating queries for
- * the {@link EventCountTable}.
+ * An implementation of the query factory generating queries for the {@link EventCountTable}.
  *
  * @author Dmytro Dashenkov
  */
