@@ -31,7 +31,7 @@ import static io.spine.server.storage.jdbc.DbTableNameFactory.newTableName;
  *
  * @author Dmytro Dashenkov
  */
-public abstract class EntityTable<I, R extends Message, W>
+abstract class EntityTable<I, R extends Message, W>
         extends AbstractTable<I, R, W> {
 
     private final Class<? extends Entity<I, ?>> entityClass;
@@ -44,7 +44,7 @@ public abstract class EntityTable<I, R extends Message, W>
      * @param entityClass the {@link Class} of the {@link Entity} to store
      * @param dataSource  an instance of {@link DataSourceWrapper} to use
      */
-    protected EntityTable(Class<? extends Entity<I, ?>> entityClass,
+    EntityTable(Class<? extends Entity<I, ?>> entityClass,
                           String idColumnName,
                           DataSourceWrapper dataSource) {
         this(newTableName(entityClass), entityClass, idColumnName, dataSource);
@@ -57,7 +57,7 @@ public abstract class EntityTable<I, R extends Message, W>
      * @param entityClass the {@link Class} of the {@link Entity} to store
      * @param dataSource  an instance of {@link DataSourceWrapper} to use
      */
-    protected EntityTable(String tableName,
+    EntityTable(String tableName,
                           Class<? extends Entity<I, ?>> entityClass,
                           String idColumnName,
                           DataSourceWrapper dataSource) {
@@ -65,7 +65,7 @@ public abstract class EntityTable<I, R extends Message, W>
         this.entityClass = entityClass;
     }
 
-    public Class<? extends Entity<I, ?>> getEntityClass() {
+    Class<? extends Entity<I, ?>> getEntityClass() {
         return entityClass;
     }
 }

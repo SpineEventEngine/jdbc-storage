@@ -34,7 +34,7 @@ import java.util.regex.Pattern;
  */
 @SuppressWarnings("UtilityClass")
 @Internal
-public class DbTableNameFactory {
+class DbTableNameFactory {
 
     private static final Pattern PATTERN_DOT = Pattern.compile("\\.");
     private static final Pattern PATTERN_DOLLAR = Pattern.compile("\\$");

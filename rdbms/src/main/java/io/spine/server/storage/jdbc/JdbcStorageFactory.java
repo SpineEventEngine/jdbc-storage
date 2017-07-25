@@ -43,6 +43,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author Alexander Litus
  * @author Andrey Lavrov
  * @author Dmytro Dashenkov
+ * @see DataSourceConfig
+ * @see JdbcTypeRegistryFactory
  */
 public class JdbcStorageFactory implements StorageFactory {
 
@@ -146,6 +148,18 @@ public class JdbcStorageFactory implements StorageFactory {
         private Builder() {
         }
 
+        /**
+         * Sets the {@link ColumnTypeRegistry} to use in the generated storages.
+         *
+         * <p>The default value is
+         * {@link JdbcTypeRegistryFactory#defaultInstance() JdbcTypeRegistryFactory.defaultInstance()}.
+         *
+         * <p>To reuse the existent {@linkplain JdbcColumnType column types}, use
+         * {@link JdbcTypeRegistryFactory#predefinedValuesAnd() JdbcTypeRegistryFactory.predefinedValuesAnd()}.
+         *
+         * @param columnTypeRegistry the custom {@link ColumnTypeRegistry} to use in the generated
+         *                           storages
+         */
         public Builder setColumnTypeRegistry(
                 ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>>
                         columnTypeRegistry) {

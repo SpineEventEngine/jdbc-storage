@@ -22,6 +22,7 @@ package io.spine.server.storage.jdbc;
 
 import com.google.common.collect.ImmutableList;
 import com.google.protobuf.Int32Value;
+import io.spine.annotation.Internal;
 import io.spine.server.entity.Entity;
 import io.spine.server.storage.jdbc.query.EventCountQueryFactory;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
@@ -29,9 +30,9 @@ import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 
 import java.util.List;
 
+import static io.spine.server.storage.jdbc.DbTableNameFactory.newTableName;
 import static io.spine.server.storage.jdbc.Sql.Type.BIGINT;
 import static io.spine.server.storage.jdbc.Sql.Type.ID;
-import static io.spine.server.storage.jdbc.DbTableNameFactory.newTableName;
 
 /**
  * A table for storing the event count after the last snapshot.
@@ -40,14 +41,15 @@ import static io.spine.server.storage.jdbc.DbTableNameFactory.newTableName;
  *
  * @author Dmytro Dashenkov
  */
+@Internal
 public class EventCountTable<I> extends AggregateTable<I, Int32Value> {
 
-    private static final String TABLE_NAME_POSTFIX = "event_count";
+    private static final String TABLE_NAME_POSTFIX = "_event_count";
 
     private final EventCountQueryFactory<I> queryFactory;
 
-    public EventCountTable(Class<? extends Entity<I, ?>> entityClass,
-                           DataSourceWrapper dataSource) {
+    EventCountTable(Class<? extends Entity<I, ?>> entityClass,
+                    DataSourceWrapper dataSource) {
         super(newTableName(entityClass) + (TABLE_NAME_POSTFIX),
               entityClass,
               Column.id.name(),
@@ -59,7 +61,7 @@ public class EventCountTable<I> extends AggregateTable<I, Int32Value> {
     }
 
     @Override
-    public Column getIdColumnDeclaration() {
+    protected Column getIdColumnDeclaration() {
         return Column.id;
     }
 
@@ -78,10 +80,10 @@ public class EventCountTable<I> extends AggregateTable<I, Int32Value> {
         return queryFactory;
     }
 
-
     /**
      * The enumeration of the columns of an {@link EventCountTable}.
      */
+    @Internal
     public enum Column implements TableColumn {
 
         id(ID),

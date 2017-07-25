@@ -36,9 +36,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author Alexander Litus
  */
 @Internal
-public class Serializer {
+public final class Serializer {
 
     private Serializer() {
+        // Prevent utility class instantiation.
     }
 
     /**

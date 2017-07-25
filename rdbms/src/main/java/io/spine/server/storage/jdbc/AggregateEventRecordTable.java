@@ -21,6 +21,7 @@
 package io.spine.server.storage.jdbc;
 
 import com.google.common.collect.ImmutableList;
+import io.spine.annotation.Internal;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.storage.jdbc.query.AggregateStorageQueryFactory;
@@ -40,7 +41,8 @@ import static io.spine.server.storage.jdbc.Sql.Type.INT;
  *
  * @author Dmytro Dashenkov
  */
-class AggregateEventRecordTable<I> extends AggregateTable<I, AggregateEventRecord> {
+@Internal
+public class AggregateEventRecordTable<I> extends AggregateTable<I, AggregateEventRecord> {
 
     private final AggregateStorageQueryFactory<I> queryFactory;
 
@@ -90,7 +92,8 @@ class AggregateEventRecordTable<I> extends AggregateTable<I, AggregateEventRecor
     /**
      * The enumeration of the columns of an {@link AggregateEventRecordTable}.
      */
-    private enum Column implements TableColumn {
+    @Internal
+    public enum Column implements TableColumn {
 
         id(ID),
         aggregate(BLOB),

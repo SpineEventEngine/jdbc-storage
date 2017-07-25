@@ -42,7 +42,7 @@ abstract class StorageBuilder<B extends StorageBuilder<B, S>, S extends Storage>
 
     private DataSourceWrapper dataSource;
 
-    protected StorageBuilder() {
+    StorageBuilder() {
         // Prevent accidental direct initialization
     }
 

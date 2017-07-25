@@ -21,7 +21,6 @@
 package io.spine.server.storage.jdbc;
 
 import com.zaxxer.hikari.HikariConfig;
-import io.spine.server.storage.jdbc.DataSourceConfig;
 
 import javax.sql.DataSource;
 
@@ -33,13 +32,14 @@ import javax.sql.DataSource;
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-public class DefaultDataSourceConfigConverter {
+class DefaultDataSourceConfigConverter {
 
     private DefaultDataSourceConfigConverter() {
+        // Prevent utility class instantiation.
     }
 
     @SuppressWarnings("MethodWithMoreThanThreeNegations") // is OK in this case
-    public static HikariConfig convert(DataSourceConfig config) {
+    static HikariConfig convert(DataSourceConfig config) {
         final HikariConfig result = new HikariConfig();
 
         /* Required fields */

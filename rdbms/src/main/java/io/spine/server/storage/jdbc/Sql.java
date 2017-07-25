@@ -43,9 +43,10 @@ import static io.spine.server.storage.jdbc.Sql.Query.PLACEHOLDER;
  * @author Dmytro Dashenkov
  */
 @SuppressWarnings("UtilityClass")
-public class Sql {
+public final class Sql {
 
     private Sql() {
+        // Prevent utility class instantiation.
     }
 
     /**
