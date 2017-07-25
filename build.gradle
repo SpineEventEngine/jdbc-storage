@@ -1,13 +1,14 @@
+buildscript {
+    // Define the versions of the library and its dependencies.
+    // As long as `buildscript` section is always evaluated first, we need to apply
+    // `ext.gradle` explicitly here.
+    apply from: "ext.gradle"
+}
 
-project.ext {
-    SPINE_VERSION = '0.9.36-SNAPSHOT'
-    BASE_VERSION = '0.9.35-SNAPSHOT'
-
+ext {
     publishPlugin = "$rootDir/scripts/publish.gradle"
     credentialsPropertyFile = 'credentials.properties'
     projectsToPublish = ['rdbms']
-
-    guavaVersion = '20.0'
 }
 
 allprojects {
@@ -15,7 +16,7 @@ allprojects {
     apply plugin: 'jacoco'
 
     group = 'io.spine'
-    version = SPINE_VERSION
+    version = spineVersion
 }
 
 subprojects {
@@ -49,18 +50,18 @@ subprojects {
         }
 
         // Spine
-        compile group: 'io.spine', name: 'spine-base', version: project.BASE_VERSION, changing: true, excludes
-        compile group: 'io.spine', name: 'spine-core', version: project.SPINE_VERSION, changing: true, excludes
-        compile group: 'io.spine', name: 'spine-client', version: project.SPINE_VERSION, changing: true, excludes
-        compile group: 'io.spine', name: 'spine-server', version: project.SPINE_VERSION, changing: true, excludes
+        compile group: 'io.spine', name: 'spine-base', version: project.baseVersion, changing: true, excludes
+        compile group: 'io.spine', name: 'spine-core', version: project.spineVersion, changing: true, excludes
+        compile group: 'io.spine', name: 'spine-client', version: project.spineVersion, changing: true, excludes
+        compile group: 'io.spine', name: 'spine-server', version: project.spineVersion, changing: true, excludes
 
 
-        testCompile group: 'io.spine', name: 'spine-server', version: project.SPINE_VERSION, changing: true, classifier: 'test', excludes
-        testCompile group: 'io.spine', name: 'spine-client', version: project.SPINE_VERSION, changing: true, classifier: 'test', excludes
+        testCompile group: 'io.spine', name: 'spine-server', version: project.spineVersion, changing: true, classifier: 'test', excludes
+        testCompile group: 'io.spine', name: 'spine-client', version: project.spineVersion, changing: true, classifier: 'test', excludes
 
-        compile group: 'io.spine', name: 'spine-testutil-base', version: project.BASE_VERSION, changing: true, excludes
-        compile group: 'io.spine', name: 'spine-testutil-client', version: project.SPINE_VERSION, changing: true, excludes
-        compile group: 'io.spine', name: 'spine-testutil-server', version: project.SPINE_VERSION, changing: true, excludes
+        compile group: 'io.spine', name: 'spine-testutil-base', version: project.baseVersion, changing: true, excludes
+        compile group: 'io.spine', name: 'spine-testutil-client', version: project.spineVersion, changing: true, excludes
+        compile group: 'io.spine', name: 'spine-testutil-server', version: project.spineVersion, changing: true, excludes
 
         // Guava
         compile group: 'com.google.guava', name: 'guava', version: project.guavaVersion
