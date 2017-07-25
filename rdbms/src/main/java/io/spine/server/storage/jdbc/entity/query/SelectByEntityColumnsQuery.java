@@ -72,6 +72,10 @@ import static io.spine.util.Exceptions.newIllegalArgumentException;
 import static java.util.Collections.emptyMap;
 
 /**
+ * A query selecting the records from
+ * the {@link io.spine.server.storage.jdbc.table.entity.RecordTable RecordTable} by
+ * an {@link EntityQuery}.
+ *
  * @author Dmytro Dashenkov
  */
 public final class SelectByEntityColumnsQuery<I> extends StorageQuery implements AutoCloseable {

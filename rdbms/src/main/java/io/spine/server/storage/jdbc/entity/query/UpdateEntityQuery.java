@@ -47,7 +47,6 @@ public class UpdateEntityQuery<I> extends WriteEntityQuery<I> {
     private static final int ID_INDEX = 2;
     private static final int RECORD_INDEX = 1;
 
-
     private static final String QUERY_TEMPLATE =
             UPDATE + "%s" +
             SET + entity + EQUAL + PLACEHOLDER +
