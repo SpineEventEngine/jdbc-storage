@@ -62,11 +62,11 @@ public class LifecycleFlagsQueryFactory<I> implements ReadQueryFactory<I, Lifecy
     public SelectMessageByIdQuery<I, LifecycleFlags> newSelectByIdQuery(I id) {
         final SelectMessageByIdQuery<I, LifecycleFlags> query =
                 SelectLifecycleFlagsQuery.<I>newBuilder(tableName)
-                        .setDataSource(dataSource)
-                        .setLogger(logger)
-                        .setIdColumn(idColumn)
-                        .setId(id)
-                        .build();
+                                         .setDataSource(dataSource)
+                                         .setLogger(logger)
+                                         .setIdColumn(idColumn)
+                                         .setId(id)
+                                         .build();
         return query;
     }
 
@@ -83,24 +83,24 @@ public class LifecycleFlagsQueryFactory<I> implements ReadQueryFactory<I, Lifecy
     @Override
     public WriteQuery newInsertQuery(I id, LifecycleFlags record) {
         final WriteQuery query = InsertLifecycleFlagsQuery.<I>newBuilder(tableName)
-                .setId(id)
-                .setLifecycleFlags(record)
-                .setLogger(logger)
-                .setDataSource(dataSource)
-                .setIdColumn(idColumn)
-                .build();
+                                                          .setId(id)
+                                                          .setLifecycleFlags(record)
+                                                          .setLogger(logger)
+                                                          .setDataSource(dataSource)
+                                                          .setIdColumn(idColumn)
+                                                          .build();
         return query;
     }
 
     @Override
     public WriteQuery newUpdateQuery(I id, LifecycleFlags record) {
         final WriteQuery query = UpdateLifecycleFlagsQuery.<I>newBuilder(tableName)
-                .setLogger(logger)
-                .setDataSource(dataSource)
-                .setId(id)
-                .setLifecycleFlags(record)
-                .setIdColumn(idColumn)
-                .build();
+                                                          .setLogger(logger)
+                                                          .setDataSource(dataSource)
+                                                          .setId(id)
+                                                          .setLifecycleFlags(record)
+                                                          .setIdColumn(idColumn)
+                                                          .build();
         return query;
     }
 }
