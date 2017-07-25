@@ -77,9 +77,9 @@ public class SelectEntityByIdQuery<I> extends SelectMessageByIdQuery<I, EntityRe
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
     public static class Builder<I> extends SelectMessageByIdQuery.Builder<Builder<I>,
-                                                                   SelectEntityByIdQuery<I>,
-                                                                   I,
-                                                                   EntityRecord> {
+                                                                          SelectEntityByIdQuery<I>,
+                                                                          I,
+                                                                          EntityRecord> {
 
         @Override
         public SelectEntityByIdQuery<I> build() {

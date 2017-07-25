@@ -85,9 +85,9 @@ public class SelectTimestampQuery extends SelectMessageByIdQuery<String, Timesta
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
     public static class Builder extends SelectMessageByIdQuery.Builder<Builder,
-                                                                SelectTimestampQuery,
-                                                                String,
-                                                                Timestamp> {
+                                                                       SelectTimestampQuery,
+                                                                       String,
+                                                                       Timestamp> {
         @Override
         public SelectTimestampQuery build() {
             return new SelectTimestampQuery(this);

@@ -126,9 +126,9 @@ class Given {
 
         @SuppressWarnings("ClassNameSameAsAncestorName")
         public static class Builder extends SelectMessageByIdQuery.Builder<Builder,
-                                                                    SelectByIdQueryMock,
-                                                                    String,
-                                                                    Message> {
+                                                                           SelectByIdQueryMock,
+                                                                           String,
+                                                                           Message> {
 
             @Override
             public SelectByIdQueryMock build() {
