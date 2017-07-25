@@ -50,18 +50,10 @@ subprojects {
         }
 
         // Spine
-        compile group: 'io.spine', name: 'spine-base', version: project.baseVersion, changing: true, excludes
-        compile group: 'io.spine', name: 'spine-core', version: project.spineVersion, changing: true, excludes
-        compile group: 'io.spine', name: 'spine-client', version: project.spineVersion, changing: true, excludes
         compile group: 'io.spine', name: 'spine-server', version: project.spineVersion, changing: true, excludes
 
-
-        testCompile group: 'io.spine', name: 'spine-server', version: project.spineVersion, changing: true, classifier: 'test', excludes
-        testCompile group: 'io.spine', name: 'spine-client', version: project.spineVersion, changing: true, classifier: 'test', excludes
-
-        compile group: 'io.spine', name: 'spine-testutil-base', version: project.baseVersion, changing: true, excludes
-        compile group: 'io.spine', name: 'spine-testutil-client', version: project.spineVersion, changing: true, excludes
         compile group: 'io.spine', name: 'spine-testutil-server', version: project.spineVersion, changing: true, excludes
+        testCompile group: 'io.spine', name: 'spine-server', version: project.spineVersion, changing: true, classifier: 'test', excludes
 
         // Guava
         compile group: 'com.google.guava', name: 'guava', version: project.guavaVersion
