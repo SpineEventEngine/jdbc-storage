@@ -19,6 +19,8 @@
  */
 package io.spine.server.storage.jdbc.type;
 
+import io.spine.annotation.SPI;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -26,6 +28,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @author Alexander Aleksandrov
  */
+@SPI
 public abstract class SimpleJdbcColumnType<T> extends AbstractJdbcColumnType<T, T> {
 
     @Override

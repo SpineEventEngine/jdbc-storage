@@ -19,6 +19,7 @@
  */
 package io.spine.server.storage.jdbc.type;
 
+import io.spine.annotation.SPI;
 import io.spine.server.entity.storage.ColumnType;
 import io.spine.server.storage.jdbc.Sql;
 
@@ -31,7 +32,9 @@ import java.sql.PreparedStatement;
  * the column identifier type.
  *
  * @author Alexander Aleksandrov
+ * @see AbstractJdbcColumnType for the skeleton implementation
  */
+@SPI
 public interface JdbcColumnType<J, C> extends ColumnType<J, C, PreparedStatement, Integer> {
 
     Sql.Type getSqlType();

@@ -19,6 +19,7 @@
  */
 package io.spine.server.storage.jdbc.type;
 
+import io.spine.annotation.SPI;
 import io.spine.server.storage.jdbc.DatabaseException;
 
 import java.sql.PreparedStatement;
@@ -30,6 +31,7 @@ import java.sql.SQLException;
  *
  * @author Alexander Aleksandrov
  */
+@SPI
 public abstract class AbstractJdbcColumnType<J, C> implements JdbcColumnType<J, C> {
 
     @Override
