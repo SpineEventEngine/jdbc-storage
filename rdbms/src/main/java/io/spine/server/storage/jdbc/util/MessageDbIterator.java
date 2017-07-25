@@ -21,6 +21,7 @@
 package io.spine.server.storage.jdbc.util;
 
 import com.google.protobuf.Message;
+import io.spine.annotation.Internal;
 import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.type.TypeUrl;
 
@@ -31,8 +32,11 @@ import java.sql.SQLException;
 import static io.spine.server.storage.jdbc.util.Serializer.deserialize;
 
 /**
+ * An iterator over the message records of a table.
+ *
  * @author Dmytro Dashenkov
  */
+@Internal
 public class MessageDbIterator<M extends Message> extends DbIterator<M> {
 
     private final TypeUrl recordType;

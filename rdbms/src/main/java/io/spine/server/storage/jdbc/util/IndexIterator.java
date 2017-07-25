@@ -22,6 +22,7 @@ package io.spine.server.storage.jdbc.util;
 
 import com.google.common.primitives.Primitives;
 import com.google.protobuf.Message;
+import io.spine.annotation.Internal;
 import io.spine.server.storage.jdbc.DatabaseException;
 
 import java.sql.PreparedStatement;
@@ -32,8 +33,11 @@ import static io.spine.json.Json.fromJson;
 import static io.spine.util.Exceptions.newIllegalArgumentException;
 
 /**
+ * An iterator over the IDs of a table.
+ *
  * @author Dmytro Dashenkov
  */
+@Internal
 public abstract class IndexIterator<I> extends DbIterator<I> {
 
     /**
