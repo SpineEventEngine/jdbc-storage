@@ -205,8 +205,8 @@ public class Sql {
      * Set of punctuation signs used in SQL:
      *
      * <ul>
-     * <li>Operators: equal, not equal, comparison operators;
-     * <li>Punctuation: comma, brackets, semicolon.
+     *     <li>Operators: equal, not equal, comparison operators;
+     *     <li>Punctuation: comma, brackets, semicolon.
      * </ul>
      */
     public enum BuildingBlock {

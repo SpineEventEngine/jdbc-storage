@@ -64,10 +64,10 @@ import static io.spine.server.storage.jdbc.Sql.Query.PRIMARY_KEY;
  *
  * <p>This class is responsible for storing all the information about a table including:
  * <ul>
- * <li>table name;
- * <li>columns;
- * <li>identifier and {@code PRIMARY KEY};
- * <li>queries to the table.
+ *     <li>table name;
+ *     <li>columns;
+ *     <li>identifier and {@code PRIMARY KEY};
+ *     <li>queries to the table.
  * </ul>
  *
  * <p>A table provides a sufficient API for performing the database interaction. However, it never
