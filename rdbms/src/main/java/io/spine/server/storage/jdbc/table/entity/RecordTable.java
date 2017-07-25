@@ -132,19 +132,29 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWit
         return result;
     }
 
+    /**
+     * An adapter converting the {@linkplain Column Entity Columns} into the {@link TableColumn}
+     * instances.
+     */
     private final class ColumnAdapter implements Function<Column, TableColumn> {
-
-        private int columnNumber = 1;
 
         @Override
         public TableColumn apply(@Nullable Column column) {
             checkNotNull(column);
-            final TableColumn result = new EntityColumnMapping(column, typeRegistry, columnNumber);
-            columnNumber++;
+            final TableColumn result = new EntityColumnWrapper(column, typeRegistry);
             return result;
         }
     }
 
+    /**
+     * The enumeration of the {@link RecordTable} standard columns common to all the Database tables
+     * represented by the {@code RecordTable}.
+     *
+     * <p>Each table which contains the {@linkplain EntityRecord Entity Records} has these columns.
+     * It also may have the columns produced from the {@linkplain Column Entity Columns}.
+     *
+     * @see EntityColumnWrapper
+     */
     public enum StandardColumn implements TableColumn {
 
         id(ID),
@@ -172,17 +182,20 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWit
         }
     }
 
-    private static final class EntityColumnMapping implements TableColumn {
+    /**
+     * A wrapper type for {@linkplain Column Entity Columns} for accessing them thorough
+     * the {@link TableColumn} interface.
+     *
+     * @see StandardColumn
+     */
+    private static final class EntityColumnWrapper implements TableColumn {
 
         private final Column column;
-        private final int ordinal;
         private final Sql.Type type;
 
-        private EntityColumnMapping(Column column,
-                                    ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> typeRegistry,
-                                    int ordinal) {
+        private EntityColumnWrapper(
+                Column column, ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> typeRegistry) {
             this.column = column;
-            this.ordinal = ordinal;
             this.type = typeRegistry.get(column)
                                     .getSqlType();
         }
@@ -190,11 +203,6 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWit
         @Override
         public String name() {
             return column.getName();
-        }
-
-        @Override
-        public int ordinal() {
-            return ordinal;
         }
 
         @Override
@@ -220,15 +228,14 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWit
             if (o == null || getClass() != o.getClass()) {
                 return false;
             }
-            EntityColumnMapping that = (EntityColumnMapping) o;
-            return ordinal == that.ordinal &&
-                   Objects.equal(column, that.column) &&
+            EntityColumnWrapper that = (EntityColumnWrapper) o;
+            return Objects.equal(column, that.column) &&
                    type == that.type;
         }
 
         @Override
         public int hashCode() {
-            return Objects.hashCode(column, ordinal, type);
+            return Objects.hashCode(column, type);
         }
     }
 }

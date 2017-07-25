@@ -21,7 +21,6 @@
 package io.spine.server.storage.jdbc.aggregate.query;
 
 import io.spine.server.storage.jdbc.query.UpdateRecordQuery;
-import io.spine.server.storage.jdbc.table.TableColumns;
 import io.spine.server.storage.jdbc.table.entity.aggregate.EventCountTable;
 import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.Sql;
@@ -49,6 +48,9 @@ import static io.spine.server.storage.jdbc.table.entity.aggregate.EventCountTabl
  */
 public class InsertEventCountQuery<I> extends UpdateRecordQuery<I> {
 
+    private static final int ID_INDEX = id.ordinal() + 1;
+    private static final int EVENT_COUNT_INDEX = event_count.ordinal() + 1;
+
     private static final String QUERY_TEMPLATE =
             INSERT_INTO + " %s " +
             BRACKET_OPEN + id + COMMA + event_count + BRACKET_CLOSE +
@@ -66,7 +68,7 @@ public class InsertEventCountQuery<I> extends UpdateRecordQuery<I> {
         final PreparedStatement statement = super.prepareStatement(connection);
 
         try {
-            statement.setInt(TableColumns.getIndex(event_count), count);
+            statement.setInt(EVENT_COUNT_INDEX, count);
             return statement;
         } catch (SQLException e) {
             logFailedToPrepareStatement(e);
@@ -77,7 +79,7 @@ public class InsertEventCountQuery<I> extends UpdateRecordQuery<I> {
     public static <I> Builder<I> newBuilder(String tableName) {
         final Builder<I> builder = new Builder<>();
         builder.setQuery(format(QUERY_TEMPLATE, tableName))
-               .setIdIndexInQuery(TableColumns.getIndex(id));
+               .setIdIndexInQuery(ID_INDEX);
         return builder;
     }
 
