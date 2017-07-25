@@ -39,18 +39,16 @@ import java.util.List;
 
 class Given {
 
-    private Given () {
-
+    private Given() {
+        // Prevent utility class instantiation.
     }
 
     static StandStorage newStorage() {
         final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(
                 GivenDataSource.DEFAULT_TABLE_NAME);
         final StandStorage storage = JdbcStandStorage.<String>newBuilder()
-                .setDataSource(dataSource)
-//                .setEntityClass(TestAggregate.class)
-                .build();
-
+                                                     .setDataSource(dataSource)
+                                                     .build();
         return storage;
     }
 
@@ -66,7 +64,7 @@ class Given {
             super(id);
         }
 
-        void setState(Message state) {
+        private void setState(Message state) {
             TestTransaction.injectState(this, state, Version.getDefaultInstance());
         }
     }
@@ -81,10 +79,6 @@ class Given {
          */
         TestAggregate2(String id) {
             super(id);
-        }
-
-        void setState(Customer state) {
-            TestTransaction.injectState(this, state, Version.getDefaultInstance());
         }
     }
 
@@ -104,9 +98,11 @@ class Given {
         for (int i = 0; i < amount; i++) {
             final TestAggregate aggregate = new TestAggregate(
                     String.valueOf(i));
+            final ProjectId projectId = ProjectId.newBuilder()
+                                                 .setId(aggregate.getId())
+                                                 .build();
             final Project state = Project.newBuilder()
-                                         .setId(ProjectId.newBuilder()
-                                                         .setId(aggregate.getId()))
+                                         .setId(projectId)
                                          .setName("Some project")
                                          .setStatus(Project.Status.CREATED)
                                          .build();

@@ -30,7 +30,8 @@ import io.spine.server.stand.StandStorage;
 import io.spine.server.storage.RecordStorage;
 import io.spine.server.storage.jdbc.util.DataSourceWrapper;
 import io.spine.test.storage.Project;
-import io.spine.validate.ValidatingBuilder;
+import io.spine.test.storage.ProjectVBuilder;
+import io.spine.validate.StringValueVBuilder;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -58,18 +59,16 @@ public class JdbcStorageFactoryShould {
                                                         .setMaxPoolSize(12)
                                                         .build();
         factory = JdbcStorageFactory.<String>newBuilder()
-                .setDataSource(config)
-                .setMultitenant(false)
-//                .setEntityClass(TestAggregate.class)
-                .build();
+                                    .setDataSource(config)
+                                    .setMultitenant(false)
+                                    .build();
     }
 
     @Test
     public void allow_to_use_custom_data_source() {
         final JdbcStorageFactory factory = JdbcStorageFactory.<String>newBuilder()
-                .setDataSource(mock(DataSource.class))
-//                .setEntityClass(TestProjection.class)
-                .build();
+                                                             .setDataSource(mock(DataSource.class))
+                                                             .build();
 
         assertNotNull(factory);
     }
@@ -120,14 +119,14 @@ public class JdbcStorageFactoryShould {
         }
     }
 
-    private static class TestAggregate extends Aggregate<String, StringValue, ValidatingBuilder<StringValue, StringValue.Builder>> {
+    private static class TestAggregate extends Aggregate<String, StringValue, StringValueVBuilder> {
 
         private TestAggregate(String id) {
             super(id);
         }
     }
 
-    private static class TestProjection extends Projection<String, Project, ValidatingBuilder<Project, Project.Builder>> {
+    private static class TestProjection extends Projection<String, Project, ProjectVBuilder> {
 
         private TestProjection(String id) {
             super(id);

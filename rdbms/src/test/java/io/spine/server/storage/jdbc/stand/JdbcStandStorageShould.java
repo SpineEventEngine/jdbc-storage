@@ -76,12 +76,11 @@ import static org.mockito.Mockito.when;
 public class JdbcStandStorageShould extends StandStorageShould {
 
     @Override
-    protected StandStorage getStorage(Class<? extends Entity> aClass) {
+    protected StandStorage getStorage(Class<? extends Entity> entityClass) {
         final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(
                 "StandStorageTests");
         final StandStorage storage = JdbcStandStorage.newBuilder()
                                                      .setDataSource(dataSource)
-//                                                     .setEntityClass(aClass)
                                                      .setMultitenant(false)
                                                      .build();
         return storage;
@@ -103,10 +102,9 @@ public class JdbcStandStorageShould extends StandStorageShould {
         when(dataSourceMock.getConnection(anyBoolean())).thenReturn(connectionMock);
 
         final StandStorage standStorage = JdbcStandStorage.<String>newBuilder()
-                .setDataSource(dataSourceMock)
-                .setMultitenant(false)
-//                .setEntityClass(TestAggregate.class)
-                .build();
+                                                          .setDataSource(dataSourceMock)
+                                                          .setMultitenant(false)
+                                                          .build();
 
         assertNotNull(standStorage);
         // Established connection with the DB
@@ -124,9 +122,8 @@ public class JdbcStandStorageShould extends StandStorageShould {
         when(dataSourceMock.getConnection(anyBoolean())).thenReturn(connectionMock);
 
         final StandStorage standStorage = JdbcStandStorage.<String>newBuilder()
-                .setDataSource(dataSourceMock)
-//                .setEntityClass(TestAggregate.class)
-                .build();
+                                                          .setDataSource(dataSourceMock)
+                                                          .build();
 
         assertNotNull(standStorage);
         assertFalse(standStorage.isMultitenant());
@@ -142,7 +139,6 @@ public class JdbcStandStorageShould extends StandStorageShould {
     public void fail_to_initialize_without_data_source() {
         JdbcStandStorage.newBuilder()
                         .setMultitenant(false)
-//                        .setEntityClass(StandStorageRecord.class)
                         .build();
     }
 

@@ -21,9 +21,6 @@
 package io.spine.server.storage.jdbc.aggregate;
 
 import com.google.common.base.Optional;
-import com.google.protobuf.StringValue;
-import io.spine.validate.ValidatingBuilder;
-import org.junit.Test;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateStorage;
 import io.spine.server.aggregate.AggregateStorageVisibilityHandlingShould;
@@ -32,7 +29,9 @@ import io.spine.server.storage.jdbc.GivenDataSource;
 import io.spine.server.storage.jdbc.util.DataSourceWrapper;
 import io.spine.test.aggregate.Project;
 import io.spine.test.aggregate.ProjectId;
+import io.spine.test.aggregate.ProjectVBuilder;
 import io.spine.testdata.Sample;
+import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -83,7 +82,7 @@ public class JdbcAggregateStorageVisibilityHandlingShould
         assertEquals(archivedAndDeleted, actualArchivedAndDeleted.get());
     }
 
-    private static class TestAggregate extends Aggregate<ProjectId, Project, ValidatingBuilder<Project, Project.Builder>> {
+    private static class TestAggregate extends Aggregate<ProjectId, Project, ProjectVBuilder> {
 
         protected TestAggregate(ProjectId id) {
             super(id);
