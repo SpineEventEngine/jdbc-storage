@@ -18,7 +18,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 /**
- * This package provides classes for Jdbc column types.
+ * This package provides classes for JDBC column types.
  */
 @ParametersAreNonnullByDefault
 package io.spine.server.storage.jdbc.type;

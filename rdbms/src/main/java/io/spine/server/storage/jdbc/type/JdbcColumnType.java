@@ -25,7 +25,7 @@ import io.spine.server.storage.jdbc.Sql;
 import java.sql.PreparedStatement;
 
 /**
- * The contract of a {@link ColumnType} used by the Jdbc storage.
+ * The contract of a {@link ColumnType} used by the JDBC storage.
  *
  * <p>Uses {@link PreparedStatement} as the record type and {@code Integer} as
  * the column identifier type.

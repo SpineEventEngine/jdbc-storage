@@ -33,7 +33,7 @@ import static io.spine.server.storage.jdbc.type.JdbcColumnTypes.timestampType;
 import static io.spine.server.storage.jdbc.type.JdbcColumnTypes.versionType;
 
 /**
- * A factory of the Jdbc-specific {@link ColumnTypeRegistry ColumnTypeRegistries}.
+ * A factory of the JDBC-specific {@linkplain ColumnTypeRegistry ColumnTypeRegistries}.
  *
  * @author Alexander Aleksandrov
  */
@@ -72,7 +72,7 @@ public final class JdbcTypeRegistryFactory {
      *     <li>{@link Version} stored as an {@code int} version number
      * </ul>
      *
-     * @return the default {@code ColumnTypeRegistry} for storing the Entity Columns in Jdbc storage
+     * @return the default {@code ColumnTypeRegistry} for storing the Entity Columns in JDBC storage
      */
     public static ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>>
     defaultInstance() {
