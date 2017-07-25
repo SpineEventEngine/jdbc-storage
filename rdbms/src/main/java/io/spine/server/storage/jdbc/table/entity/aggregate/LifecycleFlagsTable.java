@@ -78,6 +78,9 @@ public class LifecycleFlagsTable<I> extends AggregateTable<I, LifecycleFlags> {
         return queryFactory;
     }
 
+    /**
+     * The enumeration of the columns of a {@link LifecycleFlagsTable}.
+     */
     public enum Column implements TableColumn {
 
         id(ID),

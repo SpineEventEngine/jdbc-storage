@@ -88,6 +88,9 @@ public class AggregateEventRecordTable<I> extends AggregateTable<I, AggregateEve
         return result;
     }
 
+    /**
+     * The enumeration of the columns of an {@link AggregateEventRecordTable}.
+     */
     public enum Column implements TableColumn {
 
         id(ID),

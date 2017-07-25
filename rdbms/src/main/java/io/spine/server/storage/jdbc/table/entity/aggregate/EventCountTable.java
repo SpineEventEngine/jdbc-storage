@@ -82,6 +82,10 @@ public class EventCountTable<I> extends AggregateTable<I, Int32Value> {
         return queryFactory;
     }
 
+
+    /**
+     * The enumeration of the columns of an {@link EventCountTable}.
+     */
     public enum Column implements TableColumn {
 
         id(ID),

@@ -75,6 +75,9 @@ public class LastHandledEventTimeTable extends AbstractTable<String, Timestamp, 
         return queryFactory;
     }
 
+    /**
+     * The enumeration of the columns of a {@link LastHandledEventTimeTable}.
+     */
     public enum Column implements TableColumn {
 
         projection_type(VARCHAR_255),
