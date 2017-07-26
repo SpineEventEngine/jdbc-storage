@@ -42,10 +42,6 @@ abstract class StorageBuilder<B extends StorageBuilder<B, S>, S extends Storage>
 
     private DataSourceWrapper dataSource;
 
-    StorageBuilder() {
-        // Prevent accidental direct initialization
-    }
-
     public boolean isMultitenant() {
         return multitenant;
     }

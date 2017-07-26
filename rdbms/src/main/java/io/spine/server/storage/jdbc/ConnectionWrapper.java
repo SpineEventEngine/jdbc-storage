@@ -41,7 +41,7 @@ public class ConnectionWrapper implements AutoCloseable {
      *
      * @param connection the connection to wrap
      */
-    public static ConnectionWrapper wrap(Connection connection) {
+    static ConnectionWrapper wrap(Connection connection) {
         return new ConnectionWrapper(connection);
     }
 

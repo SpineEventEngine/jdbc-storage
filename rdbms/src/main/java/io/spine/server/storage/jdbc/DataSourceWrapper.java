@@ -40,7 +40,7 @@ public class DataSourceWrapper implements AutoCloseable {
     private final DataSource dataSource;
 
     /** Wraps custom {@link DataSource} implementation */
-    public static DataSourceWrapper wrap(DataSource dataSource) {
+    static DataSourceWrapper wrap(DataSource dataSource) {
         return new DataSourceWrapper(dataSource);
     }
 
