@@ -64,14 +64,14 @@ public class JdbcStorageFactory implements StorageFactory {
     }
 
     @Override
-    public StorageFactory toSingleTenant() {
+    public JdbcStorageFactory toSingleTenant() {
         if (isMultitenant()) {
-            return this;
-        } else {
             return newBuilder().setColumnTypeRegistry(columnTypeRegistry)
                                .setDataSource(dataSource)
                                .setMultitenant(false)
                                .build();
+        } else {
+            return this;
         }
     }
 

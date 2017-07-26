@@ -24,6 +24,7 @@ import com.google.protobuf.StringValue;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateStorage;
 import io.spine.server.entity.AbstractEntity;
+import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.projection.Projection;
 import io.spine.server.projection.ProjectionStorage;
 import io.spine.server.stand.StandStorage;
@@ -36,7 +37,10 @@ import org.junit.Test;
 
 import javax.sql.DataSource;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -57,7 +61,7 @@ public class JdbcStorageFactoryShould {
                                                         .setPassword("pwd")
                                                         .setMaxPoolSize(12)
                                                         .build();
-        factory = JdbcStorageFactory.<String>newBuilder()
+        factory = JdbcStorageFactory.newBuilder()
                                     .setDataSource(config)
                                     .setMultitenant(false)
                                     .build();
@@ -65,7 +69,7 @@ public class JdbcStorageFactoryShould {
 
     @Test
     public void allow_to_use_custom_data_source() {
-        final JdbcStorageFactory factory = JdbcStorageFactory.<String>newBuilder()
+        final JdbcStorageFactory factory = JdbcStorageFactory.newBuilder()
                                                              .setDataSource(mock(DataSource.class))
                                                              .build();
 
@@ -102,13 +106,44 @@ public class JdbcStorageFactoryShould {
     @Test
     public void close_datastore_on_close() {
         final DataSourceWrapper mock = GivenDataSource.withoutSuperpowers();
-        factory = JdbcStorageFactory.<String>newBuilder()
+        factory = JdbcStorageFactory.newBuilder()
                                     .setDataSource(mock)
                                     .setMultitenant(false)
-//                                    .setEntityClass(TestAggregate.class)
                                     .build();
         factory.close();
         verify(mock).close();
+    }
+
+    @Test
+    public void have_default_column_type_registry() {
+        final DataSourceWrapper dataSource = GivenDataSource.withoutSuperpowers();
+        final JdbcStorageFactory factory = JdbcStorageFactory.newBuilder()
+                                                             .setDataSource(dataSource)
+                                                             .build();
+        final ColumnTypeRegistry<?> registry = factory.getTypeRegistry();
+        assertNotNull(registry);
+    }
+
+    @Test
+    public void generate_single_tenat_view() {
+        final DataSourceWrapper dataSource = GivenDataSource.withoutSuperpowers();
+        final JdbcStorageFactory factory = JdbcStorageFactory.newBuilder()
+                                                             .setMultitenant(true)
+                                                             .setDataSource(dataSource)
+                                                             .build();
+        assertTrue(factory.isMultitenant());
+        final JdbcStorageFactory singleTenantFactory = factory.toSingleTenant();
+        assertFalse(singleTenantFactory.isMultitenant());
+    }
+
+    @Test
+    public void use_self_as_single_tenant_view() {
+        final DataSourceWrapper dataSource = GivenDataSource.withoutSuperpowers();
+        final JdbcStorageFactory factory = JdbcStorageFactory.newBuilder()
+                                                             .setMultitenant(false)
+                                                             .setDataSource(dataSource)
+                                                             .build();
+        assertSame(factory, factory.toSingleTenant());
     }
 
     private static class TestEntity extends AbstractEntity<String, StringValue> {
