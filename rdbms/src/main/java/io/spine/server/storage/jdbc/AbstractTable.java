@@ -97,6 +97,13 @@ abstract class AbstractTable<I, R extends Message, W> {
 
     private final DataSourceWrapper dataSource;
 
+    /**
+     * The memoized value of the table columns.
+     *
+     * <p>This field is effectively final but is initialized lazily.
+     *
+     * @see #getColumns() for the initialization
+     */
     private ImmutableList<? extends TableColumn> columns;
 
     AbstractTable(String name,
