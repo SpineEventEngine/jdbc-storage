@@ -276,21 +276,26 @@ abstract class AbstractTable<I, R extends Message, W> {
            .append(getName())
            .append(BRACKET_OPEN);
         final Set<String> primaryKey = new HashSet<>();
-        for (TableColumn column : columns) {
+        for (Iterator<? extends TableColumn> iterator = columns.iterator(); iterator.hasNext(); ) {
+            final TableColumn column = iterator.next();
             final String name = column.name();
             sql.append(name)
                .append(' ')
                .append(ensureType(column));
             if (COLUMN_DEFAULTS.containsKey(name)) {
                 final Object defaultValue = COLUMN_DEFAULTS.get(name);
-                sql.append(DEFAULT).append(defaultValue);
+                sql.append(DEFAULT)
+                   .append(defaultValue);
             }
             if (!column.isNullable()) {
-                sql.append(NOT).append(NULL);
+                sql.append(NOT)
+                   .append(NULL);
             }
-            sql.append(COMMA);
             if (column.isPrimaryKey()) {
                 primaryKey.add(name);
+            }
+            if (iterator.hasNext() || !primaryKey.isEmpty()) {
+                sql.append(COMMA);
             }
         }
         if (!primaryKey.isEmpty()) {
