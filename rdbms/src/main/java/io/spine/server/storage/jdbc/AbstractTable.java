@@ -204,6 +204,12 @@ abstract class AbstractTable<I, R extends Message, W> {
         }
     }
 
+    /**
+     * Retrieves the table index.
+     *
+     * @return an {@code Iterator} over the table IDs
+     * @see io.spine.server.storage.Storage#index()
+     */
     Iterator<I> index() {
         final StorageIndexQuery<I> query = getReadQueryFactory().newIndexQuery();
         final Iterator<I> result = query.execute();
