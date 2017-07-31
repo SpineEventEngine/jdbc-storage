@@ -25,14 +25,13 @@ import io.spine.server.storage.jdbc.IdColumn;
 
 import java.sql.PreparedStatement;
 
-public class UpdateRecordQuery<I> extends WriteQuery {
+class UpdateRecordQuery<I> extends WriteQuery {
 
     private final I id;
     private final int idIndexInQuery;
     private final IdColumn<I> idColumn;
 
-    protected UpdateRecordQuery(
-            Builder<? extends Builder, ? extends UpdateRecordQuery, I> builder) {
+    UpdateRecordQuery(Builder<? extends Builder, ? extends UpdateRecordQuery, I> builder) {
         super(builder);
         this.idIndexInQuery = builder.idIndexInQuery;
         this.idColumn = builder.idColumn;
@@ -47,23 +46,23 @@ public class UpdateRecordQuery<I> extends WriteQuery {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public abstract static class Builder<B extends Builder<B, Q, I>, Q extends UpdateRecordQuery, I>
+    abstract static class Builder<B extends Builder<B, Q, I>, Q extends UpdateRecordQuery, I>
             extends WriteQuery.Builder<B, Q> {
         private int idIndexInQuery;
         private IdColumn<I> idColumn;
         private I id;
 
-        public B setId(I id) {
+        B setId(I id) {
             this.id = id;
             return getThis();
         }
 
-        public B setIdColumn(IdColumn<I> idColumn) {
+        B setIdColumn(IdColumn<I> idColumn) {
             this.idColumn = idColumn;
             return getThis();
         }
 
-        public B setIdIndexInQuery(int idIndexInQuery) {
+        B setIdIndexInQuery(int idIndexInQuery) {
             this.idIndexInQuery = idIndexInQuery;
             return getThis();
         }

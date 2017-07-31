@@ -20,6 +20,8 @@
 
 package io.spine.server.storage.jdbc.query;
 
+import io.spine.annotation.Internal;
+
 /**
  * An interface of a {@linkplain StorageQuery query} factory for the read queries.
  *
@@ -32,6 +34,7 @@ package io.spine.server.storage.jdbc.query;
  * @author Dmytro Dashenkov
  * @see WriteQueryFactory
  */
+@Internal
 public interface ReadQueryFactory<I, R> {
 
     /**

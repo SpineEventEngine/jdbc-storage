@@ -21,17 +21,16 @@
 package io.spine.server.storage.jdbc.query;
 
 import com.google.common.base.Function;
-import com.google.common.base.Functions;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicates;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.storage.Column;
 import io.spine.server.entity.storage.ColumnRecords;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
-import io.spine.server.storage.jdbc.DatabaseException;
-import io.spine.server.storage.jdbc.RecordTable.StandardColumn;
 import io.spine.server.storage.jdbc.ConnectionWrapper;
+import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.IdColumn;
+import io.spine.server.storage.jdbc.RecordTable.StandardColumn;
 import io.spine.server.storage.jdbc.Serializer;
 
 import java.sql.PreparedStatement;
@@ -40,12 +39,15 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.google.common.base.Functions.forMap;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static com.google.common.collect.Iterables.find;
 import static com.google.common.collect.Maps.newHashMap;
 import static io.spine.server.entity.storage.EntityColumns.sorted;
+import static io.spine.server.storage.jdbc.RecordTable.StandardColumn.entity;
+import static io.spine.server.storage.jdbc.RecordTable.StandardColumn.id;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.COMMA;
@@ -53,8 +55,6 @@ import static io.spine.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
 import static io.spine.server.storage.jdbc.Sql.Query.INSERT_INTO;
 import static io.spine.server.storage.jdbc.Sql.Query.VALUES;
 import static io.spine.server.storage.jdbc.Sql.nPlaceholders;
-import static io.spine.server.storage.jdbc.RecordTable.StandardColumn.entity;
-import static io.spine.server.storage.jdbc.RecordTable.StandardColumn.id;
 import static java.lang.String.format;
 import static java.util.Collections.nCopies;
 
@@ -63,7 +63,7 @@ import static java.util.Collections.nCopies;
  *
  * @author Dmytro Dashenkov
  */
-public class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
+class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
 
     private static final String FORMAT_PLACEHOLDER = "%s";
 
@@ -80,7 +80,7 @@ public class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
 
     private final int columnCount;
 
-    protected InsertEntityRecordsBulkQuery(Builder<I> builder) {
+    InsertEntityRecordsBulkQuery(Builder<I> builder) {
         super(builder);
         this.records = builder.records;
         this.idColumn = builder.idColumn;
@@ -111,21 +111,18 @@ public class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
         return statement;
     }
 
-    protected Function<String, Integer> getTransformer(EntityRecordWithColumns record,
-                                                       int fromColumnNumber) {
-        final Function<String, Integer> function;
+    private static Function<String, Integer> getTransformer(EntityRecordWithColumns record,
+                                                            int fromColumnNumber) {
         final Map<String, Column> columns = record.getColumns();
         final Collection<String> columnNames = sorted(columns.keySet());
         final Map<String, Integer> result = new HashMap<>();
 
         int index = fromColumnNumber;
-
         for (String entry : columnNames) {
             result.put(entry, index);
             index++;
         }
-
-        function = Functions.forMap(result);
+        final Function<String, Integer> function = forMap(result);
         return function;
     }
 
@@ -160,27 +157,27 @@ public class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
         }
     }
 
-    public static class Builder<I>
-            extends ColumnAwareWriteQuery.Builder<Builder<I>, InsertEntityRecordsBulkQuery> {
+    static class Builder<I> extends ColumnAwareWriteQuery.Builder<Builder<I>,
+                                                                  InsertEntityRecordsBulkQuery> {
 
         private final Map<I, EntityRecordWithColumns> records = newHashMap();
         private String tableName;
         private IdColumn<I> idColumn;
         private int columnCount;
 
-        public Builder<I> setRecords(Map<I, EntityRecordWithColumns> records) {
+        Builder<I> setRecords(Map<I, EntityRecordWithColumns> records) {
             checkNotNull(records);
             this.records.putAll(records);
             return getThis();
         }
 
-        public Builder<I> setTableName(String tableName) {
+        Builder<I> setTableName(String tableName) {
             checkArgument(!isNullOrEmpty(tableName));
             this.tableName = tableName;
             return getThis();
         }
 
-        public Builder<I> setIdColumn(IdColumn<I> idColumn) {
+        Builder<I> setIdColumn(IdColumn<I> idColumn) {
             this.idColumn = checkNotNull(idColumn);
             return getThis();
         }

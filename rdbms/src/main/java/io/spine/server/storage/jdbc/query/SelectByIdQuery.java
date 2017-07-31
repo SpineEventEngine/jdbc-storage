@@ -20,6 +20,7 @@
 
 package io.spine.server.storage.jdbc.query;
 
+import io.spine.annotation.Internal;
 import io.spine.server.storage.jdbc.IdColumn;
 
 /**
@@ -27,6 +28,7 @@ import io.spine.server.storage.jdbc.IdColumn;
  *
  * @author Dmytro Dashenkov
  */
+@Internal
 public abstract class SelectByIdQuery<I, R> extends StorageQuery {
 
     private final IdColumn<I> idColumn;

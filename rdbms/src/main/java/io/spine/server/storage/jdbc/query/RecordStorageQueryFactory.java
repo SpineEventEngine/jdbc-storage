@@ -89,16 +89,15 @@ public class RecordStorageQueryFactory<I>
         return builder.build();
     }
 
-    public InsertEntityRecordsBulkQuery<I> newInsertEntityRecordsBulkQuery(
-            Map<I, EntityRecordWithColumns> records) {
+    public WriteQuery newInsertEntityRecordsBulkQuery(Map<I, EntityRecordWithColumns> records) {
         final InsertEntityRecordsBulkQuery.Builder<I> builder =
                 InsertEntityRecordsBulkQuery.<I>newBuilder()
-                        .setLogger(getLogger())
-                        .setDataSource(dataSource)
-                        .setTableName(tableName)
-                        .setIdColumn(idColumn)
-                        .setColumnTypeRegistry(columnTypeRegistry)
-                        .setRecords(records);
+                                            .setLogger(getLogger())
+                                            .setDataSource(dataSource)
+                                            .setTableName(tableName)
+                                            .setIdColumn(idColumn)
+                                            .setColumnTypeRegistry(columnTypeRegistry)
+                                            .setRecords(records);
         return builder.build();
     }
 
@@ -106,10 +105,10 @@ public class RecordStorageQueryFactory<I>
     public SelectMessageByIdQuery<I, EntityRecord> newSelectByIdQuery(I id) {
         final SelectEntityByIdQuery.Builder<I> builder =
                 SelectEntityByIdQuery.<I>newBuilder(tableName)
-                        .setDataSource(dataSource)
-                        .setLogger(getLogger())
-                        .setIdColumn(idColumn)
-                        .setId(id);
+                                     .setDataSource(dataSource)
+                                     .setLogger(getLogger())
+                                     .setIdColumn(idColumn)
+                                     .setId(id);
         return builder.build();
     }
 
@@ -128,12 +127,12 @@ public class RecordStorageQueryFactory<I>
     public WriteQuery newInsertQuery(I id, EntityRecordWithColumns record) {
         final InsertEntityQuery.Builder<I> builder =
                 InsertEntityQuery.<I>newBuilder(tableName, record)
-                .setDataSource(dataSource)
-                .setLogger(getLogger())
-                .setId(id)
-                .setIdColumn(idColumn)
-                .setColumnTypeRegistry(columnTypeRegistry)
-                .setRecord(record);
+                                 .setDataSource(dataSource)
+                                 .setLogger(getLogger())
+                                 .setId(id)
+                                 .setIdColumn(idColumn)
+                                 .setColumnTypeRegistry(columnTypeRegistry)
+                                 .setRecord(record);
         return builder.build();
     }
 

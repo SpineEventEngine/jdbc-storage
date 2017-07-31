@@ -20,6 +20,8 @@
 
 package io.spine.server.storage.jdbc.query;
 
+import io.spine.annotation.Internal;
+
 import static java.lang.String.format;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
 import static io.spine.server.storage.jdbc.Sql.Query.DELETE_FROM;
@@ -30,6 +32,7 @@ import static io.spine.server.storage.jdbc.Sql.Query.DELETE_FROM;
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
+@Internal
 public class DeleteAllQuery extends WriteQuery {
 
     private static final String QUERY_TEMPLATE = DELETE_FROM + "%s" + SEMICOLON;

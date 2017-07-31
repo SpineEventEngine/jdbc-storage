@@ -21,10 +21,10 @@
 package io.spine.server.storage.jdbc.query;
 
 import io.spine.server.entity.LifecycleFlags;
-import io.spine.server.storage.jdbc.DatabaseException;
-import io.spine.server.storage.jdbc.LifecycleFlagsTable;
 import io.spine.server.storage.jdbc.ConnectionWrapper;
+import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.IdColumn;
+import io.spine.server.storage.jdbc.LifecycleFlagsTable.Column;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -52,7 +52,7 @@ public class UpdateLifecycleFlagsQuery<I> extends WriteQuery {
     private static final String SQL = UPDATE + "%s" + SET +
                                       archived + EQUAL + PLACEHOLDER + COMMA +
                                       deleted + EQUAL + PLACEHOLDER +
-                                      WHERE + LifecycleFlagsTable.Column.id + EQUAL + PLACEHOLDER + SEMICOLON;
+                                      WHERE + Column.id + EQUAL + PLACEHOLDER + SEMICOLON;
 
     private final I id;
     private final LifecycleFlags entityStatus;

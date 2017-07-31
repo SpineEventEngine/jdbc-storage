@@ -33,7 +33,7 @@ import java.sql.SQLException;
  * @author Andrey Lavrov
  * @author Dmytro Dashenkov
  */
-public abstract class StorageQuery {
+abstract class StorageQuery {
 
     private final String query;
     private final DataSourceWrapper dataSource;
@@ -65,7 +65,7 @@ public abstract class StorageQuery {
         return dataSource.getConnection(autocommit);
     }
 
-    public abstract static class Builder<B extends Builder<B, Q>, Q extends StorageQuery> {
+    abstract static class Builder<B extends Builder<B, Q>, Q extends StorageQuery> {
 
         private String query;
         private DataSourceWrapper dataSource;

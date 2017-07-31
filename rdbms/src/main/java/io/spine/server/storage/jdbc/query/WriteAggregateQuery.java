@@ -29,9 +29,11 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 /**
+ * An abstract base for the write queries to an {@link io.spine.server.storage.jdbc.AggregateTable}.
+ *
  * @author Alexander Aleksandrov
  */
-public abstract class WriteAggregateQuery<I, R extends Message> extends WriteQuery {
+abstract class WriteAggregateQuery<I, R extends Message> extends WriteQuery {
 
     private final I id;
     private final R record;
@@ -39,12 +41,11 @@ public abstract class WriteAggregateQuery<I, R extends Message> extends WriteQue
     private final int recordIndexInQuery;
     private final IdColumn<I> idColumn;
 
-    public R getRecord() {
+    R getRecord() {
         return record;
     }
 
-    protected WriteAggregateQuery(
-            Builder<? extends Builder, ? extends WriteAggregateQuery, I, R> builder) {
+    WriteAggregateQuery(Builder<? extends Builder, ? extends WriteAggregateQuery, I, R> builder) {
         super(builder);
         this.idIndexInQuery = builder.idIndexInQuery;
         this.recordIndexInQuery = builder.recordIndexInQuery;
@@ -68,10 +69,10 @@ public abstract class WriteAggregateQuery<I, R extends Message> extends WriteQue
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public abstract static class Builder<B extends Builder<B, Q, I, R>,
-                                         Q extends WriteAggregateQuery,
-                                         I,
-                                         R extends Message>
+    abstract static class Builder<B extends Builder<B, Q, I, R>,
+                                  Q extends WriteAggregateQuery,
+                                  I,
+                                  R extends Message>
             extends WriteQuery.Builder<B, Q> {
         private int idIndexInQuery;
         private int recordIndexInQuery;

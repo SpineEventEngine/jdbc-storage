@@ -43,7 +43,7 @@ import static java.lang.String.format;
  *
  * @author Dmytro Dashenkov
  */
-public class SelectLifecycleFlagsQuery<I> extends SelectMessageByIdQuery<I, LifecycleFlags> {
+class SelectLifecycleFlagsQuery<I> extends SelectMessageByIdQuery<I, LifecycleFlags> {
 
     private static final String SQL =
             SELECT.toString() + archived + COMMA + deleted +
@@ -51,7 +51,7 @@ public class SelectLifecycleFlagsQuery<I> extends SelectMessageByIdQuery<I, Life
             WHERE + Column.id + EQUAL +
             PLACEHOLDER + SEMICOLON;
 
-    protected SelectLifecycleFlagsQuery(Builder<I> builder) {
+    private SelectLifecycleFlagsQuery(Builder<I> builder) {
         super(builder);
     }
 
@@ -68,18 +68,17 @@ public class SelectLifecycleFlagsQuery<I> extends SelectMessageByIdQuery<I, Life
         return visibility;
     }
 
-    public static <I> Builder<I> newBuilder(String tableName) {
+    static <I> Builder<I> newBuilder(String tableName) {
         final Builder<I> builder = new Builder<>();
         builder.setQuery(format(SQL, tableName))
                .setIdIndexInQuery(1);
         return builder;
     }
 
-    public static class Builder<I>
-            extends SelectMessageByIdQuery.Builder<Builder<I>,
-                                                   SelectLifecycleFlagsQuery<I>,
-                                                   I,
-                                                   LifecycleFlags> {
+    static class Builder<I> extends SelectMessageByIdQuery.Builder<Builder<I>,
+                                                                   SelectLifecycleFlagsQuery<I>,
+                                                                   I,
+                                                                   LifecycleFlags> {
         @Override
         public SelectLifecycleFlagsQuery<I> build() {
             return new SelectLifecycleFlagsQuery<>(this);

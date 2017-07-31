@@ -20,6 +20,7 @@
 
 package io.spine.server.storage.jdbc.query;
 
+import io.spine.annotation.Internal;
 import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.ConnectionWrapper;
@@ -43,6 +44,7 @@ import static java.lang.String.format;
  *
  * @author Dmytro Dashenkov
  */
+@Internal
 public class ContainsQuery<I> extends StorageQuery {
 
     private static final String FORMAT_PLACEHOLDER = "%s";
@@ -53,7 +55,7 @@ public class ContainsQuery<I> extends StorageQuery {
     private final IdColumn<I> idColumn;
     private final I id;
 
-    protected ContainsQuery(Builder<I> builder) {
+    private ContainsQuery(Builder<I> builder) {
         super(builder);
         this.idColumn = builder.idColumn;
         this.id = builder.id;

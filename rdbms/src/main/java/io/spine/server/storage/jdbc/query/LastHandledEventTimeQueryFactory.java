@@ -21,6 +21,7 @@
 package io.spine.server.storage.jdbc.query;
 
 import com.google.protobuf.Timestamp;
+import io.spine.annotation.Internal;
 import io.spine.server.storage.jdbc.LastHandledEventTimeTable;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import org.slf4j.Logger;
@@ -34,6 +35,7 @@ import static io.spine.server.storage.jdbc.IdColumn.typeString;
  *
  * @author Andrey Lavrov
  */
+@Internal
 public class LastHandledEventTimeQueryFactory
         implements ReadQueryFactory<String, Timestamp>,
                    WriteQueryFactory<String, Timestamp> {

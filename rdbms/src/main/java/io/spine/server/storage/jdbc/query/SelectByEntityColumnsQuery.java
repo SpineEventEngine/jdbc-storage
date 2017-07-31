@@ -22,6 +22,7 @@ package io.spine.server.storage.jdbc.query;
 
 import com.google.common.base.Objects;
 import com.google.protobuf.FieldMask;
+import io.spine.annotation.Internal;
 import io.spine.client.ColumnFilter;
 import io.spine.client.ColumnFilter.Operator;
 import io.spine.client.CompositeColumnFilter.CompositeOperator;
@@ -78,6 +79,7 @@ import static java.util.Collections.emptyMap;
  *
  * @author Dmytro Dashenkov
  */
+@Internal
 public final class SelectByEntityColumnsQuery<I> extends StorageQuery implements AutoCloseable {
 
     private static final String COMMON_SQL = SELECT.toString() + entity + FROM + "%s ";

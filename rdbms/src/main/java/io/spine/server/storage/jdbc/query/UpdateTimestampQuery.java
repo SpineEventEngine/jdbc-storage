@@ -21,6 +21,7 @@
 package io.spine.server.storage.jdbc.query;
 
 import com.google.protobuf.Timestamp;
+import io.spine.annotation.Internal;
 
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.COMMA;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
@@ -40,6 +41,7 @@ import static java.lang.String.format;
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
+@Internal
 public class UpdateTimestampQuery extends WriteTimestampQuery {
 
     private static final String QUERY_TEMPLATE =

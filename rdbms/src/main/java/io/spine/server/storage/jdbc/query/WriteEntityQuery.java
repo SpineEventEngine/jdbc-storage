@@ -41,9 +41,9 @@ import static io.spine.server.entity.storage.EntityColumns.sorted;
  *
  * @author Dmytro Dashenkov
  */
-public class WriteEntityQuery<I> extends WriteRecordQuery<I, EntityRecordWithColumns> {
+class WriteEntityQuery<I> extends WriteRecordQuery<I, EntityRecordWithColumns> {
 
-    protected WriteEntityQuery(
+    WriteEntityQuery(
             Builder<? extends Builder, ? extends WriteRecordQuery, I, EntityRecordWithColumns> builder) {
         super(builder);
     }

@@ -72,6 +72,7 @@ public class LifecycleFlagsQueryFactory<I> implements ReadQueryFactory<I, Lifecy
                                 .setIdColumnName(idColumn.getColumnName())
                                 .build();
     }
+
     @Override
     public WriteQuery newInsertQuery(I id, LifecycleFlags record) {
         final WriteQuery query = InsertLifecycleFlagsQuery.<I>newBuilder(tableName)

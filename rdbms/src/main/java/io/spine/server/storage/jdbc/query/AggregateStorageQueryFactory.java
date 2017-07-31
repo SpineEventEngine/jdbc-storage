@@ -20,6 +20,7 @@
 
 package io.spine.server.storage.jdbc.query;
 
+import io.spine.annotation.Internal;
 import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.IdColumn;
@@ -35,6 +36,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author Andrey Lavrov
  * @author Dmytro Dashenkov
  */
+@Internal
 public class AggregateStorageQueryFactory<I> implements ReadQueryFactory<I, AggregateEventRecord>,
                                                         WriteQueryFactory<I, AggregateEventRecord> {
 

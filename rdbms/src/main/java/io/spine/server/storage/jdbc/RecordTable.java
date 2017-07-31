@@ -67,9 +67,9 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWit
     private final ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> typeRegistry;
 
     RecordTable(Class<? extends Entity<I, ?>> entityClass,
-                       DataSourceWrapper dataSource,
-                       ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>>
-                               columnTypeRegistry) {
+                DataSourceWrapper dataSource,
+                ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>>
+                        columnTypeRegistry) {
         super(entityClass, StandardColumn.id.name(), dataSource);
         this.typeRegistry = columnTypeRegistry;
         queryFactory = new RecordStorageQueryFactory<>(dataSource,

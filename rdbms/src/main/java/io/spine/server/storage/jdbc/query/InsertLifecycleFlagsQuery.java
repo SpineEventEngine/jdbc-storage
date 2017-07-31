@@ -38,7 +38,7 @@ import static java.lang.String.format;
  *
  * @author Dmytro Dashenkov
  */
-public class InsertLifecycleFlagsQuery<I> extends WriteQuery {
+class InsertLifecycleFlagsQuery<I> extends WriteQuery {
 
     private static final int COLUMN_COUNT = TableColumn.values().length;
     private static final String SQL =
@@ -50,7 +50,7 @@ public class InsertLifecycleFlagsQuery<I> extends WriteQuery {
     private final LifecycleFlags entityStatus;
     private final IdColumn<I> idColumn;
 
-    protected InsertLifecycleFlagsQuery(Builder<I> builder) {
+    InsertLifecycleFlagsQuery(Builder<I> builder) {
         super(builder);
         this.id = builder.id;
         this.entityStatus = builder.entityStatus;
@@ -73,24 +73,24 @@ public class InsertLifecycleFlagsQuery<I> extends WriteQuery {
         return statement;
     }
 
-    public static <I> Builder<I> newBuilder(String tableName) {
+    static <I> Builder<I> newBuilder(String tableName) {
         final Builder<I> builder = new Builder<>();
         builder.setQuery(format(SQL, tableName));
         return builder;
     }
 
-    public static class Builder<I> extends WriteQuery.Builder<Builder<I>, InsertLifecycleFlagsQuery> {
+    static class Builder<I> extends WriteQuery.Builder<Builder<I>, InsertLifecycleFlagsQuery> {
 
         private I id;
         private LifecycleFlags entityStatus;
         private IdColumn<I> idColumn;
 
-        public Builder<I> setLifecycleFlags(LifecycleFlags status) {
+        Builder<I> setLifecycleFlags(LifecycleFlags status) {
             this.entityStatus = checkNotNull(status);
             return getThis();
         }
 
-        public Builder<I> setId(I id) {
+        Builder<I> setId(I id) {
             this.id = checkNotNull(id);
             return getThis();
         }
@@ -107,7 +107,7 @@ public class InsertLifecycleFlagsQuery<I> extends WriteQuery {
             return this;
         }
 
-        public Builder<I> setIdColumn(IdColumn<I> idColumn) {
+        Builder<I> setIdColumn(IdColumn<I> idColumn) {
             this.idColumn = idColumn;
             return getThis();
         }

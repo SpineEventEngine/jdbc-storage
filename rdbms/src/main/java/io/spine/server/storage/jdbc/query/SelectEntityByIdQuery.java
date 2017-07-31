@@ -43,17 +43,17 @@ import static java.lang.String.format;
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-public class SelectEntityByIdQuery<I> extends SelectMessageByIdQuery<I, EntityRecord> {
+class SelectEntityByIdQuery<I> extends SelectMessageByIdQuery<I, EntityRecord> {
 
     private static final String QUERY_TEMPLATE =
             SELECT.toString() + ALL_ATTRIBUTES + FROM + " %s" + WHERE +
             RecordTable.StandardColumn.id + EQUAL + PLACEHOLDER + SEMICOLON;
 
-    public SelectEntityByIdQuery(Builder<I> builder) {
+    private SelectEntityByIdQuery(Builder<I> builder) {
         super(builder);
     }
 
-    public static <I> Builder<I> newBuilder(String tableName) {
+    static <I> Builder<I> newBuilder(String tableName) {
         final Builder<I> builder = new Builder<>();
         builder.setIdIndexInQuery(1)
                .setQuery(format(QUERY_TEMPLATE, tableName))
@@ -75,11 +75,10 @@ public class SelectEntityByIdQuery<I> extends SelectMessageByIdQuery<I, EntityRe
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder<I> extends SelectMessageByIdQuery.Builder<Builder<I>,
+    static class Builder<I> extends SelectMessageByIdQuery.Builder<Builder<I>,
                                                                           SelectEntityByIdQuery<I>,
                                                                           I,
                                                                           EntityRecord> {
-
         @Override
         public SelectEntityByIdQuery<I> build() {
             return new SelectEntityByIdQuery<>(this);

@@ -21,8 +21,9 @@
 package io.spine.server.storage.jdbc.query;
 
 import com.google.protobuf.Int32Value;
-import io.spine.server.storage.jdbc.EventCountTable;
+import io.spine.annotation.Internal;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.EventCountTable;
 import io.spine.server.storage.jdbc.IdColumn;
 import org.slf4j.Logger;
 
@@ -31,6 +32,7 @@ import org.slf4j.Logger;
  *
  * @author Dmytro Dashenkov
  */
+@Internal
 public class EventCountQueryFactory<I> implements ReadQueryFactory<I, Int32Value>,
                                                   WriteQueryFactory<I, Int32Value>{
 

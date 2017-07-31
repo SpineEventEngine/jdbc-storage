@@ -43,7 +43,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author Alexander Litus
  */
 @Internal
-public class SelectMessageByIdQuery<I, M extends Message> extends SelectByIdQuery<I, M> {
+class SelectMessageByIdQuery<I, M extends Message> extends SelectByIdQuery<I, M> {
 
     private final String messageColumnName;
     private final Descriptor messageDescriptor;
@@ -108,21 +108,21 @@ public class SelectMessageByIdQuery<I, M extends Message> extends SelectByIdQuer
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public abstract static class Builder<B extends Builder<B, Q, I, R>,
-                                         Q extends SelectMessageByIdQuery<I, R>,
-                                         I,
-                                         R extends Message>
+    abstract static class Builder<B extends Builder<B, Q, I, R>,
+                                  Q extends SelectMessageByIdQuery<I, R>,
+                                  I,
+                                  R extends Message>
             extends SelectByIdQuery.Builder<I, B, Q> {
 
         private String messageColumnName;
         private Descriptor messageDescriptor;
 
-        public B setMessageColumnName(String messageColumnName) {
+        B setMessageColumnName(String messageColumnName) {
             this.messageColumnName = messageColumnName;
             return getThis();
         }
 
-        public B setMessageDescriptor(Descriptor messageDescriptor) {
+        B setMessageDescriptor(Descriptor messageDescriptor) {
             this.messageDescriptor = messageDescriptor;
             return getThis();
         }

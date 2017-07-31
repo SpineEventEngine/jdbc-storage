@@ -21,6 +21,7 @@
 package io.spine.server.storage.jdbc.query;
 
 import io.spine.Identifier;
+import io.spine.annotation.Internal;
 import io.spine.server.storage.jdbc.ConnectionWrapper;
 import io.spine.server.storage.jdbc.IdColumn;
 
@@ -39,6 +40,7 @@ import static io.spine.server.storage.jdbc.Sql.Query.WHERE;
  *
  * @author Dmytro Dashenkov
  */
+@Internal
 public class DeleteRecordQuery<I> extends StorageQuery {
 
     private static final String FORMAT_PLACEHOLDER = "%s";

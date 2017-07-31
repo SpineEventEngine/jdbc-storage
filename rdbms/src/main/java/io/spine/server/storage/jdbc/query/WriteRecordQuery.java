@@ -21,15 +21,15 @@
 package io.spine.server.storage.jdbc.query;
 
 import io.spine.server.entity.storage.EntityRecordWithColumns;
-import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.ConnectionWrapper;
+import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.IdColumn;
 import io.spine.server.storage.jdbc.Serializer;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public abstract class WriteRecordQuery<I, R> extends ColumnAwareWriteQuery {
+abstract class WriteRecordQuery<I, R> extends ColumnAwareWriteQuery {
 
     private final I id;
     private final EntityRecordWithColumns record;
@@ -37,8 +37,7 @@ public abstract class WriteRecordQuery<I, R> extends ColumnAwareWriteQuery {
     private final int recordIndexInQuery;
     private final IdColumn<I> idColumn;
 
-    protected WriteRecordQuery(
-            Builder<? extends Builder, ? extends WriteRecordQuery, I, R> builder) {
+    WriteRecordQuery(Builder<? extends Builder, ? extends WriteRecordQuery, I, R> builder) {
         super(builder);
         this.idIndexInQuery = builder.idIndexInQuery;
         this.recordIndexInQuery = builder.recordIndexInQuery;
@@ -61,15 +60,15 @@ public abstract class WriteRecordQuery<I, R> extends ColumnAwareWriteQuery {
         }
     }
 
-    public EntityRecordWithColumns getRecord() {
+    EntityRecordWithColumns getRecord() {
         return record;
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public abstract static class Builder<B extends Builder<B, Q, I, R>,
-                                         Q extends WriteRecordQuery,
-                                         I,
-                                         R>
+    abstract static class Builder<B extends Builder<B, Q, I, R>,
+                                  Q extends WriteRecordQuery,
+                                  I,
+                                  R>
             extends ColumnAwareWriteQuery.Builder<B, Q> {
 
         private int idIndexInQuery;
@@ -88,17 +87,17 @@ public abstract class WriteRecordQuery<I, R> extends ColumnAwareWriteQuery {
             return getThis();
         }
 
-        public B setIdColumn(IdColumn<I> idColumn) {
+        B setIdColumn(IdColumn<I> idColumn) {
             this.idColumn = idColumn;
             return getThis();
         }
 
-        public B setIdIndexInQuery(int idIndexInQuery) {
+        B setIdIndexInQuery(int idIndexInQuery) {
             this.idIndexInQuery = idIndexInQuery;
             return getThis();
         }
 
-        public B setRecordIndexInQuery(int recordIndexInQuery) {
+        B setRecordIndexInQuery(int recordIndexInQuery) {
             this.recordIndexInQuery = recordIndexInQuery;
             return getThis();
         }

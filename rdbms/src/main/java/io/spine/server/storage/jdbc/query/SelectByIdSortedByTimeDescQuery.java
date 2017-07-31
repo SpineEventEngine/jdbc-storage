@@ -20,6 +20,7 @@
 
 package io.spine.server.storage.jdbc.query;
 
+import io.spine.annotation.Internal;
 import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.AggregateEventRecordTable.Column;
@@ -53,6 +54,7 @@ import static java.lang.String.format;
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
+@Internal
 public class SelectByIdSortedByTimeDescQuery<I> extends StorageQuery {
 
     private static final String QUERY_TEMPLATE =

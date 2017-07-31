@@ -44,7 +44,7 @@ import static io.spine.server.storage.jdbc.EventCountTable.Column.id;
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-public class UpdateEventCountQuery<I> extends UpdateRecordQuery<I> {
+class UpdateEventCountQuery<I> extends UpdateRecordQuery<I> {
 
     private final int count;
 
@@ -71,7 +71,7 @@ public class UpdateEventCountQuery<I> extends UpdateRecordQuery<I> {
         }
     }
 
-    public static <I> Builder<I> newBuilder(String tableName) {
+    static <I> Builder<I> newBuilder(String tableName) {
         final Builder<I> builder = new Builder<>();
         builder.setQuery(format(QUERY_TEMPLATE, tableName))
                .setIdIndexInQuery(2);
@@ -79,8 +79,8 @@ public class UpdateEventCountQuery<I> extends UpdateRecordQuery<I> {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder<I>
-            extends UpdateRecordQuery.Builder<Builder<I>, UpdateEventCountQuery, I> {
+    static class Builder<I> extends UpdateRecordQuery.Builder<Builder<I>,
+                                                              UpdateEventCountQuery, I> {
 
         private int count;
 
@@ -89,7 +89,7 @@ public class UpdateEventCountQuery<I> extends UpdateRecordQuery<I> {
             return new UpdateEventCountQuery<>(this);
         }
 
-        public Builder<I> setCount(int count) {
+        Builder<I> setCount(int count) {
             this.count = count;
             return getThis();
         }

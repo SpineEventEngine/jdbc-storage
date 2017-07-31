@@ -35,13 +35,12 @@ import java.sql.SQLException;
  *
  * @author Dmytro Dashenkov
  */
-public abstract class WriteTimestampQuery extends WriteQuery {
+abstract class WriteTimestampQuery extends WriteQuery {
 
     private final Timestamp timestamp;
     private final String id;
 
-    protected WriteTimestampQuery(Builder<? extends Builder,
-                                          ? extends WriteTimestampQuery> builder) {
+    WriteTimestampQuery(Builder<? extends Builder, ? extends WriteTimestampQuery> builder) {
         super(builder);
         this.timestamp = builder.timestamp;
         this.id = builder.getId();
@@ -63,23 +62,23 @@ public abstract class WriteTimestampQuery extends WriteQuery {
         }
     }
 
-    public abstract static class Builder<B extends Builder<B, Q>, Q extends WriteTimestampQuery>
+    abstract static class Builder<B extends Builder<B, Q>, Q extends WriteTimestampQuery>
             extends WriteQuery.Builder<B, Q> {
 
         private Timestamp timestamp;
         private String id;
 
-        public B setTimestamp(Timestamp timestamp) {
+        B setTimestamp(Timestamp timestamp) {
             this.timestamp = timestamp;
             return getThis();
         }
 
-        public B setId(String id) {
+        B setId(String id) {
             this.id = id;
             return getThis();
         }
 
-        public String getId() {
+        String getId() {
             return id;
         }
     }
@@ -96,7 +95,7 @@ public abstract class WriteTimestampQuery extends WriteQuery {
             this.index = index;
         }
 
-        public int getIndex() {
+        private int getIndex() {
             return index;
         }
     }
