@@ -125,7 +125,7 @@ public class JdbcStorageFactoryShould {
     }
 
     @Test
-    public void generate_single_tenat_view() {
+    public void generate_single_tenant_view() {
         final DataSourceWrapper dataSource = GivenDataSource.withoutSuperpowers();
         final JdbcStorageFactory factory = JdbcStorageFactory.newBuilder()
                                                              .setMultitenant(true)

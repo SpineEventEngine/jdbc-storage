@@ -23,7 +23,6 @@ package io.spine.server.storage.jdbc;
 import com.google.common.testing.NullPointerTester;
 import com.google.protobuf.StringValue;
 import io.spine.server.entity.AbstractEntity;
-import io.spine.server.storage.jdbc.DbTableNameFactory;
 import org.junit.Test;
 
 import static io.spine.test.Tests.assertHasPrivateParameterlessCtor;
@@ -36,7 +35,7 @@ import static org.junit.Assert.assertEquals;
 public class DbTableNameFactoryShould {
 
     @Test
-    public void have_private_utility_constrctor() {
+    public void have_private_utility_constructor() {
         assertHasPrivateParameterlessCtor(DbTableNameFactory.class);
     }
 
