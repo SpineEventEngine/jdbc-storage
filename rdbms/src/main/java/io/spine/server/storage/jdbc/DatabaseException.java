@@ -27,7 +27,7 @@ package io.spine.server.storage.jdbc;
  */
 public class DatabaseException extends RuntimeException {
 
-    private static final long serialVersionUID = -4620698L;
+    private static final long serialVersionUID = 0L;
 
     public DatabaseException(String message) {
         super(message);

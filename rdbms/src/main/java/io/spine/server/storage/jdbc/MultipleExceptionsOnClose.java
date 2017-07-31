@@ -36,7 +36,7 @@ import static java.lang.System.lineSeparator;
  */
 final class MultipleExceptionsOnClose extends Throwable {
 
-    private static final long serialVersionUID = -0L;
+    private static final long serialVersionUID = 0L;
     private final Collection<Exception> exceptions;
 
     public MultipleExceptionsOnClose(Collection<Exception> exceptions) {
