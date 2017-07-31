@@ -24,8 +24,8 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.protobuf.Message;
-import io.spine.server.storage.jdbc.query.DeleteAllQuery;
 import io.spine.server.storage.jdbc.query.ContainsQuery;
+import io.spine.server.storage.jdbc.query.DeleteAllQuery;
 import io.spine.server.storage.jdbc.query.DeleteRecordQuery;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.SelectByIdQuery;
@@ -106,10 +106,7 @@ abstract class AbstractTable<I, R extends Message, W> {
      */
     private ImmutableList<? extends TableColumn> columns;
 
-    AbstractTable(String name,
-                            IdColumn<I> idColumn,
-                            DataSourceWrapper dataSource) {
-        super();
+    AbstractTable(String name, IdColumn<I> idColumn, DataSourceWrapper dataSource) {
         this.name = checkNotNull(name);
         this.idColumn = checkNotNull(idColumn);
         this.dataSource = checkNotNull(dataSource);
