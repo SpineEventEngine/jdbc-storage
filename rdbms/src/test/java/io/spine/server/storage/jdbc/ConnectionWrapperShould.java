@@ -20,18 +20,18 @@
 
 package io.spine.server.storage.jdbc;
 
-import io.spine.server.storage.jdbc.ConnectionWrapper;
 import org.junit.Test;
-import io.spine.server.storage.jdbc.DatabaseException;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Dmytro Dashenkov
@@ -66,6 +66,16 @@ public class ConnectionWrapperShould {
         final Connection connection = mockConnection();
         final ConnectionWrapper wrapper = ConnectionWrapper.wrap(connection);
         wrapper.close();
+    }
+
+    @SuppressWarnings("JDBCPrepareStatementWithNonConstantString") // OK for a mock setup
+    @Test(expected = DatabaseException.class)
+    public void throw_DatabaseException_on_SQLException_when_preparing_statement()
+            throws SQLException {
+        final Connection connection = mockConnection();
+        when(connection.prepareStatement(anyString())).thenThrow(SQLException.class);
+        final ConnectionWrapper wrapper = ConnectionWrapper.wrap(connection);
+        wrapper.prepareStatement("SOME SQL STATEMENT.");
     }
 
     @Test
