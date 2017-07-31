@@ -21,54 +21,58 @@
 package io.spine.server.storage.jdbc;
 
 import com.google.protobuf.Message;
-import io.spine.server.storage.jdbc.IdColumn;
-import org.junit.Test;
 import io.spine.server.entity.AbstractEntity;
-import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.test.entity.ProjectId;
+import org.junit.Test;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import static io.spine.server.storage.jdbc.Sql.Type.BIGINT;
+import static io.spine.server.storage.jdbc.Sql.Type.INT;
+import static io.spine.server.storage.jdbc.Sql.Type.VARCHAR_255;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static io.spine.server.storage.jdbc.Sql.Type.BIGINT;
-import static io.spine.server.storage.jdbc.Sql.Type.INT;
-import static io.spine.server.storage.jdbc.Sql.Type.VARCHAR_255;
 
 /**
  * @author Dmytro Dashenkov
  */
 public class IdColumnShould {
 
-    private final String ID = "id";
+    private static final String ID = "id";
 
     @Test
     public void have_bigint_impl() {
         final IdColumn<?> column = IdColumn.newInstance(LongIdEntity.class, ID);
         assertEquals(BIGINT, column.getSqlType());
+        assertSame(Long.class, column.getJavaType());
     }
 
     @Test
     public void have_int_impl() {
         final IdColumn<?> column = IdColumn.newInstance(IntIdEntity.class, ID);
         assertEquals(INT, column.getSqlType());
+        assertSame(Integer.class, column.getJavaType());
     }
 
     @Test
     public void have_varchar255_impl() {
         final IdColumn<?> column = IdColumn.newInstance(StringIdEntity.class, ID);
         assertEquals(VARCHAR_255, column.getSqlType());
+        assertSame(String.class, column.getJavaType());
     }
 
     @Test
     public void cast_message_IDs_to_string() {
         final IdColumn<?> column = IdColumn.newInstance(MessageIdEntity.class, ID);
         assertEquals(VARCHAR_255, column.getSqlType());
+        assertTrue(Message.class.isAssignableFrom(column.getJavaType()));
     }
 
     @Test(expected = DatabaseException.class)
