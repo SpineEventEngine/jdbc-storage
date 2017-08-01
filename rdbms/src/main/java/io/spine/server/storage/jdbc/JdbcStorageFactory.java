@@ -146,6 +146,7 @@ public class JdbcStorageFactory implements StorageFactory {
         private ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> columnTypeRegistry;
 
         private Builder() {
+            // Prevent direct instantiation.
         }
 
         /**
@@ -206,7 +207,7 @@ public class JdbcStorageFactory implements StorageFactory {
         }
 
         /**
-         * @return New instance of {@code JdbcStorageFactory}.
+         * @return new instance of {@code JdbcStorageFactory}
          */
         public JdbcStorageFactory build() {
             if (columnTypeRegistry == null) {
@@ -214,6 +215,5 @@ public class JdbcStorageFactory implements StorageFactory {
             }
             return new JdbcStorageFactory(this);
         }
-
     }
 }

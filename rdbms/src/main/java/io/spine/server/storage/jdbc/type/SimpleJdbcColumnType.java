@@ -24,7 +24,16 @@ import io.spine.annotation.SPI;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * An implementation base for the simple {@linkplain JdbcColumnType JdbcColumnTypes}.
+ * An implementation base for the {@linkplain JdbcColumnType JdbcColumnTypes} which store the given
+ * value "as is", i.e. with no preceding conversion.
+ *
+ * <p>More formally, a {@code Simple} column type is a column type whose
+ * {@link io.spine.server.entity.storage.ColumnType#convertColumnValue convertColumnValue()} method
+ * is an identity function.
+ *
+ * <p>The implementation is so that
+ * the {@link io.spine.server.entity.storage.ColumnType#convertColumnValue convertColumnValue()}
+ * method throws a {@link NullPointerException} if the value is equal to {@code null}.
  *
  * @author Alexander Aleksandrov
  */
@@ -32,7 +41,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public abstract class SimpleJdbcColumnType<T> extends AbstractJdbcColumnType<T, T> {
 
     @Override
-    public T convertColumnValue(T fieldValue) {
+    public final T convertColumnValue(T fieldValue) {
         checkNotNull(fieldValue);
         return fieldValue;
     }

@@ -207,7 +207,7 @@ public abstract class IdColumn<I> {
          * <p>The method may perform a {@code String} conversion, validation or no action for
          * a {@code String} input.
          *
-         * @param id the identifier to convert normalize
+         * @param id the identifier to normalize
          * @return the normalized {@code String} ID
          */
         protected abstract String normalize(I id);

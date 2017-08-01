@@ -211,7 +211,7 @@ public class JdbcStandStorage extends StandStorage {
      *
      * @param <I> ID type of the {@link io.spine.server.entity.Entity} that will be stored in
      *            the {@code JdbcStandStorage}.
-     * @return New parametrized instance of {@link Builder}.
+     * @return new parametrized instance of {@link Builder}.
      */
     public static <I> Builder<I> newBuilder() {
         return new Builder<>();
