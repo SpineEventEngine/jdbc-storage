@@ -1,25 +1,28 @@
+buildscript {
+    // Define the versions of the library and its dependencies.
+    // As long as `buildscript` section is always evaluated first, we need to apply
+    // `ext.gradle` explicitly here.
+    apply from: "ext.gradle"
+}
 
-project.ext {
-    SPINE_VERSION = '0.8.12-SNAPSHOT'
-
+ext {
     publishPlugin = "$rootDir/scripts/publish.gradle"
     credentialsPropertyFile = 'credentials.properties'
     projectsToPublish = ['rdbms']
-
-    guavaVersion = '20.0'
 }
 
 allprojects {
     apply plugin: 'maven'
     apply plugin: 'jacoco'
 
-    group = 'org.spine3'
-    version = SPINE_VERSION
+    group = 'io.spine'
+    version = spineVersion
 }
 
 subprojects {
     apply plugin: 'java'
     apply plugin: 'maven-publish'
+
 
     sourceCompatibility = 1.7
     targetCompatibility = 1.7
@@ -39,10 +42,18 @@ subprojects {
     }
 
     dependencies {
+
+        // Exclude transient dependencies from Spine
+        final def excludes = {
+            exclude group: 'com.google.protobuf', module: 'protobuf-lite'
+            exclude group: 'io.grpc'
+        }
+
         // Spine
-        compile group: 'org.spine3', name: 'spine-server-core', version: project.SPINE_VERSION, changing: true
-        compile group: 'org.spine3', name: 'spine-client-core', version: project.SPINE_VERSION, changing: true
-        compile group: 'org.spine3', name: 'spine-testutil-core', version: project.SPINE_VERSION, changing: true
+        compile group: 'io.spine', name: 'spine-server', version: project.spineVersion, changing: true, excludes
+
+        compile group: 'io.spine', name: 'spine-testutil-server', version: project.spineVersion, changing: true, excludes
+        testCompile group: 'io.spine', name: 'spine-server', version: project.spineVersion, changing: true, classifier: 'test', excludes
 
         // Guava
         compile group: 'com.google.guava', name: 'guava', version: project.guavaVersion
