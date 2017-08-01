@@ -220,6 +220,7 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWit
         @Override
         public boolean isNullable() {
             return true; // TODO:2017-07-21:dmytro.dashenkov: Use Column.isNullable.
+            // https://github.com/SpineEventEngine/jdbc-storage/issues/29
         }
 
         @Override

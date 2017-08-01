@@ -134,6 +134,7 @@ public class JdbcStandStorage extends StandStorage {
         final String requiredTypeUrl = type.value();
         final Iterator<EntityRecord> result = filter(allRecords, new Predicate<EntityRecord>() {
             // TODO:2017-07-14:dmytro.dashenkov: Replace in-memory filtering with SQL query.
+            // https://github.com/SpineEventEngine/jdbc-storage/issues/30
             @Override
             public boolean apply(@Nullable EntityRecord entityRecord) {
                 checkNotNull(entityRecord);
