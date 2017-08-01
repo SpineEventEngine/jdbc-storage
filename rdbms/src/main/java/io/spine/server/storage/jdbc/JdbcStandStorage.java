@@ -69,8 +69,29 @@ public class JdbcStandStorage extends StandStorage {
             Entity.class
     );
 
+    /**
+     * A {@link Converter} of the stand record IDs.
+     *
+     * <p>All the records are stored under a {@code String} ID.
+     *
+     * <p>Currently, this {@code Converter} is represented by the {@link AggregateStateId}
+     * {@link Stringifier}.
+     *
+     * @see #recordStorage
+     * @see AggregateStateId for the implementation
+     */
     private static final Converter<AggregateStateId, String> ID_MAPPER;
 
+    /**
+     * The underlying {@link JdbcRecordStorage}.
+     *
+     * <p>Any call to an instance of {@code JdbcStandStorage} turns into a call to this storage.
+     *
+     * <p>All the records are stored under {@code String} IDs to make it possible to store them in
+     * a single SQL table.
+     *
+     * @see #ID_MAPPER for the ID conversion rules
+     */
     private final JdbcRecordStorage<String> recordStorage;
 
     static {
