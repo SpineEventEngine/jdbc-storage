@@ -7,7 +7,10 @@ before_install:
 script:
   - ./gradlew build --debug
 
+  # The publishing script should be executed in `script` section in order to
+  # fail the Travis build if execution of this script is failed.
+  - chmod +x ./scripts/publish-artifacts.sh
+  - ./scripts/publish-artifacts.sh
+
 after_success:
   - codecov
-  - chmod +x ./scripts/publish_artifacts.sh
-  - ./scripts/publish_artifacts.sh
