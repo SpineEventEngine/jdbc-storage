@@ -22,12 +22,12 @@ package io.spine.server.storage.jdbc.query;
 
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
-import io.spine.server.entity.storage.Column;
 import io.spine.server.entity.storage.ColumnRecords;
+import io.spine.server.entity.storage.EntityColumn;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
+import io.spine.server.storage.jdbc.ConnectionWrapper;
 import io.spine.server.storage.jdbc.RecordTable;
 import io.spine.server.storage.jdbc.RecordTable.StandardColumn;
-import io.spine.server.storage.jdbc.ConnectionWrapper;
 
 import java.sql.PreparedStatement;
 import java.util.Collection;
@@ -66,7 +66,7 @@ class WriteEntityQuery<I> extends WriteRecordQuery<I, EntityRecordWithColumns> {
      */
     private Function<String, Integer> getTransformer() {
         final Function<String, Integer> function;
-        final Map<String, Column> columns = getRecord().getColumns();
+        final Map<String, EntityColumn> columns = getRecord().getColumns();
         final Collection<String> columnNames = sorted(columns.keySet());
         final Map<String, Integer> result = new HashMap<>();
 

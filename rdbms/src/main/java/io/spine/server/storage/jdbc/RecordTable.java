@@ -26,14 +26,14 @@ import com.google.protobuf.FieldMask;
 import io.spine.annotation.Internal;
 import io.spine.server.entity.Entity;
 import io.spine.server.entity.EntityRecord;
-import io.spine.server.entity.storage.Column;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
+import io.spine.server.entity.storage.EntityColumn;
 import io.spine.server.entity.storage.EntityColumns;
 import io.spine.server.entity.storage.EntityQuery;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
+import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.RecordStorageQueryFactory;
 import io.spine.server.storage.jdbc.query.SelectByEntityColumnsQuery;
-import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
 
@@ -98,7 +98,7 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWit
     protected List<TableColumn> getTableColumns() {
         final List<TableColumn> columns = newLinkedList();
         addAll(columns, StandardColumn.values());
-        final Collection<Column> entityColumns = EntityColumns.getColumns(getEntityClass());
+        final Collection<EntityColumn> entityColumns = EntityColumns.getColumns(getEntityClass());
         final Collection<TableColumn> tableColumns = transform(entityColumns, new ColumnAdapter());
         columns.addAll(tableColumns);
         return columns;
@@ -120,7 +120,8 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWit
             }
         }
         if (!newRecords.isEmpty()) {
-            queryFactory.newInsertEntityRecordsBulkQuery(newRecords).execute();
+            queryFactory.newInsertEntityRecordsBulkQuery(newRecords)
+                        .execute();
         }
     }
 
@@ -136,7 +137,7 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWit
      * represented by the {@code RecordTable}.
      *
      * <p>Each table which contains the {@linkplain EntityRecord Entity Records} has these columns.
-     * It also may have the columns produced from the {@linkplain Column Entity Columns}.
+     * It also may have the columns produced from the {@linkplain EntityColumn entity columns}.
      *
      * @see EntityColumnWrapper
      */
@@ -170,13 +171,13 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWit
     }
 
     /**
-     * An adapter converting the {@linkplain Column Entity Columns} into the {@link TableColumn}
-     * instances.
+     * An adapter converting the {@linkplain EntityColumn entity columns}
+     * into the {@link TableColumn} instances.
      */
-    private final class ColumnAdapter implements Function<Column, TableColumn> {
+    private final class ColumnAdapter implements Function<EntityColumn, TableColumn> {
 
         @Override
-        public TableColumn apply(@Nullable Column column) {
+        public TableColumn apply(@Nullable EntityColumn column) {
             checkNotNull(column);
             final TableColumn result = new EntityColumnWrapper(column, typeRegistry);
             return result;
@@ -184,19 +185,19 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWit
     }
 
     /**
-     * A wrapper type for {@linkplain Column Entity Columns} for accessing them thorough
-     * the {@link TableColumn} interface.
+     * A wrapper type for {@link EntityColumn}.
+     *
+     * <p>Serves for accessing entity columns trough the {@link TableColumn} interface.
      *
      * @see StandardColumn
      */
     private static final class EntityColumnWrapper implements TableColumn {
 
-
-        private final Column column;
+        private final EntityColumn column;
         private final Sql.Type type;
 
-        private EntityColumnWrapper(
-                Column column, ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> typeRegistry) {
+        private EntityColumnWrapper(EntityColumn column,
+                                    ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> typeRegistry) {
             this.column = column;
             this.type = typeRegistry.get(column)
                                     .getSqlType();
@@ -204,7 +205,7 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWit
 
         @Override
         public String name() {
-            return column.getName();
+            return column.getStoredName();
         }
 
         @Override

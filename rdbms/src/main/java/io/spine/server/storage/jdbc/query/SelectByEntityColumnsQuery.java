@@ -21,23 +21,24 @@
 package io.spine.server.storage.jdbc.query;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.UnmodifiableIterator;
 import com.google.protobuf.FieldMask;
 import io.spine.annotation.Internal;
 import io.spine.client.ColumnFilter;
 import io.spine.client.ColumnFilter.Operator;
 import io.spine.client.CompositeColumnFilter.CompositeOperator;
 import io.spine.server.entity.EntityRecord;
-import io.spine.server.entity.storage.Column;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.entity.storage.CompositeQueryParameter;
+import io.spine.server.entity.storage.EntityColumn;
 import io.spine.server.entity.storage.EntityQuery;
 import io.spine.server.entity.storage.QueryParameters;
-import io.spine.server.storage.jdbc.DatabaseException;
-import io.spine.server.storage.jdbc.RecordTable;
-import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.ConnectionWrapper;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.IdColumn;
+import io.spine.server.storage.jdbc.RecordTable;
+import io.spine.server.storage.jdbc.type.JdbcColumnType;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -51,6 +52,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.Maps.newHashMap;
 import static io.spine.protobuf.TypeConverter.toObject;
+import static io.spine.server.storage.jdbc.RecordTable.StandardColumn.entity;
+import static io.spine.server.storage.jdbc.RecordTable.StandardColumn.id;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
@@ -67,8 +70,6 @@ import static io.spine.server.storage.jdbc.Sql.Query.PLACEHOLDER;
 import static io.spine.server.storage.jdbc.Sql.Query.SELECT;
 import static io.spine.server.storage.jdbc.Sql.Query.WHERE;
 import static io.spine.server.storage.jdbc.Sql.nPlaceholders;
-import static io.spine.server.storage.jdbc.RecordTable.StandardColumn.entity;
-import static io.spine.server.storage.jdbc.RecordTable.StandardColumn.id;
 import static io.spine.util.Exceptions.newIllegalArgumentException;
 import static java.util.Collections.emptyMap;
 
@@ -153,7 +154,8 @@ public final class SelectByEntityColumnsQuery<I> extends StorageQuery implements
             return this;
         }
 
-        public Builder<I> setColumnTypeRegistry(ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> registry) {
+        public Builder<I> setColumnTypeRegistry(
+                ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> registry) {
             this.columnTypeRegistry = checkNotNull(registry);
             return this;
         }
@@ -242,17 +244,18 @@ public final class SelectByEntityColumnsQuery<I> extends StorageQuery implements
                                                  int indexInStatement) {
             final CompositeOperator operator = parameter.getOperator();
             final String compositeSqlOperator = toSql(operator);
-            final Iterator<Map.Entry<Column, ColumnFilter>> filters = parameter.getFilters()
-                                                                               .entries()
-                                                                               .iterator();
+            final UnmodifiableIterator<Map.Entry<EntityColumn, ColumnFilter>> filters =
+                    parameter.getFilters()
+                             .entries()
+                             .iterator();
             int index = indexInStatement;
             while (filters.hasNext()) {
-                Map.Entry<Column, ColumnFilter> filter = filters.next();
-                final Column column = filter.getKey();
+                Map.Entry<EntityColumn, ColumnFilter> filter = filters.next();
+                final EntityColumn column = filter.getKey();
                 indexRegistry.put(new ColumnFilterIdentity(column, parameter),
                                   index);
                 index++;
-                final String name = column.getName();
+                final String name = column.getStoredName();
                 final Operator columnFilterOperator = filter.getValue()
                                                             .getOperator();
                 final String comparisonOperator = toSql(columnFilterOperator);
@@ -280,8 +283,9 @@ public final class SelectByEntityColumnsQuery<I> extends StorageQuery implements
                                               Iterable<CompositeQueryParameter> parameters,
                                               Map<ColumnFilterIdentity, Integer> indexRegistry) {
             for (CompositeQueryParameter param : parameters) {
-                for (Map.Entry<Column, ColumnFilter> filter : param.getFilters().entries()) {
-                    final Column column = filter.getKey();
+                for (Map.Entry<EntityColumn, ColumnFilter> filter : param.getFilters()
+                                                                         .entries()) {
+                    final EntityColumn column = filter.getKey();
                     final ColumnFilter columnFilter = filter.getValue();
                     final ColumnFilterIdentity filterId = new ColumnFilterIdentity(column, param);
                     final int columnIndexInSql = indexRegistry.get(filterId);
@@ -347,10 +351,10 @@ public final class SelectByEntityColumnsQuery<I> extends StorageQuery implements
 
     private static final class ColumnFilterIdentity {
 
-        private final Column column;
+        private final EntityColumn column;
         private final CompositeQueryParameter containingParameter;
 
-        private ColumnFilterIdentity(Column column, CompositeQueryParameter parameter) {
+        private ColumnFilterIdentity(EntityColumn column, CompositeQueryParameter parameter) {
             this.column = column;
             this.containingParameter = parameter;
         }

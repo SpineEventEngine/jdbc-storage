@@ -31,7 +31,6 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Alexander Litus
  */
-@SuppressWarnings("InstanceMethodNamingConvention")
 public class SerializerShould {
 
     @Test

@@ -42,14 +42,14 @@ public final class EntityColumns {
     }
 
     /**
-     * Retrieves the {@linkplain Column Entity Columns} from the given {@linkplain Entity}
+     * Retrieves the {@linkplain EntityColumn entity columns} from the given {@linkplain Entity}
      * {@linkplain Class class} description.
      *
      * @param cls the type of the {@link Entity} to get the Columns from
-     * @return the Entity Columns declared within this {@link Entity}
+     * @return the entity columns declared within this {@link Entity}
      */
-    public static Collection<Column> getColumns(Class<? extends Entity<?, ?>> cls) {
-        final Collection<Column> result = Columns.getColumns(cls);
+    public static Collection<EntityColumn> getColumns(Class<? extends Entity<?, ?>> cls) {
+        final Collection<EntityColumn> result = Columns.getColumns(cls);
         return result;
     }
 

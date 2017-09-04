@@ -24,27 +24,22 @@ import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateStorage;
 import io.spine.server.aggregate.AggregateStorageShould;
 import io.spine.server.entity.Entity;
-import io.spine.server.storage.jdbc.DatabaseException;
-import io.spine.server.storage.jdbc.GivenDataSource;
-import io.spine.server.storage.jdbc.JdbcAggregateStorage;
-import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.test.aggregate.Project;
 import io.spine.test.aggregate.ProjectId;
 import io.spine.validate.ValidatingBuilder;
 import org.junit.Test;
 
+import static io.spine.test.Tests.nullRef;
 import static org.junit.Assert.fail;
 
 /**
  * @author Alexander Litus
  */
-@SuppressWarnings("InstanceMethodNamingConvention")
 public class JdbcAggregateStorageShould extends AggregateStorageShould {
 
     @Override
     protected AggregateStorage<ProjectId> getStorage(Class<? extends Entity> aClass) {
-
-        return null;
+        return nullRef();
     }
 
     @Override

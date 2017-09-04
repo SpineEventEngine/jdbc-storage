@@ -20,6 +20,7 @@
 
 package io.spine.server.storage.jdbc;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.protobuf.Any;
@@ -249,5 +250,10 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
                                         .build();
             return id;
         }
+    }
+
+    @VisibleForTesting
+    RecordTable<I> getTable() {
+        return table;
     }
 }

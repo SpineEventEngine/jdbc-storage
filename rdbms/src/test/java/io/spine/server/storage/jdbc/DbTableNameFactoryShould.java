@@ -31,7 +31,6 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Alexander Litus
  */
-@SuppressWarnings("InstanceMethodNamingConvention")
 public class DbTableNameFactoryShould {
 
     @Test

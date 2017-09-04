@@ -20,10 +20,9 @@
 
 package io.spine.server.storage.jdbc;
 
-import com.google.protobuf.Message;
 import io.spine.annotation.Internal;
 import io.spine.server.entity.Entity;
-import io.spine.type.TypeName;
+import io.spine.server.entity.EntityClass;
 
 import java.util.regex.Pattern;
 
@@ -41,18 +40,19 @@ class DbTableNameFactory {
     private static final String UNDERSCORE = "_";
 
     private DbTableNameFactory() {
+        // Prevent instantiation of this utility class.
     }
 
     /**
      * Retrieves the type name of the state of the {@linkplain Entity}, whose {@linkplain Class}
      * instance is passed.
      *
-     * @param clazz a class of an {@linkplain Entity} whose state type name to use
+     * @param cls a class of an {@linkplain Entity} whose state type name to use
      * @return a valid DB table name
      */
-    public static String newTableName(Class<? extends Entity<?, ?>> clazz) {
-        final Class<? extends Message> stateType = Entity.TypeInfo.getStateClass(clazz);
-        final String typeName = TypeName.of(stateType).toString();
+    static String newTableName(Class<? extends Entity<?, ?>> cls) {
+        final String typeName = new EntityClass<Entity>(cls).getStateType()
+                                                            .getTypeName();
         final String tableNameTmp = PATTERN_DOT.matcher(typeName)
                                                .replaceAll(UNDERSCORE);
         final String result = PATTERN_DOLLAR.matcher(tableNameTmp)
