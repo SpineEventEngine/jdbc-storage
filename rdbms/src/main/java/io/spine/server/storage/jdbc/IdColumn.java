@@ -25,12 +25,12 @@ import io.spine.Identifier;
 import io.spine.annotation.Internal;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.entity.Entity;
+import io.spine.server.entity.EntityClass;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.primitives.Primitives.wrap;
 import static io.spine.json.Json.toCompactJson;
 
 /**
@@ -68,7 +68,7 @@ public abstract class IdColumn<I> {
     public static <I> IdColumn<I> newInstance(Class<? extends Entity<I, ?>> entityClass,
                                               String columnName) {
         final IdColumn<I> helper;
-        final Class<I> idClass = wrap(Entity.TypeInfo.<I>getIdClass(entityClass));
+        final Class<?> idClass = new EntityClass<Entity>(entityClass).getIdClass();
         if (idClass == Long.class) {
             helper = (IdColumn<I>) new LongIdColumn(columnName);
         } else if (idClass == Integer.class) {

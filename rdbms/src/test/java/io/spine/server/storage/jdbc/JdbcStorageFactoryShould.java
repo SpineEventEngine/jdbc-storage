@@ -47,7 +47,6 @@ import static org.mockito.Mockito.verify;
 /**
  * @author Alexander Litus
  */
-@SuppressWarnings({"InstanceMethodNamingConvention", "DuplicateStringLiteralInspection"})
 public class JdbcStorageFactoryShould {
 
     private JdbcStorageFactory factory;
@@ -88,7 +87,6 @@ public class JdbcStorageFactoryShould {
                 TestAggregate.class);
         assertNotNull(storage);
     }
-
 
     @Test
     public void create_projection_storage() {

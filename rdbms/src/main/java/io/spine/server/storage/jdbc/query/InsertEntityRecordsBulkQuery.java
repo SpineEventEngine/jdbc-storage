@@ -24,8 +24,8 @@ import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicates;
 import io.spine.server.entity.EntityRecord;
-import io.spine.server.entity.storage.Column;
 import io.spine.server.entity.storage.ColumnRecords;
+import io.spine.server.entity.storage.EntityColumn;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.ConnectionWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
@@ -113,7 +113,7 @@ class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
 
     private static Function<String, Integer> getTransformer(EntityRecordWithColumns record,
                                                             int fromColumnNumber) {
-        final Map<String, Column> columns = record.getColumns();
+        final Map<String, EntityColumn> columns = record.getColumns();
         final Collection<String> columnNames = sorted(columns.keySet());
         final Map<String, Integer> result = new HashMap<>();
 
@@ -182,7 +182,6 @@ class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
             return getThis();
         }
 
-
         @Override
         public InsertEntityRecordsBulkQuery<I> build() {
             if (records.isEmpty()) {
@@ -190,7 +189,7 @@ class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
             }
             final EntityRecordWithColumns gaugeRecord =
                     find(records.values(), Predicates.<EntityRecordWithColumns>notNull());
-            final Map<String, Column> columns = gaugeRecord.getColumns();
+            final Map<String, EntityColumn> columns = gaugeRecord.getColumns();
             columnCount = StandardColumn.values().length +
                           columns.size();
             final Collection<String> sqlValues = nCopies(records.size(),

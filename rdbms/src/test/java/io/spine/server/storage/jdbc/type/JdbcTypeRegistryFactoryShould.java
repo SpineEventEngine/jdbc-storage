@@ -21,8 +21,8 @@
 package io.spine.server.storage.jdbc.type;
 
 import io.spine.core.Version;
-import io.spine.server.entity.storage.Column;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
+import io.spine.server.entity.storage.EntityColumn;
 import io.spine.server.storage.jdbc.Sql;
 import org.junit.Test;
 
@@ -65,8 +65,8 @@ public class JdbcTypeRegistryFactoryShould {
                      CustomType.INSTANCE);
     }
 
-    private static Column columnWithType(Class<?> cls) {
-        final Column column = mock(Column.class);
+    private static EntityColumn columnWithType(Class<?> cls) {
+        final EntityColumn column = mock(EntityColumn.class);
         when(column.getType()).thenReturn(cls);
         return column;
     }

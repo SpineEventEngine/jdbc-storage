@@ -25,6 +25,7 @@ import com.google.protobuf.Message;
 import io.spine.server.entity.AbstractEntity;
 import io.spine.server.entity.Entity;
 import io.spine.server.entity.EntityRecord;
+import io.spine.server.entity.storage.Column;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.RecordStorage;
 import io.spine.server.storage.RecordStorageShould;
@@ -35,6 +36,7 @@ import io.spine.testdata.Sample;
 import org.junit.Test;
 
 import static io.spine.Identifier.newUuid;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
@@ -42,9 +44,10 @@ import static org.junit.Assert.fail;
 /**
  * @author Alexander Litus
  */
-@SuppressWarnings("InstanceMethodNamingConvention")
 public class JdbcRecordStorageShould
         extends RecordStorageShould<String, JdbcRecordStorage<String>> {
+
+    private static final String COLUMN_NAME_FOR_STORING = "customName";
 
     @Override
     protected JdbcRecordStorage<String> getStorage(Class<? extends Entity> cls) {
@@ -85,7 +88,6 @@ public class JdbcRecordStorageShould
     public void clear_itself() {
         final JdbcRecordStorage<String> storage = getStorage(TestEntityWithStringId.class);
         final String id = newUuid();
-        final String columnValue = "i'm a value";
         final EntityRecord entityRecord = newStorageRecord();
 
         final EntityRecordWithColumns record = EntityRecordWithColumns.of(entityRecord);
@@ -102,6 +104,17 @@ public class JdbcRecordStorageShould
         final RecordStorage<?> storage = getStorage(TestEntityWithStringId.class);
         storage.close();
         storage.close();
+    }
+
+    @Test
+    public void use_column_names_for_storing() {
+        final JdbcRecordStorage<String> storage = getStorage(TestEntityWithStringId.class);
+        final int entityColumnIndex = RecordTable.StandardColumn.values().length;
+        final String customColumnName = storage.getTable()
+                                               .getTableColumns()
+                                               .get(entityColumnIndex)
+                                               .name();
+        assertEquals(COLUMN_NAME_FOR_STORING, customColumnName);
     }
 
     @Override
@@ -127,6 +140,11 @@ public class JdbcRecordStorageShould
 
         private TestEntityWithStringId(String id) {
             super(id);
+        }
+
+        @Column(name = COLUMN_NAME_FOR_STORING)
+        public int getValue() {
+            return 0;
         }
     }
 }

@@ -21,6 +21,7 @@
 package io.spine.server.storage.jdbc;
 
 import com.google.protobuf.Message;
+import com.google.protobuf.StringValue;
 import io.spine.server.entity.AbstractEntity;
 import io.spine.test.entity.ProjectId;
 import org.junit.Test;
@@ -114,25 +115,25 @@ public class IdColumnShould {
         return statement;
     }
 
-    private static class LongIdEntity extends AbstractEntity<Long, Message> {
+    private static class LongIdEntity extends AbstractEntity<Long, StringValue> {
         protected LongIdEntity(Long id) {
             super(id);
         }
     }
 
-    private static class IntIdEntity extends AbstractEntity<Integer, Message> {
+    private static class IntIdEntity extends AbstractEntity<Integer, StringValue> {
         protected IntIdEntity(Integer id) {
             super(id);
         }
     }
 
-    private static class StringIdEntity extends AbstractEntity<String, Message> {
+    private static class StringIdEntity extends AbstractEntity<String, StringValue> {
         protected StringIdEntity(String id) {
             super(id);
         }
     }
 
-    private static class MessageIdEntity extends AbstractEntity<ProjectId, Message> {
+    private static class MessageIdEntity extends AbstractEntity<ProjectId, StringValue> {
         protected MessageIdEntity(ProjectId id) {
             super(id);
         }
