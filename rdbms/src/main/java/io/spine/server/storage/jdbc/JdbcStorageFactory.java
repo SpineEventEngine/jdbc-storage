@@ -120,6 +120,7 @@ public class JdbcStorageFactory implements StorageFactory {
                                                                   .setMultitenant(multitenant)
                                                                   .setDataSource(dataSource)
                                                                   .setRecordStorage(entityStorage)
+                                                                  .setProjectionClass(projectionClass)
                                                                   .build();
         return storage;
     }
