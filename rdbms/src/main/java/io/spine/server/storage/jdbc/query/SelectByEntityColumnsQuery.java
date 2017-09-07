@@ -252,7 +252,7 @@ public final class SelectByEntityColumnsQuery<I> extends StorageQuery implements
             while (filters.hasNext()) {
                 Map.Entry<EntityColumn, ColumnFilter> filter = filters.next();
                 final EntityColumn column = filter.getKey();
-                indexRegistry.put(new ColumnFilterIdentity(column, parameter),
+                indexRegistry.put(new ColumnFilterIdentity(column, filter.getValue(), parameter),
                                   index);
                 index++;
                 final String name = column.getStoredName();
@@ -287,7 +287,9 @@ public final class SelectByEntityColumnsQuery<I> extends StorageQuery implements
                                                                          .entries()) {
                     final EntityColumn column = filter.getKey();
                     final ColumnFilter columnFilter = filter.getValue();
-                    final ColumnFilterIdentity filterId = new ColumnFilterIdentity(column, param);
+                    final ColumnFilterIdentity filterId = new ColumnFilterIdentity(column,
+                                                                                   columnFilter,
+                                                                                   param);
                     final int columnIndexInSql = indexRegistry.get(filterId);
                     final JdbcColumnType<? super Object, ? super Object> columnType =
                             columnTypeRegistry.get(column);
@@ -352,11 +354,14 @@ public final class SelectByEntityColumnsQuery<I> extends StorageQuery implements
     private static final class ColumnFilterIdentity {
 
         private final EntityColumn column;
+        private final ColumnFilter filter;
         private final CompositeQueryParameter containingParameter;
 
-        private ColumnFilterIdentity(EntityColumn column, CompositeQueryParameter parameter) {
+        private ColumnFilterIdentity(EntityColumn column, ColumnFilter filter,
+                                     CompositeQueryParameter containingParameter) {
             this.column = column;
-            this.containingParameter = parameter;
+            this.filter = filter;
+            this.containingParameter = containingParameter;
         }
 
         @Override
@@ -369,12 +374,13 @@ public final class SelectByEntityColumnsQuery<I> extends StorageQuery implements
             }
             ColumnFilterIdentity that = (ColumnFilterIdentity) o;
             return Objects.equal(column, that.column) &&
+                   Objects.equal(filter, that.filter) &&
                    Objects.equal(containingParameter, that.containingParameter);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hashCode(column, containingParameter);
+            return Objects.hashCode(column, filter, containingParameter);
         }
     }
 }

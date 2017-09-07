@@ -21,21 +21,33 @@
 package io.spine.server.storage.jdbc;
 
 import com.google.common.base.Optional;
+import com.google.protobuf.FieldMask;
 import com.google.protobuf.Message;
-import io.spine.server.entity.AbstractEntity;
+import io.spine.client.ColumnFilter;
+import io.spine.client.ColumnFilters;
+import io.spine.client.CompositeColumnFilter;
+import io.spine.client.EntityFilters;
 import io.spine.server.entity.Entity;
 import io.spine.server.entity.EntityRecord;
-import io.spine.server.entity.storage.Column;
+import io.spine.server.entity.storage.EntityQueries;
+import io.spine.server.entity.storage.EntityQuery;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.RecordStorage;
 import io.spine.server.storage.RecordStorageShould;
+import io.spine.server.storage.jdbc.given.JdbcRecordStorageTestEnv;
+import io.spine.server.storage.jdbc.given.JdbcRecordStorageTestEnv.TestEntityWithStringId;
 import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
 import io.spine.test.storage.Project;
 import io.spine.test.storage.ProjectId;
 import io.spine.testdata.Sample;
 import org.junit.Test;
 
+import java.util.Iterator;
+
 import static io.spine.Identifier.newUuid;
+import static io.spine.client.ColumnFilters.gt;
+import static io.spine.client.ColumnFilters.lt;
+import static io.spine.client.CompositeColumnFilter.CompositeOperator.ALL;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -46,30 +58,6 @@ import static org.junit.Assert.fail;
  */
 public class JdbcRecordStorageShould
         extends RecordStorageShould<String, JdbcRecordStorage<String>> {
-
-    private static final String COLUMN_NAME_FOR_STORING = "customName";
-
-    @Override
-    protected JdbcRecordStorage<String> getStorage(Class<? extends Entity> cls) {
-        final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(
-                "entityStorageTests");
-        @SuppressWarnings("unchecked") // Test invariant.
-        final Class<? extends Entity<String, ?>> entityClass =
-                (Class<? extends Entity<String, ?>>) cls;
-        final JdbcRecordStorage<String> storage =
-                JdbcRecordStorage.<String>newBuilder()
-                                 .setDataSource(dataSource)
-                                 .setEntityClass(entityClass)
-                                 .setMultitenant(false)
-                                 .setColumnTypeRegistry(JdbcTypeRegistryFactory.defaultInstance())
-                                 .build();
-        return storage;
-    }
-
-    @Override
-    protected String newId() {
-        return newUuid();
-    }
 
     @Test
     public void close_itself_and_throw_exception_on_read() {
@@ -114,7 +102,48 @@ public class JdbcRecordStorageShould
                                                .getTableColumns()
                                                .get(entityColumnIndex)
                                                .name();
-        assertEquals(COLUMN_NAME_FOR_STORING, customColumnName);
+        assertEquals(JdbcRecordStorageTestEnv.COLUMN_NAME_FOR_STORING, customColumnName);
+    }
+
+    @Test
+    public void read_by_composite_filter_with_column_filters_for_same_column() {
+        final JdbcRecordStorage<String> storage = getStorage(TestEntityWithStringId.class);
+        final String columnName = "value";
+        final ColumnFilter lessThan = lt(columnName, -5);
+        final ColumnFilter greaterThan = gt(columnName, 5);
+        final CompositeColumnFilter columnFilter = CompositeColumnFilter.newBuilder()
+                                                                        .addFilter(lessThan)
+                                                                        .addFilter(greaterThan)
+                                                                        .setOperator(ALL)
+                                                                        .build();
+        final EntityFilters entityFilters = EntityFilters.newBuilder()
+                                                         .addFilter(columnFilter)
+                                                         .build();
+        final EntityQuery<String> query = EntityQueries.from(entityFilters,
+                                                             TestEntityWithStringId.class);
+        storage.readAll(query, FieldMask.getDefaultInstance());
+    }
+
+    @Override
+    protected JdbcRecordStorage<String> getStorage(Class<? extends Entity> cls) {
+        final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(
+                "entityStorageTests");
+        @SuppressWarnings("unchecked") // Test invariant.
+        final Class<? extends Entity<String, ?>> entityClass =
+                (Class<? extends Entity<String, ?>>) cls;
+        final JdbcRecordStorage<String> storage =
+                JdbcRecordStorage.<String>newBuilder()
+                        .setDataSource(dataSource)
+                        .setEntityClass(entityClass)
+                        .setMultitenant(false)
+                        .setColumnTypeRegistry(JdbcTypeRegistryFactory.defaultInstance())
+                        .build();
+        return storage;
+    }
+
+    @Override
+    protected String newId() {
+        return newUuid();
     }
 
     @Override
@@ -127,24 +156,6 @@ public class JdbcRecordStorageShould
 
     @Override
     protected Class<? extends TestCounterEntity> getTestEntityClass() {
-        return TestCounterEntityJdbc.class;
-    }
-
-    static class TestCounterEntityJdbc extends TestCounterEntity<String> {
-        protected TestCounterEntityJdbc(String id) {
-            super(id);
-        }
-    }
-
-    private static class TestEntityWithStringId extends AbstractEntity<String, Project> {
-
-        private TestEntityWithStringId(String id) {
-            super(id);
-        }
-
-        @Column(name = COLUMN_NAME_FOR_STORING)
-        public int getValue() {
-            return 0;
-        }
+        return JdbcRecordStorageTestEnv.TestCounterEntityJdbc.class;
     }
 }
