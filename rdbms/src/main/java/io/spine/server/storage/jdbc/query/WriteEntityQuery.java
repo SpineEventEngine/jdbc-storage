@@ -23,7 +23,6 @@ package io.spine.server.storage.jdbc.query;
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
 import io.spine.server.entity.storage.ColumnRecords;
-import io.spine.server.entity.storage.EntityColumn;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.ConnectionWrapper;
 import io.spine.server.storage.jdbc.RecordTable;
@@ -33,8 +32,6 @@ import java.sql.PreparedStatement;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-
-import static io.spine.server.entity.storage.EntityColumns.sorted;
 
 /**
  * The write query to the {@link RecordTable RecordTable}.
@@ -66,8 +63,7 @@ class WriteEntityQuery<I> extends WriteRecordQuery<I, EntityRecordWithColumns> {
      */
     private Function<String, Integer> getTransformer() {
         final Function<String, Integer> function;
-        final Map<String, EntityColumn> columns = getRecord().getColumns();
-        final Collection<String> columnNames = sorted(columns.keySet());
+        final Collection<String> columnNames = getRecord().getColumnNames();
         final Map<String, Integer> result = new HashMap<>();
 
         int index = StandardColumn.values().length + 1;

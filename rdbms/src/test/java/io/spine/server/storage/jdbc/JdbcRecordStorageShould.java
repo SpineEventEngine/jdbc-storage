@@ -24,7 +24,6 @@ import com.google.common.base.Optional;
 import com.google.protobuf.FieldMask;
 import com.google.protobuf.Message;
 import io.spine.client.ColumnFilter;
-import io.spine.client.ColumnFilters;
 import io.spine.client.CompositeColumnFilter;
 import io.spine.client.EntityFilters;
 import io.spine.server.entity.Entity;
@@ -41,8 +40,6 @@ import io.spine.test.storage.Project;
 import io.spine.test.storage.ProjectId;
 import io.spine.testdata.Sample;
 import org.junit.Test;
-
-import java.util.Iterator;
 
 import static io.spine.Identifier.newUuid;
 import static io.spine.client.ColumnFilters.gt;

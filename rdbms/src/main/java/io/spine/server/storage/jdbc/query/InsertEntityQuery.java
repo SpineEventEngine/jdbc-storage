@@ -21,14 +21,12 @@
 package io.spine.server.storage.jdbc.query;
 
 import com.google.common.base.Joiner;
-import io.spine.server.entity.storage.EntityColumn;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.RecordTable;
 import io.spine.server.storage.jdbc.RecordTable.StandardColumn;
 
-import java.util.Map;
+import java.util.Collection;
 
-import static io.spine.server.entity.storage.EntityColumns.sorted;
 import static io.spine.server.storage.jdbc.RecordTable.StandardColumn.entity;
 import static io.spine.server.storage.jdbc.RecordTable.StandardColumn.id;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
@@ -72,10 +70,10 @@ class InsertEntityQuery<I> extends WriteEntityQuery<I> {
         final int columnCount;
         final String entityColumnNames;
         if (record.hasColumns()) {
-            final Map<String, EntityColumn> columns = record.getColumns();
-            columnCount = columns.size() + StandardColumn.values().length;
+            final Collection<String> columnNames = record.getColumnNames();
+            columnCount = columnNames.size() + StandardColumn.values().length;
             entityColumnNames = COMMA + Joiner.on(COMMA.toString())
-                                              .join(sorted(columns.keySet()));
+                                              .join(columnNames);
         } else {
             columnCount = StandardColumn.values().length;
             entityColumnNames = "";

@@ -25,7 +25,6 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Predicates;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.storage.ColumnRecords;
-import io.spine.server.entity.storage.EntityColumn;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.ConnectionWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
@@ -45,7 +44,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static com.google.common.collect.Iterables.find;
 import static com.google.common.collect.Maps.newHashMap;
-import static io.spine.server.entity.storage.EntityColumns.sorted;
 import static io.spine.server.storage.jdbc.RecordTable.StandardColumn.entity;
 import static io.spine.server.storage.jdbc.RecordTable.StandardColumn.id;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
@@ -113,12 +111,10 @@ class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
 
     private static Function<String, Integer> getTransformer(EntityRecordWithColumns record,
                                                             int fromColumnNumber) {
-        final Map<String, EntityColumn> columns = record.getColumns();
-        final Collection<String> columnNames = sorted(columns.keySet());
         final Map<String, Integer> result = new HashMap<>();
 
         int index = fromColumnNumber;
-        for (String entry : columnNames) {
+        for (String entry : record.getColumnNames()) {
             result.put(entry, index);
             index++;
         }
@@ -189,12 +185,12 @@ class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
             }
             final EntityRecordWithColumns gaugeRecord =
                     find(records.values(), Predicates.<EntityRecordWithColumns>notNull());
-            final Map<String, EntityColumn> columns = gaugeRecord.getColumns();
+            final Collection<String> columnNames = gaugeRecord.getColumnNames();
             columnCount = StandardColumn.values().length +
-                          columns.size();
+                          columnNames.size();
             final Collection<String> sqlValues = nCopies(records.size(),
                                                          nPlaceholders(columnCount));
-            final String entityColumnNames = compileEntityColumnNames(columns.keySet());
+            final String entityColumnNames = compileEntityColumnNames(columnNames);
             final String sqlValuesJoined = Joiner.on(COMMA.toString())
                                                  .join(sqlValues);
             final String sql = format(SQL_TEMPLATE, tableName, entityColumnNames, sqlValuesJoined);
