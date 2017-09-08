@@ -38,7 +38,7 @@ import java.util.Map;
  *
  * @author Dmytro Dashenkov
  */
-class WriteEntityQuery<I> extends WriteRecordQuery<I, EntityRecordWithColumns> {
+abstract class WriteEntityQuery<I> extends WriteRecordQuery<I, EntityRecordWithColumns> {
 
     WriteEntityQuery(
             Builder<? extends Builder, ? extends WriteRecordQuery, I, EntityRecordWithColumns> builder) {
@@ -66,7 +66,7 @@ class WriteEntityQuery<I> extends WriteRecordQuery<I, EntityRecordWithColumns> {
         final Collection<String> columnNames = getRecord().getColumnNames();
         final Map<String, Integer> result = new HashMap<>();
 
-        int index = StandardColumn.values().length + 1;
+        int index = getFirstColumnIndex();
         for (String entry : columnNames) {
             result.put(entry, index);
             index++;
@@ -75,4 +75,11 @@ class WriteEntityQuery<I> extends WriteRecordQuery<I, EntityRecordWithColumns> {
         function = Functions.forMap(result);
         return function;
     }
+
+    /**
+     * Obtains the index of the first entity column to be inserted in the query.
+     *
+     * @return the index of the first column
+     */
+    protected abstract int getFirstColumnIndex();
 }

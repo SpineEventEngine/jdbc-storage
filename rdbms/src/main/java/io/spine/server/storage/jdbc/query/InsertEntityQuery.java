@@ -89,6 +89,11 @@ class InsertEntityQuery<I> extends WriteEntityQuery<I> {
         return builder;
     }
 
+    @Override
+    protected int getFirstColumnIndex() {
+        return RECORD_INDEX + 1;
+    }
+
     @SuppressWarnings("ClassNameSameAsAncestorName")
     static class Builder<I> extends WriteRecordQuery.Builder<Builder<I>,
                                                              InsertEntityQuery,
