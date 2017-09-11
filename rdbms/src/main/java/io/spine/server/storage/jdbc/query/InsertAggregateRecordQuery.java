@@ -21,23 +21,26 @@
 package io.spine.server.storage.jdbc.query;
 
 import com.google.protobuf.Timestamp;
+import io.spine.core.Event;
 import io.spine.server.aggregate.AggregateEventRecord;
-import io.spine.server.storage.jdbc.DatabaseException;
-import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.AggregateEventRecordTable;
 import io.spine.server.storage.jdbc.ConnectionWrapper;
+import io.spine.server.storage.jdbc.DatabaseException;
+import io.spine.server.storage.jdbc.Sql;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
-import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
-import static io.spine.server.storage.jdbc.Sql.BuildingBlock.COMMA;
-import static io.spine.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
 import static io.spine.server.storage.jdbc.AggregateEventRecordTable.Column.aggregate;
 import static io.spine.server.storage.jdbc.AggregateEventRecordTable.Column.id;
 import static io.spine.server.storage.jdbc.AggregateEventRecordTable.Column.timestamp;
 import static io.spine.server.storage.jdbc.AggregateEventRecordTable.Column.timestamp_nanos;
+import static io.spine.server.storage.jdbc.AggregateEventRecordTable.Column.version;
+import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
+import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
+import static io.spine.server.storage.jdbc.Sql.BuildingBlock.COMMA;
+import static io.spine.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
+import static io.spine.validate.Validate.isDefault;
 import static java.lang.String.format;
 
 /**
@@ -54,9 +57,10 @@ class InsertAggregateRecordQuery<I> extends WriteAggregateQuery<I, AggregateEven
             id + COMMA +
             aggregate + COMMA +
             timestamp + COMMA +
-            timestamp_nanos +
+            timestamp_nanos + COMMA +
+            version +
             BRACKET_CLOSE
-            + Sql.Query.VALUES + Sql.nPlaceholders(4) + SEMICOLON;
+            + Sql.Query.VALUES + Sql.nPlaceholders(5) + SEMICOLON;
 
     private InsertAggregateRecordQuery(Builder<I> builder) {
         super(builder);
@@ -70,11 +74,28 @@ class InsertAggregateRecordQuery<I> extends WriteAggregateQuery<I, AggregateEven
             final Timestamp timestamp = getRecord().getTimestamp();
             statement.setLong(3, timestamp.getSeconds());
             statement.setInt(4, timestamp.getNanos());
+            statement.setInt(5, getVersionNumberOfRecord());
             return statement;
         } catch (SQLException e) {
             logFailedToPrepareStatement(e);
             throw new DatabaseException(e);
         }
+    }
+
+    private int getVersionNumberOfRecord() {
+        final int versionNumber;
+
+        final Event event = getRecord().getEvent();
+        if (isDefault(event)) {
+            versionNumber = getRecord().getSnapshot()
+                                       .getVersion()
+                                       .getNumber();
+        } else {
+            versionNumber = event.getContext()
+                                 .getVersion()
+                                 .getNumber();
+        }
+        return versionNumber;
     }
 
     static <I> Builder<I> newBuilder(String tableName) {

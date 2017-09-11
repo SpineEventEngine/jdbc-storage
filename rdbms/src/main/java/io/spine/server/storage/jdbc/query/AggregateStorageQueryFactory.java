@@ -71,9 +71,9 @@ public class AggregateStorageQueryFactory<I> implements ReadQueryFactory<I, Aggr
 
     /** Returns a query that selects aggregate records by ID sorted by time descending. */
     @SuppressWarnings("InstanceMethodNamingConvention")
-    public SelectByIdSortedByTimeDescQuery<I> newSelectByIdSortedByTimeDescQuery(I id) {
-        final SelectByIdSortedByTimeDescQuery.Builder<I> builder =
-                SelectByIdSortedByTimeDescQuery.<I>newBuilder(mainTableName)
+    public SelectEventRecordsById<I> newSelectByIdSortedByTimeDescQuery(I id) {
+        final SelectEventRecordsById.Builder<I> builder =
+                SelectEventRecordsById.<I>newBuilder(mainTableName)
                         .setDataSource(dataSource)
                         .setLogger(getLogger())
                         .setIdColumn(idColumn)

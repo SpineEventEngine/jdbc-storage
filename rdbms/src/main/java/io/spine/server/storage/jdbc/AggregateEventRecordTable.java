@@ -98,7 +98,8 @@ public class AggregateEventRecordTable<I> extends AggregateTable<I, AggregateEve
         id(ID),
         aggregate(BLOB),
         timestamp(BIGINT),
-        timestamp_nanos(INT);
+        timestamp_nanos(INT),
+        version(INT);
 
         private final Sql.Type type;
 

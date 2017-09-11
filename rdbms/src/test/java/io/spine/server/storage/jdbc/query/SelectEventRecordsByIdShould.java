@@ -38,7 +38,7 @@ import static org.mockito.Mockito.when;
 /**
  * @author Dmytro Dashenkov
  */
-public class SelectByIdSortedByTimeDescQueryShould {
+public class SelectEventRecordsByIdShould {
 
     @Test
     public void throw_DatabaseException_upon_SQL_failure() {
@@ -46,11 +46,11 @@ public class SelectByIdSortedByTimeDescQueryShould {
         when(dataSourceMock.getConnection(anyBoolean())).thenThrow(SQLException.class);
         final Logger loggerMock = mock(Logger.class);
 
-        final SelectByIdSortedByTimeDescQuery query =
-                SelectByIdSortedByTimeDescQuery.newBuilder("table-name")
-                                               .setDataSource(dataSourceMock)
-                                               .setLogger(loggerMock)
-                                               .build();
+        final SelectEventRecordsById query =
+                SelectEventRecordsById.newBuilder("table-name")
+                                      .setDataSource(dataSourceMock)
+                                      .setLogger(loggerMock)
+                                      .build();
         try {
             query.execute();
             fail();
