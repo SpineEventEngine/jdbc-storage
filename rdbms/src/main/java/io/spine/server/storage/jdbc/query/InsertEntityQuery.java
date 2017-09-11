@@ -20,12 +20,9 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import com.google.common.base.Joiner;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.RecordTable;
 import io.spine.server.storage.jdbc.RecordTable.StandardColumn;
-
-import java.util.Collection;
 
 import static io.spine.server.storage.jdbc.RecordTable.StandardColumn.entity;
 import static io.spine.server.storage.jdbc.RecordTable.StandardColumn.id;
@@ -67,26 +64,27 @@ class InsertEntityQuery<I> extends WriteEntityQuery<I> {
 
     static <I> Builder<I> newBuilder(String tableName, EntityRecordWithColumns record) {
         final Builder<I> builder = new Builder<>();
-        final int columnCount;
-        final String entityColumnNames;
-        if (record.hasColumns()) {
-            final Collection<String> columnNames = record.getColumnNames();
-            columnCount = columnNames.size() + StandardColumn.values().length;
-            entityColumnNames = COMMA + Joiner.on(COMMA.toString())
-                                              .join(columnNames);
-        } else {
-            columnCount = StandardColumn.values().length;
-            entityColumnNames = "";
-        }
+        final int columnCount = StandardColumn.values().length + record.getColumnNames()
+                                                                       .size();
+        final String columnList = columnListForQuery(record);
         final String valuePlaceholders = nPlaceholders(columnCount);
         final String sqlQuery = format(QUERY_TEMPLATE,
                                        tableName,
-                                       entityColumnNames,
+                                       columnList,
                                        valuePlaceholders);
         builder.setIdIndexInQuery(ID_INDEX)
                .setRecordIndexInQuery(RECORD_INDEX)
                .setQuery(sqlQuery);
         return builder;
+    }
+
+    private static String columnListForQuery(EntityRecordWithColumns record) {
+        final StringBuilder builder = new StringBuilder();
+        for (String columnName : record.getColumnNames()) {
+            builder.append(COMMA)
+                   .append(columnName);
+        }
+        return builder.toString();
     }
 
     @Override

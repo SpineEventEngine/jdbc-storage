@@ -20,7 +20,6 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicates;
 import io.spine.server.entity.EntityRecord;
@@ -35,10 +34,8 @@ import io.spine.server.storage.jdbc.Serializer;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 
-import static com.google.common.base.Functions.forMap;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -107,19 +104,6 @@ class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
             columnIndex += columnCount;
         }
         return statement;
-    }
-
-    private static Function<String, Integer> getTransformer(EntityRecordWithColumns record,
-                                                            int fromColumnNumber) {
-        final Map<String, Integer> result = new HashMap<>();
-
-        int index = fromColumnNumber;
-        for (String entry : record.getColumnNames()) {
-            result.put(entry, index);
-            index++;
-        }
-        final Function<String, Integer> function = forMap(result);
-        return function;
     }
 
     /**

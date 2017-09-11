@@ -20,18 +20,12 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import com.google.common.base.Function;
-import com.google.common.base.Functions;
 import io.spine.server.entity.storage.ColumnRecords;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.ConnectionWrapper;
 import io.spine.server.storage.jdbc.RecordTable;
-import io.spine.server.storage.jdbc.RecordTable.StandardColumn;
 
 import java.sql.PreparedStatement;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * The write query to the {@link RecordTable RecordTable}.
@@ -48,32 +42,13 @@ abstract class WriteEntityQuery<I> extends WriteRecordQuery<I, EntityRecordWithC
     @Override
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
         final PreparedStatement statement = super.prepareStatement(connection);
-        if(getRecord().hasColumns()) {
+        if (getRecord().hasColumns()) {
             ColumnRecords.feedColumnsTo(statement,
                                         getRecord(),
                                         getColumnTypeRegistry(),
-                                        getTransformer());
+                                        getTransformer(getRecord(), getFirstColumnIndex()));
         }
         return statement;
-    }
-
-    /**
-     * Retrieves a {@link Function} transforming the Entity Column names into the indexes of
-     * the {@link PreparedStatement} parameters.
-     */
-    private Function<String, Integer> getTransformer() {
-        final Function<String, Integer> function;
-        final Collection<String> columnNames = getRecord().getColumnNames();
-        final Map<String, Integer> result = new HashMap<>();
-
-        int index = getFirstColumnIndex();
-        for (String entry : columnNames) {
-            result.put(entry, index);
-            index++;
-        }
-
-        function = Functions.forMap(result);
-        return function;
     }
 
     /**

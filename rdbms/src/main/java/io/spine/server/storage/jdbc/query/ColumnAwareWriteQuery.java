@@ -19,9 +19,16 @@
  */
 package io.spine.server.storage.jdbc.query;
 
+import com.google.common.base.Function;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
+import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.google.common.base.Functions.forMap;
 
 /**
  * A storage write query aware of Entity Columns.
@@ -39,6 +46,27 @@ abstract class ColumnAwareWriteQuery extends WriteQuery {
 
     ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> getColumnTypeRegistry() {
         return columnTypeRegistry;
+    }
+
+    /**
+     * Obtains the name-to-index transformer for the specified record.
+     *
+     * @param record           the record to extract column names
+     * @param firstColumnIndex the index of the first entity column in a query
+     * @return a {@code Function} transforming a column name to the its index
+     * @see io.spine.server.entity.storage.ColumnRecords#feedColumnsTo
+     */
+    Function<String, Integer> getTransformer(EntityRecordWithColumns record,
+                                             int firstColumnIndex) {
+        final Map<String, Integer> result = new HashMap<>();
+
+        int index = firstColumnIndex;
+        for (String entry : record.getColumnNames()) {
+            result.put(entry, index);
+            index++;
+        }
+        final Function<String, Integer> function = forMap(result);
+        return function;
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")

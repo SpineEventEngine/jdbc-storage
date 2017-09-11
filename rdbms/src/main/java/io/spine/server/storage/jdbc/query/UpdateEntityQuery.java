@@ -26,6 +26,7 @@ import io.spine.server.storage.jdbc.RecordTable;
 
 import static io.spine.server.storage.jdbc.RecordTable.StandardColumn.entity;
 import static io.spine.server.storage.jdbc.RecordTable.StandardColumn.id;
+import static io.spine.server.storage.jdbc.Sql.BuildingBlock.COMMA;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
 import static io.spine.server.storage.jdbc.Sql.Query.PLACEHOLDER;
@@ -97,7 +98,7 @@ class UpdateEntityQuery<I> extends WriteEntityQuery<I> {
         private static String updateEntityColumnsPart(EntityRecordWithColumns record) {
             final StringBuilder builder = new StringBuilder();
             for (String columnName : record.getColumnNames()) {
-                builder.append(',')
+                builder.append(COMMA)
                        .append(columnName)
                        .append(EQUAL)
                        .append(PLACEHOLDER);
