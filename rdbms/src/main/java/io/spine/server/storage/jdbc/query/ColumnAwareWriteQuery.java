@@ -20,13 +20,11 @@
 package io.spine.server.storage.jdbc.query;
 
 import com.google.common.base.Function;
+import com.google.common.collect.ImmutableMap;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import static com.google.common.base.Functions.forMap;
 
@@ -49,23 +47,26 @@ abstract class ColumnAwareWriteQuery extends WriteQuery {
     }
 
     /**
-     * Obtains the name-to-index transformer for the specified record.
+     * Obtains {@code Function} identifying entity columns of a record in a {@code SQL} query.
+     *
+     * <p>The function transforms a column name to the index in a query.
+     * The index should be used to insert column values to {@code PreparedStatement},
+     * using the {@linkplain io.spine.server.entity.storage.ColumnRecords#feedColumnsTo utility}.
      *
      * @param record           the record to extract column names
      * @param firstColumnIndex the index of the first entity column in a query
-     * @return a {@code Function} transforming a column name to the its index
-     * @see io.spine.server.entity.storage.ColumnRecords#feedColumnsTo
+     * @return a {@code Function} transforming a column name to its index
      */
-    Function<String, Integer> getTransformer(EntityRecordWithColumns record,
-                                             int firstColumnIndex) {
-        final Map<String, Integer> result = new HashMap<>();
+    Function<String, Integer> getEntityColumnIdentifier(EntityRecordWithColumns record,
+                                                        int firstColumnIndex) {
+        final ImmutableMap.Builder<String, Integer > result = ImmutableMap.builder();
 
         int index = firstColumnIndex;
         for (String entry : record.getColumnNames()) {
             result.put(entry, index);
             index++;
         }
-        final Function<String, Integer> function = forMap(result);
+        final Function<String, Integer> function = forMap(result.build());
         return function;
     }
 

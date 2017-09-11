@@ -75,6 +75,9 @@ class InsertAggregateRecordQuery<I> extends WriteAggregateQuery<I, AggregateEven
 
         try {
             final Timestamp timestamp = getRecord().getTimestamp();
+
+            //TODO:2017-09-11:dmytro.grankin: Remove hard-coded indexes here and in other places.
+            // See the related issues: https://github.com/SpineEventEngine/jdbc-storage/issues/36
             statement.setLong(3, timestamp.getSeconds());
             statement.setInt(4, timestamp.getNanos());
             statement.setInt(5, getVersionNumberOfRecord());

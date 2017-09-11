@@ -76,6 +76,7 @@ class UpdateEntityQuery<I> extends WriteEntityQuery<I> {
         private final String tableName;
 
         private Builder(String tableName) {
+            super();
             this.tableName = tableName;
         }
 

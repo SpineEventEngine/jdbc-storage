@@ -52,7 +52,7 @@ import static java.lang.String.format;
  * Query that selects {@link AggregateEventRecord} by corresponding aggregate ID sorted by
  * time descending.
  *
- * <p>If the creation time is the same for few records, orders them by version descending.
+ * <p>If the creation time is the same for several records, orders them by version descending.
  *
  * @author Alexander Litus
  * @author Andrey Lavrov

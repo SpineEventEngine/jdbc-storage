@@ -46,7 +46,8 @@ abstract class WriteEntityQuery<I> extends WriteRecordQuery<I, EntityRecordWithC
             ColumnRecords.feedColumnsTo(statement,
                                         getRecord(),
                                         getColumnTypeRegistry(),
-                                        getTransformer(getRecord(), getFirstColumnIndex()));
+                                        getEntityColumnIdentifier(getRecord(),
+                                                                  getFirstColumnIndex()));
         }
         return statement;
     }

@@ -99,7 +99,7 @@ class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
                 ColumnRecords.feedColumnsTo(statement,
                                             record,
                                             getColumnTypeRegistry(),
-                                            getTransformer(record, nextIndex));
+                                            getEntityColumnIdentifier(record, nextIndex));
             }
             columnIndex += columnCount;
         }
