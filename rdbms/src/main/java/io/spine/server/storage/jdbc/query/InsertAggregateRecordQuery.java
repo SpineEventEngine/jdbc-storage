@@ -24,6 +24,7 @@ import com.google.protobuf.Timestamp;
 import io.spine.core.Event;
 import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.storage.jdbc.AggregateEventRecordTable;
+import io.spine.server.storage.jdbc.AggregateEventRecordTable.Column;
 import io.spine.server.storage.jdbc.ConnectionWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.Sql;
@@ -40,6 +41,8 @@ import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.COMMA;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
+import static io.spine.server.storage.jdbc.Sql.Query.VALUES;
+import static io.spine.server.storage.jdbc.Sql.nPlaceholders;
 import static io.spine.validate.Validate.isDefault;
 import static java.lang.String.format;
 
@@ -60,7 +63,7 @@ class InsertAggregateRecordQuery<I> extends WriteAggregateQuery<I, AggregateEven
             timestamp_nanos + COMMA +
             version +
             BRACKET_CLOSE
-            + Sql.Query.VALUES + Sql.nPlaceholders(5) + SEMICOLON;
+            + VALUES + nPlaceholders(Column.values().length) + SEMICOLON;
 
     private InsertAggregateRecordQuery(Builder<I> builder) {
         super(builder);
