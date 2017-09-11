@@ -49,6 +49,7 @@ class InsertEntityQuery<I> extends WriteEntityQuery<I> {
     private static final int RECORD_INDEX = 2;
 
     private static final String FORMAT_PLACEHOLDER = "%s";
+    private static final String COLUMN_FORMAT = COMMA + FORMAT_PLACEHOLDER;
 
     private static final String QUERY_TEMPLATE =
             INSERT_INTO + FORMAT_PLACEHOLDER +
@@ -66,7 +67,7 @@ class InsertEntityQuery<I> extends WriteEntityQuery<I> {
         final Builder<I> builder = new Builder<>();
         final int columnCount = StandardColumn.values().length + record.getColumnNames()
                                                                        .size();
-        final String columnList = columnListForQuery(record);
+        final String columnList = formatAndMergeColumns(record, COLUMN_FORMAT);
         final String valuePlaceholders = nPlaceholders(columnCount);
         final String sqlQuery = format(QUERY_TEMPLATE,
                                        tableName,
@@ -76,15 +77,6 @@ class InsertEntityQuery<I> extends WriteEntityQuery<I> {
                .setRecordIndexInQuery(RECORD_INDEX)
                .setQuery(sqlQuery);
         return builder;
-    }
-
-    private static String columnListForQuery(EntityRecordWithColumns record) {
-        final StringBuilder builder = new StringBuilder();
-        for (String columnName : record.getColumnNames()) {
-            builder.append(COMMA)
-                   .append(columnName);
-        }
-        return builder.toString();
     }
 
     @Override

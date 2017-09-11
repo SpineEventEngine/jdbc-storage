@@ -47,6 +47,8 @@ class UpdateEntityQuery<I> extends WriteEntityQuery<I> {
     private static final int RECORD_INDEX = 1;
 
     private static final String FORMAT_PLACEHOLDER = "%s";
+    private static final String COLUMN_FORMAT = COMMA + FORMAT_PLACEHOLDER + EQUAL + PLACEHOLDER;
+
     private static final String QUERY_TEMPLATE =
             UPDATE + FORMAT_PLACEHOLDER +
             SET + entity + EQUAL + PLACEHOLDER +
@@ -82,7 +84,8 @@ class UpdateEntityQuery<I> extends WriteEntityQuery<I> {
 
         @Override
         public Builder<I> setRecord(EntityRecordWithColumns record) {
-            setQuery(format(QUERY_TEMPLATE, tableName, updateEntityColumnsPart(record)));
+            final String entityColumnsPart = formatAndMergeColumns(record, COLUMN_FORMAT);
+            setQuery(format(QUERY_TEMPLATE, tableName, entityColumnsPart));
             return super.setRecord(record);
         }
 
@@ -94,17 +97,6 @@ class UpdateEntityQuery<I> extends WriteEntityQuery<I> {
         @Override
         protected Builder<I> getThis() {
             return this;
-        }
-
-        private static String updateEntityColumnsPart(EntityRecordWithColumns record) {
-            final StringBuilder builder = new StringBuilder();
-            for (String columnName : record.getColumnNames()) {
-                builder.append(COMMA)
-                       .append(columnName)
-                       .append(EQUAL)
-                       .append(PLACEHOLDER);
-            }
-            return builder.toString();
         }
     }
 }

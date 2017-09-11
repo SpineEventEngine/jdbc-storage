@@ -140,6 +140,8 @@ class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
     static class Builder<I> extends ColumnAwareWriteQuery.Builder<Builder<I>,
                                                                   InsertEntityRecordsBulkQuery> {
 
+        private static final String COLUMN_FORMAT = COMMA + FORMAT_PLACEHOLDER;
+
         private final Map<I, EntityRecordWithColumns> records = newHashMap();
         private String tableName;
         private IdColumn<I> idColumn;
@@ -169,12 +171,10 @@ class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
             }
             final EntityRecordWithColumns gaugeRecord =
                     find(records.values(), Predicates.<EntityRecordWithColumns>notNull());
-            final Collection<String> columnNames = gaugeRecord.getColumnNames();
-            columnCount = StandardColumn.values().length +
-                          columnNames.size();
+            columnCount = StandardColumn.values().length + gaugeRecord.getColumnNames().size();
             final Collection<String> sqlValues = nCopies(records.size(),
                                                          nPlaceholders(columnCount));
-            final String entityColumnNames = compileEntityColumnNames(columnNames);
+            final String entityColumnNames = formatAndMergeColumns(gaugeRecord, COLUMN_FORMAT);
             final String sqlValuesJoined = Joiner.on(COMMA.toString())
                                                  .join(sqlValues);
             final String sql = format(SQL_TEMPLATE, tableName, entityColumnNames, sqlValuesJoined);
@@ -185,15 +185,6 @@ class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
         @Override
         protected Builder<I> getThis() {
             return this;
-        }
-
-        private static String compileEntityColumnNames(Collection<String> entityColumnNames) {
-            final StringBuilder entityColumns = new StringBuilder();
-            for (String columnName : entityColumnNames) {
-                entityColumns.append(COMMA)
-                             .append(columnName);
-            }
-            return entityColumns.toString();
         }
     }
 }

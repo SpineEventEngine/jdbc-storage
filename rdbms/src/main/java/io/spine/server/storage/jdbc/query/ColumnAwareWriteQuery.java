@@ -26,7 +26,12 @@ import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
 
+import java.util.List;
+
 import static com.google.common.base.Functions.forMap;
+import static com.google.common.collect.Lists.newArrayList;
+import static java.lang.String.format;
+import static java.util.Collections.sort;
 
 /**
  * A storage write query aware of Entity Columns.
@@ -47,27 +52,62 @@ abstract class ColumnAwareWriteQuery extends WriteQuery {
     }
 
     /**
-     * Obtains {@code Function} identifying entity columns of a record in a {@code SQL} query.
+     * Obtains a {@code Function} identifying entity columns of a record in a {@code SQL} query
+     * by the index for each column name.
      *
-     * <p>The function transforms a column name to the index in a query.
-     * The index should be used to insert column values to {@code PreparedStatement},
-     * using the {@linkplain io.spine.server.entity.storage.ColumnRecords#feedColumnsTo utility}.
+     * <p>Such an index may be used to insert column values to a {@code PreparedStatement} via
+     * the {@linkplain io.spine.server.entity.storage.ColumnRecords#feedColumnsTo
+     * feedColumnsTo() utility}.
      *
      * @param record           the record to extract column names
      * @param firstColumnIndex the index of the first entity column in a query
      * @return a {@code Function} transforming a column name to its index
+     * @see #formatAndMergeColumns(EntityRecordWithColumns, String)
      */
     Function<String, Integer> getEntityColumnIdentifier(EntityRecordWithColumns record,
                                                         int firstColumnIndex) {
-        final ImmutableMap.Builder<String, Integer > result = ImmutableMap.builder();
+        final ImmutableMap.Builder<String, Integer> result = ImmutableMap.builder();
 
         int index = firstColumnIndex;
-        for (String entry : record.getColumnNames()) {
+        for (String entry : getSortedColumnNames(record)) {
             result.put(entry, index);
             index++;
         }
         final Function<String, Integer> function = forMap(result.build());
         return function;
+    }
+
+    /**
+     * Formats column names and merges the formatted values into {@code String}.
+     *
+     * <p>Use {@link #getEntityColumnIdentifier(EntityRecordWithColumns, int)}
+     * to identify a column in the result. These methods use the same ordering of column names.
+     *
+     * @param record       the record to obtain column names
+     * @param columnFormat the format of a column name
+     * @return the formatted column names merged into {@code String}
+     */
+    static String formatAndMergeColumns(EntityRecordWithColumns record, String columnFormat) {
+        final StringBuilder builder = new StringBuilder();
+        for (String columnName : getSortedColumnNames(record)) {
+            final String item = format(columnFormat, columnName);
+            builder.append(item);
+        }
+        return builder.toString();
+    }
+
+    /**
+     * Obtains the sorted entity column names.
+     *
+     * <p>Use this method to order the entity columns in a SQL query.
+     *
+     * @param record the record to obtain column names
+     * @return a {@code Collection} of sorted column names
+     */
+    private static Iterable<String> getSortedColumnNames(EntityRecordWithColumns record) {
+        final List<String> list = newArrayList(record.getColumnNames());
+        sort(list);
+        return list;
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
