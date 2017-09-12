@@ -20,15 +20,10 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import com.google.common.base.Joiner;
-import io.spine.server.entity.storage.EntityColumn;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.RecordTable;
 import io.spine.server.storage.jdbc.RecordTable.StandardColumn;
 
-import java.util.Map;
-
-import static io.spine.server.entity.storage.EntityColumns.sorted;
 import static io.spine.server.storage.jdbc.RecordTable.StandardColumn.entity;
 import static io.spine.server.storage.jdbc.RecordTable.StandardColumn.id;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
@@ -54,6 +49,7 @@ class InsertEntityQuery<I> extends WriteEntityQuery<I> {
     private static final int RECORD_INDEX = 2;
 
     private static final String FORMAT_PLACEHOLDER = "%s";
+    private static final String COLUMN_FORMAT = COMMA + FORMAT_PLACEHOLDER;
 
     private static final String QUERY_TEMPLATE =
             INSERT_INTO + FORMAT_PLACEHOLDER +
@@ -69,26 +65,23 @@ class InsertEntityQuery<I> extends WriteEntityQuery<I> {
 
     static <I> Builder<I> newBuilder(String tableName, EntityRecordWithColumns record) {
         final Builder<I> builder = new Builder<>();
-        final int columnCount;
-        final String entityColumnNames;
-        if (record.hasColumns()) {
-            final Map<String, EntityColumn> columns = record.getColumns();
-            columnCount = columns.size() + StandardColumn.values().length;
-            entityColumnNames = COMMA + Joiner.on(COMMA.toString())
-                                              .join(sorted(columns.keySet()));
-        } else {
-            columnCount = StandardColumn.values().length;
-            entityColumnNames = "";
-        }
+        final int columnCount = StandardColumn.values().length + record.getColumnNames()
+                                                                       .size();
+        final String columnList = formatAndMergeColumns(record, COLUMN_FORMAT);
         final String valuePlaceholders = nPlaceholders(columnCount);
         final String sqlQuery = format(QUERY_TEMPLATE,
                                        tableName,
-                                       entityColumnNames,
+                                       columnList,
                                        valuePlaceholders);
         builder.setIdIndexInQuery(ID_INDEX)
                .setRecordIndexInQuery(RECORD_INDEX)
                .setQuery(sqlQuery);
         return builder;
+    }
+
+    @Override
+    protected int getFirstColumnIndex() {
+        return RECORD_INDEX + 1;
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")

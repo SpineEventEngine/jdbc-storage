@@ -20,28 +20,19 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import com.google.common.base.Function;
-import com.google.common.base.Functions;
 import io.spine.server.entity.storage.ColumnRecords;
-import io.spine.server.entity.storage.EntityColumn;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.ConnectionWrapper;
 import io.spine.server.storage.jdbc.RecordTable;
-import io.spine.server.storage.jdbc.RecordTable.StandardColumn;
 
 import java.sql.PreparedStatement;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
-import static io.spine.server.entity.storage.EntityColumns.sorted;
 
 /**
  * The write query to the {@link RecordTable RecordTable}.
  *
  * @author Dmytro Dashenkov
  */
-class WriteEntityQuery<I> extends WriteRecordQuery<I, EntityRecordWithColumns> {
+abstract class WriteEntityQuery<I> extends WriteRecordQuery<I, EntityRecordWithColumns> {
 
     WriteEntityQuery(
             Builder<? extends Builder, ? extends WriteRecordQuery, I, EntityRecordWithColumns> builder) {
@@ -51,32 +42,20 @@ class WriteEntityQuery<I> extends WriteRecordQuery<I, EntityRecordWithColumns> {
     @Override
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
         final PreparedStatement statement = super.prepareStatement(connection);
-        if(getRecord().hasColumns()) {
+        if (getRecord().hasColumns()) {
             ColumnRecords.feedColumnsTo(statement,
                                         getRecord(),
                                         getColumnTypeRegistry(),
-                                        getTransformer());
+                                        getEntityColumnIdentifier(getRecord(),
+                                                                  getFirstColumnIndex()));
         }
         return statement;
     }
 
     /**
-     * Retrieves a {@link Function} transforming the Entity Column names into the indexes of
-     * the {@link PreparedStatement} parameters.
+     * Obtains the index of the first entity column to be inserted in the query.
+     *
+     * @return the index of the first column
      */
-    private Function<String, Integer> getTransformer() {
-        final Function<String, Integer> function;
-        final Map<String, EntityColumn> columns = getRecord().getColumns();
-        final Collection<String> columnNames = sorted(columns.keySet());
-        final Map<String, Integer> result = new HashMap<>();
-
-        int index = StandardColumn.values().length + 1;
-        for (String entry : columnNames) {
-            result.put(entry, index);
-            index++;
-        }
-
-        function = Functions.forMap(result);
-        return function;
-    }
+    protected abstract int getFirstColumnIndex();
 }

@@ -138,7 +138,7 @@ public class RecordStorageQueryFactory<I>
 
     @Override
     public WriteQuery newUpdateQuery(I id, EntityRecordWithColumns record) {
-        final int idIndex = record.getColumns().size() + StandardColumn.values().length;
+        final int idIndex = record.getColumnNames().size() + StandardColumn.values().length;
         final UpdateEntityQuery.Builder<I> builder =
                 UpdateEntityQuery.<I>newBuilder(tableName)
                                  .setDataSource(dataSource)

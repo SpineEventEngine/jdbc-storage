@@ -71,13 +71,12 @@ public class AggregateStorageQueryFactory<I> implements ReadQueryFactory<I, Aggr
 
     /** Returns a query that selects aggregate records by ID sorted by time descending. */
     @SuppressWarnings("InstanceMethodNamingConvention")
-    public SelectByIdSortedByTimeDescQuery<I> newSelectByIdSortedByTimeDescQuery(I id) {
-        final SelectByIdSortedByTimeDescQuery.Builder<I> builder =
-                SelectByIdSortedByTimeDescQuery.<I>newBuilder(mainTableName)
-                        .setDataSource(dataSource)
-                        .setLogger(getLogger())
-                        .setIdColumn(idColumn)
-                        .setId(id);
+    public SelectEventRecordsById<I> newSelectByIdSortedByTimeDescQuery(I id) {
+        final SelectEventRecordsById.Builder<I> builder =
+                SelectEventRecordsById.<I>newBuilder(mainTableName).setDataSource(dataSource)
+                                                                   .setLogger(getLogger())
+                                                                   .setIdColumn(idColumn)
+                                                                   .setId(id);
         return builder.build();
     }
 
@@ -96,23 +95,21 @@ public class AggregateStorageQueryFactory<I> implements ReadQueryFactory<I, Aggr
 
     @Override
     public StorageIndexQuery<I> newIndexQuery() {
-        return StorageIndexQuery.<I>newBuilder()
-                                .setDataSource(dataSource)
-                                .setLogger(logger)
-                                .setIdType(idColumn.getJavaType())
-                                .setTableName(mainTableName)
-                                .build();
+        return StorageIndexQuery.<I>newBuilder().setDataSource(dataSource)
+                                                .setLogger(logger)
+                                                .setIdType(idColumn.getJavaType())
+                                                .setTableName(mainTableName)
+                                                .build();
     }
 
     @Override
     public WriteQuery newInsertQuery(I id, AggregateEventRecord record) {
         final InsertAggregateRecordQuery.Builder<I> builder =
-                InsertAggregateRecordQuery.<I>newBuilder(mainTableName)
-                        .setDataSource(dataSource)
-                        .setLogger(getLogger())
-                        .setIdColumn(idColumn)
-                        .setId(id)
-                        .setRecord(record);
+                InsertAggregateRecordQuery.<I>newBuilder(mainTableName).setDataSource(dataSource)
+                                                                       .setLogger(getLogger())
+                                                                       .setIdColumn(idColumn)
+                                                                       .setId(id)
+                                                                       .setRecord(record);
         return builder.build();
     }
 

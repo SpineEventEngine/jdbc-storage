@@ -17,35 +17,39 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package io.spine.server.entity.storage;
 
-import io.spine.annotation.Internal;
-import io.spine.server.entity.Entity;
+package io.spine.server.storage.jdbc.given;
 
-import java.util.Collection;
+import io.spine.server.entity.AbstractEntity;
+import io.spine.server.entity.storage.Column;
+import io.spine.server.storage.RecordStorageShould.TestCounterEntity;
+import io.spine.test.storage.Project;
 
 /**
- * A utility for working with the Entity Columns within the JDBC
- * {@linkplain io.spine.server.storage.Storage storage} implementation.
- *
- * @author Alexander Aleksandrov
+ * @author Dmytro Grankin
  */
-@Internal
-public final class EntityColumns {
+public class JdbcRecordStorageTestEnv {
 
-    private EntityColumns() {
-        // Prevent utility class instantiation.
+    public static final String COLUMN_NAME_FOR_STORING = "customName";
+
+    private JdbcRecordStorageTestEnv() {
+        // Prevent instantiation of this utility class.
     }
 
-    /**
-     * Retrieves the {@linkplain EntityColumn entity columns} from the given {@linkplain Entity}
-     * {@linkplain Class class} description.
-     *
-     * @param cls the type of the {@link Entity} to get the Columns from
-     * @return the entity columns declared within this {@link Entity}
-     */
-    public static Collection<EntityColumn> getColumns(Class<? extends Entity<?, ?>> cls) {
-        final Collection<EntityColumn> result = Columns.getColumns(cls);
-        return result;
+    public static class TestCounterEntityJdbc extends TestCounterEntity<String> {
+        protected TestCounterEntityJdbc(String id) {
+            super(id);
+        }
+    }
+
+    public static class TestEntityWithStringId extends AbstractEntity<String, Project> {
+        protected TestEntityWithStringId(String id) {
+            super(id);
+        }
+
+        @Column(name = COLUMN_NAME_FOR_STORING)
+        public int getValue() {
+            return 0;
+        }
     }
 }

@@ -20,12 +20,10 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicates;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.storage.ColumnRecords;
-import io.spine.server.entity.storage.EntityColumn;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.ConnectionWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
@@ -36,16 +34,13 @@ import io.spine.server.storage.jdbc.Serializer;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 
-import static com.google.common.base.Functions.forMap;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static com.google.common.collect.Iterables.find;
 import static com.google.common.collect.Maps.newHashMap;
-import static io.spine.server.entity.storage.EntityColumns.sorted;
 import static io.spine.server.storage.jdbc.RecordTable.StandardColumn.entity;
 import static io.spine.server.storage.jdbc.RecordTable.StandardColumn.id;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
@@ -104,26 +99,11 @@ class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
                 ColumnRecords.feedColumnsTo(statement,
                                             record,
                                             getColumnTypeRegistry(),
-                                            getTransformer(record, nextIndex));
+                                            getEntityColumnIdentifier(record, nextIndex));
             }
             columnIndex += columnCount;
         }
         return statement;
-    }
-
-    private static Function<String, Integer> getTransformer(EntityRecordWithColumns record,
-                                                            int fromColumnNumber) {
-        final Map<String, EntityColumn> columns = record.getColumns();
-        final Collection<String> columnNames = sorted(columns.keySet());
-        final Map<String, Integer> result = new HashMap<>();
-
-        int index = fromColumnNumber;
-        for (String entry : columnNames) {
-            result.put(entry, index);
-            index++;
-        }
-        final Function<String, Integer> function = forMap(result);
-        return function;
     }
 
     /**
@@ -160,6 +140,8 @@ class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
     static class Builder<I> extends ColumnAwareWriteQuery.Builder<Builder<I>,
                                                                   InsertEntityRecordsBulkQuery> {
 
+        private static final String COLUMN_FORMAT = COMMA + FORMAT_PLACEHOLDER;
+
         private final Map<I, EntityRecordWithColumns> records = newHashMap();
         private String tableName;
         private IdColumn<I> idColumn;
@@ -189,12 +171,10 @@ class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
             }
             final EntityRecordWithColumns gaugeRecord =
                     find(records.values(), Predicates.<EntityRecordWithColumns>notNull());
-            final Map<String, EntityColumn> columns = gaugeRecord.getColumns();
-            columnCount = StandardColumn.values().length +
-                          columns.size();
+            columnCount = StandardColumn.values().length + gaugeRecord.getColumnNames().size();
             final Collection<String> sqlValues = nCopies(records.size(),
                                                          nPlaceholders(columnCount));
-            final String entityColumnNames = compileEntityColumnNames(columns.keySet());
+            final String entityColumnNames = formatAndMergeColumns(gaugeRecord, COLUMN_FORMAT);
             final String sqlValuesJoined = Joiner.on(COMMA.toString())
                                                  .join(sqlValues);
             final String sql = format(SQL_TEMPLATE, tableName, entityColumnNames, sqlValuesJoined);
@@ -205,15 +185,6 @@ class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
         @Override
         protected Builder<I> getThis() {
             return this;
-        }
-
-        private static String compileEntityColumnNames(Collection<String> entityColumnNames) {
-            final StringBuilder entityColumns = new StringBuilder();
-            for (String columnName : entityColumnNames) {
-                entityColumns.append(COMMA)
-                             .append(columnName);
-            }
-            return entityColumns.toString();
         }
     }
 }

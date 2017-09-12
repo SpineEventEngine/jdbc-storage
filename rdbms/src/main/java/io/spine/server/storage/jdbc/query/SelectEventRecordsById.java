@@ -32,6 +32,7 @@ import io.spine.server.storage.jdbc.MessageDbIterator;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import static io.spine.server.storage.jdbc.AggregateEventRecordTable.Column.version;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.COMMA;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
@@ -51,21 +52,24 @@ import static java.lang.String.format;
  * Query that selects {@link AggregateEventRecord} by corresponding aggregate ID sorted by
  * time descending.
  *
+ * <p>If the creation time is the same for several records, orders them by version descending.
+ *
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
 @Internal
-public class SelectByIdSortedByTimeDescQuery<I> extends StorageQuery {
+public class SelectEventRecordsById<I> extends StorageQuery {
 
     private static final String QUERY_TEMPLATE =
             SELECT.toString() + aggregate + FROM + "%s" +
             WHERE + Column.id + EQUAL + PLACEHOLDER +
-            ORDER_BY + timestamp + DESC + COMMA + timestamp_nanos + DESC + SEMICOLON;
+            ORDER_BY + timestamp + DESC + COMMA + timestamp_nanos + DESC + COMMA +
+            version + DESC + SEMICOLON;
 
     private final IdColumn<I> idColumn;
     private final I id;
 
-    private SelectByIdSortedByTimeDescQuery(Builder<I> builder) {
+    private SelectEventRecordsById(Builder<I> builder) {
         super(builder);
         this.idColumn = builder.idColumn;
         this.id = builder.id;
@@ -92,14 +96,14 @@ public class SelectByIdSortedByTimeDescQuery<I> extends StorageQuery {
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
     public static class Builder<I>
-            extends StorageQuery.Builder<Builder<I>, SelectByIdSortedByTimeDescQuery> {
+            extends StorageQuery.Builder<Builder<I>, SelectEventRecordsById> {
 
         private IdColumn<I> idColumn;
         private I id;
 
         @Override
-        public SelectByIdSortedByTimeDescQuery<I> build() {
-            return new SelectByIdSortedByTimeDescQuery<>(this);
+        public SelectEventRecordsById<I> build() {
+            return new SelectEventRecordsById<>(this);
         }
 
         public Builder<I> setIdColumn(IdColumn<I> idColumn) {

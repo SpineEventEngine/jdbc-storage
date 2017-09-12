@@ -24,14 +24,15 @@ import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.RecordTable;
 
+import static io.spine.server.storage.jdbc.RecordTable.StandardColumn.entity;
+import static io.spine.server.storage.jdbc.RecordTable.StandardColumn.id;
+import static io.spine.server.storage.jdbc.Sql.BuildingBlock.COMMA;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
 import static io.spine.server.storage.jdbc.Sql.Query.PLACEHOLDER;
 import static io.spine.server.storage.jdbc.Sql.Query.SET;
 import static io.spine.server.storage.jdbc.Sql.Query.UPDATE;
 import static io.spine.server.storage.jdbc.Sql.Query.WHERE;
-import static io.spine.server.storage.jdbc.RecordTable.StandardColumn.entity;
-import static io.spine.server.storage.jdbc.RecordTable.StandardColumn.id;
 import static java.lang.String.format;
 
 /**
@@ -43,12 +44,15 @@ import static java.lang.String.format;
  */
 class UpdateEntityQuery<I> extends WriteEntityQuery<I> {
 
-    private static final int ID_INDEX = 2;
     private static final int RECORD_INDEX = 1;
 
+    private static final String FORMAT_PLACEHOLDER = "%s";
+    private static final String COLUMN_FORMAT = COMMA + FORMAT_PLACEHOLDER + EQUAL + PLACEHOLDER;
+
     private static final String QUERY_TEMPLATE =
-            UPDATE + "%s" +
+            UPDATE + FORMAT_PLACEHOLDER +
             SET + entity + EQUAL + PLACEHOLDER +
+            FORMAT_PLACEHOLDER +
             WHERE + id + EQUAL + PLACEHOLDER + SEMICOLON;
 
     private UpdateEntityQuery(Builder<I> builder) {
@@ -56,11 +60,13 @@ class UpdateEntityQuery<I> extends WriteEntityQuery<I> {
     }
 
     static <I> Builder<I> newBuilder(String tableName) {
-        final Builder<I> builder = new Builder<>();
-        builder.setIdIndexInQuery(ID_INDEX)
-               .setRecordIndexInQuery(RECORD_INDEX)
-               .setQuery(format(QUERY_TEMPLATE, tableName));
-        return builder;
+        final Builder<I> builder = new Builder<>(tableName);
+        return builder.setRecordIndexInQuery(RECORD_INDEX);
+    }
+
+    @Override
+    protected int getFirstColumnIndex() {
+        return RECORD_INDEX + 1;
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
@@ -68,6 +74,21 @@ class UpdateEntityQuery<I> extends WriteEntityQuery<I> {
                                                              UpdateEntityQuery,
                                                              I,
                                                              EntityRecordWithColumns> {
+
+        private final String tableName;
+
+        private Builder(String tableName) {
+            super();
+            this.tableName = tableName;
+        }
+
+        @Override
+        public Builder<I> setRecord(EntityRecordWithColumns record) {
+            final String entityColumnsPart = formatAndMergeColumns(record, COLUMN_FORMAT);
+            setQuery(format(QUERY_TEMPLATE, tableName, entityColumnsPart));
+            return super.setRecord(record);
+        }
+
         @Override
         public UpdateEntityQuery build() {
             return new UpdateEntityQuery<>(this);
