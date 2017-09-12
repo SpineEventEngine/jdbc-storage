@@ -43,7 +43,7 @@ public class GivenDataSource {
     /**
      * The URL prefix of an in-memory HyperSQL DB.
      */
-    private static final String HSQL_IN_MEMORY_DB_URL_PREFIX = "jdbc:hsqldb:mem:";
+    private static final String HSQL_IN_MEMORY_DB_URL_PREFIX = "jdbc:h2:mem:";
 
     private static final SQLException EXCEPTION = new SQLException("");
 

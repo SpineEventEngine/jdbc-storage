@@ -76,16 +76,12 @@ public class SelectEventRecordsById<I> extends StorageQuery {
     }
 
     public DbIterator<AggregateEventRecord> execute() throws DatabaseException {
-        try (ConnectionWrapper connection = getConnection(true);
-             PreparedStatement statement = prepareStatement(connection)) {
-            idColumn.setId(1, id, statement);
-            return new MessageDbIterator<>(statement,
-                                           aggregate.toString(),
-                                           of(AggregateEventRecord.class));
-        } catch (SQLException e) {
-            getLogger().error("Error while selecting entity by aggregate id sorted by time: ", e);
-            throw new DatabaseException(e);
-        }
+        ConnectionWrapper connection = getConnection(true);
+        PreparedStatement statement = prepareStatement(connection);
+        idColumn.setId(1, id, statement);
+        return new MessageDbIterator<>(statement,
+                                       aggregate.toString(),
+                                       of(AggregateEventRecord.class));
     }
 
     public static <I> Builder<I> newBuilder(String tableName) {

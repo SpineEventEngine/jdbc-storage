@@ -23,6 +23,8 @@ package io.spine.server.storage.jdbc;
 import io.spine.annotation.Internal;
 
 import javax.annotation.Nullable;
+import java.io.Closeable;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -40,7 +42,7 @@ import java.util.NoSuchElementException;
  * @author Alexander Litus
  */
 @Internal
-public abstract class DbIterator<R> implements Iterator<R>, AutoCloseable {
+public abstract class DbIterator<R> implements Iterator<R>, Closeable {
 
     private final ResultSet resultSet;
     @Nullable
@@ -53,9 +55,9 @@ public abstract class DbIterator<R> implements Iterator<R>, AutoCloseable {
     /**
      * Creates a new iterator instance.
      *
-     * @param statement        a statement used to retrieve a result set
-     *                         (both statement and result set are closed in {@link #close()}).
-     * @param columnName       a name of a serialized storage record column
+     * @param statement  a statement used to retrieve a result set
+     *                   (both statement and result set are closed in {@link #close()}).
+     * @param columnName a name of a serialized storage record column
      * @throws DatabaseException if an error occurs during interaction with the DB
      */
     protected DbIterator(PreparedStatement statement, String columnName) throws DatabaseException {
@@ -81,6 +83,13 @@ public abstract class DbIterator<R> implements Iterator<R>, AutoCloseable {
         this.statement = null;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>Calls {@link #close()}, if {@link ResultSet#next()} returns {@code false}.
+     *
+     * @return {@inheritDoc}
+     */
     @Override
     public boolean hasNext() {
         if (!nextCalled) {
@@ -88,6 +97,10 @@ public abstract class DbIterator<R> implements Iterator<R>, AutoCloseable {
         }
         try {
             final boolean hasNextElem = resultSet.next();
+            if (!hasNextElem) {
+                close();
+            }
+
             // ResultSet.previous() is not used here because some JDBC drivers do not support it.
             memoizedHasNext = hasNextElem;
 
@@ -132,8 +145,8 @@ public abstract class DbIterator<R> implements Iterator<R>, AutoCloseable {
     /**
      * Removal is unsupported.
      *
-     * @deprecated as unsupported
      * @throws UnsupportedOperationException always
+     * @deprecated as unsupported
      */
     @Override
     @Deprecated
@@ -147,6 +160,10 @@ public abstract class DbIterator<R> implements Iterator<R>, AutoCloseable {
             resultSet.close();
             if (statement != null) {
                 statement.close();
+                final Connection connection = statement.getConnection();
+                if (connection != null) {
+                    connection.close();
+                }
             }
         } catch (SQLException e) {
             throw new DatabaseException(e);

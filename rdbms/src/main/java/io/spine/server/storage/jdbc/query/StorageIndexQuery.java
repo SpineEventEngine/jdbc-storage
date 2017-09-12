@@ -56,11 +56,10 @@ public class StorageIndexQuery<I> extends StorageQuery {
     }
 
     public Iterator<I> execute() {
-        try (ConnectionWrapper connection = getConnection(true)) {
-            final PreparedStatement statement = prepareStatement(connection);
-            final Iterator<I> result = IndexIterator.create(statement, idColumnName, idType);
-            return result;
-        }
+        ConnectionWrapper connection = getConnection(true);
+        final PreparedStatement statement = prepareStatement(connection);
+        final Iterator<I> result = IndexIterator.create(statement, idColumnName, idType);
+        return result;
     }
 
     public static <I> Builder<I> newBuilder() {
@@ -106,7 +105,7 @@ public class StorageIndexQuery<I> extends StorageQuery {
         @Override
         public StorageIndexQuery<I> build() {
             checkState(tableName != null, "Table name is not set.");
-            checkState(idType!= null, "ID type is not set.");
+            checkState(idType != null, "ID type is not set.");
             setQuery(format(SQL_TEMPLATE, idColumnName, tableName));
             return new StorageIndexQuery<>(this);
         }
