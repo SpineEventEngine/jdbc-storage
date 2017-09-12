@@ -22,17 +22,20 @@ package io.spine.server.storage.jdbc;
 
 import io.spine.annotation.Internal;
 
-import javax.annotation.Nullable;
 import java.io.Closeable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**
  * An iterator over a {@link ResultSet} of storage records.
+ *
+ * <p>This class internally uses {@link ResultSet}.
+ * See how to {@linkplain #close() finish} the usage of the iterator properly.
  *
  * <p>Uses {@link Serializer} to deserialize records.
  *
@@ -45,8 +48,6 @@ import java.util.NoSuchElementException;
 public abstract class DbIterator<R> implements Iterator<R>, Closeable {
 
     private final ResultSet resultSet;
-    @Nullable
-    private final PreparedStatement statement;
     private final String columnName;
     private boolean hasNextCalled = false;
     private boolean nextCalled = true;
@@ -64,7 +65,6 @@ public abstract class DbIterator<R> implements Iterator<R>, Closeable {
         try {
             this.resultSet = statement.executeQuery();
             this.columnName = columnName;
-            this.statement = statement;
         } catch (SQLException e) {
             throw new DatabaseException(e);
         }
@@ -80,7 +80,6 @@ public abstract class DbIterator<R> implements Iterator<R>, Closeable {
     protected DbIterator(ResultSet resultSet, String columnName) {
         this.resultSet = resultSet;
         this.columnName = columnName;
-        this.statement = null;
     }
 
     /**
@@ -154,10 +153,18 @@ public abstract class DbIterator<R> implements Iterator<R>, Closeable {
         throw new UnsupportedOperationException("Removing is not supported.");
     }
 
+    /**
+     * Closes {@link #resultSet} and the related {@link Statement} and {@link Connection}.
+     *
+     * <p>This method should be called either manually or called by {@link #hasNext()}.
+     *
+     * @throws DatabaseException if {@code SQLException} is occurred
+     */
     @Override
     public void close() throws DatabaseException {
         try {
             resultSet.close();
+            final Statement statement = resultSet.getStatement();
             if (statement != null) {
                 statement.close();
                 final Connection connection = statement.getConnection();
