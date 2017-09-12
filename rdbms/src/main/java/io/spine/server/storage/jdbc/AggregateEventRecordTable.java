@@ -47,7 +47,7 @@ public class AggregateEventRecordTable<I> extends AggregateTable<I, AggregateEve
     private final AggregateStorageQueryFactory<I> queryFactory;
 
     AggregateEventRecordTable(Class<? extends Aggregate<I, ?, ?>> entityClass,
-                                     DataSourceWrapper dataSource) {
+                              DataSourceWrapper dataSource) {
         super(entityClass, Column.id.name(), dataSource);
         queryFactory = new AggregateStorageQueryFactory<>(dataSource,
                                                           newTableName(entityClass),
@@ -83,9 +83,8 @@ public class AggregateEventRecordTable<I> extends AggregateTable<I, AggregateEve
     }
 
     DbIterator<AggregateEventRecord> historyBackward(I id) {
-        final DbIterator<AggregateEventRecord> result =
-                queryFactory.newSelectByIdSortedByTimeDescQuery(id)
-                            .execute();
+        final DbIterator<AggregateEventRecord> result = queryFactory.newSelectEventRecordsById(id)
+                                                                    .execute();
         return result;
     }
 
