@@ -43,6 +43,8 @@ public class GivenDataSource {
     /**
      * The URL prefix of an in-memory HyperSQL DB.
      */
+    //TODO:2017-09-13:dmytro.grankin: Enable flexible configuration of drivers.
+    // See the details: https://github.com/SpineEventEngine/jdbc-storage/issues/37
     private static final String HSQL_IN_MEMORY_DB_URL_PREFIX = "jdbc:h2:mem:";
 
     private static final SQLException EXCEPTION = new SQLException("");
