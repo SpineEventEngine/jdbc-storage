@@ -4,6 +4,7 @@ ext {
 
 dependencies {
     compile group: 'org.hsqldb', name: 'hsqldb', version: '2.3.3'
+    compile group: 'com.h2database', name: 'h2', version: '1.4.196'
 
     compile group: 'com.zaxxer', name: 'HikariCP', version: '2.4.3'
 

@@ -95,7 +95,8 @@ public final class SelectByEntityColumnsQuery<I> extends StorageQuery implements
     }
 
     public Iterator<EntityRecord> execute() {
-        try (PreparedStatement statement = this.statement) {
+        try {
+            PreparedStatement statement = this.statement;
             final ResultSet resultSet = statement.executeQuery();
             return QueryResults.parse(resultSet, fieldMask);
         } catch (SQLException e) {

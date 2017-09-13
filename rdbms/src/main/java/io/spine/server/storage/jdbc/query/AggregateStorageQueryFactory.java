@@ -71,7 +71,7 @@ public class AggregateStorageQueryFactory<I> implements ReadQueryFactory<I, Aggr
 
     /** Returns a query that selects aggregate records by ID sorted by time descending. */
     @SuppressWarnings("InstanceMethodNamingConvention")
-    public SelectEventRecordsById<I> newSelectByIdSortedByTimeDescQuery(I id) {
+    public SelectEventRecordsById<I> newSelectEventRecordsById(I id) {
         final SelectEventRecordsById.Builder<I> builder =
                 SelectEventRecordsById.<I>newBuilder(mainTableName).setDataSource(dataSource)
                                                                    .setLogger(getLogger())
@@ -85,12 +85,12 @@ public class AggregateStorageQueryFactory<I> implements ReadQueryFactory<I, Aggr
      *
      * @deprecated multiple records correspond to a single ID in
      * {@link io.spine.server.storage.jdbc.AggregateEventRecordTable AggregateEventRecordTable};
-     * please use {@link #newSelectByIdSortedByTimeDescQuery(Object)} to read the records.
+     * please use {@link #newSelectEventRecordsById(Object)} to read the records.
      */
     @Deprecated
     @Override
     public SelectMessageByIdQuery<I, AggregateEventRecord> newSelectByIdQuery(I id) {
-        throw new UnsupportedOperationException("Use newSelectByIdSortedByTimeDescQuery instead.");
+        throw new UnsupportedOperationException("Use newSelectEventRecordsById instead.");
     }
 
     @Override
