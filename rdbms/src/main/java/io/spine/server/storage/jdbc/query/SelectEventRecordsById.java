@@ -63,8 +63,8 @@ public class SelectEventRecordsById<I> extends StorageQuery {
     private static final String QUERY_TEMPLATE =
             SELECT.toString() + aggregate + FROM + "%s" +
             WHERE + Column.id + EQUAL + PLACEHOLDER +
-            ORDER_BY + timestamp + DESC + COMMA + timestamp_nanos + DESC + COMMA +
-            version + DESC + SEMICOLON;
+            ORDER_BY + version + DESC + COMMA +
+            timestamp + DESC + COMMA + timestamp_nanos + DESC + SEMICOLON;
 
     private final IdColumn<I> idColumn;
     private final I id;
