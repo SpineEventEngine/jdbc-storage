@@ -24,6 +24,7 @@ import com.google.common.base.Optional;
 import com.google.protobuf.Int32Value;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateEventRecord;
+import io.spine.server.aggregate.AggregateReadRequest;
 import io.spine.server.aggregate.AggregateStorage;
 import io.spine.server.entity.LifecycleFlags;
 
@@ -123,11 +124,10 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     @Override
-    protected Iterator<AggregateEventRecord> historyBackward(I id) throws DatabaseException {
-        checkNotNull(id);
-
-        final DbIterator<AggregateEventRecord> result = mainTable.historyBackward(id);
-        return result;
+    protected Iterator<AggregateEventRecord> historyBackward(AggregateReadRequest<I> request)
+            throws DatabaseException {
+        checkNotNull(request);
+        return mainTable.historyBackward(request);
     }
 
     @Override
@@ -140,8 +140,7 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
         return new Builder<>();
     }
 
-    public static class Builder<I> extends StorageBuilder<Builder<I>,
-            JdbcAggregateStorage<I>> {
+    public static class Builder<I> extends StorageBuilder<Builder<I>, JdbcAggregateStorage<I>> {
         private Class<? extends Aggregate<I, ?, ?>> aggregateClass;
 
         private Builder() {

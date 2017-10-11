@@ -22,9 +22,9 @@ package io.spine.server.storage.jdbc.query;
 
 import io.spine.annotation.Internal;
 import io.spine.server.aggregate.AggregateEventRecord;
-import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.AggregateEventRecordTable.Column;
 import io.spine.server.storage.jdbc.ConnectionWrapper;
+import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.DbIterator;
 import io.spine.server.storage.jdbc.IdColumn;
 import io.spine.server.storage.jdbc.MessageDbIterator;
@@ -32,6 +32,9 @@ import io.spine.server.storage.jdbc.MessageDbIterator;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import static io.spine.server.storage.jdbc.AggregateEventRecordTable.Column.aggregate;
+import static io.spine.server.storage.jdbc.AggregateEventRecordTable.Column.timestamp;
+import static io.spine.server.storage.jdbc.AggregateEventRecordTable.Column.timestamp_nanos;
 import static io.spine.server.storage.jdbc.AggregateEventRecordTable.Column.version;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.COMMA;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
@@ -42,9 +45,6 @@ import static io.spine.server.storage.jdbc.Sql.Query.ORDER_BY;
 import static io.spine.server.storage.jdbc.Sql.Query.PLACEHOLDER;
 import static io.spine.server.storage.jdbc.Sql.Query.SELECT;
 import static io.spine.server.storage.jdbc.Sql.Query.WHERE;
-import static io.spine.server.storage.jdbc.AggregateEventRecordTable.Column.aggregate;
-import static io.spine.server.storage.jdbc.AggregateEventRecordTable.Column.timestamp;
-import static io.spine.server.storage.jdbc.AggregateEventRecordTable.Column.timestamp_nanos;
 import static io.spine.type.TypeUrl.of;
 import static java.lang.String.format;
 
@@ -75,9 +75,14 @@ public class SelectEventRecordsById<I> extends StorageQuery {
         this.id = builder.id;
     }
 
-    public DbIterator<AggregateEventRecord> execute() throws DatabaseException {
+    public DbIterator<AggregateEventRecord> execute(int fetchSize) throws DatabaseException {
         ConnectionWrapper connection = getConnection(true);
         PreparedStatement statement = prepareStatement(connection);
+        try {
+            statement.setFetchSize(fetchSize);
+        } catch (SQLException e) {
+            throw new DatabaseException(e);
+        }
         idColumn.setId(1, id, statement);
         return new MessageDbIterator<>(statement,
                                        aggregate.toString(),

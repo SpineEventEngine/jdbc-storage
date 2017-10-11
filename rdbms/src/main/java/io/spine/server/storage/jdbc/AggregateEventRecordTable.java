@@ -24,6 +24,7 @@ import com.google.common.collect.ImmutableList;
 import io.spine.annotation.Internal;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateEventRecord;
+import io.spine.server.aggregate.AggregateReadRequest;
 import io.spine.server.storage.jdbc.query.AggregateStorageQueryFactory;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
@@ -82,9 +83,11 @@ public class AggregateEventRecordTable<I> extends AggregateTable<I, AggregateEve
                     .execute();
     }
 
-    DbIterator<AggregateEventRecord> historyBackward(I id) {
+    DbIterator<AggregateEventRecord> historyBackward(AggregateReadRequest<I> request) {
+        final I id = request.getRecordId();
+        final int batchSize = request.getBatchSize();
         final DbIterator<AggregateEventRecord> result = queryFactory.newSelectEventRecordsById(id)
-                                                                    .execute();
+                                                                    .execute(batchSize);
         return result;
     }
 
