@@ -94,7 +94,7 @@ public class JdbcStorageFactory implements StorageFactory {
         final JdbcAggregateStorage<I> storage =
                 JdbcAggregateStorage.<I>newBuilder()
                                     .setAggregateClass(aggregateClass)
-                                    .setMultitenant(false)
+                                    .setMultitenant(multitenant)
                                     .setDataSource(dataSource)
                                     .build();
         return storage;
@@ -104,7 +104,7 @@ public class JdbcStorageFactory implements StorageFactory {
     public <I> JdbcRecordStorage<I> createRecordStorage(Class<? extends Entity<I, ?>> entityClass) {
         final JdbcRecordStorage<I> recordStorage =
                 JdbcRecordStorage.<I>newBuilder()
-                                 .setMultitenant(false)
+                                 .setMultitenant(multitenant)
                                  .setEntityClass(entityClass)
                                  .setDataSource(dataSource)
                                  .setColumnTypeRegistry(columnTypeRegistry)

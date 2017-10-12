@@ -21,6 +21,8 @@
 package io.spine.server.storage.jdbc;
 
 import io.spine.server.aggregate.Aggregate;
+import io.spine.server.aggregate.AggregateEventRecord;
+import io.spine.server.aggregate.AggregateReadRequest;
 import io.spine.server.aggregate.AggregateStorage;
 import io.spine.server.aggregate.AggregateStorageShould;
 import io.spine.server.entity.Entity;
@@ -29,7 +31,11 @@ import io.spine.test.aggregate.ProjectId;
 import io.spine.validate.ValidatingBuilder;
 import org.junit.Test;
 
+import java.sql.SQLException;
+
 import static io.spine.test.Tests.nullRef;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
@@ -63,7 +69,8 @@ public class JdbcAggregateStorageShould extends AggregateStorageShould {
                                                                    TestAggregateWithMessageId.class);
         storage.close();
         try {
-            storage.historyBackward(ProjectId.getDefaultInstance());
+            final AggregateReadRequest<ProjectId> request = newReadRequest(newId());
+            storage.historyBackward(request);
         } catch (DatabaseException expected) {
             // expected exception because the storage is closed
             return;
@@ -77,6 +84,38 @@ public class JdbcAggregateStorageShould extends AggregateStorageShould {
                                                        TestAggregateWithMessageId.class);
         storage.close();
         storage.close();
+    }
+
+    @Test
+    public void return_history_iterator_with_specified_batch_size() throws SQLException {
+        final JdbcAggregateStorage<ProjectId> storage = getStorage(ProjectId.class,
+                                                                   TestAggregateWithMessageId.class);
+        final int batchSize = 10;
+        final AggregateReadRequest<ProjectId> request = new AggregateReadRequest<>(newId(),
+                                                                                   batchSize);
+        final DbIterator<AggregateEventRecord> iterator =
+                (DbIterator<AggregateEventRecord>) storage.historyBackward(request);
+
+        // Use `PreparedStatement.getFetchSize()` instead of `ResultSet.getFetchSize()`,
+        // because the result of the latter depends on a JDBC driver implementation.
+        final int fetchSize = iterator.getResultSet()
+                                      .getStatement()
+                                      .getFetchSize();
+        assertEquals(batchSize, fetchSize);
+    }
+
+    @Test
+    public void close_history_iterator() throws SQLException {
+        final JdbcAggregateStorage<ProjectId> storage = getStorage(ProjectId.class,
+                                                                   TestAggregateWithMessageId.class);
+        final AggregateReadRequest<ProjectId> request = newReadRequest(newId());
+        final DbIterator<AggregateEventRecord> iterator =
+                (DbIterator<AggregateEventRecord>) storage.historyBackward(request);
+
+        storage.close();
+        final boolean historyIteratorClosed = iterator.getResultSet()
+                                                      .isClosed();
+        assertTrue(historyIteratorClosed);
     }
 
     private static class TestAggregateWithMessageId extends Aggregate<ProjectId,

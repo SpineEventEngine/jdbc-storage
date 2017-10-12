@@ -24,12 +24,16 @@ import com.google.common.base.Optional;
 import com.google.protobuf.Int32Value;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateEventRecord;
+import io.spine.server.aggregate.AggregateReadRequest;
 import io.spine.server.aggregate.AggregateStorage;
 import io.spine.server.entity.LifecycleFlags;
 
+import java.util.Collection;
 import java.util.Iterator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.Lists.newLinkedList;
+import static io.spine.server.storage.jdbc.Closeables.closeAll;
 
 /**
  * The implementation of the aggregate storage based on the RDBMS.
@@ -48,6 +52,18 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
 
     private final DataSourceWrapper dataSource;
+
+    /**
+     * The {@linkplain #historyBackward(AggregateReadRequest) history} iterators,
+     * which are not {@linkplain DbIterator#close() closed} yet.
+     *
+     * <p>{@link DbIterator} will be closed automatically only
+     * if all elements were {@linkplain DbIterator#hasNext() iterated}.
+     *
+     * <p>Because history iterators are used to go through a part of a history,
+     * they should be closed by the storage.
+     */
+    private final Collection<DbIterator> iterators = newLinkedList();
     private final AggregateEventRecordTable<I> mainTable;
     private final LifecycleFlagsTable<I> lifecycleFlagsTable;
     private final EventCountTable<I> eventCountTable;
@@ -123,25 +139,36 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
      * @throws DatabaseException if an error occurs during an interaction with the DB
      */
     @Override
-    protected Iterator<AggregateEventRecord> historyBackward(I id) throws DatabaseException {
-        checkNotNull(id);
+    protected Iterator<AggregateEventRecord> historyBackward(AggregateReadRequest<I> request)
+            throws DatabaseException {
+        checkNotNull(request);
 
-        final DbIterator<AggregateEventRecord> result = mainTable.historyBackward(id);
+        final DbIterator<AggregateEventRecord> result = mainTable.historyBackward(request);
+        iterators.add(result);
         return result;
     }
 
+    /**
+     * Closes the storage.
+     *
+     * <p>Unclosed {@linkplain #iterators history iterators}
+     * produced by this storage will be closed together with the storage.
+     *
+     * @throws DatabaseException if the underlying datasource cannot be closed
+     */
     @Override
     public void close() throws DatabaseException {
         super.close();
         dataSource.close();
+        closeAll(iterators);
+        iterators.clear();
     }
 
     public static <I> Builder<I> newBuilder() {
         return new Builder<>();
     }
 
-    public static class Builder<I> extends StorageBuilder<Builder<I>,
-            JdbcAggregateStorage<I>> {
+    public static class Builder<I> extends StorageBuilder<Builder<I>, JdbcAggregateStorage<I>> {
         private Class<? extends Aggregate<I, ?, ?>> aggregateClass;
 
         private Builder() {

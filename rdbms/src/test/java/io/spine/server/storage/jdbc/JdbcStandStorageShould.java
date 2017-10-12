@@ -32,6 +32,7 @@ import io.spine.server.entity.EntityRecord;
 import io.spine.server.stand.AggregateStateId;
 import io.spine.server.stand.StandStorage;
 import io.spine.server.stand.StandStorageShould;
+import io.spine.server.storage.RecordReadRequest;
 import io.spine.test.commandservice.customer.Customer;
 import io.spine.test.storage.Project;
 import io.spine.time.Time;
@@ -151,9 +152,10 @@ public class JdbcStandStorageShould extends StandStorageShould {
 
         final EntityRecord record = writeToStorage(aggregate, storage, Project.class);
 
-        final Optional<EntityRecord> readRecord = storage.read(
-                AggregateStateId.of(aggregate.getId(),
-                                    TypeUrl.of(Project.class)));
+        final AggregateStateId id = AggregateStateId.of(aggregate.getId(),
+                                                        TypeUrl.of(Project.class));
+        final RecordReadRequest<AggregateStateId> request = new RecordReadRequest<>(id);
+        final Optional<EntityRecord> readRecord = storage.read(request);
         assertTrue(readRecord.isPresent());
         @SuppressWarnings("OptionalGetWithoutIsPresent") // We do check if present
         final EntityRecord actualRecord = readRecord.get();
