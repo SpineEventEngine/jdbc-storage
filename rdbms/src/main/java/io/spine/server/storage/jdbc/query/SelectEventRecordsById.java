@@ -49,10 +49,10 @@ import static io.spine.type.TypeUrl.of;
 import static java.lang.String.format;
 
 /**
- * Query that selects {@linkplain AggregateEventRecord event records} by corresponding
- * aggregate ID sorted by version descending.
+ * Query that selects {@linkplain AggregateEventRecord event records} by an aggregate ID.
  *
- * <p>If the version is the same for several records, orders them by creation time descending.
+ * <p>Resulting records is ordered by version descending. If the version is the same for
+ * several records, they will be ordered by creation time descending.
  *
  * @author Alexander Litus
  * @author Andrey Lavrov
