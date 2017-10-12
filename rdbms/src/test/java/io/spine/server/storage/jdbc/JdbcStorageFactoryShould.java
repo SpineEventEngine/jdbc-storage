@@ -32,11 +32,11 @@ import io.spine.server.storage.RecordStorage;
 import io.spine.test.storage.Project;
 import io.spine.test.storage.ProjectVBuilder;
 import io.spine.validate.StringValueVBuilder;
-import org.junit.Before;
 import org.junit.Test;
 
 import javax.sql.DataSource;
 
+import static io.spine.server.storage.jdbc.GivenDataSource.prefix;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
@@ -49,22 +49,12 @@ import static org.mockito.Mockito.verify;
  */
 public class JdbcStorageFactoryShould {
 
-    private JdbcStorageFactory factory;
-
-    @Before
-    public void setUpTest() {
-        final String dbUrl = GivenDataSource.prefix("factoryTests");
-        final DataSourceConfig config = DataSourceConfig.newBuilder()
-                                                        .setJdbcUrl(dbUrl)
-                                                        .setUsername("SA")
-                                                        .setPassword("pwd")
-                                                        .setMaxPoolSize(12)
-                                                        .build();
-        factory = JdbcStorageFactory.newBuilder()
-                                    .setDataSource(config)
-                                    .setMultitenant(false)
-                                    .build();
-    }
+    private final DataSourceConfig config = DataSourceConfig.newBuilder()
+                                                            .setJdbcUrl(prefix("factoryTests"))
+                                                            .setUsername("SA")
+                                                            .setPassword("pwd")
+                                                            .setMaxPoolSize(12)
+                                                            .build();
 
     @Test
     public void allow_to_use_custom_data_source() {
@@ -76,38 +66,72 @@ public class JdbcStorageFactoryShould {
     }
 
     @Test
-    public void create_record_storage() {
+    public void create_multitenant_record_storage() {
+        final JdbcStorageFactory factory = newFactory(true);
         final RecordStorage<String> storage = factory.createRecordStorage(TestEntity.class);
-        assertNotNull(storage);
+        assertTrue(storage.isMultitenant());
     }
 
     @Test
-    public void create_aggregate_storage() {
-        final AggregateStorage<String> storage = factory.createAggregateStorage(
-                TestAggregate.class);
-        assertNotNull(storage);
+    public void create_singletenant_record_storage() {
+        final JdbcStorageFactory factory = newFactory(false);
+        final RecordStorage<String> storage = factory.createRecordStorage(TestEntity.class);
+        assertFalse(storage.isMultitenant());
     }
 
     @Test
-    public void create_projection_storage() {
-        final ProjectionStorage<String> storage = factory.createProjectionStorage(
-                TestProjection.class);
-        assertNotNull(storage);
+    public void create_multitenant_aggregate_storage() {
+        final JdbcStorageFactory factory = newFactory(true);
+        final AggregateStorage<String> storage =
+                factory.createAggregateStorage(TestAggregate.class);
+        assertTrue(storage.isMultitenant());
     }
 
     @Test
-    public void create_stand_storage() {
+    public void create_singletenant_aggregate_storage() {
+        final JdbcStorageFactory factory = newFactory(false);
+        final AggregateStorage<String> storage =
+                factory.createAggregateStorage(TestAggregate.class);
+        assertFalse(storage.isMultitenant());
+    }
+
+    @Test
+    public void create_multitenant_projection_storage() {
+        final JdbcStorageFactory factory = newFactory(true);
+        final ProjectionStorage<String> storage =
+                factory.createProjectionStorage(TestProjection.class);
+        assertTrue(storage.isMultitenant());
+    }
+
+    @Test
+    public void create_singletenant_projection_storage() {
+        final JdbcStorageFactory factory = newFactory(false);
+        final ProjectionStorage<String> storage =
+                factory.createProjectionStorage(TestProjection.class);
+        assertFalse(storage.isMultitenant());
+    }
+
+    @Test
+    public void create_multitenant_stand_storage() {
+        final JdbcStorageFactory factory = newFactory(true);
         final StandStorage storage = factory.createStandStorage();
-        assertNotNull(storage);
+        assertTrue(storage.isMultitenant());
+    }
+
+    @Test
+    public void create_singletenant_stand_storage() {
+        final JdbcStorageFactory factory = newFactory(false);
+        final StandStorage storage = factory.createStandStorage();
+        assertFalse(storage.isMultitenant());
     }
 
     @Test
     public void close_datastore_on_close() {
         final DataSourceWrapper mock = GivenDataSource.withoutSuperpowers();
-        factory = JdbcStorageFactory.newBuilder()
-                                    .setDataSource(mock)
-                                    .setMultitenant(false)
-                                    .build();
+        final JdbcStorageFactory factory = JdbcStorageFactory.newBuilder()
+                                                             .setDataSource(mock)
+                                                             .setMultitenant(false)
+                                                             .build();
         factory.close();
         verify(mock).close();
     }
@@ -142,6 +166,13 @@ public class JdbcStorageFactoryShould {
                                                              .setDataSource(dataSource)
                                                              .build();
         assertSame(factory, factory.toSingleTenant());
+    }
+
+    private JdbcStorageFactory newFactory(boolean multitenant) {
+        return JdbcStorageFactory.newBuilder()
+                                 .setDataSource(config)
+                                 .setMultitenant(multitenant)
+                                 .build();
     }
 
     private static class TestEntity extends AbstractEntity<String, StringValue> {
