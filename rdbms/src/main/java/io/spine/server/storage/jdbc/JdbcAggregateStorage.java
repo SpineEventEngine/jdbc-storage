@@ -52,7 +52,17 @@ import static io.spine.server.storage.jdbc.Closeables.closeAll;
 public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
 
     private final DataSourceWrapper dataSource;
-    /** Iterators which are not closed yet. */
+
+    /**
+     * The {@linkplain #historyBackward(AggregateReadRequest) history} iterators,
+     * which are not {@linkplain DbIterator#close() closed} yet.
+     *
+     * <p>{@link DbIterator} will be closed automatically only
+     * if all elements were {@linkplain DbIterator#hasNext() iterated}.
+     *
+     * <p>Because history iterators is used to go through a part of a history,
+     * they should be closed by the storage.
+     */
     private final Collection<DbIterator> iterators = newLinkedList();
     private final AggregateEventRecordTable<I> mainTable;
     private final LifecycleFlagsTable<I> lifecycleFlagsTable;
@@ -138,10 +148,17 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
         return result;
     }
 
+    /**
+     * Closes the storage.
+     *
+     * <p>Unclosed {@linkplain #iterators history iterators},
+     * produced by this storage will be closed together with the storage.
+     *
+     * @throws DatabaseException if the underlying datasource cannot be closed
+     */
     @Override
     public void close() throws DatabaseException {
         super.close();
-
         dataSource.close();
         closeAll(iterators);
         iterators.clear();
