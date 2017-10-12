@@ -32,7 +32,6 @@ import io.spine.validate.ValidatingBuilder;
 import org.junit.Test;
 
 import java.sql.SQLException;
-import java.util.Iterator;
 
 import static io.spine.test.Tests.nullRef;
 import static org.junit.Assert.assertEquals;
@@ -98,7 +97,7 @@ public class JdbcAggregateStorageShould extends AggregateStorageShould {
                 (DbIterator<AggregateEventRecord>) storage.historyBackward(request);
 
         // Use `PreparedStatement.getFetchSize()` instead of `ResultSet.getFetchSize()`,
-        // because the result of the last one depends on a JDBC driver implementation.
+        // because the result of the latter depends on a JDBC driver implementation.
         final int fetchSize = iterator.getResultSet()
                                       .getStatement()
                                       .getFetchSize();
