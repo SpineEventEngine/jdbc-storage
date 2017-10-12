@@ -32,9 +32,11 @@ import io.spine.validate.ValidatingBuilder;
 import org.junit.Test;
 
 import java.sql.SQLException;
+import java.util.Iterator;
 
 import static io.spine.test.Tests.nullRef;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
@@ -101,6 +103,20 @@ public class JdbcAggregateStorageShould extends AggregateStorageShould {
                                       .getStatement()
                                       .getFetchSize();
         assertEquals(batchSize, fetchSize);
+    }
+
+    @Test
+    public void close_history_iterator() throws SQLException {
+        final JdbcAggregateStorage<ProjectId> storage = getStorage(ProjectId.class,
+                                                                   TestAggregateWithMessageId.class);
+        final AggregateReadRequest<ProjectId> request = newReadRequest(newId());
+        final DbIterator<AggregateEventRecord> iterator =
+                (DbIterator<AggregateEventRecord>) storage.historyBackward(request);
+
+        storage.close();
+        final boolean historyIteratorClosed = iterator.getResultSet()
+                                                      .isClosed();
+        assertTrue(historyIteratorClosed);
     }
 
     private static class TestAggregateWithMessageId extends Aggregate<ProjectId,

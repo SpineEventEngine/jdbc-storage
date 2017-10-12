@@ -28,9 +28,12 @@ import io.spine.server.aggregate.AggregateReadRequest;
 import io.spine.server.aggregate.AggregateStorage;
 import io.spine.server.entity.LifecycleFlags;
 
+import java.util.Collection;
 import java.util.Iterator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.Lists.newLinkedList;
+import static io.spine.server.storage.jdbc.Closeables.closeAll;
 
 /**
  * The implementation of the aggregate storage based on the RDBMS.
@@ -49,6 +52,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
 
     private final DataSourceWrapper dataSource;
+    /** Iterators which are not closed yet. */
+    private final Collection<DbIterator> iterators = newLinkedList();
     private final AggregateEventRecordTable<I> mainTable;
     private final LifecycleFlagsTable<I> lifecycleFlagsTable;
     private final EventCountTable<I> eventCountTable;
@@ -127,13 +132,19 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     protected Iterator<AggregateEventRecord> historyBackward(AggregateReadRequest<I> request)
             throws DatabaseException {
         checkNotNull(request);
-        return mainTable.historyBackward(request);
+
+        final DbIterator<AggregateEventRecord> result = mainTable.historyBackward(request);
+        iterators.add(result);
+        return result;
     }
 
     @Override
     public void close() throws DatabaseException {
         super.close();
+
         dataSource.close();
+        closeAll(iterators);
+        iterators.clear();
     }
 
     public static <I> Builder<I> newBuilder() {
