@@ -60,7 +60,7 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
      * <p>{@link DbIterator} will be closed automatically only
      * if all elements were {@linkplain DbIterator#hasNext() iterated}.
      *
-     * <p>Because history iterators is used to go through a part of a history,
+     * <p>Because history iterators are used to go through a part of a history,
      * they should be closed by the storage.
      */
     private final Collection<DbIterator> iterators = newLinkedList();
@@ -151,7 +151,7 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     /**
      * Closes the storage.
      *
-     * <p>Unclosed {@linkplain #iterators history iterators},
+     * <p>Unclosed {@linkplain #iterators history iterators}
      * produced by this storage will be closed together with the storage.
      *
      * @throws DatabaseException if the underlying datasource cannot be closed
