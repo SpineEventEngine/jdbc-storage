@@ -20,9 +20,11 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import io.spine.server.storage.jdbc.DataSourceWrapper;
-import org.slf4j.Logger;
 import io.spine.server.storage.jdbc.ConnectionWrapper;
+import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.DatabaseException;
+import org.jtemplate.sql.Parameters;
+import org.slf4j.Logger;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -47,6 +49,47 @@ abstract class StorageQuery {
 
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
         return connection.prepareStatement(query);
+    }
+
+    /**
+     * Prepares statement using {@linkplain #getNamedParameters() named parameters}.
+     *
+     * @param connection the connection to use
+     * @return a {@link PreparedStatement}, which is ready to use
+     */
+    protected PreparedStatement prepareStatementWithParameters(ConnectionWrapper connection) {
+        final Parameters queryParameters = getQueryParameters();
+        final PreparedStatement statement = connection.prepareStatement(queryParameters.getSQL());
+        try {
+            queryParameters.apply(statement);
+            return statement;
+        } catch (SQLException e) {
+            throw new DatabaseException(e);
+        }
+    }
+
+    /**
+     * Obtains {@link NamedParameters} to
+     * {@linkplain #prepareStatementWithParameters(ConnectionWrapper) prepare statement}.
+     *
+     * <p>Default implementation returns {@linkplain NamedParameters#empty() empty parameters}.
+     *
+     * <p>Override this method, to specify named parameters for the {@linkplain #getQuery() query}.
+     *
+     * @return named parameters for this query
+     */
+    protected NamedParameters getNamedParameters() {
+        return NamedParameters.empty();
+    }
+
+    private Parameters getQueryParameters() {
+        final Parameters queryParameters = Parameters.parse(query);
+        final NamedParameters namedParameters = getNamedParameters();
+        for (String parameterName : namedParameters.getNames()) {
+            final Object parameterValue = namedParameters.getValue(parameterName);
+            queryParameters.put(parameterName, parameterValue);
+        }
+        return queryParameters;
     }
 
     protected void logFailedToPrepareStatement(SQLException e) {
