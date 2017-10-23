@@ -28,6 +28,8 @@ import io.spine.server.storage.jdbc.Serializer;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import static io.spine.server.storage.jdbc.AggregateEventRecordTable.Column.aggregate;
+
 /**
  * An abstract base for the write queries to an {@link io.spine.server.storage.jdbc.AggregateTable}.
  *
@@ -37,8 +39,6 @@ abstract class WriteAggregateQuery<I, R extends Message> extends WriteQuery {
 
     private final I id;
     private final R record;
-    private final int idIndexInQuery;
-    private final int recordIndexInQuery;
     private final IdColumn<I, ?> idColumn;
 
     R getRecord() {
@@ -47,25 +47,36 @@ abstract class WriteAggregateQuery<I, R extends Message> extends WriteQuery {
 
     WriteAggregateQuery(Builder<? extends Builder, ? extends WriteAggregateQuery, I, R> builder) {
         super(builder);
-        this.idIndexInQuery = builder.idIndexInQuery;
-        this.recordIndexInQuery = builder.recordIndexInQuery;
         this.idColumn = builder.idColumn;
         this.id = builder.id;
         this.record = builder.record;
     }
 
+    //TODO:2017-10-23:dmytro.grankin: remove after reworking of WriteQuery.execute().
     @Override
-    protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
-        final PreparedStatement statement = super.prepareStatement(connection);
-        try {
-            idColumn.setId(idIndexInQuery, id, statement);
-            final byte[] bytes = Serializer.serialize(record);
-            statement.setBytes(recordIndexInQuery, bytes);
-            return statement;
-        } catch (SQLException e) {
-            logWriteError(id, e);
-            throw new DatabaseException(e);
+    public void execute() {
+        try (ConnectionWrapper connection = getConnection(false)) {
+            try (PreparedStatement statement = prepareStatementWithParameters(connection)) {
+                statement.execute();
+                connection.commit();
+            } catch (SQLException e) {
+                getLogger().error("Failed to execute write operation.", e);
+                connection.rollback();
+                throw new DatabaseException(e);
+            }
         }
+    }
+
+    @Override
+    protected NamedParameters getNamedParameters() {
+        final NamedParameters superParameters = super.getNamedParameters();
+        final String recordName = aggregate.name();
+        final byte[] serializedRecord = Serializer.serialize(record);
+        return NamedParameters.newBuilder()
+                              .addParameters(superParameters)
+                              .addParameter(idColumn.getColumnName(), idColumn.normalize(id))
+                              .addParameter(recordName, serializedRecord)
+                              .build();
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
@@ -74,8 +85,7 @@ abstract class WriteAggregateQuery<I, R extends Message> extends WriteQuery {
                                   I,
                                   R extends Message>
             extends WriteQuery.Builder<B, Q> {
-        private int idIndexInQuery;
-        private int recordIndexInQuery;
+
         private IdColumn<I, ?> idColumn;
         private I id;
         private R record;
@@ -92,16 +102,6 @@ abstract class WriteAggregateQuery<I, R extends Message> extends WriteQuery {
 
         public B setIdColumn(IdColumn<I, ?> idColumn) {
             this.idColumn = idColumn;
-            return getThis();
-        }
-
-        public B setIdIndexInQuery(int idIndexInQuery) {
-            this.idIndexInQuery = idIndexInQuery;
-            return getThis();
-        }
-
-        public B setRecordIndexInQuery(int recordIndexInQuery) {
-            this.recordIndexInQuery = recordIndexInQuery;
             return getThis();
         }
     }

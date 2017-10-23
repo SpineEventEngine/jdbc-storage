@@ -25,12 +25,7 @@ import io.spine.core.Event;
 import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.storage.jdbc.AggregateEventRecordTable;
 import io.spine.server.storage.jdbc.AggregateEventRecordTable.Column;
-import io.spine.server.storage.jdbc.ConnectionWrapper;
-import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.Sql;
-
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 
 import static io.spine.server.storage.jdbc.AggregateEventRecordTable.Column.aggregate;
 import static io.spine.server.storage.jdbc.AggregateEventRecordTable.Column.id;
@@ -42,7 +37,7 @@ import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.COMMA;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
 import static io.spine.server.storage.jdbc.Sql.Query.VALUES;
-import static io.spine.server.storage.jdbc.Sql.nPlaceholders;
+import static io.spine.server.storage.jdbc.Sql.namedParameters;
 import static io.spine.validate.Validate.isDefault;
 import static java.lang.String.format;
 
@@ -63,29 +58,22 @@ class InsertAggregateRecordQuery<I> extends WriteAggregateQuery<I, AggregateEven
             timestamp_nanos + COMMA +
             version +
             BRACKET_CLOSE
-            + VALUES + nPlaceholders(Column.values().length) + SEMICOLON;
+            + VALUES + namedParameters(Column.values()) + SEMICOLON;
 
     private InsertAggregateRecordQuery(Builder<I> builder) {
         super(builder);
     }
 
     @Override
-    protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
-        final PreparedStatement statement = super.prepareStatement(connection);
-
-        try {
-            final Timestamp timestamp = getRecord().getTimestamp();
-
-            //TODO:2017-09-11:dmytro.grankin: Remove hard-coded indexes here and in other places.
-            // See the related issues: https://github.com/SpineEventEngine/jdbc-storage/issues/36
-            statement.setLong(3, timestamp.getSeconds());
-            statement.setInt(4, timestamp.getNanos());
-            statement.setInt(5, getVersionNumberOfRecord());
-            return statement;
-        } catch (SQLException e) {
-            logFailedToPrepareStatement(e);
-            throw new DatabaseException(e);
-        }
+    protected NamedParameters getNamedParameters() {
+        final NamedParameters superParameters = super.getNamedParameters();
+        final Timestamp recordTimestamp = getRecord().getTimestamp();
+        return NamedParameters.newBuilder()
+                              .addParameters(superParameters)
+                              .addParameter(timestamp.name(), recordTimestamp.getSeconds())
+                              .addParameter(timestamp_nanos.name(), recordTimestamp.getNanos())
+                              .addParameter(version.name(), getVersionNumberOfRecord())
+                              .build();
     }
 
     private int getVersionNumberOfRecord() {
@@ -106,10 +94,7 @@ class InsertAggregateRecordQuery<I> extends WriteAggregateQuery<I, AggregateEven
 
     static <I> Builder<I> newBuilder(String tableName) {
         final Builder<I> builder = new Builder<>();
-        builder.setIdIndexInQuery(1)
-               .setRecordIndexInQuery(2)
-               .setQuery(format(QUERY_TEMPLATE, tableName));
-        return builder;
+        return builder.setQuery(format(QUERY_TEMPLATE, tableName));
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")

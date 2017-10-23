@@ -22,7 +22,6 @@ package io.spine.server.storage.jdbc.query;
 
 import com.google.protobuf.Message;
 import com.google.protobuf.Timestamp;
-import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
@@ -114,19 +113,6 @@ class Given {
                                     .setDataSource(dataSourceMock)
                                     .setLogger(loggerMock)
                                     .setTimestamp(Timestamp.getDefaultInstance());
-        return builder.build();
-    }
-
-    static InsertAggregateRecordQuery getInsertAggregateRecordQueryMock() throws SQLException {
-        loggerMock = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock = whichThrowsExceptionOnSettingStatementParam();
-        final InsertAggregateRecordQuery.Builder<String> builder =
-                InsertAggregateRecordQuery.<String>newBuilder(anyString())
-                        .setDataSource(dataSourceMock)
-                        .setLogger(loggerMock)
-                        .setIdColumn(ID_COLUMN_MOCK)
-                        .setRecord(AggregateEventRecord.getDefaultInstance()
-                                                       .getDefaultInstanceForType());
         return builder.build();
     }
 
