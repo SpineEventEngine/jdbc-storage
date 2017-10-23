@@ -88,6 +88,11 @@ class NamedParameters {
             return this;
         }
 
+        Builder addParameters(NamedParameters namedParameters) {
+            parameters.putAll(namedParameters.parameters);
+            return this;
+        }
+
         NamedParameters build() {
             return new NamedParameters(parameters.build());
         }

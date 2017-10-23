@@ -73,6 +73,23 @@ public final class Sql {
     }
 
     /**
+     * Generates a sequence of named parameters from the specified {@linkplain TableColumn columns}.
+     *
+     * <p>Resulting format: {@code (:firstColumnName, :secondColumnName, ..., :lastColumnName)}
+     *
+     * @param columns the columns to generated parameters
+     * @return named parameters separated by commas and wrapped into the braces
+     */
+    public static String namedParameters(TableColumn[] columns) {
+        checkArgument(columns.length > 0, "Count of columns should be > 0");
+
+        final String parameters = ':' + Joiner.on(COMMA.toString() + ':')
+                                              .join(columns);
+        final String wrappedParameters = BRACKET_OPEN + parameters + BRACKET_CLOSE;
+        return wrappedParameters;
+    }
+
+    /**
      * Set of SQL keywords representing basic data types used in the project.
      */
     public enum Type {
