@@ -93,7 +93,7 @@ abstract class AbstractTable<I, R extends Message, W> {
                                             version.name(), 0);
     private final String name;
 
-    private final IdColumn<I> idColumn;
+    private final IdColumn<I, ?> idColumn;
 
     private final DataSourceWrapper dataSource;
 
@@ -106,7 +106,7 @@ abstract class AbstractTable<I, R extends Message, W> {
      */
     private ImmutableList<? extends TableColumn> columns;
 
-    AbstractTable(String name, IdColumn<I> idColumn, DataSourceWrapper dataSource) {
+    AbstractTable(String name, IdColumn<I, ?> idColumn, DataSourceWrapper dataSource) {
         this.name = checkNotNull(name);
         this.idColumn = checkNotNull(idColumn);
         this.dataSource = checkNotNull(dataSource);
@@ -246,7 +246,7 @@ abstract class AbstractTable<I, R extends Message, W> {
         return name;
     }
 
-    IdColumn<I> getIdColumn() {
+    IdColumn<I, ?> getIdColumn() {
         return idColumn;
     }
 

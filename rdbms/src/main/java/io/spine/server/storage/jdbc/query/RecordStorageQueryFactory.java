@@ -46,7 +46,7 @@ public class RecordStorageQueryFactory<I>
         implements ReadQueryFactory<I, EntityRecord>,
                    WriteQueryFactory<I, EntityRecordWithColumns> {
 
-    private final IdColumn<I> idColumn;
+    private final IdColumn<I, ?> idColumn;
     private final DataSourceWrapper dataSource;
     private final String tableName;
     private final Logger logger;
@@ -61,7 +61,7 @@ public class RecordStorageQueryFactory<I>
     public RecordStorageQueryFactory(DataSourceWrapper dataSource,
                                      String tableName,
                                      Logger logger,
-                                     IdColumn<I> idColumn,
+                                     IdColumn<I, ?> idColumn,
                                      ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>>
                                              columnTypeRegistry) {
         super();

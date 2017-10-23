@@ -37,13 +37,13 @@ public class EventCountQueryFactory<I> implements ReadQueryFactory<I, Int32Value
                                                   WriteQueryFactory<I, Int32Value>{
 
     private final String tableName;
-    private final IdColumn<I> idColumn;
+    private final IdColumn<I, ?> idColumn;
     private final DataSourceWrapper dataSource;
     private final Logger logger;
 
     public EventCountQueryFactory(DataSourceWrapper dataSource,
                                   String tableName,
-                                  IdColumn<I> idColumn,
+                                  IdColumn<I, ?> idColumn,
                                   Logger logger) {
         this.tableName = tableName;
         this.idColumn = idColumn;

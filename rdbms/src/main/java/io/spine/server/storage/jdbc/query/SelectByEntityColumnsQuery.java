@@ -131,7 +131,7 @@ public final class SelectByEntityColumnsQuery<I> extends StorageQuery implements
         private EntityQuery<I> entityQuery;
         private FieldMask fieldMask;
         private ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> columnTypeRegistry;
-        private IdColumn<I> idColumn;
+        private IdColumn<I, ?> idColumn;
         private String tableName;
 
         private PreparedStatement statement;
@@ -161,7 +161,7 @@ public final class SelectByEntityColumnsQuery<I> extends StorageQuery implements
             return this;
         }
 
-        public Builder<I> setIdColumn(IdColumn<I> idColumn) {
+        public Builder<I> setIdColumn(IdColumn<I, ?> idColumn) {
             this.idColumn = checkNotNull(idColumn);
             return this;
         }
@@ -175,7 +175,7 @@ public final class SelectByEntityColumnsQuery<I> extends StorageQuery implements
             return checkNotNull(statement);
         }
 
-        private IdColumn<I> getIdColumn() {
+        private IdColumn<I, ?> getIdColumn() {
             return checkNotNull(idColumn);
         }
 
@@ -305,7 +305,7 @@ public final class SelectByEntityColumnsQuery<I> extends StorageQuery implements
                                           Iterable<I> ids,
                                           int startIndex) {
             int sqlParameterIndex = startIndex;
-            final IdColumn<I> idColumn = getIdColumn();
+            final IdColumn<I, ?> idColumn = getIdColumn();
             for (I id : ids) {
                 idColumn.setId(sqlParameterIndex, id, statement);
                 sqlParameterIndex++;

@@ -56,7 +56,7 @@ public class UpdateLifecycleFlagsQuery<I> extends WriteQuery {
 
     private final I id;
     private final LifecycleFlags entityStatus;
-    private final IdColumn<I> idColumn;
+    private final IdColumn<I, ?> idColumn;
 
     protected UpdateLifecycleFlagsQuery(Builder<I> builder) {
         super(builder);
@@ -91,7 +91,7 @@ public class UpdateLifecycleFlagsQuery<I> extends WriteQuery {
 
         private I id;
         private LifecycleFlags entityStatus;
-        private IdColumn<I> idColumn;
+        private IdColumn<I, ?> idColumn;
 
         public Builder<I> setId(I id) {
             this.id = checkNotNull(id);
@@ -115,7 +115,7 @@ public class UpdateLifecycleFlagsQuery<I> extends WriteQuery {
             return this;
         }
 
-        public Builder<I> setIdColumn(IdColumn<I> idColumn) {
+        public Builder<I> setIdColumn(IdColumn<I, ?> idColumn) {
             this.idColumn = idColumn;
             return getThis();
         }

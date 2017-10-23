@@ -37,12 +37,12 @@ public class LifecycleFlagsQueryFactory<I> implements ReadQueryFactory<I, Lifecy
 
     private final Logger logger;
     private final DataSourceWrapper dataSource;
-    private final IdColumn<I> idColumn;
+    private final IdColumn<I, ?> idColumn;
     private final String tableName;
 
     public LifecycleFlagsQueryFactory(DataSourceWrapper dataSource,
                                       Logger logger,
-                                      IdColumn<I> idColumn,
+                                      IdColumn<I, ?> idColumn,
                                       String tableName) {
         this.logger = logger;
         this.dataSource = dataSource;
