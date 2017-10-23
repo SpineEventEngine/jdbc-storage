@@ -21,10 +21,10 @@
 package io.spine.server.storage.jdbc.query;
 
 import io.spine.annotation.Internal;
-import io.spine.server.storage.jdbc.DatabaseException;
-import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.ConnectionWrapper;
+import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.IdColumn;
+import io.spine.server.storage.jdbc.TableColumn;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -34,7 +34,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
 import static io.spine.server.storage.jdbc.Sql.Query.ALL_ATTRIBUTES;
 import static io.spine.server.storage.jdbc.Sql.Query.FROM;
-import static io.spine.server.storage.jdbc.Sql.Query.PLACEHOLDER;
 import static io.spine.server.storage.jdbc.Sql.Query.SELECT;
 import static io.spine.server.storage.jdbc.Sql.Query.WHERE;
 import static java.lang.String.format;
@@ -50,9 +49,9 @@ public class ContainsQuery<I> extends StorageQuery {
     private static final String FORMAT_PLACEHOLDER = "%s";
     private static final String SQL_TEMPLATE = SELECT.toString() + ALL_ATTRIBUTES +
                                                FROM + FORMAT_PLACEHOLDER +
-                                               WHERE + FORMAT_PLACEHOLDER + EQUAL + PLACEHOLDER;
+                                               WHERE + FORMAT_PLACEHOLDER + EQUAL + ':' + FORMAT_PLACEHOLDER;
 
-    private final IdColumn<I> idColumn;
+    private final IdColumn<I, ?> idColumn;
     private final I id;
 
     private ContainsQuery(Builder<I> builder) {
@@ -61,19 +60,12 @@ public class ContainsQuery<I> extends StorageQuery {
         this.id = builder.id;
     }
 
-    @Override
-    protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
-        final PreparedStatement statement = super.prepareStatement(connection);
-        idColumn.setId(1, id, statement);
-        return statement;
-    }
-
     /**
      * @return {@code true} if there is at least one record with given ID, {@code} false otherwise
      */
     public boolean execute() {
         try (ConnectionWrapper connection = getConnection(false);
-             PreparedStatement statement = prepareStatement(connection)) {
+             PreparedStatement statement = prepareStatementWithParameters(connection)) {
             final ResultSet results = statement.executeQuery();
             final boolean result = results.next();
             results.close();
@@ -84,6 +76,13 @@ public class ContainsQuery<I> extends StorageQuery {
         }
     }
 
+    @Override
+    protected NamedParameters getNamedParameters() {
+        return NamedParameters.newBuilder()
+                              .addParameter(idColumn.getColumnName(), idColumn.normalize(id))
+                              .build();
+    }
+
     public static <I> Builder<I> newBuilder() {
         return new Builder<>();
     }
@@ -91,7 +90,7 @@ public class ContainsQuery<I> extends StorageQuery {
     public static class Builder<I> extends StorageQuery.Builder<Builder<I>, ContainsQuery<I>> {
 
         private String tableName;
-        private IdColumn<I> idColumn;
+        private IdColumn<I, ?> idColumn;
         private I id;
         private TableColumn keyColumn;
 
@@ -100,7 +99,7 @@ public class ContainsQuery<I> extends StorageQuery {
             return this;
         }
 
-        public Builder<I> setIdColumn(IdColumn<I> idColumn) {
+        public Builder<I> setIdColumn(IdColumn<I, ?> idColumn) {
             this.idColumn = idColumn;
             return this;
         }
@@ -117,7 +116,7 @@ public class ContainsQuery<I> extends StorageQuery {
 
         @Override
         public ContainsQuery<I> build() {
-            final String sql = format(SQL_TEMPLATE, tableName, keyColumn.name());
+            final String sql = format(SQL_TEMPLATE, tableName, keyColumn.name(), keyColumn.name());
             setQuery(sql);
             return new ContainsQuery<>(this);
         }
