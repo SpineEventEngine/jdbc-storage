@@ -40,6 +40,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class IdentifiedParameters {
 
+    private static final Object NULL_PARAMETER = new Object();
+
     private final Map<Integer, Object> parameters;
 
     private IdentifiedParameters(Map<Integer, Object> parameters) {
@@ -62,9 +64,13 @@ public class IdentifiedParameters {
      * @return a raw parameter value
      * @throws IllegalArgumentException if there is no parameters with the specified identifier
      */
+    @Nullable
     public Object getValue(Integer identifier) {
         checkArgument(parameters.containsKey(identifier));
-        return parameters.get(identifier);
+        final Object value = parameters.get(identifier);
+        return value.equals(NULL_PARAMETER)
+               ? null
+               : value;
     }
 
     public static IdentifiedParameters empty() {
@@ -86,7 +92,10 @@ public class IdentifiedParameters {
         public Builder addParameter(Integer identifier, @Nullable Object value) {
             checkNotNull(identifier);
 
-            parameters.put(identifier, value);
+            final Object valueToPut = value == null
+                                      ? NULL_PARAMETER
+                                      : value;
+            parameters.put(identifier, valueToPut);
             return this;
         }
 
