@@ -30,7 +30,7 @@ abstract class WriteRecordQuery<I, R> extends ColumnAwareWriteQuery {
     private final EntityRecordWithColumns record;
     private final int idIndexInQuery;
     private final int recordIndexInQuery;
-    private final IdColumn<I, ?> idColumn;
+    private final IdColumn<I> idColumn;
 
     WriteRecordQuery(Builder<? extends Builder, ? extends WriteRecordQuery, I, R> builder) {
         super(builder);
@@ -65,7 +65,7 @@ abstract class WriteRecordQuery<I, R> extends ColumnAwareWriteQuery {
 
         private int idIndexInQuery;
         private int recordIndexInQuery;
-        private IdColumn<I, ?> idColumn;
+        private IdColumn<I> idColumn;
         private I id;
         private EntityRecordWithColumns record;
 
@@ -79,7 +79,7 @@ abstract class WriteRecordQuery<I, R> extends ColumnAwareWriteQuery {
             return getThis();
         }
 
-        B setIdColumn(IdColumn<I, ?> idColumn) {
+        B setIdColumn(IdColumn<I> idColumn) {
             this.idColumn = idColumn;
             return getThis();
         }

@@ -51,7 +51,7 @@ public class DeleteRecordQuery<I> extends StorageQuery {
     private static final int COLUMN_VALUE_PARAM_INDEX = 1;
 
     private final I id;
-    private final IdColumn<I, ?> idColumn;
+    private final IdColumn<I> idColumn;
 
     protected DeleteRecordQuery(Builder<I> builder) {
         super(builder);
@@ -91,7 +91,7 @@ public class DeleteRecordQuery<I> extends StorageQuery {
 
         private I columnValue;
         private String table;
-        private IdColumn<I, ?> idColumn;
+        private IdColumn<I> idColumn;
 
         public Builder<I> setIdValue(I value) {
             this.columnValue = checkNotNull(value);
@@ -125,7 +125,7 @@ public class DeleteRecordQuery<I> extends StorageQuery {
             return this;
         }
 
-        public Builder<I> setIdColumn(IdColumn<I, ?> idColumn) {
+        public Builder<I> setIdColumn(IdColumn<I> idColumn) {
             this.idColumn = idColumn;
             return getThis();
         }

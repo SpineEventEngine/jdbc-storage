@@ -38,7 +38,7 @@ class Given {
 
     private static Logger loggerMock = null;
     @SuppressWarnings("unchecked") // OK for a mock.
-    private static final IdColumn<String, String> ID_COLUMN_MOCK = mock(IdColumn.class);
+    private static final IdColumn<String> ID_COLUMN_MOCK = mock(IdColumn.class);
 
     private Given() {
         // Prevent utility class instantiation.

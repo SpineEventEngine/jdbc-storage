@@ -37,11 +37,10 @@ import static io.spine.json.Json.toCompactJson;
  * as a query parameter.
  *
  * @param <I> the type of {@link Entity} IDs
- * @param <R> the type of IDs after {@linkplain #normalize(Object) normalization}
  * @author Alexander Litus
  */
 @Internal
-public abstract class IdColumn<I, R> {
+public abstract class IdColumn<I> {
 
     private final String columnName;
 
@@ -57,24 +56,24 @@ public abstract class IdColumn<I, R> {
             "IfStatementWithTooManyBranches", // OK for a factory method
             "ChainOfInstanceofChecks"         // which depends on the built object target type.
     })
-    public static <I> IdColumn<I, ?> newInstance(Class<? extends Entity<I, ?>> entityClass,
-                                                 String columnName) {
-        final IdColumn<I, ?> helper;
+    public static <I> IdColumn<I> newInstance(Class<? extends Entity<I, ?>> entityClass,
+                                              String columnName) {
+        final IdColumn<I> helper;
         final Class<?> idClass = new EntityClass<Entity>(entityClass).getIdClass();
         if (idClass == Long.class) {
-            helper = (IdColumn<I, Long>) new LongIdColumn(columnName);
+            helper = (IdColumn<I>) new LongIdColumn(columnName);
         } else if (idClass == Integer.class) {
-            helper = (IdColumn<I, Integer>) new IntIdColumn(columnName);
+            helper = (IdColumn<I>) new IntIdColumn(columnName);
         } else if (idClass == String.class) {
-            helper = (IdColumn<I, String>) new StringIdColumn(columnName);
+            helper = (IdColumn<I>) new StringIdColumn(columnName);
         } else {
             final Class<? extends Message> messageClass = (Class<? extends Message>) idClass;
-            helper = (IdColumn<I, String>) new MessageIdColumn(messageClass, columnName);
+            helper = (IdColumn<I>) new MessageIdColumn(messageClass, columnName);
         }
         return helper;
     }
 
-    public static IdColumn<String, String> typeString(String columnName) {
+    public static IdColumn<String> typeString(String columnName) {
         return new StringIdColumn(columnName);
     }
 
@@ -101,7 +100,7 @@ public abstract class IdColumn<I, R> {
      * @param id the identifier to normalize
      * @return the normalized ID
      */
-    protected abstract R normalize(I id);
+    protected abstract Object normalize(I id);
 
     public String getColumnName() {
         return columnName;
@@ -115,14 +114,14 @@ public abstract class IdColumn<I, R> {
      * @param parameters the parameters to set the ID
      */
     public void setId(int index, I id, Parameters.Builder parameters) {
-        final R normalizedId = normalize(id);
+        final Object normalizedId = normalize(id);
         parameters.addParameter(index, normalizedId);
     }
 
     /**
      * Helps to work with columns which contain {@code long} {@link Entity} IDs.
      */
-    private static class LongIdColumn extends IdColumn<Long, Long> {
+    private static class LongIdColumn extends IdColumn<Long> {
 
         private LongIdColumn(String columnName) {
             super(columnName);
@@ -147,7 +146,7 @@ public abstract class IdColumn<I, R> {
     /**
      * Helps to work with columns which contain {@code integer} {@link Entity} IDs.
      */
-    private static class IntIdColumn extends IdColumn<Integer, Integer> {
+    private static class IntIdColumn extends IdColumn<Integer> {
 
         private IntIdColumn(String columnName) {
             super(columnName);
@@ -173,7 +172,7 @@ public abstract class IdColumn<I, R> {
      * Helps to work with columns which contain either {@link Message} or {@code string}
      * {@link Entity} IDs.
      */
-    private abstract static class StringOrMessageIdColumn<I> extends IdColumn<I, String> {
+    private abstract static class StringOrMessageIdColumn<I> extends IdColumn<I> {
 
         private StringOrMessageIdColumn(String columnName) {
             super(columnName);

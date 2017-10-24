@@ -31,7 +31,7 @@ import io.spine.server.storage.jdbc.IdColumn;
 @Internal
 public abstract class SelectByIdQuery<I, R> extends StorageQuery {
 
-    private final IdColumn<I, ?> idColumn;
+    private final IdColumn<I> idColumn;
     private final I id;
     private final int idIndexInQuery;
 
@@ -42,7 +42,7 @@ public abstract class SelectByIdQuery<I, R> extends StorageQuery {
         this.idIndexInQuery = builder.getIdIndexInQuery();
     }
 
-    public IdColumn<I, ?> getIdColumn() {
+    public IdColumn<I> getIdColumn() {
         return idColumn;
     }
 
@@ -62,7 +62,7 @@ public abstract class SelectByIdQuery<I, R> extends StorageQuery {
             extends StorageQuery.Builder<B, Q> {
 
         private int idIndexInQuery;
-        private IdColumn<I, ?> idColumn;
+        private IdColumn<I> idColumn;
         private I id;
 
         public B setId(I id) {
@@ -70,7 +70,7 @@ public abstract class SelectByIdQuery<I, R> extends StorageQuery {
             return getThis();
         }
 
-        public B setIdColumn(IdColumn<I, ?> idColumn) {
+        public B setIdColumn(IdColumn<I> idColumn) {
             this.idColumn = idColumn;
             return getThis();
         }
@@ -84,7 +84,7 @@ public abstract class SelectByIdQuery<I, R> extends StorageQuery {
             return idIndexInQuery;
         }
 
-        public IdColumn<I, ?> getIdColumn() {
+        public IdColumn<I> getIdColumn() {
             return idColumn;
         }
 

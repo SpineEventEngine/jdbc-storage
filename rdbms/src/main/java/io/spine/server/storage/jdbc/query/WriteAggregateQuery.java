@@ -34,7 +34,7 @@ abstract class WriteAggregateQuery<I, R extends Message> extends WriteQuery {
     private final R record;
     private final int idIndexInQuery;
     private final int recordIndexInQuery;
-    private final IdColumn<I, ?> idColumn;
+    private final IdColumn<I> idColumn;
 
     R getRecord() {
         return record;
@@ -69,7 +69,7 @@ abstract class WriteAggregateQuery<I, R extends Message> extends WriteQuery {
 
         private int idIndexInQuery;
         private int recordIndexInQuery;
-        private IdColumn<I, ?> idColumn;
+        private IdColumn<I> idColumn;
         private I id;
         private R record;
 
@@ -83,7 +83,7 @@ abstract class WriteAggregateQuery<I, R extends Message> extends WriteQuery {
             return getThis();
         }
 
-        public B setIdColumn(IdColumn<I, ?> idColumn) {
+        public B setIdColumn(IdColumn<I> idColumn) {
             this.idColumn = idColumn;
             return getThis();
         }

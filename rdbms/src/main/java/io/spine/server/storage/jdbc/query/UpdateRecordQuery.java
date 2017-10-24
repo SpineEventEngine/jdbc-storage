@@ -26,7 +26,7 @@ class UpdateRecordQuery<I> extends WriteQuery {
 
     private final I id;
     private final int idIndexInQuery;
-    private final IdColumn<I, ?> idColumn;
+    private final IdColumn<I> idColumn;
 
     UpdateRecordQuery(Builder<? extends Builder, ? extends UpdateRecordQuery, I> builder) {
         super(builder);
@@ -46,7 +46,7 @@ class UpdateRecordQuery<I> extends WriteQuery {
     abstract static class Builder<B extends Builder<B, Q, I>, Q extends UpdateRecordQuery, I>
             extends WriteQuery.Builder<B, Q> {
         private int idIndexInQuery;
-        private IdColumn<I, ?> idColumn;
+        private IdColumn<I> idColumn;
         private I id;
 
         B setId(I id) {
@@ -54,7 +54,7 @@ class UpdateRecordQuery<I> extends WriteQuery {
             return getThis();
         }
 
-        B setIdColumn(IdColumn<I, ?> idColumn) {
+        B setIdColumn(IdColumn<I> idColumn) {
             this.idColumn = idColumn;
             return getThis();
         }

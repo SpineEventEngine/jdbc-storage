@@ -67,7 +67,7 @@ class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
             VALUES + FORMAT_PLACEHOLDER + SEMICOLON;
 
     private final Map<I, EntityRecordWithColumns> records;
-    private final IdColumn<I, ?> idColumn;
+    private final IdColumn<I> idColumn;
 
     private final int columnCount;
 
@@ -135,7 +135,7 @@ class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
 
         private final Map<I, EntityRecordWithColumns> records = newHashMap();
         private String tableName;
-        private IdColumn<I, ?> idColumn;
+        private IdColumn<I> idColumn;
         private int columnCount;
 
         Builder<I> setRecords(Map<I, EntityRecordWithColumns> records) {
@@ -150,7 +150,7 @@ class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
             return getThis();
         }
 
-        Builder<I> setIdColumn(IdColumn<I, ?> idColumn) {
+        Builder<I> setIdColumn(IdColumn<I> idColumn) {
             this.idColumn = checkNotNull(idColumn);
             return getThis();
         }

@@ -40,7 +40,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class AggregateStorageQueryFactory<I> implements ReadQueryFactory<I, AggregateEventRecord>,
                                                         WriteQueryFactory<I, AggregateEventRecord> {
 
-    private final IdColumn<I, ?> idColumn;
+    private final IdColumn<I> idColumn;
     private final String mainTableName;
     private final DataSourceWrapper dataSource;
 
@@ -53,7 +53,7 @@ public class AggregateStorageQueryFactory<I> implements ReadQueryFactory<I, Aggr
      */
     public AggregateStorageQueryFactory(DataSourceWrapper dataSource,
                                         String tableName,
-                                        IdColumn<I, ?> idColumn) {
+                                        IdColumn<I> idColumn) {
         super();
         this.idColumn = checkNotNull(idColumn);
         this.mainTableName = tableName;

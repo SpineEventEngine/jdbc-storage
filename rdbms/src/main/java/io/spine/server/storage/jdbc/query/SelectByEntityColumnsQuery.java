@@ -119,7 +119,7 @@ public final class SelectByEntityColumnsQuery<I> extends StorageQuery {
         private EntityQuery<I> entityQuery;
         private FieldMask fieldMask;
         private ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> columnTypeRegistry;
-        private IdColumn<I, ?> idColumn;
+        private IdColumn<I> idColumn;
         private String tableName;
 
         private final Parameters.Builder parametersBuilder = Parameters.newBuilder();
@@ -149,7 +149,7 @@ public final class SelectByEntityColumnsQuery<I> extends StorageQuery {
             return this;
         }
 
-        public Builder<I> setIdColumn(IdColumn<I, ?> idColumn) {
+        public Builder<I> setIdColumn(IdColumn<I> idColumn) {
             this.idColumn = checkNotNull(idColumn);
             return this;
         }
@@ -159,7 +159,7 @@ public final class SelectByEntityColumnsQuery<I> extends StorageQuery {
             return this;
         }
 
-        private IdColumn<I, ?> getIdColumn() {
+        private IdColumn<I> getIdColumn() {
             return checkNotNull(idColumn);
         }
 
@@ -283,7 +283,7 @@ public final class SelectByEntityColumnsQuery<I> extends StorageQuery {
 
         private void collectParametersFromIds(Iterable<I> ids, int startIndex) {
             int sqlParameterIndex = startIndex;
-            final IdColumn<I, ?> idColumn = getIdColumn();
+            final IdColumn<I> idColumn = getIdColumn();
             for (I id : ids) {
                 idColumn.setId(sqlParameterIndex, id, parametersBuilder);
                 sqlParameterIndex++;

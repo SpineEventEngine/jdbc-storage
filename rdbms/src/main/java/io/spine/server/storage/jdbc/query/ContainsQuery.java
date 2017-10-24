@@ -52,7 +52,7 @@ public class ContainsQuery<I> extends StorageQuery {
                                                FROM + FORMAT_PLACEHOLDER +
                                                WHERE + FORMAT_PLACEHOLDER + EQUAL + PLACEHOLDER;
 
-    private final IdColumn<I, ?> idColumn;
+    private final IdColumn<I> idColumn;
     private final I id;
 
     private ContainsQuery(Builder<I> builder) {
@@ -91,7 +91,7 @@ public class ContainsQuery<I> extends StorageQuery {
     public static class Builder<I> extends StorageQuery.Builder<Builder<I>, ContainsQuery<I>> {
 
         private String tableName;
-        private IdColumn<I, ?> idColumn;
+        private IdColumn<I> idColumn;
         private I id;
         private TableColumn keyColumn;
 
@@ -100,7 +100,7 @@ public class ContainsQuery<I> extends StorageQuery {
             return this;
         }
 
-        public Builder<I> setIdColumn(IdColumn<I, ?> idColumn) {
+        public Builder<I> setIdColumn(IdColumn<I> idColumn) {
             this.idColumn = idColumn;
             return this;
         }

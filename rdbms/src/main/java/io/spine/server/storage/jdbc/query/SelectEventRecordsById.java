@@ -66,7 +66,7 @@ public class SelectEventRecordsById<I> extends StorageQuery {
             ORDER_BY + version + DESC + COMMA +
             timestamp + DESC + COMMA + timestamp_nanos + DESC + SEMICOLON;
 
-    private final IdColumn<I, ?> idColumn;
+    private final IdColumn<I> idColumn;
     private final I id;
 
     private SelectEventRecordsById(Builder<I> builder) {
@@ -105,7 +105,7 @@ public class SelectEventRecordsById<I> extends StorageQuery {
     public static class Builder<I>
             extends StorageQuery.Builder<Builder<I>, SelectEventRecordsById> {
 
-        private IdColumn<I, ?> idColumn;
+        private IdColumn<I> idColumn;
         private I id;
 
         @Override
@@ -113,7 +113,7 @@ public class SelectEventRecordsById<I> extends StorageQuery {
             return new SelectEventRecordsById<>(this);
         }
 
-        public Builder<I> setIdColumn(IdColumn<I, ?> idColumn) {
+        public Builder<I> setIdColumn(IdColumn<I> idColumn) {
             this.idColumn = idColumn;
             return getThis();
         }

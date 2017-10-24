@@ -42,35 +42,35 @@ public class IdColumnShould {
 
     @Test
     public void have_bigint_impl() {
-        final IdColumn<?, ?> column = IdColumn.newInstance(LongIdEntity.class, ID);
+        final IdColumn<?> column = IdColumn.newInstance(LongIdEntity.class, ID);
         assertEquals(BIGINT, column.getSqlType());
         assertSame(Long.class, column.getJavaType());
     }
 
     @Test
     public void have_int_impl() {
-        final IdColumn<?, ?> column = IdColumn.newInstance(IntIdEntity.class, ID);
+        final IdColumn<?> column = IdColumn.newInstance(IntIdEntity.class, ID);
         assertEquals(INT, column.getSqlType());
         assertSame(Integer.class, column.getJavaType());
     }
 
     @Test
     public void have_varchar255_impl() {
-        final IdColumn<?, ?> column = IdColumn.newInstance(StringIdEntity.class, ID);
+        final IdColumn<?> column = IdColumn.newInstance(StringIdEntity.class, ID);
         assertEquals(VARCHAR_255, column.getSqlType());
         assertSame(String.class, column.getJavaType());
     }
 
     @Test
     public void cast_message_IDs_to_string() {
-        final IdColumn<?, ?> column = IdColumn.newInstance(MessageIdEntity.class, ID);
+        final IdColumn<?> column = IdColumn.newInstance(MessageIdEntity.class, ID);
         assertEquals(VARCHAR_255, column.getSqlType());
         assertTrue(Message.class.isAssignableFrom(column.getJavaType()));
     }
 
     @Test
     public void store_column_name() {
-        final IdColumn<String, ?> column = IdColumn.newInstance(StringIdEntity.class, ID);
+        final IdColumn<String> column = IdColumn.newInstance(StringIdEntity.class, ID);
         assertEquals(ID, column.getColumnName());
     }
 
