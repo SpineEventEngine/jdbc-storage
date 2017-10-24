@@ -63,7 +63,7 @@ abstract class StorageQuery {
             }
             return statement;
         } catch (SQLException e) {
-            getLogger().error("Failed to prepare statement ", e);
+            getLogger().error("Failed to prepare statement.", e);
             throw new DatabaseException(e);
         }
     }
