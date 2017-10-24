@@ -20,6 +20,7 @@
 package io.spine.server.storage.jdbc.type;
 
 import io.spine.annotation.SPI;
+import io.spine.server.storage.jdbc.query.Parameter;
 import io.spine.server.storage.jdbc.query.Parameters;
 
 /**
@@ -34,11 +35,13 @@ public abstract class AbstractJdbcColumnType<J, C> implements JdbcColumnType<J, 
     @Override
     public void setColumnValue(Parameters.Builder storageRecord, C value,
                                Integer columnIdentifier) {
-        storageRecord.addParameter(columnIdentifier, value);
+        final Parameter parameter = Parameter.of(value, getSqlType());
+        storageRecord.addParameter(columnIdentifier, parameter);
     }
 
     @Override
     public void setNull(Parameters.Builder storageRecord, Integer columnIdentifier) {
-        storageRecord.addParameter(columnIdentifier, null);
+        final Parameter nullParameter = Parameter.of(null, getSqlType());
+        storageRecord.addParameter(columnIdentifier, nullParameter);
     }
 }

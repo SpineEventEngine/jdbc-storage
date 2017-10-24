@@ -22,6 +22,7 @@ package io.spine.server.storage.jdbc.query;
 
 import com.google.protobuf.Timestamp;
 import io.spine.server.storage.jdbc.LastHandledEventTimeTable;
+import io.spine.server.storage.jdbc.LastHandledEventTimeTable.Column;
 
 /**
  * A base for the {@linkplain StorageQuery} implementations
@@ -43,12 +44,13 @@ abstract class WriteTimestampQuery extends WriteQuery {
 
     @Override
     protected Parameters getQueryParameters() {
-        final long seconds = timestamp.getSeconds();
-        final int nanos = timestamp.getNanos();
+        final Parameter seconds = Parameter.of(timestamp.getSeconds(), Column.seconds);
+        final Parameter nanos = Parameter.of(timestamp.getNanos(), Column.nanos);
+        final Parameter idParameter = Parameter.of(id, Column.projection_type);
         return Parameters.newBuilder()
                          .addParameter(QueryParameter.SECONDS.getIndex(), seconds)
                          .addParameter(QueryParameter.NANOS.getIndex(), nanos)
-                         .addParameter(QueryParameter.PROJECTION_TYPE.getIndex(), id)
+                         .addParameter(QueryParameter.PROJECTION_TYPE.getIndex(), idParameter)
                          .build();
     }
 

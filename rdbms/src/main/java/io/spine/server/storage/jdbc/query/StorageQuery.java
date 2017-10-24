@@ -58,8 +58,10 @@ abstract class StorageQuery {
         final Set<Integer> parameterIds = getQueryParameters().getIdentifiers();
         try {
             for (Integer parameterId : parameterIds) {
-                final Object parameterValue = getQueryParameters().getValue(parameterId);
-                statement.setObject(parameterId, parameterValue);
+                final Parameter parameter = getQueryParameters().getParameter(parameterId);
+                final int sqlTypeIdentifier = parameter.getType()
+                                                       .getSqlTypeIntIdentifier();
+                statement.setObject(parameterId, parameter.getValue(), sqlTypeIdentifier);
             }
             return statement;
         } catch (SQLException e) {

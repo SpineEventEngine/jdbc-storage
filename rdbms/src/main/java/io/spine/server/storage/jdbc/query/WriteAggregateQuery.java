@@ -22,6 +22,7 @@ package io.spine.server.storage.jdbc.query;
 import com.google.protobuf.Message;
 import io.spine.server.storage.jdbc.IdColumn;
 import io.spine.server.storage.jdbc.Serializer;
+import io.spine.server.storage.jdbc.Sql;
 
 /**
  * An abstract base for the write queries to an {@link io.spine.server.storage.jdbc.AggregateTable}.
@@ -56,7 +57,8 @@ abstract class WriteAggregateQuery<I, R extends Message> extends WriteQuery {
         idColumn.setId(idIndexInQuery, id, builder);
 
         final byte[] serializedRecord = Serializer.serialize(record);
-        return builder.addParameter(recordIndexInQuery, serializedRecord)
+        final Parameter record = Parameter.of(serializedRecord, Sql.Type.BLOB);
+        return builder.addParameter(recordIndexInQuery, record)
                       .build();
     }
 

@@ -20,6 +20,7 @@
 
 package io.spine.server.storage.jdbc.type;
 
+import io.spine.server.storage.jdbc.query.Parameter;
 import io.spine.server.storage.jdbc.query.Parameters;
 import io.spine.test.Tests;
 import org.junit.Test;
@@ -41,8 +42,9 @@ public class JdbcColumnTypeShould {
         final Parameters.Builder builder = Parameters.newBuilder();
         columnType.setNull(builder, identifier);
 
-        final Parameters result = builder.build();
-        assertNull(result.getValue(identifier));
+        final Parameters allParameters = builder.build();
+        final Parameter parameter = allParameters.getParameter(identifier);
+        assertNull(parameter.getValue());
     }
 
     @Test(expected = NullPointerException.class)

@@ -20,6 +20,7 @@
 
 package io.spine.server.storage.jdbc.query;
 
+import io.spine.server.storage.jdbc.Sql;
 import org.junit.Test;
 
 /**
@@ -28,19 +29,19 @@ import org.junit.Test;
 public class ParametersShould {
 
     private static final int ID = 1;
-    private static final Object VALUE = new Object();
+    private static final Parameter PARAMETER = Parameter.of(new Object(), Sql.Type.ID);
 
     @Test(expected = IllegalArgumentException.class)
     public void check_identifiers_uniqueness_for_single_parameter() {
         Parameters.newBuilder()
-                  .addParameter(ID, VALUE)
-                  .addParameter(ID, VALUE);
+                  .addParameter(ID, PARAMETER)
+                  .addParameter(ID, PARAMETER);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void check_identifiers_uniqueness_for_multiple_parameters() {
         final Parameters.Builder commonParameters = Parameters.newBuilder()
-                                                              .addParameter(ID, VALUE);
+                                                              .addParameter(ID, PARAMETER);
         final Parameters buildedCommonParameters = commonParameters.build();
         commonParameters.addParameters(buildedCommonParameters);
     }

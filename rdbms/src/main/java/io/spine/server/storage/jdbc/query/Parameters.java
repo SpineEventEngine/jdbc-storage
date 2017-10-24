@@ -20,7 +20,6 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -32,20 +31,20 @@ import static java.util.Collections.disjoint;
 import static java.util.Collections.unmodifiableMap;
 
 /**
- * A parameters for a SQL query.
+ * A {@linkplain Parameter query parameters} with identifiers.
+ *
+ * <p>{@linkplain #getIdentifiers() Identifiers} allows to distinguish a place
+ * in a query where a parameter should be inserted.
  *
  * <p>This class allows to encapsulate setting of parameters to a concrete implementation.
- *
- * <p>The parameters have {@linkplain #getIdentifiers() identifiers} to distinguish a place
- * in a query where a parameter should be inserted.
  *
  * @author Dmytro Grankin
  */
 public class Parameters {
 
-    private final Map<Integer, Object> parameters;
+    private final Map<Integer, Parameter> parameters;
 
-    private Parameters(Map<Integer, Object> parameters) {
+    private Parameters(Map<Integer, Parameter> parameters) {
         this.parameters = parameters;
     }
 
@@ -59,21 +58,20 @@ public class Parameters {
     }
 
     /**
-     * Obtains a raw value of the parameter by the specified identifier.
+     * Obtains a {@link Parameter} by the specified identifier.
      *
-     * @param identifier the parameter identifier
-     * @return a raw parameter value
+     * @param identifier a parameter identifier
+     * @return the query parameter
      * @throws IllegalArgumentException if there is no parameters with the specified identifier
      */
-    @Nullable
-    public Object getValue(Integer identifier) {
+    public Parameter getParameter(Integer identifier) {
         checkArgument(parameters.containsKey(identifier));
-        final Object value = parameters.get(identifier);
+        final Parameter value = parameters.get(identifier);
         return value;
     }
 
     public static Parameters empty() {
-        return new Parameters(Collections.<Integer, Object>emptyMap());
+        return new Parameters(Collections.<Integer, Parameter>emptyMap());
     }
 
     public static Builder newBuilder() {
@@ -82,16 +80,16 @@ public class Parameters {
 
     public static class Builder {
 
-        private final Map<Integer, Object> parameters = newHashMap();
+        private final Map<Integer, Parameter> parameters = newHashMap();
 
         private Builder() {
             // Prevent direct instantiation of this class.
         }
 
-        public Builder addParameter(Integer identifier, @Nullable Object value) {
+        public Builder addParameter(Integer identifier, Parameter parameter) {
             checkNotNull(identifier);
             checkArgument(!parameters.containsKey(identifier));
-            parameters.put(identifier, value);
+            parameters.put(identifier, parameter);
             return this;
         }
 
@@ -102,7 +100,7 @@ public class Parameters {
         }
 
         public Parameters build() {
-            final Map<Integer, Object> unmodifiableParameters = unmodifiableMap(parameters);
+            final Map<Integer, Parameter> unmodifiableParameters = unmodifiableMap(parameters);
             return new Parameters(unmodifiableParameters);
         }
     }

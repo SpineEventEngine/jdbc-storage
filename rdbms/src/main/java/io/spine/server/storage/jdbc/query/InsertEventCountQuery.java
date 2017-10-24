@@ -21,6 +21,7 @@
 package io.spine.server.storage.jdbc.query;
 
 import io.spine.server.storage.jdbc.EventCountTable;
+import io.spine.server.storage.jdbc.EventCountTable.Column;
 import io.spine.server.storage.jdbc.Sql;
 
 import static io.spine.server.storage.jdbc.EventCountTable.Column.event_count;
@@ -60,9 +61,10 @@ class InsertEventCountQuery<I> extends UpdateRecordQuery<I> {
     @Override
     protected Parameters getQueryParameters() {
         final Parameters superParameters = super.getQueryParameters();
+        final Parameter countParameter = Parameter.of(count, Column.event_count);
         return Parameters.newBuilder()
                          .addParameters(superParameters)
-                         .addParameter(EVENT_COUNT_INDEX, count)
+                         .addParameter(EVENT_COUNT_INDEX, countParameter)
                          .build();
     }
 

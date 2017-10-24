@@ -22,6 +22,7 @@ package io.spine.server.storage.jdbc.query;
 
 import io.spine.server.storage.jdbc.ConnectionWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
+import io.spine.server.storage.jdbc.Sql;
 import org.junit.Test;
 import org.slf4j.Logger;
 
@@ -48,14 +49,17 @@ public class StorageQueryShould {
 
         final int parameterId = 1;
         final Object parameterValue = new Object();
-        final StorageQuery query = new Builder().addParameter(parameterId, parameterValue)
+        final Sql.Type parameterType = Sql.Type.ID;
+        final Parameter parameter = Parameter.of(parameterValue, parameterType);
+        final StorageQuery query = new Builder().addParameter(parameterId, parameter)
                                                 .setQuery(newUuid())
                                                 .build();
         final StorageQuery querySpy = spy(query);
         doReturn(statement).when(connection)
                            .prepareStatement(anyString());
         doThrow(SQLException.class).when(statement)
-                                   .setObject(parameterId, parameterValue);
+                                   .setObject(parameterId, parameterValue,
+                                              parameterType.getSqlTypeIntIdentifier());
         doReturn(logger).when(querySpy)
                         .getLogger();
         querySpy.prepareStatement(connection);
@@ -80,8 +84,8 @@ public class StorageQueryShould {
 
         private final Parameters.Builder parameters = Parameters.newBuilder();
 
-        private Builder addParameter(Integer id, Object value) {
-            parameters.addParameter(id, value);
+        private Builder addParameter(Integer id, Parameter parameter) {
+            parameters.addParameter(id, parameter);
             return getThis();
         }
 

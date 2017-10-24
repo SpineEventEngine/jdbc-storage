@@ -25,6 +25,7 @@ import io.spine.annotation.Internal;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.entity.Entity;
 import io.spine.server.entity.EntityClass;
+import io.spine.server.storage.jdbc.query.Parameter;
 import io.spine.server.storage.jdbc.query.Parameters;
 
 import java.sql.PreparedStatement;
@@ -115,7 +116,8 @@ public abstract class IdColumn<I> {
      */
     public void setId(int index, I id, Parameters.Builder parameters) {
         final Object normalizedId = normalize(id);
-        parameters.addParameter(index, normalizedId);
+        final Parameter parameter = Parameter.of(normalizedId, getSqlType());
+        parameters.addParameter(index, parameter);
     }
 
     /**

@@ -22,6 +22,7 @@ package io.spine.server.storage.jdbc.query;
 
 import io.spine.server.entity.LifecycleFlags;
 import io.spine.server.storage.jdbc.IdColumn;
+import io.spine.server.storage.jdbc.LifecycleFlagsTable.Column;
 import io.spine.server.storage.jdbc.Sql;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -57,8 +58,8 @@ class InsertLifecycleFlagsQuery<I> extends WriteQuery {
         final Parameters.Builder builder = Parameters.newBuilder();
         idColumn.setId(TableColumn.ID.getIndex(), id, builder);
 
-        final boolean archived = entityStatus.getArchived();
-        final boolean deleted = entityStatus.getDeleted();
+        final Parameter archived = Parameter.of(entityStatus.getArchived(), Column.archived);
+        final Parameter deleted = Parameter.of(entityStatus.getDeleted(), Column.deleted);
         return builder.addParameter(TableColumn.ARCHIVED.getIndex(), archived)
                       .addParameter(TableColumn.DELETED.getIndex(), deleted)
                       .build();

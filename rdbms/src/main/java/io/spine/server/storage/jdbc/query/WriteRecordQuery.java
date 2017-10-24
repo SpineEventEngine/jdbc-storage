@@ -23,6 +23,7 @@ package io.spine.server.storage.jdbc.query;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.IdColumn;
 import io.spine.server.storage.jdbc.Serializer;
+import io.spine.server.storage.jdbc.Sql;
 
 abstract class WriteRecordQuery<I, R> extends ColumnAwareWriteQuery {
 
@@ -48,7 +49,8 @@ abstract class WriteRecordQuery<I, R> extends ColumnAwareWriteQuery {
         idColumn.setId(idIndexInQuery, id, builder);
 
         final byte[] serializedRecord = Serializer.serialize(record.getRecord());
-        return builder.addParameter(recordIndexInQuery, serializedRecord)
+        final Parameter record = Parameter.of(serializedRecord, Sql.Type.BLOB);
+        return builder.addParameter(recordIndexInQuery, record)
                       .build();
     }
 
