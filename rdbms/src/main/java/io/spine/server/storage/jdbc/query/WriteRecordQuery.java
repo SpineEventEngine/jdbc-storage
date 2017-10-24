@@ -48,14 +48,13 @@ abstract class WriteRecordQuery<I, R> extends ColumnAwareWriteQuery {
 
     @Override
     protected IdentifiedParameters getQueryParameters() {
-        final IdentifiedParameters superParameters = super.getQueryParameters();
         final IdentifiedParameters.Builder builder = IdentifiedParameters.newBuilder();
 
-        final byte[] serializedRecord = Serializer.serialize(record.getRecord());
-        builder.addParameters(superParameters)
-               .addParameter(recordIndexInQuery, serializedRecord);
         idColumn.setId(idIndexInQuery, id, builder);
-        return builder.build();
+
+        final byte[] serializedRecord = Serializer.serialize(record.getRecord());
+        return builder.addParameter(recordIndexInQuery, serializedRecord)
+                      .build();
     }
 
     EntityRecordWithColumns getRecord() {

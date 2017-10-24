@@ -89,6 +89,11 @@ public class SelectEventRecordsById<I> extends StorageQuery {
                                        of(AggregateEventRecord.class));
     }
 
+    @Override
+    protected IdentifiedParameters getQueryParameters() {
+        return IdentifiedParameters.empty();
+    }
+
     public static <I> Builder<I> newBuilder(String tableName) {
         final Builder<I> builder = new Builder<>();
         builder.setQuery(format(QUERY_TEMPLATE, tableName));

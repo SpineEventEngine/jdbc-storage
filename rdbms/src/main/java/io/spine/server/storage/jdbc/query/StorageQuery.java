@@ -69,18 +69,12 @@ abstract class StorageQuery {
     }
 
     /**
-     * Obtains {@link IdentifiedParameters} to
-     * {@linkplain #prepareStatement(ConnectionWrapper) prepare a statement}.
+     * Obtains {@linkplain IdentifiedParameters parameters} to set during
+     * {@linkplain #prepareStatement(ConnectionWrapper) statement preparation}.
      *
-     * <p>Default implementation returns {@linkplain IdentifiedParameters#empty() empty parameters}.
-     *
-     * <p>Override this method, to specify parameters for the {@linkplain #getQuery() query}.
-     *
-     * @return named parameters for this query
+     * @return parameters for this query
      */
-    protected IdentifiedParameters getQueryParameters() {
-        return IdentifiedParameters.empty();
-    }
+    protected abstract IdentifiedParameters getQueryParameters();
 
     public String getQuery() {
         return query;

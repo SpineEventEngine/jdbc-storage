@@ -33,7 +33,7 @@ import java.sql.SQLException;
  * @author Alexander Litus
  */
 @Internal
-public class WriteQuery extends StorageQuery {
+public abstract class WriteQuery extends StorageQuery {
 
     protected WriteQuery(Builder<? extends Builder, ? extends WriteQuery> builder) {
         super(builder);
@@ -53,10 +53,6 @@ public class WriteQuery extends StorageQuery {
                 throw new DatabaseException(e);
             }
         }
-    }
-
-    protected void logWriteError(Object id, SQLException e) {
-        getLogger().error("Failed to write record with id " + id, e);
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")

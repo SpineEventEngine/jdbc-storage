@@ -52,6 +52,11 @@ public class SimpleQuery extends StorageQuery {
         }
     }
 
+    @Override
+    protected IdentifiedParameters getQueryParameters() {
+        return IdentifiedParameters.empty();
+    }
+
     public static Builder newBuilder() {
         return new Builder();
     }

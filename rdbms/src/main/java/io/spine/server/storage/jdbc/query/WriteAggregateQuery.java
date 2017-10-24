@@ -51,13 +51,12 @@ abstract class WriteAggregateQuery<I, R extends Message> extends WriteQuery {
 
     @Override
     protected IdentifiedParameters getQueryParameters() {
-        final IdentifiedParameters superParameters = super.getQueryParameters();
+        final IdentifiedParameters.Builder builder = IdentifiedParameters.newBuilder();
+
         final byte[] serializedRecord = Serializer.serialize(record);
-        return IdentifiedParameters.newBuilder()
-                                   .addParameters(superParameters)
-                                   .addParameter(idIndexInQuery, idColumn.normalize(id))
-                                   .addParameter(recordIndexInQuery, serializedRecord)
-                                   .build();
+        return builder.addParameter(idIndexInQuery, idColumn.normalize(id))
+                      .addParameter(recordIndexInQuery, serializedRecord)
+                      .build();
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")

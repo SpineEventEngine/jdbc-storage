@@ -169,6 +169,11 @@ class Given {
             super(builder);
         }
 
+        @Override
+        protected IdentifiedParameters getQueryParameters() {
+            return IdentifiedParameters.empty();
+        }
+
         public static Builder newBuilder() {
             final Builder builder = new Builder();
             builder.setQuery("");

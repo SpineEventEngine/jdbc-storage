@@ -88,10 +88,8 @@ class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
 
     @Override
     protected IdentifiedParameters getQueryParameters() {
-        final IdentifiedParameters superParameters = super.getQueryParameters();
-        final IdentifiedParameters.Builder builder =
-                IdentifiedParameters.newBuilder()
-                                    .addParameters(superParameters);
+        final IdentifiedParameters.Builder builder = IdentifiedParameters.newBuilder();
+
         int columnIndex = 1;
         for (Map.Entry<I, EntityRecordWithColumns> recordPair : records.entrySet()) {
             final I id = recordPair.getKey();
