@@ -21,13 +21,8 @@
 package io.spine.server.storage.jdbc.query;
 
 import io.spine.server.entity.LifecycleFlags;
-import io.spine.server.storage.jdbc.ConnectionWrapper;
-import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.IdColumn;
 import io.spine.server.storage.jdbc.LifecycleFlagsTable.Column;
-
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -66,19 +61,15 @@ public class UpdateLifecycleFlagsQuery<I> extends WriteQuery {
     }
 
     @Override
-    protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
-        final PreparedStatement statement = super.prepareStatement(connection);
+    protected IdentifiedParameters getQueryParameters() {
+        final IdentifiedParameters.Builder builder = IdentifiedParameters.newBuilder();
+        idColumn.setId(3, id, builder);
+
         final boolean archived = entityStatus.getArchived();
         final boolean deleted = entityStatus.getDeleted();
-        try {
-            statement.setBoolean(1, archived);
-            statement.setBoolean(2, deleted);
-            idColumn.setId(3, id, statement);
-        } catch (SQLException e) {
-            throw new DatabaseException(e);
-        }
-
-        return statement;
+        return builder.addParameter(1, archived)
+                      .addParameter(2, deleted)
+                      .build();
     }
 
     public static <I> Builder<I> newBuilder(String tableName) {

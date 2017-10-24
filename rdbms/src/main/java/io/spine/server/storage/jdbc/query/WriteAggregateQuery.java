@@ -20,15 +20,8 @@
 package io.spine.server.storage.jdbc.query;
 
 import com.google.protobuf.Message;
-import io.spine.server.storage.jdbc.DatabaseException;
-import io.spine.server.storage.jdbc.ConnectionWrapper;
 import io.spine.server.storage.jdbc.IdColumn;
 import io.spine.server.storage.jdbc.Serializer;
-
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-
-import static io.spine.server.storage.jdbc.AggregateEventRecordTable.Column.aggregate;
 
 /**
  * An abstract base for the write queries to an {@link io.spine.server.storage.jdbc.AggregateTable}.
@@ -54,21 +47,6 @@ abstract class WriteAggregateQuery<I, R extends Message> extends WriteQuery {
         this.idColumn = builder.idColumn;
         this.id = builder.id;
         this.record = builder.record;
-    }
-
-    //TODO:2017-10-23:dmytro.grankin: remove after reworking of WriteQuery.execute().
-    @Override
-    public void execute() {
-        try (ConnectionWrapper connection = getConnection(false)) {
-            try (PreparedStatement statement = prepareStatementWithParameters(connection)) {
-                statement.execute();
-                connection.commit();
-            } catch (SQLException e) {
-                getLogger().error("Failed to execute write operation.", e);
-                connection.rollback();
-                throw new DatabaseException(e);
-            }
-        }
     }
 
     @Override

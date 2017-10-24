@@ -20,14 +20,9 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import io.spine.server.storage.jdbc.DatabaseException;
-import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.entity.LifecycleFlags;
-import io.spine.server.storage.jdbc.ConnectionWrapper;
 import io.spine.server.storage.jdbc.IdColumn;
-
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import io.spine.server.storage.jdbc.Sql;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
@@ -58,19 +53,15 @@ class InsertLifecycleFlagsQuery<I> extends WriteQuery {
     }
 
     @Override
-    protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
-        final PreparedStatement statement = super.prepareStatement(connection);
+    protected IdentifiedParameters getQueryParameters() {
+        final IdentifiedParameters.Builder builder = IdentifiedParameters.newBuilder();
+        idColumn.setId(TableColumn.ID.getIndex(), id, builder);
+
         final boolean archived = entityStatus.getArchived();
         final boolean deleted = entityStatus.getDeleted();
-        try {
-            idColumn.setId(TableColumn.ID.index, id, statement);
-            statement.setBoolean(TableColumn.ARCHIVED.getIndex(), archived);
-            statement.setBoolean(TableColumn.DELETED.getIndex(), deleted);
-        } catch (SQLException e) {
-            logWriteError(id, e);
-            throw new DatabaseException(e);
-        }
-        return statement;
+        return builder.addParameter(TableColumn.ARCHIVED.getIndex(), archived)
+                      .addParameter(TableColumn.DELETED.getIndex(), deleted)
+                      .build();
     }
 
     static <I> Builder<I> newBuilder(String tableName) {

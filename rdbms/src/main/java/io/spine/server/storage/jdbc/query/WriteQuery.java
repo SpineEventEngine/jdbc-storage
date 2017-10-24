@@ -20,9 +20,9 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.annotation.Internal;
 import io.spine.server.storage.jdbc.ConnectionWrapper;
+import io.spine.server.storage.jdbc.DatabaseException;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -44,7 +44,7 @@ public class WriteQuery extends StorageQuery {
      */
     public void execute() {
         try (ConnectionWrapper connection = getConnection(false)) {
-            try (PreparedStatement statement = prepareStatement(connection)) {
+            try (PreparedStatement statement = prepareStatementWithParameters(connection)) {
                 statement.execute();
                 connection.commit();
             } catch (SQLException e) {

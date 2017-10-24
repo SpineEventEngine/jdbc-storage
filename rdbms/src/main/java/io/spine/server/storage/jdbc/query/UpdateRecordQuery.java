@@ -20,10 +20,7 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import io.spine.server.storage.jdbc.ConnectionWrapper;
 import io.spine.server.storage.jdbc.IdColumn;
-
-import java.sql.PreparedStatement;
 
 class UpdateRecordQuery<I> extends WriteQuery {
 
@@ -39,10 +36,10 @@ class UpdateRecordQuery<I> extends WriteQuery {
     }
 
     @Override
-    protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
-        final PreparedStatement statement = super.prepareStatement(connection);
-        idColumn.setId(idIndexInQuery, id, statement);
-        return statement;
+    protected IdentifiedParameters getQueryParameters() {
+        final IdentifiedParameters.Builder builder = IdentifiedParameters.newBuilder();
+        idColumn.setId(idIndexInQuery, id, builder);
+        return builder.build();
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")

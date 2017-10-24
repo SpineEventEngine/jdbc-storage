@@ -21,7 +21,6 @@
 package io.spine.server.storage.jdbc.query;
 
 import com.google.protobuf.Message;
-import com.google.protobuf.Timestamp;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
@@ -32,7 +31,6 @@ import org.slf4j.Logger;
 import java.sql.SQLException;
 
 import static io.spine.server.storage.jdbc.GivenDataSource.whichThrowsExceptionOnExecuteStatement;
-import static io.spine.server.storage.jdbc.GivenDataSource.whichThrowsExceptionOnSettingStatementParam;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.mock;
 
@@ -83,17 +81,6 @@ class Given {
         return builder.build();
     }
 
-    static InsertTimestampQuery getInsertTimestampQueryMock() throws SQLException {
-        loggerMock = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock = whichThrowsExceptionOnSettingStatementParam();
-        final InsertTimestampQuery.Builder builder =
-                InsertTimestampQuery.newBuilder(anyString())
-                                    .setDataSource(dataSourceMock)
-                                    .setLogger(loggerMock)
-                                    .setTimestamp(Timestamp.getDefaultInstance());
-        return builder.build();
-    }
-
     static SelectTimestampQuery getSelectTimestampQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
         final DataSourceWrapper dataSourceMock = whichThrowsExceptionOnExecuteStatement();
@@ -105,44 +92,11 @@ class Given {
         return builder.build();
     }
 
-    static UpdateTimestampQuery getUpdateTimestampQueryMock() throws SQLException {
-        loggerMock = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock = whichThrowsExceptionOnSettingStatementParam();
-        final UpdateTimestampQuery.Builder builder =
-                UpdateTimestampQuery.newBuilder(anyString())
-                                    .setDataSource(dataSourceMock)
-                                    .setLogger(loggerMock)
-                                    .setTimestamp(Timestamp.getDefaultInstance());
-        return builder.build();
-    }
-
-    static InsertEventCountQuery getInsertEventCountQueryMock() throws SQLException {
-        loggerMock = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock = whichThrowsExceptionOnSettingStatementParam();
-        final InsertEventCountQuery.Builder<String> builder =
-                InsertEventCountQuery.<String>newBuilder(anyString())
-                        .setDataSource(dataSourceMock)
-                        .setLogger(loggerMock)
-                        .setIdColumn(ID_COLUMN_MOCK);
-        return builder.build();
-    }
-
     static SelectEventCountByIdQuery getSelectEventCountByIdQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
         final DataSourceWrapper dataSourceMock = whichThrowsExceptionOnExecuteStatement();
         final SelectEventCountByIdQuery.Builder<String> builder =
                 SelectEventCountByIdQuery.<String>newBuilder(anyString())
-                        .setDataSource(dataSourceMock)
-                        .setLogger(loggerMock)
-                        .setIdColumn(ID_COLUMN_MOCK);
-        return builder.build();
-    }
-
-    static UpdateEventCountQuery getUpdateEventCountQueryMock() throws SQLException {
-        loggerMock = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock = whichThrowsExceptionOnSettingStatementParam();
-        final UpdateEventCountQuery.Builder<String> builder =
-                UpdateEventCountQuery.<String>newBuilder(anyString())
                         .setDataSource(dataSourceMock)
                         .setLogger(loggerMock)
                         .setIdColumn(ID_COLUMN_MOCK);

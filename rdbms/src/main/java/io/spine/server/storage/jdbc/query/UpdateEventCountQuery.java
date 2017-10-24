@@ -21,21 +21,16 @@
 package io.spine.server.storage.jdbc.query;
 
 import io.spine.server.storage.jdbc.EventCountTable;
-import io.spine.server.storage.jdbc.DatabaseException;
-import io.spine.server.storage.jdbc.ConnectionWrapper;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-
-import static java.lang.String.format;
+import static io.spine.server.storage.jdbc.EventCountTable.Column.event_count;
+import static io.spine.server.storage.jdbc.EventCountTable.Column.id;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
 import static io.spine.server.storage.jdbc.Sql.Query.PLACEHOLDER;
 import static io.spine.server.storage.jdbc.Sql.Query.SET;
 import static io.spine.server.storage.jdbc.Sql.Query.UPDATE;
 import static io.spine.server.storage.jdbc.Sql.Query.WHERE;
-import static io.spine.server.storage.jdbc.EventCountTable.Column.event_count;
-import static io.spine.server.storage.jdbc.EventCountTable.Column.id;
+import static java.lang.String.format;
 
 /**
  * Query that updates event count in
@@ -59,16 +54,12 @@ class UpdateEventCountQuery<I> extends UpdateRecordQuery<I> {
     }
 
     @Override
-    protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
-        final PreparedStatement statement = super.prepareStatement(connection);
-
-        try {
-            statement.setInt(1, count);
-            return statement;
-        } catch (SQLException e) {
-            logFailedToPrepareStatement(e);
-            throw new DatabaseException(e);
-        }
+    protected IdentifiedParameters getQueryParameters() {
+        final IdentifiedParameters superParameters = super.getQueryParameters();
+        return IdentifiedParameters.newBuilder()
+                                   .addParameters(superParameters)
+                                   .addParameter(1, count)
+                                   .build();
     }
 
     static <I> Builder<I> newBuilder(String tableName) {
