@@ -20,8 +20,6 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import com.google.common.collect.ImmutableMap;
-
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Map;
@@ -29,9 +27,14 @@ import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.Maps.newHashMap;
+import static java.util.Collections.disjoint;
+import static java.util.Collections.unmodifiableMap;
 
 /**
  * A parameters for a SQL query.
+ *
+ * <p>This class allows to encapsulate setting of parameters to a concrete implementation.
  *
  * <p>The parameters have {@linkplain #getIdentifiers() identifiers} to distinguish a place
  * in a query where a parameter should be inserted.
@@ -39,8 +42,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author Dmytro Grankin
  */
 public class Parameters {
-
-    private static final Object NULL_PARAMETER = new Object();
 
     private final Map<Integer, Object> parameters;
 
@@ -68,9 +69,7 @@ public class Parameters {
     public Object getValue(Integer identifier) {
         checkArgument(parameters.containsKey(identifier));
         final Object value = parameters.get(identifier);
-        return value.equals(NULL_PARAMETER)
-               ? null
-               : value;
+        return value;
     }
 
     public static Parameters empty() {
@@ -83,7 +82,7 @@ public class Parameters {
 
     public static class Builder {
 
-        private final ImmutableMap.Builder<Integer, Object> parameters = ImmutableMap.builder();
+        private final Map<Integer, Object> parameters = newHashMap();
 
         private Builder() {
             // Prevent direct instantiation of this class.
@@ -91,21 +90,22 @@ public class Parameters {
 
         public Builder addParameter(Integer identifier, @Nullable Object value) {
             checkNotNull(identifier);
+            checkArgument(!parameters.containsKey(identifier));
 
-            final Object valueToPut = value == null
-                                      ? NULL_PARAMETER
-                                      : value;
-            parameters.put(identifier, valueToPut);
+            parameters.put(identifier, value);
             return this;
         }
 
-        public Builder addParameters(Parameters parameters) {
-            this.parameters.putAll(parameters.parameters);
+        public Builder addParameters(Parameters otherParameters) {
+            checkArgument(disjoint(parameters.keySet(), otherParameters.parameters.keySet()));
+
+            parameters.putAll(otherParameters.parameters);
             return this;
         }
 
         public Parameters build() {
-            return new Parameters(parameters.build());
+            final Map<Integer, Object> unmodifiableParameters = unmodifiableMap(parameters);
+            return new Parameters(unmodifiableParameters);
         }
     }
 }
