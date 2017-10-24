@@ -7,7 +7,6 @@ dependencies {
     compile group: 'com.h2database', name: 'h2', version: '1.4.196'
 
     compile group: 'com.zaxxer', name: 'HikariCP', version: '2.4.3'
-    compile group: 'org.jtemplate', name: 'jtemplate', version: '1.8'
 
     testCompile 'org.mockito:mockito-core:2.+'
 }

@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Set;
 
 /**
  * The implementation base for the queries to an SQL database.
@@ -52,16 +53,19 @@ abstract class StorageQuery {
     }
 
     /**
-     * Prepares a statement using {@linkplain #getIdentifiedParameters() parameters}.
+     * Prepares a statement using {@linkplain #getQueryParameters() parameters}.
      *
      * @param connection the connection to use
      * @return a {@link PreparedStatement}, which is ready to use
      */
     protected PreparedStatement prepareStatementWithParameters(ConnectionWrapper connection) {
-        final Parameters queryParameters = getQueryParameters();
-        final PreparedStatement statement = connection.prepareStatement(queryParameters.getSQL());
+        final PreparedStatement statement = connection.prepareStatement(query);
         try {
-            queryParameters.apply(statement);
+            final Set<Integer> parameterIds = getQueryParameters().getIdentifiers();
+            for (Integer parameterId : parameterIds) {
+                final Object parameterValue = getQueryParameters().getValue(parameterId);
+                statement.setObject(parameterId, parameterValue);
+            }
             return statement;
         } catch (SQLException e) {
             throw new DatabaseException(e);
@@ -78,18 +82,8 @@ abstract class StorageQuery {
      *
      * @return named parameters for this query
      */
-    protected IdentifiedParameters getIdentifiedParameters() {
+    protected IdentifiedParameters getQueryParameters() {
         return IdentifiedParameters.empty();
-    }
-
-    private Parameters getQueryParameters() {
-        final Parameters queryParameters = Parameters.parse(query);
-        final IdentifiedParameters identifiedParameters = getIdentifiedParameters();
-        for (String parameterName : identifiedParameters.getIdentifiers()) {
-            final Object parameterValue = identifiedParameters.getValue(parameterName);
-            queryParameters.put(parameterName, parameterValue);
-        }
-        return queryParameters;
     }
 
     protected void logFailedToPrepareStatement(SQLException e) {

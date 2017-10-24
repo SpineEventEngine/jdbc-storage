@@ -37,7 +37,7 @@ import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.COMMA;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
 import static io.spine.server.storage.jdbc.Sql.Query.VALUES;
-import static io.spine.server.storage.jdbc.Sql.namedParameters;
+import static io.spine.server.storage.jdbc.Sql.nPlaceholders;
 import static io.spine.validate.Validate.isDefault;
 import static java.lang.String.format;
 
@@ -58,21 +58,24 @@ class InsertAggregateRecordQuery<I> extends WriteAggregateQuery<I, AggregateEven
             timestamp_nanos + COMMA +
             version +
             BRACKET_CLOSE
-            + VALUES + namedParameters(Column.values()) + SEMICOLON;
+            + VALUES + nPlaceholders(Column.values().length) + SEMICOLON;
 
     private InsertAggregateRecordQuery(Builder<I> builder) {
         super(builder);
     }
 
     @Override
-    protected IdentifiedParameters getIdentifiedParameters() {
-        final IdentifiedParameters superParameters = super.getIdentifiedParameters();
+    protected IdentifiedParameters getQueryParameters() {
+        final IdentifiedParameters superParameters = super.getQueryParameters();
         final Timestamp recordTimestamp = getRecord().getTimestamp();
         return IdentifiedParameters.newBuilder()
                                    .addParameters(superParameters)
-                                   .addParameter(timestamp.name(), recordTimestamp.getSeconds())
-                                   .addParameter(timestamp_nanos.name(), recordTimestamp.getNanos())
-                                   .addParameter(version.name(), getVersionNumberOfRecord())
+
+                                   //TODO:2017-09-11:dmytro.grankin: Remove hard-coded indexes here and in other places.
+                                   // See the related issues: https://github.com/SpineEventEngine/jdbc-storage/issues/36
+                                   .addParameter(3, recordTimestamp.getSeconds())
+                                   .addParameter(4, recordTimestamp.getNanos())
+                                   .addParameter(5, getVersionNumberOfRecord())
                                    .build();
     }
 
@@ -94,7 +97,10 @@ class InsertAggregateRecordQuery<I> extends WriteAggregateQuery<I, AggregateEven
 
     static <I> Builder<I> newBuilder(String tableName) {
         final Builder<I> builder = new Builder<>();
-        return builder.setQuery(format(QUERY_TEMPLATE, tableName));
+        builder.setIdIndexInQuery(1)
+               .setRecordIndexInQuery(2)
+               .setQuery(format(QUERY_TEMPLATE, tableName));
+        return builder;
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")

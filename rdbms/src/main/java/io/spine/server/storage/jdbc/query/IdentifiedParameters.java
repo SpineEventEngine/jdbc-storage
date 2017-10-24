@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Strings.isNullOrEmpty;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A parameters for a SQL query.
@@ -39,9 +39,9 @@ import static com.google.common.base.Strings.isNullOrEmpty;
  */
 public class IdentifiedParameters {
 
-    private final Map<String, Object> parameters;
+    private final Map<Integer, Object> parameters;
 
-    private IdentifiedParameters(Map<String, Object> parameters) {
+    private IdentifiedParameters(Map<Integer, Object> parameters) {
         this.parameters = parameters;
     }
 
@@ -50,7 +50,7 @@ public class IdentifiedParameters {
      *
      * @return parameter identifiers
      */
-    Set<String> getIdentifiers() {
+    Set<Integer> getIdentifiers() {
         return parameters.keySet();
     }
 
@@ -61,13 +61,13 @@ public class IdentifiedParameters {
      * @return a raw parameter value
      * @throws IllegalArgumentException if there is no parameters with the specified identifier
      */
-    Object getValue(String identifier) {
+    Object getValue(Integer identifier) {
         checkArgument(parameters.containsKey(identifier));
         return parameters.get(identifier);
     }
 
     static IdentifiedParameters empty() {
-        return new IdentifiedParameters(Collections.<String, Object>emptyMap());
+        return new IdentifiedParameters(Collections.<Integer, Object>emptyMap());
     }
 
     static Builder newBuilder() {
@@ -76,14 +76,14 @@ public class IdentifiedParameters {
 
     public static class Builder {
 
-        private final ImmutableMap.Builder<String, Object> parameters = ImmutableMap.builder();
+        private final ImmutableMap.Builder<Integer, Object> parameters = ImmutableMap.builder();
 
         private Builder() {
             // Prevent direct instantiation of this class.
         }
 
-        public Builder addParameter(String identifier, Object value) {
-            checkArgument(!isNullOrEmpty(identifier));
+        public Builder addParameter(Integer identifier, Object value) {
+            checkNotNull(identifier);
 
             parameters.put(identifier, value);
             return this;

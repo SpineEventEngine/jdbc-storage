@@ -34,6 +34,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
 import static io.spine.server.storage.jdbc.Sql.Query.ALL_ATTRIBUTES;
 import static io.spine.server.storage.jdbc.Sql.Query.FROM;
+import static io.spine.server.storage.jdbc.Sql.Query.PLACEHOLDER;
 import static io.spine.server.storage.jdbc.Sql.Query.SELECT;
 import static io.spine.server.storage.jdbc.Sql.Query.WHERE;
 import static java.lang.String.format;
@@ -49,7 +50,7 @@ public class ContainsQuery<I> extends StorageQuery {
     private static final String FORMAT_PLACEHOLDER = "%s";
     private static final String SQL_TEMPLATE = SELECT.toString() + ALL_ATTRIBUTES +
                                                FROM + FORMAT_PLACEHOLDER +
-                                               WHERE + FORMAT_PLACEHOLDER + EQUAL + ':' + FORMAT_PLACEHOLDER;
+                                               WHERE + FORMAT_PLACEHOLDER + EQUAL + PLACEHOLDER;
 
     private final IdColumn<I, ?> idColumn;
     private final I id;
@@ -77,9 +78,9 @@ public class ContainsQuery<I> extends StorageQuery {
     }
 
     @Override
-    protected IdentifiedParameters getIdentifiedParameters() {
+    protected IdentifiedParameters getQueryParameters() {
         return IdentifiedParameters.newBuilder()
-                                   .addParameter(idColumn.getColumnName(), idColumn.normalize(id))
+                                   .addParameter(1, idColumn.normalize(id))
                                    .build();
     }
 
@@ -116,7 +117,7 @@ public class ContainsQuery<I> extends StorageQuery {
 
         @Override
         public ContainsQuery<I> build() {
-            final String sql = format(SQL_TEMPLATE, tableName, keyColumn.name(), keyColumn.name());
+            final String sql = format(SQL_TEMPLATE, tableName, keyColumn.name());
             setQuery(sql);
             return new ContainsQuery<>(this);
         }
