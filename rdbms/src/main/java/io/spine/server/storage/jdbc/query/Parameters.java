@@ -91,14 +91,12 @@ public class Parameters {
         public Builder addParameter(Integer identifier, @Nullable Object value) {
             checkNotNull(identifier);
             checkArgument(!parameters.containsKey(identifier));
-
             parameters.put(identifier, value);
             return this;
         }
 
         public Builder addParameters(Parameters otherParameters) {
             checkArgument(disjoint(parameters.keySet(), otherParameters.parameters.keySet()));
-
             parameters.putAll(otherParameters.parameters);
             return this;
         }
