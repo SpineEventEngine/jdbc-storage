@@ -55,8 +55,8 @@ abstract class StorageQuery {
      */
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
         final PreparedStatement statement = connection.prepareStatement(query);
+        final Set<Integer> parameterIds = getQueryParameters().getIdentifiers();
         try {
-            final Set<Integer> parameterIds = getQueryParameters().getIdentifiers();
             for (Integer parameterId : parameterIds) {
                 final Object parameterValue = getQueryParameters().getValue(parameterId);
                 statement.setObject(parameterId, parameterValue);
