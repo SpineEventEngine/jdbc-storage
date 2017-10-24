@@ -25,6 +25,7 @@ import io.spine.annotation.Internal;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.entity.Entity;
 import io.spine.server.entity.EntityClass;
+import io.spine.server.storage.jdbc.query.IdentifiedParameters;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -123,6 +124,18 @@ public abstract class IdColumn<I, R> {
         } catch (SQLException e) {
             throw new DatabaseException(e);
         }
+    }
+
+    /**
+     * Sets an ID parameter to the given value.
+     *
+     * @param index      the ID parameter index
+     * @param id         the ID value to set
+     * @param parameters the parameters to set the ID
+     */
+    public void setId(int index, I id, IdentifiedParameters.Builder parameters) {
+        final R normalizedId = normalize(id);
+        parameters.addParameter(index, normalizedId);
     }
 
     /**

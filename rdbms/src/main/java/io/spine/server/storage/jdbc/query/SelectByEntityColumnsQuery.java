@@ -34,7 +34,6 @@ import io.spine.server.entity.storage.EntityColumn;
 import io.spine.server.entity.storage.EntityQuery;
 import io.spine.server.entity.storage.QueryParameters;
 import io.spine.server.storage.jdbc.ConnectionWrapper;
-import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.IdColumn;
 import io.spine.server.storage.jdbc.RecordTable;
@@ -81,22 +80,23 @@ import static java.util.Collections.emptyMap;
  * @author Dmytro Dashenkov
  */
 @Internal
-public final class SelectByEntityColumnsQuery<I> extends StorageQuery implements AutoCloseable {
+public final class SelectByEntityColumnsQuery<I> extends StorageQuery {
 
     private static final String COMMON_SQL = SELECT.toString() + entity + FROM + "%s ";
 
-    private final PreparedStatement statement;
+    private final IdentifiedParameters parameters;
     private final FieldMask fieldMask;
 
     private SelectByEntityColumnsQuery(Builder<I> builder) {
         super(builder);
-        this.statement = builder.getStatement();
+        this.parameters = builder.parametersBuilder.build();
         this.fieldMask = builder.getFieldMask();
     }
 
     public Iterator<EntityRecord> execute() {
+        final ConnectionWrapper connection = getConnection(true);
+        final PreparedStatement statement = prepareStatementWithParameters(connection);
         try {
-            PreparedStatement statement = this.statement;
             final ResultSet resultSet = statement.executeQuery();
             return QueryResults.parse(resultSet, fieldMask);
         } catch (SQLException e) {
@@ -105,20 +105,8 @@ public final class SelectByEntityColumnsQuery<I> extends StorageQuery implements
     }
 
     @Override
-    protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
-        final PreparedStatement statement = super.prepareStatement(connection);
-
-        return statement;
-    }
-
-    /**
-     * Closes the underlying {@link PreparedStatement} unless {@link #execute()} has been called.
-     *
-     * @throws SQLException from {@link PreparedStatement#close() PreparedStatement.close()}
-     */
-    @Override
-    public void close() throws SQLException {
-        statement.close();
+    protected IdentifiedParameters getQueryParameters() {
+        return parameters;
     }
 
     public static <I> Builder<I> newBuilder() {
@@ -134,7 +122,7 @@ public final class SelectByEntityColumnsQuery<I> extends StorageQuery implements
         private IdColumn<I, ?> idColumn;
         private String tableName;
 
-        private PreparedStatement statement;
+        private final IdentifiedParameters.Builder parametersBuilder = IdentifiedParameters.newBuilder();
 
         private Builder() {
             super();
@@ -169,10 +157,6 @@ public final class SelectByEntityColumnsQuery<I> extends StorageQuery implements
         public Builder<I> setTableName(String tableName) {
             this.tableName = checkNotNull(tableName);
             return this;
-        }
-
-        private PreparedStatement getStatement() {
-            return checkNotNull(statement);
         }
 
         private IdColumn<I, ?> getIdColumn() {
@@ -212,11 +196,8 @@ public final class SelectByEntityColumnsQuery<I> extends StorageQuery implements
                    .append(nPlaceholders(ids.size()));
             }
             sql.append(SEMICOLON);
-            final DataSourceWrapper dataSource = getDataSource();
-            final ConnectionWrapper connection = dataSource.getConnection(true);
-            this.statement = connection.prepareStatement(sql.toString());
 
-            populateQuery(statement, parameters, ids, columnIndexes);
+            collectQueryParameters(parameters, ids, columnIndexes);
             return new SelectByEntityColumnsQuery<>(this);
         }
 
@@ -270,19 +251,17 @@ public final class SelectByEntityColumnsQuery<I> extends StorageQuery implements
             return index;
         }
 
-        private void populateQuery(PreparedStatement statement,
-                                   Iterable<CompositeQueryParameter> parameters,
-                                   Iterable<I> ids,
-                                   Map<ColumnFilterIdentity, Integer> indexRegistry) {
-            populateQueryWithColumns(statement, parameters, indexRegistry);
+        private void collectQueryParameters(Iterable<CompositeQueryParameter> parameters,
+                                            Iterable<I> ids,
+                                            Map<ColumnFilterIdentity, Integer> indexRegistry) {
+            collectParametersFromColumns(parameters, indexRegistry);
             int sqlParameterIndex = indexRegistry.size() + 1;
-            populateQueryWithIds(statement, ids, sqlParameterIndex);
+            collectParametersFromIds(ids, sqlParameterIndex);
         }
 
         @SuppressWarnings("MethodWithMultipleLoops") // OK in this case.
-        private void populateQueryWithColumns(PreparedStatement statement,
-                                              Iterable<CompositeQueryParameter> parameters,
-                                              Map<ColumnFilterIdentity, Integer> indexRegistry) {
+        private void collectParametersFromColumns(Iterable<CompositeQueryParameter> parameters,
+                                                  Map<ColumnFilterIdentity, Integer> indexRegistry) {
             for (CompositeQueryParameter param : parameters) {
                 for (Map.Entry<EntityColumn, ColumnFilter> filter : param.getFilters()
                                                                          .entries()) {
@@ -296,18 +275,16 @@ public final class SelectByEntityColumnsQuery<I> extends StorageQuery implements
                             columnTypeRegistry.get(column);
                     final Object javaType = toObject(columnFilter.getValue(), column.getType());
                     final Object storedType = columnType.convertColumnValue(javaType);
-                    columnType.setColumnValue(statement, storedType, columnIndexInSql);
+                    columnType.setColumnValue(parametersBuilder, storedType, columnIndexInSql);
                 }
             }
         }
 
-        private void populateQueryWithIds(PreparedStatement statement,
-                                          Iterable<I> ids,
-                                          int startIndex) {
+        private void collectParametersFromIds(Iterable<I> ids, int startIndex) {
             int sqlParameterIndex = startIndex;
             final IdColumn<I, ?> idColumn = getIdColumn();
             for (I id : ids) {
-                idColumn.setId(sqlParameterIndex, id, statement);
+                idColumn.setId(sqlParameterIndex, id, parametersBuilder);
                 sqlParameterIndex++;
             }
         }

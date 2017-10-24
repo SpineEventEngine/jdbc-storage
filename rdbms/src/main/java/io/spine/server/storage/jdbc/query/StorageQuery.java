@@ -23,7 +23,6 @@ package io.spine.server.storage.jdbc.query;
 import io.spine.server.storage.jdbc.ConnectionWrapper;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
-import org.jtemplate.sql.Parameters;
 import org.slf4j.Logger;
 
 import java.sql.PreparedStatement;
