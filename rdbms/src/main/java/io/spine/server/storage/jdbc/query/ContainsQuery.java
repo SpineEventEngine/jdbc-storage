@@ -66,7 +66,7 @@ public class ContainsQuery<I> extends StorageQuery {
      */
     public boolean execute() {
         try (ConnectionWrapper connection = getConnection(false);
-             PreparedStatement statement = prepareStatementWithParameters(connection)) {
+             PreparedStatement statement = prepareStatement(connection)) {
             final ResultSet results = statement.executeQuery();
             final boolean result = results.next();
             results.close();

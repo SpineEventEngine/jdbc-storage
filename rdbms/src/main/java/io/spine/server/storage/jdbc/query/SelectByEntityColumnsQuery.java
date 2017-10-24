@@ -95,7 +95,7 @@ public final class SelectByEntityColumnsQuery<I> extends StorageQuery {
 
     public Iterator<EntityRecord> execute() {
         final ConnectionWrapper connection = getConnection(true);
-        final PreparedStatement statement = prepareStatementWithParameters(connection);
+        final PreparedStatement statement = prepareStatement(connection);
         try {
             final ResultSet resultSet = statement.executeQuery();
             return QueryResults.parse(resultSet, fieldMask);

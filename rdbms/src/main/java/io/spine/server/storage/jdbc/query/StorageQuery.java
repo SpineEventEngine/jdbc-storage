@@ -47,17 +47,13 @@ abstract class StorageQuery {
         this.logger = builder.logger;
     }
 
-    protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
-        return connection.prepareStatement(query);
-    }
-
     /**
      * Prepares a statement using {@linkplain #getQueryParameters() parameters}.
      *
      * @param connection the connection to use
      * @return a {@link PreparedStatement}, which is ready to use
      */
-    protected PreparedStatement prepareStatementWithParameters(ConnectionWrapper connection) {
+    protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
         final PreparedStatement statement = connection.prepareStatement(query);
         try {
             final Set<Integer> parameterIds = getQueryParameters().getIdentifiers();
@@ -67,13 +63,14 @@ abstract class StorageQuery {
             }
             return statement;
         } catch (SQLException e) {
+            getLogger().error("Failed to prepare statement ", e);
             throw new DatabaseException(e);
         }
     }
 
     /**
      * Obtains {@link IdentifiedParameters} to
-     * {@linkplain #prepareStatementWithParameters(ConnectionWrapper) prepare a statement}.
+     * {@linkplain #prepareStatement(ConnectionWrapper) prepare a statement}.
      *
      * <p>Default implementation returns {@linkplain IdentifiedParameters#empty() empty parameters}.
      *
@@ -83,10 +80,6 @@ abstract class StorageQuery {
      */
     protected IdentifiedParameters getQueryParameters() {
         return IdentifiedParameters.empty();
-    }
-
-    protected void logFailedToPrepareStatement(SQLException e) {
-        getLogger().error("Failed to prepare statement ", e);
     }
 
     public String getQuery() {

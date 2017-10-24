@@ -66,7 +66,7 @@ public class DeleteRecordQuery<I> extends StorageQuery {
      */
     public boolean execute() {
         try (ConnectionWrapper connection = getConnection(false)) {
-            final PreparedStatement statement = prepareStatementWithParameters(connection);
+            final PreparedStatement statement = prepareStatement(connection);
             final int rowsAffected = statement.executeUpdate();
             connection.commit();
             final boolean result = rowsAffected != 0;

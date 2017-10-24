@@ -44,7 +44,7 @@ public class WriteQuery extends StorageQuery {
      */
     public void execute() {
         try (ConnectionWrapper connection = getConnection(false)) {
-            try (PreparedStatement statement = prepareStatementWithParameters(connection)) {
+            try (PreparedStatement statement = prepareStatement(connection)) {
                 statement.execute();
                 connection.commit();
             } catch (SQLException e) {
