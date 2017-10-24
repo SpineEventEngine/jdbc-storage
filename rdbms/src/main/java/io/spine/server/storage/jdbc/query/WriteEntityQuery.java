@@ -40,16 +40,19 @@ abstract class WriteEntityQuery<I> extends WriteRecordQuery<I, EntityRecordWithC
     }
 
     @Override
-    protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
-        final PreparedStatement statement = super.prepareStatement(connection);
+    protected IdentifiedParameters getQueryParameters() {
+        final IdentifiedParameters superParameters = super.getQueryParameters();
+        final IdentifiedParameters.Builder builder =
+                IdentifiedParameters.newBuilder()
+                                    .addParameters(superParameters);
         if (getRecord().hasColumns()) {
-            ColumnRecords.feedColumnsTo(statement,
+            ColumnRecords.feedColumnsTo(builder,
                                         getRecord(),
                                         getColumnTypeRegistry(),
                                         getEntityColumnIdentifier(getRecord(),
                                                                   getFirstColumnIndex()));
         }
-        return statement;
+        return builder.build();
     }
 
     /**

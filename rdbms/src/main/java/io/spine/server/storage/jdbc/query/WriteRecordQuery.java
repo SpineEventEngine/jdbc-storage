@@ -47,17 +47,15 @@ abstract class WriteRecordQuery<I, R> extends ColumnAwareWriteQuery {
     }
 
     @Override
-    protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
-        final PreparedStatement statement = super.prepareStatement(connection);
-        try {
-            idColumn.setId(idIndexInQuery, id, statement);
-            final byte[] bytes = Serializer.serialize(record.getRecord());
-            statement.setBytes(recordIndexInQuery, bytes);
-            return statement;
-        } catch (SQLException e) {
-            logWriteError(id, e);
-            throw new DatabaseException(e);
-        }
+    protected IdentifiedParameters getQueryParameters() {
+        final IdentifiedParameters superParameters = super.getQueryParameters();
+        final IdentifiedParameters.Builder builder = IdentifiedParameters.newBuilder();
+
+        final byte[] serializedRecord = Serializer.serialize(record.getRecord());
+        builder.addParameters(superParameters)
+               .addParameter(recordIndexInQuery, serializedRecord);
+        idColumn.setId(idIndexInQuery, id, builder);
+        return builder.build();
     }
 
     EntityRecordWithColumns getRecord() {

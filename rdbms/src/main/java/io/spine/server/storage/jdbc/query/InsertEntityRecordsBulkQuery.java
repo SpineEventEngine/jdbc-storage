@@ -87,54 +87,51 @@ class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
     }
 
     @Override
-    protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
-        final PreparedStatement statement = super.prepareStatement(connection);
+    protected IdentifiedParameters getQueryParameters() {
+        final IdentifiedParameters superParameters = super.getQueryParameters();
+        final IdentifiedParameters.Builder builder =
+                IdentifiedParameters.newBuilder()
+                                    .addParameters(superParameters);
         int columnIndex = 1;
         for (Map.Entry<I, EntityRecordWithColumns> recordPair : records.entrySet()) {
             final I id = recordPair.getKey();
             final EntityRecordWithColumns record = recordPair.getValue();
-            addRecordParams(statement, columnIndex, id, record);
+            addRecordParams(builder, columnIndex, id, record);
             if (record.hasColumns()) {
                 final int nextIndex = columnIndex + StandardColumn.values().length;
-                ColumnRecords.feedColumnsTo(statement,
+                ColumnRecords.feedColumnsTo(builder,
                                             record,
                                             getColumnTypeRegistry(),
                                             getEntityColumnIdentifier(record, nextIndex));
             }
             columnIndex += columnCount;
         }
-        return statement;
+        return builder.build();
     }
 
     /**
-     * Adds an {@link EntityRecordWithColumns} to the query.
+     * Adds an {@link EntityRecordWithColumns} to the query parameters.
      *
      * <p>This includes following items:
      * <ul>
      *     <li>ID;
      *     <li>serialized record by itself;
-     *     <li>{@code Boolean} columns for the record visibility (archived and deleted fields).
      * </ul>
      *
-     * @param statement       the {@linkplain PreparedStatement} to add the query parameters to
-     * @param firstParamIndex index of the first query parameter which must be assigned
-     * @param id              the ID of the record
-     * @param record          the record to store
+     * @param parametersBuilder the builder to add the query parameters to
+     * @param firstParamIndex   index of the first query parameter which must be assigned
+     * @param id                the ID of the record
+     * @param record            the record to store
      */
-    private void addRecordParams(PreparedStatement statement,
+    private void addRecordParams(IdentifiedParameters.Builder parametersBuilder,
                                  int firstParamIndex,
                                  I id,
                                  EntityRecordWithColumns record) {
         int paramIndex = firstParamIndex;
-        try {
-            idColumn.setId(paramIndex, id, statement);
-            paramIndex++;
-            final byte[] bytes = Serializer.serialize(record.getRecord());
-            statement.setBytes(paramIndex, bytes);
-        } catch (SQLException e) {
-            logWriteError(id, e);
-            throw new DatabaseException(e);
-        }
+        idColumn.setId(paramIndex, id, parametersBuilder);
+        paramIndex++;
+        final byte[] serializedRecord = Serializer.serialize(record.getRecord());
+        parametersBuilder.addParameter(paramIndex, serializedRecord);
     }
 
     static class Builder<I> extends ColumnAwareWriteQuery.Builder<Builder<I>,

@@ -23,9 +23,13 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
+import io.spine.server.storage.jdbc.ConnectionWrapper;
+import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.List;
 
 import static com.google.common.base.Functions.forMap;
@@ -49,6 +53,22 @@ abstract class ColumnAwareWriteQuery extends WriteQuery {
 
     ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> getColumnTypeRegistry() {
         return columnTypeRegistry;
+    }
+
+    //TODO:2017-10-24:dmytro.grankin: Remove after after migration of `WriteQuery.execute()`
+    // to usage of `StorageQuery.prepareStatementWithParameters(...)`.
+    @Override
+    public void execute() {
+        try (ConnectionWrapper connection = getConnection(false)) {
+            try (PreparedStatement statement = prepareStatementWithParameters(connection)) {
+                statement.execute();
+                connection.commit();
+            } catch (SQLException e) {
+                getLogger().error("Failed to execute write operation.", e);
+                connection.rollback();
+                throw new DatabaseException(e);
+            }
+        }
     }
 
     /**
