@@ -198,6 +198,7 @@ public final class SelectByEntityColumnsQuery<I> extends StorageQuery {
             sql.append(SEMICOLON);
 
             collectQueryParameters(parameters, ids, columnIndexes);
+            setQuery(sql.toString());
             return new SelectByEntityColumnsQuery<>(this);
         }
 
