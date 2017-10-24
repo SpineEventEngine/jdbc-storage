@@ -83,7 +83,6 @@ public class SelectEventRecordsById<I> extends StorageQuery {
         } catch (SQLException e) {
             throw new DatabaseException(e);
         }
-        idColumn.setId(1, id, statement);
         return new MessageDbIterator<>(statement,
                                        aggregate.toString(),
                                        of(AggregateEventRecord.class));
@@ -91,7 +90,9 @@ public class SelectEventRecordsById<I> extends StorageQuery {
 
     @Override
     protected IdentifiedParameters getQueryParameters() {
-        return IdentifiedParameters.empty();
+        final IdentifiedParameters.Builder builder = IdentifiedParameters.newBuilder();
+        idColumn.setId(1, id, builder);
+        return builder.build();
     }
 
     public static <I> Builder<I> newBuilder(String tableName) {

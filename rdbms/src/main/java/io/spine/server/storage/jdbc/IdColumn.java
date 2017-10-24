@@ -111,24 +111,6 @@ public abstract class IdColumn<I, R> {
     /**
      * Sets an ID parameter to the given value.
      *
-     * @param index     the ID parameter index
-     * @param id        the ID value to set
-     * @param statement the statement to use
-     * @throws DatabaseException if an error occurs during an interaction with the DB
-     */
-    public void setId(int index, I id, PreparedStatement statement) throws DatabaseException {
-        final R normalizedId = normalize(id);
-        try {
-            final int targetSqlType = getSqlType().getSqlTypeIntIdentifier();
-            statement.setObject(index, normalizedId, targetSqlType);
-        } catch (SQLException e) {
-            throw new DatabaseException(e);
-        }
-    }
-
-    /**
-     * Sets an ID parameter to the given value.
-     *
      * @param index      the ID parameter index
      * @param id         the ID value to set
      * @param parameters the parameters to set the ID

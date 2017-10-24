@@ -26,19 +26,12 @@ import io.spine.server.entity.AbstractEntity;
 import io.spine.test.entity.ProjectId;
 import org.junit.Test;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-
 import static io.spine.server.storage.jdbc.Sql.Type.BIGINT;
 import static io.spine.server.storage.jdbc.Sql.Type.INT;
 import static io.spine.server.storage.jdbc.Sql.Type.VARCHAR_255;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 
 /**
  * @author Dmytro Dashenkov
@@ -75,41 +68,10 @@ public class IdColumnShould {
         assertTrue(Message.class.isAssignableFrom(column.getJavaType()));
     }
 
-    @Test(expected = DatabaseException.class)
-    public void throw_DatabaseException_on_fail_to_set_int_id() throws SQLException {
-        final IdColumn<Integer, ?> column = IdColumn.newInstance(IntIdEntity.class, ID);
-        column.setId(1, 1, faultyStatement());
-    }
-
-    @Test(expected = DatabaseException.class)
-    public void throw_DatabaseException_on_fail_to_set_long_id() throws SQLException {
-        final IdColumn<Long, ?> column = IdColumn.newInstance(LongIdEntity.class, ID);
-        column.setId(1, 1L, faultyStatement());
-    }
-
-    @Test(expected = DatabaseException.class)
-    public void throw_DatabaseException_on_fail_to_set_string_id() throws SQLException {
-        final IdColumn<String, ?> column = IdColumn.newInstance(StringIdEntity.class, ID);
-        column.setId(1, "bazinga!", faultyStatement());
-    }
-
-    @Test(expected = DatabaseException.class)
-    public void throw_DatabaseException_on_fail_to_set_message_id() throws SQLException {
-        final IdColumn<ProjectId, ?> column = IdColumn.newInstance(MessageIdEntity.class, ID);
-        column.setId(1, ProjectId.getDefaultInstance(), faultyStatement());
-    }
-
     @Test
     public void store_column_name() {
         final IdColumn<String, ?> column = IdColumn.newInstance(StringIdEntity.class, ID);
         assertEquals(ID, column.getColumnName());
-    }
-
-    private static PreparedStatement faultyStatement() throws SQLException {
-        final PreparedStatement statement = mock(PreparedStatement.class);
-        final Exception exception = new SQLException("Faulty statement causes failures");
-        doThrow(exception).when(statement).setObject(anyInt(), any(), anyInt());
-        return statement;
     }
 
     private static class LongIdEntity extends AbstractEntity<Long, StringValue> {
