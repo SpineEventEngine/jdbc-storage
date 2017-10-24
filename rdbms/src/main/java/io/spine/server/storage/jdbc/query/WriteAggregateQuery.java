@@ -68,15 +68,15 @@ abstract class WriteAggregateQuery<I, R extends Message> extends WriteQuery {
     }
 
     @Override
-    protected NamedParameters getNamedParameters() {
-        final NamedParameters superParameters = super.getNamedParameters();
+    protected IdentifiedParameters getIdentifiedParameters() {
+        final IdentifiedParameters superParameters = super.getIdentifiedParameters();
         final String recordName = aggregate.name();
         final byte[] serializedRecord = Serializer.serialize(record);
-        return NamedParameters.newBuilder()
-                              .addParameters(superParameters)
-                              .addParameter(idColumn.getColumnName(), idColumn.normalize(id))
-                              .addParameter(recordName, serializedRecord)
-                              .build();
+        return IdentifiedParameters.newBuilder()
+                                   .addParameters(superParameters)
+                                   .addParameter(idColumn.getColumnName(), idColumn.normalize(id))
+                                   .addParameter(recordName, serializedRecord)
+                                   .build();
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")

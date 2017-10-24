@@ -65,15 +65,15 @@ class InsertAggregateRecordQuery<I> extends WriteAggregateQuery<I, AggregateEven
     }
 
     @Override
-    protected NamedParameters getNamedParameters() {
-        final NamedParameters superParameters = super.getNamedParameters();
+    protected IdentifiedParameters getIdentifiedParameters() {
+        final IdentifiedParameters superParameters = super.getIdentifiedParameters();
         final Timestamp recordTimestamp = getRecord().getTimestamp();
-        return NamedParameters.newBuilder()
-                              .addParameters(superParameters)
-                              .addParameter(timestamp.name(), recordTimestamp.getSeconds())
-                              .addParameter(timestamp_nanos.name(), recordTimestamp.getNanos())
-                              .addParameter(version.name(), getVersionNumberOfRecord())
-                              .build();
+        return IdentifiedParameters.newBuilder()
+                                   .addParameters(superParameters)
+                                   .addParameter(timestamp.name(), recordTimestamp.getSeconds())
+                                   .addParameter(timestamp_nanos.name(), recordTimestamp.getNanos())
+                                   .addParameter(version.name(), getVersionNumberOfRecord())
+                                   .build();
     }
 
     private int getVersionNumberOfRecord() {

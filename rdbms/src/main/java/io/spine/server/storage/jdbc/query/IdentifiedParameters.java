@@ -27,52 +27,54 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
 /**
- * A list of named parameters for a SQL query.
+ * A parameters for a SQL query.
+ *
+ * <p>The parameters have {@linkplain #getIdentifiers() identifiers} to distinguish a place
+ * in a query where a parameter should be inserted.
  *
  * @author Dmytro Grankin
  */
-class NamedParameters {
+public class IdentifiedParameters {
 
     private final Map<String, Object> parameters;
 
-    private NamedParameters(Map<String, Object> parameters) {
+    private IdentifiedParameters(Map<String, Object> parameters) {
         this.parameters = parameters;
     }
 
     /**
-     * Obtains a set of parameter names.
+     * Obtains a set of parameter identifiers.
      *
-     * @return parameter names
+     * @return parameter identifiers
      */
-    Set<String> getNames() {
+    Set<String> getIdentifiers() {
         return parameters.keySet();
     }
 
     /**
-     * Obtains a raw value of the parameter by the specified name.
+     * Obtains a raw value of the parameter by the specified identifier.
      *
-     * @param name the parameter name
+     * @param identifier the parameter identifier
      * @return a raw parameter value
-     * @throws IllegalArgumentException if there is no parameters with the specified name
+     * @throws IllegalArgumentException if there is no parameters with the specified identifier
      */
-    Object getValue(String name) {
-        checkArgument(parameters.containsKey(name));
-        return parameters.get(name);
+    Object getValue(String identifier) {
+        checkArgument(parameters.containsKey(identifier));
+        return parameters.get(identifier);
     }
 
-    static NamedParameters empty() {
-        return new NamedParameters(Collections.<String, Object>emptyMap());
+    static IdentifiedParameters empty() {
+        return new IdentifiedParameters(Collections.<String, Object>emptyMap());
     }
 
     static Builder newBuilder() {
         return new Builder();
     }
 
-    static class Builder {
+    public static class Builder {
 
         private final ImmutableMap.Builder<String, Object> parameters = ImmutableMap.builder();
 
@@ -80,21 +82,20 @@ class NamedParameters {
             // Prevent direct instantiation of this class.
         }
 
-        Builder addParameter(String name, Object value) {
-            checkArgument(!isNullOrEmpty(name));
-            checkNotNull(value);
+        public Builder addParameter(String identifier, Object value) {
+            checkArgument(!isNullOrEmpty(identifier));
 
-            parameters.put(name, value);
+            parameters.put(identifier, value);
             return this;
         }
 
-        Builder addParameters(NamedParameters namedParameters) {
-            parameters.putAll(namedParameters.parameters);
+        public Builder addParameters(IdentifiedParameters identifiedParameters) {
+            parameters.putAll(identifiedParameters.parameters);
             return this;
         }
 
-        NamedParameters build() {
-            return new NamedParameters(parameters.build());
+        IdentifiedParameters build() {
+            return new IdentifiedParameters(parameters.build());
         }
     }
 }

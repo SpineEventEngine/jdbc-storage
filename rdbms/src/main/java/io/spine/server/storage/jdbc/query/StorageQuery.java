@@ -52,7 +52,7 @@ abstract class StorageQuery {
     }
 
     /**
-     * Prepares statement using {@linkplain #getNamedParameters() named parameters}.
+     * Prepares a statement using {@linkplain #getIdentifiedParameters() parameters}.
      *
      * @param connection the connection to use
      * @return a {@link PreparedStatement}, which is ready to use
@@ -69,24 +69,24 @@ abstract class StorageQuery {
     }
 
     /**
-     * Obtains {@link NamedParameters} to
-     * {@linkplain #prepareStatementWithParameters(ConnectionWrapper) prepare statement}.
+     * Obtains {@link IdentifiedParameters} to
+     * {@linkplain #prepareStatementWithParameters(ConnectionWrapper) prepare a statement}.
      *
-     * <p>Default implementation returns {@linkplain NamedParameters#empty() empty parameters}.
+     * <p>Default implementation returns {@linkplain IdentifiedParameters#empty() empty parameters}.
      *
-     * <p>Override this method, to specify named parameters for the {@linkplain #getQuery() query}.
+     * <p>Override this method, to specify parameters for the {@linkplain #getQuery() query}.
      *
      * @return named parameters for this query
      */
-    protected NamedParameters getNamedParameters() {
-        return NamedParameters.empty();
+    protected IdentifiedParameters getIdentifiedParameters() {
+        return IdentifiedParameters.empty();
     }
 
     private Parameters getQueryParameters() {
         final Parameters queryParameters = Parameters.parse(query);
-        final NamedParameters namedParameters = getNamedParameters();
-        for (String parameterName : namedParameters.getNames()) {
-            final Object parameterValue = namedParameters.getValue(parameterName);
+        final IdentifiedParameters identifiedParameters = getIdentifiedParameters();
+        for (String parameterName : identifiedParameters.getIdentifiers()) {
+            final Object parameterValue = identifiedParameters.getValue(parameterName);
             queryParameters.put(parameterName, parameterValue);
         }
         return queryParameters;
