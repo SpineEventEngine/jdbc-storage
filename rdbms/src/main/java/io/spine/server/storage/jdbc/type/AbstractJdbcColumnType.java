@@ -20,10 +20,7 @@
 package io.spine.server.storage.jdbc.type;
 
 import io.spine.annotation.SPI;
-import io.spine.server.storage.jdbc.DatabaseException;
-
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import io.spine.server.storage.jdbc.query.IdentifiedParameters;
 
 /**
  * The implementation base for the JDBC-storage
@@ -35,11 +32,13 @@ import java.sql.SQLException;
 public abstract class AbstractJdbcColumnType<J, C> implements JdbcColumnType<J, C> {
 
     @Override
-    public void setNull(PreparedStatement storageRecord, Integer columnIdentifier) {
-        try {
-            storageRecord.setNull(columnIdentifier, getSqlType().getSqlTypeIntIdentifier());
-        } catch (SQLException e) {
-            throw new DatabaseException(e);
-        }
+    public void setColumnValue(IdentifiedParameters.Builder storageRecord, C value,
+                               Integer columnIdentifier) {
+        storageRecord.addParameter(columnIdentifier, value);
+    }
+
+    @Override
+    public void setNull(IdentifiedParameters.Builder storageRecord, Integer columnIdentifier) {
+        storageRecord.addParameter(columnIdentifier, null);
     }
 }

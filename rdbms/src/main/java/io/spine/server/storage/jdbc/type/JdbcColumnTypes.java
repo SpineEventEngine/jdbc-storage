@@ -24,11 +24,7 @@ import com.google.protobuf.Timestamp;
 import com.google.protobuf.util.Timestamps;
 import io.spine.core.Version;
 import io.spine.json.Json;
-import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.Sql;
-
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 
 /**
  * A factory for basic {@link JdbcColumnType} implementations.
@@ -98,16 +94,6 @@ final class JdbcColumnTypes {
     private static class BooleanColumnType extends SimpleJdbcColumnType<Boolean>{
 
         @Override
-        public void setColumnValue(PreparedStatement storageRecord, Boolean value,
-                                   Integer columnIdentifier) {
-            try {
-                storageRecord.setBoolean(columnIdentifier, value);
-            } catch (SQLException e) {
-                throw new DatabaseException(e);
-            }
-        }
-
-        @Override
         public Sql.Type getSqlType() {
             return Sql.Type.BOOLEAN;
         }
@@ -117,16 +103,6 @@ final class JdbcColumnTypes {
      * A {@link SimpleJdbcColumnType} for {@code String} Entity Columns.
      */
     private static class StringColumnType extends SimpleJdbcColumnType<String>{
-
-        @Override
-        public void setColumnValue(PreparedStatement storageRecord, String value,
-                                   Integer columnIdentifier) {
-            try {
-                storageRecord.setString(columnIdentifier, value);
-            } catch (SQLException e) {
-                throw new DatabaseException(e);
-            }
-        }
 
         @Override
         public Sql.Type getSqlType() {
@@ -140,16 +116,6 @@ final class JdbcColumnTypes {
     private static class IntegerColumnType extends SimpleJdbcColumnType<Integer>{
 
         @Override
-        public void setColumnValue(PreparedStatement storageRecord, Integer value,
-                                   Integer columnIdentifier) {
-            try {
-                storageRecord.setInt(columnIdentifier, value);
-            } catch (SQLException e) {
-                throw new DatabaseException(e);
-            }
-        }
-
-        @Override
         public Sql.Type getSqlType() {
             return Sql.Type.INT;
         }
@@ -159,16 +125,6 @@ final class JdbcColumnTypes {
      * A {@link SimpleJdbcColumnType} for {@code long} Entity Columns.
      */
     private static class LongColumnType extends SimpleJdbcColumnType<Long>{
-
-        @Override
-        public void setColumnValue(PreparedStatement storageRecord, Long value,
-                                   Integer columnIdentifier) {
-            try {
-                storageRecord.setLong(columnIdentifier, value);
-            } catch (SQLException e) {
-                throw new DatabaseException(e);
-            }
-        }
 
         @Override
         public Sql.Type getSqlType() {
@@ -186,16 +142,6 @@ final class JdbcColumnTypes {
         public Integer convertColumnValue(Version fieldValue) {
             final Integer version = fieldValue.getNumber();
             return version;
-        }
-
-        @Override
-        public void setColumnValue(PreparedStatement storageRecord, Integer value,
-                                   Integer columnIdentifier) {
-            try {
-                storageRecord.setInt(columnIdentifier, value);
-            } catch (SQLException e) {
-                throw new DatabaseException(e);
-            }
         }
 
         @Override
@@ -220,17 +166,6 @@ final class JdbcColumnTypes {
         }
 
         @Override
-        public void setColumnValue(PreparedStatement storageRecord,
-                                   Long value,
-                                   Integer columnIdentifier) {
-            try {
-                storageRecord.setLong(columnIdentifier, value);
-            } catch (SQLException e) {
-                throw new DatabaseException(e);
-            }
-        }
-
-        @Override
         public Sql.Type getSqlType() {
             return Sql.Type.BIGINT;
         }
@@ -246,18 +181,6 @@ final class JdbcColumnTypes {
         public String convertColumnValue(AbstractMessage fieldValue) {
             final String message = Json.toCompactJson(fieldValue);
             return message;
-        }
-
-        @Override
-        public void setColumnValue(PreparedStatement storageRecord,
-                                   String value,
-                                   Integer columnIdentifier) {
-            try {
-                storageRecord.setString(columnIdentifier, value);
-            } catch (SQLException e) {
-                throw new DatabaseException(e);
-            }
-
         }
 
         @Override

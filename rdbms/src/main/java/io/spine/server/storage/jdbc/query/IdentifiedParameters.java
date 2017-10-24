@@ -22,6 +22,7 @@ package io.spine.server.storage.jdbc.query;
 
 import com.google.common.collect.ImmutableMap;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -50,7 +51,7 @@ public class IdentifiedParameters {
      *
      * @return parameter identifiers
      */
-    Set<Integer> getIdentifiers() {
+    public Set<Integer> getIdentifiers() {
         return parameters.keySet();
     }
 
@@ -61,16 +62,16 @@ public class IdentifiedParameters {
      * @return a raw parameter value
      * @throws IllegalArgumentException if there is no parameters with the specified identifier
      */
-    Object getValue(Integer identifier) {
+    public Object getValue(Integer identifier) {
         checkArgument(parameters.containsKey(identifier));
         return parameters.get(identifier);
     }
 
-    static IdentifiedParameters empty() {
+    public static IdentifiedParameters empty() {
         return new IdentifiedParameters(Collections.<Integer, Object>emptyMap());
     }
 
-    static Builder newBuilder() {
+    public static Builder newBuilder() {
         return new Builder();
     }
 
@@ -82,7 +83,7 @@ public class IdentifiedParameters {
             // Prevent direct instantiation of this class.
         }
 
-        public Builder addParameter(Integer identifier, Object value) {
+        public Builder addParameter(Integer identifier, @Nullable Object value) {
             checkNotNull(identifier);
 
             parameters.put(identifier, value);
@@ -94,7 +95,7 @@ public class IdentifiedParameters {
             return this;
         }
 
-        IdentifiedParameters build() {
+        public IdentifiedParameters build() {
             return new IdentifiedParameters(parameters.build());
         }
     }
