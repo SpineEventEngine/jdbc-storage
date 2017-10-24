@@ -25,14 +25,10 @@ import com.google.common.base.Predicates;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.storage.ColumnRecords;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
-import io.spine.server.storage.jdbc.ConnectionWrapper;
-import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.IdColumn;
 import io.spine.server.storage.jdbc.RecordTable.StandardColumn;
 import io.spine.server.storage.jdbc.Serializer;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Map;
 
@@ -87,8 +83,8 @@ class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
     }
 
     @Override
-    protected IdentifiedParameters getQueryParameters() {
-        final IdentifiedParameters.Builder builder = IdentifiedParameters.newBuilder();
+    protected Parameters getQueryParameters() {
+        final Parameters.Builder builder = Parameters.newBuilder();
 
         int columnIndex = 1;
         for (Map.Entry<I, EntityRecordWithColumns> recordPair : records.entrySet()) {
@@ -121,7 +117,7 @@ class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
      * @param id                the ID of the record
      * @param record            the record to store
      */
-    private void addRecordParams(IdentifiedParameters.Builder parametersBuilder,
+    private void addRecordParams(Parameters.Builder parametersBuilder,
                                  int firstParamIndex,
                                  I id,
                                  EntityRecordWithColumns record) {

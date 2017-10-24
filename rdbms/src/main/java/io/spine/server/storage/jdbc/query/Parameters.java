@@ -38,13 +38,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @author Dmytro Grankin
  */
-public class IdentifiedParameters {
+public class Parameters {
 
     private static final Object NULL_PARAMETER = new Object();
 
     private final Map<Integer, Object> parameters;
 
-    private IdentifiedParameters(Map<Integer, Object> parameters) {
+    private Parameters(Map<Integer, Object> parameters) {
         this.parameters = parameters;
     }
 
@@ -73,8 +73,8 @@ public class IdentifiedParameters {
                : value;
     }
 
-    public static IdentifiedParameters empty() {
-        return new IdentifiedParameters(Collections.<Integer, Object>emptyMap());
+    public static Parameters empty() {
+        return new Parameters(Collections.<Integer, Object>emptyMap());
     }
 
     public static Builder newBuilder() {
@@ -99,13 +99,13 @@ public class IdentifiedParameters {
             return this;
         }
 
-        public Builder addParameters(IdentifiedParameters identifiedParameters) {
-            parameters.putAll(identifiedParameters.parameters);
+        public Builder addParameters(Parameters parameters) {
+            this.parameters.putAll(parameters.parameters);
             return this;
         }
 
-        public IdentifiedParameters build() {
-            return new IdentifiedParameters(parameters.build());
+        public Parameters build() {
+            return new Parameters(parameters.build());
         }
     }
 }

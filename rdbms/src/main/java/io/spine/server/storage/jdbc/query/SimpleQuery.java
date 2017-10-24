@@ -53,8 +53,8 @@ public class SimpleQuery extends StorageQuery {
     }
 
     @Override
-    protected IdentifiedParameters getQueryParameters() {
-        return IdentifiedParameters.empty();
+    protected Parameters getQueryParameters() {
+        return Parameters.empty();
     }
 
     public static Builder newBuilder() {

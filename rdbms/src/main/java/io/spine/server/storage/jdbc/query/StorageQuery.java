@@ -69,12 +69,12 @@ abstract class StorageQuery {
     }
 
     /**
-     * Obtains {@linkplain IdentifiedParameters parameters} to set during
+     * Obtains {@linkplain Parameters parameters} to set during
      * {@linkplain #prepareStatement(ConnectionWrapper) statement preparation}.
      *
      * @return parameters for this query
      */
-    protected abstract IdentifiedParameters getQueryParameters();
+    protected abstract Parameters getQueryParameters();
 
     public String getQuery() {
         return query;

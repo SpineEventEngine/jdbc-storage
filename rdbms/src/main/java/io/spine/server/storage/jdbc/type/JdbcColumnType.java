@@ -22,19 +22,19 @@ package io.spine.server.storage.jdbc.type;
 import io.spine.annotation.SPI;
 import io.spine.server.entity.storage.ColumnType;
 import io.spine.server.storage.jdbc.Sql;
-import io.spine.server.storage.jdbc.query.IdentifiedParameters;
+import io.spine.server.storage.jdbc.query.Parameters;
 
 /**
  * The contract of a {@link ColumnType} used by the JDBC storage.
  *
- * <p>Uses {@link IdentifiedParameters.Builder} as the record type and {@code Integer} as
- * the column identifier type.
+ * <p>Uses {@linkplain Parameters.Builder parameters builder} as the record type and
+ * {@code Integer} as the column identifier type.
  *
  * @author Alexander Aleksandrov
  * @see AbstractJdbcColumnType for the skeleton implementation
  */
 @SPI
-public interface JdbcColumnType<J, C> extends ColumnType<J, C, IdentifiedParameters.Builder, Integer> {
+public interface JdbcColumnType<J, C> extends ColumnType<J, C, Parameters.Builder, Integer> {
 
     Sql.Type getSqlType();
 }

@@ -84,7 +84,7 @@ public final class SelectByEntityColumnsQuery<I> extends StorageQuery {
 
     private static final String COMMON_SQL = SELECT.toString() + entity + FROM + "%s ";
 
-    private final IdentifiedParameters parameters;
+    private final Parameters parameters;
     private final FieldMask fieldMask;
 
     private SelectByEntityColumnsQuery(Builder<I> builder) {
@@ -105,7 +105,7 @@ public final class SelectByEntityColumnsQuery<I> extends StorageQuery {
     }
 
     @Override
-    protected IdentifiedParameters getQueryParameters() {
+    protected Parameters getQueryParameters() {
         return parameters;
     }
 
@@ -122,7 +122,7 @@ public final class SelectByEntityColumnsQuery<I> extends StorageQuery {
         private IdColumn<I, ?> idColumn;
         private String tableName;
 
-        private final IdentifiedParameters.Builder parametersBuilder = IdentifiedParameters.newBuilder();
+        private final Parameters.Builder parametersBuilder = Parameters.newBuilder();
 
         private Builder() {
             super();

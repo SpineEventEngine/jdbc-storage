@@ -54,12 +54,12 @@ class UpdateEventCountQuery<I> extends UpdateRecordQuery<I> {
     }
 
     @Override
-    protected IdentifiedParameters getQueryParameters() {
-        final IdentifiedParameters superParameters = super.getQueryParameters();
-        return IdentifiedParameters.newBuilder()
-                                   .addParameters(superParameters)
-                                   .addParameter(1, count)
-                                   .build();
+    protected Parameters getQueryParameters() {
+        final Parameters superParameters = super.getQueryParameters();
+        return Parameters.newBuilder()
+                         .addParameters(superParameters)
+                         .addParameter(1, count)
+                         .build();
     }
 
     static <I> Builder<I> newBuilder(String tableName) {

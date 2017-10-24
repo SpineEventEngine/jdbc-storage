@@ -63,8 +63,8 @@ public class StorageIndexQuery<I> extends StorageQuery {
     }
 
     @Override
-    protected IdentifiedParameters getQueryParameters() {
-        return IdentifiedParameters.empty();
+    protected Parameters getQueryParameters() {
+        return Parameters.empty();
     }
 
     public static <I> Builder<I> newBuilder() {

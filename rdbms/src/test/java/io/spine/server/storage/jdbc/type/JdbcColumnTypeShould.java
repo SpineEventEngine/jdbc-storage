@@ -20,7 +20,7 @@
 
 package io.spine.server.storage.jdbc.type;
 
-import io.spine.server.storage.jdbc.query.IdentifiedParameters;
+import io.spine.server.storage.jdbc.query.Parameters;
 import io.spine.test.Tests;
 import org.junit.Test;
 
@@ -38,10 +38,10 @@ public class JdbcColumnTypeShould {
     @Test
     public void set_null_to_parameters() throws SQLException {
         final int identifier = 42;
-        final IdentifiedParameters.Builder builder = IdentifiedParameters.newBuilder();
+        final Parameters.Builder builder = Parameters.newBuilder();
         columnType.setNull(builder, identifier);
 
-        final IdentifiedParameters result = builder.build();
+        final Parameters result = builder.build();
         assertNull(result.getValue(identifier));
     }
 

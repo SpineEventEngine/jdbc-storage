@@ -61,8 +61,8 @@ public class UpdateLifecycleFlagsQuery<I> extends WriteQuery {
     }
 
     @Override
-    protected IdentifiedParameters getQueryParameters() {
-        final IdentifiedParameters.Builder builder = IdentifiedParameters.newBuilder();
+    protected Parameters getQueryParameters() {
+        final Parameters.Builder builder = Parameters.newBuilder();
         idColumn.setId(3, id, builder);
 
         final boolean archived = entityStatus.getArchived();

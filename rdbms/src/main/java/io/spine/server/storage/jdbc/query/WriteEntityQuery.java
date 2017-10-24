@@ -22,10 +22,7 @@ package io.spine.server.storage.jdbc.query;
 
 import io.spine.server.entity.storage.ColumnRecords;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
-import io.spine.server.storage.jdbc.ConnectionWrapper;
 import io.spine.server.storage.jdbc.RecordTable;
-
-import java.sql.PreparedStatement;
 
 /**
  * The write query to the {@link RecordTable RecordTable}.
@@ -40,11 +37,11 @@ abstract class WriteEntityQuery<I> extends WriteRecordQuery<I, EntityRecordWithC
     }
 
     @Override
-    protected IdentifiedParameters getQueryParameters() {
-        final IdentifiedParameters superParameters = super.getQueryParameters();
-        final IdentifiedParameters.Builder builder =
-                IdentifiedParameters.newBuilder()
-                                    .addParameters(superParameters);
+    protected Parameters getQueryParameters() {
+        final Parameters superParameters = super.getQueryParameters();
+        final Parameters.Builder builder =
+                Parameters.newBuilder()
+                          .addParameters(superParameters);
         if (getRecord().hasColumns()) {
             ColumnRecords.feedColumnsTo(builder,
                                         getRecord(),

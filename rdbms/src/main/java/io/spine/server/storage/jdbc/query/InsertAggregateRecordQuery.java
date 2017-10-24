@@ -65,18 +65,18 @@ class InsertAggregateRecordQuery<I> extends WriteAggregateQuery<I, AggregateEven
     }
 
     @Override
-    protected IdentifiedParameters getQueryParameters() {
-        final IdentifiedParameters superParameters = super.getQueryParameters();
+    protected Parameters getQueryParameters() {
+        final Parameters superParameters = super.getQueryParameters();
         final Timestamp recordTimestamp = getRecord().getTimestamp();
-        return IdentifiedParameters.newBuilder()
-                                   .addParameters(superParameters)
+        return Parameters.newBuilder()
+                         .addParameters(superParameters)
 
-                                   //TODO:2017-09-11:dmytro.grankin: Remove hard-coded indexes here and in other places.
-                                   // See the related issues: https://github.com/SpineEventEngine/jdbc-storage/issues/36
-                                   .addParameter(3, recordTimestamp.getSeconds())
-                                   .addParameter(4, recordTimestamp.getNanos())
-                                   .addParameter(5, getVersionNumberOfRecord())
-                                   .build();
+                         //TODO:2017-09-11:dmytro.grankin: Remove hard-coded indexes here and in other places.
+                         // See the related issues: https://github.com/SpineEventEngine/jdbc-storage/issues/36
+                         .addParameter(3, recordTimestamp.getSeconds())
+                         .addParameter(4, recordTimestamp.getNanos())
+                         .addParameter(5, getVersionNumberOfRecord())
+                         .build();
     }
 
     private int getVersionNumberOfRecord() {

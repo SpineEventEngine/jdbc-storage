@@ -53,8 +53,8 @@ class InsertLifecycleFlagsQuery<I> extends WriteQuery {
     }
 
     @Override
-    protected IdentifiedParameters getQueryParameters() {
-        final IdentifiedParameters.Builder builder = IdentifiedParameters.newBuilder();
+    protected Parameters getQueryParameters() {
+        final Parameters.Builder builder = Parameters.newBuilder();
         idColumn.setId(TableColumn.ID.getIndex(), id, builder);
 
         final boolean archived = entityStatus.getArchived();

@@ -50,8 +50,8 @@ abstract class WriteAggregateQuery<I, R extends Message> extends WriteQuery {
     }
 
     @Override
-    protected IdentifiedParameters getQueryParameters() {
-        final IdentifiedParameters.Builder builder = IdentifiedParameters.newBuilder();
+    protected Parameters getQueryParameters() {
+        final Parameters.Builder builder = Parameters.newBuilder();
 
         final byte[] serializedRecord = Serializer.serialize(record);
         return builder.addParameter(idIndexInQuery, idColumn.normalize(id))

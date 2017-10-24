@@ -25,10 +25,9 @@ import io.spine.annotation.Internal;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.entity.Entity;
 import io.spine.server.entity.EntityClass;
-import io.spine.server.storage.jdbc.query.IdentifiedParameters;
+import io.spine.server.storage.jdbc.query.Parameters;
 
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static io.spine.json.Json.toCompactJson;
@@ -115,7 +114,7 @@ public abstract class IdColumn<I, R> {
      * @param id         the ID value to set
      * @param parameters the parameters to set the ID
      */
-    public void setId(int index, I id, IdentifiedParameters.Builder parameters) {
+    public void setId(int index, I id, Parameters.Builder parameters) {
         final R normalizedId = normalize(id);
         parameters.addParameter(index, normalizedId);
     }

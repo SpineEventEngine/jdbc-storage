@@ -42,14 +42,14 @@ abstract class WriteTimestampQuery extends WriteQuery {
     }
 
     @Override
-    protected IdentifiedParameters getQueryParameters() {
+    protected Parameters getQueryParameters() {
         final long seconds = timestamp.getSeconds();
         final int nanos = timestamp.getNanos();
-        return IdentifiedParameters.newBuilder()
-                                   .addParameter(QueryParameter.SECONDS.getIndex(), seconds)
-                                   .addParameter(QueryParameter.NANOS.getIndex(), nanos)
-                                   .addParameter(QueryParameter.PROJECTION_TYPE.getIndex(), id)
-                                   .build();
+        return Parameters.newBuilder()
+                         .addParameter(QueryParameter.SECONDS.getIndex(), seconds)
+                         .addParameter(QueryParameter.NANOS.getIndex(), nanos)
+                         .addParameter(QueryParameter.PROJECTION_TYPE.getIndex(), id)
+                         .build();
     }
 
     abstract static class Builder<B extends Builder<B, Q>, Q extends WriteTimestampQuery>

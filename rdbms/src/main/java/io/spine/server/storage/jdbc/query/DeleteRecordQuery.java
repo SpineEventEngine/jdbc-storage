@@ -77,8 +77,8 @@ public class DeleteRecordQuery<I> extends StorageQuery {
     }
 
     @Override
-    protected IdentifiedParameters getQueryParameters() {
-        final IdentifiedParameters.Builder builder = IdentifiedParameters.newBuilder();
+    protected Parameters getQueryParameters() {
+        final Parameters.Builder builder = Parameters.newBuilder();
         idColumn.setId(COLUMN_VALUE_PARAM_INDEX, id, builder);
         return builder.build();
     }

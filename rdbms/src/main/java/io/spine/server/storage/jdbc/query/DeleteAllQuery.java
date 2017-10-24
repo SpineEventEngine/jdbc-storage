@@ -42,8 +42,8 @@ public class DeleteAllQuery extends WriteQuery {
     }
 
     @Override
-    protected IdentifiedParameters getQueryParameters() {
-        return IdentifiedParameters.empty();
+    protected Parameters getQueryParameters() {
+        return Parameters.empty();
     }
 
     public static Builder newBuilder(String tableName) {

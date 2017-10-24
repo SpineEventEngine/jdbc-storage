@@ -21,13 +21,8 @@
 package io.spine.server.storage.jdbc.query;
 
 import io.spine.server.entity.storage.EntityRecordWithColumns;
-import io.spine.server.storage.jdbc.ConnectionWrapper;
-import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.IdColumn;
 import io.spine.server.storage.jdbc.Serializer;
-
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 
 abstract class WriteRecordQuery<I, R> extends ColumnAwareWriteQuery {
 
@@ -47,8 +42,8 @@ abstract class WriteRecordQuery<I, R> extends ColumnAwareWriteQuery {
     }
 
     @Override
-    protected IdentifiedParameters getQueryParameters() {
-        final IdentifiedParameters.Builder builder = IdentifiedParameters.newBuilder();
+    protected Parameters getQueryParameters() {
+        final Parameters.Builder builder = Parameters.newBuilder();
 
         idColumn.setId(idIndexInQuery, id, builder);
 
