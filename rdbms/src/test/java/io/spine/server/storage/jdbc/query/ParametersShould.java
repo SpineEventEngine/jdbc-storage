@@ -22,6 +22,9 @@ package io.spine.server.storage.jdbc.query;
 
 import org.junit.Test;
 
+/**
+ * @author Dmytro Grankin
+ */
 public class ParametersShould {
 
     private static final int ID = 1;

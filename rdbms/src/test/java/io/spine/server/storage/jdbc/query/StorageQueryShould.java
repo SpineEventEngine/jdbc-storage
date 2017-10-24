@@ -35,6 +35,9 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 
+/**
+ * @author Dmytro Grankin
+ */
 public class StorageQueryShould {
 
     @Test(expected = DatabaseException.class)
