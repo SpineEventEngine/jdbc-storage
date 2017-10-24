@@ -101,7 +101,7 @@ public abstract class IdColumn<I, R> {
      * @param id the identifier to normalize
      * @return the normalized ID
      */
-    public abstract R normalize(I id);
+    protected abstract R normalize(I id);
 
     public String getColumnName() {
         return columnName;

@@ -79,9 +79,9 @@ public class ContainsQuery<I> extends StorageQuery {
 
     @Override
     protected Parameters getQueryParameters() {
-        return Parameters.newBuilder()
-                         .addParameter(1, idColumn.normalize(id))
-                         .build();
+        final Parameters.Builder builder = Parameters.newBuilder();
+        idColumn.setId(1, id, builder);
+        return builder.build();
     }
 
     public static <I> Builder<I> newBuilder() {
