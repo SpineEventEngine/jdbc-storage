@@ -28,7 +28,7 @@ import javax.annotation.Nullable;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A parameter of a SQL query.
+ * A parameter of an SQL query.
  *
  * <p>Contains all the necessary data to work with its raw value.
  *
@@ -63,7 +63,7 @@ public class Parameter {
     }
 
     /**
-     * Obtains a SQL type of the parameter.
+     * Obtains an SQL type of the parameter.
      *
      * <p>A type allows to store a raw value and work with objects of different classes
      * in a unified way.
