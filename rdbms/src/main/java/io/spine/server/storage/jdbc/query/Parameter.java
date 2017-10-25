@@ -79,8 +79,7 @@ public final class Parameter {
     /**
      * Obtains an SQL type of the parameter.
      *
-     * <p>A type allows to store a raw value and work with objects of different classes
-     * in a unified way.
+     * <p>The type should be used to set a {@linkplain #getValue() parameter value} to an SQL query.
      *
      * @return the type of the parameter
      */
