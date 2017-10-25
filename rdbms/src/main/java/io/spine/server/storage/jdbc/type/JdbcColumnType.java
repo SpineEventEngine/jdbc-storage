@@ -28,13 +28,13 @@ import io.spine.server.storage.jdbc.query.Parameters;
  * The contract of a {@link ColumnType} used by the JDBC storage.
  *
  * <p>Uses {@linkplain Parameters.Builder parameters builder} as the record type and
- * {@code Integer} as the column identifier type.
+ * {@code String} as the column identifier type.
  *
  * @author Alexander Aleksandrov
  * @see AbstractJdbcColumnType for the skeleton implementation
  */
 @SPI
-public interface JdbcColumnType<J, C> extends ColumnType<J, C, Parameters.Builder, Integer> {
+public interface JdbcColumnType<J, C> extends ColumnType<J, C, Parameters.Builder, String> {
 
     Sql.Type getSqlType();
 }

@@ -78,9 +78,9 @@ class InsertAggregateRecordQuery<I> extends WriteAggregateQuery<I, AggregateEven
 
                          //TODO:2017-09-11:dmytro.grankin: Remove hard-coded indexes here and in other places.
                          // See the related issues: https://github.com/SpineEventEngine/jdbc-storage/issues/36
-                         .addParameter(3, seconds)
-                         .addParameter(4, nanos)
-                         .addParameter(5, version)
+                         .addParameter(String.valueOf(3), seconds)
+                         .addParameter(String.valueOf(4), nanos)
+                         .addParameter(String.valueOf(5), version)
                          .build();
     }
 

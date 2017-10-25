@@ -46,11 +46,11 @@ abstract class WriteRecordQuery<I, R> extends ColumnAwareWriteQuery {
     protected Parameters getQueryParameters() {
         final Parameters.Builder builder = Parameters.newBuilder();
 
-        idColumn.setId(idIndexInQuery, id, builder);
+        idColumn.setId(String.valueOf(idIndexInQuery), id, builder);
 
         final byte[] serializedRecord = Serializer.serialize(record.getRecord());
         final Parameter record = Parameter.of(serializedRecord, Sql.Type.BLOB);
-        return builder.addParameter(recordIndexInQuery, record)
+        return builder.addParameter(String.valueOf(recordIndexInQuery), record)
                       .build();
     }
 

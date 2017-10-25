@@ -64,7 +64,7 @@ class InsertEventCountQuery<I> extends UpdateRecordQuery<I> {
         final Parameter countParameter = Parameter.of(count, Column.event_count);
         return Parameters.newBuilder()
                          .addParameters(superParameters)
-                         .addParameter(EVENT_COUNT_INDEX, countParameter)
+                         .addParameter(String.valueOf(EVENT_COUNT_INDEX), countParameter)
                          .build();
     }
 

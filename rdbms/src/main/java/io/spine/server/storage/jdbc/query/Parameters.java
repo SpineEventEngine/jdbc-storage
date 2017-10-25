@@ -42,9 +42,9 @@ import static java.util.Collections.unmodifiableMap;
  */
 public class Parameters {
 
-    private final Map<Integer, Parameter> parameters;
+    private final Map<String, Parameter> parameters;
 
-    private Parameters(Map<Integer, Parameter> parameters) {
+    private Parameters(Map<String, Parameter> parameters) {
         this.parameters = parameters;
     }
 
@@ -53,7 +53,7 @@ public class Parameters {
      *
      * @return parameter identifiers
      */
-    public Set<Integer> getIdentifiers() {
+    public Set<String> getIdentifiers() {
         return parameters.keySet();
     }
 
@@ -64,14 +64,14 @@ public class Parameters {
      * @return the query parameter
      * @throws IllegalArgumentException if there is no parameters with the specified identifier
      */
-    public Parameter getParameter(Integer identifier) {
+    public Parameter getParameter(String identifier) {
         checkArgument(parameters.containsKey(identifier));
         final Parameter value = parameters.get(identifier);
         return value;
     }
 
     public static Parameters empty() {
-        return new Parameters(Collections.<Integer, Parameter>emptyMap());
+        return new Parameters(Collections.<String, Parameter>emptyMap());
     }
 
     public static Builder newBuilder() {
@@ -80,13 +80,13 @@ public class Parameters {
 
     public static class Builder {
 
-        private final Map<Integer, Parameter> parameters = newHashMap();
+        private final Map<String, Parameter> parameters = newHashMap();
 
         private Builder() {
             // Prevent direct instantiation of this class.
         }
 
-        public Builder addParameter(Integer identifier, Parameter parameter) {
+        public Builder addParameter(String identifier, Parameter parameter) {
             checkNotNull(identifier);
             checkArgument(!parameters.containsKey(identifier));
             parameters.put(identifier, parameter);
@@ -100,7 +100,7 @@ public class Parameters {
         }
 
         public Parameters build() {
-            final Map<Integer, Parameter> unmodifiableParameters = unmodifiableMap(parameters);
+            final Map<String, Parameter> unmodifiableParameters = unmodifiableMap(parameters);
             return new Parameters(unmodifiableParameters);
         }
     }

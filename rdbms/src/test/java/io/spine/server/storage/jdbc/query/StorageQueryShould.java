@@ -47,7 +47,7 @@ public class StorageQueryShould {
         final ConnectionWrapper connection = mock(ConnectionWrapper.class);
         final PreparedStatement statement = mock(PreparedStatement.class);
 
-        final int parameterId = 1;
+        final String parameterId = String.valueOf(1);
         final Object parameterValue = new Object();
         final Sql.Type parameterType = Sql.Type.ID;
         final Parameter parameter = Parameter.of(parameterValue, parameterType);
@@ -58,7 +58,7 @@ public class StorageQueryShould {
         doReturn(statement).when(connection)
                            .prepareStatement(anyString());
         doThrow(SQLException.class).when(statement)
-                                   .setObject(parameterId, parameterValue,
+                                   .setObject(Integer.valueOf(parameterId), parameterValue,
                                               parameterType.getSqlTypeIntIdentifier());
         doReturn(logger).when(querySpy)
                         .getLogger();
@@ -84,7 +84,7 @@ public class StorageQueryShould {
 
         private final Parameters.Builder parameters = Parameters.newBuilder();
 
-        private Builder addParameter(Integer id, Parameter parameter) {
+        private Builder addParameter(String id, Parameter parameter) {
             parameters.addParameter(id, parameter);
             return getThis();
         }

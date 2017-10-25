@@ -27,6 +27,7 @@ import org.junit.Test;
 
 import java.sql.SQLException;
 
+import static io.spine.Identifier.newUuid;
 import static org.junit.Assert.assertNull;
 
 /**
@@ -38,7 +39,7 @@ public class JdbcColumnTypeShould {
 
     @Test
     public void set_null_to_parameters() throws SQLException {
-        final int identifier = 42;
+        final String identifier = newUuid();
         final Parameters.Builder builder = Parameters.newBuilder();
         columnType.setNull(builder, identifier);
 

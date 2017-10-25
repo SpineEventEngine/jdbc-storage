@@ -60,7 +60,7 @@ class UpdateEventCountQuery<I> extends UpdateRecordQuery<I> {
         final Parameter countParameter = Parameter.of(count, Column.event_count);
         return Parameters.newBuilder()
                          .addParameters(superParameters)
-                         .addParameter(1, countParameter)
+                         .addParameter(String.valueOf(1), countParameter)
                          .build();
     }
 

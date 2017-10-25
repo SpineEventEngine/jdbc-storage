@@ -110,14 +110,14 @@ public abstract class IdColumn<I> {
     /**
      * Sets an ID parameter to the given value.
      *
-     * @param index      the ID parameter index
+     * @param idName     the name of the ID
      * @param id         the ID value to set
      * @param parameters the parameters to set the ID
      */
-    public void setId(int index, I id, Parameters.Builder parameters) {
+    public void setId(String idName, I id, Parameters.Builder parameters) {
         final Object normalizedId = normalize(id);
         final Parameter parameter = Parameter.of(normalizedId, getSqlType());
-        parameters.addParameter(index, parameter);
+        parameters.addParameter(idName, parameter);
     }
 
     /**

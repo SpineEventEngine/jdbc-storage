@@ -48,9 +48,9 @@ abstract class WriteTimestampQuery extends WriteQuery {
         final Parameter nanos = Parameter.of(timestamp.getNanos(), Column.nanos);
         final Parameter idParameter = Parameter.of(id, Column.projection_type);
         return Parameters.newBuilder()
-                         .addParameter(QueryParameter.SECONDS.getIndex(), seconds)
-                         .addParameter(QueryParameter.NANOS.getIndex(), nanos)
-                         .addParameter(QueryParameter.PROJECTION_TYPE.getIndex(), idParameter)
+                         .addParameter(String.valueOf(QueryParameter.SECONDS.getIndex()), seconds)
+                         .addParameter(String.valueOf(QueryParameter.NANOS.getIndex()), nanos)
+                         .addParameter(String.valueOf(QueryParameter.PROJECTION_TYPE.getIndex()), idParameter)
                          .build();
     }
 

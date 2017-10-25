@@ -79,7 +79,7 @@ public class DeleteRecordQuery<I> extends StorageQuery {
     @Override
     protected Parameters getQueryParameters() {
         final Parameters.Builder builder = Parameters.newBuilder();
-        idColumn.setId(COLUMN_VALUE_PARAM_INDEX, id, builder);
+        idColumn.setId(String.valueOf(COLUMN_VALUE_PARAM_INDEX), id, builder);
         return builder.build();
     }
 

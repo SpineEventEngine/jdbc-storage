@@ -123,11 +123,11 @@ class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
                                  I id,
                                  EntityRecordWithColumns record) {
         int paramIndex = firstParamIndex;
-        idColumn.setId(paramIndex, id, parametersBuilder);
+        idColumn.setId(String.valueOf(paramIndex), id, parametersBuilder);
         paramIndex++;
         final byte[] serializedRecord = Serializer.serialize(record.getRecord());
         final Parameter recordParameter = Parameter.of(serializedRecord, Sql.Type.BLOB);
-        parametersBuilder.addParameter(paramIndex, recordParameter);
+        parametersBuilder.addParameter(String.valueOf(paramIndex), recordParameter);
     }
 
     static class Builder<I> extends ColumnAwareWriteQuery.Builder<Builder<I>,

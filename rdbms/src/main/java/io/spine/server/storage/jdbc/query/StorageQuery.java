@@ -55,13 +55,15 @@ abstract class StorageQuery {
      */
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
         final PreparedStatement statement = connection.prepareStatement(query);
-        final Set<Integer> parameterIds = getQueryParameters().getIdentifiers();
+        final Set<String> parameterIds = getQueryParameters().getIdentifiers();
         try {
-            for (Integer parameterId : parameterIds) {
+            for (String parameterId : parameterIds) {
                 final Parameter parameter = getQueryParameters().getParameter(parameterId);
                 final int sqlTypeIdentifier = parameter.getType()
                                                        .getSqlTypeIntIdentifier();
-                statement.setObject(parameterId, parameter.getValue(), sqlTypeIdentifier);
+                //TODO:2017-10-25:dmytro.grankin: Get rid of such a dangerous code.
+                final int parameterIdAsInt = Integer.valueOf(parameterId);
+                statement.setObject(parameterIdAsInt, parameter.getValue(), sqlTypeIdentifier);
             }
             return statement;
         } catch (SQLException e) {

@@ -64,16 +64,16 @@ abstract class ColumnAwareWriteQuery extends WriteQuery {
      * @return a {@code Function} transforming a column name to its index
      * @see #formatAndMergeColumns(EntityRecordWithColumns, String)
      */
-    Function<String, Integer> getEntityColumnIdentifier(EntityRecordWithColumns record,
+    Function<String, String> getEntityColumnIdentifier(EntityRecordWithColumns record,
                                                         int firstColumnIndex) {
-        final ImmutableMap.Builder<String, Integer> result = ImmutableMap.builder();
+        final ImmutableMap.Builder<String, String> result = ImmutableMap.builder();
 
         int index = firstColumnIndex;
         for (String entry : getSortedColumnNames(record)) {
-            result.put(entry, index);
+            result.put(entry, String.valueOf(index));
             index++;
         }
-        final Function<String, Integer> function = forMap(result.build());
+        final Function<String, String> function = forMap(result.build());
         return function;
     }
 

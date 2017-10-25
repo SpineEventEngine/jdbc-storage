@@ -38,7 +38,7 @@ class UpdateRecordQuery<I> extends WriteQuery {
     @Override
     protected Parameters getQueryParameters() {
         final Parameters.Builder builder = Parameters.newBuilder();
-        idColumn.setId(idIndexInQuery, id, builder);
+        idColumn.setId(String.valueOf(idIndexInQuery), id, builder);
         return builder.build();
     }
 

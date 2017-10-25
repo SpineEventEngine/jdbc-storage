@@ -56,12 +56,12 @@ class InsertLifecycleFlagsQuery<I> extends WriteQuery {
     @Override
     protected Parameters getQueryParameters() {
         final Parameters.Builder builder = Parameters.newBuilder();
-        idColumn.setId(TableColumn.ID.getIndex(), id, builder);
+        idColumn.setId(String.valueOf(TableColumn.ID.getIndex()), id, builder);
 
         final Parameter archived = Parameter.of(entityStatus.getArchived(), Column.archived);
         final Parameter deleted = Parameter.of(entityStatus.getDeleted(), Column.deleted);
-        return builder.addParameter(TableColumn.ARCHIVED.getIndex(), archived)
-                      .addParameter(TableColumn.DELETED.getIndex(), deleted)
+        return builder.addParameter(String.valueOf(TableColumn.ARCHIVED.getIndex()), archived)
+                      .addParameter(String.valueOf(TableColumn.DELETED.getIndex()), deleted)
                       .build();
     }
 

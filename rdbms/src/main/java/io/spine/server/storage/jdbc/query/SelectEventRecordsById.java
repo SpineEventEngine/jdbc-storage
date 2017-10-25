@@ -91,7 +91,7 @@ public class SelectEventRecordsById<I> extends StorageQuery {
     @Override
     protected Parameters getQueryParameters() {
         final Parameters.Builder builder = Parameters.newBuilder();
-        idColumn.setId(1, id, builder);
+        idColumn.setId(String.valueOf(1), id, builder);
         return builder.build();
     }
 

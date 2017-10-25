@@ -22,7 +22,6 @@ package io.spine.server.storage.jdbc.query;
 
 import io.spine.server.entity.LifecycleFlags;
 import io.spine.server.storage.jdbc.IdColumn;
-import io.spine.server.storage.jdbc.LifecycleFlagsTable;
 import io.spine.server.storage.jdbc.LifecycleFlagsTable.Column;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -64,12 +63,12 @@ public class UpdateLifecycleFlagsQuery<I> extends WriteQuery {
     @Override
     protected Parameters getQueryParameters() {
         final Parameters.Builder builder = Parameters.newBuilder();
-        idColumn.setId(3, id, builder);
+        idColumn.setId(String.valueOf(3), id, builder);
 
         final Parameter archived = Parameter.of(entityStatus.getArchived(), Column.archived);
         final Parameter deleted = Parameter.of(entityStatus.getDeleted(), Column.deleted);
-        return builder.addParameter(1, archived)
-                      .addParameter(2, deleted)
+        return builder.addParameter(String.valueOf(1), archived)
+                      .addParameter(String.valueOf(2), deleted)
                       .build();
     }
 

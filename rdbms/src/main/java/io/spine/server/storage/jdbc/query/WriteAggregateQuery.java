@@ -54,11 +54,11 @@ abstract class WriteAggregateQuery<I, R extends Message> extends WriteQuery {
     protected Parameters getQueryParameters() {
         final Parameters.Builder builder = Parameters.newBuilder();
 
-        idColumn.setId(idIndexInQuery, id, builder);
+        idColumn.setId(String.valueOf(idIndexInQuery), id, builder);
 
         final byte[] serializedRecord = Serializer.serialize(record);
         final Parameter record = Parameter.of(serializedRecord, Sql.Type.BLOB);
-        return builder.addParameter(recordIndexInQuery, record)
+        return builder.addParameter(String.valueOf(recordIndexInQuery), record)
                       .build();
     }
 

@@ -276,7 +276,7 @@ public final class SelectByEntityColumnsQuery<I> extends StorageQuery {
                             columnTypeRegistry.get(column);
                     final Object javaType = toObject(columnFilter.getValue(), column.getType());
                     final Object storedType = columnType.convertColumnValue(javaType);
-                    columnType.setColumnValue(parametersBuilder, storedType, columnIndexInSql);
+                    columnType.setColumnValue(parametersBuilder, storedType, String.valueOf(columnIndexInSql));
                 }
             }
         }
@@ -285,7 +285,7 @@ public final class SelectByEntityColumnsQuery<I> extends StorageQuery {
             int sqlParameterIndex = startIndex;
             final IdColumn<I> idColumn = getIdColumn();
             for (I id : ids) {
-                idColumn.setId(sqlParameterIndex, id, parametersBuilder);
+                idColumn.setId(String.valueOf(sqlParameterIndex), id, parametersBuilder);
                 sqlParameterIndex++;
             }
         }

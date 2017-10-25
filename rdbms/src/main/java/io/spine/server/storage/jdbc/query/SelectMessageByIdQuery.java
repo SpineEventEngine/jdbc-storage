@@ -104,7 +104,7 @@ class SelectMessageByIdQuery<I, M extends Message> extends SelectByIdQuery<I, M>
     @Override
     protected Parameters getQueryParameters() {
         final Parameters.Builder builder = Parameters.newBuilder();
-        getIdColumn().setId(getIdIndexInQuery(), getId(), builder);
+        getIdColumn().setId(String.valueOf(getIdIndexInQuery()), getId(), builder);
         return builder.build();
     }
 

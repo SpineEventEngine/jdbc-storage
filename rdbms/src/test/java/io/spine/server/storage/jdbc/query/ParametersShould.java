@@ -23,12 +23,14 @@ package io.spine.server.storage.jdbc.query;
 import io.spine.server.storage.jdbc.Sql;
 import org.junit.Test;
 
+import static io.spine.Identifier.newUuid;
+
 /**
  * @author Dmytro Grankin
  */
 public class ParametersShould {
 
-    private static final int ID = 1;
+    private static final String ID = newUuid();
     private static final Parameter PARAMETER = Parameter.of(new Object(), Sql.Type.ID);
 
     @Test(expected = IllegalArgumentException.class)
