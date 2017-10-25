@@ -34,7 +34,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @author Dmytro Grankin
  */
-public class Parameter {
+public final class Parameter {
 
     private final Object value;
     private final Sql.Type type;

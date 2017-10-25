@@ -40,7 +40,7 @@ import static java.util.Collections.unmodifiableMap;
  *
  * @author Dmytro Grankin
  */
-public class Parameters {
+public final class Parameters {
 
     private final Map<Integer, Parameter> parameters;
 
