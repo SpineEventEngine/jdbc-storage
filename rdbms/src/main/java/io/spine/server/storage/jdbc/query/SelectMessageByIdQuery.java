@@ -66,7 +66,7 @@ class SelectMessageByIdQuery<I, M extends Message> extends SelectByIdQuery<I, M>
     @Override
     public M execute() throws DatabaseException {
         try (ConnectionWrapper connection = getConnection(true);
-             PreparedStatement statement = prepareStatement(connection, getId());
+             PreparedStatement statement = prepareStatement(connection);
              ResultSet resultSet = statement.executeQuery()) {
             if (!resultSet.next()) {
                 return null;
@@ -101,10 +101,11 @@ class SelectMessageByIdQuery<I, M extends Message> extends SelectByIdQuery<I, M>
         return message;
     }
 
-    protected PreparedStatement prepareStatement(ConnectionWrapper connection, I id) {
-        final PreparedStatement statement = prepareStatement(connection);
-        getIdColumn().setId(getIdIndexInQuery(), id, statement);
-        return statement;
+    @Override
+    protected Parameters getQueryParameters() {
+        final Parameters.Builder builder = Parameters.newBuilder();
+        getIdColumn().setId(getIdIndexInQuery(), getId(), builder);
+        return builder.build();
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")

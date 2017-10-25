@@ -21,22 +21,17 @@
 package io.spine.server.storage.jdbc.query;
 
 import io.spine.server.storage.jdbc.EventCountTable;
-import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.Sql;
-import io.spine.server.storage.jdbc.ConnectionWrapper;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-
-import static java.lang.String.format;
+import static io.spine.server.storage.jdbc.EventCountTable.Column.event_count;
+import static io.spine.server.storage.jdbc.EventCountTable.Column.id;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.COMMA;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
 import static io.spine.server.storage.jdbc.Sql.Query.INSERT_INTO;
 import static io.spine.server.storage.jdbc.Sql.Query.VALUES;
-import static io.spine.server.storage.jdbc.EventCountTable.Column.event_count;
-import static io.spine.server.storage.jdbc.EventCountTable.Column.id;
+import static java.lang.String.format;
 
 /**
  * Query that inserts a new aggregate event count after the last snapshot to the
@@ -63,16 +58,13 @@ class InsertEventCountQuery<I> extends UpdateRecordQuery<I> {
     }
 
     @Override
-    protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
-        final PreparedStatement statement = super.prepareStatement(connection);
-
-        try {
-            statement.setInt(EVENT_COUNT_INDEX, count);
-            return statement;
-        } catch (SQLException e) {
-            logFailedToPrepareStatement(e);
-            throw new DatabaseException(e);
-        }
+    protected Parameters getQueryParameters() {
+        final Parameters superParameters = super.getQueryParameters();
+        final Parameter countParameter = Parameter.of(count, event_count);
+        return Parameters.newBuilder()
+                         .addParameters(superParameters)
+                         .addParameter(EVENT_COUNT_INDEX, countParameter)
+                         .build();
     }
 
     static <I> Builder<I> newBuilder(String tableName) {

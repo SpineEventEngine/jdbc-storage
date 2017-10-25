@@ -21,13 +21,9 @@
 package io.spine.server.storage.jdbc.query;
 
 import io.spine.server.entity.storage.EntityRecordWithColumns;
-import io.spine.server.storage.jdbc.ConnectionWrapper;
-import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.IdColumn;
 import io.spine.server.storage.jdbc.Serializer;
-
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import io.spine.server.storage.jdbc.Sql;
 
 abstract class WriteRecordQuery<I, R> extends ColumnAwareWriteQuery {
 
@@ -47,17 +43,15 @@ abstract class WriteRecordQuery<I, R> extends ColumnAwareWriteQuery {
     }
 
     @Override
-    protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
-        final PreparedStatement statement = super.prepareStatement(connection);
-        try {
-            idColumn.setId(idIndexInQuery, id, statement);
-            final byte[] bytes = Serializer.serialize(record.getRecord());
-            statement.setBytes(recordIndexInQuery, bytes);
-            return statement;
-        } catch (SQLException e) {
-            logWriteError(id, e);
-            throw new DatabaseException(e);
-        }
+    protected Parameters getQueryParameters() {
+        final Parameters.Builder builder = Parameters.newBuilder();
+
+        idColumn.setId(idIndexInQuery, id, builder);
+
+        final byte[] serializedRecord = Serializer.serialize(record.getRecord());
+        final Parameter record = Parameter.of(serializedRecord, Sql.Type.BLOB);
+        return builder.addParameter(recordIndexInQuery, record)
+                      .build();
     }
 
     EntityRecordWithColumns getRecord() {

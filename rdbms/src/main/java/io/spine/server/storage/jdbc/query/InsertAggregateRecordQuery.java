@@ -25,12 +25,7 @@ import io.spine.core.Event;
 import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.storage.jdbc.AggregateEventRecordTable;
 import io.spine.server.storage.jdbc.AggregateEventRecordTable.Column;
-import io.spine.server.storage.jdbc.ConnectionWrapper;
-import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.Sql;
-
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 
 import static io.spine.server.storage.jdbc.AggregateEventRecordTable.Column.aggregate;
 import static io.spine.server.storage.jdbc.AggregateEventRecordTable.Column.id;
@@ -70,22 +65,23 @@ class InsertAggregateRecordQuery<I> extends WriteAggregateQuery<I, AggregateEven
     }
 
     @Override
-    protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
-        final PreparedStatement statement = super.prepareStatement(connection);
+    protected Parameters getQueryParameters() {
+        final Parameters superParameters = super.getQueryParameters();
+        final Timestamp recordTimestamp = getRecord().getTimestamp();
 
-        try {
-            final Timestamp timestamp = getRecord().getTimestamp();
+        final Parameter secondsParameter = Parameter.of(recordTimestamp.getSeconds(), timestamp);
+        final Parameter nanosParameter = Parameter.of(recordTimestamp.getNanos(), timestamp_nanos);
+        final Parameter versionParameter = Parameter.of(getVersionNumberOfRecord(), version);
 
-            //TODO:2017-09-11:dmytro.grankin: Remove hard-coded indexes here and in other places.
-            // See the related issues: https://github.com/SpineEventEngine/jdbc-storage/issues/36
-            statement.setLong(3, timestamp.getSeconds());
-            statement.setInt(4, timestamp.getNanos());
-            statement.setInt(5, getVersionNumberOfRecord());
-            return statement;
-        } catch (SQLException e) {
-            logFailedToPrepareStatement(e);
-            throw new DatabaseException(e);
-        }
+        return Parameters.newBuilder()
+                         .addParameters(superParameters)
+
+                         //TODO:2017-09-11:dmytro.grankin: Remove hard-coded indexes here and in other places.
+                         // See the related issues: https://github.com/SpineEventEngine/jdbc-storage/issues/36
+                         .addParameter(3, secondsParameter)
+                         .addParameter(4, nanosParameter)
+                         .addParameter(5, versionParameter)
+                         .build();
     }
 
     private int getVersionNumberOfRecord() {

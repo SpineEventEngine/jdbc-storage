@@ -20,21 +20,15 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import org.junit.Test;
 import io.spine.server.storage.jdbc.DatabaseException;
-import io.spine.server.storage.jdbc.ConnectionWrapper;
+import org.junit.Test;
 
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import static org.junit.Assert.fail;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
  * @author Andrey Lavrov
@@ -50,17 +44,5 @@ public class WriteRecordQueryShould {
         } catch (DatabaseException expected) {
             verify(Given.getLoggerMock()).error(anyString(), any(SQLException.class));
         }
-    }
-
-    @Test(expected = DatabaseException.class)
-    public void handle_SQL_exception_when_preparing_query() throws SQLException {
-        final WriteRecordQuery query = Given.getWriteRecordQueryMock();
-        final ConnectionWrapper connectionMock = mock(ConnectionWrapper.class);
-        final PreparedStatement statementMock = mock(PreparedStatement.class);
-
-        when(connectionMock.prepareStatement(anyString())).thenReturn(statementMock);
-        doThrow(SQLException.class).when(statementMock).setBytes(anyInt(), any(byte[].class));
-
-        query.prepareStatement(connectionMock);
     }
 }

@@ -16,7 +16,7 @@ allprojects {
     apply plugin: 'jacoco'
 
     group = 'io.spine'
-    version = spineVersion
+    version = jdbcVersion
 }
 
 subprojects {
@@ -50,10 +50,10 @@ subprojects {
         }
 
         // Spine
-        compile group: 'io.spine', name: 'spine-server', version: project.spineVersion, changing: true, excludes
+        compile group: 'io.spine', name: 'spine-server', version: project.coreVersion, changing: true, excludes
 
-        compile group: 'io.spine', name: 'spine-testutil-server', version: project.spineVersion, changing: true, excludes
-        testCompile group: 'io.spine', name: 'spine-server', version: project.spineVersion, changing: true, classifier: 'test', excludes
+        compile group: 'io.spine', name: 'spine-testutil-server', version: project.coreVersion, changing: true, excludes
+        testCompile group: 'io.spine', name: 'spine-server', version: project.coreVersion, changing: true, classifier: 'test', excludes
 
         // Guava
         compile group: 'com.google.guava', name: 'guava', version: project.guavaVersion

@@ -24,9 +24,8 @@ import io.spine.core.Version;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.entity.storage.EntityColumn;
 import io.spine.server.storage.jdbc.Sql;
+import io.spine.server.storage.jdbc.query.Parameters;
 import org.junit.Test;
-
-import java.sql.PreparedStatement;
 
 import static io.spine.test.Tests.assertHasPrivateParameterlessCtor;
 import static org.junit.Assert.assertEquals;
@@ -86,13 +85,13 @@ public class JdbcTypeRegistryFactoryShould {
         }
 
         @Override
-        public void setColumnValue(PreparedStatement storageRecord, String value,
+        public void setColumnValue(Parameters.Builder storageRecord, String value,
                                    Integer columnIdentifier) {
             // NoOp (as for tests)
         }
 
         @Override
-        public void setNull(PreparedStatement storageRecord, Integer columnIdentifier) {
+        public void setNull(Parameters.Builder storageRecord, Integer columnIdentifier) {
             // NoOp (as for tests)
         }
     }

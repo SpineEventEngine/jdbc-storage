@@ -20,12 +20,14 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import io.spine.server.storage.jdbc.DataSourceWrapper;
-import org.slf4j.Logger;
 import io.spine.server.storage.jdbc.ConnectionWrapper;
+import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.DatabaseException;
+import org.slf4j.Logger;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Set;
 
 /**
  * The implementation base for the queries to an SQL database.
@@ -45,13 +47,36 @@ abstract class StorageQuery {
         this.logger = builder.logger;
     }
 
+    /**
+     * Prepares a statement using {@linkplain #getQueryParameters() parameters}.
+     *
+     * @param connection the connection to use
+     * @return a {@link PreparedStatement}, which is ready to use
+     */
     protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
-        return connection.prepareStatement(query);
+        final PreparedStatement statement = connection.prepareStatement(query);
+        final Set<Integer> parameterIds = getQueryParameters().getIdentifiers();
+        try {
+            for (Integer parameterId : parameterIds) {
+                final Parameter parameter = getQueryParameters().getParameter(parameterId);
+                final int sqlTypeIdentifier = parameter.getType()
+                                                       .getSqlTypeIntIdentifier();
+                statement.setObject(parameterId, parameter.getValue(), sqlTypeIdentifier);
+            }
+            return statement;
+        } catch (SQLException e) {
+            getLogger().error("Failed to prepare statement.", e);
+            throw new DatabaseException(e);
+        }
     }
 
-    protected void logFailedToPrepareStatement(SQLException e) {
-        getLogger().error("Failed to prepare statement ", e);
-    }
+    /**
+     * Obtains {@linkplain Parameters parameters} to set during
+     * {@linkplain #prepareStatement(ConnectionWrapper) statement preparation}.
+     *
+     * @return parameters for this query
+     */
+    protected abstract Parameters getQueryParameters();
 
     public String getQuery() {
         return query;

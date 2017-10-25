@@ -21,10 +21,10 @@
 package io.spine.server.storage.jdbc.query;
 
 import io.spine.annotation.Internal;
-import io.spine.server.storage.jdbc.DatabaseException;
-import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.ConnectionWrapper;
+import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.IdColumn;
+import io.spine.server.storage.jdbc.TableColumn;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -61,13 +61,6 @@ public class ContainsQuery<I> extends StorageQuery {
         this.id = builder.id;
     }
 
-    @Override
-    protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
-        final PreparedStatement statement = super.prepareStatement(connection);
-        idColumn.setId(1, id, statement);
-        return statement;
-    }
-
     /**
      * @return {@code true} if there is at least one record with given ID, {@code} false otherwise
      */
@@ -82,6 +75,13 @@ public class ContainsQuery<I> extends StorageQuery {
             getLogger().error("Exception executing statement: " + getQuery(), e);
             throw new DatabaseException(e);
         }
+    }
+
+    @Override
+    protected Parameters getQueryParameters() {
+        final Parameters.Builder builder = Parameters.newBuilder();
+        idColumn.setId(1, id, builder);
+        return builder.build();
     }
 
     public static <I> Builder<I> newBuilder() {

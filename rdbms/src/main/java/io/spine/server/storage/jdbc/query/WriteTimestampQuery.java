@@ -21,12 +21,8 @@
 package io.spine.server.storage.jdbc.query;
 
 import com.google.protobuf.Timestamp;
-import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.LastHandledEventTimeTable;
-import io.spine.server.storage.jdbc.ConnectionWrapper;
-
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import io.spine.server.storage.jdbc.LastHandledEventTimeTable.Column;
 
 /**
  * A base for the {@linkplain StorageQuery} implementations
@@ -47,19 +43,15 @@ abstract class WriteTimestampQuery extends WriteQuery {
     }
 
     @Override
-    protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
-        final PreparedStatement statement = super.prepareStatement(connection);
-        final long seconds = timestamp.getSeconds();
-        final int nanos = timestamp.getNanos();
-        try {
-            statement.setLong(QueryParameter.SECONDS.getIndex(), seconds);
-            statement.setInt(QueryParameter.NANOS.getIndex(), nanos);
-            statement.setString(QueryParameter.PROJECTION_TYPE.getIndex(), id);
-            return statement;
-        } catch (SQLException e) {
-            logFailedToPrepareStatement(e);
-            throw new DatabaseException(e);
-        }
+    protected Parameters getQueryParameters() {
+        final Parameter seconds = Parameter.of(timestamp.getSeconds(), Column.seconds);
+        final Parameter nanos = Parameter.of(timestamp.getNanos(), Column.nanos);
+        final Parameter idParameter = Parameter.of(id, Column.projection_type);
+        return Parameters.newBuilder()
+                         .addParameter(QueryParameter.SECONDS.getIndex(), seconds)
+                         .addParameter(QueryParameter.NANOS.getIndex(), nanos)
+                         .addParameter(QueryParameter.PROJECTION_TYPE.getIndex(), idParameter)
+                         .build();
     }
 
     abstract static class Builder<B extends Builder<B, Q>, Q extends WriteTimestampQuery>

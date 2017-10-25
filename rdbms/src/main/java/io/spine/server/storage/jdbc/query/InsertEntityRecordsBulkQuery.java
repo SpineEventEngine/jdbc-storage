@@ -25,14 +25,11 @@ import com.google.common.base.Predicates;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.storage.ColumnRecords;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
-import io.spine.server.storage.jdbc.ConnectionWrapper;
-import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.IdColumn;
 import io.spine.server.storage.jdbc.RecordTable.StandardColumn;
 import io.spine.server.storage.jdbc.Serializer;
+import io.spine.server.storage.jdbc.Sql;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Map;
 
@@ -87,54 +84,50 @@ class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
     }
 
     @Override
-    protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
-        final PreparedStatement statement = super.prepareStatement(connection);
+    protected Parameters getQueryParameters() {
+        final Parameters.Builder builder = Parameters.newBuilder();
+
         int columnIndex = 1;
         for (Map.Entry<I, EntityRecordWithColumns> recordPair : records.entrySet()) {
             final I id = recordPair.getKey();
             final EntityRecordWithColumns record = recordPair.getValue();
-            addRecordParams(statement, columnIndex, id, record);
+            addRecordParams(builder, columnIndex, id, record);
             if (record.hasColumns()) {
                 final int nextIndex = columnIndex + StandardColumn.values().length;
-                ColumnRecords.feedColumnsTo(statement,
+                ColumnRecords.feedColumnsTo(builder,
                                             record,
                                             getColumnTypeRegistry(),
                                             getEntityColumnIdentifier(record, nextIndex));
             }
             columnIndex += columnCount;
         }
-        return statement;
+        return builder.build();
     }
 
     /**
-     * Adds an {@link EntityRecordWithColumns} to the query.
+     * Adds an {@link EntityRecordWithColumns} to the query parameters.
      *
      * <p>This includes following items:
      * <ul>
      *     <li>ID;
      *     <li>serialized record by itself;
-     *     <li>{@code Boolean} columns for the record visibility (archived and deleted fields).
      * </ul>
      *
-     * @param statement       the {@linkplain PreparedStatement} to add the query parameters to
-     * @param firstParamIndex index of the first query parameter which must be assigned
-     * @param id              the ID of the record
-     * @param record          the record to store
+     * @param parametersBuilder the builder to add the query parameters to
+     * @param firstParamIndex   index of the first query parameter which must be assigned
+     * @param id                the ID of the record
+     * @param record            the record to store
      */
-    private void addRecordParams(PreparedStatement statement,
+    private void addRecordParams(Parameters.Builder parametersBuilder,
                                  int firstParamIndex,
                                  I id,
                                  EntityRecordWithColumns record) {
         int paramIndex = firstParamIndex;
-        try {
-            idColumn.setId(paramIndex, id, statement);
-            paramIndex++;
-            final byte[] bytes = Serializer.serialize(record.getRecord());
-            statement.setBytes(paramIndex, bytes);
-        } catch (SQLException e) {
-            logWriteError(id, e);
-            throw new DatabaseException(e);
-        }
+        idColumn.setId(paramIndex, id, parametersBuilder);
+        paramIndex++;
+        final byte[] serializedRecord = Serializer.serialize(record.getRecord());
+        final Parameter recordParameter = Parameter.of(serializedRecord, Sql.Type.BLOB);
+        parametersBuilder.addParameter(paramIndex, recordParameter);
     }
 
     static class Builder<I> extends ColumnAwareWriteQuery.Builder<Builder<I>,

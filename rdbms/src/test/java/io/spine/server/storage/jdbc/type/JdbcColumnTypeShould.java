@@ -20,19 +20,14 @@
 
 package io.spine.server.storage.jdbc.type;
 
-import io.spine.server.storage.jdbc.DatabaseException;
-import io.spine.server.storage.jdbc.Sql;
+import io.spine.server.storage.jdbc.query.Parameter;
+import io.spine.server.storage.jdbc.query.Parameters;
 import io.spine.test.Tests;
 import org.junit.Test;
 
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.junit.Assert.assertNull;
 
 /**
  * @author Dmytro Dashenkov
@@ -42,19 +37,14 @@ public class JdbcColumnTypeShould {
     private final JdbcColumnType<String, ?> columnType = JdbcColumnTypes.stringType();
 
     @Test
-    public void set_null_to_prepared_statement() throws SQLException {
-        final int index = 42;
-        final PreparedStatement preparedStatement = mock(PreparedStatement.class);
-        columnType.setNull(preparedStatement, index);
-        verify(preparedStatement).setNull(eq(index),
-                                          eq(Sql.Type.VARCHAR_999.getSqlTypeIntIdentifier()));
-    }
+    public void set_null_to_parameters() throws SQLException {
+        final int identifier = 42;
+        final Parameters.Builder builder = Parameters.newBuilder();
+        columnType.setNull(builder, identifier);
 
-    @Test(expected = DatabaseException.class)
-    public void throw_DatabaseException_on_SQLException() throws SQLException {
-        final PreparedStatement preparedStatement = mock(PreparedStatement.class);
-        doThrow(DatabaseException.class).when(preparedStatement).setNull(anyInt(), anyInt());
-        columnType.setNull(preparedStatement, 1);
+        final Parameters allParameters = builder.build();
+        final Parameter parameter = allParameters.getParameter(identifier);
+        assertNull(parameter.getValue());
     }
 
     @Test(expected = NullPointerException.class)

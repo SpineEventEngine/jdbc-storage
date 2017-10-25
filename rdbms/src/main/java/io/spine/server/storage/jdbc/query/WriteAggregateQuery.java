@@ -20,13 +20,9 @@
 package io.spine.server.storage.jdbc.query;
 
 import com.google.protobuf.Message;
-import io.spine.server.storage.jdbc.DatabaseException;
-import io.spine.server.storage.jdbc.ConnectionWrapper;
 import io.spine.server.storage.jdbc.IdColumn;
 import io.spine.server.storage.jdbc.Serializer;
-
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import io.spine.server.storage.jdbc.Sql;
 
 /**
  * An abstract base for the write queries to an {@link io.spine.server.storage.jdbc.AggregateTable}.
@@ -55,17 +51,15 @@ abstract class WriteAggregateQuery<I, R extends Message> extends WriteQuery {
     }
 
     @Override
-    protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
-        final PreparedStatement statement = super.prepareStatement(connection);
-        try {
-            idColumn.setId(idIndexInQuery, id, statement);
-            final byte[] bytes = Serializer.serialize(record);
-            statement.setBytes(recordIndexInQuery, bytes);
-            return statement;
-        } catch (SQLException e) {
-            logWriteError(id, e);
-            throw new DatabaseException(e);
-        }
+    protected Parameters getQueryParameters() {
+        final Parameters.Builder builder = Parameters.newBuilder();
+
+        idColumn.setId(idIndexInQuery, id, builder);
+
+        final byte[] serializedRecord = Serializer.serialize(record);
+        final Parameter record = Parameter.of(serializedRecord, Sql.Type.BLOB);
+        return builder.addParameter(recordIndexInQuery, record)
+                      .build();
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
@@ -74,33 +68,34 @@ abstract class WriteAggregateQuery<I, R extends Message> extends WriteQuery {
                                   I,
                                   R extends Message>
             extends WriteQuery.Builder<B, Q> {
+
         private int idIndexInQuery;
         private int recordIndexInQuery;
         private IdColumn<I> idColumn;
         private I id;
         private R record;
 
-        public B setId(I id) {
+        B setId(I id) {
             this.id = id;
             return getThis();
         }
 
-        public B setRecord(R record) {
+        B setRecord(R record) {
             this.record = record;
             return getThis();
         }
 
-        public B setIdColumn(IdColumn<I> idColumn) {
+        B setIdColumn(IdColumn<I> idColumn) {
             this.idColumn = idColumn;
             return getThis();
         }
 
-        public B setIdIndexInQuery(int idIndexInQuery) {
+        B setIdIndexInQuery(int idIndexInQuery) {
             this.idIndexInQuery = idIndexInQuery;
             return getThis();
         }
 
-        public B setRecordIndexInQuery(int recordIndexInQuery) {
+        B setRecordIndexInQuery(int recordIndexInQuery) {
             this.recordIndexInQuery = recordIndexInQuery;
             return getThis();
         }

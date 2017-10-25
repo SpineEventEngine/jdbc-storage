@@ -21,29 +21,18 @@
 package io.spine.server.storage.jdbc;
 
 import com.google.protobuf.Message;
-import io.spine.Identifier;
 import io.spine.annotation.Internal;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.entity.Entity;
 import io.spine.server.entity.EntityClass;
-
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import io.spine.server.storage.jdbc.query.Parameter;
+import io.spine.server.storage.jdbc.query.Parameters;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static io.spine.json.Json.toCompactJson;
 
 /**
- * A helper class for setting the {@link Entity} ID into a {@link PreparedStatement}as a query
- * parameter.
- *
- * <p>Depending on what type ID is, {@linkplain #setId(int, Object, PreparedStatement) setId} method
- * will call one of the setters:
- * <ul>
- *     <li>{@link PreparedStatement#setInt}
- *     <li>{@link PreparedStatement#setLong}
- *     <li>{@link PreparedStatement#setString}
- * </ul>
+ * A helper class for setting the {@link Entity} ID into {@linkplain Parameters query parameters}.
  *
  * @param <I> the type of {@link Entity} IDs
  * @author Alexander Litus
@@ -82,8 +71,14 @@ public abstract class IdColumn<I> {
         return helper;
     }
 
+    /**
+     * Creates a {@link StringIdColumn} with the specified column name.
+     *
+     * @param columnName the name of the ID column
+     * @return the {@code IdColumn}
+     */
     public static IdColumn<String> typeString(String columnName) {
-        return new StringIdColumn<>(columnName);
+        return new StringIdColumn(columnName);
     }
 
     protected IdColumn(String columnName) {
@@ -96,10 +91,25 @@ public abstract class IdColumn<I> {
     public abstract Sql.Type getSqlType();
 
     /**
-     * Retrieves the {@linkplain Class Java class} of the ID when it's being set to
-     * the {@link PreparedStatement}.
+     * Retrieves the {@linkplain Class Java class} of the ID before
+     * {@linkplain #normalize(Object) normalization}.
      */
     public abstract Class<I> getJavaType();
+
+    /**
+     * Normalizes the identifier before setting it to a {@link Parameter}.
+     *
+     * <p>The method may perform a conversion of the ID to a type, which is more suitable
+     * for storing. E.g. it may be useful to store a {@linkplain Message Protobuf Message}
+     * in a JSON representation as a {@code String}.
+     *
+     * <p>If an ID type is a simple type as {@code String}, {@code Integer}, etc
+     * the method may return the same value.
+     *
+     * @param id the identifier to normalize
+     * @return the normalized ID
+     */
+    protected abstract Object normalize(I id);
 
     public String getColumnName() {
         return columnName;
@@ -108,13 +118,15 @@ public abstract class IdColumn<I> {
     /**
      * Sets an ID parameter to the given value.
      *
-     * @param index     the ID parameter index
-     * @param id        the ID value to set
-     * @param statement the statement to use
-     * @throws DatabaseException if an error occurs during an interaction with the DB
+     * @param index      the ID parameter index
+     * @param id         the ID value to set
+     * @param parameters the parameters to set the ID
      */
-    public abstract void setId(int index, I id, PreparedStatement statement)
-            throws DatabaseException;
+    public void setId(int index, I id, Parameters.Builder parameters) {
+        final Object normalizedId = normalize(id);
+        final Parameter parameter = Parameter.of(normalizedId, getSqlType());
+        parameters.addParameter(index, parameter);
+    }
 
     /**
      * Helps to work with columns which contain {@code long} {@link Entity} IDs.
@@ -136,13 +148,8 @@ public abstract class IdColumn<I> {
         }
 
         @Override
-        public void setId(int index, Long id, PreparedStatement statement)
-                throws DatabaseException {
-            try {
-                statement.setLong(index, id);
-            } catch (SQLException e) {
-                throw new DatabaseException(e);
-            }
+        public Long normalize(Long id) {
+            return id;
         }
     }
 
@@ -166,13 +173,8 @@ public abstract class IdColumn<I> {
         }
 
         @Override
-        public void setId(int index, Integer id, PreparedStatement statement)
-                throws DatabaseException {
-            try {
-                statement.setInt(index, id);
-            } catch (SQLException e) {
-                throw new DatabaseException(e);
-            }
+        public Integer normalize(Integer id) {
+            return id;
         }
     }
 
@@ -190,50 +192,25 @@ public abstract class IdColumn<I> {
         public Sql.Type getSqlType() {
             return Sql.Type.VARCHAR_255;
         }
-
-        @Override
-        public void setId(int index, I id, PreparedStatement statement) throws DatabaseException {
-            final String idString = normalize(id);
-            try {
-                statement.setString(index, idString);
-            } catch (SQLException e) {
-                throw new DatabaseException(e);
-            }
-        }
-
-        /**
-         * Normalizes the identifier before setting it to a {@link PreparedStatement}.
-         *
-         * <p>The method may perform a {@code String} conversion, validation or no action for
-         * a {@code String} input.
-         *
-         * @param id the identifier to normalize
-         * @return the normalized {@code String} ID
-         */
-        protected abstract String normalize(I id);
     }
 
     /**
-     * Helps to work with columns which contain {@code string} {@link Entity} IDs.
-     *
-     * <p>This class may serve as a stub for unknown ID types by considering their string
-     * representation. See {@link Identifier#toString(Object) Identifier.toString(I)}.
+     * Helps to work with columns which contain {@code String} {@link Entity} IDs.
      */
-    private static class StringIdColumn<I> extends StringOrMessageIdColumn<I> {
+    private static class StringIdColumn extends StringOrMessageIdColumn<String> {
 
         private StringIdColumn(String columnName) {
             super(columnName);
         }
 
         @Override
-        protected String normalize(I id) {
-            return (String) id;
+        public String normalize(String id) {
+            return id;
         }
 
-        @SuppressWarnings("unchecked") // Logically checked.
         @Override
-        public Class<I> getJavaType() {
-            return (Class<I>) String.class;
+        public Class<String> getJavaType() {
+            return String.class;
         }
     }
 
@@ -253,7 +230,7 @@ public abstract class IdColumn<I> {
          * {@linkplain io.spine.json.Json#toCompactJson JSON representation}.
          */
         @Override
-        protected String normalize(M id) {
+        public String normalize(M id) {
             return toCompactJson(id);
         }
 

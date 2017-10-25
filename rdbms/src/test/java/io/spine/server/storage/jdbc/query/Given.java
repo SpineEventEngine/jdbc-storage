@@ -20,34 +20,25 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import com.google.protobuf.Any;
 import com.google.protobuf.Message;
-import com.google.protobuf.Timestamp;
-import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
-import io.spine.server.storage.jdbc.ConnectionWrapper;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.GivenDataSource;
 import io.spine.server.storage.jdbc.IdColumn;
 import org.slf4j.Logger;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static io.spine.server.storage.jdbc.GivenDataSource.whichThrowsExceptionOnExecuteStatement;
-import static io.spine.server.storage.jdbc.GivenDataSource.whichThrowsExceptionOnSettingStatementParam;
-import static org.mockito.Mockito.anyBoolean;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class Given {
 
     private static Logger loggerMock = null;
     @SuppressWarnings("unchecked") // OK for a mock.
-    private static final IdColumn<String> idColumnMock = mock(IdColumn.class);
+    private static final IdColumn<String> ID_COLUMN_MOCK = mock(IdColumn.class);
 
     private Given() {
         // Prevent utility class instantiation.
@@ -61,33 +52,7 @@ class Given {
                 SelectByIdQueryMock.newBuilder()
                                    .setDataSource(dataSourceMock)
                                    .setLogger(loggerMock)
-                                   .setIdColumn(idColumnMock);
-        return builder.build();
-    }
-
-    static SelectByIdQueryMock getSelectByIdQueryReturningEmptyResultSetMock() throws SQLException {
-        loggerMock = mock(Logger.class);
-
-        final DataSourceWrapper dataSourceMock = mock(DataSourceWrapper.class);
-        final ConnectionWrapper connectionMock = mock(ConnectionWrapper.class);
-        final PreparedStatement preparedStatementMock = mock(PreparedStatement.class);
-        @SuppressWarnings("unchecked") // OK for a mock.
-        final IdColumn<String> idColumnMock = mock(IdColumn.class);
-        final ResultSet resultSetMock = mock(ResultSet.class);
-
-        when(dataSourceMock.getConnection(anyBoolean())).thenReturn(connectionMock);
-        when(connectionMock.prepareStatement(anyString())).thenReturn(preparedStatementMock);
-        when(preparedStatementMock.executeQuery()).thenReturn(resultSetMock);
-        when(resultSetMock.next()).thenReturn(true);
-        when(resultSetMock.getBytes(anyString())).thenReturn(null);
-
-        final SelectByIdQueryMock.Builder builder =
-                SelectByIdQueryMock.newBuilder()
-                                   .setDataSource(dataSourceMock)
-                                   .setLogger(loggerMock)
-                                   .setIdColumn(idColumnMock)
-                                   .setMessageColumnName(anyString())
-                                   .setMessageDescriptor(Any.getDescriptor());
+                                   .setIdColumn(ID_COLUMN_MOCK);
         return builder.build();
     }
 
@@ -105,23 +70,14 @@ class Given {
         loggerMock = mock(Logger.class);
         final DataSourceWrapper dataSourceMock =
                 GivenDataSource.whichThrowsExceptionOnExecuteStatement();
+        final EntityRecordWithColumns record =
+                EntityRecordWithColumns.of(EntityRecord.getDefaultInstance());
         final WriteRecordQueryMock.Builder builder =
                 WriteRecordQueryMock.newBuilder()
                                     .setDataSource(dataSourceMock)
                                     .setLogger(loggerMock)
-                                    .setIdColumn(idColumnMock)
-                                    .setRecord(recordMock);
-        return builder.build();
-    }
-
-    static InsertTimestampQuery getInsertTimestampQueryMock() throws SQLException {
-        loggerMock = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock = whichThrowsExceptionOnSettingStatementParam();
-        final InsertTimestampQuery.Builder builder =
-                InsertTimestampQuery.newBuilder(anyString())
-                                    .setDataSource(dataSourceMock)
-                                    .setLogger(loggerMock)
-                                    .setTimestamp(Timestamp.getDefaultInstance());
+                                    .setIdColumn(ID_COLUMN_MOCK)
+                                    .setRecord(record);
         return builder.build();
     }
 
@@ -136,43 +92,6 @@ class Given {
         return builder.build();
     }
 
-    static UpdateTimestampQuery getUpdateTimestampQueryMock() throws SQLException {
-        loggerMock = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock = whichThrowsExceptionOnSettingStatementParam();
-        final UpdateTimestampQuery.Builder builder =
-                UpdateTimestampQuery.newBuilder(anyString())
-                                    .setDataSource(dataSourceMock)
-                                    .setLogger(loggerMock)
-                                    .setTimestamp(Timestamp.getDefaultInstance());
-        return builder.build();
-    }
-
-    private static final IdColumn<String> ID_COLUMN_QUERY_SETTER_MOCK = mock(IdColumn.class);
-
-    static InsertAggregateRecordQuery getInsertAggregateRecordQueryMock() throws SQLException {
-        loggerMock = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock = whichThrowsExceptionOnSettingStatementParam();
-        final InsertAggregateRecordQuery.Builder<String> builder =
-                InsertAggregateRecordQuery.<String>newBuilder(anyString())
-                        .setDataSource(dataSourceMock)
-                        .setLogger(loggerMock)
-                        .setIdColumn(ID_COLUMN_QUERY_SETTER_MOCK)
-                        .setRecord(AggregateEventRecord.getDefaultInstance()
-                                                       .getDefaultInstanceForType());
-        return builder.build();
-    }
-
-    static InsertEventCountQuery getInsertEventCountQueryMock() throws SQLException {
-        loggerMock = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock = whichThrowsExceptionOnSettingStatementParam();
-        final InsertEventCountQuery.Builder<String> builder =
-                InsertEventCountQuery.<String>newBuilder(anyString())
-                        .setDataSource(dataSourceMock)
-                        .setLogger(loggerMock)
-                        .setIdColumn(ID_COLUMN_QUERY_SETTER_MOCK);
-        return builder.build();
-    }
-
     static SelectEventCountByIdQuery getSelectEventCountByIdQueryMock() throws SQLException {
         loggerMock = mock(Logger.class);
         final DataSourceWrapper dataSourceMock = whichThrowsExceptionOnExecuteStatement();
@@ -180,23 +99,9 @@ class Given {
                 SelectEventCountByIdQuery.<String>newBuilder(anyString())
                         .setDataSource(dataSourceMock)
                         .setLogger(loggerMock)
-                        .setIdColumn(ID_COLUMN_QUERY_SETTER_MOCK);
+                        .setIdColumn(ID_COLUMN_MOCK);
         return builder.build();
     }
-
-    static UpdateEventCountQuery getUpdateEventCountQueryMock() throws SQLException {
-        loggerMock = mock(Logger.class);
-        final DataSourceWrapper dataSourceMock = whichThrowsExceptionOnSettingStatementParam();
-        final UpdateEventCountQuery.Builder<String> builder =
-                UpdateEventCountQuery.<String>newBuilder(anyString())
-                        .setDataSource(dataSourceMock)
-                        .setLogger(loggerMock)
-                        .setIdColumn(ID_COLUMN_QUERY_SETTER_MOCK);
-        return builder.build();
-    }
-
-    private static final EntityRecordWithColumns recordMock =
-            EntityRecordWithColumns.of(EntityRecord.getDefaultInstance());
 
     private static class SelectByIdQueryMock extends SelectMessageByIdQuery<String, Message> {
 
@@ -262,6 +167,11 @@ class Given {
 
         protected WriteQueryMock(Builder builder) {
             super(builder);
+        }
+
+        @Override
+        protected Parameters getQueryParameters() {
+            return Parameters.empty();
         }
 
         public static Builder newBuilder() {

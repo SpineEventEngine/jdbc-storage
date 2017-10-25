@@ -29,11 +29,11 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static java.lang.String.format;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
 import static io.spine.server.storage.jdbc.Sql.Query.DELETE_FROM;
 import static io.spine.server.storage.jdbc.Sql.Query.PLACEHOLDER;
 import static io.spine.server.storage.jdbc.Sql.Query.WHERE;
+import static java.lang.String.format;
 
 /**
  * A query for deleting one or many items by a id of a given column.
@@ -67,7 +67,6 @@ public class DeleteRecordQuery<I> extends StorageQuery {
     public boolean execute() {
         try (ConnectionWrapper connection = getConnection(false)) {
             final PreparedStatement statement = prepareStatement(connection);
-            idColumn.setId(COLUMN_VALUE_PARAM_INDEX, id, statement);
             final int rowsAffected = statement.executeUpdate();
             connection.commit();
             final boolean result = rowsAffected != 0;
@@ -75,6 +74,13 @@ public class DeleteRecordQuery<I> extends StorageQuery {
         } catch (SQLException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    @Override
+    protected Parameters getQueryParameters() {
+        final Parameters.Builder builder = Parameters.newBuilder();
+        idColumn.setId(COLUMN_VALUE_PARAM_INDEX, id, builder);
+        return builder.build();
     }
 
     public static <V> Builder<V> newBuilder() {
