@@ -29,7 +29,7 @@ import io.spine.server.storage.jdbc.IdColumn;
  * @author Dmytro Dashenkov
  */
 @Internal
-public abstract class SelectByIdQuery<I, R> extends StorageQuery {
+public abstract class SelectByIdQuery<I, R> extends AbstractQuery {
 
     private final IdColumn<I> idColumn;
     private final I id;
@@ -59,7 +59,7 @@ public abstract class SelectByIdQuery<I, R> extends StorageQuery {
     protected abstract static class Builder<I,
                                             B extends Builder<I, B, Q>,
                                             Q extends SelectByIdQuery>
-            extends StorageQuery.Builder<B, Q> {
+            extends AbstractQuery.Builder<B, Q> {
 
         private int idIndexInQuery;
         private IdColumn<I> idColumn;

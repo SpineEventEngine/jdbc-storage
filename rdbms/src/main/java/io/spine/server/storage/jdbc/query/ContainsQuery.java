@@ -45,7 +45,7 @@ import static java.lang.String.format;
  * @author Dmytro Dashenkov
  */
 @Internal
-public class ContainsQuery<I> extends StorageQuery {
+public class ContainsQuery<I> extends AbstractQuery {
 
     private static final String FORMAT_PLACEHOLDER = "%s";
     private static final String SQL_TEMPLATE = SELECT.toString() + ALL_ATTRIBUTES +
@@ -88,7 +88,7 @@ public class ContainsQuery<I> extends StorageQuery {
         return new Builder<>();
     }
 
-    public static class Builder<I> extends StorageQuery.Builder<Builder<I>, ContainsQuery<I>> {
+    public static class Builder<I> extends AbstractQuery.Builder<Builder<I>, ContainsQuery<I>> {
 
         private String tableName;
         private IdColumn<I> idColumn;

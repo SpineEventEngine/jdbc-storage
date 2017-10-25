@@ -58,7 +58,7 @@ import static java.lang.String.format;
  * @author Andrey Lavrov
  */
 @Internal
-public class SelectEventRecordsById<I> extends StorageQuery {
+public class SelectEventRecordsById<I> extends AbstractQuery {
 
     private static final String QUERY_TEMPLATE =
             SELECT.toString() + aggregate + FROM + "%s" +
@@ -103,7 +103,7 @@ public class SelectEventRecordsById<I> extends StorageQuery {
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
     public static class Builder<I>
-            extends StorageQuery.Builder<Builder<I>, SelectEventRecordsById> {
+            extends AbstractQuery.Builder<Builder<I>, SelectEventRecordsById> {
 
         private IdColumn<I> idColumn;
         private I id;

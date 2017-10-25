@@ -33,7 +33,7 @@ import java.sql.SQLException;
  * @author Dmytro Dashenkov
  */
 @Internal
-public class SimpleQuery extends StorageQuery {
+public class SimpleQuery extends AbstractQuery {
 
     private SimpleQuery(Builder builder) {
         super(builder);
@@ -61,7 +61,7 @@ public class SimpleQuery extends StorageQuery {
         return new Builder();
     }
 
-    public static class Builder extends StorageQuery.Builder<Builder, SimpleQuery> {
+    public static class Builder extends AbstractQuery.Builder<Builder, SimpleQuery> {
 
         private Builder() {
             super();

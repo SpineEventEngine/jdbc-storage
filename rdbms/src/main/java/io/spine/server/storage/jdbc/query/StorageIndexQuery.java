@@ -40,7 +40,7 @@ import static java.lang.String.format;
  * @author Dmytro Dashenkov
  */
 @Internal
-public class StorageIndexQuery<I> extends StorageQuery {
+public class StorageIndexQuery<I> extends AbstractQuery {
 
     private static final String FORMAT = "%s";
 
@@ -71,7 +71,7 @@ public class StorageIndexQuery<I> extends StorageQuery {
         return new Builder<>();
     }
 
-    public static class Builder<I> extends StorageQuery.Builder<Builder<I>, StorageIndexQuery<I>> {
+    public static class Builder<I> extends AbstractQuery.Builder<Builder<I>, StorageIndexQuery<I>> {
 
         private static final String DEFAULT_ID_COLUMN_NAME = "id";
 

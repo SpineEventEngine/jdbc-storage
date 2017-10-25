@@ -39,7 +39,7 @@ import static org.mockito.Mockito.spy;
 /**
  * @author Dmytro Grankin
  */
-public class StorageQueryShould {
+public class AbstractQueryShould {
 
     @Test(expected = DatabaseException.class)
     public void handle_sql_exception() throws SQLException {
@@ -51,10 +51,10 @@ public class StorageQueryShould {
         final Object parameterValue = new Object();
         final Sql.Type parameterType = Sql.Type.ID;
         final Parameter parameter = Parameter.of(parameterValue, parameterType);
-        final StorageQuery query = new Builder().addParameter(parameterId, parameter)
+        final AbstractQuery query = new Builder().addParameter(parameterId, parameter)
                                                 .setQuery(newUuid())
                                                 .build();
-        final StorageQuery querySpy = spy(query);
+        final AbstractQuery querySpy = spy(query);
         doReturn(statement).when(connection)
                            .prepareStatement(anyString());
         doThrow(SQLException.class).when(statement)
@@ -65,11 +65,11 @@ public class StorageQueryShould {
         querySpy.prepareStatement(connection);
     }
 
-    private static class AStorageQuery extends StorageQuery {
+    private static class AStorageQuery extends AbstractQuery {
 
         private final Parameters parameters;
 
-        private AStorageQuery(StorageQueryShould.Builder builder) {
+        private AStorageQuery(AbstractQueryShould.Builder builder) {
             super(builder);
             this.parameters = builder.parameters.build();
         }
@@ -80,7 +80,7 @@ public class StorageQueryShould {
         }
     }
 
-    private static class Builder extends StorageQuery.Builder<Builder, AStorageQuery> {
+    private static class Builder extends AbstractQuery.Builder<Builder, AStorageQuery> {
 
         private final Parameters.Builder parameters = Parameters.newBuilder();
 

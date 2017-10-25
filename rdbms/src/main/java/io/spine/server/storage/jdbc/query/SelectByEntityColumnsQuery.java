@@ -80,7 +80,7 @@ import static java.util.Collections.emptyMap;
  * @author Dmytro Dashenkov
  */
 @Internal
-public final class SelectByEntityColumnsQuery<I> extends StorageQuery {
+public final class SelectByEntityColumnsQuery<I> extends AbstractQuery {
 
     private static final String COMMON_SQL = SELECT.toString() + entity + FROM + "%s ";
 
@@ -113,8 +113,8 @@ public final class SelectByEntityColumnsQuery<I> extends StorageQuery {
         return new Builder<>();
     }
 
-    public static class Builder<I> extends StorageQuery.Builder<Builder<I>,
-                                                                SelectByEntityColumnsQuery<I>> {
+    public static class Builder<I> extends AbstractQuery.Builder<Builder<I>,
+                                                                 SelectByEntityColumnsQuery<I>> {
 
         private EntityQuery<I> entityQuery;
         private FieldMask fieldMask;

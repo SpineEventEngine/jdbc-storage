@@ -33,7 +33,7 @@ import java.sql.SQLException;
  * @author Alexander Litus
  */
 @Internal
-public abstract class WriteQuery extends StorageQuery {
+public abstract class WriteQuery extends AbstractQuery {
 
     protected WriteQuery(Builder<? extends Builder, ? extends WriteQuery> builder) {
         super(builder);
@@ -57,6 +57,6 @@ public abstract class WriteQuery extends StorageQuery {
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
     public abstract static class Builder<B extends Builder<B, Q>, Q extends WriteQuery>
-            extends StorageQuery.Builder<B, Q> {
+            extends AbstractQuery.Builder<B, Q> {
     }
 }
