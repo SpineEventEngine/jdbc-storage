@@ -20,7 +20,6 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import io.spine.annotation.Internal;
 import io.spine.server.storage.jdbc.ConnectionWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
 
@@ -32,8 +31,7 @@ import java.sql.SQLException;
  *
  * @author Alexander Litus
  */
-@Internal
-public abstract class AbstractWriteQuery extends AbstractQuery implements WriteQuery {
+abstract class AbstractWriteQuery extends AbstractQuery implements WriteQuery {
 
     protected AbstractWriteQuery(Builder<? extends Builder, ? extends WriteQuery> builder) {
         super(builder);

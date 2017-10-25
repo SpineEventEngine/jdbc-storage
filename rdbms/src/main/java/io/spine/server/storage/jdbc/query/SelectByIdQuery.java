@@ -20,76 +20,35 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import io.spine.annotation.Internal;
 import io.spine.server.storage.jdbc.IdColumn;
 
 /**
- * An abstract base for the queries which read a single record by ID.
+ * A read query of a single record by an ID.
  *
- * @author Dmytro Dashenkov
+ * @param <I> the type of IDs
+ * @param <R> the type of records
+ * @author Dmytro Grankin
  */
-@Internal
-public abstract class SelectByIdQuery<I, R> extends AbstractQuery {
+public interface SelectByIdQuery<I, R> extends StorageQuery {
 
-    private final IdColumn<I> idColumn;
-    private final I id;
-    private final int idIndexInQuery;
+    /**
+     * Obtains {@link IdColumn} for working with the {@linkplain #getId() ID}.
+     *
+     * @return the {@link IdColumn}
+     */
+    IdColumn<I> getIdColumn();
 
-    protected SelectByIdQuery(Builder<I, ? extends Builder, ? extends StorageQuery> builder) {
-        super(builder);
-        this.id = builder.getId();
-        this.idColumn = builder.getIdColumn();
-        this.idIndexInQuery = builder.getIdIndexInQuery();
-    }
+    /**
+     * Obtains the ID of the record, which should be selected.
+     *
+     * @return the record ID
+     */
+    I getId();
 
-    public IdColumn<I> getIdColumn() {
-        return idColumn;
-    }
-
-    public I getId() {
-        return id;
-    }
-
-    public int getIdIndexInQuery() {
-        return idIndexInQuery;
-    }
-
-    public abstract R execute();
-
-    protected abstract static class Builder<I,
-                                            B extends Builder<I, B, Q>,
-                                            Q extends SelectByIdQuery>
-            extends AbstractQuery.Builder<B, Q> {
-
-        private int idIndexInQuery;
-        private IdColumn<I> idColumn;
-        private I id;
-
-        public B setId(I id) {
-            this.id = id;
-            return getThis();
-        }
-
-        public B setIdColumn(IdColumn<I> idColumn) {
-            this.idColumn = idColumn;
-            return getThis();
-        }
-
-        public B setIdIndexInQuery(int idIndexInQuery) {
-            this.idIndexInQuery = idIndexInQuery;
-            return getThis();
-        }
-
-        public int getIdIndexInQuery() {
-            return idIndexInQuery;
-        }
-
-        public IdColumn<I> getIdColumn() {
-            return idColumn;
-        }
-
-        public I getId() {
-            return id;
-        }
-    }
+    /**
+     * Executes the query and returns the record.
+     *
+     * @return the record
+     */
+    R execute();
 }

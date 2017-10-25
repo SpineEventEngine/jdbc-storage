@@ -43,7 +43,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author Alexander Litus
  */
 @Internal
-class SelectMessageByIdQuery<I, M extends Message> extends SelectByIdQuery<I, M> {
+class SelectMessageByIdQuery<I, M extends Message> extends AbstractSelectByIdQuery<I, M> {
 
     private final String messageColumnName;
     private final Descriptor messageDescriptor;
@@ -113,7 +113,7 @@ class SelectMessageByIdQuery<I, M extends Message> extends SelectByIdQuery<I, M>
                                   Q extends SelectMessageByIdQuery<I, R>,
                                   I,
                                   R extends Message>
-            extends SelectByIdQuery.Builder<I, B, Q> {
+            extends AbstractSelectByIdQuery.Builder<I, B, Q> {
 
         private String messageColumnName;
         private Descriptor messageDescriptor;
