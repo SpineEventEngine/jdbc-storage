@@ -89,6 +89,11 @@ public final class Parameters {
         return new Builder();
     }
 
+    /**
+     * A builder for {@link Parameters}.
+     *
+     * <p>The builder doesn't allow to create {@link Parameters} with duplicated identifiers.
+     */
     public static class Builder {
 
         private final Map<Integer, Parameter> parameters = newHashMap();
