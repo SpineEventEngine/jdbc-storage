@@ -38,7 +38,7 @@ import static java.util.Collections.sort;
  *
  * @author Alexander Aleksandrov
  */
-abstract class ColumnAwareWriteQuery extends WriteQuery {
+abstract class ColumnAwareWriteQuery extends AbstractWriteQuery {
 
     private final ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry;
 
@@ -112,7 +112,7 @@ abstract class ColumnAwareWriteQuery extends WriteQuery {
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
     abstract static class Builder<B extends Builder<B, Q>, Q extends ColumnAwareWriteQuery>
-            extends WriteQuery.Builder<B, Q> {
+            extends AbstractWriteQuery.Builder<B, Q> {
 
         private ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry
                 = JdbcTypeRegistryFactory.defaultInstance();

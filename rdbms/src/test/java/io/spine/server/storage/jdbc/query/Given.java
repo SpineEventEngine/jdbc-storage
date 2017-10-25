@@ -163,7 +163,7 @@ class Given {
         }
     }
 
-    private static class WriteQueryMock extends WriteQuery {
+    private static class WriteQueryMock extends AbstractWriteQuery {
 
         protected WriteQueryMock(Builder builder) {
             super(builder);
@@ -181,7 +181,7 @@ class Given {
         }
 
         @SuppressWarnings("ClassNameSameAsAncestorName")
-        public static class Builder extends WriteQuery.Builder<Builder, WriteQueryMock> {
+        public static class Builder extends AbstractWriteQuery.Builder<Builder, WriteQueryMock> {
 
             @Override
             public WriteQueryMock build() {

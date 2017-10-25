@@ -34,7 +34,7 @@ import static java.lang.String.format;
  *
  * @author Dmytro Dashenkov
  */
-class InsertLifecycleFlagsQuery<I> extends WriteQuery {
+class InsertLifecycleFlagsQuery<I> extends AbstractWriteQuery {
 
     private static final int COLUMN_COUNT = TableColumn.values().length;
     private static final String SQL =
@@ -71,7 +71,7 @@ class InsertLifecycleFlagsQuery<I> extends WriteQuery {
         return builder;
     }
 
-    static class Builder<I> extends WriteQuery.Builder<Builder<I>, InsertLifecycleFlagsQuery> {
+    static class Builder<I> extends AbstractWriteQuery.Builder<Builder<I>, InsertLifecycleFlagsQuery> {
 
         private I id;
         private LifecycleFlags entityStatus;

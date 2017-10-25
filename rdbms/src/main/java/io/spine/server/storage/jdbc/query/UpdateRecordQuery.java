@@ -22,7 +22,7 @@ package io.spine.server.storage.jdbc.query;
 
 import io.spine.server.storage.jdbc.IdColumn;
 
-class UpdateRecordQuery<I> extends WriteQuery {
+class UpdateRecordQuery<I> extends AbstractWriteQuery {
 
     private final I id;
     private final int idIndexInQuery;
@@ -44,7 +44,7 @@ class UpdateRecordQuery<I> extends WriteQuery {
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
     abstract static class Builder<B extends Builder<B, Q, I>, Q extends UpdateRecordQuery, I>
-            extends WriteQuery.Builder<B, Q> {
+            extends AbstractWriteQuery.Builder<B, Q> {
         private int idIndexInQuery;
         private IdColumn<I> idColumn;
         private I id;

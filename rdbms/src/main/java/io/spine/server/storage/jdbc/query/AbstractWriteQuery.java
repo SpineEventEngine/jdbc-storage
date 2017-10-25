@@ -21,48 +21,40 @@
 package io.spine.server.storage.jdbc.query;
 
 import io.spine.annotation.Internal;
+import io.spine.server.storage.jdbc.ConnectionWrapper;
+import io.spine.server.storage.jdbc.DatabaseException;
 
-import static java.lang.String.format;
-import static io.spine.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
-import static io.spine.server.storage.jdbc.Sql.Query.DELETE_FROM;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 /**
- * Query that deletes all from a table.
+ * An abstract base for {@linkplain WriteQuery write queries}.
  *
  * @author Alexander Litus
- * @author Andrey Lavrov
  */
 @Internal
-public class DeleteAllQuery extends AbstractWriteQuery {
+public abstract class AbstractWriteQuery extends AbstractQuery implements WriteQuery {
 
-    private static final String QUERY_TEMPLATE = DELETE_FROM + "%s" + SEMICOLON;
-
-    private DeleteAllQuery(Builder builder) {
+    protected AbstractWriteQuery(Builder<? extends Builder, ? extends WriteQuery> builder) {
         super(builder);
     }
 
     @Override
-    protected Parameters getQueryParameters() {
-        return Parameters.empty();
-    }
-
-    public static Builder newBuilder(String tableName) {
-        final Builder builder = new Builder();
-        builder.setQuery(format(QUERY_TEMPLATE, tableName));
-        return builder;
+    public void execute() {
+        try (ConnectionWrapper connection = getConnection(false)) {
+            try (PreparedStatement statement = prepareStatement(connection)) {
+                statement.execute();
+                connection.commit();
+            } catch (SQLException e) {
+                getLogger().error("Failed to execute write operation.", e);
+                connection.rollback();
+                throw new DatabaseException(e);
+            }
+        }
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder extends AbstractWriteQuery.Builder<Builder, DeleteAllQuery> {
-
-        @Override
-        public DeleteAllQuery build() {
-            return new DeleteAllQuery(this);
-        }
-
-        @Override
-        protected Builder getThis() {
-            return this;
-        }
+    public abstract static class Builder<B extends Builder<B, Q>, Q extends AbstractWriteQuery>
+            extends AbstractQuery.Builder<B, Q> {
     }
 }

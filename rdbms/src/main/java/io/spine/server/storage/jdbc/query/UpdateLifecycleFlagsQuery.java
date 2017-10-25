@@ -42,7 +42,7 @@ import static java.lang.String.format;
  *
  * @author Dmytro Dashenkov
  */
-public class UpdateLifecycleFlagsQuery<I> extends WriteQuery {
+public class UpdateLifecycleFlagsQuery<I> extends AbstractWriteQuery {
 
     private static final String SQL = UPDATE + "%s" + SET +
                                       archived + EQUAL + PLACEHOLDER + COMMA +
@@ -78,7 +78,7 @@ public class UpdateLifecycleFlagsQuery<I> extends WriteQuery {
         return builder;
     }
 
-    public static class Builder<I> extends WriteQuery.Builder<Builder<I>, UpdateLifecycleFlagsQuery> {
+    public static class Builder<I> extends AbstractWriteQuery.Builder<Builder<I>, UpdateLifecycleFlagsQuery> {
 
         private I id;
         private LifecycleFlags entityStatus;

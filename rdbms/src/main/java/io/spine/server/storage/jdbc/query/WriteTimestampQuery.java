@@ -31,7 +31,7 @@ import io.spine.server.storage.jdbc.LastHandledEventTimeTable.Column;
  *
  * @author Dmytro Dashenkov
  */
-abstract class WriteTimestampQuery extends WriteQuery {
+abstract class WriteTimestampQuery extends AbstractWriteQuery {
 
     private final Timestamp timestamp;
     private final String id;
@@ -55,7 +55,7 @@ abstract class WriteTimestampQuery extends WriteQuery {
     }
 
     abstract static class Builder<B extends Builder<B, Q>, Q extends WriteTimestampQuery>
-            extends WriteQuery.Builder<B, Q> {
+            extends AbstractWriteQuery.Builder<B, Q> {
 
         private Timestamp timestamp;
         private String id;

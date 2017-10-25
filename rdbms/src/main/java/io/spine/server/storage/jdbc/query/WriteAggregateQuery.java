@@ -29,7 +29,7 @@ import io.spine.server.storage.jdbc.Sql;
  *
  * @author Alexander Aleksandrov
  */
-abstract class WriteAggregateQuery<I, R extends Message> extends WriteQuery {
+abstract class WriteAggregateQuery<I, R extends Message> extends AbstractWriteQuery {
 
     private final I id;
     private final R record;
@@ -67,7 +67,7 @@ abstract class WriteAggregateQuery<I, R extends Message> extends WriteQuery {
                                   Q extends WriteAggregateQuery,
                                   I,
                                   R extends Message>
-            extends WriteQuery.Builder<B, Q> {
+            extends AbstractWriteQuery.Builder<B, Q> {
 
         private int idIndexInQuery;
         private int recordIndexInQuery;
