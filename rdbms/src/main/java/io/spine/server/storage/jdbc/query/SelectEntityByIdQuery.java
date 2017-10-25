@@ -62,18 +62,6 @@ class SelectEntityByIdQuery<I> extends SelectMessageByIdQuery<I, EntityRecord> {
         return builder;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * <p>Overridden to expose this method to {@code io.spine.server.storage.jdbc.entity.query}
-     * package.
-     */
-    @Nullable
-    @Override
-    protected EntityRecord readMessage(ResultSet resultSet) throws SQLException {
-        return super.readMessage(resultSet);
-    }
-
     @SuppressWarnings("ClassNameSameAsAncestorName")
     static class Builder<I> extends SelectMessageByIdQuery.Builder<Builder<I>,
                                                                           SelectEntityByIdQuery<I>,
