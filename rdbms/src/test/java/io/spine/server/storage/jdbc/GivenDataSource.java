@@ -29,8 +29,6 @@ import java.sql.SQLException;
 
 import static io.spine.Identifier.newUuid;
 import static org.mockito.Mockito.anyBoolean;
-import static org.mockito.Mockito.anyInt;
-import static org.mockito.Mockito.anyLong;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -54,25 +52,6 @@ public class GivenDataSource {
 
     public static DataSourceWrapper withoutSuperpowers() {
         return mock(DataSourceWrapper.class);
-    }
-
-    public static DataSourceWrapper whichThrowsExceptionOnSettingStatementParam()
-            throws SQLException {
-        final PreparedStatement preparedStatement = mock(PreparedStatement.class);
-        final ConnectionWrapper connection = mock(ConnectionWrapper.class);
-        final DataSourceWrapper dataSource = mock(DataSourceWrapper.class);
-
-        when(dataSource.getConnection(anyBoolean())).thenReturn(connection);
-        when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
-
-        doThrow(EXCEPTION).when(preparedStatement)
-                          .setInt(anyInt(), anyInt());
-        doThrow(EXCEPTION).when(preparedStatement)
-                          .setLong(anyInt(), anyLong());
-        doThrow(EXCEPTION).when(preparedStatement)
-                          .setString(anyInt(), anyString());
-
-        return dataSource;
     }
 
     public static DataSourceWrapper whichThrowsExceptionOnExecuteStatement() throws SQLException {
