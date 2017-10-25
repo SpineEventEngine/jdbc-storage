@@ -44,10 +44,24 @@ public final class Parameter {
         this.type = checkNotNull(type);
     }
 
+    /**
+     * Creates a parameter using the specified parameters.
+     *
+     * @param value the parameter value
+     * @param type  the SQL type of the parameter
+     * @return a new {@code Parameter} instance
+     */
     public static Parameter of(@Nullable Object value, Sql.Type type) {
         return new Parameter(value, type);
     }
 
+    /**
+     * Creates a parameter using the specified parameters.
+     *
+     * @param value  the parameter value
+     * @param column the {@link TableColumn} describing this parameter
+     * @return a new {@code Parameter} instance
+     */
     public static Parameter of(@Nullable Object value, TableColumn column) {
         return new Parameter(value, column.type());
     }
