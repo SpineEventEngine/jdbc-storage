@@ -26,6 +26,8 @@ import io.spine.server.storage.jdbc.LastHandledEventTimeTable;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import org.slf4j.Logger;
 
+import java.util.Iterator;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 import static io.spine.server.storage.jdbc.LastHandledEventTimeTable.Column.projection_type;
 import static io.spine.server.storage.jdbc.IdColumn.typeString;
@@ -66,8 +68,8 @@ public class LastHandledEventTimeQueryFactory
     }
 
     @Override
-    public StorageIndexQuery<String> newIndexQuery() {
-        final StorageIndexQueryPlain.Builder<String> builder = StorageIndexQueryPlain.newBuilder();
+    public SelectQuery<Iterator<String>> newIndexQuery() {
+        final StorageIndexQuery.Builder<String> builder = StorageIndexQuery.newBuilder();
         return builder.setDataSource(dataSource)
                       .setLogger(logger)
                       .setTableName(tableName)

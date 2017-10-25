@@ -32,6 +32,7 @@ import io.spine.server.storage.jdbc.RecordTable.StandardColumn;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import org.slf4j.Logger;
 
+import java.util.Iterator;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -113,8 +114,8 @@ public class RecordStorageQueryFactory<I>
     }
 
     @Override
-    public StorageIndexQuery<I> newIndexQuery() {
-        final StorageIndexQueryPlain.Builder<I> builder = StorageIndexQueryPlain.newBuilder();
+    public SelectQuery<Iterator<I>> newIndexQuery() {
+        final StorageIndexQuery.Builder<I> builder = StorageIndexQuery.newBuilder();
         return builder.setDataSource(dataSource)
                       .setLogger(logger)
                       .setTableName(tableName)

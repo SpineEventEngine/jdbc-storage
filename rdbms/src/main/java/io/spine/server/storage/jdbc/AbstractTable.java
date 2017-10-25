@@ -29,8 +29,8 @@ import io.spine.server.storage.jdbc.query.DeleteAllQuery;
 import io.spine.server.storage.jdbc.query.DeleteRecordQuery;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.SelectByIdQuery;
+import io.spine.server.storage.jdbc.query.SelectQuery;
 import io.spine.server.storage.jdbc.query.SimpleQuery;
-import io.spine.server.storage.jdbc.query.StorageIndexQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 import org.slf4j.Logger;
@@ -211,7 +211,7 @@ abstract class AbstractTable<I, R extends Message, W> {
      * @see io.spine.server.storage.Storage#index()
      */
     Iterator<I> index() {
-        final StorageIndexQuery<I> query = getReadQueryFactory().newIndexQuery();
+        final SelectQuery<Iterator<I>> query = getReadQueryFactory().newIndexQuery();
         final Iterator<I> result = query.execute();
         return result;
     }

@@ -29,7 +29,7 @@ import io.spine.server.storage.jdbc.IdColumn;
  * @param <R> the type of records
  * @author Dmytro Grankin
  */
-public interface SelectByIdQuery<I, R> extends StorageQuery {
+public interface SelectByIdQuery<I, R> extends SelectQuery<R> {
 
     /**
      * Obtains {@link IdColumn} for working with the {@linkplain #getId() ID}.
@@ -44,11 +44,4 @@ public interface SelectByIdQuery<I, R> extends StorageQuery {
      * @return the record ID
      */
     I getId();
-
-    /**
-     * Executes the query and returns the record.
-     *
-     * @return the record
-     */
-    R execute();
 }

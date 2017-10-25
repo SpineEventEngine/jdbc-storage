@@ -26,6 +26,8 @@ import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.IdColumn;
 import org.slf4j.Logger;
 
+import java.util.Iterator;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -94,8 +96,8 @@ public class AggregateStorageQueryFactory<I> implements ReadQueryFactory<I, Aggr
     }
 
     @Override
-    public StorageIndexQuery<I> newIndexQuery() {
-        final StorageIndexQueryPlain.Builder<I> builder = StorageIndexQueryPlain.newBuilder();
+    public SelectQuery<Iterator<I>> newIndexQuery() {
+        final StorageIndexQuery.Builder<I> builder = StorageIndexQuery.newBuilder();
         return builder.setDataSource(dataSource)
                       .setLogger(logger)
                       .setIdType(idColumn.getJavaType())

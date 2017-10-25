@@ -27,6 +27,8 @@ import io.spine.server.storage.jdbc.EventCountTable;
 import io.spine.server.storage.jdbc.IdColumn;
 import org.slf4j.Logger;
 
+import java.util.Iterator;
+
 /**
  * An implementation of the query factory generating queries for the {@link EventCountTable}.
  *
@@ -64,8 +66,8 @@ public class EventCountQueryFactory<I> implements ReadQueryFactory<I, Int32Value
     }
 
     @Override
-    public StorageIndexQuery<I> newIndexQuery() {
-        final StorageIndexQueryPlain.Builder<I> builder = StorageIndexQueryPlain.newBuilder();
+    public SelectQuery<Iterator<I>> newIndexQuery() {
+        final StorageIndexQuery.Builder<I> builder = StorageIndexQuery.newBuilder();
         return builder.setDataSource(dataSource)
                       .setLogger(logger)
                       .setTableName(tableName)

@@ -20,36 +20,18 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import io.spine.annotation.Internal;
-
-import java.util.Iterator;
-
 /**
- * An interface of a {@linkplain StorageQuery query} factory for the read queries.
+ * An interface for {@code SELECT} queries.
  *
- * <p>Each JDBC {@linkplain io.spine.server.storage.jdbc.AbstractTable table} uses a query factory
- * to construct its SQL queries to the database.
- *
- * @param <I> type of the ID of the record
- * @param <R> type of the record
- *
- * @author Dmytro Dashenkov
- * @see WriteQueryFactory
+ * @param <R> the result type
+ * @author Dmytro Grankin
  */
-@Internal
-public interface ReadQueryFactory<I, R> {
+public interface SelectQuery<R> {
 
     /**
-     * Creates an {@linkplain SelectByIdQuery read by ID query}.
+     * Executes the query and returns the result.
      *
-     * @return a query for selecting a record by given ID
+     * @return the result of the query execution
      */
-    SelectByIdQuery<I, R> newSelectByIdQuery(I id);
-
-    /**
-     * Creates an index query for the given table.
-     *
-     * @return a query retrieving all the IDs of a table
-     */
-    SelectQuery<Iterator<I>> newIndexQuery();
+    R execute();
 }
