@@ -95,11 +95,12 @@ public class AggregateStorageQueryFactory<I> implements ReadQueryFactory<I, Aggr
 
     @Override
     public StorageIndexQuery<I> newIndexQuery() {
-        return StorageIndexQuery.<I>newBuilder().setDataSource(dataSource)
-                                                .setLogger(logger)
-                                                .setIdType(idColumn.getJavaType())
-                                                .setTableName(mainTableName)
-                                                .build();
+        final StorageIndexQueryPlain.Builder<I> builder = StorageIndexQueryPlain.newBuilder();
+        return builder.setDataSource(dataSource)
+                      .setLogger(logger)
+                      .setIdType(idColumn.getJavaType())
+                      .setTableName(mainTableName)
+                      .build();
     }
 
     @Override

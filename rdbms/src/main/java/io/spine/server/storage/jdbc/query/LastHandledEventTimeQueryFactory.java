@@ -67,12 +67,12 @@ public class LastHandledEventTimeQueryFactory
 
     @Override
     public StorageIndexQuery<String> newIndexQuery() {
-        return StorageIndexQuery.<String>newBuilder()
-                                .setDataSource(dataSource)
-                                .setLogger(logger)
-                                .setTableName(tableName)
-                                .setIdType(String.class)
-                                .build();
+        final StorageIndexQueryPlain.Builder<String> builder = StorageIndexQueryPlain.newBuilder();
+        return builder.setDataSource(dataSource)
+                      .setLogger(logger)
+                      .setTableName(tableName)
+                      .setIdType(String.class)
+                      .build();
     }
 
     @Override
