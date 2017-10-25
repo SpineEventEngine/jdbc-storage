@@ -21,7 +21,6 @@
 package io.spine.server.storage.jdbc.query;
 
 import io.spine.server.storage.jdbc.EventCountTable;
-import io.spine.server.storage.jdbc.EventCountTable.Column;
 
 import static io.spine.server.storage.jdbc.EventCountTable.Column.event_count;
 import static io.spine.server.storage.jdbc.EventCountTable.Column.id;
