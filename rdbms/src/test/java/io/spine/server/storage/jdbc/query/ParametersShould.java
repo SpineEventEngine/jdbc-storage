@@ -23,6 +23,8 @@ package io.spine.server.storage.jdbc.query;
 import io.spine.server.storage.jdbc.Sql;
 import org.junit.Test;
 
+import java.util.Set;
+
 /**
  * @author Dmytro Grankin
  */
@@ -44,5 +46,13 @@ public class ParametersShould {
                                                               .addParameter(ID, PARAMETER);
         final Parameters buildedCommonParameters = commonParameters.build();
         commonParameters.addParameters(buildedCommonParameters);
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void not_allow_modify_identifiers() {
+        final Parameters parameters = Parameters.empty();
+        final Set<Integer> identifiers = parameters.getIdentifiers();
+        final int newIdentifier = 0;
+        identifiers.add(newIdentifier);
     }
 }

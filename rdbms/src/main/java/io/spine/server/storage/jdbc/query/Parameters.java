@@ -20,7 +20,8 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import java.util.Collections;
+import com.google.common.collect.ImmutableMap;
+
 import java.util.Map;
 import java.util.Set;
 
@@ -28,7 +29,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Maps.newHashMap;
 import static java.util.Collections.disjoint;
-import static java.util.Collections.unmodifiableMap;
 
 /**
  * A {@linkplain Parameter query parameters} with identifiers.
@@ -42,10 +42,10 @@ import static java.util.Collections.unmodifiableMap;
  */
 public final class Parameters {
 
-    private final Map<Integer, Parameter> parameters;
+    private final ImmutableMap<Integer, Parameter> parameters;
 
-    private Parameters(Map<Integer, Parameter> parameters) {
-        this.parameters = parameters;
+    private Parameters(Builder builder) {
+        this.parameters = ImmutableMap.copyOf(builder.parameters);
     }
 
     /**
@@ -54,6 +54,7 @@ public final class Parameters {
      * @return parameter identifiers
      */
     public Set<Integer> getIdentifiers() {
+        // It's OK for an immutable map to return the key set directly.
         return parameters.keySet();
     }
 
@@ -70,10 +71,20 @@ public final class Parameters {
         return value;
     }
 
+    /**
+     * Creates empty {@code Parameters}.
+     *
+     * @return empty parameters
+     */
     public static Parameters empty() {
-        return new Parameters(Collections.<Integer, Parameter>emptyMap());
+        return newBuilder().build();
     }
 
+    /**
+     * Creates a builder for {@code Parameters}.
+     *
+     * @return the builder
+     */
     public static Builder newBuilder() {
         return new Builder();
     }
@@ -86,6 +97,12 @@ public final class Parameters {
             // Prevent direct instantiation of this class.
         }
 
+        /**
+         * Adds a parameters with the specified identifier.
+         *
+         * @param identifier the identifier for a parameter
+         * @param parameter the {@link Parameter} to add
+         */
         public Builder addParameter(Integer identifier, Parameter parameter) {
             checkNotNull(identifier);
             checkArgument(!parameters.containsKey(identifier));
@@ -93,15 +110,23 @@ public final class Parameters {
             return this;
         }
 
+        /**
+         * Adds {@linkplain Parameters parameters with identifiers} to the builder.
+         *
+         * @param otherParameters the parameters to add
+         * @throws IllegalArgumentException if duplicated identifiers were found
+         */
         public Builder addParameters(Parameters otherParameters) {
             checkArgument(disjoint(parameters.keySet(), otherParameters.parameters.keySet()));
             parameters.putAll(otherParameters.parameters);
             return this;
         }
 
+        /**
+         * @return the assembled {@code Parameters}
+         */
         public Parameters build() {
-            final Map<Integer, Parameter> unmodifiableParameters = unmodifiableMap(parameters);
-            return new Parameters(unmodifiableParameters);
+            return new Parameters(this);
         }
     }
 }
