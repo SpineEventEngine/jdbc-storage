@@ -30,7 +30,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * A parameter of an SQL query.
  *
- * <p>Contains all the necessary data to work with its raw value.
+ * <p>The class is a DTO containing a parameter value and its {@linkplain Sql.Type SQL type}.
  *
  * @author Dmytro Grankin
  */
