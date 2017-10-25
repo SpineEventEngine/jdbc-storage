@@ -25,5 +25,5 @@ package io.spine.server.storage.jdbc.query;
  *
  * @author Dmytro Grankin
  */
-interface StorageQuery {
+public interface StorageQuery {
 }
