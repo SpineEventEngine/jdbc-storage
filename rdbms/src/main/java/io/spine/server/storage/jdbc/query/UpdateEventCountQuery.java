@@ -57,7 +57,7 @@ class UpdateEventCountQuery<I> extends UpdateRecordQuery<I> {
     @Override
     protected Parameters getQueryParameters() {
         final Parameters superParameters = super.getQueryParameters();
-        final Parameter countParameter = Parameter.of(count, Column.event_count);
+        final Parameter countParameter = Parameter.of(count, event_count);
         return Parameters.newBuilder()
                          .addParameters(superParameters)
                          .addParameter(1, countParameter)

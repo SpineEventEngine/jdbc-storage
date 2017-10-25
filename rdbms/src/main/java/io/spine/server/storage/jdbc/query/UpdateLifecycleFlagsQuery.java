@@ -22,7 +22,6 @@ package io.spine.server.storage.jdbc.query;
 
 import io.spine.server.entity.LifecycleFlags;
 import io.spine.server.storage.jdbc.IdColumn;
-import io.spine.server.storage.jdbc.LifecycleFlagsTable;
 import io.spine.server.storage.jdbc.LifecycleFlagsTable.Column;
 
 import static com.google.common.base.Preconditions.checkNotNull;

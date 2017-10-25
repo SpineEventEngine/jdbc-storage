@@ -69,18 +69,18 @@ class InsertAggregateRecordQuery<I> extends WriteAggregateQuery<I, AggregateEven
         final Parameters superParameters = super.getQueryParameters();
         final Timestamp recordTimestamp = getRecord().getTimestamp();
 
-        final Parameter seconds = Parameter.of(recordTimestamp.getSeconds(), Column.timestamp);
-        final Parameter nanos = Parameter.of(recordTimestamp.getNanos(), Column.timestamp_nanos);
-        final Parameter version = Parameter.of(getVersionNumberOfRecord(), Column.version);
+        final Parameter secondsParameter = Parameter.of(recordTimestamp.getSeconds(), timestamp);
+        final Parameter nanosParameter = Parameter.of(recordTimestamp.getNanos(), timestamp_nanos);
+        final Parameter versionParameter = Parameter.of(getVersionNumberOfRecord(), version);
 
         return Parameters.newBuilder()
                          .addParameters(superParameters)
 
                          //TODO:2017-09-11:dmytro.grankin: Remove hard-coded indexes here and in other places.
                          // See the related issues: https://github.com/SpineEventEngine/jdbc-storage/issues/36
-                         .addParameter(3, seconds)
-                         .addParameter(4, nanos)
-                         .addParameter(5, version)
+                         .addParameter(3, secondsParameter)
+                         .addParameter(4, nanosParameter)
+                         .addParameter(5, versionParameter)
                          .build();
     }
 
