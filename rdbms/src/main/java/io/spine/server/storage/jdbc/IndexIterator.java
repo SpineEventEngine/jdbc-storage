@@ -24,7 +24,7 @@ import com.google.common.primitives.Primitives;
 import com.google.protobuf.Message;
 import io.spine.annotation.Internal;
 
-import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -42,39 +42,34 @@ public abstract class IndexIterator<I> extends DbIterator<I> {
     /**
      * Creates a new iterator instance.
      *
-     * @param statement  a statement used to retrieve a result set
-     *                   (both statement and result set are closed in {@link #close()}).
+     * @param resultSet  a result set of IDs (will be closed on a {@link #close()})
      * @param columnName a name of a serialized storage record column
-     * @throws DatabaseException if an error occurs during interaction with the DB
      */
-    private IndexIterator(PreparedStatement statement, String columnName) throws DatabaseException {
-        super(statement, columnName);
+    private IndexIterator(ResultSet resultSet, String columnName) {
+        super(resultSet, columnName);
     }
 
     /**
      * Creates a new iterator instance.
      *
-     * @param statement  a statement used to retrieve a result set
-     *                   (both statement and result set are closed in {@link #close()}).
+     * @param resultSet  a result set of IDs (will be closed on a {@link #close()})
      * @param columnName a name of a serialized storage record column
-     * @throws DatabaseException if an error occurs during interaction with the DB
      */
     @SuppressWarnings("unchecked") // Logically checked by if statements
-    public static <I> IndexIterator<I> create(PreparedStatement statement,
+    public static <I> IndexIterator<I> create(ResultSet resultSet,
                                               String columnName,
-                                              Class<I> idType)
-            throws DatabaseException {
-        checkNotNull(statement);
+                                              Class<I> idType) {
+        checkNotNull(resultSet);
         checkNotNull(columnName);
         checkNotNull(idType);
         final Class<I> wrapper = Primitives.wrap(idType);
         final IndexIterator<I> result;
         if (String.class.equals(idType)) {
-            result = (IndexIterator<I>) new StringIndexIterator(statement, columnName);
+            result = (IndexIterator<I>) new StringIndexIterator(resultSet, columnName);
         } else if (Integer.class == wrapper || Long.class == wrapper) {
-            result = (IndexIterator<I>) new NumberIndexIterator(statement, columnName);
+            result = (IndexIterator<I>) new NumberIndexIterator(resultSet, columnName);
         } else if (Message.class.isAssignableFrom(idType)) {
-            result = (IndexIterator<I>) new MessageIndexIterator(statement, columnName, idType);
+            result = (IndexIterator<I>) new MessageIndexIterator(resultSet, columnName, idType);
         } else {
             throw newIllegalArgumentException("ID type '%s' is not supported.", idType);
         }
@@ -86,14 +81,11 @@ public abstract class IndexIterator<I> extends DbIterator<I> {
         /**
          * Creates a new iterator instance.
          *
-         * @param statement  a statement used to retrieve a result set
-         *                   (both statement and result set are closed in {@link #close()}).
+         * @param resultSet  a result set of IDs (will be closed on a {@link #close()})
          * @param columnName a name of a serialized storage record column
-         * @throws DatabaseException if an error occurs during interaction with the DB
          */
-        private StringIndexIterator(PreparedStatement statement, String columnName)
-                throws DatabaseException {
-            super(statement, columnName);
+        private StringIndexIterator(ResultSet resultSet, String columnName) {
+            super(resultSet, columnName);
         }
 
         @Override
@@ -108,14 +100,11 @@ public abstract class IndexIterator<I> extends DbIterator<I> {
         /**
          * Creates a new iterator instance.
          *
-         * @param statement  a statement used to retrieve a result set
-         *                   (both statement and result set are closed in {@link #close()}).
+         * @param resultSet  a result set of IDs (will be closed on a {@link #close()})
          * @param columnName a name of a serialized storage record column
-         * @throws DatabaseException if an error occurs during interaction with the DB
          */
-        private NumberIndexIterator(PreparedStatement statement, String columnName)
-                throws DatabaseException {
-            super(statement, columnName);
+        private NumberIndexIterator(ResultSet resultSet, String columnName) {
+            super(resultSet, columnName);
         }
 
         @Override
@@ -132,16 +121,13 @@ public abstract class IndexIterator<I> extends DbIterator<I> {
         /**
          * Creates a new iterator instance.
          *
-         * @param statement  a statement used to retrieve a result set
-         *                   (both statement and result set are closed in {@link #close()}).
+         * @param resultSet  a result set of IDs (will be closed on a {@link #close()})
          * @param columnName a name of a serialized storage record column
-         * @throws DatabaseException if an error occurs during interaction with the DB
          */
-        private MessageIndexIterator(PreparedStatement statement,
+        private MessageIndexIterator(ResultSet resultSet,
                                      String columnName,
-                                     Class<M> idClass)
-                throws DatabaseException {
-            super(statement, columnName);
+                                     Class<M> idClass) {
+            super(resultSet, columnName);
             this.idClass = idClass;
         }
 

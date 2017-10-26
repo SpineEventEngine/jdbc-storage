@@ -75,7 +75,6 @@ public abstract class DbIterator<R> implements Iterator<R>, Closeable {
      *
      * @param resultSet  the results of a DB query to iterate over
      * @param columnName a name of a serialized storage record column
-     * @throws DatabaseException if an error occurs during interaction with the DB
      */
     protected DbIterator(ResultSet resultSet, String columnName) {
         this.resultSet = resultSet;

@@ -76,7 +76,11 @@ abstract class AbstractQuery implements StorageQuery {
     }
 
     PathBuilder<Object> pathOf(TableColumn column) {
-        return pathBuilder.get(column.name());
+        return pathOf(column.name());
+    }
+
+    PathBuilder<Object> pathOf(String columnName) {
+        return pathBuilder.get(columnName);
     }
 
     OrderSpecifier<Comparable> orderBy(TableColumn column, Order order) {

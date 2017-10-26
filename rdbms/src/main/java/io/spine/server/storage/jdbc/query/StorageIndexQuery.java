@@ -22,9 +22,12 @@ package io.spine.server.storage.jdbc.query;
 
 import io.spine.annotation.Internal;
 import io.spine.server.storage.jdbc.ConnectionWrapper;
+import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.IndexIterator;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Iterator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -60,8 +63,14 @@ public class StorageIndexQuery<I> extends AbstractQuery implements SelectQuery<I
     public Iterator<I> execute() {
         ConnectionWrapper connection = getConnection(true);
         final PreparedStatement statement = prepareStatement(connection);
-        final Iterator<I> result = IndexIterator.create(statement, idColumnName, idType);
-        return result;
+        final ResultSet resultSet;
+        try {
+            resultSet = statement.executeQuery();
+            final Iterator<I> result = IndexIterator.create(resultSet, idColumnName, idType);
+            return result;
+        } catch (SQLException e) {
+            throw new DatabaseException(e);
+        }
     }
 
     @Override

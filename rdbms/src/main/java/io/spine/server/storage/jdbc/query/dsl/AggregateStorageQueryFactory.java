@@ -28,7 +28,6 @@ import io.spine.server.storage.jdbc.IdColumn;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.SelectByIdQuery;
 import io.spine.server.storage.jdbc.query.SelectQuery;
-import io.spine.server.storage.jdbc.query.StorageIndexQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 import org.slf4j.Logger;
@@ -52,8 +51,7 @@ public class AggregateStorageQueryFactory<I> implements ReadQueryFactory<I, Aggr
     private final IdColumn<I> idColumn;
     private final String mainTableName;
     private final DataSourceWrapper dataSource;
-
-    private Logger logger;
+    private final Logger logger;
 
     /**
      * Creates a new instance.
@@ -62,20 +60,13 @@ public class AggregateStorageQueryFactory<I> implements ReadQueryFactory<I, Aggr
      */
     public AggregateStorageQueryFactory(DataSourceWrapper dataSource,
                                         String tableName,
-                                        IdColumn<I> idColumn) {
+                                        IdColumn<I> idColumn,
+                                        Logger logger) {
         super();
         this.idColumn = checkNotNull(idColumn);
         this.mainTableName = tableName;
         this.dataSource = dataSource;
-    }
-
-    /** Sets the logger for logging exceptions during queries execution. */
-    public void setLogger(Logger logger) {
         this.logger = checkNotNull(logger);
-    }
-
-    public Logger getLogger() {
-        return logger;
     }
 
     /** Returns a query that selects aggregate records by ID sorted by time descending. */
@@ -108,8 +99,7 @@ public class AggregateStorageQueryFactory<I> implements ReadQueryFactory<I, Aggr
     public SelectQuery<Iterator<I>> newIndexQuery() {
         final StorageIndexQuery.Builder<I> builder = StorageIndexQuery.newBuilder();
         return builder.setDataSource(dataSource)
-                      .setLogger(logger)
-                      .setIdType(idColumn.getJavaType())
+                      .setIdColumn(idColumn)
                       .setTableName(mainTableName)
                       .build();
     }
