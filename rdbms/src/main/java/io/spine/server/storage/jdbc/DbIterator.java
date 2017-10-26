@@ -165,10 +165,12 @@ public abstract class DbIterator<R> implements Iterator<R>, Closeable {
         try {
             resultSet.close();
             final Statement statement = resultSet.getStatement();
-            if (statement != null) {
+            final boolean statementClosed = statement == null || statement.isClosed();
+            if (!statementClosed) {
                 statement.close();
                 final Connection connection = statement.getConnection();
-                if (connection != null) {
+                final boolean connectionClosed = connection == null || connection.isClosed();
+                if (!connectionClosed) {
                     connection.close();
                 }
             }
