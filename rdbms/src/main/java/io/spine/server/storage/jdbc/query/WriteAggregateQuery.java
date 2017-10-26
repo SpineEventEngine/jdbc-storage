@@ -75,17 +75,17 @@ abstract class WriteAggregateQuery<I, R extends Message> extends AbstractWriteQu
         private I id;
         private R record;
 
-        B setId(I id) {
+        public B setId(I id) {
             this.id = id;
             return getThis();
         }
 
-        B setRecord(R record) {
+        public B setRecord(R record) {
             this.record = record;
             return getThis();
         }
 
-        B setIdColumn(IdColumn<I> idColumn) {
+        public B setIdColumn(IdColumn<I> idColumn) {
             this.idColumn = idColumn;
             return getThis();
         }

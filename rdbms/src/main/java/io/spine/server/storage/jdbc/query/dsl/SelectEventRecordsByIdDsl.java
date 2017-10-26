@@ -43,14 +43,14 @@ import static io.spine.type.TypeUrl.of;
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-class SelectEventRecordsById<I> extends AbstractQuery
+class SelectEventRecordsByIdDsl<I> extends AbstractQuery
         implements SelectByIdQuery<I, DbIterator<AggregateEventRecord>>{
 
     private final IdColumn<I> idColumn;
     private final I id;
     private final int fetchSize;
 
-    private SelectEventRecordsById(Builder<I> builder) {
+    private SelectEventRecordsByIdDsl(Builder<I> builder) {
         super(builder);
         this.idColumn = builder.idColumn;
         this.id = builder.id;
@@ -85,7 +85,7 @@ class SelectEventRecordsById<I> extends AbstractQuery
     }
 
     static class Builder<I> extends AbstractQuery.Builder<Builder<I>,
-                                                          SelectEventRecordsById<I>> {
+            SelectEventRecordsByIdDsl<I>> {
 
         private IdColumn<I> idColumn;
         private I id;
@@ -107,8 +107,8 @@ class SelectEventRecordsById<I> extends AbstractQuery
         }
 
         @Override
-        public SelectEventRecordsById<I> build() {
-            return new SelectEventRecordsById<>(this);
+        public SelectEventRecordsByIdDsl<I> build() {
+            return new SelectEventRecordsByIdDsl<>(this);
         }
 
         @Override

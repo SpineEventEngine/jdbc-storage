@@ -91,7 +91,7 @@ public class AggregateStorageQueryFactory<I> implements ReadQueryFactory<I, Aggr
      */
     @Deprecated
     @Override
-    public SelectMessageByIdQuery<I, AggregateEventRecord> newSelectByIdQuery(I id) {
+    public SelectByIdQuery<I, AggregateEventRecord> newSelectByIdQuery(I id) {
         throw new UnsupportedOperationException("Use newSelectEventRecordsById instead.");
     }
 

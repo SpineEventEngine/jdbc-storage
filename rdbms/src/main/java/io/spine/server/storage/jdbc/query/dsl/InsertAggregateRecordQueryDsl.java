@@ -23,7 +23,6 @@ package io.spine.server.storage.jdbc.query.dsl;
 import com.google.protobuf.Timestamp;
 import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.sql.RelationalPath;
-import com.querydsl.sql.RelationalPathBase;
 import io.spine.core.Event;
 import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.storage.jdbc.AggregateEventRecordTable;
@@ -43,13 +42,13 @@ import static io.spine.validate.Validate.isDefault;
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-class InsertAggregateRecordQuery<I> extends AbstractQuery implements WriteQuery {
+class InsertAggregateRecordQueryDsl<I> extends AbstractQuery implements WriteQuery {
 
     private final I id;
     private final AggregateEventRecord record;
     private final IdColumn<I> idColumn;
 
-    private InsertAggregateRecordQuery(Builder<I> builder) {
+    private InsertAggregateRecordQueryDsl(Builder<I> builder) {
         super(builder);
         this.idColumn = builder.idColumn;
         this.id = builder.id;
@@ -92,7 +91,7 @@ class InsertAggregateRecordQuery<I> extends AbstractQuery implements WriteQuery 
     }
 
     static class Builder<I> extends AbstractQuery.Builder<Builder<I>,
-                                                          InsertAggregateRecordQuery> {
+            InsertAggregateRecordQueryDsl> {
 
         private IdColumn<I> idColumn;
         private I id;
@@ -114,8 +113,8 @@ class InsertAggregateRecordQuery<I> extends AbstractQuery implements WriteQuery 
         }
 
         @Override
-        public InsertAggregateRecordQuery<I> build() {
-            return new InsertAggregateRecordQuery<>(this);
+        public InsertAggregateRecordQueryDsl<I> build() {
+            return new InsertAggregateRecordQueryDsl<>(this);
         }
 
         @Override

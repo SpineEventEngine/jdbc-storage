@@ -43,8 +43,10 @@ public class SelectEventRecordsByIdShould {
     @Test(expected = DatabaseException.class)
     public void handle_invalid_fetch_size() throws SQLException {
         final IdColumn idColumn = mock(IdColumn.class);
+        final int invalidFetchSize = -1;
         final SelectEventRecordsById query = spy(SelectEventRecordsById.newBuilder("table")
                                                                        .setIdColumn(idColumn)
+                                                                       .setFetchSize(invalidFetchSize)
                                                                        .build());
         final ConnectionWrapper connection = mock(ConnectionWrapper.class);
         final PreparedStatement statement = mock(PreparedStatement.class);
@@ -52,8 +54,6 @@ public class SelectEventRecordsByIdShould {
                             .getConnection(anyBoolean());
         doReturn(statement).when(query)
                            .prepareStatement(connection);
-
-        final int invalidFetchSize = -1;
         doThrow(SQLException.class).when(statement)
                                    .setFetchSize(invalidFetchSize);
         query.execute();
