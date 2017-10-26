@@ -86,9 +86,8 @@ public class AggregateEventRecordTable<I> extends AggregateTable<I, AggregateEve
     DbIterator<AggregateEventRecord> historyBackward(AggregateReadRequest<I> request) {
         final I id = request.getRecordId();
         final int batchSize = request.getBatchSize();
-        final DbIterator<AggregateEventRecord> result = queryFactory.newSelectEventRecordsById(id)
-                                                                    .execute();
-        return result;
+        return queryFactory.newSelectEventRecordsById(id, batchSize)
+                           .execute();
     }
 
     /**

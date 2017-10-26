@@ -58,7 +58,8 @@ import static java.lang.String.format;
  * @author Andrey Lavrov
  */
 @Internal
-public class SelectEventRecordsById<I> extends AbstractQuery {
+public class SelectEventRecordsById<I> extends AbstractQuery
+        implements SelectByIdQuery<I, DbIterator<AggregateEventRecord>> {
 
     private static final String QUERY_TEMPLATE =
             SELECT.toString() + aggregate + FROM + "%s" +
@@ -68,14 +69,17 @@ public class SelectEventRecordsById<I> extends AbstractQuery {
 
     private final IdColumn<I> idColumn;
     private final I id;
+    private final int fetchSize;
 
     private SelectEventRecordsById(Builder<I> builder) {
         super(builder);
         this.idColumn = builder.idColumn;
         this.id = builder.id;
+        this.fetchSize = builder.fetchSize;
     }
 
-    public DbIterator<AggregateEventRecord> execute(int fetchSize) throws DatabaseException {
+    @Override
+    public DbIterator<AggregateEventRecord> execute() throws DatabaseException {
         ConnectionWrapper connection = getConnection(true);
         PreparedStatement statement = prepareStatement(connection);
         try {
@@ -95,6 +99,16 @@ public class SelectEventRecordsById<I> extends AbstractQuery {
         return builder.build();
     }
 
+    @Override
+    public IdColumn<I> getIdColumn() {
+        return idColumn;
+    }
+
+    @Override
+    public I getId() {
+        return id;
+    }
+
     public static <I> Builder<I> newBuilder(String tableName) {
         final Builder<I> builder = new Builder<>();
         builder.setQuery(format(QUERY_TEMPLATE, tableName));
@@ -107,6 +121,7 @@ public class SelectEventRecordsById<I> extends AbstractQuery {
 
         private IdColumn<I> idColumn;
         private I id;
+        private int fetchSize;
 
         @Override
         public SelectEventRecordsById<I> build() {
@@ -120,6 +135,11 @@ public class SelectEventRecordsById<I> extends AbstractQuery {
 
         public Builder<I> setId(I id) {
             this.id = id;
+            return getThis();
+        }
+
+        public Builder<I> setFetchSize(int fetchSize) {
+            this.fetchSize = fetchSize;
             return getThis();
         }
 

@@ -48,7 +48,7 @@ import static java.lang.String.format;
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-class InsertAggregateRecordQuery<I> extends WriteAggregateQuery<I, AggregateEventRecord> {
+public class InsertAggregateRecordQuery<I> extends WriteAggregateQuery<I, AggregateEventRecord> {
 
     private static final String QUERY_TEMPLATE =
             Sql.Query.INSERT_INTO + " %s " + BRACKET_OPEN +
@@ -100,7 +100,7 @@ class InsertAggregateRecordQuery<I> extends WriteAggregateQuery<I, AggregateEven
         return versionNumber;
     }
 
-    static <I> Builder<I> newBuilder(String tableName) {
+    public static <I> Builder<I> newBuilder(String tableName) {
         final Builder<I> builder = new Builder<>();
         builder.setIdIndexInQuery(1)
                .setRecordIndexInQuery(2)

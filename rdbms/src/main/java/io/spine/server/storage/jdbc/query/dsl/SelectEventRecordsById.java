@@ -48,13 +48,13 @@ class SelectEventRecordsById<I> extends AbstractQuery
 
     private final IdColumn<I> idColumn;
     private final I id;
-    private final int batchSize;
+    private final int fetchSize;
 
     private SelectEventRecordsById(Builder<I> builder) {
         super(builder);
         this.idColumn = builder.idColumn;
         this.id = builder.id;
-        this.batchSize = builder.batchSize;
+        this.fetchSize = builder.fetchSize;
     }
 
     @Override
@@ -89,7 +89,7 @@ class SelectEventRecordsById<I> extends AbstractQuery
 
         private IdColumn<I> idColumn;
         private I id;
-        private int batchSize;
+        private int fetchSize;
 
         Builder<I> setId(I id) {
             this.id = id;
@@ -101,8 +101,8 @@ class SelectEventRecordsById<I> extends AbstractQuery
             return getThis();
         }
 
-        Builder<I> setBatchSize(int batchSize) {
-            this.batchSize = batchSize;
+        Builder<I> setFetchSize(int batchSize) {
+            this.fetchSize = batchSize;
             return getThis();
         }
 

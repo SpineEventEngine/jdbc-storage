@@ -56,6 +56,6 @@ public class SelectEventRecordsByIdShould {
         final int invalidFetchSize = -1;
         doThrow(SQLException.class).when(statement)
                                    .setFetchSize(invalidFetchSize);
-        query.execute(invalidFetchSize);
+        query.execute();
     }
 }

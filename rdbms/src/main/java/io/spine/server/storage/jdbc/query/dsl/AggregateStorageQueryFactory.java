@@ -80,12 +80,14 @@ public class AggregateStorageQueryFactory<I> implements ReadQueryFactory<I, Aggr
 
     /** Returns a query that selects aggregate records by ID sorted by time descending. */
     @SuppressWarnings("InstanceMethodNamingConvention")
-    public SelectByIdQuery<I, DbIterator<AggregateEventRecord>> newSelectEventRecordsById(I id) {
+    public SelectByIdQuery<I, DbIterator<AggregateEventRecord>> newSelectEventRecordsById(I id,
+                                                                                          int fetchSize) {
         final SelectEventRecordsById.Builder<I> builder = SelectEventRecordsById.newBuilder();
         return builder.setTableName(mainTableName)
                       .setDataSource(dataSource)
                       .setIdColumn(idColumn)
                       .setId(id)
+                      .setFetchSize(fetchSize)
                       .build();
     }
 
@@ -94,7 +96,7 @@ public class AggregateStorageQueryFactory<I> implements ReadQueryFactory<I, Aggr
      *
      * @deprecated multiple records correspond to a single ID in
      * {@link io.spine.server.storage.jdbc.AggregateEventRecordTable AggregateEventRecordTable};
-     * please use {@link #newSelectEventRecordsById(Object)} to read the records.
+     * please use {@link #newSelectEventRecordsById(Object, int)} to read the records.
      */
     @Deprecated
     @Override
