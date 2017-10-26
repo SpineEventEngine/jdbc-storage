@@ -87,7 +87,7 @@ public class AggregateEventRecordTable<I> extends AggregateTable<I, AggregateEve
         final I id = request.getRecordId();
         final int batchSize = request.getBatchSize();
         final DbIterator<AggregateEventRecord> result = queryFactory.newSelectEventRecordsById(id)
-                                                                    .execute(batchSize);
+                                                                    .execute();
         return result;
     }
 

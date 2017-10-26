@@ -49,7 +49,7 @@ class InsertAggregateRecordQuery<I> extends AbstractQuery implements WriteQuery 
     private final AggregateEventRecord record;
     private final IdColumn<I> idColumn;
 
-    InsertAggregateRecordQuery(Builder<I> builder) {
+    private InsertAggregateRecordQuery(Builder<I> builder) {
         super(builder);
         this.idColumn = builder.idColumn;
         this.id = builder.id;
@@ -58,10 +58,7 @@ class InsertAggregateRecordQuery<I> extends AbstractQuery implements WriteQuery 
 
     @Override
     public void execute() {
-        final RelationalPath<Object> table = new RelationalPathBase<>(Object.class,
-                                                                      getTableName(),
-                                                                      getTableName(),
-                                                                      getTableName());
+        final RelationalPath<Object> table = getTable();
         final PathBuilder<Object> pathBuilder = new PathBuilder<>(Object.class,
                                                                   table.getMetadata());
         final Timestamp recordTimestamp = record.getTimestamp();

@@ -23,10 +23,10 @@ package io.spine.server.storage.jdbc.query.dsl;
 import io.spine.annotation.Internal;
 import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.DbIterator;
 import io.spine.server.storage.jdbc.IdColumn;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.SelectByIdQuery;
-import io.spine.server.storage.jdbc.query.SelectEventRecordsById;
 import io.spine.server.storage.jdbc.query.SelectQuery;
 import io.spine.server.storage.jdbc.query.StorageIndexQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
@@ -80,13 +80,13 @@ public class AggregateStorageQueryFactory<I> implements ReadQueryFactory<I, Aggr
 
     /** Returns a query that selects aggregate records by ID sorted by time descending. */
     @SuppressWarnings("InstanceMethodNamingConvention")
-    public SelectEventRecordsById<I> newSelectEventRecordsById(I id) {
-        final SelectEventRecordsById.Builder<I> builder =
-                SelectEventRecordsById.<I>newBuilder(mainTableName).setDataSource(dataSource)
-                                                                   .setLogger(getLogger())
-                                                                   .setIdColumn(idColumn)
-                                                                   .setId(id);
-        return builder.build();
+    public SelectByIdQuery<I, DbIterator<AggregateEventRecord>> newSelectEventRecordsById(I id) {
+        final SelectEventRecordsById.Builder<I> builder = SelectEventRecordsById.newBuilder();
+        return builder.setTableName(mainTableName)
+                      .setDataSource(dataSource)
+                      .setIdColumn(idColumn)
+                      .setId(id)
+                      .build();
     }
 
     /**

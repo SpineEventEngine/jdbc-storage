@@ -22,14 +22,18 @@ package io.spine.server.storage.jdbc.query.dsl;
 
 import com.querydsl.sql.AbstractSQLQueryFactory;
 import com.querydsl.sql.MySQLTemplates;
+import com.querydsl.sql.RelationalPath;
+import com.querydsl.sql.RelationalPathBase;
 import com.querydsl.sql.SQLQueryFactory;
 import com.querydsl.sql.SQLTemplates;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.query.StorageQuery;
 
 import javax.inject.Provider;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -53,6 +57,16 @@ abstract class AbstractQuery implements StorageQuery {
 
     String getTableName() {
         return tableName;
+    }
+
+    RelationalPath<Object> getTable() {
+        try {
+            final String schema = factory.getConnection()
+                                         .getSchema();
+            return new RelationalPathBase<>(Object.class, tableName, schema, tableName);
+        } catch (SQLException e) {
+            throw new DatabaseException(e);
+        }
     }
 
     AbstractSQLQueryFactory<?> factory() {
