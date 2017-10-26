@@ -29,13 +29,11 @@ import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.IdColumn;
 import io.spine.server.storage.jdbc.RecordTable;
 import io.spine.server.storage.jdbc.RecordTable.StandardColumn;
-import io.spine.server.storage.jdbc.query.InsertEntityQuery;
 import io.spine.server.storage.jdbc.query.InsertEntityRecordsBulkQuery;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.SelectByEntityColumnsQuery;
 import io.spine.server.storage.jdbc.query.SelectByIdQuery;
 import io.spine.server.storage.jdbc.query.SelectQuery;
-import io.spine.server.storage.jdbc.query.StorageIndexQuery;
 import io.spine.server.storage.jdbc.query.UpdateEntityQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
@@ -124,25 +122,22 @@ public class RecordStorageQueryFactory<I>
 
     @Override
     public SelectQuery<Iterator<I>> newIndexQuery() {
-        final io.spine.server.storage.jdbc.query.StorageIndexQuery.Builder<I> builder = StorageIndexQuery.newBuilder();
+        final StorageIndexQuery.Builder<I> builder = StorageIndexQuery.newBuilder();
         return builder.setDataSource(dataSource)
-                      .setLogger(logger)
                       .setTableName(tableName)
-                      .setIdType(idColumn.getJavaType())
-                      .setIdColumnName(idColumn.getColumnName())
+                      .setIdColumn(idColumn)
                       .build();
     }
 
     @Override
     public WriteQuery newInsertQuery(I id, EntityRecordWithColumns record) {
-        final InsertEntityQuery.Builder<I> builder =
-                InsertEntityQuery.<I>newBuilder(tableName, record)
-                                 .setDataSource(dataSource)
-                                 .setLogger(getLogger())
-                                 .setId(id)
-                                 .setIdColumn(idColumn)
-                                 .setColumnTypeRegistry(columnTypeRegistry)
-                                 .setRecord(record);
+        final InsertEntityQuery.Builder<I> builder = InsertEntityQuery.newBuilder();
+        builder.setDataSource(dataSource)
+               .setTableName(tableName)
+               .setId(id)
+               .setIdColumn(idColumn)
+               .setColumnTypeRegistry(columnTypeRegistry)
+               .setRecord(record);
         return builder.build();
     }
 
