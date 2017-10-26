@@ -49,14 +49,14 @@ import static io.spine.type.TypeUrl.of;
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-class SelectEventRecordsByIdDsl<I> extends AbstractQuery
-        implements SelectByIdQuery<I, DbIterator<AggregateEventRecord>>{
+class SelectEventRecordsById<I> extends AbstractQuery
+        implements SelectByIdQuery<I, DbIterator<AggregateEventRecord>> {
 
     private final IdColumn<I> idColumn;
     private final I idValue;
     private final int fetchSize;
 
-    private SelectEventRecordsByIdDsl(Builder<I> builder) {
+    private SelectEventRecordsById(Builder<I> builder) {
         super(builder);
         this.idColumn = builder.idColumn;
         this.idValue = builder.id;
@@ -79,8 +79,13 @@ class SelectEventRecordsByIdDsl<I> extends AbstractQuery
                                                   .build());
         final ResultSet resultSet = query.getResults();
         return new MessageDbIterator<>(resultSet,
-                                       aggregate.toString(),
+                                       aggregate.name(),
                                        of(AggregateEventRecord.class));
+    }
+
+    @Override
+    boolean closeConnectionAfterExecution() {
+        return false;
     }
 
     @Override
@@ -98,7 +103,7 @@ class SelectEventRecordsByIdDsl<I> extends AbstractQuery
     }
 
     static class Builder<I> extends AbstractQuery.Builder<Builder<I>,
-                                                          SelectEventRecordsByIdDsl<I>> {
+                                                          SelectEventRecordsById<I>> {
 
         private IdColumn<I> idColumn;
         private I id;
@@ -120,8 +125,8 @@ class SelectEventRecordsByIdDsl<I> extends AbstractQuery
         }
 
         @Override
-        public SelectEventRecordsByIdDsl<I> build() {
-            return new SelectEventRecordsByIdDsl<>(this);
+        public SelectEventRecordsById<I> build() {
+            return new SelectEventRecordsById<>(this);
         }
 
         @Override

@@ -41,13 +41,13 @@ import static io.spine.validate.Validate.isDefault;
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-class InsertAggregateRecordQueryDsl<I> extends AbstractQuery implements WriteQuery {
+class InsertAggregateRecordQuery<I> extends AbstractQuery implements WriteQuery {
 
     private final I idValue;
     private final AggregateEventRecord record;
     private final IdColumn<I> idColumn;
 
-    private InsertAggregateRecordQueryDsl(Builder<I> builder) {
+    private InsertAggregateRecordQuery(Builder<I> builder) {
         super(builder);
         this.idColumn = builder.idColumn;
         this.idValue = builder.id;
@@ -87,7 +87,7 @@ class InsertAggregateRecordQueryDsl<I> extends AbstractQuery implements WriteQue
     }
 
     static class Builder<I> extends AbstractQuery.Builder<Builder<I>,
-            InsertAggregateRecordQueryDsl> {
+                                                          InsertAggregateRecordQuery> {
 
         private IdColumn<I> idColumn;
         private I id;
@@ -109,8 +109,8 @@ class InsertAggregateRecordQueryDsl<I> extends AbstractQuery implements WriteQue
         }
 
         @Override
-        public InsertAggregateRecordQueryDsl<I> build() {
-            return new InsertAggregateRecordQueryDsl<>(this);
+        public InsertAggregateRecordQuery<I> build() {
+            return new InsertAggregateRecordQuery<>(this);
         }
 
         @Override

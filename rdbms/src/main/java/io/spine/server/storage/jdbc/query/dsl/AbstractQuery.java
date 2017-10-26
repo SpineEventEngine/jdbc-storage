@@ -126,7 +126,7 @@ abstract class AbstractQuery implements StorageQuery {
         };
         final SQLTemplates templates = new MySQLTemplates();
         final Configuration configuration = new Configuration(templates);
-        configuration.addListener(new TransactionHandler());
+        configuration.addListener(TransactionHandler.INSTANCE);
         configuration.addListener(getConnectionCloseHandler());
         return new SQLQueryFactory(configuration, connectionProvider);
     }
@@ -159,6 +159,8 @@ abstract class AbstractQuery implements StorageQuery {
      * that was successfully executed or {@linkplain Connection#rollback() rollbacks} it otherwise.
      */
     private static class TransactionHandler extends SQLBaseListener {
+
+        private static final SQLListener INSTANCE = new TransactionHandler();
 
         @Override
         public void end(SQLListenerContext context) {
