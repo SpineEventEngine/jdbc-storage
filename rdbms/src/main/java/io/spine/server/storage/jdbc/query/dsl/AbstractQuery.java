@@ -24,18 +24,25 @@ import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.sql.AbstractSQLQueryFactory;
+import com.querydsl.sql.Configuration;
 import com.querydsl.sql.MySQLTemplates;
 import com.querydsl.sql.RelationalPath;
 import com.querydsl.sql.RelationalPathBase;
+import com.querydsl.sql.SQLBaseListener;
+import com.querydsl.sql.SQLCloseListener;
+import com.querydsl.sql.SQLListener;
+import com.querydsl.sql.SQLListenerContext;
+import com.querydsl.sql.SQLNoCloseListener;
 import com.querydsl.sql.SQLQueryFactory;
 import com.querydsl.sql.SQLTemplates;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.query.StorageQuery;
 
 import javax.inject.Provider;
-
 import java.sql.Connection;
+import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -77,7 +84,39 @@ abstract class AbstractQuery implements StorageQuery {
         return new OrderSpecifier<>(order, columnPath);
     }
 
-    private static AbstractSQLQueryFactory<?> createFactory(final DataSourceWrapper dataSource) {
+    /**
+     * Determines whether a {@link Connection} should be closed after execution of a query.
+     *
+     * <p>The default implementation returns {@code true}.
+     *
+     * @return {@code true} if a connection should be close, {@code false} otherwise
+     */
+    boolean closeConnectionAfterExecution() {
+        return true;
+    }
+
+    private SQLListener getConnectionCloseHandler() {
+        return closeConnectionAfterExecution()
+               ? SQLCloseListener.DEFAULT
+               : SQLNoCloseListener.DEFAULT;
+    }
+
+    /**
+     * Creates a configured query factory.
+     *
+     * <p>All queries produced by the factory will be
+     * {@linkplain Connection#setAutoCommit(boolean) transactional}.
+     *
+     * <p>Committing and rollback of transactions will be handled automatically
+     * by {@linkplain TransactionHandler transaction handler}.
+     *
+     * <p>The strategy of closing {@link Connection connections} is determined by
+     * the {@link #closeConnectionAfterExecution() method}.
+     *
+     * @param dataSource the data source to produce connections
+     * @return the query factory
+     */
+    private AbstractSQLQueryFactory<?> createFactory(final DataSourceWrapper dataSource) {
         final Provider<Connection> connectionProvider = new Provider<Connection>() {
             @Override
             public Connection get() {
@@ -86,7 +125,10 @@ abstract class AbstractQuery implements StorageQuery {
             }
         };
         final SQLTemplates templates = new MySQLTemplates();
-        return new SQLQueryFactory(templates, connectionProvider);
+        final Configuration configuration = new Configuration(templates);
+        configuration.addListener(new TransactionHandler());
+        configuration.addListener(getConnectionCloseHandler());
+        return new SQLQueryFactory(configuration, connectionProvider);
     }
 
     abstract static class Builder<B extends AbstractQuery.Builder<B, Q>, Q extends AbstractQuery> {
@@ -107,6 +149,35 @@ abstract class AbstractQuery implements StorageQuery {
             checkArgument(!isNullOrEmpty(tableName));
             this.tableName = tableName;
             return getThis();
+        }
+    }
+
+    /**
+     * A handler for a transactional query.
+     *
+     * <p>{@linkplain Connection#commit() Commits} a transaction of a query,
+     * that was successfully executed or {@linkplain Connection#rollback() rollbacks} it otherwise.
+     */
+    private static class TransactionHandler extends SQLBaseListener {
+
+        @Override
+        public void end(SQLListenerContext context) {
+            final Connection connection = context.getConnection();
+            try {
+                connection.commit();
+            } catch (SQLException e) {
+                throw new DatabaseException(e);
+            }
+        }
+
+        @Override
+        public void exception(SQLListenerContext context) {
+            final Connection connection = context.getConnection();
+            try {
+                connection.rollback();
+            } catch (SQLException e) {
+                throw new DatabaseException(e);
+            }
         }
     }
 }
