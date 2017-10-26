@@ -21,14 +21,11 @@
 package io.spine.server.storage.jdbc.query.dsl;
 
 import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.sql.AbstractSQLQuery;
 import com.querydsl.sql.StatementOptions;
 import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.storage.jdbc.DbIterator;
-import io.spine.server.storage.jdbc.IdColumn;
 import io.spine.server.storage.jdbc.MessageDbIterator;
-import io.spine.server.storage.jdbc.query.SelectByIdQuery;
 
 import java.sql.ResultSet;
 
@@ -37,7 +34,6 @@ import static io.spine.server.storage.jdbc.AggregateEventRecordTable.Column.aggr
 import static io.spine.server.storage.jdbc.AggregateEventRecordTable.Column.timestamp;
 import static io.spine.server.storage.jdbc.AggregateEventRecordTable.Column.timestamp_nanos;
 import static io.spine.server.storage.jdbc.AggregateEventRecordTable.Column.version;
-import static io.spine.server.storage.jdbc.EventCountTable.Column.id;
 import static io.spine.type.TypeUrl.of;
 
 /**
@@ -49,30 +45,24 @@ import static io.spine.type.TypeUrl.of;
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-class SelectEventRecordsById<I> extends AbstractQuery
-        implements SelectByIdQuery<I, DbIterator<AggregateEventRecord>> {
+class SelectEventRecordsById<I> extends AbstractSelectByIdQuery<I, DbIterator<AggregateEventRecord>> {
 
-    private final IdColumn<I> idColumn;
-    private final I idValue;
     private final int fetchSize;
 
     private SelectEventRecordsById(Builder<I> builder) {
         super(builder);
-        this.idColumn = builder.idColumn;
-        this.idValue = builder.id;
         this.fetchSize = builder.fetchSize;
     }
 
     @Override
     public DbIterator<AggregateEventRecord> execute() {
-        final BooleanExpression hasId = pathOf(id).eq(idColumn.normalize(idValue));
         final OrderSpecifier<Comparable> byVersion = orderBy(version, DESC);
         final OrderSpecifier<Comparable> bySeconds = orderBy(timestamp, DESC);
         final OrderSpecifier<Comparable> byNanos = orderBy(timestamp_nanos, DESC);
 
         final AbstractSQLQuery<Object, ?> query = factory().select(pathOf(aggregate))
                                                            .from(table())
-                                                           .where(hasId)
+                                                           .where(hasId())
                                                            .orderBy(byVersion, bySeconds, byNanos);
         query.setStatementOptions(StatementOptions.builder()
                                                   .setFetchSize(fetchSize)
@@ -88,36 +78,15 @@ class SelectEventRecordsById<I> extends AbstractQuery
         return false;
     }
 
-    @Override
-    public IdColumn<I> getIdColumn() {
-        return idColumn;
-    }
-
-    @Override
-    public I getId() {
-        return idValue;
-    }
-
     static <I> Builder<I> newBuilder() {
         return new Builder<>();
     }
 
-    static class Builder<I> extends AbstractQuery.Builder<Builder<I>,
-                                                          SelectEventRecordsById<I>> {
+    static class Builder<I> extends AbstractSelectByIdQuery.Builder<I,
+                                                                    Builder<I>,
+                                                                    SelectEventRecordsById<I>> {
 
-        private IdColumn<I> idColumn;
-        private I id;
         private int fetchSize;
-
-        Builder<I> setId(I id) {
-            this.id = id;
-            return getThis();
-        }
-
-        Builder<I> setIdColumn(IdColumn<I> idColumn) {
-            this.idColumn = idColumn;
-            return getThis();
-        }
 
         Builder<I> setFetchSize(int batchSize) {
             this.fetchSize = batchSize;
