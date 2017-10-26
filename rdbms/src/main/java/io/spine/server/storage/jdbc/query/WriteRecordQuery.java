@@ -81,12 +81,12 @@ abstract class WriteRecordQuery<I, R> extends ColumnAwareWriteQuery {
             return getThis();
         }
 
-        B setIdColumn(IdColumn<I> idColumn) {
+        public B setIdColumn(IdColumn<I> idColumn) {
             this.idColumn = idColumn;
             return getThis();
         }
 
-        B setIdIndexInQuery(int idIndexInQuery) {
+        public B setIdIndexInQuery(int idIndexInQuery) {
             this.idIndexInQuery = idIndexInQuery;
             return getThis();
         }

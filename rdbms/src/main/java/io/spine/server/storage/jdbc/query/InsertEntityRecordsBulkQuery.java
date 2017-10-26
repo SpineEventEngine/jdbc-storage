@@ -55,7 +55,7 @@ import static java.util.Collections.nCopies;
  *
  * @author Dmytro Dashenkov
  */
-class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
+public class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
 
     private static final String FORMAT_PLACEHOLDER = "%s";
 
@@ -130,7 +130,7 @@ class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
         parametersBuilder.addParameter(String.valueOf(paramIndex), recordParameter);
     }
 
-    static class Builder<I> extends ColumnAwareWriteQuery.Builder<Builder<I>,
+    public static class Builder<I> extends ColumnAwareWriteQuery.Builder<Builder<I>,
                                                                   InsertEntityRecordsBulkQuery> {
 
         private static final String COLUMN_FORMAT = COMMA + FORMAT_PLACEHOLDER;
@@ -140,19 +140,19 @@ class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
         private IdColumn<I> idColumn;
         private int columnCount;
 
-        Builder<I> setRecords(Map<I, EntityRecordWithColumns> records) {
+        public Builder<I> setRecords(Map<I, EntityRecordWithColumns> records) {
             checkNotNull(records);
             this.records.putAll(records);
             return getThis();
         }
 
-        Builder<I> setTableName(String tableName) {
+        public Builder<I> setTableName(String tableName) {
             checkArgument(!isNullOrEmpty(tableName));
             this.tableName = tableName;
             return getThis();
         }
 
-        Builder<I> setIdColumn(IdColumn<I> idColumn) {
+        public Builder<I> setIdColumn(IdColumn<I> idColumn) {
             this.idColumn = checkNotNull(idColumn);
             return getThis();
         }

@@ -52,8 +52,8 @@ public class AggregateEventRecordTable<I> extends AggregateTable<I, AggregateEve
         super(entityClass, Column.id.name(), dataSource);
         queryFactory = new AggregateStorageQueryFactory<>(dataSource,
                                                           newTableName(entityClass),
-                                                          getIdColumn());
-        queryFactory.setLogger(log());
+                                                          getIdColumn(),
+                                                          log());
     }
 
     @Override

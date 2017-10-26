@@ -43,7 +43,7 @@ import static java.lang.String.format;
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-class SelectEntityByIdQuery<I> extends SelectMessageByIdQuery<I, EntityRecord> {
+public class SelectEntityByIdQuery<I> extends SelectMessageByIdQuery<I, EntityRecord> {
 
     private static final String QUERY_TEMPLATE =
             SELECT.toString() + ALL_ATTRIBUTES + FROM + " %s" + WHERE +
@@ -53,7 +53,7 @@ class SelectEntityByIdQuery<I> extends SelectMessageByIdQuery<I, EntityRecord> {
         super(builder);
     }
 
-    static <I> Builder<I> newBuilder(String tableName) {
+    public static <I> Builder<I> newBuilder(String tableName) {
         final Builder<I> builder = new Builder<>();
         builder.setIdIndexInQuery(1)
                .setQuery(format(QUERY_TEMPLATE, tableName))
@@ -63,7 +63,7 @@ class SelectEntityByIdQuery<I> extends SelectMessageByIdQuery<I, EntityRecord> {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    static class Builder<I> extends SelectMessageByIdQuery.Builder<Builder<I>,
+    public static class Builder<I> extends SelectMessageByIdQuery.Builder<Builder<I>,
                                                                           SelectEntityByIdQuery<I>,
                                                                           I,
                                                                           EntityRecord> {

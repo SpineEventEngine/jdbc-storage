@@ -43,7 +43,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author Alexander Litus
  */
 @Internal
-class SelectMessageByIdQuery<I, M extends Message> extends AbstractSelectByIdQuery<I, M> {
+public class SelectMessageByIdQuery<I, M extends Message> extends AbstractSelectByIdQuery<I, M> {
 
     private final String messageColumnName;
     private final Descriptor messageDescriptor;

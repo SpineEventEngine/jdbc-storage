@@ -121,7 +121,7 @@ abstract class ColumnAwareWriteQuery extends AbstractWriteQuery {
             return columnTypeRegistry;
         }
 
-        B setColumnTypeRegistry(
+        public B setColumnTypeRegistry(
                 ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry) {
             this.columnTypeRegistry = columnTypeRegistry;
             return getThis();

@@ -42,7 +42,7 @@ import static java.lang.String.format;
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-class UpdateEntityQuery<I> extends WriteEntityQuery<I> {
+public class UpdateEntityQuery<I> extends WriteEntityQuery<I> {
 
     private static final int RECORD_INDEX = 1;
 
@@ -59,7 +59,7 @@ class UpdateEntityQuery<I> extends WriteEntityQuery<I> {
         super(builder);
     }
 
-    static <I> Builder<I> newBuilder(String tableName) {
+    public static <I> Builder<I> newBuilder(String tableName) {
         final Builder<I> builder = new Builder<>(tableName);
         return builder.setRecordIndexInQuery(RECORD_INDEX);
     }
@@ -70,7 +70,7 @@ class UpdateEntityQuery<I> extends WriteEntityQuery<I> {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    static class Builder<I> extends WriteRecordQuery.Builder<Builder<I>,
+    public static class Builder<I> extends WriteRecordQuery.Builder<Builder<I>,
                                                              UpdateEntityQuery,
                                                              I,
                                                              EntityRecordWithColumns> {
