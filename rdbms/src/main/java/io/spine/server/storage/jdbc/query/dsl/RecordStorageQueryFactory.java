@@ -33,8 +33,7 @@ import io.spine.server.storage.jdbc.query.InsertEntityQuery;
 import io.spine.server.storage.jdbc.query.InsertEntityRecordsBulkQuery;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.SelectByEntityColumnsQuery;
-import io.spine.server.storage.jdbc.query.SelectEntityByIdQuery;
-import io.spine.server.storage.jdbc.query.SelectMessageByIdQuery;
+import io.spine.server.storage.jdbc.query.SelectByIdQuery;
 import io.spine.server.storage.jdbc.query.SelectQuery;
 import io.spine.server.storage.jdbc.query.StorageIndexQuery;
 import io.spine.server.storage.jdbc.query.UpdateEntityQuery;
@@ -114,13 +113,12 @@ public class RecordStorageQueryFactory<I>
     }
 
     @Override
-    public SelectMessageByIdQuery<I, EntityRecord> newSelectByIdQuery(I id) {
-        final SelectEntityByIdQuery.Builder<I> builder =
-                SelectEntityByIdQuery.<I>newBuilder(tableName)
-                                     .setDataSource(dataSource)
-                                     .setLogger(getLogger())
-                                     .setIdColumn(idColumn)
-                                     .setId(id);
+    public SelectByIdQuery<I, EntityRecord> newSelectByIdQuery(I id) {
+        final SelectEntityByIdQuery.Builder<I> builder = SelectEntityByIdQuery.newBuilder();
+        builder.setTableName(tableName)
+               .setDataSource(dataSource)
+               .setIdColumn(idColumn)
+               .setId(id);
         return builder.build();
     }
 
