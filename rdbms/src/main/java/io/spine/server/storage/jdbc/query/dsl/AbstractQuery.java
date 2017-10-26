@@ -20,6 +20,9 @@
 
 package io.spine.server.storage.jdbc.query.dsl;
 
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.sql.AbstractSQLQueryFactory;
 import com.querydsl.sql.MySQLTemplates;
 import com.querydsl.sql.RelationalPath;
@@ -27,13 +30,12 @@ import com.querydsl.sql.RelationalPathBase;
 import com.querydsl.sql.SQLQueryFactory;
 import com.querydsl.sql.SQLTemplates;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.DatabaseException;
+import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.query.StorageQuery;
 
 import javax.inject.Provider;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -47,30 +49,32 @@ import static com.google.common.base.Strings.isNullOrEmpty;
  */
 abstract class AbstractQuery implements StorageQuery {
 
-    private final AbstractSQLQueryFactory<?> factory;
-    private final String tableName;
+    private final AbstractSQLQueryFactory<?> queryFactory;
+    private final RelationalPathBase<Object> tablePath;
+    private final PathBuilder<Object> pathBuilder;
 
     AbstractQuery(Builder<? extends Builder, ? extends StorageQuery> builder) {
-        this.factory = createFactory(builder.dataSource);
-        this.tableName = builder.tableName;
+        final String tableName = builder.tableName;
+        this.queryFactory = createFactory(builder.dataSource);
+        this.tablePath = new RelationalPathBase<>(Object.class, tableName, tableName, tableName);
+        this.pathBuilder = new PathBuilder<>(Object.class, tableName);
     }
 
-    String getTableName() {
-        return tableName;
-    }
-
-    RelationalPath<Object> getTable() {
-        try {
-            final String schema = factory.getConnection()
-                                         .getSchema();
-            return new RelationalPathBase<>(Object.class, tableName, schema, tableName);
-        } catch (SQLException e) {
-            throw new DatabaseException(e);
-        }
+    RelationalPath<Object> table() {
+        return tablePath;
     }
 
     AbstractSQLQueryFactory<?> factory() {
-        return factory;
+        return queryFactory;
+    }
+
+    PathBuilder<Object> pathOf(TableColumn column) {
+        return pathBuilder.get(column.name());
+    }
+
+    OrderSpecifier<Comparable> orderBy(TableColumn column, Order order) {
+        final PathBuilder<Comparable> columnPath = pathBuilder.get(column.name(), Comparable.class);
+        return new OrderSpecifier<>(order, columnPath);
     }
 
     private static AbstractSQLQueryFactory<?> createFactory(final DataSourceWrapper dataSource) {

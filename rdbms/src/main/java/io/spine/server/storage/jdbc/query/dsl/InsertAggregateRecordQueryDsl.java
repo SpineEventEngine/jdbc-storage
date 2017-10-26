@@ -21,8 +21,6 @@
 package io.spine.server.storage.jdbc.query.dsl;
 
 import com.google.protobuf.Timestamp;
-import com.querydsl.core.types.dsl.PathBuilder;
-import com.querydsl.sql.RelationalPath;
 import io.spine.core.Event;
 import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.storage.jdbc.AggregateEventRecordTable;
@@ -31,6 +29,7 @@ import io.spine.server.storage.jdbc.Serializer;
 import io.spine.server.storage.jdbc.query.WriteQuery;
 
 import static io.spine.server.storage.jdbc.AggregateEventRecordTable.Column.aggregate;
+import static io.spine.server.storage.jdbc.AggregateEventRecordTable.Column.id;
 import static io.spine.server.storage.jdbc.AggregateEventRecordTable.Column.timestamp;
 import static io.spine.server.storage.jdbc.AggregateEventRecordTable.Column.timestamp_nanos;
 import static io.spine.server.storage.jdbc.AggregateEventRecordTable.Column.version;
@@ -44,29 +43,26 @@ import static io.spine.validate.Validate.isDefault;
  */
 class InsertAggregateRecordQueryDsl<I> extends AbstractQuery implements WriteQuery {
 
-    private final I id;
+    private final I idValue;
     private final AggregateEventRecord record;
     private final IdColumn<I> idColumn;
 
     private InsertAggregateRecordQueryDsl(Builder<I> builder) {
         super(builder);
         this.idColumn = builder.idColumn;
-        this.id = builder.id;
+        this.idValue = builder.id;
         this.record = builder.record;
     }
 
     @Override
     public void execute() {
-        final RelationalPath<Object> table = getTable();
-        final PathBuilder<Object> pathBuilder = new PathBuilder<>(Object.class,
-                                                                  table.getMetadata());
         final Timestamp recordTimestamp = record.getTimestamp();
-        factory().insert(table)
-                 .set(pathBuilder.get(idColumn.getColumnName()), idColumn.normalize(id))
-                 .set(pathBuilder.get(aggregate.name()), Serializer.serialize(record))
-                 .set(pathBuilder.get(timestamp.name()), recordTimestamp.getSeconds())
-                 .set(pathBuilder.get(timestamp_nanos.name()), recordTimestamp.getNanos())
-                 .set(pathBuilder.get(version.name()), getVersionNumberOfRecord())
+        factory().insert(table())
+                 .set(pathOf(id), idColumn.normalize(idValue))
+                 .set(pathOf(aggregate), Serializer.serialize(record))
+                 .set(pathOf(timestamp), recordTimestamp.getSeconds())
+                 .set(pathOf(timestamp_nanos), recordTimestamp.getNanos())
+                 .set(pathOf(version), getVersionNumberOfRecord())
                  .execute();
     }
 
