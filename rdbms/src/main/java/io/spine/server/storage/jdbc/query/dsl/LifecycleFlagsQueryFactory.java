@@ -26,10 +26,8 @@ import io.spine.server.storage.jdbc.IdColumn;
 import io.spine.server.storage.jdbc.LifecycleFlagsTable;
 import io.spine.server.storage.jdbc.query.InsertLifecycleFlagsQuery;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
-import io.spine.server.storage.jdbc.query.SelectLifecycleFlagsQuery;
-import io.spine.server.storage.jdbc.query.SelectMessageByIdQuery;
+import io.spine.server.storage.jdbc.query.SelectByIdQuery;
 import io.spine.server.storage.jdbc.query.SelectQuery;
-import io.spine.server.storage.jdbc.query.StorageIndexQuery;
 import io.spine.server.storage.jdbc.query.UpdateLifecycleFlagsQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
@@ -62,14 +60,13 @@ public class LifecycleFlagsQueryFactory<I> implements ReadQueryFactory<I, Lifecy
     }
 
     @Override
-    public SelectMessageByIdQuery<I, LifecycleFlags> newSelectByIdQuery(I id) {
-        final SelectMessageByIdQuery<I, LifecycleFlags> query =
-                SelectLifecycleFlagsQuery.<I>newBuilder(tableName)
-                                         .setDataSource(dataSource)
-                                         .setLogger(logger)
-                                         .setIdColumn(idColumn)
-                                         .setId(id)
-                                         .build();
+    public SelectByIdQuery<I, LifecycleFlags> newSelectByIdQuery(I id) {
+        final SelectLifecycleFlagsQuery.Builder<I> builder = SelectLifecycleFlagsQuery.newBuilder();
+        final SelectByIdQuery<I, LifecycleFlags> query = builder.setTableName(tableName)
+                                                                .setDataSource(dataSource)
+                                                                .setIdColumn(idColumn)
+                                                                .setId(id)
+                                                                .build();
         return query;
     }
 
@@ -77,10 +74,8 @@ public class LifecycleFlagsQueryFactory<I> implements ReadQueryFactory<I, Lifecy
     public SelectQuery<Iterator<I>> newIndexQuery() {
         final StorageIndexQuery.Builder<I> builder = StorageIndexQuery.newBuilder();
         return builder.setDataSource(dataSource)
-                      .setLogger(logger)
                       .setTableName(tableName)
-                      .setIdType(idColumn.getJavaType())
-                      .setIdColumnName(idColumn.getColumnName())
+                      .setIdColumn(idColumn)
                       .build();
     }
 
