@@ -29,7 +29,6 @@ import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.IdColumn;
 import io.spine.server.storage.jdbc.RecordTable;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
-import io.spine.server.storage.jdbc.query.SelectByEntityColumnsQuery;
 import io.spine.server.storage.jdbc.query.SelectByIdQuery;
 import io.spine.server.storage.jdbc.query.SelectQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
@@ -82,16 +81,15 @@ public class RecordStorageQueryFactory<I>
         return logger;
     }
 
-    public SelectByEntityColumnsQuery<I> newSelectByEntityQuery(EntityQuery<I> query, FieldMask fieldMask) {
-        final SelectByEntityColumnsQuery.Builder<I> builder =
-                SelectByEntityColumnsQuery.<I>newBuilder()
-                                          .setDataSource(dataSource)
-                                          .setLogger(logger)
-                                          .setTableName(tableName)
-                                          .setIdColumn(idColumn)
-                                          .setColumnTypeRegistry(columnTypeRegistry)
-                                          .setEntityQuery(query)
-                                          .setFieldMask(fieldMask);
+    public SelectQuery<Iterator<EntityRecord>> newSelectByEntityQuery(EntityQuery<I> query,
+                                                                      FieldMask fieldMask) {
+        final SelectByEntityColumnsQuery.Builder<I> builder = SelectByEntityColumnsQuery.newBuilder();
+        builder.setDataSource(dataSource)
+               .setTableName(tableName)
+               .setIdColumn(idColumn)
+               .setColumnTypeRegistry(columnTypeRegistry)
+               .setEntityQuery(query)
+               .setFieldMask(fieldMask);
         return builder.build();
     }
 

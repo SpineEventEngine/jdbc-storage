@@ -32,6 +32,7 @@ import io.spine.server.entity.storage.EntityColumns;
 import io.spine.server.entity.storage.EntityQuery;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
+import io.spine.server.storage.jdbc.query.SelectQuery;
 import io.spine.server.storage.jdbc.query.dsl.RecordStorageQueryFactory;
 import io.spine.server.storage.jdbc.query.SelectByEntityColumnsQuery;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
@@ -126,9 +127,8 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWit
     }
 
     Iterator<EntityRecord> readByQuery(EntityQuery<I> query, FieldMask fieldMask) {
-        final SelectByEntityColumnsQuery<I> queryByEntity =
-                queryFactory.newSelectByEntityQuery(query, fieldMask);
-        final Iterator<EntityRecord> result = queryByEntity.execute();
+        final Iterator<EntityRecord> result = queryFactory.newSelectByEntityQuery(query, fieldMask)
+                                                          .execute();
         return result;
     }
 
