@@ -73,12 +73,12 @@ class StorageIndexQuery<I> extends AbstractQuery implements SelectQuery<Iterator
         }
 
         @Override
-        public StorageIndexQuery<I> build() {
+        StorageIndexQuery<I> build() {
             return new StorageIndexQuery<>(this);
         }
 
         @Override
-        protected Builder<I> getThis() {
+        Builder<I> getThis() {
             return this;
         }
     }
