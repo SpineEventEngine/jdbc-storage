@@ -24,9 +24,9 @@ import com.google.common.collect.ImmutableList;
 import com.google.protobuf.Int32Value;
 import io.spine.annotation.Internal;
 import io.spine.server.entity.Entity;
-import io.spine.server.storage.jdbc.query.EventCountQueryFactory;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
+import io.spine.server.storage.jdbc.query.dsl.EventCountQueryFactory;
 
 import java.util.List;
 

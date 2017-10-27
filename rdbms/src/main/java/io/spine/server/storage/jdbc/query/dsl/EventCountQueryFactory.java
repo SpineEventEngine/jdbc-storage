@@ -27,8 +27,7 @@ import io.spine.server.storage.jdbc.EventCountTable;
 import io.spine.server.storage.jdbc.IdColumn;
 import io.spine.server.storage.jdbc.query.InsertEventCountQuery;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
-import io.spine.server.storage.jdbc.query.SelectEventCountByIdQuery;
-import io.spine.server.storage.jdbc.query.SelectMessageByIdQuery;
+import io.spine.server.storage.jdbc.query.SelectByIdQuery;
 import io.spine.server.storage.jdbc.query.SelectQuery;
 import io.spine.server.storage.jdbc.query.UpdateEventCountQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
@@ -62,14 +61,13 @@ public class EventCountQueryFactory<I> implements ReadQueryFactory<I, Int32Value
     }
 
     @Override
-    public SelectMessageByIdQuery<I, Int32Value> newSelectByIdQuery(I id) {
-        final SelectMessageByIdQuery<I, Int32Value> query =
-                SelectEventCountByIdQuery.<I>newBuilder(tableName)
-                                         .setLogger(logger)
-                                         .setDataSource(dataSource)
-                                         .setId(id)
-                                         .setIdColumn(idColumn)
-                                         .build();
+    public SelectByIdQuery<I, Int32Value> newSelectByIdQuery(I id) {
+        final SelectEventCountByIdQuery.Builder<I> builder = SelectEventCountByIdQuery.newBuilder();
+        final SelectEventCountByIdQuery<I> query = builder.setTableName(tableName)
+                                                          .setDataSource(dataSource)
+                                                          .setId(id)
+                                                          .setIdColumn(idColumn)
+                                                          .build();
         return query;
     }
 
