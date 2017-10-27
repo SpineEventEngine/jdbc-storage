@@ -49,12 +49,12 @@ class UpdateRecordQuery<I> extends AbstractWriteQuery {
         private IdColumn<I> idColumn;
         private I id;
 
-        B setId(I id) {
+        public B setId(I id) {
             this.id = id;
             return getThis();
         }
 
-        B setIdColumn(IdColumn<I> idColumn) {
+        public B setIdColumn(IdColumn<I> idColumn) {
             this.idColumn = idColumn;
             return getThis();
         }

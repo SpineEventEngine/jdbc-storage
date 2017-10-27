@@ -41,7 +41,7 @@ import static java.lang.String.format;
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-class SelectEventCountByIdQuery<I> extends SelectMessageByIdQuery<I, Int32Value> {
+public class SelectEventCountByIdQuery<I> extends SelectMessageByIdQuery<I, Int32Value> {
 
     private static final String QUERY_TEMPLATE =
             SELECT.toString() + event_count +
@@ -61,7 +61,7 @@ class SelectEventCountByIdQuery<I> extends SelectMessageByIdQuery<I, Int32Value>
                          .build();
     }
 
-    static <I> Builder<I> newBuilder(String tableName) {
+    public static <I> Builder<I> newBuilder(String tableName) {
         final Builder<I> builder = new Builder<>();
         builder.setQuery(format(QUERY_TEMPLATE, tableName))
                .setIdIndexInQuery(1);
@@ -69,7 +69,7 @@ class SelectEventCountByIdQuery<I> extends SelectMessageByIdQuery<I, Int32Value>
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    static class Builder<I> extends SelectMessageByIdQuery.Builder<Builder<I>,
+    public static class Builder<I> extends SelectMessageByIdQuery.Builder<Builder<I>,
                                                                    SelectEventCountByIdQuery<I>,
                                                                    I,
                                                                    Int32Value> {

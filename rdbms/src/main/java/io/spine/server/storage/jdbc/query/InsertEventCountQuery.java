@@ -41,7 +41,7 @@ import static java.lang.String.format;
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-class InsertEventCountQuery<I> extends UpdateRecordQuery<I> {
+public class InsertEventCountQuery<I> extends UpdateRecordQuery<I> {
 
     private static final int ID_INDEX = id.ordinal() + 1;
     private static final int EVENT_COUNT_INDEX = event_count.ordinal() + 1;
@@ -68,7 +68,7 @@ class InsertEventCountQuery<I> extends UpdateRecordQuery<I> {
                          .build();
     }
 
-    static <I> Builder<I> newBuilder(String tableName) {
+    public static <I> Builder<I> newBuilder(String tableName) {
         final Builder<I> builder = new Builder<>();
         builder.setQuery(format(QUERY_TEMPLATE, tableName))
                .setIdIndexInQuery(ID_INDEX);
@@ -76,7 +76,7 @@ class InsertEventCountQuery<I> extends UpdateRecordQuery<I> {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    static class Builder<I>
+    public static class Builder<I>
             extends UpdateRecordQuery.Builder<Builder<I>, InsertEventCountQuery, I> {
 
         private int count;
@@ -86,7 +86,7 @@ class InsertEventCountQuery<I> extends UpdateRecordQuery<I> {
             return new InsertEventCountQuery<>(this);
         }
 
-        Builder<I> setCount(int count) {
+        public Builder<I> setCount(int count) {
             this.count = count;
             return getThis();
         }

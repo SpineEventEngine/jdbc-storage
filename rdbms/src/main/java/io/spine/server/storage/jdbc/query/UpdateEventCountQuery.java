@@ -40,7 +40,7 @@ import static java.lang.String.format;
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-class UpdateEventCountQuery<I> extends UpdateRecordQuery<I> {
+public class UpdateEventCountQuery<I> extends UpdateRecordQuery<I> {
 
     private final int count;
 
@@ -64,7 +64,7 @@ class UpdateEventCountQuery<I> extends UpdateRecordQuery<I> {
                          .build();
     }
 
-    static <I> Builder<I> newBuilder(String tableName) {
+    public static <I> Builder<I> newBuilder(String tableName) {
         final Builder<I> builder = new Builder<>();
         builder.setQuery(format(QUERY_TEMPLATE, tableName))
                .setIdIndexInQuery(2);
@@ -72,7 +72,7 @@ class UpdateEventCountQuery<I> extends UpdateRecordQuery<I> {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    static class Builder<I> extends UpdateRecordQuery.Builder<Builder<I>,
+    public static class Builder<I> extends UpdateRecordQuery.Builder<Builder<I>,
                                                               UpdateEventCountQuery, I> {
 
         private int count;
@@ -82,7 +82,7 @@ class UpdateEventCountQuery<I> extends UpdateRecordQuery<I> {
             return new UpdateEventCountQuery<>(this);
         }
 
-        Builder<I> setCount(int count) {
+        public Builder<I> setCount(int count) {
             this.count = count;
             return getThis();
         }
