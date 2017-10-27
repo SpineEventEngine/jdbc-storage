@@ -25,11 +25,9 @@ import io.spine.annotation.Internal;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.EventCountTable;
 import io.spine.server.storage.jdbc.IdColumn;
-import io.spine.server.storage.jdbc.query.InsertEventCountQuery;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.SelectByIdQuery;
 import io.spine.server.storage.jdbc.query.SelectQuery;
-import io.spine.server.storage.jdbc.query.UpdateEventCountQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 import org.slf4j.Logger;
@@ -48,7 +46,6 @@ public class EventCountQueryFactory<I> implements ReadQueryFactory<I, Int32Value
     private final String tableName;
     private final IdColumn<I> idColumn;
     private final DataSourceWrapper dataSource;
-    private final Logger logger;
 
     public EventCountQueryFactory(DataSourceWrapper dataSource,
                                   String tableName,
@@ -57,7 +54,6 @@ public class EventCountQueryFactory<I> implements ReadQueryFactory<I, Int32Value
         this.tableName = tableName;
         this.idColumn = idColumn;
         this.dataSource = dataSource;
-        this.logger = logger;
     }
 
     @Override
@@ -82,25 +78,25 @@ public class EventCountQueryFactory<I> implements ReadQueryFactory<I, Int32Value
 
     @Override
     public WriteQuery newInsertQuery(I id, Int32Value record) {
-        final WriteQuery query = InsertEventCountQuery.<I>newBuilder(tableName)
-                                                      .setId(id)
-                                                      .setIdColumn(idColumn)
-                                                      .setLogger(logger)
-                                                      .setDataSource(dataSource)
-                                                      .setCount(record.getValue())
-                                                      .build();
+        final InsertEventCountQuery.Builder<I> builder = InsertEventCountQuery.newBuilder();
+        final WriteQuery query = builder.setTableName(tableName)
+                                        .setId(id)
+                                        .setIdColumn(idColumn)
+                                        .setDataSource(dataSource)
+                                        .setEventCount(record.getValue())
+                                        .build();
         return query;
     }
 
     @Override
     public WriteQuery newUpdateQuery(I id, Int32Value record) {
-        final WriteQuery query = UpdateEventCountQuery.<I>newBuilder(tableName)
-                                                      .setDataSource(dataSource)
-                                                      .setLogger(logger)
-                                                      .setId(id)
-                                                      .setIdColumn(idColumn)
-                                                      .setCount(record.getValue())
-                                                      .build();
+        final UpdateEventCountQuery.Builder<I> builder = UpdateEventCountQuery.newBuilder();
+        final WriteQuery query = builder.setDataSource(dataSource)
+                                        .setTableName(tableName)
+                                        .setId(id)
+                                        .setIdColumn(idColumn)
+                                        .setEventCount(record.getValue())
+                                        .build();
         return query;
     }
 }
