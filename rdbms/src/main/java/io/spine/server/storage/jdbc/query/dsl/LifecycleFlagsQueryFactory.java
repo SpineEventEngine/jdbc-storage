@@ -24,11 +24,9 @@ import io.spine.server.entity.LifecycleFlags;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.IdColumn;
 import io.spine.server.storage.jdbc.LifecycleFlagsTable;
-import io.spine.server.storage.jdbc.query.InsertLifecycleFlagsQuery;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.SelectByIdQuery;
 import io.spine.server.storage.jdbc.query.SelectQuery;
-import io.spine.server.storage.jdbc.query.UpdateLifecycleFlagsQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 import org.slf4j.Logger;
@@ -81,25 +79,25 @@ public class LifecycleFlagsQueryFactory<I> implements ReadQueryFactory<I, Lifecy
 
     @Override
     public WriteQuery newInsertQuery(I id, LifecycleFlags record) {
-        final WriteQuery query = InsertLifecycleFlagsQuery.<I>newBuilder(tableName)
-                                                          .setId(id)
-                                                          .setLifecycleFlags(record)
-                                                          .setLogger(logger)
-                                                          .setDataSource(dataSource)
-                                                          .setIdColumn(idColumn)
-                                                          .build();
+        final InsertLifecycleFlagsQuery.Builder<I> builder = InsertLifecycleFlagsQuery.newBuilder();
+        final WriteQuery query = builder.setTableName(tableName)
+                                        .setId(id)
+                                        .setLifecycleFlags(record)
+                                        .setDataSource(dataSource)
+                                        .setIdColumn(idColumn)
+                                        .build();
         return query;
     }
 
     @Override
     public WriteQuery newUpdateQuery(I id, LifecycleFlags record) {
-        final WriteQuery query = UpdateLifecycleFlagsQuery.<I>newBuilder(tableName)
-                                                          .setLogger(logger)
-                                                          .setDataSource(dataSource)
-                                                          .setId(id)
-                                                          .setLifecycleFlags(record)
-                                                          .setIdColumn(idColumn)
-                                                          .build();
+        final UpdateLifecycleFlagsQuery.Builder<I> builder = UpdateLifecycleFlagsQuery.newBuilder();
+        final WriteQuery query = builder.setTableName(tableName)
+                                        .setDataSource(dataSource)
+                                        .setId(id)
+                                        .setLifecycleFlags(record)
+                                        .setIdColumn(idColumn)
+                                        .build();
         return query;
     }
 }
