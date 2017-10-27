@@ -91,9 +91,9 @@ abstract class AbstractQuery implements StorageQuery {
     /**
      * Determines whether a {@link Connection} should be closed after execution of a query.
      *
-     * <p>The default implementation returns {@code true}.
+     * <p>By default, a connection will be closed.
      *
-     * @return {@code true} if a connection should be close, {@code false} otherwise
+     * @return {@code true} if a connection should be closed, {@code false} otherwise
      */
     boolean closeConnectionAfterExecution() {
         return true;
@@ -111,8 +111,8 @@ abstract class AbstractQuery implements StorageQuery {
      * <p>All queries produced by the factory will be
      * {@linkplain Connection#setAutoCommit(boolean) transactional}.
      *
-     * <p>Committing and rollback of transactions will be handled automatically
-     * by {@linkplain TransactionHandler transaction handler}.
+     * <p>Commit or rollback for a transaction will be handled automatically
+     * by the {@linkplain TransactionHandler transaction handler}.
      *
      * <p>The strategy of closing {@link Connection connections} is determined by
      * the {@link #closeConnectionAfterExecution() method}.
