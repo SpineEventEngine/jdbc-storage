@@ -28,7 +28,6 @@ import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.IdColumn;
 import io.spine.server.storage.jdbc.RecordTable;
-import io.spine.server.storage.jdbc.query.InsertEntityRecordsBulkQuery;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.SelectByEntityColumnsQuery;
 import io.spine.server.storage.jdbc.query.SelectByIdQuery;
@@ -97,14 +96,12 @@ public class RecordStorageQueryFactory<I>
     }
 
     public WriteQuery newInsertEntityRecordsBulkQuery(Map<I, EntityRecordWithColumns> records) {
-        final InsertEntityRecordsBulkQuery.Builder<I> builder =
-                InsertEntityRecordsBulkQuery.<I>newBuilder()
-                                            .setLogger(getLogger())
-                                            .setDataSource(dataSource)
-                                            .setTableName(tableName)
-                                            .setIdColumn(idColumn)
-                                            .setColumnTypeRegistry(columnTypeRegistry)
-                                            .setRecords(records);
+        final InsertEntityRecordsBulkQuery.Builder<I> builder = InsertEntityRecordsBulkQuery.newBuilder();
+        builder.setDataSource(dataSource)
+               .setTableName(tableName)
+               .setIdColumn(idColumn)
+               .setColumnTypeRegistry(columnTypeRegistry)
+               .addRecords(records);
         return builder.build();
     }
 

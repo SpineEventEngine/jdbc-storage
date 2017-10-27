@@ -41,7 +41,8 @@ abstract class AbstractWriteQuery extends AbstractQuery implements WriteQuery {
     @Override
     public void execute() {
         final StoreClause<?> clause = createClause();
-        setParameters(clause).execute();
+        setParameters(clause, getParameters());
+        clause.execute();
     }
 
     /**
@@ -58,15 +59,13 @@ abstract class AbstractWriteQuery extends AbstractQuery implements WriteQuery {
      */
     abstract Parameters getParameters();
 
-    private DMLClause<?> setParameters(StoreClause<?> clause) {
-        final Parameters parameters = getParameters();
+    private void setParameters(StoreClause<?> clause, Parameters parameters) {
         final Set<String> identifiers = parameters.getIdentifiers();
         for (String identifier : identifiers) {
             final Object parameterValue = parameters.getParameter(identifier)
                                                     .getValue();
             clause.set(pathOf(identifier), parameterValue);
         }
-        return clause;
     }
 
     abstract static class Builder<B extends Builder<B, Q>, Q extends AbstractWriteQuery>
