@@ -42,6 +42,14 @@ abstract class WriteRecordQuery<I, R> extends ColumnAwareWriteQuery {
         return record;
     }
 
+    I getId() {
+        return id;
+    }
+
+    IdColumn<I> getIdColumn() {
+        return idColumn;
+    }
+
     @Override
     Parameters getParameters() {
         final Object normalizedId = idColumn.normalize(id);

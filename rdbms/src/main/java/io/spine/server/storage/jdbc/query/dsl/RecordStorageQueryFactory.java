@@ -28,13 +28,11 @@ import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.IdColumn;
 import io.spine.server.storage.jdbc.RecordTable;
-import io.spine.server.storage.jdbc.RecordTable.StandardColumn;
 import io.spine.server.storage.jdbc.query.InsertEntityRecordsBulkQuery;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.SelectByEntityColumnsQuery;
 import io.spine.server.storage.jdbc.query.SelectByIdQuery;
 import io.spine.server.storage.jdbc.query.SelectQuery;
-import io.spine.server.storage.jdbc.query.UpdateEntityQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
@@ -143,16 +141,13 @@ public class RecordStorageQueryFactory<I>
 
     @Override
     public WriteQuery newUpdateQuery(I id, EntityRecordWithColumns record) {
-        final int idIndex = record.getColumnNames().size() + StandardColumn.values().length;
-        final UpdateEntityQuery.Builder<I> builder =
-                UpdateEntityQuery.<I>newBuilder(tableName)
-                                 .setDataSource(dataSource)
-                                 .setLogger(getLogger())
-                                 .setIdColumn(idColumn)
-                                 .setIdIndexInQuery(idIndex)
-                                 .setId(id)
-                                 .setRecord(record)
-                                 .setColumnTypeRegistry(columnTypeRegistry);
+        final UpdateEntityQuery.Builder<I> builder = UpdateEntityQuery.newBuilder();
+        builder.setTableName(tableName)
+               .setDataSource(dataSource)
+               .setIdColumn(idColumn)
+               .setId(id)
+               .setRecord(record)
+               .setColumnTypeRegistry(columnTypeRegistry);
         return builder.build();
     }
 }
