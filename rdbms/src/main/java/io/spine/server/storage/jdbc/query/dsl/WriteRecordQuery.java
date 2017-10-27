@@ -20,14 +20,10 @@
 
 package io.spine.server.storage.jdbc.query.dsl;
 
-import com.querydsl.core.dml.DMLClause;
-import com.querydsl.core.dml.StoreClause;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.IdColumn;
 import io.spine.server.storage.jdbc.query.Parameter;
 import io.spine.server.storage.jdbc.query.Parameters;
-
-import java.util.Set;
 
 abstract class WriteRecordQuery<I, R> extends ColumnAwareWriteQuery {
 
@@ -47,30 +43,12 @@ abstract class WriteRecordQuery<I, R> extends ColumnAwareWriteQuery {
     }
 
     @Override
-    public void execute() {
-        final StoreClause<?> clause = createClause();
-        setCommonParameters(clause).execute();
-    }
-
-    abstract StoreClause<?> createClause();
-
-    Parameters getCommonParameters() {
+    Parameters getParameters() {
         final Object normalizedId = idColumn.normalize(id);
         final Parameter idParameter = Parameter.of(normalizedId, idColumn.getSqlType());
         return Parameters.newBuilder()
                          .addParameter(idColumn.getColumnName(), idParameter)
                          .build();
-    }
-
-    private DMLClause<?> setCommonParameters(StoreClause<?> clause) {
-        final Parameters parameters = getCommonParameters();
-        final Set<String> identifiers = parameters.getIdentifiers();
-        for (String identifier : identifiers) {
-            final Object parameterValue = parameters.getParameter(identifier)
-                                                    .getValue();
-            clause.set(pathOf(identifier), parameterValue);
-        }
-        return clause;
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")

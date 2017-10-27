@@ -20,7 +20,6 @@
 package io.spine.server.storage.jdbc.query.dsl;
 
 import io.spine.server.entity.storage.ColumnTypeRegistry;
-import io.spine.server.storage.jdbc.query.WriteQuery;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
 
@@ -29,7 +28,7 @@ import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
  *
  * @author Alexander Aleksandrov
  */
-abstract class ColumnAwareWriteQuery extends AbstractQuery implements WriteQuery {
+abstract class ColumnAwareWriteQuery extends AbstractWriteQuery {
 
     private final ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry;
 
@@ -44,7 +43,7 @@ abstract class ColumnAwareWriteQuery extends AbstractQuery implements WriteQuery
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
     abstract static class Builder<B extends Builder<B, Q>, Q extends ColumnAwareWriteQuery>
-            extends AbstractQuery.Builder<B, Q> {
+            extends AbstractWriteQuery.Builder<B, Q> {
 
         private ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry
                 = JdbcTypeRegistryFactory.defaultInstance();
