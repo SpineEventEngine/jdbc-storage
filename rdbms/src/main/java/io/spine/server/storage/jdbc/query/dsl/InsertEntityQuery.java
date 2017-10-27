@@ -23,6 +23,8 @@ package io.spine.server.storage.jdbc.query.dsl;
 import com.querydsl.core.dml.StoreClause;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.RecordTable;
+import io.spine.server.storage.jdbc.query.Parameter;
+import io.spine.server.storage.jdbc.query.Parameters;
 
 /**
  * Query that inserts a new {@link EntityRecordWithColumns} to
@@ -41,6 +43,17 @@ class InsertEntityQuery<I> extends WriteEntityQuery<I> {
     @Override
     StoreClause<?> createClause() {
         return factory().insert(table());
+    }
+
+    @Override
+    Parameters getParameters() {
+        final Parameters superParameters = super.getParameters();
+        final Object normalizedId = getIdColumn().normalize(getId());
+        final Parameter idParameter = Parameter.of(normalizedId, getIdColumn().getSqlType());
+        return Parameters.newBuilder()
+                         .addParameters(superParameters)
+                         .addParameter(getIdColumn().getColumnName(), idParameter)
+                         .build();
     }
 
     static <I> Builder<I> newBuilder() {

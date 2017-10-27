@@ -45,9 +45,7 @@ abstract class WriteEntityQuery<I> extends WriteRecordQuery<I, EntityRecordWithC
 
     @Override
     Parameters getParameters() {
-        final Parameters superParameters = super.getParameters();
-        final Parameters.Builder builder = Parameters.newBuilder()
-                                                     .addParameters(superParameters);
+        final Parameters.Builder builder = Parameters.newBuilder();
         final byte[] serializedRecord = Serializer.serialize(getRecord().getRecord());
         final Parameter recordParameter = Parameter.of(serializedRecord, Sql.Type.BLOB);
         builder.addParameter(entity.name(), recordParameter);

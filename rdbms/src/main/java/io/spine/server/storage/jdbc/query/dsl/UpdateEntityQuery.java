@@ -21,6 +21,7 @@
 package io.spine.server.storage.jdbc.query.dsl;
 
 import com.querydsl.core.dml.StoreClause;
+import com.querydsl.core.types.dsl.PathBuilder;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.RecordTable;
@@ -40,10 +41,10 @@ class UpdateEntityQuery<I> extends WriteEntityQuery<I> {
 
     @Override
     StoreClause<?> createClause() {
-        final String idName = getIdColumn().getColumnName();
+        final PathBuilder<Object> id = pathOf(getIdColumn().getColumnName());
         final Object normalizedId = getIdColumn().normalize(getId());
         return factory().update(table())
-                        .where(pathOf(idName).eq(normalizedId));
+                        .where(id.eq(normalizedId));
     }
 
     static <I> Builder<I> newBuilder() {

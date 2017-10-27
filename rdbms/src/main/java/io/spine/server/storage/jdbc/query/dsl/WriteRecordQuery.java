@@ -50,15 +50,6 @@ abstract class WriteRecordQuery<I, R> extends ColumnAwareWriteQuery {
         return idColumn;
     }
 
-    @Override
-    Parameters getParameters() {
-        final Object normalizedId = idColumn.normalize(id);
-        final Parameter idParameter = Parameter.of(normalizedId, idColumn.getSqlType());
-        return Parameters.newBuilder()
-                         .addParameter(idColumn.getColumnName(), idParameter)
-                         .build();
-    }
-
     @SuppressWarnings("ClassNameSameAsAncestorName")
     abstract static class Builder<B extends Builder<B, Q, I, R>,
                                   Q extends WriteRecordQuery,
