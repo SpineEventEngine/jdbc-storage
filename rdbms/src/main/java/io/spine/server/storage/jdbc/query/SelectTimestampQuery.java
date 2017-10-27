@@ -47,7 +47,7 @@ import static io.spine.validate.Validate.isDefault;
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-class SelectTimestampQuery extends SelectMessageByIdQuery<String, Timestamp> {
+public class SelectTimestampQuery extends SelectMessageByIdQuery<String, Timestamp> {
 
     private static final String QUERY_TEMPLATE = SELECT.toString() +
                                                  seconds + COMMA +
@@ -75,7 +75,7 @@ class SelectTimestampQuery extends SelectMessageByIdQuery<String, Timestamp> {
         return time;
     }
 
-    static Builder newBuilder(String tableName) {
+    public static Builder newBuilder(String tableName) {
         final Builder builder = new Builder();
         builder.setQuery(format(QUERY_TEMPLATE, tableName))
                .setIdIndexInQuery(1);
@@ -83,7 +83,7 @@ class SelectTimestampQuery extends SelectMessageByIdQuery<String, Timestamp> {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    static class Builder extends SelectMessageByIdQuery.Builder<Builder,
+    public static class Builder extends SelectMessageByIdQuery.Builder<Builder,
                                                                        SelectTimestampQuery,
                                                                        String,
                                                                        Timestamp> {

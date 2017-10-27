@@ -42,7 +42,7 @@ import static io.spine.server.storage.jdbc.LastHandledEventTimeTable.Column.seco
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-class InsertTimestampQuery extends WriteTimestampQuery {
+public class InsertTimestampQuery extends WriteTimestampQuery {
 
     private static final String QUERY_TEMPLATE =
             INSERT_INTO + "%s" +
@@ -53,14 +53,14 @@ class InsertTimestampQuery extends WriteTimestampQuery {
         super(builder);
     }
 
-    static Builder newBuilder(String tableName) {
+    public static Builder newBuilder(String tableName) {
         final Builder builder = new Builder();
         builder.setQuery(format(QUERY_TEMPLATE, tableName));
         return builder;
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    static class Builder extends WriteTimestampQuery.Builder<Builder, InsertTimestampQuery> {
+    public static class Builder extends WriteTimestampQuery.Builder<Builder, InsertTimestampQuery> {
 
         @Override
         public InsertTimestampQuery build() {

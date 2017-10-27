@@ -22,9 +22,9 @@ package io.spine.server.storage.jdbc;
 
 import com.google.protobuf.Timestamp;
 import io.spine.annotation.Internal;
-import io.spine.server.storage.jdbc.query.LastHandledEventTimeQueryFactory;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
+import io.spine.server.storage.jdbc.query.dsl.LastHandledEventTimeQueryFactory;
 
 import java.util.List;
 
@@ -52,7 +52,6 @@ public class LastHandledEventTimeTable extends AbstractTable<String, Timestamp, 
               IdColumn.typeString(Column.projection_type.name()),
               dataSource);
         this.queryFactory = new LastHandledEventTimeQueryFactory(dataSource, TABLE_NAME);
-        queryFactory.setLogger(log());
     }
 
     @Override
