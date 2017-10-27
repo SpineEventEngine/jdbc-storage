@@ -25,12 +25,9 @@ import io.spine.annotation.Internal;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.IdColumn;
 import io.spine.server.storage.jdbc.LastHandledEventTimeTable;
-import io.spine.server.storage.jdbc.query.InsertTimestampQuery;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
-import io.spine.server.storage.jdbc.query.SelectMessageByIdQuery;
+import io.spine.server.storage.jdbc.query.SelectByIdQuery;
 import io.spine.server.storage.jdbc.query.SelectQuery;
-import io.spine.server.storage.jdbc.query.SelectTimestampQuery;
-import io.spine.server.storage.jdbc.query.UpdateTimestampQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 
@@ -51,7 +48,7 @@ public class LastHandledEventTimeQueryFactory
 
     private final DataSourceWrapper dataSource;
     private final String tableName;
-    private IdColumn<String> idColumn;
+    private final IdColumn<String> idColumn;
 
     /**
      * Creates a new instance.
@@ -65,13 +62,14 @@ public class LastHandledEventTimeQueryFactory
     }
 
     @Override
-    public SelectMessageByIdQuery<String, Timestamp> newSelectByIdQuery(String id) {
-        final SelectTimestampQuery.Builder builder =
-                SelectTimestampQuery.newBuilder(tableName)
-                                    .setDataSource(dataSource)
-                                    .setId(id)
-                                    .setIdColumn(idColumn);
-        return builder.build();
+    public SelectByIdQuery<String, Timestamp> newSelectByIdQuery(String id) {
+        final SelectTimestampQuery.Builder builder = SelectTimestampQuery.newBuilder();
+        final SelectTimestampQuery query = builder.setTableName(tableName)
+                                                  .setDataSource(dataSource)
+                                                  .setId(id)
+                                                  .setIdColumn(idColumn)
+                                                  .build();
+        return query;
     }
 
     @Override
@@ -85,19 +83,23 @@ public class LastHandledEventTimeQueryFactory
 
     @Override
     public WriteQuery newInsertQuery(String id, Timestamp record) {
-        final InsertTimestampQuery.Builder builder = InsertTimestampQuery.newBuilder(tableName)
-                                                                         .setDataSource(dataSource)
-                                                                         .setId(id)
-                                                                         .setTimestamp(record);
-        return builder.build();
+        final InsertTimestampQuery.Builder builder = InsertTimestampQuery.newBuilder();
+        final InsertTimestampQuery query = builder.setTableName(tableName)
+                                                  .setDataSource(dataSource)
+                                                  .setId(id)
+                                                  .setTimestamp(record)
+                                                  .build();
+        return query;
     }
 
     @Override
     public WriteQuery newUpdateQuery(String id, Timestamp record) {
-        final UpdateTimestampQuery.Builder builder = UpdateTimestampQuery.newBuilder(tableName)
-                                                                         .setDataSource(dataSource)
-                                                                         .setId(id)
-                                                                         .setTimestamp(record);
-        return builder.build();
+        final UpdateTimestampQuery.Builder builder = UpdateTimestampQuery.newBuilder();
+        final UpdateTimestampQuery query = builder.setTableName(tableName)
+                                                  .setDataSource(dataSource)
+                                                  .setId(id)
+                                                  .setTimestamp(record)
+                                                  .build();
+        return query;
     }
 }
