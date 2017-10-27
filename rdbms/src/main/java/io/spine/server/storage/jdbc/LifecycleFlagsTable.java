@@ -24,9 +24,9 @@ import com.google.common.collect.ImmutableList;
 import io.spine.annotation.Internal;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.entity.LifecycleFlags;
-import io.spine.server.storage.jdbc.query.LifecycleFlagsQueryFactory;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
+import io.spine.server.storage.jdbc.query.dsl.LifecycleFlagsQueryFactory;
 
 import java.util.List;
 

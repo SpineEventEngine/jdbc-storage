@@ -34,7 +34,7 @@ import static java.lang.String.format;
  *
  * @author Dmytro Dashenkov
  */
-class InsertLifecycleFlagsQuery<I> extends AbstractWriteQuery {
+public class InsertLifecycleFlagsQuery<I> extends AbstractWriteQuery {
 
     private static final int COLUMN_COUNT = TableColumn.values().length;
     private static final String SQL =
@@ -65,24 +65,24 @@ class InsertLifecycleFlagsQuery<I> extends AbstractWriteQuery {
                       .build();
     }
 
-    static <I> Builder<I> newBuilder(String tableName) {
+    public static <I> Builder<I> newBuilder(String tableName) {
         final Builder<I> builder = new Builder<>();
         builder.setQuery(format(SQL, tableName));
         return builder;
     }
 
-    static class Builder<I> extends AbstractWriteQuery.Builder<Builder<I>, InsertLifecycleFlagsQuery> {
+    public static class Builder<I> extends AbstractWriteQuery.Builder<Builder<I>, InsertLifecycleFlagsQuery> {
 
         private I id;
         private LifecycleFlags entityStatus;
         private IdColumn<I> idColumn;
 
-        Builder<I> setLifecycleFlags(LifecycleFlags status) {
+        public Builder<I> setLifecycleFlags(LifecycleFlags status) {
             this.entityStatus = checkNotNull(status);
             return getThis();
         }
 
-        Builder<I> setId(I id) {
+        public Builder<I> setId(I id) {
             this.id = checkNotNull(id);
             return getThis();
         }
@@ -99,7 +99,7 @@ class InsertLifecycleFlagsQuery<I> extends AbstractWriteQuery {
             return this;
         }
 
-        Builder<I> setIdColumn(IdColumn<I> idColumn) {
+        public Builder<I> setIdColumn(IdColumn<I> idColumn) {
             this.idColumn = idColumn;
             return getThis();
         }

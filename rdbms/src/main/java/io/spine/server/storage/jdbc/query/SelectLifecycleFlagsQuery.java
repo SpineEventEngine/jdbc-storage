@@ -43,7 +43,7 @@ import static java.lang.String.format;
  *
  * @author Dmytro Dashenkov
  */
-class SelectLifecycleFlagsQuery<I> extends SelectMessageByIdQuery<I, LifecycleFlags> {
+public class SelectLifecycleFlagsQuery<I> extends SelectMessageByIdQuery<I, LifecycleFlags> {
 
     private static final String SQL =
             SELECT.toString() + archived + COMMA + deleted +
@@ -68,14 +68,14 @@ class SelectLifecycleFlagsQuery<I> extends SelectMessageByIdQuery<I, LifecycleFl
         return visibility;
     }
 
-    static <I> Builder<I> newBuilder(String tableName) {
+    public static <I> Builder<I> newBuilder(String tableName) {
         final Builder<I> builder = new Builder<>();
         builder.setQuery(format(SQL, tableName))
                .setIdIndexInQuery(1);
         return builder;
     }
 
-    static class Builder<I> extends SelectMessageByIdQuery.Builder<Builder<I>,
+    public static class Builder<I> extends SelectMessageByIdQuery.Builder<Builder<I>,
                                                                    SelectLifecycleFlagsQuery<I>,
                                                                    I,
                                                                    LifecycleFlags> {
