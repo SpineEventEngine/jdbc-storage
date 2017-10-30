@@ -47,6 +47,11 @@ public interface WriteQueryFactory<I, R> {
     WriteQuery newUpdateQuery(I id, R record);
 
     /**
+     * @return a query for deleting the record with the specified ID
+     */
+    WriteQuery newDeleteQuery(I id);
+
+    /**
      * @return a query for deleting of all records in a table
      */
     WriteQuery newDeleteAllQuery();

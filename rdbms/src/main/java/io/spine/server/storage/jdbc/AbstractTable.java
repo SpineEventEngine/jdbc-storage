@@ -24,7 +24,6 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.protobuf.Message;
-import io.spine.server.storage.jdbc.query.DeleteRecordQuery;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.SelectByIdQuery;
 import io.spine.server.storage.jdbc.query.SelectQuery;
@@ -334,18 +333,13 @@ abstract class AbstractTable<I, R extends Message, W> {
      * Deletes a row in the table corresponding to the given ID.
      *
      * @param id ID to search by
-     * @return {@code true} if the row was deleted successfully, {@code false} if the row was
-     * not found
+     * @return {@code true} if the row was deleted successfully,
+     *         {@code false} if the row was not found
      */
     boolean delete(I id) {
-        final DeleteRecordQuery<I> query = DeleteRecordQuery.<I>newBuilder()
-                                                            .setTableName(getName())
-                                                            .setIdColumn(getIdColumn())
-                                                            .setIdValue(id)
-                                                            .setLogger(log())
-                                                            .setDataSource(dataSource)
-                                                            .build();
-        return query.execute();
+        final WriteQuery query = getWriteQueryFactory().newDeleteQuery(id);
+        final long rowsAffected = query.execute();
+        return rowsAffected != 0;
     }
 
     /**

@@ -41,7 +41,7 @@ import static java.lang.String.format;
  * @author Dmytro Dashenkov
  */
 @Internal
-public class DeleteRecordQuery<I> extends AbstractQuery {
+public class DeleteRecordQuery<I> extends AbstractQuery implements WriteQuery {
 
     private static final String FORMAT_PLACEHOLDER = "%s";
 
@@ -59,18 +59,13 @@ public class DeleteRecordQuery<I> extends AbstractQuery {
         this.idColumn = builder.idColumn;
     }
 
-    /**
-     * Executes the {@code DELETE} SQL statement.
-     *
-     * @return {@code true} if at least one row was deleted, {@code false} otherwise
-     */
-    public boolean execute() {
+    @Override
+    public long execute() {
         try (ConnectionWrapper connection = getConnection(false)) {
             final PreparedStatement statement = prepareStatement(connection);
             final int rowsAffected = statement.executeUpdate();
             connection.commit();
-            final boolean result = rowsAffected != 0;
-            return result;
+            return rowsAffected;
         } catch (SQLException e) {
             throw new IllegalStateException(e);
         }
