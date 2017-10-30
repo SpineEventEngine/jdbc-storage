@@ -38,10 +38,10 @@ abstract class AbstractStoreQuery extends AbstractQuery implements WriteQuery {
     }
 
     @Override
-    public void execute() {
+    public long execute() {
         final StoreClause<?> clause = createClause();
         setParameters(clause, getParameters());
-        clause.execute();
+        return clause.execute();
     }
 
     /**

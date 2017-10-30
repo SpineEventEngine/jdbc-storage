@@ -55,14 +55,14 @@ class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
     }
 
     @Override
-    public void execute() {
+    public long execute() {
         final SQLInsertClause clause = createClause();
         for (I id : records.keySet()) {
             final EntityRecordWithColumns record = records.get(id);
             final Parameters batchParameters = getBatchParameters(id, record);
             addBatch(clause, batchParameters);
         }
-        clause.execute();
+        return clause.execute();
     }
 
     @Override

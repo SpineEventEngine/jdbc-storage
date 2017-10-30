@@ -21,14 +21,16 @@
 package io.spine.server.storage.jdbc.query;
 
 /**
- * A query which is executed in order to write to the data source.
+ * A query which makes changes in a data source.
  *
  * @author Dmytro Grankin
  */
 public interface WriteQuery extends StorageQuery {
 
     /**
-     * Executes a write query.
+     * Executes a write query and return the amount of affected rows.
+     *
+     * @return the amount of affected rows
      */
-    void execute();
+    long execute();
 }

@@ -35,9 +35,9 @@ class DeleteAllQuery extends AbstractQuery implements WriteQuery {
     }
 
     @Override
-    public void execute() {
-        factory().delete(table())
-                 .execute();
+    public long execute() {
+        return factory().delete(table())
+                        .execute();
     }
 
     static Builder newBuilder() {

@@ -55,15 +55,15 @@ class InsertAggregateRecordQuery<I> extends AbstractQuery implements WriteQuery 
     }
 
     @Override
-    public void execute() {
+    public long execute() {
         final Timestamp recordTimestamp = record.getTimestamp();
-        factory().insert(table())
-                 .set(pathOf(id), idColumn.normalize(idValue))
-                 .set(pathOf(aggregate), Serializer.serialize(record))
-                 .set(pathOf(timestamp), recordTimestamp.getSeconds())
-                 .set(pathOf(timestamp_nanos), recordTimestamp.getNanos())
-                 .set(pathOf(version), getVersionNumberOfRecord())
-                 .execute();
+        return factory().insert(table())
+                        .set(pathOf(id), idColumn.normalize(idValue))
+                        .set(pathOf(aggregate), Serializer.serialize(record))
+                        .set(pathOf(timestamp), recordTimestamp.getSeconds())
+                        .set(pathOf(timestamp_nanos), recordTimestamp.getNanos())
+                        .set(pathOf(version), getVersionNumberOfRecord())
+                        .execute();
     }
 
     private int getVersionNumberOfRecord() {
