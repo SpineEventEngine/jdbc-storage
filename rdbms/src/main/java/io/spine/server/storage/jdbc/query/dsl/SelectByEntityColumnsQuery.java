@@ -20,6 +20,7 @@
 
 package io.spine.server.storage.jdbc.query.dsl;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.protobuf.FieldMask;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -134,9 +135,10 @@ final class SelectByEntityColumnsQuery<I> extends AbstractQuery
     }
 
     @SuppressWarnings("EnumSwitchStatementWhichMissesCases") // OK for the Protobuf enum switch.
-    private static Predicate composePredicates(Predicate left,
-                                               Predicate right,
-                                               CompositeOperator operator) {
+    @VisibleForTesting
+    static Predicate composePredicates(Predicate left,
+                                       Predicate right,
+                                       CompositeOperator operator) {
         checkArgument(operator.getNumber() > 0, operator.name());
         switch (operator) {
             case EITHER:

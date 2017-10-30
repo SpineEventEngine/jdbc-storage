@@ -20,7 +20,6 @@
 
 package io.spine.server.storage.jdbc.query.dsl;
 
-import com.querydsl.core.dml.DMLClause;
 import com.querydsl.core.dml.StoreClause;
 import io.spine.server.storage.jdbc.query.Parameters;
 import io.spine.server.storage.jdbc.query.WriteQuery;
