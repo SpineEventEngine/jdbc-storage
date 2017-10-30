@@ -353,10 +353,7 @@ abstract class AbstractTable<I, R extends Message, W> {
      * Deletes all the records from the table.
      */
     void deleteAll() {
-        final DeleteAllQuery query = DeleteAllQuery.newBuilder(getName())
-                                                   .setDataSource(dataSource)
-                                                   .setLogger(log())
-                                                   .build();
+        final WriteQuery query = getWriteQueryFactory().newDeleteAllQuery();
         query.execute();
     }
 

@@ -22,6 +22,8 @@ package io.spine.server.storage.jdbc.query.dsl;
 
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.IdColumn;
+import io.spine.server.storage.jdbc.query.DeleteAllQuery;
+import io.spine.server.storage.jdbc.query.WriteQuery;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 
 /**
@@ -46,6 +48,14 @@ abstract class AbstractWriteQueryFactory <I, R> implements WriteQueryFactory<I, 
         this.idColumn = idColumn;
         this.dataSource = dataSource;
         this.tableName = tableName;
+    }
+
+    @Override
+    public WriteQuery newDeleteAllQuery() {
+        final DeleteAllQuery query = DeleteAllQuery.newBuilder(tableName)
+                                                   .setDataSource(dataSource)
+                                                   .build();
+        return query;
     }
 
     IdColumn<I> getIdColumn() {
