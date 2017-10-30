@@ -124,7 +124,7 @@ public abstract class IdColumn<I> {
      */
     public void setId(String idName, I id, Parameters.Builder parameters) {
         final Object normalizedId = normalize(id);
-        final Parameter parameter = Parameter.of(normalizedId, getSqlType());
+        final Parameter parameter = Parameter.of(normalizedId);
         parameters.addParameter(idName, parameter);
     }
 

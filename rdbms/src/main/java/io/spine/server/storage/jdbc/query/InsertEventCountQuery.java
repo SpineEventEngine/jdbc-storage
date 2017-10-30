@@ -45,7 +45,7 @@ class InsertEventCountQuery<I> extends WriteEventCountQuery<I> {
     Parameters getParameters() {
         final Parameters superParameters = super.getParameters();
         final Object normalizedId = getIdColumn().normalize(getId());
-        final Parameter id = Parameter.of(normalizedId, getIdColumn().getSqlType());
+        final Parameter id = Parameter.of(normalizedId);
         final Parameters result = Parameters.newBuilder()
                                             .addParameters(superParameters)
                                             .addParameter(getIdColumn().getColumnName(), id)

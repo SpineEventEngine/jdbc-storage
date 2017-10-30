@@ -27,7 +27,6 @@ import io.spine.server.entity.storage.ColumnRecords;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.IdColumn;
 import io.spine.server.storage.jdbc.Serializer;
-import io.spine.server.storage.jdbc.Sql;
 
 import java.util.Map;
 import java.util.Set;
@@ -117,7 +116,7 @@ class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
                                  EntityRecordWithColumns record) {
         idColumn.setId(idColumn.getColumnName(), id, parametersBuilder);
         final byte[] serializedRecord = Serializer.serialize(record.getRecord());
-        final Parameter recordParameter = Parameter.of(serializedRecord, Sql.Type.BLOB);
+        final Parameter recordParameter = Parameter.of(serializedRecord);
         parametersBuilder.addParameter(entity.name(), recordParameter);
     }
 

@@ -47,7 +47,7 @@ class InsertEntityQuery<I> extends WriteEntityQuery<I> {
     Parameters getParameters() {
         final Parameters superParameters = super.getParameters();
         final Object normalizedId = getIdColumn().normalize(getId());
-        final Parameter idParameter = Parameter.of(normalizedId, getIdColumn().getSqlType());
+        final Parameter idParameter = Parameter.of(normalizedId);
         return Parameters.newBuilder()
                          .addParameters(superParameters)
                          .addParameter(getIdColumn().getColumnName(), idParameter)

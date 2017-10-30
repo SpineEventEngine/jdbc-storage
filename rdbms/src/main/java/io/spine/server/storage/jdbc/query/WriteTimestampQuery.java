@@ -43,8 +43,8 @@ abstract class WriteTimestampQuery extends AbstractStoreQuery {
 
     @Override
     Parameters getParameters() {
-        final Parameter seconds = Parameter.of(timestamp.getSeconds(), Column.seconds);
-        final Parameter nanos = Parameter.of(timestamp.getNanos(), Column.nanos);
+        final Parameter seconds = Parameter.of(timestamp.getSeconds());
+        final Parameter nanos = Parameter.of(timestamp.getNanos());
         return Parameters.newBuilder()
                          .addParameter(Column.seconds.name(), seconds)
                          .addParameter(Column.nanos.name(), nanos)

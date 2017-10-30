@@ -25,7 +25,6 @@ import io.spine.server.entity.storage.ColumnRecords;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.RecordTable;
 import io.spine.server.storage.jdbc.Serializer;
-import io.spine.server.storage.jdbc.Sql;
 
 import static io.spine.server.storage.jdbc.RecordTable.StandardColumn.entity;
 
@@ -45,7 +44,7 @@ abstract class WriteEntityQuery<I> extends WriteRecordQuery<I, EntityRecordWithC
     Parameters getParameters() {
         final Parameters.Builder builder = Parameters.newBuilder();
         final byte[] serializedRecord = Serializer.serialize(getRecord().getRecord());
-        final Parameter recordParameter = Parameter.of(serializedRecord, Sql.Type.BLOB);
+        final Parameter recordParameter = Parameter.of(serializedRecord);
         builder.addParameter(entity.name(), recordParameter);
         if (getRecord().hasColumns()) {
             ColumnRecords.feedColumnsTo(builder,

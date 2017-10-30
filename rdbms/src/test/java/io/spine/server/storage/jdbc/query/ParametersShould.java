@@ -20,7 +20,6 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import io.spine.server.storage.jdbc.Sql;
 import org.junit.Test;
 
 import java.util.Set;
@@ -33,7 +32,7 @@ import static io.spine.Identifier.newUuid;
 public class ParametersShould {
 
     private static final String ID = newUuid();
-    private static final Parameter PARAMETER = Parameter.of(new Object(), Sql.Type.ID);
+    private static final Parameter PARAMETER = Parameter.of(new Object());
 
     @Test(expected = IllegalArgumentException.class)
     public void check_identifiers_uniqueness_for_single_parameter() {

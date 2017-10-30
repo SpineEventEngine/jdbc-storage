@@ -57,8 +57,8 @@ class InsertLifecycleFlagsQuery<I> extends AbstractStoreQuery {
         final Parameters.Builder builder = Parameters.newBuilder();
         idColumn.setId(idColumn.getColumnName(), id, builder);
 
-        final Parameter archivedParameter = Parameter.of(entityStatus.getArchived(), archived);
-        final Parameter deletedParameter = Parameter.of(entityStatus.getDeleted(), deleted);
+        final Parameter archivedParameter = Parameter.of(entityStatus.getArchived());
+        final Parameter deletedParameter = Parameter.of(entityStatus.getDeleted());
         return builder.addParameter(archived.name(), archivedParameter)
                       .addParameter(deleted.name(), deletedParameter)
                       .build();

@@ -46,7 +46,7 @@ class InsertTimestampQuery extends WriteTimestampQuery {
     @Override
     Parameters getParameters() {
         final Parameters superParameters = super.getParameters();
-        final Parameter idParameter = Parameter.of(getId(), projection_type.type());
+        final Parameter idParameter = Parameter.of(getId());
         return Parameters.newBuilder()
                          .addParameters(superParameters)
                          .addParameter(projection_type.name(), idParameter)
