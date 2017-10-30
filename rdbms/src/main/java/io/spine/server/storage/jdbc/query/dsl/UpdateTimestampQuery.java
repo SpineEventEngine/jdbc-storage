@@ -23,20 +23,8 @@ package io.spine.server.storage.jdbc.query.dsl;
 import com.google.protobuf.Timestamp;
 import com.querydsl.core.dml.StoreClause;
 import com.querydsl.core.types.dsl.PathBuilder;
-import io.spine.annotation.Internal;
-import io.spine.server.storage.jdbc.query.LastHandledEventTimeQueryFactory;
 
-import static io.spine.server.storage.jdbc.LastHandledEventTimeTable.Column.nanos;
 import static io.spine.server.storage.jdbc.LastHandledEventTimeTable.Column.projection_type;
-import static io.spine.server.storage.jdbc.LastHandledEventTimeTable.Column.seconds;
-import static io.spine.server.storage.jdbc.Sql.BuildingBlock.COMMA;
-import static io.spine.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
-import static io.spine.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
-import static io.spine.server.storage.jdbc.Sql.Query.PLACEHOLDER;
-import static io.spine.server.storage.jdbc.Sql.Query.SET;
-import static io.spine.server.storage.jdbc.Sql.Query.UPDATE;
-import static io.spine.server.storage.jdbc.Sql.Query.WHERE;
-import static java.lang.String.format;
 
 /**
  * Query that updates {@link Timestamp} in the {@link LastHandledEventTimeQueryFactory}.
