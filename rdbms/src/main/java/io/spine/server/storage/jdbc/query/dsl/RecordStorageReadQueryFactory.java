@@ -21,33 +21,31 @@
 package io.spine.server.storage.jdbc.query.dsl;
 
 import com.google.protobuf.FieldMask;
+import io.spine.annotation.Internal;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.entity.storage.EntityQuery;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.IdColumn;
-import io.spine.server.storage.jdbc.RecordTable;
 import io.spine.server.storage.jdbc.query.SelectByIdQuery;
 import io.spine.server.storage.jdbc.query.SelectQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
-import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
-import org.slf4j.Logger;
 
 import java.util.Iterator;
 import java.util.Map;
 
 /**
- * The query factory for interaction with the {@link RecordTable}.
+ * An implementation of the query factory for generating read queries for
+ * the {@link io.spine.server.storage.jdbc.RecordTable RecordTable}.
  *
  * @author Andrey Lavrov
  * @author Dmytro Dashenkov
  */
-public class RecordStorageQueryFactory<I> extends AbstractReadQueryFactory<I, EntityRecord>
-        implements WriteQueryFactory<I, EntityRecordWithColumns> {
+@Internal
+public class RecordStorageReadQueryFactory<I> extends AbstractReadQueryFactory<I, EntityRecord> {
 
-    private final Logger logger;
     private final ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> columnTypeRegistry;
 
     /**
@@ -56,19 +54,13 @@ public class RecordStorageQueryFactory<I> extends AbstractReadQueryFactory<I, En
      * @param dataSource instance of {@link DataSourceWrapper}
      * @param tableName  the name of the table to generate queries for
      */
-    public RecordStorageQueryFactory(DataSourceWrapper dataSource,
-                                     String tableName,
-                                     Logger logger,
-                                     IdColumn<I> idColumn,
-                                     ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>>
+    public RecordStorageReadQueryFactory(DataSourceWrapper dataSource,
+                                         String tableName,
+                                         IdColumn<I> idColumn,
+                                         ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>>
                                              columnTypeRegistry) {
         super(idColumn, dataSource, tableName);
-        this.logger = logger;
         this.columnTypeRegistry = columnTypeRegistry;
-    }
-
-    public Logger getLogger() {
-        return logger;
     }
 
     public SelectQuery<Iterator<EntityRecord>> newSelectByEntityQuery(EntityQuery<I> query,
@@ -100,30 +92,6 @@ public class RecordStorageQueryFactory<I> extends AbstractReadQueryFactory<I, En
                .setDataSource(getDataSource())
                .setIdColumn(getIdColumn())
                .setId(id);
-        return builder.build();
-    }
-
-    @Override
-    public WriteQuery newInsertQuery(I id, EntityRecordWithColumns record) {
-        final InsertEntityQuery.Builder<I> builder = InsertEntityQuery.newBuilder();
-        builder.setDataSource(getDataSource())
-               .setTableName(getTableName())
-               .setId(id)
-               .setIdColumn(getIdColumn())
-               .setColumnTypeRegistry(columnTypeRegistry)
-               .setRecord(record);
-        return builder.build();
-    }
-
-    @Override
-    public WriteQuery newUpdateQuery(I id, EntityRecordWithColumns record) {
-        final UpdateEntityQuery.Builder<I> builder = UpdateEntityQuery.newBuilder();
-        builder.setTableName(getTableName())
-               .setDataSource(getDataSource())
-               .setIdColumn(getIdColumn())
-               .setId(id)
-               .setRecord(record)
-               .setColumnTypeRegistry(columnTypeRegistry);
         return builder.build();
     }
 }

@@ -35,11 +35,12 @@ import io.spine.server.storage.jdbc.query.SelectByIdQuery;
  * @author Dmytro Grankin
  */
 @Internal
-public class AggregateStorageReadFactory<I> extends AbstractReadQueryFactory<I, AggregateEventRecord> {
+public class AggregateStorageReadQueryFactory<I>
+        extends AbstractReadQueryFactory<I, AggregateEventRecord> {
 
-    public AggregateStorageReadFactory(IdColumn<I> idColumn,
-                                       DataSourceWrapper dataSource,
-                                       String tableName) {
+    public AggregateStorageReadQueryFactory(IdColumn<I> idColumn,
+                                            DataSourceWrapper dataSource,
+                                            String tableName) {
         super(idColumn, dataSource, tableName);
     }
 

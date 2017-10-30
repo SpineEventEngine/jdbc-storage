@@ -20,40 +20,25 @@
 
 package io.spine.server.storage.jdbc.query.dsl;
 
+import io.spine.annotation.Internal;
 import io.spine.server.entity.LifecycleFlags;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.IdColumn;
-import io.spine.server.storage.jdbc.LifecycleFlagsTable;
-import io.spine.server.storage.jdbc.query.SelectByIdQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
-import io.spine.server.storage.jdbc.query.WriteQueryFactory;
-import org.slf4j.Logger;
 
 /**
- * An implementation of the query factory for generating queries for
- * the {@link LifecycleFlagsTable}.
+ * An implementation of the query factory for generating write queries for
+ * the {@link io.spine.server.storage.jdbc.LifecycleFlagsTable LifecycleFlagsTable}.
  *
- * @author Dmytro Dashenkov
+ * @author Dmytro Grankin
  */
-public class LifecycleFlagsQueryFactory<I> extends AbstractReadQueryFactory<I, LifecycleFlags>
-        implements WriteQueryFactory<I, LifecycleFlags> {
+@Internal
+public class LifecycleFlagsWriteQueryFactory<I> extends AbstractWriteQueryFactory<I, LifecycleFlags> {
 
-    public LifecycleFlagsQueryFactory(DataSourceWrapper dataSource,
-                                      Logger logger,
-                                      IdColumn<I> idColumn,
-                                      String tableName) {
+    public LifecycleFlagsWriteQueryFactory(IdColumn<I> idColumn,
+                                           DataSourceWrapper dataSource,
+                                           String tableName) {
         super(idColumn, dataSource, tableName);
-    }
-
-    @Override
-    public SelectByIdQuery<I, LifecycleFlags> newSelectByIdQuery(I id) {
-        final SelectLifecycleFlagsQuery.Builder<I> builder = SelectLifecycleFlagsQuery.newBuilder();
-        final SelectByIdQuery<I, LifecycleFlags> query = builder.setTableName(getTableName())
-                                                                .setDataSource(getDataSource())
-                                                                .setIdColumn(getIdColumn())
-                                                                .setId(id)
-                                                                .build();
-        return query;
     }
 
     @Override

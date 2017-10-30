@@ -26,7 +26,8 @@ import io.spine.server.aggregate.Aggregate;
 import io.spine.server.entity.LifecycleFlags;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
-import io.spine.server.storage.jdbc.query.dsl.LifecycleFlagsQueryFactory;
+import io.spine.server.storage.jdbc.query.dsl.LifecycleFlagsReadQueryFactory;
+import io.spine.server.storage.jdbc.query.dsl.LifecycleFlagsWriteQueryFactory;
 
 import java.util.List;
 
@@ -43,7 +44,8 @@ public class LifecycleFlagsTable<I> extends AggregateTable<I, LifecycleFlags> {
 
     private static final String TABLE_NAME_POSTFIX = "visibility";
 
-    private final LifecycleFlagsQueryFactory<I> queryFactory;
+    private final LifecycleFlagsWriteQueryFactory<I> writeQueryFactory;
+    private final LifecycleFlagsReadQueryFactory<I> readQueryFactory;
 
     LifecycleFlagsTable(Class<? extends Aggregate<I, ?, ?>> aggregateClass,
                         DataSourceWrapper dataSource) {
@@ -51,8 +53,12 @@ public class LifecycleFlagsTable<I> extends AggregateTable<I, LifecycleFlags> {
               aggregateClass,
               Column.id.name(),
               dataSource);
-        this.queryFactory = new LifecycleFlagsQueryFactory<>(dataSource, log(), getIdColumn(),
-                                                             getName());
+        this.writeQueryFactory = new LifecycleFlagsWriteQueryFactory<>(getIdColumn(),
+                                                                       dataSource,
+                                                                       getName());
+        this.readQueryFactory = new LifecycleFlagsReadQueryFactory<>(getIdColumn(),
+                                                                     dataSource,
+                                                                     getName());
     }
 
     @Override
@@ -67,12 +73,12 @@ public class LifecycleFlagsTable<I> extends AggregateTable<I, LifecycleFlags> {
 
     @Override
     protected ReadQueryFactory<I, LifecycleFlags> getReadQueryFactory() {
-        return queryFactory;
+        return readQueryFactory;
     }
 
     @Override
     protected WriteQueryFactory<I, LifecycleFlags> getWriteQueryFactory() {
-        return queryFactory;
+        return writeQueryFactory;
     }
 
     /**

@@ -38,7 +38,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author Dmytro Dashenkov
  */
 @Internal
-public class AggregateStorageWriteFactory<I> extends AbstractWriteQueryFactory<I, AggregateEventRecord> {
+public class AggregateStorageWriteQueryFactory<I>
+        extends AbstractWriteQueryFactory<I, AggregateEventRecord> {
 
     private final Logger logger;
 
@@ -47,10 +48,10 @@ public class AggregateStorageWriteFactory<I> extends AbstractWriteQueryFactory<I
      *
      * @param dataSource instance of {@link DataSourceWrapper}
      */
-    public AggregateStorageWriteFactory(IdColumn<I> idColumn,
-                                        DataSourceWrapper dataSource,
-                                        String tableName,
-                                        Logger logger) {
+    public AggregateStorageWriteQueryFactory(IdColumn<I> idColumn,
+                                             DataSourceWrapper dataSource,
+                                             String tableName,
+                                             Logger logger) {
         super(idColumn, dataSource, tableName);
         this.logger = checkNotNull(logger);
     }

@@ -27,7 +27,7 @@ import com.querydsl.core.types.dsl.PathBuilder;
 import static io.spine.server.storage.jdbc.LastHandledEventTimeTable.Column.projection_type;
 
 /**
- * Query that updates {@link Timestamp} in the {@link LastHandledEventTimeQueryFactory}.
+ * Query that updates {@link Timestamp} in the {@link LastHandledEventTimeReadFactory}.
  *
  * @author Alexander Litus
  * @author Andrey Lavrov

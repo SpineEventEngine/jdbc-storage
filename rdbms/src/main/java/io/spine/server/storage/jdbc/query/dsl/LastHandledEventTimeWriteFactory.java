@@ -23,41 +23,22 @@ package io.spine.server.storage.jdbc.query.dsl;
 import com.google.protobuf.Timestamp;
 import io.spine.annotation.Internal;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.LastHandledEventTimeTable;
-import io.spine.server.storage.jdbc.query.SelectByIdQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
-import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 
 import static io.spine.server.storage.jdbc.IdColumn.typeString;
 import static io.spine.server.storage.jdbc.LastHandledEventTimeTable.Column.projection_type;
 
 /**
- * The query factory for interaction with the {@link LastHandledEventTimeTable}.
+ * An implementation of the query factory for generating write queries for
+ * the {@link io.spine.server.storage.jdbc.LastHandledEventTimeTable LastHandledEventTimeTable}.
  *
- * @author Andrey Lavrov
+ * @author Dmytro Grankin
  */
 @Internal
-public class LastHandledEventTimeQueryFactory extends AbstractReadQueryFactory<String, Timestamp>
-        implements WriteQueryFactory<String, Timestamp> {
+public class LastHandledEventTimeWriteFactory extends AbstractWriteQueryFactory<String, Timestamp> {
 
-    /**
-     * Creates a new instance.
-     *
-     * @param dataSource instance of {@link DataSourceWrapper}
-     */
-    public LastHandledEventTimeQueryFactory(DataSourceWrapper dataSource, String tableName) {
+    public LastHandledEventTimeWriteFactory(DataSourceWrapper dataSource, String tableName) {
         super(typeString(projection_type.name()), dataSource, tableName);
-    }
-
-    @Override
-    public SelectByIdQuery<String, Timestamp> newSelectByIdQuery(String id) {
-        final SelectTimestampQuery.Builder builder = SelectTimestampQuery.newBuilder();
-        final SelectTimestampQuery query = builder.setTableName(getTableName())
-                                                  .setDataSource(getDataSource())
-                                                  .setId(id)
-                                                  .setIdColumn(getIdColumn())
-                                                  .build();
-        return query;
     }
 
     @Override

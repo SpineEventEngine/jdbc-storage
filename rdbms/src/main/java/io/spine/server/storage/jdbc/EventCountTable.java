@@ -26,7 +26,8 @@ import io.spine.annotation.Internal;
 import io.spine.server.entity.Entity;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
-import io.spine.server.storage.jdbc.query.dsl.EventCountQueryFactory;
+import io.spine.server.storage.jdbc.query.dsl.EventCountReadQueryFactory;
+import io.spine.server.storage.jdbc.query.dsl.EventCountWriteQueryFactory;
 
 import java.util.List;
 
@@ -46,7 +47,8 @@ public class EventCountTable<I> extends AggregateTable<I, Int32Value> {
 
     private static final String TABLE_NAME_POSTFIX = "_event_count";
 
-    private final EventCountQueryFactory<I> queryFactory;
+    private final EventCountReadQueryFactory<I> readQueryFactory;
+    private final EventCountWriteQueryFactory<I> writeQueryFactory;
 
     EventCountTable(Class<? extends Entity<I, ?>> entityClass,
                     DataSourceWrapper dataSource) {
@@ -54,10 +56,12 @@ public class EventCountTable<I> extends AggregateTable<I, Int32Value> {
               entityClass,
               Column.id.name(),
               dataSource);
-        this.queryFactory = new EventCountQueryFactory<>(getDataSource(),
-                                                         getName(),
-                                                         getIdColumn(),
-                                                         log());
+        this.readQueryFactory = new EventCountReadQueryFactory<>(getIdColumn(),
+                                                                 getDataSource(),
+                                                                 getName());
+        this.writeQueryFactory = new EventCountWriteQueryFactory<>(getIdColumn(),
+                                                                   getDataSource(),
+                                                                   getName());
     }
 
     @Override
@@ -72,12 +76,12 @@ public class EventCountTable<I> extends AggregateTable<I, Int32Value> {
 
     @Override
     protected ReadQueryFactory<I, Int32Value> getReadQueryFactory() {
-        return queryFactory;
+        return readQueryFactory;
     }
 
     @Override
     protected WriteQueryFactory<I, Int32Value> getWriteQueryFactory() {
-        return queryFactory;
+        return writeQueryFactory;
     }
 
     /**

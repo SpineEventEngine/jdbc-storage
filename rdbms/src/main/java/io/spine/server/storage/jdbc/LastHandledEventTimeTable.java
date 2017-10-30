@@ -24,7 +24,8 @@ import com.google.protobuf.Timestamp;
 import io.spine.annotation.Internal;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
-import io.spine.server.storage.jdbc.query.dsl.LastHandledEventTimeQueryFactory;
+import io.spine.server.storage.jdbc.query.dsl.LastHandledEventTimeReadFactory;
+import io.spine.server.storage.jdbc.query.dsl.LastHandledEventTimeWriteFactory;
 
 import java.util.List;
 
@@ -45,13 +46,15 @@ public class LastHandledEventTimeTable extends AbstractTable<String, Timestamp, 
 
     private static final String TABLE_NAME = "projection_last_handled_event_time";
 
-    private final LastHandledEventTimeQueryFactory queryFactory;
+    private final LastHandledEventTimeWriteFactory writeQueryFactory;
+    private final LastHandledEventTimeReadFactory readQueryFactory;
 
     LastHandledEventTimeTable(DataSourceWrapper dataSource) {
         super(TABLE_NAME,
               IdColumn.typeString(Column.projection_type.name()),
               dataSource);
-        this.queryFactory = new LastHandledEventTimeQueryFactory(dataSource, TABLE_NAME);
+        this.writeQueryFactory = new LastHandledEventTimeWriteFactory(dataSource, TABLE_NAME);
+        this.readQueryFactory = new LastHandledEventTimeReadFactory(dataSource, TABLE_NAME);
     }
 
     @Override
@@ -66,12 +69,12 @@ public class LastHandledEventTimeTable extends AbstractTable<String, Timestamp, 
 
     @Override
     protected ReadQueryFactory<String, Timestamp> getReadQueryFactory() {
-        return queryFactory;
+        return readQueryFactory;
     }
 
     @Override
     protected WriteQueryFactory<String, Timestamp> getWriteQueryFactory() {
-        return queryFactory;
+        return writeQueryFactory;
     }
 
     /**

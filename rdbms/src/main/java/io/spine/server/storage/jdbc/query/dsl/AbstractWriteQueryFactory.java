@@ -20,7 +20,6 @@
 
 package io.spine.server.storage.jdbc.query.dsl;
 
-import com.google.protobuf.Message;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.IdColumn;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
@@ -30,12 +29,19 @@ import io.spine.server.storage.jdbc.query.WriteQueryFactory;
  *
  * @author Dmytro Grankin
  */
-abstract class AbstractWriteQueryFactory <I, R extends Message> implements WriteQueryFactory<I, R> {
+abstract class AbstractWriteQueryFactory <I, R> implements WriteQueryFactory<I, R> {
 
     private final IdColumn<I> idColumn;
     private final DataSourceWrapper dataSource;
     private final String tableName;
 
+    /**
+     * Creates a new instance.
+     *
+     * @param idColumn the {@link IdColumn} for working with IDs of this factory
+     * @param dataSource instance of {@link DataSourceWrapper}
+     * @param tableName  the name of the table to generate queries for
+     */
     AbstractWriteQueryFactory(IdColumn<I> idColumn, DataSourceWrapper dataSource, String tableName) {
         this.idColumn = idColumn;
         this.dataSource = dataSource;

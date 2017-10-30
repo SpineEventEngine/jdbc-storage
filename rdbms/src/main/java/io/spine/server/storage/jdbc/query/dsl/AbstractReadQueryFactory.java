@@ -40,6 +40,13 @@ abstract class AbstractReadQueryFactory<I, R extends Message> implements ReadQue
     private final DataSourceWrapper dataSource;
     private final String tableName;
 
+    /**
+     * Creates a new instance.
+     *
+     * @param idColumn the {@link IdColumn} for working with IDs of this factory
+     * @param dataSource instance of {@link DataSourceWrapper}
+     * @param tableName  the name of the table to generate queries for
+     */
     AbstractReadQueryFactory(IdColumn<I> idColumn, DataSourceWrapper dataSource, String tableName) {
         this.idColumn = idColumn;
         this.dataSource = dataSource;
