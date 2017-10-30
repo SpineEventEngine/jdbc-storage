@@ -46,7 +46,7 @@ public class LastHandledEventTimeReadFactory extends AbstractReadQueryFactory<St
     }
 
     @Override
-    public SelectByIdQuery<String, Timestamp> newSelectByIdQuery(String id) {
+    public SelectQuery<Timestamp> newSelectByIdQuery(String id) {
         final SelectTimestampQuery.Builder builder = SelectTimestampQuery.newBuilder();
         final SelectTimestampQuery query = builder.setTableName(getTableName())
                                                   .setDataSource(getDataSource())

@@ -41,7 +41,7 @@ public class EventCountReadQueryFactory<I> extends AbstractReadQueryFactory<I, I
     }
 
     @Override
-    public SelectByIdQuery<I, Int32Value> newSelectByIdQuery(I id) {
+    public SelectQuery<Int32Value> newSelectByIdQuery(I id) {
         final SelectEventCountByIdQuery.Builder<I> builder = SelectEventCountByIdQuery.newBuilder();
         final SelectEventCountByIdQuery<I> query = builder.setTableName(getTableName())
                                                           .setDataSource(getDataSource())

@@ -60,7 +60,7 @@ abstract class AbstractReadQueryFactory<I, R extends Message> implements ReadQue
     }
 
     @Override
-    public SelectByIdQuery<I, Boolean> containsQuery(I id) {
+    public SelectQuery<Boolean> containsQuery(I id) {
         final ContainsQuery.Builder<I> builder = ContainsQuery.newBuilder();
         final ContainsQuery<I> query = builder.setIdColumn(idColumn)
                                               .setId(id)

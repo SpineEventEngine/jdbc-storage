@@ -41,9 +41,9 @@ public class LifecycleFlagsReadQueryFactory<I> extends AbstractReadQueryFactory<
     }
 
     @Override
-    public SelectByIdQuery<I, LifecycleFlags> newSelectByIdQuery(I id) {
+    public SelectQuery<LifecycleFlags> newSelectByIdQuery(I id) {
         final SelectLifecycleFlagsQuery.Builder<I> builder = SelectLifecycleFlagsQuery.newBuilder();
-        final SelectByIdQuery<I, LifecycleFlags> query = builder.setTableName(getTableName())
+        final SelectQuery<LifecycleFlags> query = builder.setTableName(getTableName())
                                                                 .setDataSource(getDataSource())
                                                                 .setIdColumn(getIdColumn())
                                                                 .setId(id)

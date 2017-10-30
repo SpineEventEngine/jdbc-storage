@@ -45,8 +45,8 @@ public class AggregateStorageReadQueryFactory<I>
 
     /** Returns a query that selects aggregate records by ID sorted by time descending. */
     @SuppressWarnings("InstanceMethodNamingConvention")
-    public SelectByIdQuery<I, DbIterator<AggregateEventRecord>> newSelectEventRecordsById(I id,
-                                                                                          int fetchSize) {
+    public SelectQuery<DbIterator<AggregateEventRecord>> newSelectEventRecordsById(I id,
+                                                                                   int fetchSize) {
         final SelectEventRecordsById.Builder<I> builder = SelectEventRecordsById.newBuilder();
         return builder.setTableName(getTableName())
                       .setDataSource(getDataSource())
@@ -65,7 +65,7 @@ public class AggregateStorageReadQueryFactory<I>
      */
     @Deprecated
     @Override
-    public SelectByIdQuery<I, AggregateEventRecord> newSelectByIdQuery(I id) {
+    public SelectQuery<AggregateEventRecord> newSelectByIdQuery(I id) {
         throw new UnsupportedOperationException("Use newSelectEventRecordsById instead.");
     }
 }

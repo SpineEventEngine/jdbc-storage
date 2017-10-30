@@ -31,7 +31,7 @@ import static com.querydsl.sql.SQLExpressions.count;
  *
  * @author Dmytro Dashenkov
  */
-class ContainsQuery<I> extends AbstractQuery implements SelectByIdQuery<I, Boolean> {
+class ContainsQuery<I> extends AbstractQuery implements SelectQuery<Boolean> {
 
     private final IdColumn<I> idColumn;
     private final I id;
@@ -54,16 +54,6 @@ class ContainsQuery<I> extends AbstractQuery implements SelectByIdQuery<I, Boole
                                                          .where(idPath.eq(normalizedId));
         final long recordsCount = query.fetchOne();
         return recordsCount > 0;
-    }
-
-    @Override
-    public IdColumn<I> getIdColumn() {
-        return idColumn;
-    }
-
-    @Override
-    public I getId() {
-        return id;
     }
 
     static <I> Builder<I> newBuilder() {

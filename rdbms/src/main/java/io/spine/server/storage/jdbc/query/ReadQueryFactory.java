@@ -44,7 +44,7 @@ public interface ReadQueryFactory<I, R> {
      *
      * @return a query for selecting a record by given ID
      */
-    SelectByIdQuery<I, R> newSelectByIdQuery(I id);
+    SelectQuery<R> newSelectByIdQuery(I id);
 
     /**
      * Creates an index query for the given table.
@@ -59,5 +59,5 @@ public interface ReadQueryFactory<I, R> {
      * @param id the ID to check
      * @return a query to check presence of a record
      */
-    SelectByIdQuery<I, Boolean> containsQuery(I id);
+    SelectQuery<Boolean> containsQuery(I id);
 }

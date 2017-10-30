@@ -83,7 +83,7 @@ public class RecordStorageReadQueryFactory<I> extends AbstractReadQueryFactory<I
     }
 
     @Override
-    public SelectByIdQuery<I, EntityRecord> newSelectByIdQuery(I id) {
+    public SelectQuery<EntityRecord> newSelectByIdQuery(I id) {
         final SelectEntityByIdQuery.Builder<I> builder = SelectEntityByIdQuery.newBuilder();
         builder.setTableName(getTableName())
                .setDataSource(getDataSource())

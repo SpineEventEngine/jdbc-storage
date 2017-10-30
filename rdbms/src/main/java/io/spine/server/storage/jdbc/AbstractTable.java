@@ -24,10 +24,9 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.protobuf.Message;
-import io.spine.server.storage.jdbc.query.ReadQueryFactory;
-import io.spine.server.storage.jdbc.query.SelectByIdQuery;
-import io.spine.server.storage.jdbc.query.SelectQuery;
 import io.spine.server.storage.jdbc.query.QueryExecutor;
+import io.spine.server.storage.jdbc.query.ReadQueryFactory;
+import io.spine.server.storage.jdbc.query.SelectQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 import org.slf4j.Logger;
@@ -155,7 +154,7 @@ abstract class AbstractTable<I, R extends Message, W> {
      * @return {@code true} if there is a record with such ID in the table, {@code false} otherwise
      */
     boolean containsRecord(I id) {
-        final SelectByIdQuery<I, Boolean> query = getReadQueryFactory().containsQuery(id);
+        final SelectQuery<Boolean> query = getReadQueryFactory().containsQuery(id);
         final boolean result = query.execute();
         return result;
     }
@@ -168,7 +167,7 @@ abstract class AbstractTable<I, R extends Message, W> {
      */
     @Nullable
     R read(I id) {
-        final SelectByIdQuery<I, R> query = composeSelectQuery(id);
+        final SelectQuery<R> query = composeSelectQuery(id);
         final R result = query.execute();
         return result;
     }
@@ -250,8 +249,8 @@ abstract class AbstractTable<I, R extends Message, W> {
         return query;
     }
 
-    private SelectByIdQuery<I, R> composeSelectQuery(I id) {
-        final SelectByIdQuery<I, R> query = getReadQueryFactory().newSelectByIdQuery(id);
+    private SelectQuery<R> composeSelectQuery(I id) {
+        final SelectQuery<R> query = getReadQueryFactory().newSelectByIdQuery(id);
         return query;
     }
 

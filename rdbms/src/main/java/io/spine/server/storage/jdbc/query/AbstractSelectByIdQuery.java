@@ -29,7 +29,7 @@ import io.spine.server.storage.jdbc.IdColumn;
  *
  * @author Dmytro Dashenkov
  */
-abstract class AbstractSelectByIdQuery<I, R> extends AbstractQuery implements SelectByIdQuery<I, R> {
+abstract class AbstractSelectByIdQuery<I, R> extends AbstractQuery implements SelectQuery<R> {
 
     private final IdColumn<I> idColumn;
     private final I id;
@@ -38,16 +38,6 @@ abstract class AbstractSelectByIdQuery<I, R> extends AbstractQuery implements Se
         super(builder);
         this.id = builder.getId();
         this.idColumn = builder.getIdColumn();
-    }
-
-    @Override
-    public IdColumn<I> getIdColumn() {
-        return idColumn;
-    }
-
-    @Override
-    public I getId() {
-        return id;
     }
 
     /**
