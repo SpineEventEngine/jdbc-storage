@@ -27,13 +27,13 @@ import io.spine.server.storage.jdbc.query.WriteQuery;
 import java.util.Set;
 
 /**
- * An abstract base for {@linkplain WriteQuery write queries}.
+ * An abstract base for {@code INSERT} and {@code UPDATE} queries.
  *
  * @author Alexander Litus
  */
-abstract class AbstractWriteQuery extends AbstractQuery implements WriteQuery {
+abstract class AbstractStoreQuery extends AbstractQuery implements WriteQuery {
 
-    protected AbstractWriteQuery(Builder<? extends Builder, ? extends WriteQuery> builder) {
+    AbstractStoreQuery(Builder<? extends Builder, ? extends WriteQuery> builder) {
         super(builder);
     }
 
@@ -67,7 +67,7 @@ abstract class AbstractWriteQuery extends AbstractQuery implements WriteQuery {
         }
     }
 
-    abstract static class Builder<B extends Builder<B, Q>, Q extends AbstractWriteQuery>
+    abstract static class Builder<B extends Builder<B, Q>, Q extends AbstractStoreQuery>
             extends AbstractQuery.Builder<B, Q> {
     }
 }

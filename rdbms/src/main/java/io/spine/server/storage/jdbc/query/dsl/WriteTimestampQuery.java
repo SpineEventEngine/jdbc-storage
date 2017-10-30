@@ -33,7 +33,7 @@ import io.spine.server.storage.jdbc.query.StorageQuery;
  *
  * @author Dmytro Dashenkov
  */
-abstract class WriteTimestampQuery extends AbstractWriteQuery {
+abstract class WriteTimestampQuery extends AbstractStoreQuery {
 
     private final Timestamp timestamp;
     private final String id;
@@ -59,7 +59,7 @@ abstract class WriteTimestampQuery extends AbstractWriteQuery {
     }
 
     abstract static class Builder<B extends Builder<B, Q>, Q extends WriteTimestampQuery>
-            extends AbstractWriteQuery.Builder<B, Q> {
+            extends AbstractStoreQuery.Builder<B, Q> {
 
         private Timestamp timestamp;
         private String id;

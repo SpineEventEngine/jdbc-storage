@@ -31,7 +31,7 @@ import static io.spine.server.storage.jdbc.EventCountTable.Column.event_count;
  *
  * @author Dmytro Grankin
  */
-abstract class WriteEventCountQuery<I> extends AbstractWriteQuery {
+abstract class WriteEventCountQuery<I> extends AbstractStoreQuery {
 
     private final I id;
     private final IdColumn<I> idColumn;
@@ -62,7 +62,7 @@ abstract class WriteEventCountQuery<I> extends AbstractWriteQuery {
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
     abstract static class Builder<B extends Builder<B, Q, I>, Q extends WriteEventCountQuery, I>
-            extends AbstractWriteQuery.Builder<B, Q> {
+            extends AbstractStoreQuery.Builder<B, Q> {
 
         private IdColumn<I> idColumn;
         private I id;

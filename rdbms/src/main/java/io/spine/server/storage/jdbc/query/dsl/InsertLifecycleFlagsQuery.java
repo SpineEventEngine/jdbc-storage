@@ -36,7 +36,7 @@ import static io.spine.server.storage.jdbc.LifecycleFlagsTable.Column.deleted;
  *
  * @author Dmytro Dashenkov
  */
-class InsertLifecycleFlagsQuery<I> extends AbstractWriteQuery {
+class InsertLifecycleFlagsQuery<I> extends AbstractStoreQuery {
 
     private final I id;
     private final LifecycleFlags entityStatus;
@@ -70,7 +70,7 @@ class InsertLifecycleFlagsQuery<I> extends AbstractWriteQuery {
         return new Builder<>();
     }
 
-    static class Builder<I> extends AbstractWriteQuery.Builder<Builder<I>, InsertLifecycleFlagsQuery> {
+    static class Builder<I> extends AbstractStoreQuery.Builder<Builder<I>, InsertLifecycleFlagsQuery> {
 
         private I id;
         private LifecycleFlags entityStatus;
