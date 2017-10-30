@@ -27,7 +27,7 @@ import com.google.protobuf.Message;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.SelectByIdQuery;
 import io.spine.server.storage.jdbc.query.SelectQuery;
-import io.spine.server.storage.jdbc.query.SimpleQuery;
+import io.spine.server.storage.jdbc.query.QueryExecutor;
 import io.spine.server.storage.jdbc.query.WriteQuery;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 import org.slf4j.Logger;
@@ -143,13 +143,9 @@ abstract class AbstractTable<I, R extends Message, W> {
      * <p>{@code CREATE TABLE IF NOT EXISTS $TableName ( $Columns );}
      */
     void createIfNotExists() {
-        final String rawSql = composeCreateTableSql();
-        final SimpleQuery query = SimpleQuery.newBuilder()
-                                             .setDataSource(dataSource)
-                                             .setLogger(log())
-                                             .setQuery(rawSql)
-                                             .build();
-        query.execute();
+        final QueryExecutor queryExecutor = new QueryExecutor(dataSource, log());
+        final String createTableSql = composeCreateTableSql();
+        queryExecutor.execute(createTableSql);
     }
 
     /**

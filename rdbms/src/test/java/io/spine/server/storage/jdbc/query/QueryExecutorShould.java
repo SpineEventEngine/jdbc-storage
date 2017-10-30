@@ -22,25 +22,22 @@ package io.spine.server.storage.jdbc.query;
 
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
-import io.spine.server.storage.jdbc.GivenDataSource;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
+
 /**
  * @author Dmytro Dashenkov
  */
-public class SimpleQueryShould {
+public class QueryExecutorShould {
 
     @Test(expected = DatabaseException.class)
-    public void propagate_sql_exception() {
-        final DataSourceWrapper dataSourceWrapper = GivenDataSource.whichIsStoredInMemory("foo");
-        final SimpleQuery query = SimpleQuery.newBuilder()
-                                             .setDataSource(dataSourceWrapper)
-                                             .setLogger(log())
-                                             .setQuery("invalid query")
-                                             .build();
-        query.execute();
+    public void handle_sql_exception() {
+        final DataSourceWrapper dataSourceWrapper = whichIsStoredInMemory("foo");
+        final QueryExecutor query = new QueryExecutor(dataSourceWrapper, log());
+        query.execute("invalid query");
     }
 
     private static Logger log() {
@@ -50,6 +47,6 @@ public class SimpleQueryShould {
     private enum LogSingleton {
         INSTANCE;
         @SuppressWarnings("NonSerializableFieldInSerializableClass")
-        private final Logger value = LoggerFactory.getLogger(SimpleQueryShould.class);
+        private final Logger value = LoggerFactory.getLogger(QueryExecutorShould.class);
     }
 }

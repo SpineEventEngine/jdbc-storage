@@ -21,60 +21,43 @@
 package io.spine.server.storage.jdbc.query;
 
 import io.spine.annotation.Internal;
-import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.ConnectionWrapper;
+import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.DatabaseException;
+import org.slf4j.Logger;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import static java.lang.String.format;
+
 /**
- * A query for executing a generic SQL.
+ * A helper class for execution of SQL queries.
  *
  * @author Dmytro Dashenkov
  */
 @Internal
-public class SimpleQuery extends AbstractQuery {
+public class QueryExecutor {
 
-    private SimpleQuery(Builder builder) {
-        super(builder);
+    private final DataSourceWrapper dataSource;
+    private final Logger logger;
+
+    public QueryExecutor(DataSourceWrapper dataSource, Logger logger) {
+        this.dataSource = dataSource;
+        this.logger = logger;
     }
 
     /**
      * Executes the given SQL query and ignores the result.
      */
-    public void execute() {
-        try (ConnectionWrapper connection = getConnection(true);
-             PreparedStatement statement = prepareStatement(connection)) {
+    public void execute(String query) {
+        try (ConnectionWrapper connection = dataSource.getConnection(true);
+             PreparedStatement statement = connection.prepareStatement(query)) {
             statement.execute();
         } catch (SQLException e) {
-            getLogger().error("Error executing statement " + getQuery(), e);
+            final String errorMsg = format("Error executing statement %s", query);
+            logger.error(errorMsg, e);
             throw new DatabaseException(e);
-        }
-    }
-
-    @Override
-    protected Parameters getQueryParameters() {
-        return Parameters.empty();
-    }
-
-    public static Builder newBuilder() {
-        return new Builder();
-    }
-
-    public static class Builder extends AbstractQuery.Builder<Builder, SimpleQuery> {
-
-        private Builder() {
-            super();
-        }
-
-        @Override
-        public SimpleQuery build() {
-            return new SimpleQuery(this);
-        }
-
-        @Override
-        protected Builder getThis() {
-            return this;
         }
     }
 }
