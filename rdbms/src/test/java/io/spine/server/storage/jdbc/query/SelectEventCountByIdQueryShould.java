@@ -21,12 +21,14 @@
 package io.spine.server.storage.jdbc.query;
 
 import com.google.protobuf.Message;
+import io.spine.server.storage.jdbc.DataSourceWrapper;
 import org.junit.Test;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static io.spine.Identifier.newUuid;
+import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
 import static io.spine.server.storage.jdbc.query.SelectEventCountByIdQuery.newBuilder;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
@@ -39,7 +41,9 @@ public class SelectEventCountByIdQueryShould {
     @Test
     public void return_null_if_event_count_is_null() throws SQLException {
         final ResultSet resultSet = mock(ResultSet.class);
+        final DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
         final SelectEventCountByIdQuery<Object> query = newBuilder().setTableName(newUuid())
+                                                                    .setDataSource(dataSource)
                                                                     .build();
         final Message deserialized = query.readMessage(resultSet);
         assertNull(deserialized);

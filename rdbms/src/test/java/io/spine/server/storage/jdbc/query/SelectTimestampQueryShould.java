@@ -21,12 +21,14 @@
 package io.spine.server.storage.jdbc.query;
 
 import com.google.protobuf.Message;
+import io.spine.server.storage.jdbc.DataSourceWrapper;
 import org.junit.Test;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static io.spine.Identifier.newUuid;
+import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 
@@ -38,8 +40,10 @@ public class SelectTimestampQueryShould {
     @Test
     public void return_null_if_seconds_and_nanos_fields_are_nulls() throws SQLException {
         final ResultSet resultSet = mock(ResultSet.class);
+        final DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
         final SelectTimestampQuery query = SelectTimestampQuery.newBuilder()
                                                                .setTableName(newUuid())
+                                                               .setDataSource(dataSource)
                                                                .build();
         final Message deserialized = query.readMessage(resultSet);
         assertNull(deserialized);

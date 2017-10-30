@@ -25,6 +25,7 @@ import com.google.protobuf.Message;
 import com.google.protobuf.StringValue;
 import com.querydsl.sql.AbstractSQLQuery;
 import com.querydsl.sql.SQLQuery;
+import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
 import org.junit.Test;
 
@@ -32,6 +33,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static io.spine.Identifier.newUuid;
+import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -51,8 +53,10 @@ public class SelectMessageByIdQueryShould {
                            .getResults();
         doThrow(SQLException.class).when(resultSet)
                                    .next();
+        final DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
         final SelectByIdQueryMock query = newBuilder().setTableName(newUuid())
                                                       .setQuery(underlyingQuery)
+                                                      .setDataSource(dataSource)
                                                       .build();
         query.execute();
     }
@@ -60,10 +64,12 @@ public class SelectMessageByIdQueryShould {
     @Test
     public void return_null_on_deserialization_if_column_is_null() throws SQLException {
         final ResultSet resultSet = mock(ResultSet.class);
+        final DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
         final Descriptors.Descriptor messageDescriptor = StringValue.getDescriptor();
         final SelectByIdQueryMock query = newBuilder().setTableName(newUuid())
                                                       .setMessageColumnName(newUuid())
                                                       .setMessageDescriptor(messageDescriptor)
+                                                      .setDataSource(dataSource)
                                                       .build();
         final Message deserialized = query.readMessage(resultSet);
         assertNull(deserialized);
