@@ -23,7 +23,9 @@ package io.spine.server.storage.jdbc.query.dsl;
 import com.google.protobuf.Message;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.IdColumn;
+import io.spine.server.storage.jdbc.query.ContainsQuery;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
+import io.spine.server.storage.jdbc.query.SelectByIdQuery;
 import io.spine.server.storage.jdbc.query.SelectQuery;
 
 import java.util.Iterator;
@@ -52,6 +54,17 @@ abstract class AbstractReadQueryFactory<I, R extends Message> implements ReadQue
                       .setTableName(tableName)
                       .setIdColumn(idColumn)
                       .build();
+    }
+
+    @Override
+    public SelectByIdQuery<I, Boolean> containsQuery(I id) {
+        final ContainsQuery.Builder<I> builder = ContainsQuery.newBuilder();
+        final ContainsQuery<I> query = builder.setIdColumn(idColumn)
+                                              .setId(id)
+                                              .setTableName(tableName)
+                                              .setDataSource(dataSource)
+                                              .build();
+        return query;
     }
 
     IdColumn<I> getIdColumn() {

@@ -24,7 +24,6 @@ import io.spine.annotation.Internal;
 import io.spine.server.storage.jdbc.ConnectionWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.IdColumn;
-import io.spine.server.storage.jdbc.TableColumn;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -45,7 +44,7 @@ import static java.lang.String.format;
  * @author Dmytro Dashenkov
  */
 @Internal
-public class ContainsQuery<I> extends AbstractQuery {
+public class ContainsQuery<I> extends AbstractQuery implements SelectByIdQuery<I, Boolean> {
 
     private static final String FORMAT_PLACEHOLDER = "%s";
     private static final String SQL_TEMPLATE = SELECT.toString() + ALL_ATTRIBUTES +
@@ -64,7 +63,8 @@ public class ContainsQuery<I> extends AbstractQuery {
     /**
      * @return {@code true} if there is at least one record with given ID, {@code} false otherwise
      */
-    public boolean execute() {
+    @Override
+    public Boolean execute() {
         try (ConnectionWrapper connection = getConnection(false);
              PreparedStatement statement = prepareStatement(connection)) {
             final ResultSet results = statement.executeQuery();
@@ -88,12 +88,21 @@ public class ContainsQuery<I> extends AbstractQuery {
         return new Builder<>();
     }
 
+    @Override
+    public IdColumn<I> getIdColumn() {
+        return idColumn;
+    }
+
+    @Override
+    public I getId() {
+        return id;
+    }
+
     public static class Builder<I> extends AbstractQuery.Builder<Builder<I>, ContainsQuery<I>> {
 
         private String tableName;
         private IdColumn<I> idColumn;
         private I id;
-        private TableColumn keyColumn;
 
         public Builder<I> setTableName(String tableName) {
             this.tableName = checkNotNull(tableName);
@@ -105,11 +114,6 @@ public class ContainsQuery<I> extends AbstractQuery {
             return this;
         }
 
-        public Builder<I> setKeyColumn(TableColumn keyColumn) {
-            this.keyColumn = keyColumn;
-            return this;
-        }
-
         public Builder<I> setId(I id) {
             this.id = id;
             return this;
@@ -117,7 +121,7 @@ public class ContainsQuery<I> extends AbstractQuery {
 
         @Override
         public ContainsQuery<I> build() {
-            final String sql = format(SQL_TEMPLATE, tableName, keyColumn.name());
+            final String sql = format(SQL_TEMPLATE, tableName, idColumn.getColumnName());
             setQuery(sql);
             return new ContainsQuery<>(this);
         }

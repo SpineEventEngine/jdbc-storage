@@ -24,7 +24,6 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.protobuf.Message;
-import io.spine.server.storage.jdbc.query.ContainsQuery;
 import io.spine.server.storage.jdbc.query.DeleteAllQuery;
 import io.spine.server.storage.jdbc.query.DeleteRecordQuery;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
@@ -162,14 +161,7 @@ abstract class AbstractTable<I, R extends Message, W> {
      * @return {@code true} if there is a record with such ID in the table, {@code false} otherwise
      */
     boolean containsRecord(I id) {
-        final ContainsQuery<I> query = ContainsQuery.<I>newBuilder()
-                                                    .setIdColumn(getIdColumn())
-                                                    .setId(id)
-                                                    .setTableName(getName())
-                                                    .setKeyColumn(getIdColumnDeclaration())
-                                                    .setDataSource(dataSource)
-                                                    .setLogger(log())
-                                                    .build();
+        final SelectByIdQuery<I, Boolean> query = getReadQueryFactory().containsQuery(id);
         final boolean result = query.execute();
         return result;
     }
