@@ -39,30 +39,6 @@ public class SqlShould {
         assertHasPrivateParameterlessCtor(Sql.class);
     }
 
-    @Test
-    public void generate_sequence_of_placeholders() {
-        final int count = 2;
-        final String placeholders = Sql.nPlaceholders(count);
-        final String expected =
-                BRACKET_OPEN.toString()
-                + PLACEHOLDER + COMMA
-                + PLACEHOLDER
-                + BRACKET_CLOSE;
-        assertEquals(expected, placeholders);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void fail_to_generate_placeholders_of_negative_count() {
-        final int count = -1;
-        Sql.nPlaceholders(count);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void fail_to_generate_zero_placeholders() {
-        final int count = 0;
-        Sql.nPlaceholders(count);
-    }
-
     @SuppressWarnings("DuplicateStringLiteralInspection")
     @Test
     public void provide_valid_sql_tokens() {
