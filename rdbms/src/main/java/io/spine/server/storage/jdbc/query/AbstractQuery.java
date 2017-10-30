@@ -25,7 +25,6 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.sql.AbstractSQLQueryFactory;
 import com.querydsl.sql.Configuration;
-import com.querydsl.sql.MySQLTemplates;
 import com.querydsl.sql.RelationalPath;
 import com.querydsl.sql.RelationalPathBase;
 import com.querydsl.sql.SQLBaseListener;
@@ -35,12 +34,15 @@ import com.querydsl.sql.SQLListenerContext;
 import com.querydsl.sql.SQLNoCloseListener;
 import com.querydsl.sql.SQLQueryFactory;
 import com.querydsl.sql.SQLTemplates;
+import com.querydsl.sql.SQLTemplatesRegistry;
+import io.spine.server.storage.jdbc.ConnectionWrapper;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.TableColumn;
 
 import javax.inject.Provider;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -127,11 +129,28 @@ abstract class AbstractQuery implements StorageQuery {
                                  .get();
             }
         };
-        final SQLTemplates templates = new MySQLTemplates();
+        final SQLTemplates templates = getDialectTemplates(dataSource);
         final Configuration configuration = new Configuration(templates);
         configuration.addListener(TransactionHandler.INSTANCE);
         configuration.addListener(getConnectionCloseHandler());
         return new SQLQueryFactory(configuration, connectionProvider);
+    }
+
+    /**
+     * Obtains {@linkplain SQLTemplates templates} for the JDBC dialect.
+     *
+     * @param dataSource the data source to get {@link java.sql.DatabaseMetaData DB metadata}
+     * @return templates for a particular JDBC implementation
+     */
+    private static SQLTemplates getDialectTemplates(DataSourceWrapper dataSource) {
+        try(ConnectionWrapper connection = dataSource.getConnection(true)) {
+            final DatabaseMetaData metaData = connection.get()
+                                                        .getMetaData();
+            final SQLTemplatesRegistry templatesRegistry = new SQLTemplatesRegistry();
+            return templatesRegistry.getTemplates(metaData);
+        } catch (SQLException e) {
+            throw new DatabaseException(e);
+        }
     }
 
     abstract static class Builder<B extends AbstractQuery.Builder<B, Q>, Q extends AbstractQuery> {
