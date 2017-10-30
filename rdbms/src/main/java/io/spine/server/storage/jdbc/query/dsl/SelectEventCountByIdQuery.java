@@ -23,6 +23,7 @@ package io.spine.server.storage.jdbc.query.dsl;
 import com.google.protobuf.Int32Value;
 import com.querydsl.sql.AbstractSQLQuery;
 
+import javax.annotation.Nullable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -48,12 +49,16 @@ public class SelectEventCountByIdQuery<I> extends SelectMessageByIdQuery<I, Int3
     }
 
     @SuppressWarnings("MethodDoesntCallSuperMethod") // Override default message storing policy
+    @Nullable
     @Override
     protected Int32Value readMessage(ResultSet resultSet) throws SQLException {
         final int eventCount = resultSet.getInt(event_count.name());
-        return Int32Value.newBuilder()
-                         .setValue(eventCount)
-                         .build();
+        final boolean isSqlNull = eventCount == 0;
+        return isSqlNull
+               ? null
+               : Int32Value.newBuilder()
+                           .setValue(eventCount)
+                           .build();
     }
 
     static <I> Builder<I> newBuilder() {

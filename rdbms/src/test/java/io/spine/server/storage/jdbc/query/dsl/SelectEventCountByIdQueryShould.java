@@ -27,20 +27,20 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static io.spine.Identifier.newUuid;
-import static org.junit.Assert.*;
+import static io.spine.server.storage.jdbc.query.dsl.SelectEventCountByIdQuery.newBuilder;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 
 /**
  * @author Dmytro Grankin
  */
-public class SelectTimestampQueryShould {
+public class SelectEventCountByIdQueryShould {
 
     @Test
-    public void return_null_if_seconds_and_nanos_fields_are_nulls() throws SQLException {
+    public void return_null_if_event_count_is_null() throws SQLException {
         final ResultSet resultSet = mock(ResultSet.class);
-        final SelectTimestampQuery query = SelectTimestampQuery.newBuilder()
-                                                               .setTableName(newUuid())
-                                                               .build();
+        final SelectEventCountByIdQuery<Object> query = newBuilder().setTableName(newUuid())
+                                                                    .build();
         final Message deserialized = query.readMessage(resultSet);
         assertNull(deserialized);
     }
