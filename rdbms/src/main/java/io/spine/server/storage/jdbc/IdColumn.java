@@ -28,14 +28,11 @@ import io.spine.server.entity.EntityClass;
 import io.spine.server.storage.jdbc.query.Parameter;
 import io.spine.server.storage.jdbc.query.Parameters;
 
-import java.sql.PreparedStatement;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 import static io.spine.json.Json.toCompactJson;
 
 /**
- * A helper class for setting the {@link Entity} ID into a {@link PreparedStatement}
- * as a query parameter.
+ * A helper class for setting the {@link Entity} ID into {@linkplain Parameters query parameters}.
  *
  * @param <I> the type of {@link Entity} IDs
  * @author Alexander Litus
@@ -74,6 +71,12 @@ public abstract class IdColumn<I> {
         return helper;
     }
 
+    /**
+     * Creates a {@link StringIdColumn} with the specified column name.
+     *
+     * @param columnName the name of the ID column
+     * @return the {@code IdColumn}
+     */
     public static IdColumn<String> typeString(String columnName) {
         return new StringIdColumn(columnName);
     }
@@ -88,15 +91,20 @@ public abstract class IdColumn<I> {
     public abstract Sql.Type getSqlType();
 
     /**
-     * Retrieves the {@linkplain Class Java class} of the ID when it's being set to
-     * the {@link PreparedStatement}.
+     * Retrieves the {@linkplain Class Java class} of the ID before
+     * {@linkplain #normalize(Object) normalization}.
      */
     public abstract Class<I> getJavaType();
 
     /**
-     * Normalizes the identifier before setting it to a {@link PreparedStatement}.
+     * Normalizes the identifier before setting it to a {@link Parameter}.
      *
-     * <p>The method may perform a conversion, validation or no action.
+     * <p>The method may perform a conversion of the ID to a type, which is more suitable
+     * for storing. E.g. it may be useful to store a {@linkplain Message Protobuf Message}
+     * in a JSON representation as a {@code String}.
+     *
+     * <p>If an ID type is a simple type as {@code String}, {@code Integer}, etc
+     * the method may return the same value.
      *
      * @param id the identifier to normalize
      * @return the normalized ID

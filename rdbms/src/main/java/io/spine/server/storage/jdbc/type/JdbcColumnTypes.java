@@ -156,8 +156,7 @@ final class JdbcColumnTypes {
      *
      * @see Timestamps#toMillis(Timestamp)
      */
-    private static class TimestampColumnType
-            extends AbstractJdbcColumnType<Timestamp, Long>{
+    private static class TimestampColumnType extends AbstractJdbcColumnType<Timestamp, Long>{
 
         @Override
         public Long convertColumnValue(Timestamp fieldValue) {

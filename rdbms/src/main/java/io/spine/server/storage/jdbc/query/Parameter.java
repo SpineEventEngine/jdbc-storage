@@ -28,13 +28,13 @@ import javax.annotation.Nullable;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A parameter of a SQL query.
+ * A parameter of an SQL query.
  *
- * <p>Contains all the necessary data to work with its raw value.
+ * <p>The class is a DTO containing a parameter value and its {@linkplain Sql.Type SQL type}.
  *
  * @author Dmytro Grankin
  */
-public class Parameter {
+public final class Parameter {
 
     private final Object value;
     private final Sql.Type type;
@@ -44,10 +44,24 @@ public class Parameter {
         this.type = checkNotNull(type);
     }
 
+    /**
+     * Creates a parameter using the specified parameters.
+     *
+     * @param value the parameter value
+     * @param type  the SQL type of the parameter
+     * @return a new {@code Parameter} instance
+     */
     public static Parameter of(@Nullable Object value, Sql.Type type) {
         return new Parameter(value, type);
     }
 
+    /**
+     * Creates a parameter using the specified parameters.
+     *
+     * @param value  the parameter value
+     * @param column the {@link TableColumn} describing this parameter
+     * @return a new {@code Parameter} instance
+     */
     public static Parameter of(@Nullable Object value, TableColumn column) {
         return new Parameter(value, column.type());
     }
@@ -63,10 +77,9 @@ public class Parameter {
     }
 
     /**
-     * Obtains a SQL type of the parameter.
+     * Obtains an SQL type of the parameter.
      *
-     * <p>A type allows to store a raw value and work with objects of different classes
-     * in a unified way.
+     * <p>The type should be used to set a {@linkplain #getValue() parameter value} to an SQL query.
      *
      * @return the type of the parameter
      */

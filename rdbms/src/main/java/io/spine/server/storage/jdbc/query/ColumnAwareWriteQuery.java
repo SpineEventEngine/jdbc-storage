@@ -99,7 +99,7 @@ abstract class ColumnAwareWriteQuery extends AbstractWriteQuery {
     /**
      * Obtains the sorted entity column names.
      *
-     * <p>Use this method to order the entity columns in a SQL query.
+     * <p>Use this method to order the entity columns in an SQL query.
      *
      * @param record the record to obtain column names
      * @return a {@code Collection} of sorted column names
