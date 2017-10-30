@@ -18,13 +18,9 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.query;
+package io.spine.server.storage.jdbc.query.dsl;
 
-import io.spine.annotation.Internal;
-
-import static java.lang.String.format;
-import static io.spine.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
-import static io.spine.server.storage.jdbc.Sql.Query.DELETE_FROM;
+import io.spine.server.storage.jdbc.query.WriteQuery;
 
 /**
  * Query that deletes all from a table.
@@ -32,36 +28,32 @@ import static io.spine.server.storage.jdbc.Sql.Query.DELETE_FROM;
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-@Internal
-public class DeleteAllQuery extends AbstractWriteQuery {
-
-    private static final String QUERY_TEMPLATE = DELETE_FROM + "%s" + SEMICOLON;
+class DeleteAllQuery extends AbstractQuery implements WriteQuery {
 
     private DeleteAllQuery(Builder builder) {
         super(builder);
     }
 
     @Override
-    protected Parameters getQueryParameters() {
-        return Parameters.empty();
+    public void execute() {
+        factory().delete(table())
+                 .execute();
     }
 
-    public static Builder newBuilder(String tableName) {
-        final Builder builder = new Builder();
-        builder.setQuery(format(QUERY_TEMPLATE, tableName));
-        return builder;
+    static Builder newBuilder() {
+        return new Builder();
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder extends AbstractWriteQuery.Builder<Builder, DeleteAllQuery> {
+    static class Builder extends AbstractQuery.Builder<Builder, DeleteAllQuery> {
 
         @Override
-        public DeleteAllQuery build() {
+        DeleteAllQuery build() {
             return new DeleteAllQuery(this);
         }
 
         @Override
-        protected Builder getThis() {
+        Builder getThis() {
             return this;
         }
     }
