@@ -26,8 +26,8 @@ import io.spine.server.aggregate.Aggregate;
 import io.spine.server.entity.LifecycleFlags;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
-import io.spine.server.storage.jdbc.query.dsl.LifecycleFlagsReadQueryFactory;
-import io.spine.server.storage.jdbc.query.dsl.LifecycleFlagsWriteQueryFactory;
+import io.spine.server.storage.jdbc.query.LifecycleFlagsReadQueryFactory;
+import io.spine.server.storage.jdbc.query.LifecycleFlagsWriteQueryFactory;
 
 import java.util.List;
 

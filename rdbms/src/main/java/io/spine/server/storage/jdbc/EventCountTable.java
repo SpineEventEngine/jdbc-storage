@@ -26,8 +26,8 @@ import io.spine.annotation.Internal;
 import io.spine.server.entity.Entity;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
-import io.spine.server.storage.jdbc.query.dsl.EventCountReadQueryFactory;
-import io.spine.server.storage.jdbc.query.dsl.EventCountWriteQueryFactory;
+import io.spine.server.storage.jdbc.query.EventCountReadQueryFactory;
+import io.spine.server.storage.jdbc.query.EventCountWriteQueryFactory;
 
 import java.util.List;
 

@@ -24,8 +24,8 @@ import com.google.protobuf.Timestamp;
 import io.spine.annotation.Internal;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
-import io.spine.server.storage.jdbc.query.dsl.LastHandledEventTimeReadFactory;
-import io.spine.server.storage.jdbc.query.dsl.LastHandledEventTimeWriteFactory;
+import io.spine.server.storage.jdbc.query.LastHandledEventTimeReadFactory;
+import io.spine.server.storage.jdbc.query.LastHandledEventTimeWriteFactory;
 
 import java.util.List;
 

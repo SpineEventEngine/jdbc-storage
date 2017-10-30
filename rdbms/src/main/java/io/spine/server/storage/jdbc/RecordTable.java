@@ -33,8 +33,8 @@ import io.spine.server.entity.storage.EntityQuery;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
-import io.spine.server.storage.jdbc.query.dsl.RecordStorageReadQueryFactory;
-import io.spine.server.storage.jdbc.query.dsl.RecordStorageWriteQueryFactory;
+import io.spine.server.storage.jdbc.query.RecordStorageReadQueryFactory;
+import io.spine.server.storage.jdbc.query.RecordStorageWriteQueryFactory;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
 
 import javax.annotation.Nullable;

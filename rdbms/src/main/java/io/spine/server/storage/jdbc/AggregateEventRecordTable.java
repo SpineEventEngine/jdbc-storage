@@ -27,8 +27,8 @@ import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.aggregate.AggregateReadRequest;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
-import io.spine.server.storage.jdbc.query.dsl.AggregateStorageReadQueryFactory;
-import io.spine.server.storage.jdbc.query.dsl.AggregateStorageWriteQueryFactory;
+import io.spine.server.storage.jdbc.query.AggregateStorageReadQueryFactory;
+import io.spine.server.storage.jdbc.query.AggregateStorageWriteQueryFactory;
 
 import java.util.List;
 
