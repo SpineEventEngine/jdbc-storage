@@ -20,13 +20,23 @@
 
 package io.spine.server.storage.jdbc.query;
 
+import io.spine.server.storage.jdbc.ConnectionWrapper;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+import static io.spine.Identifier.newUuid;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 
 /**
  * @author Dmytro Dashenkov
@@ -34,10 +44,19 @@ import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory
 public class QueryExecutorShould {
 
     @Test(expected = DatabaseException.class)
-    public void handle_sql_exception() {
-        final DataSourceWrapper dataSourceWrapper = whichIsStoredInMemory("foo");
-        final QueryExecutor query = new QueryExecutor(dataSourceWrapper, log());
-        query.execute("invalid query");
+    public void handle_sql_exception_on_query_execution() throws SQLException {
+        final DataSourceWrapper dataSource = mock(DataSourceWrapper.class);
+        final ConnectionWrapper connection = mock(ConnectionWrapper.class);
+        final PreparedStatement statement = mock(PreparedStatement.class);
+
+        doReturn(connection).when(dataSource)
+                            .getConnection(anyBoolean());
+        doReturn(statement).when(connection)
+                           .prepareStatement(anyString());
+        doThrow(SQLException.class).when(statement)
+                                   .execute();
+        final QueryExecutor query = spy(new QueryExecutor(dataSource, log()));
+        query.execute(newUuid());
     }
 
     private static Logger log() {
