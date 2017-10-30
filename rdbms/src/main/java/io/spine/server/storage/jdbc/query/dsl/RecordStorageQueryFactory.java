@@ -28,7 +28,6 @@ import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.IdColumn;
 import io.spine.server.storage.jdbc.RecordTable;
-import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.SelectByIdQuery;
 import io.spine.server.storage.jdbc.query.SelectQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
@@ -39,21 +38,15 @@ import org.slf4j.Logger;
 import java.util.Iterator;
 import java.util.Map;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
  * The query factory for interaction with the {@link RecordTable}.
  *
  * @author Andrey Lavrov
  * @author Dmytro Dashenkov
  */
-public class RecordStorageQueryFactory<I>
-        implements ReadQueryFactory<I, EntityRecord>,
-                   WriteQueryFactory<I, EntityRecordWithColumns> {
+public class RecordStorageQueryFactory<I> extends AbstractReadQueryFactory<I, EntityRecord>
+        implements WriteQueryFactory<I, EntityRecordWithColumns> {
 
-    private final IdColumn<I> idColumn;
-    private final DataSourceWrapper dataSource;
-    private final String tableName;
     private final Logger logger;
     private final ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> columnTypeRegistry;
 
@@ -69,10 +62,7 @@ public class RecordStorageQueryFactory<I>
                                      IdColumn<I> idColumn,
                                      ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>>
                                              columnTypeRegistry) {
-        super();
-        this.idColumn = checkNotNull(idColumn);
-        this.dataSource = dataSource;
-        this.tableName = tableName;
+        super(idColumn, dataSource, tableName);
         this.logger = logger;
         this.columnTypeRegistry = columnTypeRegistry;
     }
@@ -84,9 +74,9 @@ public class RecordStorageQueryFactory<I>
     public SelectQuery<Iterator<EntityRecord>> newSelectByEntityQuery(EntityQuery<I> query,
                                                                       FieldMask fieldMask) {
         final SelectByEntityColumnsQuery.Builder<I> builder = SelectByEntityColumnsQuery.newBuilder();
-        builder.setDataSource(dataSource)
-               .setTableName(tableName)
-               .setIdColumn(idColumn)
+        builder.setDataSource(getDataSource())
+               .setTableName(getTableName())
+               .setIdColumn(getIdColumn())
                .setColumnTypeRegistry(columnTypeRegistry)
                .setEntityQuery(query)
                .setFieldMask(fieldMask);
@@ -95,9 +85,9 @@ public class RecordStorageQueryFactory<I>
 
     public WriteQuery newInsertEntityRecordsBulkQuery(Map<I, EntityRecordWithColumns> records) {
         final InsertEntityRecordsBulkQuery.Builder<I> builder = InsertEntityRecordsBulkQuery.newBuilder();
-        builder.setDataSource(dataSource)
-               .setTableName(tableName)
-               .setIdColumn(idColumn)
+        builder.setDataSource(getDataSource())
+               .setTableName(getTableName())
+               .setIdColumn(getIdColumn())
                .setColumnTypeRegistry(columnTypeRegistry)
                .addRecords(records);
         return builder.build();
@@ -106,29 +96,20 @@ public class RecordStorageQueryFactory<I>
     @Override
     public SelectByIdQuery<I, EntityRecord> newSelectByIdQuery(I id) {
         final SelectEntityByIdQuery.Builder<I> builder = SelectEntityByIdQuery.newBuilder();
-        builder.setTableName(tableName)
-               .setDataSource(dataSource)
-               .setIdColumn(idColumn)
+        builder.setTableName(getTableName())
+               .setDataSource(getDataSource())
+               .setIdColumn(getIdColumn())
                .setId(id);
         return builder.build();
     }
 
     @Override
-    public SelectQuery<Iterator<I>> newIndexQuery() {
-        final StorageIndexQuery.Builder<I> builder = StorageIndexQuery.newBuilder();
-        return builder.setDataSource(dataSource)
-                      .setTableName(tableName)
-                      .setIdColumn(idColumn)
-                      .build();
-    }
-
-    @Override
     public WriteQuery newInsertQuery(I id, EntityRecordWithColumns record) {
         final InsertEntityQuery.Builder<I> builder = InsertEntityQuery.newBuilder();
-        builder.setDataSource(dataSource)
-               .setTableName(tableName)
+        builder.setDataSource(getDataSource())
+               .setTableName(getTableName())
                .setId(id)
-               .setIdColumn(idColumn)
+               .setIdColumn(getIdColumn())
                .setColumnTypeRegistry(columnTypeRegistry)
                .setRecord(record);
         return builder.build();
@@ -137,9 +118,9 @@ public class RecordStorageQueryFactory<I>
     @Override
     public WriteQuery newUpdateQuery(I id, EntityRecordWithColumns record) {
         final UpdateEntityQuery.Builder<I> builder = UpdateEntityQuery.newBuilder();
-        builder.setTableName(tableName)
-               .setDataSource(dataSource)
-               .setIdColumn(idColumn)
+        builder.setTableName(getTableName())
+               .setDataSource(getDataSource())
+               .setIdColumn(getIdColumn())
                .setId(id)
                .setRecord(record)
                .setColumnTypeRegistry(columnTypeRegistry);

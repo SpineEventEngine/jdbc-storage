@@ -24,14 +24,10 @@ import io.spine.server.entity.LifecycleFlags;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.IdColumn;
 import io.spine.server.storage.jdbc.LifecycleFlagsTable;
-import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.SelectByIdQuery;
-import io.spine.server.storage.jdbc.query.SelectQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 import org.slf4j.Logger;
-
-import java.util.Iterator;
 
 /**
  * An implementation of the query factory for generating queries for
@@ -39,52 +35,35 @@ import java.util.Iterator;
  *
  * @author Dmytro Dashenkov
  */
-public class LifecycleFlagsQueryFactory<I> implements ReadQueryFactory<I, LifecycleFlags>,
-                                                      WriteQueryFactory<I, LifecycleFlags> {
-
-    private final Logger logger;
-    private final DataSourceWrapper dataSource;
-    private final IdColumn<I> idColumn;
-    private final String tableName;
+public class LifecycleFlagsQueryFactory<I> extends AbstractReadQueryFactory<I, LifecycleFlags>
+        implements WriteQueryFactory<I, LifecycleFlags> {
 
     public LifecycleFlagsQueryFactory(DataSourceWrapper dataSource,
                                       Logger logger,
                                       IdColumn<I> idColumn,
                                       String tableName) {
-        this.logger = logger;
-        this.dataSource = dataSource;
-        this.idColumn = idColumn;
-        this.tableName = tableName;
+        super(idColumn, dataSource, tableName);
     }
 
     @Override
     public SelectByIdQuery<I, LifecycleFlags> newSelectByIdQuery(I id) {
         final SelectLifecycleFlagsQuery.Builder<I> builder = SelectLifecycleFlagsQuery.newBuilder();
-        final SelectByIdQuery<I, LifecycleFlags> query = builder.setTableName(tableName)
-                                                                .setDataSource(dataSource)
-                                                                .setIdColumn(idColumn)
+        final SelectByIdQuery<I, LifecycleFlags> query = builder.setTableName(getTableName())
+                                                                .setDataSource(getDataSource())
+                                                                .setIdColumn(getIdColumn())
                                                                 .setId(id)
                                                                 .build();
         return query;
     }
 
     @Override
-    public SelectQuery<Iterator<I>> newIndexQuery() {
-        final StorageIndexQuery.Builder<I> builder = StorageIndexQuery.newBuilder();
-        return builder.setDataSource(dataSource)
-                      .setTableName(tableName)
-                      .setIdColumn(idColumn)
-                      .build();
-    }
-
-    @Override
     public WriteQuery newInsertQuery(I id, LifecycleFlags record) {
         final InsertLifecycleFlagsQuery.Builder<I> builder = InsertLifecycleFlagsQuery.newBuilder();
-        final WriteQuery query = builder.setTableName(tableName)
+        final WriteQuery query = builder.setTableName(getTableName())
                                         .setId(id)
                                         .setLifecycleFlags(record)
-                                        .setDataSource(dataSource)
-                                        .setIdColumn(idColumn)
+                                        .setDataSource(getDataSource())
+                                        .setIdColumn(getIdColumn())
                                         .build();
         return query;
     }
@@ -92,11 +71,11 @@ public class LifecycleFlagsQueryFactory<I> implements ReadQueryFactory<I, Lifecy
     @Override
     public WriteQuery newUpdateQuery(I id, LifecycleFlags record) {
         final UpdateLifecycleFlagsQuery.Builder<I> builder = UpdateLifecycleFlagsQuery.newBuilder();
-        final WriteQuery query = builder.setTableName(tableName)
-                                        .setDataSource(dataSource)
+        final WriteQuery query = builder.setTableName(getTableName())
+                                        .setDataSource(getDataSource())
                                         .setId(id)
                                         .setLifecycleFlags(record)
-                                        .setIdColumn(idColumn)
+                                        .setIdColumn(getIdColumn())
                                         .build();
         return query;
     }

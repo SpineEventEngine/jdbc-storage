@@ -23,15 +23,10 @@ package io.spine.server.storage.jdbc.query.dsl;
 import com.google.protobuf.Timestamp;
 import io.spine.annotation.Internal;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.IdColumn;
 import io.spine.server.storage.jdbc.LastHandledEventTimeTable;
-import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.SelectByIdQuery;
-import io.spine.server.storage.jdbc.query.SelectQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
-
-import java.util.Iterator;
 
 import static io.spine.server.storage.jdbc.IdColumn.typeString;
 import static io.spine.server.storage.jdbc.LastHandledEventTimeTable.Column.projection_type;
@@ -42,13 +37,8 @@ import static io.spine.server.storage.jdbc.LastHandledEventTimeTable.Column.proj
  * @author Andrey Lavrov
  */
 @Internal
-public class LastHandledEventTimeQueryFactory
-        implements ReadQueryFactory<String, Timestamp>,
-                   WriteQueryFactory<String, Timestamp> {
-
-    private final DataSourceWrapper dataSource;
-    private final String tableName;
-    private final IdColumn<String> idColumn;
+public class LastHandledEventTimeQueryFactory extends AbstractReadQueryFactory<String, Timestamp>
+        implements WriteQueryFactory<String, Timestamp> {
 
     /**
      * Creates a new instance.
@@ -56,36 +46,25 @@ public class LastHandledEventTimeQueryFactory
      * @param dataSource instance of {@link DataSourceWrapper}
      */
     public LastHandledEventTimeQueryFactory(DataSourceWrapper dataSource, String tableName) {
-        this.dataSource = dataSource;
-        this.tableName = tableName;
-        this.idColumn = typeString(projection_type.name());
+        super(typeString(projection_type.name()), dataSource, tableName);
     }
 
     @Override
     public SelectByIdQuery<String, Timestamp> newSelectByIdQuery(String id) {
         final SelectTimestampQuery.Builder builder = SelectTimestampQuery.newBuilder();
-        final SelectTimestampQuery query = builder.setTableName(tableName)
-                                                  .setDataSource(dataSource)
+        final SelectTimestampQuery query = builder.setTableName(getTableName())
+                                                  .setDataSource(getDataSource())
                                                   .setId(id)
-                                                  .setIdColumn(idColumn)
+                                                  .setIdColumn(getIdColumn())
                                                   .build();
         return query;
     }
 
     @Override
-    public SelectQuery<Iterator<String>> newIndexQuery() {
-        final StorageIndexQuery.Builder<String> builder = StorageIndexQuery.newBuilder();
-        return builder.setDataSource(dataSource)
-                      .setTableName(tableName)
-                      .setIdColumn(idColumn)
-                      .build();
-    }
-
-    @Override
     public WriteQuery newInsertQuery(String id, Timestamp record) {
         final InsertTimestampQuery.Builder builder = InsertTimestampQuery.newBuilder();
-        final InsertTimestampQuery query = builder.setTableName(tableName)
-                                                  .setDataSource(dataSource)
+        final InsertTimestampQuery query = builder.setTableName(getTableName())
+                                                  .setDataSource(getDataSource())
                                                   .setId(id)
                                                   .setTimestamp(record)
                                                   .build();
@@ -95,8 +74,8 @@ public class LastHandledEventTimeQueryFactory
     @Override
     public WriteQuery newUpdateQuery(String id, Timestamp record) {
         final UpdateTimestampQuery.Builder builder = UpdateTimestampQuery.newBuilder();
-        final UpdateTimestampQuery query = builder.setTableName(tableName)
-                                                  .setDataSource(dataSource)
+        final UpdateTimestampQuery query = builder.setTableName(getTableName())
+                                                  .setDataSource(getDataSource())
                                                   .setId(id)
                                                   .setTimestamp(record)
                                                   .build();

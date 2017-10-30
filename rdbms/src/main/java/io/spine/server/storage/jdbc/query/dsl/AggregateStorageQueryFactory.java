@@ -25,14 +25,10 @@ import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DbIterator;
 import io.spine.server.storage.jdbc.IdColumn;
-import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.SelectByIdQuery;
-import io.spine.server.storage.jdbc.query.SelectQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 import org.slf4j.Logger;
-
-import java.util.Iterator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -45,12 +41,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author Dmytro Dashenkov
  */
 @Internal
-public class AggregateStorageQueryFactory<I> implements ReadQueryFactory<I, AggregateEventRecord>,
-                                                        WriteQueryFactory<I, AggregateEventRecord> {
+public class AggregateStorageQueryFactory<I> extends AbstractReadQueryFactory<I, AggregateEventRecord>
+        implements WriteQueryFactory<I, AggregateEventRecord> {
 
-    private final IdColumn<I> idColumn;
-    private final String mainTableName;
-    private final DataSourceWrapper dataSource;
     private final Logger logger;
 
     /**
@@ -62,10 +55,7 @@ public class AggregateStorageQueryFactory<I> implements ReadQueryFactory<I, Aggr
                                         String tableName,
                                         IdColumn<I> idColumn,
                                         Logger logger) {
-        super();
-        this.idColumn = checkNotNull(idColumn);
-        this.mainTableName = tableName;
-        this.dataSource = dataSource;
+        super(idColumn, dataSource, tableName);
         this.logger = checkNotNull(logger);
     }
 
@@ -74,9 +64,9 @@ public class AggregateStorageQueryFactory<I> implements ReadQueryFactory<I, Aggr
     public SelectByIdQuery<I, DbIterator<AggregateEventRecord>> newSelectEventRecordsById(I id,
                                                                                           int fetchSize) {
         final SelectEventRecordsById.Builder<I> builder = SelectEventRecordsById.newBuilder();
-        return builder.setTableName(mainTableName)
-                      .setDataSource(dataSource)
-                      .setIdColumn(idColumn)
+        return builder.setTableName(getTableName())
+                      .setDataSource(getDataSource())
+                      .setIdColumn(getIdColumn())
                       .setId(id)
                       .setFetchSize(fetchSize)
                       .build();
@@ -96,20 +86,11 @@ public class AggregateStorageQueryFactory<I> implements ReadQueryFactory<I, Aggr
     }
 
     @Override
-    public SelectQuery<Iterator<I>> newIndexQuery() {
-        final StorageIndexQuery.Builder<I> builder = StorageIndexQuery.newBuilder();
-        return builder.setDataSource(dataSource)
-                      .setIdColumn(idColumn)
-                      .setTableName(mainTableName)
-                      .build();
-    }
-
-    @Override
     public WriteQuery newInsertQuery(I id, AggregateEventRecord record) {
         final InsertAggregateRecordQuery.Builder<I> builder = InsertAggregateRecordQuery.newBuilder();
-        return builder.setTableName(mainTableName)
-                      .setDataSource(dataSource)
-                      .setIdColumn(idColumn)
+        return builder.setTableName(getTableName())
+                      .setDataSource(getDataSource())
+                      .setIdColumn(getIdColumn())
                       .setId(id)
                       .setRecord(record)
                       .build();

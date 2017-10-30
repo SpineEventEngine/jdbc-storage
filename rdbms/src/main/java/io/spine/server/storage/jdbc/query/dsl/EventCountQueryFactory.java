@@ -25,14 +25,10 @@ import io.spine.annotation.Internal;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.EventCountTable;
 import io.spine.server.storage.jdbc.IdColumn;
-import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.SelectByIdQuery;
-import io.spine.server.storage.jdbc.query.SelectQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 import org.slf4j.Logger;
-
-import java.util.Iterator;
 
 /**
  * An implementation of the query factory generating queries for the {@link EventCountTable}.
@@ -40,49 +36,34 @@ import java.util.Iterator;
  * @author Dmytro Dashenkov
  */
 @Internal
-public class EventCountQueryFactory<I> implements ReadQueryFactory<I, Int32Value>,
-                                                  WriteQueryFactory<I, Int32Value>{
-
-    private final String tableName;
-    private final IdColumn<I> idColumn;
-    private final DataSourceWrapper dataSource;
+public class EventCountQueryFactory<I> extends AbstractReadQueryFactory<I, Int32Value>
+        implements WriteQueryFactory<I, Int32Value>{
 
     public EventCountQueryFactory(DataSourceWrapper dataSource,
                                   String tableName,
                                   IdColumn<I> idColumn,
                                   Logger logger) {
-        this.tableName = tableName;
-        this.idColumn = idColumn;
-        this.dataSource = dataSource;
+        super(idColumn, dataSource, tableName);
     }
 
     @Override
     public SelectByIdQuery<I, Int32Value> newSelectByIdQuery(I id) {
         final SelectEventCountByIdQuery.Builder<I> builder = SelectEventCountByIdQuery.newBuilder();
-        final SelectEventCountByIdQuery<I> query = builder.setTableName(tableName)
-                                                          .setDataSource(dataSource)
+        final SelectEventCountByIdQuery<I> query = builder.setTableName(getTableName())
+                                                          .setDataSource(getDataSource())
                                                           .setId(id)
-                                                          .setIdColumn(idColumn)
+                                                          .setIdColumn(getIdColumn())
                                                           .build();
         return query;
     }
 
     @Override
-    public SelectQuery<Iterator<I>> newIndexQuery() {
-        final StorageIndexQuery.Builder<I> builder = StorageIndexQuery.newBuilder();
-        return builder.setDataSource(dataSource)
-                      .setTableName(tableName)
-                      .setIdColumn(idColumn)
-                      .build();
-    }
-
-    @Override
     public WriteQuery newInsertQuery(I id, Int32Value record) {
         final InsertEventCountQuery.Builder<I> builder = InsertEventCountQuery.newBuilder();
-        final WriteQuery query = builder.setTableName(tableName)
+        final WriteQuery query = builder.setTableName(getTableName())
                                         .setId(id)
-                                        .setIdColumn(idColumn)
-                                        .setDataSource(dataSource)
+                                        .setIdColumn(getIdColumn())
+                                        .setDataSource(getDataSource())
                                         .setEventCount(record.getValue())
                                         .build();
         return query;
@@ -91,10 +72,10 @@ public class EventCountQueryFactory<I> implements ReadQueryFactory<I, Int32Value
     @Override
     public WriteQuery newUpdateQuery(I id, Int32Value record) {
         final UpdateEventCountQuery.Builder<I> builder = UpdateEventCountQuery.newBuilder();
-        final WriteQuery query = builder.setDataSource(dataSource)
-                                        .setTableName(tableName)
+        final WriteQuery query = builder.setDataSource(getDataSource())
+                                        .setTableName(getTableName())
                                         .setId(id)
-                                        .setIdColumn(idColumn)
+                                        .setIdColumn(getIdColumn())
                                         .setEventCount(record.getValue())
                                         .build();
         return query;
