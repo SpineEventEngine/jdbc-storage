@@ -27,7 +27,8 @@ import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.aggregate.AggregateReadRequest;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
-import io.spine.server.storage.jdbc.query.dsl.AggregateStorageQueryFactory;
+import io.spine.server.storage.jdbc.query.dsl.AggregateStorageReadFactory;
+import io.spine.server.storage.jdbc.query.dsl.AggregateStorageWriteFactory;
 
 import java.util.List;
 
@@ -45,14 +46,17 @@ import static io.spine.server.storage.jdbc.Sql.Type.INT;
 @Internal
 public class AggregateEventRecordTable<I> extends AggregateTable<I, AggregateEventRecord> {
 
-    private final AggregateStorageQueryFactory<I> queryFactory;
+    private final AggregateStorageReadFactory<I> readFactory;
+    private final AggregateStorageWriteFactory<I> writeFactory;
 
     AggregateEventRecordTable(Class<? extends Aggregate<I, ?, ?>> entityClass,
                               DataSourceWrapper dataSource) {
         super(entityClass, Column.id.name(), dataSource);
-        queryFactory = new AggregateStorageQueryFactory<>(dataSource,
-                                                          newTableName(entityClass),
-                                                          getIdColumn(),
+        final String tableName = newTableName(entityClass);
+        readFactory = new AggregateStorageReadFactory<>(getIdColumn(), dataSource, tableName);
+        writeFactory = new AggregateStorageWriteFactory<>(getIdColumn(),
+                                                          dataSource,
+                                                          tableName,
                                                           log());
     }
 
@@ -63,12 +67,12 @@ public class AggregateEventRecordTable<I> extends AggregateTable<I, AggregateEve
 
     @Override
     protected ReadQueryFactory<I, AggregateEventRecord> getReadQueryFactory() {
-        return queryFactory;
+        return readFactory;
     }
 
     @Override
     protected WriteQueryFactory<I, AggregateEventRecord> getWriteQueryFactory() {
-        return queryFactory;
+        return writeFactory;
     }
 
     @Override
@@ -79,15 +83,15 @@ public class AggregateEventRecordTable<I> extends AggregateTable<I, AggregateEve
     @SuppressWarnings("MethodDoesntCallSuperMethod") // No extra presence checks are required
     @Override
     public void write(I id, AggregateEventRecord record) {
-        queryFactory.newInsertQuery(id, record)
+        writeFactory.newInsertQuery(id, record)
                     .execute();
     }
 
     DbIterator<AggregateEventRecord> historyBackward(AggregateReadRequest<I> request) {
         final I id = request.getRecordId();
         final int batchSize = request.getBatchSize();
-        return queryFactory.newSelectEventRecordsById(id, batchSize)
-                           .execute();
+        return readFactory.newSelectEventRecordsById(id, batchSize)
+                          .execute();
     }
 
     /**

@@ -23,17 +23,14 @@ package io.spine.server.storage.jdbc.query.dsl;
 import io.spine.annotation.Internal;
 import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.DbIterator;
 import io.spine.server.storage.jdbc.IdColumn;
-import io.spine.server.storage.jdbc.query.SelectByIdQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
-import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 import org.slf4j.Logger;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * The query factory for interaction with
+ * The {@code WriteQueryFactory} for
  * {@link io.spine.server.storage.jdbc.AggregateEventRecordTable AggregateEventRecordTable}.
  *
  * @param <I> the type of IDs used in the storage
@@ -41,8 +38,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author Dmytro Dashenkov
  */
 @Internal
-public class AggregateStorageQueryFactory<I> extends AbstractReadQueryFactory<I, AggregateEventRecord>
-        implements WriteQueryFactory<I, AggregateEventRecord> {
+public class AggregateStorageWriteFactory<I> extends AbstractWriteQueryFactory<I, AggregateEventRecord> {
 
     private final Logger logger;
 
@@ -51,38 +47,12 @@ public class AggregateStorageQueryFactory<I> extends AbstractReadQueryFactory<I,
      *
      * @param dataSource instance of {@link DataSourceWrapper}
      */
-    public AggregateStorageQueryFactory(DataSourceWrapper dataSource,
+    public AggregateStorageWriteFactory(IdColumn<I> idColumn,
+                                        DataSourceWrapper dataSource,
                                         String tableName,
-                                        IdColumn<I> idColumn,
                                         Logger logger) {
         super(idColumn, dataSource, tableName);
         this.logger = checkNotNull(logger);
-    }
-
-    /** Returns a query that selects aggregate records by ID sorted by time descending. */
-    @SuppressWarnings("InstanceMethodNamingConvention")
-    public SelectByIdQuery<I, DbIterator<AggregateEventRecord>> newSelectEventRecordsById(I id,
-                                                                                          int fetchSize) {
-        final SelectEventRecordsById.Builder<I> builder = SelectEventRecordsById.newBuilder();
-        return builder.setTableName(getTableName())
-                      .setDataSource(getDataSource())
-                      .setIdColumn(getIdColumn())
-                      .setId(id)
-                      .setFetchSize(fetchSize)
-                      .build();
-    }
-
-    /**
-     * Thrown an {@link UnsupportedOperationException}.
-     *
-     * @deprecated multiple records correspond to a single ID in
-     * {@link io.spine.server.storage.jdbc.AggregateEventRecordTable AggregateEventRecordTable};
-     * please use {@link #newSelectEventRecordsById(Object, int)} to read the records.
-     */
-    @Deprecated
-    @Override
-    public SelectByIdQuery<I, AggregateEventRecord> newSelectByIdQuery(I id) {
-        throw new UnsupportedOperationException("Use newSelectEventRecordsById instead.");
     }
 
     @Override
