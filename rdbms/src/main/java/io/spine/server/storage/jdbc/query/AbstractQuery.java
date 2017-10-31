@@ -68,10 +68,20 @@ abstract class AbstractQuery implements StorageQuery {
         this.pathBuilder = new PathBuilder<>(Object.class, tableName);
     }
 
+    /**
+     * Obtains the {@linkplain RelationalPath path} of the target table for the query.
+     *
+     * @return the table path
+     */
     RelationalPath<Object> table() {
         return tablePath;
     }
 
+    /**
+     * Obtains a {@linkplain AbstractSQLQueryFactory factory} to compose the query.
+     *
+     * @return the query factory
+     */
     AbstractSQLQueryFactory<?> factory() {
         return queryFactory;
     }
