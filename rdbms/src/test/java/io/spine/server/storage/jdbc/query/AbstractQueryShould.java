@@ -83,7 +83,7 @@ public class AbstractQueryShould {
         doReturn(connection).when(context)
                             .getConnection();
         final SQLListeners listeners = configuration.getListeners();
-        listeners.end(context);
+        listeners.executed(context);
     }
 
     private static class AStorageQuery extends AbstractQuery {
