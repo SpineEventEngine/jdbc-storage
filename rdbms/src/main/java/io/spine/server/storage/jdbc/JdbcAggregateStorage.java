@@ -159,8 +159,8 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     @Override
     public void close() throws DatabaseException {
         super.close();
-        dataSource.close();
         closeAll(iterators);
+        dataSource.close();
         iterators.clear();
     }
 
