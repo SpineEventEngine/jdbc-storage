@@ -40,7 +40,7 @@ import java.util.Iterator;
 public interface ReadQueryFactory<I, R> {
 
     /**
-     * Creates an {@linkplain SelectByIdQuery read by ID query}.
+     * Creates an {@linkplain SelectQuery read by ID query}.
      *
      * @return a query for selecting a record by given ID
      */
@@ -54,7 +54,7 @@ public interface ReadQueryFactory<I, R> {
     SelectQuery<Iterator<I>> newIndexQuery();
 
     /**
-     * Creates a {@linkplain SelectByIdQuery contains by ID query}.
+     * Creates a {@linkplain SelectQuery contains by ID query}.
      *
      * @param id the ID to check
      * @return a query to check presence of a record
