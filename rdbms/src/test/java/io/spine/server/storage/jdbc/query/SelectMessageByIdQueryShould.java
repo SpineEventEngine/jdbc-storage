@@ -38,11 +38,28 @@ import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 /**
  * @author Dmytro Grankin
  */
 public class SelectMessageByIdQueryShould {
+
+    @Test
+    public void close_result_set() throws SQLException {
+        final SQLQuery underlyingQuery = mock(SQLQuery.class);
+        final ResultSet resultSet = mock(ResultSet.class);
+
+        doReturn(resultSet).when(underlyingQuery)
+                           .getResults();
+        final DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
+        final ASelectMessageByIdQuery query = newBuilder().setTableName(newUuid())
+                                                          .setQuery(underlyingQuery)
+                                                          .setDataSource(dataSource)
+                                                          .build();
+        query.execute();
+        verify(resultSet).close();
+    }
 
     @Test(expected = DatabaseException.class)
     public void handle_sql_exception() throws SQLException {
@@ -54,10 +71,10 @@ public class SelectMessageByIdQueryShould {
         doThrow(SQLException.class).when(resultSet)
                                    .next();
         final DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
-        final SelectByIdQueryMock query = newBuilder().setTableName(newUuid())
-                                                      .setQuery(underlyingQuery)
-                                                      .setDataSource(dataSource)
-                                                      .build();
+        final ASelectMessageByIdQuery query = newBuilder().setTableName(newUuid())
+                                                          .setQuery(underlyingQuery)
+                                                          .setDataSource(dataSource)
+                                                          .build();
         query.execute();
     }
 
@@ -66,20 +83,20 @@ public class SelectMessageByIdQueryShould {
         final ResultSet resultSet = mock(ResultSet.class);
         final DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
         final Descriptors.Descriptor messageDescriptor = StringValue.getDescriptor();
-        final SelectByIdQueryMock query = newBuilder().setTableName(newUuid())
-                                                      .setMessageColumnName(newUuid())
-                                                      .setMessageDescriptor(messageDescriptor)
-                                                      .setDataSource(dataSource)
-                                                      .build();
+        final ASelectMessageByIdQuery query = newBuilder().setTableName(newUuid())
+                                                          .setMessageColumnName(newUuid())
+                                                          .setMessageDescriptor(messageDescriptor)
+                                                          .setDataSource(dataSource)
+                                                          .build();
         final Message deserialized = query.readMessage(resultSet);
         assertNull(deserialized);
     }
 
-    private static class SelectByIdQueryMock extends SelectMessageByIdQuery<String, Message> {
+    private static class ASelectMessageByIdQuery extends SelectMessageByIdQuery<String, Message> {
+
 
         private final AbstractSQLQuery<?, ?> query;
-
-        private SelectByIdQueryMock(Builder builder) {
+        private ASelectMessageByIdQuery(Builder builder) {
             super(builder);
             this.query = builder.query;
         }
@@ -90,7 +107,7 @@ public class SelectMessageByIdQueryShould {
         }
 
         private static class Builder extends SelectMessageByIdQuery.Builder<Builder,
-                                                                            SelectByIdQueryMock,
+                                                                            ASelectMessageByIdQuery,
                                                                             String,
                                                                             Message> {
 
@@ -102,8 +119,8 @@ public class SelectMessageByIdQueryShould {
             }
 
             @Override
-            SelectByIdQueryMock build() {
-                return new SelectByIdQueryMock(this);
+            ASelectMessageByIdQuery build() {
+                return new ASelectMessageByIdQuery(this);
             }
 
             @Override
@@ -113,7 +130,7 @@ public class SelectMessageByIdQueryShould {
         }
     }
 
-    static SelectByIdQueryMock.Builder newBuilder() {
-        return new SelectByIdQueryMock.Builder();
+    static ASelectMessageByIdQuery.Builder newBuilder() {
+        return new ASelectMessageByIdQuery.Builder();
     }
 }

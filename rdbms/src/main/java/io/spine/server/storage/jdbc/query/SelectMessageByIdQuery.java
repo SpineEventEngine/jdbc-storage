@@ -44,7 +44,7 @@ abstract class SelectMessageByIdQuery<I, M extends Message> extends AbstractSele
     private final String messageColumnName;
     private final Descriptor messageDescriptor;
 
-    protected SelectMessageByIdQuery(
+    SelectMessageByIdQuery(
             Builder<? extends Builder, ? extends SelectMessageByIdQuery, I, M> builder) {
         super(builder);
         this.messageColumnName = builder.messageColumnName;
@@ -61,8 +61,7 @@ abstract class SelectMessageByIdQuery<I, M extends Message> extends AbstractSele
     @Nullable
     @Override
     public final M execute() throws DatabaseException {
-        try {
-            final ResultSet resultSet = getQuery().getResults();
+        try (ResultSet resultSet = getQuery().getResults()){
             if (!resultSet.next()) {
                 return null;
             }
