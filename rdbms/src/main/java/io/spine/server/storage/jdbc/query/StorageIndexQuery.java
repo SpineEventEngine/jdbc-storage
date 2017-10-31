@@ -53,11 +53,6 @@ class StorageIndexQuery<I> extends AbstractQuery implements SelectQuery<Iterator
         return result;
     }
 
-    @Override
-    boolean closeConnectionAfterExecution() {
-        return false;
-    }
-
     static <I> Builder<I> newBuilder() {
         return new Builder<>();
     }

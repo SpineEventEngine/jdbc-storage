@@ -177,11 +177,6 @@ final class SelectByEntityColumnsQuery<I> extends AbstractQuery
         }
     }
 
-    @Override
-    boolean closeConnectionAfterExecution() {
-        return false;
-    }
-
     static <I> Builder<I> newBuilder() {
         return new Builder<>();
     }

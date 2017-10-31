@@ -31,7 +31,6 @@ import com.querydsl.sql.SQLBaseListener;
 import com.querydsl.sql.SQLCloseListener;
 import com.querydsl.sql.SQLListener;
 import com.querydsl.sql.SQLListenerContext;
-import com.querydsl.sql.SQLNoCloseListener;
 import com.querydsl.sql.SQLQueryFactory;
 import com.querydsl.sql.SQLTemplates;
 import com.querydsl.sql.SQLTemplatesRegistry;
@@ -100,23 +99,6 @@ abstract class AbstractQuery implements StorageQuery {
     }
 
     /**
-     * Determines whether a {@link Connection} should be closed after execution of a query.
-     *
-     * <p>By default, a connection will be closed.
-     *
-     * @return {@code true} if a connection should be closed, {@code false} otherwise
-     */
-    boolean closeConnectionAfterExecution() {
-        return true;
-    }
-
-    private SQLListener getConnectionCloseHandler() {
-        return closeConnectionAfterExecution()
-               ? SQLCloseListener.DEFAULT
-               : SQLNoCloseListener.DEFAULT;
-    }
-
-    /**
      * Creates a configured query factory.
      *
      * <p>All queries produced by the factory will be
@@ -125,13 +107,13 @@ abstract class AbstractQuery implements StorageQuery {
      * <p>Commit or rollback for a transaction will be handled automatically
      * by the {@linkplain TransactionHandler transaction handler}.
      *
-     * <p>The strategy of closing {@link Connection connections} is determined by
-     * the {@link #closeConnectionAfterExecution() method}.
+     * <p>All {@link Connection connections} will be closed automatically
+     * using {@link SQLCloseListener}.
      *
      * @param dataSource the data source to produce connections
      * @return the query factory
      */
-    private AbstractSQLQueryFactory<?> createFactory(final DataSourceWrapper dataSource) {
+    private static AbstractSQLQueryFactory<?> createFactory(final DataSourceWrapper dataSource) {
         final Provider<Connection> connectionProvider = new Provider<Connection>() {
             @Override
             public Connection get() {
@@ -142,7 +124,7 @@ abstract class AbstractQuery implements StorageQuery {
         final SQLTemplates templates = getDialectTemplates(dataSource);
         final Configuration configuration = new Configuration(templates);
         configuration.addListener(TransactionHandler.INSTANCE);
-        configuration.addListener(getConnectionCloseHandler());
+        configuration.addListener(SQLCloseListener.DEFAULT);
         return new SQLQueryFactory(configuration, connectionProvider);
     }
 
@@ -153,7 +135,7 @@ abstract class AbstractQuery implements StorageQuery {
      * @return templates for a particular JDBC implementation
      */
     private static SQLTemplates getDialectTemplates(DataSourceWrapper dataSource) {
-        try(ConnectionWrapper connection = dataSource.getConnection(true)) {
+        try (ConnectionWrapper connection = dataSource.getConnection(true)) {
             final DatabaseMetaData metaData = connection.get()
                                                         .getMetaData();
             final SQLTemplatesRegistry templatesRegistry = new SQLTemplatesRegistry();
@@ -195,22 +177,26 @@ abstract class AbstractQuery implements StorageQuery {
         private static final SQLListener INSTANCE = new TransactionHandler();
 
         @Override
-        public void end(SQLListenerContext context) {
+        public void executed(SQLListenerContext context) {
             final Connection connection = context.getConnection();
-            try {
-                connection.commit();
-            } catch (SQLException e) {
-                throw new DatabaseException(e);
+            if (connection != null) {
+                try {
+                    connection.commit();
+                } catch (SQLException e) {
+                    throw new DatabaseException(e);
+                }
             }
         }
 
         @Override
         public void exception(SQLListenerContext context) {
             final Connection connection = context.getConnection();
-            try {
-                connection.rollback();
-            } catch (SQLException e) {
-                throw new DatabaseException(e);
+            if (connection != null) {
+                try {
+                    connection.rollback();
+                } catch (SQLException e) {
+                    throw new DatabaseException(e);
+                }
             }
         }
     }

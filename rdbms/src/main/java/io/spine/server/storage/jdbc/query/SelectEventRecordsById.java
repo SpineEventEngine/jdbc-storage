@@ -73,11 +73,6 @@ class SelectEventRecordsById<I> extends AbstractSelectByIdQuery<I, DbIterator<Ag
                                        of(AggregateEventRecord.class));
     }
 
-    @Override
-    boolean closeConnectionAfterExecution() {
-        return false;
-    }
-
     static <I> Builder<I> newBuilder() {
         return new Builder<>();
     }
