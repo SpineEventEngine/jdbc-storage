@@ -154,7 +154,7 @@ abstract class AbstractTable<I, R extends Message, W> {
      * @return {@code true} if there is a record with such ID in the table, {@code false} otherwise
      */
     boolean containsRecord(I id) {
-        final SelectQuery<Boolean> query = getReadQueryFactory().containsQuery(id);
+        final SelectQuery<Boolean> query = getReadQueryFactory().newContainsQuery(id);
         final boolean result = query.execute();
         return result;
     }

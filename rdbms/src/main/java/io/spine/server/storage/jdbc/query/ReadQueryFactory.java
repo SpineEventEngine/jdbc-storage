@@ -59,5 +59,5 @@ public interface ReadQueryFactory<I, R> {
      * @param id the ID to check
      * @return a query to check presence of a record
      */
-    SelectQuery<Boolean> containsQuery(I id);
+    SelectQuery<Boolean> newContainsQuery(I id);
 }
