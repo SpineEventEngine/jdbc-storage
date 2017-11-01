@@ -66,7 +66,7 @@ public abstract class EntityTable<I, R extends Message, W> extends AbstractTable
         this.entityClass = entityClass;
     }
 
-    Class<? extends Entity<I, ?>> getEntityClass() {
+    protected Class<? extends Entity<I, ?>> getEntityClass() {
         return entityClass;
     }
 }

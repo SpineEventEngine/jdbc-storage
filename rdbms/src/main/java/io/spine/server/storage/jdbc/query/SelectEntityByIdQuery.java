@@ -24,7 +24,7 @@ import com.querydsl.sql.AbstractSQLQuery;
 import io.spine.server.entity.EntityRecord;
 
 import static com.querydsl.sql.SQLExpressions.all;
-import static io.spine.server.storage.jdbc.RecordTable.StandardColumn.entity;
+import static io.spine.server.storage.jdbc.record.RecordTable.StandardColumn.entity;
 
 /**
  * Query that selects {@link EntityRecord} by ID.

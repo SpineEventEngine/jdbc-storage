@@ -33,7 +33,7 @@ import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Maps.newHashMap;
-import static io.spine.server.storage.jdbc.RecordTable.StandardColumn.entity;
+import static io.spine.server.storage.jdbc.record.RecordTable.StandardColumn.entity;
 
 /**
  * A query for {@code INSERT}-ing multiple {@linkplain EntityRecord entity records} as a bulk.

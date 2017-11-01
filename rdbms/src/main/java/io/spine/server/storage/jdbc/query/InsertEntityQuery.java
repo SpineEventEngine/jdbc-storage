@@ -22,7 +22,7 @@ package io.spine.server.storage.jdbc.query;
 
 import com.querydsl.core.dml.StoreClause;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
-import io.spine.server.storage.jdbc.RecordTable;
+import io.spine.server.storage.jdbc.record.RecordTable;
 
 /**
  * Query that inserts a new {@link EntityRecordWithColumns} to

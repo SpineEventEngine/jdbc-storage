@@ -25,11 +25,11 @@ import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.IdColumn;
+import io.spine.server.storage.jdbc.record.RecordTable;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
 
 /**
- * An implementation of the query factory for generating write queries for
- * the {@link io.spine.server.storage.jdbc.RecordTable RecordTable}.
+ * An implementation of the query factory for generating write queries for the {@link RecordTable}.
  *
  * @author Dmytro Grankin
  */

@@ -18,7 +18,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.given;
+package io.spine.server.storage.jdbc.record.given;
 
 import io.spine.server.entity.AbstractEntity;
 import io.spine.server.entity.storage.Column;

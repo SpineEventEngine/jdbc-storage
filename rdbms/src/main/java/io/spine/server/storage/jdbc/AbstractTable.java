@@ -155,7 +155,7 @@ public abstract class AbstractTable<I, R extends Message, W> {
      * @param id ID to check
      * @return {@code true} if there is a record with such ID in the table, {@code false} otherwise
      */
-    boolean containsRecord(I id) {
+    protected boolean containsRecord(I id) {
         final SelectQuery<Boolean> query = getReadQueryFactory().newContainsQuery(id);
         final boolean result = query.execute();
         return result;
@@ -333,7 +333,7 @@ public abstract class AbstractTable<I, R extends Message, W> {
      * @return {@code true} if the row was deleted successfully,
      *         {@code false} if the row was not found
      */
-    boolean delete(I id) {
+    public boolean delete(I id) {
         final WriteQuery query = getWriteQueryFactory().newDeleteQuery(id);
         final long rowsAffected = query.execute();
         return rowsAffected != 0;
@@ -342,7 +342,7 @@ public abstract class AbstractTable<I, R extends Message, W> {
     /**
      * Deletes all the records from the table.
      */
-    void deleteAll() {
+    public void deleteAll() {
         final WriteQuery query = getWriteQueryFactory().newDeleteAllQuery();
         query.execute();
     }

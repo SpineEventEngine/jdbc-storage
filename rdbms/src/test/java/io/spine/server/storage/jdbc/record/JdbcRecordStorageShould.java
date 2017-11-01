@@ -18,7 +18,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc;
+package io.spine.server.storage.jdbc.record;
 
 import com.google.common.base.Optional;
 import com.google.protobuf.FieldMask;
@@ -33,8 +33,11 @@ import io.spine.server.entity.storage.EntityQuery;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.RecordStorage;
 import io.spine.server.storage.RecordStorageShould;
-import io.spine.server.storage.jdbc.given.JdbcRecordStorageTestEnv;
-import io.spine.server.storage.jdbc.given.JdbcRecordStorageTestEnv.TestEntityWithStringId;
+import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.DatabaseException;
+import io.spine.server.storage.jdbc.GivenDataSource;
+import io.spine.server.storage.jdbc.record.given.JdbcRecordStorageTestEnv;
+import io.spine.server.storage.jdbc.record.given.JdbcRecordStorageTestEnv.TestEntityWithStringId;
 import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
 import io.spine.test.storage.Project;
 import io.spine.test.storage.ProjectId;

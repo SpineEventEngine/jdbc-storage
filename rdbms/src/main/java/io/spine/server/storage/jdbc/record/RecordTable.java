@@ -18,7 +18,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc;
+package io.spine.server.storage.jdbc.record;
 
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
@@ -31,10 +31,14 @@ import io.spine.server.entity.storage.EntityColumn;
 import io.spine.server.entity.storage.EntityColumns;
 import io.spine.server.entity.storage.EntityQuery;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
+import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.EntityTable;
+import io.spine.server.storage.jdbc.Sql;
+import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
-import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 import io.spine.server.storage.jdbc.query.RecordStorageReadQueryFactory;
 import io.spine.server.storage.jdbc.query.RecordStorageWriteQueryFactory;
+import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
 
 import javax.annotation.Nullable;

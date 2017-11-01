@@ -23,13 +23,13 @@ package io.spine.server.storage.jdbc.query;
 import com.google.common.base.Functions;
 import io.spine.server.entity.storage.ColumnRecords;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
-import io.spine.server.storage.jdbc.RecordTable;
+import io.spine.server.storage.jdbc.record.RecordTable;
 import io.spine.server.storage.jdbc.Serializer;
 
-import static io.spine.server.storage.jdbc.RecordTable.StandardColumn.entity;
+import static io.spine.server.storage.jdbc.record.RecordTable.StandardColumn.entity;
 
 /**
- * The write query to the {@link RecordTable RecordTable}.
+ * The write query to the {@link RecordTable}.
  *
  * @author Dmytro Dashenkov
  */

@@ -24,7 +24,7 @@ import com.querydsl.core.dml.StoreClause;
 import com.querydsl.core.types.dsl.PathBuilder;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
-import io.spine.server.storage.jdbc.RecordTable;
+import io.spine.server.storage.jdbc.record.RecordTable;
 
 /**
  * Query that updates {@link EntityRecord} in

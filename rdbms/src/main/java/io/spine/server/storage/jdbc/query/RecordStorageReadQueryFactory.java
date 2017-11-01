@@ -28,14 +28,14 @@ import io.spine.server.entity.storage.EntityQuery;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.IdColumn;
+import io.spine.server.storage.jdbc.record.RecordTable;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
 
 import java.util.Iterator;
 import java.util.Map;
 
 /**
- * An implementation of the query factory for generating read queries for
- * the {@link io.spine.server.storage.jdbc.RecordTable RecordTable}.
+ * An implementation of the query factory for generating read queries for the {@link RecordTable}.
  *
  * @author Andrey Lavrov
  * @author Dmytro Dashenkov
