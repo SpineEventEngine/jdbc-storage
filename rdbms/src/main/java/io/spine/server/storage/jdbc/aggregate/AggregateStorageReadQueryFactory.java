@@ -41,10 +41,16 @@ class AggregateStorageReadQueryFactory<I> extends AbstractReadQueryFactory<I, Ag
         super(idColumn, dataSource, tableName);
     }
 
-    /** Returns a query that selects aggregate records by ID sorted by time descending. */
-    @SuppressWarnings("InstanceMethodNamingConvention")
-    SelectQuery<DbIterator<AggregateEventRecord>> newSelectEventRecordsById(I id,
-                                                                            int fetchSize) {
+    /**
+     * Creates the {@linkplain SelectEventRecordsById query} that selects
+     * aggregate records by an aggregate ID.
+     *
+     * @param id        the aggregate ID
+     * @param fetchSize the {@linkplain java.sql.PreparedStatement#setFetchSize(int) fetch size}
+     *                  of records for the query
+     * @return the select query for {@linkplain AggregateEventRecord aggregate event records}
+     */
+    SelectQuery<DbIterator<AggregateEventRecord>> newSelectEventRecordsById(I id, int fetchSize) {
         final SelectEventRecordsById.Builder<I> builder = SelectEventRecordsById.newBuilder();
         return builder.setTableName(getTableName())
                       .setDataSource(getDataSource())
