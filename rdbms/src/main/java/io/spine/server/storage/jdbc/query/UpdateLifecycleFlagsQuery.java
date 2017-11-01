@@ -31,7 +31,7 @@ import static io.spine.server.storage.jdbc.LifecycleFlagsTable.Column.archived;
 import static io.spine.server.storage.jdbc.LifecycleFlagsTable.Column.deleted;
 
 /**
- * The query updating an {@linkplain LifecycleFlags entity lifecycle flags}.
+ * The query updating {@linkplain LifecycleFlags entity lifecycle flags}.
  *
  * @author Dmytro Dashenkov
  */

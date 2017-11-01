@@ -34,7 +34,7 @@ import static io.spine.server.storage.jdbc.LastHandledEventTimeTable.Column.seco
 import static io.spine.validate.Validate.isDefault;
 
 /**
- * Query that selects timestamp from the {@link LastHandledEventTimeTable}.
+ * A query that selects timestamp from the {@link LastHandledEventTimeTable}.
  *
  * @author Alexander Litus
  * @author Andrey Lavrov

@@ -25,7 +25,7 @@ import com.querydsl.core.types.dsl.PathBuilder;
 import io.spine.server.storage.jdbc.EventCountTable;
 
 /**
- * Query that updates event count in the {@link EventCountTable}.
+ * A query that updates event count in the {@link EventCountTable}.
  *
  * @author Alexander Litus
  * @author Andrey Lavrov
