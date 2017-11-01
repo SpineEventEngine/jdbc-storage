@@ -21,7 +21,6 @@
 package io.spine.server.storage.jdbc.aggregate;
 
 import com.google.common.collect.ImmutableList;
-import io.spine.annotation.Internal;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.entity.LifecycleFlags;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
@@ -30,8 +29,6 @@ import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
-import io.spine.server.storage.jdbc.query.LifecycleFlagsReadQueryFactory;
-import io.spine.server.storage.jdbc.query.LifecycleFlagsWriteQueryFactory;
 
 import java.util.List;
 
@@ -43,8 +40,7 @@ import static io.spine.server.storage.jdbc.Sql.Type.ID;
  *
  * @author Dmytro Dashenkov
  */
-@Internal
-public class LifecycleFlagsTable<I> extends AggregateTable<I, LifecycleFlags> {
+class LifecycleFlagsTable<I> extends AggregateTable<I, LifecycleFlags> {
 
     private static final String TABLE_NAME_POSTFIX = "visibility";
 
@@ -88,8 +84,7 @@ public class LifecycleFlagsTable<I> extends AggregateTable<I, LifecycleFlags> {
     /**
      * The enumeration of the columns of a {@link LifecycleFlagsTable}.
      */
-    @Internal
-    public enum Column implements TableColumn {
+    enum Column implements TableColumn {
 
         id(ID),
         archived(BOOLEAN),

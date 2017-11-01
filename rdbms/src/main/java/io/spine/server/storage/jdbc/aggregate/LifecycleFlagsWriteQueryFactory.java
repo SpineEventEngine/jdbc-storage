@@ -18,13 +18,13 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.query;
+package io.spine.server.storage.jdbc.aggregate;
 
-import io.spine.annotation.Internal;
 import io.spine.server.entity.LifecycleFlags;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.IdColumn;
-import io.spine.server.storage.jdbc.aggregate.LifecycleFlagsTable;
+import io.spine.server.storage.jdbc.query.AbstractWriteQueryFactory;
+import io.spine.server.storage.jdbc.query.WriteQuery;
 
 /**
  * An implementation of the query factory for generating write queries for
@@ -32,12 +32,11 @@ import io.spine.server.storage.jdbc.aggregate.LifecycleFlagsTable;
  *
  * @author Dmytro Grankin
  */
-@Internal
-public class LifecycleFlagsWriteQueryFactory<I> extends AbstractWriteQueryFactory<I, LifecycleFlags> {
+class LifecycleFlagsWriteQueryFactory<I> extends AbstractWriteQueryFactory<I, LifecycleFlags> {
 
-    public LifecycleFlagsWriteQueryFactory(IdColumn<I> idColumn,
-                                           DataSourceWrapper dataSource,
-                                           String tableName) {
+    LifecycleFlagsWriteQueryFactory(IdColumn<I> idColumn,
+                                    DataSourceWrapper dataSource,
+                                    String tableName) {
         super(idColumn, dataSource, tableName);
     }
 

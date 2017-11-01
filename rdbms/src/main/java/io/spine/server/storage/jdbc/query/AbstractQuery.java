@@ -89,7 +89,7 @@ public abstract class AbstractQuery implements StorageQuery {
         return pathOf(column.name());
     }
 
-    PathBuilder<Object> pathOf(String columnName) {
+    protected PathBuilder<Object> pathOf(String columnName) {
         return pathBuilder.get(columnName);
     }
 

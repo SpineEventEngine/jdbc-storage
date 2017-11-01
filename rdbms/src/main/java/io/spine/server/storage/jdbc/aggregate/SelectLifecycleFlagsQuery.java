@@ -18,11 +18,12 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.query;
+package io.spine.server.storage.jdbc.aggregate;
 
 import com.querydsl.sql.AbstractSQLQuery;
 import io.spine.server.entity.LifecycleFlags;
 import io.spine.server.storage.jdbc.aggregate.LifecycleFlagsTable.Column;
+import io.spine.server.storage.jdbc.query.SelectMessageByIdQuery;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
