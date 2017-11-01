@@ -18,39 +18,33 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.query;
+package io.spine.server.storage.jdbc.projection;
 
 import com.google.protobuf.Timestamp;
 import com.querydsl.core.dml.StoreClause;
-import io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable;
+import com.querydsl.core.types.dsl.PathBuilder;
 
 import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.projection_type;
 
 /**
- * Query that inserts a new {@link Timestamp} to the {@link LastHandledEventTimeTable}.
+ * A query that updates {@link Timestamp} in the
+ * {@link io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable LastHandledEventTimeTable}.
  *
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-class InsertTimestampQuery extends WriteTimestampQuery {
+class UpdateTimestampQuery extends WriteTimestampQuery {
 
-    private InsertTimestampQuery(Builder builder) {
+    private UpdateTimestampQuery(Builder builder) {
         super(builder);
     }
 
     @Override
-    StoreClause<?> createClause() {
-        return factory().insert(table());
-    }
-
-    @Override
-    Parameters getParameters() {
-        final Parameters superParameters = super.getParameters();
-        final Parameter idParameter = Parameter.of(getId());
-        return Parameters.newBuilder()
-                         .addParameters(superParameters)
-                         .addParameter(projection_type.name(), idParameter)
-                         .build();
+    protected StoreClause<?> createClause() {
+        final PathBuilder<Object> id = pathOf(projection_type);
+        final String idValue = getId();
+        return factory().update(table())
+                        .where(id.eq(idValue));
     }
 
     static Builder newBuilder() {
@@ -58,11 +52,11 @@ class InsertTimestampQuery extends WriteTimestampQuery {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    static class Builder extends WriteTimestampQuery.Builder<Builder, InsertTimestampQuery> {
+    static class Builder extends WriteTimestampQuery.Builder<Builder, UpdateTimestampQuery> {
 
         @Override
-        protected InsertTimestampQuery build() {
-            return new InsertTimestampQuery(this);
+        protected UpdateTimestampQuery build() {
+            return new UpdateTimestampQuery(this);
         }
 
         @Override

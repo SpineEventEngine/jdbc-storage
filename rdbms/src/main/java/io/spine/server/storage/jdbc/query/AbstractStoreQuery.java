@@ -29,9 +29,9 @@ import java.util.Set;
  *
  * @author Alexander Litus
  */
-abstract class AbstractStoreQuery extends AbstractQuery implements WriteQuery {
+public abstract class AbstractStoreQuery extends AbstractQuery implements WriteQuery {
 
-    AbstractStoreQuery(Builder<? extends Builder, ? extends WriteQuery> builder) {
+    protected AbstractStoreQuery(Builder<? extends Builder, ? extends WriteQuery> builder) {
         super(builder);
     }
 
@@ -47,14 +47,14 @@ abstract class AbstractStoreQuery extends AbstractQuery implements WriteQuery {
      *
      * @return a new {@link StoreClause} instance
      */
-    abstract StoreClause<?> createClause();
+    protected abstract StoreClause<?> createClause();
 
     /**
      * Obtains parameters to set for the query.
      *
      * @return the query parameters
      */
-    abstract Parameters getParameters();
+    protected abstract Parameters getParameters();
 
     private void setParameters(StoreClause<?> clause, Parameters parameters) {
         final Set<String> identifiers = parameters.getIdentifiers();
@@ -65,7 +65,7 @@ abstract class AbstractStoreQuery extends AbstractQuery implements WriteQuery {
         }
     }
 
-    abstract static class Builder<B extends Builder<B, Q>, Q extends AbstractStoreQuery>
+    protected abstract static class Builder<B extends Builder<B, Q>, Q extends AbstractStoreQuery>
             extends AbstractQuery.Builder<B, Q> {
     }
 }

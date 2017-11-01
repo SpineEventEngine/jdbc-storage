@@ -21,14 +21,12 @@
 package io.spine.server.storage.jdbc.projection;
 
 import com.google.protobuf.Timestamp;
-import io.spine.annotation.Internal;
 import io.spine.server.storage.jdbc.AbstractTable;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.IdColumn;
 import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
-import io.spine.server.storage.jdbc.query.LastHandledEventTimeWriteFactory;
 
 import java.util.List;
 
@@ -44,8 +42,7 @@ import static io.spine.server.storage.jdbc.Sql.Type.VARCHAR_255;
  *
  * @author Dmytro Dashenkov
  */
-@Internal
-public class LastHandledEventTimeTable extends AbstractTable<String, Timestamp, Timestamp> {
+class LastHandledEventTimeTable extends AbstractTable<String, Timestamp, Timestamp> {
 
     private static final String TABLE_NAME = "projection_last_handled_event_time";
 
@@ -83,8 +80,7 @@ public class LastHandledEventTimeTable extends AbstractTable<String, Timestamp, 
     /**
      * The enumeration of the columns of a {@link LastHandledEventTimeTable}.
      */
-    @Internal
-    public enum Column implements TableColumn {
+    enum Column implements TableColumn {
 
         projection_type(VARCHAR_255),
         seconds(BIGINT),

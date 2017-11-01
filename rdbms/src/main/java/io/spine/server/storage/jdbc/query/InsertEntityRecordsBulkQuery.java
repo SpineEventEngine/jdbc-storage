@@ -63,7 +63,7 @@ class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
     }
 
     @Override
-    Parameters getParameters() {
+    protected Parameters getParameters() {
         throw new UnsupportedOperationException("Bulk operations don't allow this.");
     }
 
@@ -90,7 +90,7 @@ class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
     }
 
     @Override
-    SQLInsertClause createClause() {
+    protected SQLInsertClause createClause() {
         return factory().insert(table());
     }
 

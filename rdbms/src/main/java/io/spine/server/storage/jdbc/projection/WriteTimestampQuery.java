@@ -18,11 +18,14 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.query;
+package io.spine.server.storage.jdbc.projection;
 
 import com.google.protobuf.Timestamp;
-import io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable;
 import io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column;
+import io.spine.server.storage.jdbc.query.AbstractStoreQuery;
+import io.spine.server.storage.jdbc.query.Parameter;
+import io.spine.server.storage.jdbc.query.Parameters;
+import io.spine.server.storage.jdbc.query.StorageQuery;
 
 /**
  * A base for the {@linkplain StorageQuery} implementations
@@ -42,7 +45,7 @@ abstract class WriteTimestampQuery extends AbstractStoreQuery {
     }
 
     @Override
-    Parameters getParameters() {
+    protected Parameters getParameters() {
         final Parameter seconds = Parameter.of(timestamp.getSeconds());
         final Parameter nanos = Parameter.of(timestamp.getNanos());
         return Parameters.newBuilder()

@@ -40,7 +40,7 @@ class UpdateEntityQuery<I> extends WriteEntityQuery<I> {
     }
 
     @Override
-    StoreClause<?> createClause() {
+    protected StoreClause<?> createClause() {
         final PathBuilder<Object> id = pathOf(getIdColumn().getColumnName());
         final Object normalizedId = getIdColumn().normalize(getId());
         return factory().update(table())

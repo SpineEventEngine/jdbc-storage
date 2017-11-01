@@ -39,12 +39,12 @@ class InsertEntityQuery<I> extends WriteEntityQuery<I> {
     }
 
     @Override
-    StoreClause<?> createClause() {
+    protected StoreClause<?> createClause() {
         return factory().insert(table());
     }
 
     @Override
-    Parameters getParameters() {
+    protected Parameters getParameters() {
         final Parameters superParameters = super.getParameters();
         final Object normalizedId = getIdColumn().normalize(getId());
         final Parameter idParameter = Parameter.of(normalizedId);

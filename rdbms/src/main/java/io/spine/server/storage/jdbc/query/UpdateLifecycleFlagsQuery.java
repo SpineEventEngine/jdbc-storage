@@ -49,7 +49,7 @@ class UpdateLifecycleFlagsQuery<I> extends AbstractStoreQuery {
     }
 
     @Override
-    StoreClause<?> createClause() {
+    protected StoreClause<?> createClause() {
         final PathBuilder<Object> idPath = pathOf(idColumn.getColumnName());
         final Object normalizedId = idColumn.normalize(id);
         return factory().update(table())
@@ -57,7 +57,7 @@ class UpdateLifecycleFlagsQuery<I> extends AbstractStoreQuery {
     }
 
     @Override
-    Parameters getParameters() {
+    protected Parameters getParameters() {
         final Parameters.Builder builder = Parameters.newBuilder();
         final Parameter archivedParameter = Parameter.of(entityStatus.getArchived());
         final Parameter deletedParameter = Parameter.of(entityStatus.getDeleted());

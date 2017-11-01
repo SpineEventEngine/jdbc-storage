@@ -18,33 +18,40 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.query;
+package io.spine.server.storage.jdbc.projection;
 
 import com.google.protobuf.Timestamp;
 import com.querydsl.core.dml.StoreClause;
-import com.querydsl.core.types.dsl.PathBuilder;
+import io.spine.server.storage.jdbc.query.Parameter;
+import io.spine.server.storage.jdbc.query.Parameters;
 
 import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.projection_type;
 
 /**
- * A query that updates {@link Timestamp} in the
- * {@link io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable LastHandledEventTimeTable}.
+ * Query that inserts a new {@link Timestamp} to the {@link LastHandledEventTimeTable}.
  *
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-class UpdateTimestampQuery extends WriteTimestampQuery {
+class InsertTimestampQuery extends WriteTimestampQuery {
 
-    private UpdateTimestampQuery(Builder builder) {
+    private InsertTimestampQuery(Builder builder) {
         super(builder);
     }
 
     @Override
-    StoreClause<?> createClause() {
-        final PathBuilder<Object> id = pathOf(projection_type);
-        final String idValue = getId();
-        return factory().update(table())
-                        .where(id.eq(idValue));
+    protected StoreClause<?> createClause() {
+        return factory().insert(table());
+    }
+
+    @Override
+    protected Parameters getParameters() {
+        final Parameters superParameters = super.getParameters();
+        final Parameter idParameter = Parameter.of(getId());
+        return Parameters.newBuilder()
+                         .addParameters(superParameters)
+                         .addParameter(projection_type.name(), idParameter)
+                         .build();
     }
 
     static Builder newBuilder() {
@@ -52,11 +59,11 @@ class UpdateTimestampQuery extends WriteTimestampQuery {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    static class Builder extends WriteTimestampQuery.Builder<Builder, UpdateTimestampQuery> {
+    static class Builder extends WriteTimestampQuery.Builder<Builder, InsertTimestampQuery> {
 
         @Override
-        protected UpdateTimestampQuery build() {
-            return new UpdateTimestampQuery(this);
+        protected InsertTimestampQuery build() {
+            return new InsertTimestampQuery(this);
         }
 
         @Override

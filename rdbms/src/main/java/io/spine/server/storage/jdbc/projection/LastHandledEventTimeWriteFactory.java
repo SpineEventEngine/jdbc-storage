@@ -18,26 +18,25 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.query;
+package io.spine.server.storage.jdbc.projection;
 
 import com.google.protobuf.Timestamp;
-import io.spine.annotation.Internal;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable;
+import io.spine.server.storage.jdbc.query.AbstractWriteQueryFactory;
+import io.spine.server.storage.jdbc.query.WriteQuery;
 
 import static io.spine.server.storage.jdbc.IdColumn.typeString;
 import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.projection_type;
 
 /**
  * An implementation of the query factory for generating write queries for
- * the {@link LastHandledEventTimeTable LastHandledEventTimeTable}.
+ * the {@link LastHandledEventTimeTable}.
  *
  * @author Dmytro Grankin
  */
-@Internal
-public class LastHandledEventTimeWriteFactory extends AbstractWriteQueryFactory<String, Timestamp> {
+class LastHandledEventTimeWriteFactory extends AbstractWriteQueryFactory<String, Timestamp> {
 
-    public LastHandledEventTimeWriteFactory(DataSourceWrapper dataSource, String tableName) {
+    LastHandledEventTimeWriteFactory(DataSourceWrapper dataSource, String tableName) {
         super(typeString(projection_type.name()), dataSource, tableName);
     }
 

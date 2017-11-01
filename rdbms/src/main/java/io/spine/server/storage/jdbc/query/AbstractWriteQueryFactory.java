@@ -28,7 +28,7 @@ import io.spine.server.storage.jdbc.IdColumn;
  *
  * @author Dmytro Grankin
  */
-abstract class AbstractWriteQueryFactory <I, R> implements WriteQueryFactory<I, R> {
+public abstract class AbstractWriteQueryFactory <I, R> implements WriteQueryFactory<I, R> {
 
     private final IdColumn<I> idColumn;
     private final DataSourceWrapper dataSource;
@@ -41,7 +41,8 @@ abstract class AbstractWriteQueryFactory <I, R> implements WriteQueryFactory<I, 
      * @param dataSource instance of {@link DataSourceWrapper}
      * @param tableName  the name of the table to generate queries for
      */
-    AbstractWriteQueryFactory(IdColumn<I> idColumn, DataSourceWrapper dataSource, String tableName) {
+    protected AbstractWriteQueryFactory(IdColumn<I> idColumn, DataSourceWrapper dataSource,
+                                        String tableName) {
         this.idColumn = idColumn;
         this.dataSource = dataSource;
         this.tableName = tableName;
@@ -71,11 +72,11 @@ abstract class AbstractWriteQueryFactory <I, R> implements WriteQueryFactory<I, 
         return idColumn;
     }
 
-    DataSourceWrapper getDataSource() {
+    protected DataSourceWrapper getDataSource() {
         return dataSource;
     }
 
-    String getTableName() {
+    protected String getTableName() {
         return tableName;
     }
 }

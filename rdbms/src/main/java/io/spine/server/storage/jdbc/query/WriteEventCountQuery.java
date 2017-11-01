@@ -43,7 +43,7 @@ abstract class WriteEventCountQuery<I> extends AbstractStoreQuery {
     }
 
     @Override
-    Parameters getParameters() {
+    protected Parameters getParameters() {
         final Parameter eventCountParameter = Parameter.of(eventCount);
         return Parameters.newBuilder()
                          .addParameter(event_count.name(), eventCountParameter)

@@ -41,7 +41,7 @@ abstract class WriteEntityQuery<I> extends WriteRecordQuery<I, EntityRecordWithC
     }
 
     @Override
-    Parameters getParameters() {
+    protected Parameters getParameters() {
         final Parameters.Builder builder = Parameters.newBuilder();
         final byte[] serializedRecord = Serializer.serialize(getRecord().getRecord());
         final Parameter recordParameter = Parameter.of(serializedRecord);

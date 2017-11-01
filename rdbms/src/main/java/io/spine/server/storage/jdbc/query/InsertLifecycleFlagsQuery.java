@@ -48,12 +48,12 @@ class InsertLifecycleFlagsQuery<I> extends AbstractStoreQuery {
     }
 
     @Override
-    StoreClause<?> createClause() {
+    protected StoreClause<?> createClause() {
         return factory().insert(table());
     }
 
     @Override
-    Parameters getParameters() {
+    protected Parameters getParameters() {
         final Parameters.Builder builder = Parameters.newBuilder();
         idColumn.setId(idColumn.getColumnName(), id, builder);
 
