@@ -18,13 +18,16 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc;
+package io.spine.server.storage.jdbc.stand.given;
 
 import com.google.protobuf.Message;
 import io.spine.core.Version;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.entity.TestTransaction;
 import io.spine.server.stand.StandStorage;
+import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.GivenDataSource;
+import io.spine.server.storage.jdbc.stand.JdbcStandStorage;
 import io.spine.test.commandservice.customer.Customer;
 import io.spine.test.commandservice.customer.CustomerVBuilder;
 import io.spine.test.storage.Project;
@@ -34,13 +37,13 @@ import io.spine.test.storage.ProjectVBuilder;
 import java.util.LinkedList;
 import java.util.List;
 
-class Given {
+public class Given {
 
     private Given() {
         // Prevent utility class instantiation.
     }
 
-    static StandStorage newStorage() {
+    public static StandStorage newStorage() {
         final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(
                 GivenDataSource.DEFAULT_TABLE_NAME);
         final StandStorage storage = JdbcStandStorage.<String>newBuilder()
@@ -49,7 +52,7 @@ class Given {
         return storage;
     }
 
-    static class TestAggregate extends Aggregate<String, Project, ProjectVBuilder> {
+    public static class TestAggregate extends Aggregate<String, Project, ProjectVBuilder> {
 
         /**
          * Creates a new aggregate instance.
@@ -57,7 +60,7 @@ class Given {
          * @param id the ID for the new aggregate
          * @throws IllegalArgumentException if the ID is not of one of the supported types
          */
-        TestAggregate(String id) {
+        public TestAggregate(String id) {
             super(id);
         }
 
@@ -66,7 +69,7 @@ class Given {
         }
     }
 
-    static class TestAggregate2 extends Aggregate<String, Customer, CustomerVBuilder> {
+    public static class TestAggregate2 extends Aggregate<String, Customer, CustomerVBuilder> {
 
         /**
          * Creates a new aggregate instance.
@@ -74,12 +77,12 @@ class Given {
          * @param id the ID for the new aggregate
          * @throws IllegalArgumentException if the ID is not of one of the supported types
          */
-        TestAggregate2(String id) {
+        public TestAggregate2(String id) {
             super(id);
         }
     }
 
-    static List<TestAggregate> testAggregates(int amount) {
+    public static List<TestAggregate> testAggregates(int amount) {
         final List<TestAggregate> aggregates = new LinkedList<>();
 
         for (int i = 0; i < amount; i++) {
@@ -89,7 +92,7 @@ class Given {
         return aggregates;
     }
 
-    static List<TestAggregate> testAggregatesWithState(int amount) {
+    public static List<TestAggregate> testAggregatesWithState(int amount) {
         final List<TestAggregate> aggregates = new LinkedList<>();
 
         for (int i = 0; i < amount; i++) {

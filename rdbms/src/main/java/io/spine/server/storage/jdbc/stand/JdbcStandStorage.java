@@ -18,7 +18,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc;
+package io.spine.server.storage.jdbc.stand;
 
 import com.google.common.base.Converter;
 import com.google.common.base.Function;
@@ -38,6 +38,7 @@ import io.spine.server.entity.storage.EntityQuery;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.stand.AggregateStateId;
 import io.spine.server.stand.StandStorage;
+import io.spine.server.storage.jdbc.StorageBuilder;
 import io.spine.server.storage.jdbc.record.JdbcRecordStorage;
 import io.spine.string.Stringifier;
 import io.spine.string.StringifierRegistry;

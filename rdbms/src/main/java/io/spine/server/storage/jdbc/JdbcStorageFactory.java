@@ -33,6 +33,7 @@ import io.spine.server.storage.StorageFactory;
 import io.spine.server.storage.jdbc.aggregate.JdbcAggregateStorage;
 import io.spine.server.storage.jdbc.projection.JdbcProjectionStorage;
 import io.spine.server.storage.jdbc.record.JdbcRecordStorage;
+import io.spine.server.storage.jdbc.stand.JdbcStandStorage;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
 

@@ -18,7 +18,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc;
+package io.spine.server.storage.jdbc.stand;
 
 import com.google.common.base.Optional;
 import com.google.protobuf.Descriptors;
@@ -33,6 +33,10 @@ import io.spine.server.stand.AggregateStateId;
 import io.spine.server.stand.StandStorage;
 import io.spine.server.stand.StandStorageShould;
 import io.spine.server.storage.RecordReadRequest;
+import io.spine.server.storage.jdbc.ConnectionWrapper;
+import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.GivenDataSource;
+import io.spine.server.storage.jdbc.stand.given.Given;
 import io.spine.test.commandservice.customer.Customer;
 import io.spine.test.storage.Project;
 import io.spine.time.Time;
@@ -48,11 +52,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static io.spine.server.storage.jdbc.Given.newStorage;
-import static io.spine.server.storage.jdbc.Given.testAggregates;
-import static io.spine.server.storage.jdbc.Given.testAggregatesWithState;
-import static io.spine.server.storage.jdbc.Given.TestAggregate;
-import static io.spine.server.storage.jdbc.Given.TestAggregate2;
+import static io.spine.server.storage.jdbc.stand.given.Given.TestAggregate;
+import static io.spine.server.storage.jdbc.stand.given.Given.TestAggregate2;
+import static io.spine.server.storage.jdbc.stand.given.Given.newStorage;
+import static io.spine.server.storage.jdbc.stand.given.Given.testAggregates;
+import static io.spine.server.storage.jdbc.stand.given.Given.testAggregatesWithState;
 import static io.spine.test.Verify.assertContains;
 import static io.spine.test.Verify.assertSize;
 import static junit.framework.TestCase.assertEquals;
