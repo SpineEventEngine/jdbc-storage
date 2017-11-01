@@ -18,10 +18,11 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.query;
+package io.spine.server.storage.jdbc.aggregate;
 
 import com.google.protobuf.Int32Value;
 import com.querydsl.sql.AbstractSQLQuery;
+import io.spine.server.storage.jdbc.query.SelectMessageByIdQuery;
 
 import javax.annotation.Nullable;
 import java.sql.ResultSet;
@@ -30,12 +31,12 @@ import java.sql.SQLException;
 import static io.spine.server.storage.jdbc.aggregate.EventCountTable.Column.event_count;
 
 /**
- * Query that selects event count by corresponding aggregate ID.
+ * A query that selects event count by corresponding aggregate ID.
  *
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-public class SelectEventCountByIdQuery<I> extends SelectMessageByIdQuery<I, Int32Value> {
+class SelectEventCountByIdQuery<I> extends SelectMessageByIdQuery<I, Int32Value> {
 
     private SelectEventCountByIdQuery(Builder<I> builder) {
         super(builder);
@@ -71,7 +72,7 @@ public class SelectEventCountByIdQuery<I> extends SelectMessageByIdQuery<I, Int3
                                                                    I,
                                                                    Int32Value> {
         @Override
-        protected SelectEventCountByIdQuery<I> build() {
+        public SelectEventCountByIdQuery<I> build() {
             return new SelectEventCountByIdQuery<>(this);
         }
 

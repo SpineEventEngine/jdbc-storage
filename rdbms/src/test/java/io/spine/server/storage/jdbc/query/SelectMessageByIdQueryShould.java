@@ -119,7 +119,7 @@ public class SelectMessageByIdQueryShould {
             }
 
             @Override
-            protected ASelectMessageByIdQuery build() {
+            public ASelectMessageByIdQuery build() {
                 return new ASelectMessageByIdQuery(this);
             }
 

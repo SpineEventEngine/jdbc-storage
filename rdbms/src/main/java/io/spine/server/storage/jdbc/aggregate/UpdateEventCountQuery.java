@@ -18,11 +18,10 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.query;
+package io.spine.server.storage.jdbc.aggregate;
 
 import com.querydsl.core.dml.StoreClause;
 import com.querydsl.core.types.dsl.PathBuilder;
-import io.spine.server.storage.jdbc.aggregate.EventCountTable;
 
 /**
  * A query that updates event count in the {@link EventCountTable}.
@@ -54,7 +53,7 @@ class UpdateEventCountQuery<I> extends WriteEventCountQuery<I> {
                                                                  I> {
 
         @Override
-        protected UpdateEventCountQuery<I> build() {
+        public UpdateEventCountQuery<I> build() {
             return new UpdateEventCountQuery<>(this);
         }
 

@@ -78,7 +78,7 @@ class SelectTimestampQuery extends SelectMessageByIdQuery<String, Timestamp> {
                                                                 String,
                                                                 Timestamp> {
         @Override
-        protected SelectTimestampQuery build() {
+        public SelectTimestampQuery build() {
             return new SelectTimestampQuery(this);
         }
 

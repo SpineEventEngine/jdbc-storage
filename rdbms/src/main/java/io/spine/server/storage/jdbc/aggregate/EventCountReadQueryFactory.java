@@ -18,25 +18,24 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.query;
+package io.spine.server.storage.jdbc.aggregate;
 
 import com.google.protobuf.Int32Value;
-import io.spine.annotation.Internal;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.IdColumn;
-import io.spine.server.storage.jdbc.aggregate.EventCountTable;
+import io.spine.server.storage.jdbc.query.AbstractReadQueryFactory;
+import io.spine.server.storage.jdbc.query.SelectQuery;
 
 /**
  * An implementation of the query factory generating read queries for the {@link EventCountTable}.
  *
  * @author Dmytro Grankin
  */
-@Internal
-public class EventCountReadQueryFactory<I> extends AbstractReadQueryFactory<I, Int32Value> {
+class EventCountReadQueryFactory<I> extends AbstractReadQueryFactory<I, Int32Value> {
 
-    public EventCountReadQueryFactory(IdColumn<I> idColumn,
-                                      DataSourceWrapper dataSource,
-                                      String tableName) {
+    EventCountReadQueryFactory(IdColumn<I> idColumn,
+                               DataSourceWrapper dataSource,
+                               String tableName) {
         super(idColumn, dataSource, tableName);
     }
 

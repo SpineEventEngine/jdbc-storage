@@ -18,10 +18,11 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.query;
+package io.spine.server.storage.jdbc.aggregate;
 
 import com.querydsl.core.dml.StoreClause;
-import io.spine.server.storage.jdbc.aggregate.EventCountTable;
+import io.spine.server.storage.jdbc.query.Parameter;
+import io.spine.server.storage.jdbc.query.Parameters;
 
 /**
  * A query that inserts a new aggregate event count after the last snapshot to the
@@ -63,7 +64,7 @@ class InsertEventCountQuery<I> extends WriteEventCountQuery<I> {
                                                                  I> {
 
         @Override
-        protected InsertEventCountQuery<I> build() {
+        public InsertEventCountQuery<I> build() {
             return new InsertEventCountQuery<>(this);
         }
 

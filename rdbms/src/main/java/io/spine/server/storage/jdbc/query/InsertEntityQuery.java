@@ -65,7 +65,7 @@ class InsertEntityQuery<I> extends WriteEntityQuery<I> {
                                                              EntityRecordWithColumns> {
 
         @Override
-        protected InsertEntityQuery build() {
+        public InsertEntityQuery build() {
             return new InsertEntityQuery<>(this);
         }
 

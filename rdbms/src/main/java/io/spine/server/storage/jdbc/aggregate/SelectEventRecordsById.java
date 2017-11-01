@@ -90,7 +90,7 @@ class SelectEventRecordsById<I> extends AbstractSelectByIdQuery<I, DbIterator<Ag
         }
 
         @Override
-        protected SelectEventRecordsById<I> build() {
+        public SelectEventRecordsById<I> build() {
             return new SelectEventRecordsById<>(this);
         }
 

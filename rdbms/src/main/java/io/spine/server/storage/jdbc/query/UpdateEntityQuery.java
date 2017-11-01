@@ -58,7 +58,7 @@ class UpdateEntityQuery<I> extends WriteEntityQuery<I> {
                                                              EntityRecordWithColumns> {
 
         @Override
-        protected UpdateEntityQuery build() {
+        public UpdateEntityQuery build() {
             return new UpdateEntityQuery<>(this);
         }
 

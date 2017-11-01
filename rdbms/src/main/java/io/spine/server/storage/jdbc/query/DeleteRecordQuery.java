@@ -70,7 +70,7 @@ class DeleteRecordQuery<I> extends AbstractQuery implements WriteQuery {
         }
 
         @Override
-        protected DeleteRecordQuery<I> build() {
+        public DeleteRecordQuery<I> build() {
             checkNotNull(idColumn, "ID column must be set");
             checkNotNull(columnValue, "ID must be set");
             return new DeleteRecordQuery<>(this);

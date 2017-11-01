@@ -150,7 +150,7 @@ public abstract class AbstractQuery implements StorageQuery {
         private DataSourceWrapper dataSource;
         private String tableName;
 
-        protected abstract Q build();
+        public abstract Q build();
 
         protected abstract B getThis();
 

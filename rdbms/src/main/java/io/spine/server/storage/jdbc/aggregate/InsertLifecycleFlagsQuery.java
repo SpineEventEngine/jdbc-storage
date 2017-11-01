@@ -88,7 +88,7 @@ class InsertLifecycleFlagsQuery<I> extends AbstractStoreQuery {
         }
 
         @Override
-        protected InsertLifecycleFlagsQuery build() {
+        public InsertLifecycleFlagsQuery build() {
             checkNotNull(id, "ID is not set.");
             checkNotNull(entityStatus, "Entity status is not set.");
             return new InsertLifecycleFlagsQuery<>(this);

@@ -18,7 +18,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.query;
+package io.spine.server.storage.jdbc.aggregate;
 
 import com.google.protobuf.Message;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
@@ -29,7 +29,7 @@ import java.sql.SQLException;
 
 import static io.spine.Identifier.newUuid;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
-import static io.spine.server.storage.jdbc.query.SelectEventCountByIdQuery.newBuilder;
+import static io.spine.server.storage.jdbc.aggregate.SelectEventCountByIdQuery.newBuilder;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 

@@ -18,25 +18,24 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.query;
+package io.spine.server.storage.jdbc.aggregate;
 
 import com.google.protobuf.Int32Value;
-import io.spine.annotation.Internal;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.IdColumn;
-import io.spine.server.storage.jdbc.aggregate.EventCountTable;
+import io.spine.server.storage.jdbc.query.AbstractWriteQueryFactory;
+import io.spine.server.storage.jdbc.query.WriteQuery;
 
 /**
  * An implementation of the query factory generating write queries for the {@link EventCountTable}.
  *
  * @author Dmytro Dashenkov
  */
-@Internal
-public class EventCountWriteQueryFactory<I> extends AbstractWriteQueryFactory<I, Int32Value> {
+class EventCountWriteQueryFactory<I> extends AbstractWriteQueryFactory<I, Int32Value> {
 
-    public EventCountWriteQueryFactory(IdColumn<I> idColumn,
-                                       DataSourceWrapper dataSource,
-                                       String tableName) {
+    EventCountWriteQueryFactory(IdColumn<I> idColumn,
+                                DataSourceWrapper dataSource,
+                                String tableName) {
         super(idColumn, dataSource, tableName);
     }
 

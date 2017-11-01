@@ -62,7 +62,7 @@ class InsertTimestampQuery extends WriteTimestampQuery {
     static class Builder extends WriteTimestampQuery.Builder<Builder, InsertTimestampQuery> {
 
         @Override
-        protected InsertTimestampQuery build() {
+        public InsertTimestampQuery build() {
             return new InsertTimestampQuery(this);
         }
 

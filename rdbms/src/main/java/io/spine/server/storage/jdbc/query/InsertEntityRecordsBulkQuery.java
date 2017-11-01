@@ -138,7 +138,7 @@ class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
         }
 
         @Override
-        protected InsertEntityRecordsBulkQuery<I> build() {
+        public InsertEntityRecordsBulkQuery<I> build() {
             if (records.isEmpty()) {
                 throw new IllegalStateException("Records are not set.");
             }

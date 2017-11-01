@@ -46,7 +46,7 @@ class DeleteAllQuery extends AbstractQuery implements WriteQuery {
     static class Builder extends AbstractQuery.Builder<Builder, DeleteAllQuery> {
 
         @Override
-        protected DeleteAllQuery build() {
+        public DeleteAllQuery build() {
             return new DeleteAllQuery(this);
         }
 
