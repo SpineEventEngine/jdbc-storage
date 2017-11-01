@@ -27,7 +27,7 @@ import javax.annotation.Nullable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import static io.spine.server.storage.jdbc.EventCountTable.Column.event_count;
+import static io.spine.server.storage.jdbc.aggregate.EventCountTable.Column.event_count;
 
 /**
  * Query that selects event count by corresponding aggregate ID.

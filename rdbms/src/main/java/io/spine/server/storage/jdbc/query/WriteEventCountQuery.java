@@ -21,11 +21,12 @@
 package io.spine.server.storage.jdbc.query;
 
 import io.spine.server.storage.jdbc.IdColumn;
+import io.spine.server.storage.jdbc.aggregate.EventCountTable;
 
-import static io.spine.server.storage.jdbc.EventCountTable.Column.event_count;
+import static io.spine.server.storage.jdbc.aggregate.EventCountTable.Column.event_count;
 
 /**
- * An abstract base for {@link io.spine.server.storage.jdbc.EventCountTable EventCountTable} queries.
+ * An abstract base for {@link EventCountTable} queries.
  *
  * @author Dmytro Grankin
  */

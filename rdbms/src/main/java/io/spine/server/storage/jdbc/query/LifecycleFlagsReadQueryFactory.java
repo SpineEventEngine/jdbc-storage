@@ -24,10 +24,11 @@ import io.spine.annotation.Internal;
 import io.spine.server.entity.LifecycleFlags;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.IdColumn;
+import io.spine.server.storage.jdbc.aggregate.LifecycleFlagsTable;
 
 /**
  * An implementation of the query factory for generating read queries for
- * the {@link io.spine.server.storage.jdbc.LifecycleFlagsTable LifecycleFlagsTable}.
+ * the {@link LifecycleFlagsTable}.
  *
  * @author Dmytro Dashenkov
  */

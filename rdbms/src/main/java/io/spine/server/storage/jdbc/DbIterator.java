@@ -20,6 +20,7 @@
 
 package io.spine.server.storage.jdbc;
 
+import com.google.common.annotations.VisibleForTesting;
 import io.spine.annotation.Internal;
 
 import java.io.Closeable;
@@ -132,7 +133,8 @@ public abstract class DbIterator<R> implements Iterator<R>, Closeable {
 
     protected abstract R readResult() throws SQLException;
 
-    protected ResultSet getResultSet() {
+    @VisibleForTesting
+    public ResultSet getResultSet() {
         return resultSet;
     }
 

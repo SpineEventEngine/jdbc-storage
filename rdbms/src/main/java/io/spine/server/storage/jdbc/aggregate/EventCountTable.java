@@ -18,47 +18,53 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc;
+package io.spine.server.storage.jdbc.aggregate;
 
 import com.google.common.collect.ImmutableList;
+import com.google.protobuf.Int32Value;
 import io.spine.annotation.Internal;
-import io.spine.server.aggregate.Aggregate;
-import io.spine.server.entity.LifecycleFlags;
+import io.spine.server.entity.Entity;
+import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.Sql;
+import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
-import io.spine.server.storage.jdbc.query.LifecycleFlagsReadQueryFactory;
-import io.spine.server.storage.jdbc.query.LifecycleFlagsWriteQueryFactory;
+import io.spine.server.storage.jdbc.query.EventCountReadQueryFactory;
+import io.spine.server.storage.jdbc.query.EventCountWriteQueryFactory;
 
 import java.util.List;
 
-import static io.spine.server.storage.jdbc.Sql.Type.BOOLEAN;
+import static io.spine.server.storage.jdbc.DbTableNameFactory.newTableName;
+import static io.spine.server.storage.jdbc.Sql.Type.BIGINT;
 import static io.spine.server.storage.jdbc.Sql.Type.ID;
 
 /**
- * A table for storing the {@link LifecycleFlags} of an {@link Aggregate}.
+ * A table for storing the event count after the last snapshot.
+ *
+ * <p>Used in the {@link JdbcAggregateStorage}.
  *
  * @author Dmytro Dashenkov
  */
 @Internal
-public class LifecycleFlagsTable<I> extends AggregateTable<I, LifecycleFlags> {
+public class EventCountTable<I> extends AggregateTable<I, Int32Value> {
 
-    private static final String TABLE_NAME_POSTFIX = "visibility";
+    private static final String TABLE_NAME_POSTFIX = "_event_count";
 
-    private final LifecycleFlagsWriteQueryFactory<I> writeQueryFactory;
-    private final LifecycleFlagsReadQueryFactory<I> readQueryFactory;
+    private final EventCountReadQueryFactory<I> readQueryFactory;
+    private final EventCountWriteQueryFactory<I> writeQueryFactory;
 
-    LifecycleFlagsTable(Class<? extends Aggregate<I, ?, ?>> aggregateClass,
-                        DataSourceWrapper dataSource) {
-        super(DbTableNameFactory.newTableName(aggregateClass) + TABLE_NAME_POSTFIX,
-              aggregateClass,
+    EventCountTable(Class<? extends Entity<I, ?>> entityClass,
+                    DataSourceWrapper dataSource) {
+        super(newTableName(entityClass) + (TABLE_NAME_POSTFIX),
+              entityClass,
               Column.id.name(),
               dataSource);
-        this.writeQueryFactory = new LifecycleFlagsWriteQueryFactory<>(getIdColumn(),
-                                                                       dataSource,
-                                                                       getName());
-        this.readQueryFactory = new LifecycleFlagsReadQueryFactory<>(getIdColumn(),
-                                                                     dataSource,
-                                                                     getName());
+        this.readQueryFactory = new EventCountReadQueryFactory<>(getIdColumn(),
+                                                                 getDataSource(),
+                                                                 getName());
+        this.writeQueryFactory = new EventCountWriteQueryFactory<>(getIdColumn(),
+                                                                   getDataSource(),
+                                                                   getName());
     }
 
     @Override
@@ -72,24 +78,23 @@ public class LifecycleFlagsTable<I> extends AggregateTable<I, LifecycleFlags> {
     }
 
     @Override
-    protected ReadQueryFactory<I, LifecycleFlags> getReadQueryFactory() {
+    protected ReadQueryFactory<I, Int32Value> getReadQueryFactory() {
         return readQueryFactory;
     }
 
     @Override
-    protected WriteQueryFactory<I, LifecycleFlags> getWriteQueryFactory() {
+    protected WriteQueryFactory<I, Int32Value> getWriteQueryFactory() {
         return writeQueryFactory;
     }
 
     /**
-     * The enumeration of the columns of a {@link LifecycleFlagsTable}.
+     * The enumeration of the columns of an {@link EventCountTable}.
      */
     @Internal
     public enum Column implements TableColumn {
 
         id(ID),
-        archived(BOOLEAN),
-        deleted(BOOLEAN);
+        event_count(BIGINT);
 
         private final Sql.Type type;
 

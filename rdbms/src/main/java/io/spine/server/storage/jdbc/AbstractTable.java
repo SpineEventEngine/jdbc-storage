@@ -197,7 +197,7 @@ public abstract class AbstractTable<I, R extends Message, W> {
      * @return an {@code Iterator} over the table IDs
      * @see io.spine.server.storage.Storage#index()
      */
-    Iterator<I> index() {
+    public Iterator<I> index() {
         final SelectQuery<Iterator<I>> query = getReadQueryFactory().newIndexQuery();
         final Iterator<I> result = query.execute();
         return result;
@@ -229,15 +229,15 @@ public abstract class AbstractTable<I, R extends Message, W> {
         return columns;
     }
 
-    String getName() {
+    protected String getName() {
         return name;
     }
 
-    IdColumn<I> getIdColumn() {
+    protected IdColumn<I> getIdColumn() {
         return idColumn;
     }
 
-    DataSourceWrapper getDataSource() {
+    protected DataSourceWrapper getDataSource() {
         return dataSource;
     }
 
@@ -347,7 +347,7 @@ public abstract class AbstractTable<I, R extends Message, W> {
         query.execute();
     }
 
-    static Logger log() {
+    protected static Logger log() {
         return LogSingleton.INSTANCE.value;
     }
 

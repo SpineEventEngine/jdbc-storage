@@ -23,15 +23,15 @@ package io.spine.server.storage.jdbc.query;
 import com.google.protobuf.Timestamp;
 import io.spine.core.Event;
 import io.spine.server.aggregate.AggregateEventRecord;
-import io.spine.server.storage.jdbc.AggregateEventRecordTable;
+import io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable;
 import io.spine.server.storage.jdbc.IdColumn;
 import io.spine.server.storage.jdbc.Serializer;
 
-import static io.spine.server.storage.jdbc.AggregateEventRecordTable.Column.aggregate;
-import static io.spine.server.storage.jdbc.AggregateEventRecordTable.Column.id;
-import static io.spine.server.storage.jdbc.AggregateEventRecordTable.Column.timestamp;
-import static io.spine.server.storage.jdbc.AggregateEventRecordTable.Column.timestamp_nanos;
-import static io.spine.server.storage.jdbc.AggregateEventRecordTable.Column.version;
+import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.aggregate;
+import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.id;
+import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.timestamp;
+import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.timestamp_nanos;
+import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.version;
 import static io.spine.validate.Validate.isDefault;
 
 /**

@@ -30,10 +30,10 @@ import io.spine.server.storage.jdbc.MessageDbIterator;
 import java.sql.ResultSet;
 
 import static com.querydsl.core.types.Order.DESC;
-import static io.spine.server.storage.jdbc.AggregateEventRecordTable.Column.aggregate;
-import static io.spine.server.storage.jdbc.AggregateEventRecordTable.Column.timestamp;
-import static io.spine.server.storage.jdbc.AggregateEventRecordTable.Column.timestamp_nanos;
-import static io.spine.server.storage.jdbc.AggregateEventRecordTable.Column.version;
+import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.aggregate;
+import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.timestamp;
+import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.timestamp_nanos;
+import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.version;
 import static io.spine.type.TypeUrl.of;
 
 /**

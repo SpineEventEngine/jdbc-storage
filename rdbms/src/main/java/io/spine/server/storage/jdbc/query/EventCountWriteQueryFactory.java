@@ -24,10 +24,10 @@ import com.google.protobuf.Int32Value;
 import io.spine.annotation.Internal;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.IdColumn;
+import io.spine.server.storage.jdbc.aggregate.EventCountTable;
 
 /**
- * An implementation of the query factory generating write queries for the
- * {@link io.spine.server.storage.jdbc.EventCountTable EventCountTable}.
+ * An implementation of the query factory generating write queries for the {@link EventCountTable}.
  *
  * @author Dmytro Dashenkov
  */

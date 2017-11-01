@@ -27,8 +27,8 @@ import io.spine.server.storage.jdbc.IdColumn;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
-import static io.spine.server.storage.jdbc.LifecycleFlagsTable.Column.archived;
-import static io.spine.server.storage.jdbc.LifecycleFlagsTable.Column.deleted;
+import static io.spine.server.storage.jdbc.aggregate.LifecycleFlagsTable.Column.archived;
+import static io.spine.server.storage.jdbc.aggregate.LifecycleFlagsTable.Column.deleted;
 
 /**
  * The query updating {@linkplain LifecycleFlags entity lifecycle flags}.

@@ -22,7 +22,7 @@ package io.spine.server.storage.jdbc.query;
 
 import com.querydsl.core.dml.StoreClause;
 import com.querydsl.core.types.dsl.PathBuilder;
-import io.spine.server.storage.jdbc.EventCountTable;
+import io.spine.server.storage.jdbc.aggregate.EventCountTable;
 
 /**
  * A query that updates event count in the {@link EventCountTable}.

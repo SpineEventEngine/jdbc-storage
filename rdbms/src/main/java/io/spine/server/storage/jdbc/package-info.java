@@ -25,7 +25,7 @@
  * {@link io.spine.server.storage.jdbc.JdbcRecordStorage JdbcRecordStorage},
  * {@link io.spine.server.storage.jdbc.JdbcStandStorage JdbcStandStorage},
  * {@link io.spine.server.storage.jdbc.projection.JdbcProjectionStorage JdbcProjectionStorage} and
- * {@link io.spine.server.storage.jdbc.JdbcAggregateStorage JdbcAggregateStorage}) to change
+ * {@link io.spine.server.storage.jdbc.aggregate.JdbcAggregateStorage JdbcAggregateStorage}) to change
  * the behavior of the storages.
  *
  * @see io.spine.server.storage.jdbc.JdbcStorageFactory for the library entry point

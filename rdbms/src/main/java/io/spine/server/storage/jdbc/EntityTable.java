@@ -21,6 +21,7 @@
 package io.spine.server.storage.jdbc;
 
 import com.google.protobuf.Message;
+import io.spine.annotation.Internal;
 import io.spine.server.entity.Entity;
 
 import static io.spine.server.storage.jdbc.DbTableNameFactory.newTableName;
@@ -31,8 +32,8 @@ import static io.spine.server.storage.jdbc.DbTableNameFactory.newTableName;
  *
  * @author Dmytro Dashenkov
  */
-abstract class EntityTable<I, R extends Message, W>
-        extends AbstractTable<I, R, W> {
+@Internal
+public abstract class EntityTable<I, R extends Message, W> extends AbstractTable<I, R, W> {
 
     private final Class<? extends Entity<I, ?>> entityClass;
 
@@ -44,7 +45,7 @@ abstract class EntityTable<I, R extends Message, W>
      * @param entityClass the {@link Class} of the {@link Entity} to store
      * @param dataSource  an instance of {@link DataSourceWrapper} to use
      */
-    EntityTable(Class<? extends Entity<I, ?>> entityClass,
+    protected EntityTable(Class<? extends Entity<I, ?>> entityClass,
                           String idColumnName,
                           DataSourceWrapper dataSource) {
         this(newTableName(entityClass), entityClass, idColumnName, dataSource);
@@ -57,7 +58,7 @@ abstract class EntityTable<I, R extends Message, W>
      * @param entityClass the {@link Class} of the {@link Entity} to store
      * @param dataSource  an instance of {@link DataSourceWrapper} to use
      */
-    EntityTable(String tableName,
+    protected EntityTable(String tableName,
                           Class<? extends Entity<I, ?>> entityClass,
                           String idColumnName,
                           DataSourceWrapper dataSource) {

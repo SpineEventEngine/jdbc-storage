@@ -25,10 +25,10 @@ import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DbIterator;
 import io.spine.server.storage.jdbc.IdColumn;
+import io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable;
 
 /**
- * The {@code ReadQueryFactory} for
- * {@link io.spine.server.storage.jdbc.AggregateEventRecordTable AggregateEventRecordTable}.
+ * The {@code ReadQueryFactory} for {@link AggregateEventRecordTable}.
  *
  * @param <I> the type of IDs used in the storage
  * @author Dmytro Grankin
@@ -59,8 +59,7 @@ public class AggregateStorageReadQueryFactory<I>
     /**
      * Thrown an {@link UnsupportedOperationException}.
      *
-     * @deprecated multiple records correspond to a single ID in
-     * {@link io.spine.server.storage.jdbc.AggregateEventRecordTable AggregateEventRecordTable};
+     * @deprecated multiple records correspond to a single ID in {@link AggregateEventRecordTable};
      * please use {@link #newSelectEventRecordsById(Object, int)} to read the records.
      */
     @Deprecated

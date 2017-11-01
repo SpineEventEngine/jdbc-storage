@@ -21,10 +21,10 @@
 package io.spine.server.storage.jdbc.query;
 
 import com.querydsl.core.dml.StoreClause;
-import io.spine.server.storage.jdbc.EventCountTable;
+import io.spine.server.storage.jdbc.aggregate.EventCountTable;
 
 /**
- * Query that inserts a new aggregate event count after the last snapshot to the
+ * A query that inserts a new aggregate event count after the last snapshot to the
  * {@link EventCountTable}.
  *
  * @author Alexander Litus

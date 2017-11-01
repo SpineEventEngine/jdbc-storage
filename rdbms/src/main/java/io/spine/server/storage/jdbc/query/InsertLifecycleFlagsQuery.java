@@ -25,8 +25,8 @@ import io.spine.server.entity.LifecycleFlags;
 import io.spine.server.storage.jdbc.IdColumn;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static io.spine.server.storage.jdbc.LifecycleFlagsTable.Column.archived;
-import static io.spine.server.storage.jdbc.LifecycleFlagsTable.Column.deleted;
+import static io.spine.server.storage.jdbc.aggregate.LifecycleFlagsTable.Column.archived;
+import static io.spine.server.storage.jdbc.aggregate.LifecycleFlagsTable.Column.deleted;
 
 /**
  * The query for creating a new record in the table storing

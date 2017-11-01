@@ -22,13 +22,13 @@ package io.spine.server.storage.jdbc.query;
 
 import com.querydsl.sql.AbstractSQLQuery;
 import io.spine.server.entity.LifecycleFlags;
-import io.spine.server.storage.jdbc.LifecycleFlagsTable.Column;
+import io.spine.server.storage.jdbc.aggregate.LifecycleFlagsTable.Column;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import static io.spine.server.storage.jdbc.LifecycleFlagsTable.Column.archived;
-import static io.spine.server.storage.jdbc.LifecycleFlagsTable.Column.deleted;
+import static io.spine.server.storage.jdbc.aggregate.LifecycleFlagsTable.Column.archived;
+import static io.spine.server.storage.jdbc.aggregate.LifecycleFlagsTable.Column.deleted;
 
 /**
  * The query selecting one {@linkplain LifecycleFlags entity lifecycle flags} by ID.

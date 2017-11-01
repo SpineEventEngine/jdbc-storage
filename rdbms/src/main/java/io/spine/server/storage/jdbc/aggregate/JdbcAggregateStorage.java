@@ -18,7 +18,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc;
+package io.spine.server.storage.jdbc.aggregate;
 
 import com.google.common.base.Optional;
 import com.google.protobuf.Int32Value;
@@ -27,6 +27,10 @@ import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.aggregate.AggregateReadRequest;
 import io.spine.server.aggregate.AggregateStorage;
 import io.spine.server.entity.LifecycleFlags;
+import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.DatabaseException;
+import io.spine.server.storage.jdbc.DbIterator;
+import io.spine.server.storage.jdbc.StorageBuilder;
 
 import java.util.Collection;
 import java.util.Iterator;

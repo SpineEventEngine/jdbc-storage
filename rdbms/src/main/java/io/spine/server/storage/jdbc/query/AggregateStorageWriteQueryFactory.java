@@ -24,13 +24,13 @@ import io.spine.annotation.Internal;
 import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.IdColumn;
+import io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable;
 import org.slf4j.Logger;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * The {@code WriteQueryFactory} for
- * {@link io.spine.server.storage.jdbc.AggregateEventRecordTable AggregateEventRecordTable}.
+ * The {@code WriteQueryFactory} for {@link AggregateEventRecordTable}.
  *
  * @param <I> the type of IDs used in the storage
  * @author Andrey Lavrov

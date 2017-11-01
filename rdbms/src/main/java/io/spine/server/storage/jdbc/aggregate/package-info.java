@@ -18,30 +18,12 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc;
-
-import com.google.protobuf.Message;
-import io.spine.server.entity.Entity;
-
 /**
- * A common superclass for the
- * {@linkplain AbstractTable tables} working with
- * the {@linkplain JdbcAggregateStorage aggregate storage}.
- *
- * @author Dmytro Dashenkov
+ * The JDBC-based implementation of the
+ * {@link io.spine.server.aggregate.AggregateStorage AggregateStorage}.
  */
-abstract class AggregateTable<I, T extends Message> extends EntityTable<I, T, T> {
 
-    AggregateTable(Class<? extends Entity<I, ?>> entityClass,
-                             String idColumnName,
-                             DataSourceWrapper dataSource) {
-        super(entityClass, idColumnName, dataSource);
-    }
+@ParametersAreNonnullByDefault
+package io.spine.server.storage.jdbc.aggregate;
 
-    AggregateTable(String tableName,
-                             Class<? extends Entity<I, ?>> entityClass,
-                             String idColumnName,
-                             DataSourceWrapper dataSource) {
-        super(tableName, entityClass, idColumnName, dataSource);
-    }
-}
+import javax.annotation.ParametersAreNonnullByDefault;

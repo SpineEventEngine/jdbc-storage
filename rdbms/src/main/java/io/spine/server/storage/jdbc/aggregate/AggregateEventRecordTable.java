@@ -18,17 +18,21 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc;
+package io.spine.server.storage.jdbc.aggregate;
 
 import com.google.common.collect.ImmutableList;
 import io.spine.annotation.Internal;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.aggregate.AggregateReadRequest;
-import io.spine.server.storage.jdbc.query.ReadQueryFactory;
-import io.spine.server.storage.jdbc.query.WriteQueryFactory;
+import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.DbIterator;
+import io.spine.server.storage.jdbc.Sql;
+import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.query.AggregateStorageReadQueryFactory;
 import io.spine.server.storage.jdbc.query.AggregateStorageWriteQueryFactory;
+import io.spine.server.storage.jdbc.query.ReadQueryFactory;
+import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 
 import java.util.List;
 
