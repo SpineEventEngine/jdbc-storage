@@ -28,7 +28,6 @@ import io.spine.server.storage.jdbc.IdColumn;
 import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
-import io.spine.server.storage.jdbc.query.LastHandledEventTimeReadFactory;
 import io.spine.server.storage.jdbc.query.LastHandledEventTimeWriteFactory;
 
 import java.util.List;

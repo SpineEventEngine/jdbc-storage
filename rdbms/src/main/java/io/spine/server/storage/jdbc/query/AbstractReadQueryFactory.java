@@ -31,7 +31,7 @@ import java.util.Iterator;
  *
  * @author Dmytro Grankin
  */
-abstract class AbstractReadQueryFactory<I, R extends Message> implements ReadQueryFactory<I, R> {
+public abstract class AbstractReadQueryFactory<I, R extends Message> implements ReadQueryFactory<I, R> {
 
     private final IdColumn<I> idColumn;
     private final DataSourceWrapper dataSource;
@@ -44,7 +44,8 @@ abstract class AbstractReadQueryFactory<I, R extends Message> implements ReadQue
      * @param dataSource instance of {@link DataSourceWrapper}
      * @param tableName  the name of the table to generate queries for
      */
-    AbstractReadQueryFactory(IdColumn<I> idColumn, DataSourceWrapper dataSource, String tableName) {
+    protected AbstractReadQueryFactory(IdColumn<I> idColumn, DataSourceWrapper dataSource,
+                                       String tableName) {
         this.idColumn = idColumn;
         this.dataSource = dataSource;
         this.tableName = tableName;
@@ -70,15 +71,15 @@ abstract class AbstractReadQueryFactory<I, R extends Message> implements ReadQue
         return query;
     }
 
-    IdColumn<I> getIdColumn() {
+    protected IdColumn<I> getIdColumn() {
         return idColumn;
     }
 
-    DataSourceWrapper getDataSource() {
+    protected DataSourceWrapper getDataSource() {
         return dataSource;
     }
 
-    String getTableName() {
+    protected String getTableName() {
         return tableName;
     }
 }

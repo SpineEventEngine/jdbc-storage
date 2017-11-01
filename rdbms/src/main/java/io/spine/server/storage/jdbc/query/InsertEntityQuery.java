@@ -65,12 +65,12 @@ class InsertEntityQuery<I> extends WriteEntityQuery<I> {
                                                              EntityRecordWithColumns> {
 
         @Override
-        InsertEntityQuery build() {
+        protected InsertEntityQuery build() {
             return new InsertEntityQuery<>(this);
         }
 
         @Override
-        Builder<I> getThis() {
+        protected Builder<I> getThis() {
             return this;
         }
     }

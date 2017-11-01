@@ -76,12 +76,12 @@ class ContainsQuery<I> extends AbstractQuery implements SelectQuery<Boolean> {
         }
 
         @Override
-        ContainsQuery<I> build() {
+        protected ContainsQuery<I> build() {
             return new ContainsQuery<>(this);
         }
 
         @Override
-        Builder<I> getThis() {
+        protected Builder<I> getThis() {
             return this;
         }
     }

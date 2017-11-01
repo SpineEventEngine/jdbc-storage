@@ -39,7 +39,7 @@ class SelectEntityByIdQuery<I> extends SelectMessageByIdQuery<I, EntityRecord> {
     }
 
     @Override
-    AbstractSQLQuery<?, ?> getQuery() {
+    protected AbstractSQLQuery<?, ?> getQuery() {
         return factory().select(all)
                         .from(table())
                         .where(hasId());

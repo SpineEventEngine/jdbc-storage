@@ -54,12 +54,12 @@ class UpdateEventCountQuery<I> extends WriteEventCountQuery<I> {
                                                                  I> {
 
         @Override
-        UpdateEventCountQuery<I> build() {
+        protected UpdateEventCountQuery<I> build() {
             return new UpdateEventCountQuery<>(this);
         }
 
         @Override
-        Builder<I> getThis() {
+        protected Builder<I> getThis() {
             return this;
         }
     }

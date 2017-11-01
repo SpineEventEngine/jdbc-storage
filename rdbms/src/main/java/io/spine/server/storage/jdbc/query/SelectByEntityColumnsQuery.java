@@ -215,14 +215,14 @@ final class SelectByEntityColumnsQuery<I> extends AbstractQuery
         }
 
         @Override
-        SelectByEntityColumnsQuery<I> build() {
+        protected SelectByEntityColumnsQuery<I> build() {
             checkState(entityQuery != null, "EntityQuery is not set.");
             checkState(columnTypeRegistry != null, "ColumnTypeRegistry is not set.");
             return new SelectByEntityColumnsQuery<>(this);
         }
 
         @Override
-        Builder<I> getThis() {
+        protected Builder<I> getThis() {
             return this;
         }
     }

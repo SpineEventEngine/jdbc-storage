@@ -18,12 +18,12 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.query;
+package io.spine.server.storage.jdbc.projection;
 
 import com.google.protobuf.Timestamp;
 import com.querydsl.sql.AbstractSQLQuery;
-import io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable;
 import io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column;
+import io.spine.server.storage.jdbc.query.SelectMessageByIdQuery;
 
 import javax.annotation.Nullable;
 import java.sql.ResultSet;
@@ -46,7 +46,7 @@ class SelectTimestampQuery extends SelectMessageByIdQuery<String, Timestamp> {
     }
 
     @Override
-    AbstractSQLQuery<?, ?> getQuery() {
+    protected AbstractSQLQuery<?, ?> getQuery() {
         return factory().select(pathOf(seconds), pathOf(nanos))
                         .from(table())
                         .where(hasId());
@@ -55,7 +55,7 @@ class SelectTimestampQuery extends SelectMessageByIdQuery<String, Timestamp> {
     @SuppressWarnings("MethodDoesntCallSuperMethod") // Override default Message storing policy
     @Nullable
     @Override
-    protected Timestamp readMessage(ResultSet resultSet) throws SQLException {
+    public Timestamp readMessage(ResultSet resultSet) throws SQLException {
         final long seconds = resultSet.getLong(Column.seconds.name());
         final int nanos = resultSet.getInt(Column.nanos.name());
         final Timestamp time = Timestamp.newBuilder()
@@ -78,12 +78,12 @@ class SelectTimestampQuery extends SelectMessageByIdQuery<String, Timestamp> {
                                                                 String,
                                                                 Timestamp> {
         @Override
-        SelectTimestampQuery build() {
+        protected SelectTimestampQuery build() {
             return new SelectTimestampQuery(this);
         }
 
         @Override
-        Builder getThis() {
+        protected Builder getThis() {
             return this;
         }
     }

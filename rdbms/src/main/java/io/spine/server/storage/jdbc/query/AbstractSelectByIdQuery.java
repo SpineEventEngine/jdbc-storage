@@ -45,7 +45,7 @@ abstract class AbstractSelectByIdQuery<I, R> extends AbstractQuery implements Se
      *
      * @return a predicate to match records
      */
-    Predicate hasId() {
+    protected Predicate hasId() {
         final String columnName = idColumn.getColumnName();
         final Object normalizedId = idColumn.normalize(id);
         final BooleanExpression hasId = pathOf(columnName).eq(normalizedId);
@@ -60,12 +60,12 @@ abstract class AbstractSelectByIdQuery<I, R> extends AbstractQuery implements Se
         private IdColumn<I> idColumn;
         private I id;
 
-        B setId(I id) {
+        public B setId(I id) {
             this.id = id;
             return getThis();
         }
 
-        B setIdColumn(IdColumn<I> idColumn) {
+        public B setIdColumn(IdColumn<I> idColumn) {
             this.idColumn = idColumn;
             return getThis();
         }

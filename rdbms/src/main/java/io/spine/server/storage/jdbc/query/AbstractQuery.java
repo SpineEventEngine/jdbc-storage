@@ -72,7 +72,7 @@ abstract class AbstractQuery implements StorageQuery {
      *
      * @return the table path
      */
-    RelationalPath<Object> table() {
+    protected RelationalPath<Object> table() {
         return tablePath;
     }
 
@@ -81,11 +81,11 @@ abstract class AbstractQuery implements StorageQuery {
      *
      * @return the query factory
      */
-    AbstractSQLQueryFactory<?> factory() {
+    protected AbstractSQLQueryFactory<?> factory() {
         return queryFactory;
     }
 
-    PathBuilder<Object> pathOf(TableColumn column) {
+    protected PathBuilder<Object> pathOf(TableColumn column) {
         return pathOf(column.name());
     }
 
@@ -150,16 +150,16 @@ abstract class AbstractQuery implements StorageQuery {
         private DataSourceWrapper dataSource;
         private String tableName;
 
-        abstract Q build();
+        protected abstract Q build();
 
-        abstract B getThis();
+        protected abstract B getThis();
 
-        B setDataSource(DataSourceWrapper dataSource) {
+        public B setDataSource(DataSourceWrapper dataSource) {
             this.dataSource = checkNotNull(dataSource);
             return getThis();
         }
 
-        B setTableName(String tableName) {
+        public B setTableName(String tableName) {
             checkArgument(!isNullOrEmpty(tableName));
             this.tableName = tableName;
             return getThis();

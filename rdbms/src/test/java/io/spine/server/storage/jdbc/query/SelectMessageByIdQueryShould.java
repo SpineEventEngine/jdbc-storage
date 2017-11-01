@@ -102,7 +102,7 @@ public class SelectMessageByIdQueryShould {
         }
 
         @Override
-        AbstractSQLQuery<?, ?> getQuery() {
+        protected AbstractSQLQuery<?, ?> getQuery() {
             return query;
         }
 
@@ -119,12 +119,12 @@ public class SelectMessageByIdQueryShould {
             }
 
             @Override
-            ASelectMessageByIdQuery build() {
+            protected ASelectMessageByIdQuery build() {
                 return new ASelectMessageByIdQuery(this);
             }
 
             @Override
-            Builder getThis() {
+            protected Builder getThis() {
                 return this;
             }
         }

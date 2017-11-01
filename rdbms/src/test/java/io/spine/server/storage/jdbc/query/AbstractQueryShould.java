@@ -96,12 +96,12 @@ public class AbstractQueryShould {
     private static class Builder extends AbstractQuery.Builder<Builder, AStorageQuery> {
 
         @Override
-        AStorageQuery build() {
+        protected AStorageQuery build() {
             return new AStorageQuery(this);
         }
 
         @Override
-        Builder getThis() {
+        protected Builder getThis() {
             return this;
         }
     }

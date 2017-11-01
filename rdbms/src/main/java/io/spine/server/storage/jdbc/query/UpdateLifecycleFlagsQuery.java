@@ -87,14 +87,14 @@ class UpdateLifecycleFlagsQuery<I> extends AbstractStoreQuery {
         }
 
         @Override
-        UpdateLifecycleFlagsQuery build() {
+        protected UpdateLifecycleFlagsQuery build() {
             checkState(id != null, "ID is not set.");
             checkState(entityStatus != null, "Entity status is not set.");
             return new UpdateLifecycleFlagsQuery<>(this);
         }
 
         @Override
-        Builder<I> getThis() {
+        protected Builder<I> getThis() {
             return this;
         }
 

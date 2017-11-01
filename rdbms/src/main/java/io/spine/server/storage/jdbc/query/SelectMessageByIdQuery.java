@@ -20,6 +20,7 @@
 
 package io.spine.server.storage.jdbc.query;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Message;
 import com.querydsl.sql.AbstractSQLQuery;
@@ -39,12 +40,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @param <M> a type of messages to read
  * @author Alexander Litus
  */
-abstract class SelectMessageByIdQuery<I, M extends Message> extends AbstractSelectByIdQuery<I, M> {
+public abstract class SelectMessageByIdQuery<I, M extends Message> extends AbstractSelectByIdQuery<I, M> {
 
     private final String messageColumnName;
     private final Descriptor messageDescriptor;
 
-    SelectMessageByIdQuery(
+    protected SelectMessageByIdQuery(
             Builder<? extends Builder, ? extends SelectMessageByIdQuery, I, M> builder) {
         super(builder);
         this.messageColumnName = builder.messageColumnName;
@@ -77,7 +78,7 @@ abstract class SelectMessageByIdQuery<I, M extends Message> extends AbstractSele
      *
      * @return a query, which is ready for execution
      */
-    abstract AbstractSQLQuery<?, ?> getQuery();
+    protected abstract AbstractSQLQuery<?, ?> getQuery();
 
     /**
      * Retrieves a message from a DB result set.
@@ -88,8 +89,9 @@ abstract class SelectMessageByIdQuery<I, M extends Message> extends AbstractSele
      * @return a message instance or {@code null} if the row does not contain the needed data
      * @throws SQLException if an error occurs during an interaction with the DB
      */
+    @VisibleForTesting
     @Nullable
-    M readMessage(ResultSet resultSet) throws SQLException {
+    public M readMessage(ResultSet resultSet) throws SQLException {
         checkNotNull(messageColumnName);
         checkNotNull(messageDescriptor);
         final byte[] bytes = resultSet.getBytes(messageColumnName);
@@ -101,10 +103,10 @@ abstract class SelectMessageByIdQuery<I, M extends Message> extends AbstractSele
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    abstract static class Builder<B extends Builder<B, Q, I, R>,
-                                  Q extends SelectMessageByIdQuery<I, R>,
-                                  I,
-                                  R extends Message>
+    protected abstract static class Builder<B extends Builder<B, Q, I, R>,
+                                            Q extends SelectMessageByIdQuery<I, R>,
+                                            I,
+                                            R extends Message>
             extends AbstractSelectByIdQuery.Builder<I, B, Q> {
 
         private String messageColumnName;

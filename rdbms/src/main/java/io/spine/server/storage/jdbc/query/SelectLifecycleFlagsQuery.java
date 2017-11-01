@@ -42,7 +42,7 @@ class SelectLifecycleFlagsQuery<I> extends SelectMessageByIdQuery<I, LifecycleFl
     }
 
     @Override
-    AbstractSQLQuery<?, ?> getQuery() {
+    protected AbstractSQLQuery<?, ?> getQuery() {
         return factory().select(pathOf(archived), pathOf(deleted))
                         .from(table())
                         .where(hasId());
@@ -51,7 +51,7 @@ class SelectLifecycleFlagsQuery<I> extends SelectMessageByIdQuery<I, LifecycleFl
     @SuppressWarnings("MethodDoesntCallSuperMethod")
     // Override the mechanism of the Message restoring
     @Override
-    protected LifecycleFlags readMessage(ResultSet resultSet) throws SQLException {
+    public LifecycleFlags readMessage(ResultSet resultSet) throws SQLException {
         final boolean archived = resultSet.getBoolean(Column.archived.name());
         final boolean deleted = resultSet.getBoolean(Column.deleted.name());
         final LifecycleFlags visibility = LifecycleFlags.newBuilder()
@@ -70,12 +70,12 @@ class SelectLifecycleFlagsQuery<I> extends SelectMessageByIdQuery<I, LifecycleFl
                                                                    I,
                                                                    LifecycleFlags> {
         @Override
-        SelectLifecycleFlagsQuery<I> build() {
+        protected SelectLifecycleFlagsQuery<I> build() {
             return new SelectLifecycleFlagsQuery<>(this);
         }
 
         @Override
-        Builder<I> getThis() {
+        protected Builder<I> getThis() {
             return this;
         }
     }

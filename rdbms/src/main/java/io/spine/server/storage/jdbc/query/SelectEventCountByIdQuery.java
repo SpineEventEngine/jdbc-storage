@@ -42,7 +42,7 @@ public class SelectEventCountByIdQuery<I> extends SelectMessageByIdQuery<I, Int3
     }
 
     @Override
-    AbstractSQLQuery<?, ?> getQuery() {
+    protected AbstractSQLQuery<?, ?> getQuery() {
         return factory().select(pathOf(event_count))
                         .from(table())
                         .where(hasId());
@@ -51,7 +51,7 @@ public class SelectEventCountByIdQuery<I> extends SelectMessageByIdQuery<I, Int3
     @SuppressWarnings("MethodDoesntCallSuperMethod") // Override default message storing policy
     @Nullable
     @Override
-    protected Int32Value readMessage(ResultSet resultSet) throws SQLException {
+    public Int32Value readMessage(ResultSet resultSet) throws SQLException {
         final int eventCount = resultSet.getInt(event_count.name());
         final boolean isSqlNull = eventCount == 0;
         return isSqlNull
@@ -71,12 +71,12 @@ public class SelectEventCountByIdQuery<I> extends SelectMessageByIdQuery<I, Int3
                                                                    I,
                                                                    Int32Value> {
         @Override
-        SelectEventCountByIdQuery<I> build() {
+        protected SelectEventCountByIdQuery<I> build() {
             return new SelectEventCountByIdQuery<>(this);
         }
 
         @Override
-        Builder<I> getThis() {
+        protected Builder<I> getThis() {
             return this;
         }
     }

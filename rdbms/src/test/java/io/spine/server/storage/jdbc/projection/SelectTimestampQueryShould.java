@@ -18,7 +18,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.query;
+package io.spine.server.storage.jdbc.projection;
 
 import com.google.protobuf.Message;
 import io.spine.server.storage.jdbc.DataSourceWrapper;

@@ -27,7 +27,8 @@ import com.querydsl.core.types.dsl.PathBuilder;
 import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.projection_type;
 
 /**
- * A query that updates {@link Timestamp} in the {@link LastHandledEventTimeReadFactory}.
+ * A query that updates {@link Timestamp} in the
+ * {@link io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable LastHandledEventTimeTable}.
  *
  * @author Alexander Litus
  * @author Andrey Lavrov
@@ -54,12 +55,12 @@ class UpdateTimestampQuery extends WriteTimestampQuery {
     static class Builder extends WriteTimestampQuery.Builder<Builder, UpdateTimestampQuery> {
 
         @Override
-        UpdateTimestampQuery build() {
+        protected UpdateTimestampQuery build() {
             return new UpdateTimestampQuery(this);
         }
 
         @Override
-        Builder getThis() {
+        protected Builder getThis() {
             return this;
         }
     }
