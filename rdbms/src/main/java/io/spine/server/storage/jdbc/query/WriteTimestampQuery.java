@@ -21,8 +21,8 @@
 package io.spine.server.storage.jdbc.query;
 
 import com.google.protobuf.Timestamp;
-import io.spine.server.storage.jdbc.LastHandledEventTimeTable;
-import io.spine.server.storage.jdbc.LastHandledEventTimeTable.Column;
+import io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable;
+import io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column;
 
 /**
  * A base for the {@linkplain StorageQuery} implementations

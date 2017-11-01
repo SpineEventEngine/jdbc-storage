@@ -22,9 +22,9 @@ package io.spine.server.storage.jdbc.query;
 
 import com.google.protobuf.Timestamp;
 import com.querydsl.core.dml.StoreClause;
-import io.spine.server.storage.jdbc.LastHandledEventTimeTable;
+import io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable;
 
-import static io.spine.server.storage.jdbc.LastHandledEventTimeTable.Column.projection_type;
+import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.projection_type;
 
 /**
  * Query that inserts a new {@link Timestamp} to the {@link LastHandledEventTimeTable}.

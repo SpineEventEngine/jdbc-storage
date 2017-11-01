@@ -22,15 +22,15 @@ package io.spine.server.storage.jdbc.query;
 
 import com.google.protobuf.Timestamp;
 import com.querydsl.sql.AbstractSQLQuery;
-import io.spine.server.storage.jdbc.LastHandledEventTimeTable;
-import io.spine.server.storage.jdbc.LastHandledEventTimeTable.Column;
+import io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable;
+import io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column;
 
 import javax.annotation.Nullable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import static io.spine.server.storage.jdbc.LastHandledEventTimeTable.Column.nanos;
-import static io.spine.server.storage.jdbc.LastHandledEventTimeTable.Column.seconds;
+import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.nanos;
+import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.seconds;
 import static io.spine.validate.Validate.isDefault;
 
 /**

@@ -24,7 +24,7 @@ import com.google.protobuf.Timestamp;
 import com.querydsl.core.dml.StoreClause;
 import com.querydsl.core.types.dsl.PathBuilder;
 
-import static io.spine.server.storage.jdbc.LastHandledEventTimeTable.Column.projection_type;
+import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.projection_type;
 
 /**
  * A query that updates {@link Timestamp} in the {@link LastHandledEventTimeReadFactory}.

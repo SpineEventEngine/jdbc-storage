@@ -24,6 +24,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.protobuf.Message;
+import io.spine.annotation.Internal;
 import io.spine.server.storage.jdbc.query.QueryExecutor;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.SelectQuery;
@@ -71,7 +72,8 @@ import static io.spine.server.storage.jdbc.Sql.Query.PRIMARY_KEY;
  * @author Dmytro Dashenkov
  * @see TableColumn
  */
-abstract class AbstractTable<I, R extends Message, W> {
+@Internal
+public abstract class AbstractTable<I, R extends Message, W> {
 
     /**
      * A map of the Spine common Entity Columns to their default values.
@@ -102,7 +104,7 @@ abstract class AbstractTable<I, R extends Message, W> {
      */
     private ImmutableList<? extends TableColumn> columns;
 
-    AbstractTable(String name, IdColumn<I> idColumn, DataSourceWrapper dataSource) {
+    protected AbstractTable(String name, IdColumn<I> idColumn, DataSourceWrapper dataSource) {
         this.name = checkNotNull(name);
         this.idColumn = checkNotNull(idColumn);
         this.dataSource = checkNotNull(dataSource);
@@ -141,7 +143,7 @@ abstract class AbstractTable<I, R extends Message, W> {
      * <p>Equivalent to an SQL expression:
      * <p>{@code CREATE TABLE IF NOT EXISTS $TableName ( $Columns );}
      */
-    void createIfNotExists() {
+    public void createIfNotExists() {
         final QueryExecutor queryExecutor = new QueryExecutor(dataSource, log());
         final String createTableSql = composeCreateTableSql();
         queryExecutor.execute(createTableSql);
@@ -166,7 +168,7 @@ abstract class AbstractTable<I, R extends Message, W> {
      * @return table record or {@code null} if there is no record with given ID
      */
     @Nullable
-    R read(I id) {
+    public R read(I id) {
         final SelectQuery<R> query = composeSelectQuery(id);
         final R result = query.execute();
         return result;
@@ -181,7 +183,7 @@ abstract class AbstractTable<I, R extends Message, W> {
      * @param id     ID to write the record under
      * @param record the record to write
      */
-    void write(I id, W record) {
+    public void write(I id, W record) {
         if (containsRecord(id)) {
             update(id, record);
         } else {

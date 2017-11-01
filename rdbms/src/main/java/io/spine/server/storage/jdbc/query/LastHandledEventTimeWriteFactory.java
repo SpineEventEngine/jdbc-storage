@@ -23,13 +23,14 @@ package io.spine.server.storage.jdbc.query;
 import com.google.protobuf.Timestamp;
 import io.spine.annotation.Internal;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable;
 
 import static io.spine.server.storage.jdbc.IdColumn.typeString;
-import static io.spine.server.storage.jdbc.LastHandledEventTimeTable.Column.projection_type;
+import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.projection_type;
 
 /**
  * An implementation of the query factory for generating write queries for
- * the {@link io.spine.server.storage.jdbc.LastHandledEventTimeTable LastHandledEventTimeTable}.
+ * the {@link LastHandledEventTimeTable LastHandledEventTimeTable}.
  *
  * @author Dmytro Grankin
  */

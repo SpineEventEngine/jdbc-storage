@@ -33,7 +33,7 @@ import java.util.regex.Pattern;
  */
 @SuppressWarnings("UtilityClass")
 @Internal
-class DbTableNameFactory {
+public class DbTableNameFactory {
 
     private static final Pattern PATTERN_DOT = Pattern.compile("\\.");
     private static final Pattern PATTERN_DOLLAR = Pattern.compile("\\$");
@@ -50,7 +50,7 @@ class DbTableNameFactory {
      * @param cls a class of an {@linkplain Entity} whose state type name to use
      * @return a valid DB table name
      */
-    static String newTableName(Class<? extends Entity<?, ?>> cls) {
+    public static String newTableName(Class<? extends Entity<?, ?>> cls) {
         final String typeName = new EntityClass<Entity>(cls).getStateType()
                                                             .getTypeName();
         final String tableNameTmp = PATTERN_DOT.matcher(typeName)

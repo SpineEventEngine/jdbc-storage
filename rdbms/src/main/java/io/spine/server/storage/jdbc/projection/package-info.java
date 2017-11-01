@@ -19,18 +19,11 @@
  */
 
 /**
- * The JDBC-based implementation of the Spine {@linkplain io.spine.server.storage.Storage storages}.
- *
- * <p>Extend the storage classes (
- * {@link io.spine.server.storage.jdbc.JdbcRecordStorage JdbcRecordStorage},
- * {@link io.spine.server.storage.jdbc.JdbcStandStorage JdbcStandStorage},
- * {@link io.spine.server.storage.jdbc.projection.JdbcProjectionStorage JdbcProjectionStorage} and
- * {@link io.spine.server.storage.jdbc.JdbcAggregateStorage JdbcAggregateStorage}) to change
- * the behavior of the storages.
- *
- * @see io.spine.server.storage.jdbc.JdbcStorageFactory for the library entry point
+ * The JDBC-based implementation of the
+ * {@link io.spine.server.projection.ProjectionStorage ProjectionStorage}.
  */
+
 @ParametersAreNonnullByDefault
-package io.spine.server.storage.jdbc;
+package io.spine.server.storage.jdbc.projection;
 
 import javax.annotation.ParametersAreNonnullByDefault;
