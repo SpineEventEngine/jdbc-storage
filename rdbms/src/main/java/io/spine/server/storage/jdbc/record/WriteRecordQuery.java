@@ -18,11 +18,17 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.query;
+package io.spine.server.storage.jdbc.record;
 
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.IdColumn;
+import io.spine.server.storage.jdbc.query.ColumnAwareWriteQuery;
 
+/**
+ * An abstract base for write record queries.
+ *
+ * @author Dmytro Grankin
+ */
 abstract class WriteRecordQuery<I, R> extends ColumnAwareWriteQuery {
 
     private final I id;

@@ -37,7 +37,6 @@ import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.RecordStorageReadQueryFactory;
-import io.spine.server.storage.jdbc.query.RecordStorageWriteQueryFactory;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
 

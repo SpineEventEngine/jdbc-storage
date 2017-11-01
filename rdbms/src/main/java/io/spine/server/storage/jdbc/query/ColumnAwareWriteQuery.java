@@ -28,21 +28,22 @@ import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
  *
  * @author Alexander Aleksandrov
  */
-abstract class ColumnAwareWriteQuery extends AbstractStoreQuery {
+public abstract class ColumnAwareWriteQuery extends AbstractStoreQuery {
 
     private final ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry;
 
-    ColumnAwareWriteQuery(Builder<? extends Builder, ? extends ColumnAwareWriteQuery> builder) {
+    protected ColumnAwareWriteQuery(
+            Builder<? extends Builder, ? extends ColumnAwareWriteQuery> builder) {
         super(builder);
         this.columnTypeRegistry = builder.getColumnTypeRegistry();
     }
 
-    ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> getColumnTypeRegistry() {
+    protected ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> getColumnTypeRegistry() {
         return columnTypeRegistry;
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    abstract static class Builder<B extends Builder<B, Q>, Q extends ColumnAwareWriteQuery>
+    protected abstract static class Builder<B extends Builder<B, Q>, Q extends ColumnAwareWriteQuery>
             extends AbstractStoreQuery.Builder<B, Q> {
 
         private ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry
@@ -52,7 +53,8 @@ abstract class ColumnAwareWriteQuery extends AbstractStoreQuery {
             return columnTypeRegistry;
         }
 
-        B setColumnTypeRegistry(ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry) {
+        public B setColumnTypeRegistry(
+                ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry) {
             this.columnTypeRegistry = columnTypeRegistry;
             return getThis();
         }

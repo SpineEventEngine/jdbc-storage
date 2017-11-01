@@ -18,14 +18,14 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.query;
+package io.spine.server.storage.jdbc.record;
 
-import io.spine.annotation.Internal;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.IdColumn;
-import io.spine.server.storage.jdbc.record.RecordTable;
+import io.spine.server.storage.jdbc.query.AbstractWriteQueryFactory;
+import io.spine.server.storage.jdbc.query.WriteQuery;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
 
 /**
@@ -33,16 +33,15 @@ import io.spine.server.storage.jdbc.type.JdbcColumnType;
  *
  * @author Dmytro Grankin
  */
-@Internal
-public class RecordStorageWriteQueryFactory<I> extends AbstractWriteQueryFactory<I, EntityRecordWithColumns> {
+class RecordStorageWriteQueryFactory<I> extends AbstractWriteQueryFactory<I, EntityRecordWithColumns> {
 
     private final ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> columnTypeRegistry;
 
-    public RecordStorageWriteQueryFactory(IdColumn<I> idColumn,
-                                          DataSourceWrapper dataSource,
-                                          String tableName,
-                                          ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>>
-                                                  columnTypeRegistry) {
+    RecordStorageWriteQueryFactory(IdColumn<I> idColumn,
+                                   DataSourceWrapper dataSource,
+                                   String tableName,
+                                   ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>>
+                                           columnTypeRegistry) {
         super(idColumn, dataSource, tableName);
         this.columnTypeRegistry = columnTypeRegistry;
     }

@@ -18,13 +18,14 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.query;
+package io.spine.server.storage.jdbc.record;
 
 import com.google.common.base.Functions;
 import io.spine.server.entity.storage.ColumnRecords;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
-import io.spine.server.storage.jdbc.record.RecordTable;
 import io.spine.server.storage.jdbc.Serializer;
+import io.spine.server.storage.jdbc.query.Parameter;
+import io.spine.server.storage.jdbc.query.Parameters;
 
 import static io.spine.server.storage.jdbc.record.RecordTable.StandardColumn.entity;
 

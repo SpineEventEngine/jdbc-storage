@@ -18,33 +18,41 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.query;
+package io.spine.server.storage.jdbc.record;
 
 import com.querydsl.core.dml.StoreClause;
-import com.querydsl.core.types.dsl.PathBuilder;
-import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
-import io.spine.server.storage.jdbc.record.RecordTable;
+import io.spine.server.storage.jdbc.query.Parameter;
+import io.spine.server.storage.jdbc.query.Parameters;
 
 /**
- * Query that updates {@link EntityRecord} in
+ * Query that inserts a new {@link EntityRecordWithColumns} to
  * the {@link RecordTable}.
  *
  * @author Alexander Litus
  * @author Andrey Lavrov
+ * @author Alexander Aleksandrov
  */
-class UpdateEntityQuery<I> extends WriteEntityQuery<I> {
+class InsertEntityQuery<I> extends WriteEntityQuery<I> {
 
-    private UpdateEntityQuery(Builder<I> builder) {
+    private InsertEntityQuery(Builder<I> builder) {
         super(builder);
     }
 
     @Override
     protected StoreClause<?> createClause() {
-        final PathBuilder<Object> id = pathOf(getIdColumn().getColumnName());
+        return factory().insert(table());
+    }
+
+    @Override
+    protected Parameters getParameters() {
+        final Parameters superParameters = super.getParameters();
         final Object normalizedId = getIdColumn().normalize(getId());
-        return factory().update(table())
-                        .where(id.eq(normalizedId));
+        final Parameter idParameter = Parameter.of(normalizedId);
+        return Parameters.newBuilder()
+                         .addParameters(superParameters)
+                         .addParameter(getIdColumn().getColumnName(), idParameter)
+                         .build();
     }
 
     static <I> Builder<I> newBuilder() {
@@ -53,13 +61,13 @@ class UpdateEntityQuery<I> extends WriteEntityQuery<I> {
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
     static class Builder<I> extends WriteRecordQuery.Builder<Builder<I>,
-                                                             UpdateEntityQuery,
+                                                             InsertEntityQuery,
                                                              I,
                                                              EntityRecordWithColumns> {
 
         @Override
-        public UpdateEntityQuery build() {
-            return new UpdateEntityQuery<>(this);
+        public InsertEntityQuery build() {
+            return new InsertEntityQuery<>(this);
         }
 
         @Override

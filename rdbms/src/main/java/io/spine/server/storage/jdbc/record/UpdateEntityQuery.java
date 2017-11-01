@@ -18,40 +18,32 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.query;
+package io.spine.server.storage.jdbc.record;
 
 import com.querydsl.core.dml.StoreClause;
+import com.querydsl.core.types.dsl.PathBuilder;
+import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
-import io.spine.server.storage.jdbc.record.RecordTable;
 
 /**
- * Query that inserts a new {@link EntityRecordWithColumns} to
+ * Query that updates {@link EntityRecord} in
  * the {@link RecordTable}.
  *
  * @author Alexander Litus
  * @author Andrey Lavrov
- * @author Alexander Aleksandrov
  */
-class InsertEntityQuery<I> extends WriteEntityQuery<I> {
+class UpdateEntityQuery<I> extends WriteEntityQuery<I> {
 
-    private InsertEntityQuery(Builder<I> builder) {
+    private UpdateEntityQuery(Builder<I> builder) {
         super(builder);
     }
 
     @Override
     protected StoreClause<?> createClause() {
-        return factory().insert(table());
-    }
-
-    @Override
-    protected Parameters getParameters() {
-        final Parameters superParameters = super.getParameters();
+        final PathBuilder<Object> id = pathOf(getIdColumn().getColumnName());
         final Object normalizedId = getIdColumn().normalize(getId());
-        final Parameter idParameter = Parameter.of(normalizedId);
-        return Parameters.newBuilder()
-                         .addParameters(superParameters)
-                         .addParameter(getIdColumn().getColumnName(), idParameter)
-                         .build();
+        return factory().update(table())
+                        .where(id.eq(normalizedId));
     }
 
     static <I> Builder<I> newBuilder() {
@@ -60,13 +52,13 @@ class InsertEntityQuery<I> extends WriteEntityQuery<I> {
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
     static class Builder<I> extends WriteRecordQuery.Builder<Builder<I>,
-                                                             InsertEntityQuery,
+                                                             UpdateEntityQuery,
                                                              I,
                                                              EntityRecordWithColumns> {
 
         @Override
-        public InsertEntityQuery build() {
-            return new InsertEntityQuery<>(this);
+        public UpdateEntityQuery build() {
+            return new UpdateEntityQuery<>(this);
         }
 
         @Override
