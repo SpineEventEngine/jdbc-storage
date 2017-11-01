@@ -20,7 +20,6 @@
 
 package io.spine.server.storage.jdbc.aggregate;
 
-import com.google.protobuf.Int32Value;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.IdColumn;
 import io.spine.server.storage.jdbc.query.AbstractReadQueryFactory;
@@ -31,7 +30,7 @@ import io.spine.server.storage.jdbc.query.SelectQuery;
  *
  * @author Dmytro Grankin
  */
-class EventCountReadQueryFactory<I> extends AbstractReadQueryFactory<I, Int32Value> {
+class EventCountReadQueryFactory<I> extends AbstractReadQueryFactory<I, Integer> {
 
     EventCountReadQueryFactory(IdColumn<I> idColumn,
                                DataSourceWrapper dataSource,
@@ -40,7 +39,7 @@ class EventCountReadQueryFactory<I> extends AbstractReadQueryFactory<I, Int32Val
     }
 
     @Override
-    public SelectQuery<Int32Value> newSelectByIdQuery(I id) {
+    public SelectQuery<Integer> newSelectByIdQuery(I id) {
         final SelectEventCountByIdQuery.Builder<I> builder = SelectEventCountByIdQuery.newBuilder();
         final SelectEventCountByIdQuery<I> query = builder.setTableName(getTableName())
                                                           .setDataSource(getDataSource())

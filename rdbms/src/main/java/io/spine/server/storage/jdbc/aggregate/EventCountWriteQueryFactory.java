@@ -20,7 +20,6 @@
 
 package io.spine.server.storage.jdbc.aggregate;
 
-import com.google.protobuf.Int32Value;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.IdColumn;
 import io.spine.server.storage.jdbc.query.AbstractWriteQueryFactory;
@@ -31,7 +30,7 @@ import io.spine.server.storage.jdbc.query.WriteQuery;
  *
  * @author Dmytro Dashenkov
  */
-class EventCountWriteQueryFactory<I> extends AbstractWriteQueryFactory<I, Int32Value> {
+class EventCountWriteQueryFactory<I> extends AbstractWriteQueryFactory<I, Integer> {
 
     EventCountWriteQueryFactory(IdColumn<I> idColumn,
                                 DataSourceWrapper dataSource,
@@ -40,25 +39,25 @@ class EventCountWriteQueryFactory<I> extends AbstractWriteQueryFactory<I, Int32V
     }
 
     @Override
-    public WriteQuery newInsertQuery(I id, Int32Value record) {
+    public WriteQuery newInsertQuery(I id, Integer record) {
         final InsertEventCountQuery.Builder<I> builder = InsertEventCountQuery.newBuilder();
         final WriteQuery query = builder.setTableName(getTableName())
                                         .setId(id)
                                         .setIdColumn(getIdColumn())
                                         .setDataSource(getDataSource())
-                                        .setEventCount(record.getValue())
+                                        .setEventCount(record)
                                         .build();
         return query;
     }
 
     @Override
-    public WriteQuery newUpdateQuery(I id, Int32Value record) {
+    public WriteQuery newUpdateQuery(I id, Integer record) {
         final UpdateEventCountQuery.Builder<I> builder = UpdateEventCountQuery.newBuilder();
         final WriteQuery query = builder.setDataSource(getDataSource())
                                         .setTableName(getTableName())
                                         .setId(id)
                                         .setIdColumn(getIdColumn())
-                                        .setEventCount(record.getValue())
+                                        .setEventCount(record)
                                         .build();
         return query;
     }

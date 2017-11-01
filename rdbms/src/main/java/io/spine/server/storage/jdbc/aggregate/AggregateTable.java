@@ -20,7 +20,6 @@
 
 package io.spine.server.storage.jdbc.aggregate;
 
-import com.google.protobuf.Message;
 import io.spine.server.entity.Entity;
 import io.spine.server.storage.jdbc.AbstractTable;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
@@ -33,7 +32,7 @@ import io.spine.server.storage.jdbc.EntityTable;
  *
  * @author Dmytro Dashenkov
  */
-abstract class AggregateTable<I, T extends Message> extends EntityTable<I, T, T> {
+abstract class AggregateTable<I, T> extends EntityTable<I, T, T> {
 
     AggregateTable(Class<? extends Entity<I, ?>> entityClass,
                              String idColumnName,

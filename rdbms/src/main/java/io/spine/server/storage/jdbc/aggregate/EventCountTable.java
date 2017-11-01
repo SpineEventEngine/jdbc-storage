@@ -21,7 +21,6 @@
 package io.spine.server.storage.jdbc.aggregate;
 
 import com.google.common.collect.ImmutableList;
-import com.google.protobuf.Int32Value;
 import io.spine.server.entity.Entity;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.Sql;
@@ -42,7 +41,7 @@ import static io.spine.server.storage.jdbc.Sql.Type.ID;
  *
  * @author Dmytro Dashenkov
  */
-class EventCountTable<I> extends AggregateTable<I, Int32Value> {
+class EventCountTable<I> extends AggregateTable<I, Integer> {
 
     private static final String TABLE_NAME_POSTFIX = "_event_count";
 
@@ -74,12 +73,12 @@ class EventCountTable<I> extends AggregateTable<I, Int32Value> {
     }
 
     @Override
-    protected ReadQueryFactory<I, Int32Value> getReadQueryFactory() {
+    protected ReadQueryFactory<I, Integer> getReadQueryFactory() {
         return readQueryFactory;
     }
 
     @Override
-    protected WriteQueryFactory<I, Int32Value> getWriteQueryFactory() {
+    protected WriteQueryFactory<I, Integer> getWriteQueryFactory() {
         return writeQueryFactory;
     }
 

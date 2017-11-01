@@ -21,7 +21,6 @@
 package io.spine.server.storage.jdbc.aggregate;
 
 import com.google.common.base.Optional;
-import com.google.protobuf.Int32Value;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.aggregate.AggregateReadRequest;
@@ -97,10 +96,10 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     @Override
     public int readEventCountAfterLastSnapshot(I id) {
         checkNotClosed();
-        final Int32Value value = eventCountTable.read(id);
+        final Integer value = eventCountTable.read(id);
         final int result = value == null
                            ? 0
-                           : value.getValue();
+                           : value;
         return result;
     }
 
@@ -117,10 +116,7 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     @Override
     public void writeEventCountAfterLastSnapshot(I id, int count) {
         checkNotClosed();
-        final Int32Value record = Int32Value.newBuilder()
-                                            .setValue(count)
-                                            .build();
-        eventCountTable.write(id, record);
+        eventCountTable.write(id, count);
     }
 
     /**

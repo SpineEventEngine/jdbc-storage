@@ -31,7 +31,7 @@ import java.util.Iterator;
  *
  * @author Dmytro Grankin
  */
-public abstract class AbstractReadQueryFactory<I, R extends Message> implements ReadQueryFactory<I, R> {
+public abstract class AbstractReadQueryFactory<I, R> implements ReadQueryFactory<I, R> {
 
     private final IdColumn<I> idColumn;
     private final DataSourceWrapper dataSource;

@@ -20,13 +20,7 @@
 
 package io.spine.server.storage.jdbc.aggregate;
 
-import com.google.protobuf.Int32Value;
-import com.querydsl.sql.AbstractSQLQuery;
-import io.spine.server.storage.jdbc.query.SelectMessageByIdQuery;
-
-import javax.annotation.Nullable;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import io.spine.server.storage.jdbc.query.AbstractSelectByIdQuery;
 
 import static io.spine.server.storage.jdbc.aggregate.EventCountTable.Column.event_count;
 
@@ -36,30 +30,18 @@ import static io.spine.server.storage.jdbc.aggregate.EventCountTable.Column.even
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-class SelectEventCountByIdQuery<I> extends SelectMessageByIdQuery<I, Int32Value> {
+class SelectEventCountByIdQuery<I> extends AbstractSelectByIdQuery<I, Integer> {
 
     private SelectEventCountByIdQuery(Builder<I> builder) {
         super(builder);
     }
 
     @Override
-    protected AbstractSQLQuery<?, ?> getQuery() {
-        return factory().select(pathOf(event_count))
+    public Integer execute() {
+        return factory().select(pathOf(event_count.name(), Integer.class))
                         .from(table())
-                        .where(hasId());
-    }
-
-    @SuppressWarnings("MethodDoesntCallSuperMethod") // Override default message storing policy
-    @Nullable
-    @Override
-    protected Int32Value readMessage(ResultSet resultSet) throws SQLException {
-        final int eventCount = resultSet.getInt(event_count.name());
-        final boolean isSqlNull = eventCount == 0;
-        return isSqlNull
-               ? null
-               : Int32Value.newBuilder()
-                           .setValue(eventCount)
-                           .build();
+                        .where(hasId())
+                        .fetchOne();
     }
 
     static <I> Builder<I> newBuilder() {
@@ -67,10 +49,9 @@ class SelectEventCountByIdQuery<I> extends SelectMessageByIdQuery<I, Int32Value>
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    static class Builder<I> extends SelectMessageByIdQuery.Builder<Builder<I>,
-                                                                   SelectEventCountByIdQuery<I>,
-                                                                   I,
-                                                                   Int32Value> {
+    static class Builder<I> extends AbstractSelectByIdQuery.Builder<I,
+                                                                    Builder<I>,
+                                                                    SelectEventCountByIdQuery<I>> {
         @Override
         public SelectEventCountByIdQuery<I> build() {
             return new SelectEventCountByIdQuery<>(this);
