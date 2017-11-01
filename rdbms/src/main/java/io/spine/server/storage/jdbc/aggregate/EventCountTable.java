@@ -31,8 +31,8 @@ import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 import java.util.List;
 
 import static io.spine.server.storage.jdbc.DbTableNameFactory.newTableName;
-import static io.spine.server.storage.jdbc.Sql.Type.BIGINT;
 import static io.spine.server.storage.jdbc.Sql.Type.ID;
+import static io.spine.server.storage.jdbc.Sql.Type.INT;
 
 /**
  * A table for storing the event count after the last snapshot.
@@ -88,7 +88,7 @@ class EventCountTable<I> extends AggregateTable<I, Integer> {
     enum Column implements TableColumn {
 
         id(ID),
-        event_count(BIGINT);
+        event_count(INT);
 
         private final Sql.Type type;
 
