@@ -18,14 +18,14 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.query;
+package io.spine.server.storage.jdbc.aggregate;
 
-import io.spine.annotation.Internal;
 import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DbIterator;
 import io.spine.server.storage.jdbc.IdColumn;
-import io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable;
+import io.spine.server.storage.jdbc.query.AbstractReadQueryFactory;
+import io.spine.server.storage.jdbc.query.SelectQuery;
 
 /**
  * The {@code ReadQueryFactory} for {@link AggregateEventRecordTable}.
@@ -33,20 +33,18 @@ import io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable;
  * @param <I> the type of IDs used in the storage
  * @author Dmytro Grankin
  */
-@Internal
-public class AggregateStorageReadQueryFactory<I>
-        extends AbstractReadQueryFactory<I, AggregateEventRecord> {
+class AggregateStorageReadQueryFactory<I> extends AbstractReadQueryFactory<I, AggregateEventRecord> {
 
-    public AggregateStorageReadQueryFactory(IdColumn<I> idColumn,
-                                            DataSourceWrapper dataSource,
-                                            String tableName) {
+    AggregateStorageReadQueryFactory(IdColumn<I> idColumn,
+                                     DataSourceWrapper dataSource,
+                                     String tableName) {
         super(idColumn, dataSource, tableName);
     }
 
     /** Returns a query that selects aggregate records by ID sorted by time descending. */
     @SuppressWarnings("InstanceMethodNamingConvention")
-    public SelectQuery<DbIterator<AggregateEventRecord>> newSelectEventRecordsById(I id,
-                                                                                   int fetchSize) {
+    SelectQuery<DbIterator<AggregateEventRecord>> newSelectEventRecordsById(I id,
+                                                                            int fetchSize) {
         final SelectEventRecordsById.Builder<I> builder = SelectEventRecordsById.newBuilder();
         return builder.setTableName(getTableName())
                       .setDataSource(getDataSource())
