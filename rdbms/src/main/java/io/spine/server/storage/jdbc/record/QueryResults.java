@@ -18,7 +18,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.query;
+package io.spine.server.storage.jdbc.record;
 
 import com.google.common.base.Function;
 import com.google.protobuf.Any;
@@ -27,7 +27,6 @@ import com.google.protobuf.Message;
 import io.spine.protobuf.AnyPacker;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.FieldMasks;
-import io.spine.server.storage.jdbc.record.RecordTable;
 import io.spine.server.storage.jdbc.MessageDbIterator;
 import io.spine.type.TypeUrl;
 

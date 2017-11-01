@@ -111,12 +111,12 @@ public abstract class SelectMessageByIdQuery<I, M extends Message> extends Abstr
         private String messageColumnName;
         private Descriptor messageDescriptor;
 
-        B setMessageColumnName(String messageColumnName) {
+        protected B setMessageColumnName(String messageColumnName) {
             this.messageColumnName = messageColumnName;
             return getThis();
         }
 
-        B setMessageDescriptor(Descriptor messageDescriptor) {
+        protected B setMessageDescriptor(Descriptor messageDescriptor) {
             this.messageDescriptor = messageDescriptor;
             return getThis();
         }

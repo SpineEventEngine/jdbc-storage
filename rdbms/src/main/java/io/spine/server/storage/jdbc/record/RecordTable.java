@@ -23,7 +23,6 @@ package io.spine.server.storage.jdbc.record;
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.protobuf.FieldMask;
-import io.spine.annotation.Internal;
 import io.spine.server.entity.Entity;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
@@ -36,7 +35,6 @@ import io.spine.server.storage.jdbc.EntityTable;
 import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
-import io.spine.server.storage.jdbc.query.RecordStorageReadQueryFactory;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
 
@@ -62,8 +60,7 @@ import static java.util.Collections.addAll;
  *
  * @author Dmytro Dashenkov
  */
-@Internal
-public class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumns> {
+class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumns> {
 
     private final RecordStorageWriteQueryFactory<I> writeQueryFactory;
     private final RecordStorageReadQueryFactory<I> readQueryFactory;
@@ -128,7 +125,7 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWit
             }
         }
         if (!newRecords.isEmpty()) {
-            readQueryFactory.newInsertEntityRecordsBulkQuery(newRecords)
+            writeQueryFactory.newInsertEntityRecordsBulkQuery(newRecords)
                             .execute();
         }
     }
@@ -148,8 +145,7 @@ public class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWit
      *
      * @see EntityColumnWrapper
      */
-    @Internal
-    public enum StandardColumn implements TableColumn {
+    enum StandardColumn implements TableColumn {
 
         id(ID),
         entity(BLOB);

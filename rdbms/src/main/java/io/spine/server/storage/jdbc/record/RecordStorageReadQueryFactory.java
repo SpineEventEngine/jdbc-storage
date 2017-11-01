@@ -18,21 +18,19 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.query;
+package io.spine.server.storage.jdbc.record;
 
 import com.google.protobuf.FieldMask;
-import io.spine.annotation.Internal;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.entity.storage.EntityQuery;
-import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.IdColumn;
-import io.spine.server.storage.jdbc.record.RecordTable;
+import io.spine.server.storage.jdbc.query.AbstractReadQueryFactory;
+import io.spine.server.storage.jdbc.query.SelectQuery;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
 
 import java.util.Iterator;
-import java.util.Map;
 
 /**
  * An implementation of the query factory for generating read queries for the {@link RecordTable}.
@@ -40,8 +38,7 @@ import java.util.Map;
  * @author Andrey Lavrov
  * @author Dmytro Dashenkov
  */
-@Internal
-public class RecordStorageReadQueryFactory<I> extends AbstractReadQueryFactory<I, EntityRecord> {
+class RecordStorageReadQueryFactory<I> extends AbstractReadQueryFactory<I, EntityRecord> {
 
     private final ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> columnTypeRegistry;
 
@@ -51,17 +48,17 @@ public class RecordStorageReadQueryFactory<I> extends AbstractReadQueryFactory<I
      * @param dataSource instance of {@link DataSourceWrapper}
      * @param tableName  the name of the table to generate queries for
      */
-    public RecordStorageReadQueryFactory(DataSourceWrapper dataSource,
-                                         String tableName,
-                                         IdColumn<I> idColumn,
-                                         ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>>
-                                             columnTypeRegistry) {
+    RecordStorageReadQueryFactory(DataSourceWrapper dataSource,
+                                  String tableName,
+                                  IdColumn<I> idColumn,
+                                  ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>>
+                                          columnTypeRegistry) {
         super(idColumn, dataSource, tableName);
         this.columnTypeRegistry = columnTypeRegistry;
     }
 
-    public SelectQuery<Iterator<EntityRecord>> newSelectByEntityQuery(EntityQuery<I> query,
-                                                                      FieldMask fieldMask) {
+    SelectQuery<Iterator<EntityRecord>> newSelectByEntityQuery(EntityQuery<I> query,
+                                                               FieldMask fieldMask) {
         final SelectByEntityColumnsQuery.Builder<I> builder = SelectByEntityColumnsQuery.newBuilder();
         builder.setDataSource(getDataSource())
                .setTableName(getTableName())
@@ -69,16 +66,6 @@ public class RecordStorageReadQueryFactory<I> extends AbstractReadQueryFactory<I
                .setColumnTypeRegistry(columnTypeRegistry)
                .setEntityQuery(query)
                .setFieldMask(fieldMask);
-        return builder.build();
-    }
-
-    public WriteQuery newInsertEntityRecordsBulkQuery(Map<I, EntityRecordWithColumns> records) {
-        final InsertEntityRecordsBulkQuery.Builder<I> builder = InsertEntityRecordsBulkQuery.newBuilder();
-        builder.setDataSource(getDataSource())
-               .setTableName(getTableName())
-               .setIdColumn(getIdColumn())
-               .setColumnTypeRegistry(columnTypeRegistry)
-               .addRecords(records);
         return builder.build();
     }
 

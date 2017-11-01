@@ -18,10 +18,11 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.query;
+package io.spine.server.storage.jdbc.record;
 
 import com.querydsl.sql.AbstractSQLQuery;
 import io.spine.server.entity.EntityRecord;
+import io.spine.server.storage.jdbc.query.SelectMessageByIdQuery;
 
 import static com.querydsl.sql.SQLExpressions.all;
 import static io.spine.server.storage.jdbc.record.RecordTable.StandardColumn.entity;

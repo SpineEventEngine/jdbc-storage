@@ -18,7 +18,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.query;
+package io.spine.server.storage.jdbc.record;
 
 import com.google.common.base.Functions;
 import com.querydsl.sql.dml.SQLInsertClause;
@@ -27,6 +27,9 @@ import io.spine.server.entity.storage.ColumnRecords;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.IdColumn;
 import io.spine.server.storage.jdbc.Serializer;
+import io.spine.server.storage.jdbc.query.ColumnAwareWriteQuery;
+import io.spine.server.storage.jdbc.query.Parameter;
+import io.spine.server.storage.jdbc.query.Parameters;
 
 import java.util.Map;
 import java.util.Set;
@@ -45,7 +48,7 @@ class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
     private final Map<I, EntityRecordWithColumns> records;
     private final IdColumn<I> idColumn;
 
-    InsertEntityRecordsBulkQuery(Builder<I> builder) {
+    private InsertEntityRecordsBulkQuery(Builder<I> builder) {
         super(builder);
         this.records = builder.records;
         this.idColumn = builder.idColumn;

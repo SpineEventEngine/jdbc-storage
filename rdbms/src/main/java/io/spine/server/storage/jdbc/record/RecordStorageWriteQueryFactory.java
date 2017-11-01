@@ -28,6 +28,8 @@ import io.spine.server.storage.jdbc.query.AbstractWriteQueryFactory;
 import io.spine.server.storage.jdbc.query.WriteQuery;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
 
+import java.util.Map;
+
 /**
  * An implementation of the query factory for generating write queries for the {@link RecordTable}.
  *
@@ -44,6 +46,16 @@ class RecordStorageWriteQueryFactory<I> extends AbstractWriteQueryFactory<I, Ent
                                            columnTypeRegistry) {
         super(idColumn, dataSource, tableName);
         this.columnTypeRegistry = columnTypeRegistry;
+    }
+
+    WriteQuery newInsertEntityRecordsBulkQuery(Map<I, EntityRecordWithColumns> records) {
+        final InsertEntityRecordsBulkQuery.Builder<I> builder = InsertEntityRecordsBulkQuery.newBuilder();
+        builder.setDataSource(getDataSource())
+               .setTableName(getTableName())
+               .setIdColumn(getIdColumn())
+               .setColumnTypeRegistry(columnTypeRegistry)
+               .addRecords(records);
+        return builder.build();
     }
 
     @Override

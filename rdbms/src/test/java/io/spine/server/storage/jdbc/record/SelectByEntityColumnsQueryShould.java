@@ -18,7 +18,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.query;
+package io.spine.server.storage.jdbc.record;
 
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -29,7 +29,7 @@ import static com.querydsl.core.types.dsl.Expressions.TRUE;
 import static io.spine.client.CompositeColumnFilter.CompositeOperator.ALL;
 import static io.spine.client.CompositeColumnFilter.CompositeOperator.EITHER;
 import static io.spine.client.CompositeColumnFilter.CompositeOperator.UNRECOGNIZED;
-import static io.spine.server.storage.jdbc.query.SelectByEntityColumnsQuery.composePredicates;
+import static io.spine.server.storage.jdbc.record.SelectByEntityColumnsQuery.composePredicates;
 import static org.junit.Assert.assertEquals;
 
 /**
