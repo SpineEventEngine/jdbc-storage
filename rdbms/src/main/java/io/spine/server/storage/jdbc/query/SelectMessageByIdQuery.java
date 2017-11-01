@@ -89,9 +89,8 @@ public abstract class SelectMessageByIdQuery<I, M extends Message> extends Abstr
      * @return a message instance or {@code null} if the row does not contain the needed data
      * @throws SQLException if an error occurs during an interaction with the DB
      */
-    @VisibleForTesting
     @Nullable
-    public M readMessage(ResultSet resultSet) throws SQLException {
+    protected M readMessage(ResultSet resultSet) throws SQLException {
         checkNotNull(messageColumnName);
         checkNotNull(messageDescriptor);
         final byte[] bytes = resultSet.getBytes(messageColumnName);

@@ -51,7 +51,7 @@ public class SelectEventCountByIdQuery<I> extends SelectMessageByIdQuery<I, Int3
     @SuppressWarnings("MethodDoesntCallSuperMethod") // Override default message storing policy
     @Nullable
     @Override
-    public Int32Value readMessage(ResultSet resultSet) throws SQLException {
+    protected Int32Value readMessage(ResultSet resultSet) throws SQLException {
         final int eventCount = resultSet.getInt(event_count.name());
         final boolean isSqlNull = eventCount == 0;
         return isSqlNull

@@ -51,7 +51,7 @@ class SelectLifecycleFlagsQuery<I> extends SelectMessageByIdQuery<I, LifecycleFl
     @SuppressWarnings("MethodDoesntCallSuperMethod")
     // Override the mechanism of the Message restoring
     @Override
-    public LifecycleFlags readMessage(ResultSet resultSet) throws SQLException {
+    protected LifecycleFlags readMessage(ResultSet resultSet) throws SQLException {
         final boolean archived = resultSet.getBoolean(Column.archived.name());
         final boolean deleted = resultSet.getBoolean(Column.deleted.name());
         final LifecycleFlags visibility = LifecycleFlags.newBuilder()

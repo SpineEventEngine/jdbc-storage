@@ -55,7 +55,7 @@ class SelectTimestampQuery extends SelectMessageByIdQuery<String, Timestamp> {
     @SuppressWarnings("MethodDoesntCallSuperMethod") // Override default Message storing policy
     @Nullable
     @Override
-    public Timestamp readMessage(ResultSet resultSet) throws SQLException {
+    protected Timestamp readMessage(ResultSet resultSet) throws SQLException {
         final long seconds = resultSet.getLong(Column.seconds.name());
         final int nanos = resultSet.getInt(Column.nanos.name());
         final Timestamp time = Timestamp.newBuilder()
