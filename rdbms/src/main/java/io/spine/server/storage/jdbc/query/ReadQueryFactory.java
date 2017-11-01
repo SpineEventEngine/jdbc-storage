@@ -20,8 +20,6 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import io.spine.annotation.Internal;
-
 import java.util.Iterator;
 
 /**
@@ -36,7 +34,6 @@ import java.util.Iterator;
  * @author Dmytro Dashenkov
  * @see WriteQueryFactory
  */
-@Internal
 public interface ReadQueryFactory<I, R> {
 
     /**

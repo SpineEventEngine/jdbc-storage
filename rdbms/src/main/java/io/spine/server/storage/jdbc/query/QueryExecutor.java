@@ -20,7 +20,6 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import io.spine.annotation.Internal;
 import io.spine.server.storage.jdbc.ConnectionWrapper;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
@@ -36,7 +35,6 @@ import static java.lang.String.format;
  *
  * @author Dmytro Dashenkov
  */
-@Internal
 public class QueryExecutor {
 
     private final DataSourceWrapper dataSource;
