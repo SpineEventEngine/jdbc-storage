@@ -64,12 +64,12 @@ abstract class WriteTimestampQuery extends AbstractStoreQuery {
         private Timestamp timestamp;
         private String id;
 
-        public B setTimestamp(Timestamp timestamp) {
+        B setTimestamp(Timestamp timestamp) {
             this.timestamp = timestamp;
             return getThis();
         }
 
-        public B setId(String id) {
+        B setId(String id) {
             this.id = id;
             return getThis();
         }
