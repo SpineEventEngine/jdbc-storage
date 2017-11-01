@@ -20,7 +20,6 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Message;
 import com.querydsl.sql.AbstractSQLQuery;
