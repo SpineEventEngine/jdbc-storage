@@ -54,13 +54,13 @@ import static com.google.common.base.Strings.isNullOrEmpty;
  * @author Andrey Lavrov
  * @author Dmytro Dashenkov
  */
-abstract class AbstractQuery implements StorageQuery {
+public abstract class AbstractQuery implements StorageQuery {
 
     private final AbstractSQLQueryFactory<?> queryFactory;
     private final RelationalPathBase<Object> tablePath;
     private final PathBuilder<Object> pathBuilder;
 
-    AbstractQuery(Builder<? extends Builder, ? extends StorageQuery> builder) {
+    protected AbstractQuery(Builder<? extends Builder, ? extends StorageQuery> builder) {
         final String tableName = builder.tableName;
         this.queryFactory = createFactory(builder.dataSource);
         this.tablePath = new RelationalPathBase<>(Object.class, tableName, tableName, tableName);
@@ -145,7 +145,7 @@ abstract class AbstractQuery implements StorageQuery {
         }
     }
 
-    abstract static class Builder<B extends Builder<B, Q>, Q extends AbstractQuery> {
+    protected abstract static class Builder<B extends Builder<B, Q>, Q extends AbstractQuery> {
 
         private DataSourceWrapper dataSource;
         private String tableName;

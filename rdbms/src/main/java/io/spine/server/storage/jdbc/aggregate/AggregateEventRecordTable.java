@@ -30,7 +30,6 @@ import io.spine.server.storage.jdbc.DbIterator;
 import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.query.AggregateStorageReadQueryFactory;
-import io.spine.server.storage.jdbc.query.AggregateStorageWriteQueryFactory;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 

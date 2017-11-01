@@ -68,7 +68,7 @@ public abstract class AbstractWriteQueryFactory <I, R> implements WriteQueryFact
         return query;
     }
 
-    IdColumn<I> getIdColumn() {
+    protected IdColumn<I> getIdColumn() {
         return idColumn;
     }
 

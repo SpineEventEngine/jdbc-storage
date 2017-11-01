@@ -18,13 +18,13 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.query;
+package io.spine.server.storage.jdbc.aggregate;
 
-import io.spine.annotation.Internal;
 import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.IdColumn;
-import io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable;
+import io.spine.server.storage.jdbc.query.AbstractWriteQueryFactory;
+import io.spine.server.storage.jdbc.query.WriteQuery;
 import org.slf4j.Logger;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -36,9 +36,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author Andrey Lavrov
  * @author Dmytro Dashenkov
  */
-@Internal
-public class AggregateStorageWriteQueryFactory<I>
-        extends AbstractWriteQueryFactory<I, AggregateEventRecord> {
+class AggregateStorageWriteQueryFactory<I> extends AbstractWriteQueryFactory<I, AggregateEventRecord> {
 
     private final Logger logger;
 
@@ -47,10 +45,10 @@ public class AggregateStorageWriteQueryFactory<I>
      *
      * @param dataSource instance of {@link DataSourceWrapper}
      */
-    public AggregateStorageWriteQueryFactory(IdColumn<I> idColumn,
-                                             DataSourceWrapper dataSource,
-                                             String tableName,
-                                             Logger logger) {
+    AggregateStorageWriteQueryFactory(IdColumn<I> idColumn,
+                                      DataSourceWrapper dataSource,
+                                      String tableName,
+                                      Logger logger) {
         super(idColumn, dataSource, tableName);
         this.logger = checkNotNull(logger);
     }
