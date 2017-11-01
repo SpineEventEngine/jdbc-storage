@@ -20,7 +20,6 @@
 
 package io.spine.server.storage.jdbc;
 
-import com.google.protobuf.Message;
 import io.spine.annotation.Internal;
 import io.spine.server.entity.Entity;
 
@@ -33,7 +32,7 @@ import static io.spine.server.storage.jdbc.DbTableNameFactory.newTableName;
  * @author Dmytro Dashenkov
  */
 @Internal
-public abstract class EntityTable<I, R extends Message, W> extends AbstractTable<I, R, W> {
+public abstract class EntityTable<I, R, W> extends AbstractTable<I, R, W> {
 
     private final Class<? extends Entity<I, ?>> entityClass;
 

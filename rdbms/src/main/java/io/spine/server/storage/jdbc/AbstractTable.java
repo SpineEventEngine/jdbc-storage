@@ -23,7 +23,6 @@ package io.spine.server.storage.jdbc;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.protobuf.Message;
 import io.spine.annotation.Internal;
 import io.spine.server.storage.jdbc.query.QueryExecutor;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
@@ -68,12 +67,12 @@ import static io.spine.server.storage.jdbc.Sql.Query.PRIMARY_KEY;
  * performs any validation or data transformation, but only invokes the appropriate queries.
  *
  * @param <I> type of ID of the records stored in the table
- * @param <R> type of the record stored in the table; must be a {@linkplain Message proto message}
+ * @param <R> type of the record stored in the table
  * @author Dmytro Dashenkov
  * @see TableColumn
  */
 @Internal
-public abstract class AbstractTable<I, R extends Message, W> {
+public abstract class AbstractTable<I, R, W> {
 
     /**
      * A map of the Spine common Entity Columns to their default values.
