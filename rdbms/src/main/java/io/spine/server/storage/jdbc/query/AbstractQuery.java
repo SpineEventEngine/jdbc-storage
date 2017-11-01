@@ -104,10 +104,10 @@ abstract class AbstractQuery implements StorageQuery {
      * <p>All queries produced by the factory will be
      * {@linkplain Connection#setAutoCommit(boolean) transactional}.
      *
-     * <p>Commit or rollback for a transaction will be handled automatically
+     * <p>A commit or rollback for a transaction will be done automatically
      * by the {@linkplain TransactionHandler transaction handler}.
      *
-     * <p>All {@link Connection connections} will be closed automatically
+     * <p>All {@linkplain Connection connections} will be closed automatically
      * using {@link SQLCloseListener}.
      *
      * @param dataSource the data source to produce connections
@@ -131,7 +131,7 @@ abstract class AbstractQuery implements StorageQuery {
     /**
      * Obtains {@linkplain SQLTemplates templates} for the JDBC dialect.
      *
-     * @param dataSource the data source to get {@link java.sql.DatabaseMetaData DB metadata}
+     * @param dataSource the data source to get {@linkplain java.sql.DatabaseMetaData DB metadata}
      * @return templates for a particular JDBC implementation
      */
     private static SQLTemplates getDialectTemplates(DataSourceWrapper dataSource) {
@@ -145,7 +145,7 @@ abstract class AbstractQuery implements StorageQuery {
         }
     }
 
-    abstract static class Builder<B extends AbstractQuery.Builder<B, Q>, Q extends AbstractQuery> {
+    abstract static class Builder<B extends Builder<B, Q>, Q extends AbstractQuery> {
 
         private DataSourceWrapper dataSource;
         private String tableName;
@@ -169,8 +169,8 @@ abstract class AbstractQuery implements StorageQuery {
     /**
      * A handler for a transactional query.
      *
-     * <p>{@linkplain Connection#commit() Commits} a transaction of a query,
-     * that was successfully executed or {@linkplain Connection#rollback() rollbacks} it otherwise.
+     * <p>{@linkplain Connection#commit() Commits} a transaction, that was successfully executed
+     * or {@linkplain Connection#rollback() rollbacks} it otherwise.
      */
     private static class TransactionHandler extends SQLBaseListener {
 
