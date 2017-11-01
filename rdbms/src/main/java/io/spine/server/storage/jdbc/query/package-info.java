@@ -19,7 +19,7 @@
  */
 
 /**
- * This package contains the types representing the queries to a relational Database.
+ * This package contains the API for working with queries and common queries for different storages.
  *
  * <p>The package is {@linkplain io.spine.annotation.Internal internal} to Spine code and should not
  * be used outside of the library.
