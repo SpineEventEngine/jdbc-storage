@@ -25,7 +25,6 @@ import com.google.protobuf.FieldMask;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.ComparablePath;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.sql.AbstractSQLQuery;
 import io.spine.client.ColumnFilter;
 import io.spine.client.CompositeColumnFilter.CompositeOperator;
@@ -113,7 +112,7 @@ final class SelectByEntityColumnsQuery<I> extends AbstractQuery
      * @return the predicate for columns
      */
     private Predicate matchColumnValues() {
-        BooleanExpression result = Expressions.TRUE;
+        BooleanExpression result = TRUE;
         final QueryParameters parameters = entityQuery.getParameters();
         for (CompositeQueryParameter parameter : parameters) {
             result = result.and(predicateFrom(parameter));
@@ -122,7 +121,7 @@ final class SelectByEntityColumnsQuery<I> extends AbstractQuery
     }
 
     private Predicate predicateFrom(CompositeQueryParameter parameter) {
-        Predicate result = Expressions.TRUE;
+        Predicate result = TRUE;
         for (Map.Entry<EntityColumn, ColumnFilter> columnWithFilter : parameter.getFilters()
                                                                                .entries()) {
             final Predicate predicate = columnMatchFilter(columnWithFilter.getKey(),
