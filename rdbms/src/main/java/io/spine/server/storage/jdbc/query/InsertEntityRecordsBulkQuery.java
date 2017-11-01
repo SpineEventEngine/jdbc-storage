@@ -64,7 +64,7 @@ class InsertEntityRecordsBulkQuery<I> extends ColumnAwareWriteQuery {
 
     @Override
     Parameters getParameters() {
-        throw new UnsupportedOperationException("Bulk operations doesn't allow this.");
+        throw new UnsupportedOperationException("Bulk operations don't allow this.");
     }
 
     private void addBatch(SQLInsertClause clause, Parameters parameters) {
