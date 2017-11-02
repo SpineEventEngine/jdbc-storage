@@ -55,7 +55,7 @@ public final class Sql {
          * but only to solve the problem if identifiers with unknown types. Using this type for
          * a non-ID column may lead to a failure.
          */
-        ID("generic id type"),
+        ID("generic ID type"),
         BLOB("BLOB"),
         TIMESTAMP("TIMESTAMP"),
         INT("INT"),
