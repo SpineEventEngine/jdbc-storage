@@ -20,9 +20,6 @@
 
 package io.spine.server.storage.jdbc;
 
-import com.google.protobuf.Any;
-import com.google.protobuf.Message;
-import io.spine.type.TypeUrl;
 import org.junit.Test;
 
 import java.sql.Connection;
@@ -37,6 +34,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -46,17 +44,6 @@ import static org.mockito.Mockito.when;
 public class DbIteratorShould {
 
     private static final byte[] EMPTY_BYTES = new byte[0];
-
-    @SuppressWarnings("ResultOfObjectAllocationIgnored")
-    // Need to call a constructor and fail in it
-    @Test(expected = DatabaseException.class)
-    public void throw_DatabaseException_on_sql_execution_failure() throws SQLException {
-        final PreparedStatement statement = mock(PreparedStatement.class);
-        when(statement.executeQuery()).thenThrow(new SQLException("Failure!"));
-
-        // Calls to PreparedStatement#executeQuery
-        new MessageDbIterator<>(statement, "", TypeUrl.of(Any.class));
-    }
 
     @Test(expected = DatabaseException.class)
     public void throw_DatabaseException_on_next_check_failure() {
@@ -87,8 +74,7 @@ public class DbIteratorShould {
     @Test
     public void set_fetch_size() throws SQLException {
         final ResultSet resultSet = mock(ResultSet.class);
-        final MessageDbIterator<Message> iterator = new MessageDbIterator<>(resultSet, "",
-                                                                            TypeUrl.of(Any.class));
+        final DbIterator iterator = new AnIterator(resultSet);
         final int fetchSize = 10;
         iterator.setFetchSize(fetchSize);
         verify(resultSet).setFetchSize(fetchSize);
@@ -98,8 +84,7 @@ public class DbIteratorShould {
     public void wrap_sql_exception_for_invalid_fetch_size() throws SQLException {
         final int invalidFetchSize = -1;
         final ResultSet resultSet = mock(ResultSet.class);
-        final MessageDbIterator<Message> iterator = new MessageDbIterator<>(resultSet, "",
-                                                                            TypeUrl.of(Any.class));
+        final DbIterator iterator = new AnIterator(resultSet);
         doThrow(SQLException.class).when(resultSet)
                                    .setFetchSize(invalidFetchSize);
         iterator.setFetchSize(invalidFetchSize);
@@ -146,23 +131,19 @@ public class DbIteratorShould {
 
     private static DbIterator emptyIterator() {
         final ResultSet resultSet = baseResultSetMock();
-        PreparedStatement statement = null;
         try {
-            statement = (PreparedStatement) resultSet.getStatement();
             when(resultSet.next()).thenReturn(false);
         } catch (SQLException e) {
             fail(e.getMessage());
         }
 
-        final DbIterator iterator = new MessageDbIterator<>(statement, "", TypeUrl.of(Any.class));
+        final DbIterator iterator = new AnIterator(resultSet);
         return iterator;
     }
 
     private static DbIterator faultyResultIterator() {
         final ResultSet resultSet = baseResultSetMock();
-        PreparedStatement statement = null;
         try {
-            statement = (PreparedStatement) resultSet.getStatement();
             final Exception failure = new SQLException("Faulty Result in action");
             when(resultSet.next()).thenThrow(failure);
             doThrow(failure).when(resultSet)
@@ -171,38 +152,33 @@ public class DbIteratorShould {
             fail(e.getMessage());
         }
 
-        final DbIterator iterator = new MessageDbIterator<>(statement, "", TypeUrl.of(Any.class));
+        final DbIterator iterator = new AnIterator(resultSet);
         return iterator;
     }
 
     private static DbIterator sneakyResultIterator() {
         final ResultSet resultSet = baseResultSetMock();
-        PreparedStatement statement = null;
+        final DbIterator iterator = spy(new AnIterator(resultSet));
         try {
-            statement = (PreparedStatement) resultSet.getStatement();
             when(resultSet.next()).thenReturn(true);
-            when(resultSet.getBytes(any(String.class)))
+            when(iterator.readResult())
                     .thenThrow(new SQLException("Read is not allowed; I'm sneaky"));
         } catch (SQLException e) {
             fail(e.getMessage());
         }
-
-        final DbIterator iterator = new MessageDbIterator<>(statement, "", TypeUrl.of(Any.class));
         return iterator;
     }
 
     private static DbIterator nonEmptyIterator() {
         final ResultSet resultSet = baseResultSetMock();
-        PreparedStatement statement = null;
         try {
-            statement = (PreparedStatement) resultSet.getStatement();
             when(resultSet.next()).thenReturn(true);
             when(resultSet.getBytes(any(String.class))).thenReturn(EMPTY_BYTES);
         } catch (SQLException e) {
             fail(e.getMessage());
         }
 
-        final DbIterator iterator = new MessageDbIterator<>(statement, "", TypeUrl.of(Any.class));
+        final DbIterator iterator = new AnIterator(resultSet);
         return iterator;
     }
 
@@ -227,5 +203,17 @@ public class DbIteratorShould {
         verify(resultSet).close();
         verify(statement).close();
         verify(connection).close();
+    }
+
+    private static class AnIterator extends DbIterator {
+
+        private AnIterator(ResultSet resultSet) {
+            super(resultSet, "");
+        }
+
+        @Override
+        protected Object readResult() throws SQLException {
+            return getResultSet();
+        }
     }
 }

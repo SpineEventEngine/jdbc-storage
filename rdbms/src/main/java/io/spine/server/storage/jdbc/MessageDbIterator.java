@@ -24,7 +24,6 @@ import com.google.protobuf.Message;
 import io.spine.annotation.Internal;
 import io.spine.type.TypeUrl;
 
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -39,21 +38,6 @@ import static io.spine.server.storage.jdbc.Serializer.deserialize;
 public class MessageDbIterator<M extends Message> extends DbIterator<M> {
 
     private final TypeUrl recordType;
-
-    /**
-     * Creates a new iterator instance.
-     *
-     * @param statement  a statement used to retrieve a result set
-     *                   (both statement and result set are closed in {@link #close()}).
-     * @param columnName the name of a serialized storage record column
-     * @param recordType the type of the storage record
-     * @throws DatabaseException if an error occurs during interaction with the DB
-     */
-    public MessageDbIterator(PreparedStatement statement, String columnName, TypeUrl recordType)
-            throws DatabaseException {
-        super(statement, columnName);
-        this.recordType = recordType;
-    }
 
     public MessageDbIterator(ResultSet resultSet, String columnName, TypeUrl recordType) {
         super(resultSet, columnName);

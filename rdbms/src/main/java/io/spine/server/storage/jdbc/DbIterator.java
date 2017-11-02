@@ -25,7 +25,6 @@ import io.spine.annotation.Internal;
 
 import java.io.Closeable;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -53,23 +52,6 @@ public abstract class DbIterator<R> implements Iterator<R>, Closeable {
     private boolean hasNextCalled = false;
     private boolean nextCalled = true;
     private boolean memoizedHasNext = false;
-
-    /**
-     * Creates a new iterator instance.
-     *
-     * @param statement  a statement used to retrieve a result set
-     *                   (both statement and result set are closed in {@link #close()}).
-     * @param columnName a name of a serialized storage record column
-     * @throws DatabaseException if an error occurs during interaction with the DB
-     */
-    protected DbIterator(PreparedStatement statement, String columnName) throws DatabaseException {
-        try {
-            this.resultSet = statement.executeQuery();
-            this.columnName = columnName;
-        } catch (SQLException e) {
-            throw new DatabaseException(e);
-        }
-    }
 
     /**
      * Creates a new iterator instance.
