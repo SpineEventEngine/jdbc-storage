@@ -142,7 +142,7 @@ public abstract class AbstractTable<I, R, W> {
      * <p>Equivalent to an SQL expression:
      * <p>{@code CREATE TABLE IF NOT EXISTS $TableName ( $Columns );}
      */
-    public void createIfNotExists() {
+    public void create() {
         final QueryExecutor queryExecutor = new QueryExecutor(dataSource, log());
         final String createTableSql = composeCreateTableSql();
         queryExecutor.execute(createTableSql);

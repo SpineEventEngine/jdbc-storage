@@ -74,7 +74,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
         this.dataSource = dataSource;
         this.entityClass = entityClass;
         this.table = new RecordTable<>(entityClass, dataSource, columnTypeRegistry);
-        table.createIfNotExists();
+        table.create();
     }
 
 

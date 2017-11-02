@@ -81,9 +81,9 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
         this.mainTable = new AggregateEventRecordTable<>(aggregateClass, dataSource);
         this.lifecycleFlagsTable = new LifecycleFlagsTable<>(aggregateClass, dataSource);
         this.eventCountTable = new EventCountTable<>(aggregateClass, dataSource);
-        mainTable.createIfNotExists();
-        lifecycleFlagsTable.createIfNotExists();
-        eventCountTable.createIfNotExists();
+        mainTable.create();
+        lifecycleFlagsTable.create();
+        eventCountTable.create();
     }
 
     private JdbcAggregateStorage(Builder<I> builder) {
