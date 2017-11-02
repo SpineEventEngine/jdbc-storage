@@ -44,7 +44,8 @@ import static io.spine.server.storage.jdbc.Sql.Type.INT;
  *
  * @author Dmytro Dashenkov
  */
-class AggregateEventRecordTable<I> extends AggregateTable<I, AggregateEventRecord> {
+class AggregateEventRecordTable<I>
+        extends AggregateTable<I, AggregateEventRecord, AggregateEventRecord> {
 
     private final AggregateStorageReadQueryFactory<I> readQueryFactory;
     private final AggregateStorageWriteQueryFactory<I> writeQueryFactory;

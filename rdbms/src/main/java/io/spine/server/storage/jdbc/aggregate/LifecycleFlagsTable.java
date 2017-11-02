@@ -40,7 +40,7 @@ import static io.spine.server.storage.jdbc.Sql.Type.ID;
  *
  * @author Dmytro Dashenkov
  */
-class LifecycleFlagsTable<I> extends AggregateTable<I, LifecycleFlags> {
+class LifecycleFlagsTable<I> extends AggregateTable<I, LifecycleFlags, LifecycleFlags> {
 
     private static final String TABLE_NAME_POSTFIX = "visibility";
 

@@ -32,7 +32,7 @@ import io.spine.server.storage.jdbc.EntityTable;
  *
  * @author Dmytro Dashenkov
  */
-abstract class AggregateTable<I, T> extends EntityTable<I, T, T> {
+abstract class AggregateTable<I, R, W> extends EntityTable<I, R, W> {
 
     AggregateTable(Class<? extends Entity<I, ?>> entityClass,
                              String idColumnName,

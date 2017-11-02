@@ -41,7 +41,7 @@ import static io.spine.server.storage.jdbc.Sql.Type.INT;
  *
  * @author Dmytro Dashenkov
  */
-class EventCountTable<I> extends AggregateTable<I, Integer> {
+class EventCountTable<I> extends AggregateTable<I, Integer, Integer> {
 
     private static final String TABLE_NAME_POSTFIX = "_event_count";
 
