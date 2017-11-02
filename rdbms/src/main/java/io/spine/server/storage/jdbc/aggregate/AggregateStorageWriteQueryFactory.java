@@ -52,12 +52,13 @@ class AggregateStorageWriteQueryFactory<I> extends AbstractWriteQueryFactory<I, 
     @Override
     public WriteQuery newInsertQuery(I id, AggregateEventRecord record) {
         final InsertAggregateRecordQuery.Builder<I> builder = InsertAggregateRecordQuery.newBuilder();
-        return builder.setTableName(getTableName())
-                      .setDataSource(getDataSource())
-                      .setIdColumn(getIdColumn())
-                      .setId(id)
-                      .setRecord(record)
-                      .build();
+        final InsertAggregateRecordQuery<I> query = builder.setTableName(getTableName())
+                                                           .setDataSource(getDataSource())
+                                                           .setIdColumn(getIdColumn())
+                                                           .setId(id)
+                                                           .setRecord(record)
+                                                           .build();
+        return query;
     }
 
     /**
