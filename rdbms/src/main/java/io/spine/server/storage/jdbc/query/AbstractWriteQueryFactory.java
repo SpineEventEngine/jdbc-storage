@@ -48,26 +48,6 @@ public abstract class AbstractWriteQueryFactory <I, R> implements WriteQueryFact
         this.tableName = tableName;
     }
 
-    @Override
-    public WriteQuery newDeleteQuery(I id) {
-        final DeleteRecordQuery.Builder<I> builder = DeleteRecordQuery.newBuilder();
-        final DeleteRecordQuery<I> query = builder.setTableName(tableName)
-                                                  .setIdColumn(getIdColumn())
-                                                  .setIdValue(id)
-                                                  .setDataSource(dataSource)
-                                                  .build();
-        return query;
-    }
-
-    @Override
-    public WriteQuery newDeleteAllQuery() {
-        final DeleteAllQuery query = DeleteAllQuery.newBuilder()
-                                                   .setTableName(tableName)
-                                                   .setDataSource(dataSource)
-                                                   .build();
-        return query;
-    }
-
     protected IdColumn<I> getIdColumn() {
         return idColumn;
     }

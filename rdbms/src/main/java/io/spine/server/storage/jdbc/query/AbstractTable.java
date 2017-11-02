@@ -154,7 +154,12 @@ public abstract class AbstractTable<I, R, W> {
      * @return {@code true} if there is a record with such ID in the table, {@code false} otherwise
      */
     protected boolean containsRecord(I id) {
-        final SelectQuery<Boolean> query = getReadQueryFactory().newContainsQuery(id);
+        final ContainsQuery.Builder<I> builder = ContainsQuery.newBuilder();
+        final ContainsQuery<I> query = builder.setIdColumn(idColumn)
+                                              .setId(id)
+                                              .setTableName(name)
+                                              .setDataSource(dataSource)
+                                              .build();
         final boolean result = query.execute();
         return result;
     }
@@ -196,7 +201,11 @@ public abstract class AbstractTable<I, R, W> {
      * @see io.spine.server.storage.Storage#index()
      */
     public Iterator<I> index() {
-        final SelectQuery<Iterator<I>> query = getReadQueryFactory().newIndexQuery();
+        final StorageIndexQuery.Builder<I> builder = StorageIndexQuery.newBuilder();
+        final StorageIndexQuery<I> query = builder.setDataSource(dataSource)
+                                                  .setTableName(name)
+                                                  .setIdColumn(idColumn)
+                                                  .build();
         final Iterator<I> result = query.execute();
         return result;
     }
@@ -332,7 +341,12 @@ public abstract class AbstractTable<I, R, W> {
      *         {@code false} if the row was not found
      */
     public boolean delete(I id) {
-        final WriteQuery query = getWriteQueryFactory().newDeleteQuery(id);
+        final DeleteRecordQuery.Builder<I> builder = DeleteRecordQuery.newBuilder();
+        final DeleteRecordQuery<I> query = builder.setTableName(name)
+                                                  .setIdColumn(getIdColumn())
+                                                  .setIdValue(id)
+                                                  .setDataSource(dataSource)
+                                                  .build();
         final long rowsAffected = query.execute();
         return rowsAffected != 0;
     }
@@ -341,7 +355,10 @@ public abstract class AbstractTable<I, R, W> {
      * Deletes all the records from the table.
      */
     public void deleteAll() {
-        final WriteQuery query = getWriteQueryFactory().newDeleteAllQuery();
+        final DeleteAllQuery query = DeleteAllQuery.newBuilder()
+                                                   .setTableName(name)
+                                                   .setDataSource(dataSource)
+                                                   .build();
         query.execute();
     }
 

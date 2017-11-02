@@ -23,8 +23,6 @@ package io.spine.server.storage.jdbc.query;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.IdColumn;
 
-import java.util.Iterator;
-
 /**
  * A factory of common read queries for all tables.
  *
@@ -48,26 +46,6 @@ public abstract class AbstractReadQueryFactory<I, R> implements ReadQueryFactory
         this.idColumn = idColumn;
         this.dataSource = dataSource;
         this.tableName = tableName;
-    }
-
-    @Override
-    public SelectQuery<Iterator<I>> newIndexQuery() {
-        final StorageIndexQuery.Builder<I> builder = StorageIndexQuery.newBuilder();
-        return builder.setDataSource(dataSource)
-                      .setTableName(tableName)
-                      .setIdColumn(idColumn)
-                      .build();
-    }
-
-    @Override
-    public SelectQuery<Boolean> newContainsQuery(I id) {
-        final ContainsQuery.Builder<I> builder = ContainsQuery.newBuilder();
-        final ContainsQuery<I> query = builder.setIdColumn(idColumn)
-                                              .setId(id)
-                                              .setTableName(tableName)
-                                              .setDataSource(dataSource)
-                                              .build();
-        return query;
     }
 
     protected IdColumn<I> getIdColumn() {

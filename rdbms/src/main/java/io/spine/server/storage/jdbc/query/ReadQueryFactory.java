@@ -42,19 +42,4 @@ public interface ReadQueryFactory<I, R> {
      * @return a query for selecting a record by given ID
      */
     SelectQuery<R> newSelectByIdQuery(I id);
-
-    /**
-     * Creates an index query for the given table.
-     *
-     * @return a query retrieving all the IDs of a table
-     */
-    SelectQuery<Iterator<I>> newIndexQuery();
-
-    /**
-     * Creates a {@linkplain SelectQuery contains by ID query}.
-     *
-     * @param id the ID to check
-     * @return a query to check presence of a record
-     */
-    SelectQuery<Boolean> newContainsQuery(I id);
 }
