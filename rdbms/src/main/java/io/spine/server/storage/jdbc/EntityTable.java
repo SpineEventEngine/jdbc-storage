@@ -47,21 +47,26 @@ public abstract class EntityTable<I, R, W> extends AbstractTable<I, R, W> {
     protected EntityTable(Class<? extends Entity<I, ?>> entityClass,
                           String idColumnName,
                           DataSourceWrapper dataSource) {
-        this(newTableName(entityClass), entityClass, idColumnName, dataSource);
+        this("", entityClass, idColumnName, dataSource);
     }
 
     /**
      * Creates a new instance of the {@code EntityTable}.
      *
-     * @param tableName   the name of the table
-     * @param entityClass the {@link Class} of the {@link Entity} to store
-     * @param dataSource  an instance of {@link DataSourceWrapper} to use
+     * <p>The table will have a name based on the FQN name of
+     * the given {@link Entity} class and the given postfix.
+     *
+     * @param tableNamePostfix the postfix for the the table name
+     * @param entityClass      the {@link Class} of the {@link Entity} to store
+     * @param dataSource       an instance of {@link DataSourceWrapper} to use
      */
-    protected EntityTable(String tableName,
+    protected EntityTable(String tableNamePostfix,
                           Class<? extends Entity<I, ?>> entityClass,
                           String idColumnName,
                           DataSourceWrapper dataSource) {
-        super(tableName, IdColumn.newInstance(entityClass, idColumnName), dataSource);
+        super(newTableName(entityClass) + tableNamePostfix,
+              IdColumn.newInstance(entityClass, idColumnName),
+              dataSource);
         this.entityClass = entityClass;
     }
 

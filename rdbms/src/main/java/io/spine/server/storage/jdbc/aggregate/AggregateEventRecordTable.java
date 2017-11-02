@@ -32,7 +32,6 @@ import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 
 import java.util.List;
 
-import static io.spine.server.storage.jdbc.DbTableNameFactory.newTableName;
 import static io.spine.server.storage.jdbc.Sql.Type.BIGINT;
 import static io.spine.server.storage.jdbc.Sql.Type.BLOB;
 import static io.spine.server.storage.jdbc.Sql.Type.ID;
@@ -52,13 +51,12 @@ class AggregateEventRecordTable<I>
     AggregateEventRecordTable(Class<? extends Aggregate<I, ?, ?>> entityClass,
                               DataSourceWrapper dataSource) {
         super(entityClass, Column.id.name(), dataSource);
-        final String tableName = newTableName(entityClass);
         readQueryFactory = new AggregateStorageReadQueryFactory<>(getIdColumn(),
                                                                   dataSource,
-                                                                  tableName);
+                                                                  getName());
         writeQueryFactory = new AggregateStorageWriteQueryFactory<>(getIdColumn(),
                                                                     dataSource,
-                                                                    tableName);
+                                                                    getName());
     }
 
     @Override

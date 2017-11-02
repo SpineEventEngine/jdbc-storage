@@ -28,15 +28,14 @@ import io.spine.server.projection.ProjectionStorage;
 import io.spine.server.storage.RecordStorage;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
-import io.spine.server.storage.jdbc.record.JdbcRecordStorage;
 import io.spine.server.storage.jdbc.JdbcStorageFactory;
 import io.spine.server.storage.jdbc.StorageBuilder;
+import io.spine.server.storage.jdbc.record.JdbcRecordStorage;
 
 import javax.annotation.Nullable;
 import java.util.Iterator;
 
 import static com.google.common.base.Preconditions.checkState;
-import static io.spine.server.storage.jdbc.DbTableNameFactory.newTableName;
 
 /**
  * The implementation of the projection storage based on the RDBMS.
@@ -51,7 +50,7 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
 
     private final LastHandledEventTimeTable table;
 
-    private final Class<? extends Projection<I, ?, ?>> projectionClass;
+    private final String projectionId;
 
     protected JdbcProjectionStorage(JdbcRecordStorage<I> recordStorage,
                                     boolean multitenant,
@@ -60,7 +59,7 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
             throws DatabaseException {
         super(multitenant);
         this.recordStorage = recordStorage;
-        this.projectionClass = projectionClass;
+        this.projectionId = projectionClass.getName();
         this.table = new LastHandledEventTimeTable(dataSource);
         table.create();
     }
@@ -79,15 +78,13 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
 
     @Override
     public void writeLastHandledEventTime(Timestamp time) throws DatabaseException {
-        // Use type as an ID, since the records are mapped to entity types 1:1
-        final String id = newTableName(projectionClass);
-        table.write(id, time);
+        table.write(projectionId, time);
     }
 
     @Override
     @Nullable
     public Timestamp readLastHandledEventTime() throws DatabaseException {
-        final Timestamp timestamp = table.read(newTableName(projectionClass));
+        final Timestamp timestamp = table.read(projectionId);
         return timestamp;
     }
 

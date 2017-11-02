@@ -20,7 +20,6 @@
 
 package io.spine.server.storage.jdbc;
 
-import io.spine.annotation.Internal;
 import io.spine.server.entity.Entity;
 import io.spine.server.entity.EntityClass;
 
@@ -32,8 +31,7 @@ import java.util.regex.Pattern;
  * @author Alexander Litus
  */
 @SuppressWarnings("UtilityClass")
-@Internal
-public class DbTableNameFactory {
+class DbTableNameFactory {
 
     private static final Pattern PATTERN_DOT = Pattern.compile("\\.");
     private static final Pattern PATTERN_DOLLAR = Pattern.compile("\\$");
@@ -50,7 +48,7 @@ public class DbTableNameFactory {
      * @param cls a class of an {@linkplain Entity} whose state type name to use
      * @return a valid DB table name
      */
-    public static String newTableName(Class<? extends Entity<?, ?>> cls) {
+    static String newTableName(Class<? extends Entity<?, ?>> cls) {
         final String typeName = new EntityClass<Entity>(cls).getStateType()
                                                             .getTypeName();
         final String tableNameTmp = PATTERN_DOT.matcher(typeName)

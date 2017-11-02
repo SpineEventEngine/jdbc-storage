@@ -48,7 +48,6 @@ import java.util.Map;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Collections2.transform;
 import static com.google.common.collect.Lists.newLinkedList;
-import static io.spine.server.storage.jdbc.DbTableNameFactory.newTableName;
 import static io.spine.server.storage.jdbc.Sql.Type.BLOB;
 import static io.spine.server.storage.jdbc.Sql.Type.ID;
 import static java.util.Collections.addAll;
@@ -72,15 +71,14 @@ class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumn
                 ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>>
                         columnTypeRegistry) {
         super(entityClass, StandardColumn.id.name(), dataSource);
-        final String tableName = newTableName(entityClass);
         this.typeRegistry = columnTypeRegistry;
         readQueryFactory = new RecordStorageReadQueryFactory<>(dataSource,
-                                                               tableName,
+                                                               getName(),
                                                                getIdColumn(),
                                                                columnTypeRegistry);
         writeQueryFactory = new RecordStorageWriteQueryFactory<>(getIdColumn(),
                                                                  dataSource,
-                                                                 tableName,
+                                                                 getName(),
                                                                  columnTypeRegistry);
     }
 

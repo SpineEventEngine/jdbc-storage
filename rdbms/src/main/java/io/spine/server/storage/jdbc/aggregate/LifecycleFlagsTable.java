@@ -24,7 +24,6 @@ import com.google.common.collect.ImmutableList;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.entity.LifecycleFlags;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.DbTableNameFactory;
 import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.query.ReadQueryFactory;
@@ -34,6 +33,7 @@ import java.util.List;
 
 import static io.spine.server.storage.jdbc.Sql.Type.BOOLEAN;
 import static io.spine.server.storage.jdbc.Sql.Type.ID;
+import static io.spine.server.storage.jdbc.aggregate.LifecycleFlagsTable.Column.id;
 
 /**
  * A table for storing the {@link LifecycleFlags} of an {@link Aggregate}.
@@ -49,10 +49,7 @@ class LifecycleFlagsTable<I> extends AggregateTable<I, LifecycleFlags, Lifecycle
 
     LifecycleFlagsTable(Class<? extends Aggregate<I, ?, ?>> aggregateClass,
                         DataSourceWrapper dataSource) {
-        super(DbTableNameFactory.newTableName(aggregateClass) + TABLE_NAME_POSTFIX,
-              aggregateClass,
-              Column.id.name(),
-              dataSource);
+        super(TABLE_NAME_POSTFIX, aggregateClass, id.name(), dataSource);
         this.writeQueryFactory = new LifecycleFlagsWriteQueryFactory<>(getIdColumn(),
                                                                        dataSource,
                                                                        getName());
@@ -63,7 +60,7 @@ class LifecycleFlagsTable<I> extends AggregateTable<I, LifecycleFlags, Lifecycle
 
     @Override
     protected Column getIdColumnDeclaration() {
-        return Column.id;
+        return id;
     }
 
     @Override

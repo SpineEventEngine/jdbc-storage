@@ -30,9 +30,9 @@ import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 
 import java.util.List;
 
-import static io.spine.server.storage.jdbc.DbTableNameFactory.newTableName;
 import static io.spine.server.storage.jdbc.Sql.Type.ID;
 import static io.spine.server.storage.jdbc.Sql.Type.INT;
+import static io.spine.server.storage.jdbc.aggregate.EventCountTable.Column.id;
 
 /**
  * A table for storing the event count after the last snapshot.
@@ -50,10 +50,7 @@ class EventCountTable<I> extends AggregateTable<I, Integer, Integer> {
 
     EventCountTable(Class<? extends Entity<I, ?>> entityClass,
                     DataSourceWrapper dataSource) {
-        super(newTableName(entityClass) + (TABLE_NAME_POSTFIX),
-              entityClass,
-              Column.id.name(),
-              dataSource);
+        super(TABLE_NAME_POSTFIX, entityClass, id.name(), dataSource);
         this.readQueryFactory = new EventCountReadQueryFactory<>(getIdColumn(),
                                                                  getDataSource(),
                                                                  getName());
@@ -64,7 +61,7 @@ class EventCountTable<I> extends AggregateTable<I, Integer, Integer> {
 
     @Override
     protected Column getIdColumnDeclaration() {
-        return Column.id;
+        return id;
     }
 
     @Override

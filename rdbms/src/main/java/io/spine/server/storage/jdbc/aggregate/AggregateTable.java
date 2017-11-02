@@ -35,15 +35,15 @@ import io.spine.server.storage.jdbc.EntityTable;
 abstract class AggregateTable<I, R, W> extends EntityTable<I, R, W> {
 
     AggregateTable(Class<? extends Entity<I, ?>> entityClass,
-                             String idColumnName,
-                             DataSourceWrapper dataSource) {
+                   String idColumnName,
+                   DataSourceWrapper dataSource) {
         super(entityClass, idColumnName, dataSource);
     }
 
-    AggregateTable(String tableName,
-                             Class<? extends Entity<I, ?>> entityClass,
-                             String idColumnName,
-                             DataSourceWrapper dataSource) {
-        super(tableName, entityClass, idColumnName, dataSource);
+    AggregateTable(String tableNamePostfix,
+                   Class<? extends Entity<I, ?>> entityClass,
+                   String idColumnName,
+                   DataSourceWrapper dataSource) {
+        super(tableNamePostfix, entityClass, idColumnName, dataSource);
     }
 }
