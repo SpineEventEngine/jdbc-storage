@@ -27,7 +27,7 @@ import com.google.protobuf.Message;
 import io.spine.protobuf.AnyPacker;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.FieldMasks;
-import io.spine.server.storage.jdbc.MessageDbIterator;
+import io.spine.server.storage.jdbc.query.MessageDbIterator;
 import io.spine.type.TypeUrl;
 
 import javax.annotation.Nullable;

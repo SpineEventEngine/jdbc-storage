@@ -28,14 +28,13 @@ import io.spine.server.aggregate.AggregateStorageShould;
 import io.spine.server.entity.Entity;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
-import io.spine.server.storage.jdbc.DbIterator;
+import io.spine.server.storage.jdbc.query.DbIterator;
 import io.spine.server.storage.jdbc.GivenDataSource;
 import io.spine.test.aggregate.Project;
 import io.spine.test.aggregate.ProjectId;
 import io.spine.validate.ValidatingBuilder;
 import org.junit.Test;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static io.spine.test.Tests.nullRef;

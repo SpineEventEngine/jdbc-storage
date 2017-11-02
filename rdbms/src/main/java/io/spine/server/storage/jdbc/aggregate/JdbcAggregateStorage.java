@@ -29,7 +29,7 @@ import io.spine.server.aggregate.AggregateStorage;
 import io.spine.server.entity.LifecycleFlags;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
-import io.spine.server.storage.jdbc.DbIterator;
+import io.spine.server.storage.jdbc.query.DbIterator;
 import io.spine.server.storage.jdbc.StorageBuilder;
 
 import java.util.Collection;

@@ -22,7 +22,7 @@ package io.spine.server.storage.jdbc.aggregate;
 
 import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.DbIterator;
+import io.spine.server.storage.jdbc.query.DbIterator;
 import io.spine.server.storage.jdbc.IdColumn;
 import io.spine.server.storage.jdbc.query.AbstractReadQueryFactory;
 

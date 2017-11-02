@@ -23,8 +23,8 @@ package io.spine.server.storage.jdbc.aggregate;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.sql.AbstractSQLQuery;
 import io.spine.server.aggregate.AggregateEventRecord;
-import io.spine.server.storage.jdbc.DbIterator;
-import io.spine.server.storage.jdbc.MessageDbIterator;
+import io.spine.server.storage.jdbc.query.DbIterator;
+import io.spine.server.storage.jdbc.query.MessageDbIterator;
 import io.spine.server.storage.jdbc.query.AbstractSelectByIdQuery;
 
 import java.sql.ResultSet;

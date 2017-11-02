@@ -22,7 +22,6 @@ package io.spine.server.storage.jdbc.query;
 
 import com.google.common.primitives.Primitives;
 import com.google.protobuf.Message;
-import io.spine.server.storage.jdbc.DbIterator;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
