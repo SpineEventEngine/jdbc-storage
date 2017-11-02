@@ -27,7 +27,7 @@ import io.spine.server.storage.jdbc.query.AbstractWriteQueryFactory;
 import io.spine.server.storage.jdbc.query.WriteQuery;
 import org.slf4j.Logger;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * The {@code WriteQueryFactory} for {@link AggregateEventRecordTable}.
@@ -38,8 +38,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 class AggregateStorageWriteQueryFactory<I> extends AbstractWriteQueryFactory<I, AggregateEventRecord> {
 
-    private final Logger logger;
-
     /**
      * Creates a new instance.
      *
@@ -47,10 +45,8 @@ class AggregateStorageWriteQueryFactory<I> extends AbstractWriteQueryFactory<I, 
      */
     AggregateStorageWriteQueryFactory(IdColumn<I> idColumn,
                                       DataSourceWrapper dataSource,
-                                      String tableName,
-                                      Logger logger) {
+                                      String tableName) {
         super(idColumn, dataSource, tableName);
-        this.logger = checkNotNull(logger);
     }
 
     @Override
@@ -76,8 +72,18 @@ class AggregateStorageWriteQueryFactory<I> extends AbstractWriteQueryFactory<I, 
      */
     @Override
     public WriteQuery newUpdateQuery(I id, AggregateEventRecord record) {
-        logger.warn("UPDATE operation is not possible within the AggregateEventRecordTable. " +
-                    "Performing an INSERT instead.");
+        log().warn("UPDATE operation is not possible within the AggregateEventRecordTable. " +
+                   "Performing an INSERT instead.");
         return newInsertQuery(id, record);
+    }
+
+    private static Logger log() {
+        return LogSingleton.INSTANCE.value;
+    }
+
+    private enum LogSingleton {
+        INSTANCE;
+        @SuppressWarnings("NonSerializableFieldInSerializableClass")
+        private final Logger value = getLogger(AggregateStorageWriteQueryFactory.class);
     }
 }

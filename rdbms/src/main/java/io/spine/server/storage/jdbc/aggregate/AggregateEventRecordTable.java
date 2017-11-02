@@ -58,8 +58,7 @@ class AggregateEventRecordTable<I>
                                                                   tableName);
         writeQueryFactory = new AggregateStorageWriteQueryFactory<>(getIdColumn(),
                                                                     dataSource,
-                                                                    tableName,
-                                                                    log());
+                                                                    tableName);
     }
 
     @Override
