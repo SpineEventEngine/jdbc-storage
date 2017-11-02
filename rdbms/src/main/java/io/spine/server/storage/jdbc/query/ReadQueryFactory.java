@@ -37,7 +37,7 @@ import java.util.Iterator;
 public interface ReadQueryFactory<I, R> {
 
     /**
-     * Creates an {@linkplain SelectQuery read by ID query}.
+     * Creates a {@linkplain SelectQuery read by ID query}.
      *
      * @return a query for selecting a record by given ID
      */
