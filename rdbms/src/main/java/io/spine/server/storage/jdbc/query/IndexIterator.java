@@ -18,11 +18,11 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc;
+package io.spine.server.storage.jdbc.query;
 
 import com.google.common.primitives.Primitives;
 import com.google.protobuf.Message;
-import io.spine.annotation.Internal;
+import io.spine.server.storage.jdbc.DbIterator;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -36,8 +36,7 @@ import static io.spine.util.Exceptions.newIllegalArgumentException;
  *
  * @author Dmytro Dashenkov
  */
-@Internal
-public abstract class IndexIterator<I> extends DbIterator<I> {
+abstract class IndexIterator<I> extends DbIterator<I> {
 
     /**
      * Creates a new iterator instance.
@@ -56,9 +55,7 @@ public abstract class IndexIterator<I> extends DbIterator<I> {
      * @param columnName a name of a serialized storage record column
      */
     @SuppressWarnings("unchecked") // Logically checked by if statements
-    public static <I> IndexIterator<I> create(ResultSet resultSet,
-                                              String columnName,
-                                              Class<I> idType) {
+    static <I> IndexIterator<I> create(ResultSet resultSet, String columnName, Class<I> idType) {
         checkNotNull(resultSet);
         checkNotNull(columnName);
         checkNotNull(idType);

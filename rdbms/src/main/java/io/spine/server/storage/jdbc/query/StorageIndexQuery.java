@@ -26,7 +26,7 @@ import java.sql.ResultSet;
 import java.util.Iterator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static io.spine.server.storage.jdbc.IndexIterator.create;
+import static io.spine.server.storage.jdbc.query.IndexIterator.create;
 
 /**
  * A query for all the IDs in a certain table.
