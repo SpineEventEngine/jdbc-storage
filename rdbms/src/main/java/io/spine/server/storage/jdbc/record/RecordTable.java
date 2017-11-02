@@ -31,10 +31,10 @@ import io.spine.server.entity.storage.EntityColumns;
 import io.spine.server.entity.storage.EntityQuery;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.query.EntityTable;
 import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.TableColumn;
-import io.spine.server.storage.jdbc.query.ReadQueryFactory;
+import io.spine.server.storage.jdbc.query.EntityTable;
+import io.spine.server.storage.jdbc.query.SelectQuery;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
 
@@ -62,7 +62,6 @@ import static java.util.Collections.addAll;
 class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumns> {
 
     private final RecordStorageWriteQueryFactory<I> writeQueryFactory;
-    private final RecordStorageReadQueryFactory<I> readQueryFactory;
 
     private final ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> typeRegistry;
 
@@ -72,10 +71,6 @@ class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumn
                         columnTypeRegistry) {
         super(entityClass, StandardColumn.id.name(), dataSource);
         this.typeRegistry = columnTypeRegistry;
-        readQueryFactory = new RecordStorageReadQueryFactory<>(dataSource,
-                                                               getName(),
-                                                               getIdColumn(),
-                                                               columnTypeRegistry);
         writeQueryFactory = new RecordStorageWriteQueryFactory<>(getIdColumn(),
                                                                  dataSource,
                                                                  getName(),
@@ -85,11 +80,6 @@ class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumn
     @Override
     protected StandardColumn getIdColumnDeclaration() {
         return StandardColumn.id;
-    }
-
-    @Override
-    protected ReadQueryFactory<I, EntityRecord> getReadQueryFactory() {
-        return readQueryFactory;
     }
 
     @Override
@@ -105,6 +95,17 @@ class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumn
         final Collection<TableColumn> tableColumns = transform(entityColumns, new ColumnAdapter());
         columns.addAll(tableColumns);
         return columns;
+    }
+
+    @Override
+    protected SelectQuery<EntityRecord> composeSelectQuery(I id) {
+        final SelectEntityByIdQuery.Builder<I> builder = SelectEntityByIdQuery.newBuilder();
+        final SelectEntityByIdQuery<I> query = builder.setTableName(getName())
+                                                      .setDataSource(getDataSource())
+                                                      .setIdColumn(getIdColumn())
+                                                      .setId(id)
+                                                      .build();
+        return query;
     }
 
     void write(Map<I, EntityRecordWithColumns> records) {
@@ -128,9 +129,16 @@ class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumn
         }
     }
 
-    Iterator<EntityRecord> readByQuery(EntityQuery<I> query, FieldMask fieldMask) {
-        final Iterator<EntityRecord> result = readQueryFactory.newSelectByEntityQuery(query, fieldMask)
-                                                              .execute();
+    Iterator<EntityRecord> readByQuery(EntityQuery<I> entityQuery, FieldMask fieldMask) {
+        final SelectByEntityColumnsQuery.Builder<I> builder = SelectByEntityColumnsQuery.newBuilder();
+        final SelectByEntityColumnsQuery<I> query = builder.setDataSource(getDataSource())
+                                                           .setTableName(getName())
+                                                           .setIdColumn(getIdColumn())
+                                                           .setColumnTypeRegistry(typeRegistry)
+                                                           .setEntityQuery(entityQuery)
+                                                           .setFieldMask(fieldMask)
+                                                           .build();
+        final Iterator<EntityRecord> result = query.execute();
         return result;
     }
 

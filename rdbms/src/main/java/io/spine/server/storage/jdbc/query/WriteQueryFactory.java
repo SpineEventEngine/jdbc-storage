@@ -29,7 +29,6 @@ package io.spine.server.storage.jdbc.query;
  * @param <R> type of the record
  *
  * @author Alexander Aleksandrov
- * @see ReadQueryFactory
  */
 public interface WriteQueryFactory<I, R> {
 

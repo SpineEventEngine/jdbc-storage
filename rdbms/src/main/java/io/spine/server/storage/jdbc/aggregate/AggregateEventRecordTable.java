@@ -24,10 +24,10 @@ import com.google.common.collect.ImmutableList;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.query.DbIterator;
 import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.TableColumn;
-import io.spine.server.storage.jdbc.query.ReadQueryFactory;
+import io.spine.server.storage.jdbc.query.DbIterator;
+import io.spine.server.storage.jdbc.query.SelectQuery;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 
 import java.util.List;
@@ -45,15 +45,11 @@ import static io.spine.server.storage.jdbc.Sql.Type.INT;
 class AggregateEventRecordTable<I>
         extends AggregateTable<I, DbIterator<AggregateEventRecord>, AggregateEventRecord> {
 
-    private final AggregateStorageReadQueryFactory<I> readQueryFactory;
     private final AggregateStorageWriteQueryFactory<I> writeQueryFactory;
 
     AggregateEventRecordTable(Class<? extends Aggregate<I, ?, ?>> entityClass,
                               DataSourceWrapper dataSource) {
         super(entityClass, Column.id.name(), dataSource);
-        readQueryFactory = new AggregateStorageReadQueryFactory<>(getIdColumn(),
-                                                                  dataSource,
-                                                                  getName());
         writeQueryFactory = new AggregateStorageWriteQueryFactory<>(getIdColumn(),
                                                                     dataSource,
                                                                     getName());
@@ -62,11 +58,6 @@ class AggregateEventRecordTable<I>
     @Override
     protected Column getIdColumnDeclaration() {
         return Column.id;
-    }
-
-    @Override
-    protected ReadQueryFactory<I, DbIterator<AggregateEventRecord>> getReadQueryFactory() {
-        return readQueryFactory;
     }
 
     @Override
@@ -84,6 +75,16 @@ class AggregateEventRecordTable<I>
     public void write(I id, AggregateEventRecord record) {
         writeQueryFactory.newInsertQuery(id, record)
                          .execute();
+    }
+
+    @Override
+    protected SelectQuery<DbIterator<AggregateEventRecord>> composeSelectQuery(I id) {
+        final SelectEventRecordsById.Builder<I> builder = SelectEventRecordsById.newBuilder();
+        return builder.setTableName(getName())
+                      .setDataSource(getDataSource())
+                      .setIdColumn(getIdColumn())
+                      .setId(id)
+                      .build();
     }
 
     /**

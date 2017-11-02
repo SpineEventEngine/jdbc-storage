@@ -124,11 +124,6 @@ public abstract class AbstractTable<I, R, W> {
     protected abstract TableColumn getIdColumnDeclaration();
 
     /**
-     * @return an instance of {@link ReadQueryFactory} which produces queries to the given table
-     */
-    protected abstract ReadQueryFactory<I, R> getReadQueryFactory();
-
-    /**
      * @return an instance of {@link WriteQueryFactory} which produces queries to the given table
      */
     protected abstract WriteQueryFactory<I, W> getWriteQueryFactory();
@@ -258,10 +253,7 @@ public abstract class AbstractTable<I, R, W> {
         return query;
     }
 
-    private SelectQuery<R> composeSelectQuery(I id) {
-        final SelectQuery<R> query = getReadQueryFactory().newSelectByIdQuery(id);
-        return query;
-    }
+    protected abstract SelectQuery<R> composeSelectQuery(I id);
 
     private String composeCreateTableSql() {
         final Iterable<? extends TableColumn> columns = getColumns();

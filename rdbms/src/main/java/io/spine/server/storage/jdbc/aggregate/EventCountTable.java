@@ -25,7 +25,7 @@ import io.spine.server.entity.Entity;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.TableColumn;
-import io.spine.server.storage.jdbc.query.ReadQueryFactory;
+import io.spine.server.storage.jdbc.query.SelectQuery;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 
 import java.util.List;
@@ -45,15 +45,11 @@ class EventCountTable<I> extends AggregateTable<I, Integer, Integer> {
 
     private static final String TABLE_NAME_POSTFIX = "_event_count";
 
-    private final EventCountReadQueryFactory<I> readQueryFactory;
     private final EventCountWriteQueryFactory<I> writeQueryFactory;
 
     EventCountTable(Class<? extends Entity<I, ?>> entityClass,
                     DataSourceWrapper dataSource) {
         super(TABLE_NAME_POSTFIX, entityClass, id.name(), dataSource);
-        this.readQueryFactory = new EventCountReadQueryFactory<>(getIdColumn(),
-                                                                 getDataSource(),
-                                                                 getName());
         this.writeQueryFactory = new EventCountWriteQueryFactory<>(getIdColumn(),
                                                                    getDataSource(),
                                                                    getName());
@@ -69,14 +65,21 @@ class EventCountTable<I> extends AggregateTable<I, Integer, Integer> {
         return ImmutableList.copyOf(Column.values());
     }
 
-    @Override
-    protected ReadQueryFactory<I, Integer> getReadQueryFactory() {
-        return readQueryFactory;
-    }
 
     @Override
     protected WriteQueryFactory<I, Integer> getWriteQueryFactory() {
         return writeQueryFactory;
+    }
+
+    @Override
+    protected SelectQuery<Integer> composeSelectQuery(I id) {
+        final SelectEventCountByIdQuery.Builder<I> builder = SelectEventCountByIdQuery.newBuilder();
+        final SelectEventCountByIdQuery<I> query = builder.setTableName(getName())
+                                                          .setDataSource(getDataSource())
+                                                          .setId(id)
+                                                          .setIdColumn(getIdColumn())
+                                                          .build();
+        return query;
     }
 
     /**

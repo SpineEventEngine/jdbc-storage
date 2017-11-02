@@ -21,20 +21,21 @@
 package io.spine.server.storage.jdbc.projection;
 
 import com.google.protobuf.Timestamp;
-import io.spine.server.storage.jdbc.query.AbstractTable;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.IdColumn;
 import io.spine.server.storage.jdbc.TableColumn;
-import io.spine.server.storage.jdbc.query.ReadQueryFactory;
+import io.spine.server.storage.jdbc.query.AbstractTable;
+import io.spine.server.storage.jdbc.query.SelectQuery;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 
 import java.util.List;
 
 import static com.google.common.collect.ImmutableList.copyOf;
+import static io.spine.server.storage.jdbc.IdColumn.typeString;
 import static io.spine.server.storage.jdbc.Sql.Type;
 import static io.spine.server.storage.jdbc.Sql.Type.BIGINT;
 import static io.spine.server.storage.jdbc.Sql.Type.INT;
 import static io.spine.server.storage.jdbc.Sql.Type.VARCHAR_255;
+import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.projection_type;
 
 /**
  * A table for storing the last handled by
@@ -47,19 +48,15 @@ class LastHandledEventTimeTable extends AbstractTable<String, Timestamp, Timesta
     private static final String TABLE_NAME = "projection_last_handled_event_time";
 
     private final LastHandledEventTimeWriteFactory writeQueryFactory;
-    private final LastHandledEventTimeReadFactory readQueryFactory;
 
     LastHandledEventTimeTable(DataSourceWrapper dataSource) {
-        super(TABLE_NAME,
-              IdColumn.typeString(Column.projection_type.name()),
-              dataSource);
+        super(TABLE_NAME, typeString(projection_type.name()), dataSource);
         this.writeQueryFactory = new LastHandledEventTimeWriteFactory(dataSource, TABLE_NAME);
-        this.readQueryFactory = new LastHandledEventTimeReadFactory(dataSource, TABLE_NAME);
     }
 
     @Override
     protected Column getIdColumnDeclaration() {
-        return Column.projection_type;
+        return projection_type;
     }
 
     @Override
@@ -68,13 +65,19 @@ class LastHandledEventTimeTable extends AbstractTable<String, Timestamp, Timesta
     }
 
     @Override
-    protected ReadQueryFactory<String, Timestamp> getReadQueryFactory() {
-        return readQueryFactory;
+    protected WriteQueryFactory<String, Timestamp> getWriteQueryFactory() {
+        return writeQueryFactory;
     }
 
     @Override
-    protected WriteQueryFactory<String, Timestamp> getWriteQueryFactory() {
-        return writeQueryFactory;
+    protected SelectQuery<Timestamp> composeSelectQuery(String id) {
+        final SelectTimestampQuery.Builder builder = SelectTimestampQuery.newBuilder();
+        final SelectTimestampQuery query = builder.setTableName(getName())
+                                                  .setDataSource(getDataSource())
+                                                  .setId(id)
+                                                  .setIdColumn(getIdColumn())
+                                                  .build();
+        return query;
     }
 
     /**

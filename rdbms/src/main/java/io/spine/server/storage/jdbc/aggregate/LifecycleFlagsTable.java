@@ -26,7 +26,7 @@ import io.spine.server.entity.LifecycleFlags;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.TableColumn;
-import io.spine.server.storage.jdbc.query.ReadQueryFactory;
+import io.spine.server.storage.jdbc.query.SelectQuery;
 import io.spine.server.storage.jdbc.query.WriteQueryFactory;
 
 import java.util.List;
@@ -45,7 +45,6 @@ class LifecycleFlagsTable<I> extends AggregateTable<I, LifecycleFlags, Lifecycle
     private static final String TABLE_NAME_POSTFIX = "visibility";
 
     private final LifecycleFlagsWriteQueryFactory<I> writeQueryFactory;
-    private final LifecycleFlagsReadQueryFactory<I> readQueryFactory;
 
     LifecycleFlagsTable(Class<? extends Aggregate<I, ?, ?>> aggregateClass,
                         DataSourceWrapper dataSource) {
@@ -53,9 +52,6 @@ class LifecycleFlagsTable<I> extends AggregateTable<I, LifecycleFlags, Lifecycle
         this.writeQueryFactory = new LifecycleFlagsWriteQueryFactory<>(getIdColumn(),
                                                                        dataSource,
                                                                        getName());
-        this.readQueryFactory = new LifecycleFlagsReadQueryFactory<>(getIdColumn(),
-                                                                     dataSource,
-                                                                     getName());
     }
 
     @Override
@@ -69,13 +65,19 @@ class LifecycleFlagsTable<I> extends AggregateTable<I, LifecycleFlags, Lifecycle
     }
 
     @Override
-    protected ReadQueryFactory<I, LifecycleFlags> getReadQueryFactory() {
-        return readQueryFactory;
+    protected WriteQueryFactory<I, LifecycleFlags> getWriteQueryFactory() {
+        return writeQueryFactory;
     }
 
     @Override
-    protected WriteQueryFactory<I, LifecycleFlags> getWriteQueryFactory() {
-        return writeQueryFactory;
+    protected SelectQuery<LifecycleFlags> composeSelectQuery(I id) {
+        final SelectLifecycleFlagsQuery.Builder<I> builder = SelectLifecycleFlagsQuery.newBuilder();
+        final SelectQuery<LifecycleFlags> query = builder.setTableName(getName())
+                                                         .setDataSource(getDataSource())
+                                                         .setIdColumn(getIdColumn())
+                                                         .setId(id)
+                                                         .build();
+        return query;
     }
 
     /**
