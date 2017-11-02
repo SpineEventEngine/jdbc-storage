@@ -27,6 +27,7 @@ import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.query.DbIterator;
+import io.spine.server.storage.jdbc.query.EntityTable;
 import io.spine.server.storage.jdbc.query.SelectQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
 
@@ -42,8 +43,9 @@ import static io.spine.server.storage.jdbc.Sql.Type.INT;
  *
  * @author Dmytro Dashenkov
  */
-class AggregateEventRecordTable<I>
-        extends AggregateTable<I, DbIterator<AggregateEventRecord>, AggregateEventRecord> {
+class AggregateEventRecordTable<I> extends EntityTable<I,
+                                                       DbIterator<AggregateEventRecord>,
+                                                       AggregateEventRecord> {
 
     AggregateEventRecordTable(Class<? extends Aggregate<I, ?, ?>> entityClass,
                               DataSourceWrapper dataSource) {

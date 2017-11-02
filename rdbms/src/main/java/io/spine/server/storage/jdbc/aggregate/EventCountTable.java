@@ -25,6 +25,7 @@ import io.spine.server.entity.Entity;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.TableColumn;
+import io.spine.server.storage.jdbc.query.EntityTable;
 import io.spine.server.storage.jdbc.query.SelectQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
 
@@ -41,7 +42,7 @@ import static io.spine.server.storage.jdbc.aggregate.EventCountTable.Column.id;
  *
  * @author Dmytro Dashenkov
  */
-class EventCountTable<I> extends AggregateTable<I, Integer, Integer> {
+class EventCountTable<I> extends EntityTable<I, Integer, Integer> {
 
     private static final String TABLE_NAME_POSTFIX = "_event_count";
 
