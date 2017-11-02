@@ -20,7 +20,6 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import com.google.protobuf.Message;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.IdColumn;
 
