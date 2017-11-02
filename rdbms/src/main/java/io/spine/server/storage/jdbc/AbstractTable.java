@@ -67,7 +67,7 @@ import static io.spine.server.storage.jdbc.Sql.Query.PRIMARY_KEY;
  * performs any validation or data transformation, but only invokes the appropriate queries.
  *
  * @param <I> type of ID of the records stored in the table
- * @param <R> type of the record stored in the table
+ * @param <R> result type of the read operation
  * @author Dmytro Dashenkov
  * @see TableColumn
  */

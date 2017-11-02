@@ -29,7 +29,7 @@ import java.util.Iterator;
  * to construct its SQL queries to the database.
  *
  * @param <I> type of the ID of the record
- * @param <R> type of the record
+ * @param <R> result type of the select operation
  *
  * @author Dmytro Dashenkov
  * @see WriteQueryFactory
