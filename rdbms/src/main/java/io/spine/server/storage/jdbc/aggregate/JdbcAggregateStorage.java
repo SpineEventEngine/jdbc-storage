@@ -20,6 +20,7 @@
 
 package io.spine.server.storage.jdbc.aggregate;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateEventRecord;
@@ -37,6 +38,7 @@ import java.util.Iterator;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Lists.newLinkedList;
 import static io.spine.server.storage.jdbc.Closeables.closeAll;
+import static java.util.Collections.emptyIterator;
 
 /**
  * The implementation of the aggregate storage based on the RDBMS.
@@ -143,9 +145,21 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
             throws DatabaseException {
         checkNotNull(request);
 
-        final DbIterator<AggregateEventRecord> result = mainTable.historyBackward(request);
-        iterators.add(result);
-        return result;
+        final I id = request.getRecordId();
+        final DbIterator<AggregateEventRecord> historyIterator = getHistoryIterator(id);
+        if (historyIterator == null) {
+            return emptyIterator();
+        }
+
+        final int fetchSize = request.getBatchSize();
+        historyIterator.setFetchSize(fetchSize);
+        iterators.add(historyIterator);
+        return historyIterator;
+    }
+
+    @VisibleForTesting
+    DbIterator<AggregateEventRecord> getHistoryIterator(I id) {
+        return mainTable.read(id);
     }
 
     /**

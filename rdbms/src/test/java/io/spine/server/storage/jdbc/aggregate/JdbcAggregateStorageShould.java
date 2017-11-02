@@ -35,12 +35,18 @@ import io.spine.test.aggregate.ProjectId;
 import io.spine.validate.ValidatingBuilder;
 import org.junit.Test;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static io.spine.test.Tests.nullRef;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 
 /**
  * @author Alexander Litus
@@ -90,22 +96,21 @@ public class JdbcAggregateStorageShould extends AggregateStorageShould {
         storage.close();
     }
 
+    @SuppressWarnings("unchecked") // OK for a mock.
     @Test
     public void return_history_iterator_with_specified_batch_size() throws SQLException {
-        final JdbcAggregateStorage<ProjectId> storage = getStorage(ProjectId.class,
-                                                                   TestAggregateWithMessageId.class);
+        final JdbcAggregateStorage<ProjectId> storage =
+                spy(getStorage(ProjectId.class, TestAggregateWithMessageId.class));
+        final DbIterator<AggregateEventRecord> historyIterator = mock(DbIterator.class);
+        doReturn(historyIterator).when(storage)
+                                 .getHistoryIterator(any(ProjectId.class));
         final int batchSize = 10;
         final AggregateReadRequest<ProjectId> request = new AggregateReadRequest<>(newId(),
                                                                                    batchSize);
-        final DbIterator<AggregateEventRecord> iterator =
+        final DbIterator<AggregateEventRecord> resultingIterator =
                 (DbIterator<AggregateEventRecord>) storage.historyBackward(request);
-
-        // Use `PreparedStatement.getFetchSize()` instead of `ResultSet.getFetchSize()`,
-        // because the result of the latter depends on a JDBC driver implementation.
-        final int fetchSize = iterator.getResultSet()
-                                      .getStatement()
-                                      .getFetchSize();
-        assertEquals(batchSize, fetchSize);
+        verify(historyIterator).setFetchSize(batchSize);
+        assertEquals(historyIterator, resultingIterator);
     }
 
     @Test

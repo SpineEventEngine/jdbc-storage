@@ -23,7 +23,6 @@ package io.spine.server.storage.jdbc.aggregate;
 import com.google.common.collect.ImmutableList;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateEventRecord;
-import io.spine.server.aggregate.AggregateReadRequest;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DbIterator;
 import io.spine.server.storage.jdbc.Sql;
@@ -45,7 +44,7 @@ import static io.spine.server.storage.jdbc.Sql.Type.INT;
  * @author Dmytro Dashenkov
  */
 class AggregateEventRecordTable<I>
-        extends AggregateTable<I, AggregateEventRecord, AggregateEventRecord> {
+        extends AggregateTable<I, DbIterator<AggregateEventRecord>, AggregateEventRecord> {
 
     private final AggregateStorageReadQueryFactory<I> readQueryFactory;
     private final AggregateStorageWriteQueryFactory<I> writeQueryFactory;
@@ -69,7 +68,7 @@ class AggregateEventRecordTable<I>
     }
 
     @Override
-    protected ReadQueryFactory<I, AggregateEventRecord> getReadQueryFactory() {
+    protected ReadQueryFactory<I, DbIterator<AggregateEventRecord>> getReadQueryFactory() {
         return readQueryFactory;
     }
 
@@ -88,13 +87,6 @@ class AggregateEventRecordTable<I>
     public void write(I id, AggregateEventRecord record) {
         writeQueryFactory.newInsertQuery(id, record)
                          .execute();
-    }
-
-    DbIterator<AggregateEventRecord> historyBackward(AggregateReadRequest<I> request) {
-        final I id = request.getRecordId();
-        final int batchSize = request.getBatchSize();
-        return readQueryFactory.newSelectEventRecordsById(id, batchSize)
-                               .execute();
     }
 
     /**

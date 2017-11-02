@@ -83,6 +83,20 @@ public abstract class DbIterator<R> implements Iterator<R>, Closeable {
     }
 
     /**
+     * Sets the specified fetch size for the underlying {@linkplain #getResultSet() result set}.
+     *
+     * @param fetchSize the fetch size
+     * @throws DatabaseException if an error occurs during an interaction with the DB
+     */
+    public void setFetchSize(int fetchSize) {
+        try {
+            resultSet.setFetchSize(fetchSize);
+        } catch (SQLException e) {
+            throw new DatabaseException(e);
+        }
+    }
+
+    /**
      * {@inheritDoc}
      *
      * <p>Calls {@link #close()}, if {@link ResultSet#next()} returns {@code false}.

@@ -25,7 +25,6 @@ import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DbIterator;
 import io.spine.server.storage.jdbc.IdColumn;
 import io.spine.server.storage.jdbc.query.AbstractReadQueryFactory;
-import io.spine.server.storage.jdbc.query.SelectQuery;
 
 /**
  * The {@code ReadQueryFactory} for {@link AggregateEventRecordTable}.
@@ -33,7 +32,8 @@ import io.spine.server.storage.jdbc.query.SelectQuery;
  * @param <I> the type of IDs used in the storage
  * @author Dmytro Grankin
  */
-class AggregateStorageReadQueryFactory<I> extends AbstractReadQueryFactory<I, AggregateEventRecord> {
+class AggregateStorageReadQueryFactory<I>
+        extends AbstractReadQueryFactory<I, DbIterator<AggregateEventRecord>> {
 
     AggregateStorageReadQueryFactory(IdColumn<I> idColumn,
                                      DataSourceWrapper dataSource,
@@ -45,30 +45,16 @@ class AggregateStorageReadQueryFactory<I> extends AbstractReadQueryFactory<I, Ag
      * Creates the {@linkplain SelectEventRecordsById query} that selects
      * aggregate records by an aggregate ID.
      *
-     * @param id        the aggregate ID
-     * @param fetchSize the {@linkplain java.sql.PreparedStatement#setFetchSize(int) fetch size}
-     *                  of records for the query
+     * @param id the aggregate ID
      * @return the select query for {@linkplain AggregateEventRecord aggregate event records}
      */
-    SelectQuery<DbIterator<AggregateEventRecord>> newSelectEventRecordsById(I id, int fetchSize) {
+    @Override
+    public SelectEventRecordsById<I> newSelectByIdQuery(I id) {
         final SelectEventRecordsById.Builder<I> builder = SelectEventRecordsById.newBuilder();
         return builder.setTableName(getTableName())
                       .setDataSource(getDataSource())
                       .setIdColumn(getIdColumn())
                       .setId(id)
-                      .setFetchSize(fetchSize)
                       .build();
-    }
-
-    /**
-     * Thrown an {@link UnsupportedOperationException}.
-     *
-     * @deprecated multiple records correspond to a single ID in {@link AggregateEventRecordTable};
-     * please use {@link #newSelectEventRecordsById(Object, int)} to read the records.
-     */
-    @Deprecated
-    @Override
-    public SelectQuery<AggregateEventRecord> newSelectByIdQuery(I id) {
-        throw new UnsupportedOperationException("Use newSelectEventRecordsById instead.");
     }
 }

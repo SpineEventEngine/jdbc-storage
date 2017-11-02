@@ -22,7 +22,6 @@ package io.spine.server.storage.jdbc.aggregate;
 
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.sql.AbstractSQLQuery;
-import com.querydsl.sql.StatementOptions;
 import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.storage.jdbc.DbIterator;
 import io.spine.server.storage.jdbc.MessageDbIterator;
@@ -48,11 +47,8 @@ import static io.spine.type.TypeUrl.of;
  */
 class SelectEventRecordsById<I> extends AbstractSelectByIdQuery<I, DbIterator<AggregateEventRecord>> {
 
-    private final int fetchSize;
-
     private SelectEventRecordsById(Builder<I> builder) {
         super(builder);
-        this.fetchSize = builder.fetchSize;
     }
 
     @Override
@@ -65,9 +61,6 @@ class SelectEventRecordsById<I> extends AbstractSelectByIdQuery<I, DbIterator<Ag
                                                            .from(table())
                                                            .where(hasId())
                                                            .orderBy(byVersion, bySeconds, byNanos);
-        query.setStatementOptions(StatementOptions.builder()
-                                                  .setFetchSize(fetchSize)
-                                                  .build());
         final ResultSet resultSet = query.getResults();
         return new MessageDbIterator<>(resultSet,
                                        aggregate.name(),
@@ -81,13 +74,6 @@ class SelectEventRecordsById<I> extends AbstractSelectByIdQuery<I, DbIterator<Ag
     static class Builder<I> extends AbstractSelectByIdQuery.Builder<I,
                                                                     Builder<I>,
                                                                     SelectEventRecordsById<I>> {
-
-        private int fetchSize;
-
-        Builder<I> setFetchSize(int batchSize) {
-            this.fetchSize = batchSize;
-            return getThis();
-        }
 
         @Override
         public SelectEventRecordsById<I> build() {
