@@ -21,6 +21,7 @@
 package io.spine.server.storage.jdbc;
 
 import com.google.protobuf.Any;
+import com.google.protobuf.Message;
 import io.spine.type.TypeUrl;
 import org.junit.Test;
 
@@ -84,6 +85,27 @@ public class DbIteratorShould {
     }
 
     @Test
+    public void set_fetch_size() throws SQLException {
+        final ResultSet resultSet = mock(ResultSet.class);
+        final MessageDbIterator<Message> iterator = new MessageDbIterator<>(resultSet, "",
+                                                                            TypeUrl.of(Any.class));
+        final int fetchSize = 10;
+        iterator.setFetchSize(fetchSize);
+        verify(resultSet).setFetchSize(fetchSize);
+    }
+
+    @Test(expected = DatabaseException.class)
+    public void wrap_sql_exception_for_invalid_fetch_size() throws SQLException {
+        final int invalidFetchSize = -1;
+        final ResultSet resultSet = mock(ResultSet.class);
+        final MessageDbIterator<Message> iterator = new MessageDbIterator<>(resultSet, "",
+                                                                            TypeUrl.of(Any.class));
+        doThrow(SQLException.class).when(resultSet)
+                                   .setFetchSize(invalidFetchSize);
+        iterator.setFetchSize(invalidFetchSize);
+    }
+
+    @Test
     public void close_ResultSet() throws SQLException {
         final DbIterator iterator = nonEmptyIterator();
         final ResultSet resultSet = iterator.getResultSet();
@@ -143,7 +165,8 @@ public class DbIteratorShould {
             statement = (PreparedStatement) resultSet.getStatement();
             final Exception failure = new SQLException("Faulty Result in action");
             when(resultSet.next()).thenThrow(failure);
-            doThrow(failure).when(resultSet).close();
+            doThrow(failure).when(resultSet)
+                            .close();
         } catch (SQLException e) {
             fail(e.getMessage());
         }
