@@ -18,12 +18,14 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc;
+package io.spine.server.storage.jdbc.query;
 
 import io.spine.annotation.Internal;
 import io.spine.server.entity.Entity;
+import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.IdColumn;
 
-import static io.spine.server.storage.jdbc.DbTableNameFactory.newTableName;
+import static io.spine.server.storage.jdbc.query.DbTableNameFactory.newTableName;
 
 /**
  * A common superclass for the {@linkplain AbstractTable tables} working with the storages which

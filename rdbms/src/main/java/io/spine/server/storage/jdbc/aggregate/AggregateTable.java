@@ -21,9 +21,9 @@
 package io.spine.server.storage.jdbc.aggregate;
 
 import io.spine.server.entity.Entity;
-import io.spine.server.storage.jdbc.AbstractTable;
+import io.spine.server.storage.jdbc.query.AbstractTable;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.EntityTable;
+import io.spine.server.storage.jdbc.query.EntityTable;
 
 /**
  * A common superclass for the

@@ -21,7 +21,7 @@
 package io.spine.server.storage.jdbc.projection;
 
 import com.google.protobuf.Timestamp;
-import io.spine.server.storage.jdbc.AbstractTable;
+import io.spine.server.storage.jdbc.query.AbstractTable;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.IdColumn;
 import io.spine.server.storage.jdbc.TableColumn;

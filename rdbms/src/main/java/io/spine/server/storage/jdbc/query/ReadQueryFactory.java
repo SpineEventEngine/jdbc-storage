@@ -25,7 +25,7 @@ import java.util.Iterator;
 /**
  * An interface of a {@linkplain StorageQuery query} factory for the read queries.
  *
- * <p>Each JDBC {@linkplain io.spine.server.storage.jdbc.AbstractTable table} uses a query factory
+ * <p>Each JDBC {@linkplain AbstractTable table} uses a query factory
  * to construct its SQL queries to the database.
  *
  * @param <I> type of the ID of the record
