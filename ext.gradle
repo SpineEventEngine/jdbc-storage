@@ -25,4 +25,8 @@ ext {
     coreVersion = "0.9.76-SNAPSHOT"
     baseVersion = "0.9.35-SNAPSHOT"
     guavaVersion = "20.0"
+
+    // Versions of libraries for working with JDBC.
+    hikariVersion = "2.4.3"
+    queryDslVersion = "4.1.4"
 }
