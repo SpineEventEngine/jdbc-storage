@@ -19,7 +19,7 @@
  */
 
 /**
- * The API for the JDBC-based storage implementations.
+ * The API for the JDBC-based storage implementation.
  *
  * @see io.spine.server.storage.jdbc.JdbcStorageFactory for the library entry point
  */
