@@ -26,7 +26,7 @@ import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.query.SelectQuery;
-import io.spine.server.storage.jdbc.query.WriteQueryFactory;
+import io.spine.server.storage.jdbc.query.WriteQuery;
 
 import java.util.List;
 
@@ -45,14 +45,9 @@ class EventCountTable<I> extends AggregateTable<I, Integer, Integer> {
 
     private static final String TABLE_NAME_POSTFIX = "_event_count";
 
-    private final EventCountWriteQueryFactory<I> writeQueryFactory;
-
     EventCountTable(Class<? extends Entity<I, ?>> entityClass,
                     DataSourceWrapper dataSource) {
         super(TABLE_NAME_POSTFIX, entityClass, id.name(), dataSource);
-        this.writeQueryFactory = new EventCountWriteQueryFactory<>(getIdColumn(),
-                                                                   getDataSource(),
-                                                                   getName());
     }
 
     @Override
@@ -65,12 +60,6 @@ class EventCountTable<I> extends AggregateTable<I, Integer, Integer> {
         return ImmutableList.copyOf(Column.values());
     }
 
-
-    @Override
-    protected WriteQueryFactory<I, Integer> getWriteQueryFactory() {
-        return writeQueryFactory;
-    }
-
     @Override
     protected SelectQuery<Integer> composeSelectQuery(I id) {
         final SelectEventCountByIdQuery.Builder<I> builder = SelectEventCountByIdQuery.newBuilder();
@@ -79,6 +68,30 @@ class EventCountTable<I> extends AggregateTable<I, Integer, Integer> {
                                                           .setId(id)
                                                           .setIdColumn(getIdColumn())
                                                           .build();
+        return query;
+    }
+
+    @Override
+    protected WriteQuery composeInsertQuery(I id, Integer record) {
+        final InsertEventCountQuery.Builder<I> builder = InsertEventCountQuery.newBuilder();
+        final WriteQuery query = builder.setTableName(getName())
+                                        .setId(id)
+                                        .setIdColumn(getIdColumn())
+                                        .setDataSource(getDataSource())
+                                        .setEventCount(record)
+                                        .build();
+        return query;
+    }
+
+    @Override
+    protected WriteQuery composeUpdateQuery(I id, Integer record) {
+        final UpdateEventCountQuery.Builder<I> builder = UpdateEventCountQuery.newBuilder();
+        final WriteQuery query = builder.setDataSource(getDataSource())
+                                        .setTableName(getName())
+                                        .setId(id)
+                                        .setIdColumn(getIdColumn())
+                                        .setEventCount(record)
+                                        .build();
         return query;
     }
 

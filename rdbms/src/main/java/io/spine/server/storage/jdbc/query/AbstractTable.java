@@ -123,11 +123,6 @@ public abstract class AbstractTable<I, R, W> {
      */
     protected abstract TableColumn getIdColumnDeclaration();
 
-    /**
-     * @return an instance of {@link WriteQueryFactory} which produces queries to the given table
-     */
-    protected abstract WriteQueryFactory<I, W> getWriteQueryFactory();
-
     protected abstract List<? extends TableColumn> getTableColumns();
 
     /**
@@ -205,7 +200,7 @@ public abstract class AbstractTable<I, R, W> {
         return result;
     }
 
-    private void insert(I id, W record) {
+    protected void insert(I id, W record) {
         final WriteQuery query = composeInsertQuery(id, record);
         query.execute();
     }
@@ -243,15 +238,9 @@ public abstract class AbstractTable<I, R, W> {
         return dataSource;
     }
 
-    private WriteQuery composeInsertQuery(I id, W record) {
-        final WriteQuery query = getWriteQueryFactory().newInsertQuery(id, record);
-        return query;
-    }
+    protected abstract WriteQuery composeInsertQuery(I id, W record);
 
-    private WriteQuery composeUpdateQuery(I id, W record) {
-        final WriteQuery query = getWriteQueryFactory().newUpdateQuery(id, record);
-        return query;
-    }
+    protected abstract WriteQuery composeUpdateQuery(I id, W record);
 
     protected abstract SelectQuery<R> composeSelectQuery(I id);
 

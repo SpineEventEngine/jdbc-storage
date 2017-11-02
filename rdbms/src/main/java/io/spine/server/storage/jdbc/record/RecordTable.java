@@ -35,7 +35,7 @@ import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.query.EntityTable;
 import io.spine.server.storage.jdbc.query.SelectQuery;
-import io.spine.server.storage.jdbc.query.WriteQueryFactory;
+import io.spine.server.storage.jdbc.query.WriteQuery;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
 
 import javax.annotation.Nullable;
@@ -61,8 +61,6 @@ import static java.util.Collections.addAll;
  */
 class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumns> {
 
-    private final RecordStorageWriteQueryFactory<I> writeQueryFactory;
-
     private final ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> typeRegistry;
 
     RecordTable(Class<? extends Entity<I, ?>> entityClass,
@@ -71,20 +69,11 @@ class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumn
                         columnTypeRegistry) {
         super(entityClass, StandardColumn.id.name(), dataSource);
         this.typeRegistry = columnTypeRegistry;
-        writeQueryFactory = new RecordStorageWriteQueryFactory<>(getIdColumn(),
-                                                                 dataSource,
-                                                                 getName(),
-                                                                 columnTypeRegistry);
     }
 
     @Override
     protected StandardColumn getIdColumnDeclaration() {
         return StandardColumn.id;
-    }
-
-    @Override
-    protected WriteQueryFactory<I, EntityRecordWithColumns> getWriteQueryFactory() {
-        return writeQueryFactory;
     }
 
     @Override
@@ -108,24 +97,48 @@ class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumn
         return query;
     }
 
+    @Override
+    protected WriteQuery composeInsertQuery(I id, EntityRecordWithColumns record) {
+        final InsertEntityQuery.Builder<I> builder = InsertEntityQuery.newBuilder();
+        final InsertEntityQuery query = builder.setDataSource(getDataSource())
+                                               .setTableName(getName())
+                                               .setId(id)
+                                               .setIdColumn(getIdColumn())
+                                               .setColumnTypeRegistry(typeRegistry)
+                                               .setRecord(record)
+                                               .build();
+        return query;
+    }
+
+    @Override
+    protected WriteQuery composeUpdateQuery(I id, EntityRecordWithColumns record) {
+        final UpdateEntityQuery.Builder<I> builder = UpdateEntityQuery.newBuilder();
+        final UpdateEntityQuery query = builder.setTableName(getName())
+                                               .setDataSource(getDataSource())
+                                               .setIdColumn(getIdColumn())
+                                               .setId(id)
+                                               .setRecord(record)
+                                               .setColumnTypeRegistry(typeRegistry)
+                                               .build();
+        return query;
+    }
+
     void write(Map<I, EntityRecordWithColumns> records) {
+
         // Map's initial capacity is maximum, meaning no records exist in the storage yet
-
         final Map<I, EntityRecordWithColumns> newRecords = new HashMap<>(records.size());
-
         for (Map.Entry<I, EntityRecordWithColumns> unclassifiedRecord : records.entrySet()) {
             final I id = unclassifiedRecord.getKey();
             final EntityRecordWithColumns record = unclassifiedRecord.getValue();
             if (containsRecord(id)) {
-                writeQueryFactory.newUpdateQuery(id, unclassifiedRecord.getValue())
-                                 .execute();
+                final WriteQuery query = composeUpdateQuery(id, unclassifiedRecord.getValue());
+                query.execute();
             } else {
                 newRecords.put(id, record);
             }
         }
         if (!newRecords.isEmpty()) {
-            writeQueryFactory.newInsertEntityRecordsBulkQuery(newRecords)
-                            .execute();
+            newInsertEntityRecordsBulkQuery(newRecords).execute();
         }
     }
 
@@ -140,6 +153,17 @@ class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumn
                                                            .build();
         final Iterator<EntityRecord> result = query.execute();
         return result;
+    }
+
+    private WriteQuery newInsertEntityRecordsBulkQuery(Map<I, EntityRecordWithColumns> records) {
+        final InsertEntityRecordsBulkQuery.Builder<I> builder = InsertEntityRecordsBulkQuery.newBuilder();
+        final InsertEntityRecordsBulkQuery<I> query = builder.setDataSource(getDataSource())
+                                                             .setTableName(getName())
+                                                             .setIdColumn(getIdColumn())
+                                                             .setColumnTypeRegistry(typeRegistry)
+                                                             .addRecords(records)
+                                                             .build();
+        return query;
     }
 
     /**

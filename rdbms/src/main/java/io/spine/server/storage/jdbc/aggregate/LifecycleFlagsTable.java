@@ -27,7 +27,7 @@ import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.query.SelectQuery;
-import io.spine.server.storage.jdbc.query.WriteQueryFactory;
+import io.spine.server.storage.jdbc.query.WriteQuery;
 
 import java.util.List;
 
@@ -44,14 +44,9 @@ class LifecycleFlagsTable<I> extends AggregateTable<I, LifecycleFlags, Lifecycle
 
     private static final String TABLE_NAME_POSTFIX = "visibility";
 
-    private final LifecycleFlagsWriteQueryFactory<I> writeQueryFactory;
-
     LifecycleFlagsTable(Class<? extends Aggregate<I, ?, ?>> aggregateClass,
                         DataSourceWrapper dataSource) {
         super(TABLE_NAME_POSTFIX, aggregateClass, id.name(), dataSource);
-        this.writeQueryFactory = new LifecycleFlagsWriteQueryFactory<>(getIdColumn(),
-                                                                       dataSource,
-                                                                       getName());
     }
 
     @Override
@@ -65,11 +60,6 @@ class LifecycleFlagsTable<I> extends AggregateTable<I, LifecycleFlags, Lifecycle
     }
 
     @Override
-    protected WriteQueryFactory<I, LifecycleFlags> getWriteQueryFactory() {
-        return writeQueryFactory;
-    }
-
-    @Override
     protected SelectQuery<LifecycleFlags> composeSelectQuery(I id) {
         final SelectLifecycleFlagsQuery.Builder<I> builder = SelectLifecycleFlagsQuery.newBuilder();
         final SelectQuery<LifecycleFlags> query = builder.setTableName(getName())
@@ -77,6 +67,30 @@ class LifecycleFlagsTable<I> extends AggregateTable<I, LifecycleFlags, Lifecycle
                                                          .setIdColumn(getIdColumn())
                                                          .setId(id)
                                                          .build();
+        return query;
+    }
+
+    @Override
+    protected WriteQuery composeInsertQuery(I id, LifecycleFlags record) {
+        final InsertLifecycleFlagsQuery.Builder<I> builder = InsertLifecycleFlagsQuery.newBuilder();
+        final WriteQuery query = builder.setTableName(getName())
+                                        .setId(id)
+                                        .setLifecycleFlags(record)
+                                        .setDataSource(getDataSource())
+                                        .setIdColumn(getIdColumn())
+                                        .build();
+        return query;
+    }
+
+    @Override
+    protected WriteQuery composeUpdateQuery(I id, LifecycleFlags record) {
+        final UpdateLifecycleFlagsQuery.Builder<I> builder = UpdateLifecycleFlagsQuery.newBuilder();
+        final WriteQuery query = builder.setTableName(getName())
+                                        .setDataSource(getDataSource())
+                                        .setId(id)
+                                        .setLifecycleFlags(record)
+                                        .setIdColumn(getIdColumn())
+                                        .build();
         return query;
     }
 

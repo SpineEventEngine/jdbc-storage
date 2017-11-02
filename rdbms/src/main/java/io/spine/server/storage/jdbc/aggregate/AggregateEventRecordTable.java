@@ -28,7 +28,7 @@ import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.query.DbIterator;
 import io.spine.server.storage.jdbc.query.SelectQuery;
-import io.spine.server.storage.jdbc.query.WriteQueryFactory;
+import io.spine.server.storage.jdbc.query.WriteQuery;
 
 import java.util.List;
 
@@ -45,24 +45,14 @@ import static io.spine.server.storage.jdbc.Sql.Type.INT;
 class AggregateEventRecordTable<I>
         extends AggregateTable<I, DbIterator<AggregateEventRecord>, AggregateEventRecord> {
 
-    private final AggregateStorageWriteQueryFactory<I> writeQueryFactory;
-
     AggregateEventRecordTable(Class<? extends Aggregate<I, ?, ?>> entityClass,
                               DataSourceWrapper dataSource) {
         super(entityClass, Column.id.name(), dataSource);
-        writeQueryFactory = new AggregateStorageWriteQueryFactory<>(getIdColumn(),
-                                                                    dataSource,
-                                                                    getName());
     }
 
     @Override
     protected Column getIdColumnDeclaration() {
         return Column.id;
-    }
-
-    @Override
-    protected WriteQueryFactory<I, AggregateEventRecord> getWriteQueryFactory() {
-        return writeQueryFactory;
     }
 
     @Override
@@ -73,8 +63,7 @@ class AggregateEventRecordTable<I>
     @SuppressWarnings("MethodDoesntCallSuperMethod") // No extra presence checks are required
     @Override
     public void write(I id, AggregateEventRecord record) {
-        writeQueryFactory.newInsertQuery(id, record)
-                         .execute();
+        insert(id, record);
     }
 
     @Override
@@ -85,6 +74,35 @@ class AggregateEventRecordTable<I>
                       .setIdColumn(getIdColumn())
                       .setId(id)
                       .build();
+    }
+
+    @Override
+    protected WriteQuery composeInsertQuery(I id, AggregateEventRecord record) {
+        final InsertAggregateRecordQuery.Builder<I> builder = InsertAggregateRecordQuery.newBuilder();
+        final InsertAggregateRecordQuery<I> query = builder.setTableName(getName())
+                                                           .setDataSource(getDataSource())
+                                                           .setIdColumn(getIdColumn())
+                                                           .setId(id)
+                                                           .setRecord(record)
+                                                           .build();
+        return query;
+    }
+
+    /**
+     * Generates new {@code INSERT} query.
+     *
+     * <p>{@linkplain AggregateEventRecord aggregate records} are never updated, and ID does not act
+     * as a {@code PRIMARY KEY} in the table. That's why this method redirects to the
+     * {@link #composeInsertQuery(Object, AggregateEventRecord)} method.
+     *
+     * @return the result of the {@linkplain #composeInsertQuery(Object, AggregateEventRecord)
+     *         composeInsertQuery} method
+     */
+    @Override
+    protected WriteQuery composeUpdateQuery(I id, AggregateEventRecord record) {
+        log().warn("UPDATE operation is not possible within the AggregateEventRecordTable. " +
+                   "Performing an INSERT instead.");
+        return composeInsertQuery(id, record);
     }
 
     /**

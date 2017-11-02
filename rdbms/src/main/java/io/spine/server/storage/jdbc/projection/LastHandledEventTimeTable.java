@@ -25,7 +25,7 @@ import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.query.AbstractTable;
 import io.spine.server.storage.jdbc.query.SelectQuery;
-import io.spine.server.storage.jdbc.query.WriteQueryFactory;
+import io.spine.server.storage.jdbc.query.WriteQuery;
 
 import java.util.List;
 
@@ -47,11 +47,8 @@ class LastHandledEventTimeTable extends AbstractTable<String, Timestamp, Timesta
 
     private static final String TABLE_NAME = "projection_last_handled_event_time";
 
-    private final LastHandledEventTimeWriteFactory writeQueryFactory;
-
     LastHandledEventTimeTable(DataSourceWrapper dataSource) {
         super(TABLE_NAME, typeString(projection_type.name()), dataSource);
-        this.writeQueryFactory = new LastHandledEventTimeWriteFactory(dataSource, TABLE_NAME);
     }
 
     @Override
@@ -65,17 +62,34 @@ class LastHandledEventTimeTable extends AbstractTable<String, Timestamp, Timesta
     }
 
     @Override
-    protected WriteQueryFactory<String, Timestamp> getWriteQueryFactory() {
-        return writeQueryFactory;
-    }
-
-    @Override
     protected SelectQuery<Timestamp> composeSelectQuery(String id) {
         final SelectTimestampQuery.Builder builder = SelectTimestampQuery.newBuilder();
         final SelectTimestampQuery query = builder.setTableName(getName())
                                                   .setDataSource(getDataSource())
                                                   .setId(id)
                                                   .setIdColumn(getIdColumn())
+                                                  .build();
+        return query;
+    }
+
+    @Override
+    protected WriteQuery composeInsertQuery(String id, Timestamp record) {
+        final InsertTimestampQuery.Builder builder = InsertTimestampQuery.newBuilder();
+        final InsertTimestampQuery query = builder.setTableName(getName())
+                                                  .setDataSource(getDataSource())
+                                                  .setId(id)
+                                                  .setTimestamp(record)
+                                                  .build();
+        return query;
+    }
+
+    @Override
+    protected WriteQuery composeUpdateQuery(String id, Timestamp record) {
+        final UpdateTimestampQuery.Builder builder = UpdateTimestampQuery.newBuilder();
+        final UpdateTimestampQuery query = builder.setTableName(getName())
+                                                  .setDataSource(getDataSource())
+                                                  .setId(id)
+                                                  .setTimestamp(record)
                                                   .build();
         return query;
     }
