@@ -18,7 +18,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc;
+package io.spine.server.storage.jdbc.aggregate;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -30,7 +30,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @author Dmytro Dashenkov
  */
-public class Closeables {
+class Closeables {
 
     private Closeables() {
     }
@@ -48,7 +48,7 @@ public class Closeables {
      * @throws IllegalStateException if {@linkplain AutoCloseable#close() close()} throws
      *                               an {@link Exception}
      */
-    public static void closeAll(Iterable<? extends AutoCloseable> closeables) {
+    static void closeAll(Iterable<? extends AutoCloseable> closeables) {
         checkNotNull(closeables);
         final Collection<Exception> exceptions = new LinkedList<>();
         for (AutoCloseable closable : closeables) {

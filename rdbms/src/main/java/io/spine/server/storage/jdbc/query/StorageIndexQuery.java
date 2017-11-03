@@ -20,8 +20,6 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import io.spine.server.storage.jdbc.IdColumn;
-
 import java.sql.ResultSet;
 import java.util.Iterator;
 

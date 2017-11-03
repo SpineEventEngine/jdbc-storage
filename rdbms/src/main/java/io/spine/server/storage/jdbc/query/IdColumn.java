@@ -18,15 +18,14 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc;
+package io.spine.server.storage.jdbc.query;
 
 import com.google.protobuf.Message;
 import io.spine.annotation.Internal;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.entity.Entity;
 import io.spine.server.entity.EntityClass;
-import io.spine.server.storage.jdbc.query.Parameter;
-import io.spine.server.storage.jdbc.query.Parameters;
+import io.spine.server.storage.jdbc.Sql;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static io.spine.json.Json.toCompactJson;
@@ -54,8 +53,8 @@ public abstract class IdColumn<I> {
             "IfStatementWithTooManyBranches", // OK for a factory method
             "ChainOfInstanceofChecks"         // which depends on the built object target type.
     })
-    public static <I> IdColumn<I> newInstance(Class<? extends Entity<I, ?>> entityClass,
-                                              String columnName) {
+    static <I> IdColumn<I> newInstance(Class<? extends Entity<I, ?>> entityClass,
+                                       String columnName) {
         final IdColumn<I> helper;
         final Class<?> idClass = new EntityClass<Entity>(entityClass).getIdClass();
         if (idClass == Long.class) {

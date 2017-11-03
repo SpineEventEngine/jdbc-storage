@@ -37,7 +37,7 @@ import java.util.Iterator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Lists.newLinkedList;
-import static io.spine.server.storage.jdbc.Closeables.closeAll;
+import static io.spine.server.storage.jdbc.aggregate.Closeables.closeAll;
 import static java.util.Collections.emptyIterator;
 
 /**

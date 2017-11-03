@@ -25,7 +25,7 @@ import com.querydsl.sql.dml.SQLInsertClause;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.storage.ColumnRecords;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
-import io.spine.server.storage.jdbc.IdColumn;
+import io.spine.server.storage.jdbc.query.IdColumn;
 import io.spine.server.storage.jdbc.Serializer;
 import io.spine.server.storage.jdbc.query.ColumnAwareWriteQuery;
 import io.spine.server.storage.jdbc.query.Parameter;

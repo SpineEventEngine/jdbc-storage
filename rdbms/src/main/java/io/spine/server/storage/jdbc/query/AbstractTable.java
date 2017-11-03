@@ -25,7 +25,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.spine.annotation.Internal;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.IdColumn;
 import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.TableColumn;
 import org.slf4j.Logger;

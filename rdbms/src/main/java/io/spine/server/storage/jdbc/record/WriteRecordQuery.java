@@ -21,7 +21,7 @@
 package io.spine.server.storage.jdbc.record;
 
 import io.spine.server.entity.storage.EntityRecordWithColumns;
-import io.spine.server.storage.jdbc.IdColumn;
+import io.spine.server.storage.jdbc.query.IdColumn;
 import io.spine.server.storage.jdbc.query.ColumnAwareWriteQuery;
 
 /**

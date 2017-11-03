@@ -34,7 +34,7 @@ import io.spine.server.entity.storage.CompositeQueryParameter;
 import io.spine.server.entity.storage.EntityColumn;
 import io.spine.server.entity.storage.EntityQuery;
 import io.spine.server.entity.storage.QueryParameters;
-import io.spine.server.storage.jdbc.IdColumn;
+import io.spine.server.storage.jdbc.query.IdColumn;
 import io.spine.server.storage.jdbc.query.AbstractQuery;
 import io.spine.server.storage.jdbc.query.SelectQuery;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;

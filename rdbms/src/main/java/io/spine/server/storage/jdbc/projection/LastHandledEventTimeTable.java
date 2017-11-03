@@ -30,7 +30,7 @@ import io.spine.server.storage.jdbc.query.WriteQuery;
 import java.util.List;
 
 import static com.google.common.collect.ImmutableList.copyOf;
-import static io.spine.server.storage.jdbc.IdColumn.typeString;
+import static io.spine.server.storage.jdbc.query.IdColumn.typeString;
 import static io.spine.server.storage.jdbc.Sql.Type;
 import static io.spine.server.storage.jdbc.Sql.Type.BIGINT;
 import static io.spine.server.storage.jdbc.Sql.Type.INT;

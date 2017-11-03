@@ -23,7 +23,6 @@ package io.spine.server.storage.jdbc.query;
 import io.spine.annotation.Internal;
 import io.spine.server.entity.Entity;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.IdColumn;
 
 import static io.spine.server.storage.jdbc.query.DbTableNameFactory.newTableName;
 

@@ -18,7 +18,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc;
+package io.spine.server.storage.jdbc.aggregate;
 
 import com.google.common.collect.Lists;
 import org.junit.Test;

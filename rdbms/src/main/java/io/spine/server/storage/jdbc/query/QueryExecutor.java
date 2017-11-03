@@ -35,12 +35,12 @@ import static java.lang.String.format;
  *
  * @author Dmytro Dashenkov
  */
-public class QueryExecutor {
+class QueryExecutor {
 
     private final DataSourceWrapper dataSource;
     private final Logger logger;
 
-    public QueryExecutor(DataSourceWrapper dataSource, Logger logger) {
+    QueryExecutor(DataSourceWrapper dataSource, Logger logger) {
         this.dataSource = dataSource;
         this.logger = logger;
     }
@@ -48,7 +48,7 @@ public class QueryExecutor {
     /**
      * Executes the given SQL query and ignores the result.
      */
-    public void execute(String query) {
+    void execute(String query) {
         try (ConnectionWrapper connection = dataSource.getConnection(true);
              PreparedStatement statement = connection.prepareStatement(query)) {
             statement.execute();

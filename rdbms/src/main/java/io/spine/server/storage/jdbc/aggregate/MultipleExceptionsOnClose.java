@@ -18,7 +18,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc;
+package io.spine.server.storage.jdbc.aggregate;
 
 import com.google.common.base.Throwables;
 
@@ -29,8 +29,7 @@ import static java.lang.System.lineSeparator;
 
 /**
  * An {@link Exception} telling that there were <b>multiple</b> exceptions while trying to
- * {@link Closeables#closeAll(Iterable)} close} multiple
- * closeables.
+ * {@link Closeables#closeAll(Iterable)} close} multiple closeables.
  *
  * @author Dmytro Dashenkov
  */
@@ -39,7 +38,7 @@ final class MultipleExceptionsOnClose extends Throwable {
     private static final long serialVersionUID = 0L;
     private final Collection<Exception> exceptions;
 
-    public MultipleExceptionsOnClose(Collection<Exception> exceptions) {
+    MultipleExceptionsOnClose(Collection<Exception> exceptions) {
         super(format("%s fatal exceptions.", exceptions.size()));
         this.exceptions = exceptions;
     }

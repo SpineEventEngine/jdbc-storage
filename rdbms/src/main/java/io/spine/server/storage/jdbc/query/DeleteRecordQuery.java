@@ -21,7 +21,6 @@
 package io.spine.server.storage.jdbc.query;
 
 import com.querydsl.core.types.dsl.PathBuilder;
-import io.spine.server.storage.jdbc.IdColumn;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

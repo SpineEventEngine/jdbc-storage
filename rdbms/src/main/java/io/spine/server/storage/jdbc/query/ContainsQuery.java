@@ -22,7 +22,6 @@ package io.spine.server.storage.jdbc.query;
 
 import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.sql.AbstractSQLQuery;
-import io.spine.server.storage.jdbc.IdColumn;
 
 import static com.querydsl.sql.SQLExpressions.count;
 

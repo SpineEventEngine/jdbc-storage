@@ -22,7 +22,6 @@ package io.spine.server.storage.jdbc.query;
 
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import io.spine.server.storage.jdbc.IdColumn;
 
 /**
  * An abstract base for the queries which read a single record by ID.

@@ -23,7 +23,7 @@ package io.spine.server.storage.jdbc.aggregate;
 import com.google.protobuf.Timestamp;
 import io.spine.core.Event;
 import io.spine.server.aggregate.AggregateEventRecord;
-import io.spine.server.storage.jdbc.IdColumn;
+import io.spine.server.storage.jdbc.query.IdColumn;
 import io.spine.server.storage.jdbc.Serializer;
 import io.spine.server.storage.jdbc.query.AbstractQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
