@@ -20,13 +20,11 @@
 
 package io.spine.server.storage.jdbc.aggregate;
 
-import com.querydsl.core.dml.StoreClause;
 import com.querydsl.core.types.dsl.PathBuilder;
 import io.spine.server.entity.LifecycleFlags;
+import io.spine.server.storage.jdbc.query.AbstractQuery;
 import io.spine.server.storage.jdbc.query.IdColumn;
-import io.spine.server.storage.jdbc.query.AbstractStoreQuery;
-import io.spine.server.storage.jdbc.query.Parameter;
-import io.spine.server.storage.jdbc.query.Parameters;
+import io.spine.server.storage.jdbc.query.WriteQuery;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -38,7 +36,7 @@ import static io.spine.server.storage.jdbc.aggregate.LifecycleFlagsTable.Column.
  *
  * @author Dmytro Dashenkov
  */
-class UpdateLifecycleFlagsQuery<I> extends AbstractStoreQuery {
+class UpdateLifecycleFlagsQuery<I> extends AbstractQuery implements WriteQuery {
 
     private final I id;
     private final LifecycleFlags entityStatus;
@@ -52,28 +50,21 @@ class UpdateLifecycleFlagsQuery<I> extends AbstractStoreQuery {
     }
 
     @Override
-    protected StoreClause<?> createClause() {
+    public long execute() {
         final PathBuilder<Object> idPath = pathOf(idColumn.getColumnName());
         final Object normalizedId = idColumn.normalize(id);
         return factory().update(table())
-                        .where(idPath.eq(normalizedId));
-    }
-
-    @Override
-    protected Parameters getParameters() {
-        final Parameters.Builder builder = Parameters.newBuilder();
-        final Parameter archivedParameter = Parameter.of(entityStatus.getArchived());
-        final Parameter deletedParameter = Parameter.of(entityStatus.getDeleted());
-        return builder.addParameter(archived.name(), archivedParameter)
-                      .addParameter(deleted.name(), deletedParameter)
-                      .build();
+                        .where(idPath.eq(normalizedId))
+                        .set(pathOf(archived), entityStatus.getArchived())
+                        .set(pathOf(deleted), entityStatus.getDeleted())
+                        .execute();
     }
 
     static <I> Builder<I> newBuilder() {
         return new Builder<>();
     }
 
-    static class Builder<I> extends AbstractStoreQuery.Builder<Builder<I>, UpdateLifecycleFlagsQuery> {
+    static class Builder<I> extends AbstractQuery.Builder<Builder<I>, UpdateLifecycleFlagsQuery> {
 
         private I id;
         private LifecycleFlags entityStatus;

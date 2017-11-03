@@ -20,12 +20,10 @@
 
 package io.spine.server.storage.jdbc.aggregate;
 
-import com.querydsl.core.dml.StoreClause;
 import io.spine.server.entity.LifecycleFlags;
+import io.spine.server.storage.jdbc.query.AbstractQuery;
 import io.spine.server.storage.jdbc.query.IdColumn;
-import io.spine.server.storage.jdbc.query.AbstractStoreQuery;
-import io.spine.server.storage.jdbc.query.Parameter;
-import io.spine.server.storage.jdbc.query.Parameters;
+import io.spine.server.storage.jdbc.query.WriteQuery;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static io.spine.server.storage.jdbc.aggregate.LifecycleFlagsTable.Column.archived;
@@ -37,7 +35,7 @@ import static io.spine.server.storage.jdbc.aggregate.LifecycleFlagsTable.Column.
  *
  * @author Dmytro Dashenkov
  */
-class InsertLifecycleFlagsQuery<I> extends AbstractStoreQuery {
+class InsertLifecycleFlagsQuery<I> extends AbstractQuery implements WriteQuery {
 
     private final I id;
     private final LifecycleFlags entityStatus;
@@ -51,27 +49,19 @@ class InsertLifecycleFlagsQuery<I> extends AbstractStoreQuery {
     }
 
     @Override
-    protected StoreClause<?> createClause() {
-        return factory().insert(table());
-    }
-
-    @Override
-    protected Parameters getParameters() {
-        final Parameters.Builder builder = Parameters.newBuilder();
-        idColumn.setId(idColumn.getColumnName(), id, builder);
-
-        final Parameter archivedParameter = Parameter.of(entityStatus.getArchived());
-        final Parameter deletedParameter = Parameter.of(entityStatus.getDeleted());
-        return builder.addParameter(archived.name(), archivedParameter)
-                      .addParameter(deleted.name(), deletedParameter)
-                      .build();
+    public long execute() {
+        return factory().insert(table())
+                        .set(pathOf(idColumn.getColumnName()), idColumn.normalize(id))
+                        .set(pathOf(archived), entityStatus.getArchived())
+                        .set(pathOf(deleted), entityStatus.getDeleted())
+                        .execute();
     }
 
     static <I> Builder<I> newBuilder() {
         return new Builder<>();
     }
 
-    static class Builder<I> extends AbstractStoreQuery.Builder<Builder<I>, InsertLifecycleFlagsQuery> {
+    static class Builder<I> extends AbstractQuery.Builder<Builder<I>, InsertLifecycleFlagsQuery> {
 
         private I id;
         private LifecycleFlags entityStatus;
