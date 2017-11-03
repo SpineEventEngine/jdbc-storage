@@ -23,7 +23,6 @@ package io.spine.server.storage.jdbc.query;
 import com.google.common.annotations.VisibleForTesting;
 import io.spine.annotation.Internal;
 import io.spine.server.storage.jdbc.DatabaseException;
-import io.spine.server.storage.jdbc.Serializer;
 
 import java.io.Closeable;
 import java.sql.Connection;

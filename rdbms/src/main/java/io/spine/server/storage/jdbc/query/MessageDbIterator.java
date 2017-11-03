@@ -28,7 +28,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static io.spine.server.storage.jdbc.Serializer.deserialize;
+import static io.spine.server.storage.jdbc.query.Serializer.deserialize;
 
 /**
  * An iterator over the message records of a table.

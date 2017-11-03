@@ -24,7 +24,7 @@ import com.google.protobuf.Timestamp;
 import io.spine.core.Event;
 import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.storage.jdbc.query.IdColumn;
-import io.spine.server.storage.jdbc.Serializer;
+import io.spine.server.storage.jdbc.query.Serializer;
 import io.spine.server.storage.jdbc.query.AbstractQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
 

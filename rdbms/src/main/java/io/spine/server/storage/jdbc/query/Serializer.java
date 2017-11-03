@@ -18,7 +18,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc;
+package io.spine.server.storage.jdbc.query;
 
 import com.google.protobuf.Any;
 import com.google.protobuf.ByteString;
@@ -35,7 +35,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @author Alexander Litus
  */
-@Internal
 public final class Serializer {
 
     private Serializer() {
@@ -64,7 +63,7 @@ public final class Serializer {
      * @param <M>               the type of message expected
      * @return a message instance
      */
-    public static <M extends Message> M deserialize(byte[] bytes, Descriptor messageDescriptor) {
+    static <M extends Message> M deserialize(byte[] bytes, Descriptor messageDescriptor) {
         checkNotNull(bytes);
         final Any.Builder builder = Any.newBuilder();
         final String typeUrlValue = TypeUrl.from(messageDescriptor)
