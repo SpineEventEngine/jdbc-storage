@@ -200,12 +200,24 @@ public abstract class AbstractTable<I, R, W> {
         return result;
     }
 
-    protected void insert(I id, W record) {
+    /**
+     * Inserts the record to the table using the specified ID.
+     *
+     * @param id     the ID for the record
+     * @param record the record to insert
+     */
+    public void insert(I id, W record) {
         final WriteQuery query = composeInsertQuery(id, record);
         query.execute();
     }
 
-    private void update(I id, W record) {
+    /**
+     * Updates the record with the specified ID for the table.
+     *
+     * @param id     the ID of the record
+     * @param record the new state of the record
+     */
+    public void update(I id, W record) {
         final WriteQuery query = composeUpdateQuery(id, record);
         query.execute();
     }

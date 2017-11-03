@@ -128,7 +128,7 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
      */
     @Override
     protected void writeRecord(I id, AggregateEventRecord record) throws DatabaseException {
-        mainTable.write(id, record);
+        mainTable.insert(id, record);
     }
 
     /**

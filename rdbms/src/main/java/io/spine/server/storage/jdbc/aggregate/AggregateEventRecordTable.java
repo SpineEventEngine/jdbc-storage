@@ -62,12 +62,6 @@ class AggregateEventRecordTable<I> extends EntityTable<I,
         return ImmutableList.copyOf(Column.values());
     }
 
-    @SuppressWarnings("MethodDoesntCallSuperMethod") // No extra presence checks are required
-    @Override
-    public void write(I id, AggregateEventRecord record) {
-        insert(id, record);
-    }
-
     @Override
     protected SelectQuery<DbIterator<AggregateEventRecord>> composeSelectQuery(I id) {
         final SelectEventRecordsById.Builder<I> builder = SelectEventRecordsById.newBuilder();
