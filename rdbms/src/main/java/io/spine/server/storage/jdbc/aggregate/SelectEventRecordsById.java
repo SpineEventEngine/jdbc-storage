@@ -22,6 +22,7 @@ package io.spine.server.storage.jdbc.aggregate;
 
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.sql.AbstractSQLQuery;
+import com.querydsl.sql.StatementOptions;
 import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.storage.jdbc.query.AbstractSelectByIdQuery;
 import io.spine.server.storage.jdbc.query.DbIterator;
@@ -50,8 +51,7 @@ class SelectEventRecordsById<I> extends AbstractSelectByIdQuery<I, DbIterator<Ag
         super(builder);
     }
 
-    @Override
-    public DbIterator<AggregateEventRecord> execute() {
+    public DbIterator<AggregateEventRecord> execute(int fetchSize) {
         final OrderSpecifier<Comparable> byVersion = orderBy(version, DESC);
         final OrderSpecifier<Comparable> bySeconds = orderBy(timestamp, DESC);
         final OrderSpecifier<Comparable> byNanos = orderBy(timestamp_nanos, DESC);
@@ -60,10 +60,19 @@ class SelectEventRecordsById<I> extends AbstractSelectByIdQuery<I, DbIterator<Ag
                                                            .from(table())
                                                            .where(hasId())
                                                            .orderBy(byVersion, bySeconds, byNanos);
+        query.setStatementOptions(StatementOptions.builder()
+                                                  .setFetchSize(fetchSize)
+                                                  .build());
         final ResultSet resultSet = query.getResults();
         return new MessageDbIterator<>(resultSet,
                                        aggregate.name(),
                                        AggregateEventRecord.getDescriptor());
+    }
+
+    @Override
+    public DbIterator<AggregateEventRecord> execute() {
+        final int defaultFetchSize = 0;
+        return execute(defaultFetchSize);
     }
 
     static <I> Builder<I> newBuilder() {

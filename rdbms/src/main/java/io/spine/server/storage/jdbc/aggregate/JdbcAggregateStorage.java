@@ -20,7 +20,6 @@
 
 package io.spine.server.storage.jdbc.aggregate;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateEventRecord;
@@ -29,8 +28,8 @@ import io.spine.server.aggregate.AggregateStorage;
 import io.spine.server.entity.LifecycleFlags;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
-import io.spine.server.storage.jdbc.query.DbIterator;
 import io.spine.server.storage.jdbc.StorageBuilder;
+import io.spine.server.storage.jdbc.query.DbIterator;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -38,7 +37,6 @@ import java.util.Iterator;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Lists.newLinkedList;
 import static io.spine.server.storage.jdbc.aggregate.Closeables.closeAll;
-import static java.util.Collections.emptyIterator;
 
 /**
  * The implementation of the aggregate storage based on the RDBMS.
@@ -146,20 +144,11 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
         checkNotNull(request);
 
         final I id = request.getRecordId();
-        final DbIterator<AggregateEventRecord> historyIterator = getHistoryIterator(id);
-        if (historyIterator == null) {
-            return emptyIterator();
-        }
-
         final int fetchSize = request.getBatchSize();
-        historyIterator.setFetchSize(fetchSize);
+        final SelectEventRecordsById<I> query = mainTable.composeSelectQuery(id);
+        final DbIterator<AggregateEventRecord> historyIterator = query.execute(fetchSize);
         iterators.add(historyIterator);
         return historyIterator;
-    }
-
-    @VisibleForTesting
-    DbIterator<AggregateEventRecord> getHistoryIterator(I id) {
-        return mainTable.read(id);
     }
 
     /**

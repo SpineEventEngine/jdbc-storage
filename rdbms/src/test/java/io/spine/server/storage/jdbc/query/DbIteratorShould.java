@@ -73,25 +73,6 @@ public class DbIteratorShould {
     }
 
     @Test
-    public void set_fetch_size() throws SQLException {
-        final ResultSet resultSet = mock(ResultSet.class);
-        final DbIterator iterator = new AnIterator(resultSet);
-        final int fetchSize = 10;
-        iterator.setFetchSize(fetchSize);
-        verify(resultSet).setFetchSize(fetchSize);
-    }
-
-    @Test(expected = DatabaseException.class)
-    public void wrap_sql_exception_for_invalid_fetch_size() throws SQLException {
-        final int invalidFetchSize = -1;
-        final ResultSet resultSet = mock(ResultSet.class);
-        final DbIterator iterator = new AnIterator(resultSet);
-        doThrow(SQLException.class).when(resultSet)
-                                   .setFetchSize(invalidFetchSize);
-        iterator.setFetchSize(invalidFetchSize);
-    }
-
-    @Test
     public void close_ResultSet() throws SQLException {
         final DbIterator iterator = nonEmptyIterator();
         final ResultSet resultSet = iterator.getResultSet();

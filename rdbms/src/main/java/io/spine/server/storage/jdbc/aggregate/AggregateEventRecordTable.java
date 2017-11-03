@@ -63,7 +63,7 @@ class AggregateEventRecordTable<I> extends EntityTable<I,
     }
 
     @Override
-    protected SelectQuery<DbIterator<AggregateEventRecord>> composeSelectQuery(I id) {
+    protected SelectEventRecordsById<I> composeSelectQuery(I id) {
         final SelectEventRecordsById.Builder<I> builder = SelectEventRecordsById.newBuilder();
         return builder.setTableName(getName())
                       .setDataSource(getDataSource())

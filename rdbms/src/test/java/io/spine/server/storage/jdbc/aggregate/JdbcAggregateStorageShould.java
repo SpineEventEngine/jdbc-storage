@@ -98,18 +98,20 @@ public class JdbcAggregateStorageShould extends AggregateStorageShould {
     @SuppressWarnings("unchecked") // OK for a mock.
     @Test
     public void return_history_iterator_with_specified_batch_size() throws SQLException {
-        final JdbcAggregateStorage<ProjectId> storage =
-                spy(getStorage(ProjectId.class, TestAggregateWithMessageId.class));
-        final DbIterator<AggregateEventRecord> historyIterator = mock(DbIterator.class);
-        doReturn(historyIterator).when(storage)
-                                 .getHistoryIterator(any(ProjectId.class));
+        final JdbcAggregateStorage<ProjectId> storage = getStorage(ProjectId.class,
+                                                                   TestAggregateWithMessageId.class);
         final int batchSize = 10;
         final AggregateReadRequest<ProjectId> request = new AggregateReadRequest<>(newId(),
                                                                                    batchSize);
-        final DbIterator<AggregateEventRecord> resultingIterator =
+        final DbIterator<AggregateEventRecord> iterator =
                 (DbIterator<AggregateEventRecord>) storage.historyBackward(request);
-        verify(historyIterator).setFetchSize(batchSize);
-        assertEquals(historyIterator, resultingIterator);
+
+        // Use `PreparedStatement.getFetchSize()` instead of `ResultSet.getFetchSize()`,
+        // because the result of the latter depends on a JDBC driver implementation.
+        final int fetchSize = iterator.getResultSet()
+                                      .getStatement()
+                                      .getFetchSize();
+        assertEquals(batchSize, fetchSize);
     }
 
     @Test
