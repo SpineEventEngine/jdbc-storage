@@ -21,7 +21,7 @@
 package io.spine.server.storage.jdbc.query;
 
 /**
- * Query that deletes all from a table.
+ * A query that deletes all rows from a table.
  *
  * @author Alexander Litus
  * @author Andrey Lavrov

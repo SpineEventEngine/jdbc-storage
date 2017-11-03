@@ -25,7 +25,7 @@ import com.querydsl.core.types.dsl.PathBuilder;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A query for deleting one or many items by a id of a given column.
+ * A query for deleting one or many items by an ID.
  *
  * @author Dmytro Dashenkov
  */
