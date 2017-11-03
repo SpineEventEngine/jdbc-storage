@@ -20,13 +20,14 @@
 
 package io.spine.server.storage.jdbc.query;
 
+import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Message;
 import io.spine.annotation.Internal;
-import io.spine.type.TypeUrl;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static io.spine.server.storage.jdbc.Serializer.deserialize;
 
 /**
@@ -37,17 +38,17 @@ import static io.spine.server.storage.jdbc.Serializer.deserialize;
 @Internal
 public class MessageDbIterator<M extends Message> extends DbIterator<M> {
 
-    private final TypeUrl recordType;
+    private final Descriptor messageDescriptor;
 
-    public MessageDbIterator(ResultSet resultSet, String columnName, TypeUrl recordType) {
+    public MessageDbIterator(ResultSet resultSet, String columnName, Descriptor messageDescriptor) {
         super(resultSet, columnName);
-        this.recordType = recordType;
+        this.messageDescriptor = checkNotNull(messageDescriptor);
     }
 
     @Override
     protected M readResult() throws SQLException {
         final byte[] bytes = getResultSet().getBytes(getColumnName());
-        final M result = deserialize(bytes, recordType);
+        final M result = deserialize(bytes, messageDescriptor);
         return result;
     }
 }

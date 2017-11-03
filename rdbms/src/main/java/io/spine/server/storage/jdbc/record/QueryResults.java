@@ -48,8 +48,6 @@ import static io.spine.type.TypeUrl.from;
  */
 final class QueryResults {
 
-    private static final TypeUrl ENTITY_RECORD_TYPE_URL = from(EntityRecord.getDescriptor());
-
     private QueryResults() {
         // Prevent utility class instantiation.
     }
@@ -64,7 +62,7 @@ final class QueryResults {
      */
     static Iterator<EntityRecord> parse(ResultSet resultSet, FieldMask fieldMask) {
         final Iterator<EntityRecord> recordIterator =
-                new MessageDbIterator<>(resultSet, entity.name(), ENTITY_RECORD_TYPE_URL);
+                new MessageDbIterator<>(resultSet, entity.name(), EntityRecord.getDescriptor());
         final Iterator<EntityRecord> result = transform(recordIterator, maskFields(fieldMask));
         return result;
     }

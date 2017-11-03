@@ -65,21 +65,11 @@ public final class Serializer {
      * @return a message instance
      */
     public static <M extends Message> M deserialize(byte[] bytes, Descriptor messageDescriptor) {
-        return deserialize(bytes, TypeUrl.from(messageDescriptor));
-    }
-
-    /**
-     * Deserializes a {@link Message}.
-     *
-     * @param bytes   the serialized message
-     * @param typeUrl the type of the serialized message
-     * @param <M>     the type of message expected
-     * @return a message instance
-     */
-    public static <M extends Message> M deserialize(byte[] bytes, TypeUrl typeUrl) {
         checkNotNull(bytes);
         final Any.Builder builder = Any.newBuilder();
-        builder.setTypeUrl(typeUrl.value());
+        final String typeUrlValue = TypeUrl.from(messageDescriptor)
+                                           .value();
+        builder.setTypeUrl(typeUrlValue);
         final ByteString byteString = ByteString.copyFrom(bytes);
         builder.setValue(byteString);
         final M message = AnyPacker.unpack(builder.build());

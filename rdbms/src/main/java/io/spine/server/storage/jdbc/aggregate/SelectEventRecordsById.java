@@ -64,7 +64,7 @@ class SelectEventRecordsById<I> extends AbstractSelectByIdQuery<I, DbIterator<Ag
         final ResultSet resultSet = query.getResults();
         return new MessageDbIterator<>(resultSet,
                                        aggregate.name(),
-                                       of(AggregateEventRecord.class));
+                                       AggregateEventRecord.getDescriptor());
     }
 
     static <I> Builder<I> newBuilder() {
