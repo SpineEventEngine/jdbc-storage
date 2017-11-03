@@ -23,9 +23,9 @@ package io.spine.server.storage.jdbc.aggregate;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.sql.AbstractSQLQuery;
 import io.spine.server.aggregate.AggregateEventRecord;
+import io.spine.server.storage.jdbc.query.AbstractSelectByIdQuery;
 import io.spine.server.storage.jdbc.query.DbIterator;
 import io.spine.server.storage.jdbc.query.MessageDbIterator;
-import io.spine.server.storage.jdbc.query.AbstractSelectByIdQuery;
 
 import java.sql.ResultSet;
 
@@ -34,7 +34,6 @@ import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.C
 import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.timestamp;
 import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.timestamp_nanos;
 import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.version;
-import static io.spine.type.TypeUrl.of;
 
 /**
  * Query that selects {@linkplain AggregateEventRecord event records} by an aggregate ID.
