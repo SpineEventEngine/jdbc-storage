@@ -28,5 +28,5 @@ ext {
 
     // Versions of libraries for working with JDBC.
     hikariVersion = "2.4.3"
-    queryDslVersion = "4.1.4"
+    querydslVersion = "4.1.4"
 }
