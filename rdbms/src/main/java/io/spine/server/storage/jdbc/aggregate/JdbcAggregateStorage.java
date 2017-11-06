@@ -71,21 +71,21 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     private final LifecycleFlagsTable<I> lifecycleFlagsTable;
     private final EventCountTable<I> eventCountTable;
 
-    protected JdbcAggregateStorage(DataSourceWrapper dataSource,
-                                   boolean multitenant,
-                                   Class<? extends Aggregate<I, ?, ?>> aggregateClass) {
-        super(multitenant);
-        this.dataSource = dataSource;
+    /**
+     * Creates a new instance using the builder.
+     *
+     * @param builder the storage builder
+     */
+    protected JdbcAggregateStorage(Builder<I> builder) {
+        super(builder.isMultitenant());
+        final Class<? extends Aggregate<I, ?, ?>> aggregateClass = builder.getAggregateClass();
+        this.dataSource = builder.getDataSource();
         this.mainTable = new AggregateEventRecordTable<>(aggregateClass, dataSource);
         this.lifecycleFlagsTable = new LifecycleFlagsTable<>(aggregateClass, dataSource);
         this.eventCountTable = new EventCountTable<>(aggregateClass, dataSource);
         mainTable.create();
         lifecycleFlagsTable.create();
         eventCountTable.create();
-    }
-
-    private JdbcAggregateStorage(Builder<I> builder) {
-        this(builder.getDataSource(), builder.isMultitenant(), builder.getAggregateClass());
     }
 
     @Override
@@ -167,11 +167,20 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
         iterators.clear();
     }
 
+    /**
+     * Creates the builder for the storage.
+     *
+     * @return the builder instance
+     */
     public static <I> Builder<I> newBuilder() {
         return new Builder<>();
     }
 
+    /**
+     * The builder for {@link JdbcAggregateStorage}.
+     */
     public static class Builder<I> extends StorageBuilder<Builder<I>, JdbcAggregateStorage<I>> {
+
         private Class<? extends Aggregate<I, ?, ?>> aggregateClass;
 
         private Builder() {
@@ -188,10 +197,19 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
             return new JdbcAggregateStorage<>(this);
         }
 
+        @Override
+        protected void checkPreconditions() throws IllegalStateException {
+            super.checkPreconditions();
+            checkNotNull(aggregateClass);
+        }
+
         public Class<? extends Aggregate<I, ?, ?>> getAggregateClass() {
             return aggregateClass;
         }
 
+        /**
+         * @param aggregateClass the class of aggregates to be stored
+         */
         public Builder<I> setAggregateClass(Class<? extends Aggregate<I, ?, ?>> aggregateClass) {
             this.aggregateClass = aggregateClass;
             return this;

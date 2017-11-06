@@ -64,24 +64,17 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     private final RecordTable<I> table;
     private final Class<? extends Entity<I, ?>> entityClass;
 
-    protected JdbcRecordStorage(DataSourceWrapper dataSource,
-                                boolean multitenant,
-                                Class<? extends Entity<I, ?>> entityClass,
-                                ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>>
-                                        columnTypeRegistry)
-            throws DatabaseException {
-        super(multitenant);
-        this.dataSource = dataSource;
-        this.entityClass = entityClass;
-        this.table = new RecordTable<>(entityClass, dataSource, columnTypeRegistry);
+    /**
+     * Creates a new instance using the builder.
+     *
+     * @param builder the storage builder
+     */
+    protected JdbcRecordStorage(Builder<I> builder) throws DatabaseException {
+        super(builder.isMultitenant());
+        this.dataSource = builder.getDataSource();
+        this.entityClass = builder.getEntityClass();
+        this.table = new RecordTable<>(entityClass, dataSource, builder.getColumnTypeRegistry());
         table.create();
-    }
-
-
-
-    private JdbcRecordStorage(Builder<I> builder) {
-        this(builder.getDataSource(), builder.isMultitenant(),
-             builder.getEntityClass(), builder.getColumnTypeRegistry());
     }
 
     @Override
@@ -189,10 +182,18 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
         return EntityQueries.from(entityFilters, Entity.class);
     }
 
+    /**
+     * Creates the builder for the storage.
+     *
+     * @return the builder instance
+     */
     public static <I> Builder<I> newBuilder() {
         return new Builder<>();
     }
 
+    /**
+     * The builder for {@link JdbcRecordStorage}.
+     */
     public static class Builder<I>
             extends StorageBuilder<Builder<I>, JdbcRecordStorage<I>> {
 
@@ -213,11 +214,17 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
             return entityClass;
         }
 
+        /**
+         * @param entityClass the class of entities to be stored
+         */
         public Builder<I> setEntityClass(Class<? extends Entity<I, ?>> entityClass) {
             this.entityClass = checkNotNull(entityClass);
             return this;
         }
 
+        /**
+         * @param columnTypeRegistry the registry of entity columns to be used
+         */
         public Builder<I> setColumnTypeRegistry(
                 ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>>
                         columnTypeRegistry) {
@@ -234,6 +241,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
         protected void checkPreconditions() throws IllegalStateException {
             super.checkPreconditions();
             checkNotNull(entityClass, "Entity class must be set");
+            checkNotNull(columnTypeRegistry, "Column type registry must not be null.");
         }
 
         @Override

@@ -109,6 +109,11 @@ public class JdbcStandStorage extends StandStorage {
         ID_MAPPER = stringifier.get();
     }
 
+    /**
+     * Creates a new instance using the builder.
+     *
+     * @param builder the storage builder
+     */
     protected JdbcStandStorage(Builder builder) {
         super(builder.isMultitenant());
         recordStorage = JdbcRecordStorage.<String>newBuilder()

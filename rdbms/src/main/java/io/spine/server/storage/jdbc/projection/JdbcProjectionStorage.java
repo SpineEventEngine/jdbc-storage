@@ -26,7 +26,6 @@ import io.spine.server.entity.EntityRecord;
 import io.spine.server.projection.Projection;
 import io.spine.server.projection.ProjectionStorage;
 import io.spine.server.storage.RecordStorage;
-import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.JdbcStorageFactory;
 import io.spine.server.storage.jdbc.StorageBuilder;
@@ -52,23 +51,18 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
 
     private final String projectionId;
 
-    protected JdbcProjectionStorage(JdbcRecordStorage<I> recordStorage,
-                                    boolean multitenant,
-                                    Class<? extends Projection<I, ?, ?>> projectionClass,
-                                    DataSourceWrapper dataSource)
-            throws DatabaseException {
-        super(multitenant);
-        this.recordStorage = recordStorage;
-        this.projectionId = projectionClass.getName();
-        this.table = new LastHandledEventTimeTable(dataSource);
+    /**
+     * Creates a new instance using the builder.
+     *
+     * @param builder the storage builder
+     */
+    protected JdbcProjectionStorage(Builder<I> builder) throws DatabaseException {
+        super(builder.isMultitenant());
+        this.recordStorage = builder.getRecordStorage();
+        this.projectionId = builder.getProjectionClass()
+                                   .getName();
+        this.table = new LastHandledEventTimeTable(builder.getDataSource());
         table.create();
-    }
-
-    private JdbcProjectionStorage(Builder<I> builder) {
-        this(builder.getRecordStorage(),
-             builder.isMultitenant(),
-             builder.getProjectionClass(),
-             builder.getDataSource());
     }
 
     @Override
@@ -127,10 +121,18 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
         return recordStorage.readAll(fieldMask);
     }
 
+    /**
+     * Creates the builder for the storage.
+     *
+     * @return the builder instance
+     */
     public static <I> Builder<I> newBuilder() {
         return new Builder<>();
     }
 
+    /**
+     * The builder for {@link JdbcProjectionStorage}.
+     */
     public static class Builder<I> extends StorageBuilder<Builder<I>,
                                                           JdbcProjectionStorage<I>> {
         private JdbcRecordStorage<I> recordStorage;
@@ -149,6 +151,9 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
             return recordStorage;
         }
 
+        /**
+         * @param recordStorage a {@link RecordStorage} for the internal usage
+         */
         public Builder<I> setRecordStorage(JdbcRecordStorage<I> recordStorage) {
             this.recordStorage = recordStorage;
             return this;
@@ -163,7 +168,8 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
         @Override
         protected void checkPreconditions() throws IllegalStateException {
             super.checkPreconditions();
-            checkState(getRecordStorage() != null, "Record Storage must not be null.");
+            checkState(recordStorage != null, "Record Storage must not be null.");
+            checkState(projectionClass != null, "Projection class must no be null.");
         }
 
         @Override
@@ -171,6 +177,9 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
             return new JdbcProjectionStorage<>(this);
         }
 
+        /**
+         * @param projectionClass the class of projections to be stored
+         */
         public Builder<I> setProjectionClass(Class<? extends Projection<I, ?, ?>> projectionClass) {
             this.projectionClass = projectionClass;
             return this;
