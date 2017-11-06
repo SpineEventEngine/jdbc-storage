@@ -21,11 +21,13 @@
 package io.spine.server.storage.jdbc.projection;
 
 import com.google.protobuf.Timestamp;
-import io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column;
-import io.spine.server.storage.jdbc.query.AbstractStoreQuery;
-import io.spine.server.storage.jdbc.query.Parameter;
-import io.spine.server.storage.jdbc.query.Parameters;
+import com.querydsl.core.dml.StoreClause;
+import io.spine.server.storage.jdbc.query.AbstractQuery;
 import io.spine.server.storage.jdbc.query.StorageQuery;
+import io.spine.server.storage.jdbc.query.WriteQuery;
+
+import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.nanos;
+import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.seconds;
 
 /**
  * A base for the {@linkplain StorageQuery} implementations
@@ -33,7 +35,7 @@ import io.spine.server.storage.jdbc.query.StorageQuery;
  *
  * @author Dmytro Dashenkov
  */
-abstract class WriteTimestampQuery extends AbstractStoreQuery {
+abstract class WriteTimestampQuery extends AbstractQuery implements WriteQuery {
 
     private final Timestamp timestamp;
     private final String id;
@@ -45,21 +47,24 @@ abstract class WriteTimestampQuery extends AbstractStoreQuery {
     }
 
     @Override
-    protected Parameters getParameters() {
-        final Parameter seconds = Parameter.of(timestamp.getSeconds());
-        final Parameter nanos = Parameter.of(timestamp.getNanos());
-        return Parameters.newBuilder()
-                         .addParameter(Column.seconds.name(), seconds)
-                         .addParameter(Column.nanos.name(), nanos)
-                         .build();
+    public long execute() {
+        final StoreClause query = prepareQuery();
+        return query.set(pathOf(seconds), timestamp.getSeconds())
+                    .set(pathOf(nanos), timestamp.getNanos())
+                    .execute();
     }
 
-    String getId() {
+    /**
+     * @return the query to be {@linkplain #execute() executed}.
+     */
+    protected abstract StoreClause prepareQuery();
+
+    String getIdValue() {
         return id;
     }
 
     abstract static class Builder<B extends Builder<B, Q>, Q extends WriteTimestampQuery>
-            extends AbstractStoreQuery.Builder<B, Q> {
+            extends AbstractQuery.Builder<B, Q> {
 
         private Timestamp timestamp;
         private String id;

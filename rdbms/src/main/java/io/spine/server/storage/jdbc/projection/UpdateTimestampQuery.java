@@ -23,12 +23,12 @@ package io.spine.server.storage.jdbc.projection;
 import com.google.protobuf.Timestamp;
 import com.querydsl.core.dml.StoreClause;
 import com.querydsl.core.types.dsl.PathBuilder;
+import com.querydsl.sql.dml.SQLUpdateClause;
 
 import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.projection_type;
 
 /**
- * A query that updates {@link Timestamp} in the
- * {@link io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable LastHandledEventTimeTable}.
+ * A query that updates {@link Timestamp} in the {@link LastHandledEventTimeTable}.
  *
  * @author Alexander Litus
  * @author Andrey Lavrov
@@ -40,11 +40,11 @@ class UpdateTimestampQuery extends WriteTimestampQuery {
     }
 
     @Override
-    protected StoreClause<?> createClause() {
+    protected StoreClause prepareQuery() {
         final PathBuilder<Object> id = pathOf(projection_type);
-        final String idValue = getId();
-        return factory().update(table())
-                        .where(id.eq(idValue));
+        final SQLUpdateClause query = factory().update(table())
+                                               .where(id.eq(getIdValue()));
+        return query;
     }
 
     static Builder newBuilder() {

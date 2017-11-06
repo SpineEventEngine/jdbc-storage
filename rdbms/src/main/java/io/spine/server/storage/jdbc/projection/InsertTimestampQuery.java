@@ -22,8 +22,7 @@ package io.spine.server.storage.jdbc.projection;
 
 import com.google.protobuf.Timestamp;
 import com.querydsl.core.dml.StoreClause;
-import io.spine.server.storage.jdbc.query.Parameter;
-import io.spine.server.storage.jdbc.query.Parameters;
+import com.querydsl.sql.dml.SQLInsertClause;
 
 import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.projection_type;
 
@@ -40,18 +39,10 @@ class InsertTimestampQuery extends WriteTimestampQuery {
     }
 
     @Override
-    protected StoreClause<?> createClause() {
-        return factory().insert(table());
-    }
-
-    @Override
-    protected Parameters getParameters() {
-        final Parameters superParameters = super.getParameters();
-        final Parameter idParameter = Parameter.of(getId());
-        return Parameters.newBuilder()
-                         .addParameters(superParameters)
-                         .addParameter(projection_type.name(), idParameter)
-                         .build();
+    protected StoreClause prepareQuery() {
+        final SQLInsertClause query = factory().insert(table())
+                                               .set(pathOf(projection_type), getIdValue());
+        return query;
     }
 
     static Builder newBuilder() {
