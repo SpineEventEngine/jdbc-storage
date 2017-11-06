@@ -36,6 +36,7 @@ import static io.spine.server.storage.jdbc.Sql.Type.BIGINT;
 import static io.spine.server.storage.jdbc.Sql.Type.BLOB;
 import static io.spine.server.storage.jdbc.Sql.Type.ID;
 import static io.spine.server.storage.jdbc.Sql.Type.INT;
+import static io.spine.util.Exceptions.newIllegalStateException;
 
 /**
  * A table for storing the {@linkplain AggregateEventRecord aggregate event records}.
@@ -84,20 +85,13 @@ class AggregateEventRecordTable<I> extends EntityTable<I,
     }
 
     /**
-     * Generates new {@code INSERT} query.
-     *
-     * <p>{@linkplain AggregateEventRecord aggregate records} are never updated, and ID does not act
-     * as a {@code PRIMARY KEY} in the table. That's why this method redirects to the
-     * {@link #composeInsertQuery(Object, AggregateEventRecord)} method.
-     *
-     * @return the result of the {@linkplain #composeInsertQuery(Object, AggregateEventRecord)
-     *         composeInsertQuery} method
+     * @throws IllegalStateException always,
+     *                               because {@link AggregateEventRecord} should be immutable
      */
     @Override
     protected WriteQuery composeUpdateQuery(I id, AggregateEventRecord record) {
-        log().warn("UPDATE operation is not possible within the AggregateEventRecordTable. " +
-                   "Performing an INSERT instead.");
-        return composeInsertQuery(id, record);
+        final String errMsg = "AggregateEventRecord is immutable and should not be updated.";
+        throw newIllegalStateException(errMsg);
     }
 
     /**

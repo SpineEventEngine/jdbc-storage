@@ -49,6 +49,7 @@ import static io.spine.server.storage.jdbc.Sql.Query.DEFAULT;
 import static io.spine.server.storage.jdbc.Sql.Query.NOT;
 import static io.spine.server.storage.jdbc.Sql.Query.NULL;
 import static io.spine.server.storage.jdbc.Sql.Query.PRIMARY_KEY;
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * A representation of an SQL table.
@@ -354,13 +355,13 @@ public abstract class AbstractTable<I, R, W> {
         query.execute();
     }
 
-    protected static Logger log() {
+    private static Logger log() {
         return LogSingleton.INSTANCE.value;
     }
 
     private enum LogSingleton {
         INSTANCE;
         @SuppressWarnings("NonSerializableFieldInSerializableClass")
-        private final Logger value = LoggerFactory.getLogger(AbstractTable.class);
+        private final Logger value = getLogger(AbstractTable.class);
     }
 }

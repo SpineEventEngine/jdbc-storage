@@ -28,8 +28,8 @@ import io.spine.server.aggregate.AggregateStorageShould;
 import io.spine.server.entity.Entity;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
-import io.spine.server.storage.jdbc.query.DbIterator;
 import io.spine.server.storage.jdbc.GivenDataSource;
+import io.spine.server.storage.jdbc.query.DbIterator;
 import io.spine.test.aggregate.Project;
 import io.spine.test.aggregate.ProjectId;
 import io.spine.validate.ValidatingBuilder;
@@ -41,11 +41,6 @@ import static io.spine.test.Tests.nullRef;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
 
 /**
  * @author Alexander Litus
