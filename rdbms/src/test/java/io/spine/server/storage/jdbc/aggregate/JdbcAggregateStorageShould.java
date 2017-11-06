@@ -30,9 +30,10 @@ import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.GivenDataSource;
 import io.spine.server.storage.jdbc.query.DbIterator;
+import io.spine.test.Tests;
 import io.spine.test.aggregate.Project;
 import io.spine.test.aggregate.ProjectId;
-import io.spine.validate.ValidatingBuilder;
+import io.spine.test.aggregate.ProjectVBuilder;
 import org.junit.Test;
 
 import java.sql.SQLException;
@@ -123,9 +124,16 @@ public class JdbcAggregateStorageShould extends AggregateStorageShould {
         assertTrue(historyIteratorClosed);
     }
 
+    @Test(expected = NullPointerException.class)
+    public void require_non_null_aggregate_class() {
+        final Class<? extends Aggregate<Object, ?, ?>> nullClass = Tests.nullRef();
+        JdbcAggregateStorage.newBuilder()
+                            .setAggregateClass(nullClass);
+    }
+
     private static class TestAggregateWithMessageId extends Aggregate<ProjectId,
-            Project,
-            ValidatingBuilder<Project, Project.Builder>> {
+                                                                      Project,
+                                                                      ProjectVBuilder> {
         private TestAggregateWithMessageId(ProjectId id) {
             super(id);
         }

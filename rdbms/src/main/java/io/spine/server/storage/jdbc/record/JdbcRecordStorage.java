@@ -228,7 +228,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
         public Builder<I> setColumnTypeRegistry(
                 ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>>
                         columnTypeRegistry) {
-            this.columnTypeRegistry = columnTypeRegistry;
+            this.columnTypeRegistry = checkNotNull(columnTypeRegistry);
             return this;
         }
 

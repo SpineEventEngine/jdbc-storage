@@ -27,12 +27,14 @@ import io.spine.server.projection.ProjectionStorageShould;
 import io.spine.server.storage.RecordStorageShould;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.GivenDataSource;
-import io.spine.server.storage.jdbc.record.JdbcRecordStorage;
 import io.spine.server.storage.jdbc.StorageBuilder;
+import io.spine.server.storage.jdbc.record.JdbcRecordStorage;
 import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
+import io.spine.test.Tests;
 import io.spine.test.storage.ProjectId;
 import org.junit.Test;
 
+import static io.spine.test.Tests.nullRef;
 import static org.junit.Assert.assertNotNull;
 
 /**
@@ -77,6 +79,20 @@ public class JdbcProjectionStorageShould extends ProjectionStorageShould {
                 JdbcProjectionStorage.newBuilder()
                                      .setDataSource(GivenDataSource.withoutSuperpowers());
         assertNotNull(builder);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void require_non_null_projection_class() {
+        final Class<? extends Projection<Object, ?, ?>> nullClass = nullRef();
+        JdbcProjectionStorage.newBuilder()
+                             .setProjectionClass(nullClass);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void require_non_null_record_storage() {
+        final JdbcRecordStorage<Object> nullStorage = Tests.nullRef();
+        JdbcProjectionStorage.newBuilder()
+                             .setRecordStorage(nullStorage);
     }
 
     @Override

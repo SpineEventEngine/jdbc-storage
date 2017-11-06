@@ -211,7 +211,7 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
          * @param aggregateClass the class of aggregates to be stored
          */
         public Builder<I> setAggregateClass(Class<? extends Aggregate<I, ?, ?>> aggregateClass) {
-            this.aggregateClass = aggregateClass;
+            this.aggregateClass = checkNotNull(aggregateClass);
             return this;
         }
     }

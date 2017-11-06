@@ -28,6 +28,7 @@ import io.spine.client.CompositeColumnFilter;
 import io.spine.client.EntityFilters;
 import io.spine.server.entity.Entity;
 import io.spine.server.entity.EntityRecord;
+import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.entity.storage.EntityQueries;
 import io.spine.server.entity.storage.EntityQuery;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
@@ -38,7 +39,9 @@ import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.GivenDataSource;
 import io.spine.server.storage.jdbc.record.given.JdbcRecordStorageTestEnv;
 import io.spine.server.storage.jdbc.record.given.JdbcRecordStorageTestEnv.TestEntityWithStringId;
+import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
+import io.spine.test.Tests;
 import io.spine.test.storage.Project;
 import io.spine.test.storage.ProjectId;
 import io.spine.testdata.Sample;
@@ -48,6 +51,7 @@ import static io.spine.Identifier.newUuid;
 import static io.spine.client.ColumnFilters.gt;
 import static io.spine.client.ColumnFilters.lt;
 import static io.spine.client.CompositeColumnFilter.CompositeOperator.ALL;
+import static io.spine.test.Tests.nullRef;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -122,6 +126,21 @@ public class JdbcRecordStorageShould
         final EntityQuery<String> query = EntityQueries.from(entityFilters,
                                                              TestEntityWithStringId.class);
         storage.readAll(query, FieldMask.getDefaultInstance());
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void require_non_null_entity_class() {
+        final Class<? extends Entity<Object, ?>> nullEntityCls = nullRef();
+        JdbcRecordStorage.newBuilder()
+                         .setEntityClass(nullEntityCls);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void require_non_null_column_type_registry() {
+        final ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> registry
+                = nullRef();
+        JdbcRecordStorage.newBuilder()
+                         .setColumnTypeRegistry(registry);
     }
 
     @Override

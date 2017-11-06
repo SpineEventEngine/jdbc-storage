@@ -34,6 +34,7 @@ import io.spine.server.storage.jdbc.record.JdbcRecordStorage;
 import javax.annotation.Nullable;
 import java.util.Iterator;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 /**
@@ -155,7 +156,7 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
          * @param recordStorage a {@link RecordStorage} for the internal usage
          */
         public Builder<I> setRecordStorage(JdbcRecordStorage<I> recordStorage) {
-            this.recordStorage = recordStorage;
+            this.recordStorage = checkNotNull(recordStorage);
             return this;
         }
 
@@ -181,7 +182,7 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
          * @param projectionClass the class of projections to be stored
          */
         public Builder<I> setProjectionClass(Class<? extends Projection<I, ?, ?>> projectionClass) {
-            this.projectionClass = projectionClass;
+            this.projectionClass = checkNotNull(projectionClass);
             return this;
         }
 
