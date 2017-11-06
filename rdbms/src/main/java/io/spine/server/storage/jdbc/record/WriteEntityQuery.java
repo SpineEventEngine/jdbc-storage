@@ -77,10 +77,28 @@ abstract class WriteEntityQuery<I, C extends StoreClause<C>> extends AbstractQue
         return clause.execute();
     }
 
+    /**
+     * Adds either an {@linkplain com.querydsl.sql.dml.SQLUpdateClause#addBatch() update}
+     * or {@linkplain com.querydsl.sql.dml.SQLInsertClause#addBatch() insert} batch.
+     *
+     * @param clause the clause to add a batch for
+     */
     protected abstract void addBatch(C clause);
 
+    /**
+     * Sets an ID value to the specified {@linkplain StoreClause clause}.
+     *
+     * @param clause       the clause to set ID
+     * @param idColumn     the {@link IdColumn} representing the ID
+     * @param normalizedId the {@linkplain IdColumn#normalize(Object) ID value} to set
+     */
     protected abstract void setIdValue(C clause, IdColumn<I> idColumn, Object normalizedId);
 
+    /**
+     * Creates an empty {@linkplain StoreClause clause} representing this query.
+     *
+     * @return the new clause
+     */
     protected abstract C createClause();
 
     private void setEntityColumns(C clause, EntityRecordWithColumns record) {
