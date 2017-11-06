@@ -102,10 +102,9 @@ class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumn
         final InsertEntityQuery.Builder<I> builder = InsertEntityQuery.newBuilder();
         final InsertEntityQuery query = builder.setDataSource(getDataSource())
                                                .setTableName(getName())
-                                               .setId(id)
                                                .setIdColumn(getIdColumn())
                                                .setColumnTypeRegistry(typeRegistry)
-                                               .setRecord(record)
+                                               .addRecord(id, record)
                                                .build();
         return query;
     }
@@ -116,8 +115,7 @@ class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumn
         final UpdateEntityQuery query = builder.setTableName(getName())
                                                .setDataSource(getDataSource())
                                                .setIdColumn(getIdColumn())
-                                               .setId(id)
-                                               .setRecord(record)
+                                               .addRecord(id, record)
                                                .setColumnTypeRegistry(typeRegistry)
                                                .build();
         return query;
@@ -156,13 +154,13 @@ class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumn
     }
 
     private WriteQuery newInsertEntityRecordsBulkQuery(Map<I, EntityRecordWithColumns> records) {
-        final InsertEntityRecordsBulkQuery.Builder<I> builder = InsertEntityRecordsBulkQuery.newBuilder();
-        final InsertEntityRecordsBulkQuery<I> query = builder.setDataSource(getDataSource())
-                                                             .setTableName(getName())
-                                                             .setIdColumn(getIdColumn())
-                                                             .setColumnTypeRegistry(typeRegistry)
-                                                             .addRecords(records)
-                                                             .build();
+        final InsertEntityQuery.Builder<I> builder = InsertEntityQuery.newBuilder();
+        final InsertEntityQuery query = builder.setDataSource(getDataSource())
+                                               .setTableName(getName())
+                                               .setIdColumn(getIdColumn())
+                                               .setColumnTypeRegistry(typeRegistry)
+                                               .addRecords(records)
+                                               .build();
         return query;
     }
 

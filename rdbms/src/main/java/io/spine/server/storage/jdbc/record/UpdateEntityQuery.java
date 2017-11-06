@@ -20,30 +20,37 @@
 
 package io.spine.server.storage.jdbc.record;
 
-import com.querydsl.core.dml.StoreClause;
 import com.querydsl.core.types.dsl.PathBuilder;
+import com.querydsl.sql.dml.SQLUpdateClause;
 import io.spine.server.entity.EntityRecord;
-import io.spine.server.entity.storage.EntityRecordWithColumns;
+import io.spine.server.storage.jdbc.query.IdColumn;
 
 /**
- * Query that updates {@link EntityRecord} in
- * the {@link RecordTable}.
+ * Query that updates {@link EntityRecord} in the {@link RecordTable}.
  *
  * @author Alexander Litus
  * @author Andrey Lavrov
  */
-class UpdateEntityQuery<I> extends WriteEntityQuery<I> {
+class UpdateEntityQuery<I> extends WriteEntityQuery<I, SQLUpdateClause> {
 
     private UpdateEntityQuery(Builder<I> builder) {
         super(builder);
     }
 
     @Override
-    protected StoreClause<?> createClause() {
-        final PathBuilder<Object> id = pathOf(getIdColumn().getColumnName());
-        final Object normalizedId = getIdColumn().normalize(getId());
-        return factory().update(table())
-                        .where(id.eq(normalizedId));
+    protected void addBatch(SQLUpdateClause clause) {
+        clause.addBatch();
+    }
+
+    @Override
+    protected void setIdValue(SQLUpdateClause clause, IdColumn<I> idColumn, Object normalizedId) {
+        final PathBuilder<Object> idPath = pathOf(idColumn.getColumnName());
+        clause.where(idPath.eq(normalizedId));
+    }
+
+    @Override
+    protected SQLUpdateClause createClause() {
+        return factory().update(table());
     }
 
     static <I> Builder<I> newBuilder() {
@@ -51,10 +58,9 @@ class UpdateEntityQuery<I> extends WriteEntityQuery<I> {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    static class Builder<I> extends WriteRecordQuery.Builder<Builder<I>,
+    static class Builder<I> extends WriteEntityQuery.Builder<Builder<I>,
                                                              UpdateEntityQuery,
-                                                             I,
-                                                             EntityRecordWithColumns> {
+                                                             I> {
 
         @Override
         public UpdateEntityQuery build() {

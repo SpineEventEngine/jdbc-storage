@@ -20,39 +20,38 @@
 
 package io.spine.server.storage.jdbc.record;
 
-import com.querydsl.core.dml.StoreClause;
+import com.querydsl.core.types.dsl.PathBuilder;
+import com.querydsl.sql.dml.SQLInsertClause;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
-import io.spine.server.storage.jdbc.query.Parameter;
-import io.spine.server.storage.jdbc.query.Parameters;
+import io.spine.server.storage.jdbc.query.IdColumn;
 
 /**
- * Query that inserts a new {@link EntityRecordWithColumns} to
- * the {@link RecordTable}.
+ * Query that inserts a new {@link EntityRecordWithColumns} to the {@link RecordTable}.
  *
  * @author Alexander Litus
  * @author Andrey Lavrov
  * @author Alexander Aleksandrov
  */
-class InsertEntityQuery<I> extends WriteEntityQuery<I> {
+class InsertEntityQuery<I> extends WriteEntityQuery<I, SQLInsertClause> {
 
     private InsertEntityQuery(Builder<I> builder) {
         super(builder);
     }
 
     @Override
-    protected StoreClause<?> createClause() {
-        return factory().insert(table());
+    protected void addBatch(SQLInsertClause clause) {
+        clause.addBatch();
     }
 
     @Override
-    protected Parameters getParameters() {
-        final Parameters superParameters = super.getParameters();
-        final Object normalizedId = getIdColumn().normalize(getId());
-        final Parameter idParameter = Parameter.of(normalizedId);
-        return Parameters.newBuilder()
-                         .addParameters(superParameters)
-                         .addParameter(getIdColumn().getColumnName(), idParameter)
-                         .build();
+    protected void setIdValue(SQLInsertClause clause, IdColumn<I> idColumn, Object normalizedId) {
+        final PathBuilder<Object> idPath = pathOf(idColumn.getColumnName());
+        clause.set(idPath, normalizedId);
+    }
+
+    @Override
+    protected SQLInsertClause createClause() {
+        return factory().insert(table());
     }
 
     static <I> Builder<I> newBuilder() {
@@ -60,10 +59,9 @@ class InsertEntityQuery<I> extends WriteEntityQuery<I> {
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    static class Builder<I> extends WriteRecordQuery.Builder<Builder<I>,
+    static class Builder<I> extends WriteEntityQuery.Builder<Builder<I>,
                                                              InsertEntityQuery,
-                                                             I,
-                                                             EntityRecordWithColumns> {
+                                                             I> {
 
         @Override
         public InsertEntityQuery build() {

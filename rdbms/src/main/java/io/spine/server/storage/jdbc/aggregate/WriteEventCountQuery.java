@@ -23,9 +23,6 @@ package io.spine.server.storage.jdbc.aggregate;
 import com.querydsl.core.dml.StoreClause;
 import io.spine.server.storage.jdbc.query.AbstractQuery;
 import io.spine.server.storage.jdbc.query.IdColumn;
-import io.spine.server.storage.jdbc.query.AbstractStoreQuery;
-import io.spine.server.storage.jdbc.query.Parameter;
-import io.spine.server.storage.jdbc.query.Parameters;
 import io.spine.server.storage.jdbc.query.WriteQuery;
 
 import static io.spine.server.storage.jdbc.aggregate.EventCountTable.Column.event_count;

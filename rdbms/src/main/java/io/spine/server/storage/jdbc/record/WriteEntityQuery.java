@@ -21,38 +21,126 @@
 package io.spine.server.storage.jdbc.record;
 
 import com.google.common.base.Functions;
+import com.querydsl.core.dml.StoreClause;
 import io.spine.server.entity.storage.ColumnRecords;
+import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
-import io.spine.server.storage.jdbc.query.Serializer;
-import io.spine.server.storage.jdbc.query.Parameter;
+import io.spine.server.storage.jdbc.query.AbstractQuery;
+import io.spine.server.storage.jdbc.query.IdColumn;
 import io.spine.server.storage.jdbc.query.Parameters;
+import io.spine.server.storage.jdbc.query.WriteQuery;
+import io.spine.server.storage.jdbc.type.JdbcColumnType;
+import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
 
+import java.util.Map;
+import java.util.Set;
+
+import static com.google.common.collect.Maps.newLinkedHashMap;
+import static io.spine.server.storage.jdbc.query.Serializer.serialize;
 import static io.spine.server.storage.jdbc.record.RecordTable.StandardColumn.entity;
 
 /**
- * The write query to the {@link RecordTable}.
+ * An abstract base for write queries to the {@link RecordTable}.
  *
- * @author Dmytro Dashenkov
+ * <p>The query can be used to work with {@linkplain Builder#addRecords(Map) multiple records}.
+ *
+ * <p>An overhead for multiple records will be the same as for a single record.
+ *
+ * @param <I> the type of IDs
+ * @param <C> the type of {@link StoreClause}
+ * @author Dmytro Grankin
  */
-abstract class WriteEntityQuery<I> extends WriteRecordQuery<I, EntityRecordWithColumns> {
+abstract class WriteEntityQuery<I, C extends StoreClause<C>> extends AbstractQuery implements WriteQuery {
 
-    WriteEntityQuery(
-            Builder<? extends Builder, ? extends WriteRecordQuery, I, EntityRecordWithColumns> builder) {
+    private final IdColumn<I> idColumn;
+    private final Map<I, EntityRecordWithColumns> records;
+    private final ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry;
+
+    WriteEntityQuery(Builder<? extends Builder, ? extends WriteEntityQuery, I> builder) {
         super(builder);
+        this.idColumn = builder.idColumn;
+        this.records = builder.records;
+        this.columnTypeRegistry = builder.columnTypeRegistry;
     }
 
     @Override
-    protected Parameters getParameters() {
-        final Parameters.Builder builder = Parameters.newBuilder();
-        final byte[] serializedRecord = Serializer.serialize(getRecord().getRecord());
-        final Parameter recordParameter = Parameter.of(serializedRecord);
-        builder.addParameter(entity.name(), recordParameter);
-        if (getRecord().hasColumns()) {
-            ColumnRecords.feedColumnsTo(builder,
-                                        getRecord(),
-                                        getColumnTypeRegistry(),
+    public long execute() {
+        final C clause = createClause();
+        for (I id : records.keySet()) {
+            final EntityRecordWithColumns record = records.get(id);
+            setEntityColumns(clause, record);
+
+            clause.set(pathOf(entity), serialize(record.getRecord()));
+            setIdValue(clause, idColumn, idColumn.normalize(id));
+            addBatch(clause);
+        }
+        return clause.execute();
+    }
+
+    protected abstract void addBatch(C clause);
+
+    protected abstract void setIdValue(C clause, IdColumn<I> idColumn, Object normalizedId);
+
+    protected abstract C createClause();
+
+    private void setEntityColumns(C clause, EntityRecordWithColumns record) {
+        final Parameters parameters = createParametersFromColumns(record);
+        final Set<String> identifiers = parameters.getIdentifiers();
+        for (String identifier : identifiers) {
+            final Object parameterValue = parameters.getParameter(identifier)
+                                                    .getValue();
+            clause.set(pathOf(identifier), parameterValue);
+        }
+    }
+
+    /**
+     * Creates {@link Parameters} from
+     * {@linkplain EntityRecordWithColumns#hasColumns() entity columns}.
+     *
+     * @param record the record to extract entity column values
+     * @return query parameters from entity columns
+     */
+    private Parameters createParametersFromColumns(EntityRecordWithColumns record) {
+        final Parameters.Builder parameters = Parameters.newBuilder();
+        if (record.hasColumns()) {
+            ColumnRecords.feedColumnsTo(parameters,
+                                        record,
+                                        columnTypeRegistry,
                                         Functions.<String>identity());
         }
-        return builder.build();
+        return parameters.build();
+    }
+
+    @SuppressWarnings("ClassNameSameAsAncestorName")
+    abstract static class Builder<B extends Builder<B, Q, I>,
+                                  Q extends WriteEntityQuery,
+                                  I>
+            extends AbstractQuery.Builder<B, Q> {
+
+        private IdColumn<I> idColumn;
+        private final Map<I, EntityRecordWithColumns> records = newLinkedHashMap();
+        private ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry
+                = JdbcTypeRegistryFactory.defaultInstance();
+
+        B setColumnTypeRegistry(
+                ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry) {
+            this.columnTypeRegistry = columnTypeRegistry;
+            return getThis();
+        }
+
+        B addRecord(I id, EntityRecordWithColumns record) {
+            records.put(id, record);
+            return getThis();
+        }
+
+        B addRecords(Map<I, EntityRecordWithColumns> records) {
+            this.records.putAll(records);
+            return getThis();
+        }
+
+        B setIdColumn(IdColumn<I> idColumn) {
+            this.idColumn = idColumn;
+            return getThis();
+        }
     }
 }
