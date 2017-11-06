@@ -36,7 +36,7 @@ class UpdateEventCountQuery<I> extends WriteEventCountQuery<I> {
     }
 
     @Override
-    protected StoreClause<?> createClause() {
+    protected StoreClause prepareQuery() {
         final PathBuilder<Object> id = pathOf(getIdColumn().getColumnName());
         final Object normalizedId = getIdColumn().normalize(getId());
         return factory().update(table())

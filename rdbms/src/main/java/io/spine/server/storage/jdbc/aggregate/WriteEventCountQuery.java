@@ -20,10 +20,13 @@
 
 package io.spine.server.storage.jdbc.aggregate;
 
+import com.querydsl.core.dml.StoreClause;
+import io.spine.server.storage.jdbc.query.AbstractQuery;
 import io.spine.server.storage.jdbc.query.IdColumn;
 import io.spine.server.storage.jdbc.query.AbstractStoreQuery;
 import io.spine.server.storage.jdbc.query.Parameter;
 import io.spine.server.storage.jdbc.query.Parameters;
+import io.spine.server.storage.jdbc.query.WriteQuery;
 
 import static io.spine.server.storage.jdbc.aggregate.EventCountTable.Column.event_count;
 
@@ -32,7 +35,7 @@ import static io.spine.server.storage.jdbc.aggregate.EventCountTable.Column.even
  *
  * @author Dmytro Grankin
  */
-abstract class WriteEventCountQuery<I> extends AbstractStoreQuery {
+abstract class WriteEventCountQuery<I> extends AbstractQuery implements WriteQuery {
 
     private final I id;
     private final IdColumn<I> idColumn;
@@ -46,12 +49,16 @@ abstract class WriteEventCountQuery<I> extends AbstractStoreQuery {
     }
 
     @Override
-    protected Parameters getParameters() {
-        final Parameter eventCountParameter = Parameter.of(eventCount);
-        return Parameters.newBuilder()
-                         .addParameter(event_count.name(), eventCountParameter)
-                         .build();
+    public long execute() {
+        final StoreClause query = prepareQuery();
+        return query.set(pathOf(event_count), eventCount)
+                    .execute();
     }
+
+    /**
+     * @return the query to be {@linkplain #execute() executed}.
+     */
+    protected abstract StoreClause prepareQuery();
 
     I getId() {
         return id;
@@ -63,7 +70,7 @@ abstract class WriteEventCountQuery<I> extends AbstractStoreQuery {
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
     abstract static class Builder<B extends Builder<B, Q, I>, Q extends WriteEventCountQuery, I>
-            extends AbstractStoreQuery.Builder<B, Q> {
+            extends AbstractQuery.Builder<B, Q> {
 
         private IdColumn<I> idColumn;
         private I id;

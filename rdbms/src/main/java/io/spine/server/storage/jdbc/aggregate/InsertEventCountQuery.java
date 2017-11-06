@@ -21,8 +21,8 @@
 package io.spine.server.storage.jdbc.aggregate;
 
 import com.querydsl.core.dml.StoreClause;
-import io.spine.server.storage.jdbc.query.Parameter;
-import io.spine.server.storage.jdbc.query.Parameters;
+import com.querydsl.core.types.dsl.PathBuilder;
+import com.querydsl.sql.dml.SQLInsertClause;
 
 /**
  * A query that inserts a new aggregate event count after the last snapshot to the
@@ -38,20 +38,12 @@ class InsertEventCountQuery<I> extends WriteEventCountQuery<I> {
     }
 
     @Override
-    protected StoreClause<?> createClause() {
-        return factory().insert(table());
-    }
-
-    @Override
-    protected Parameters getParameters() {
-        final Parameters superParameters = super.getParameters();
+    protected StoreClause prepareQuery() {
+        final PathBuilder<Object> idPath = pathOf(getIdColumn().getColumnName());
         final Object normalizedId = getIdColumn().normalize(getId());
-        final Parameter id = Parameter.of(normalizedId);
-        final Parameters result = Parameters.newBuilder()
-                                            .addParameters(superParameters)
-                                            .addParameter(getIdColumn().getColumnName(), id)
-                                            .build();
-        return result;
+        final SQLInsertClause query = factory().insert(table())
+                                               .set(idPath, normalizedId);
+        return query;
     }
 
     static <I> Builder<I> newBuilder() {
