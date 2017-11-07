@@ -49,7 +49,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
 /**
- * The implementation base for the queries to an SQL database.
+ * The implementation base for the queries to an SQL-compliant database.
  *
  * @author Dmytro Grankin
  */
@@ -148,20 +148,43 @@ public abstract class AbstractQuery implements StorageQuery {
         }
     }
 
+    /**
+     * An abstract builder for {@linkplain StorageQuery queries}.
+     */
     protected abstract static class Builder<B extends Builder<B, Q>, Q extends AbstractQuery> {
 
         private DataSourceWrapper dataSource;
         private String tableName;
 
+        /**
+         * Creates a new instance of the query.
+         *
+         * @return the new query
+         */
         public abstract Q build();
 
+        /**
+         * Obtains typed reference to {@code this}.
+         *
+         * <p>This method provides return type covariance in methods.
+         */
         protected abstract B getThis();
 
+        /**
+         * Sets the {@linkplain DataSourceWrapper data source} to be used for query execution.
+         *
+         * @param dataSource the data source to use
+         */
         public B setDataSource(DataSourceWrapper dataSource) {
             this.dataSource = checkNotNull(dataSource);
             return getThis();
         }
 
+        /**
+         * Sets the table name to use as a target for the query
+         *
+         * @param tableName the table name for the query
+         */
         public B setTableName(String tableName) {
             checkArgument(!isNullOrEmpty(tableName));
             this.tableName = tableName;
