@@ -22,10 +22,6 @@ package io.spine.server.storage.jdbc;
 
 import org.junit.Test;
 
-import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
-import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
-import static io.spine.server.storage.jdbc.Sql.BuildingBlock.COMMA;
-import static io.spine.server.storage.jdbc.Sql.Query.PLACEHOLDER;
 import static io.spine.test.Tests.assertHasPrivateParameterlessCtor;
 import static org.junit.Assert.assertEquals;
 
@@ -52,8 +48,8 @@ public class SqlShould {
                                                      .trim();
         assertEquals(countExpected, countActual);
 
-        final String varcharExpected = "VARCHAR(512)";
-        final String varcharActual = Sql.Type.VARCHAR_512.toString()
+        final String varcharExpected = "VARCHAR(255)";
+        final String varcharActual = Sql.Type.VARCHAR_255.toString()
                                                          .trim();
         assertEquals(varcharExpected, varcharActual);
     }

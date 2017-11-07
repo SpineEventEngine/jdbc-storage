@@ -63,7 +63,13 @@ public final class Sql {
         INT("INT"),
         BIGINT("BIGINT"),
         VARCHAR_255("VARCHAR(255)"),
-        VARCHAR_512("VARCHAR(512)"),
+
+        /**
+         * A type that can be used for a {@link com.google.protobuf.Message Message}
+         * {@linkplain io.spine.server.storage.jdbc.type.JdbcColumnType column type}.
+         *
+         * <p>The type should be suitable for MySQL indexes.
+         */
         VARCHAR_999("VARCHAR(999)"),
         BOOLEAN("BOOLEAN");
 
