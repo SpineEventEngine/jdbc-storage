@@ -27,8 +27,7 @@ import io.spine.server.storage.jdbc.DataSourceWrapper;
 import static io.spine.server.storage.jdbc.query.DbTableNameFactory.newTableName;
 
 /**
- * A common superclass for the {@linkplain AbstractTable tables} working with the storages which
- * store {@linkplain Entity entities}.
+ * A common base for the storage tables, that are used to maintain {@linkplain Entity entities}.
  *
  * @author Dmytro Dashenkov
  */
