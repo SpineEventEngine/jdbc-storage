@@ -39,7 +39,7 @@ import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.C
 /**
  * Query that selects {@linkplain AggregateEventRecord event records} by an aggregate ID.
  *
- * <p>Resulting records is ordered by version descending. If the version is the same for
+ * <p>Resulting records are ordered by version descending. If the version is the same for
  * several records, they will be ordered by creation time descending.
  *
  * @author Dmytro Grankin
