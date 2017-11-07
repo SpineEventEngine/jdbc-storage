@@ -52,7 +52,7 @@ class InsertEventCountQuery<I> extends WriteEventCountQuery<I> {
                                                                  I> {
 
         @Override
-        public InsertEventCountQuery<I> build() {
+        protected InsertEventCountQuery<I> doBuild() {
             return new InsertEventCountQuery<>(this);
         }
 

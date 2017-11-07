@@ -49,7 +49,7 @@ class UpdateEventCountQuery<I> extends WriteEventCountQuery<I> {
                                                                  I> {
 
         @Override
-        public UpdateEventCountQuery<I> build() {
+        protected UpdateEventCountQuery<I> doBuild() {
             return new UpdateEventCountQuery<>(this);
         }
 

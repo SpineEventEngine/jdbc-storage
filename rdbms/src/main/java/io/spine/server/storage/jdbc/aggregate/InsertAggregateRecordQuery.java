@@ -92,7 +92,7 @@ class InsertAggregateRecordQuery<I> extends IdAwareQuery<I> implements WriteQuer
         }
 
         @Override
-        public InsertAggregateRecordQuery<I> build() {
+        protected InsertAggregateRecordQuery<I> doBuild() {
             return new InsertAggregateRecordQuery<>(this);
         }
 

@@ -126,7 +126,7 @@ public class SelectMessageByIdQueryShould {
             }
 
             @Override
-            public ASelectMessageByIdQuery build() {
+            protected ASelectMessageByIdQuery doBuild() {
                 return new ASelectMessageByIdQuery(this);
             }
 

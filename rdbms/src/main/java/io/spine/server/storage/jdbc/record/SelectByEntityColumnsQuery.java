@@ -188,7 +188,6 @@ final class SelectByEntityColumnsQuery<I> extends AbstractQuery
 
         private Builder() {
             super();
-            fieldMask = FieldMask.getDefaultInstance();
         }
 
         Builder<I> setEntityQuery(EntityQuery<I> entityQuery) {
@@ -212,10 +211,22 @@ final class SelectByEntityColumnsQuery<I> extends AbstractQuery
             return this;
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * <p>Checks that all the builder fields were set to a non-{@code null} values.
+         */
         @Override
-        public SelectByEntityColumnsQuery<I> build() {
+        protected void checkPreconditions() throws IllegalStateException {
+            super.checkPreconditions();
+            checkState(idColumn != null, "IdColumn is not set.");
+            checkState(fieldMask != null, "FieldMask is not set.");
             checkState(entityQuery != null, "EntityQuery is not set.");
             checkState(columnTypeRegistry != null, "ColumnTypeRegistry is not set.");
+        }
+
+        @Override
+        protected SelectByEntityColumnsQuery<I> doBuild() {
             return new SelectByEntityColumnsQuery<>(this);
         }
 

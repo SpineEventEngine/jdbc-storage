@@ -52,7 +52,7 @@ class SelectEventCountByIdQuery<I> extends AbstractSelectByIdQuery<I, Integer> {
                                                                     Builder<I>,
                                                                     SelectEventCountByIdQuery<I>> {
         @Override
-        public SelectEventCountByIdQuery<I> build() {
+        protected SelectEventCountByIdQuery<I> doBuild() {
             return new SelectEventCountByIdQuery<>(this);
         }
 

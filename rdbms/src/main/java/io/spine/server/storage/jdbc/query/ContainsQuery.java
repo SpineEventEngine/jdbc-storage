@@ -54,7 +54,7 @@ class ContainsQuery<I> extends IdAwareQuery<I> implements SelectQuery<Boolean> {
     static class Builder<I> extends IdAwareQuery.Builder<I, Builder<I>, ContainsQuery<I>> {
 
         @Override
-        public ContainsQuery<I> build() {
+        protected ContainsQuery<I> doBuild() {
             return new ContainsQuery<>(this);
         }
 

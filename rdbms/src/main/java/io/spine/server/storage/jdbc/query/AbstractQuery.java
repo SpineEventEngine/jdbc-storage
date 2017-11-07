@@ -46,6 +46,7 @@ import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
 /**
@@ -157,18 +158,48 @@ public abstract class AbstractQuery implements StorageQuery {
         private String tableName;
 
         /**
-         * Creates a new instance of the query.
+         * Creates a new instance of the {@link StorageQuery} with respect to the preconditions.
          *
-         * @return the new query
+         * @return a new non-null instance of the query
+         * @see #checkPreconditions()
          */
-        public abstract Q build();
+        public final Q build() {
+            checkPreconditions();
+            final Q result = doBuild();
+            checkNotNull(result, "The query must not be null.");
+            return result;
+        }
 
         /**
          * Obtains typed reference to {@code this}.
          *
-         * <p>This method provides return type covariance in methods.
+         * <p>This method provides return type covariance in builder setters.
          */
         protected abstract B getThis();
+
+        /**
+         * Checks the preconditions of the storage construction.
+         *
+         * <p>Default implementation checks that the {@linkplain #dataSource data source} is not
+         * {@code null} and {@linkplain #tableName table name} is not an empty string.
+         *
+         * <p>Override this method to modify these preconditions.
+         *
+         * @throws IllegalStateException upon a precondition violation
+         */
+        protected void checkPreconditions() throws IllegalStateException {
+            checkState(dataSource != null, "Data source must not be null");
+            checkState(!isNullOrEmpty(tableName), "Table name must be a non-empty string.");
+        }
+
+        /**
+         * Builds a new instance of the query.
+         *
+         * <p>The construction preconditions are checked before calling this method.
+         *
+         * @return a new non-null instance of the query.
+         */
+        protected abstract Q doBuild();
 
         /**
          * Sets the {@linkplain DataSourceWrapper data source} to be used for query execution.

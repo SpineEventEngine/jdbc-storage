@@ -54,7 +54,7 @@ class SelectEntityByIdQuery<I> extends SelectMessageByIdQuery<I, EntityRecord> {
                                                                    I,
                                                                    EntityRecord> {
         @Override
-        public SelectEntityByIdQuery<I> build() {
+        protected SelectEntityByIdQuery<I> doBuild() {
             setMessageColumnName(entity.name());
             setMessageDescriptor(EntityRecord.getDescriptor());
             return new SelectEntityByIdQuery<>(this);

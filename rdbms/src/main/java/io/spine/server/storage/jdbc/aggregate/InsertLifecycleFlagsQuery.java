@@ -25,6 +25,7 @@ import io.spine.server.storage.jdbc.query.IdAwareQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 import static io.spine.server.storage.jdbc.aggregate.LifecycleFlagsTable.Column.archived;
 import static io.spine.server.storage.jdbc.aggregate.LifecycleFlagsTable.Column.deleted;
 
@@ -66,9 +67,19 @@ class InsertLifecycleFlagsQuery<I> extends IdAwareQuery<I> implements WriteQuery
         }
 
         @Override
-        public InsertLifecycleFlagsQuery<I> build() {
-            checkNotNull(entityStatus, "Entity status is not set.");
+        protected InsertLifecycleFlagsQuery<I> doBuild() {
             return new InsertLifecycleFlagsQuery<>(this);
+        }
+
+        /**
+         * {@inheritDoc}
+         *
+         * <p>Also checks that {@link LifecycleFlags} were set.
+         */
+        @Override
+        protected void checkPreconditions() throws IllegalStateException {
+            super.checkPreconditions();
+            checkState(entityStatus != null, "Entity status is not set.");
         }
 
         @Override

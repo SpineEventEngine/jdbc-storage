@@ -62,7 +62,7 @@ class InsertEntityQuery<I> extends WriteEntityQuery<I, SQLInsertClause> {
                                                              I> {
 
         @Override
-        public InsertEntityQuery build() {
+        protected InsertEntityQuery doBuild() {
             return new InsertEntityQuery<>(this);
         }
 

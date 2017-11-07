@@ -45,7 +45,7 @@ class DeleteRecordQuery<I> extends IdAwareQuery<I> implements WriteQuery {
     static class Builder<I> extends IdAwareQuery.Builder<I, Builder<I>, DeleteRecordQuery<I>> {
 
         @Override
-        public DeleteRecordQuery<I> build() {
+        protected DeleteRecordQuery<I> doBuild() {
             return new DeleteRecordQuery<>(this);
         }
 

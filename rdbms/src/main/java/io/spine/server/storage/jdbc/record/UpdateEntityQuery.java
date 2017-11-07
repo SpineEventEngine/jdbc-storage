@@ -62,7 +62,7 @@ class UpdateEntityQuery<I> extends WriteEntityQuery<I, SQLUpdateClause> {
                                                              I> {
 
         @Override
-        public UpdateEntityQuery build() {
+        protected UpdateEntityQuery doBuild() {
             return new UpdateEntityQuery<>(this);
         }
 

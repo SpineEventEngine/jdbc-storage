@@ -54,7 +54,7 @@ class UpdateTimestampQuery extends WriteTimestampQuery {
     static class Builder extends WriteTimestampQuery.Builder<Builder, UpdateTimestampQuery> {
 
         @Override
-        public UpdateTimestampQuery build() {
+        protected UpdateTimestampQuery doBuild() {
             return new UpdateTimestampQuery(this);
         }
 

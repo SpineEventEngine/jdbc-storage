@@ -65,9 +65,19 @@ class UpdateLifecycleFlagsQuery<I> extends IdAwareQuery<I> implements WriteQuery
             return getThis();
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * <p>Also checks that {@link LifecycleFlags} were set.
+         */
         @Override
-        public UpdateLifecycleFlagsQuery<I> build() {
+        protected void checkPreconditions() throws IllegalStateException {
+            super.checkPreconditions();
             checkState(entityStatus != null, "Entity status is not set.");
+        }
+
+        @Override
+        protected UpdateLifecycleFlagsQuery<I> doBuild() {
             return new UpdateLifecycleFlagsQuery<>(this);
         }
 

@@ -70,8 +70,9 @@ class SelectLifecycleFlagsQuery<I> extends SelectMessageByIdQuery<I, LifecycleFl
                                                                    SelectLifecycleFlagsQuery<I>,
                                                                    I,
                                                                    LifecycleFlags> {
+
         @Override
-        public SelectLifecycleFlagsQuery<I> build() {
+        protected SelectLifecycleFlagsQuery<I> doBuild() {
             return new SelectLifecycleFlagsQuery<>(this);
         }
 
