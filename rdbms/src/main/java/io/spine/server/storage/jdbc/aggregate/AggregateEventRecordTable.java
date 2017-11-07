@@ -65,11 +65,12 @@ class AggregateEventRecordTable<I> extends EntityTable<I,
     @Override
     protected SelectEventRecordsById<I> composeSelectQuery(I id) {
         final SelectEventRecordsById.Builder<I> builder = SelectEventRecordsById.newBuilder();
-        return builder.setTableName(getName())
-                      .setDataSource(getDataSource())
-                      .setIdColumn(getIdColumn())
-                      .setId(id)
-                      .build();
+        final SelectEventRecordsById<I> query = builder.setTableName(getName())
+                                                       .setDataSource(getDataSource())
+                                                       .setIdColumn(getIdColumn())
+                                                       .setId(id)
+                                                       .build();
+        return query;
     }
 
     @Override
