@@ -25,6 +25,7 @@ import com.google.protobuf.FieldMask;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.ComparablePath;
+import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.sql.AbstractSQLQuery;
 import io.spine.client.ColumnFilter;
 import io.spine.client.CompositeColumnFilter.CompositeOperator;
@@ -34,8 +35,8 @@ import io.spine.server.entity.storage.CompositeQueryParameter;
 import io.spine.server.entity.storage.EntityColumn;
 import io.spine.server.entity.storage.EntityQuery;
 import io.spine.server.entity.storage.QueryParameters;
-import io.spine.server.storage.jdbc.query.IdColumn;
 import io.spine.server.storage.jdbc.query.AbstractQuery;
+import io.spine.server.storage.jdbc.query.IdColumn;
 import io.spine.server.storage.jdbc.query.SelectQuery;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
 
@@ -48,7 +49,6 @@ import java.util.Set;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
-import static com.google.common.collect.Lists.newLinkedList;
 import static com.querydsl.core.types.ExpressionUtils.and;
 import static com.querydsl.core.types.ExpressionUtils.or;
 import static com.querydsl.core.types.dsl.Expressions.TRUE;
@@ -99,12 +99,9 @@ final class SelectByEntityColumnsQuery<I> extends AbstractQuery
             return TRUE;
         }
 
-        final Collection<Object> normalizedIds = newLinkedList();
-        for (I id : ids) {
-            final Object normalized = idColumn.normalize(id);
-            normalizedIds.add(normalized);
-        }
-        return pathOf(idColumn.getColumnName()).in(normalizedIds);
+        final PathBuilder<Object> id = pathOf(idColumn.getColumnName());
+        final Collection<Object> normalizedIds = idColumn.normalize(ids);
+        return id.in(normalizedIds);
     }
 
     /**

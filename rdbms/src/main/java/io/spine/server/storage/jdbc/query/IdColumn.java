@@ -27,7 +27,10 @@ import io.spine.server.entity.Entity;
 import io.spine.server.entity.EntityClass;
 import io.spine.server.storage.jdbc.Sql;
 
+import java.util.Collection;
+
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.Lists.newLinkedList;
 import static io.spine.json.Json.toCompactJson;
 
 /**
@@ -109,6 +112,21 @@ public abstract class IdColumn<I> {
      * @return the normalized ID
      */
     public abstract Object normalize(I id);
+
+    /**
+     * {@linkplain #normalize(Object) Normalizes} the specified IDs.
+     *
+     * @param ids the IDs to normalize
+     * @return the normalized IDs
+     */
+    public Collection<Object> normalize(Iterable<I> ids) {
+        final Collection<Object> result = newLinkedList();
+        for (I id : ids) {
+            final Object normalizedId = normalize(id);
+            result.add(normalizedId);
+        }
+        return result;
+    }
 
     public String getColumnName() {
         return columnName;
