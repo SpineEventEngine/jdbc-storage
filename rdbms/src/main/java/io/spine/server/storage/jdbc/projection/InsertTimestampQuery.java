@@ -21,10 +21,11 @@
 package io.spine.server.storage.jdbc.projection;
 
 import com.google.protobuf.Timestamp;
-import com.querydsl.core.dml.StoreClause;
 import com.querydsl.sql.dml.SQLInsertClause;
 
+import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.nanos;
 import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.projection_type;
+import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.seconds;
 
 /**
  * A query that inserts a new {@link Timestamp} into the {@link LastHandledEventTimeTable}.
@@ -38,10 +39,12 @@ class InsertTimestampQuery extends WriteTimestampQuery {
     }
 
     @Override
-    protected StoreClause prepareQuery() {
+    public long execute() {
         final SQLInsertClause query = factory().insert(table())
-                                               .set(pathOf(projection_type), getIdValue());
-        return query;
+                                               .set(pathOf(projection_type), getIdValue())
+                                               .set(pathOf(seconds), getTimestamp().getSeconds())
+                                               .set(pathOf(nanos), getTimestamp().getNanos());
+        return query.execute();
     }
 
     static Builder newBuilder() {

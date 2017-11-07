@@ -38,7 +38,7 @@ abstract class WriteEventCountQuery<I> extends IdAwareQuery<I> implements WriteQ
         this.eventCount = builder.eventCount;
     }
 
-    protected int getEventCount() {
+    int getEventCount() {
         return eventCount;
     }
 

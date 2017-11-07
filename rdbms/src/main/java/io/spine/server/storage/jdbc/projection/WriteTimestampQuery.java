@@ -21,13 +21,9 @@
 package io.spine.server.storage.jdbc.projection;
 
 import com.google.protobuf.Timestamp;
-import com.querydsl.core.dml.StoreClause;
 import io.spine.server.storage.jdbc.query.AbstractQuery;
 import io.spine.server.storage.jdbc.query.StorageQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
-
-import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.nanos;
-import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.seconds;
 
 /**
  * A base for the {@linkplain StorageQuery} implementations
@@ -46,21 +42,12 @@ abstract class WriteTimestampQuery extends AbstractQuery implements WriteQuery {
         this.id = builder.getId();
     }
 
-    @Override
-    public long execute() {
-        final StoreClause query = prepareQuery();
-        return query.set(pathOf(seconds), timestamp.getSeconds())
-                    .set(pathOf(nanos), timestamp.getNanos())
-                    .execute();
-    }
-
-    /**
-     * @return the query to be {@linkplain #execute() executed}.
-     */
-    protected abstract StoreClause prepareQuery();
-
     String getIdValue() {
         return id;
+    }
+
+    Timestamp getTimestamp() {
+        return timestamp;
     }
 
     abstract static class Builder<B extends Builder<B, Q>, Q extends WriteTimestampQuery>
