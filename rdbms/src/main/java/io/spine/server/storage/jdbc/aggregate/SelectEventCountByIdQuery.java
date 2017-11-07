@@ -27,8 +27,7 @@ import static io.spine.server.storage.jdbc.aggregate.EventCountTable.Column.even
 /**
  * A query that selects event count by corresponding aggregate ID.
  *
- * @author Alexander Litus
- * @author Andrey Lavrov
+ * @author Dmytro Grankin
  */
 class SelectEventCountByIdQuery<I> extends AbstractSelectByIdQuery<I, Integer> {
 

@@ -26,7 +26,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 /**
  * An abstract base for the queries which read a single record by ID.
  *
- * @author Dmytro Dashenkov
+ * @author Dmytro Grankin
  */
 public abstract class AbstractSelectByIdQuery<I, R> extends AbstractQuery implements SelectQuery<R> {
 

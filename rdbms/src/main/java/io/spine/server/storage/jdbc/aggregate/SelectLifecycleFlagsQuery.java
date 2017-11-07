@@ -34,7 +34,7 @@ import static io.spine.server.storage.jdbc.aggregate.LifecycleFlagsTable.Column.
 /**
  * The query selecting one {@linkplain LifecycleFlags entity lifecycle flags} by ID.
  *
- * @author Dmytro Dashenkov
+ * @author Dmytro Grankin
  */
 class SelectLifecycleFlagsQuery<I> extends SelectMessageByIdQuery<I, LifecycleFlags> {
 

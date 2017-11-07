@@ -28,9 +28,7 @@ import io.spine.server.storage.jdbc.query.IdColumn;
 /**
  * Query that inserts a new {@link EntityRecordWithColumns} to the {@link RecordTable}.
  *
- * @author Alexander Litus
- * @author Andrey Lavrov
- * @author Alexander Aleksandrov
+ * @author Dmytro Grankin
  */
 class InsertEntityQuery<I> extends WriteEntityQuery<I, SQLInsertClause> {
 

@@ -27,7 +27,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * A query for deleting one or many items by an ID.
  *
- * @author Dmytro Dashenkov
+ * @author Dmytro Grankin
  */
 class DeleteRecordQuery<I> extends AbstractQuery implements WriteQuery {
 

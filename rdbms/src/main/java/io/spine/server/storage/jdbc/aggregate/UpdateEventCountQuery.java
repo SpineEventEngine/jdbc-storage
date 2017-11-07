@@ -26,8 +26,7 @@ import com.querydsl.core.types.dsl.PathBuilder;
 /**
  * A query that updates event count in the {@link EventCountTable}.
  *
- * @author Alexander Litus
- * @author Andrey Lavrov
+ * @author Dmytro Grankin
  */
 class UpdateEventCountQuery<I> extends WriteEventCountQuery<I> {
 

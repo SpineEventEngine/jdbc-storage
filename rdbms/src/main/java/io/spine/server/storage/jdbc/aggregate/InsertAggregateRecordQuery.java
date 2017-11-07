@@ -40,8 +40,7 @@ import static io.spine.validate.Validate.isDefault;
  * A query that inserts a new {@link AggregateEventRecord} into
  * the {@link AggregateEventRecordTable}.
  *
- * @author Alexander Litus
- * @author Andrey Lavrov
+ * @author Dmytro Grankin
  */
 class InsertAggregateRecordQuery<I> extends AbstractQuery implements WriteQuery {
 

@@ -30,7 +30,7 @@ import static io.spine.server.storage.jdbc.query.IndexIterator.create;
  * A query for all the IDs in a certain table.
  *
  * @param <I> the type of IDs
- * @author Dmytro Dashenkov
+ * @author Dmytro Grankin
  */
 class StorageIndexQuery<I> extends AbstractQuery implements SelectQuery<Iterator<I>> {
 

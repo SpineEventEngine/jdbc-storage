@@ -36,7 +36,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @param <I> a type of storage message IDs
  * @param <M> a type of messages to read
- * @author Alexander Litus
+ * @author Dmytro Grankin
  */
 public abstract class SelectMessageByIdQuery<I, M extends Message> extends AbstractSelectByIdQuery<I, M> {
 

@@ -34,7 +34,7 @@ import static io.spine.server.storage.jdbc.aggregate.LifecycleFlagsTable.Column.
 /**
  * The query updating {@linkplain LifecycleFlags entity lifecycle flags}.
  *
- * @author Dmytro Dashenkov
+ * @author Dmytro Grankin
  */
 class UpdateLifecycleFlagsQuery<I> extends AbstractQuery implements WriteQuery {
 

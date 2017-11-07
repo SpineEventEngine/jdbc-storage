@@ -25,11 +25,10 @@ import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.sql.dml.SQLInsertClause;
 
 /**
- * A query that inserts a new aggregate event count after the last snapshot to the
+ * A query that inserts a new aggregate event count after the last snapshot into the
  * {@link EventCountTable}.
  *
- * @author Alexander Litus
- * @author Andrey Lavrov
+ * @author Dmytro Grankin
  */
 class InsertEventCountQuery<I> extends WriteEventCountQuery<I> {
 

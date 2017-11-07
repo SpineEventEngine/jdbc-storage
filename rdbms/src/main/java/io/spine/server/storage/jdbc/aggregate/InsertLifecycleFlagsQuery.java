@@ -33,7 +33,7 @@ import static io.spine.server.storage.jdbc.aggregate.LifecycleFlagsTable.Column.
  * The query for creating a new record in the table storing
  * the {@linkplain LifecycleFlags entity lifecycle flags}.
  *
- * @author Dmytro Dashenkov
+ * @author Dmytro Grankin
  */
 class InsertLifecycleFlagsQuery<I> extends AbstractQuery implements WriteQuery {
 

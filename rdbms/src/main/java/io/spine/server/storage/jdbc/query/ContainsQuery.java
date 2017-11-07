@@ -28,7 +28,7 @@ import static com.querydsl.sql.SQLExpressions.count;
 /**
  * A query that checks if the table contains a record with given ID.
  *
- * @author Dmytro Dashenkov
+ * @author Dmytro Grankin
  */
 class ContainsQuery<I> extends AbstractQuery implements SelectQuery<Boolean> {
 

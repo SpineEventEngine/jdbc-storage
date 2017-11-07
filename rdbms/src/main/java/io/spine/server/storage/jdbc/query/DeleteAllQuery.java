@@ -23,8 +23,7 @@ package io.spine.server.storage.jdbc.query;
 /**
  * A query that deletes all rows from a table.
  *
- * @author Alexander Litus
- * @author Andrey Lavrov
+ * @author Dmytro Grankin
  */
 class DeleteAllQuery extends AbstractQuery implements WriteQuery {
 

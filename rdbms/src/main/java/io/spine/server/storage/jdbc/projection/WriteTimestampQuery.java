@@ -33,7 +33,7 @@ import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.
  * A base for the {@linkplain StorageQuery} implementations
  * which write a {@link Timestamp} in the {@link LastHandledEventTimeTable}.
  *
- * @author Dmytro Dashenkov
+ * @author Dmytro Grankin
  */
 abstract class WriteTimestampQuery extends AbstractQuery implements WriteQuery {
 

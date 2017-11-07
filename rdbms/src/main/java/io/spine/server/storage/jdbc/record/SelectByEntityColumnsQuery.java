@@ -60,7 +60,7 @@ import static io.spine.util.Exceptions.newIllegalArgumentException;
 /**
  * A query selecting the records from the {@link RecordTable RecordTable} by an {@link EntityQuery}.
  *
- * @author Dmytro Dashenkov
+ * @author Dmytro Grankin
  */
 final class SelectByEntityColumnsQuery<I> extends AbstractQuery
         implements SelectQuery<Iterator<EntityRecord>> {

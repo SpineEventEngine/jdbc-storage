@@ -51,8 +51,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 /**
  * The implementation base for the queries to an SQL database.
  *
- * @author Andrey Lavrov
- * @author Dmytro Dashenkov
+ * @author Dmytro Grankin
  */
 public abstract class AbstractQuery implements StorageQuery {
 

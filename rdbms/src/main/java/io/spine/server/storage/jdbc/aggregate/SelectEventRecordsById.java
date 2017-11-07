@@ -42,8 +42,7 @@ import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.C
  * <p>Resulting records is ordered by version descending. If the version is the same for
  * several records, they will be ordered by creation time descending.
  *
- * @author Alexander Litus
- * @author Andrey Lavrov
+ * @author Dmytro Grankin
  */
 class SelectEventRecordsById<I> extends AbstractSelectByIdQuery<I, DbIterator<AggregateEventRecord>> {
 

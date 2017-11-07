@@ -36,8 +36,7 @@ import static io.spine.validate.Validate.isDefault;
 /**
  * A query that selects timestamp from the {@link LastHandledEventTimeTable}.
  *
- * @author Alexander Litus
- * @author Andrey Lavrov
+ * @author Dmytro Grankin
  */
 class SelectTimestampQuery extends SelectMessageByIdQuery<String, Timestamp> {
 

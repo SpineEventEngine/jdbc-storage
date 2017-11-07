@@ -28,10 +28,9 @@ import static com.querydsl.sql.SQLExpressions.all;
 import static io.spine.server.storage.jdbc.record.RecordTable.StandardColumn.entity;
 
 /**
- * Query that selects {@link EntityRecord} by ID.
+ * A query that selects {@link EntityRecord} by an ID.
  *
- * @author Alexander Litus
- * @author Andrey Lavrov
+ * @author Dmytro Grankin
  */
 class SelectEntityByIdQuery<I> extends SelectMessageByIdQuery<I, EntityRecord> {
 

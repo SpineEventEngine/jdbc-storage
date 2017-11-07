@@ -30,8 +30,7 @@ import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.
 /**
  * A query that updates {@link Timestamp} in the {@link LastHandledEventTimeTable}.
  *
- * @author Alexander Litus
- * @author Andrey Lavrov
+ * @author Dmytro Grankin
  */
 class UpdateTimestampQuery extends WriteTimestampQuery {
 

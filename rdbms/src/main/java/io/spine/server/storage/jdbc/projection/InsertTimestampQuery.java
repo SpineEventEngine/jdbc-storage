@@ -27,10 +27,9 @@ import com.querydsl.sql.dml.SQLInsertClause;
 import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.projection_type;
 
 /**
- * Query that inserts a new {@link Timestamp} to the {@link LastHandledEventTimeTable}.
+ * A query that inserts a new {@link Timestamp} into the {@link LastHandledEventTimeTable}.
  *
- * @author Alexander Litus
- * @author Andrey Lavrov
+ * @author Dmytro Grankin
  */
 class InsertTimestampQuery extends WriteTimestampQuery {
 
