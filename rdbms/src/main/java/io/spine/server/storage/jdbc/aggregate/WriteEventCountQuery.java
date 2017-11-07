@@ -27,7 +27,8 @@ import io.spine.server.storage.jdbc.query.WriteQuery;
 import static io.spine.server.storage.jdbc.aggregate.EventCountTable.Column.event_count;
 
 /**
- * An abstract base for {@link EventCountTable} queries.
+ * An abstract base for queries, which write an event count after the last
+ * {@link io.spine.server.aggregate.Snapshot Snapshot} to the {@link EventCountTable}.
  *
  * @author Dmytro Grankin
  */
