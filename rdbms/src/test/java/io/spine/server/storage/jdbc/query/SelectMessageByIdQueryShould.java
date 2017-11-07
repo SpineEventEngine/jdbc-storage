@@ -34,6 +34,7 @@ import java.sql.SQLException;
 
 import static io.spine.Identifier.newUuid;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
+import static io.spine.server.storage.jdbc.query.IdColumn.typeString;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -56,6 +57,8 @@ public class SelectMessageByIdQueryShould {
         final ASelectMessageByIdQuery query = newBuilder().setTableName(newUuid())
                                                           .setQuery(underlyingQuery)
                                                           .setDataSource(dataSource)
+                                                          .setId(newUuid())
+                                                          .setIdColumn(typeString(newUuid()))
                                                           .build();
         query.execute();
         verify(resultSet).close();
@@ -74,6 +77,8 @@ public class SelectMessageByIdQueryShould {
         final ASelectMessageByIdQuery query = newBuilder().setTableName(newUuid())
                                                           .setQuery(underlyingQuery)
                                                           .setDataSource(dataSource)
+                                                          .setId(newUuid())
+                                                          .setIdColumn(typeString(newUuid()))
                                                           .build();
         query.execute();
     }
@@ -87,6 +92,8 @@ public class SelectMessageByIdQueryShould {
                                                           .setMessageColumnName(newUuid())
                                                           .setMessageDescriptor(messageDescriptor)
                                                           .setDataSource(dataSource)
+                                                          .setId(newUuid())
+                                                          .setIdColumn(typeString(newUuid()))
                                                           .build();
         final Message deserialized = query.readMessage(resultSet);
         assertNull(deserialized);

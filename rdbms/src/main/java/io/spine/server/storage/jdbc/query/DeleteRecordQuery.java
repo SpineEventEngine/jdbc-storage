@@ -20,32 +20,21 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import com.querydsl.core.types.dsl.PathBuilder;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
  * A query for deleting one or many items by an ID.
  *
  * @author Dmytro Grankin
  */
-class DeleteRecordQuery<I> extends AbstractQuery implements WriteQuery {
-
-    private final I id;
-    private final IdColumn<I> idColumn;
+class DeleteRecordQuery<I> extends IdAwareQuery<I> implements WriteQuery {
 
     DeleteRecordQuery(Builder<I> builder) {
         super(builder);
-        this.id = builder.columnValue;
-        this.idColumn = builder.idColumn;
     }
 
     @Override
     public long execute() {
-        final PathBuilder<Object> idPath = pathOf(idColumn.getColumnName());
-        final Object normalizedId = idColumn.normalize(id);
         return factory().delete(table())
-                        .where(idPath.eq(normalizedId))
+                        .where(idPath().eq(getNormalizedId()))
                         .execute();
     }
 
@@ -53,25 +42,10 @@ class DeleteRecordQuery<I> extends AbstractQuery implements WriteQuery {
         return new Builder<>();
     }
 
-    static class Builder<I> extends AbstractQuery.Builder<Builder<I>, DeleteRecordQuery> {
-
-        private I columnValue;
-        private IdColumn<I> idColumn;
-
-        Builder<I> setIdValue(I value) {
-            this.columnValue = checkNotNull(value);
-            return getThis();
-        }
-
-        Builder<I> setIdColumn(IdColumn<I> idColumn) {
-            this.idColumn = idColumn;
-            return getThis();
-        }
+    static class Builder<I> extends IdAwareQuery.Builder<I, Builder<I>, DeleteRecordQuery<I>> {
 
         @Override
         public DeleteRecordQuery<I> build() {
-            checkNotNull(idColumn, "ID column must be set");
-            checkNotNull(columnValue, "ID must be set");
             return new DeleteRecordQuery<>(this);
         }
 

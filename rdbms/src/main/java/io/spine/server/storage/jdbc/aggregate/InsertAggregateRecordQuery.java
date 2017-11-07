@@ -23,13 +23,10 @@ package io.spine.server.storage.jdbc.aggregate;
 import com.google.protobuf.Timestamp;
 import io.spine.core.Event;
 import io.spine.server.aggregate.AggregateEventRecord;
-import io.spine.server.storage.jdbc.query.IdColumn;
-import io.spine.server.storage.jdbc.query.Serializer;
-import io.spine.server.storage.jdbc.query.AbstractQuery;
+import io.spine.server.storage.jdbc.query.IdAwareQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
 
 import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.aggregate;
-import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.id;
 import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.timestamp;
 import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.timestamp_nanos;
 import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.version;
@@ -42,16 +39,12 @@ import static io.spine.validate.Validate.isDefault;
  *
  * @author Dmytro Grankin
  */
-class InsertAggregateRecordQuery<I> extends AbstractQuery implements WriteQuery {
+class InsertAggregateRecordQuery<I> extends IdAwareQuery<I> implements WriteQuery {
 
-    private final I idValue;
     private final AggregateEventRecord record;
-    private final IdColumn<I> idColumn;
 
     private InsertAggregateRecordQuery(Builder<I> builder) {
         super(builder);
-        this.idColumn = builder.idColumn;
-        this.idValue = builder.id;
         this.record = builder.record;
     }
 
@@ -59,7 +52,7 @@ class InsertAggregateRecordQuery<I> extends AbstractQuery implements WriteQuery 
     public long execute() {
         final Timestamp recordTimestamp = record.getTimestamp();
         return factory().insert(table())
-                        .set(pathOf(id), idColumn.normalize(idValue))
+                        .set(idPath(), getNormalizedId())
                         .set(pathOf(aggregate), serialize(record))
                         .set(pathOf(timestamp), recordTimestamp.getSeconds())
                         .set(pathOf(timestamp_nanos), recordTimestamp.getNanos())
@@ -87,25 +80,14 @@ class InsertAggregateRecordQuery<I> extends AbstractQuery implements WriteQuery 
         return new Builder<>();
     }
 
-    static class Builder<I> extends AbstractQuery.Builder<Builder<I>,
-                                                          InsertAggregateRecordQuery> {
+    static class Builder<I> extends IdAwareQuery.Builder<I,
+                                                         Builder<I>,
+                                                         InsertAggregateRecordQuery<I>> {
 
-        private IdColumn<I> idColumn;
-        private I id;
         private AggregateEventRecord record;
-
-        Builder<I> setId(I id) {
-            this.id = id;
-            return getThis();
-        }
 
         Builder<I> setRecord(AggregateEventRecord record) {
             this.record = record;
-            return getThis();
-        }
-
-        Builder<I> setIdColumn(IdColumn<I> idColumn) {
-            this.idColumn = idColumn;
             return getThis();
         }
 

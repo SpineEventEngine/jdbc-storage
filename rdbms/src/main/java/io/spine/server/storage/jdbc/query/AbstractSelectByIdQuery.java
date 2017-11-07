@@ -28,15 +28,10 @@ import com.querydsl.core.types.dsl.BooleanExpression;
  *
  * @author Dmytro Grankin
  */
-public abstract class AbstractSelectByIdQuery<I, R> extends AbstractQuery implements SelectQuery<R> {
-
-    private final IdColumn<I> idColumn;
-    private final I id;
+public abstract class AbstractSelectByIdQuery<I, R> extends IdAwareQuery<I> implements SelectQuery<R> {
 
     protected AbstractSelectByIdQuery(Builder<I, ? extends Builder, ? extends StorageQuery> builder) {
         super(builder);
-        this.id = builder.getId();
-        this.idColumn = builder.getIdColumn();
     }
 
     /**
@@ -45,36 +40,14 @@ public abstract class AbstractSelectByIdQuery<I, R> extends AbstractQuery implem
      * @return a predicate to match records
      */
     protected Predicate hasId() {
-        final String columnName = idColumn.getColumnName();
-        final Object normalizedId = idColumn.normalize(id);
-        final BooleanExpression hasId = pathOf(columnName).eq(normalizedId);
+        final Object idValue = getNormalizedId();
+        final BooleanExpression hasId = idPath().eq(idValue);
         return hasId;
     }
 
     protected abstract static class Builder<I,
                                             B extends Builder<I, B, Q>,
-                                            Q extends AbstractSelectByIdQuery>
-            extends AbstractQuery.Builder<B, Q> {
-
-        private IdColumn<I> idColumn;
-        private I id;
-
-        public B setId(I id) {
-            this.id = id;
-            return getThis();
-        }
-
-        public B setIdColumn(IdColumn<I> idColumn) {
-            this.idColumn = idColumn;
-            return getThis();
-        }
-
-        IdColumn<I> getIdColumn() {
-            return idColumn;
-        }
-
-        I getId() {
-            return id;
-        }
+                                            Q extends AbstractSelectByIdQuery<I, ?>>
+            extends IdAwareQuery.Builder<I, B, Q> {
     }
 }

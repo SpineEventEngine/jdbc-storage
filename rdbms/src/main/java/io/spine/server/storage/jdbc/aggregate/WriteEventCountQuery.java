@@ -21,8 +21,7 @@
 package io.spine.server.storage.jdbc.aggregate;
 
 import com.querydsl.core.dml.StoreClause;
-import io.spine.server.storage.jdbc.query.AbstractQuery;
-import io.spine.server.storage.jdbc.query.IdColumn;
+import io.spine.server.storage.jdbc.query.IdAwareQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
 
 import static io.spine.server.storage.jdbc.aggregate.EventCountTable.Column.event_count;
@@ -32,16 +31,12 @@ import static io.spine.server.storage.jdbc.aggregate.EventCountTable.Column.even
  *
  * @author Dmytro Grankin
  */
-abstract class WriteEventCountQuery<I> extends AbstractQuery implements WriteQuery {
+abstract class WriteEventCountQuery<I> extends IdAwareQuery<I> implements WriteQuery {
 
-    private final I id;
-    private final IdColumn<I> idColumn;
     private final int eventCount;
 
     WriteEventCountQuery(Builder<? extends Builder, ? extends WriteEventCountQuery, I> builder) {
         super(builder);
-        this.idColumn = builder.idColumn;
-        this.id = builder.id;
         this.eventCount = builder.eventCount;
     }
 
@@ -57,31 +52,11 @@ abstract class WriteEventCountQuery<I> extends AbstractQuery implements WriteQue
      */
     protected abstract StoreClause prepareQuery();
 
-    I getId() {
-        return id;
-    }
-
-    IdColumn<I> getIdColumn() {
-        return idColumn;
-    }
-
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    abstract static class Builder<B extends Builder<B, Q, I>, Q extends WriteEventCountQuery, I>
-            extends AbstractQuery.Builder<B, Q> {
+    abstract static class Builder<B extends Builder<B, Q, I>, Q extends WriteEventCountQuery<I>, I>
+            extends IdAwareQuery.Builder<I, B, Q> {
 
-        private IdColumn<I> idColumn;
-        private I id;
         private int eventCount;
-
-        B setId(I id) {
-            this.id = id;
-            return getThis();
-        }
-
-        B setIdColumn(IdColumn<I> idColumn) {
-            this.idColumn = idColumn;
-            return getThis();
-        }
 
         Builder<B, Q, I> setEventCount(int eventCount) {
             this.eventCount = eventCount;

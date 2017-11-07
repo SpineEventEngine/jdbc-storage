@@ -21,7 +21,6 @@
 package io.spine.server.storage.jdbc.aggregate;
 
 import com.querydsl.core.dml.StoreClause;
-import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.sql.dml.SQLInsertClause;
 
 /**
@@ -38,10 +37,8 @@ class InsertEventCountQuery<I> extends WriteEventCountQuery<I> {
 
     @Override
     protected StoreClause prepareQuery() {
-        final PathBuilder<Object> idPath = pathOf(getIdColumn().getColumnName());
-        final Object normalizedId = getIdColumn().normalize(getId());
         final SQLInsertClause query = factory().insert(table())
-                                               .set(idPath, normalizedId);
+                                               .set(idPath(), getNormalizedId());
         return query;
     }
 
@@ -51,7 +48,7 @@ class InsertEventCountQuery<I> extends WriteEventCountQuery<I> {
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
     static class Builder<I> extends WriteEventCountQuery.Builder<Builder<I>,
-                                                                 InsertEventCountQuery,
+                                                                 InsertEventCountQuery<I>,
                                                                  I> {
 
         @Override

@@ -20,10 +20,8 @@
 
 package io.spine.server.storage.jdbc.aggregate;
 
-import com.querydsl.core.types.dsl.PathBuilder;
 import io.spine.server.entity.LifecycleFlags;
-import io.spine.server.storage.jdbc.query.AbstractQuery;
-import io.spine.server.storage.jdbc.query.IdColumn;
+import io.spine.server.storage.jdbc.query.IdAwareQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -36,25 +34,19 @@ import static io.spine.server.storage.jdbc.aggregate.LifecycleFlagsTable.Column.
  *
  * @author Dmytro Grankin
  */
-class UpdateLifecycleFlagsQuery<I> extends AbstractQuery implements WriteQuery {
+class UpdateLifecycleFlagsQuery<I> extends IdAwareQuery<I> implements WriteQuery {
 
-    private final I id;
     private final LifecycleFlags entityStatus;
-    private final IdColumn<I> idColumn;
 
     private UpdateLifecycleFlagsQuery(Builder<I> builder) {
         super(builder);
-        this.id = builder.id;
         this.entityStatus = builder.entityStatus;
-        this.idColumn = builder.idColumn;
     }
 
     @Override
     public long execute() {
-        final PathBuilder<Object> idPath = pathOf(idColumn.getColumnName());
-        final Object normalizedId = idColumn.normalize(id);
         return factory().update(table())
-                        .where(idPath.eq(normalizedId))
+                        .where(idPath().eq(getNormalizedId()))
                         .set(pathOf(archived), entityStatus.getArchived())
                         .set(pathOf(deleted), entityStatus.getDeleted())
                         .execute();
@@ -64,16 +56,9 @@ class UpdateLifecycleFlagsQuery<I> extends AbstractQuery implements WriteQuery {
         return new Builder<>();
     }
 
-    static class Builder<I> extends AbstractQuery.Builder<Builder<I>, UpdateLifecycleFlagsQuery> {
+    static class Builder<I> extends IdAwareQuery.Builder<I, Builder<I>, UpdateLifecycleFlagsQuery<I>> {
 
-        private I id;
         private LifecycleFlags entityStatus;
-        private IdColumn<I> idColumn;
-
-        Builder<I> setId(I id) {
-            this.id = checkNotNull(id);
-            return getThis();
-        }
 
         Builder<I> setLifecycleFlags(LifecycleFlags status) {
             this.entityStatus = checkNotNull(status);
@@ -81,8 +66,7 @@ class UpdateLifecycleFlagsQuery<I> extends AbstractQuery implements WriteQuery {
         }
 
         @Override
-        public UpdateLifecycleFlagsQuery build() {
-            checkState(id != null, "ID is not set.");
+        public UpdateLifecycleFlagsQuery<I> build() {
             checkState(entityStatus != null, "Entity status is not set.");
             return new UpdateLifecycleFlagsQuery<>(this);
         }
@@ -90,11 +74,6 @@ class UpdateLifecycleFlagsQuery<I> extends AbstractQuery implements WriteQuery {
         @Override
         protected Builder<I> getThis() {
             return this;
-        }
-
-        Builder<I> setIdColumn(IdColumn<I> idColumn) {
-            this.idColumn = idColumn;
-            return getThis();
         }
     }
 }

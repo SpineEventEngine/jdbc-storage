@@ -21,8 +21,7 @@
 package io.spine.server.storage.jdbc.aggregate;
 
 import io.spine.server.entity.LifecycleFlags;
-import io.spine.server.storage.jdbc.query.AbstractQuery;
-import io.spine.server.storage.jdbc.query.IdColumn;
+import io.spine.server.storage.jdbc.query.IdAwareQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -35,23 +34,19 @@ import static io.spine.server.storage.jdbc.aggregate.LifecycleFlagsTable.Column.
  *
  * @author Dmytro Grankin
  */
-class InsertLifecycleFlagsQuery<I> extends AbstractQuery implements WriteQuery {
+class InsertLifecycleFlagsQuery<I> extends IdAwareQuery<I> implements WriteQuery {
 
-    private final I id;
     private final LifecycleFlags entityStatus;
-    private final IdColumn<I> idColumn;
 
     private InsertLifecycleFlagsQuery(Builder<I> builder) {
         super(builder);
-        this.id = builder.id;
         this.entityStatus = builder.entityStatus;
-        this.idColumn = builder.idColumn;
     }
 
     @Override
     public long execute() {
         return factory().insert(table())
-                        .set(pathOf(idColumn.getColumnName()), idColumn.normalize(id))
+                        .set(idPath(), getNormalizedId())
                         .set(pathOf(archived), entityStatus.getArchived())
                         .set(pathOf(deleted), entityStatus.getDeleted())
                         .execute();
@@ -61,25 +56,17 @@ class InsertLifecycleFlagsQuery<I> extends AbstractQuery implements WriteQuery {
         return new Builder<>();
     }
 
-    static class Builder<I> extends AbstractQuery.Builder<Builder<I>, InsertLifecycleFlagsQuery> {
+    static class Builder<I> extends IdAwareQuery.Builder<I, Builder<I>, InsertLifecycleFlagsQuery<I>> {
 
-        private I id;
         private LifecycleFlags entityStatus;
-        private IdColumn<I> idColumn;
 
         Builder<I> setLifecycleFlags(LifecycleFlags status) {
             this.entityStatus = checkNotNull(status);
             return getThis();
         }
 
-        Builder<I> setId(I id) {
-            this.id = checkNotNull(id);
-            return getThis();
-        }
-
         @Override
-        public InsertLifecycleFlagsQuery build() {
-            checkNotNull(id, "ID is not set.");
+        public InsertLifecycleFlagsQuery<I> build() {
             checkNotNull(entityStatus, "Entity status is not set.");
             return new InsertLifecycleFlagsQuery<>(this);
         }
@@ -87,11 +74,6 @@ class InsertLifecycleFlagsQuery<I> extends AbstractQuery implements WriteQuery {
         @Override
         protected Builder<I> getThis() {
             return this;
-        }
-
-        Builder<I> setIdColumn(IdColumn<I> idColumn) {
-            this.idColumn = idColumn;
-            return getThis();
         }
     }
 }

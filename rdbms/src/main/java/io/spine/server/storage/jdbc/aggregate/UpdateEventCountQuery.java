@@ -21,7 +21,6 @@
 package io.spine.server.storage.jdbc.aggregate;
 
 import com.querydsl.core.dml.StoreClause;
-import com.querydsl.core.types.dsl.PathBuilder;
 
 /**
  * A query that updates event count in the {@link EventCountTable}.
@@ -36,10 +35,8 @@ class UpdateEventCountQuery<I> extends WriteEventCountQuery<I> {
 
     @Override
     protected StoreClause prepareQuery() {
-        final PathBuilder<Object> id = pathOf(getIdColumn().getColumnName());
-        final Object normalizedId = getIdColumn().normalize(getId());
         return factory().update(table())
-                        .where(id.eq(normalizedId));
+                        .where(idPath().eq(getNormalizedId()));
     }
 
     static <I> Builder<I> newBuilder() {
@@ -48,7 +45,7 @@ class UpdateEventCountQuery<I> extends WriteEventCountQuery<I> {
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
     static class Builder<I> extends WriteEventCountQuery.Builder<Builder<I>,
-                                                                 UpdateEventCountQuery,
+                                                                 UpdateEventCountQuery<I>,
                                                                  I> {
 
         @Override

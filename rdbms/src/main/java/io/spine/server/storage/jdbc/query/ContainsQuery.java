@@ -20,7 +20,6 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.sql.AbstractSQLQuery;
 
 import static com.querydsl.sql.SQLExpressions.count;
@@ -30,15 +29,10 @@ import static com.querydsl.sql.SQLExpressions.count;
  *
  * @author Dmytro Grankin
  */
-class ContainsQuery<I> extends AbstractQuery implements SelectQuery<Boolean> {
-
-    private final IdColumn<I> idColumn;
-    private final I id;
+class ContainsQuery<I> extends IdAwareQuery<I> implements SelectQuery<Boolean> {
 
     private ContainsQuery(Builder<I> builder) {
         super(builder);
-        this.idColumn = builder.idColumn;
-        this.id = builder.id;
     }
 
     /**
@@ -46,11 +40,9 @@ class ContainsQuery<I> extends AbstractQuery implements SelectQuery<Boolean> {
      */
     @Override
     public Boolean execute() {
-        final PathBuilder<Object> idPath = pathOf(idColumn.getColumnName());
-        final Object normalizedId = idColumn.normalize(id);
         final AbstractSQLQuery<Long, ?> query = factory().select(count())
                                                          .from(table())
-                                                         .where(idPath.eq(normalizedId));
+                                                         .where(idPath().eq(getNormalizedId()));
         final long recordsCount = query.fetchOne();
         return recordsCount > 0;
     }
@@ -59,20 +51,7 @@ class ContainsQuery<I> extends AbstractQuery implements SelectQuery<Boolean> {
         return new Builder<>();
     }
 
-    static class Builder<I> extends AbstractQuery.Builder<Builder<I>, ContainsQuery<I>> {
-
-        private IdColumn<I> idColumn;
-        private I id;
-
-        Builder<I> setIdColumn(IdColumn<I> idColumn) {
-            this.idColumn = idColumn;
-            return this;
-        }
-
-        Builder<I> setId(I id) {
-            this.id = id;
-            return this;
-        }
+    static class Builder<I> extends IdAwareQuery.Builder<I, Builder<I>, ContainsQuery<I>> {
 
         @Override
         public ContainsQuery<I> build() {

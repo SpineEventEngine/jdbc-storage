@@ -337,7 +337,7 @@ public abstract class AbstractTable<I, R, W> {
         final DeleteRecordQuery.Builder<I> builder = DeleteRecordQuery.newBuilder();
         final DeleteRecordQuery<I> query = builder.setTableName(name)
                                                   .setIdColumn(getIdColumn())
-                                                  .setIdValue(id)
+                                                  .setId(id)
                                                   .setDataSource(dataSource)
                                                   .build();
         final long rowsAffected = query.execute();

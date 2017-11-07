@@ -29,6 +29,7 @@ import java.sql.SQLException;
 
 import static io.spine.Identifier.newUuid;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
+import static io.spine.server.storage.jdbc.query.IdColumn.typeString;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 
@@ -44,6 +45,8 @@ public class SelectTimestampQueryShould {
         final SelectTimestampQuery query = SelectTimestampQuery.newBuilder()
                                                                .setTableName(newUuid())
                                                                .setDataSource(dataSource)
+                                                               .setId(newUuid())
+                                                               .setIdColumn(typeString(newUuid()))
                                                                .build();
         final Message deserialized = query.readMessage(resultSet);
         assertNull(deserialized);
