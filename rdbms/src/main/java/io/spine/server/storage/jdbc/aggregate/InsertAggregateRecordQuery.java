@@ -33,10 +33,12 @@ import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.C
 import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.timestamp;
 import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.timestamp_nanos;
 import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.version;
+import static io.spine.server.storage.jdbc.query.Serializer.serialize;
 import static io.spine.validate.Validate.isDefault;
 
 /**
- * Query that inserts a new {@link AggregateEventRecord} to the {@link AggregateEventRecordTable}.
+ * A query that inserts a new {@link AggregateEventRecord} into
+ * the {@link AggregateEventRecordTable}.
  *
  * @author Alexander Litus
  * @author Andrey Lavrov
@@ -59,7 +61,7 @@ class InsertAggregateRecordQuery<I> extends AbstractQuery implements WriteQuery 
         final Timestamp recordTimestamp = record.getTimestamp();
         return factory().insert(table())
                         .set(pathOf(id), idColumn.normalize(idValue))
-                        .set(pathOf(aggregate), Serializer.serialize(record))
+                        .set(pathOf(aggregate), serialize(record))
                         .set(pathOf(timestamp), recordTimestamp.getSeconds())
                         .set(pathOf(timestamp_nanos), recordTimestamp.getNanos())
                         .set(pathOf(version), getVersionNumberOfRecord())
