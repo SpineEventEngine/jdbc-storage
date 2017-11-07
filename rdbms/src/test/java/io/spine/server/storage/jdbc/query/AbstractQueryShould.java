@@ -23,7 +23,9 @@ package io.spine.server.storage.jdbc.query;
 import com.querydsl.sql.Configuration;
 import com.querydsl.sql.SQLListenerContext;
 import com.querydsl.sql.SQLListeners;
+import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
+import io.spine.server.storage.jdbc.query.given.Given.AStorageQuery;
 import org.junit.Test;
 
 import java.sql.Connection;
@@ -31,6 +33,7 @@ import java.sql.SQLException;
 
 import static io.spine.Identifier.newUuid;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
+import static io.spine.server.storage.jdbc.query.given.Given.storageQueryBuilder;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -41,9 +44,10 @@ import static org.mockito.Mockito.verify;
  */
 public class AbstractQueryShould {
 
-    private final AStorageQuery query = new Builder().setTableName(newUuid())
-                                                     .setDataSource(whichIsStoredInMemory(newUuid()))
-                                                     .build();
+    private final DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
+    private final AStorageQuery query = storageQueryBuilder().setTableName(newUuid())
+                                                             .setDataSource(dataSource)
+                                                             .build();
 
     @Test
     public void close_connection() throws SQLException {
@@ -84,25 +88,5 @@ public class AbstractQueryShould {
                             .getConnection();
         final SQLListeners listeners = configuration.getListeners();
         listeners.executed(context);
-    }
-
-    private static class AStorageQuery extends AbstractQuery {
-
-        private AStorageQuery(AbstractQueryShould.Builder builder) {
-            super(builder);
-        }
-    }
-
-    private static class Builder extends AbstractQuery.Builder<Builder, AStorageQuery> {
-
-        @Override
-        protected AStorageQuery doBuild() {
-            return new AStorageQuery(this);
-        }
-
-        @Override
-        protected Builder getThis() {
-            return this;
-        }
     }
 }

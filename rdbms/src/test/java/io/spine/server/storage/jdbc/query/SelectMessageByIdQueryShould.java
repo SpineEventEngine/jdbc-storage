@@ -23,10 +23,10 @@ package io.spine.server.storage.jdbc.query;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.Message;
 import com.google.protobuf.StringValue;
-import com.querydsl.sql.AbstractSQLQuery;
 import com.querydsl.sql.SQLQuery;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
+import io.spine.server.storage.jdbc.query.given.Given.ASelectMessageByIdQuery;
 import org.junit.Test;
 
 import java.sql.ResultSet;
@@ -35,6 +35,7 @@ import java.sql.SQLException;
 import static io.spine.Identifier.newUuid;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
 import static io.spine.server.storage.jdbc.query.IdColumn.typeString;
+import static io.spine.server.storage.jdbc.query.given.Given.selectMessageBuilder;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -46,6 +47,8 @@ import static org.mockito.Mockito.verify;
  */
 public class SelectMessageByIdQueryShould {
 
+    private final ASelectMessageByIdQuery.Builder builder = selectMessageBuilder();
+
     @Test
     public void close_result_set() throws SQLException {
         final SQLQuery underlyingQuery = mock(SQLQuery.class);
@@ -54,12 +57,12 @@ public class SelectMessageByIdQueryShould {
         doReturn(resultSet).when(underlyingQuery)
                            .getResults();
         final DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
-        final ASelectMessageByIdQuery query = newBuilder().setTableName(newUuid())
-                                                          .setQuery(underlyingQuery)
-                                                          .setDataSource(dataSource)
-                                                          .setId(newUuid())
-                                                          .setIdColumn(typeString(newUuid()))
-                                                          .build();
+        final ASelectMessageByIdQuery query = builder.setTableName(newUuid())
+                                                     .setQuery(underlyingQuery)
+                                                     .setDataSource(dataSource)
+                                                     .setId(newUuid())
+                                                     .setIdColumn(typeString(newUuid()))
+                                                     .build();
         query.execute();
         verify(resultSet).close();
     }
@@ -74,12 +77,12 @@ public class SelectMessageByIdQueryShould {
         doThrow(SQLException.class).when(resultSet)
                                    .next();
         final DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
-        final ASelectMessageByIdQuery query = newBuilder().setTableName(newUuid())
-                                                          .setQuery(underlyingQuery)
-                                                          .setDataSource(dataSource)
-                                                          .setId(newUuid())
-                                                          .setIdColumn(typeString(newUuid()))
-                                                          .build();
+        final ASelectMessageByIdQuery query = builder.setTableName(newUuid())
+                                                     .setQuery(underlyingQuery)
+                                                     .setDataSource(dataSource)
+                                                     .setId(newUuid())
+                                                     .setIdColumn(typeString(newUuid()))
+                                                     .build();
         query.execute();
     }
 
@@ -88,56 +91,14 @@ public class SelectMessageByIdQueryShould {
         final ResultSet resultSet = mock(ResultSet.class);
         final DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
         final Descriptors.Descriptor messageDescriptor = StringValue.getDescriptor();
-        final ASelectMessageByIdQuery query = newBuilder().setTableName(newUuid())
-                                                          .setMessageColumnName(newUuid())
-                                                          .setMessageDescriptor(messageDescriptor)
-                                                          .setDataSource(dataSource)
-                                                          .setId(newUuid())
-                                                          .setIdColumn(typeString(newUuid()))
-                                                          .build();
+        final ASelectMessageByIdQuery query = builder.setTableName(newUuid())
+                                                     .setMessageColumnName(newUuid())
+                                                     .setMessageDescriptor(messageDescriptor)
+                                                     .setDataSource(dataSource)
+                                                     .setId(newUuid())
+                                                     .setIdColumn(typeString(newUuid()))
+                                                     .build();
         final Message deserialized = query.readMessage(resultSet);
         assertNull(deserialized);
-    }
-
-    private static class ASelectMessageByIdQuery extends SelectMessageByIdQuery<String, Message> {
-
-
-        private final AbstractSQLQuery<?, ?> query;
-        private ASelectMessageByIdQuery(Builder builder) {
-            super(builder);
-            this.query = builder.query;
-        }
-
-        @Override
-        protected AbstractSQLQuery<?, ?> getQuery() {
-            return query;
-        }
-
-        private static class Builder extends SelectMessageByIdQuery.Builder<Builder,
-                                                                            ASelectMessageByIdQuery,
-                                                                            String,
-                                                                            Message> {
-
-            private AbstractSQLQuery<?, ?> query;
-
-            private Builder setQuery(AbstractSQLQuery<?, ?> query) {
-                this.query = query;
-                return this;
-            }
-
-            @Override
-            protected ASelectMessageByIdQuery doBuild() {
-                return new ASelectMessageByIdQuery(this);
-            }
-
-            @Override
-            protected Builder getThis() {
-                return this;
-            }
-        }
-    }
-
-    static ASelectMessageByIdQuery.Builder newBuilder() {
-        return new ASelectMessageByIdQuery.Builder();
     }
 }
