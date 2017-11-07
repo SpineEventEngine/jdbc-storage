@@ -29,7 +29,7 @@ import static com.querydsl.core.types.dsl.Expressions.TRUE;
 import static io.spine.client.CompositeColumnFilter.CompositeOperator.ALL;
 import static io.spine.client.CompositeColumnFilter.CompositeOperator.EITHER;
 import static io.spine.client.CompositeColumnFilter.CompositeOperator.UNRECOGNIZED;
-import static io.spine.server.storage.jdbc.record.SelectByEntityColumnsQuery.composePredicates;
+import static io.spine.server.storage.jdbc.record.SelectByEntityColumnsQuery.joinPredicates;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -38,23 +38,23 @@ import static org.junit.Assert.assertEquals;
 public class SelectByEntityColumnsQueryShould {
 
     @Test
-    public void compose_predicates_using_either_operator() {
+    public void join_predicates_using_either_operator() {
         final BooleanExpression left = TRUE;
         final BooleanExpression right = FALSE;
-        final Predicate result = composePredicates(left, right, EITHER);
+        final Predicate result = joinPredicates(left, right, EITHER);
         assertEquals(left.or(right), result);
     }
 
     @Test
-    public void compose_predicates_using_all_operator() {
+    public void join_predicates_using_all_operator() {
         final BooleanExpression left = TRUE;
         final BooleanExpression right = FALSE;
-        final Predicate result = composePredicates(left, right, ALL);
+        final Predicate result = joinPredicates(left, right, ALL);
         assertEquals(left.and(right), result);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void throw_exception_for_unsupported_operator() {
-        composePredicates(TRUE, TRUE, UNRECOGNIZED);
+        joinPredicates(TRUE, TRUE, UNRECOGNIZED);
     }
 }

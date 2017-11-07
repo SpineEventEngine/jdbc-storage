@@ -124,16 +124,16 @@ final class SelectByEntityColumnsQuery<I> extends AbstractQuery
                                                                                .entries()) {
             final Predicate predicate = columnMatchFilter(columnWithFilter.getKey(),
                                                           columnWithFilter.getValue());
-            result = composePredicates(result, predicate, parameter.getOperator());
+            result = joinPredicates(result, predicate, parameter.getOperator());
         }
         return result;
     }
 
     @SuppressWarnings("EnumSwitchStatementWhichMissesCases") // OK for the Protobuf enum switch.
     @VisibleForTesting
-    static Predicate composePredicates(Predicate left,
-                                       Predicate right,
-                                       CompositeOperator operator) {
+    static Predicate joinPredicates(Predicate left,
+                                    Predicate right,
+                                    CompositeOperator operator) {
         checkArgument(operator.getNumber() > 0, operator.name());
         switch (operator) {
             case EITHER:
