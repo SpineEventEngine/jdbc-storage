@@ -20,6 +20,8 @@
 
 package io.spine.server.storage.jdbc.aggregate;
 
+import com.querydsl.core.Fetchable;
+import com.querydsl.core.types.dsl.PathBuilder;
 import io.spine.server.storage.jdbc.query.AbstractSelectByIdQuery;
 
 import static io.spine.server.storage.jdbc.aggregate.EventCountTable.Column.event_count;
@@ -37,10 +39,12 @@ class SelectEventCountByIdQuery<I> extends AbstractSelectByIdQuery<I, Integer> {
 
     @Override
     public Integer execute() {
-        return factory().select(pathOf(event_count.name(), Integer.class))
-                        .from(table())
-                        .where(hasId())
-                        .fetchOne();
+        final PathBuilder<Integer> eventCount = pathOf(event_count.name(), Integer.class);
+        final Fetchable<Integer> query = factory().select(eventCount)
+                                                  .from(table())
+                                                  .where(hasId());
+        final Integer result = query.fetchOne();
+        return result;
     }
 
     static <I> Builder<I> newBuilder() {
