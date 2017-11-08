@@ -36,7 +36,13 @@ import static io.spine.server.storage.jdbc.Sql.Type.INT;
 import static io.spine.server.storage.jdbc.aggregate.EventCountTable.Column.id;
 
 /**
- * A table for storing the event count after the last snapshot.
+ * A table for storing the
+ * {@link io.spine.server.aggregate.AggregateStorage#readEventCountAfterLastSnapshot(Object)
+ * event count after the last snapshot}.
+ *
+ * <p>This table exists for the performance reason. The event count after the snapshot can
+ * be retrieved from {@link AggregateEventRecordTable} using a query,
+ * but this approach is less efficient.
  *
  * <p>Used in the {@link JdbcAggregateStorage}.
  *
