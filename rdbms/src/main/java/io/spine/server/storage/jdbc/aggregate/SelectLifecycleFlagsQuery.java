@@ -44,9 +44,10 @@ class SelectLifecycleFlagsQuery<I> extends SelectMessageByIdQuery<I, LifecycleFl
 
     @Override
     protected AbstractSQLQuery<?, ?> getQuery() {
-        return factory().select(pathOf(archived), pathOf(deleted))
-                        .from(table())
-                        .where(hasId());
+        final AbstractSQLQuery<?, ?> query = factory().select(pathOf(archived), pathOf(deleted))
+                                                      .from(table())
+                                                      .where(hasId());
+        return query;
     }
 
     @SuppressWarnings("MethodDoesntCallSuperMethod")

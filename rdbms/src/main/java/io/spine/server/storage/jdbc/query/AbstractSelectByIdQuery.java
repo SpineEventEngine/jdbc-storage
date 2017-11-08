@@ -24,7 +24,7 @@ import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 
 /**
- * An abstract base for the queries which read a single record by ID.
+ * An abstract base for the queries which read a single record by an ID.
  *
  * @author Dmytro Grankin
  */

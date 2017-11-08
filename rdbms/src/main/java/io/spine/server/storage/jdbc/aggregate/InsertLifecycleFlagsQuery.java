@@ -20,6 +20,7 @@
 
 package io.spine.server.storage.jdbc.aggregate;
 
+import com.querydsl.sql.dml.SQLInsertClause;
 import io.spine.server.entity.LifecycleFlags;
 import io.spine.server.storage.jdbc.query.IdAwareQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
@@ -46,11 +47,11 @@ class InsertLifecycleFlagsQuery<I> extends IdAwareQuery<I> implements WriteQuery
 
     @Override
     public long execute() {
-        return factory().insert(table())
-                        .set(idPath(), getNormalizedId())
-                        .set(pathOf(archived), entityStatus.getArchived())
-                        .set(pathOf(deleted), entityStatus.getDeleted())
-                        .execute();
+        final SQLInsertClause query = factory().insert(table())
+                                               .set(idPath(), getNormalizedId())
+                                               .set(pathOf(archived), entityStatus.getArchived())
+                                               .set(pathOf(deleted), entityStatus.getDeleted());
+        return query.execute();
     }
 
     static <I> Builder<I> newBuilder() {

@@ -27,7 +27,7 @@ import io.spine.server.storage.jdbc.query.WriteQuery;
 
 /**
  * A base for the {@linkplain StorageQuery} implementations
- * which write a {@link Timestamp} in the {@link LastHandledEventTimeTable}.
+ * which write a {@link Timestamp} into the {@link LastHandledEventTimeTable}.
  *
  * @author Dmytro Grankin
  */

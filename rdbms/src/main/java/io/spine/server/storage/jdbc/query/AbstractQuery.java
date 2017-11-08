@@ -181,7 +181,7 @@ public abstract class AbstractQuery implements StorageQuery {
         protected abstract B getThis();
 
         /**
-         * Checks the preconditions of the storage construction.
+         * Checks the preconditions of the query construction.
          *
          * <p>Default implementation checks that the {@linkplain #dataSource data source} is not
          * {@code null} and {@linkplain #tableName table name} is not an empty string.
@@ -200,7 +200,7 @@ public abstract class AbstractQuery implements StorageQuery {
          *
          * <p>The construction preconditions are checked before calling this method.
          *
-         * @return a new non-null instance of the query.
+         * @return a new non-{@code null} instance of the query.
          */
         protected abstract Q doBuild();
 

@@ -20,6 +20,7 @@
 
 package io.spine.server.storage.jdbc.aggregate;
 
+import com.querydsl.sql.dml.SQLUpdateClause;
 import io.spine.server.entity.LifecycleFlags;
 import io.spine.server.storage.jdbc.query.IdAwareQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
@@ -45,11 +46,11 @@ class UpdateLifecycleFlagsQuery<I> extends IdAwareQuery<I> implements WriteQuery
 
     @Override
     public long execute() {
-        return factory().update(table())
-                        .where(idPath().eq(getNormalizedId()))
-                        .set(pathOf(archived), entityStatus.getArchived())
-                        .set(pathOf(deleted), entityStatus.getDeleted())
-                        .execute();
+        final SQLUpdateClause query = factory().update(table())
+                                               .where(idPath().eq(getNormalizedId()))
+                                               .set(pathOf(archived), entityStatus.getArchived())
+                                               .set(pathOf(deleted), entityStatus.getDeleted());
+        return query.execute();
     }
 
     static <I> Builder<I> newBuilder() {

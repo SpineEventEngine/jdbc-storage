@@ -20,6 +20,8 @@
 
 package io.spine.server.storage.jdbc.query;
 
+import com.querydsl.sql.dml.SQLDeleteClause;
+
 /**
  * A query that deletes all rows from a table.
  *
@@ -33,8 +35,8 @@ class DeleteAllQuery extends AbstractQuery implements WriteQuery {
 
     @Override
     public long execute() {
-        return factory().delete(table())
-                        .execute();
+        final SQLDeleteClause query = factory().delete(table());
+        return query.execute();
     }
 
     static Builder newBuilder() {

@@ -25,7 +25,7 @@ import com.querydsl.sql.AbstractSQLQuery;
 import static com.querydsl.sql.SQLExpressions.count;
 
 /**
- * A query that checks if the table contains a record with given ID.
+ * A query that checks if the table contains a record with the given ID.
  *
  * @author Dmytro Grankin
  */

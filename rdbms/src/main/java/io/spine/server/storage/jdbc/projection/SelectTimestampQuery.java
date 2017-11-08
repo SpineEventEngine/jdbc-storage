@@ -46,9 +46,10 @@ class SelectTimestampQuery extends SelectMessageByIdQuery<String, Timestamp> {
 
     @Override
     protected AbstractSQLQuery<?, ?> getQuery() {
-        return factory().select(pathOf(seconds), pathOf(nanos))
-                        .from(table())
-                        .where(hasId());
+        final AbstractSQLQuery<?, ?> query = factory().select(pathOf(seconds), pathOf(nanos))
+                                                      .from(table())
+                                                      .where(hasId());
+        return query;
     }
 
     @SuppressWarnings("MethodDoesntCallSuperMethod") // Override default Message storing policy

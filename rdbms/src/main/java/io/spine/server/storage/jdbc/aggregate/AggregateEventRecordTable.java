@@ -87,8 +87,7 @@ class AggregateEventRecordTable<I> extends EntityTable<I,
     }
 
     /**
-     * @throws IllegalStateException always,
-     *                               because {@link AggregateEventRecord} should be immutable
+     * @throws IllegalStateException always, because {@link AggregateEventRecord} is immutable
      */
     @Override
     protected WriteQuery composeUpdateQuery(I id, AggregateEventRecord record) {

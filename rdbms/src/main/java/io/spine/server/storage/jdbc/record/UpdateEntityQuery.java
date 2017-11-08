@@ -26,7 +26,7 @@ import io.spine.server.entity.EntityRecord;
 import io.spine.server.storage.jdbc.query.IdColumn;
 
 /**
- * Query that updates {@link EntityRecord} in the {@link RecordTable}.
+ * A query that updates {@link EntityRecord} in the {@link RecordTable}.
  *
  * @author Dmytro Grankin
  */
