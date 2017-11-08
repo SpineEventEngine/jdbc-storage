@@ -51,7 +51,7 @@ public final class Sql {
          *
          * <p>E.g. {@link io.spine.server.aggregate.AggregateStorage AggregateStorage} has
          * a generic ID, that can be {@code int}, {@code long}, {@code Message} etc.
-         * So an ID type in these cases should be determined at the runtime.
+         * So an ID type in these cases can be determined only at the runtime.
          *
          * <p>This is not designed to serve as a "dynamic" type which can be replaced in any time,
          * but only to solve the problem if identifiers with unknown types. Using this type for
