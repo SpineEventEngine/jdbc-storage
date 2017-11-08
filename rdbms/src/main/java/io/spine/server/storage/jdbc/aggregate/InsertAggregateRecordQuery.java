@@ -21,12 +21,14 @@
 package io.spine.server.storage.jdbc.aggregate;
 
 import com.google.protobuf.Timestamp;
+import com.querydsl.sql.dml.SQLInsertClause;
 import io.spine.core.Event;
 import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.storage.jdbc.query.IdAwareQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
 
 import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.aggregate;
+import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.kind;
 import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.timestamp;
 import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.timestamp_nanos;
 import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.version;
@@ -51,13 +53,17 @@ class InsertAggregateRecordQuery<I> extends IdAwareQuery<I> implements WriteQuer
     @Override
     public long execute() {
         final Timestamp recordTimestamp = record.getTimestamp();
-        return factory().insert(table())
-                        .set(idPath(), getNormalizedId())
-                        .set(pathOf(aggregate), serialize(record))
-                        .set(pathOf(timestamp), recordTimestamp.getSeconds())
-                        .set(pathOf(timestamp_nanos), recordTimestamp.getNanos())
-                        .set(pathOf(version), getVersionNumberOfRecord())
-                        .execute();
+        final String kindValue = record.getKindCase()
+                                       .toString();
+        final SQLInsertClause query = factory().insert(table())
+                                               .set(idPath(), getNormalizedId())
+                                               .set(pathOf(aggregate), serialize(record))
+                                               .set(pathOf(kind), kindValue)
+                                               .set(pathOf(version), getVersionNumberOfRecord())
+                                               .set(pathOf(timestamp), recordTimestamp.getSeconds())
+                                               .set(pathOf(timestamp_nanos),
+                                                    recordTimestamp.getNanos());
+        return query.execute();
     }
 
     private int getVersionNumberOfRecord() {

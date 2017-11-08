@@ -36,6 +36,7 @@ import static io.spine.server.storage.jdbc.Sql.Type.BIGINT;
 import static io.spine.server.storage.jdbc.Sql.Type.BLOB;
 import static io.spine.server.storage.jdbc.Sql.Type.ID;
 import static io.spine.server.storage.jdbc.Sql.Type.INT;
+import static io.spine.server.storage.jdbc.Sql.Type.VARCHAR_255;
 import static io.spine.util.Exceptions.newIllegalStateException;
 
 /**
@@ -74,7 +75,7 @@ class AggregateEventRecordTable<I> extends EntityTable<I,
     }
 
     @Override
-    protected WriteQuery composeInsertQuery(I id, AggregateEventRecord record) {
+    protected InsertAggregateRecordQuery<I> composeInsertQuery(I id, AggregateEventRecord record) {
         final InsertAggregateRecordQuery.Builder<I> builder = InsertAggregateRecordQuery.newBuilder();
         final InsertAggregateRecordQuery<I> query = builder.setTableName(getName())
                                                            .setDataSource(getDataSource())
@@ -102,6 +103,12 @@ class AggregateEventRecordTable<I> extends EntityTable<I,
 
         id(ID),
         aggregate(BLOB),
+
+        /**
+         * The {@linkplain AggregateEventRecord.KindCase kind} of an aggregate record
+         * in a {@linkplain AggregateEventRecord.KindCase#toString() string} representation.
+         */
+        kind(VARCHAR_255),
         timestamp(BIGINT),
         timestamp_nanos(INT),
         version(INT);

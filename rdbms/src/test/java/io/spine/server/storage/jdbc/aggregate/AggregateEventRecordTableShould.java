@@ -23,11 +23,19 @@ package io.spine.server.storage.jdbc.aggregate;
 import com.google.protobuf.StringValue;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateEventRecord;
+import io.spine.server.aggregate.Snapshot;
+import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.validate.StringValueVBuilder;
 import org.junit.Test;
 
+import static com.querydsl.core.types.ExpressionUtils.path;
 import static io.spine.Identifier.newUuid;
+import static io.spine.core.Versions.newVersion;
+import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
 import static io.spine.server.storage.jdbc.GivenDataSource.withoutSuperpowers;
+import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.kind;
+import static io.spine.time.Time.getCurrentTime;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Dmytro Grankin
@@ -39,6 +47,32 @@ public class AggregateEventRecordTableShould {
         final AggregateEventRecordTable<String> table =
                 new AggregateEventRecordTable<>(AnAggregate.class, withoutSuperpowers());
         table.update(newUuid(), AggregateEventRecord.getDefaultInstance());
+    }
+
+    @Test
+    public void store_record_kind_in_string_representation() {
+        final DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
+        final AggregateEventRecordTable<String> table =
+                new AggregateEventRecordTable<>(AnAggregate.class, dataSource);
+        table.create();
+
+        final Snapshot snapshot = Snapshot.newBuilder()
+                                          .setVersion(newVersion(5, getCurrentTime()))
+                                          .build();
+        final AggregateEventRecord record = AggregateEventRecord.newBuilder()
+                                                                .setSnapshot(snapshot)
+                                                                .build();
+        final InsertAggregateRecordQuery<String> query = table.composeInsertQuery(newUuid(),
+                                                                                  record);
+        query.execute();
+
+        final String expectedKind = record.getKindCase()
+                                          .toString();
+        final String actualKind = query.factory()
+                                            .select(path(String.class, kind.name()))
+                                            .from(query.table())
+                                            .fetchFirst();
+        assertEquals(expectedKind, actualKind);
     }
 
     private static class AnAggregate extends Aggregate<String, StringValue, StringValueVBuilder> {

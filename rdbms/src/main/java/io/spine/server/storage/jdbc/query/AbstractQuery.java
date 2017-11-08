@@ -20,6 +20,7 @@
 
 package io.spine.server.storage.jdbc.query;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.PathBuilder;
@@ -72,7 +73,8 @@ public abstract class AbstractQuery implements StorageQuery {
      *
      * @return the table path
      */
-    protected RelationalPath<Object> table() {
+    @VisibleForTesting
+    public RelationalPath<Object> table() {
         return tablePath;
     }
 
@@ -81,7 +83,8 @@ public abstract class AbstractQuery implements StorageQuery {
      *
      * @return the query factory
      */
-    protected AbstractSQLQueryFactory<?> factory() {
+    @VisibleForTesting
+    public AbstractSQLQueryFactory<?> factory() {
         return queryFactory;
     }
 
