@@ -22,6 +22,7 @@ package io.spine.server.storage.jdbc.record;
 
 import com.google.common.base.Functions;
 import com.querydsl.core.dml.StoreClause;
+import com.querydsl.core.types.Path;
 import io.spine.server.entity.storage.ColumnRecords;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
@@ -78,8 +79,11 @@ abstract class WriteEntityQuery<I, C extends StoreClause<C>> extends AbstractQue
     }
 
     /**
-     * Adds either an {@linkplain com.querydsl.sql.dml.SQLUpdateClause#addBatch() update}
-     * or {@linkplain com.querydsl.sql.dml.SQLInsertClause#addBatch() insert} batch.
+     * Adds a batch for the clause.
+     *
+     * <p>A batch is formed from the state of the clause.
+     *
+     * <p>After a batch was added, the clause can be used to prepare and add the next batch.
      *
      * @param clause the clause to add a batch for
      */
