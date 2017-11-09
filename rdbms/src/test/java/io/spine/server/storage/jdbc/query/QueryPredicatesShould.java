@@ -18,7 +18,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.record;
+package io.spine.server.storage.jdbc.query;
 
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -29,13 +29,19 @@ import static com.querydsl.core.types.dsl.Expressions.TRUE;
 import static io.spine.client.CompositeColumnFilter.CompositeOperator.ALL;
 import static io.spine.client.CompositeColumnFilter.CompositeOperator.EITHER;
 import static io.spine.client.CompositeColumnFilter.CompositeOperator.UNRECOGNIZED;
-import static io.spine.server.storage.jdbc.record.SelectByEntityColumnsQuery.joinPredicates;
+import static io.spine.server.storage.jdbc.query.QueryPredicates.joinPredicates;
+import static io.spine.test.Tests.assertHasPrivateParameterlessCtor;
 import static org.junit.Assert.assertEquals;
 
 /**
  * @author Dmytro Grankin
  */
-public class SelectByEntityColumnsQueryShould {
+public class QueryPredicatesShould {
+
+    @Test
+    public void have_the_private_utility_ctor() {
+        assertHasPrivateParameterlessCtor(QueryPredicates.class);
+    }
 
     @Test
     public void join_predicates_using_either_operator() {

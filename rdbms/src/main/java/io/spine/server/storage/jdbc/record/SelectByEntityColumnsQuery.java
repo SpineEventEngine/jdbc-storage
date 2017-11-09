@@ -37,6 +37,7 @@ import io.spine.server.entity.storage.EntityQuery;
 import io.spine.server.entity.storage.QueryParameters;
 import io.spine.server.storage.jdbc.query.AbstractQuery;
 import io.spine.server.storage.jdbc.query.IdColumn;
+import io.spine.server.storage.jdbc.query.QueryPredicates;
 import io.spine.server.storage.jdbc.query.SelectQuery;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
 
@@ -54,6 +55,8 @@ import static com.querydsl.core.types.ExpressionUtils.or;
 import static com.querydsl.core.types.dsl.Expressions.TRUE;
 import static com.querydsl.core.types.dsl.Expressions.comparablePath;
 import static io.spine.protobuf.TypeConverter.toObject;
+import static io.spine.server.storage.jdbc.query.QueryPredicates.inIds;
+import static io.spine.server.storage.jdbc.query.QueryPredicates.matchParameters;
 import static io.spine.server.storage.jdbc.record.RecordTable.StandardColumn.entity;
 import static io.spine.util.Exceptions.newIllegalArgumentException;
 
@@ -80,98 +83,15 @@ final class SelectByEntityColumnsQuery<I> extends AbstractQuery
 
     @Override
     public Iterator<EntityRecord> execute() {
+        final Predicate inIds = inIds(idColumn, entityQuery.getIds());
+        final Predicate matchParameters = matchParameters(entityQuery.getParameters(),
+                                                          columnTypeRegistry);
         final AbstractSQLQuery<Object, ?> query = factory().select(pathOf(entity))
-                                                           .where(inIds())
-                                                           .where(matchColumnValues())
+                                                           .where(inIds)
+                                                           .where(matchParameters)
                                                            .from(table());
         final ResultSet resultSet = query.getResults();
         return QueryResults.parse(resultSet, fieldMask);
-    }
-
-    /**
-     * Obtains a predicate to match records by {@linkplain EntityQuery#getIds() IDs}.
-     *
-     * @return the predicate for IDs
-     */
-    private Predicate inIds() {
-        final Set<I> ids = entityQuery.getIds();
-        if (ids.isEmpty()) {
-            return TRUE;
-        }
-
-        final PathBuilder<Object> id = pathOf(idColumn.getColumnName());
-        final Collection<Object> normalizedIds = idColumn.normalize(ids);
-        return id.in(normalizedIds);
-    }
-
-    /**
-     * Obtains a predicate to match records by entity columns.
-     *
-     * @return the predicate for columns
-     */
-    private Predicate matchColumnValues() {
-        BooleanExpression result = TRUE;
-        final QueryParameters parameters = entityQuery.getParameters();
-        for (CompositeQueryParameter parameter : parameters) {
-            result = result.and(predicateFrom(parameter));
-        }
-        return result;
-    }
-
-    private Predicate predicateFrom(CompositeQueryParameter parameter) {
-        Predicate result = TRUE;
-        for (Map.Entry<EntityColumn, ColumnFilter> columnWithFilter : parameter.getFilters()
-                                                                               .entries()) {
-            final Predicate predicate = columnMatchFilter(columnWithFilter.getKey(),
-                                                          columnWithFilter.getValue());
-            result = joinPredicates(result, predicate, parameter.getOperator());
-        }
-        return result;
-    }
-
-    @SuppressWarnings("EnumSwitchStatementWhichMissesCases") // OK for the Protobuf enum switch.
-    @VisibleForTesting
-    static Predicate joinPredicates(Predicate left,
-                                    Predicate right,
-                                    CompositeOperator operator) {
-        checkArgument(operator.getNumber() > 0, operator.name());
-        switch (operator) {
-            case EITHER:
-                return or(left, right);
-            case ALL:
-                return and(left, right);
-            default:
-                throw newIllegalArgumentException("Unexpected composite operator %s.",
-                                                  operator);
-        }
-    }
-
-    @SuppressWarnings("EnumSwitchStatementWhichMissesCases") // OK for the Protobuf enum switch.
-    private Predicate columnMatchFilter(EntityColumn column, ColumnFilter filter) {
-        final ColumnFilter.Operator operator = filter.getOperator();
-        checkArgument(operator.getNumber() > 0, operator.name());
-
-        final String columnName = column.getStoredName();
-        final ComparablePath<Comparable> columnPath = comparablePath(Comparable.class, columnName);
-        final JdbcColumnType<? super Object, ? super Object> columnType =
-                columnTypeRegistry.get(column);
-        final Object javaType = toObject(filter.getValue(), column.getType());
-        final Comparable columnValue = (Comparable) columnType.convertColumnValue(javaType);
-
-        switch (operator) {
-            case EQUAL:
-                return columnPath.eq(columnValue);
-            case GREATER_THAN:
-                return columnPath.gt(columnValue);
-            case LESS_THAN:
-                return columnPath.lt(columnValue);
-            case GREATER_OR_EQUAL:
-                return columnPath.goe(columnValue);
-            case LESS_OR_EQUAL:
-                return columnPath.loe(columnValue);
-            default:
-                throw newIllegalArgumentException("Unexpected operator %s.", operator);
-        }
     }
 
     static <I> Builder<I> newBuilder() {
