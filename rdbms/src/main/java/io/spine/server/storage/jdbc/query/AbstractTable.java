@@ -200,7 +200,7 @@ public abstract class AbstractTable<I, R, W> {
     }
 
     /**
-     * Inserts the record to the table using the specified ID.
+     * Inserts the record into the table using the specified ID.
      *
      * @param id     the ID for the record
      * @param record the record to insert
