@@ -22,7 +22,6 @@ package io.spine.server.storage.jdbc.record;
 
 import com.google.common.base.Functions;
 import com.querydsl.core.dml.StoreClause;
-import com.querydsl.core.types.Path;
 import io.spine.server.entity.storage.ColumnRecords;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
