@@ -65,7 +65,7 @@ public final class Sql {
         VARCHAR_255("VARCHAR(255)"),
 
         /**
-         * The type for strings, maximal size of which is unknown.
+         * The type for strings, maximum size of which is unknown.
          */
         TEXT("TEXT"),
         BOOLEAN("BOOLEAN");
