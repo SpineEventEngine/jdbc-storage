@@ -184,7 +184,7 @@ final class JdbcColumnTypes {
 
         @Override
         public Sql.Type getSqlType() {
-            return Sql.Type.VARCHAR_999;
+            return Sql.Type.TEXT;
         }
     }
 }

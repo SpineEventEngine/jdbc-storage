@@ -65,12 +65,9 @@ public final class Sql {
         VARCHAR_255("VARCHAR(255)"),
 
         /**
-         * A type that can be used for a {@link com.google.protobuf.Message Message}
-         * {@linkplain io.spine.server.storage.jdbc.type.JdbcColumnType column type}.
-         *
-         * <p>The type should be suitable for MySQL indexes.
+         * The type for strings, maximal size of which is unknown.
          */
-        VARCHAR_999("VARCHAR(999)"),
+        TEXT("TEXT"),
         BOOLEAN("BOOLEAN");
 
         private final String token;
