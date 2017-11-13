@@ -9,20 +9,19 @@ internally. So the list of supported drivers depends on `Querydsl` and can be fo
 [here](http://www.querydsl.com/static/querydsl/4.1.3/reference/html_single/#d0e1067).
 
 To use a particular JDBC implementation, you need to configure `JdbcStorageFactory` with
-the corresponding JDBC URL. The JDBC driver should be supplied to the classpath. The library
-will generate queries depending on the JDBC URL, see the configuration example for the details:
+the corresponding JDBC connection string.
+ 
+The JDBC driver, corresponding to the target database, must be present in the project classpath.
+This is a responsibility of a developer.
+
+Here is an example of specifying the connection string:
 
 ```
 final HikariConfig config = new HikariConfig();
-
-// The `jdbc:mysql` part tells which driver to use and determines details of query generation.
 config.setJdbcUrl("jdbc:mysql://localhost:3306/DbName");
-config.setUsername(***);
-config.setPassword(***);
         
 final DataSource dataSource = new HikariDataSource(config);
 JdbcStorageFactory.newBuilder()
                   .setDataSource(dataSource)
-                  .setMultitenant(false)
                   .build();
 ```
