@@ -25,13 +25,17 @@ import com.google.protobuf.StringValue;
 import io.spine.server.entity.AbstractEntity;
 import org.junit.Test;
 
+import static io.spine.server.storage.jdbc.query.DbTableNameFactory.newTableName;
 import static io.spine.test.Tests.assertHasPrivateParameterlessCtor;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Alexander Litus
  */
 public class DbTableNameFactoryShould {
+
+    private final Class<TestEntity> entityClass = TestEntity.class;
 
     @Test
     public void have_private_utility_constructor() {
@@ -45,11 +49,15 @@ public class DbTableNameFactoryShould {
     }
 
     @Test
-    public void provide_table_name_for_class() {
-        final String tableName = DbTableNameFactory.newTableName(TestEntity.class);
+    public void return_table_name_which_starts_with_entity_class_name() {
+        final String tableName = newTableName(entityClass);
+        final String className = entityClass.getSimpleName();
+        assertTrue(tableName.startsWith(className));
+    }
 
-        assertEquals("google_protobuf_stringvalue",
-                     tableName);
+    @Test
+    public void produce_same_name_for_same_class() {
+        assertEquals(newTableName(entityClass), newTableName(entityClass));
     }
 
     private static class TestEntity extends AbstractEntity<String, StringValue> {

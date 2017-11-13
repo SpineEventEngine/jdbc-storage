@@ -21,9 +21,8 @@
 package io.spine.server.storage.jdbc.query;
 
 import io.spine.server.entity.Entity;
-import io.spine.server.entity.EntityClass;
 
-import java.util.regex.Pattern;
+import java.sql.DatabaseMetaData;
 
 /**
  * A utility class which provides strings valid for DB table names.
@@ -33,29 +32,29 @@ import java.util.regex.Pattern;
 @SuppressWarnings("UtilityClass")
 class DbTableNameFactory {
 
-    private static final Pattern PATTERN_DOT = Pattern.compile("\\.");
-    private static final Pattern PATTERN_DOLLAR = Pattern.compile("\\$");
-    private static final String UNDERSCORE = "_";
-
     private DbTableNameFactory() {
         // Prevent instantiation of this utility class.
     }
 
     /**
-     * Retrieves the type name of the state of the {@linkplain Entity}, whose {@linkplain Class}
-     * instance is passed.
+     * Obtains the table name basing on the specified {@link Entity} class.
      *
-     * @param cls a class of an {@linkplain Entity} whose state type name to use
-     * @return a valid DB table name
+     * <p>The name consist of the {@link Class#getSimpleName() simple name} and short representation
+     * of the {@linkplain Class#getPackage() package}, which are separated by an underscore.
+     *
+     * <p>A package name should be compacted, because a
+     * {@linkplain DatabaseMetaData#getMaxTableNameLength() length} of the table has restrictions.
+     *
+     * @param cls a class of an {@linkplain Entity}
+     * @return a table name from the class
      */
     static String newTableName(Class<? extends Entity<?, ?>> cls) {
-        final String typeName = new EntityClass<Entity>(cls).getStateType()
-                                                            .getTypeName();
-        final String tableNameTmp = PATTERN_DOT.matcher(typeName)
-                                               .replaceAll(UNDERSCORE);
-        final String result = PATTERN_DOLLAR.matcher(tableNameTmp)
-                                            .replaceAll(UNDERSCORE)
-                                            .toLowerCase();
+        final int shortPackageId = cls.getPackage()
+                                      .hashCode();
+        // The minus is an invalid sign in a table name.
+        final int validPackageId = Math.abs(shortPackageId);
+        final String packageIdAsString = String.valueOf(validPackageId);
+        final String result = cls.getSimpleName() + '_' + packageIdAsString;
         return result;
     }
 }

@@ -43,7 +43,7 @@ import static io.spine.server.storage.jdbc.aggregate.LifecycleFlagsTable.Column.
  */
 class LifecycleFlagsTable<I> extends EntityTable<I, LifecycleFlags, LifecycleFlags> {
 
-    private static final String TABLE_NAME_POSTFIX = "visibility";
+    private static final String TABLE_NAME_POSTFIX = "_visibility";
 
     LifecycleFlagsTable(Class<? extends Aggregate<I, ?, ?>> aggregateClass,
                         DataSourceWrapper dataSource) {
