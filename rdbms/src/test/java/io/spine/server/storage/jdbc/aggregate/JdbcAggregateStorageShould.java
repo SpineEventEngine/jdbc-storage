@@ -27,7 +27,6 @@ import io.spine.server.aggregate.AggregateStorage;
 import io.spine.server.aggregate.AggregateStorageShould;
 import io.spine.server.entity.Entity;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.GivenDataSource;
 import io.spine.server.storage.jdbc.query.DbIterator;
 import io.spine.test.Tests;
@@ -41,7 +40,6 @@ import java.sql.SQLException;
 import static io.spine.test.Tests.nullRef;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author Alexander Litus
@@ -66,21 +64,6 @@ public class JdbcAggregateStorageShould extends AggregateStorageShould {
                         .setAggregateClass(aggregateClass)
                         .build();
         return storage;
-    }
-
-    @Test
-    public void throw_exception_if_try_to_use_closed_storage() {
-        final JdbcAggregateStorage<ProjectId> storage = getStorage(ProjectId.class,
-                                                                   TestAggregateWithMessageId.class);
-        storage.close();
-        try {
-            final AggregateReadRequest<ProjectId> request = newReadRequest(newId());
-            storage.historyBackward(request);
-        } catch (DatabaseException expected) {
-            // expected exception because the storage is closed
-            return;
-        }
-        fail("Aggregate storage should close itself.");
     }
 
     @Test(expected = IllegalStateException.class)

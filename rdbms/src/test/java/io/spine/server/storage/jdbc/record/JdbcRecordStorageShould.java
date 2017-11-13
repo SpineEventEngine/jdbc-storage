@@ -35,13 +35,11 @@ import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.RecordStorage;
 import io.spine.server.storage.RecordStorageShould;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.GivenDataSource;
 import io.spine.server.storage.jdbc.record.given.JdbcRecordStorageTestEnv;
 import io.spine.server.storage.jdbc.record.given.JdbcRecordStorageTestEnv.TestEntityWithStringId;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
-import io.spine.test.Tests;
 import io.spine.test.storage.Project;
 import io.spine.test.storage.ProjectId;
 import io.spine.testdata.Sample;
@@ -55,26 +53,12 @@ import static io.spine.test.Tests.nullRef;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 
 /**
  * @author Alexander Litus
  */
 public class JdbcRecordStorageShould
         extends RecordStorageShould<String, JdbcRecordStorage<String>> {
-
-    @Test
-    public void close_itself_and_throw_exception_on_read() {
-        final JdbcRecordStorage<String> storage = getStorage(TestEntityWithStringId.class);
-        storage.close();
-        try {
-            storage.readRecord("any-id");
-        } catch (DatabaseException ignored) {
-            // is OK because the storage is closed
-            return;
-        }
-        fail("Storage must close itself.");
-    }
 
     @Test
     public void clear_itself() {
