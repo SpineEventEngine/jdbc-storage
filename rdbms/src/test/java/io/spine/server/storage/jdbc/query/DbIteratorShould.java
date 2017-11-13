@@ -22,6 +22,7 @@ package io.spine.server.storage.jdbc.query;
 
 import io.spine.server.storage.jdbc.DatabaseException;
 import org.junit.Test;
+import org.mockito.InOrder;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -33,6 +34,7 @@ import java.util.NoSuchElementException;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -109,6 +111,43 @@ public class DbIteratorShould {
 
         // Get an error
         iterator.next();
+    }
+
+    @Test
+    public void check_if_result_set_closed() throws SQLException {
+        final DbIterator iterator = emptyIterator();
+        iterator.close();
+
+        final ResultSet resultSet = iterator.getResultSet();
+        verify(resultSet).isClosed();
+        verify(resultSet).close();
+    }
+
+    @Test
+    public void obtain_statement_before_result_set_closed() throws SQLException {
+        final DbIterator iterator = emptyIterator();
+        iterator.close();
+
+        final ResultSet resultSet = iterator.getResultSet();
+        final InOrder order = inOrder(resultSet);
+        order.verify(resultSet)
+             .getStatement();
+        order.verify(resultSet)
+             .close();
+    }
+
+    @Test
+    public void obtain_connection_before_statement_closed() throws SQLException {
+        final DbIterator iterator = emptyIterator();
+        iterator.close();
+
+        final Statement statement = iterator.getResultSet()
+                                            .getStatement();
+        final InOrder order = inOrder(statement);
+        order.verify(statement)
+             .getConnection();
+        order.verify(statement)
+             .close();
     }
 
     private static DbIterator emptyIterator() {

@@ -147,15 +147,21 @@ public abstract class DbIterator<R> implements Iterator<R>, Closeable {
     @Override
     public void close() throws DatabaseException {
         try {
-            resultSet.close();
-            final Statement statement = resultSet.getStatement();
-            final boolean statementClosed = statement == null || statement.isClosed();
-            if (!statementClosed) {
-                statement.close();
-                final Connection connection = statement.getConnection();
-                final boolean connectionClosed = connection == null || connection.isClosed();
-                if (!connectionClosed) {
-                    connection.close();
+            if (!resultSet.isClosed()) {
+
+                // Get statement before closing the result set, because PostgreSQL doesn't allow
+                // to retrieve a statement if a result set is closed.
+                // The same strategy to obtain the connection is also safer.
+                final Statement statement = resultSet.getStatement();
+                resultSet.close();
+                final boolean statementClosed = statement == null || statement.isClosed();
+                if (!statementClosed) {
+                    final Connection connection = statement.getConnection();
+                    statement.close();
+                    final boolean connectionClosed = connection == null || connection.isClosed();
+                    if (!connectionClosed) {
+                        connection.close();
+                    }
                 }
             }
         } catch (SQLException e) {
