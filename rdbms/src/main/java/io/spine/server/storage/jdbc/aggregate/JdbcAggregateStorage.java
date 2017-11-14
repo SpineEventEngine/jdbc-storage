@@ -29,6 +29,7 @@ import io.spine.server.entity.LifecycleFlags;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.StorageBuilder;
+import io.spine.server.storage.jdbc.TypeMapping;
 import io.spine.server.storage.jdbc.query.DbIterator;
 
 import java.util.Collection;
@@ -79,13 +80,11 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     protected JdbcAggregateStorage(Builder<I> builder) {
         super(builder.isMultitenant());
         final Class<? extends Aggregate<I, ?, ?>> aggregateClass = builder.getAggregateClass();
+        final TypeMapping mapping = builder.getTypeMapping();
         this.dataSource = builder.getDataSource();
-        this.mainTable = new AggregateEventRecordTable<>(aggregateClass, dataSource,
-                                                         builder.getTypeMapping());
-        this.lifecycleFlagsTable = new LifecycleFlagsTable<>(aggregateClass, dataSource,
-                                                             builder.getTypeMapping());
-        this.eventCountTable = new EventCountTable<>(aggregateClass, dataSource,
-                                                     builder.getTypeMapping());
+        this.mainTable = new AggregateEventRecordTable<>(aggregateClass, dataSource, mapping);
+        this.lifecycleFlagsTable = new LifecycleFlagsTable<>(aggregateClass, dataSource, mapping);
+        this.eventCountTable = new EventCountTable<>(aggregateClass, dataSource, mapping);
         mainTable.create();
         lifecycleFlagsTable.create();
         eventCountTable.create();
