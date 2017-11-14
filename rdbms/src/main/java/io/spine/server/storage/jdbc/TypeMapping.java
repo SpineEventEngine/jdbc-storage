@@ -43,12 +43,7 @@ public class TypeMapping {
     private final Map<Type, String> mappedTypes;
 
     private TypeMapping(Builder builder) {
-        final ImmutableMap<Type, String> types = builder.types.build();
-        if (types.isEmpty()) {
-            mappedTypes = new EnumMap<>(Type.class);
-        } else {
-            mappedTypes = new EnumMap<>(types);
-        }
+        mappedTypes = new EnumMap<>(builder.types.build());
     }
 
     public Optional<String> getTypeName(Type type) {

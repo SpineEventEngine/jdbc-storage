@@ -27,6 +27,7 @@ import io.spine.server.entity.TestTransaction;
 import io.spine.server.stand.StandStorage;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.GivenDataSource;
+import io.spine.server.storage.jdbc.given.GivenMapping;
 import io.spine.server.storage.jdbc.stand.JdbcStandStorage;
 import io.spine.test.commandservice.customer.Customer;
 import io.spine.test.commandservice.customer.CustomerVBuilder;
@@ -36,6 +37,8 @@ import io.spine.test.storage.ProjectVBuilder;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import static io.spine.server.storage.jdbc.given.GivenMapping.defaultMapping;
 
 public class Given {
 
@@ -48,6 +51,7 @@ public class Given {
                 GivenDataSource.DEFAULT_TABLE_NAME);
         final StandStorage storage = JdbcStandStorage.<String>newBuilder()
                                                      .setDataSource(dataSource)
+                                                     .setTypeMapping(defaultMapping())
                                                      .build();
         return storage;
     }

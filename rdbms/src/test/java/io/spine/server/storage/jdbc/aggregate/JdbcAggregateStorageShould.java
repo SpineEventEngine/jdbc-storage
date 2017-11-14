@@ -28,6 +28,7 @@ import io.spine.server.aggregate.AggregateStorageShould;
 import io.spine.server.entity.Entity;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.GivenDataSource;
+import io.spine.server.storage.jdbc.given.GivenMapping;
 import io.spine.server.storage.jdbc.query.DbIterator;
 import io.spine.test.Tests;
 import io.spine.test.aggregate.Project;
@@ -37,6 +38,7 @@ import org.junit.Test;
 
 import java.sql.SQLException;
 
+import static io.spine.server.storage.jdbc.given.GivenMapping.defaultMapping;
 import static io.spine.test.Tests.nullRef;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -62,6 +64,7 @@ public class JdbcAggregateStorageShould extends AggregateStorageShould {
                         .setMultitenant(false)
                         .setDataSource(dataSource)
                         .setAggregateClass(aggregateClass)
+                        .setTypeMapping(defaultMapping())
                         .build();
         return storage;
     }

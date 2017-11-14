@@ -37,6 +37,7 @@ import org.junit.Test;
 import javax.sql.DataSource;
 
 import static io.spine.server.storage.jdbc.GivenDataSource.prefix;
+import static io.spine.server.storage.jdbc.TypeMappings.mySql;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
@@ -60,6 +61,7 @@ public class JdbcStorageFactoryShould {
     public void allow_to_use_custom_data_source() {
         final JdbcStorageFactory factory = JdbcStorageFactory.newBuilder()
                                                              .setDataSource(mock(DataSource.class))
+                                                             .setTypeMapping(mySql())
                                                              .build();
 
         assertNotNull(factory);
@@ -172,6 +174,7 @@ public class JdbcStorageFactoryShould {
         return JdbcStorageFactory.newBuilder()
                                  .setDataSource(config)
                                  .setMultitenant(multitenant)
+                                 .setTypeMapping(mySql())
                                  .build();
     }
 

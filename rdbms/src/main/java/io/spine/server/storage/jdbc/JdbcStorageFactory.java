@@ -155,8 +155,7 @@ public class JdbcStorageFactory implements StorageFactory {
         private DataSourceWrapper dataSource;
         private boolean multitenant;
         private ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> columnTypeRegistry;
-        private TypeMapping typeMapping = TypeMapping.newBuilder()
-                                                     .build();
+        private TypeMapping typeMapping;
 
         private Builder() {
             // Prevent direct instantiation.
@@ -220,7 +219,9 @@ public class JdbcStorageFactory implements StorageFactory {
         }
 
         /**
-         * @param typeMapping the type mapping for the usage in queries
+         * Sets required field {@code typeMapping}.
+         *
+         * @see TypeMappings
          */
         public Builder setTypeMapping(TypeMapping typeMapping) {
             this.typeMapping = checkNotNull(typeMapping);

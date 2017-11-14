@@ -120,6 +120,7 @@ public class JdbcStandStorage extends StandStorage {
                                          .setDataSource(builder.getDataSource())
                                          .setMultitenant(builder.isMultitenant())
                                          .setEntityClass(StandEntity.class)
+                                         .setTypeMapping(builder.getTypeMapping())
                                          .build();
     }
 

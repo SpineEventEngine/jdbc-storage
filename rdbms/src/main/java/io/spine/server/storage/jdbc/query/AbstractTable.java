@@ -107,9 +107,7 @@ public abstract class AbstractTable<I, R, W> {
         this.name = checkNotNull(name);
         this.idColumn = checkNotNull(idColumn);
         this.dataSource = checkNotNull(dataSource);
-
-        //TODO:2017-11-14:dmytro.grankin: add null checking
-        this.typeMapping = typeMapping;
+        this.typeMapping = checkNotNull(typeMapping);
     }
 
     /**
