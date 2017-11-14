@@ -49,6 +49,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static java.sql.ResultSet.HOLD_CURSORS_OVER_COMMIT;
 
 /**
  * The implementation base for the queries to an SQL-compliant database.
@@ -117,6 +118,10 @@ public abstract class AbstractQuery implements StorageQuery {
      * <p>All {@linkplain Connection connections} will be closed automatically
      * using {@link SQLCloseListener}.
      *
+     * <p>To support iteration over {@link java.sql.ResultSet ResultSet} after a transaction commit,
+     * {@link java.sql.ResultSet#HOLD_CURSORS_OVER_COMMIT HOLD_CURSORS_OVER_COMMIT} option is used
+     * for the underlying {@linkplain Connection#setHoldability(int) connection}.
+     *
      * @param dataSource the data source to produce connections
      * @return the query factory
      */
@@ -124,8 +129,14 @@ public abstract class AbstractQuery implements StorageQuery {
         final Provider<Connection> connectionProvider = new Provider<Connection>() {
             @Override
             public Connection get() {
-                return dataSource.getConnection(false)
-                                 .get();
+                final Connection connection = dataSource.getConnection(false)
+                                                        .get();
+                try {
+                    connection.setHoldability(HOLD_CURSORS_OVER_COMMIT);
+                    return connection;
+                } catch (SQLException e) {
+                    throw new DatabaseException(e);
+                }
             }
         };
         final SQLTemplates templates = getDialectTemplates(dataSource);

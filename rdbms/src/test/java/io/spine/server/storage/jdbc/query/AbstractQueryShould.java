@@ -34,6 +34,8 @@ import java.sql.SQLException;
 import static io.spine.Identifier.newUuid;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
 import static io.spine.server.storage.jdbc.query.given.Given.storageQueryBuilder;
+import static java.sql.ResultSet.HOLD_CURSORS_OVER_COMMIT;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -60,6 +62,13 @@ public class AbstractQueryShould {
         configuration.getListeners()
                      .end(context);
         verify(connection).close();
+    }
+
+    @Test
+    public void hold_cursors_over_commit() throws SQLException {
+        final Connection connection = query.factory()
+                                           .getConnection();
+        assertEquals(HOLD_CURSORS_OVER_COMMIT, connection.getHoldability());
     }
 
     @Test(expected = DatabaseException.class)
