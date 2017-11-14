@@ -26,6 +26,7 @@ import io.spine.server.entity.LifecycleFlags;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.TableColumn;
+import io.spine.server.storage.jdbc.TypeMapping;
 import io.spine.server.storage.jdbc.query.EntityTable;
 import io.spine.server.storage.jdbc.query.SelectQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
@@ -46,8 +47,9 @@ class LifecycleFlagsTable<I> extends EntityTable<I, LifecycleFlags, LifecycleFla
     private static final String TABLE_NAME_POSTFIX = "_visibility";
 
     LifecycleFlagsTable(Class<? extends Aggregate<I, ?, ?>> aggregateClass,
-                        DataSourceWrapper dataSource) {
-        super(TABLE_NAME_POSTFIX, aggregateClass, id.name(), dataSource);
+                        DataSourceWrapper dataSource,
+                        TypeMapping typeMapping) {
+        super(TABLE_NAME_POSTFIX, aggregateClass, id.name(), dataSource, typeMapping);
     }
 
     @Override

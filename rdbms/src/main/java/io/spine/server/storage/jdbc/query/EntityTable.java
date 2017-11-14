@@ -23,6 +23,7 @@ package io.spine.server.storage.jdbc.query;
 import io.spine.annotation.Internal;
 import io.spine.server.entity.Entity;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.TypeMapping;
 
 import static io.spine.server.storage.jdbc.query.DbTableNameFactory.newTableName;
 
@@ -46,8 +47,9 @@ public abstract class EntityTable<I, R, W> extends AbstractTable<I, R, W> {
      */
     protected EntityTable(Class<? extends Entity<I, ?>> entityClass,
                           String idColumnName,
-                          DataSourceWrapper dataSource) {
-        this("", entityClass, idColumnName, dataSource);
+                          DataSourceWrapper dataSource,
+                          TypeMapping typeMapping) {
+        this("", entityClass, idColumnName, dataSource, typeMapping);
     }
 
     /**
@@ -63,10 +65,11 @@ public abstract class EntityTable<I, R, W> extends AbstractTable<I, R, W> {
     protected EntityTable(String tableNamePostfix,
                           Class<? extends Entity<I, ?>> entityClass,
                           String idColumnName,
-                          DataSourceWrapper dataSource) {
+                          DataSourceWrapper dataSource,
+                          TypeMapping typeMapping) {
         super(newTableName(entityClass) + tableNamePostfix,
               IdColumn.newInstance(entityClass, idColumnName),
-              dataSource);
+              dataSource, typeMapping);
         this.entityClass = entityClass;
     }
 

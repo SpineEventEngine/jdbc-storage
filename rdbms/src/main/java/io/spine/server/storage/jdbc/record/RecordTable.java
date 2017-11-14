@@ -33,6 +33,7 @@ import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.TableColumn;
+import io.spine.server.storage.jdbc.TypeMapping;
 import io.spine.server.storage.jdbc.query.EntityTable;
 import io.spine.server.storage.jdbc.query.SelectQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
@@ -66,8 +67,9 @@ class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumn
     RecordTable(Class<? extends Entity<I, ?>> entityClass,
                 DataSourceWrapper dataSource,
                 ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>>
-                        columnTypeRegistry) {
-        super(entityClass, StandardColumn.id.name(), dataSource);
+                        columnTypeRegistry,
+                TypeMapping typeMapping) {
+        super(entityClass, StandardColumn.id.name(), dataSource, typeMapping);
         this.typeRegistry = columnTypeRegistry;
     }
 

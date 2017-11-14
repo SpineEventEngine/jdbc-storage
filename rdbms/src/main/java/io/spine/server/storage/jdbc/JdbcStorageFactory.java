@@ -55,11 +55,13 @@ public class JdbcStorageFactory implements StorageFactory {
     private final DataSourceWrapper dataSource;
     private final boolean multitenant;
     private final ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> columnTypeRegistry;
+    private final TypeMapping typeMapping;
 
     private JdbcStorageFactory(Builder builder) {
         this.dataSource = checkNotNull(builder.dataSource);
         this.multitenant = builder.multitenant;
         this.columnTypeRegistry = builder.columnTypeRegistry;
+        this.typeMapping = builder.typeMapping;
     }
 
     @Override
@@ -89,6 +91,7 @@ public class JdbcStorageFactory implements StorageFactory {
         return JdbcStandStorage.newBuilder()
                                .setDataSource(dataSource)
                                .setMultitenant(isMultitenant())
+                               .setTypeMapping(typeMapping)
                                .build();
     }
 
@@ -100,6 +103,7 @@ public class JdbcStorageFactory implements StorageFactory {
                                     .setAggregateClass(aggregateClass)
                                     .setMultitenant(multitenant)
                                     .setDataSource(dataSource)
+                                    .setTypeMapping(typeMapping)
                                     .build();
         return storage;
     }
@@ -112,6 +116,7 @@ public class JdbcStorageFactory implements StorageFactory {
                                  .setEntityClass(entityClass)
                                  .setDataSource(dataSource)
                                  .setColumnTypeRegistry(columnTypeRegistry)
+                                 .setTypeMapping(typeMapping)
                                  .build();
         return recordStorage;
     }
@@ -125,6 +130,7 @@ public class JdbcStorageFactory implements StorageFactory {
                                                                   .setDataSource(dataSource)
                                                                   .setRecordStorage(entityStorage)
                                                                   .setProjectionClass(projectionClass)
+                                                                  .setTypeMapping(typeMapping)
                                                                   .build();
         return storage;
     }
@@ -149,6 +155,8 @@ public class JdbcStorageFactory implements StorageFactory {
         private DataSourceWrapper dataSource;
         private boolean multitenant;
         private ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> columnTypeRegistry;
+        private TypeMapping typeMapping = TypeMapping.newBuilder()
+                                                     .build();
 
         private Builder() {
             // Prevent direct instantiation.
@@ -208,6 +216,14 @@ public class JdbcStorageFactory implements StorageFactory {
         public Builder setDataSource(DataSourceConfig dataSource) {
             final HikariConfig hikariConfig = DefaultDataSourceConfigConverter.convert(dataSource);
             this.dataSource = DataSourceWrapper.wrap(new HikariDataSource(hikariConfig));
+            return this;
+        }
+
+        /**
+         * @param typeMapping the type mapping for the usage in queries
+         */
+        public Builder setTypeMapping(TypeMapping typeMapping) {
+            this.typeMapping = checkNotNull(typeMapping);
             return this;
         }
 

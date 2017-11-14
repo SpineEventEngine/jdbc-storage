@@ -42,8 +42,7 @@ public abstract class StorageBuilder<B extends StorageBuilder<B, S>, S extends S
 
     private boolean multitenant;
     private DataSourceWrapper dataSource;
-    private TypeMapping typeMapping = TypeMapping.newBuilder()
-                                                 .build();
+    private TypeMapping typeMapping;
 
     public boolean isMultitenant() {
         return multitenant;
@@ -107,7 +106,6 @@ public abstract class StorageBuilder<B extends StorageBuilder<B, S>, S extends S
      */
     protected void checkPreconditions() throws IllegalStateException {
         checkState(dataSource != null, "Data source must not be null");
-        checkState(typeMapping != null, "Type mapping must not be null");
     }
 
     /**

@@ -25,6 +25,7 @@ import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.aggregate.Snapshot;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.TypeMapping;
 import io.spine.validate.StringValueVBuilder;
 import org.junit.Test;
 
@@ -42,10 +43,13 @@ import static org.junit.Assert.assertEquals;
  */
 public class AggregateEventRecordTableShould {
 
+    private final TypeMapping mapping = TypeMapping.newBuilder()
+                                           .build();
+
     @Test(expected = IllegalStateException.class)
     public void throw_on_attempt_to_update_event_record() {
         final AggregateEventRecordTable<String> table =
-                new AggregateEventRecordTable<>(AnAggregate.class, withoutSuperpowers());
+                new AggregateEventRecordTable<>(AnAggregate.class, withoutSuperpowers(), mapping);
         table.update(newUuid(), AggregateEventRecord.getDefaultInstance());
     }
 
@@ -53,7 +57,7 @@ public class AggregateEventRecordTableShould {
     public void store_record_kind_in_string_representation() {
         final DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
         final AggregateEventRecordTable<String> table =
-                new AggregateEventRecordTable<>(AnAggregate.class, dataSource);
+                new AggregateEventRecordTable<>(AnAggregate.class, dataSource, mapping);
         table.create();
 
         final Snapshot snapshot = Snapshot.newBuilder()

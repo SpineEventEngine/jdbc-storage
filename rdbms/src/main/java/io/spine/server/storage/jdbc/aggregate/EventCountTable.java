@@ -25,6 +25,7 @@ import io.spine.server.entity.Entity;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.TableColumn;
+import io.spine.server.storage.jdbc.TypeMapping;
 import io.spine.server.storage.jdbc.query.EntityTable;
 import io.spine.server.storage.jdbc.query.SelectQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
@@ -56,8 +57,9 @@ class EventCountTable<I> extends EntityTable<I, Integer, Integer> {
     private static final String TABLE_NAME_POSTFIX = "_event_count";
 
     EventCountTable(Class<? extends Entity<I, ?>> entityClass,
-                    DataSourceWrapper dataSource) {
-        super(TABLE_NAME_POSTFIX, entityClass, id.name(), dataSource);
+                    DataSourceWrapper dataSource,
+                    TypeMapping typeMapping) {
+        super(TABLE_NAME_POSTFIX, entityClass, id.name(), dataSource, typeMapping);
     }
 
     @Override

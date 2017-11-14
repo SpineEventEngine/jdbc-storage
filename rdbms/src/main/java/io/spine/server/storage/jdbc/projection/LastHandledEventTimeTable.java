@@ -23,6 +23,7 @@ package io.spine.server.storage.jdbc.projection;
 import com.google.protobuf.Timestamp;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.TableColumn;
+import io.spine.server.storage.jdbc.TypeMapping;
 import io.spine.server.storage.jdbc.query.AbstractTable;
 import io.spine.server.storage.jdbc.query.SelectQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
@@ -47,8 +48,8 @@ class LastHandledEventTimeTable extends AbstractTable<String, Timestamp, Timesta
 
     private static final String TABLE_NAME = "projection_last_handled_event_time";
 
-    LastHandledEventTimeTable(DataSourceWrapper dataSource) {
-        super(TABLE_NAME, typeString(projection_type.name()), dataSource);
+    LastHandledEventTimeTable(DataSourceWrapper dataSource, TypeMapping typeMapping) {
+        super(TABLE_NAME, typeString(projection_type.name()), dataSource, typeMapping);
     }
 
     @Override

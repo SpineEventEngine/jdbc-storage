@@ -27,6 +27,7 @@ import io.spine.annotation.Internal;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.TableColumn;
+import io.spine.server.storage.jdbc.TypeMapping;
 import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
@@ -87,10 +88,9 @@ public abstract class AbstractTable<I, R, W> {
                                             deleted.name(), false,
                                             version.name(), 0);
     private final String name;
-
     private final IdColumn<I> idColumn;
-
     private final DataSourceWrapper dataSource;
+    private final TypeMapping typeMapping;
 
     /**
      * The memoized value of the table columns.
@@ -101,10 +101,14 @@ public abstract class AbstractTable<I, R, W> {
      */
     private ImmutableList<? extends TableColumn> columns;
 
-    protected AbstractTable(String name, IdColumn<I> idColumn, DataSourceWrapper dataSource) {
+    protected AbstractTable(String name, IdColumn<I> idColumn,
+                            DataSourceWrapper dataSource, TypeMapping typeMapping) {
         this.name = checkNotNull(name);
         this.idColumn = checkNotNull(idColumn);
         this.dataSource = checkNotNull(dataSource);
+
+        //TODO:2017-11-14:dmytro.grankin: add null checking
+        this.typeMapping = typeMapping;
     }
 
     /**
