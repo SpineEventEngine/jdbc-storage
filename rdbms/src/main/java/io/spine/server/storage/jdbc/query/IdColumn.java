@@ -156,7 +156,7 @@ public abstract class IdColumn<I> {
 
         @Override
         public Sql.Type getSqlType() {
-            return Sql.Type.BIGINT;
+            return Sql.Type.LONG;
         }
 
         @Override
@@ -207,7 +207,7 @@ public abstract class IdColumn<I> {
 
         @Override
         public Sql.Type getSqlType() {
-            return Sql.Type.VARCHAR_255;
+            return Sql.Type.STRING_255;
         }
     }
 

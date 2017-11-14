@@ -26,9 +26,9 @@ import io.spine.server.entity.AbstractEntity;
 import io.spine.test.entity.ProjectId;
 import org.junit.Test;
 
-import static io.spine.server.storage.jdbc.Sql.Type.BIGINT;
+import static io.spine.server.storage.jdbc.Sql.Type.LONG;
 import static io.spine.server.storage.jdbc.Sql.Type.INT;
-import static io.spine.server.storage.jdbc.Sql.Type.VARCHAR_255;
+import static io.spine.server.storage.jdbc.Sql.Type.STRING_255;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
@@ -43,7 +43,7 @@ public class IdColumnShould {
     @Test
     public void have_bigint_impl() {
         final IdColumn<?> column = IdColumn.newInstance(LongIdEntity.class, ID);
-        assertEquals(BIGINT, column.getSqlType());
+        assertEquals(LONG, column.getSqlType());
         assertSame(Long.class, column.getJavaType());
     }
 
@@ -57,14 +57,14 @@ public class IdColumnShould {
     @Test
     public void have_varchar255_impl() {
         final IdColumn<?> column = IdColumn.newInstance(StringIdEntity.class, ID);
-        assertEquals(VARCHAR_255, column.getSqlType());
+        assertEquals(STRING_255, column.getSqlType());
         assertSame(String.class, column.getJavaType());
     }
 
     @Test
     public void cast_message_IDs_to_string() {
         final IdColumn<?> column = IdColumn.newInstance(MessageIdEntity.class, ID);
-        assertEquals(VARCHAR_255, column.getSqlType());
+        assertEquals(STRING_255, column.getSqlType());
         assertTrue(Message.class.isAssignableFrom(column.getJavaType()));
     }
 

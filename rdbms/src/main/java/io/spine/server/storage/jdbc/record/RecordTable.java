@@ -49,7 +49,7 @@ import java.util.Map;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Collections2.transform;
 import static com.google.common.collect.Lists.newLinkedList;
-import static io.spine.server.storage.jdbc.Sql.Type.BLOB;
+import static io.spine.server.storage.jdbc.Sql.Type.BYTE_ARRAY;
 import static io.spine.server.storage.jdbc.Sql.Type.ID;
 import static java.util.Collections.addAll;
 
@@ -178,7 +178,7 @@ class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumn
     enum StandardColumn implements TableColumn {
 
         id(ID),
-        entity(BLOB);
+        entity(BYTE_ARRAY);
 
         private final Sql.Type type;
 

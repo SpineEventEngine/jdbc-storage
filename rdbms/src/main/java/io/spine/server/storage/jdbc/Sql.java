@@ -58,16 +58,32 @@ public final class Sql {
          * a non-ID column may lead to a failure.
          */
         ID("generic ID type"),
-        BLOB("BLOB"),
-        TIMESTAMP("TIMESTAMP"),
-        INT("INT"),
-        BIGINT("BIGINT"),
-        VARCHAR_255("VARCHAR(255)"),
 
         /**
-         * The type for strings, maximum size of which is unknown.
+         * The type representing a byte array.
          */
-        TEXT("TEXT"),
+        BYTE_ARRAY("BLOB"),
+
+        /**
+         * The type representing an {@code int} value.
+         */
+        INT("INT"),
+
+        /**
+         * The type representing a {@code long} value.
+         */
+        LONG("BIGINT"),
+
+        /**
+         * The type representing a {@code String}, maximum size of which
+         * is limited to 255 characters.
+         */
+        STRING_255("VARCHAR(255)"),
+
+        /**
+         * The type representing a {@code String}, maximum size of which is unknown.
+         */
+        STRING("TEXT"),
         BOOLEAN("BOOLEAN");
 
         private final String token;

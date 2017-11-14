@@ -33,11 +33,11 @@ import io.spine.server.storage.jdbc.query.WriteQuery;
 
 import java.util.List;
 
-import static io.spine.server.storage.jdbc.Sql.Type.BIGINT;
-import static io.spine.server.storage.jdbc.Sql.Type.BLOB;
+import static io.spine.server.storage.jdbc.Sql.Type.LONG;
+import static io.spine.server.storage.jdbc.Sql.Type.BYTE_ARRAY;
 import static io.spine.server.storage.jdbc.Sql.Type.ID;
 import static io.spine.server.storage.jdbc.Sql.Type.INT;
-import static io.spine.server.storage.jdbc.Sql.Type.VARCHAR_255;
+import static io.spine.server.storage.jdbc.Sql.Type.STRING_255;
 import static io.spine.util.Exceptions.newIllegalStateException;
 
 /**
@@ -103,14 +103,14 @@ class AggregateEventRecordTable<I> extends EntityTable<I,
     enum Column implements TableColumn {
 
         id(ID),
-        aggregate(BLOB),
+        aggregate(BYTE_ARRAY),
 
         /**
          * The {@linkplain AggregateEventRecord.KindCase kind} of an aggregate record
          * in a {@linkplain AggregateEventRecord.KindCase#toString() string} representation.
          */
-        kind(VARCHAR_255),
-        timestamp(BIGINT),
+        kind(STRING_255),
+        timestamp(LONG),
         timestamp_nanos(INT),
         version(INT);
 

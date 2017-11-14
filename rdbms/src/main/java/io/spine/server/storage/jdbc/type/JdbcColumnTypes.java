@@ -106,7 +106,7 @@ final class JdbcColumnTypes {
 
         @Override
         public Sql.Type getSqlType() {
-            return Sql.Type.VARCHAR_255;
+            return Sql.Type.STRING_255;
         }
     }
 
@@ -128,7 +128,7 @@ final class JdbcColumnTypes {
 
         @Override
         public Sql.Type getSqlType() {
-            return Sql.Type.BIGINT;
+            return Sql.Type.LONG;
         }
     }
 
@@ -166,7 +166,7 @@ final class JdbcColumnTypes {
 
         @Override
         public Sql.Type getSqlType() {
-            return Sql.Type.BIGINT;
+            return Sql.Type.LONG;
         }
     }
 
@@ -184,7 +184,7 @@ final class JdbcColumnTypes {
 
         @Override
         public Sql.Type getSqlType() {
-            return Sql.Type.TEXT;
+            return Sql.Type.STRING;
         }
     }
 }

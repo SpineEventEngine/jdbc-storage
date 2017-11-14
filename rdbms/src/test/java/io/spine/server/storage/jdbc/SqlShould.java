@@ -49,8 +49,8 @@ public class SqlShould {
         assertEquals(countExpected, countActual);
 
         final String varcharExpected = "VARCHAR(255)";
-        final String varcharActual = Sql.Type.VARCHAR_255.toString()
-                                                         .trim();
+        final String varcharActual = Sql.Type.STRING_255.toString()
+                                                        .trim();
         assertEquals(varcharExpected, varcharActual);
     }
 
@@ -61,7 +61,7 @@ public class SqlShould {
         assertEquals(sumExpected, sumActual);
 
         final String blobExpected = " BLOB ";
-        final String blobActual = Sql.Type.BLOB.toString();
+        final String blobActual = Sql.Type.BYTE_ARRAY.toString();
         assertEquals(blobExpected, blobActual);
 
         final String primaryKeyExpected = " PRIMARY KEY ";

@@ -76,7 +76,7 @@ public class JdbcTypeRegistryFactoryShould {
 
         @Override
         public Sql.Type getSqlType() {
-            return Sql.Type.VARCHAR_255;
+            return Sql.Type.STRING_255;
         }
 
         @Override
