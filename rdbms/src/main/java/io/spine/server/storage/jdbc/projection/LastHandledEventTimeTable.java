@@ -32,10 +32,11 @@ import java.util.List;
 
 import static com.google.common.collect.ImmutableList.copyOf;
 import static io.spine.server.storage.jdbc.query.IdColumn.typeString;
-import static io.spine.server.storage.jdbc.Sql.Type;
-import static io.spine.server.storage.jdbc.Sql.Type.LONG;
-import static io.spine.server.storage.jdbc.Sql.Type.INT;
-import static io.spine.server.storage.jdbc.Sql.Type.STRING_255;
+
+import io.spine.server.storage.jdbc.Type;
+import static io.spine.server.storage.jdbc.Type.LONG;
+import static io.spine.server.storage.jdbc.Type.INT;
+import static io.spine.server.storage.jdbc.Type.STRING_255;
 import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.projection_type;
 
 /**

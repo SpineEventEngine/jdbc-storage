@@ -23,8 +23,8 @@ package io.spine.server.storage.jdbc.aggregate;
 import com.google.common.collect.ImmutableList;
 import io.spine.server.entity.Entity;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.TableColumn;
+import io.spine.server.storage.jdbc.Type;
 import io.spine.server.storage.jdbc.TypeMapping;
 import io.spine.server.storage.jdbc.query.EntityTable;
 import io.spine.server.storage.jdbc.query.SelectQuery;
@@ -32,8 +32,8 @@ import io.spine.server.storage.jdbc.query.WriteQuery;
 
 import java.util.List;
 
-import static io.spine.server.storage.jdbc.Sql.Type.ID;
-import static io.spine.server.storage.jdbc.Sql.Type.INT;
+import static io.spine.server.storage.jdbc.Type.ID;
+import static io.spine.server.storage.jdbc.Type.INT;
 import static io.spine.server.storage.jdbc.aggregate.EventCountTable.Column.id;
 
 /**
@@ -115,14 +115,14 @@ class EventCountTable<I> extends EntityTable<I, Integer, Integer> {
         id(ID),
         event_count(INT);
 
-        private final Sql.Type type;
+        private final Type type;
 
-        Column(Sql.Type type) {
+        Column(Type type) {
             this.type = type;
         }
 
         @Override
-        public Sql.Type type() {
+        public Type type() {
             return type;
         }
 

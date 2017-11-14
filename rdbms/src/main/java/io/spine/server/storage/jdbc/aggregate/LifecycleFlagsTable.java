@@ -24,8 +24,8 @@ import com.google.common.collect.ImmutableList;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.entity.LifecycleFlags;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.TableColumn;
+import io.spine.server.storage.jdbc.Type;
 import io.spine.server.storage.jdbc.TypeMapping;
 import io.spine.server.storage.jdbc.query.EntityTable;
 import io.spine.server.storage.jdbc.query.SelectQuery;
@@ -33,8 +33,8 @@ import io.spine.server.storage.jdbc.query.WriteQuery;
 
 import java.util.List;
 
-import static io.spine.server.storage.jdbc.Sql.Type.BOOLEAN;
-import static io.spine.server.storage.jdbc.Sql.Type.ID;
+import static io.spine.server.storage.jdbc.Type.BOOLEAN;
+import static io.spine.server.storage.jdbc.Type.ID;
 import static io.spine.server.storage.jdbc.aggregate.LifecycleFlagsTable.Column.id;
 
 /**
@@ -106,14 +106,14 @@ class LifecycleFlagsTable<I> extends EntityTable<I, LifecycleFlags, LifecycleFla
         archived(BOOLEAN),
         deleted(BOOLEAN);
 
-        private final Sql.Type type;
+        private final Type type;
 
-        Column(Sql.Type type) {
+        Column(Type type) {
             this.type = type;
         }
 
         @Override
-        public Sql.Type type() {
+        public Type type() {
             return type;
         }
 

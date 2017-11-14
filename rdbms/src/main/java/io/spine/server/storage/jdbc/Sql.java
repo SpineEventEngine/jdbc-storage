@@ -39,66 +39,6 @@ public final class Sql {
     }
 
     /**
-     * Set of SQL keywords representing basic data types used in the project.
-     */
-    public enum Type {
-
-        /**
-         * The type of a generic ID.
-         *
-         * <p>Use this type for an ID {@linkplain TableColumn column},
-         * type of which can be determined only at the runtime.
-         *
-         * <p>E.g. {@link io.spine.server.aggregate.AggregateStorage AggregateStorage} has
-         * a generic ID, that can be {@code int}, {@code long}, {@code Message} etc.
-         * So an ID type in these cases can be determined only at the runtime.
-         *
-         * <p>This is not designed to serve as a "dynamic" type which can be replaced in any time,
-         * but only to solve the problem if identifiers with unknown types. Using this type for
-         * a non-ID column may lead to a failure.
-         */
-        ID("generic ID type"),
-
-        /**
-         * The type representing a byte array.
-         */
-        BYTE_ARRAY("BLOB"),
-
-        /**
-         * The type representing an {@code int} value.
-         */
-        INT("INT"),
-
-        /**
-         * The type representing a {@code long} value.
-         */
-        LONG("BIGINT"),
-
-        /**
-         * The type representing a {@code String}, maximum size of which
-         * is limited to 255 characters.
-         */
-        STRING_255("VARCHAR(255)"),
-
-        /**
-         * The type representing a {@code String}, maximum size of which is unknown.
-         */
-        STRING("TEXT"),
-        BOOLEAN("BOOLEAN");
-
-        private final String token;
-
-        Type(String token) {
-            this.token = token;
-        }
-
-        @Override
-        public String toString() {
-            return ' ' + token + ' ';
-        }
-    }
-
-    /**
      * Set of basic SQL keywords/key-phrases for CRUD operations, predicate constructing,
      * grouping and ordering, etc.
      */

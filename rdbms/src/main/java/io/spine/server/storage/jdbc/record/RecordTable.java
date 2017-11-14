@@ -31,8 +31,8 @@ import io.spine.server.entity.storage.EntityColumns;
 import io.spine.server.entity.storage.EntityQuery;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.TableColumn;
+import io.spine.server.storage.jdbc.Type;
 import io.spine.server.storage.jdbc.TypeMapping;
 import io.spine.server.storage.jdbc.query.EntityTable;
 import io.spine.server.storage.jdbc.query.SelectQuery;
@@ -49,8 +49,8 @@ import java.util.Map;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Collections2.transform;
 import static com.google.common.collect.Lists.newLinkedList;
-import static io.spine.server.storage.jdbc.Sql.Type.BYTE_ARRAY;
-import static io.spine.server.storage.jdbc.Sql.Type.ID;
+import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
+import static io.spine.server.storage.jdbc.Type.ID;
 import static java.util.Collections.addAll;
 
 /**
@@ -180,14 +180,14 @@ class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumn
         id(ID),
         entity(BYTE_ARRAY);
 
-        private final Sql.Type type;
+        private final Type type;
 
-        StandardColumn(Sql.Type type) {
+        StandardColumn(Type type) {
             this.type = type;
         }
 
         @Override
-        public Sql.Type type() {
+        public Type type() {
             return type;
         }
 
@@ -227,13 +227,13 @@ class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumn
     private static final class EntityColumnWrapper implements TableColumn {
 
         private final EntityColumn column;
-        private final Sql.Type type;
+        private final Type type;
 
         private EntityColumnWrapper(EntityColumn column,
                                     ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> typeRegistry) {
             this.column = column;
             this.type = typeRegistry.get(column)
-                                    .getSqlType();
+                                    .getType();
         }
 
         @Override
@@ -242,7 +242,7 @@ class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumn
         }
 
         @Override
-        public Sql.Type type() {
+        public Type type() {
             return type;
         }
 

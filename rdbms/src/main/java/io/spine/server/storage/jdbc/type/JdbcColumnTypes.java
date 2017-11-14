@@ -24,7 +24,7 @@ import com.google.protobuf.Timestamp;
 import com.google.protobuf.util.Timestamps;
 import io.spine.core.Version;
 import io.spine.json.Json;
-import io.spine.server.storage.jdbc.Sql;
+import io.spine.server.storage.jdbc.Type;
 
 /**
  * A factory for basic {@link JdbcColumnType} implementations.
@@ -94,8 +94,8 @@ final class JdbcColumnTypes {
     private static class BooleanColumnType extends SimpleJdbcColumnType<Boolean>{
 
         @Override
-        public Sql.Type getSqlType() {
-            return Sql.Type.BOOLEAN;
+        public Type getType() {
+            return Type.BOOLEAN;
         }
     }
 
@@ -105,8 +105,8 @@ final class JdbcColumnTypes {
     private static class StringColumnType extends SimpleJdbcColumnType<String>{
 
         @Override
-        public Sql.Type getSqlType() {
-            return Sql.Type.STRING_255;
+        public Type getType() {
+            return Type.STRING_255;
         }
     }
 
@@ -116,8 +116,8 @@ final class JdbcColumnTypes {
     private static class IntegerColumnType extends SimpleJdbcColumnType<Integer>{
 
         @Override
-        public Sql.Type getSqlType() {
-            return Sql.Type.INT;
+        public Type getType() {
+            return Type.INT;
         }
     }
 
@@ -127,8 +127,8 @@ final class JdbcColumnTypes {
     private static class LongColumnType extends SimpleJdbcColumnType<Long>{
 
         @Override
-        public Sql.Type getSqlType() {
-            return Sql.Type.LONG;
+        public Type getType() {
+            return Type.LONG;
         }
     }
 
@@ -145,8 +145,8 @@ final class JdbcColumnTypes {
         }
 
         @Override
-        public Sql.Type getSqlType() {
-            return Sql.Type.INT;
+        public Type getType() {
+            return Type.INT;
         }
     }
 
@@ -165,8 +165,8 @@ final class JdbcColumnTypes {
         }
 
         @Override
-        public Sql.Type getSqlType() {
-            return Sql.Type.LONG;
+        public Type getType() {
+            return Type.LONG;
         }
     }
 
@@ -183,8 +183,8 @@ final class JdbcColumnTypes {
         }
 
         @Override
-        public Sql.Type getSqlType() {
-            return Sql.Type.STRING;
+        public Type getType() {
+            return Type.STRING;
         }
     }
 }

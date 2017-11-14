@@ -20,12 +20,12 @@
 
 package io.spine.server.storage.jdbc;
 
-import static io.spine.server.storage.jdbc.Sql.Type.BOOLEAN;
-import static io.spine.server.storage.jdbc.Sql.Type.BYTE_ARRAY;
-import static io.spine.server.storage.jdbc.Sql.Type.INT;
-import static io.spine.server.storage.jdbc.Sql.Type.LONG;
-import static io.spine.server.storage.jdbc.Sql.Type.STRING;
-import static io.spine.server.storage.jdbc.Sql.Type.STRING_255;
+import static io.spine.server.storage.jdbc.Type.BOOLEAN;
+import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
+import static io.spine.server.storage.jdbc.Type.INT;
+import static io.spine.server.storage.jdbc.Type.LONG;
+import static io.spine.server.storage.jdbc.Type.STRING;
+import static io.spine.server.storage.jdbc.Type.STRING_255;
 
 /**
  * Default {@link TypeMapping type mappings} for different databases.

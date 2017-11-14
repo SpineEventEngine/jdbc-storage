@@ -23,7 +23,7 @@ package io.spine.server.storage.jdbc.type;
 import io.spine.core.Version;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.entity.storage.EntityColumn;
-import io.spine.server.storage.jdbc.Sql;
+import io.spine.server.storage.jdbc.Type;
 import io.spine.server.storage.jdbc.query.Parameters;
 import org.junit.Test;
 
@@ -75,8 +75,8 @@ public class JdbcTypeRegistryFactoryShould {
         INSTANCE;
 
         @Override
-        public Sql.Type getSqlType() {
-            return Sql.Type.STRING_255;
+        public Type getType() {
+            return Type.STRING_255;
         }
 
         @Override

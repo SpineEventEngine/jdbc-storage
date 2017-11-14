@@ -38,9 +38,9 @@ public interface TableColumn extends StorageField {
     String name();
 
     /**
-     * @return the {@link Sql.Type} of the column
+     * @return the {@link Type} of the column
      */
-    Sql.Type type();
+    Type type();
 
     /**
      * @return {@code true} is this column is a primary key of the table, {@code false} otherwise

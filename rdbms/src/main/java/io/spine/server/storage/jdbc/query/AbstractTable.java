@@ -21,13 +21,12 @@
 package io.spine.server.storage.jdbc.query;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.spine.annotation.Internal;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.TableColumn;
+import io.spine.server.storage.jdbc.Type;
 import io.spine.server.storage.jdbc.TypeMapping;
 import org.slf4j.Logger;
 
@@ -268,7 +267,7 @@ public abstract class AbstractTable<I, R, W> {
         for (Iterator<? extends TableColumn> iterator = columns.iterator(); iterator.hasNext(); ) {
             final TableColumn column = iterator.next();
             final String name = column.name();
-            final Sql.Type type = ensureType(column);
+            final Type type = ensureType(column);
             final String typeName = typeMapping.getTypeName(type);
             sql.append(name)
                .append(' ')
@@ -303,14 +302,14 @@ public abstract class AbstractTable<I, R, W> {
         return result;
     }
 
-    private Sql.Type getIdType() {
-        final Sql.Type idType = getIdColumn().getSqlType();
+    private Type getIdType() {
+        final Type idType = getIdColumn().getSqlType();
         return idType;
     }
 
     /**
-     * For the ID column checks the {@link Sql.Type} and returns the type of the ID column if
-     * the ID type is {@linkplain Sql.Type#ID}.
+     * For the ID column checks the {@link Type} and returns the type of the ID column if
+     * the ID type is {@linkplain Type#ID}.
      *
      * <p>If the column does not represent an ID of the table, this method throws
      * an {@link IllegalStateException}.
@@ -318,9 +317,9 @@ public abstract class AbstractTable<I, R, W> {
      * @param column the column the type of which will be checked
      * @return the SQL type of the column
      */
-    private Sql.Type ensureType(TableColumn column) throws IllegalStateException {
-        Sql.Type type = column.type();
-        if (type == Sql.Type.ID) {
+    private Type ensureType(TableColumn column) throws IllegalStateException {
+        Type type = column.type();
+        if (type == Type.ID) {
             if (column.equals(getIdColumnDeclaration())) {
                 type = getIdType();
             } else {

@@ -21,7 +21,6 @@
 package io.spine.server.storage.jdbc;
 
 import com.google.common.collect.ImmutableMap;
-import io.spine.server.storage.jdbc.Sql.Type;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -32,9 +31,15 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import static io.spine.util.Exceptions.newIllegalStateException;
 
 /**
- * A custom {@link Type} mapping.
+ * A {@link Type}-to-name mapping.
  *
- * <p>This class allows to specify custom SQL type names for the standard types.
+ * <p>A type may have different names in different databases.
+ * E.g. for binary data in MySQL is used {@code BLOB}, but in PostgreSQL - {@code BYTEA}.
+ *
+ * <p>This class provides a flexible way to point out
+ * database specific names of {@linkplain Type types}.
+ *
+ * <p>There are predefined {@linkplain TypeMappings mappings}.
  *
  * @author Dmytro Grankin
  */
