@@ -20,7 +20,6 @@
 
 package io.spine.server.storage.jdbc;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import io.spine.server.storage.jdbc.Sql.Type;
 
@@ -30,6 +29,7 @@ import java.util.Map;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static io.spine.util.Exceptions.newIllegalStateException;
 
 /**
  * A custom {@link Type} mapping.
@@ -46,10 +46,20 @@ public class TypeMapping {
         mappedTypes = new EnumMap<>(builder.types.build());
     }
 
-    public Optional<String> getTypeName(Type type) {
-        checkNotNull(type);
-        final String customName = mappedTypes.get(type);
-        return Optional.fromNullable(customName);
+    /**
+     * Obtains the name of specified {@link Type}.
+     *
+     * @param type the type to get the name
+     * @return the type name
+     * @throws IllegalStateException if the name for the specified type is not defined
+     */
+    public String getTypeName(Type type) {
+        final String name = mappedTypes.get(type);
+        if (name == null) {
+            throw newIllegalStateException("The type mapping doesn't define name for %s type.",
+                                           type);
+        }
+        return name;
     }
 
     /**

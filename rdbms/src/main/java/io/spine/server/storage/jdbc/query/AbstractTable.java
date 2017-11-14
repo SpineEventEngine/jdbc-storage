@@ -269,10 +269,7 @@ public abstract class AbstractTable<I, R, W> {
             final TableColumn column = iterator.next();
             final String name = column.name();
             final Sql.Type type = ensureType(column);
-            final Optional<String> typeNameFromMapping = typeMapping.getTypeName(type);
-            final String typeName = typeNameFromMapping.isPresent()
-                                    ? ' ' + typeNameFromMapping.get() + ' '
-                                    : type.toString();
+            final String typeName = typeMapping.getTypeName(type);
             sql.append(name)
                .append(' ')
                .append(typeName);
