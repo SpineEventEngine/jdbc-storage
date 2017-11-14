@@ -21,6 +21,7 @@
 package io.spine.server.storage.jdbc.query;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.spine.annotation.Internal;
@@ -269,9 +270,14 @@ public abstract class AbstractTable<I, R, W> {
         for (Iterator<? extends TableColumn> iterator = columns.iterator(); iterator.hasNext(); ) {
             final TableColumn column = iterator.next();
             final String name = column.name();
+            final Sql.Type type = ensureType(column);
+            final Optional<String> typeNameFromMapping = typeMapping.getTypeName(type);
+            final String typeName = typeNameFromMapping.isPresent()
+                                    ? ' ' + typeNameFromMapping.get() + ' '
+                                    : type.toString();
             sql.append(name)
                .append(' ')
-               .append(ensureType(column));
+               .append(typeName);
             if (COLUMN_DEFAULTS.containsKey(name)) {
                 final Object defaultValue = COLUMN_DEFAULTS.get(name);
                 sql.append(DEFAULT)
