@@ -71,7 +71,7 @@ public class TypeMapping {
      */
     public static class Builder {
 
-        private ImmutableMap.Builder<Type, String> types = ImmutableMap.builder();
+        private final ImmutableMap.Builder<Type, String> types = ImmutableMap.builder();
 
         private Builder() {
             // Prevent direct instantiation of this class.
