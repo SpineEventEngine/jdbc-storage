@@ -70,7 +70,7 @@ public class TypeMappings {
      * 
      * @param dataSource the data source to get database metadata
      * @return the type mapping for the used database
-     *         or {@linkplain #mySql() MySQL} mapping as a default mapping
+     *         or {@linkplain #mySql() MySQL} mapping if there is no standard mapping for the database
      */
     static TypeMapping get(DataSourceWrapper dataSource) {
         try (final ConnectionWrapper connection = dataSource.getConnection(true)) {

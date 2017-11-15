@@ -30,12 +30,12 @@ JdbcStorageFactory.newBuilder()
 
 ### Type mapping
 
-Data types differs for various SQL databases. There is `TypeMapping` to deal with it.
+Data types differ for various SQL databases. There is `TypeMapping` to deal with it.
 The mapping defines correspondence of `Type` to a name for a particular database. 
 `Type` is an abstraction for a data type in a database. 
 
 The type mapping is selected automatically basing on the JDBC connection string.
-If there is no predefined mapping for the database, MySQL mapping will be used as a default.
+If there is no standard mapping for the database, MySQL mapping will be used as the default.
 
 If the automatically selected mapping doesn't match your requirements,
 a custom mapping can be specified during creation of `JdbcStorageFactory`.
