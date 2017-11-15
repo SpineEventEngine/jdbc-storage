@@ -22,6 +22,8 @@ package io.spine.server.storage.jdbc;
 
 import io.spine.server.storage.jdbc.TypeMapping.Builder;
 
+import java.sql.SQLException;
+
 import static io.spine.server.storage.jdbc.Type.BOOLEAN;
 import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
 import static io.spine.server.storage.jdbc.Type.INT;
@@ -57,6 +59,30 @@ public class TypeMappings {
      */
     public static TypeMapping postgreSql() {
         return POSTGRES;
+    }
+
+    /**
+     * Obtains the type mapping for the used
+     * {@linkplain java.sql.DatabaseMetaData#getDatabaseProductName() database}.
+     * 
+     * @param dataSource the data source to get database metadata
+     * @return the type mapping for the used database
+     *         or {@linkplain #mySql() MySQL} mapping as a default mapping
+     */
+    static TypeMapping get(DataSourceWrapper dataSource) {
+        try (final ConnectionWrapper connection = dataSource.getConnection(true)) {
+            final String name = connection.get()
+                                          .getMetaData()
+                                          .getDatabaseProductName()
+                                          .toLowerCase();
+            if (name.equals("postgresql")) {
+                return POSTGRES;
+            }
+
+            return MY_SQL;
+        } catch (SQLException e) {
+            throw new DatabaseException(e);
+        }
     }
 
     private static TypeMapping.Builder baseMapping() {

@@ -220,9 +220,15 @@ public class JdbcStorageFactory implements StorageFactory {
         }
 
         /**
-         * Sets required field {@code typeMapping}.
+         * Sets {@link TypeMapping} to use for working with the database.
          *
-         * @see TypeMapping
+         * <p>If the mapping was not specified, it will be
+         * {@linkplain TypeMappings#get(DataSourceWrapper) obtained} basing on
+         * the {@linkplain java.sql.DatabaseMetaData#getDatabaseProductName() DB name}.
+         *
+         * <p>If there is no mapping for the database, mapping for MySQL will be used.
+         *
+         * @param typeMapping the custom type mapping
          */
         public Builder setTypeMapping(TypeMapping typeMapping) {
             this.typeMapping = checkNotNull(typeMapping);
@@ -235,6 +241,9 @@ public class JdbcStorageFactory implements StorageFactory {
         public JdbcStorageFactory build() {
             if (columnTypeRegistry == null) {
                 columnTypeRegistry = JdbcTypeRegistryFactory.defaultInstance();
+            }
+            if (typeMapping == null) {
+                typeMapping = TypeMappings.get(dataSource);
             }
             return new JdbcStorageFactory(this);
         }
