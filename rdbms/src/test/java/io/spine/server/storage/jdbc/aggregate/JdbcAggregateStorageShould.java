@@ -27,16 +27,13 @@ import io.spine.server.aggregate.AggregateStorage;
 import io.spine.server.aggregate.AggregateStorageShould;
 import io.spine.server.entity.Entity;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.GivenDataSource;
 import io.spine.server.storage.jdbc.query.DbIterator;
-import io.spine.test.Tests;
-import io.spine.test.aggregate.Project;
 import io.spine.test.aggregate.ProjectId;
-import io.spine.test.aggregate.ProjectVBuilder;
 import org.junit.Test;
 
 import java.sql.SQLException;
 
+import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
 import static io.spine.server.storage.jdbc.given.GivenMapping.defaultMapping;
 import static io.spine.test.Tests.nullRef;
 import static org.junit.Assert.assertEquals;
@@ -47,25 +44,12 @@ import static org.junit.Assert.assertTrue;
  */
 public class JdbcAggregateStorageShould extends AggregateStorageShould {
 
-    @Override
-    protected AggregateStorage<ProjectId> newStorage(Class<? extends Entity> aClass) {
-        return newStorage(ProjectId.class, (Class<? extends Aggregate<ProjectId, ?, ?>>) aClass);
-    }
+    private JdbcAggregateStorage<ProjectId> storage;
 
     @Override
-    protected <I> JdbcAggregateStorage<I> newStorage(
-            Class<? extends I> idClass,
-            Class<? extends Aggregate<I, ?, ?>> aggregateClass) {
-        final DataSourceWrapper dataSource =
-                GivenDataSource.whichIsStoredInMemory("aggregateStorageTests");
-        final JdbcAggregateStorage<I> storage =
-                JdbcAggregateStorage.<I>newBuilder()
-                        .setMultitenant(false)
-                        .setDataSource(dataSource)
-                        .setAggregateClass(aggregateClass)
-                        .setTypeMapping(defaultMapping())
-                        .build();
-        return storage;
+    public void setUpAbstractStorageTest() {
+        super.setUpAbstractStorageTest();
+        storage = (JdbcAggregateStorage<ProjectId>) getStorage();
     }
 
     @Test(expected = IllegalStateException.class)
@@ -75,11 +59,8 @@ public class JdbcAggregateStorageShould extends AggregateStorageShould {
         storage.close();
     }
 
-    @SuppressWarnings("unchecked") // OK for a mock.
     @Test
     public void return_history_iterator_with_specified_batch_size() throws SQLException {
-        final JdbcAggregateStorage<ProjectId> storage = newStorage(ProjectId.class,
-                                                                   TestAggregateWithMessageId.class);
         final int batchSize = 10;
         final AggregateReadRequest<ProjectId> request = new AggregateReadRequest<>(newId(),
                                                                                    batchSize);
@@ -92,13 +73,10 @@ public class JdbcAggregateStorageShould extends AggregateStorageShould {
                                       .getStatement()
                                       .getFetchSize();
         assertEquals(batchSize, fetchSize);
-        close(storage);
     }
 
     @Test
     public void close_history_iterator() throws SQLException {
-        final JdbcAggregateStorage<ProjectId> storage = newStorage(ProjectId.class,
-                                                                   TestAggregateWithMessageId.class);
         final AggregateReadRequest<ProjectId> request = newReadRequest(newId());
         final DbIterator<AggregateEventRecord> iterator =
                 (DbIterator<AggregateEventRecord>) storage.historyBackward(request);
@@ -111,16 +89,27 @@ public class JdbcAggregateStorageShould extends AggregateStorageShould {
 
     @Test(expected = NullPointerException.class)
     public void require_non_null_aggregate_class() {
-        final Class<? extends Aggregate<Object, ?, ?>> nullClass = Tests.nullRef();
+        final Class<? extends Aggregate<Object, ?, ?>> nullClass = nullRef();
         JdbcAggregateStorage.newBuilder()
                             .setAggregateClass(nullClass);
     }
 
-    private static class TestAggregateWithMessageId extends Aggregate<ProjectId,
-                                                                      Project,
-                                                                      ProjectVBuilder> {
-        private TestAggregateWithMessageId(ProjectId id) {
-            super(id);
-        }
+    @Override
+    protected AggregateStorage<ProjectId> newStorage(Class<? extends Entity> aClass) {
+        return newStorage(ProjectId.class, (Class<? extends Aggregate<ProjectId, ?, ?>>) aClass);
+    }
+
+    @Override
+    protected <I> JdbcAggregateStorage<I> newStorage(
+            Class<? extends I> idClass,
+            Class<? extends Aggregate<I, ?, ?>> aggregateClass) {
+        final DataSourceWrapper dataSource = whichIsStoredInMemory("aggregateStorageTests");
+        final JdbcAggregateStorage.Builder<I> builder = JdbcAggregateStorage.newBuilder();
+        final JdbcAggregateStorage<I> storage = builder.setMultitenant(false)
+                                                       .setDataSource(dataSource)
+                                                       .setAggregateClass(aggregateClass)
+                                                       .setTypeMapping(defaultMapping())
+                                                       .build();
+        return storage;
     }
 }
