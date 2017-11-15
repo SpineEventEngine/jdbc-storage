@@ -20,9 +20,11 @@
 
 package io.spine.server.storage.jdbc.query;
 
+import com.querydsl.sql.AbstractSQLQueryFactory;
 import com.querydsl.sql.Configuration;
 import com.querydsl.sql.SQLListenerContext;
 import com.querydsl.sql.SQLListeners;
+import io.spine.server.storage.jdbc.ConnectionWrapper;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.query.given.Given.AStorageQuery;
@@ -33,12 +35,14 @@ import java.sql.SQLException;
 
 import static io.spine.Identifier.newUuid;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
+import static io.spine.server.storage.jdbc.query.AbstractQuery.createFactory;
 import static io.spine.server.storage.jdbc.query.given.Given.storageQueryBuilder;
 import static java.sql.ResultSet.HOLD_CURSORS_OVER_COMMIT;
-import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -65,10 +69,20 @@ public class AbstractQueryShould {
     }
 
     @Test
-    public void hold_cursors_over_commit() throws SQLException {
-        final Connection connection = query.factory()
-                                           .getConnection();
-        assertEquals(HOLD_CURSORS_OVER_COMMIT, connection.getHoldability());
+    public void set_hold_cursors_over_commit_for_connection() throws SQLException {
+        final DataSourceWrapper dataSourceSpy = spy(dataSource);
+        final ConnectionWrapper connectionWrapper = spy(dataSourceSpy.getConnection(true));
+        final Connection connection = spy(connectionWrapper.get());
+        doReturn(connectionWrapper).when(dataSourceSpy)
+                                   .getConnection(anyBoolean());
+        doReturn(connection).when(connectionWrapper)
+                            .get();
+        final AbstractSQLQueryFactory<?> factory = createFactory(dataSourceSpy);
+        final Connection connectionFromFactory = factory.getConnection();
+
+        // The test can only verify that the holdability was set.
+        // The result of the operation depends on a JDBC implementation.
+        verify(connectionFromFactory).setHoldability(HOLD_CURSORS_OVER_COMMIT);
     }
 
     @Test(expected = DatabaseException.class)
