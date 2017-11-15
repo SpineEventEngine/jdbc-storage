@@ -20,6 +20,8 @@
 
 package io.spine.server.storage.jdbc;
 
+import io.spine.server.storage.jdbc.TypeMapping.Builder;
+
 import static io.spine.server.storage.jdbc.Type.BOOLEAN;
 import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
 import static io.spine.server.storage.jdbc.Type.INT;
@@ -32,26 +34,12 @@ import static io.spine.server.storage.jdbc.Type.STRING_255;
  *
  * @author Dmytro Grankin
  */
-@SuppressWarnings("DuplicateStringLiteralInspection") // Use literals for a better readability.
 public class TypeMappings {
 
-    private static final TypeMapping MY_SQL = TypeMapping.newBuilder()
-                                                         .add(BYTE_ARRAY, "BLOB")
-                                                         .add(INT, "INT")
-                                                         .add(LONG, "BIGINT")
-                                                         .add(STRING_255, "VARCHAR(255)")
-                                                         .add(STRING, "TEXT")
-                                                         .add(BOOLEAN, "BOOLEAN")
-                                                         .build();
-
-    private static final TypeMapping POSTGRES = TypeMapping.newBuilder()
-                                                           .add(BYTE_ARRAY, "BYTEA")
-                                                           .add(INT, "INT")
-                                                           .add(LONG, "BIGINT")
-                                                           .add(STRING_255, "VARCHAR(255)")
-                                                           .add(STRING, "TEXT")
-                                                           .add(BOOLEAN, "BOOLEAN")
+    private static final TypeMapping MY_SQL = baseMapping().add(BYTE_ARRAY, "BLOB")
                                                            .build();
+    private static final TypeMapping POSTGRES = baseMapping().add(BYTE_ARRAY, "BYTEA")
+                                                             .build();
 
     private TypeMappings() {
         // Prevent instantiation of this utility class.
@@ -69,5 +57,15 @@ public class TypeMappings {
      */
     public static TypeMapping postgreSql() {
         return POSTGRES;
+    }
+
+    private static TypeMapping.Builder baseMapping() {
+        final Builder baseMapping = TypeMapping.newBuilder()
+                                               .add(INT, "INT")
+                                               .add(LONG, "BIGINT")
+                                               .add(STRING_255, "VARCHAR(255)")
+                                               .add(STRING, "TEXT")
+                                               .add(BOOLEAN, "BOOLEAN");
+        return baseMapping;
     }
 }
