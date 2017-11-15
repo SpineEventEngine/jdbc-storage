@@ -39,6 +39,8 @@ import static io.spine.util.Exceptions.newIllegalStateException;
  * <p>This class provides a flexible way to point out
  * database specific names of {@linkplain Type types}.
  *
+ * <p>A mapping should provide names for all types except the {@link Type#ID ID}.
+ *
  * <p>There are predefined {@linkplain TypeMappings mappings}.
  *
  * @author Dmytro Grankin

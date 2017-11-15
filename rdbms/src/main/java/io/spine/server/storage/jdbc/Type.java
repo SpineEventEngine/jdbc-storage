@@ -21,9 +21,11 @@
 package io.spine.server.storage.jdbc;
 
 /**
- * Basic data types used in the project.
+ * Data types used in the SQL tables of the project.
  *
- * <p>The names of the types for a particular database can be specified via {@link TypeMapping}.
+ * <p>These types are abstract and have no relation to a particular SQL database.
+ *
+ * <p>The names of the types for a particular database is specified by a {@link TypeMapping}.
  *
  * @author Dmytro Grankin
  */
