@@ -61,7 +61,7 @@ public class JdbcStorageFactory implements StorageFactory {
         this.dataSource = checkNotNull(builder.dataSource);
         this.multitenant = builder.multitenant;
         this.columnTypeRegistry = builder.columnTypeRegistry;
-        this.typeMapping = builder.typeMapping;
+        this.typeMapping = checkNotNull(builder.typeMapping);
     }
 
     @Override
@@ -74,6 +74,7 @@ public class JdbcStorageFactory implements StorageFactory {
         if (isMultitenant()) {
             return newBuilder().setColumnTypeRegistry(columnTypeRegistry)
                                .setDataSource(dataSource)
+                               .setTypeMapping(typeMapping)
                                .setMultitenant(false)
                                .build();
         } else {

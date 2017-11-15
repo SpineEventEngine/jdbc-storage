@@ -133,6 +133,7 @@ public class JdbcStorageFactoryShould {
         final JdbcStorageFactory factory = JdbcStorageFactory.newBuilder()
                                                              .setDataSource(mock)
                                                              .setMultitenant(false)
+                                                             .setTypeMapping(mySql())
                                                              .build();
         factory.close();
         verify(mock).close();
@@ -143,6 +144,7 @@ public class JdbcStorageFactoryShould {
         final DataSourceWrapper dataSource = GivenDataSource.withoutSuperpowers();
         final JdbcStorageFactory factory = JdbcStorageFactory.newBuilder()
                                                              .setDataSource(dataSource)
+                                                             .setTypeMapping(mySql())
                                                              .build();
         final ColumnTypeRegistry<?> registry = factory.getTypeRegistry();
         assertNotNull(registry);
@@ -154,6 +156,7 @@ public class JdbcStorageFactoryShould {
         final JdbcStorageFactory factory = JdbcStorageFactory.newBuilder()
                                                              .setMultitenant(true)
                                                              .setDataSource(dataSource)
+                                                             .setTypeMapping(mySql())
                                                              .build();
         assertTrue(factory.isMultitenant());
         final JdbcStorageFactory singleTenantFactory = factory.toSingleTenant();
@@ -166,6 +169,7 @@ public class JdbcStorageFactoryShould {
         final JdbcStorageFactory factory = JdbcStorageFactory.newBuilder()
                                                              .setMultitenant(false)
                                                              .setDataSource(dataSource)
+                                                             .setTypeMapping(mySql())
                                                              .build();
         assertSame(factory, factory.toSingleTenant());
     }
