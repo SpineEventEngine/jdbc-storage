@@ -36,7 +36,6 @@ import io.spine.server.storage.RecordStorage;
 import io.spine.server.storage.RecordStorageShould;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.GivenDataSource;
-import io.spine.server.storage.jdbc.given.GivenMapping;
 import io.spine.server.storage.jdbc.record.given.JdbcRecordStorageTestEnv;
 import io.spine.server.storage.jdbc.record.given.JdbcRecordStorageTestEnv.TestCounterEntityJdbc;
 import io.spine.server.storage.jdbc.record.given.JdbcRecordStorageTestEnv.TestEntityWithStringId;
@@ -51,7 +50,7 @@ import static io.spine.Identifier.newUuid;
 import static io.spine.client.ColumnFilters.gt;
 import static io.spine.client.ColumnFilters.lt;
 import static io.spine.client.CompositeColumnFilter.CompositeOperator.ALL;
-import static io.spine.server.storage.jdbc.given.GivenMapping.defaultMapping;
+import static io.spine.server.storage.jdbc.TypeMappings.mySql;
 import static io.spine.test.Tests.nullRef;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -146,7 +145,7 @@ public class JdbcRecordStorageShould
                         .setEntityClass(entityClass)
                         .setMultitenant(false)
                         .setColumnTypeRegistry(JdbcTypeRegistryFactory.defaultInstance())
-                        .setTypeMapping(defaultMapping())
+                        .setTypeMapping(mySql())
                         .build();
         return storage;
     }

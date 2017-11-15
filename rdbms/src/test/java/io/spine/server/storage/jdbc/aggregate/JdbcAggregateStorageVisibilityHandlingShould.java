@@ -33,7 +33,7 @@ import io.spine.test.aggregate.ProjectVBuilder;
 import io.spine.testdata.Sample;
 import org.junit.Test;
 
-import static io.spine.server.storage.jdbc.given.GivenMapping.defaultMapping;
+import static io.spine.server.storage.jdbc.TypeMappings.mySql;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -53,7 +53,7 @@ public class JdbcAggregateStorageVisibilityHandlingShould
                         .setMultitenant(false)
                         .setAggregateClass(TestAggregate.class)
                         .setDataSource(dataSource)
-                        .setTypeMapping(defaultMapping())
+                        .setTypeMapping(mySql())
                         .build();
         return storage;
     }

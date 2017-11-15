@@ -25,7 +25,6 @@ import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.aggregate.Snapshot;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.given.GivenMapping;
 import io.spine.validate.StringValueVBuilder;
 import org.junit.Test;
 
@@ -34,8 +33,8 @@ import static io.spine.Identifier.newUuid;
 import static io.spine.core.Versions.newVersion;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
 import static io.spine.server.storage.jdbc.GivenDataSource.withoutSuperpowers;
+import static io.spine.server.storage.jdbc.TypeMappings.mySql;
 import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.kind;
-import static io.spine.server.storage.jdbc.given.GivenMapping.defaultMapping;
 import static io.spine.time.Time.getCurrentTime;
 import static org.junit.Assert.assertEquals;
 
@@ -47,8 +46,7 @@ public class AggregateEventRecordTableShould {
     @Test(expected = IllegalStateException.class)
     public void throw_on_attempt_to_update_event_record() {
         final AggregateEventRecordTable<String> table =
-                new AggregateEventRecordTable<>(AnAggregate.class, withoutSuperpowers(),
-                                                defaultMapping());
+                new AggregateEventRecordTable<>(AnAggregate.class, withoutSuperpowers(), mySql());
         table.update(newUuid(), AggregateEventRecord.getDefaultInstance());
     }
 
@@ -56,7 +54,7 @@ public class AggregateEventRecordTableShould {
     public void store_record_kind_in_string_representation() {
         final DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
         final AggregateEventRecordTable<String> table =
-                new AggregateEventRecordTable<>(AnAggregate.class, dataSource, defaultMapping());
+                new AggregateEventRecordTable<>(AnAggregate.class, dataSource, mySql());
         table.create();
 
         final Snapshot snapshot = Snapshot.newBuilder()
