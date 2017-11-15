@@ -36,8 +36,6 @@ import static org.mockito.Mockito.when;
 
 public class GivenDataSource {
 
-    public static final String DEFAULT_TABLE_NAME = "test";
-
     /**
      * The URL prefix of an in-memory HyperSQL DB.
      */
