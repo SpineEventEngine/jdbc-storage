@@ -45,7 +45,7 @@ import static io.spine.server.storage.jdbc.Type.ID;
  *
  * @author Dmytro Grankin
  */
-public class TypeMapping {
+public final class TypeMapping {
 
     private final Map<Type, String> mappedTypes;
 

@@ -20,6 +20,7 @@
 
 package io.spine.server.storage.jdbc;
 
+import com.google.common.annotations.VisibleForTesting;
 import io.spine.server.storage.jdbc.TypeMapping.Builder;
 
 import java.sql.SQLException;
@@ -50,6 +51,7 @@ public class TypeMappings {
     /**
      * Obtains the default type mapping for MySQL database.
      */
+    @VisibleForTesting
     public static TypeMapping mySql() {
         return MY_SQL;
     }
@@ -57,6 +59,7 @@ public class TypeMappings {
     /**
      * Obtains the default type mapping for PostreSQL database.
      */
+    @VisibleForTesting
     public static TypeMapping postgreSql() {
         return POSTGRES;
     }

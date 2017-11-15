@@ -20,6 +20,7 @@
 
 package io.spine.server.storage.jdbc;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import io.spine.server.aggregate.Aggregate;
@@ -142,6 +143,11 @@ public class JdbcStorageFactory implements StorageFactory {
     @Override
     public void close() {
         dataSource.close();
+    }
+
+    @VisibleForTesting
+    TypeMapping getTypeMapping() {
+        return typeMapping;
     }
 
     public static Builder newBuilder() {
