@@ -33,8 +33,8 @@ import static io.spine.server.storage.jdbc.Type.ID;
 /**
  * A {@link Type}-to-name mapping.
  *
- * <p>A type may have different names in different databases.
- * E.g. for binary data in MySQL is used {@code BLOB}, but in PostgreSQL - {@code BYTEA}.
+ * <p>A data type may have different names in different databases.
+ * E.g. for binary data {@code BLOB} is used in MySQL, but in PostgreSQL it's {@code BYTEA}.
  *
  * <p>This class provides a flexible way to point out
  * database specific names of {@linkplain Type types}.
@@ -54,12 +54,12 @@ public class TypeMapping {
         final int typesCountWithoutId = Type.values().length - 1;
         checkState(typesFromBuilder.size() == typesCountWithoutId,
                    "A mapping should contain names for all types except Type.ID (%s), " +
-                   "but only %s types were mapped.", typesCountWithoutId, typesFromBuilder.size());
+                   "but only (%s) types were mapped.", typesCountWithoutId, typesFromBuilder.size());
         mappedTypes = new EnumMap<>(typesFromBuilder);
     }
 
     /**
-     * Obtains the name of specified {@link Type}.
+     * Obtains the name of the specified {@link Type}.
      *
      * @param type the type to get the name
      * @return the type name

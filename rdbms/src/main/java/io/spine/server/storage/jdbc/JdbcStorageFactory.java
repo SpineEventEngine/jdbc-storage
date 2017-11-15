@@ -222,7 +222,7 @@ public class JdbcStorageFactory implements StorageFactory {
         /**
          * Sets required field {@code typeMapping}.
          *
-         * @see TypeMappings
+         * @see TypeMapping
          */
         public Builder setTypeMapping(TypeMapping typeMapping) {
             this.typeMapping = checkNotNull(typeMapping);
