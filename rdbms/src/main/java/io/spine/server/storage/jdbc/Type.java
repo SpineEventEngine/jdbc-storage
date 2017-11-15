@@ -63,13 +63,13 @@ public enum Type {
     LONG,
 
     /**
-     * The type representing a {@code String}, maximum size of which
-     * is limited to 255 characters.
+     * The type representing a {@code String}, maximum length of which
+     * doesn't exceed 255 characters.
      */
     STRING_255,
 
     /**
-     * The type representing a {@code String}, maximum size of which is unknown.
+     * The type representing a {@code String}, maximum length of which is unknown.
      */
     STRING,
     BOOLEAN

@@ -26,9 +26,9 @@ import java.util.EnumMap;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static io.spine.util.Exceptions.newIllegalStateException;
+import static io.spine.server.storage.jdbc.Type.ID;
 
 /**
  * A {@link Type}-to-name mapping.
@@ -50,7 +50,12 @@ public class TypeMapping {
     private final Map<Type, String> mappedTypes;
 
     private TypeMapping(Builder builder) {
-        mappedTypes = new EnumMap<>(builder.types.build());
+        final ImmutableMap<Type, String> typesFromBuilder = builder.types.build();
+        final int typesCountWithoutId = Type.values().length - 1;
+        checkState(typesFromBuilder.size() == typesCountWithoutId,
+                   "A mapping should contain names for all types except Type.ID (%s), " +
+                   "but only %s types were mapped.", typesCountWithoutId, typesFromBuilder.size());
+        mappedTypes = new EnumMap<>(typesFromBuilder);
     }
 
     /**
@@ -61,11 +66,9 @@ public class TypeMapping {
      * @throws IllegalStateException if the name for the specified type is not defined
      */
     public String getTypeName(Type type) {
+        checkState(mappedTypes.containsKey(type),
+                   "The type mapping doesn't define name for %s type.");
         final String name = mappedTypes.get(type);
-        if (name == null) {
-            throw newIllegalStateException("The type mapping doesn't define name for %s type.",
-                                           type);
-        }
         return name;
     }
 
@@ -95,9 +98,11 @@ public class TypeMapping {
          * @param type the type for the mapping
          * @param name the custom name for the type
          * @return the builder instance
+         * @throws IllegalArgumentException if the type is {@link Type#ID ID}
+         *                                  or the name if {@code null} or empty
          */
         public Builder add(Type type, String name) {
-            checkNotNull(type);
+            checkArgument(type != ID);
             checkArgument(!isNullOrEmpty(name));
             types.put(type, name);
             return this;
