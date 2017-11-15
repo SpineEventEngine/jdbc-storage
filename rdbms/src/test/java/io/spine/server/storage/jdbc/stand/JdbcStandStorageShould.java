@@ -56,7 +56,6 @@ import static com.google.common.collect.Lists.newArrayList;
 import static io.spine.server.storage.jdbc.given.GivenMapping.defaultMapping;
 import static io.spine.server.storage.jdbc.stand.given.Given.TestAggregate;
 import static io.spine.server.storage.jdbc.stand.given.Given.TestAggregate2;
-import static io.spine.server.storage.jdbc.stand.given.Given.newStorage;
 import static io.spine.server.storage.jdbc.stand.given.Given.testAggregates;
 import static io.spine.server.storage.jdbc.stand.given.Given.testAggregatesWithState;
 import static io.spine.test.Verify.assertContains;
@@ -79,7 +78,7 @@ import static org.mockito.Mockito.when;
 public class JdbcStandStorageShould extends StandStorageShould {
 
     @Override
-    protected StandStorage getStorage(Class<? extends Entity> entityClass) {
+    protected StandStorage newStorage(Class<? extends Entity> entityClass) {
         final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(
                 "StandStorageTests");
         final StandStorage storage = JdbcStandStorage.newBuilder()
@@ -155,7 +154,7 @@ public class JdbcStandStorageShould extends StandStorageShould {
 
     @Test
     public void write_data_to_store() {
-        final StandStorage storage = newStorage();
+        final StandStorage storage = getStorage();
 
         final TestAggregate aggregate = new TestAggregate("some_id");
 
@@ -173,7 +172,7 @@ public class JdbcStandStorageShould extends StandStorageShould {
 
     @Test
     public void perform_bulk_read_operations() {
-        final StandStorage storage = newStorage();
+        final StandStorage storage = getStorage();
 
         final Collection<Given.TestAggregate> testData = testAggregates(10);
 
@@ -203,7 +202,7 @@ public class JdbcStandStorageShould extends StandStorageShould {
 
     @Test
     public void handle_wrong_ids_silently() {
-        final StandStorage storage = newStorage();
+        final StandStorage storage = getStorage();
 
         final TypeUrl typeUrl = TypeUrl.of(Project.class);
         final String repeatingInvalidId = "invalid-id-1";
@@ -222,7 +221,7 @@ public class JdbcStandStorageShould extends StandStorageShould {
     @SuppressWarnings("MethodWithMultipleLoops")
     @Test
     public void read_all_from_database() {
-        final StandStorage storage = newStorage();
+        final StandStorage storage = getStorage();
 
         final Collection<Given.TestAggregate> testData = testAggregates(10);
 
@@ -243,7 +242,7 @@ public class JdbcStandStorageShould extends StandStorageShould {
 
     @Test
     public void read_all_by_type_url() {
-        final StandStorage storage = newStorage();
+        final StandStorage storage = getStorage();
 
         final int aggregatesCount = 5;
         final List<Given.TestAggregate> aggregates = testAggregates(aggregatesCount);
@@ -271,7 +270,7 @@ public class JdbcStandStorageShould extends StandStorageShould {
     @SuppressWarnings("MethodWithMultipleLoops")
     @Test
     public void read_by_type_and_apply_field_mask() {
-        final StandStorage storage = newStorage();
+        final StandStorage storage = getStorage();
 
         final List<Given.TestAggregate> aggregates = testAggregatesWithState(5);
 
@@ -303,7 +302,7 @@ public class JdbcStandStorageShould extends StandStorageShould {
 
     @Test
     public void be_auto_closable() throws Exception {
-        try (StandStorage storage = newStorage()) {
+        try (StandStorage storage = getStorage()) {
             assertTrue(storage.isOpen());
             assertFalse(storage.isClosed());
         }
@@ -311,7 +310,7 @@ public class JdbcStandStorageShould extends StandStorageShould {
 
     @Test(expected = IllegalStateException.class)
     public void fail_to_write_data_after_closed() throws Exception {
-        final StandStorage storage = newStorage();
+        final StandStorage storage = getStorage();
 
         assertTrue(storage.isOpen());
         storage.close();
@@ -322,7 +321,7 @@ public class JdbcStandStorageShould extends StandStorageShould {
 
     @Test(expected = IllegalStateException.class)
     public void fail_to_read_data_after_closed() throws Exception {
-        final StandStorage storage = newStorage();
+        final StandStorage storage = getStorage();
 
         assertTrue(storage.isOpen());
         storage.close();

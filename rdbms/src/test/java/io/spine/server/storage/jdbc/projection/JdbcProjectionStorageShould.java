@@ -45,7 +45,7 @@ import static org.junit.Assert.assertNotNull;
 public class JdbcProjectionStorageShould extends ProjectionStorageShould {
 
     @Override
-    protected ProjectionStorage<ProjectId> getStorage(Class<? extends Entity> entityClass) {
+    protected ProjectionStorage<ProjectId> newStorage(Class<? extends Entity> entityClass) {
         final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(
                 "projectionStorageTests");
         @SuppressWarnings("unchecked") // Required for the tests
@@ -72,7 +72,7 @@ public class JdbcProjectionStorageShould extends ProjectionStorageShould {
 
     @Test(expected = IllegalStateException.class)
     public void throw_exception_when_closing_twice() throws Exception {
-        final ProjectionStorage<?> storage = getStorage(getTestEntityClass());
+        final ProjectionStorage<?> storage = getStorage();
         storage.close();
         storage.close();
     }

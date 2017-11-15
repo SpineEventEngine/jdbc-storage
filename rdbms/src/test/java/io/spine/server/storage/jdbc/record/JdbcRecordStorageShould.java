@@ -38,6 +38,7 @@ import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.GivenDataSource;
 import io.spine.server.storage.jdbc.given.GivenMapping;
 import io.spine.server.storage.jdbc.record.given.JdbcRecordStorageTestEnv;
+import io.spine.server.storage.jdbc.record.given.JdbcRecordStorageTestEnv.TestCounterEntityJdbc;
 import io.spine.server.storage.jdbc.record.given.JdbcRecordStorageTestEnv.TestEntityWithStringId;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
@@ -64,7 +65,7 @@ public class JdbcRecordStorageShould
 
     @Test
     public void clear_itself() {
-        final JdbcRecordStorage<String> storage = getStorage(TestEntityWithStringId.class);
+        final JdbcRecordStorage<String> storage = getStorage();
         final String id = newUuid();
         final EntityRecord entityRecord = newStorageRecord();
 
@@ -75,29 +76,31 @@ public class JdbcRecordStorageShould
         final Optional<EntityRecord> actual = storage.readRecord(id);
         assertNotNull(actual);
         assertFalse(actual.isPresent());
+        close(storage);
     }
 
     @Test(expected = IllegalStateException.class)
     public void throw_exception_when_closing_twice() throws Exception {
-        final RecordStorage<?> storage = getStorage(TestEntityWithStringId.class);
+        final RecordStorage<?> storage = getStorage();
         storage.close();
         storage.close();
     }
 
     @Test
     public void use_column_names_for_storing() {
-        final JdbcRecordStorage<String> storage = getStorage(TestEntityWithStringId.class);
+        final JdbcRecordStorage<String> storage = newStorage(TestEntityWithStringId.class);
         final int entityColumnIndex = RecordTable.StandardColumn.values().length;
         final String customColumnName = storage.getTable()
                                                .getTableColumns()
                                                .get(entityColumnIndex)
                                                .name();
         assertEquals(JdbcRecordStorageTestEnv.COLUMN_NAME_FOR_STORING, customColumnName);
+        close(storage);
     }
 
     @Test
     public void read_by_composite_filter_with_column_filters_for_same_column() {
-        final JdbcRecordStorage<String> storage = getStorage(TestEntityWithStringId.class);
+        final JdbcRecordStorage<String> storage = newStorage(TestEntityWithStringId.class);
         final String columnName = "value";
         final ColumnFilter lessThan = lt(columnName, -5);
         final ColumnFilter greaterThan = gt(columnName, 5);
@@ -112,6 +115,7 @@ public class JdbcRecordStorageShould
         final EntityQuery<String> query = EntityQueries.from(entityFilters,
                                                              TestEntityWithStringId.class);
         storage.readAll(query, FieldMask.getDefaultInstance());
+        close(storage);
     }
 
     @Test(expected = NullPointerException.class)
@@ -130,7 +134,7 @@ public class JdbcRecordStorageShould
     }
 
     @Override
-    protected JdbcRecordStorage<String> getStorage(Class<? extends Entity> cls) {
+    protected JdbcRecordStorage<String> newStorage(Class<? extends Entity> cls) {
         final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(
                 "entityStorageTests");
         @SuppressWarnings("unchecked") // Test invariant.
@@ -162,6 +166,6 @@ public class JdbcRecordStorageShould
 
     @Override
     protected Class<? extends TestCounterEntity> getTestEntityClass() {
-        return JdbcRecordStorageTestEnv.TestCounterEntityJdbc.class;
+        return TestCounterEntityJdbc.class;
     }
 }
