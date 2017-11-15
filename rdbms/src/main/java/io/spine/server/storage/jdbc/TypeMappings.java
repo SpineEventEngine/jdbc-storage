@@ -78,7 +78,7 @@ public class TypeMappings {
                                           .getMetaData()
                                           .getDatabaseProductName()
                                           .toLowerCase();
-            if (name.equals("postgresql")) {
+            if ("postgresql".equals(name)) {
                 return POSTGRES;
             }
 
