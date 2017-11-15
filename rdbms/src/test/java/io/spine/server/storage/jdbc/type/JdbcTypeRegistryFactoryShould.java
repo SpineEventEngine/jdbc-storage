@@ -86,12 +86,12 @@ public class JdbcTypeRegistryFactoryShould {
 
         @Override
         public void setColumnValue(Parameters.Builder storageRecord, String value,
-                                   Integer columnIdentifier) {
+                                   String columnIdentifier) {
             // NoOp (as for tests)
         }
 
         @Override
-        public void setNull(Parameters.Builder storageRecord, Integer columnIdentifier) {
+        public void setNull(Parameters.Builder storageRecord, String columnIdentifier) {
             // NoOp (as for tests)
         }
     }

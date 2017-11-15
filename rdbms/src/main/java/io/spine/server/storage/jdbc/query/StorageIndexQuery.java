@@ -20,98 +20,52 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import io.spine.annotation.Internal;
-import io.spine.server.storage.jdbc.ConnectionWrapper;
-import io.spine.server.storage.jdbc.IndexIterator;
-
-import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.Iterator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
-import static io.spine.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
-import static io.spine.server.storage.jdbc.Sql.Query.FROM;
-import static io.spine.server.storage.jdbc.Sql.Query.SELECT;
-import static java.lang.String.format;
+import static io.spine.server.storage.jdbc.query.IndexIterator.create;
 
 /**
  * A query for all the IDs in a certain table.
  *
- * @author Dmytro Dashenkov
+ * @param <I> the type of IDs
+ * @author Dmytro Grankin
  */
-@Internal
-public class StorageIndexQuery<I> extends StorageQuery {
+class StorageIndexQuery<I> extends AbstractQuery implements SelectQuery<Iterator<I>> {
 
-    private static final String FORMAT = "%s";
-
-    private static final String SQL_TEMPLATE = SELECT + FORMAT + FROM + FORMAT + SEMICOLON;
-
-    private final String idColumnName;
-    private final Class<I> idType;
+    private final IdColumn<I> idColumn;
 
     private StorageIndexQuery(Builder<I> builder) {
         super(builder);
-        this.idColumnName = builder.getIdColumnName();
-        this.idType = builder.getIdType();
-    }
-
-    public Iterator<I> execute() {
-        ConnectionWrapper connection = getConnection(true);
-        final PreparedStatement statement = prepareStatement(connection);
-        final Iterator<I> result = IndexIterator.create(statement, idColumnName, idType);
-        return result;
+        this.idColumn = builder.idColumn;
     }
 
     @Override
-    protected Parameters getQueryParameters() {
-        return Parameters.empty();
+    public Iterator<I> execute() {
+        final String columnName = idColumn.getColumnName();
+        final ResultSet resultSet = factory().select(pathOf(columnName))
+                                             .from(table())
+                                             .getResults();
+        final Iterator<I> result = create(resultSet, columnName, idColumn.getJavaType());
+        return result;
     }
 
-    public static <I> Builder<I> newBuilder() {
+    static <I> Builder<I> newBuilder() {
         return new Builder<>();
     }
 
-    public static class Builder<I> extends StorageQuery.Builder<Builder<I>, StorageIndexQuery<I>> {
+    static class Builder<I> extends AbstractQuery.Builder<Builder<I>, StorageIndexQuery<I>> {
 
-        private static final String DEFAULT_ID_COLUMN_NAME = "id";
+        private IdColumn<I> idColumn;
 
-        private String idColumnName = DEFAULT_ID_COLUMN_NAME;
-        private String tableName;
-        private Class<I> idType;
-
-        private Builder() {
-            super();
-            // Prevent direct instantiation.
-        }
-
-        public String getIdColumnName() {
-            return idColumnName;
-        }
-
-        public Builder<I> setIdColumnName(String idColumnName) {
-            this.idColumnName = checkNotNull(idColumnName);
-            return getThis();
-        }
-
-        public Builder<I> setTableName(String tableName) {
-            this.tableName = tableName;
-            return getThis();
-        }
-
-        private Class<I> getIdType() {
-            return idType;
-        }
-
-        public Builder<I> setIdType(Class<I> idType) {
-            this.idType = idType;
+        Builder<I> setIdColumn(IdColumn<I> idColumn) {
+            this.idColumn = checkNotNull(idColumn);
             return getThis();
         }
 
         @Override
-        public StorageIndexQuery<I> build() {
-            checkState(tableName != null, "Table name is not set.");
-            checkState(idType != null, "ID type is not set.");
-            setQuery(format(SQL_TEMPLATE, idColumnName, tableName));
+        protected StorageIndexQuery<I> doBuild() {
             return new StorageIndexQuery<>(this);
         }
 

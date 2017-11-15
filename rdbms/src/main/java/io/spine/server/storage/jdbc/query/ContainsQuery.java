@@ -20,105 +20,41 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import io.spine.annotation.Internal;
-import io.spine.server.storage.jdbc.ConnectionWrapper;
-import io.spine.server.storage.jdbc.DatabaseException;
-import io.spine.server.storage.jdbc.IdColumn;
-import io.spine.server.storage.jdbc.TableColumn;
+import com.querydsl.sql.AbstractSQLQuery;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-import static io.spine.server.storage.jdbc.Sql.BuildingBlock.EQUAL;
-import static io.spine.server.storage.jdbc.Sql.Query.ALL_ATTRIBUTES;
-import static io.spine.server.storage.jdbc.Sql.Query.FROM;
-import static io.spine.server.storage.jdbc.Sql.Query.PLACEHOLDER;
-import static io.spine.server.storage.jdbc.Sql.Query.SELECT;
-import static io.spine.server.storage.jdbc.Sql.Query.WHERE;
-import static java.lang.String.format;
+import static com.querydsl.sql.SQLExpressions.count;
 
 /**
- * A query that checks if the table contains a record with given ID.
+ * A query that checks if the table contains a record with the given ID.
  *
- * @author Dmytro Dashenkov
+ * @author Dmytro Grankin
  */
-@Internal
-public class ContainsQuery<I> extends StorageQuery {
-
-    private static final String FORMAT_PLACEHOLDER = "%s";
-    private static final String SQL_TEMPLATE = SELECT.toString() + ALL_ATTRIBUTES +
-                                               FROM + FORMAT_PLACEHOLDER +
-                                               WHERE + FORMAT_PLACEHOLDER + EQUAL + PLACEHOLDER;
-
-    private final IdColumn<I> idColumn;
-    private final I id;
+class ContainsQuery<I> extends IdAwareQuery<I> implements SelectQuery<Boolean> {
 
     private ContainsQuery(Builder<I> builder) {
         super(builder);
-        this.idColumn = builder.idColumn;
-        this.id = builder.id;
     }
 
     /**
      * @return {@code true} if there is at least one record with given ID, {@code} false otherwise
      */
-    public boolean execute() {
-        try (ConnectionWrapper connection = getConnection(false);
-             PreparedStatement statement = prepareStatement(connection)) {
-            final ResultSet results = statement.executeQuery();
-            final boolean result = results.next();
-            results.close();
-            return result;
-        } catch (SQLException e) {
-            getLogger().error("Exception executing statement: " + getQuery(), e);
-            throw new DatabaseException(e);
-        }
-    }
-
     @Override
-    protected Parameters getQueryParameters() {
-        final Parameters.Builder builder = Parameters.newBuilder();
-        idColumn.setId(1, id, builder);
-        return builder.build();
+    public Boolean execute() {
+        final AbstractSQLQuery<Long, ?> query = factory().select(count())
+                                                         .from(table())
+                                                         .where(idPath().eq(getNormalizedId()));
+        final long recordsCount = query.fetchOne();
+        return recordsCount > 0;
     }
 
-    public static <I> Builder<I> newBuilder() {
+    static <I> Builder<I> newBuilder() {
         return new Builder<>();
     }
 
-    public static class Builder<I> extends StorageQuery.Builder<Builder<I>, ContainsQuery<I>> {
-
-        private String tableName;
-        private IdColumn<I> idColumn;
-        private I id;
-        private TableColumn keyColumn;
-
-        public Builder<I> setTableName(String tableName) {
-            this.tableName = checkNotNull(tableName);
-            return this;
-        }
-
-        public Builder<I> setIdColumn(IdColumn<I> idColumn) {
-            this.idColumn = idColumn;
-            return this;
-        }
-
-        public Builder<I> setKeyColumn(TableColumn keyColumn) {
-            this.keyColumn = keyColumn;
-            return this;
-        }
-
-        public Builder<I> setId(I id) {
-            this.id = id;
-            return this;
-        }
+    static class Builder<I> extends IdAwareQuery.Builder<I, Builder<I>, ContainsQuery<I>> {
 
         @Override
-        public ContainsQuery<I> build() {
-            final String sql = format(SQL_TEMPLATE, tableName, keyColumn.name());
-            setQuery(sql);
+        protected ContainsQuery<I> doBuild() {
             return new ContainsQuery<>(this);
         }
 

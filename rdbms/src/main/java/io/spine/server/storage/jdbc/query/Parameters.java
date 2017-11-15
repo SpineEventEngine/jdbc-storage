@@ -42,7 +42,7 @@ import static java.util.Collections.disjoint;
  */
 public final class Parameters {
 
-    private final ImmutableMap<Integer, Parameter> parameters;
+    private final ImmutableMap<String, Parameter> parameters;
 
     private Parameters(Builder builder) {
         this.parameters = ImmutableMap.copyOf(builder.parameters);
@@ -53,7 +53,7 @@ public final class Parameters {
      *
      * @return parameter identifiers
      */
-    public Set<Integer> getIdentifiers() {
+    public Set<String> getIdentifiers() {
         // It's OK for an immutable map to return the key set directly.
         return parameters.keySet();
     }
@@ -65,7 +65,7 @@ public final class Parameters {
      * @return the query parameter
      * @throws IllegalArgumentException if there is no parameters with the specified identifier
      */
-    public Parameter getParameter(Integer identifier) {
+    public Parameter getParameter(String identifier) {
         checkArgument(parameters.containsKey(identifier));
         final Parameter value = parameters.get(identifier);
         return value;
@@ -96,7 +96,7 @@ public final class Parameters {
      */
     public static class Builder {
 
-        private final Map<Integer, Parameter> parameters = newHashMap();
+        private final Map<String, Parameter> parameters = newHashMap();
 
         private Builder() {
             // Prevent direct instantiation of this class.
@@ -108,7 +108,7 @@ public final class Parameters {
          * @param identifier the identifier for a parameter
          * @param parameter the {@link Parameter} to add
          */
-        public Builder addParameter(Integer identifier, Parameter parameter) {
+        public Builder addParameter(String identifier, Parameter parameter) {
             checkNotNull(identifier);
             checkArgument(!parameters.containsKey(identifier));
             parameters.put(identifier, parameter);

@@ -22,14 +22,10 @@ package io.spine.server.storage.jdbc.query;
 
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Message;
-import io.spine.Identifier;
-import io.spine.annotation.Internal;
+import com.querydsl.sql.AbstractSQLQuery;
 import io.spine.server.storage.jdbc.DatabaseException;
-import io.spine.server.storage.jdbc.ConnectionWrapper;
-import io.spine.server.storage.jdbc.Serializer;
 
 import javax.annotation.Nullable;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -40,10 +36,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @param <I> a type of storage message IDs
  * @param <M> a type of messages to read
- * @author Alexander Litus
+ * @author Dmytro Grankin
  */
-@Internal
-class SelectMessageByIdQuery<I, M extends Message> extends SelectByIdQuery<I, M> {
+public abstract class SelectMessageByIdQuery<I, M extends Message> extends AbstractSelectByIdQuery<I, M> {
 
     private final String messageColumnName;
     private final Descriptor messageDescriptor;
@@ -64,21 +59,24 @@ class SelectMessageByIdQuery<I, M extends Message> extends SelectByIdQuery<I, M>
      */
     @Nullable
     @Override
-    public M execute() throws DatabaseException {
-        try (ConnectionWrapper connection = getConnection(true);
-             PreparedStatement statement = prepareStatement(connection);
-             ResultSet resultSet = statement.executeQuery()) {
+    public final M execute() throws DatabaseException {
+        try (ResultSet resultSet = getQuery().getResults()){
             if (!resultSet.next()) {
                 return null;
             }
             final M message = readMessage(resultSet);
             return message;
         } catch (SQLException e) {
-            getLogger().error("Error during reading a message, ID = "
-                              + Identifier.toString(getId()), e);
             throw new DatabaseException(e);
         }
     }
+
+    /**
+     * Obtains a query to get {@link AbstractSQLQuery#getResults() results}.
+     *
+     * @return a query, which is ready for execution
+     */
+    protected abstract AbstractSQLQuery<?, ?> getQuery();
 
     /**
      * Retrieves a message from a DB result set.
@@ -101,29 +99,22 @@ class SelectMessageByIdQuery<I, M extends Message> extends SelectByIdQuery<I, M>
         return message;
     }
 
-    @Override
-    protected Parameters getQueryParameters() {
-        final Parameters.Builder builder = Parameters.newBuilder();
-        getIdColumn().setId(getIdIndexInQuery(), getId(), builder);
-        return builder.build();
-    }
-
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    abstract static class Builder<B extends Builder<B, Q, I, R>,
-                                  Q extends SelectMessageByIdQuery<I, R>,
-                                  I,
-                                  R extends Message>
-            extends SelectByIdQuery.Builder<I, B, Q> {
+    protected abstract static class Builder<B extends Builder<B, Q, I, R>,
+                                            Q extends SelectMessageByIdQuery<I, R>,
+                                            I,
+                                            R extends Message>
+            extends AbstractSelectByIdQuery.Builder<I, B, Q> {
 
         private String messageColumnName;
         private Descriptor messageDescriptor;
 
-        B setMessageColumnName(String messageColumnName) {
+        protected B setMessageColumnName(String messageColumnName) {
             this.messageColumnName = messageColumnName;
             return getThis();
         }
 
-        B setMessageDescriptor(Descriptor messageDescriptor) {
+        protected B setMessageDescriptor(Descriptor messageDescriptor) {
             this.messageDescriptor = messageDescriptor;
             return getThis();
         }

@@ -20,18 +20,19 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import io.spine.server.storage.jdbc.Sql;
 import org.junit.Test;
 
 import java.util.Set;
+
+import static io.spine.Identifier.newUuid;
 
 /**
  * @author Dmytro Grankin
  */
 public class ParametersShould {
 
-    private static final int ID = 1;
-    private static final Parameter PARAMETER = Parameter.of(new Object(), Sql.Type.ID);
+    private static final String ID = newUuid();
+    private static final Parameter PARAMETER = Parameter.of(new Object());
 
     @Test(expected = IllegalArgumentException.class)
     public void check_identifiers_uniqueness_for_single_parameter() {
@@ -51,8 +52,8 @@ public class ParametersShould {
     @Test(expected = UnsupportedOperationException.class)
     public void not_allow_modify_identifiers() {
         final Parameters parameters = Parameters.empty();
-        final Set<Integer> identifiers = parameters.getIdentifiers();
-        final int newIdentifier = 0;
+        final Set<String> identifiers = parameters.getIdentifiers();
+        final String newIdentifier = newUuid();
         identifiers.add(newIdentifier);
     }
 }

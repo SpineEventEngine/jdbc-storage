@@ -19,14 +19,7 @@
  */
 
 /**
- * The JDBC-based implementation of the Spine {@linkplain io.spine.server.storage.Storage storages}.
- *
- * <p>Extend the storage classes (
- * {@link io.spine.server.storage.jdbc.JdbcRecordStorage JdbcRecordStorage},
- * {@link io.spine.server.storage.jdbc.JdbcStandStorage JdbcStandStorage},
- * {@link io.spine.server.storage.jdbc.JdbcProjectionStorage JdbcProjectionStorage} and
- * {@link io.spine.server.storage.jdbc.JdbcAggregateStorage JdbcAggregateStorage}) to change
- * the behavior of the storages.
+ * The API for the JDBC-based storage implementation.
  *
  * @see io.spine.server.storage.jdbc.JdbcStorageFactory for the library entry point
  */

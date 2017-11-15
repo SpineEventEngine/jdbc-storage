@@ -33,15 +33,14 @@ import io.spine.server.storage.jdbc.query.Parameters;
 public abstract class AbstractJdbcColumnType<J, C> implements JdbcColumnType<J, C> {
 
     @Override
-    public void setColumnValue(Parameters.Builder storageRecord, C value,
-                               Integer columnIdentifier) {
-        final Parameter parameter = Parameter.of(value, getSqlType());
+    public void setColumnValue(Parameters.Builder storageRecord, C value, String columnIdentifier) {
+        final Parameter parameter = Parameter.of(value);
         storageRecord.addParameter(columnIdentifier, parameter);
     }
 
     @Override
-    public void setNull(Parameters.Builder storageRecord, Integer columnIdentifier) {
-        final Parameter nullParameter = Parameter.of(null, getSqlType());
+    public void setNull(Parameters.Builder storageRecord, String columnIdentifier) {
+        final Parameter nullParameter = Parameter.of(null);
         storageRecord.addParameter(columnIdentifier, nullParameter);
     }
 }

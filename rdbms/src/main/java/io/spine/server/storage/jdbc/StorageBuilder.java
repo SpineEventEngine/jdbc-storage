@@ -20,6 +20,7 @@
 
 package io.spine.server.storage.jdbc;
 
+import io.spine.annotation.Internal;
 import io.spine.server.storage.Storage;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -36,7 +37,8 @@ import static com.google.common.base.Preconditions.checkState;
  * @param <S> type of the built storage
  * @author Dmytro Dashenkov
  */
-abstract class StorageBuilder<B extends StorageBuilder<B, S>, S extends Storage> {
+@Internal
+public abstract class StorageBuilder<B extends StorageBuilder<B, S>, S extends Storage> {
 
     private boolean multitenant;
 

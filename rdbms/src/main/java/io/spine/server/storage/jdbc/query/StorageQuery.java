@@ -20,103 +20,10 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import io.spine.server.storage.jdbc.ConnectionWrapper;
-import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.DatabaseException;
-import org.slf4j.Logger;
-
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.Set;
-
 /**
- * The implementation base for the queries to an SQL database.
+ * A marker interface for an SQL query.
  *
- * @author Andrey Lavrov
- * @author Dmytro Dashenkov
+ * @author Dmytro Grankin
  */
-abstract class StorageQuery {
-
-    private final String query;
-    private final DataSourceWrapper dataSource;
-    private final Logger logger;
-
-    protected StorageQuery(Builder<? extends Builder, ? extends StorageQuery> builder) {
-        this.query = builder.query;
-        this.dataSource = builder.dataSource;
-        this.logger = builder.logger;
-    }
-
-    /**
-     * Prepares a statement using {@linkplain #getQueryParameters() parameters}.
-     *
-     * @param connection the connection to use
-     * @return a {@link PreparedStatement}, which is ready to use
-     */
-    protected PreparedStatement prepareStatement(ConnectionWrapper connection) {
-        final PreparedStatement statement = connection.prepareStatement(query);
-        final Set<Integer> parameterIds = getQueryParameters().getIdentifiers();
-        try {
-            for (Integer parameterId : parameterIds) {
-                final Parameter parameter = getQueryParameters().getParameter(parameterId);
-                final int sqlTypeIdentifier = parameter.getType()
-                                                       .getSqlTypeIntIdentifier();
-                statement.setObject(parameterId, parameter.getValue(), sqlTypeIdentifier);
-            }
-            return statement;
-        } catch (SQLException e) {
-            getLogger().error("Failed to prepare statement.", e);
-            throw new DatabaseException(e);
-        }
-    }
-
-    /**
-     * Obtains {@linkplain Parameters parameters} to set during
-     * {@linkplain #prepareStatement(ConnectionWrapper) statement preparation}.
-     *
-     * @return parameters for this query
-     */
-    protected abstract Parameters getQueryParameters();
-
-    public String getQuery() {
-        return query;
-    }
-
-    protected Logger getLogger() {
-        return logger;
-    }
-
-    protected ConnectionWrapper getConnection(boolean autocommit) {
-        return dataSource.getConnection(autocommit);
-    }
-
-    abstract static class Builder<B extends Builder<B, Q>, Q extends StorageQuery> {
-
-        private String query;
-        private DataSourceWrapper dataSource;
-        private Logger logger;
-
-        public abstract Q build();
-
-        protected abstract B getThis();
-
-        public B setDataSource(DataSourceWrapper dataSource) {
-            this.dataSource = dataSource;
-            return getThis();
-        }
-
-        public B setQuery(String query) {
-            this.query = query;
-            return getThis();
-        }
-
-        public B setLogger(Logger logger) {
-            this.logger = logger;
-            return getThis();
-        }
-
-        public DataSourceWrapper getDataSource() {
-            return dataSource;
-        }
-    }
+public interface StorageQuery {
 }

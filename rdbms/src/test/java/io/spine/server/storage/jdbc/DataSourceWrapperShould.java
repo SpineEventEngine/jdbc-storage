@@ -20,10 +20,7 @@
 
 package io.spine.server.storage.jdbc;
 
-import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.GivenDataSource;
 import org.junit.Test;
-import io.spine.server.storage.jdbc.DatabaseException;
 
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doThrow;

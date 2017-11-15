@@ -22,10 +22,6 @@ package io.spine.server.storage.jdbc;
 
 import org.junit.Test;
 
-import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
-import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
-import static io.spine.server.storage.jdbc.Sql.BuildingBlock.COMMA;
-import static io.spine.server.storage.jdbc.Sql.Query.PLACEHOLDER;
 import static io.spine.test.Tests.assertHasPrivateParameterlessCtor;
 import static org.junit.Assert.assertEquals;
 
@@ -37,30 +33,6 @@ public class SqlShould {
     @Test
     public void have_private_constructor() {
         assertHasPrivateParameterlessCtor(Sql.class);
-    }
-
-    @Test
-    public void generate_sequence_of_placeholders() {
-        final int count = 2;
-        final String placeholders = Sql.nPlaceholders(count);
-        final String expected =
-                BRACKET_OPEN.toString()
-                + PLACEHOLDER + COMMA
-                + PLACEHOLDER
-                + BRACKET_CLOSE;
-        assertEquals(expected, placeholders);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void fail_to_generate_placeholders_of_negative_count() {
-        final int count = -1;
-        Sql.nPlaceholders(count);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void fail_to_generate_zero_placeholders() {
-        final int count = 0;
-        Sql.nPlaceholders(count);
     }
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
@@ -76,8 +48,8 @@ public class SqlShould {
                                                      .trim();
         assertEquals(countExpected, countActual);
 
-        final String varcharExpected = "VARCHAR(512)";
-        final String varcharActual = Sql.Type.VARCHAR_512.toString()
+        final String varcharExpected = "VARCHAR(255)";
+        final String varcharActual = Sql.Type.VARCHAR_255.toString()
                                                          .trim();
         assertEquals(varcharExpected, varcharActual);
     }

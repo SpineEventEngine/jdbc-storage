@@ -20,43 +20,17 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import io.spine.annotation.Internal;
-import io.spine.server.storage.jdbc.ConnectionWrapper;
-import io.spine.server.storage.jdbc.DatabaseException;
-
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-
 /**
- * A query which is executed in order to write to the data source.
+ * A query which makes changes in a data source.
  *
- * @author Alexander Litus
+ * @author Dmytro Grankin
  */
-@Internal
-public abstract class WriteQuery extends StorageQuery {
-
-    protected WriteQuery(Builder<? extends Builder, ? extends WriteQuery> builder) {
-        super(builder);
-    }
+public interface WriteQuery extends StorageQuery {
 
     /**
-     * Executes a write query.
+     * Executes a write query and return the amount of affected rows.
+     *
+     * @return the amount of affected rows
      */
-    public void execute() {
-        try (ConnectionWrapper connection = getConnection(false)) {
-            try (PreparedStatement statement = prepareStatement(connection)) {
-                statement.execute();
-                connection.commit();
-            } catch (SQLException e) {
-                getLogger().error("Failed to execute write operation.", e);
-                connection.rollback();
-                throw new DatabaseException(e);
-            }
-        }
-    }
-
-    @SuppressWarnings("ClassNameSameAsAncestorName")
-    public abstract static class Builder<B extends Builder<B, Q>, Q extends WriteQuery>
-            extends StorageQuery.Builder<B, Q> {
-    }
+    long execute();
 }

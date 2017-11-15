@@ -20,43 +20,34 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import io.spine.annotation.Internal;
-
-import static java.lang.String.format;
-import static io.spine.server.storage.jdbc.Sql.BuildingBlock.SEMICOLON;
-import static io.spine.server.storage.jdbc.Sql.Query.DELETE_FROM;
+import com.querydsl.sql.dml.SQLDeleteClause;
 
 /**
- * Query that deletes all from a table.
+ * A query that deletes all rows from a table.
  *
- * @author Alexander Litus
- * @author Andrey Lavrov
+ * @author Dmytro Grankin
  */
-@Internal
-public class DeleteAllQuery extends WriteQuery {
-
-    private static final String QUERY_TEMPLATE = DELETE_FROM + "%s" + SEMICOLON;
+class DeleteAllQuery extends AbstractQuery implements WriteQuery {
 
     private DeleteAllQuery(Builder builder) {
         super(builder);
     }
 
     @Override
-    protected Parameters getQueryParameters() {
-        return Parameters.empty();
+    public long execute() {
+        final SQLDeleteClause query = factory().delete(table());
+        return query.execute();
     }
 
-    public static Builder newBuilder(String tableName) {
-        final Builder builder = new Builder();
-        builder.setQuery(format(QUERY_TEMPLATE, tableName));
-        return builder;
+    static Builder newBuilder() {
+        return new Builder();
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName")
-    public static class Builder extends WriteQuery.Builder<Builder, DeleteAllQuery> {
+    static class Builder extends AbstractQuery.Builder<Builder, DeleteAllQuery> {
 
         @Override
-        public DeleteAllQuery build() {
+        protected DeleteAllQuery doBuild() {
             return new DeleteAllQuery(this);
         }
 

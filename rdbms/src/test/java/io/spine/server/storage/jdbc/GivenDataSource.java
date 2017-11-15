@@ -45,29 +45,11 @@ public class GivenDataSource {
     // See the details: https://github.com/SpineEventEngine/jdbc-storage/issues/37
     private static final String HSQL_IN_MEMORY_DB_URL_PREFIX = "jdbc:h2:mem:";
 
-    private static final SQLException EXCEPTION = new SQLException("");
-
     private GivenDataSource() {
     }
 
     public static DataSourceWrapper withoutSuperpowers() {
         return mock(DataSourceWrapper.class);
-    }
-
-    public static DataSourceWrapper whichThrowsExceptionOnExecuteStatement() throws SQLException {
-        final DataSourceWrapper dataSource = mock(DataSourceWrapper.class);
-        final PreparedStatement statement = mock(PreparedStatement.class);
-        final ConnectionWrapper connection = mock(ConnectionWrapper.class);
-
-        when(dataSource.getConnection(anyBoolean())).thenReturn(connection);
-        when(connection.prepareStatement(anyString())).thenReturn(statement);
-
-        doThrow(EXCEPTION).when(statement)
-                          .execute();
-        doThrow(EXCEPTION).when(statement)
-                          .executeQuery();
-
-        return dataSource;
     }
 
     public static ClosableDataSource whichIsAutoCloseable() {
