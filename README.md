@@ -4,7 +4,7 @@
 
 Support of storage in JDBC-compliant databases.
 
-###Base configuration
+### Base configuration
 
 To support working with different JDBC drivers, the library uses [Querydsl](http://www.querydsl.com/)
 internally. So the list of supported drivers depends on `Querydsl` and can be found
@@ -28,7 +28,7 @@ JdbcStorageFactory.newBuilder()
                   .build();
 ```
 
-###Type mapping
+### Type mapping
 
 Data types differs for various SQL databases. There is `TypeMapping` to deal with it.
 The mapping defines correspondence of `Type` to a name for a particular database. 
