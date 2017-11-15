@@ -67,7 +67,7 @@ public class TypeMapping {
      */
     public String getTypeName(Type type) {
         checkState(mappedTypes.containsKey(type),
-                   "The type mapping doesn't define name for %s type.");
+                   "The type mapping doesn't define name for %s type.", type);
         final String name = mappedTypes.get(type);
         return name;
     }
