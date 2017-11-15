@@ -69,7 +69,8 @@ public abstract class EntityTable<I, R, W> extends AbstractTable<I, R, W> {
                           TypeMapping typeMapping) {
         super(newTableName(entityClass) + tableNamePostfix,
               IdColumn.newInstance(entityClass, idColumnName),
-              dataSource, typeMapping);
+              dataSource,
+              typeMapping);
         this.entityClass = entityClass;
     }
 

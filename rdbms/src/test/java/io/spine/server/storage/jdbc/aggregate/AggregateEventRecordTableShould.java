@@ -56,8 +56,7 @@ public class AggregateEventRecordTableShould {
     public void store_record_kind_in_string_representation() {
         final DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
         final AggregateEventRecordTable<String> table =
-                new AggregateEventRecordTable<>(AnAggregate.class, dataSource,
-                                                defaultMapping());
+                new AggregateEventRecordTable<>(AnAggregate.class, dataSource, defaultMapping());
         table.create();
 
         final Snapshot snapshot = Snapshot.newBuilder()
@@ -73,9 +72,9 @@ public class AggregateEventRecordTableShould {
         final String expectedKind = record.getKindCase()
                                           .toString();
         final String actualKind = query.factory()
-                                            .select(path(String.class, kind.name()))
-                                            .from(query.table())
-                                            .fetchFirst();
+                                       .select(path(String.class, kind.name()))
+                                       .from(query.table())
+                                       .fetchFirst();
         assertEquals(expectedKind, actualKind);
     }
 
