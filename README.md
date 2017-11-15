@@ -27,5 +27,5 @@ JdbcStorageFactory.newBuilder()
                   .build();
 ```
 
-If there is no required `TypeMapping` in the pre-defined `TypeMappings`, it can be created
+If there is no required `TypeMapping` in the predefined `TypeMappings`, it can be created
 using `TypeMapping.Builder`.
