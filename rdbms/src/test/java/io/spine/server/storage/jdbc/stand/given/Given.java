@@ -24,10 +24,6 @@ import com.google.protobuf.Message;
 import io.spine.core.Version;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.entity.TestTransaction;
-import io.spine.server.stand.StandStorage;
-import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.GivenDataSource;
-import io.spine.server.storage.jdbc.stand.JdbcStandStorage;
 import io.spine.test.commandservice.customer.Customer;
 import io.spine.test.commandservice.customer.CustomerVBuilder;
 import io.spine.test.storage.Project;
@@ -41,15 +37,6 @@ public class Given {
 
     private Given() {
         // Prevent utility class instantiation.
-    }
-
-    public static StandStorage newStorage() {
-        final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(
-                GivenDataSource.DEFAULT_TABLE_NAME);
-        final StandStorage storage = JdbcStandStorage.<String>newBuilder()
-                                                     .setDataSource(dataSource)
-                                                     .build();
-        return storage;
     }
 
     public static class TestAggregate extends Aggregate<String, Project, ProjectVBuilder> {

@@ -37,7 +37,6 @@ import org.junit.Test;
 
 import java.sql.SQLException;
 
-import static io.spine.test.Tests.nullRef;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -47,12 +46,12 @@ import static org.junit.Assert.assertTrue;
 public class JdbcAggregateStorageShould extends AggregateStorageShould {
 
     @Override
-    protected AggregateStorage<ProjectId> getStorage(Class<? extends Entity> aClass) {
-        return nullRef();
+    protected AggregateStorage<ProjectId> newStorage(Class<? extends Entity> aClass) {
+        return newStorage(ProjectId.class, (Class<? extends Aggregate<ProjectId, ?, ?>>) aClass);
     }
 
     @Override
-    protected <I> JdbcAggregateStorage<I> getStorage(
+    protected <I> JdbcAggregateStorage<I> newStorage(
             Class<? extends I> idClass,
             Class<? extends Aggregate<I, ?, ?>> aggregateClass) {
         final DataSourceWrapper dataSource =
@@ -68,8 +67,7 @@ public class JdbcAggregateStorageShould extends AggregateStorageShould {
 
     @Test(expected = IllegalStateException.class)
     public void throw_exception_when_closing_twice() throws Exception {
-        final AggregateStorage<?> storage = getStorage(ProjectId.class,
-                                                       TestAggregateWithMessageId.class);
+        final AggregateStorage<?> storage = getStorage();
         storage.close();
         storage.close();
     }
@@ -77,7 +75,7 @@ public class JdbcAggregateStorageShould extends AggregateStorageShould {
     @SuppressWarnings("unchecked") // OK for a mock.
     @Test
     public void return_history_iterator_with_specified_batch_size() throws SQLException {
-        final JdbcAggregateStorage<ProjectId> storage = getStorage(ProjectId.class,
+        final JdbcAggregateStorage<ProjectId> storage = newStorage(ProjectId.class,
                                                                    TestAggregateWithMessageId.class);
         final int batchSize = 10;
         final AggregateReadRequest<ProjectId> request = new AggregateReadRequest<>(newId(),
@@ -91,11 +89,12 @@ public class JdbcAggregateStorageShould extends AggregateStorageShould {
                                       .getStatement()
                                       .getFetchSize();
         assertEquals(batchSize, fetchSize);
+        close(storage);
     }
 
     @Test
     public void close_history_iterator() throws SQLException {
-        final JdbcAggregateStorage<ProjectId> storage = getStorage(ProjectId.class,
+        final JdbcAggregateStorage<ProjectId> storage = newStorage(ProjectId.class,
                                                                    TestAggregateWithMessageId.class);
         final AggregateReadRequest<ProjectId> request = newReadRequest(newId());
         final DbIterator<AggregateEventRecord> iterator =
