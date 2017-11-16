@@ -39,7 +39,7 @@ If there is no standard mapping for the database, MySQL mapping will be used as 
 
 #### Standard mappings
 
-| Type         | MySQL         | PostgreSQL    |
+| Type         | MySQL 5       | PostgreSQL 10 |
 | :----------: |:-------------:| :------------:|
 | BYTE_ARRAY   | BLOB          | BYTEA         |
 | INT          | INT           | INT           |

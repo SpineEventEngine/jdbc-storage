@@ -232,7 +232,8 @@ public class JdbcStorageFactory implements StorageFactory {
          * {@linkplain TypeMappings#get(DataSourceWrapper) obtained} basing on
          * the {@linkplain java.sql.DatabaseMetaData#getDatabaseProductName() database product name}.
          *
-         * <p>If there is no mapping for the database, MySQL-specific mapping is used.
+         * <p>If there is no mapping for the database,
+         * MySQL-specific mapping for the 5th version is used.
          *
          * @param typeMapping the custom type mapping
          */

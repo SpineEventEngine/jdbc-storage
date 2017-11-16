@@ -23,6 +23,7 @@ package io.spine.server.storage.jdbc;
 import com.google.common.annotations.VisibleForTesting;
 import io.spine.server.storage.jdbc.TypeMapping.Builder;
 
+import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
 import static io.spine.server.storage.jdbc.Type.BOOLEAN;
@@ -39,34 +40,38 @@ import static io.spine.server.storage.jdbc.Type.STRING_255;
  */
 public final class TypeMappings {
 
-    private static final TypeMapping MYSQL = baseMapping().add(BYTE_ARRAY, "BLOB")
-                                                          .build();
-    private static final TypeMapping POSTGRESQL = baseMapping().add(BYTE_ARRAY, "BYTEA")
-                                                               .build();
+    private static final TypeMapping MYSQL_5 = baseMappingBuilder().add(BYTE_ARRAY, "BLOB")
+                                                                   .build();
+    private static final TypeMapping POSTGRESQL_10 = baseMappingBuilder().add(BYTE_ARRAY, "BYTEA")
+                                                                         .build();
 
     private TypeMappings() {
         // Prevent instantiation of this utility class.
     }
 
     /**
-     * Obtains the standard type mapping for MySQL database.
+     * Obtains the type mapping for MySQL 5 database.
      */
     @VisibleForTesting
     public static TypeMapping mySql() {
-        return MYSQL;
+        return MYSQL_5;
     }
 
     /**
-     * Obtains the standard type mapping for PostreSQL database.
+     * Obtains the type mapping for PostreSQL 10 database.
      */
     @VisibleForTesting
     public static TypeMapping postgreSql() {
-        return POSTGRESQL;
+        return POSTGRESQL_10;
     }
 
     /**
      * Obtains the type mapping for the used
-     * {@linkplain java.sql.DatabaseMetaData#getDatabaseProductName() database}.
+     * {@linkplain DatabaseMetaData#getDatabaseProductName() database}.
+     *
+     * <p>The mappings may differ for various versions of the same database,
+     * so {@linkplain DatabaseMetaData#getDatabaseMajorVersion() major database version}
+     * either affects the selection of the mapping.
      * 
      * @param dataSource the data source to get database metadata
      * @return the type mapping for the used database
@@ -74,21 +79,25 @@ public final class TypeMappings {
      */
     static TypeMapping get(DataSourceWrapper dataSource) {
         try (final ConnectionWrapper connection = dataSource.getConnection(true)) {
-            final String name = connection.get()
-                                          .getMetaData()
-                                          .getDatabaseProductName()
-                                          .toLowerCase();
-            if ("postgresql".equals(name)) {
-                return POSTGRESQL;
+            final DatabaseMetaData metaData = connection.get()
+                                                        .getMetaData();
+            final String databaseName = metaData.getDatabaseProductName()
+                                                .toLowerCase();
+            final int majorVersion = metaData.getDatabaseMajorVersion();
+
+            if ("postgresql".equals(databaseName)) {
+                if (majorVersion == 10) {
+                    return POSTGRESQL_10;
+                }
             }
 
-            return MYSQL;
+            return MYSQL_5;
         } catch (SQLException e) {
             throw new DatabaseException(e);
         }
     }
 
-    private static TypeMapping.Builder baseMapping() {
+    private static TypeMapping.Builder baseMappingBuilder() {
         final Builder baseMapping = TypeMapping.newBuilder()
                                                .add(INT, "INT")
                                                .add(LONG, "BIGINT")
