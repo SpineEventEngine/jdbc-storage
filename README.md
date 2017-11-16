@@ -50,10 +50,8 @@ If there is no standard mapping for the database, MySQL mapping will be used as 
 
 #### Custom mapping
 
-If the automatically selected mapping doesn't match your requirements,
-a custom mapping can be specified during creation of `JdbcStorageFactory`.
-
-A custom mapping should define names for all `Type`s, except `Type.ID`:
+If the automatically selected mapping doesn't match your requirements, a custom mapping can be
+specified during creation of `JdbcStorageFactory`. A custom mapping should define names for all `Type`s:
 
 ```
 TypeMapping mapping = TypeMapping.newBuilder()

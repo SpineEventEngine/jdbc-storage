@@ -24,20 +24,14 @@ import io.spine.server.storage.jdbc.TypeMapping.Builder;
 import org.junit.Test;
 
 import static io.spine.server.storage.jdbc.Type.BOOLEAN;
-import static io.spine.server.storage.jdbc.Type.ID;
 import static io.spine.server.storage.jdbc.Type.STRING;
 import static io.spine.server.storage.jdbc.TypeMappings.mySql;
+import static io.spine.test.Tests.nullRef;
 
 /**
  * @author Dmytro Grankin
  */
 public class TypeMappingShould {
-
-    @Test(expected = IllegalArgumentException.class)
-    public void throw_exception_on_attempt_to_map_ID_type() {
-        TypeMapping.newBuilder()
-                   .add(ID, ID.name());
-    }
 
     @Test(expected = IllegalStateException.class)
     public void throw_exception_if_required_types_not_mapped() {
@@ -49,6 +43,7 @@ public class TypeMappingShould {
 
     @Test(expected = IllegalStateException.class)
     public void throw_ISE_if_requested_type_has_no_mapping() {
-        mySql().getTypeName(ID);
+        final Type notMappedType = nullRef();
+        mySql().getTypeName(notMappedType);
     }
 }

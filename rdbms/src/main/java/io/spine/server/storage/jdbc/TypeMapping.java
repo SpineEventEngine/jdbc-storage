@@ -26,9 +26,9 @@ import java.util.EnumMap;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static io.spine.server.storage.jdbc.Type.ID;
 
 /**
  * A {@link Type}-to-name mapping.
@@ -39,9 +39,7 @@ import static io.spine.server.storage.jdbc.Type.ID;
  * <p>This class provides a flexible way to point out
  * database specific names of {@linkplain Type types}.
  *
- * <p>A mapping should provide names for all types except the {@link Type#ID ID}.
- *
- * <p>There are predefined {@linkplain TypeMappings mappings}.
+ * <p>There are standard {@linkplain TypeMappings mappings}.
  *
  * @author Dmytro Grankin
  */
@@ -93,11 +91,9 @@ public final class TypeMapping {
          * @param type the type for the mapping
          * @param name the custom name for the type
          * @return the builder instance
-         * @throws IllegalArgumentException if the type is {@link Type#ID ID}
-         *                                  or the name if {@code null} or empty
          */
         public Builder add(Type type, String name) {
-            checkArgument(type != ID);
+            checkNotNull(type);
             checkArgument(!isNullOrEmpty(name));
             types.put(type, name);
             return this;
@@ -107,13 +103,14 @@ public final class TypeMapping {
          * Creates {@link TypeMapping} for the builder.
          *
          * @return a new type mapping
+         * @throws IllegalStateException if not all of the {@linkplain Type types} were mapped
          */
         public TypeMapping build() {
             final Map<Type, String> mappedTypes = new EnumMap<>(types.build());
-            final int typesCountWithoutId = Type.values().length - 1;
-            checkState(mappedTypes.size() == typesCountWithoutId,
-                       "A mapping should contain names for all types except Type.ID (%s), " +
-                       "but only (%s) types were mapped.", typesCountWithoutId, mappedTypes.size());
+            final int typesCount = Type.values().length;
+            checkState(mappedTypes.size() == typesCount,
+                       "A mapping should contain names for all types (%s), " +
+                       "but only (%s) types were mapped.", typesCount, mappedTypes.size());
             return new TypeMapping(mappedTypes);
         }
     }
