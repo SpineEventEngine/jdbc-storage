@@ -37,6 +37,19 @@ The mapping defines correspondence of `Type` to a name for a particular database
 The type mapping is selected automatically basing on the JDBC connection string.
 If there is no standard mapping for the database, MySQL mapping will be used as the default.
 
+#### Standard mappings
+
+| Type         | MySQL         | PostgreSQL    |
+| :----------: |:-------------:| :------------:|
+| BYTE_ARRAY   | BLOB          | BYTEA         |
+| INT          | INT           | INT           |
+| LONG         | BIGINT        | BIGINT        |
+| STRING_255   | VARCHAR(255)  | VARCHAR(255)  | 
+| STRING       | TEXT          | TEXT          |
+| BOOLEAN      | BOOLEAN       | BOOLEAN       |
+
+#### Custom mapping
+
 If the automatically selected mapping doesn't match your requirements,
 a custom mapping can be specified during creation of `JdbcStorageFactory`.
 
