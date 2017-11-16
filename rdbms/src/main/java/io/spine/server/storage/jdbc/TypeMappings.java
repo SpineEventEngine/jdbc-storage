@@ -37,12 +37,12 @@ import static io.spine.server.storage.jdbc.Type.STRING_255;
  *
  * @author Dmytro Grankin
  */
-public class TypeMappings {
+public final class TypeMappings {
 
-    private static final TypeMapping MY_SQL = baseMapping().add(BYTE_ARRAY, "BLOB")
-                                                           .build();
-    private static final TypeMapping POSTGRES = baseMapping().add(BYTE_ARRAY, "BYTEA")
-                                                             .build();
+    private static final TypeMapping MYSQL = baseMapping().add(BYTE_ARRAY, "BLOB")
+                                                          .build();
+    private static final TypeMapping POSTGRESQL = baseMapping().add(BYTE_ARRAY, "BYTEA")
+                                                               .build();
 
     private TypeMappings() {
         // Prevent instantiation of this utility class.
@@ -53,7 +53,7 @@ public class TypeMappings {
      */
     @VisibleForTesting
     public static TypeMapping mySql() {
-        return MY_SQL;
+        return MYSQL;
     }
 
     /**
@@ -61,7 +61,7 @@ public class TypeMappings {
      */
     @VisibleForTesting
     public static TypeMapping postgreSql() {
-        return POSTGRES;
+        return POSTGRESQL;
     }
 
     /**
@@ -69,8 +69,8 @@ public class TypeMappings {
      * {@linkplain java.sql.DatabaseMetaData#getDatabaseProductName() database}.
      * 
      * @param dataSource the data source to get database metadata
-     * @return the type mapping for the used database
-     *         or {@linkplain #mySql() MySQL} mapping if there is no standard mapping for the database
+     * @return the type mapping for the used database or {@linkplain #mySql() MySQL}-specific
+     *         mapping if there is no standard mapping for the database
      */
     static TypeMapping get(DataSourceWrapper dataSource) {
         try (final ConnectionWrapper connection = dataSource.getConnection(true)) {
@@ -79,10 +79,10 @@ public class TypeMappings {
                                           .getDatabaseProductName()
                                           .toLowerCase();
             if ("postgresql".equals(name)) {
-                return POSTGRES;
+                return POSTGRESQL;
             }
 
-            return MY_SQL;
+            return MYSQL;
         } catch (SQLException e) {
             throw new DatabaseException(e);
         }
