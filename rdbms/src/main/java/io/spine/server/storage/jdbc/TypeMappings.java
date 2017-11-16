@@ -49,7 +49,7 @@ public final class TypeMappings {
     }
 
     /**
-     * Obtains the default type mapping for MySQL database.
+     * Obtains the standard type mapping for MySQL database.
      */
     @VisibleForTesting
     public static TypeMapping mySql() {
@@ -57,7 +57,7 @@ public final class TypeMappings {
     }
 
     /**
-     * Obtains the default type mapping for PostreSQL database.
+     * Obtains the standard type mapping for PostreSQL database.
      */
     @VisibleForTesting
     public static TypeMapping postgreSql() {

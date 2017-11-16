@@ -54,13 +54,14 @@ If the automatically selected mapping doesn't match your requirements, a custom 
 specified during creation of `JdbcStorageFactory`. A custom mapping should define names for all `Type`s:
 
 ```
+// A custom mapping for PostgreSQL database.
 TypeMapping mapping = TypeMapping.newBuilder()
-                                 .add(Type.BYTE_ARRAY, "*")
-                                 .add(Type.INT, "*")
-                                 .add(Type.LONG, "*")
-                                 .add(Type.STRING_255, "*")
-                                 .add(Type.STRING, "*")
-                                 .add(Type.BOOLEAN, "*")
+                                 .add(Type.BYTE_ARRAY, "BYTEA")
+                                 .add(Type.INT, "INT4")
+                                 .add(Type.LONG, "INT8")
+                                 .add(Type.STRING_255, "VARCHAR(255)")
+                                 .add(Type.STRING, "VARCHAR")
+                                 .add(Type.BOOLEAN, "BOOLEAN")
                                  .build();
 JdbcStorageFactory.newBuilder()
                   .setTypeMapping(mapping)
