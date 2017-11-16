@@ -84,11 +84,8 @@ public final class TypeMappings {
             final String databaseName = metaData.getDatabaseProductName()
                                                 .toLowerCase();
             final int majorVersion = metaData.getDatabaseMajorVersion();
-
-            if ("postgresql".equals(databaseName)) {
-                if (majorVersion == 10) {
-                    return POSTGRESQL_10;
-                }
+            if ("postgresql".equals(databaseName) && majorVersion == 10) {
+                return POSTGRESQL_10;
             }
 
             return MYSQL_5;
