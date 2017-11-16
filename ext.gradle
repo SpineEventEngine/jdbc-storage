@@ -18,15 +18,15 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-final def JDBC_VERSION = "0.10.0"
+final def JDBC_VERSION = '0.10.0'
 
 ext {
     jdbcVersion = JDBC_VERSION
-    coreVersion = "0.10.5-SNAPSHOT"
-    baseVersion = "0.10.0"
-    guavaVersion = "20.0"
+    coreVersion = '0.10.5-SNAPSHOT'
+    baseVersion = '0.10.0'
+    guavaVersion = '20.0'
 
     // Versions of libraries for working with JDBC.
-    hikariVersion = "2.4.3"
-    querydslVersion = "4.1.4"
+    hikariVersion = '2.4.3'
+    querydslVersion = '4.1.4'
 }

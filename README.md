@@ -67,4 +67,3 @@ TypeMapping mapping = TypeMapping.newBuilder()
 JdbcStorageFactory.newBuilder()
                   .setTypeMapping(mapping)
 ``` 
-
