@@ -310,7 +310,7 @@ public abstract class AbstractTable<I, R, W> {
     /**
      * Obtains the type of the specified column.
      *
-     * <p>If the column is the ID and its type cannot be {@linkplain TableColumn#type() determined}
+     * <p>If the column is the ID and its type is {@linkplain TableColumn#type() unknown}
      * at the compile time, returns {@linkplain #getIdType() the ID type},
      * which is determined at the runtime.
      *

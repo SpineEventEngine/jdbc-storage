@@ -41,7 +41,7 @@ public interface TableColumn extends StorageField {
 
     /**
      * @return the {@link Type} of the column
-     *         or {@code null} if the type cannot be determined at the compile time
+     *         or {@code null} if the type is unknown at the compile time
      */
     @Nullable
     Type type();
