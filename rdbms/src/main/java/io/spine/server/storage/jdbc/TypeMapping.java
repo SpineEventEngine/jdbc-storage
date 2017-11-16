@@ -20,8 +20,9 @@
 
 package io.spine.server.storage.jdbc;
 
-import com.google.common.collect.ImmutableMap;
+import com.google.common.annotations.VisibleForTesting;
 
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Map;
 
@@ -29,6 +30,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static java.util.Collections.unmodifiableMap;
 
 /**
  * A {@link Type}-to-name mapping.
@@ -91,7 +93,7 @@ public final class TypeMapping {
      */
     public static class Builder {
 
-        private final ImmutableMap.Builder<Type, String> types = ImmutableMap.builder();
+        private final Map<Type, String> mappedTypes = new EnumMap<>(Type.class);
 
         private Builder() {
             // Prevent direct instantiation of this class.
@@ -100,6 +102,8 @@ public final class TypeMapping {
         /**
          * Adds a mapping for the specified type.
          *
+         * <p>Overrides the name of the already specified type.
+         *
          * @param type the type for the mapping
          * @param name the custom name for the type
          * @return the builder instance
@@ -107,7 +111,7 @@ public final class TypeMapping {
         public Builder add(Type type, String name) {
             checkNotNull(type);
             checkArgument(!isNullOrEmpty(name));
-            types.put(type, name);
+            mappedTypes.put(type, name);
             return this;
         }
 
@@ -118,12 +122,16 @@ public final class TypeMapping {
          * @throws IllegalStateException if not all of the {@linkplain Type types} were mapped
          */
         public TypeMapping build() {
-            final Map<Type, String> mappedTypes = new EnumMap<>(types.build());
             final int typesCount = Type.values().length;
             checkState(mappedTypes.size() == typesCount,
                        "A mapping should contain names for all types (%s), " +
                        "but only (%s) types were mapped.", typesCount, mappedTypes.size());
             return new TypeMapping(mappedTypes);
+        }
+
+        @VisibleForTesting
+        Map<Type, String> getMappedTypes() {
+            return unmodifiableMap(mappedTypes);
         }
     }
 }

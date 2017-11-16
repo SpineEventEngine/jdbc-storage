@@ -23,21 +23,31 @@ package io.spine.server.storage.jdbc;
 import io.spine.server.storage.jdbc.TypeMapping.Builder;
 import org.junit.Test;
 
-import static io.spine.server.storage.jdbc.Type.BOOLEAN;
-import static io.spine.server.storage.jdbc.Type.STRING;
 import static io.spine.server.storage.jdbc.TypeMappings.mySql;
 import static io.spine.test.Tests.nullRef;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Dmytro Grankin
  */
 public class TypeMappingShould {
 
-    @Test(expected = IllegalStateException.class)
-    public void throw_exception_if_required_types_not_mapped() {
+    @Test
+    public void allow_override_type_names_during_building() {
+        final Type type = Type.BYTE_ARRAY;
+        final String originalName = "original";
+        final String nameReplacement = "replacement";
         final Builder builder = TypeMapping.newBuilder()
-                                           .add(BOOLEAN, BOOLEAN.name())
-                                           .add(STRING, STRING.name());
+                                           .add(type, originalName)
+                                           .add(type, nameReplacement);
+        final String resultingName = builder.getMappedTypes()
+                                            .get(type);
+        assertEquals(nameReplacement, resultingName);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void throw_exception_if_not_all_types_mapped() {
+        final Builder builder = TypeMapping.newBuilder();
         builder.build();
     }
 
