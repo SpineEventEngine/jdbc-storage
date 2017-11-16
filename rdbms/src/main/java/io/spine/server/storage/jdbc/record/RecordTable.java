@@ -50,7 +50,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Collections2.transform;
 import static com.google.common.collect.Lists.newLinkedList;
 import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
-import static io.spine.server.storage.jdbc.Type.ID;
 import static java.util.Collections.addAll;
 
 /**
@@ -177,13 +176,17 @@ class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumn
      */
     enum StandardColumn implements TableColumn {
 
-        id(ID),
+        id,
         entity(BYTE_ARRAY);
 
         private final Type type;
 
         StandardColumn(Type type) {
             this.type = type;
+        }
+
+        StandardColumn() {
+            this.type = null;
         }
 
         @Override

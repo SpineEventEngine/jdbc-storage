@@ -267,7 +267,7 @@ public abstract class AbstractTable<I, R, W> {
         for (Iterator<? extends TableColumn> iterator = columns.iterator(); iterator.hasNext(); ) {
             final TableColumn column = iterator.next();
             final String name = column.name();
-            final Type type = ensureType(column);
+            final Type type = ensureIdType(column);
             final String typeName = typeMapping.getTypeName(type);
             sql.append(name)
                .append(' ')
@@ -308,23 +308,21 @@ public abstract class AbstractTable<I, R, W> {
     }
 
     /**
-     * For the ID column checks the {@link Type} and returns the type of the ID column if
-     * the ID type is {@linkplain Type#ID}.
+     * Obtains the type of the specified column.
      *
-     * <p>If the column does not represent an ID of the table, this method throws
-     * an {@link IllegalStateException}.
+     * <p>If the column is the ID and its type cannot be {@linkplain TableColumn#type() determined}
+     * at the compile time, returns {@linkplain #getIdType() the ID type},
+     * which is determined at the runtime.
      *
-     * @param column the column the type of which will be checked
+     * @param column the column the type of which will be handled
      * @return the SQL type of the column
      */
-    private Type ensureType(TableColumn column) throws IllegalStateException {
+    private Type ensureIdType(TableColumn column) {
         Type type = column.type();
-        if (type == Type.ID) {
-            if (column.equals(getIdColumnDeclaration())) {
-                type = getIdType();
-            } else {
-                throw new IllegalStateException("ID type of a non-ID column " + column.name());
-            }
+        final boolean isIdColumn = column.equals(getIdColumnDeclaration());
+        final boolean typeUnknown = type == null;
+        if (isIdColumn && typeUnknown) {
+            type = getIdType();
         }
         return type;
     }

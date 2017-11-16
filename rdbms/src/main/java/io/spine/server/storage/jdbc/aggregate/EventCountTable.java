@@ -32,7 +32,6 @@ import io.spine.server.storage.jdbc.query.WriteQuery;
 
 import java.util.List;
 
-import static io.spine.server.storage.jdbc.Type.ID;
 import static io.spine.server.storage.jdbc.Type.INT;
 import static io.spine.server.storage.jdbc.aggregate.EventCountTable.Column.id;
 
@@ -112,13 +111,17 @@ class EventCountTable<I> extends EntityTable<I, Integer, Integer> {
      */
     enum Column implements TableColumn {
 
-        id(ID),
+        id,
         event_count(INT);
 
         private final Type type;
 
         Column(Type type) {
             this.type = type;
+        }
+
+        Column() {
+            this.type = null;
         }
 
         @Override

@@ -34,7 +34,6 @@ import io.spine.server.storage.jdbc.query.WriteQuery;
 import java.util.List;
 
 import static io.spine.server.storage.jdbc.Type.BOOLEAN;
-import static io.spine.server.storage.jdbc.Type.ID;
 import static io.spine.server.storage.jdbc.aggregate.LifecycleFlagsTable.Column.id;
 
 /**
@@ -102,7 +101,7 @@ class LifecycleFlagsTable<I> extends EntityTable<I, LifecycleFlags, LifecycleFla
      */
     enum Column implements TableColumn {
 
-        id(ID),
+        id,
         archived(BOOLEAN),
         deleted(BOOLEAN);
 
@@ -110,6 +109,10 @@ class LifecycleFlagsTable<I> extends EntityTable<I, LifecycleFlags, LifecycleFla
 
         Column(Type type) {
             this.type = type;
+        }
+
+        Column() {
+            this.type = null;
         }
 
         @Override

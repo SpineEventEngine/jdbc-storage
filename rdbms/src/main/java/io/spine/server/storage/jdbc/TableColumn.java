@@ -22,6 +22,8 @@ package io.spine.server.storage.jdbc;
 
 import io.spine.server.storage.StorageField;
 
+import javax.annotation.Nullable;
+
 /**
  * An interface for the database table columns representation.
  *
@@ -39,7 +41,9 @@ public interface TableColumn extends StorageField {
 
     /**
      * @return the {@link Type} of the column
+     *         or {@code null} if the type cannot be determined at the compile time
      */
+    @Nullable
     Type type();
 
     /**
