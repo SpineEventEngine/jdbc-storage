@@ -22,7 +22,8 @@ package io.spine.server.storage.jdbc;
 
 import com.google.common.annotations.VisibleForTesting;
 
-import java.util.Collections;
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
 import java.util.EnumMap;
 import java.util.Map;
 
@@ -48,9 +49,13 @@ import static java.util.Collections.unmodifiableMap;
 public final class TypeMapping {
 
     private final Map<Type, String> mappedTypes;
+    private final DatabaseProductName databaseProductName;
+    private final int majorVersion;
 
-    private TypeMapping(Map<Type, String> mappedTypes) {
-        this.mappedTypes = mappedTypes;
+    private TypeMapping(Builder builder) {
+        this.mappedTypes = builder.mappedTypes;
+        this.databaseProductName = builder.databaseProductName;
+        this.majorVersion = builder.majorVersion;
     }
 
     /**
@@ -65,6 +70,30 @@ public final class TypeMapping {
                    "The type mapping doesn't define name for %s type.", type);
         final String name = mappedTypes.get(type);
         return name;
+    }
+
+    /**
+     * Determines whether the mapping is suitable to work with the data source.
+     *
+     * @param dataSource the data source to test compatibility
+     * @return {@code true} if the {@linkplain DatabaseMetaData#getDatabaseProductName()
+     *         database product name} and the {@linkplain DatabaseMetaData#getDatabaseMajorVersion()
+     *         major version} are equal to the used in the mapping
+     */
+    public boolean suitableFor(DataSourceWrapper dataSource) {
+        try (final ConnectionWrapper connection = dataSource.getConnection(true)) {
+            final DatabaseMetaData metaData = connection.get()
+                                                        .getMetaData();
+            final String databaseName = metaData.getDatabaseProductName()
+                                                .toLowerCase();
+            if (databaseName.equals(databaseProductName.name())
+                && majorVersion == metaData.getDatabaseMajorVersion()) {
+                return true;
+            }
+        } catch (SQLException e) {
+            throw new DatabaseException(e);
+        }
+        return false;
     }
 
     /**
@@ -84,6 +113,8 @@ public final class TypeMapping {
     public static class Builder {
 
         private final Map<Type, String> mappedTypes = new EnumMap<>(Type.class);
+        private DatabaseProductName databaseProductName;
+        private int majorVersion;
 
         private Builder() {
             // Prevent direct instantiation of this class.
@@ -92,7 +123,7 @@ public final class TypeMapping {
         /**
          * Adds a mapping for the specified type.
          *
-         * <p>Overrides the name of the already specified type.
+         * <p>Overrides the name of the type if it is already specified.
          *
          * @param type the type for the mapping
          * @param name the custom name for the type
@@ -102,6 +133,23 @@ public final class TypeMapping {
             checkNotNull(type);
             checkArgument(!isNullOrEmpty(name));
             mappedTypes.put(type, name);
+            return this;
+        }
+
+        /**
+         * Sets the target {@link DatabaseProductName} for the mapping.
+         */
+        Builder setDatabaseName(DatabaseProductName databaseName) {
+            this.databaseProductName = checkNotNull(databaseName);
+            return this;
+        }
+
+        /**
+         * Sets the target {@linkplain DatabaseMetaData#getDatabaseMajorVersion()
+         * database major version} for the mapping.
+         */
+        Builder setMajorVersion(int majorVersion) {
+            this.majorVersion = majorVersion;
             return this;
         }
 
@@ -116,12 +164,21 @@ public final class TypeMapping {
             checkState(mappedTypes.size() == typesCount,
                        "A mapping should contain names for all types (%s), " +
                        "but only (%s) types were mapped.", typesCount, mappedTypes.size());
-            return new TypeMapping(mappedTypes);
+            return new TypeMapping(this);
         }
 
         @VisibleForTesting
         Map<Type, String> getMappedTypes() {
             return unmodifiableMap(mappedTypes);
         }
+    }
+
+    /**
+     * Names of {@linkplain DatabaseMetaData#getDatabaseProductName() database products}.
+     */
+    public enum DatabaseProductName {
+
+        postresql,
+        mysql
     }
 }

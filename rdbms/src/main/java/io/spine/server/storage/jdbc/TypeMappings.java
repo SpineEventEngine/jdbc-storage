@@ -24,7 +24,6 @@ import com.google.common.annotations.VisibleForTesting;
 import io.spine.server.storage.jdbc.TypeMapping.Builder;
 
 import java.sql.DatabaseMetaData;
-import java.sql.SQLException;
 
 import static io.spine.server.storage.jdbc.Type.BOOLEAN;
 import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
@@ -32,6 +31,8 @@ import static io.spine.server.storage.jdbc.Type.INT;
 import static io.spine.server.storage.jdbc.Type.LONG;
 import static io.spine.server.storage.jdbc.Type.STRING;
 import static io.spine.server.storage.jdbc.Type.STRING_255;
+import static io.spine.server.storage.jdbc.TypeMapping.DatabaseProductName.mysql;
+import static io.spine.server.storage.jdbc.TypeMapping.DatabaseProductName.postresql;
 
 /**
  * Standard {@link TypeMapping type mappings} for different databases.
@@ -40,8 +41,12 @@ import static io.spine.server.storage.jdbc.Type.STRING_255;
  */
 public final class TypeMappings {
 
-    private static final TypeMapping MYSQL_5 = baseBuilder().build();
+    private static final TypeMapping MYSQL_5 = baseBuilder().setDatabaseName(mysql)
+                                                            .setMajorVersion(5)
+                                                            .build();
     private static final TypeMapping POSTGRESQL_10 = baseBuilder().add(BYTE_ARRAY, "BYTEA")
+                                                                  .setDatabaseName(postresql)
+                                                                  .setMajorVersion(10)
                                                                   .build();
 
     private TypeMappings() {
@@ -65,38 +70,25 @@ public final class TypeMappings {
     }
 
     /**
-     * Obtains the type mapping for the used
-     * {@linkplain DatabaseMetaData#getDatabaseProductName() database}.
+     * Obtains the {@linkplain TypeMapping#suitableFor(DataSourceWrapper) suitable} type mapping
+     * for the specified data source.
      *
-     * <p>The mappings may differ for various versions of the same database,
-     * so {@linkplain DatabaseMetaData#getDatabaseMajorVersion() major database version}
-     * either affects the selection of the mapping.
-     *
-     * @param dataSource the data source to get database metadata
+     * @param dataSource the data source to test suitability
      * @return the type mapping for the used database
      *         or MySQL-specific mapping if there is no standard mapping for the database
      */
     static TypeMapping get(DataSourceWrapper dataSource) {
-        try (final ConnectionWrapper connection = dataSource.getConnection(true)) {
-            final DatabaseMetaData metaData = connection.get()
-                                                        .getMetaData();
-            final String databaseName = metaData.getDatabaseProductName()
-                                                .toLowerCase();
-            final int majorVersion = metaData.getDatabaseMajorVersion();
-            if ("postgresql".equals(databaseName) && majorVersion == 10) {
-                return POSTGRESQL_10;
-            }
-
-            return MYSQL_5;
-        } catch (SQLException e) {
-            throw new DatabaseException(e);
+        if (POSTGRESQL_10.suitableFor(dataSource)) {
+            return POSTGRESQL_10;
         }
+
+        return MYSQL_5;
     }
 
     /**
      * Obtains the base builder for mappings.
      *
-     * <p>All the types is mapped as follows:
+     * <p>All the types are mapped as follows:
      * <ul>
      *     <li>{@code Type.BYTE_ARRAY} - BLOB</li>
      *     <li>{@code Type.INT} - INT</li>
@@ -107,7 +99,7 @@ public final class TypeMappings {
      * </ul>
      *
      * <p>{@linkplain Builder#add(Type, String) Override} the type name
-     * if it doesn't match your database.
+     * if it doesn't match a database.
      *
      * @return the builder with all types
      */
