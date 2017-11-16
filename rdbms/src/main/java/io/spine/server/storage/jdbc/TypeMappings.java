@@ -40,10 +40,9 @@ import static io.spine.server.storage.jdbc.Type.STRING_255;
  */
 public final class TypeMappings {
 
-    private static final TypeMapping MYSQL_5 = baseMappingBuilder().add(BYTE_ARRAY, "BLOB")
-                                                                   .build();
-    private static final TypeMapping POSTGRESQL_10 = baseMappingBuilder().add(BYTE_ARRAY, "BYTEA")
-                                                                         .build();
+    private static final TypeMapping MYSQL_5 = baseBuilder().build();
+    private static final TypeMapping POSTGRESQL_10 = baseBuilder().add(BYTE_ARRAY, "BYTEA")
+                                                                  .build();
 
     private TypeMappings() {
         // Prevent instantiation of this utility class.
@@ -72,7 +71,7 @@ public final class TypeMappings {
      * <p>The mappings may differ for various versions of the same database,
      * so {@linkplain DatabaseMetaData#getDatabaseMajorVersion() major database version}
      * either affects the selection of the mapping.
-     * 
+     *
      * @param dataSource the data source to get database metadata
      * @return the type mapping for the used database
      *         or MySQL-specific mapping if there is no standard mapping for the database
@@ -94,8 +93,27 @@ public final class TypeMappings {
         }
     }
 
-    private static TypeMapping.Builder baseMappingBuilder() {
+    /**
+     * Obtains the base builder for mappings.
+     *
+     * <p>All the types is mapped as follows:
+     * <ul>
+     *     <li>{@code Type.BYTE_ARRAY} - BLOB</li>
+     *     <li>{@code Type.INT} - INT</li>
+     *     <li>{@code Type.LONG} - BIGINT</li>
+     *     <li>{@code Type.STRING_255} - VARCHAR(255)</li>
+     *     <li>{@code Type.STRING} - TEXT</li>
+     *     <li>{@code Type.BOOLEAN} - BOOLEAN</li>
+     * </ul>
+     *
+     * <p>{@linkplain Builder#add(Type, String) Override} the type name
+     * if it doesn't match your database.
+     *
+     * @return the builder with all types
+     */
+    public static TypeMapping.Builder baseBuilder() {
         final Builder baseMapping = TypeMapping.newBuilder()
+                                               .add(BYTE_ARRAY, "BLOB")
                                                .add(INT, "INT")
                                                .add(LONG, "BIGINT")
                                                .add(STRING_255, "VARCHAR(255)")

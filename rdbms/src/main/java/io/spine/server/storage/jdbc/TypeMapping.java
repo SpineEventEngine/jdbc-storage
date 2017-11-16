@@ -72,19 +72,9 @@ public final class TypeMapping {
      *
      * <p>All the {@link Type types} should be mapped.
      *
-     * <p>A MySQL-specific mapping may look as follows:
-     * <ul>
-     *     <li>{@code Type.BYTE_ARRAY} - BLOB</li>
-     *     <li>{@code Type.INT} - INT</li>
-     *     <li>{@code Type.LONG} - BIGINT</li>
-     *     <li>{@code Type.STRING_255} - VARCHAR(255)</li>
-     *     <li>{@code Type.STRING} - TEXT</li>
-     *     <li>{@code Type.BOOLEAN} - BOOLEAN</li>
-     * </ul>
-     *
      * @return the new builder instance
      */
-    public static Builder newBuilder() {
+    static Builder newBuilder() {
         return new Builder();
     }
 
