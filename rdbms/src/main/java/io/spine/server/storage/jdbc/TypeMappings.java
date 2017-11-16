@@ -69,8 +69,8 @@ public final class TypeMappings {
      * {@linkplain java.sql.DatabaseMetaData#getDatabaseProductName() database}.
      * 
      * @param dataSource the data source to get database metadata
-     * @return the type mapping for the used database or {@linkplain #mySql() MySQL}-specific
-     *         mapping if there is no standard mapping for the database
+     * @return the type mapping for the used database
+     *         or MySQL-specific mapping if there is no standard mapping for the database
      */
     static TypeMapping get(DataSourceWrapper dataSource) {
         try (final ConnectionWrapper connection = dataSource.getConnection(true)) {
