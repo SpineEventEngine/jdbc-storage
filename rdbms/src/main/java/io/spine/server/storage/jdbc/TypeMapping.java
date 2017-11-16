@@ -49,13 +49,8 @@ public final class TypeMapping {
 
     private final Map<Type, String> mappedTypes;
 
-    private TypeMapping(Builder builder) {
-        final ImmutableMap<Type, String> typesFromBuilder = builder.types.build();
-        final int typesCountWithoutId = Type.values().length - 1;
-        checkState(typesFromBuilder.size() == typesCountWithoutId,
-                   "A mapping should contain names for all types except Type.ID (%s), " +
-                   "but only (%s) types were mapped.", typesCountWithoutId, typesFromBuilder.size());
-        mappedTypes = new EnumMap<>(typesFromBuilder);
+    private TypeMapping(Map<Type, String> mappedTypes) {
+        this.mappedTypes = mappedTypes;
     }
 
     /**
@@ -114,7 +109,12 @@ public final class TypeMapping {
          * @return a new type mapping
          */
         public TypeMapping build() {
-            return new TypeMapping(this);
+            final Map<Type, String> mappedTypes = new EnumMap<>(types.build());
+            final int typesCountWithoutId = Type.values().length - 1;
+            checkState(mappedTypes.size() == typesCountWithoutId,
+                       "A mapping should contain names for all types except Type.ID (%s), " +
+                       "but only (%s) types were mapped.", typesCountWithoutId, mappedTypes.size());
+            return new TypeMapping(mappedTypes);
         }
     }
 }
