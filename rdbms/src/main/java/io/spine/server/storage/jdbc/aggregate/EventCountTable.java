@@ -120,6 +120,9 @@ class EventCountTable<I> extends EntityTable<I, Integer, Integer> {
             this.type = type;
         }
 
+        /**
+         * Creates a column, {@linkplain #type() type} of which is unknown at the compile time.
+         */
         Column() {
             this.type = null;
         }

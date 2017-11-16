@@ -185,6 +185,9 @@ class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumn
             this.type = type;
         }
 
+        /**
+         * Creates a column, {@linkplain #type() type} of which is unknown at the compile time.
+         */
         StandardColumn() {
             this.type = null;
         }
