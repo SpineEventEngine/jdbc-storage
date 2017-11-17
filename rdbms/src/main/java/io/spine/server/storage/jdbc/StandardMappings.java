@@ -21,7 +21,7 @@
 package io.spine.server.storage.jdbc;
 
 import com.google.common.annotations.VisibleForTesting;
-import io.spine.server.storage.jdbc.TypeMapping.Builder;
+import io.spine.server.storage.jdbc.BaseMapping.Builder;
 
 import static io.spine.server.storage.jdbc.Type.BOOLEAN;
 import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
@@ -29,8 +29,8 @@ import static io.spine.server.storage.jdbc.Type.INT;
 import static io.spine.server.storage.jdbc.Type.LONG;
 import static io.spine.server.storage.jdbc.Type.STRING;
 import static io.spine.server.storage.jdbc.Type.STRING_255;
-import static io.spine.server.storage.jdbc.TypeMapping.DatabaseProductName.MySQL;
-import static io.spine.server.storage.jdbc.TypeMapping.DatabaseProductName.PostgreSQL;
+import static io.spine.server.storage.jdbc.BaseMapping.DatabaseProductName.MySQL;
+import static io.spine.server.storage.jdbc.BaseMapping.DatabaseProductName.PostgreSQL;
 
 /**
  * Standard {@linkplain TypeMapping type mappings} for different databases.
@@ -39,10 +39,10 @@ import static io.spine.server.storage.jdbc.TypeMapping.DatabaseProductName.Postg
  */
 public final class StandardMappings {
 
-    private static final TypeMapping MYSQL_5 = baseBuilder().setDatabaseName(MySQL)
+    private static final BaseMapping MYSQL_5 = baseBuilder().setDatabaseName(MySQL)
                                                             .setMajorVersion(5)
                                                             .build();
-    private static final TypeMapping POSTGRESQL_10 = baseBuilder().add(BYTE_ARRAY, "BYTEA")
+    private static final BaseMapping POSTGRESQL_10 = baseBuilder().add(BYTE_ARRAY, "BYTEA")
                                                                   .setDatabaseName(PostgreSQL)
                                                                   .setMajorVersion(10)
                                                                   .build();
@@ -68,7 +68,7 @@ public final class StandardMappings {
     }
 
     /**
-     * Obtains the {@linkplain TypeMapping#suitableFor(DataSourceWrapper) suitable} type mapping
+     * Obtains the {@linkplain BaseMapping#suitableFor(DataSourceWrapper) suitable} type mapping
      * for the specified data source.
      *
      * @param dataSource the data source to test suitability
@@ -101,8 +101,8 @@ public final class StandardMappings {
      *
      * @return the builder with all types
      */
-    public static TypeMapping.Builder baseBuilder() {
-        final Builder baseMapping = TypeMapping.newBuilder()
+    public static BaseMapping.Builder baseBuilder() {
+        final Builder baseMapping = BaseMapping.newBuilder()
                                                .add(BYTE_ARRAY, "BLOB")
                                                .add(INT, "INT")
                                                .add(LONG, "BIGINT")

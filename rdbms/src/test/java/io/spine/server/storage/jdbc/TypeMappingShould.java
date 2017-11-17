@@ -20,15 +20,15 @@
 
 package io.spine.server.storage.jdbc;
 
-import io.spine.server.storage.jdbc.TypeMapping.Builder;
-import io.spine.server.storage.jdbc.TypeMapping.DatabaseProductName;
+import io.spine.server.storage.jdbc.BaseMapping.Builder;
+import io.spine.server.storage.jdbc.BaseMapping.DatabaseProductName;
 import org.junit.Test;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
-import static io.spine.server.storage.jdbc.TypeMapping.DatabaseProductName.MySQL;
+import static io.spine.server.storage.jdbc.BaseMapping.DatabaseProductName.MySQL;
 import static io.spine.server.storage.jdbc.StandardMappings.mySql;
 import static io.spine.test.Tests.nullRef;
 import static io.spine.util.Exceptions.illegalStateWithCauseOf;
@@ -50,7 +50,7 @@ public class TypeMappingShould {
         final Type type = Type.BYTE_ARRAY;
         final String originalName = "original";
         final String nameReplacement = "replacement";
-        final TypeMapping mapping = TypeMapping.newBuilder()
+        final TypeMapping mapping = BaseMapping.newBuilder()
                                                .add(type, originalName)
                                                .add(type, nameReplacement)
                                                .build();
@@ -62,7 +62,7 @@ public class TypeMappingShould {
     public void match_for_data_source_by_database_product_name_and_major_version() {
         final int majorVersion = 5;
         final DatabaseProductName databaseProductName = MySQL;
-        final TypeMapping mapping = StandardMappings.baseBuilder()
+        final BaseMapping mapping = StandardMappings.baseBuilder()
                                                     .setDatabaseName(databaseProductName)
                                                     .setMajorVersion(majorVersion)
                                                     .build();
@@ -74,7 +74,7 @@ public class TypeMappingShould {
     public void not_match_for_data_source_if_major_versions_different() {
         final int mappingVersion = 5;
         final DatabaseProductName databaseProductName = MySQL;
-        final TypeMapping mapping = StandardMappings.baseBuilder()
+        final BaseMapping mapping = StandardMappings.baseBuilder()
                                                     .setDatabaseName(databaseProductName)
                                                     .setMajorVersion(mappingVersion)
                                                     .build();
@@ -85,7 +85,7 @@ public class TypeMappingShould {
 
     @Test
     public void not_match_if_database_product_name_null() {
-        final TypeMapping mapping = StandardMappings.baseBuilder()
+        final BaseMapping mapping = StandardMappings.baseBuilder()
                                                     .build();
         assertNull(mapping.getDatabaseProductName());
 
@@ -95,7 +95,7 @@ public class TypeMappingShould {
 
     @Test(expected = IllegalStateException.class)
     public void throw_exception_if_not_all_types_mapped() {
-        final Builder builder = TypeMapping.newBuilder();
+        final Builder builder = BaseMapping.newBuilder();
         builder.build();
     }
 
