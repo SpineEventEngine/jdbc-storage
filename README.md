@@ -51,17 +51,14 @@ If there is no standard mapping for the database, MySQL mapping will be used as 
 #### Custom mapping
 
 If the automatically selected mapping doesn't match your requirements, a custom mapping can be
-specified during creation of `JdbcStorageFactory`. A custom mapping should define names for all `Type`s:
+specified during creation of `JdbcStorageFactory`. There is the base builder for this purpose - 
+`BaseMapping.baseBuilder()`. This builder contains mappings for all types (equal to MySQL 5 mapping).
+So only required types should be overridden:
 
 ```
-// A custom mapping for PostgreSQL database.
-TypeMapping mapping = TypeMapping.newBuilder()
-                                 .add(Type.BYTE_ARRAY, "BYTEA")
+TypeMapping mapping = BaseMapping.baseBuilder()
                                  .add(Type.INT, "INT4")
                                  .add(Type.LONG, "INT8")
-                                 .add(Type.STRING_255, "VARCHAR(255)")
-                                 .add(Type.STRING, "VARCHAR")
-                                 .add(Type.BOOLEAN, "BOOLEAN")
                                  .build();
 JdbcStorageFactory.newBuilder()
                   .setTypeMapping(mapping)
