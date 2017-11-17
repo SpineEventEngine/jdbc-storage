@@ -21,16 +21,15 @@
 package io.spine.server.storage.jdbc;
 
 import com.google.common.annotations.VisibleForTesting;
-import io.spine.server.storage.jdbc.BaseMapping.Builder;
 
-import static io.spine.server.storage.jdbc.Type.BOOLEAN;
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static io.spine.server.storage.jdbc.BaseMapping.baseBuilder;
+import static io.spine.server.storage.jdbc.StandardMappings.DatabaseProductName.MySQL;
+import static io.spine.server.storage.jdbc.StandardMappings.DatabaseProductName.PostgreSQL;
 import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
-import static io.spine.server.storage.jdbc.Type.INT;
-import static io.spine.server.storage.jdbc.Type.LONG;
-import static io.spine.server.storage.jdbc.Type.STRING;
-import static io.spine.server.storage.jdbc.Type.STRING_255;
-import static io.spine.server.storage.jdbc.BaseMapping.DatabaseProductName.MySQL;
-import static io.spine.server.storage.jdbc.BaseMapping.DatabaseProductName.PostgreSQL;
 
 /**
  * Standard {@linkplain TypeMapping type mappings} for different databases.
@@ -39,13 +38,12 @@ import static io.spine.server.storage.jdbc.BaseMapping.DatabaseProductName.Postg
  */
 public final class StandardMappings {
 
-    private static final BaseMapping MYSQL_5 = baseBuilder().setDatabaseName(MySQL)
-                                                            .setMajorVersion(5)
-                                                            .build();
-    private static final BaseMapping POSTGRESQL_10 = baseBuilder().add(BYTE_ARRAY, "BYTEA")
-                                                                  .setDatabaseName(PostgreSQL)
-                                                                  .setMajorVersion(10)
-                                                                  .build();
+    private static final SelectableMapping MYSQL_5 = new SelectableMapping(MySQL, 5,
+                                                                           baseBuilder().build());
+    private static final SelectableMapping POSTGRESQL_10 =
+            new SelectableMapping(PostgreSQL, 10,
+                                  baseBuilder().add(BYTE_ARRAY, "BYTEA")
+                                               .build());
 
     private StandardMappings() {
         // Prevent instantiation of this utility class.
@@ -68,8 +66,8 @@ public final class StandardMappings {
     }
 
     /**
-     * Obtains the {@linkplain BaseMapping#suitableFor(DataSourceWrapper) suitable} type mapping
-     * for the specified data source.
+     * Obtains the {@linkplain SelectableMapping#suitableFor(DataSourceWrapper) suitable}
+     * type mapping for the specified data source.
      *
      * @param dataSource the data source to test suitability
      * @return the type mapping for the used database
@@ -84,31 +82,55 @@ public final class StandardMappings {
     }
 
     /**
-     * Obtains the base builder for mappings.
-     *
-     * <p>All the types are mapped as follows:
-     * <ul>
-     *     <li>{@code Type.BYTE_ARRAY} - BLOB</li>
-     *     <li>{@code Type.INT} - INT</li>
-     *     <li>{@code Type.LONG} - BIGINT</li>
-     *     <li>{@code Type.STRING_255} - VARCHAR(255)</li>
-     *     <li>{@code Type.STRING} - TEXT</li>
-     *     <li>{@code Type.BOOLEAN} - BOOLEAN</li>
-     * </ul>
-     *
-     * <p>{@linkplain Builder#add(Type, String) Override} the type name
-     * if it doesn't match a database.
-     *
-     * @return the builder with all types
+     * Names of {@linkplain DatabaseMetaData#getDatabaseProductName() database products}.
      */
-    public static BaseMapping.Builder baseBuilder() {
-        final Builder baseMapping = BaseMapping.newBuilder()
-                                               .add(BYTE_ARRAY, "BLOB")
-                                               .add(INT, "INT")
-                                               .add(LONG, "BIGINT")
-                                               .add(STRING_255, "VARCHAR(255)")
-                                               .add(STRING, "TEXT")
-                                               .add(BOOLEAN, "BOOLEAN");
-        return baseMapping;
+    enum DatabaseProductName {
+
+        PostgreSQL,
+        MySQL
+    }
+
+    /**
+     * A mapping for a {@linkplain #suitableFor(DataSourceWrapper) specific} data source.
+     */
+    static class SelectableMapping implements TypeMapping {
+
+        private final TypeMapping mapping;
+        private final DatabaseProductName databaseProductName;
+        private final int majorVersion;
+
+        SelectableMapping(DatabaseProductName databaseProductName, int majorVersion,
+                          TypeMapping mapping) {
+            this.mapping = checkNotNull(mapping);
+            this.databaseProductName = checkNotNull(databaseProductName);
+            this.majorVersion = majorVersion;
+        }
+
+        @Override
+        public String getTypeName(Type type) {
+            return  mapping.getTypeName(type);
+        }
+
+        /**
+         * Determines whether the mapping is suitable to work with the data source.
+         *
+         * @param dataSource the data source to test compatibility
+         * @return {@code true} if the {@linkplain DatabaseMetaData#getDatabaseProductName()
+         *         database product name} and the {@linkplain DatabaseMetaData#getDatabaseMajorVersion()
+         *         major version} are equal to the used in the mapping
+         */
+        @VisibleForTesting
+        boolean suitableFor(DataSourceWrapper dataSource) {
+            try (final ConnectionWrapper connection = dataSource.getConnection(true)) {
+                final DatabaseMetaData metaData = connection.get()
+                                                            .getMetaData();
+                final boolean nameMatch = databaseProductName.name()
+                                                             .equals(metaData.getDatabaseProductName());
+                final boolean versionMatch = majorVersion == metaData.getDatabaseMajorVersion();
+                return nameMatch && versionMatch;
+            } catch (SQLException e) {
+                throw new DatabaseException(e);
+            }
+        }
     }
 }

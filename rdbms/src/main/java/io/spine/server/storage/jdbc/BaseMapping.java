@@ -20,10 +20,6 @@
 
 package io.spine.server.storage.jdbc;
 
-import com.google.common.annotations.VisibleForTesting;
-
-import java.sql.DatabaseMetaData;
-import java.sql.SQLException;
 import java.util.EnumMap;
 import java.util.Map;
 
@@ -31,6 +27,12 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static io.spine.server.storage.jdbc.Type.BOOLEAN;
+import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
+import static io.spine.server.storage.jdbc.Type.INT;
+import static io.spine.server.storage.jdbc.Type.LONG;
+import static io.spine.server.storage.jdbc.Type.STRING;
+import static io.spine.server.storage.jdbc.Type.STRING_255;
 
 /**
  * A base implementation of {@link TypeMapping}.
@@ -40,13 +42,37 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 public final class BaseMapping implements TypeMapping {
 
     private final Map<Type, String> mappedTypes;
-    private final DatabaseProductName databaseProductName;
-    private final int majorVersion;
 
-    private BaseMapping(Builder builder) {
-        this.mappedTypes = builder.mappedTypes;
-        this.databaseProductName = builder.databaseProductName;
-        this.majorVersion = builder.majorVersion;
+    private BaseMapping(Map<Type, String> mappedTypes) {
+        this.mappedTypes = mappedTypes;
+    }
+
+    /**
+     * Obtains the base builder for mappings.
+     *
+     * <p>All the types are mapped as follows:
+     * <ul>
+     *     <li>{@code Type.BYTE_ARRAY} - BLOB</li>
+     *     <li>{@code Type.INT} - INT</li>
+     *     <li>{@code Type.LONG} - BIGINT</li>
+     *     <li>{@code Type.STRING_255} - VARCHAR(255)</li>
+     *     <li>{@code Type.STRING} - TEXT</li>
+     *     <li>{@code Type.BOOLEAN} - BOOLEAN</li>
+     * </ul>
+     *
+     * <p>{@linkplain Builder#add(Type, String) Override} the type name
+     * if it doesn't match a database.
+     *
+     * @return the builder with all types
+     */
+    public static Builder baseBuilder() {
+        final Builder baseMapping = new Builder().add(BYTE_ARRAY, "BLOB")
+                                                 .add(INT, "INT")
+                                                 .add(LONG, "BIGINT")
+                                                 .add(STRING_255, "VARCHAR(255)")
+                                                 .add(STRING, "TEXT")
+                                                 .add(BOOLEAN, "BOOLEAN");
+        return baseMapping;
     }
 
     @Override
@@ -58,55 +84,11 @@ public final class BaseMapping implements TypeMapping {
     }
 
     /**
-     * Determines whether the mapping is suitable to work with the data source.
-     *
-     * @param dataSource the data source to test compatibility
-     * @return {@code true} if the {@linkplain DatabaseMetaData#getDatabaseProductName()
-     *         database product name} and the {@linkplain DatabaseMetaData#getDatabaseMajorVersion()
-     *         major version} are equal to the used in the mapping
-     */
-    public boolean suitableFor(DataSourceWrapper dataSource) {
-        try (final ConnectionWrapper connection = dataSource.getConnection(true)) {
-            final DatabaseMetaData metaData = connection.get()
-                                                        .getMetaData();
-            final DatabaseProductName currentDbProductName =
-                    DatabaseProductName.valueOf(metaData.getDatabaseProductName());
-            final boolean nameMatch = currentDbProductName == databaseProductName;
-            final boolean versionMatch = metaData.getDatabaseMajorVersion() == majorVersion;
-            return nameMatch && versionMatch;
-        } catch (SQLException e) {
-            throw new DatabaseException(e);
-        }
-    }
-
-    @VisibleForTesting
-    DatabaseProductName getDatabaseProductName() {
-        return databaseProductName;
-    }
-
-    /**
-     * Creates a new instance of the {@link BaseMapping} builder.
-     *
-     * <p>All the {@link Type types} should be mapped.
-     *
-     * @return the new builder instance
-     */
-    static Builder newBuilder() {
-        return new Builder();
-    }
-
-    /**
      * A builder for {@link BaseMapping}.
      */
     public static class Builder {
 
         private final Map<Type, String> mappedTypes = new EnumMap<>(Type.class);
-        private DatabaseProductName databaseProductName;
-        private int majorVersion;
-
-        private Builder() {
-            // Prevent direct instantiation of this class.
-        }
 
         /**
          * Adds a mapping for the specified type.
@@ -125,43 +107,18 @@ public final class BaseMapping implements TypeMapping {
         }
 
         /**
-         * Sets the target {@link DatabaseProductName} for the mapping.
-         */
-        Builder setDatabaseName(DatabaseProductName databaseName) {
-            this.databaseProductName = checkNotNull(databaseName);
-            return this;
-        }
-
-        /**
-         * Sets the target {@linkplain DatabaseMetaData#getDatabaseMajorVersion()
-         * database major version} for the mapping.
-         */
-        Builder setMajorVersion(int majorVersion) {
-            this.majorVersion = majorVersion;
-            return this;
-        }
-
-        /**
          * Creates {@link BaseMapping} for the builder.
          *
          * @return a new type mapping
-         * @throws IllegalStateException if not all of the {@linkplain Type types} were mapped
+         * @throws IllegalStateException if not all the {@linkplain Type types} were mapped
          */
         public BaseMapping build() {
             final int typesCount = Type.values().length;
             checkState(mappedTypes.size() == typesCount,
                        "A mapping should contain names for all types (%s), " +
                        "but only (%s) types were mapped.", typesCount, mappedTypes.size());
-            return new BaseMapping(this);
+            return new BaseMapping(mappedTypes);
         }
     }
 
-    /**
-     * Names of {@linkplain DatabaseMetaData#getDatabaseProductName() database products}.
-     */
-    public enum DatabaseProductName {
-
-        PostgreSQL,
-        MySQL
-    }
 }
