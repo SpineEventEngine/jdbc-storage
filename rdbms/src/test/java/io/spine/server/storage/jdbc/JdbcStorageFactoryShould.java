@@ -38,7 +38,7 @@ import javax.sql.DataSource;
 
 import static io.spine.Identifier.newUuid;
 import static io.spine.server.storage.jdbc.GivenDataSource.prefix;
-import static io.spine.server.storage.jdbc.TypeMappings.mySql;
+import static io.spine.server.storage.jdbc.StandardMappings.mySql;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;

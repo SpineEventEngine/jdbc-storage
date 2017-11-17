@@ -52,7 +52,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static io.spine.server.storage.jdbc.TypeMappings.mySql;
+import static io.spine.server.storage.jdbc.StandardMappings.mySql;
 import static io.spine.server.storage.jdbc.stand.given.Given.TestAggregate;
 import static io.spine.server.storage.jdbc.stand.given.Given.TestAggregate2;
 import static io.spine.server.storage.jdbc.stand.given.Given.testAggregates;

@@ -228,10 +228,10 @@ public class JdbcStorageFactory implements StorageFactory {
         /**
          * Sets {@link TypeMapping}, which defines {@link Type} names for the used database.
          *
-         * <p>Use the {@linkplain TypeMappings#baseBuilder() base builder} to build a custom mapping.
+         * <p>Use the {@linkplain StandardMappings#baseBuilder() base builder} to build a custom mapping.
          *
          * <p>If the mapping was not specified, it is
-         * {@linkplain TypeMappings#get(DataSourceWrapper) obtained} basing on
+         * {@linkplain StandardMappings#get(DataSourceWrapper) obtained} basing on
          * the {@linkplain java.sql.DatabaseMetaData#getDatabaseProductName() database product name}.
          *
          * <p>If there is no mapping for the database,
@@ -252,7 +252,7 @@ public class JdbcStorageFactory implements StorageFactory {
                 columnTypeRegistry = JdbcTypeRegistryFactory.defaultInstance();
             }
             if (typeMapping == null) {
-                typeMapping = TypeMappings.get(dataSource);
+                typeMapping = StandardMappings.get(dataSource);
             }
             return new JdbcStorageFactory(this);
         }

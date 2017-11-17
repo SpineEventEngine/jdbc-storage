@@ -27,10 +27,10 @@ import static io.spine.test.Tests.assertHasPrivateParameterlessCtor;
 /**
  * @author Dmytro Grankin
  */
-public class TypeMappingsShould {
+public class StandardMappingsShould {
 
     @Test
     public void have_private_util_ctor() {
-        assertHasPrivateParameterlessCtor(TypeMappings.class);
+        assertHasPrivateParameterlessCtor(StandardMappings.class);
     }
 }

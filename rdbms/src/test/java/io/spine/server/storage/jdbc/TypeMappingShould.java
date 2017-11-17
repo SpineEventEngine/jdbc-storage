@@ -29,7 +29,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
 import static io.spine.server.storage.jdbc.TypeMapping.DatabaseProductName.MySQL;
-import static io.spine.server.storage.jdbc.TypeMappings.mySql;
+import static io.spine.server.storage.jdbc.StandardMappings.mySql;
 import static io.spine.test.Tests.nullRef;
 import static io.spine.util.Exceptions.illegalStateWithCauseOf;
 import static org.junit.Assert.assertEquals;
@@ -62,10 +62,10 @@ public class TypeMappingShould {
     public void match_for_data_source_by_database_product_name_and_major_version() {
         final int majorVersion = 5;
         final DatabaseProductName databaseProductName = MySQL;
-        final TypeMapping mapping = TypeMappings.baseBuilder()
-                                                .setDatabaseName(databaseProductName)
-                                                .setMajorVersion(majorVersion)
-                                                .build();
+        final TypeMapping mapping = StandardMappings.baseBuilder()
+                                                    .setDatabaseName(databaseProductName)
+                                                    .setMajorVersion(majorVersion)
+                                                    .build();
         final DataSourceWrapper dataSource = dataSourceMock(databaseProductName, majorVersion);
         assertTrue(mapping.suitableFor(dataSource));
     }
@@ -74,10 +74,10 @@ public class TypeMappingShould {
     public void not_match_for_data_source_if_major_versions_different() {
         final int mappingVersion = 5;
         final DatabaseProductName databaseProductName = MySQL;
-        final TypeMapping mapping = TypeMappings.baseBuilder()
-                                                .setDatabaseName(databaseProductName)
-                                                .setMajorVersion(mappingVersion)
-                                                .build();
+        final TypeMapping mapping = StandardMappings.baseBuilder()
+                                                    .setDatabaseName(databaseProductName)
+                                                    .setMajorVersion(mappingVersion)
+                                                    .build();
         final int differentVersion = mappingVersion + 1;
         final DataSourceWrapper dataSource = dataSourceMock(databaseProductName, differentVersion);
         assertFalse(mapping.suitableFor(dataSource));
@@ -85,8 +85,8 @@ public class TypeMappingShould {
 
     @Test
     public void not_match_if_database_product_name_null() {
-        final TypeMapping mapping = TypeMappings.baseBuilder()
-                                                .build();
+        final TypeMapping mapping = StandardMappings.baseBuilder()
+                                                    .build();
         assertNull(mapping.getDatabaseProductName());
 
         final DataSourceWrapper dataSource = dataSourceMock(MySQL, 0);

@@ -41,7 +41,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
  * <p>This class provides a flexible way to point out
  * database specific names of {@linkplain Type types}.
  *
- * <p>There are standard {@linkplain TypeMappings mappings}.
+ * <p>There are {@linkplain StandardMappings standard mappings}.
  *
  * @author Dmytro Grankin
  */

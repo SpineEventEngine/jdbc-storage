@@ -33,11 +33,11 @@ import static io.spine.server.storage.jdbc.TypeMapping.DatabaseProductName.MySQL
 import static io.spine.server.storage.jdbc.TypeMapping.DatabaseProductName.PostgreSQL;
 
 /**
- * Standard {@link TypeMapping type mappings} for different databases.
+ * Standard {@linkplain TypeMapping type mappings} for different databases.
  *
  * @author Dmytro Grankin
  */
-public final class TypeMappings {
+public final class StandardMappings {
 
     private static final TypeMapping MYSQL_5 = baseBuilder().setDatabaseName(MySQL)
                                                             .setMajorVersion(5)
@@ -47,7 +47,7 @@ public final class TypeMappings {
                                                                   .setMajorVersion(10)
                                                                   .build();
 
-    private TypeMappings() {
+    private StandardMappings() {
         // Prevent instantiation of this utility class.
     }
 

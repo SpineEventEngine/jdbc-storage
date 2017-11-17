@@ -34,7 +34,7 @@ import org.junit.Test;
 import java.sql.SQLException;
 
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
-import static io.spine.server.storage.jdbc.TypeMappings.mySql;
+import static io.spine.server.storage.jdbc.StandardMappings.mySql;
 import static io.spine.test.Tests.nullRef;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
