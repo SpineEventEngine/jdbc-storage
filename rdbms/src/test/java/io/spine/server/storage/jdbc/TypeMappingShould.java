@@ -50,11 +50,11 @@ public class TypeMappingShould {
         final Type type = Type.BYTE_ARRAY;
         final String originalName = "original";
         final String nameReplacement = "replacement";
-        final Builder builder = TypeMapping.newBuilder()
-                                           .add(type, originalName)
-                                           .add(type, nameReplacement);
-        final String resultingName = builder.getMappedTypes()
-                                            .get(type);
+        final TypeMapping mapping = TypeMapping.newBuilder()
+                                               .add(type, originalName)
+                                               .add(type, nameReplacement)
+                                               .build();
+        final String resultingName = mapping.getTypeName(type);
         assertEquals(nameReplacement, resultingName);
     }
 

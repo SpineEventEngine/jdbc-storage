@@ -31,7 +31,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static java.util.Collections.unmodifiableMap;
 
 /**
  * A {@link Type}-to-name mapping.
@@ -168,11 +167,6 @@ public final class TypeMapping {
                        "A mapping should contain names for all types (%s), " +
                        "but only (%s) types were mapped.", typesCount, mappedTypes.size());
             return new TypeMapping(this);
-        }
-
-        @VisibleForTesting
-        Map<Type, String> getMappedTypes() {
-            return unmodifiableMap(mappedTypes);
         }
     }
 
