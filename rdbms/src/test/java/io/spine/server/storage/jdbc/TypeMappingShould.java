@@ -21,11 +21,24 @@
 package io.spine.server.storage.jdbc;
 
 import io.spine.server.storage.jdbc.TypeMapping.Builder;
+import io.spine.server.storage.jdbc.TypeMapping.DatabaseProductName;
 import org.junit.Test;
 
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
+
+import static io.spine.server.storage.jdbc.TypeMapping.DatabaseProductName.mysql;
 import static io.spine.server.storage.jdbc.TypeMappings.mySql;
 import static io.spine.test.Tests.nullRef;
+import static io.spine.util.Exceptions.illegalStateWithCauseOf;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 
 /**
  * @author Dmytro Grankin
@@ -45,6 +58,41 @@ public class TypeMappingShould {
         assertEquals(nameReplacement, resultingName);
     }
 
+    @Test
+    public void match_for_data_source_by_database_product_name_and_major_version() {
+        final int majorVersion = 5;
+        final DatabaseProductName databaseProductName = mysql;
+        final TypeMapping mapping = TypeMappings.baseBuilder()
+                                                .setDatabaseName(databaseProductName)
+                                                .setMajorVersion(majorVersion)
+                                                .build();
+        final DataSourceWrapper dataSource = dataSourceMock(databaseProductName, majorVersion);
+        assertTrue(mapping.suitableFor(dataSource));
+    }
+
+    @Test
+    public void not_match_for_data_source_if_major_versions_different() {
+        final int mappingVersion = 5;
+        final DatabaseProductName databaseProductName = mysql;
+        final TypeMapping mapping = TypeMappings.baseBuilder()
+                                                .setDatabaseName(databaseProductName)
+                                                .setMajorVersion(mappingVersion)
+                                                .build();
+        final int differentVersion = mappingVersion + 1;
+        final DataSourceWrapper dataSource = dataSourceMock(databaseProductName, differentVersion);
+        assertFalse(mapping.suitableFor(dataSource));
+    }
+
+    @Test
+    public void not_match_if_database_product_name_null() {
+        final TypeMapping mapping = TypeMappings.baseBuilder()
+                                                .build();
+        assertNull(mapping.getDatabaseProductName());
+
+        final DataSourceWrapper dataSource = dataSourceMock(mysql, 0);
+        assertFalse(mapping.suitableFor(dataSource));
+    }
+
     @Test(expected = IllegalStateException.class)
     public void throw_exception_if_not_all_types_mapped() {
         final Builder builder = TypeMapping.newBuilder();
@@ -55,5 +103,28 @@ public class TypeMappingShould {
     public void throw_ISE_if_requested_type_has_no_mapping() {
         final Type notMappedType = nullRef();
         mySql().getTypeName(notMappedType);
+    }
+
+    private static DataSourceWrapper dataSourceMock(DatabaseProductName databaseProductName,
+                                                    int majorVersion) {
+        final DataSourceWrapper dataSource = mock(DataSourceWrapper.class);
+        final ConnectionWrapper connectionWrapper = mock(ConnectionWrapper.class);
+        final Connection connection = mock(Connection.class);
+        final DatabaseMetaData metadata = mock(DatabaseMetaData.class);
+        doReturn(connectionWrapper).when(dataSource)
+                                   .getConnection(anyBoolean());
+        doReturn(connection).when(connectionWrapper)
+                            .get();
+        try {
+            doReturn(metadata).when(connection)
+                              .getMetaData();
+            doReturn(databaseProductName.name()).when(metadata)
+                                                .getDatabaseProductName();
+            doReturn(majorVersion).when(metadata)
+                                  .getDatabaseMajorVersion();
+            return dataSource;
+        } catch (SQLException e) {
+            throw illegalStateWithCauseOf(e);
+        }
     }
 }

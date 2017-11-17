@@ -23,8 +23,6 @@ package io.spine.server.storage.jdbc;
 import com.google.common.annotations.VisibleForTesting;
 import io.spine.server.storage.jdbc.TypeMapping.Builder;
 
-import java.sql.DatabaseMetaData;
-
 import static io.spine.server.storage.jdbc.Type.BOOLEAN;
 import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
 import static io.spine.server.storage.jdbc.Type.INT;

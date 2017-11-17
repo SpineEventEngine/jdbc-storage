@@ -84,16 +84,20 @@ public final class TypeMapping {
         try (final ConnectionWrapper connection = dataSource.getConnection(true)) {
             final DatabaseMetaData metaData = connection.get()
                                                         .getMetaData();
-            final String databaseName = metaData.getDatabaseProductName()
-                                                .toLowerCase();
-            if (databaseName.equals(databaseProductName.name())
-                && majorVersion == metaData.getDatabaseMajorVersion()) {
-                return true;
-            }
+            final DatabaseProductName currentDbProductName =
+                    DatabaseProductName.valueOf(metaData.getDatabaseProductName()
+                                                        .toLowerCase());
+            final boolean nameMatch = currentDbProductName == databaseProductName;
+            final boolean versionMatch = metaData.getDatabaseMajorVersion() == majorVersion;
+            return nameMatch && versionMatch;
         } catch (SQLException e) {
             throw new DatabaseException(e);
         }
-        return false;
+    }
+
+    @VisibleForTesting
+    DatabaseProductName getDatabaseProductName() {
+        return databaseProductName;
     }
 
     /**
