@@ -29,8 +29,8 @@ import static io.spine.server.storage.jdbc.Type.INT;
 import static io.spine.server.storage.jdbc.Type.LONG;
 import static io.spine.server.storage.jdbc.Type.STRING;
 import static io.spine.server.storage.jdbc.Type.STRING_255;
-import static io.spine.server.storage.jdbc.TypeMapping.DatabaseProductName.mysql;
-import static io.spine.server.storage.jdbc.TypeMapping.DatabaseProductName.postresql;
+import static io.spine.server.storage.jdbc.TypeMapping.DatabaseProductName.MySQL;
+import static io.spine.server.storage.jdbc.TypeMapping.DatabaseProductName.PostgreSQL;
 
 /**
  * Standard {@link TypeMapping type mappings} for different databases.
@@ -39,11 +39,11 @@ import static io.spine.server.storage.jdbc.TypeMapping.DatabaseProductName.postr
  */
 public final class TypeMappings {
 
-    private static final TypeMapping MYSQL_5 = baseBuilder().setDatabaseName(mysql)
+    private static final TypeMapping MYSQL_5 = baseBuilder().setDatabaseName(MySQL)
                                                             .setMajorVersion(5)
                                                             .build();
     private static final TypeMapping POSTGRESQL_10 = baseBuilder().add(BYTE_ARRAY, "BYTEA")
-                                                                  .setDatabaseName(postresql)
+                                                                  .setDatabaseName(PostgreSQL)
                                                                   .setMajorVersion(10)
                                                                   .build();
 

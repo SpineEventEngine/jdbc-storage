@@ -28,7 +28,7 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
-import static io.spine.server.storage.jdbc.TypeMapping.DatabaseProductName.mysql;
+import static io.spine.server.storage.jdbc.TypeMapping.DatabaseProductName.MySQL;
 import static io.spine.server.storage.jdbc.TypeMappings.mySql;
 import static io.spine.test.Tests.nullRef;
 import static io.spine.util.Exceptions.illegalStateWithCauseOf;
@@ -61,7 +61,7 @@ public class TypeMappingShould {
     @Test
     public void match_for_data_source_by_database_product_name_and_major_version() {
         final int majorVersion = 5;
-        final DatabaseProductName databaseProductName = mysql;
+        final DatabaseProductName databaseProductName = MySQL;
         final TypeMapping mapping = TypeMappings.baseBuilder()
                                                 .setDatabaseName(databaseProductName)
                                                 .setMajorVersion(majorVersion)
@@ -73,7 +73,7 @@ public class TypeMappingShould {
     @Test
     public void not_match_for_data_source_if_major_versions_different() {
         final int mappingVersion = 5;
-        final DatabaseProductName databaseProductName = mysql;
+        final DatabaseProductName databaseProductName = MySQL;
         final TypeMapping mapping = TypeMappings.baseBuilder()
                                                 .setDatabaseName(databaseProductName)
                                                 .setMajorVersion(mappingVersion)
@@ -89,7 +89,7 @@ public class TypeMappingShould {
                                                 .build();
         assertNull(mapping.getDatabaseProductName());
 
-        final DataSourceWrapper dataSource = dataSourceMock(mysql, 0);
+        final DataSourceWrapper dataSource = dataSourceMock(MySQL, 0);
         assertFalse(mapping.suitableFor(dataSource));
     }
 

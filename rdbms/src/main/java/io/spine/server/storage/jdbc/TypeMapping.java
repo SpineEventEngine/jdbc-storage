@@ -85,8 +85,7 @@ public final class TypeMapping {
             final DatabaseMetaData metaData = connection.get()
                                                         .getMetaData();
             final DatabaseProductName currentDbProductName =
-                    DatabaseProductName.valueOf(metaData.getDatabaseProductName()
-                                                        .toLowerCase());
+                    DatabaseProductName.valueOf(metaData.getDatabaseProductName());
             final boolean nameMatch = currentDbProductName == databaseProductName;
             final boolean versionMatch = metaData.getDatabaseMajorVersion() == majorVersion;
             return nameMatch && versionMatch;
@@ -182,7 +181,7 @@ public final class TypeMapping {
      */
     public enum DatabaseProductName {
 
-        postresql,
-        mysql
+        PostgreSQL,
+        MySQL
     }
 }
