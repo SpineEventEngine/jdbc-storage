@@ -33,7 +33,7 @@ import static io.spine.Identifier.newUuid;
 import static io.spine.core.Versions.newVersion;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
 import static io.spine.server.storage.jdbc.GivenDataSource.withoutSuperpowers;
-import static io.spine.server.storage.jdbc.StandardMappings.mySql;
+import static io.spine.server.storage.jdbc.StandardMapping.mySql;
 import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.kind;
 import static io.spine.time.Time.getCurrentTime;
 import static org.junit.Assert.assertEquals;

@@ -50,7 +50,7 @@ import static io.spine.Identifier.newUuid;
 import static io.spine.client.ColumnFilters.gt;
 import static io.spine.client.ColumnFilters.lt;
 import static io.spine.client.CompositeColumnFilter.CompositeOperator.ALL;
-import static io.spine.server.storage.jdbc.StandardMappings.mySql;
+import static io.spine.server.storage.jdbc.StandardMapping.mySql;
 import static io.spine.test.Tests.nullRef;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

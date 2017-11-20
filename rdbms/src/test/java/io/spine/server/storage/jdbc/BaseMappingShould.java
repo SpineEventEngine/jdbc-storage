@@ -23,7 +23,7 @@ package io.spine.server.storage.jdbc;
 import io.spine.server.storage.jdbc.BaseMapping.Builder;
 import org.junit.Test;
 
-import static io.spine.server.storage.jdbc.StandardMappings.mySql;
+import static io.spine.server.storage.jdbc.StandardMapping.mySql;
 import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
 import static io.spine.test.Tests.nullRef;
 import static org.junit.Assert.assertEquals;

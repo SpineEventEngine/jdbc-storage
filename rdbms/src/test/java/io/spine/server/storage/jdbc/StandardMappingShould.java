@@ -20,19 +20,18 @@
 
 package io.spine.server.storage.jdbc;
 
-import io.spine.server.storage.jdbc.StandardMappings.DatabaseProductName;
-import io.spine.server.storage.jdbc.StandardMappings.SelectableMapping;
 import org.junit.Test;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
-import static io.spine.server.storage.jdbc.StandardMappings.DatabaseProductName.MySQL;
+import static io.spine.server.storage.jdbc.StandardMapping.MYSQL_5;
+import static io.spine.server.storage.jdbc.StandardMapping.get;
 import static io.spine.test.Tests.assertHasPrivateParameterlessCtor;
 import static io.spine.util.Exceptions.illegalStateWithCauseOf;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -40,37 +39,30 @@ import static org.mockito.Mockito.mock;
 /**
  * @author Dmytro Grankin
  */
-public class StandardMappingsShould {
+public class StandardMappingShould {
 
     @Test
     public void have_private_util_ctor() {
-        assertHasPrivateParameterlessCtor(StandardMappings.class);
+        assertHasPrivateParameterlessCtor(StandardMapping.class);
     }
 
     @Test
     public void select_mapping_by_database_product_name_and_major_version() {
-        final int majorVersion = 5;
-        final DatabaseProductName databaseProductName = MySQL;
-        final SelectableMapping mapping = new SelectableMapping(databaseProductName, majorVersion,
-                                                                BaseMapping.baseBuilder()
-                                                                           .build());
-        final DataSourceWrapper dataSource = dataSourceMock(databaseProductName, majorVersion);
-        assertTrue(mapping.suitableFor(dataSource));
+        final DataSourceWrapper dataSource = dataSourceMock(MYSQL_5.getDatabaseProductName(),
+                                                            MYSQL_5.getMajorVersion());
+        assertEquals(MYSQL_5, get(dataSource));
     }
 
     @Test
     public void not_select_mapping_if_major_versions_different() {
-        final int mappingVersion = 5;
-        final DatabaseProductName databaseProductName = MySQL;
-        final SelectableMapping mapping = new SelectableMapping(databaseProductName, mappingVersion,
-                                                                BaseMapping.baseBuilder()
-                                                                           .build());
+        final int mappingVersion = MYSQL_5.getMajorVersion();
         final int differentVersion = mappingVersion + 1;
-        final DataSourceWrapper dataSource = dataSourceMock(databaseProductName, differentVersion);
-        assertFalse(mapping.suitableFor(dataSource));
+        final DataSourceWrapper dataSource = dataSourceMock(MYSQL_5.getDatabaseProductName(),
+                                                            differentVersion);
+        assertNotEquals(MYSQL_5, get(dataSource));
     }
 
-    private static DataSourceWrapper dataSourceMock(DatabaseProductName databaseProductName,
+    private static DataSourceWrapper dataSourceMock(String databaseProductName,
                                                     int majorVersion) {
         final DataSourceWrapper dataSource = mock(DataSourceWrapper.class);
         final ConnectionWrapper connectionWrapper = mock(ConnectionWrapper.class);
@@ -83,8 +75,8 @@ public class StandardMappingsShould {
         try {
             doReturn(metadata).when(connection)
                               .getMetaData();
-            doReturn(databaseProductName.name()).when(metadata)
-                                                .getDatabaseProductName();
+            doReturn(databaseProductName).when(metadata)
+                                         .getDatabaseProductName();
             doReturn(majorVersion).when(metadata)
                                   .getDatabaseMajorVersion();
             return dataSource;
