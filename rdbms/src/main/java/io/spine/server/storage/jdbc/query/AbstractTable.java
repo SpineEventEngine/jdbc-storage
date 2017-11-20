@@ -28,6 +28,7 @@ import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.Type;
 import io.spine.server.storage.jdbc.TypeMapping;
+import io.spine.type.TypeName;
 import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
@@ -268,7 +269,7 @@ public abstract class AbstractTable<I, R, W> {
             final TableColumn column = iterator.next();
             final String name = column.name();
             final Type type = ensureIdType(column);
-            final String typeName = typeMapping.getTypeName(type);
+            final TypeName typeName = typeMapping.typeNameFor(type);
             sql.append(name)
                .append(' ')
                .append(typeName);

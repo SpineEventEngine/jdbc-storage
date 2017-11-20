@@ -20,13 +20,14 @@
 
 package io.spine.server.storage.jdbc;
 
+import io.spine.type.TypeName;
+
 import java.util.EnumMap;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
-import static com.google.common.base.Strings.isNullOrEmpty;
 import static io.spine.server.storage.jdbc.Type.BOOLEAN;
 import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
 import static io.spine.server.storage.jdbc.Type.INT;
@@ -41,9 +42,9 @@ import static io.spine.server.storage.jdbc.Type.STRING_255;
  */
 public final class BaseMapping implements TypeMapping {
 
-    private final Map<Type, String> mappedTypes;
+    private final Map<Type, TypeName> mappedTypes;
 
-    private BaseMapping(Map<Type, String> mappedTypes) {
+    private BaseMapping(Map<Type, TypeName> mappedTypes) {
         this.mappedTypes = mappedTypes;
     }
 
@@ -76,11 +77,11 @@ public final class BaseMapping implements TypeMapping {
     }
 
     @Override
-    public String getTypeName(Type type) {
+    public TypeName typeNameFor(Type type) {
         checkState(mappedTypes.containsKey(type),
                    "The type mapping doesn't define name for %s type.", type);
-        final String name = mappedTypes.get(type);
-        return name;
+        final TypeName typeName = mappedTypes.get(type);
+        return typeName;
     }
 
     /**
@@ -88,7 +89,7 @@ public final class BaseMapping implements TypeMapping {
      */
     public static class Builder {
 
-        private final Map<Type, String> mappedTypes = new EnumMap<>(Type.class);
+        private final Map<Type, TypeName> mappedTypes = new EnumMap<>(Type.class);
 
         /**
          * Adds a mapping for the specified type.
@@ -101,8 +102,7 @@ public final class BaseMapping implements TypeMapping {
          */
         public Builder add(Type type, String name) {
             checkNotNull(type);
-            checkArgument(!isNullOrEmpty(name));
-            mappedTypes.put(type, name);
+            mappedTypes.put(type, TypeName.of(name));
             return this;
         }
 

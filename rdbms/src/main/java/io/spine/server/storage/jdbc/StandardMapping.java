@@ -21,6 +21,7 @@
 package io.spine.server.storage.jdbc;
 
 import com.google.common.annotations.VisibleForTesting;
+import io.spine.type.TypeName;
 
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
@@ -51,8 +52,8 @@ public enum StandardMapping implements TypeMapping {
     }
 
     @Override
-    public String getTypeName(Type type) {
-        return typeMapping.getTypeName(type);
+    public TypeName typeNameFor(Type type) {
+        return typeMapping.typeNameFor(type);
     }
 
     /**

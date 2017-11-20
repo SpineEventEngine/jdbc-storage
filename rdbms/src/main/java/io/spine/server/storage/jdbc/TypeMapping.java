@@ -20,6 +20,8 @@
 
 package io.spine.server.storage.jdbc;
 
+import io.spine.type.TypeName;
+
 /**
  * A {@link Type}-to-name mapping.
  *
@@ -40,5 +42,5 @@ public interface TypeMapping {
      * @return the type name
      * @throws IllegalStateException if the name for the specified type is not defined
      */
-    String getTypeName(Type type);
+    TypeName typeNameFor(Type type);
 }
