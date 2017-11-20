@@ -4,7 +4,7 @@
 
 Support of storage in JDBC-compliant databases.
 
-### Base configuration
+### Configuration
 
 To support working with different JDBC drivers, the library uses [Querydsl](http://www.querydsl.com/)
 internally. So the list of supported drivers depends on `Querydsl` and can be found
@@ -28,7 +28,7 @@ JdbcStorageFactory.newBuilder()
                   .build();
 ```
 
-### Type mapping
+### SQL Type Mapping
 
 Data types differ for various SQL databases. There is `TypeMapping` to deal with it.
 The mapping defines correspondence of `Type` to a name for a particular database. 
@@ -37,7 +37,7 @@ The mapping defines correspondence of `Type` to a name for a particular database
 The type mapping is selected automatically basing on the JDBC connection string.
 If there is no standard mapping for the database, MySQL mapping will be used as the default.
 
-#### Standard mappings
+#### Default Values
 
 | Type         | MySQL 5       | PostgreSQL 10 |
 | :----------: |:-------------:| :------------:|
@@ -48,7 +48,7 @@ If there is no standard mapping for the database, MySQL mapping will be used as 
 | STRING       | TEXT          | TEXT          |
 | BOOLEAN      | BOOLEAN       | BOOLEAN       |
 
-#### Custom mapping
+#### Custom Mapping
 
 If the automatically selected mapping doesn't match your requirements, a custom mapping can be
 specified during creation of `JdbcStorageFactory`. There is the base builder for this purpose - 
