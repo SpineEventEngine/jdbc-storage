@@ -37,7 +37,7 @@ import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
 public enum StandardMapping implements TypeMapping {
 
     MYSQL_5("MySQL", 5, baseBuilder()),
-    POSTRESQL_10("PostreSQL", 10, baseBuilder().add(BYTE_ARRAY, "BYTEA"));
+    POSTGRESQL_10("PostgreSQL", 10, baseBuilder().add(BYTE_ARRAY, "BYTEA"));
 
     @SuppressWarnings("NonSerializableFieldInSerializableClass")
     private final TypeMapping typeMapping;

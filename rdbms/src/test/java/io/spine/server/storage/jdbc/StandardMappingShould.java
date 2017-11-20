@@ -27,7 +27,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
 import static io.spine.server.storage.jdbc.StandardMapping.MYSQL_5;
-import static io.spine.server.storage.jdbc.StandardMapping.POSTRESQL_10;
+import static io.spine.server.storage.jdbc.StandardMapping.POSTGRESQL_10;
 import static io.spine.server.storage.jdbc.StandardMapping.select;
 import static io.spine.util.Exceptions.illegalStateWithCauseOf;
 import static org.junit.Assert.assertEquals;
@@ -50,7 +50,7 @@ public class StandardMappingShould {
 
     @Test
     public void not_select_mapping_if_major_versions_different() {
-        final StandardMapping mapping = POSTRESQL_10;
+        final StandardMapping mapping = POSTGRESQL_10;
         final String databaseProductName = mapping.getDatabaseProductName();
         final int differentVersion = mapping.getMajorVersion() + 1;
         final DataSourceWrapper dataSource = dataSourceMock(databaseProductName,
