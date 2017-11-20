@@ -231,8 +231,9 @@ public class JdbcStorageFactory implements StorageFactory {
          * <p>Use the {@linkplain BaseMapping#baseBuilder() base builder} to build a custom mapping.
          *
          * <p>If the mapping was not specified, it is
-         * {@linkplain StandardMapping#get(DataSourceWrapper) obtained} basing on
-         * the {@linkplain java.sql.DatabaseMetaData#getDatabaseProductName() database product name}.
+         * {@linkplain StandardMapping#select(DataSourceWrapper) selected} basing on
+         * the {@linkplain java.sql.DatabaseMetaData#getDatabaseProductName() database product name}
+         * and the {@linkplain java.sql.DatabaseMetaData#getDatabaseMajorVersion() major version}.
          *
          * <p>If there is no mapping for the database,
          * MySQL-specific mapping for the 5th version is used.
@@ -252,7 +253,7 @@ public class JdbcStorageFactory implements StorageFactory {
                 columnTypeRegistry = JdbcTypeRegistryFactory.defaultInstance();
             }
             if (typeMapping == null) {
-                typeMapping = StandardMapping.get(dataSource);
+                typeMapping = StandardMapping.select(dataSource);
             }
             return new JdbcStorageFactory(this);
         }

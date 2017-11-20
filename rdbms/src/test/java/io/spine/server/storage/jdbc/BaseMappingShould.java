@@ -23,7 +23,7 @@ package io.spine.server.storage.jdbc;
 import io.spine.server.storage.jdbc.BaseMapping.Builder;
 import org.junit.Test;
 
-import static io.spine.server.storage.jdbc.StandardMapping.mySql;
+import static io.spine.server.storage.jdbc.StandardMapping.MYSQL_5;
 import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
 import static io.spine.test.Tests.nullRef;
 import static org.junit.Assert.assertEquals;
@@ -61,6 +61,6 @@ public class BaseMappingShould {
     @Test(expected = IllegalStateException.class)
     public void throw_ISE_if_requested_type_has_no_mapping() {
         final Type notMappedType = nullRef();
-        mySql().getTypeName(notMappedType);
+        MYSQL_5.getTypeName(notMappedType);
     }
 }

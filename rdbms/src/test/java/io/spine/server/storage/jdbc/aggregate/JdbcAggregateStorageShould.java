@@ -27,6 +27,7 @@ import io.spine.server.aggregate.AggregateStorage;
 import io.spine.server.aggregate.AggregateStorageShould;
 import io.spine.server.entity.Entity;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.StandardMapping;
 import io.spine.server.storage.jdbc.query.DbIterator;
 import io.spine.test.aggregate.ProjectId;
 import org.junit.Test;
@@ -34,7 +35,7 @@ import org.junit.Test;
 import java.sql.SQLException;
 
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
-import static io.spine.server.storage.jdbc.StandardMapping.mySql;
+import static io.spine.server.storage.jdbc.StandardMapping.MYSQL_5;
 import static io.spine.test.Tests.nullRef;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -108,7 +109,7 @@ public class JdbcAggregateStorageShould extends AggregateStorageShould {
         final JdbcAggregateStorage<I> storage = builder.setMultitenant(false)
                                                        .setDataSource(dataSource)
                                                        .setAggregateClass(aggregateClass)
-                                                       .setTypeMapping(mySql())
+                                                       .setTypeMapping(MYSQL_5)
                                                        .build();
         return storage;
     }

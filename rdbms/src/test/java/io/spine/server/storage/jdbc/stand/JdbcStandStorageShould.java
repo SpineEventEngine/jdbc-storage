@@ -36,6 +36,7 @@ import io.spine.server.storage.RecordReadRequest;
 import io.spine.server.storage.jdbc.ConnectionWrapper;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.GivenDataSource;
+import io.spine.server.storage.jdbc.StandardMapping;
 import io.spine.server.storage.jdbc.stand.given.Given;
 import io.spine.test.commandservice.customer.Customer;
 import io.spine.test.storage.Project;
@@ -52,7 +53,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static io.spine.server.storage.jdbc.StandardMapping.mySql;
+import static io.spine.server.storage.jdbc.StandardMapping.MYSQL_5;
 import static io.spine.server.storage.jdbc.stand.given.Given.TestAggregate;
 import static io.spine.server.storage.jdbc.stand.given.Given.TestAggregate2;
 import static io.spine.server.storage.jdbc.stand.given.Given.testAggregates;
@@ -83,7 +84,7 @@ public class JdbcStandStorageShould extends StandStorageShould {
         final StandStorage storage = JdbcStandStorage.newBuilder()
                                                      .setDataSource(dataSource)
                                                      .setMultitenant(false)
-                                                     .setTypeMapping(mySql())
+                                                     .setTypeMapping(MYSQL_5)
                                                      .build();
         return storage;
     }
@@ -106,7 +107,7 @@ public class JdbcStandStorageShould extends StandStorageShould {
         final StandStorage standStorage = JdbcStandStorage.<String>newBuilder()
                                                           .setDataSource(dataSourceMock)
                                                           .setMultitenant(false)
-                                                          .setTypeMapping(mySql())
+                                                          .setTypeMapping(MYSQL_5)
                                                           .build();
 
         assertNotNull(standStorage);
@@ -126,7 +127,7 @@ public class JdbcStandStorageShould extends StandStorageShould {
 
         final StandStorage standStorage = JdbcStandStorage.<String>newBuilder()
                                                           .setDataSource(dataSourceMock)
-                                                          .setTypeMapping(mySql())
+                                                          .setTypeMapping(MYSQL_5)
                                                           .build();
 
         assertNotNull(standStorage);

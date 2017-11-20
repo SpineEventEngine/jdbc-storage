@@ -39,9 +39,10 @@ public enum StandardMapping implements TypeMapping {
     POSTRESQL_10("PostreSQL", 10, baseBuilder().add(BYTE_ARRAY, "BYTEA")
                                                .build());
 
+    @SuppressWarnings("NonSerializableFieldInSerializableClass")
+    private final TypeMapping typeMapping;
     private final String databaseProductName;
     private final int majorVersion;
-    private final TypeMapping typeMapping;
 
     StandardMapping(String databaseProductName, int majorVersion, TypeMapping typeMapping) {
         this.databaseProductName = databaseProductName;
@@ -55,14 +56,6 @@ public enum StandardMapping implements TypeMapping {
     }
 
     /**
-     * Obtains the type mapping for MySQL 5 database.
-     */
-    @VisibleForTesting
-    public static TypeMapping mySql() {
-        return MYSQL_5;
-    }
-
-    /**
      * Selects the type mapping for the specified data source.
      *
      * <p>The {@linkplain DatabaseMetaData#getDatabaseProductName() database product name} and
@@ -73,11 +66,11 @@ public enum StandardMapping implements TypeMapping {
      * @return the type mapping for the used database
      *         or MySQL-specific mapping if there is no standard mapping for the database
      */
-    static TypeMapping get(DataSourceWrapper dataSource) {
+    static TypeMapping select(DataSourceWrapper dataSource) {
         try (final ConnectionWrapper connection = dataSource.getConnection(true)) {
             final DatabaseMetaData metaData = connection.get()
                                                         .getMetaData();
-            for (StandardMapping mapping : StandardMapping.values()) {
+            for (StandardMapping mapping : values()) {
                 final boolean nameMatch = metaData.getDatabaseProductName()
                                                   .equals(mapping.databaseProductName);
                 final boolean versionMatch =

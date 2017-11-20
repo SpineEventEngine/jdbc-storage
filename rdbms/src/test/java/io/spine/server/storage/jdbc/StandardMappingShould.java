@@ -27,8 +27,8 @@ import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
 import static io.spine.server.storage.jdbc.StandardMapping.MYSQL_5;
-import static io.spine.server.storage.jdbc.StandardMapping.get;
-import static io.spine.test.Tests.assertHasPrivateParameterlessCtor;
+import static io.spine.server.storage.jdbc.StandardMapping.POSTRESQL_10;
+import static io.spine.server.storage.jdbc.StandardMapping.select;
 import static io.spine.util.Exceptions.illegalStateWithCauseOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -42,24 +42,20 @@ import static org.mockito.Mockito.mock;
 public class StandardMappingShould {
 
     @Test
-    public void have_private_util_ctor() {
-        assertHasPrivateParameterlessCtor(StandardMapping.class);
-    }
-
-    @Test
     public void select_mapping_by_database_product_name_and_major_version() {
         final DataSourceWrapper dataSource = dataSourceMock(MYSQL_5.getDatabaseProductName(),
                                                             MYSQL_5.getMajorVersion());
-        assertEquals(MYSQL_5, get(dataSource));
+        assertEquals(MYSQL_5, select(dataSource));
     }
 
     @Test
     public void not_select_mapping_if_major_versions_different() {
-        final int mappingVersion = MYSQL_5.getMajorVersion();
-        final int differentVersion = mappingVersion + 1;
-        final DataSourceWrapper dataSource = dataSourceMock(MYSQL_5.getDatabaseProductName(),
+        final StandardMapping mapping = POSTRESQL_10;
+        final String databaseProductName = mapping.getDatabaseProductName();
+        final int differentVersion = mapping.getMajorVersion() + 1;
+        final DataSourceWrapper dataSource = dataSourceMock(databaseProductName,
                                                             differentVersion);
-        assertNotEquals(MYSQL_5, get(dataSource));
+        assertNotEquals(mapping, select(dataSource));
     }
 
     private static DataSourceWrapper dataSourceMock(String databaseProductName,
