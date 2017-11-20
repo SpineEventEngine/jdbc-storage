@@ -24,6 +24,7 @@ import io.spine.server.storage.jdbc.BaseMapping.Builder;
 import org.junit.Test;
 
 import static io.spine.server.storage.jdbc.StandardMappings.mySql;
+import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
 import static io.spine.test.Tests.nullRef;
 import static org.junit.Assert.assertEquals;
 
@@ -34,7 +35,7 @@ public class BaseMappingShould {
 
     @Test
     public void allow_override_type_names_during_building() {
-        final Type type = Type.BYTE_ARRAY;
+        final Type type = BYTE_ARRAY;
         final String originalName = "original";
         final String nameReplacement = "replacement";
         final TypeMapping mapping = BaseMapping.baseBuilder()
@@ -43,6 +44,12 @@ public class BaseMappingShould {
                                                .build();
         final String resultingName = mapping.getTypeName(type);
         assertEquals(nameReplacement, resultingName);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void not_allow_empty_type_names() {
+        final Builder builder = BaseMapping.baseBuilder();
+        builder.add(BYTE_ARRAY, "");
     }
 
     @Test(expected = IllegalStateException.class)
