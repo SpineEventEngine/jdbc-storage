@@ -52,12 +52,12 @@ public final class BaseMapping implements TypeMapping {
      *
      * <p>All the types are mapped as follows:
      * <ul>
-     *     <li>{@code Type.BYTE_ARRAY} - BLOB</li>
-     *     <li>{@code Type.INT} - INT</li>
-     *     <li>{@code Type.LONG} - BIGINT</li>
-     *     <li>{@code Type.STRING_255} - VARCHAR(255)</li>
-     *     <li>{@code Type.STRING} - TEXT</li>
-     *     <li>{@code Type.BOOLEAN} - BOOLEAN</li>
+     *     <li>{@code Type.BYTE_ARRAY} - {@code BLOB}</li>
+     *     <li>{@code Type.INT} - {@code INT}</li>
+     *     <li>{@code Type.LONG} - {@code BIGINT}</li>
+     *     <li>{@code Type.STRING_255} - {@code VARCHAR(255)}</li>
+     *     <li>{@code Type.STRING} - {@code TEXT}</li>
+     *     <li>{@code Type.BOOLEAN} - {@code BOOLEAN}</li>
      * </ul>
      *
      * <p>{@linkplain Builder#add(Type, String) Override} the type name
