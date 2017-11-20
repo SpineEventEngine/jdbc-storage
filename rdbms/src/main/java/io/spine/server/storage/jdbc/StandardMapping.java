@@ -36,19 +36,19 @@ import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
  */
 public enum StandardMapping implements TypeMapping {
 
-    MYSQL_5("MySQL", 5, baseBuilder().build()),
-    POSTRESQL_10("PostreSQL", 10, baseBuilder().add(BYTE_ARRAY, "BYTEA")
-                                               .build());
+    MYSQL_5("MySQL", 5, baseBuilder()),
+    POSTRESQL_10("PostreSQL", 10, baseBuilder().add(BYTE_ARRAY, "BYTEA"));
 
     @SuppressWarnings("NonSerializableFieldInSerializableClass")
     private final TypeMapping typeMapping;
     private final String databaseProductName;
     private final int majorVersion;
 
-    StandardMapping(String databaseProductName, int majorVersion, TypeMapping typeMapping) {
+    StandardMapping(String databaseProductName, int majorVersion,
+                    BaseMapping.Builder mappingBuilder) {
         this.databaseProductName = databaseProductName;
         this.majorVersion = majorVersion;
-        this.typeMapping = typeMapping;
+        this.typeMapping = mappingBuilder.build();
     }
 
     @Override
