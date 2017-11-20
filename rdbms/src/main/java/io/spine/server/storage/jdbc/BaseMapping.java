@@ -35,7 +35,7 @@ import static io.spine.server.storage.jdbc.Type.STRING;
 import static io.spine.server.storage.jdbc.Type.STRING_255;
 
 /**
- * A base implementation of {@link TypeMapping}.
+ * A basic implementation of {@link TypeMapping}.
  *
  * @author Dmytro Grankin
  */

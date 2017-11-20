@@ -226,7 +226,7 @@ public class JdbcStorageFactory implements StorageFactory {
         }
 
         /**
-         * Sets {@link TypeMapping}, which defines {@link Type} names for the used database.
+         * Sets {@link TypeMapping}, which defines {@link Type} names for the database used.
          *
          * <p>Use the {@linkplain BaseMapping#baseBuilder() base builder} to build a custom mapping.
          *
