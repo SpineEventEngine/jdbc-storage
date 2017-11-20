@@ -42,14 +42,14 @@ import static org.mockito.Mockito.mock;
 public class StandardMappingShould {
 
     @Test
-    public void select_mapping_by_database_product_name_and_major_version() {
+    public void be_selected_by_database_product_name_and_major_version() {
         final DataSourceWrapper dataSource = dataSourceMock(MYSQL_5.getDatabaseProductName(),
                                                             MYSQL_5.getMajorVersion());
         assertEquals(MYSQL_5, select(dataSource));
     }
 
     @Test
-    public void not_select_mapping_if_major_versions_different() {
+    public void not_be_selected_if_major_versions_different() {
         final StandardMapping mapping = POSTGRESQL_10;
         final String databaseProductName = mapping.getDatabaseProductName();
         final int differentVersion = mapping.getMajorVersion() + 1;
