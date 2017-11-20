@@ -68,6 +68,11 @@ public class AbstractQueryShould {
         verify(connection).close();
     }
 
+
+    /**
+     * <p>A commit is executed after a query execution, but a {@code ResultSet} should be used
+     * after this, hence the result set should not be closed. This test verifies it.
+     */
     @Test
     public void set_hold_cursors_over_commit_for_connection() throws SQLException {
         final DataSourceWrapper dataSourceSpy = spy(dataSource);
