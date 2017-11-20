@@ -25,7 +25,6 @@ import io.spine.type.TypeName;
 import java.util.EnumMap;
 import java.util.Map;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static io.spine.server.storage.jdbc.Type.BOOLEAN;
