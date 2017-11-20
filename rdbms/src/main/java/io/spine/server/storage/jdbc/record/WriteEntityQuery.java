@@ -37,7 +37,7 @@ import java.util.Set;
 
 import static com.google.common.collect.Maps.newLinkedHashMap;
 import static io.spine.server.storage.jdbc.query.Serializer.serialize;
-import static io.spine.server.storage.jdbc.record.RecordTable.StandardColumn.entity;
+import static io.spine.server.storage.jdbc.record.RecordTable.StandardColumn.ENTITY;
 
 /**
  * An abstract base for write queries to the {@link RecordTable}.
@@ -70,7 +70,7 @@ abstract class WriteEntityQuery<I, C extends StoreClause<C>> extends AbstractQue
             final EntityRecordWithColumns record = records.get(id);
             setEntityColumns(clause, record);
 
-            clause.set(pathOf(entity), serialize(record.getRecord()));
+            clause.set(pathOf(ENTITY), serialize(record.getRecord()));
             setIdValue(clause, idColumn, idColumn.normalize(id));
             addBatch(clause);
         }

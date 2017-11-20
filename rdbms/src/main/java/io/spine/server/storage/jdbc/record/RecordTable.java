@@ -68,13 +68,13 @@ class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumn
                 ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>>
                         columnTypeRegistry,
                 TypeMapping typeMapping) {
-        super(entityClass, StandardColumn.id.name(), dataSource, typeMapping);
+        super(entityClass, StandardColumn.ID.name(), dataSource, typeMapping);
         this.typeRegistry = columnTypeRegistry;
     }
 
     @Override
     protected StandardColumn getIdColumnDeclaration() {
-        return StandardColumn.id;
+        return StandardColumn.ID;
     }
 
     @Override
@@ -176,8 +176,8 @@ class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumn
      */
     enum StandardColumn implements TableColumn {
 
-        id,
-        entity(BYTE_ARRAY);
+        ID,
+        ENTITY(BYTE_ARRAY);
 
         private final Type type;
 
@@ -199,7 +199,7 @@ class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumn
 
         @Override
         public boolean isPrimaryKey() {
-            return this == id;
+            return this == ID;
         }
 
         @Override

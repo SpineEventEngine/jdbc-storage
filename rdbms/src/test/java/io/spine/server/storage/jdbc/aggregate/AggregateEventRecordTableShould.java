@@ -34,7 +34,7 @@ import static io.spine.core.Versions.newVersion;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
 import static io.spine.server.storage.jdbc.GivenDataSource.withoutSuperpowers;
 import static io.spine.server.storage.jdbc.StandardMapping.MYSQL_5_7;
-import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.kind;
+import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.KIND;
 import static io.spine.time.Time.getCurrentTime;
 import static org.junit.Assert.assertEquals;
 
@@ -70,7 +70,7 @@ public class AggregateEventRecordTableShould {
         final String expectedKind = record.getKindCase()
                                           .toString();
         final String actualKind = query.factory()
-                                       .select(path(String.class, kind.name()))
+                                       .select(path(String.class, KIND.name()))
                                        .from(query.table())
                                        .fetchFirst();
         assertEquals(expectedKind, actualKind);

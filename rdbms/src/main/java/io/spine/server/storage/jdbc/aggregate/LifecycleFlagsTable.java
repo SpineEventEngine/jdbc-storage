@@ -34,7 +34,7 @@ import io.spine.server.storage.jdbc.query.WriteQuery;
 import java.util.List;
 
 import static io.spine.server.storage.jdbc.Type.BOOLEAN;
-import static io.spine.server.storage.jdbc.aggregate.LifecycleFlagsTable.Column.id;
+import static io.spine.server.storage.jdbc.aggregate.LifecycleFlagsTable.Column.ID;
 
 /**
  * A table for storing the {@link LifecycleFlags} of an {@link Aggregate}.
@@ -48,12 +48,12 @@ class LifecycleFlagsTable<I> extends EntityTable<I, LifecycleFlags, LifecycleFla
     LifecycleFlagsTable(Class<? extends Aggregate<I, ?, ?>> aggregateClass,
                         DataSourceWrapper dataSource,
                         TypeMapping typeMapping) {
-        super(TABLE_NAME_POSTFIX, aggregateClass, id.name(), dataSource, typeMapping);
+        super(TABLE_NAME_POSTFIX, aggregateClass, ID.name(), dataSource, typeMapping);
     }
 
     @Override
     protected Column getIdColumnDeclaration() {
-        return id;
+        return ID;
     }
 
     @Override
@@ -101,9 +101,9 @@ class LifecycleFlagsTable<I> extends EntityTable<I, LifecycleFlags, LifecycleFla
      */
     enum Column implements TableColumn {
 
-        id,
-        archived(BOOLEAN),
-        deleted(BOOLEAN);
+        ID,
+        ARCHIVED(BOOLEAN),
+        DELETED(BOOLEAN);
 
         private final Type type;
 
@@ -125,7 +125,7 @@ class LifecycleFlagsTable<I> extends EntityTable<I, LifecycleFlags, LifecycleFla
 
         @Override
         public boolean isPrimaryKey() {
-            return this == id;
+            return this == ID;
         }
 
         @Override

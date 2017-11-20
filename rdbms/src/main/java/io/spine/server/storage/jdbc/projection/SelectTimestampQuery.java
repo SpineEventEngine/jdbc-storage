@@ -29,8 +29,8 @@ import javax.annotation.Nullable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.nanos;
-import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.seconds;
+import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.NANOS;
+import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.SECONDS;
 import static io.spine.validate.Validate.isDefault;
 
 /**
@@ -46,7 +46,7 @@ class SelectTimestampQuery extends SelectMessageByIdQuery<String, Timestamp> {
 
     @Override
     protected AbstractSQLQuery<?, ?> getQuery() {
-        final AbstractSQLQuery<?, ?> query = factory().select(pathOf(seconds), pathOf(nanos))
+        final AbstractSQLQuery<?, ?> query = factory().select(pathOf(SECONDS), pathOf(NANOS))
                                                       .from(table())
                                                       .where(hasId());
         return query;
@@ -56,8 +56,8 @@ class SelectTimestampQuery extends SelectMessageByIdQuery<String, Timestamp> {
     @Nullable
     @Override
     protected Timestamp readMessage(ResultSet resultSet) throws SQLException {
-        final long seconds = resultSet.getLong(Column.seconds.name());
-        final int nanos = resultSet.getInt(Column.nanos.name());
+        final long seconds = resultSet.getLong(Column.SECONDS.name());
+        final int nanos = resultSet.getInt(Column.NANOS.name());
         final Timestamp time = Timestamp.newBuilder()
                                         .setSeconds(seconds)
                                         .setNanos(nanos)

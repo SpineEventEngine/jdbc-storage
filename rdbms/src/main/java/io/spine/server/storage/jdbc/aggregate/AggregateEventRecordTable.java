@@ -51,12 +51,12 @@ class AggregateEventRecordTable<I> extends EntityTable<I,
     AggregateEventRecordTable(Class<? extends Aggregate<I, ?, ?>> entityClass,
                               DataSourceWrapper dataSource,
                               TypeMapping typeMapping) {
-        super(entityClass, Column.id.name(), dataSource, typeMapping);
+        super(entityClass, Column.ID.name(), dataSource, typeMapping);
     }
 
     @Override
     protected Column getIdColumnDeclaration() {
-        return Column.id;
+        return Column.ID;
     }
 
     @Override
@@ -101,17 +101,17 @@ class AggregateEventRecordTable<I> extends EntityTable<I,
      */
     enum Column implements TableColumn {
 
-        id,
-        aggregate(BYTE_ARRAY),
+        ID,
+        AGGREGATE(BYTE_ARRAY),
 
         /**
          * The {@linkplain AggregateEventRecord.KindCase kind} of an aggregate record
          * in a {@linkplain AggregateEventRecord.KindCase#toString() string} representation.
          */
-        kind(STRING_255),
-        timestamp(LONG),
-        timestamp_nanos(INT),
-        version(INT);
+        KIND(STRING_255),
+        TIMESTAMP(LONG),
+        TIMESTAMP_NANOS(INT),
+        VERSION(INT);
 
         private final Type type;
 

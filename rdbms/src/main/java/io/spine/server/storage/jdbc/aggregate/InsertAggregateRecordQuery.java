@@ -27,11 +27,11 @@ import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.storage.jdbc.query.IdAwareQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
 
-import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.aggregate;
-import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.kind;
-import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.timestamp;
-import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.timestamp_nanos;
-import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.version;
+import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.AGGREGATE;
+import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.KIND;
+import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.TIMESTAMP;
+import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.TIMESTAMP_NANOS;
+import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.VERSION;
 import static io.spine.server.storage.jdbc.query.Serializer.serialize;
 import static io.spine.validate.Validate.isDefault;
 
@@ -57,11 +57,11 @@ class InsertAggregateRecordQuery<I> extends IdAwareQuery<I> implements WriteQuer
                                        .toString();
         final SQLInsertClause query = factory().insert(table())
                                                .set(idPath(), getNormalizedId())
-                                               .set(pathOf(aggregate), serialize(record))
-                                               .set(pathOf(kind), kindValue)
-                                               .set(pathOf(version), getVersionNumberOfRecord())
-                                               .set(pathOf(timestamp), recordTimestamp.getSeconds())
-                                               .set(pathOf(timestamp_nanos),
+                                               .set(pathOf(AGGREGATE), serialize(record))
+                                               .set(pathOf(KIND), kindValue)
+                                               .set(pathOf(VERSION), getVersionNumberOfRecord())
+                                               .set(pathOf(TIMESTAMP), recordTimestamp.getSeconds())
+                                               .set(pathOf(TIMESTAMP_NANOS),
                                                     recordTimestamp.getNanos());
         return query.execute();
     }

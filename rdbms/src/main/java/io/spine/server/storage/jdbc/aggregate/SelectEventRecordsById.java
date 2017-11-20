@@ -31,10 +31,10 @@ import io.spine.server.storage.jdbc.query.MessageDbIterator;
 import java.sql.ResultSet;
 
 import static com.querydsl.core.types.Order.DESC;
-import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.aggregate;
-import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.timestamp;
-import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.timestamp_nanos;
-import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.version;
+import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.AGGREGATE;
+import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.TIMESTAMP;
+import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.TIMESTAMP_NANOS;
+import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.VERSION;
 
 /**
  * A query that selects {@linkplain AggregateEventRecord event records} by an aggregate ID.
@@ -51,11 +51,11 @@ class SelectEventRecordsById<I> extends AbstractSelectByIdQuery<I, DbIterator<Ag
     }
 
     public DbIterator<AggregateEventRecord> execute(int fetchSize) {
-        final OrderSpecifier<Comparable> byVersion = orderBy(version, DESC);
-        final OrderSpecifier<Comparable> bySeconds = orderBy(timestamp, DESC);
-        final OrderSpecifier<Comparable> byNanos = orderBy(timestamp_nanos, DESC);
+        final OrderSpecifier<Comparable> byVersion = orderBy(VERSION, DESC);
+        final OrderSpecifier<Comparable> bySeconds = orderBy(TIMESTAMP, DESC);
+        final OrderSpecifier<Comparable> byNanos = orderBy(TIMESTAMP_NANOS, DESC);
 
-        final AbstractSQLQuery<Object, ?> query = factory().select(pathOf(aggregate))
+        final AbstractSQLQuery<Object, ?> query = factory().select(pathOf(AGGREGATE))
                                                            .from(table())
                                                            .where(hasId())
                                                            .orderBy(byVersion, bySeconds, byNanos);
@@ -64,7 +64,7 @@ class SelectEventRecordsById<I> extends AbstractSelectByIdQuery<I, DbIterator<Ag
                                                   .build());
         final ResultSet resultSet = query.getResults();
         return new MessageDbIterator<>(resultSet,
-                                       aggregate.name(),
+                                       AGGREGATE.name(),
                                        AggregateEventRecord.getDescriptor());
     }
 

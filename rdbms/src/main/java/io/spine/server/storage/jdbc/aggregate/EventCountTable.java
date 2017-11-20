@@ -33,7 +33,7 @@ import io.spine.server.storage.jdbc.query.WriteQuery;
 import java.util.List;
 
 import static io.spine.server.storage.jdbc.Type.INT;
-import static io.spine.server.storage.jdbc.aggregate.EventCountTable.Column.id;
+import static io.spine.server.storage.jdbc.aggregate.EventCountTable.Column.ID;
 
 /**
  * A table for storing the
@@ -58,12 +58,12 @@ class EventCountTable<I> extends EntityTable<I, Integer, Integer> {
     EventCountTable(Class<? extends Entity<I, ?>> entityClass,
                     DataSourceWrapper dataSource,
                     TypeMapping typeMapping) {
-        super(TABLE_NAME_POSTFIX, entityClass, id.name(), dataSource, typeMapping);
+        super(TABLE_NAME_POSTFIX, entityClass, ID.name(), dataSource, typeMapping);
     }
 
     @Override
     protected Column getIdColumnDeclaration() {
-        return id;
+        return ID;
     }
 
     @Override
@@ -111,8 +111,8 @@ class EventCountTable<I> extends EntityTable<I, Integer, Integer> {
      */
     enum Column implements TableColumn {
 
-        id,
-        event_count(INT);
+        ID,
+        EVENT_COUNT(INT);
 
         private final Type type;
 
@@ -134,7 +134,7 @@ class EventCountTable<I> extends EntityTable<I, Integer, Integer> {
 
         @Override
         public boolean isPrimaryKey() {
-            return this == id;
+            return this == ID;
         }
 
         @Override
