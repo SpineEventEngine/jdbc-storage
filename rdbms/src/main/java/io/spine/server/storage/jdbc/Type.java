@@ -56,5 +56,9 @@ public enum Type {
      * The type representing a {@code String}, maximum length of which is unknown.
      */
     STRING,
+
+    /**
+     * The type representing a {@code boolean} value.
+     */
     BOOLEAN
 }
