@@ -27,7 +27,6 @@ import io.spine.server.projection.ProjectionStorageShould;
 import io.spine.server.storage.RecordStorageShould;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.GivenDataSource;
-import io.spine.server.storage.jdbc.StandardMapping;
 import io.spine.server.storage.jdbc.StorageBuilder;
 import io.spine.server.storage.jdbc.TypeMapping;
 import io.spine.server.storage.jdbc.record.JdbcRecordStorage;
@@ -36,7 +35,7 @@ import io.spine.test.Tests;
 import io.spine.test.storage.ProjectId;
 import org.junit.Test;
 
-import static io.spine.server.storage.jdbc.StandardMapping.MYSQL_5;
+import static io.spine.server.storage.jdbc.StandardMapping.MYSQL_5_7;
 import static io.spine.test.Tests.nullRef;
 import static org.junit.Assert.assertNotNull;
 
@@ -52,7 +51,7 @@ public class JdbcProjectionStorageShould extends ProjectionStorageShould {
         @SuppressWarnings("unchecked") // Required for the tests
         final Class<? extends Projection<ProjectId, ?, ?>> projectionClass =
                 (Class<? extends Projection<ProjectId, ?, ?>>) entityClass;
-        final TypeMapping typeMapping = MYSQL_5;
+        final TypeMapping typeMapping = MYSQL_5_7;
         final JdbcRecordStorage<ProjectId> entityStorage =
                 JdbcRecordStorage.<ProjectId>newBuilder()
                                  .setDataSource(dataSource)

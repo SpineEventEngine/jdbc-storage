@@ -36,18 +36,20 @@ import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
  */
 public enum StandardMapping implements TypeMapping {
 
-    MYSQL_5("MySQL", 5, baseBuilder()),
-    POSTGRESQL_10("PostgreSQL", 10, baseBuilder().add(BYTE_ARRAY, "BYTEA"));
+    MYSQL_5_7("MySQL", 5, 7, baseBuilder()),
+    POSTGRESQL_10_1("PostgreSQL", 10, 1, baseBuilder().add(BYTE_ARRAY, "BYTEA"));
 
     @SuppressWarnings("NonSerializableFieldInSerializableClass")
     private final TypeMapping typeMapping;
     private final String databaseProductName;
     private final int majorVersion;
+    private final int minorVersion;
 
     StandardMapping(String databaseProductName, int majorVersion,
-                    BaseMapping.Builder mappingBuilder) {
+                    int minorVersion, BaseMapping.Builder mappingBuilder) {
         this.databaseProductName = databaseProductName;
         this.majorVersion = majorVersion;
+        this.minorVersion = minorVersion;
         this.typeMapping = mappingBuilder.build();
     }
 
@@ -60,12 +62,11 @@ public enum StandardMapping implements TypeMapping {
      * Selects the type mapping for the specified data source.
      *
      * <p>The {@linkplain DatabaseMetaData#getDatabaseProductName() database product name} and
-     * the {@linkplain DatabaseMetaData#getDatabaseMajorVersion() major version} are taken into
-     * account during the selection.
+     * the version are taken into account during the selection.
      *
      * @param dataSource the data source to test suitability
-     * @return the type mapping for the used database
-     *         or MySQL-specific mapping if there is no standard mapping for the database
+     * @return the type mapping for the used database or {@linkplain StandardMapping#MYSQL_5_7
+     *         mapping for MySQL 5.7} if there is no standard mapping for the database
      */
     static TypeMapping select(DataSourceWrapper dataSource) {
         try (final ConnectionWrapper connection = dataSource.getConnection(true)) {
@@ -75,7 +76,8 @@ public enum StandardMapping implements TypeMapping {
                 final boolean nameMatch = metaData.getDatabaseProductName()
                                                   .equals(mapping.databaseProductName);
                 final boolean versionMatch =
-                        metaData.getDatabaseMajorVersion() == mapping.majorVersion;
+                        metaData.getDatabaseMajorVersion() == mapping.majorVersion
+                        && metaData.getDatabaseMinorVersion() == mapping.minorVersion;
                 if (nameMatch && versionMatch) {
                     return mapping;
                 }
@@ -84,7 +86,7 @@ public enum StandardMapping implements TypeMapping {
             throw new DatabaseException(e);
         }
 
-        return MYSQL_5;
+        return MYSQL_5_7;
     }
 
     @VisibleForTesting
@@ -95,5 +97,10 @@ public enum StandardMapping implements TypeMapping {
     @VisibleForTesting
     int getMajorVersion() {
         return majorVersion;
+    }
+
+    @VisibleForTesting
+    int getMinorVersion() {
+        return minorVersion;
     }
 }

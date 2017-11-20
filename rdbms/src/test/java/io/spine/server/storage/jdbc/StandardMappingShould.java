@@ -26,8 +26,7 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
-import static io.spine.server.storage.jdbc.StandardMapping.MYSQL_5;
-import static io.spine.server.storage.jdbc.StandardMapping.POSTGRESQL_10;
+import static io.spine.server.storage.jdbc.StandardMapping.POSTGRESQL_10_1;
 import static io.spine.server.storage.jdbc.StandardMapping.select;
 import static io.spine.util.Exceptions.illegalStateWithCauseOf;
 import static org.junit.Assert.assertEquals;
@@ -41,25 +40,29 @@ import static org.mockito.Mockito.mock;
  */
 public class StandardMappingShould {
 
+    private final StandardMapping mapping = POSTGRESQL_10_1;
+
     @Test
     public void be_selected_by_database_product_name_and_major_version() {
-        final DataSourceWrapper dataSource = dataSourceMock(MYSQL_5.getDatabaseProductName(),
-                                                            MYSQL_5.getMajorVersion());
-        assertEquals(MYSQL_5, select(dataSource));
+        final DataSourceWrapper dataSource = dataSourceMock(mapping.getDatabaseProductName(),
+                                                            mapping.getMajorVersion(),
+                                                            mapping.getMinorVersion());
+        assertEquals(mapping, select(dataSource));
     }
 
     @Test
     public void not_be_selected_if_major_versions_different() {
-        final StandardMapping mapping = POSTGRESQL_10;
         final String databaseProductName = mapping.getDatabaseProductName();
         final int differentVersion = mapping.getMajorVersion() + 1;
         final DataSourceWrapper dataSource = dataSourceMock(databaseProductName,
+                                                            differentVersion,
                                                             differentVersion);
         assertNotEquals(mapping, select(dataSource));
     }
 
     private static DataSourceWrapper dataSourceMock(String databaseProductName,
-                                                    int majorVersion) {
+                                                    int majorVersion,
+                                                    int minorVersion) {
         final DataSourceWrapper dataSource = mock(DataSourceWrapper.class);
         final ConnectionWrapper connectionWrapper = mock(ConnectionWrapper.class);
         final Connection connection = mock(Connection.class);
@@ -75,6 +78,8 @@ public class StandardMappingShould {
                                          .getDatabaseProductName();
             doReturn(majorVersion).when(metadata)
                                   .getDatabaseMajorVersion();
+            doReturn(minorVersion).when(metadata)
+                                  .getDatabaseMinorVersion();
             return dataSource;
         } catch (SQLException e) {
             throw illegalStateWithCauseOf(e);

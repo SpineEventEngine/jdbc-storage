@@ -35,18 +35,18 @@ The mapping defines correspondence of `Type` to a name for a particular database
 `Type` is an abstraction for a data type in a database. 
 
 The type mapping is selected automatically basing on the JDBC connection string.
-If there is no standard mapping for the database, MySQL mapping will be used as the default.
+If there is no standard mapping for the database, mapping for MySQL 5.7 will be used as the default.
 
 #### Default Values
 
-| Type         | MySQL 5       | PostgreSQL 10 |
-| :----------: |:-------------:| :------------:|
-| BYTE_ARRAY   | BLOB          | BYTEA         |
-| INT          | INT           | INT           |
-| LONG         | BIGINT        | BIGINT        |
-| STRING_255   | VARCHAR(255)  | VARCHAR(255)  | 
-| STRING       | TEXT          | TEXT          |
-| BOOLEAN      | BOOLEAN       | BOOLEAN       |
+| Type         | MySQL 5.7     | PostgreSQL 10.1 |
+| :----------: |:-------------:| :--------------:|
+| BYTE_ARRAY   | BLOB          | BYTEA           |
+| INT          | INT           | INT             |
+| LONG         | BIGINT        | BIGINT          |
+| STRING_255   | VARCHAR(255)  | VARCHAR(255)    | 
+| STRING       | TEXT          | TEXT            |
+| BOOLEAN      | BOOLEAN       | BOOLEAN         |
 
 #### Custom Mapping
 

@@ -233,10 +233,10 @@ public class JdbcStorageFactory implements StorageFactory {
          * <p>If the mapping was not specified, it is
          * {@linkplain StandardMapping#select(DataSourceWrapper) selected} basing on
          * the {@linkplain java.sql.DatabaseMetaData#getDatabaseProductName() database product name}
-         * and the {@linkplain java.sql.DatabaseMetaData#getDatabaseMajorVersion() major version}.
+         * and the database version.
          *
          * <p>If there is no mapping for the database,
-         * MySQL-specific mapping for the 5th version is used.
+         * {@linkplain StandardMapping#MYSQL_5_7 mapping for MySQL 5.7} is used.
          *
          * @param typeMapping the custom type mapping
          */

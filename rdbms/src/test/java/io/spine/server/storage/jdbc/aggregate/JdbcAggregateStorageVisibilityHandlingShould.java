@@ -27,14 +27,13 @@ import io.spine.server.aggregate.AggregateStorageVisibilityHandlingShould;
 import io.spine.server.entity.LifecycleFlags;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.GivenDataSource;
-import io.spine.server.storage.jdbc.StandardMapping;
 import io.spine.test.aggregate.Project;
 import io.spine.test.aggregate.ProjectId;
 import io.spine.test.aggregate.ProjectVBuilder;
 import io.spine.testdata.Sample;
 import org.junit.Test;
 
-import static io.spine.server.storage.jdbc.StandardMapping.MYSQL_5;
+import static io.spine.server.storage.jdbc.StandardMapping.MYSQL_5_7;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -54,7 +53,7 @@ public class JdbcAggregateStorageVisibilityHandlingShould
                         .setMultitenant(false)
                         .setAggregateClass(TestAggregate.class)
                         .setDataSource(dataSource)
-                        .setTypeMapping(MYSQL_5)
+                        .setTypeMapping(MYSQL_5_7)
                         .build();
         return storage;
     }

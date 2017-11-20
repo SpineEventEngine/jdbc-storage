@@ -38,7 +38,7 @@ import javax.sql.DataSource;
 
 import static io.spine.Identifier.newUuid;
 import static io.spine.server.storage.jdbc.GivenDataSource.prefix;
-import static io.spine.server.storage.jdbc.StandardMapping.MYSQL_5;
+import static io.spine.server.storage.jdbc.StandardMapping.MYSQL_5_7;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -63,7 +63,7 @@ public class JdbcStorageFactoryShould {
     public void allow_to_use_custom_data_source() {
         final JdbcStorageFactory factory = JdbcStorageFactory.newBuilder()
                                                              .setDataSource(mock(DataSource.class))
-                                                             .setTypeMapping(MYSQL_5)
+                                                             .setTypeMapping(MYSQL_5_7)
                                                              .build();
 
         assertNotNull(factory);
@@ -135,7 +135,7 @@ public class JdbcStorageFactoryShould {
         final JdbcStorageFactory factory = JdbcStorageFactory.newBuilder()
                                                              .setDataSource(mock)
                                                              .setMultitenant(false)
-                                                             .setTypeMapping(MYSQL_5)
+                                                             .setTypeMapping(MYSQL_5_7)
                                                              .build();
         factory.close();
         verify(mock).close();
@@ -146,7 +146,7 @@ public class JdbcStorageFactoryShould {
         final DataSourceWrapper dataSource = GivenDataSource.withoutSuperpowers();
         final JdbcStorageFactory factory = JdbcStorageFactory.newBuilder()
                                                              .setDataSource(dataSource)
-                                                             .setTypeMapping(MYSQL_5)
+                                                             .setTypeMapping(MYSQL_5_7)
                                                              .build();
         final ColumnTypeRegistry<?> registry = factory.getTypeRegistry();
         assertNotNull(registry);
@@ -158,7 +158,7 @@ public class JdbcStorageFactoryShould {
         final JdbcStorageFactory factory = JdbcStorageFactory.newBuilder()
                                                              .setMultitenant(true)
                                                              .setDataSource(dataSource)
-                                                             .setTypeMapping(MYSQL_5)
+                                                             .setTypeMapping(MYSQL_5_7)
                                                              .build();
         assertTrue(factory.isMultitenant());
         final JdbcStorageFactory singleTenantFactory = factory.toSingleTenant();
@@ -171,7 +171,7 @@ public class JdbcStorageFactoryShould {
         final JdbcStorageFactory factory = JdbcStorageFactory.newBuilder()
                                                              .setMultitenant(false)
                                                              .setDataSource(dataSource)
-                                                             .setTypeMapping(MYSQL_5)
+                                                             .setTypeMapping(MYSQL_5_7)
                                                              .build();
         assertSame(factory, factory.toSingleTenant());
     }
@@ -183,14 +183,14 @@ public class JdbcStorageFactoryShould {
                                                              .setMultitenant(false)
                                                              .setDataSource(dataSource)
                                                              .build();
-        assertEquals(MYSQL_5, factory.getTypeMapping());
+        assertEquals(MYSQL_5_7, factory.getTypeMapping());
     }
 
     private JdbcStorageFactory newFactory(boolean multitenant) {
         return JdbcStorageFactory.newBuilder()
                                  .setDataSource(config)
                                  .setMultitenant(multitenant)
-                                 .setTypeMapping(MYSQL_5)
+                                 .setTypeMapping(MYSQL_5_7)
                                  .build();
     }
 
