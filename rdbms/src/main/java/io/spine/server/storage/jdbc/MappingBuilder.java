@@ -103,4 +103,24 @@ public class MappingBuilder {
                    "but only (%s) types were mapped.", typesCount, mappedTypes.size());
         return new TypeMappingImpl(mappedTypes);
     }
+
+    /**
+     * A {@link TypeMapping}, which is created by the {@link MappingBuilder}.
+     */
+    private static final class TypeMappingImpl implements TypeMapping {
+
+        private final Map<Type, TypeName> mappedTypes;
+
+        private TypeMappingImpl(Map<Type, TypeName> mappedTypes) {
+            this.mappedTypes = mappedTypes;
+        }
+
+        @Override
+        public TypeName typeNameFor(Type type) {
+            checkState(mappedTypes.containsKey(type),
+                       "The type mapping doesn't define name for %s type.", type);
+            final TypeName typeName = mappedTypes.get(type);
+            return typeName;
+        }
+    }
 }
