@@ -24,7 +24,7 @@ import io.spine.server.storage.jdbc.BasicMapping.Builder;
 import io.spine.type.TypeName;
 import org.junit.Test;
 
-import static io.spine.server.storage.jdbc.StandardMapping.MYSQL_5_7;
+import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
 import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
 import static io.spine.test.Tests.nullRef;
 import static org.junit.Assert.assertEquals;

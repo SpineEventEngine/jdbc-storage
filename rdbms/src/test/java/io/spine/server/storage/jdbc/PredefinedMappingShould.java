@@ -26,8 +26,8 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
-import static io.spine.server.storage.jdbc.StandardMapping.POSTGRESQL_10_1;
-import static io.spine.server.storage.jdbc.StandardMapping.select;
+import static io.spine.server.storage.jdbc.PredefinedMapping.POSTGRESQL_10_1;
+import static io.spine.server.storage.jdbc.PredefinedMapping.select;
 import static io.spine.util.Exceptions.illegalStateWithCauseOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -38,9 +38,9 @@ import static org.mockito.Mockito.mock;
 /**
  * @author Dmytro Grankin
  */
-public class StandardMappingShould {
+public class PredefinedMappingShould {
 
-    private final StandardMapping mapping = POSTGRESQL_10_1;
+    private final PredefinedMapping mapping = POSTGRESQL_10_1;
 
     @Test
     public void be_selected_by_database_product_name_and_major_version() {

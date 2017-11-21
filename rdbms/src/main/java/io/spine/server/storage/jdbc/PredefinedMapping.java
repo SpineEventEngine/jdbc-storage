@@ -30,11 +30,11 @@ import static io.spine.server.storage.jdbc.BasicMapping.basicBuilder;
 import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
 
 /**
- * Standard {@linkplain TypeMapping type mappings} for different databases.
+ * Predefined {@linkplain TypeMapping type mappings} for different databases.
  *
  * @author Dmytro Grankin
  */
-public enum StandardMapping implements TypeMapping {
+public enum PredefinedMapping implements TypeMapping {
 
     MYSQL_5_7("MySQL", 5, 7, basicBuilder()),
     POSTGRESQL_10_1("PostgreSQL", 10, 1, basicBuilder().add(BYTE_ARRAY, "BYTEA"));
@@ -45,8 +45,8 @@ public enum StandardMapping implements TypeMapping {
     private final int majorVersion;
     private final int minorVersion;
 
-    StandardMapping(String databaseProductName, int majorVersion,
-                    int minorVersion, BasicMapping.Builder mappingBuilder) {
+    PredefinedMapping(String databaseProductName, int majorVersion,
+                      int minorVersion, BasicMapping.Builder mappingBuilder) {
         this.databaseProductName = databaseProductName;
         this.majorVersion = majorVersion;
         this.minorVersion = minorVersion;
@@ -65,14 +65,14 @@ public enum StandardMapping implements TypeMapping {
      * the version are taken into account during the selection.
      *
      * @param dataSource the data source to test suitability
-     * @return the type mapping for the used database or {@linkplain StandardMapping#MYSQL_5_7
+     * @return the type mapping for the used database or {@linkplain PredefinedMapping#MYSQL_5_7
      *         mapping for MySQL 5.7} if there is no standard mapping for the database
      */
     static TypeMapping select(DataSourceWrapper dataSource) {
         try (final ConnectionWrapper connection = dataSource.getConnection(true)) {
             final DatabaseMetaData metaData = connection.get()
                                                         .getMetaData();
-            for (StandardMapping mapping : values()) {
+            for (PredefinedMapping mapping : values()) {
                 final boolean nameMatch = metaData.getDatabaseProductName()
                                                   .equals(mapping.databaseProductName);
                 final boolean versionMatch =

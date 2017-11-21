@@ -35,7 +35,7 @@ The mapping defines correspondence of `Type` to a name for a particular database
 `Type` is an abstraction for a data type in a database. 
 
 The type mapping is selected automatically basing on the JDBC connection string.
-If there is no standard mapping for the database, mapping for MySQL 5.7 will be used as the default.
+If there is no predefined mapping for the database, mapping for MySQL 5.7 will be used as the default.
 
 #### Default Values
 

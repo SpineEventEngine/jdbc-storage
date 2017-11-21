@@ -33,7 +33,7 @@ import io.spine.test.aggregate.ProjectVBuilder;
 import io.spine.testdata.Sample;
 import org.junit.Test;
 
-import static io.spine.server.storage.jdbc.StandardMapping.MYSQL_5_7;
+import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 

@@ -232,12 +232,12 @@ public class JdbcStorageFactory implements StorageFactory {
          * to build a custom mapping.
          *
          * <p>If the mapping was not specified, it is
-         * {@linkplain StandardMapping#select(DataSourceWrapper) selected} basing on
+         * {@linkplain PredefinedMapping#select(DataSourceWrapper) selected} basing on
          * the {@linkplain java.sql.DatabaseMetaData#getDatabaseProductName() database product name}
          * and the database version.
          *
          * <p>If there is no mapping for the database,
-         * {@linkplain StandardMapping#MYSQL_5_7 mapping for MySQL 5.7} is used.
+         * {@linkplain PredefinedMapping#MYSQL_5_7 mapping for MySQL 5.7} is used.
          *
          * @param typeMapping the custom type mapping
          */
@@ -254,7 +254,7 @@ public class JdbcStorageFactory implements StorageFactory {
                 columnTypeRegistry = JdbcTypeRegistryFactory.defaultInstance();
             }
             if (typeMapping == null) {
-                typeMapping = StandardMapping.select(dataSource);
+                typeMapping = PredefinedMapping.select(dataSource);
             }
             return new JdbcStorageFactory(this);
         }
