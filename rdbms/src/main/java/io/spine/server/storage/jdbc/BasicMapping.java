@@ -39,18 +39,18 @@ import static io.spine.server.storage.jdbc.Type.STRING_255;
  *
  * @author Dmytro Grankin
  */
-public final class BaseMapping implements TypeMapping {
+public final class BasicMapping implements TypeMapping {
 
     private final Map<Type, TypeName> mappedTypes;
 
-    private BaseMapping(Map<Type, TypeName> mappedTypes) {
+    private BasicMapping(Map<Type, TypeName> mappedTypes) {
         this.mappedTypes = mappedTypes;
     }
 
     /**
-     * Obtains the base builder for mappings.
+     * Obtains the basic builder for mappings.
      *
-     * <p>All the types are mapped as follows:
+     * <p>All the types are mapped in the builder as follows:
      * <ul>
      *     <li>{@code Type.BYTE_ARRAY} - {@code BLOB}</li>
      *     <li>{@code Type.INT} - {@code INT}</li>
@@ -60,19 +60,25 @@ public final class BaseMapping implements TypeMapping {
      *     <li>{@code Type.BOOLEAN} - {@code BOOLEAN}</li>
      * </ul>
      *
-     * <p>{@linkplain Builder#add(Type, String) Override} the type name
-     * if it doesn't match a database.
+     * <p>If the mapping provided by the builder doesn't match a database, it can be
+     * {@linkplain Builder#add(Type, String) overridden} as follows:
      *
-     * @return the builder with all types
+     * <pre>{@code
+     * TypeMapping mapping = baseBuilder().add(Type.INT, "INT4")
+     *                                    .add(Type.LONG, "INT8")
+     *                                    .build();
+     * }</pre>
+     *
+     * @return the builder with names for all types
      */
-    public static Builder baseBuilder() {
-        final Builder baseMapping = new Builder().add(BYTE_ARRAY, "BLOB")
-                                                 .add(INT, "INT")
-                                                 .add(LONG, "BIGINT")
-                                                 .add(STRING_255, "VARCHAR(255)")
-                                                 .add(STRING, "TEXT")
-                                                 .add(BOOLEAN, "BOOLEAN");
-        return baseMapping;
+    public static Builder basicBuilder() {
+        final Builder builder = new Builder().add(BYTE_ARRAY, "BLOB")
+                                             .add(INT, "INT")
+                                             .add(LONG, "BIGINT")
+                                             .add(STRING_255, "VARCHAR(255)")
+                                             .add(STRING, "TEXT")
+                                             .add(BOOLEAN, "BOOLEAN");
+        return builder;
     }
 
     @Override
@@ -84,7 +90,7 @@ public final class BaseMapping implements TypeMapping {
     }
 
     /**
-     * A builder for {@link BaseMapping}.
+     * A builder for {@link BasicMapping}.
      */
     public static class Builder {
 
@@ -106,17 +112,17 @@ public final class BaseMapping implements TypeMapping {
         }
 
         /**
-         * Creates {@link BaseMapping} from the builder.
+         * Creates {@link BasicMapping} from the builder.
          *
          * @return a new type mapping
          * @throws IllegalStateException if not all the {@linkplain Type types} were mapped
          */
-        public BaseMapping build() {
+        public BasicMapping build() {
             final int typesCount = Type.values().length;
             checkState(mappedTypes.size() == typesCount,
                        "A mapping should contain names for all types (%s), " +
                        "but only (%s) types were mapped.", typesCount, mappedTypes.size());
-            return new BaseMapping(mappedTypes);
+            return new BasicMapping(mappedTypes);
         }
     }
 

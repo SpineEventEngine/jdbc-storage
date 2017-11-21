@@ -26,7 +26,7 @@ import io.spine.type.TypeName;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
-import static io.spine.server.storage.jdbc.BaseMapping.baseBuilder;
+import static io.spine.server.storage.jdbc.BasicMapping.basicBuilder;
 import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
 
 /**
@@ -36,8 +36,8 @@ import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
  */
 public enum StandardMapping implements TypeMapping {
 
-    MYSQL_5_7("MySQL", 5, 7, baseBuilder()),
-    POSTGRESQL_10_1("PostgreSQL", 10, 1, baseBuilder().add(BYTE_ARRAY, "BYTEA"));
+    MYSQL_5_7("MySQL", 5, 7, basicBuilder()),
+    POSTGRESQL_10_1("PostgreSQL", 10, 1, basicBuilder().add(BYTE_ARRAY, "BYTEA"));
 
     @SuppressWarnings("NonSerializableFieldInSerializableClass")
     private final TypeMapping typeMapping;
@@ -46,7 +46,7 @@ public enum StandardMapping implements TypeMapping {
     private final int minorVersion;
 
     StandardMapping(String databaseProductName, int majorVersion,
-                    int minorVersion, BaseMapping.Builder mappingBuilder) {
+                    int minorVersion, BasicMapping.Builder mappingBuilder) {
         this.databaseProductName = databaseProductName;
         this.majorVersion = majorVersion;
         this.minorVersion = minorVersion;
