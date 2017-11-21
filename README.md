@@ -52,7 +52,7 @@ If there is no standard mapping for the database, mapping for MySQL 5.7 will be 
 
 If the automatically selected mapping doesn't match your requirements, a custom mapping can be
 specified during creation of `JdbcStorageFactory`. There is the base builder for this purpose - 
-`BaseMapping.baseBuilder()`. This builder contains mappings for all types (equal to MySQL 5 mapping).
+`BaseMapping.baseBuilder()`. This builder contains mappings for all types (equal to MySQL 5.7 mapping).
 So only required types should be overridden:
 
 ```

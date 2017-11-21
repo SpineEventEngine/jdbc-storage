@@ -106,7 +106,7 @@ public final class BaseMapping implements TypeMapping {
         }
 
         /**
-         * Creates {@link BaseMapping} for the builder.
+         * Creates {@link BaseMapping} from the builder.
          *
          * @return a new type mapping
          * @throws IllegalStateException if not all the {@linkplain Type types} were mapped
