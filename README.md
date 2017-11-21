@@ -51,15 +51,15 @@ If there is no predefined mapping for the database, mapping for MySQL 5.7 will b
 #### Custom Mapping
 
 If the automatically selected mapping doesn't match your requirements, a custom mapping can be
-specified during creation of `JdbcStorageFactory`. There is the basic builder for this purpose - 
-`TypeMappingImpl.basicBuilder()`. This builder contains mappings for all types
+specified during creation of `JdbcStorageFactory`. There is the builder for this purpose - 
+`MappingBuilder.basicBuilder()`. This builder contains mappings for all types
 (equal to MySQL 5.7 mapping). So only required types should be overridden:
 
 ```
-TypeMapping mapping = TypeMappingImpl.basicBuilder()
-                                     .add(Type.INT, "INT4")
-                                     .add(Type.LONG, "INT8")
-                                     .build();
+TypeMapping mapping = MappingBuilder.basicBuilder()
+                                    .add(Type.INT, "INT4")
+                                    .add(Type.LONG, "INT8")
+                                    .build();
 JdbcStorageFactory.newBuilder()
                   .setTypeMapping(mapping)
 ``` 
