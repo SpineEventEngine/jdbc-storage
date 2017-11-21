@@ -30,7 +30,7 @@ JdbcStorageFactory.newBuilder()
 
 ### SQL Type Mapping
 
-Data types differ for various SQL databases. There is `TypeMapping` to deal with it.
+The framework provides a `TypeMapping` to configure the SQL types, which fit the target storage.
 The mapping defines correspondence of `Type` to a name for a particular database. 
 `Type` is an abstraction for a data type in a database. 
 
