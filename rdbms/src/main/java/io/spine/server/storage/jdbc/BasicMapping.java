@@ -125,5 +125,4 @@ public final class BasicMapping implements TypeMapping {
             return new BasicMapping(mappedTypes);
         }
     }
-
 }
