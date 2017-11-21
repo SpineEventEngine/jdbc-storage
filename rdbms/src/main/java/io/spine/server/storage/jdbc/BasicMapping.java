@@ -69,7 +69,7 @@ public final class BasicMapping implements TypeMapping {
      *                                    .build();
      * }</pre>
      *
-     * @return the builder with names for all types
+     * @return the builder containing names for all types
      */
     public static Builder basicBuilder() {
         final Builder builder = new Builder().add(BYTE_ARRAY, "BLOB")
