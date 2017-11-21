@@ -39,11 +39,11 @@ import static io.spine.server.storage.jdbc.Type.STRING_255;
  *
  * @author Dmytro Grankin
  */
-public final class BasicMapping implements TypeMapping {
+public final class TypeMappingImpl implements TypeMapping {
 
     private final Map<Type, TypeName> mappedTypes;
 
-    private BasicMapping(Map<Type, TypeName> mappedTypes) {
+    private TypeMappingImpl(Map<Type, TypeName> mappedTypes) {
         this.mappedTypes = mappedTypes;
     }
 
@@ -64,9 +64,9 @@ public final class BasicMapping implements TypeMapping {
      * {@linkplain Builder#add(Type, String) overridden} as follows:
      *
      * <pre>{@code
-     * TypeMapping mapping = baseBuilder().add(Type.INT, "INT4")
-     *                                    .add(Type.LONG, "INT8")
-     *                                    .build();
+     * TypeMapping mapping = basicBuilder().add(Type.INT, "INT4")
+     *                                     .add(Type.LONG, "INT8")
+     *                                     .build();
      * }</pre>
      *
      * @return the builder containing names for all types
@@ -90,7 +90,7 @@ public final class BasicMapping implements TypeMapping {
     }
 
     /**
-     * A builder for {@link BasicMapping}.
+     * A builder for {@link TypeMappingImpl}.
      */
     public static class Builder {
 
@@ -112,17 +112,17 @@ public final class BasicMapping implements TypeMapping {
         }
 
         /**
-         * Creates {@link BasicMapping} from the builder.
+         * Creates {@link TypeMappingImpl} from the builder.
          *
          * @return a new type mapping
          * @throws IllegalStateException if not all the {@linkplain Type types} were mapped
          */
-        public BasicMapping build() {
+        public TypeMappingImpl build() {
             final int typesCount = Type.values().length;
             checkState(mappedTypes.size() == typesCount,
                        "A mapping should contain names for all types (%s), " +
                        "but only (%s) types were mapped.", typesCount, mappedTypes.size());
-            return new BasicMapping(mappedTypes);
+            return new TypeMappingImpl(mappedTypes);
         }
     }
 }

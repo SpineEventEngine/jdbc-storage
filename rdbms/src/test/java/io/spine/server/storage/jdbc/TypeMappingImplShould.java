@@ -20,7 +20,7 @@
 
 package io.spine.server.storage.jdbc;
 
-import io.spine.server.storage.jdbc.BasicMapping.Builder;
+import io.spine.server.storage.jdbc.TypeMappingImpl.Builder;
 import io.spine.type.TypeName;
 import org.junit.Test;
 
@@ -32,30 +32,30 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Dmytro Grankin
  */
-public class BasicMappingShould {
+public class TypeMappingImplShould {
 
     @Test
     public void allow_override_type_names_during_building() {
         final Type type = BYTE_ARRAY;
         final String originalName = "original";
         final String nameReplacement = "replacement";
-        final TypeMapping mapping = BasicMapping.basicBuilder()
-                                                .add(type, originalName)
-                                                .add(type, nameReplacement)
-                                                .build();
+        final TypeMapping mapping = TypeMappingImpl.basicBuilder()
+                                                   .add(type, originalName)
+                                                   .add(type, nameReplacement)
+                                                   .build();
         final TypeName resultingName = mapping.typeNameFor(type);
         assertEquals(nameReplacement, resultingName.value());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void not_allow_empty_type_names() {
-        final Builder builder = BasicMapping.basicBuilder();
+        final Builder builder = TypeMappingImpl.basicBuilder();
         builder.add(BYTE_ARRAY, "");
     }
 
     @Test(expected = IllegalStateException.class)
     public void throw_exception_if_not_all_types_mapped() {
-        final Builder builder = new BasicMapping.Builder();
+        final Builder builder = new TypeMappingImpl.Builder();
         builder.build();
     }
 
