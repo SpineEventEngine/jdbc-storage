@@ -23,18 +23,16 @@ package io.spine.server.storage.jdbc;
 import io.spine.type.TypeName;
 import org.junit.Test;
 
-import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
 import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
-import static io.spine.test.Tests.nullRef;
 import static org.junit.Assert.assertEquals;
 
 /**
  * @author Dmytro Grankin
  */
-public class TypeMappingImplShould {
+public class MappingBuilderShould {
 
     @Test
-    public void allow_override_type_names_during_building() {
+    public void override_type_names() {
         final Type type = BYTE_ARRAY;
         final String originalName = "original";
         final String nameReplacement = "replacement";
@@ -56,11 +54,5 @@ public class TypeMappingImplShould {
     public void throw_exception_if_not_all_types_mapped() {
         final MappingBuilder builder = new MappingBuilder();
         builder.build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void throw_ISE_if_requested_type_has_no_mapping() {
-        final Type notMappedType = nullRef();
-        MYSQL_5_7.typeNameFor(notMappedType);
     }
 }

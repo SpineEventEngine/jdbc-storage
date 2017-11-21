@@ -26,8 +26,10 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
+import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
 import static io.spine.server.storage.jdbc.PredefinedMapping.POSTGRESQL_10_1;
 import static io.spine.server.storage.jdbc.PredefinedMapping.select;
+import static io.spine.test.Tests.nullRef;
 import static io.spine.util.Exceptions.illegalStateWithCauseOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -41,6 +43,12 @@ import static org.mockito.Mockito.mock;
 public class PredefinedMappingShould {
 
     private final PredefinedMapping mapping = POSTGRESQL_10_1;
+
+    @Test(expected = IllegalStateException.class)
+    public void throw_ISE_if_requested_type_has_no_mapping() {
+        final Type notMappedType = nullRef();
+        MYSQL_5_7.typeNameFor(notMappedType);
+    }
 
     @Test
     public void be_selected_by_database_product_name_and_major_version() {
