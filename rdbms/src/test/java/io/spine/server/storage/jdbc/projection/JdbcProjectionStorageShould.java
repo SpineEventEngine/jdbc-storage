@@ -28,12 +28,14 @@ import io.spine.server.storage.RecordStorageShould;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.GivenDataSource;
 import io.spine.server.storage.jdbc.StorageBuilder;
+import io.spine.server.storage.jdbc.TypeMapping;
 import io.spine.server.storage.jdbc.record.JdbcRecordStorage;
 import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
 import io.spine.test.Tests;
 import io.spine.test.storage.ProjectId;
 import org.junit.Test;
 
+import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
 import static io.spine.test.Tests.nullRef;
 import static org.junit.Assert.assertNotNull;
 
@@ -49,12 +51,14 @@ public class JdbcProjectionStorageShould extends ProjectionStorageShould {
         @SuppressWarnings("unchecked") // Required for the tests
         final Class<? extends Projection<ProjectId, ?, ?>> projectionClass =
                 (Class<? extends Projection<ProjectId, ?, ?>>) entityClass;
+        final TypeMapping typeMapping = MYSQL_5_7;
         final JdbcRecordStorage<ProjectId> entityStorage =
                 JdbcRecordStorage.<ProjectId>newBuilder()
                                  .setDataSource(dataSource)
                                  .setMultitenant(false)
                                  .setEntityClass(projectionClass)
                                  .setColumnTypeRegistry(JdbcTypeRegistryFactory.defaultInstance())
+                                 .setTypeMapping(typeMapping)
                                  .build();
         final ProjectionStorage<ProjectId> storage =
                 JdbcProjectionStorage.<ProjectId>newBuilder()
@@ -62,6 +66,7 @@ public class JdbcProjectionStorageShould extends ProjectionStorageShould {
                                      .setDataSource(dataSource)
                                      .setMultitenant(false)
                                      .setProjectionClass(projectionClass)
+                                     .setTypeMapping(typeMapping)
                                      .build();
         return storage;
     }

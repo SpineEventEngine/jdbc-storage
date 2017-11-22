@@ -20,6 +20,7 @@
 
 package io.spine.server.storage.jdbc;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import io.spine.server.aggregate.Aggregate;
@@ -55,11 +56,13 @@ public class JdbcStorageFactory implements StorageFactory {
     private final DataSourceWrapper dataSource;
     private final boolean multitenant;
     private final ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> columnTypeRegistry;
+    private final TypeMapping typeMapping;
 
     private JdbcStorageFactory(Builder builder) {
         this.dataSource = checkNotNull(builder.dataSource);
         this.multitenant = builder.multitenant;
         this.columnTypeRegistry = builder.columnTypeRegistry;
+        this.typeMapping = checkNotNull(builder.typeMapping);
     }
 
     @Override
@@ -72,6 +75,7 @@ public class JdbcStorageFactory implements StorageFactory {
         if (isMultitenant()) {
             return newBuilder().setColumnTypeRegistry(columnTypeRegistry)
                                .setDataSource(dataSource)
+                               .setTypeMapping(typeMapping)
                                .setMultitenant(false)
                                .build();
         } else {
@@ -89,6 +93,7 @@ public class JdbcStorageFactory implements StorageFactory {
         return JdbcStandStorage.newBuilder()
                                .setDataSource(dataSource)
                                .setMultitenant(isMultitenant())
+                               .setTypeMapping(typeMapping)
                                .build();
     }
 
@@ -100,6 +105,7 @@ public class JdbcStorageFactory implements StorageFactory {
                                     .setAggregateClass(aggregateClass)
                                     .setMultitenant(multitenant)
                                     .setDataSource(dataSource)
+                                    .setTypeMapping(typeMapping)
                                     .build();
         return storage;
     }
@@ -112,6 +118,7 @@ public class JdbcStorageFactory implements StorageFactory {
                                  .setEntityClass(entityClass)
                                  .setDataSource(dataSource)
                                  .setColumnTypeRegistry(columnTypeRegistry)
+                                 .setTypeMapping(typeMapping)
                                  .build();
         return recordStorage;
     }
@@ -125,6 +132,7 @@ public class JdbcStorageFactory implements StorageFactory {
                                                                   .setDataSource(dataSource)
                                                                   .setRecordStorage(entityStorage)
                                                                   .setProjectionClass(projectionClass)
+                                                                  .setTypeMapping(typeMapping)
                                                                   .build();
         return storage;
     }
@@ -135,6 +143,11 @@ public class JdbcStorageFactory implements StorageFactory {
     @Override
     public void close() {
         dataSource.close();
+    }
+
+    @VisibleForTesting
+    TypeMapping getTypeMapping() {
+        return typeMapping;
     }
 
     public static Builder newBuilder() {
@@ -149,6 +162,7 @@ public class JdbcStorageFactory implements StorageFactory {
         private DataSourceWrapper dataSource;
         private boolean multitenant;
         private ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> columnTypeRegistry;
+        private TypeMapping typeMapping;
 
         private Builder() {
             // Prevent direct instantiation.
@@ -212,11 +226,35 @@ public class JdbcStorageFactory implements StorageFactory {
         }
 
         /**
+         * Sets {@link TypeMapping}, which defines {@link Type} names for the database used.
+         *
+         * <p>Use the {@linkplain TypeMappingBuilder#basicBuilder() basic builder}
+         * to build a custom mapping.
+         *
+         * <p>If the mapping was not specified, it is
+         * {@linkplain PredefinedMapping#select(DataSourceWrapper) selected} basing on
+         * the {@linkplain java.sql.DatabaseMetaData#getDatabaseProductName() database product name}
+         * and the database version.
+         *
+         * <p>If there is no mapping for the database,
+         * {@linkplain PredefinedMapping#MYSQL_5_7 mapping for MySQL 5.7} is used.
+         *
+         * @param typeMapping the custom type mapping
+         */
+        public Builder setTypeMapping(TypeMapping typeMapping) {
+            this.typeMapping = checkNotNull(typeMapping);
+            return this;
+        }
+
+        /**
          * @return new instance of {@code JdbcStorageFactory}
          */
         public JdbcStorageFactory build() {
             if (columnTypeRegistry == null) {
                 columnTypeRegistry = JdbcTypeRegistryFactory.defaultInstance();
+            }
+            if (typeMapping == null) {
+                typeMapping = PredefinedMapping.select(dataSource);
             }
             return new JdbcStorageFactory(this);
         }

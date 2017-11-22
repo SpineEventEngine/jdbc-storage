@@ -23,9 +23,9 @@ package io.spine.server.storage.jdbc.projection;
 import com.google.protobuf.Timestamp;
 import com.querydsl.sql.dml.SQLInsertClause;
 
-import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.nanos;
-import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.projection_type;
-import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.seconds;
+import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.NANOS;
+import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.PROJECTION_TYPE;
+import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.SECONDS;
 
 /**
  * A query that inserts a new {@link Timestamp} into the {@link LastHandledEventTimeTable}.
@@ -41,9 +41,9 @@ class InsertTimestampQuery extends WriteTimestampQuery {
     @Override
     public long execute() {
         final SQLInsertClause query = factory().insert(table())
-                                               .set(pathOf(projection_type), getIdValue())
-                                               .set(pathOf(seconds), getTimestamp().getSeconds())
-                                               .set(pathOf(nanos), getTimestamp().getNanos());
+                                               .set(pathOf(PROJECTION_TYPE), getIdValue())
+                                               .set(pathOf(SECONDS), getTimestamp().getSeconds())
+                                               .set(pathOf(NANOS), getTimestamp().getNanos());
         return query.execute();
     }
 

@@ -23,6 +23,8 @@ package io.spine.server.storage.jdbc.projection;
 import com.google.protobuf.Timestamp;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.TableColumn;
+import io.spine.server.storage.jdbc.Type;
+import io.spine.server.storage.jdbc.TypeMapping;
 import io.spine.server.storage.jdbc.query.AbstractTable;
 import io.spine.server.storage.jdbc.query.SelectQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
@@ -30,12 +32,11 @@ import io.spine.server.storage.jdbc.query.WriteQuery;
 import java.util.List;
 
 import static com.google.common.collect.ImmutableList.copyOf;
+import static io.spine.server.storage.jdbc.Type.INT;
+import static io.spine.server.storage.jdbc.Type.LONG;
+import static io.spine.server.storage.jdbc.Type.STRING_255;
+import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.PROJECTION_TYPE;
 import static io.spine.server.storage.jdbc.query.IdColumn.typeString;
-import static io.spine.server.storage.jdbc.Sql.Type;
-import static io.spine.server.storage.jdbc.Sql.Type.BIGINT;
-import static io.spine.server.storage.jdbc.Sql.Type.INT;
-import static io.spine.server.storage.jdbc.Sql.Type.VARCHAR_255;
-import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.projection_type;
 
 /**
  * A table for storing the last handled by
@@ -47,13 +48,13 @@ class LastHandledEventTimeTable extends AbstractTable<String, Timestamp, Timesta
 
     private static final String TABLE_NAME = "projection_last_handled_event_time";
 
-    LastHandledEventTimeTable(DataSourceWrapper dataSource) {
-        super(TABLE_NAME, typeString(projection_type.name()), dataSource);
+    LastHandledEventTimeTable(DataSourceWrapper dataSource, TypeMapping typeMapping) {
+        super(TABLE_NAME, typeString(PROJECTION_TYPE.name()), dataSource, typeMapping);
     }
 
     @Override
     protected Column getIdColumnDeclaration() {
-        return projection_type;
+        return PROJECTION_TYPE;
     }
 
     @Override
@@ -99,9 +100,9 @@ class LastHandledEventTimeTable extends AbstractTable<String, Timestamp, Timesta
      */
     enum Column implements TableColumn {
 
-        projection_type(VARCHAR_255),
-        seconds(BIGINT),
-        nanos(INT);
+        PROJECTION_TYPE(STRING_255),
+        SECONDS(LONG),
+        NANOS(INT);
 
         private final Type type;
 
@@ -116,7 +117,7 @@ class LastHandledEventTimeTable extends AbstractTable<String, Timestamp, Timesta
 
         @Override
         public boolean isPrimaryKey() {
-            return this == projection_type;
+            return this == PROJECTION_TYPE;
         }
 
         @Override

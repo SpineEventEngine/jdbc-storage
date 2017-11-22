@@ -25,8 +25,10 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.spine.annotation.Internal;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.TableColumn;
+import io.spine.server.storage.jdbc.Type;
+import io.spine.server.storage.jdbc.TypeMapping;
+import io.spine.type.TypeName;
 import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
@@ -87,10 +89,9 @@ public abstract class AbstractTable<I, R, W> {
                                             deleted.name(), false,
                                             version.name(), 0);
     private final String name;
-
     private final IdColumn<I> idColumn;
-
     private final DataSourceWrapper dataSource;
+    private final TypeMapping typeMapping;
 
     /**
      * The memoized value of the table columns.
@@ -101,10 +102,12 @@ public abstract class AbstractTable<I, R, W> {
      */
     private ImmutableList<? extends TableColumn> columns;
 
-    protected AbstractTable(String name, IdColumn<I> idColumn, DataSourceWrapper dataSource) {
+    protected AbstractTable(String name, IdColumn<I> idColumn,
+                            DataSourceWrapper dataSource, TypeMapping typeMapping) {
         this.name = checkNotNull(name);
         this.idColumn = checkNotNull(idColumn);
         this.dataSource = checkNotNull(dataSource);
+        this.typeMapping = checkNotNull(typeMapping);
     }
 
     /**
@@ -265,9 +268,11 @@ public abstract class AbstractTable<I, R, W> {
         for (Iterator<? extends TableColumn> iterator = columns.iterator(); iterator.hasNext(); ) {
             final TableColumn column = iterator.next();
             final String name = column.name();
+            final Type type = ensureIdType(column);
+            final TypeName typeName = typeMapping.typeNameFor(type);
             sql.append(name)
                .append(' ')
-               .append(ensureType(column));
+               .append(typeName);
             if (COLUMN_DEFAULTS.containsKey(name)) {
                 final Object defaultValue = COLUMN_DEFAULTS.get(name);
                 sql.append(DEFAULT)
@@ -298,29 +303,27 @@ public abstract class AbstractTable<I, R, W> {
         return result;
     }
 
-    private Sql.Type getIdType() {
-        final Sql.Type idType = getIdColumn().getSqlType();
+    private Type getIdType() {
+        final Type idType = getIdColumn().getSqlType();
         return idType;
     }
 
     /**
-     * For the ID column checks the {@link Sql.Type} and returns the type of the ID column if
-     * the ID type is {@linkplain Sql.Type#ID}.
+     * Obtains the type of the specified column.
      *
-     * <p>If the column does not represent an ID of the table, this method throws
-     * an {@link IllegalStateException}.
+     * <p>If the column is the ID and its type is {@linkplain TableColumn#type() unknown}
+     * at the compile time, returns {@linkplain #getIdType() the ID type},
+     * which is determined at the runtime.
      *
-     * @param column the column the type of which will be checked
+     * @param column the column the type of which will be handled
      * @return the SQL type of the column
      */
-    private Sql.Type ensureType(TableColumn column) throws IllegalStateException {
-        Sql.Type type = column.type();
-        if (type == Sql.Type.ID) {
-            if (column.equals(getIdColumnDeclaration())) {
-                type = getIdType();
-            } else {
-                throw new IllegalStateException("ID type of a non-ID column " + column.name());
-            }
+    private Type ensureIdType(TableColumn column) {
+        Type type = column.type();
+        final boolean isIdColumn = column.equals(getIdColumnDeclaration());
+        final boolean typeUnknown = type == null;
+        if (isIdColumn && typeUnknown) {
+            type = getIdType();
         }
         return type;
     }

@@ -38,7 +38,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static io.spine.server.storage.jdbc.query.QueryPredicates.inIds;
 import static io.spine.server.storage.jdbc.query.QueryPredicates.matchParameters;
-import static io.spine.server.storage.jdbc.record.RecordTable.StandardColumn.entity;
+import static io.spine.server.storage.jdbc.record.RecordTable.StandardColumn.ENTITY;
 
 /**
  * A query selecting the records from the {@link RecordTable RecordTable} by an {@link EntityQuery}.
@@ -66,7 +66,7 @@ final class SelectByEntityColumnsQuery<I> extends AbstractQuery
         final Predicate inIds = inIds(idColumn, entityQuery.getIds());
         final Predicate matchParameters = matchParameters(entityQuery.getParameters(),
                                                           columnTypeRegistry);
-        final AbstractSQLQuery<Object, ?> query = factory().select(pathOf(entity))
+        final AbstractSQLQuery<Object, ?> query = factory().select(pathOf(ENTITY))
                                                            .where(inIds)
                                                            .where(matchParameters)
                                                            .from(table());

@@ -25,7 +25,7 @@ import io.spine.annotation.Internal;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.entity.Entity;
 import io.spine.server.entity.EntityClass;
-import io.spine.server.storage.jdbc.Sql;
+import io.spine.server.storage.jdbc.Type;
 
 import java.util.Collection;
 
@@ -88,9 +88,9 @@ public abstract class IdColumn<I> {
     }
 
     /**
-     * Returns the {@link Sql.Type} of the column with which this helper instance works.
+     * Returns the {@link Type} of the column with which this helper instance works.
      */
-    public abstract Sql.Type getSqlType();
+    public abstract Type getSqlType();
 
     /**
      * Retrieves the {@linkplain Class Java class} of the ID before
@@ -155,8 +155,8 @@ public abstract class IdColumn<I> {
         }
 
         @Override
-        public Sql.Type getSqlType() {
-            return Sql.Type.BIGINT;
+        public Type getSqlType() {
+            return Type.LONG;
         }
 
         @Override
@@ -180,8 +180,8 @@ public abstract class IdColumn<I> {
         }
 
         @Override
-        public Sql.Type getSqlType() {
-            return Sql.Type.INT;
+        public Type getSqlType() {
+            return Type.INT;
         }
 
         @Override
@@ -206,8 +206,8 @@ public abstract class IdColumn<I> {
         }
 
         @Override
-        public Sql.Type getSqlType() {
-            return Sql.Type.VARCHAR_255;
+        public Type getSqlType() {
+            return Type.STRING_255;
         }
     }
 

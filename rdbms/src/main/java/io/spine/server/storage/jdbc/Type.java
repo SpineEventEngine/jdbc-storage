@@ -20,39 +20,45 @@
 
 package io.spine.server.storage.jdbc;
 
-import io.spine.server.storage.StorageField;
-
-import javax.annotation.Nullable;
-
 /**
- * An interface for the database table columns representation.
+ * Data types used in the SQL tables of the project.
  *
- * <p>It's recommended to implement this interface in an {@code enum}, since it's API is sharpened
- * to be overridden with the {@code enum} default methods.
+ * <p>These types are abstract and have no relation to a particular SQL database.
  *
- * @author Dmytro Dashenkov
+ * <p>The names of the types for a particular database are specified by a {@link TypeMapping}.
+ *
+ * @author Dmytro Grankin
  */
-public interface TableColumn extends StorageField {
+public enum Type {
 
     /**
-     * @return the name of the column
+     * The type representing a byte array.
      */
-    String name();
+    BYTE_ARRAY,
 
     /**
-     * @return the {@link Type} of the column
-     *         or {@code null} if the type is unknown at the compile time
+     * The type representing an {@code int} value.
      */
-    @Nullable
-    Type type();
+    INT,
 
     /**
-     * @return {@code true} is this column is a primary key of the table, {@code false} otherwise
+     * The type representing a {@code long} value.
      */
-    boolean isPrimaryKey();
+    LONG,
 
     /**
-     * @return {@code true} if this column may contain {@code NULL} values, {@code false} otherwise
+     * The type representing a {@code String}, maximum length of which
+     * doesn't exceed 255 characters.
      */
-    boolean isNullable();
+    STRING_255,
+
+    /**
+     * The type representing a {@code String}, maximum length of which is unknown.
+     */
+    STRING,
+
+    /**
+     * The type representing a {@code boolean} value.
+     */
+    BOOLEAN
 }

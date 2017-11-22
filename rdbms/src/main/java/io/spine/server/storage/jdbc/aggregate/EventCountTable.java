@@ -23,17 +23,17 @@ package io.spine.server.storage.jdbc.aggregate;
 import com.google.common.collect.ImmutableList;
 import io.spine.server.entity.Entity;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.TableColumn;
+import io.spine.server.storage.jdbc.Type;
+import io.spine.server.storage.jdbc.TypeMapping;
 import io.spine.server.storage.jdbc.query.EntityTable;
 import io.spine.server.storage.jdbc.query.SelectQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
 
 import java.util.List;
 
-import static io.spine.server.storage.jdbc.Sql.Type.ID;
-import static io.spine.server.storage.jdbc.Sql.Type.INT;
-import static io.spine.server.storage.jdbc.aggregate.EventCountTable.Column.id;
+import static io.spine.server.storage.jdbc.Type.INT;
+import static io.spine.server.storage.jdbc.aggregate.EventCountTable.Column.ID;
 
 /**
  * A table for storing the
@@ -56,13 +56,14 @@ class EventCountTable<I> extends EntityTable<I, Integer, Integer> {
     private static final String TABLE_NAME_POSTFIX = "_event_count";
 
     EventCountTable(Class<? extends Entity<I, ?>> entityClass,
-                    DataSourceWrapper dataSource) {
-        super(TABLE_NAME_POSTFIX, entityClass, id.name(), dataSource);
+                    DataSourceWrapper dataSource,
+                    TypeMapping typeMapping) {
+        super(TABLE_NAME_POSTFIX, entityClass, ID.name(), dataSource, typeMapping);
     }
 
     @Override
     protected Column getIdColumnDeclaration() {
-        return id;
+        return ID;
     }
 
     @Override
@@ -110,23 +111,30 @@ class EventCountTable<I> extends EntityTable<I, Integer, Integer> {
      */
     enum Column implements TableColumn {
 
-        id(ID),
-        event_count(INT);
+        ID,
+        EVENT_COUNT(INT);
 
-        private final Sql.Type type;
+        private final Type type;
 
-        Column(Sql.Type type) {
+        Column(Type type) {
             this.type = type;
         }
 
+        /**
+         * Creates a column, {@linkplain #type() type} of which is unknown at the compile time.
+         */
+        Column() {
+            this.type = null;
+        }
+
         @Override
-        public Sql.Type type() {
+        public Type type() {
             return type;
         }
 
         @Override
         public boolean isPrimaryKey() {
-            return this == id;
+            return this == ID;
         }
 
         @Override

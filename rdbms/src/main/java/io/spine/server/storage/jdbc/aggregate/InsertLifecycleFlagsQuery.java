@@ -27,8 +27,8 @@ import io.spine.server.storage.jdbc.query.WriteQuery;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
-import static io.spine.server.storage.jdbc.aggregate.LifecycleFlagsTable.Column.archived;
-import static io.spine.server.storage.jdbc.aggregate.LifecycleFlagsTable.Column.deleted;
+import static io.spine.server.storage.jdbc.aggregate.LifecycleFlagsTable.Column.ARCHIVED;
+import static io.spine.server.storage.jdbc.aggregate.LifecycleFlagsTable.Column.DELETED;
 
 /**
  * The query for creating a new record in the table storing
@@ -49,8 +49,8 @@ class InsertLifecycleFlagsQuery<I> extends IdAwareQuery<I> implements WriteQuery
     public long execute() {
         final SQLInsertClause query = factory().insert(table())
                                                .set(idPath(), getNormalizedId())
-                                               .set(pathOf(archived), entityStatus.getArchived())
-                                               .set(pathOf(deleted), entityStatus.getDeleted());
+                                               .set(pathOf(ARCHIVED), entityStatus.getArchived())
+                                               .set(pathOf(DELETED), entityStatus.getDeleted());
         return query.execute();
     }
 

@@ -20,39 +20,27 @@
 
 package io.spine.server.storage.jdbc;
 
-import io.spine.server.storage.StorageField;
-
-import javax.annotation.Nullable;
+import io.spine.type.TypeName;
 
 /**
- * An interface for the database table columns representation.
+ * A {@link Type}-to-name mapping.
  *
- * <p>It's recommended to implement this interface in an {@code enum}, since it's API is sharpened
- * to be overridden with the {@code enum} default methods.
+ * <p>A data type may have different names in different databases.
+ * E.g. for binary data {@code BLOB} is used in MySQL, but in PostgreSQL it's {@code BYTEA}.
  *
- * @author Dmytro Dashenkov
+ * <p>A type mapping provides a flexible way to point out
+ * database specific names of {@linkplain Type types}.
+ *
+ * @author Dmytro Grankin
  */
-public interface TableColumn extends StorageField {
+public interface TypeMapping {
 
     /**
-     * @return the name of the column
+     * Obtains the name of the specified {@link Type}.
+     *
+     * @param type the type to get the name
+     * @return the type name
+     * @throws IllegalStateException if the name for the specified type is not defined
      */
-    String name();
-
-    /**
-     * @return the {@link Type} of the column
-     *         or {@code null} if the type is unknown at the compile time
-     */
-    @Nullable
-    Type type();
-
-    /**
-     * @return {@code true} is this column is a primary key of the table, {@code false} otherwise
-     */
-    boolean isPrimaryKey();
-
-    /**
-     * @return {@code true} if this column may contain {@code NULL} values, {@code false} otherwise
-     */
-    boolean isNullable();
+    TypeName typeNameFor(Type type);
 }

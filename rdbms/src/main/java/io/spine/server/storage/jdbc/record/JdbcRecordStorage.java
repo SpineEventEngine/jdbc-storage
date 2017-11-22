@@ -73,7 +73,8 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
         super(builder.isMultitenant());
         this.dataSource = builder.getDataSource();
         this.entityClass = builder.getEntityClass();
-        this.table = new RecordTable<>(entityClass, dataSource, builder.getColumnTypeRegistry());
+        this.table = new RecordTable<>(entityClass, dataSource, builder.getColumnTypeRegistry(),
+                                       builder.getTypeMapping());
         table.create();
     }
 

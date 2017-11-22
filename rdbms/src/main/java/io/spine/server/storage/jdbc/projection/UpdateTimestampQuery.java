@@ -24,9 +24,9 @@ import com.google.protobuf.Timestamp;
 import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.sql.dml.SQLUpdateClause;
 
-import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.nanos;
-import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.projection_type;
-import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.seconds;
+import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.NANOS;
+import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.PROJECTION_TYPE;
+import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.SECONDS;
 
 /**
  * A query that updates {@link Timestamp} in the {@link LastHandledEventTimeTable}.
@@ -41,11 +41,11 @@ class UpdateTimestampQuery extends WriteTimestampQuery {
 
     @Override
     public long execute() {
-        final PathBuilder<Object> id = pathOf(projection_type);
+        final PathBuilder<Object> id = pathOf(PROJECTION_TYPE);
         final SQLUpdateClause query = factory().update(table())
                                                .where(id.eq(getIdValue()))
-                                               .set(pathOf(seconds), getTimestamp().getSeconds())
-                                               .set(pathOf(nanos), getTimestamp().getNanos());
+                                               .set(pathOf(SECONDS), getTimestamp().getSeconds())
+                                               .set(pathOf(NANOS), getTimestamp().getNanos());
         return query.execute();
     }
 

@@ -22,7 +22,7 @@ package io.spine.server.storage.jdbc.aggregate;
 
 import com.querydsl.sql.dml.SQLUpdateClause;
 
-import static io.spine.server.storage.jdbc.aggregate.EventCountTable.Column.event_count;
+import static io.spine.server.storage.jdbc.aggregate.EventCountTable.Column.EVENT_COUNT;
 
 /**
  * A query that updates event count in the {@link EventCountTable}.
@@ -39,7 +39,7 @@ class UpdateEventCountQuery<I> extends WriteEventCountQuery<I> {
     public long execute() {
         final SQLUpdateClause query = factory().update(table())
                                                .where(idPath().eq(getNormalizedId()))
-                                               .set(pathOf(event_count), getEventCount());
+                                               .set(pathOf(EVENT_COUNT), getEventCount());
         return query.execute();
     }
 

@@ -24,19 +24,19 @@ import com.google.common.collect.ImmutableList;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.TableColumn;
+import io.spine.server.storage.jdbc.Type;
+import io.spine.server.storage.jdbc.TypeMapping;
 import io.spine.server.storage.jdbc.query.DbIterator;
 import io.spine.server.storage.jdbc.query.EntityTable;
 import io.spine.server.storage.jdbc.query.WriteQuery;
 
 import java.util.List;
 
-import static io.spine.server.storage.jdbc.Sql.Type.BIGINT;
-import static io.spine.server.storage.jdbc.Sql.Type.BLOB;
-import static io.spine.server.storage.jdbc.Sql.Type.ID;
-import static io.spine.server.storage.jdbc.Sql.Type.INT;
-import static io.spine.server.storage.jdbc.Sql.Type.VARCHAR_255;
+import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
+import static io.spine.server.storage.jdbc.Type.INT;
+import static io.spine.server.storage.jdbc.Type.LONG;
+import static io.spine.server.storage.jdbc.Type.STRING_255;
 import static io.spine.util.Exceptions.newIllegalStateException;
 
 /**
@@ -49,13 +49,14 @@ class AggregateEventRecordTable<I> extends EntityTable<I,
                                                        AggregateEventRecord> {
 
     AggregateEventRecordTable(Class<? extends Aggregate<I, ?, ?>> entityClass,
-                              DataSourceWrapper dataSource) {
-        super(entityClass, Column.id.name(), dataSource);
+                              DataSourceWrapper dataSource,
+                              TypeMapping typeMapping) {
+        super(entityClass, Column.ID.name(), dataSource, typeMapping);
     }
 
     @Override
     protected Column getIdColumnDeclaration() {
-        return Column.id;
+        return Column.ID;
     }
 
     @Override
@@ -100,26 +101,33 @@ class AggregateEventRecordTable<I> extends EntityTable<I,
      */
     enum Column implements TableColumn {
 
-        id(ID),
-        aggregate(BLOB),
+        ID,
+        AGGREGATE(BYTE_ARRAY),
 
         /**
          * The {@linkplain AggregateEventRecord.KindCase kind} of an aggregate record
          * in a {@linkplain AggregateEventRecord.KindCase#toString() string} representation.
          */
-        kind(VARCHAR_255),
-        timestamp(BIGINT),
-        timestamp_nanos(INT),
-        version(INT);
+        KIND(STRING_255),
+        TIMESTAMP(LONG),
+        TIMESTAMP_NANOS(INT),
+        VERSION(INT);
 
-        private final Sql.Type type;
+        private final Type type;
 
-        Column(Sql.Type type) {
+        Column(Type type) {
             this.type = type;
         }
 
+        /**
+         * Creates a column, {@linkplain #type() type} of which is unknown at the compile time.
+         */
+        Column() {
+            this.type = null;
+        }
+
         @Override
-        public Sql.Type type() {
+        public Type type() {
             return type;
         }
 

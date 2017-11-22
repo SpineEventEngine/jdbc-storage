@@ -21,7 +21,7 @@ package io.spine.server.storage.jdbc.type;
 
 import io.spine.annotation.SPI;
 import io.spine.server.entity.storage.ColumnType;
-import io.spine.server.storage.jdbc.Sql;
+import io.spine.server.storage.jdbc.Type;
 import io.spine.server.storage.jdbc.query.Parameters;
 
 /**
@@ -36,5 +36,10 @@ import io.spine.server.storage.jdbc.query.Parameters;
 @SPI
 public interface JdbcColumnType<J, C> extends ColumnType<J, C, Parameters.Builder, String> {
 
-    Sql.Type getSqlType();
+    /**
+     * Obtains {@link Type} representing this column.
+     *
+     * @return the type for the column
+     */
+    Type getType();
 }

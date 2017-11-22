@@ -41,8 +41,8 @@ import static com.google.common.base.Preconditions.checkState;
 public abstract class StorageBuilder<B extends StorageBuilder<B, S>, S extends Storage> {
 
     private boolean multitenant;
-
     private DataSourceWrapper dataSource;
+    private TypeMapping typeMapping;
 
     public boolean isMultitenant() {
         return multitenant;
@@ -66,6 +66,18 @@ public abstract class StorageBuilder<B extends StorageBuilder<B, S>, S extends S
      */
     public B setDataSource(DataSourceWrapper dataSource) {
         this.dataSource = dataSource;
+        return getThis();
+    }
+
+    public TypeMapping getTypeMapping() {
+        return typeMapping;
+    }
+
+    /**
+     * @param typeMapping the type mapping for the usage in queries
+     */
+    public B setTypeMapping(TypeMapping typeMapping) {
+        this.typeMapping = checkNotNull(typeMapping);
         return getThis();
     }
 

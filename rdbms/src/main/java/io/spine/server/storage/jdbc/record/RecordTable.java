@@ -31,8 +31,9 @@ import io.spine.server.entity.storage.EntityColumns;
 import io.spine.server.entity.storage.EntityQuery;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.TableColumn;
+import io.spine.server.storage.jdbc.Type;
+import io.spine.server.storage.jdbc.TypeMapping;
 import io.spine.server.storage.jdbc.query.EntityTable;
 import io.spine.server.storage.jdbc.query.SelectQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
@@ -48,8 +49,7 @@ import java.util.Map;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Collections2.transform;
 import static com.google.common.collect.Lists.newLinkedList;
-import static io.spine.server.storage.jdbc.Sql.Type.BLOB;
-import static io.spine.server.storage.jdbc.Sql.Type.ID;
+import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
 import static java.util.Collections.addAll;
 
 /**
@@ -66,14 +66,15 @@ class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumn
     RecordTable(Class<? extends Entity<I, ?>> entityClass,
                 DataSourceWrapper dataSource,
                 ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>>
-                        columnTypeRegistry) {
-        super(entityClass, StandardColumn.id.name(), dataSource);
+                        columnTypeRegistry,
+                TypeMapping typeMapping) {
+        super(entityClass, StandardColumn.ID.name(), dataSource, typeMapping);
         this.typeRegistry = columnTypeRegistry;
     }
 
     @Override
     protected StandardColumn getIdColumnDeclaration() {
-        return StandardColumn.id;
+        return StandardColumn.ID;
     }
 
     @Override
@@ -175,23 +176,30 @@ class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumn
      */
     enum StandardColumn implements TableColumn {
 
-        id(ID),
-        entity(BLOB);
+        ID,
+        ENTITY(BYTE_ARRAY);
 
-        private final Sql.Type type;
+        private final Type type;
 
-        StandardColumn(Sql.Type type) {
+        StandardColumn(Type type) {
             this.type = type;
         }
 
+        /**
+         * Creates a column, {@linkplain #type() type} of which is unknown at the compile time.
+         */
+        StandardColumn() {
+            this.type = null;
+        }
+
         @Override
-        public Sql.Type type() {
+        public Type type() {
             return type;
         }
 
         @Override
         public boolean isPrimaryKey() {
-            return this == id;
+            return this == ID;
         }
 
         @Override
@@ -225,13 +233,13 @@ class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumn
     private static final class EntityColumnWrapper implements TableColumn {
 
         private final EntityColumn column;
-        private final Sql.Type type;
+        private final Type type;
 
         private EntityColumnWrapper(EntityColumn column,
                                     ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> typeRegistry) {
             this.column = column;
             this.type = typeRegistry.get(column)
-                                    .getSqlType();
+                                    .getType();
         }
 
         @Override
@@ -240,7 +248,7 @@ class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumn
         }
 
         @Override
-        public Sql.Type type() {
+        public Type type() {
             return type;
         }
 

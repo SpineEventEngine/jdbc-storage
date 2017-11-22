@@ -28,8 +28,8 @@ import io.spine.server.storage.jdbc.query.SelectMessageByIdQuery;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import static io.spine.server.storage.jdbc.aggregate.LifecycleFlagsTable.Column.archived;
-import static io.spine.server.storage.jdbc.aggregate.LifecycleFlagsTable.Column.deleted;
+import static io.spine.server.storage.jdbc.aggregate.LifecycleFlagsTable.Column.ARCHIVED;
+import static io.spine.server.storage.jdbc.aggregate.LifecycleFlagsTable.Column.DELETED;
 
 /**
  * The query selecting one {@linkplain LifecycleFlags entity lifecycle flags} by ID.
@@ -44,7 +44,7 @@ class SelectLifecycleFlagsQuery<I> extends SelectMessageByIdQuery<I, LifecycleFl
 
     @Override
     protected AbstractSQLQuery<?, ?> getQuery() {
-        final AbstractSQLQuery<?, ?> query = factory().select(pathOf(archived), pathOf(deleted))
+        final AbstractSQLQuery<?, ?> query = factory().select(pathOf(ARCHIVED), pathOf(DELETED))
                                                       .from(table())
                                                       .where(hasId());
         return query;
@@ -54,8 +54,8 @@ class SelectLifecycleFlagsQuery<I> extends SelectMessageByIdQuery<I, LifecycleFl
     // Override the mechanism of the Message restoring
     @Override
     protected LifecycleFlags readMessage(ResultSet resultSet) throws SQLException {
-        final boolean archived = resultSet.getBoolean(Column.archived.name());
-        final boolean deleted = resultSet.getBoolean(Column.deleted.name());
+        final boolean archived = resultSet.getBoolean(Column.ARCHIVED.name());
+        final boolean deleted = resultSet.getBoolean(Column.DELETED.name());
         final LifecycleFlags visibility = LifecycleFlags.newBuilder()
                                                         .setArchived(archived)
                                                         .setDeleted(deleted)

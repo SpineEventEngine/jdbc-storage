@@ -33,7 +33,8 @@ import static io.spine.Identifier.newUuid;
 import static io.spine.core.Versions.newVersion;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
 import static io.spine.server.storage.jdbc.GivenDataSource.withoutSuperpowers;
-import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.kind;
+import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
+import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.KIND;
 import static io.spine.time.Time.getCurrentTime;
 import static org.junit.Assert.assertEquals;
 
@@ -45,7 +46,7 @@ public class AggregateEventRecordTableShould {
     @Test(expected = IllegalStateException.class)
     public void throw_on_attempt_to_update_event_record() {
         final AggregateEventRecordTable<String> table =
-                new AggregateEventRecordTable<>(AnAggregate.class, withoutSuperpowers());
+                new AggregateEventRecordTable<>(AnAggregate.class, withoutSuperpowers(), MYSQL_5_7);
         table.update(newUuid(), AggregateEventRecord.getDefaultInstance());
     }
 
@@ -53,7 +54,7 @@ public class AggregateEventRecordTableShould {
     public void store_record_kind_in_string_representation() {
         final DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
         final AggregateEventRecordTable<String> table =
-                new AggregateEventRecordTable<>(AnAggregate.class, dataSource);
+                new AggregateEventRecordTable<>(AnAggregate.class, dataSource, MYSQL_5_7);
         table.create();
 
         final Snapshot snapshot = Snapshot.newBuilder()
@@ -69,9 +70,9 @@ public class AggregateEventRecordTableShould {
         final String expectedKind = record.getKindCase()
                                           .toString();
         final String actualKind = query.factory()
-                                            .select(path(String.class, kind.name()))
-                                            .from(query.table())
-                                            .fetchFirst();
+                                       .select(path(String.class, KIND.name()))
+                                       .from(query.table())
+                                       .fetchFirst();
         assertEquals(expectedKind, actualKind);
     }
 

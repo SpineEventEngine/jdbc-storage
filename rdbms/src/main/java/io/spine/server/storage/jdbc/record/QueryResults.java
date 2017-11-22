@@ -37,7 +37,7 @@ import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Iterators.transform;
-import static io.spine.server.storage.jdbc.record.RecordTable.StandardColumn.entity;
+import static io.spine.server.storage.jdbc.record.RecordTable.StandardColumn.ENTITY;
 import static io.spine.type.TypeUrl.from;
 
 /**
@@ -62,7 +62,7 @@ final class QueryResults {
      */
     static Iterator<EntityRecord> parse(ResultSet resultSet, FieldMask fieldMask) {
         final Iterator<EntityRecord> recordIterator =
-                new MessageDbIterator<>(resultSet, entity.name(), EntityRecord.getDescriptor());
+                new MessageDbIterator<>(resultSet, ENTITY.name(), EntityRecord.getDescriptor());
         final Iterator<EntityRecord> result = transform(recordIterator, maskFields(fieldMask));
         return result;
     }

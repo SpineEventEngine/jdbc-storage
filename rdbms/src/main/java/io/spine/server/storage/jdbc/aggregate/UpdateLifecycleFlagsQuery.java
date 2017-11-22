@@ -27,8 +27,8 @@ import io.spine.server.storage.jdbc.query.WriteQuery;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
-import static io.spine.server.storage.jdbc.aggregate.LifecycleFlagsTable.Column.archived;
-import static io.spine.server.storage.jdbc.aggregate.LifecycleFlagsTable.Column.deleted;
+import static io.spine.server.storage.jdbc.aggregate.LifecycleFlagsTable.Column.ARCHIVED;
+import static io.spine.server.storage.jdbc.aggregate.LifecycleFlagsTable.Column.DELETED;
 
 /**
  * The query updating {@linkplain LifecycleFlags entity lifecycle flags}.
@@ -48,8 +48,8 @@ class UpdateLifecycleFlagsQuery<I> extends IdAwareQuery<I> implements WriteQuery
     public long execute() {
         final SQLUpdateClause query = factory().update(table())
                                                .where(idPath().eq(getNormalizedId()))
-                                               .set(pathOf(archived), entityStatus.getArchived())
-                                               .set(pathOf(deleted), entityStatus.getDeleted());
+                                               .set(pathOf(ARCHIVED), entityStatus.getArchived())
+                                               .set(pathOf(DELETED), entityStatus.getDeleted());
         return query.execute();
     }
 

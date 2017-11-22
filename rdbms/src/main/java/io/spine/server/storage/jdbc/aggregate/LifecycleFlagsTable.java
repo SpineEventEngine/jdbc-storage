@@ -24,17 +24,17 @@ import com.google.common.collect.ImmutableList;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.entity.LifecycleFlags;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.Sql;
 import io.spine.server.storage.jdbc.TableColumn;
+import io.spine.server.storage.jdbc.Type;
+import io.spine.server.storage.jdbc.TypeMapping;
 import io.spine.server.storage.jdbc.query.EntityTable;
 import io.spine.server.storage.jdbc.query.SelectQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
 
 import java.util.List;
 
-import static io.spine.server.storage.jdbc.Sql.Type.BOOLEAN;
-import static io.spine.server.storage.jdbc.Sql.Type.ID;
-import static io.spine.server.storage.jdbc.aggregate.LifecycleFlagsTable.Column.id;
+import static io.spine.server.storage.jdbc.Type.BOOLEAN;
+import static io.spine.server.storage.jdbc.aggregate.LifecycleFlagsTable.Column.ID;
 
 /**
  * A table for storing the {@link LifecycleFlags} of an {@link Aggregate}.
@@ -46,13 +46,14 @@ class LifecycleFlagsTable<I> extends EntityTable<I, LifecycleFlags, LifecycleFla
     private static final String TABLE_NAME_POSTFIX = "_visibility";
 
     LifecycleFlagsTable(Class<? extends Aggregate<I, ?, ?>> aggregateClass,
-                        DataSourceWrapper dataSource) {
-        super(TABLE_NAME_POSTFIX, aggregateClass, id.name(), dataSource);
+                        DataSourceWrapper dataSource,
+                        TypeMapping typeMapping) {
+        super(TABLE_NAME_POSTFIX, aggregateClass, ID.name(), dataSource, typeMapping);
     }
 
     @Override
     protected Column getIdColumnDeclaration() {
-        return id;
+        return ID;
     }
 
     @Override
@@ -100,24 +101,31 @@ class LifecycleFlagsTable<I> extends EntityTable<I, LifecycleFlags, LifecycleFla
      */
     enum Column implements TableColumn {
 
-        id(ID),
-        archived(BOOLEAN),
-        deleted(BOOLEAN);
+        ID,
+        ARCHIVED(BOOLEAN),
+        DELETED(BOOLEAN);
 
-        private final Sql.Type type;
+        private final Type type;
 
-        Column(Sql.Type type) {
+        Column(Type type) {
             this.type = type;
         }
 
+        /**
+         * Creates a column, {@linkplain #type() type} of which is unknown at the compile time.
+         */
+        Column() {
+            this.type = null;
+        }
+
         @Override
-        public Sql.Type type() {
+        public Type type() {
             return type;
         }
 
         @Override
         public boolean isPrimaryKey() {
-            return this == id;
+            return this == ID;
         }
 
         @Override

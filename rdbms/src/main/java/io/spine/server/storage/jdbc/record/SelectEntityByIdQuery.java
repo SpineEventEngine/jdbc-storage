@@ -25,7 +25,7 @@ import io.spine.server.entity.EntityRecord;
 import io.spine.server.storage.jdbc.query.SelectMessageByIdQuery;
 
 import static com.querydsl.sql.SQLExpressions.all;
-import static io.spine.server.storage.jdbc.record.RecordTable.StandardColumn.entity;
+import static io.spine.server.storage.jdbc.record.RecordTable.StandardColumn.ENTITY;
 
 /**
  * A query that selects {@link EntityRecord} by an ID.
@@ -56,7 +56,7 @@ class SelectEntityByIdQuery<I> extends SelectMessageByIdQuery<I, EntityRecord> {
                                                                    EntityRecord> {
         @Override
         protected SelectEntityByIdQuery<I> doBuild() {
-            setMessageColumnName(entity.name());
+            setMessageColumnName(ENTITY.name());
             setMessageDescriptor(EntityRecord.getDescriptor());
             return new SelectEntityByIdQuery<>(this);
         }

@@ -125,7 +125,8 @@ public abstract class AbstractQuery implements StorageQuery {
      * @param dataSource the data source to produce connections
      * @return the query factory
      */
-    private static AbstractSQLQueryFactory<?> createFactory(final DataSourceWrapper dataSource) {
+    @VisibleForTesting
+    static AbstractSQLQueryFactory<?> createFactory(final DataSourceWrapper dataSource) {
         final Provider<Connection> connectionProvider = new Provider<Connection>() {
             @Override
             public Connection get() {

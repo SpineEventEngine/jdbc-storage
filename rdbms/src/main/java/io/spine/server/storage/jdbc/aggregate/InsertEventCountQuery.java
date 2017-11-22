@@ -22,7 +22,7 @@ package io.spine.server.storage.jdbc.aggregate;
 
 import com.querydsl.sql.dml.SQLInsertClause;
 
-import static io.spine.server.storage.jdbc.aggregate.EventCountTable.Column.event_count;
+import static io.spine.server.storage.jdbc.aggregate.EventCountTable.Column.EVENT_COUNT;
 
 /**
  * A query that inserts a new aggregate event count after the last snapshot into the
@@ -40,7 +40,7 @@ class InsertEventCountQuery<I> extends WriteEventCountQuery<I> {
     public long execute() {
         final SQLInsertClause query = factory().insert(table())
                                                .set(idPath(), getNormalizedId())
-                                               .set(pathOf(event_count), getEventCount());
+                                               .set(pathOf(EVENT_COUNT), getEventCount());
         return query.execute();
     }
 
