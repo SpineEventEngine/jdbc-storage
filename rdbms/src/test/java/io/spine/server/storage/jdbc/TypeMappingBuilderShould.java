@@ -29,30 +29,30 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Dmytro Grankin
  */
-public class MappingBuilderShould {
+public class TypeMappingBuilderShould {
 
     @Test
     public void override_type_names() {
         final Type type = BYTE_ARRAY;
         final String originalName = "original";
         final String nameReplacement = "replacement";
-        final TypeMapping mapping = MappingBuilder.basicBuilder()
-                                                  .add(type, originalName)
-                                                  .add(type, nameReplacement)
-                                                  .build();
+        final TypeMapping mapping = TypeMappingBuilder.basicBuilder()
+                                                      .add(type, originalName)
+                                                      .add(type, nameReplacement)
+                                                      .build();
         final TypeName resultingName = mapping.typeNameFor(type);
         assertEquals(nameReplacement, resultingName.value());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void not_allow_empty_type_names() {
-        final MappingBuilder builder = MappingBuilder.basicBuilder();
+        final TypeMappingBuilder builder = TypeMappingBuilder.basicBuilder();
         builder.add(BYTE_ARRAY, "");
     }
 
     @Test(expected = IllegalStateException.class)
     public void throw_exception_if_not_all_types_mapped() {
-        final MappingBuilder builder = new MappingBuilder();
+        final TypeMappingBuilder builder = new TypeMappingBuilder();
         builder.build();
     }
 }

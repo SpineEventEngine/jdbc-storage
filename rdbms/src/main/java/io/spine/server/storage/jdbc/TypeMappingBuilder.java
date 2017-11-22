@@ -37,7 +37,7 @@ import static io.spine.server.storage.jdbc.Type.STRING_255;
 /**
  * A builder for {@linkplain TypeMapping type mappings}.
  */
-public class MappingBuilder {
+public class TypeMappingBuilder {
 
     private final Map<Type, TypeName> mappedTypes = new EnumMap<>(Type.class);
 
@@ -55,7 +55,7 @@ public class MappingBuilder {
      * </ul>
      *
      * <p>If the mapping provided by the builder doesn't match a database, it can be
-     * {@linkplain MappingBuilder#add(Type, String) overridden} as follows:
+     * {@linkplain TypeMappingBuilder#add(Type, String) overridden} as follows:
      *
      * <pre>{@code
      * TypeMapping mapping = basicBuilder().add(Type.INT, "INT4")
@@ -65,13 +65,13 @@ public class MappingBuilder {
      *
      * @return the builder containing names for all types
      */
-    public static MappingBuilder basicBuilder() {
-        final MappingBuilder builder = new MappingBuilder().add(BYTE_ARRAY, "BLOB")
-                                                           .add(INT, "INT")
-                                                           .add(LONG, "BIGINT")
-                                                           .add(STRING_255, "VARCHAR(255)")
-                                                           .add(STRING, "TEXT")
-                                                           .add(BOOLEAN, "BOOLEAN");
+    public static TypeMappingBuilder basicBuilder() {
+        final TypeMappingBuilder builder = new TypeMappingBuilder().add(BYTE_ARRAY, "BLOB")
+                                                                   .add(INT, "INT")
+                                                                   .add(LONG, "BIGINT")
+                                                                   .add(STRING_255, "VARCHAR(255)")
+                                                                   .add(STRING, "TEXT")
+                                                                   .add(BOOLEAN, "BOOLEAN");
         return builder;
     }
 
@@ -84,7 +84,7 @@ public class MappingBuilder {
      * @param name the custom name for the type
      * @return the builder instance
      */
-    public MappingBuilder add(Type type, String name) {
+    public TypeMappingBuilder add(Type type, String name) {
         checkNotNull(type);
         mappedTypes.put(type, TypeName.of(name));
         return this;
@@ -105,7 +105,7 @@ public class MappingBuilder {
     }
 
     /**
-     * A {@link TypeMapping}, which is created by the {@link MappingBuilder}.
+     * A {@link TypeMapping}, which is created by the {@link TypeMappingBuilder}.
      */
     private static final class TypeMappingImpl implements TypeMapping {
 
@@ -118,7 +118,7 @@ public class MappingBuilder {
         @Override
         public TypeName typeNameFor(Type type) {
             checkState(mappedTypes.containsKey(type),
-                       "The type mapping doesn't define name for %s type.", type);
+                       "The type mapping does not define a name for %s type.", type);
             final TypeName typeName = mappedTypes.get(type);
             return typeName;
         }

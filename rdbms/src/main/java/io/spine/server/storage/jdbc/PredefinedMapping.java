@@ -26,8 +26,8 @@ import io.spine.type.TypeName;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
-import static io.spine.server.storage.jdbc.MappingBuilder.basicBuilder;
 import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
+import static io.spine.server.storage.jdbc.TypeMappingBuilder.basicBuilder;
 
 /**
  * Predefined {@linkplain TypeMapping type mappings} for different databases.
@@ -46,11 +46,11 @@ public enum PredefinedMapping implements TypeMapping {
     private final int minorVersion;
 
     PredefinedMapping(String databaseProductName, int majorVersion,
-                      int minorVersion, MappingBuilder mappingBuilder) {
+                      int minorVersion, TypeMappingBuilder typeMappingBuilder) {
         this.databaseProductName = databaseProductName;
         this.majorVersion = majorVersion;
         this.minorVersion = minorVersion;
-        this.typeMapping = mappingBuilder.build();
+        this.typeMapping = typeMappingBuilder.build();
     }
 
     @Override
