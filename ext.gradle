@@ -22,7 +22,7 @@ final def JDBC_VERSION = '0.10.29-SNAPSHOT'
 
 ext {
     jdbcVersion = JDBC_VERSION
-    coreVersion = '0.10.29-SNAPSHOT'
+    coreVersion = '0.10.30-SNAPSHOT'
     baseVersion = '0.10.29-SNAPSHOT'
     guavaVersion = '20.0'
 
