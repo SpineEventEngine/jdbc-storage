@@ -112,7 +112,7 @@ public class JdbcRecordStorageShould
                                                          .addFilter(columnFilter)
                                                          .build();
         final EntityQuery<String> query = EntityQueries.from(entityFilters,
-                                                             TestEntityWithStringId.class);
+                                                             storage.getEntityColumnCache());
         storage.readAll(query, FieldMask.getDefaultInstance());
         close(storage);
     }
