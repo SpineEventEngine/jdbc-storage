@@ -111,8 +111,8 @@ public class JdbcRecordStorageShould
         final EntityFilters entityFilters = EntityFilters.newBuilder()
                                                          .addFilter(columnFilter)
                                                          .build();
-        final EntityQuery<String> query = EntityQueries.from(entityFilters,
-                                                             storage.getEntityColumnCache());
+        final EntityQuery<String> query =
+                EntityQueries.from(entityFilters, storage.getEntityColumnCache());
         storage.readAll(query, FieldMask.getDefaultInstance());
         close(storage);
     }
