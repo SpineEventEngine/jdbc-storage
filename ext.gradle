@@ -18,11 +18,11 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-final def JDBC_VERSION = '0.10.29-SNAPSHOT'
+final def JDBC_VERSION = '0.10.32-SNAPSHOT'
 
 ext {
     jdbcVersion = JDBC_VERSION
-    coreVersion = '0.10.29-SNAPSHOT'
+    coreVersion = '0.10.32-SNAPSHOT'
     baseVersion = '0.10.29-SNAPSHOT'
     guavaVersion = '20.0'
 
