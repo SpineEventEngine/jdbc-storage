@@ -32,7 +32,6 @@ import io.spine.client.EntityId;
 import io.spine.client.EntityIdFilter;
 import io.spine.server.entity.AbstractVersionableEntity;
 import io.spine.server.entity.EntityRecord;
-import io.spine.server.entity.storage.EntityColumnCache;
 import io.spine.server.entity.storage.EntityQueries;
 import io.spine.server.entity.storage.EntityQuery;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
@@ -66,11 +65,6 @@ import static java.util.Collections.singleton;
  * @author Dmytro Dashenkov
  */
 public class JdbcStandStorage extends StandStorage {
-
-    private static final EntityQuery<String> EMPTY_QUERY = EntityQueries.from(
-            EntityFilters.getDefaultInstance(),
-            EntityColumnCache.getEmptyInstance()
-    );
 
     /**
      * A {@link Converter} of the stand record IDs.
@@ -190,12 +184,12 @@ public class JdbcStandStorage extends StandStorage {
 
     @Override
     protected Iterator<EntityRecord> readAllRecords() {
-        return recordStorage().readAll(EMPTY_QUERY, FieldMask.getDefaultInstance());
+        return recordStorage().readAll(emptyQuery(), FieldMask.getDefaultInstance());
     }
 
     @Override
     protected Iterator<EntityRecord> readAllRecords(FieldMask fieldMask) {
-        return recordStorage().readAll(EMPTY_QUERY, fieldMask);
+        return recordStorage().readAll(emptyQuery(), fieldMask);
     }
 
     @Override
@@ -230,7 +224,15 @@ public class JdbcStandStorage extends StandStorage {
         recordStorage().close();
     }
 
-    private static EntityQuery<String> idsToQuery(Iterable<AggregateStateId> ids) {
+    private EntityQuery<String> emptyQuery() {
+        final EntityQuery<String> emptyQuery = EntityQueries.from(
+                EntityFilters.getDefaultInstance(),
+                recordStorage()
+        );
+        return emptyQuery;
+    }
+
+    private EntityQuery<String> idsToQuery(Iterable<AggregateStateId> ids) {
         final Iterable<EntityId> entityIds = transform(ids, AggregateStateIdToEntityId.INSTANCE);
         final EntityIdFilter idFilter = EntityIdFilter.newBuilder()
                                                       .addAllIds(entityIds)
@@ -238,7 +240,7 @@ public class JdbcStandStorage extends StandStorage {
         final EntityFilters entityFilters = EntityFilters.newBuilder()
                                                          .setIdFilter(idFilter)
                                                          .build();
-        final EntityQuery<String> query = EntityQueries.from(entityFilters, EntityColumnCache.getEmptyInstance());
+        final EntityQuery<String> query = EntityQueries.from(entityFilters, recordStorage());
         return query;
     }
 

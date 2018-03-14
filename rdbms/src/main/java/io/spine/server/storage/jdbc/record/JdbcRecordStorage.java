@@ -75,7 +75,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
         super(builder.isMultitenant(), builder.getEntityClass());
         this.dataSource = builder.getDataSource();
         this.entityClass = builder.getEntityClass();
-        final Collection<EntityColumn> entityColumns = getEntityColumnCache().getColumns();
+        final Collection<EntityColumn> entityColumns = entityColumnCache().getColumns();
         this.table = new RecordTable<>(entityClass, dataSource, builder.getColumnTypeRegistry(),
                                        builder.getTypeMapping(), entityColumns);
         table.create();
@@ -165,12 +165,12 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     private EntityQuery<I> emptyQuery() {
         EntityQuery<I> query = EntityQueries.from(
                 EntityFilters.getDefaultInstance(),
-                getEntityColumnCache());
+                getThis());
         if (EntityWithLifecycle.class.isAssignableFrom(entityClass)) {
             @SuppressWarnings("unchecked") // Checked with the if statement.
             final Class<EntityWithLifecycle<I, ?>> cls =
                     (Class<EntityWithLifecycle<I, ?>>) entityClass;
-            query = query.withLifecycleFlags(getEntityColumnCache());
+            query = query.withLifecycleFlags(getThis());
         }
         return query;
     }
@@ -183,7 +183,11 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
         final EntityFilters entityFilters = EntityFilters.newBuilder()
                                                          .setIdFilter(idFilter)
                                                          .build();
-        return EntityQueries.from(entityFilters, getEntityColumnCache());
+        return EntityQueries.from(entityFilters, getThis());
+    }
+
+    private RecordStorage<I> getThis() {
+        return this;
     }
 
     /**
