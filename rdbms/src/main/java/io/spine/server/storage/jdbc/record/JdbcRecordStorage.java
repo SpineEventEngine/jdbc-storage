@@ -33,6 +33,7 @@ import io.spine.server.entity.Entity;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.EntityWithLifecycle;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
+import io.spine.server.entity.storage.EntityColumn;
 import io.spine.server.entity.storage.EntityQueries;
 import io.spine.server.entity.storage.EntityQuery;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
@@ -45,6 +46,7 @@ import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
 
 import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -70,11 +72,12 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
      * @param builder the storage builder
      */
     protected JdbcRecordStorage(Builder<I> builder) throws DatabaseException {
-        super(builder.isMultitenant());
+        super(builder.isMultitenant(), builder.getEntityClass());
         this.dataSource = builder.getDataSource();
         this.entityClass = builder.getEntityClass();
+        final Collection<EntityColumn> entityColumns = entityColumnCache().getColumns();
         this.table = new RecordTable<>(entityClass, dataSource, builder.getColumnTypeRegistry(),
-                                       builder.getTypeMapping());
+                                       builder.getTypeMapping(), entityColumns);
         table.create();
     }
 
@@ -162,12 +165,12 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     private EntityQuery<I> emptyQuery() {
         EntityQuery<I> query = EntityQueries.from(
                 EntityFilters.getDefaultInstance(),
-                entityClass);
+                getThis());
         if (EntityWithLifecycle.class.isAssignableFrom(entityClass)) {
             @SuppressWarnings("unchecked") // Checked with the if statement.
             final Class<EntityWithLifecycle<I, ?>> cls =
                     (Class<EntityWithLifecycle<I, ?>>) entityClass;
-            query = query.withLifecycleFlags(cls);
+            query = query.withLifecycleFlags(getThis());
         }
         return query;
     }
@@ -180,7 +183,11 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
         final EntityFilters entityFilters = EntityFilters.newBuilder()
                                                          .setIdFilter(idFilter)
                                                          .build();
-        return EntityQueries.from(entityFilters, Entity.class);
+        return EntityQueries.from(entityFilters, getThis());
+    }
+
+    private RecordStorage<I> getThis() {
+        return this;
     }
 
     /**

@@ -31,13 +31,13 @@ import io.spine.client.EntityFilters;
 import io.spine.client.EntityId;
 import io.spine.client.EntityIdFilter;
 import io.spine.server.entity.AbstractVersionableEntity;
-import io.spine.server.entity.Entity;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.storage.EntityQueries;
 import io.spine.server.entity.storage.EntityQuery;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.stand.AggregateStateId;
 import io.spine.server.stand.StandStorage;
+import io.spine.server.storage.RecordStorage;
 import io.spine.server.storage.jdbc.StorageBuilder;
 import io.spine.server.storage.jdbc.record.JdbcRecordStorage;
 import io.spine.string.Stringifier;
@@ -65,11 +65,6 @@ import static java.util.Collections.singleton;
  * @author Dmytro Dashenkov
  */
 public class JdbcStandStorage extends StandStorage {
-
-    private static final EntityQuery<String> EMPTY_QUERY = EntityQueries.from(
-            EntityFilters.getDefaultInstance(),
-            Entity.class
-    );
 
     /**
      * A {@link Converter} of the stand record IDs.
@@ -126,7 +121,7 @@ public class JdbcStandStorage extends StandStorage {
 
     @Override
     public Iterator<AggregateStateId> index() {
-        final Iterator<String> index = recordStorage.index();
+        final Iterator<String> index = recordStorage().index();
         final Iterator<AggregateStateId> result = Iterators.transform(index, ID_MAPPER.reverse());
         return result;
     }
@@ -157,7 +152,7 @@ public class JdbcStandStorage extends StandStorage {
     public boolean delete(AggregateStateId id) {
         final String aggregateId = ID_MAPPER.convert(id);
         checkNotNull(aggregateId);
-        return recordStorage.delete(aggregateId);
+        return recordStorage().delete(aggregateId);
     }
 
     @Override
@@ -177,31 +172,31 @@ public class JdbcStandStorage extends StandStorage {
     @Override
     protected Iterator<EntityRecord> readMultipleRecords(Iterable<AggregateStateId> ids) {
         final Iterable<String> genericIds = ID_MAPPER.convertAll(ids);
-        return recordStorage.readMultiple(genericIds);
+        return recordStorage().readMultiple(genericIds);
     }
 
     @Override
     protected Iterator<EntityRecord> readMultipleRecords(Iterable<AggregateStateId> ids,
                                                          FieldMask fieldMask) {
         final EntityQuery<String> query = idsToQuery(ids);
-        return recordStorage.readAll(query, fieldMask);
+        return recordStorage().readAll(query, fieldMask);
     }
 
     @Override
     protected Iterator<EntityRecord> readAllRecords() {
-        return recordStorage.readAll(EMPTY_QUERY, FieldMask.getDefaultInstance());
+        return recordStorage().readAll(emptyQuery(), FieldMask.getDefaultInstance());
     }
 
     @Override
     protected Iterator<EntityRecord> readAllRecords(FieldMask fieldMask) {
-        return recordStorage.readAll(EMPTY_QUERY, fieldMask);
+        return recordStorage().readAll(emptyQuery(), fieldMask);
     }
 
     @Override
     protected void writeRecord(AggregateStateId id, EntityRecordWithColumns record) {
         final String aggregateId = ID_MAPPER.convert(id);
         checkNotNull(aggregateId);
-        recordStorage.write(aggregateId, record);
+        recordStorage().write(aggregateId, record);
     }
 
     @Override
@@ -212,7 +207,12 @@ public class JdbcStandStorage extends StandStorage {
             final EntityRecordWithColumns recordValue = record.getValue();
             genericIdRecords.put(genericId, recordValue);
         }
-        recordStorage.write(genericIdRecords);
+        recordStorage().write(genericIdRecords);
+    }
+
+    @Override
+    protected RecordStorage<String> recordStorage() {
+        return recordStorage;
     }
 
     /**
@@ -221,10 +221,18 @@ public class JdbcStandStorage extends StandStorage {
     @Override
     public void close() {
         super.close();
-        recordStorage.close();
+        recordStorage().close();
     }
 
-    private static EntityQuery<String> idsToQuery(Iterable<AggregateStateId> ids) {
+    private EntityQuery<String> emptyQuery() {
+        final EntityQuery<String> emptyQuery = EntityQueries.from(
+                EntityFilters.getDefaultInstance(),
+                recordStorage()
+        );
+        return emptyQuery;
+    }
+
+    private EntityQuery<String> idsToQuery(Iterable<AggregateStateId> ids) {
         final Iterable<EntityId> entityIds = transform(ids, AggregateStateIdToEntityId.INSTANCE);
         final EntityIdFilter idFilter = EntityIdFilter.newBuilder()
                                                       .addAllIds(entityIds)
@@ -232,7 +240,7 @@ public class JdbcStandStorage extends StandStorage {
         final EntityFilters entityFilters = EntityFilters.newBuilder()
                                                          .setIdFilter(idFilter)
                                                          .build();
-        final EntityQuery<String> query = EntityQueries.from(entityFilters, Entity.class);
+        final EntityQuery<String> query = EntityQueries.from(entityFilters, recordStorage());
         return query;
     }
 

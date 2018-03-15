@@ -27,7 +27,6 @@ import io.spine.server.entity.Entity;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.entity.storage.EntityColumn;
-import io.spine.server.entity.storage.EntityColumns;
 import io.spine.server.entity.storage.EntityQuery;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
@@ -62,14 +61,17 @@ import static java.util.Collections.addAll;
 class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumns> {
 
     private final ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> typeRegistry;
+    private final Collection<EntityColumn> entityColumns;
 
     RecordTable(Class<? extends Entity<I, ?>> entityClass,
                 DataSourceWrapper dataSource,
                 ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>>
                         columnTypeRegistry,
-                TypeMapping typeMapping) {
+                TypeMapping typeMapping,
+                Collection<EntityColumn> entityColumns) {
         super(entityClass, StandardColumn.ID.name(), dataSource, typeMapping);
         this.typeRegistry = columnTypeRegistry;
+        this.entityColumns = entityColumns;
     }
 
     @Override
@@ -81,7 +83,6 @@ class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumn
     protected List<TableColumn> getTableColumns() {
         final List<TableColumn> columns = newLinkedList();
         addAll(columns, StandardColumn.values());
-        final Collection<EntityColumn> entityColumns = EntityColumns.getColumns(getEntityClass());
         final Collection<TableColumn> tableColumns = transform(entityColumns, new ColumnAdapter());
         columns.addAll(tableColumns);
         return columns;
