@@ -33,6 +33,7 @@ import io.spine.server.entity.storage.EntityColumn;
 import io.spine.server.entity.storage.QueryParameters;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
 
@@ -132,7 +133,8 @@ public class QueryPredicates {
         final JdbcColumnType<? super Object, ? super Object> columnType =
                 columnTypeRegistry.get(column);
         final Object javaType = toObject(filter.getValue(), column.getType());
-        final Comparable columnValue = (Comparable) columnType.convertColumnValue(javaType);
+        final Serializable persistedValue = column.toPersistedValue(javaType);
+        final Comparable columnValue = (Comparable) columnType.convertColumnValue(persistedValue);
 
         switch (operator) {
             case EQUAL:
