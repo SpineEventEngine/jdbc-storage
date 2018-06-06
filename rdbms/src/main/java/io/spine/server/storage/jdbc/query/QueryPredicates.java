@@ -122,7 +122,6 @@ public class QueryPredicates {
         }
     }
 
-    @SuppressWarnings("EnumSwitchStatementWhichMissesCases") // OK for the Protobuf enum switch.
     private static Predicate columnMatchFilter(EntityColumn column, ColumnFilter filter,
                                                ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> columnTypeRegistry) {
         final ColumnFilter.Operator operator = filter.getOperator();
@@ -134,8 +133,33 @@ public class QueryPredicates {
                 columnTypeRegistry.get(column);
         final Object javaType = toObject(filter.getValue(), column.getType());
         final Serializable persistedValue = column.toPersistedValue(javaType);
+        if (persistedValue == null) {
+            return nullFilter(operator, columnPath);
+        }
         final Comparable columnValue = (Comparable) columnType.convertColumnValue(persistedValue);
+        return valueFilter(operator, columnPath, columnValue);
+    }
 
+    @SuppressWarnings("EnumSwitchStatementWhichMissesCases") // OK for the Protobuf enum switch.
+    private static Predicate nullFilter(ColumnFilter.Operator operator,
+                                        ComparablePath<Comparable> columnPath) {
+        switch (operator) {
+            case EQUAL:
+                return columnPath.isNull();
+            case GREATER_THAN:
+            case LESS_THAN:
+            case GREATER_OR_EQUAL:
+            case LESS_OR_EQUAL:
+            default:
+                throw newIllegalArgumentException(
+                        "Operator %s not supported for the null filter value", operator);
+        }
+    }
+
+    @SuppressWarnings("EnumSwitchStatementWhichMissesCases") // OK for the Protobuf enum switch.
+    private static Predicate valueFilter(ColumnFilter.Operator operator,
+                                         ComparablePath<Comparable> columnPath,
+                                         Comparable columnValue) {
         switch (operator) {
             case EQUAL:
                 return columnPath.eq(columnValue);
