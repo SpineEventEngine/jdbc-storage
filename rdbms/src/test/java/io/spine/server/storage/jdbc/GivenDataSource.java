@@ -25,7 +25,7 @@ import com.zaxxer.hikari.HikariDataSource;
 
 import javax.sql.DataSource;
 
-import static io.spine.Identifier.newUuid;
+import static io.spine.base.Identifier.newUuid;
 import static org.mockito.Mockito.mock;
 
 public class GivenDataSource {

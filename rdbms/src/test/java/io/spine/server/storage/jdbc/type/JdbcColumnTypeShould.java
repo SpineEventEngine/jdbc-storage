@@ -27,7 +27,7 @@ import org.junit.Test;
 
 import java.sql.SQLException;
 
-import static io.spine.Identifier.newUuid;
+import static io.spine.base.Identifier.newUuid;
 import static org.junit.Assert.assertNull;
 
 /**

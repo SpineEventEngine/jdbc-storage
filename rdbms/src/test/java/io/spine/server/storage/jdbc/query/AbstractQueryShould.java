@@ -33,7 +33,7 @@ import org.junit.Test;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import static io.spine.Identifier.newUuid;
+import static io.spine.base.Identifier.newUuid;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
 import static io.spine.server.storage.jdbc.query.AbstractQuery.createFactory;
 import static io.spine.server.storage.jdbc.query.given.Given.storageQueryBuilder;
