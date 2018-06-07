@@ -22,21 +22,36 @@ package io.spine.server.storage.jdbc.query;
 
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.ComparablePath;
+import io.spine.client.ColumnFilter;
+import io.spine.server.entity.storage.ColumnTypeRegistry;
+import io.spine.server.entity.storage.EntityColumn;
+import io.spine.server.storage.jdbc.type.JdbcColumnType;
+import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
 import org.junit.Test;
 
 import static com.querydsl.core.types.dsl.Expressions.FALSE;
 import static com.querydsl.core.types.dsl.Expressions.TRUE;
+import static com.querydsl.core.types.dsl.Expressions.comparablePath;
+import static io.spine.client.ColumnFilters.eq;
+import static io.spine.client.ColumnFilters.gt;
 import static io.spine.client.CompositeColumnFilter.CompositeOperator.ALL;
 import static io.spine.client.CompositeColumnFilter.CompositeOperator.EITHER;
 import static io.spine.client.CompositeColumnFilter.CompositeOperator.UNRECOGNIZED;
+import static io.spine.server.storage.jdbc.query.QueryPredicates.columnMatchFilter;
 import static io.spine.server.storage.jdbc.query.QueryPredicates.joinPredicates;
 import static io.spine.test.Tests.assertHasPrivateParameterlessCtor;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Dmytro Grankin
  */
 public class QueryPredicatesShould {
+
+    private static final String COLUMN_FILTER_VALUE = "test";
 
     @Test
     public void have_the_private_utility_ctor() {
@@ -62,5 +77,61 @@ public class QueryPredicatesShould {
     @Test(expected = IllegalArgumentException.class)
     public void throw_exception_for_unsupported_operator() {
         joinPredicates(TRUE, TRUE, UNRECOGNIZED);
+    }
+
+    @Test
+    public void create_equal_predicate_for_null_value() {
+        final EntityColumn column = stringColumnMock();
+        when(column.toPersistedValue(any())).thenReturn(null);
+
+        final ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> registry
+                = JdbcTypeRegistryFactory.defaultInstance();
+
+        final ColumnFilter filter = eq(column.getStoredName(), COLUMN_FILTER_VALUE);
+        final Predicate predicate = columnMatchFilter(column, filter, registry);
+
+        final ComparablePath<Comparable> columnPath = comparablePath(Comparable.class,
+                                                                     column.getStoredName());
+        final BooleanExpression isNullPredicate = columnPath.isNull();
+        assertEquals(isNullPredicate, predicate);
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored") // Method expected to throw exception.
+    @Test(expected = IllegalArgumentException.class)
+    public void not_create_ordering_predicate_for_null_value() {
+        final EntityColumn column = stringColumnMock();
+        when(column.toPersistedValue(any())).thenReturn(null);
+
+        final ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> registry
+                = JdbcTypeRegistryFactory.defaultInstance();
+
+        final ColumnFilter filter = gt(column.getStoredName(), COLUMN_FILTER_VALUE);
+        columnMatchFilter(column, filter, registry);
+    }
+
+    @SuppressWarnings({"unchecked" /* Using raw types for mocks. */,
+            "ResultOfMethodCallIgnored" /* Method expected to throw exception. */})
+    @Test(expected = IllegalArgumentException.class)
+    public void not_accept_non_comparable_value() {
+        final EntityColumn column = stringColumnMock();
+        when(column.toPersistedValue(any())).thenReturn("test value");
+
+        final JdbcColumnType type = mock(JdbcColumnType.class);
+        when(type.convertColumnValue(any())).thenReturn(new Object());
+
+        final ColumnTypeRegistry registry = ColumnTypeRegistry.newBuilder()
+                                                              .put(String.class, type)
+                                                              .build();
+
+        final ColumnFilter filter = eq(column.getStoredName(), COLUMN_FILTER_VALUE);
+        columnMatchFilter(column, filter, registry);
+    }
+
+    private static EntityColumn stringColumnMock() {
+        final EntityColumn column = mock(EntityColumn.class);
+        when(column.getStoredName()).thenReturn("test column");
+        when(column.getType()).thenReturn(String.class);
+        when(column.getPersistedType()).thenReturn(String.class);
+        return column;
     }
 }

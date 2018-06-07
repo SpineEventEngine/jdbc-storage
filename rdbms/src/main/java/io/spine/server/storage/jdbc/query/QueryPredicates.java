@@ -122,7 +122,8 @@ public class QueryPredicates {
         }
     }
 
-    private static Predicate columnMatchFilter(EntityColumn column, ColumnFilter filter,
+    @VisibleForTesting
+    static Predicate columnMatchFilter(EntityColumn column, ColumnFilter filter,
                                                ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> columnTypeRegistry) {
         final ColumnFilter.Operator operator = filter.getOperator();
         checkArgument(operator.getNumber() > 0, operator.name());
