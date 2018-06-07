@@ -124,7 +124,8 @@ public class QueryPredicatesShould {
         when(column.toPersistedValue(any())).thenReturn("test value");
 
         final JdbcColumnType type = mock(JdbcColumnType.class);
-        when(type.convertColumnValue(any())).thenReturn(new Object());
+        final Object nonComparableValue = new Object();
+        when(type.convertColumnValue(any())).thenReturn(nonComparableValue);
 
         final ColumnTypeRegistry registry = ColumnTypeRegistry.newBuilder()
                                                               .put(String.class, type)
