@@ -144,7 +144,7 @@ public class QueryPredicates {
         if (!Comparable.class.isAssignableFrom(storedValueType)) {
             final Class<?> javaValueType = javaValue.getClass();
             throw newIllegalStateException(
-                    "Filter value of class %s is stored as non-Comparable type %s",
+                    "Received filter value of class %s which has non-Comparable storage type %s",
                     javaValueType.getCanonicalName(),
                     storedValueType.getCanonicalName());
         }
