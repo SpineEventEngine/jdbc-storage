@@ -153,7 +153,8 @@ public class QueryPredicates {
     }
 
     @SuppressWarnings("EnumSwitchStatementWhichMissesCases") // OK for the Protobuf enum switch.
-    private static Predicate nullFilter(ColumnFilter.Operator operator,
+    @VisibleForTesting
+    static Predicate nullFilter(ColumnFilter.Operator operator,
                                         ComparablePath<Comparable> columnPath) {
         switch (operator) {
             case EQUAL:
@@ -170,7 +171,8 @@ public class QueryPredicates {
     }
 
     @SuppressWarnings("EnumSwitchStatementWhichMissesCases") // OK for the Protobuf enum switch.
-    private static Predicate valueFilter(ColumnFilter.Operator operator,
+    @VisibleForTesting
+    static Predicate valueFilter(ColumnFilter.Operator operator,
                                          ComparablePath<Comparable> columnPath,
                                          Comparable columnValue) {
         switch (operator) {
