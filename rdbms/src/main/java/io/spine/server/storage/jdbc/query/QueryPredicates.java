@@ -124,7 +124,7 @@ public class QueryPredicates {
 
     @VisibleForTesting
     static Predicate columnMatchFilter(EntityColumn column, ColumnFilter filter,
-                                               ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> columnTypeRegistry) {
+                                       ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> columnTypeRegistry) {
         final ColumnFilter.Operator operator = filter.getOperator();
         checkArgument(operator.getNumber() > 0, operator.name());
 
@@ -162,7 +162,7 @@ public class QueryPredicates {
     @SuppressWarnings("EnumSwitchStatementWhichMissesCases") // OK for the Protobuf enum switch.
     @VisibleForTesting
     static Predicate nullFilter(ColumnFilter.Operator operator,
-                                        ComparablePath<Comparable> columnPath) {
+                                ComparablePath<Comparable> columnPath) {
         switch (operator) {
             case EQUAL:
                 return columnPath.isNull();
@@ -180,8 +180,8 @@ public class QueryPredicates {
     @SuppressWarnings("EnumSwitchStatementWhichMissesCases") // OK for the Protobuf enum switch.
     @VisibleForTesting
     static Predicate valueFilter(ColumnFilter.Operator operator,
-                                         ComparablePath<Comparable> columnPath,
-                                         Comparable columnValue) {
+                                 ComparablePath<Comparable> columnPath,
+                                 Comparable columnValue) {
         switch (operator) {
             case EQUAL:
                 return columnPath.eq(columnValue);
