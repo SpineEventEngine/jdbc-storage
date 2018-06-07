@@ -131,12 +131,21 @@ public class QueryPredicates {
         final ComparablePath<Comparable> columnPath = comparablePath(Comparable.class, columnName);
         final JdbcColumnType<? super Object, ? super Object> columnType =
                 columnTypeRegistry.get(column);
-        final Object javaType = toObject(filter.getValue(), column.getType());
-        final Serializable persistedValue = column.toPersistedValue(javaType);
+        final Object javaValue = toObject(filter.getValue(), column.getType());
+        final Serializable persistedValue = column.toPersistedValue(javaValue);
+
         if (persistedValue == null) {
             return nullFilter(operator, columnPath);
         }
-        final Comparable columnValue = (Comparable) columnType.convertColumnValue(persistedValue);
+
+        final Object storedValue = columnType.convertColumnValue(persistedValue);
+        final Class<?> storedValueType = storedValue.getClass();
+        if (!Comparable.class.isAssignableFrom(storedValueType)) {
+            throw newIllegalArgumentException(
+                    "Filter value should implement Comparable, instead got value of class %s",
+                    storedValueType.getCanonicalName());
+        }
+        final Comparable columnValue = (Comparable) storedValue;
         return valueFilter(operator, columnPath, columnValue);
     }
 
@@ -153,8 +162,7 @@ public class QueryPredicates {
                 throw newIllegalArgumentException(
                         "Operator %s not supported for the null filter value.", operator);
             default:
-                throw newIllegalArgumentException(
-                        "Unexpected filter operator %s.", operator);
+                throw newIllegalArgumentException("Unexpected filter operator %s.", operator);
         }
     }
 
