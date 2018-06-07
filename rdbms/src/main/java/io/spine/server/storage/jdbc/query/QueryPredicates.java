@@ -141,8 +141,10 @@ public class QueryPredicates {
         final Object storedValue = columnType.convertColumnValue(persistedValue);
         final Class<?> storedValueType = storedValue.getClass();
         if (!Comparable.class.isAssignableFrom(storedValueType)) {
+            final Class<?> javaValueType = javaValue.getClass();
             throw newIllegalArgumentException(
-                    "Filter value should implement Comparable, instead got value of class %s",
+                    "Filter value of class %s is stored as non-Comparable type %s",
+                    javaValueType.getCanonicalName(),
                     storedValueType.getCanonicalName());
         }
         final Comparable columnValue = (Comparable) storedValue;
