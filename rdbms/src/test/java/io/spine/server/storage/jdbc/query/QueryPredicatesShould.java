@@ -24,7 +24,7 @@ import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.ComparablePath;
 import io.spine.client.ColumnFilter;
-import io.spine.client.CompositeColumnFilter.CompositeOperator;
+import io.spine.client.CompositeColumnFilter;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.entity.storage.EntityColumn;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
@@ -84,7 +84,7 @@ public class QueryPredicatesShould {
 
     @Test(expected = IllegalArgumentException.class)
     public void throw_exception_for_unsupported_operator() {
-        joinPredicates(TRUE, TRUE, CompositeOperator.UNRECOGNIZED);
+        joinPredicates(TRUE, TRUE, CompositeColumnFilter.CompositeOperator.UNRECOGNIZED);
     }
 
     @Test
