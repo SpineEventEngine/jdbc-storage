@@ -24,6 +24,7 @@ import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.ComparablePath;
 import io.spine.client.ColumnFilter;
+import io.spine.client.CompositeColumnFilter.CompositeOperator;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.entity.storage.EntityColumn;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
@@ -38,11 +39,11 @@ import static io.spine.client.ColumnFilter.Operator.GREATER_OR_EQUAL;
 import static io.spine.client.ColumnFilter.Operator.GREATER_THAN;
 import static io.spine.client.ColumnFilter.Operator.LESS_OR_EQUAL;
 import static io.spine.client.ColumnFilter.Operator.LESS_THAN;
+import static io.spine.client.ColumnFilter.Operator.UNRECOGNIZED;
 import static io.spine.client.ColumnFilters.eq;
 import static io.spine.client.ColumnFilters.gt;
 import static io.spine.client.CompositeColumnFilter.CompositeOperator.ALL;
 import static io.spine.client.CompositeColumnFilter.CompositeOperator.EITHER;
-import static io.spine.client.CompositeColumnFilter.CompositeOperator.UNRECOGNIZED;
 import static io.spine.server.storage.jdbc.query.QueryPredicates.columnMatchFilter;
 import static io.spine.server.storage.jdbc.query.QueryPredicates.joinPredicates;
 import static io.spine.server.storage.jdbc.query.QueryPredicates.nullFilter;
@@ -83,7 +84,7 @@ public class QueryPredicatesShould {
 
     @Test(expected = IllegalArgumentException.class)
     public void throw_exception_for_unsupported_operator() {
-        joinPredicates(TRUE, TRUE, UNRECOGNIZED);
+        joinPredicates(TRUE, TRUE, CompositeOperator.UNRECOGNIZED);
     }
 
     @Test
@@ -164,7 +165,7 @@ public class QueryPredicatesShould {
 
     @Test(expected = IllegalArgumentException.class)
     public void not_generate_null_filter_for_UNRECOGNIZED() {
-        runNullFilterCreationFor(ColumnFilter.Operator.UNRECOGNIZED);
+        runNullFilterCreationFor(UNRECOGNIZED);
     }
 
     @Test
@@ -204,7 +205,7 @@ public class QueryPredicatesShould {
 
     @Test(expected = IllegalArgumentException.class)
     public void not_generate_value_filter_for_UNRECOGNIZED() {
-        runValueFilterCreationFor(ColumnFilter.Operator.UNRECOGNIZED);
+        runValueFilterCreationFor(UNRECOGNIZED);
     }
 
     private static EntityColumn stringColumnMock() {
