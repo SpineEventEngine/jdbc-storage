@@ -140,6 +140,15 @@ public class QueryPredicates {
         }
 
         final Object storedValue = columnType.convertColumnValue(persistedValue);
+        checkIsComparable(storedValue, javaValue);
+        final Comparable columnValue = (Comparable) storedValue;
+        return valueFilter(operator, columnPath, columnValue);
+    }
+
+    /**
+     * Checks that storedValue implements Comparable; javaValue passed for logging purposes.
+     */
+    private static void checkIsComparable(Object storedValue, Object javaValue) {
         final Class<?> storedType = storedValue.getClass();
         if (!Comparable.class.isAssignableFrom(storedType)) {
             final Class<?> javaType = javaValue.getClass();
@@ -148,8 +157,6 @@ public class QueryPredicates {
                     javaType.getCanonicalName(),
                     storedType.getCanonicalName());
         }
-        final Comparable columnValue = (Comparable) storedValue;
-        return valueFilter(operator, columnPath, columnValue);
     }
 
     @SuppressWarnings("EnumSwitchStatementWhichMissesCases") // OK for the Protobuf enum switch.
