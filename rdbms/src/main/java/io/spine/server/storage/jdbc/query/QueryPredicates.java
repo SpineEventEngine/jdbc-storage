@@ -150,9 +150,11 @@ public class QueryPredicates {
             case LESS_THAN:
             case GREATER_OR_EQUAL:
             case LESS_OR_EQUAL:
+                throw newIllegalArgumentException(
+                        "Operator %s not supported for the null filter value.", operator);
             default:
                 throw newIllegalArgumentException(
-                        "Operator %s not supported for the null filter value", operator);
+                        "Unexpected filter operator %s.", operator);
         }
     }
 
