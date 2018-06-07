@@ -146,7 +146,9 @@ public class QueryPredicates {
     }
 
     /**
-     * Checks that storedValue implements Comparable; javaValue passed for logging purposes.
+     * Checks that {@code storedValue} implements {@link Comparable}.
+     *
+     * <p>{@code javaValue} is passed for logging purposes only.
      */
     private static void checkIsComparable(Object storedValue, Object javaValue) {
         final Class<?> storedType = storedValue.getClass();
