@@ -25,7 +25,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.protobuf.Any;
 import com.google.protobuf.FieldMask;
-import io.spine.Identifier;
+import io.spine.base.Identifier;
 import io.spine.client.EntityFilters;
 import io.spine.client.EntityId;
 import io.spine.client.EntityIdFilter;

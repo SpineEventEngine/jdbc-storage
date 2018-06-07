@@ -24,7 +24,7 @@ import org.junit.Test;
 
 import java.util.Set;
 
-import static io.spine.Identifier.newUuid;
+import static io.spine.base.Identifier.newUuid;
 
 /**
  * @author Dmytro Grankin

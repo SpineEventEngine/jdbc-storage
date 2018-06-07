@@ -33,6 +33,7 @@ import io.spine.server.entity.storage.EntityColumn;
 import io.spine.server.entity.storage.QueryParameters;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
 
@@ -121,9 +122,9 @@ public class QueryPredicates {
         }
     }
 
-    @SuppressWarnings("EnumSwitchStatementWhichMissesCases") // OK for the Protobuf enum switch.
-    private static Predicate columnMatchFilter(EntityColumn column, ColumnFilter filter,
-                                               ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> columnTypeRegistry) {
+    @VisibleForTesting
+    static Predicate columnMatchFilter(EntityColumn column, ColumnFilter filter,
+                                       ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> columnTypeRegistry) {
         final ColumnFilter.Operator operator = filter.getOperator();
         checkArgument(operator.getNumber() > 0, operator.name());
 
@@ -131,9 +132,58 @@ public class QueryPredicates {
         final ComparablePath<Comparable> columnPath = comparablePath(Comparable.class, columnName);
         final JdbcColumnType<? super Object, ? super Object> columnType =
                 columnTypeRegistry.get(column);
-        final Object javaType = toObject(filter.getValue(), column.getType());
-        final Comparable columnValue = (Comparable) columnType.convertColumnValue(javaType);
+        final Object javaValue = toObject(filter.getValue(), column.getType());
+        final Serializable persistedValue = column.toPersistedValue(javaValue);
 
+        if (persistedValue == null) {
+            return nullFilter(operator, columnPath);
+        }
+
+        final Object storedValue = columnType.convertColumnValue(persistedValue);
+        checkIsComparable(storedValue, javaValue);
+        final Comparable columnValue = (Comparable) storedValue;
+        return valueFilter(operator, columnPath, columnValue);
+    }
+
+    /**
+     * Checks that {@code storedValue} implements {@link Comparable}.
+     *
+     * <p>{@code javaValue} is passed for logging purposes only.
+     */
+    private static void checkIsComparable(Object storedValue, Object javaValue) {
+        final Class<?> storedType = storedValue.getClass();
+        if (!Comparable.class.isAssignableFrom(storedType)) {
+            final Class<?> javaType = javaValue.getClass();
+            throw newIllegalArgumentException(
+                    "Received filter value of class %s which has non-Comparable storage type %s",
+                    javaType.getCanonicalName(),
+                    storedType.getCanonicalName());
+        }
+    }
+
+    @SuppressWarnings("EnumSwitchStatementWhichMissesCases") // OK for the Protobuf enum switch.
+    @VisibleForTesting
+    static Predicate nullFilter(ColumnFilter.Operator operator,
+                                ComparablePath<Comparable> columnPath) {
+        switch (operator) {
+            case EQUAL:
+                return columnPath.isNull();
+            case GREATER_THAN:
+            case LESS_THAN:
+            case GREATER_OR_EQUAL:
+            case LESS_OR_EQUAL:
+                throw newIllegalArgumentException(
+                        "Operator %s not supported for the null filter value.", operator);
+            default:
+                throw newIllegalArgumentException("Unexpected filter operator %s.", operator);
+        }
+    }
+
+    @SuppressWarnings("EnumSwitchStatementWhichMissesCases") // OK for the Protobuf enum switch.
+    @VisibleForTesting
+    static Predicate valueFilter(ColumnFilter.Operator operator,
+                                 ComparablePath<Comparable> columnPath,
+                                 Comparable columnValue) {
         switch (operator) {
             case EQUAL:
                 return columnPath.eq(columnValue);

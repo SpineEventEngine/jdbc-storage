@@ -32,7 +32,7 @@ import org.junit.Test;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import static io.spine.Identifier.newUuid;
+import static io.spine.base.Identifier.newUuid;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
 import static io.spine.server.storage.jdbc.query.IdColumn.typeString;
 import static io.spine.server.storage.jdbc.query.given.Given.selectMessageBuilder;

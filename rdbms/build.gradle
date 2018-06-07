@@ -8,7 +8,9 @@ dependencies {
 
     compile group: 'com.zaxxer', name: 'HikariCP', version: hikariVersion
 
-    compile group: 'com.querydsl', name: 'querydsl-sql', version: querydslVersion
+    compile (group: 'com.querydsl', name: 'querydsl-sql', version: querydslVersion) {
+        exclude group: 'com.google.guava'
+    }
 
     testCompile 'org.mockito:mockito-core:2.+'
 }

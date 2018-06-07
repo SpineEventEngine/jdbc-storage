@@ -46,7 +46,7 @@ import io.spine.test.storage.ProjectId;
 import io.spine.testdata.Sample;
 import org.junit.Test;
 
-import static io.spine.Identifier.newUuid;
+import static io.spine.base.Identifier.newUuid;
 import static io.spine.client.ColumnFilters.gt;
 import static io.spine.client.ColumnFilters.lt;
 import static io.spine.client.CompositeColumnFilter.CompositeOperator.ALL;
