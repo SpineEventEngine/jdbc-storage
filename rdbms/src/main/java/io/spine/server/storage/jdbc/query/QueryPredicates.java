@@ -140,13 +140,13 @@ public class QueryPredicates {
         }
 
         final Object storedValue = columnType.convertColumnValue(persistedValue);
-        final Class<?> storedValueType = storedValue.getClass();
-        if (!Comparable.class.isAssignableFrom(storedValueType)) {
-            final Class<?> javaValueType = javaValue.getClass();
+        final Class<?> storedType = storedValue.getClass();
+        if (!Comparable.class.isAssignableFrom(storedType)) {
+            final Class<?> javaType = javaValue.getClass();
             throw newIllegalStateException(
                     "Received filter value of class %s which has non-Comparable storage type %s",
-                    javaValueType.getCanonicalName(),
-                    storedValueType.getCanonicalName());
+                    javaType.getCanonicalName(),
+                    storedType.getCanonicalName());
         }
         final Comparable columnValue = (Comparable) storedValue;
         return valueFilter(operator, columnPath, columnValue);
