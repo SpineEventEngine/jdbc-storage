@@ -44,6 +44,7 @@ import static com.querydsl.core.types.dsl.Expressions.TRUE;
 import static com.querydsl.core.types.dsl.Expressions.comparablePath;
 import static io.spine.protobuf.TypeConverter.toObject;
 import static io.spine.util.Exceptions.newIllegalArgumentException;
+import static io.spine.util.Exceptions.newIllegalStateException;
 
 /**
  * A utility methods to work with {@linkplain Predicate predicates}.
@@ -142,7 +143,7 @@ public class QueryPredicates {
         final Class<?> storedValueType = storedValue.getClass();
         if (!Comparable.class.isAssignableFrom(storedValueType)) {
             final Class<?> javaValueType = javaValue.getClass();
-            throw newIllegalArgumentException(
+            throw newIllegalStateException(
                     "Filter value of class %s is stored as non-Comparable type %s",
                     javaValueType.getCanonicalName(),
                     storedValueType.getCanonicalName());
