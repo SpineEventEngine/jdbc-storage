@@ -32,7 +32,7 @@ import io.spine.server.entity.Entity;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.stand.AggregateStateId;
 import io.spine.server.stand.StandStorage;
-import io.spine.server.stand.StandStorageShould;
+import io.spine.server.stand.StandStorageTest;
 import io.spine.server.storage.RecordReadRequest;
 import io.spine.server.storage.jdbc.ConnectionWrapper;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
@@ -41,8 +41,7 @@ import io.spine.server.storage.jdbc.stand.given.Given;
 import io.spine.test.commandservice.customer.Customer;
 import io.spine.test.storage.Project;
 import io.spine.type.TypeUrl;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
@@ -65,6 +64,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -74,7 +74,7 @@ import static org.mockito.Mockito.when;
 /**
  * @author Dmytro Dashenkov
  */
-public class JdbcStandStorageShould extends StandStorageShould {
+public class JdbcStandStorageShould extends StandStorageTest {
 
     @Override
     protected StandStorage newStorage(Class<? extends Entity> entityClass) {
@@ -133,17 +133,17 @@ public class JdbcStandStorageShould extends StandStorageShould {
         assertFalse(standStorage.isMultitenant());
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void fail_to_initialize_with_empty_builder() {
-        JdbcStandStorage.newBuilder()
-                        .build();
+        assertThrows(IllegalStateException.class, () -> JdbcStandStorage.newBuilder()
+                                                                        .build());
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void fail_to_initialize_without_data_source() {
-        JdbcStandStorage.newBuilder()
-                        .setMultitenant(false)
-                        .build();
+        assertThrows(IllegalStateException.class, () -> JdbcStandStorage.newBuilder()
+                                                                        .setMultitenant(false)
+                                                                        .build());
     }
 
     /*
@@ -307,7 +307,7 @@ public class JdbcStandStorageShould extends StandStorageShould {
         }
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void fail_to_write_data_after_closed() throws Exception {
         final StandStorage storage = getStorage();
 
@@ -315,10 +315,11 @@ public class JdbcStandStorageShould extends StandStorageShould {
         storage.close();
         assertTrue(storage.isClosed());
 
-        writeToStorage(new TestAggregate("42"), storage, Project.class);
+        assertThrows(IllegalStateException.class,
+                     () -> writeToStorage(new TestAggregate("42"), storage, Project.class));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void fail_to_read_data_after_closed() throws Exception {
         final StandStorage storage = getStorage();
 
@@ -326,15 +327,7 @@ public class JdbcStandStorageShould extends StandStorageShould {
         storage.close();
         assertTrue(storage.isClosed());
 
-        storage.readAll();
-    }
-
-    @SuppressWarnings("MethodDoesntCallSuperMethod")
-    @Ignore
-    @Test
-    @Override
-    public void write_record_with_columns() {
-        // Ignored since stand storage does not support (explicit) entity columns.
+        assertThrows(IllegalStateException.class, storage::readAll);
     }
 
     private static void assertMatches(Message message, FieldMask fieldMask) {

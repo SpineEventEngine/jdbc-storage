@@ -23,8 +23,8 @@ package io.spine.server.storage.jdbc.projection;
 import io.spine.server.entity.Entity;
 import io.spine.server.projection.Projection;
 import io.spine.server.projection.ProjectionStorage;
-import io.spine.server.projection.ProjectionStorageShould;
-import io.spine.server.storage.RecordStorageShould;
+import io.spine.server.projection.ProjectionStorageTest;
+import io.spine.server.storage.given.RecordStorageTestEnv.TestCounterEntity;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.GivenDataSource;
 import io.spine.server.storage.jdbc.StorageBuilder;
@@ -33,16 +33,17 @@ import io.spine.server.storage.jdbc.record.JdbcRecordStorage;
 import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
 import io.spine.test.Tests;
 import io.spine.test.storage.ProjectId;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
 import static io.spine.test.Tests.nullRef;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Alexander Litus
  */
-public class JdbcProjectionStorageShould extends ProjectionStorageShould {
+public class JdbcProjectionStorageShould extends ProjectionStorageTest {
 
     @Override
     protected ProjectionStorage<ProjectId> newStorage(Class<? extends Entity> entityClass) {
@@ -71,11 +72,11 @@ public class JdbcProjectionStorageShould extends ProjectionStorageShould {
         return storage;
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void throw_exception_when_closing_twice() throws Exception {
         final ProjectionStorage<?> storage = getStorage();
         storage.close();
-        storage.close();
+        assertThrows(IllegalStateException.class, storage::close);
     }
 
     @Test
@@ -86,18 +87,20 @@ public class JdbcProjectionStorageShould extends ProjectionStorageShould {
         assertNotNull(builder);
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void require_non_null_projection_class() {
         final Class<? extends Projection<Object, ?, ?>> nullClass = nullRef();
-        JdbcProjectionStorage.newBuilder()
-                             .setProjectionClass(nullClass);
+        assertThrows(NullPointerException.class,
+                     () -> JdbcProjectionStorage.newBuilder()
+                                                .setProjectionClass(nullClass));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void require_non_null_record_storage() {
         final JdbcRecordStorage<Object> nullStorage = Tests.nullRef();
-        JdbcProjectionStorage.newBuilder()
-                             .setRecordStorage(nullStorage);
+        assertThrows(NullPointerException.class,
+                     () -> JdbcProjectionStorage.newBuilder()
+                                                .setRecordStorage(nullStorage));
     }
 
     @Override
@@ -105,7 +108,7 @@ public class JdbcProjectionStorageShould extends ProjectionStorageShould {
         return TestEntity.class;
     }
 
-    private static class TestEntity extends RecordStorageShould.TestCounterEntity<ProjectId> {
+    private static class TestEntity extends TestCounterEntity<ProjectId> {
         protected TestEntity(ProjectId id) {
             super(id);
         }

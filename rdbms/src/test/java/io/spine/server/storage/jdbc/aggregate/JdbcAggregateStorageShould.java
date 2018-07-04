@@ -24,12 +24,13 @@ import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.aggregate.AggregateReadRequest;
 import io.spine.server.aggregate.AggregateStorage;
-import io.spine.server.aggregate.AggregateStorageShould;
+import io.spine.server.aggregate.AggregateStorageTest;
 import io.spine.server.entity.Entity;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.query.DbIterator;
 import io.spine.test.aggregate.ProjectId;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;
 
@@ -38,25 +39,27 @@ import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
 import static io.spine.test.Tests.nullRef;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Alexander Litus
  */
-public class JdbcAggregateStorageShould extends AggregateStorageShould {
+public class JdbcAggregateStorageShould extends AggregateStorageTest {
 
     private JdbcAggregateStorage<ProjectId> storage;
 
+    @BeforeEach
     @Override
     public void setUpAbstractStorageTest() {
         super.setUpAbstractStorageTest();
         storage = (JdbcAggregateStorage<ProjectId>) getStorage();
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void throw_exception_when_closing_twice() throws Exception {
         final AggregateStorage<?> storage = getStorage();
         storage.close();
-        storage.close();
+        assertThrows(IllegalStateException.class, storage::close);
     }
 
     @Test
@@ -87,11 +90,12 @@ public class JdbcAggregateStorageShould extends AggregateStorageShould {
         assertTrue(historyIteratorClosed);
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void require_non_null_aggregate_class() {
         final Class<? extends Aggregate<Object, ?, ?>> nullClass = nullRef();
-        JdbcAggregateStorage.newBuilder()
-                            .setAggregateClass(nullClass);
+        assertThrows(NullPointerException.class,
+                     () -> JdbcAggregateStorage.newBuilder()
+                                               .setAggregateClass(nullClass));
     }
 
     @Override

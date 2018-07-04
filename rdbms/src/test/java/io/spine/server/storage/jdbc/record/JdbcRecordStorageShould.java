@@ -33,7 +33,8 @@ import io.spine.server.entity.storage.EntityQueries;
 import io.spine.server.entity.storage.EntityQuery;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.RecordStorage;
-import io.spine.server.storage.RecordStorageShould;
+import io.spine.server.storage.RecordStorageTest;
+import io.spine.server.storage.given.RecordStorageTestEnv.TestCounterEntity;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.GivenDataSource;
 import io.spine.server.storage.jdbc.record.given.JdbcRecordStorageTestEnv;
@@ -44,7 +45,7 @@ import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
 import io.spine.test.storage.Project;
 import io.spine.test.storage.ProjectId;
 import io.spine.testdata.Sample;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static io.spine.base.Identifier.newUuid;
 import static io.spine.client.ColumnFilters.gt;
@@ -55,12 +56,13 @@ import static io.spine.test.Tests.nullRef;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Alexander Litus
  */
 public class JdbcRecordStorageShould
-        extends RecordStorageShould<String, JdbcRecordStorage<String>> {
+        extends RecordStorageTest<String, JdbcRecordStorage<String>> {
 
     @Test
     public void clear_itself() {
@@ -78,11 +80,11 @@ public class JdbcRecordStorageShould
         close(storage);
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void throw_exception_when_closing_twice() throws Exception {
         final RecordStorage<?> storage = getStorage();
         storage.close();
-        storage.close();
+        assertThrows(IllegalStateException.class, storage::close);
     }
 
     @Test
@@ -116,19 +118,21 @@ public class JdbcRecordStorageShould
         close(storage);
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void require_non_null_entity_class() {
         final Class<? extends Entity<Object, ?>> nullEntityCls = nullRef();
-        JdbcRecordStorage.newBuilder()
-                         .setEntityClass(nullEntityCls);
+        assertThrows(NullPointerException.class,
+                     () -> JdbcRecordStorage.newBuilder()
+                                            .setEntityClass(nullEntityCls));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void require_non_null_column_type_registry() {
         final ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> registry
                 = nullRef();
-        JdbcRecordStorage.newBuilder()
-                         .setColumnTypeRegistry(registry);
+        assertThrows(NullPointerException.class,
+                     () -> JdbcRecordStorage.newBuilder()
+                                            .setColumnTypeRegistry(registry));
     }
 
     @Override

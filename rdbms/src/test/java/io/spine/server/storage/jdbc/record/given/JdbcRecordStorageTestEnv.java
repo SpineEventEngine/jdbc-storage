@@ -22,7 +22,7 @@ package io.spine.server.storage.jdbc.record.given;
 
 import io.spine.server.entity.AbstractEntity;
 import io.spine.server.entity.storage.Column;
-import io.spine.server.storage.RecordStorageShould.TestCounterEntity;
+import io.spine.server.storage.given.RecordStorageTestEnv.TestCounterEntity;
 import io.spine.test.storage.Project;
 
 /**

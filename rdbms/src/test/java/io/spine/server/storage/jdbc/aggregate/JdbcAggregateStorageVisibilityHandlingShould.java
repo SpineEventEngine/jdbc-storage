@@ -23,7 +23,7 @@ package io.spine.server.storage.jdbc.aggregate;
 import com.google.common.base.Optional;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateStorage;
-import io.spine.server.aggregate.AggregateStorageVisibilityHandlingShould;
+import io.spine.server.aggregate.AggregateStorageVisibilityHandlingTest;
 import io.spine.server.entity.LifecycleFlags;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.GivenDataSource;
@@ -41,7 +41,7 @@ import static org.junit.Assert.assertTrue;
  * @author Dmytro Dashenkov
  */
 public class JdbcAggregateStorageVisibilityHandlingShould
-        extends AggregateStorageVisibilityHandlingShould {
+        extends AggregateStorageVisibilityHandlingTest {
 
     @Override
     protected AggregateStorage<ProjectId> getAggregateStorage(
