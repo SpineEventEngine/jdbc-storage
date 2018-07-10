@@ -45,6 +45,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 /**
  * @author Alexander Litus
  */
+@SuppressWarnings("DuplicateStringLiteralInspection") // Common test display names.
 @DisplayName("JdbcAggregateStorage should")
 class JdbcAggregateStorageTest extends AggregateStorageTest {
 

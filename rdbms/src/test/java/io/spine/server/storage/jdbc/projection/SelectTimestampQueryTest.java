@@ -22,8 +22,8 @@ package io.spine.server.storage.jdbc.projection;
 
 import com.google.protobuf.Message;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -37,11 +37,12 @@ import static org.mockito.Mockito.mock;
 /**
  * @author Dmytro Grankin
  */
-public class SelectTimestampQueryShould {
+@DisplayName("SelectTimestampQuery should")
+class SelectTimestampQueryTest {
 
     @Test
-    @DisplayName("return null if seconds and nanos fields are nulls")
-    void returnNullIfSecondsAndNanosFieldsAreNulls() throws SQLException {
+    @DisplayName("return null if `seconds` and `nanos` fields are nulls")
+    void returnNullForEmptyTimestamp() throws SQLException {
         final ResultSet resultSet = mock(ResultSet.class);
         final DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
         final SelectTimestampQuery query = SelectTimestampQuery.newBuilder()

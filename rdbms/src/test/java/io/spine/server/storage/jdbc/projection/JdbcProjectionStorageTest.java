@@ -29,6 +29,7 @@ import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.GivenDataSource;
 import io.spine.server.storage.jdbc.StorageBuilder;
 import io.spine.server.storage.jdbc.TypeMapping;
+import io.spine.server.storage.jdbc.projection.given.JdbcProjectionStorageTestEnv.TestEntity;
 import io.spine.server.storage.jdbc.record.JdbcRecordStorage;
 import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
 import io.spine.test.Tests;
@@ -44,7 +45,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 /**
  * @author Alexander Litus
  */
-public class JdbcProjectionStorageShould extends ProjectionStorageTest {
+@SuppressWarnings("DuplicateStringLiteralInspection") // Common test display names.
+@DisplayName("JdbcProjectionStorage should")
+class JdbcProjectionStorageTest extends ProjectionStorageTest {
 
     @Override
     protected ProjectionStorage<ProjectId> newStorage(Class<? extends Entity> entityClass) {
@@ -74,16 +77,16 @@ public class JdbcProjectionStorageShould extends ProjectionStorageTest {
     }
 
     @Test
-    @DisplayName("throw exception when closing twice")
-    void throwExceptionWhenClosingTwice() throws Exception {
+    @DisplayName("throw ISE when closing twice")
+    void throwOnClosingTwice() throws Exception {
         final ProjectionStorage<?> storage = getStorage();
         storage.close();
         assertThrows(IllegalStateException.class, storage::close);
     }
 
     @Test
-    @DisplayName("accept datasource in builder event though not uses it")
-    void acceptDatasourceInBuilderEventThoughNotUsesIt() {
+    @DisplayName("accept datasource in builder even though it is not used")
+    void acceptDatasourceInBuilder() {
         final StorageBuilder<?, ?> builder =
                 JdbcProjectionStorage.newBuilder()
                                      .setDataSource(GivenDataSource.withoutSuperpowers());
@@ -91,8 +94,8 @@ public class JdbcProjectionStorageShould extends ProjectionStorageTest {
     }
 
     @Test
-    @DisplayName("require non null projection class")
-    void requireNonNullProjectionClass() {
+    @DisplayName("require non-null projection class")
+    void rejectNullProjectionClass() {
         final Class<? extends Projection<Object, ?, ?>> nullClass = nullRef();
         assertThrows(NullPointerException.class,
                      () -> JdbcProjectionStorage.newBuilder()
@@ -100,8 +103,8 @@ public class JdbcProjectionStorageShould extends ProjectionStorageTest {
     }
 
     @Test
-    @DisplayName("require non null record storage")
-    void requireNonNullRecordStorage() {
+    @DisplayName("require non-null record storage")
+    void rejectNullRecordStorage() {
         final JdbcRecordStorage<Object> nullStorage = Tests.nullRef();
         assertThrows(NullPointerException.class,
                      () -> JdbcProjectionStorage.newBuilder()
@@ -111,11 +114,5 @@ public class JdbcProjectionStorageShould extends ProjectionStorageTest {
     @Override
     protected Class<? extends TestCounterEntity> getTestEntityClass() {
         return TestEntity.class;
-    }
-
-    private static class TestEntity extends TestCounterEntity<ProjectId> {
-        protected TestEntity(ProjectId id) {
-            super(id);
-        }
     }
 }
