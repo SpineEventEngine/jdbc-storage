@@ -18,10 +18,10 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-final def JDBC_VERSION = '0.10.45-SNAPSHOT'
+final def SPINE_VERSION = '0.10.45-SNAPSHOT'
 
 ext {
-    versionToPublish = JDBC_VERSION
+    spineVersion = SPINE_VERSION
     baseVersion = '0.10.45-SNAPSHOT'
     coreVersion = '0.10.45-SNAPSHOT'
 }
