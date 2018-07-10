@@ -22,7 +22,10 @@
  * Test environment classes for tests of the {@link io.spine.server.storage.jdbc.aggregate} package.
  */
 
+@CheckReturnValue
 @ParametersAreNonnullByDefault
 package io.spine.server.storage.jdbc.aggregate.given;
+
+import com.google.errorprone.annotations.CheckReturnValue;
 
 import javax.annotation.ParametersAreNonnullByDefault;
