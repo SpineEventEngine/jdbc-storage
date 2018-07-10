@@ -25,6 +25,10 @@ import io.spine.test.aggregate.Project;
 import io.spine.test.aggregate.ProjectId;
 import io.spine.test.aggregate.ProjectVBuilder;
 
+/**
+ * @author Dmytro Dashenkov
+ * @author Dmytro Kuzmin
+ */
 public class JdbcAggregateStorageVisibilityHandlingTestEnv {
 
     /** Prevents instantiation of this utility class. */
