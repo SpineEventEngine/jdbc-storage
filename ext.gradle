@@ -21,11 +21,7 @@
 final def JDBC_VERSION = '0.10.45-SNAPSHOT'
 
 ext {
-    jdbcVersion = JDBC_VERSION
+    versionToPublish = JDBC_VERSION
+    baseVersion = '0.10.45-SNAPSHOT'
     coreVersion = '0.10.45-SNAPSHOT'
-    guavaVersion = '25.1-jre'
-
-    // Versions of libraries for working with JDBC.
-    hikariVersion = '2.4.3'
-    querydslVersion = '4.1.4'
 }
