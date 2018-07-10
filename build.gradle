@@ -63,10 +63,17 @@ subprojects {
         implementation deps.build.jsr305Annotations
         implementation deps.build.slf4j
 
-        testImplementation deps.test.junit4
+        testImplementation deps.test.junit5Api
+        testImplementation deps.test.junit5Runner
         testImplementation deps.test.hamcrest
         testImplementation deps.test.mockito
         testImplementation deps.test.guavaTestlib
+    }
+
+    test {
+        useJUnitPlatform {
+            includeEngines 'junit-jupiter'
+        }
     }
 
     jacocoTestReport {
