@@ -21,6 +21,7 @@
 package io.spine.server.storage.jdbc;
 
 import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
 
 import static io.spine.test.Tests.assertHasPrivateParameterlessCtor;
 import static org.junit.Assert.assertEquals;
@@ -31,13 +32,15 @@ import static org.junit.Assert.assertEquals;
 public class SqlShould {
 
     @Test
-    public void have_private_constructor() {
+    @DisplayName("have private constructor")
+    void havePrivateConstructor() {
         assertHasPrivateParameterlessCtor(Sql.class);
     }
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     @Test
-    public void provide_valid_sql_tokens() {
+    @DisplayName("provide valid sql tokens")
+    void provideValidSqlTokens() {
         final String createTableExpected = "CREATE TABLE";
         final String createTableActual = Sql.Query.CREATE_TABLE.toString()
                                                                .trim();
@@ -50,7 +53,8 @@ public class SqlShould {
     }
 
     @Test
-    public void provide_tokens_wrapped_into_whitespace() {
+    @DisplayName("provide tokens wrapped into whitespace")
+    void provideTokensWrappedIntoWhitespace() {
         final String sumExpected = " SUM ";
         final String sumActual = Sql.Function.SUM.toString();
         assertEquals(sumExpected, sumActual);

@@ -22,6 +22,7 @@ package io.spine.server.storage.jdbc;
 
 import io.spine.type.TypeName;
 import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
 
 import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
 import static org.junit.Assert.assertEquals;
@@ -32,7 +33,8 @@ import static org.junit.Assert.assertEquals;
 public class TypeMappingBuilderShould {
 
     @Test
-    public void override_type_names() {
+    @DisplayName("override type names")
+    void overrideTypeNames() {
         final Type type = BYTE_ARRAY;
         final String originalName = "original";
         final String nameReplacement = "replacement";
@@ -45,13 +47,15 @@ public class TypeMappingBuilderShould {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void not_allow_empty_type_names() {
+    @DisplayName("not allow empty type names")
+    void notAllowEmptyTypeNames() {
         final TypeMappingBuilder builder = TypeMappingBuilder.basicBuilder();
         builder.add(BYTE_ARRAY, "");
     }
 
     @Test(expected = IllegalStateException.class)
-    public void throw_exception_if_not_all_types_mapped() {
+    @DisplayName("throw exception if not all types mapped")
+    void throwExceptionIfNotAllTypesMapped() {
         final TypeMappingBuilder builder = new TypeMappingBuilder();
         builder.build();
     }

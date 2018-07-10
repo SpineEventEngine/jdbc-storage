@@ -33,6 +33,7 @@ import io.spine.test.storage.Project;
 import io.spine.test.storage.ProjectVBuilder;
 import io.spine.validate.StringValueVBuilder;
 import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
 
 import javax.sql.DataSource;
 
@@ -60,7 +61,8 @@ public class JdbcStorageFactoryShould {
                                                             .build();
 
     @Test
-    public void allow_to_use_custom_data_source() {
+    @DisplayName("allow to use custom data source")
+    void allowToUseCustomDataSource() {
         final JdbcStorageFactory factory = JdbcStorageFactory.newBuilder()
                                                              .setDataSource(mock(DataSource.class))
                                                              .setTypeMapping(MYSQL_5_7)
@@ -70,21 +72,24 @@ public class JdbcStorageFactoryShould {
     }
 
     @Test
-    public void create_multitenant_record_storage() {
+    @DisplayName("create multitenant record storage")
+    void createMultitenantRecordStorage() {
         final JdbcStorageFactory factory = newFactory(true);
         final RecordStorage<String> storage = factory.createRecordStorage(TestEntity.class);
         assertTrue(storage.isMultitenant());
     }
 
     @Test
-    public void create_singletenant_record_storage() {
+    @DisplayName("create singletenant record storage")
+    void createSingletenantRecordStorage() {
         final JdbcStorageFactory factory = newFactory(false);
         final RecordStorage<String> storage = factory.createRecordStorage(TestEntity.class);
         assertFalse(storage.isMultitenant());
     }
 
     @Test
-    public void create_multitenant_aggregate_storage() {
+    @DisplayName("create multitenant aggregate storage")
+    void createMultitenantAggregateStorage() {
         final JdbcStorageFactory factory = newFactory(true);
         final AggregateStorage<String> storage =
                 factory.createAggregateStorage(TestAggregate.class);
@@ -92,7 +97,8 @@ public class JdbcStorageFactoryShould {
     }
 
     @Test
-    public void create_singletenant_aggregate_storage() {
+    @DisplayName("create singletenant aggregate storage")
+    void createSingletenantAggregateStorage() {
         final JdbcStorageFactory factory = newFactory(false);
         final AggregateStorage<String> storage =
                 factory.createAggregateStorage(TestAggregate.class);
@@ -100,7 +106,8 @@ public class JdbcStorageFactoryShould {
     }
 
     @Test
-    public void create_multitenant_projection_storage() {
+    @DisplayName("create multitenant projection storage")
+    void createMultitenantProjectionStorage() {
         final JdbcStorageFactory factory = newFactory(true);
         final ProjectionStorage<String> storage =
                 factory.createProjectionStorage(TestProjection.class);
@@ -108,7 +115,8 @@ public class JdbcStorageFactoryShould {
     }
 
     @Test
-    public void create_singletenant_projection_storage() {
+    @DisplayName("create singletenant projection storage")
+    void createSingletenantProjectionStorage() {
         final JdbcStorageFactory factory = newFactory(false);
         final ProjectionStorage<String> storage =
                 factory.createProjectionStorage(TestProjection.class);
@@ -116,21 +124,24 @@ public class JdbcStorageFactoryShould {
     }
 
     @Test
-    public void create_multitenant_stand_storage() {
+    @DisplayName("create multitenant stand storage")
+    void createMultitenantStandStorage() {
         final JdbcStorageFactory factory = newFactory(true);
         final StandStorage storage = factory.createStandStorage();
         assertTrue(storage.isMultitenant());
     }
 
     @Test
-    public void create_singletenant_stand_storage() {
+    @DisplayName("create singletenant stand storage")
+    void createSingletenantStandStorage() {
         final JdbcStorageFactory factory = newFactory(false);
         final StandStorage storage = factory.createStandStorage();
         assertFalse(storage.isMultitenant());
     }
 
     @Test
-    public void close_datastore_on_close() {
+    @DisplayName("close datastore on close")
+    void closeDatastoreOnClose() {
         final DataSourceWrapper mock = GivenDataSource.withoutSuperpowers();
         final JdbcStorageFactory factory = JdbcStorageFactory.newBuilder()
                                                              .setDataSource(mock)
@@ -142,7 +153,8 @@ public class JdbcStorageFactoryShould {
     }
 
     @Test
-    public void have_default_column_type_registry() {
+    @DisplayName("have default column type registry")
+    void haveDefaultColumnTypeRegistry() {
         final DataSourceWrapper dataSource = GivenDataSource.withoutSuperpowers();
         final JdbcStorageFactory factory = JdbcStorageFactory.newBuilder()
                                                              .setDataSource(dataSource)
@@ -153,7 +165,8 @@ public class JdbcStorageFactoryShould {
     }
 
     @Test
-    public void generate_single_tenant_view() {
+    @DisplayName("generate single tenant view")
+    void generateSingleTenantView() {
         final DataSourceWrapper dataSource = GivenDataSource.withoutSuperpowers();
         final JdbcStorageFactory factory = JdbcStorageFactory.newBuilder()
                                                              .setMultitenant(true)
@@ -166,7 +179,8 @@ public class JdbcStorageFactoryShould {
     }
 
     @Test
-    public void use_self_as_single_tenant_view() {
+    @DisplayName("use self as single tenant view")
+    void useSelfAsSingleTenantView() {
         final DataSourceWrapper dataSource = GivenDataSource.withoutSuperpowers();
         final JdbcStorageFactory factory = JdbcStorageFactory.newBuilder()
                                                              .setMultitenant(false)
@@ -177,7 +191,8 @@ public class JdbcStorageFactoryShould {
     }
 
     @Test
-    public void use_MySQL_mapping_by_default() {
+    @DisplayName("use MySQL mapping by default")
+    void useMySQLMappingByDefault() {
         final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(newUuid());
         final JdbcStorageFactory factory = JdbcStorageFactory.newBuilder()
                                                              .setMultitenant(false)

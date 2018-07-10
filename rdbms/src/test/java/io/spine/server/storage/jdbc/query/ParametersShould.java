@@ -21,6 +21,7 @@
 package io.spine.server.storage.jdbc.query;
 
 import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
 
 import java.util.Set;
 
@@ -35,14 +36,16 @@ public class ParametersShould {
     private static final Parameter PARAMETER = Parameter.of(new Object());
 
     @Test(expected = IllegalArgumentException.class)
-    public void check_identifiers_uniqueness_for_single_parameter() {
+    @DisplayName("check identifiers uniqueness for single parameter")
+    void checkIdentifiersUniquenessForSingleParameter() {
         Parameters.newBuilder()
                   .addParameter(ID, PARAMETER)
                   .addParameter(ID, PARAMETER);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void check_identifiers_uniqueness_for_multiple_parameters() {
+    @DisplayName("check identifiers uniqueness for multiple parameters")
+    void checkIdentifiersUniquenessForMultipleParameters() {
         final Parameters.Builder commonParameters = Parameters.newBuilder()
                                                               .addParameter(ID, PARAMETER);
         final Parameters buildedCommonParameters = commonParameters.build();
@@ -50,7 +53,8 @@ public class ParametersShould {
     }
 
     @Test(expected = UnsupportedOperationException.class)
-    public void not_allow_modify_identifiers() {
+    @DisplayName("not allow modify identifiers")
+    void notAllowModifyIdentifiers() {
         final Parameters parameters = Parameters.empty();
         final Set<String> identifiers = parameters.getIdentifiers();
         final String newIdentifier = newUuid();

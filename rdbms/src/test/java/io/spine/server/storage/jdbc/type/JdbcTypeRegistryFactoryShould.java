@@ -26,6 +26,7 @@ import io.spine.server.entity.storage.EntityColumn;
 import io.spine.server.storage.jdbc.Type;
 import io.spine.server.storage.jdbc.query.Parameters;
 import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
 
 import static io.spine.test.Tests.assertHasPrivateParameterlessCtor;
 import static org.junit.Assert.assertEquals;
@@ -39,12 +40,14 @@ import static org.mockito.Mockito.when;
 public class JdbcTypeRegistryFactoryShould {
 
     @Test
-    public void have_private_util_ctor() {
+    @DisplayName("have private util ctor")
+    void havePrivateUtilCtor() {
         assertHasPrivateParameterlessCtor(JdbcTypeRegistryFactory.class);
     }
 
     @Test
-    public void provide_default_type_registry_for_required_types() {
+    @DisplayName("provide default type registry for required types")
+    void provideDefaultTypeRegistryForRequiredTypes() {
         final ColumnTypeRegistry<?> registry = JdbcTypeRegistryFactory.defaultInstance();
         assertNotNull(registry);
         assertNotNull(registry.get(columnWithType(Version.class)));
@@ -52,7 +55,8 @@ public class JdbcTypeRegistryFactoryShould {
     }
 
     @Test
-    public void provide_builder_for_extending_defaults() {
+    @DisplayName("provide builder for extending defaults")
+    void provideBuilderForExtendingDefaults() {
         final ColumnTypeRegistry<?> registry =
                 JdbcTypeRegistryFactory.predefinedValuesAnd()
                                        .put(String.class, CustomType.INSTANCE)

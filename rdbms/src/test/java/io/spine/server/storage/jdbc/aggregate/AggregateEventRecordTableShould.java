@@ -27,6 +27,7 @@ import io.spine.server.aggregate.Snapshot;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.validate.StringValueVBuilder;
 import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
 
 import static com.querydsl.core.types.ExpressionUtils.path;
 import static io.spine.base.Identifier.newUuid;
@@ -44,14 +45,16 @@ import static org.junit.Assert.assertEquals;
 public class AggregateEventRecordTableShould {
 
     @Test(expected = IllegalStateException.class)
-    public void throw_on_attempt_to_update_event_record() {
+    @DisplayName("throw on attempt to update event record")
+    void throwOnAttemptToUpdateEventRecord() {
         final AggregateEventRecordTable<String> table =
                 new AggregateEventRecordTable<>(AnAggregate.class, withoutSuperpowers(), MYSQL_5_7);
         table.update(newUuid(), AggregateEventRecord.getDefaultInstance());
     }
 
     @Test
-    public void store_record_kind_in_string_representation() {
+    @DisplayName("store record kind in string representation")
+    void storeRecordKindInStringRepresentation() {
         final DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
         final AggregateEventRecordTable<String> table =
                 new AggregateEventRecordTable<>(AnAggregate.class, dataSource, MYSQL_5_7);

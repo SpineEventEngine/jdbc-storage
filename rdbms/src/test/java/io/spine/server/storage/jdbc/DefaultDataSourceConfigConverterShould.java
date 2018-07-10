@@ -24,6 +24,7 @@ import com.google.common.testing.NullPointerTester;
 import io.spine.server.storage.jdbc.DataSourceConfig;
 import io.spine.server.storage.jdbc.DefaultDataSourceConfigConverter;
 import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
 
 import static io.spine.test.Tests.assertHasPrivateParameterlessCtor;
 import static org.mockito.Mockito.mock;
@@ -34,12 +35,14 @@ import static org.mockito.Mockito.mock;
 public class DefaultDataSourceConfigConverterShould {
 
     @Test
-    public void have_private_utility_constructor() {
+    @DisplayName("have private utility constructor")
+    void havePrivateUtilityConstructor() {
         assertHasPrivateParameterlessCtor(DefaultDataSourceConfigConverter.class);
     }
 
     @Test
-    public void pass_null_tolerance_test() {
+    @DisplayName("pass null tolerance test")
+    void passNullToleranceTest() {
         final NullPointerTester tester = new NullPointerTester();
         tester.setDefault(DataSourceConfig.class, mock(DataSourceConfig.class));
         tester.testStaticMethods(DefaultDataSourceConfigConverter.class,

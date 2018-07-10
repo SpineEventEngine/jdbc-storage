@@ -24,6 +24,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.testing.NullPointerTester;
 import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -42,12 +43,14 @@ import static org.junit.Assert.assertTrue;
 public class CloseablesShould {
 
     @Test
-    public void have_private_constructor() {
+    @DisplayName("have private constructor")
+    void havePrivateConstructor() {
         assertHasPrivateParameterlessCtor(Closeables.class);
     }
 
     @Test
-    public void pass_null_tolerance_check() {
+    @DisplayName("pass null tolerance check")
+    void passNullToleranceCheck() {
         new NullPointerTester()
                 .testAllPublicStaticMethods(Closeables.class);
     }
@@ -55,7 +58,8 @@ public class CloseablesShould {
     @SuppressWarnings("MethodWithMultipleLoops")
     // Two loops - one for data set up and one for checks
     @Test
-    public void close_all_passed_instances() {
+    @DisplayName("close all passed instances")
+    void closeAllPassedInstances() {
         final int count = 10;
         final Set<StatefulClosable> closeables = new HashSet<>(count);
         for (int i = 0; i < count; i++) {
@@ -70,13 +74,15 @@ public class CloseablesShould {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void throw_Illegal_state_on_failure() {
+    @DisplayName("throw Illegal state on failure")
+    void throwIllegalStateOnFailure() {
         final AutoCloseable closeable = new FaultyClosable();
         Closeables.closeAll(singleton(closeable));
     }
 
     @Test
-    public void try_to_close_all_instances() {
+    @DisplayName("try to close all instances")
+    void tryToCloseAllInstances() {
         final AutoCloseable faulty = new FaultyClosable();
         final StatefulClosable stateful = new StatefulClosable();
 
@@ -95,7 +101,8 @@ public class CloseablesShould {
     }
 
     @Test
-    public void throw_exception_with_aggregating_cause_upon_multiple_failures() {
+    @DisplayName("throw exception with aggregating cause upon multiple failures")
+    void throwExceptionWithAggregatingCauseUponMultipleFailures() {
         final Collection<AutoCloseable> closeables =
                 Sets.<AutoCloseable>newHashSet(new FaultyClosable(),
                                                new FaultyClosable());

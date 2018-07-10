@@ -29,6 +29,7 @@ import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.query.given.Given.AStorageQuery;
 import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -56,7 +57,8 @@ public class AbstractQueryShould {
                                                              .build();
 
     @Test
-    public void close_connection() throws SQLException {
+    @DisplayName("close connection")
+    void closeConnection() throws SQLException {
         final Configuration configuration = query.factory()
                                                  .getConfiguration();
         final SQLListenerContext context = mock(SQLListenerContext.class);
@@ -75,7 +77,8 @@ public class AbstractQueryShould {
      * a JDBC implementation.
      */
     @Test
-    public void set_hold_cursors_over_commit_for_connection() throws SQLException {
+    @DisplayName("set hold cursors over commit for connection")
+    void setHoldCursorsOverCommitForConnection() throws SQLException {
         final DataSourceWrapper dataSourceSpy = spy(dataSource);
         final ConnectionWrapper connectionWrapper = spy(dataSourceSpy.getConnection(true));
         final Connection connection = spy(connectionWrapper.get());
@@ -92,7 +95,8 @@ public class AbstractQueryShould {
     }
 
     @Test(expected = DatabaseException.class)
-    public void handle_sql_exception_on_transaction_rollback() throws SQLException {
+    @DisplayName("handle sql exception on transaction rollback")
+    void handleSqlExceptionOnTransactionRollback() throws SQLException {
         final Configuration configuration = query.factory()
                                                  .getConfiguration();
         final SQLListenerContext context = mock(SQLListenerContext.class);
@@ -106,7 +110,8 @@ public class AbstractQueryShould {
     }
 
     @Test(expected = DatabaseException.class)
-    public void handle_sql_exception_on_transaction_commit() throws SQLException {
+    @DisplayName("handle sql exception on transaction commit")
+    void handleSqlExceptionOnTransactionCommit() throws SQLException {
         final Configuration configuration = query.factory()
                                                  .getConfiguration();
         final SQLListenerContext context = mock(SQLListenerContext.class);

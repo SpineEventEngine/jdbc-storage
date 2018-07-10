@@ -21,6 +21,7 @@
 package io.spine.server.storage.jdbc.record;
 
 import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
 
 import static io.spine.test.Tests.assertHasPrivateParameterlessCtor;
 
@@ -30,7 +31,8 @@ import static io.spine.test.Tests.assertHasPrivateParameterlessCtor;
 public class QueryResultsShould {
 
     @Test
-    public void have_private_utility_constructor() {
+    @DisplayName("have private utility constructor")
+    void havePrivateUtilityConstructor() {
         assertHasPrivateParameterlessCtor(QueryResults.class);
     }
 

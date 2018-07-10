@@ -41,6 +41,7 @@ import io.spine.server.storage.jdbc.stand.given.Given;
 import io.spine.test.commandservice.customer.Customer;
 import io.spine.test.storage.Project;
 import io.spine.type.TypeUrl;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.sql.PreparedStatement;
@@ -95,7 +96,8 @@ public class JdbcStandStorageShould extends StandStorageTest {
 
     @SuppressWarnings("unchecked") // For mocks
     @Test
-    public void initialize_properly_with_all_builder_fields() {
+    @DisplayName("initialize properly with all builder fields")
+    void initializeProperlyWithAllBuilderFields() {
         final DataSourceWrapper dataSourceMock = mock(DataSourceWrapper.class);
         final ConnectionWrapper connectionMock = mock(ConnectionWrapper.class);
         final PreparedStatement statementMock = mock(PreparedStatement.class);
@@ -116,7 +118,8 @@ public class JdbcStandStorageShould extends StandStorageTest {
 
     @SuppressWarnings("unchecked") // For mocks
     @Test
-    public void initialize_properly_without_multitenancy() {
+    @DisplayName("initialize properly without multitenancy")
+    void initializeProperlyWithoutMultitenancy() {
         final DataSourceWrapper dataSourceMock = mock(DataSourceWrapper.class);
         final ConnectionWrapper connectionMock = mock(ConnectionWrapper.class);
         final PreparedStatement statementMock = mock(PreparedStatement.class);
@@ -134,13 +137,15 @@ public class JdbcStandStorageShould extends StandStorageTest {
     }
 
     @Test
-    public void fail_to_initialize_with_empty_builder() {
+    @DisplayName("fail to initialize with empty builder")
+    void failToInitializeWithEmptyBuilder() {
         assertThrows(IllegalStateException.class, () -> JdbcStandStorage.newBuilder()
                                                                         .build());
     }
 
     @Test
-    public void fail_to_initialize_without_data_source() {
+    @DisplayName("fail to initialize without data source")
+    void failToInitializeWithoutDataSource() {
         assertThrows(IllegalStateException.class, () -> JdbcStandStorage.newBuilder()
                                                                         .setMultitenant(false)
                                                                         .build());
@@ -152,7 +157,8 @@ public class JdbcStandStorageShould extends StandStorageTest {
      */
 
     @Test
-    public void write_data_to_store() {
+    @DisplayName("write data to store")
+    void writeDataToStore() {
         final StandStorage storage = getStorage();
 
         final TestAggregate aggregate = new TestAggregate("some_id");
@@ -170,7 +176,8 @@ public class JdbcStandStorageShould extends StandStorageTest {
     }
 
     @Test
-    public void perform_bulk_read_operations() {
+    @DisplayName("perform bulk read operations")
+    void performBulkReadOperations() {
         final StandStorage storage = getStorage();
 
         final Collection<Given.TestAggregate> testData = testAggregates(10);
@@ -200,7 +207,8 @@ public class JdbcStandStorageShould extends StandStorageTest {
     }
 
     @Test
-    public void handle_wrong_ids_silently() {
+    @DisplayName("handle wrong ids silently")
+    void handleWrongIdsSilently() {
         final StandStorage storage = getStorage();
 
         final TypeUrl typeUrl = TypeUrl.of(Project.class);
@@ -219,7 +227,8 @@ public class JdbcStandStorageShould extends StandStorageTest {
 
     @SuppressWarnings("MethodWithMultipleLoops")
     @Test
-    public void read_all_from_database() {
+    @DisplayName("read all from database")
+    void readAllFromDatabase() {
         final StandStorage storage = getStorage();
 
         final Collection<Given.TestAggregate> testData = testAggregates(10);
@@ -240,7 +249,8 @@ public class JdbcStandStorageShould extends StandStorageTest {
     }
 
     @Test
-    public void read_all_by_type_url() {
+    @DisplayName("read all by type url")
+    void readAllByTypeUrl() {
         final StandStorage storage = getStorage();
 
         final int aggregatesCount = 5;
@@ -268,7 +278,8 @@ public class JdbcStandStorageShould extends StandStorageTest {
 
     @SuppressWarnings("MethodWithMultipleLoops")
     @Test
-    public void read_by_type_and_apply_field_mask() {
+    @DisplayName("read by type and apply field mask")
+    void readByTypeAndApplyFieldMask() {
         final StandStorage storage = getStorage();
 
         final List<Given.TestAggregate> aggregates = testAggregatesWithState(5);
@@ -300,7 +311,8 @@ public class JdbcStandStorageShould extends StandStorageTest {
      */
 
     @Test
-    public void be_auto_closable() throws Exception {
+    @DisplayName("be auto closable")
+    void beAutoClosable() throws Exception {
         try (StandStorage storage = getStorage()) {
             assertTrue(storage.isOpen());
             assertFalse(storage.isClosed());
@@ -308,7 +320,8 @@ public class JdbcStandStorageShould extends StandStorageTest {
     }
 
     @Test
-    public void fail_to_write_data_after_closed() throws Exception {
+    @DisplayName("fail to write data after closed")
+    void failToWriteDataAfterClosed() throws Exception {
         final StandStorage storage = getStorage();
 
         assertTrue(storage.isOpen());
@@ -320,7 +333,8 @@ public class JdbcStandStorageShould extends StandStorageTest {
     }
 
     @Test
-    public void fail_to_read_data_after_closed() throws Exception {
+    @DisplayName("fail to read data after closed")
+    void failToReadDataAfterClosed() throws Exception {
         final StandStorage storage = getStorage();
 
         assertTrue(storage.isOpen());

@@ -24,6 +24,7 @@ import com.google.common.testing.NullPointerTester;
 import com.google.protobuf.StringValue;
 import io.spine.server.entity.AbstractEntity;
 import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
 
 import static io.spine.server.storage.jdbc.query.DbTableNameFactory.newTableName;
 import static io.spine.test.Tests.assertHasPrivateParameterlessCtor;
@@ -38,25 +39,29 @@ public class DbTableNameFactoryShould {
     private final Class<TestEntity> entityClass = TestEntity.class;
 
     @Test
-    public void have_private_utility_constructor() {
+    @DisplayName("have private utility constructor")
+    void havePrivateUtilityConstructor() {
         assertHasPrivateParameterlessCtor(DbTableNameFactory.class);
     }
 
     @Test
-    public void pass_null_tolerance_check() {
+    @DisplayName("pass null tolerance check")
+    void passNullToleranceCheck() {
         final NullPointerTester tester = new NullPointerTester();
         tester.testStaticMethods(DbTableNameFactory.class, NullPointerTester.Visibility.PACKAGE);
     }
 
     @Test
-    public void return_table_name_which_starts_with_entity_class_name() {
+    @DisplayName("return table name which starts with entity class name")
+    void returnTableNameWhichStartsWithEntityClassName() {
         final String tableName = newTableName(entityClass);
         final String className = entityClass.getSimpleName();
         assertTrue(tableName.startsWith(className));
     }
 
     @Test
-    public void produce_same_name_for_same_class() {
+    @DisplayName("produce same name for same class")
+    void produceSameNameForSameClass() {
         assertEquals(newTableName(entityClass), newTableName(entityClass));
     }
 

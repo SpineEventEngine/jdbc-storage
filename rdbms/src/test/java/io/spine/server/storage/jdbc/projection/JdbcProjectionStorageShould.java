@@ -33,6 +33,7 @@ import io.spine.server.storage.jdbc.record.JdbcRecordStorage;
 import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
 import io.spine.test.Tests;
 import io.spine.test.storage.ProjectId;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
@@ -73,14 +74,16 @@ public class JdbcProjectionStorageShould extends ProjectionStorageTest {
     }
 
     @Test
-    public void throw_exception_when_closing_twice() throws Exception {
+    @DisplayName("throw exception when closing twice")
+    void throwExceptionWhenClosingTwice() throws Exception {
         final ProjectionStorage<?> storage = getStorage();
         storage.close();
         assertThrows(IllegalStateException.class, storage::close);
     }
 
     @Test
-    public void accept_datasource_in_builder_event_though_not_uses_it() {
+    @DisplayName("accept datasource in builder event though not uses it")
+    void acceptDatasourceInBuilderEventThoughNotUsesIt() {
         final StorageBuilder<?, ?> builder =
                 JdbcProjectionStorage.newBuilder()
                                      .setDataSource(GivenDataSource.withoutSuperpowers());
@@ -88,7 +91,8 @@ public class JdbcProjectionStorageShould extends ProjectionStorageTest {
     }
 
     @Test
-    public void require_non_null_projection_class() {
+    @DisplayName("require non null projection class")
+    void requireNonNullProjectionClass() {
         final Class<? extends Projection<Object, ?, ?>> nullClass = nullRef();
         assertThrows(NullPointerException.class,
                      () -> JdbcProjectionStorage.newBuilder()
@@ -96,7 +100,8 @@ public class JdbcProjectionStorageShould extends ProjectionStorageTest {
     }
 
     @Test
-    public void require_non_null_record_storage() {
+    @DisplayName("require non null record storage")
+    void requireNonNullRecordStorage() {
         final JdbcRecordStorage<Object> nullStorage = Tests.nullRef();
         assertThrows(NullPointerException.class,
                      () -> JdbcProjectionStorage.newBuilder()

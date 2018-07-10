@@ -28,6 +28,7 @@ import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.query.given.Given.ASelectMessageByIdQuery;
 import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -50,7 +51,8 @@ public class SelectMessageByIdQueryShould {
     private final ASelectMessageByIdQuery.Builder builder = selectMessageBuilder();
 
     @Test
-    public void close_result_set() throws SQLException {
+    @DisplayName("close result set")
+    void closeResultSet() throws SQLException {
         final SQLQuery underlyingQuery = mock(SQLQuery.class);
         final ResultSet resultSet = mock(ResultSet.class);
 
@@ -68,7 +70,8 @@ public class SelectMessageByIdQueryShould {
     }
 
     @Test(expected = DatabaseException.class)
-    public void handle_sql_exception() throws SQLException {
+    @DisplayName("handle sql exception")
+    void handleSqlException() throws SQLException {
         final SQLQuery underlyingQuery = mock(SQLQuery.class);
         final ResultSet resultSet = mock(ResultSet.class);
 
@@ -87,7 +90,8 @@ public class SelectMessageByIdQueryShould {
     }
 
     @Test
-    public void return_null_on_deserialization_if_column_is_null() throws SQLException {
+    @DisplayName("return null on deserialization if column is null")
+    void returnNullOnDeserializationIfColumnIsNull() throws SQLException {
         final ResultSet resultSet = mock(ResultSet.class);
         final DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
         final Descriptors.Descriptor messageDescriptor = StringValue.getDescriptor();

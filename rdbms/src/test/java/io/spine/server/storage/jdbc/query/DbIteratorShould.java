@@ -22,6 +22,7 @@ package io.spine.server.storage.jdbc.query;
 
 import io.spine.server.storage.jdbc.DatabaseException;
 import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.mockito.InOrder;
 
 import java.sql.Connection;
@@ -49,19 +50,22 @@ public class DbIteratorShould {
     private static final byte[] EMPTY_BYTES = new byte[0];
 
     @Test(expected = DatabaseException.class)
-    public void throw_DatabaseException_on_next_check_failure() {
+    @DisplayName("throw DatabaseException on next check failure")
+    void throwDatabaseExceptionOnNextCheckFailure() {
         final DbIterator iterator = faultyResultIterator();
         iterator.hasNext();
     }
 
     @Test(expected = DatabaseException.class)
-    public void throw_DatabaseException_on_close_failure() {
+    @DisplayName("throw DatabaseException on close failure")
+    void throwDatabaseExceptionOnCloseFailure() {
         final DbIterator iterator = faultyResultIterator();
         iterator.close();
     }
 
     @Test(expected = DatabaseException.class)
-    public void throw_DatabaseException_on_read_failure() {
+    @DisplayName("throw DatabaseException on read failure")
+    void throwDatabaseExceptionOnReadFailure() {
         final DbIterator iterator = sneakyResultIterator();
         if (iterator.hasNext()) {
             iterator.next();
@@ -69,13 +73,15 @@ public class DbIteratorShould {
     }
 
     @Test
-    public void allow_next_without_hasNext() {
+    @DisplayName("allow next without hasNext")
+    void allowNextWithoutHasNext() {
         final DbIterator iterator = nonEmptyIterator();
         iterator.next();
     }
 
     @Test
-    public void close_ResultSet() throws SQLException {
+    @DisplayName("close ResultSet")
+    void closeResultSet() throws SQLException {
         final DbIterator iterator = nonEmptyIterator();
         final ResultSet resultSet = iterator.getResultSet();
 
@@ -86,7 +92,8 @@ public class DbIteratorShould {
     }
 
     @Test
-    public void close_ResultSet_if_no_more_elements_to_iterate() throws SQLException {
+    @DisplayName("close ResultSet if no more elements to iterate")
+    void closeResultSetIfNoMoreElementsToIterate() throws SQLException {
         final DbIterator iterator = emptyIterator();
         final ResultSet resultSet = iterator.getResultSet();
 
@@ -97,13 +104,15 @@ public class DbIteratorShould {
     }
 
     @Test(expected = UnsupportedOperationException.class)
-    public void not_support_removal() {
+    @DisplayName("not support removal")
+    void notSupportRemoval() {
         final DbIterator iterator = emptyIterator();
         iterator.remove();
     }
 
     @Test(expected = NoSuchElementException.class)
-    public void throw_if_trying_to_get_absent_element() {
+    @DisplayName("throw if trying to get absent element")
+    void throwIfTryingToGetAbsentElement() {
         final DbIterator iterator = emptyIterator();
 
         // Ignore that the element is absent
@@ -114,7 +123,8 @@ public class DbIteratorShould {
     }
 
     @Test
-    public void check_if_result_set_closed() throws SQLException {
+    @DisplayName("check if result set closed")
+    void checkIfResultSetClosed() throws SQLException {
         final DbIterator iterator = emptyIterator();
         iterator.close();
 
@@ -124,7 +134,8 @@ public class DbIteratorShould {
     }
 
     @Test
-    public void obtain_statement_before_result_set_closed() throws SQLException {
+    @DisplayName("obtain statement before result set closed")
+    void obtainStatementBeforeResultSetClosed() throws SQLException {
         final DbIterator iterator = emptyIterator();
         iterator.close();
 
@@ -137,7 +148,8 @@ public class DbIteratorShould {
     }
 
     @Test
-    public void obtain_connection_before_statement_closed() throws SQLException {
+    @DisplayName("obtain connection before statement closed")
+    void obtainConnectionBeforeStatementClosed() throws SQLException {
         final DbIterator iterator = emptyIterator();
         iterator.close();
 

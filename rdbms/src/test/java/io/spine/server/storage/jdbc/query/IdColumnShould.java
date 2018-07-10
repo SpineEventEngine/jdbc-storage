@@ -25,6 +25,7 @@ import com.google.protobuf.StringValue;
 import io.spine.server.entity.AbstractEntity;
 import io.spine.test.entity.ProjectId;
 import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
 
 import static io.spine.server.storage.jdbc.Type.LONG;
 import static io.spine.server.storage.jdbc.Type.INT;
@@ -41,35 +42,40 @@ public class IdColumnShould {
     private static final String ID = "id";
 
     @Test
-    public void have_bigint_impl() {
+    @DisplayName("have bigint impl")
+    void haveBigintImpl() {
         final IdColumn<?> column = IdColumn.newInstance(LongIdEntity.class, ID);
         assertEquals(LONG, column.getSqlType());
         assertSame(Long.class, column.getJavaType());
     }
 
     @Test
-    public void have_int_impl() {
+    @DisplayName("have int impl")
+    void haveIntImpl() {
         final IdColumn<?> column = IdColumn.newInstance(IntIdEntity.class, ID);
         assertEquals(INT, column.getSqlType());
         assertSame(Integer.class, column.getJavaType());
     }
 
     @Test
-    public void have_varchar255_impl() {
+    @DisplayName("have varchar255 impl")
+    void haveVarchar255Impl() {
         final IdColumn<?> column = IdColumn.newInstance(StringIdEntity.class, ID);
         assertEquals(STRING_255, column.getSqlType());
         assertSame(String.class, column.getJavaType());
     }
 
     @Test
-    public void cast_message_IDs_to_string() {
+    @DisplayName("cast message IDs to string")
+    void castMessageIDsToString() {
         final IdColumn<?> column = IdColumn.newInstance(MessageIdEntity.class, ID);
         assertEquals(STRING_255, column.getSqlType());
         assertTrue(Message.class.isAssignableFrom(column.getJavaType()));
     }
 
     @Test
-    public void store_column_name() {
+    @DisplayName("store column name")
+    void storeColumnName() {
         final IdColumn<String> column = IdColumn.newInstance(StringIdEntity.class, ID);
         assertEquals(ID, column.getColumnName());
     }

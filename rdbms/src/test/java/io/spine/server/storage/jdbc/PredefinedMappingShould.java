@@ -21,6 +21,7 @@
 package io.spine.server.storage.jdbc;
 
 import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -45,13 +46,15 @@ public class PredefinedMappingShould {
     private final PredefinedMapping mapping = POSTGRESQL_10_1;
 
     @Test(expected = IllegalStateException.class)
-    public void throw_ISE_if_requested_type_has_no_mapping() {
+    @DisplayName("throw ISE if requested type has no mapping")
+    void throwISEIfRequestedTypeHasNoMapping() {
         final Type notMappedType = nullRef();
         MYSQL_5_7.typeNameFor(notMappedType);
     }
 
     @Test
-    public void be_selected_by_database_product_name_and_major_version() {
+    @DisplayName("be selected by database product name and major version")
+    void beSelectedByDatabaseProductNameAndMajorVersion() {
         final DataSourceWrapper dataSource = dataSourceMock(mapping.getDatabaseProductName(),
                                                             mapping.getMajorVersion(),
                                                             mapping.getMinorVersion());
@@ -59,7 +62,8 @@ public class PredefinedMappingShould {
     }
 
     @Test
-    public void not_be_selected_if_major_versions_different() {
+    @DisplayName("not be selected if major versions different")
+    void notBeSelectedIfMajorVersionsDifferent() {
         final String databaseProductName = mapping.getDatabaseProductName();
         final int differentVersion = mapping.getMajorVersion() + 1;
         final DataSourceWrapper dataSource = dataSourceMock(databaseProductName,

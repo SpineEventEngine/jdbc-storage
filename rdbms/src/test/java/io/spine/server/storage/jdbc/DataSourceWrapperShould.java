@@ -21,6 +21,7 @@
 package io.spine.server.storage.jdbc;
 
 import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
 
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doThrow;
@@ -31,7 +32,8 @@ import static org.mockito.Mockito.doThrow;
 public class DataSourceWrapperShould {
 
     @Test
-    public void throw_database_exception_if_fail_to_close() throws Exception {
+    @DisplayName("throw database exception if fail to close")
+    void throwDatabaseExceptionIfFailToClose() throws Exception {
         final GivenDataSource.ClosableDataSource dataSource = GivenDataSource.whichIsAutoCloseable();
         doThrow(new Exception("")).when(dataSource).close();
         final DataSourceWrapper wrapper = DataSourceWrapper.wrap(dataSource);

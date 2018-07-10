@@ -21,6 +21,7 @@
 package io.spine.server.storage.jdbc.type;
 
 import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
 
 import static io.spine.test.Tests.assertHasPrivateParameterlessCtor;
 
@@ -30,7 +31,8 @@ import static io.spine.test.Tests.assertHasPrivateParameterlessCtor;
 public class JdbcColumnTypesShould {
 
     @Test
-    public void have_private_util_ctor() {
+    @DisplayName("have private util ctor")
+    void havePrivateUtilCtor() {
         assertHasPrivateParameterlessCtor(JdbcColumnTypes.class);
     }
 }

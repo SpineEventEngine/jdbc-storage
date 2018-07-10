@@ -45,6 +45,7 @@ import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
 import io.spine.test.storage.Project;
 import io.spine.test.storage.ProjectId;
 import io.spine.testdata.Sample;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static io.spine.base.Identifier.newUuid;
@@ -65,7 +66,8 @@ public class JdbcRecordStorageShould
         extends RecordStorageTest<String, JdbcRecordStorage<String>> {
 
     @Test
-    public void clear_itself() {
+    @DisplayName("clear itself")
+    void clearItself() {
         final JdbcRecordStorage<String> storage = getStorage();
         final String id = newUuid();
         final EntityRecord entityRecord = newStorageRecord();
@@ -81,14 +83,16 @@ public class JdbcRecordStorageShould
     }
 
     @Test
-    public void throw_exception_when_closing_twice() throws Exception {
+    @DisplayName("throw exception when closing twice")
+    void throwExceptionWhenClosingTwice() throws Exception {
         final RecordStorage<?> storage = getStorage();
         storage.close();
         assertThrows(IllegalStateException.class, storage::close);
     }
 
     @Test
-    public void use_column_names_for_storing() {
+    @DisplayName("use column names for storing")
+    void useColumnNamesForStoring() {
         final JdbcRecordStorage<String> storage = newStorage(TestEntityWithStringId.class);
         final int entityColumnIndex = RecordTable.StandardColumn.values().length;
         final String customColumnName = storage.getTable()
@@ -100,7 +104,8 @@ public class JdbcRecordStorageShould
     }
 
     @Test
-    public void read_by_composite_filter_with_column_filters_for_same_column() {
+    @DisplayName("read by composite filter with column filters for same column")
+    void readByCompositeFilterWithColumnFiltersForSameColumn() {
         final JdbcRecordStorage<String> storage = newStorage(TestEntityWithStringId.class);
         final String columnName = "value";
         final ColumnFilter lessThan = lt(columnName, -5);
@@ -119,7 +124,8 @@ public class JdbcRecordStorageShould
     }
 
     @Test
-    public void require_non_null_entity_class() {
+    @DisplayName("require non null entity class")
+    void requireNonNullEntityClass() {
         final Class<? extends Entity<Object, ?>> nullEntityCls = nullRef();
         assertThrows(NullPointerException.class,
                      () -> JdbcRecordStorage.newBuilder()
@@ -127,7 +133,8 @@ public class JdbcRecordStorageShould
     }
 
     @Test
-    public void require_non_null_column_type_registry() {
+    @DisplayName("require non null column type registry")
+    void requireNonNullColumnTypeRegistry() {
         final ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> registry
                 = nullRef();
         assertThrows(NullPointerException.class,

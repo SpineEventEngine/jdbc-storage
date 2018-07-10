@@ -24,6 +24,7 @@ import io.spine.server.storage.jdbc.ConnectionWrapper;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
 import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +45,8 @@ import static org.mockito.Mockito.spy;
 public class QueryExecutorShould {
 
     @Test(expected = DatabaseException.class)
-    public void handle_sql_exception_on_query_execution() throws SQLException {
+    @DisplayName("handle sql exception on query execution")
+    void handleSqlExceptionOnQueryExecution() throws SQLException {
         final DataSourceWrapper dataSource = mock(DataSourceWrapper.class);
         final ConnectionWrapper connection = mock(ConnectionWrapper.class);
         final PreparedStatement statement = mock(PreparedStatement.class);

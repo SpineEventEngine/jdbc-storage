@@ -22,6 +22,7 @@ package io.spine.server.storage.jdbc.aggregate;
 
 import com.google.common.collect.Lists;
 import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
 
 import static io.spine.test.Verify.assertContains;
 import static org.junit.Assert.assertEquals;
@@ -32,7 +33,8 @@ import static org.junit.Assert.assertEquals;
 public class MultipleExceptionsOnCloseShould {
 
     @Test
-    public void describe_all_given_exceptions_in_toString() {
+    @DisplayName("describe all given exceptions in toString")
+    void describeAllGivenExceptionsInToString() {
         final String message1 = "message1";
         final String message2 = "message2";
         final String message3 = "message3";
@@ -56,7 +58,8 @@ public class MultipleExceptionsOnCloseShould {
     }
 
     @Test
-    public void be_direct_subclass_of_Throwable() {
+    @DisplayName("be direct subclass of Throwable")
+    void beDirectSubclassOfThrowable() {
         final Class<MultipleExceptionsOnClose> clazz = MultipleExceptionsOnClose.class;
         final Class<? super MultipleExceptionsOnClose> superclass = clazz.getSuperclass();
         assertEquals(Throwable.class, superclass);

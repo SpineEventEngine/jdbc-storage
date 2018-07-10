@@ -32,6 +32,7 @@ import io.spine.test.aggregate.ProjectId;
 import io.spine.test.aggregate.ProjectVBuilder;
 import io.spine.testdata.Sample;
 import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
 
 import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
 import static org.junit.Assert.assertEquals;
@@ -60,7 +61,8 @@ public class JdbcAggregateStorageVisibilityHandlingShould
 
     @SuppressWarnings("OptionalGetWithoutIsPresent") // We do check
     @Test
-    public void update_entity_visibility() {
+    @DisplayName("update entity visibility")
+    void updateEntityVisibility() {
         final ProjectId id = Sample.messageOfType(ProjectId.class);
         final LifecycleFlags archived = LifecycleFlags.newBuilder()
                                               .setArchived(true)

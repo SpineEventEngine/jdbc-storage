@@ -24,6 +24,7 @@ import io.spine.server.storage.jdbc.query.Parameter;
 import io.spine.server.storage.jdbc.query.Parameters;
 import io.spine.test.Tests;
 import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
 
 import java.sql.SQLException;
 
@@ -38,7 +39,8 @@ public class JdbcColumnTypeShould {
     private final JdbcColumnType<String, ?> columnType = JdbcColumnTypes.stringType();
 
     @Test
-    public void set_null_to_parameters() throws SQLException {
+    @DisplayName("set null to parameters")
+    void setNullToParameters() throws SQLException {
         final String identifier = newUuid();
         final Parameters.Builder builder = Parameters.newBuilder();
         columnType.setNull(builder, identifier);
@@ -49,7 +51,8 @@ public class JdbcColumnTypeShould {
     }
 
     @Test(expected = NullPointerException.class)
-    public void check_converted_value_to_be_nonnull() {
+    @DisplayName("check converted value to be nonnull")
+    void checkConvertedValueToBeNonnull() {
         columnType.convertColumnValue(Tests.<String>nullRef());
     }
 }

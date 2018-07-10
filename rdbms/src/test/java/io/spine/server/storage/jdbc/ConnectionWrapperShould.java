@@ -21,6 +21,7 @@
 package io.spine.server.storage.jdbc;
 
 import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -40,7 +41,8 @@ public class ConnectionWrapperShould {
 
     @SuppressWarnings("ObjectEquality")
     @Test
-    public void store_and_retrieve_connection() {
+    @DisplayName("store and retrieve connection")
+    void storeAndRetrieveConnection() {
         final Connection connection = mockConnection();
         final ConnectionWrapper wrapper = ConnectionWrapper.wrap(connection);
         final Connection stored = wrapper.get();
@@ -48,21 +50,24 @@ public class ConnectionWrapperShould {
     }
 
     @Test(expected = DatabaseException.class)
-    public void throw_DatabaseException_on_SQLException_on_commit() {
+    @DisplayName("throw DatabaseException on SQLException on commit")
+    void throwDatabaseExceptionOnSQLExceptionOnCommit() {
         final Connection connection = mockConnection();
         final ConnectionWrapper wrapper = ConnectionWrapper.wrap(connection);
         wrapper.commit();
     }
 
     @Test(expected = DatabaseException.class)
-    public void throw_DatabaseException_on_SQLException_on_rollback() {
+    @DisplayName("throw DatabaseException on SQLException on rollback")
+    void throwDatabaseExceptionOnSQLExceptionOnRollback() {
         final Connection connection = mockConnection();
         final ConnectionWrapper wrapper = ConnectionWrapper.wrap(connection);
         wrapper.rollback();
     }
 
     @Test(expected = DatabaseException.class)
-    public void throw_DatabaseException_on_SQLException_on_close() {
+    @DisplayName("throw DatabaseException on SQLException on close")
+    void throwDatabaseExceptionOnSQLExceptionOnClose() {
         final Connection connection = mockConnection();
         final ConnectionWrapper wrapper = ConnectionWrapper.wrap(connection);
         wrapper.close();
@@ -70,7 +75,8 @@ public class ConnectionWrapperShould {
 
     @SuppressWarnings("JDBCPrepareStatementWithNonConstantString") // OK for a mock setup
     @Test(expected = DatabaseException.class)
-    public void throw_DatabaseException_on_SQLException_when_preparing_statement()
+    @DisplayName("throw DatabaseException on SQLException when preparing statement")
+    void throwDatabaseExceptionOnSQLExceptionWhenPreparingStatement()
             throws SQLException {
         final Connection connection = mockConnection();
         when(connection.prepareStatement(anyString())).thenThrow(SQLException.class);
@@ -79,7 +85,8 @@ public class ConnectionWrapperShould {
     }
 
     @Test
-    public void rollback_transaction_successfully() throws SQLException {
+    @DisplayName("rollback transaction successfully")
+    void rollbackTransactionSuccessfully() throws SQLException {
         final Connection connection = mock(Connection.class);
         final ConnectionWrapper wrapper = ConnectionWrapper.wrap(connection);
         wrapper.rollback();

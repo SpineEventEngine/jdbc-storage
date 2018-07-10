@@ -30,6 +30,7 @@ import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.query.DbIterator;
 import io.spine.test.aggregate.ProjectId;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;
@@ -56,14 +57,16 @@ public class JdbcAggregateStorageShould extends AggregateStorageTest {
     }
 
     @Test
-    public void throw_exception_when_closing_twice() throws Exception {
+    @DisplayName("throw exception when closing twice")
+    void throwExceptionWhenClosingTwice() throws Exception {
         final AggregateStorage<?> storage = getStorage();
         storage.close();
         assertThrows(IllegalStateException.class, storage::close);
     }
 
     @Test
-    public void return_history_iterator_with_specified_batch_size() throws SQLException {
+    @DisplayName("return history iterator with specified batch size")
+    void returnHistoryIteratorWithSpecifiedBatchSize() throws SQLException {
         final int batchSize = 10;
         final AggregateReadRequest<ProjectId> request = new AggregateReadRequest<>(newId(),
                                                                                    batchSize);
@@ -79,7 +82,8 @@ public class JdbcAggregateStorageShould extends AggregateStorageTest {
     }
 
     @Test
-    public void close_history_iterator() throws SQLException {
+    @DisplayName("close history iterator")
+    void closeHistoryIterator() throws SQLException {
         final AggregateReadRequest<ProjectId> request = newReadRequest(newId());
         final DbIterator<AggregateEventRecord> iterator =
                 (DbIterator<AggregateEventRecord>) storage.historyBackward(request);
@@ -91,7 +95,8 @@ public class JdbcAggregateStorageShould extends AggregateStorageTest {
     }
 
     @Test
-    public void require_non_null_aggregate_class() {
+    @DisplayName("require non null aggregate class")
+    void requireNonNullAggregateClass() {
         final Class<? extends Aggregate<Object, ?, ?>> nullClass = nullRef();
         assertThrows(NullPointerException.class,
                      () -> JdbcAggregateStorage.newBuilder()

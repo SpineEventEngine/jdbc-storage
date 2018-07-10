@@ -22,6 +22,7 @@ package io.spine.server.storage.jdbc.query;
 
 import com.google.protobuf.StringValue;
 import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
 
 import static io.spine.base.Identifier.newUuid;
 import static io.spine.test.Tests.assertHasPrivateParameterlessCtor;
@@ -34,12 +35,14 @@ import static org.junit.Assert.assertTrue;
 public class SerializerShould {
 
     @Test
-    public void have_private_utility_constructor() {
+    @DisplayName("have private utility constructor")
+    void havePrivateUtilityConstructor() {
         assertHasPrivateParameterlessCtor(Serializer.class);
     }
 
     @Test
-    public void serialize_and_deserialize_message() {
+    @DisplayName("serialize and deserialize message")
+    void serializeAndDeserializeMessage() {
         final StringValue expected = StringValue
                 .getDefaultInstance().toBuilder().setValue(newUuid()).build();
 
