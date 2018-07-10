@@ -51,14 +51,13 @@ subprojects {
         }
 
         // Spine
-        implementation group: 'io.spine', name: 'spine-server', version: coreVersion,
-                changing: true, excludes
+        implementation group: 'io.spine', name: 'spine-server', version: coreVersion, excludes
 
-        implementation group: 'io.spine', name: 'spine-testutil-server',
-                version: coreVersion, changing: true, excludes
+        implementation group: 'io.spine', name: 'spine-testutil-server', version: coreVersion,
+                excludes
 
         testImplementation group: 'io.spine', name: 'spine-server', version: coreVersion,
-                changing: true, classifier: 'test', excludes
+                classifier: 'test', excludes
 
         implementation deps.build.guava
         implementation deps.build.jsr305Annotations
