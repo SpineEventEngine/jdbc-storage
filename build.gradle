@@ -59,6 +59,9 @@ subprojects {
         testImplementation group: 'io.spine', name: 'spine-server', version: spineCoreVersion,
                 classifier: 'test', excludes
 
+
+        testImplementation group: 'io.spine', name: 'spine-testlib', version: spineBaseVersion
+
         implementation deps.build.guava
         implementation deps.build.jsr305Annotations
         implementation deps.build.slf4j
