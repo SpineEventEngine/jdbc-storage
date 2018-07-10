@@ -17,7 +17,7 @@ allprojects {
     apply plugin: 'jacoco'
 
     group = 'io.spine'
-    version = spineVersion
+    version = versionToPublish
 }
 
 subprojects {
