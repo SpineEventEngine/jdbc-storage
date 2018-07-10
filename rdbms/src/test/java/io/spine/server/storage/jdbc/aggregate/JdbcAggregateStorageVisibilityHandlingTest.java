@@ -27,12 +27,11 @@ import io.spine.server.aggregate.AggregateStorageVisibilityHandlingTest;
 import io.spine.server.entity.LifecycleFlags;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.GivenDataSource;
-import io.spine.test.aggregate.Project;
+import io.spine.server.storage.jdbc.aggregate.given.JdbcAggregateStorageVisibilityHandlingTestEnv.TestAggregate;
 import io.spine.test.aggregate.ProjectId;
-import io.spine.test.aggregate.ProjectVBuilder;
 import io.spine.testdata.Sample;
-import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
 import static org.junit.Assert.assertEquals;
@@ -41,7 +40,8 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Dmytro Dashenkov
  */
-public class JdbcAggregateStorageVisibilityHandlingShould
+@DisplayName("JdbcAggregateStorage, when saving aggregate with lifecycle flags, should")
+class JdbcAggregateStorageVisibilityHandlingTest
         extends AggregateStorageVisibilityHandlingTest {
 
     @Override
@@ -59,7 +59,7 @@ public class JdbcAggregateStorageVisibilityHandlingShould
         return storage;
     }
 
-    @SuppressWarnings("OptionalGetWithoutIsPresent") // We do check
+    @SuppressWarnings("OptionalGetWithoutIsPresent") // We do check.
     @Test
     @DisplayName("update entity visibility")
     void updateEntityVisibility() {
@@ -84,12 +84,5 @@ public class JdbcAggregateStorageVisibilityHandlingShould
         final Optional<LifecycleFlags> actualArchivedAndDeleted = storage.readLifecycleFlags(id);
         assertTrue(actualArchivedAndDeleted.isPresent());
         assertEquals(archivedAndDeleted, actualArchivedAndDeleted.get());
-    }
-
-    private static class TestAggregate extends Aggregate<ProjectId, Project, ProjectVBuilder> {
-
-        protected TestAggregate(ProjectId id) {
-            super(id);
-        }
     }
 }

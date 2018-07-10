@@ -45,7 +45,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 /**
  * @author Alexander Litus
  */
-public class JdbcAggregateStorageShould extends AggregateStorageTest {
+@DisplayName("JdbcAggregateStorage should")
+class JdbcAggregateStorageTest extends AggregateStorageTest {
 
     private JdbcAggregateStorage<ProjectId> storage;
 
@@ -57,8 +58,8 @@ public class JdbcAggregateStorageShould extends AggregateStorageTest {
     }
 
     @Test
-    @DisplayName("throw exception when closing twice")
-    void throwExceptionWhenClosingTwice() throws Exception {
+    @DisplayName("throw ISE when closing twice")
+    void throwOnClosingTwice() throws Exception {
         final AggregateStorage<?> storage = getStorage();
         storage.close();
         assertThrows(IllegalStateException.class, storage::close);
@@ -66,7 +67,7 @@ public class JdbcAggregateStorageShould extends AggregateStorageTest {
 
     @Test
     @DisplayName("return history iterator with specified batch size")
-    void returnHistoryIteratorWithSpecifiedBatchSize() throws SQLException {
+    void returnHistoryIterator() throws SQLException {
         final int batchSize = 10;
         final AggregateReadRequest<ProjectId> request = new AggregateReadRequest<>(newId(),
                                                                                    batchSize);
@@ -95,14 +96,15 @@ public class JdbcAggregateStorageShould extends AggregateStorageTest {
     }
 
     @Test
-    @DisplayName("require non null aggregate class")
-    void requireNonNullAggregateClass() {
+    @DisplayName("require non-null aggregate class")
+    void rejectNullAggregateClass() {
         final Class<? extends Aggregate<Object, ?, ?>> nullClass = nullRef();
         assertThrows(NullPointerException.class,
                      () -> JdbcAggregateStorage.newBuilder()
                                                .setAggregateClass(nullClass));
     }
 
+    @SuppressWarnings("unchecked") // It is OK for a test.
     @Override
     protected AggregateStorage<ProjectId> newStorage(Class<? extends Entity> aClass) {
         return newStorage(ProjectId.class, (Class<? extends Aggregate<ProjectId, ?, ?>>) aClass);

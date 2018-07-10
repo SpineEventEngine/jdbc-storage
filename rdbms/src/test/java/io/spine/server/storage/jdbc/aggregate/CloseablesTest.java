@@ -23,33 +23,39 @@ package io.spine.server.storage.jdbc.aggregate;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.testing.NullPointerTester;
-import org.junit.Test;
+import io.spine.server.storage.jdbc.aggregate.given.CloseablesTestEnv.FaultyClosable;
+import io.spine.server.storage.jdbc.aggregate.given.CloseablesTestEnv.StatefulClosable;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import static io.spine.test.DisplayNames.HAVE_PARAMETERLESS_CTOR;
+import static io.spine.test.DisplayNames.NOT_ACCEPT_NULLS;
 import static io.spine.test.Tests.assertHasPrivateParameterlessCtor;
 import static java.util.Collections.singleton;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Dmytro Dashenkov
  */
-public class CloseablesShould {
+@DisplayName("Closeables utility should")
+class CloseablesTest {
 
     @Test
-    @DisplayName("have private constructor")
-    void havePrivateConstructor() {
+    @DisplayName(HAVE_PARAMETERLESS_CTOR)
+    void haveUtilityConstructor() {
         assertHasPrivateParameterlessCtor(Closeables.class);
     }
 
     @Test
-    @DisplayName("pass null tolerance check")
+    @DisplayName(NOT_ACCEPT_NULLS)
     void passNullToleranceCheck() {
         new NullPointerTester()
                 .testAllPublicStaticMethods(Closeables.class);
@@ -59,7 +65,7 @@ public class CloseablesShould {
     // Two loops - one for data set up and one for checks
     @Test
     @DisplayName("close all passed instances")
-    void closeAllPassedInstances() {
+    void closeAll() {
         final int count = 10;
         final Set<StatefulClosable> closeables = new HashSet<>(count);
         for (int i = 0; i < count; i++) {
@@ -69,25 +75,26 @@ public class CloseablesShould {
         Closeables.closeAll(closeables);
 
         for (StatefulClosable sc : closeables) {
-            assertTrue(sc.closed);
+            assertTrue(sc.isClosed());
         }
     }
 
-    @Test(expected = IllegalStateException.class)
-    @DisplayName("throw Illegal state on failure")
-    void throwIllegalStateOnFailure() {
+    @Test
+    @DisplayName("throw ISE when closing fails")
+    void throwOnCloseFailure() {
         final AutoCloseable closeable = new FaultyClosable();
-        Closeables.closeAll(singleton(closeable));
+        assertThrows(IllegalStateException.class, () -> Closeables.closeAll(singleton(closeable)));
     }
 
     @Test
     @DisplayName("try to close all instances")
-    void tryToCloseAllInstances() {
+    void tryToCloseAll() {
         final AutoCloseable faulty = new FaultyClosable();
         final StatefulClosable stateful = new StatefulClosable();
 
+        // Needs to be ordered.
         final Collection<AutoCloseable> closeables =
-                Lists.newArrayList(faulty, stateful); // Needs to be ordered
+                Lists.newArrayList(faulty, stateful);
         boolean success;
         try {
             Closeables.closeAll(closeables);
@@ -97,39 +104,20 @@ public class CloseablesShould {
         }
 
         assertFalse(success);
-        assertTrue((stateful.closed));
+        assertTrue((stateful.isClosed()));
     }
 
     @Test
     @DisplayName("throw exception with aggregating cause upon multiple failures")
-    void throwExceptionWithAggregatingCauseUponMultipleFailures() {
+    void throwAggregatedFailures() {
         final Collection<AutoCloseable> closeables =
-                Sets.<AutoCloseable>newHashSet(new FaultyClosable(),
-                                               new FaultyClosable());
+                Sets.newHashSet(new FaultyClosable(),
+                                new FaultyClosable());
         try {
             Closeables.closeAll(closeables);
         } catch (IllegalStateException e) {
             final Throwable cause = e.getCause();
             assertThat(cause, instanceOf(MultipleExceptionsOnClose.class));
-        }
-    }
-
-    private static class StatefulClosable implements AutoCloseable {
-
-        private boolean closed = false;
-
-        @Override
-        public void close() throws Exception {
-            assertFalse(closed);
-            closed = true;
-        }
-    }
-
-    private static class FaultyClosable implements AutoCloseable {
-
-        @Override
-        public void close() throws Exception {
-            throw new RuntimeException("Fault!");
         }
     }
 }

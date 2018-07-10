@@ -20,14 +20,12 @@
 
 package io.spine.server.storage.jdbc.aggregate;
 
-import com.google.protobuf.StringValue;
-import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.aggregate.Snapshot;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.validate.StringValueVBuilder;
-import org.junit.Test;
+import io.spine.server.storage.jdbc.aggregate.given.AggregateEventRecordTableTestEnv.AnAggregate;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import static com.querydsl.core.types.ExpressionUtils.path;
 import static io.spine.base.Identifier.newUuid;
@@ -38,23 +36,26 @@ import static io.spine.server.storage.jdbc.GivenDataSource.withoutSuperpowers;
 import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
 import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.KIND;
 import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Dmytro Grankin
  */
-public class AggregateEventRecordTableShould {
+@DisplayName("AggregateEventRecordTable should")
+class AggregateEventRecordTableTest {
 
-    @Test(expected = IllegalStateException.class)
-    @DisplayName("throw on attempt to update event record")
-    void throwOnAttemptToUpdateEventRecord() {
+    @Test
+    @DisplayName("throw ISE on attempt to update event record")
+    void throwOnUpdateEventRecord() {
         final AggregateEventRecordTable<String> table =
                 new AggregateEventRecordTable<>(AnAggregate.class, withoutSuperpowers(), MYSQL_5_7);
-        table.update(newUuid(), AggregateEventRecord.getDefaultInstance());
+        assertThrows(IllegalStateException.class,
+                     () -> table.update(newUuid(), AggregateEventRecord.getDefaultInstance()));
     }
 
     @Test
     @DisplayName("store record kind in string representation")
-    void storeRecordKindInStringRepresentation() {
+    void storeRecordKind() {
         final DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
         final AggregateEventRecordTable<String> table =
                 new AggregateEventRecordTable<>(AnAggregate.class, dataSource, MYSQL_5_7);
@@ -77,11 +78,5 @@ public class AggregateEventRecordTableShould {
                                        .from(query.table())
                                        .fetchFirst();
         assertEquals(expectedKind, actualKind);
-    }
-
-    private static class AnAggregate extends Aggregate<String, StringValue, StringValueVBuilder> {
-        private AnAggregate(String id) {
-            super(id);
-        }
     }
 }

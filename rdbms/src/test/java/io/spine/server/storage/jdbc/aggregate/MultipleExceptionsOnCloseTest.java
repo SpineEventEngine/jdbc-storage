@@ -20,21 +20,22 @@
 
 package io.spine.server.storage.jdbc.aggregate;
 
-import com.google.common.collect.Lists;
-import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static io.spine.test.Verify.assertContains;
 import static org.junit.Assert.assertEquals;
 
 /**
  * @author Dmytro Dashenkov
  */
-public class MultipleExceptionsOnCloseShould {
+@DisplayName("MultipleExceptionsOnClose should")
+class MultipleExceptionsOnCloseTest {
 
     @Test
-    @DisplayName("describe all given exceptions in toString")
-    void describeAllGivenExceptionsInToString() {
+    @DisplayName("describe all given exceptions in `toString`")
+    void provideToString() {
         final String message1 = "message1";
         final String message2 = "message2";
         final String message3 = "message3";
@@ -43,7 +44,7 @@ public class MultipleExceptionsOnCloseShould {
         final IllegalStateException ex3 = new IllegalStateException(message3);
 
         final MultipleExceptionsOnClose aggregatingException =
-                new MultipleExceptionsOnClose(Lists.<Exception>newArrayList(ex1, ex2, ex3));
+                new MultipleExceptionsOnClose(newArrayList(ex1, ex2, ex3));
 
         final String stringName = "Exception description";
         assertContains(stringName,
@@ -59,7 +60,7 @@ public class MultipleExceptionsOnCloseShould {
 
     @Test
     @DisplayName("be direct subclass of Throwable")
-    void beDirectSubclassOfThrowable() {
+    void beSubclassOfThrowable() {
         final Class<MultipleExceptionsOnClose> clazz = MultipleExceptionsOnClose.class;
         final Class<? super MultipleExceptionsOnClose> superclass = clazz.getSuperclass();
         assertEquals(Throwable.class, superclass);
