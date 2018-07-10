@@ -51,12 +51,12 @@ subprojects {
         }
 
         // Spine
-        implementation group: 'io.spine', name: 'spine-server', version: coreVersion, excludes
+        implementation group: 'io.spine', name: 'spine-server', version: spineCoreVersion, excludes
 
-        implementation group: 'io.spine', name: 'spine-testutil-server', version: coreVersion,
+        implementation group: 'io.spine', name: 'spine-testutil-server', version: spineCoreVersion,
                 excludes
 
-        testImplementation group: 'io.spine', name: 'spine-server', version: coreVersion,
+        testImplementation group: 'io.spine', name: 'spine-server', version: spineCoreVersion,
                 classifier: 'test', excludes
 
         implementation deps.build.guava
