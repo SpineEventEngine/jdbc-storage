@@ -61,9 +61,7 @@ subprojects {
                 changing: true, classifier: 'test', excludes
 
         implementation deps.build.guava
-
         implementation deps.build.jsr305Annotations
-
         implementation deps.build.slf4j
 
         testImplementation deps.test.junit4
