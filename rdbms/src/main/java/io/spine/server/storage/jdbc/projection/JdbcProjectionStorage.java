@@ -79,7 +79,7 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
 
     @Override
     public @Nullable Timestamp readLastHandledEventTime() throws DatabaseException {
-        final Timestamp timestamp = table.read(projectionId);
+        Timestamp timestamp = table.read(projectionId);
         return timestamp;
     }
 

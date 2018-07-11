@@ -40,10 +40,10 @@ class ContainsQuery<I> extends IdAwareQuery<I> implements SelectQuery<Boolean> {
      */
     @Override
     public Boolean execute() {
-        final AbstractSQLQuery<Long, ?> query = factory().select(count())
-                                                         .from(table())
-                                                         .where(idPath().eq(getNormalizedId()));
-        final long recordsCount = query.fetchOne();
+        AbstractSQLQuery<Long, ?> query = factory().select(count())
+                                                   .from(table())
+                                                   .where(idPath().eq(getNormalizedId()));
+        long recordsCount = query.fetchOne();
         return recordsCount > 0;
     }
 

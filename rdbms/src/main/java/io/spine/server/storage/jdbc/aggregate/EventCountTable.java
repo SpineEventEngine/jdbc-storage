@@ -73,36 +73,36 @@ class EventCountTable<I> extends EntityTable<I, Integer, Integer> {
 
     @Override
     protected SelectQuery<Integer> composeSelectQuery(I id) {
-        final SelectEventCountByIdQuery.Builder<I> builder = SelectEventCountByIdQuery.newBuilder();
-        final SelectEventCountByIdQuery<I> query = builder.setTableName(getName())
-                                                          .setDataSource(getDataSource())
-                                                          .setId(id)
-                                                          .setIdColumn(getIdColumn())
-                                                          .build();
+        SelectEventCountByIdQuery.Builder<I> builder = SelectEventCountByIdQuery.newBuilder();
+        SelectEventCountByIdQuery<I> query = builder.setTableName(getName())
+                                                    .setDataSource(getDataSource())
+                                                    .setId(id)
+                                                    .setIdColumn(getIdColumn())
+                                                    .build();
         return query;
     }
 
     @Override
     protected WriteQuery composeInsertQuery(I id, Integer record) {
-        final InsertEventCountQuery.Builder<I> builder = InsertEventCountQuery.newBuilder();
-        final WriteQuery query = builder.setTableName(getName())
-                                        .setId(id)
-                                        .setIdColumn(getIdColumn())
-                                        .setDataSource(getDataSource())
-                                        .setEventCount(record)
-                                        .build();
+        InsertEventCountQuery.Builder<I> builder = InsertEventCountQuery.newBuilder();
+        WriteQuery query = builder.setTableName(getName())
+                                  .setId(id)
+                                  .setIdColumn(getIdColumn())
+                                  .setDataSource(getDataSource())
+                                  .setEventCount(record)
+                                  .build();
         return query;
     }
 
     @Override
     protected WriteQuery composeUpdateQuery(I id, Integer record) {
-        final UpdateEventCountQuery.Builder<I> builder = UpdateEventCountQuery.newBuilder();
-        final WriteQuery query = builder.setDataSource(getDataSource())
-                                        .setTableName(getName())
-                                        .setId(id)
-                                        .setIdColumn(getIdColumn())
-                                        .setEventCount(record)
-                                        .build();
+        UpdateEventCountQuery.Builder<I> builder = UpdateEventCountQuery.newBuilder();
+        WriteQuery query = builder.setDataSource(getDataSource())
+                                  .setTableName(getName())
+                                  .setId(id)
+                                  .setIdColumn(getIdColumn())
+                                  .setEventCount(record)
+                                  .build();
         return query;
     }
 

@@ -66,24 +66,24 @@ class AggregateEventRecordTable<I> extends EntityTable<I,
 
     @Override
     protected SelectEventRecordsById<I> composeSelectQuery(I id) {
-        final SelectEventRecordsById.Builder<I> builder = SelectEventRecordsById.newBuilder();
-        final SelectEventRecordsById<I> query = builder.setTableName(getName())
-                                                       .setDataSource(getDataSource())
-                                                       .setIdColumn(getIdColumn())
-                                                       .setId(id)
-                                                       .build();
+        SelectEventRecordsById.Builder<I> builder = SelectEventRecordsById.newBuilder();
+        SelectEventRecordsById<I> query = builder.setTableName(getName())
+                                                 .setDataSource(getDataSource())
+                                                 .setIdColumn(getIdColumn())
+                                                 .setId(id)
+                                                 .build();
         return query;
     }
 
     @Override
     protected InsertAggregateRecordQuery<I> composeInsertQuery(I id, AggregateEventRecord record) {
-        final InsertAggregateRecordQuery.Builder<I> builder = InsertAggregateRecordQuery.newBuilder();
-        final InsertAggregateRecordQuery<I> query = builder.setTableName(getName())
-                                                           .setDataSource(getDataSource())
-                                                           .setIdColumn(getIdColumn())
-                                                           .setId(id)
-                                                           .setRecord(record)
-                                                           .build();
+        InsertAggregateRecordQuery.Builder<I> builder = InsertAggregateRecordQuery.newBuilder();
+        InsertAggregateRecordQuery<I> query = builder.setTableName(getName())
+                                                     .setDataSource(getDataSource())
+                                                     .setIdColumn(getIdColumn())
+                                                     .setId(id)
+                                                     .setRecord(record)
+                                                     .build();
         return query;
     }
 
@@ -92,7 +92,7 @@ class AggregateEventRecordTable<I> extends EntityTable<I,
      */
     @Override
     protected WriteQuery composeUpdateQuery(I id, AggregateEventRecord record) {
-        final String errMsg = "AggregateEventRecord is immutable and should not be updated.";
+        String errMsg = "AggregateEventRecord is immutable and should not be updated.";
         throw newIllegalStateException(errMsg);
     }
 

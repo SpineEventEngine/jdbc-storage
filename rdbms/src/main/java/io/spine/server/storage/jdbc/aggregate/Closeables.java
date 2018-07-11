@@ -50,7 +50,7 @@ class Closeables {
      */
     static void closeAll(Iterable<? extends AutoCloseable> closeables) {
         checkNotNull(closeables);
-        final Collection<Exception> exceptions = new LinkedList<>();
+        Collection<Exception> exceptions = new LinkedList<>();
         for (AutoCloseable closable : closeables) {
             try {
                 closable.close();
@@ -62,7 +62,7 @@ class Closeables {
             return;
         }
 
-        final Throwable cause;
+        Throwable cause;
         if (exceptions.size() == 1) {
             cause = exceptions.iterator()
                               .next();

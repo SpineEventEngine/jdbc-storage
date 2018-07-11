@@ -70,12 +70,12 @@ public enum PredefinedMapping implements TypeMapping {
      */
     static TypeMapping select(DataSourceWrapper dataSource) {
         try (final ConnectionWrapper connection = dataSource.getConnection(true)) {
-            final DatabaseMetaData metaData = connection.get()
-                                                        .getMetaData();
+            DatabaseMetaData metaData = connection.get()
+                                                  .getMetaData();
             for (PredefinedMapping mapping : values()) {
-                final boolean nameMatch = metaData.getDatabaseProductName()
-                                                  .equals(mapping.databaseProductName);
-                final boolean versionMatch =
+                boolean nameMatch = metaData.getDatabaseProductName()
+                                            .equals(mapping.databaseProductName);
+                boolean versionMatch =
                         metaData.getDatabaseMajorVersion() == mapping.majorVersion
                         && metaData.getDatabaseMinorVersion() == mapping.minorVersion;
                 if (nameMatch && versionMatch) {

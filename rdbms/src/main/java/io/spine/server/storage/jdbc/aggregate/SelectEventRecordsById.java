@@ -51,18 +51,18 @@ class SelectEventRecordsById<I> extends AbstractSelectByIdQuery<I, DbIterator<Ag
     }
 
     public DbIterator<AggregateEventRecord> execute(int fetchSize) {
-        final OrderSpecifier<Comparable> byVersion = orderBy(VERSION, DESC);
-        final OrderSpecifier<Comparable> bySeconds = orderBy(TIMESTAMP, DESC);
-        final OrderSpecifier<Comparable> byNanos = orderBy(TIMESTAMP_NANOS, DESC);
+        OrderSpecifier<Comparable> byVersion = orderBy(VERSION, DESC);
+        OrderSpecifier<Comparable> bySeconds = orderBy(TIMESTAMP, DESC);
+        OrderSpecifier<Comparable> byNanos = orderBy(TIMESTAMP_NANOS, DESC);
 
-        final AbstractSQLQuery<Object, ?> query = factory().select(pathOf(AGGREGATE))
-                                                           .from(table())
-                                                           .where(hasId())
-                                                           .orderBy(byVersion, bySeconds, byNanos);
+        AbstractSQLQuery<Object, ?> query = factory().select(pathOf(AGGREGATE))
+                                                     .from(table())
+                                                     .where(hasId())
+                                                     .orderBy(byVersion, bySeconds, byNanos);
         query.setStatementOptions(StatementOptions.builder()
                                                   .setFetchSize(fetchSize)
                                                   .build());
-        final ResultSet resultSet = query.getResults();
+        ResultSet resultSet = query.getResults();
         return new MessageDbIterator<>(resultSet,
                                        AGGREGATE.name(),
                                        AggregateEventRecord.getDescriptor());
@@ -70,7 +70,7 @@ class SelectEventRecordsById<I> extends AbstractSelectByIdQuery<I, DbIterator<Ag
 
     @Override
     public DbIterator<AggregateEventRecord> execute() {
-        final int defaultFetchSize = 0;
+        int defaultFetchSize = 0;
         return execute(defaultFetchSize);
     }
 

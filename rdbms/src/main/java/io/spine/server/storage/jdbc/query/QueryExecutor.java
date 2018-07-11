@@ -53,7 +53,7 @@ class QueryExecutor {
              PreparedStatement statement = connection.prepareStatement(query)) {
             statement.execute();
         } catch (SQLException e) {
-            final String errorMsg = format("Error executing statement %s", query);
+            String errorMsg = format("Error executing statement %s", query);
             logger.error(errorMsg, e);
             throw new DatabaseException(e);
         }

@@ -41,11 +41,11 @@ class UpdateTimestampQuery extends WriteTimestampQuery {
 
     @Override
     public long execute() {
-        final PathBuilder<Object> id = pathOf(PROJECTION_TYPE);
-        final SQLUpdateClause query = factory().update(table())
-                                               .where(id.eq(getIdValue()))
-                                               .set(pathOf(SECONDS), getTimestamp().getSeconds())
-                                               .set(pathOf(NANOS), getTimestamp().getNanos());
+        PathBuilder<Object> id = pathOf(PROJECTION_TYPE);
+        SQLUpdateClause query = factory().update(table())
+                                         .where(id.eq(getIdValue()))
+                                         .set(pathOf(SECONDS), getTimestamp().getSeconds())
+                                         .set(pathOf(NANOS), getTimestamp().getNanos());
         return query.execute();
     }
 

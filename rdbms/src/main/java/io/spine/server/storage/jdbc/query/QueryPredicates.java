@@ -71,8 +71,8 @@ public class QueryPredicates {
             return TRUE;
         }
 
-        final PathBuilder<Object> id = new PathBuilder<>(Object.class, column.getColumnName());
-        final Collection<Object> normalizedIds = column.normalize(ids);
+        PathBuilder<Object> id = new PathBuilder<>(Object.class, column.getColumnName());
+        Collection<Object> normalizedIds = column.normalize(ids);
         return id.in(normalizedIds);
     }
 
@@ -97,9 +97,9 @@ public class QueryPredicates {
         Predicate result = TRUE;
         for (Map.Entry<EntityColumn, ColumnFilter> columnWithFilter : parameter.getFilters()
                                                                                .entries()) {
-            final Predicate predicate = columnMatchFilter(columnWithFilter.getKey(),
-                                                          columnWithFilter.getValue(),
-                                                          columnTypeRegistry);
+            Predicate predicate = columnMatchFilter(columnWithFilter.getKey(),
+                                                    columnWithFilter.getValue(),
+                                                    columnTypeRegistry);
             result = joinPredicates(result, predicate, parameter.getOperator());
         }
         return result;
@@ -125,23 +125,23 @@ public class QueryPredicates {
     @VisibleForTesting
     static Predicate columnMatchFilter(EntityColumn column, ColumnFilter filter,
                                        ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> columnTypeRegistry) {
-        final ColumnFilter.Operator operator = filter.getOperator();
+        ColumnFilter.Operator operator = filter.getOperator();
         checkArgument(operator.getNumber() > 0, operator.name());
 
-        final String columnName = column.getStoredName();
-        final ComparablePath<Comparable> columnPath = comparablePath(Comparable.class, columnName);
-        final JdbcColumnType<? super Object, ? super Object> columnType =
+        String columnName = column.getStoredName();
+        ComparablePath<Comparable> columnPath = comparablePath(Comparable.class, columnName);
+        JdbcColumnType<? super Object, ? super Object> columnType =
                 columnTypeRegistry.get(column);
-        final Object javaValue = toObject(filter.getValue(), column.getType());
-        final Serializable persistedValue = column.toPersistedValue(javaValue);
+        Object javaValue = toObject(filter.getValue(), column.getType());
+        Serializable persistedValue = column.toPersistedValue(javaValue);
 
         if (persistedValue == null) {
             return nullFilter(operator, columnPath);
         }
 
-        final Object storedValue = columnType.convertColumnValue(persistedValue);
+        Object storedValue = columnType.convertColumnValue(persistedValue);
         checkIsComparable(storedValue, javaValue);
-        final Comparable columnValue = (Comparable) storedValue;
+        Comparable columnValue = (Comparable) storedValue;
         return valueFilter(operator, columnPath, columnValue);
     }
 
@@ -151,9 +151,9 @@ public class QueryPredicates {
      * <p>{@code javaValue} is passed for logging purposes only.
      */
     private static void checkIsComparable(Object storedValue, Object javaValue) {
-        final Class<?> storedType = storedValue.getClass();
+        Class<?> storedType = storedValue.getClass();
         if (!Comparable.class.isAssignableFrom(storedType)) {
-            final Class<?> javaType = javaValue.getClass();
+            Class<?> javaType = javaValue.getClass();
             throw newIllegalArgumentException(
                     "Received filter value of class %s which has non-Comparable storage type %s",
                     javaType.getCanonicalName(),

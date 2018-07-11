@@ -58,8 +58,8 @@ public abstract class IdColumn<I> {
     })
     static <I> IdColumn<I> newInstance(Class<? extends Entity<I, ?>> entityClass,
                                        String columnName) {
-        final IdColumn<I> helper;
-        final Class<?> idClass = new EntityClass<Entity>(entityClass).getIdClass();
+        IdColumn<I> helper;
+        Class<?> idClass = new EntityClass<Entity>(entityClass).getIdClass();
         if (idClass == Long.class) {
             helper = (IdColumn<I>) new LongIdColumn(columnName);
         } else if (idClass == Integer.class) {
@@ -67,7 +67,7 @@ public abstract class IdColumn<I> {
         } else if (idClass == String.class) {
             helper = (IdColumn<I>) new StringIdColumn(columnName);
         } else {
-            final Class<? extends Message> messageClass = (Class<? extends Message>) idClass;
+            Class<? extends Message> messageClass = (Class<? extends Message>) idClass;
             helper = (IdColumn<I>) new MessageIdColumn(messageClass, columnName);
         }
         return helper;
@@ -120,9 +120,9 @@ public abstract class IdColumn<I> {
      * @return the normalized IDs
      */
     public Collection<Object> normalize(Iterable<I> ids) {
-        final Collection<Object> result = newLinkedList();
+        Collection<Object> result = newLinkedList();
         for (I id : ids) {
-            final Object normalizedId = normalize(id);
+            Object normalizedId = normalize(id);
             result.add(normalizedId);
         }
         return result;
@@ -140,8 +140,8 @@ public abstract class IdColumn<I> {
      * @param parameters the parameters to set the ID
      */
     public void setId(String idName, I id, Parameters.Builder parameters) {
-        final Object normalizedId = normalize(id);
-        final Parameter parameter = Parameter.of(normalizedId);
+        Object normalizedId = normalize(id);
+        Parameter parameter = Parameter.of(normalizedId);
         parameters.addParameter(idName, parameter);
     }
 

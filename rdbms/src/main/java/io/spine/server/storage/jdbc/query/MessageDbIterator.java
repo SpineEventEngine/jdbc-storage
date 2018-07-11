@@ -47,8 +47,8 @@ public class MessageDbIterator<M extends Message> extends DbIterator<M> {
 
     @Override
     protected M readResult() throws SQLException {
-        final byte[] bytes = getResultSet().getBytes(getColumnName());
-        final M result = deserialize(bytes, messageDescriptor);
+        byte[] bytes = getResultSet().getBytes(getColumnName());
+        M result = deserialize(bytes, messageDescriptor);
         return result;
     }
 }

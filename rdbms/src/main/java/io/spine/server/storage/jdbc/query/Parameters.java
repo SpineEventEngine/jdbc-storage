@@ -68,7 +68,7 @@ public final class Parameters {
      */
     public Parameter getParameter(String identifier) {
         checkArgument(parameters.containsKey(identifier));
-        final Parameter value = parameters.get(identifier);
+        Parameter value = parameters.get(identifier);
         return value;
     }
 

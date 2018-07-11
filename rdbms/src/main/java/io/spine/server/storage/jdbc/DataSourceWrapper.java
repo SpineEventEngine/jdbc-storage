@@ -56,9 +56,9 @@ public class DataSourceWrapper implements AutoCloseable {
      */
     public ConnectionWrapper getConnection(boolean autoCommit) throws DatabaseException {
         try {
-            final Connection connection = dataSource.getConnection();
+            Connection connection = dataSource.getConnection();
             connection.setAutoCommit(autoCommit);
-            final ConnectionWrapper wrapper = ConnectionWrapper.wrap(connection);
+            ConnectionWrapper wrapper = ConnectionWrapper.wrap(connection);
             return wrapper;
         } catch (SQLException e) {
             log().error("Failed to get connection.", e);

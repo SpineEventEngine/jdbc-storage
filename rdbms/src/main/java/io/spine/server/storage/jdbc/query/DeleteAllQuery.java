@@ -37,7 +37,7 @@ class DeleteAllQuery extends AbstractQuery implements WriteQuery {
     @CanIgnoreReturnValue
     @Override
     public long execute() {
-        final SQLDeleteClause query = factory().delete(table());
+        SQLDeleteClause query = factory().delete(table());
         return query.execute();
     }
 

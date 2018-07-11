@@ -39,11 +39,11 @@ class SelectEventCountByIdQuery<I> extends AbstractSelectByIdQuery<I, Integer> {
 
     @Override
     public Integer execute() {
-        final PathBuilder<Integer> eventCount = pathOf(EVENT_COUNT.name(), Integer.class);
-        final Fetchable<Integer> query = factory().select(eventCount)
-                                                  .from(table())
-                                                  .where(hasId());
-        final Integer result = query.fetchOne();
+        PathBuilder<Integer> eventCount = pathOf(EVENT_COUNT.name(), Integer.class);
+        Fetchable<Integer> query = factory().select(eventCount)
+                                            .from(table())
+                                            .where(hasId());
+        Integer result = query.fetchOne();
         return result;
     }
 

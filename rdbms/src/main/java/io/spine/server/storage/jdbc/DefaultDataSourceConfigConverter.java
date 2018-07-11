@@ -41,7 +41,7 @@ class DefaultDataSourceConfigConverter {
 
     @SuppressWarnings("MethodWithMoreThanThreeNegations") // is OK in this case
     static HikariConfig convert(DataSourceConfig config) {
-        final HikariConfig result = new HikariConfig();
+        HikariConfig result = new HikariConfig();
 
         /* Required fields */
 
@@ -52,37 +52,37 @@ class DefaultDataSourceConfigConverter {
 
         /* Optional fields */
 
-        final Boolean autoCommit = config.getAutoCommit();
+        Boolean autoCommit = config.getAutoCommit();
         if (autoCommit != null) {
             result.setAutoCommit(autoCommit);
         }
 
-        final Long connectionTimeout = config.getConnectionTimeout();
+        Long connectionTimeout = config.getConnectionTimeout();
         if (connectionTimeout != null) {
             result.setConnectionTimeout(connectionTimeout);
         }
 
-        final Long idleTimeout = config.getIdleTimeout();
+        Long idleTimeout = config.getIdleTimeout();
         if (idleTimeout != null) {
             result.setIdleTimeout(idleTimeout);
         }
 
-        final Long maxLifetime = config.getMaxLifetime();
+        Long maxLifetime = config.getMaxLifetime();
         if (maxLifetime != null) {
             result.setMaxLifetime(maxLifetime);
         }
 
-        final String connectionTestQuery = config.getConnectionTestQuery();
+        String connectionTestQuery = config.getConnectionTestQuery();
         if (connectionTestQuery != null) {
             result.setConnectionTestQuery(connectionTestQuery);
         }
 
-        final Integer maxPoolSize = config.getMaxPoolSize();
+        Integer maxPoolSize = config.getMaxPoolSize();
         if (maxPoolSize != null) {
             result.setMaximumPoolSize(maxPoolSize);
         }
 
-        final String poolName = config.getPoolName();
+        String poolName = config.getPoolName();
         if (poolName != null) {
             result.setPoolName(poolName);
         }

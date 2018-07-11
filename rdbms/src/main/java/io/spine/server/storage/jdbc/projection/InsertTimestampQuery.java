@@ -40,10 +40,10 @@ class InsertTimestampQuery extends WriteTimestampQuery {
 
     @Override
     public long execute() {
-        final SQLInsertClause query = factory().insert(table())
-                                               .set(pathOf(PROJECTION_TYPE), getIdValue())
-                                               .set(pathOf(SECONDS), getTimestamp().getSeconds())
-                                               .set(pathOf(NANOS), getTimestamp().getNanos());
+        SQLInsertClause query = factory().insert(table())
+                                         .set(pathOf(PROJECTION_TYPE), getIdValue())
+                                         .set(pathOf(SECONDS), getTimestamp().getSeconds())
+                                         .set(pathOf(NANOS), getTimestamp().getNanos());
         return query.execute();
     }
 

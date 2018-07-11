@@ -63,36 +63,36 @@ class LifecycleFlagsTable<I> extends EntityTable<I, LifecycleFlags, LifecycleFla
 
     @Override
     protected SelectQuery<LifecycleFlags> composeSelectQuery(I id) {
-        final SelectLifecycleFlagsQuery.Builder<I> builder = SelectLifecycleFlagsQuery.newBuilder();
-        final SelectQuery<LifecycleFlags> query = builder.setTableName(getName())
-                                                         .setDataSource(getDataSource())
-                                                         .setIdColumn(getIdColumn())
-                                                         .setId(id)
-                                                         .build();
+        SelectLifecycleFlagsQuery.Builder<I> builder = SelectLifecycleFlagsQuery.newBuilder();
+        SelectQuery<LifecycleFlags> query = builder.setTableName(getName())
+                                                   .setDataSource(getDataSource())
+                                                   .setIdColumn(getIdColumn())
+                                                   .setId(id)
+                                                   .build();
         return query;
     }
 
     @Override
     protected WriteQuery composeInsertQuery(I id, LifecycleFlags record) {
-        final InsertLifecycleFlagsQuery.Builder<I> builder = InsertLifecycleFlagsQuery.newBuilder();
-        final WriteQuery query = builder.setTableName(getName())
-                                        .setId(id)
-                                        .setLifecycleFlags(record)
-                                        .setDataSource(getDataSource())
-                                        .setIdColumn(getIdColumn())
-                                        .build();
+        InsertLifecycleFlagsQuery.Builder<I> builder = InsertLifecycleFlagsQuery.newBuilder();
+        WriteQuery query = builder.setTableName(getName())
+                                  .setId(id)
+                                  .setLifecycleFlags(record)
+                                  .setDataSource(getDataSource())
+                                  .setIdColumn(getIdColumn())
+                                  .build();
         return query;
     }
 
     @Override
     protected WriteQuery composeUpdateQuery(I id, LifecycleFlags record) {
-        final UpdateLifecycleFlagsQuery.Builder<I> builder = UpdateLifecycleFlagsQuery.newBuilder();
-        final WriteQuery query = builder.setTableName(getName())
-                                        .setDataSource(getDataSource())
-                                        .setId(id)
-                                        .setLifecycleFlags(record)
-                                        .setIdColumn(getIdColumn())
-                                        .build();
+        UpdateLifecycleFlagsQuery.Builder<I> builder = UpdateLifecycleFlagsQuery.newBuilder();
+        WriteQuery query = builder.setTableName(getName())
+                                  .setDataSource(getDataSource())
+                                  .setId(id)
+                                  .setLifecycleFlags(record)
+                                  .setIdColumn(getIdColumn())
+                                  .build();
         return query;
     }
 

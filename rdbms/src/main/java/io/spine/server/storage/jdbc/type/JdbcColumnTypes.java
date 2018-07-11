@@ -140,7 +140,7 @@ final class JdbcColumnTypes {
 
         @Override
         public Integer convertColumnValue(Version fieldValue) {
-            final Integer version = fieldValue.getNumber();
+            Integer version = fieldValue.getNumber();
             return version;
         }
 
@@ -160,7 +160,7 @@ final class JdbcColumnTypes {
 
         @Override
         public Long convertColumnValue(Timestamp fieldValue) {
-            final long millis = Timestamps.toMillis(fieldValue);
+            long millis = Timestamps.toMillis(fieldValue);
             return millis;
         }
 
@@ -178,7 +178,7 @@ final class JdbcColumnTypes {
 
         @Override
         public String convertColumnValue(AbstractMessage fieldValue) {
-            final String message = Json.toCompactJson(fieldValue);
+            String message = Json.toCompactJson(fieldValue);
             return message;
         }
 

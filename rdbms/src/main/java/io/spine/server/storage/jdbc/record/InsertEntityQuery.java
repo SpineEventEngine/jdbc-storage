@@ -43,7 +43,7 @@ class InsertEntityQuery<I> extends WriteEntityQuery<I, SQLInsertClause> {
 
     @Override
     protected void setIdValue(SQLInsertClause clause, IdColumn<I> idColumn, Object normalizedId) {
-        final PathBuilder<Object> idPath = pathOf(idColumn.getColumnName());
+        PathBuilder<Object> idPath = pathOf(idColumn.getColumnName());
         clause.set(idPath, normalizedId);
     }
 

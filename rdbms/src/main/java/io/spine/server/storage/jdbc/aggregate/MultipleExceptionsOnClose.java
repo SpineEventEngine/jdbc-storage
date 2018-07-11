@@ -51,17 +51,17 @@ final class MultipleExceptionsOnClose extends Throwable {
     @Override
     public String toString() {
         @SuppressWarnings("StringBufferWithoutInitialCapacity")
-        // We don't know the size of the stacktrace
-        final StringBuilder builder = new StringBuilder();
-        final String selfInfo = super.toString();
+        // We don't know the size of the stacktrace.
+        StringBuilder builder = new StringBuilder();
+        String selfInfo = super.toString();
         builder.append(selfInfo)
                .append(lineSeparator());
         for (Exception exception : exceptions) {
-            final String stackTrace = Throwables.getStackTraceAsString(exception);
+            String stackTrace = Throwables.getStackTraceAsString(exception);
             builder.append(stackTrace)
                    .append(lineSeparator());
         }
-        final String result = builder.toString();
+        String result = builder.toString();
         return result;
     }
 }

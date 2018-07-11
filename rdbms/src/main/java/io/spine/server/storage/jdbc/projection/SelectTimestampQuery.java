@@ -46,21 +46,21 @@ class SelectTimestampQuery extends SelectMessageByIdQuery<String, Timestamp> {
 
     @Override
     protected AbstractSQLQuery<?, ?> getQuery() {
-        final AbstractSQLQuery<?, ?> query = factory().select(pathOf(SECONDS), pathOf(NANOS))
-                                                      .from(table())
-                                                      .where(hasId());
+        AbstractSQLQuery<?, ?> query = factory().select(pathOf(SECONDS), pathOf(NANOS))
+                                                .from(table())
+                                                .where(hasId());
         return query;
     }
 
     @Override
     @SuppressWarnings("MethodDoesntCallSuperMethod") // Override default Message storing policy.
     protected @Nullable Timestamp readMessage(ResultSet resultSet) throws SQLException {
-        final long seconds = resultSet.getLong(Column.SECONDS.name());
-        final int nanos = resultSet.getInt(Column.NANOS.name());
-        final Timestamp time = Timestamp.newBuilder()
-                                        .setSeconds(seconds)
-                                        .setNanos(nanos)
-                                        .build();
+        long seconds = resultSet.getLong(Column.SECONDS.name());
+        int nanos = resultSet.getInt(Column.NANOS.name());
+        Timestamp time = Timestamp.newBuilder()
+                                  .setSeconds(seconds)
+                                  .setNanos(nanos)
+                                  .build();
         if (isDefault(time)) {
             return null;
         }

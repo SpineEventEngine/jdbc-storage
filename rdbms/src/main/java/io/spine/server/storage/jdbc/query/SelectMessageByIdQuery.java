@@ -60,11 +60,11 @@ public abstract class SelectMessageByIdQuery<I, M extends Message> extends Abstr
      */
     @Override
     public final @Nullable M execute() throws DatabaseException {
-        try (ResultSet resultSet = getQuery().getResults()){
+        try (ResultSet resultSet = getQuery().getResults()) {
             if (!resultSet.next()) {
                 return null;
             }
-            final M message = readMessage(resultSet);
+            M message = readMessage(resultSet);
             return message;
         } catch (SQLException e) {
             throw new DatabaseException(e);
@@ -90,11 +90,11 @@ public abstract class SelectMessageByIdQuery<I, M extends Message> extends Abstr
     protected @Nullable M readMessage(ResultSet resultSet) throws SQLException {
         checkNotNull(messageColumnName);
         checkNotNull(messageDescriptor);
-        final byte[] bytes = resultSet.getBytes(messageColumnName);
+        byte[] bytes = resultSet.getBytes(messageColumnName);
         if (bytes == null) {
             return null;
         }
-        final M message = Serializer.deserialize(bytes, messageDescriptor);
+        M message = Serializer.deserialize(bytes, messageDescriptor);
         return message;
     }
 
