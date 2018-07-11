@@ -64,7 +64,7 @@ import static org.mockito.Mockito.when;
 @SuppressWarnings({"InnerClassMayBeStatic", "ClassCanBeStatic"
         /* JUnit nested classes cannot be static. */,
         "DuplicateStringLiteralInspection" /* Common test display names. */})
-@DisplayName("QueryPredicates should")
+@DisplayName("QueryPredicates utility should")
 class QueryPredicatesTest {
 
     private static final String COLUMN_FILTER_VALUE = "test";

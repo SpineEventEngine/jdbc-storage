@@ -55,7 +55,7 @@ class DbIteratorTest {
     class ThrowDatabaseException {
 
         @Test
-        @DisplayName("on next check failure")
+        @DisplayName("on `hasNext` check failure")
         void onNextCheckFailure() {
             final DbIterator iterator = faultyResultIterator();
             assertThrows(DatabaseException.class, iterator::hasNext);

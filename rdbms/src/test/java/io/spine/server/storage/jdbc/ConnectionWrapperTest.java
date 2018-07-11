@@ -52,7 +52,7 @@ class ConnectionWrapperTest {
     }
 
     @Test
-    @DisplayName("throw DatabaseException on SQLException on commit")
+    @DisplayName("throw DatabaseException in case of SQLException on commit")
     void handleExceptionOnCommit() {
         final Connection connection = mockConnection();
         final ConnectionWrapper wrapper = ConnectionWrapper.wrap(connection);
@@ -60,7 +60,7 @@ class ConnectionWrapperTest {
     }
 
     @Test
-    @DisplayName("throw DatabaseException on SQLException on rollback")
+    @DisplayName("throw DatabaseException in case of SQLException on rollback")
     void handleExceptionOnRollback() {
         final Connection connection = mockConnection();
         final ConnectionWrapper wrapper = ConnectionWrapper.wrap(connection);
@@ -68,7 +68,7 @@ class ConnectionWrapperTest {
     }
 
     @Test
-    @DisplayName("throw DatabaseException on SQLException on close")
+    @DisplayName("throw DatabaseException in case of SQLException on close")
     void handleExceptionOnClose() {
         final Connection connection = mockConnection();
         final ConnectionWrapper wrapper = ConnectionWrapper.wrap(connection);
@@ -77,7 +77,7 @@ class ConnectionWrapperTest {
 
     @SuppressWarnings("JDBCPrepareStatementWithNonConstantString") // OK for a mock setup.
     @Test
-    @DisplayName("throw DatabaseException on SQLException when preparing statement")
+    @DisplayName("throw DatabaseException in case of SQLException on preparing statement")
     void handleExceptionOnPrepareStatement()
             throws SQLException {
         final Connection connection = mockConnection();
