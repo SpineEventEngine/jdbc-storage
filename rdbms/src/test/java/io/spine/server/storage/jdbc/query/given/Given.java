@@ -63,9 +63,9 @@ public class Given {
         }
 
         public static class Builder extends SelectMessageByIdQuery.Builder<Builder,
-                ASelectMessageByIdQuery,
-                String,
-                Message> {
+                                                                           ASelectMessageByIdQuery,
+                                                                           String,
+                                                                           Message> {
 
             private AbstractSQLQuery<?, ?> query;
 
