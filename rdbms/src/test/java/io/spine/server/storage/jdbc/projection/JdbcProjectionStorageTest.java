@@ -32,7 +32,6 @@ import io.spine.server.storage.jdbc.TypeMapping;
 import io.spine.server.storage.jdbc.projection.given.JdbcProjectionStorageTestEnv.TestEntity;
 import io.spine.server.storage.jdbc.record.JdbcRecordStorage;
 import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
-import io.spine.test.Tests;
 import io.spine.test.storage.ProjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -105,7 +104,7 @@ class JdbcProjectionStorageTest extends ProjectionStorageTest {
     @Test
     @DisplayName("require non-null record storage")
     void rejectNullRecordStorage() {
-        final JdbcRecordStorage<Object> nullStorage = Tests.nullRef();
+        final JdbcRecordStorage<Object> nullStorage = nullRef();
         assertThrows(NullPointerException.class,
                      () -> JdbcProjectionStorage.newBuilder()
                                                 .setRecordStorage(nullStorage));
