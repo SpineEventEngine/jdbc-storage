@@ -116,7 +116,7 @@ class DbIteratorTest {
         }
     }
 
-    @SuppressWarnings("deprecation") // Need to use deprecated to make sure it's not supported.
+    @SuppressWarnings("deprecation") // Use deprecated method to make sure it's not supported.
     @Test
     @DisplayName("not support removal")
     void notSupportRemoval() {
