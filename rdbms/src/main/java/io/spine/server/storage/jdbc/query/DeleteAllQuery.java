@@ -20,6 +20,7 @@
 
 package io.spine.server.storage.jdbc.query;
 
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.querydsl.sql.dml.SQLDeleteClause;
 
 /**
@@ -33,6 +34,7 @@ class DeleteAllQuery extends AbstractQuery implements WriteQuery {
         super(builder);
     }
 
+    @CanIgnoreReturnValue
     @Override
     public long execute() {
         final SQLDeleteClause query = factory().delete(table());

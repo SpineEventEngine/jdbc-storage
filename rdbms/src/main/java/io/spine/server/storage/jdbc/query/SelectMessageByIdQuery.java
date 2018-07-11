@@ -20,6 +20,7 @@
 
 package io.spine.server.storage.jdbc.query;
 
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Message;
 import com.querydsl.sql.AbstractSQLQuery;
@@ -109,11 +110,13 @@ public abstract class SelectMessageByIdQuery<I, M extends Message> extends Abstr
         private String messageColumnName;
         private Descriptor messageDescriptor;
 
+        @CanIgnoreReturnValue
         protected B setMessageColumnName(String messageColumnName) {
             this.messageColumnName = messageColumnName;
             return getThis();
         }
 
+        @CanIgnoreReturnValue
         protected B setMessageDescriptor(Descriptor messageDescriptor) {
             this.messageDescriptor = messageDescriptor;
             return getThis();

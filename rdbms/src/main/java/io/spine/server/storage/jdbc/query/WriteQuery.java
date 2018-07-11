@@ -20,6 +20,8 @@
 
 package io.spine.server.storage.jdbc.query;
 
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+
 /**
  * A query which makes changes in a data source.
  *
@@ -32,5 +34,6 @@ public interface WriteQuery extends StorageQuery {
      *
      * @return the amount of affected rows
      */
+    @CanIgnoreReturnValue
     long execute();
 }
