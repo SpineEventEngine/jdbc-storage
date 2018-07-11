@@ -29,8 +29,8 @@ import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.FieldMasks;
 import io.spine.server.storage.jdbc.query.MessageDbIterator;
 import io.spine.type.TypeUrl;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-import javax.annotation.Nullable;
 import java.sql.ResultSet;
 import java.util.Iterator;
 import java.util.Map;

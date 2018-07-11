@@ -30,8 +30,8 @@ import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.JdbcStorageFactory;
 import io.spine.server.storage.jdbc.StorageBuilder;
 import io.spine.server.storage.jdbc.record.JdbcRecordStorage;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.Iterator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -78,8 +78,7 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
     }
 
     @Override
-    @Nullable
-    public Timestamp readLastHandledEventTime() throws DatabaseException {
+    public @Nullable Timestamp readLastHandledEventTime() throws DatabaseException {
         final Timestamp timestamp = table.read(projectionId);
         return timestamp;
     }

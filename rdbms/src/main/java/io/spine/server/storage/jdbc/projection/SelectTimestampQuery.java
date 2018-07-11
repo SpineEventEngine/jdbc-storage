@@ -24,8 +24,8 @@ import com.google.protobuf.Timestamp;
 import com.querydsl.sql.AbstractSQLQuery;
 import io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column;
 import io.spine.server.storage.jdbc.query.SelectMessageByIdQuery;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-import javax.annotation.Nullable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -52,10 +52,9 @@ class SelectTimestampQuery extends SelectMessageByIdQuery<String, Timestamp> {
         return query;
     }
 
-    @SuppressWarnings("MethodDoesntCallSuperMethod") // Override default Message storing policy
-    @Nullable
     @Override
-    protected Timestamp readMessage(ResultSet resultSet) throws SQLException {
+    @SuppressWarnings("MethodDoesntCallSuperMethod") // Override default Message storing policy.
+    protected @Nullable Timestamp readMessage(ResultSet resultSet) throws SQLException {
         final long seconds = resultSet.getLong(Column.SECONDS.name());
         final int nanos = resultSet.getInt(Column.NANOS.name());
         final Timestamp time = Timestamp.newBuilder()

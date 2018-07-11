@@ -25,8 +25,8 @@ import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Message;
 import com.querydsl.sql.AbstractSQLQuery;
 import io.spine.server.storage.jdbc.DatabaseException;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-import javax.annotation.Nullable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -58,9 +58,8 @@ public abstract class SelectMessageByIdQuery<I, M extends Message> extends Abstr
      * @throws DatabaseException if an error occurs during an interaction with the DB
      * @see Serializer#deserialize
      */
-    @Nullable
     @Override
-    public final M execute() throws DatabaseException {
+    public final @Nullable M execute() throws DatabaseException {
         try (ResultSet resultSet = getQuery().getResults()){
             if (!resultSet.next()) {
                 return null;
@@ -88,8 +87,7 @@ public abstract class SelectMessageByIdQuery<I, M extends Message> extends Abstr
      * @return a message instance or {@code null} if the row does not contain the needed data
      * @throws SQLException if an error occurs during an interaction with the DB
      */
-    @Nullable
-    protected M readMessage(ResultSet resultSet) throws SQLException {
+    protected @Nullable M readMessage(ResultSet resultSet) throws SQLException {
         checkNotNull(messageColumnName);
         checkNotNull(messageDescriptor);
         final byte[] bytes = resultSet.getBytes(messageColumnName);

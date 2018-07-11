@@ -43,8 +43,8 @@ import io.spine.server.storage.jdbc.record.JdbcRecordStorage;
 import io.spine.string.Stringifier;
 import io.spine.string.StringifierRegistry;
 import io.spine.type.TypeUrl;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;

@@ -29,9 +29,9 @@ import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.Type;
 import io.spine.server.storage.jdbc.TypeMapping;
 import io.spine.type.TypeName;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 
-import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -162,8 +162,7 @@ public abstract class AbstractTable<I, R, W> {
      * @param id ID to search by
      * @return table record or {@code null} if there is no record with given ID
      */
-    @Nullable
-    public R read(I id) {
+    public @Nullable R read(I id) {
         final SelectQuery<R> query = composeSelectQuery(id);
         final R result = query.execute();
         return result;

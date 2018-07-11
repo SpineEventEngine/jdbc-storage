@@ -20,7 +20,7 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * A parameter of an SQL query.
@@ -52,8 +52,7 @@ public final class Parameter {
      *
      * @return the parameter value
      */
-    @Nullable
-    public Object getValue() {
+    public @Nullable Object getValue() {
         return value;
     }
 }
