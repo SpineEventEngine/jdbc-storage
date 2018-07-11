@@ -47,6 +47,7 @@ public class JdbcRecordStorageTestEnv {
             super(id);
         }
 
+        @SuppressWarnings("unused") // Reflective access.
         @Column(name = COLUMN_NAME_FOR_STORING)
         public int getValue() {
             return 0;
