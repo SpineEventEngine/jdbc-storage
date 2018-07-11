@@ -64,6 +64,8 @@ subprojects {
 
         implementation deps.build.guava
         implementation deps.build.jsr305Annotations
+        implementation deps.build.checkerAnnotations
+        implementation deps.build.errorProneAnnotations
         implementation deps.build.slf4j
 
         testImplementation deps.test.junit5Api
