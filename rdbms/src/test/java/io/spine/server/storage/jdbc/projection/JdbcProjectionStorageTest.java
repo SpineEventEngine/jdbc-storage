@@ -59,20 +59,20 @@ class JdbcProjectionStorageTest extends ProjectionStorageTest {
         final TypeMapping typeMapping = MYSQL_5_7;
         final JdbcRecordStorage<ProjectId> entityStorage =
                 JdbcRecordStorage.<ProjectId>newBuilder()
-                                 .setDataSource(dataSource)
-                                 .setMultitenant(false)
-                                 .setEntityClass(projectionClass)
-                                 .setColumnTypeRegistry(JdbcTypeRegistryFactory.defaultInstance())
-                                 .setTypeMapping(typeMapping)
-                                 .build();
+                        .setDataSource(dataSource)
+                        .setMultitenant(false)
+                        .setEntityClass(projectionClass)
+                        .setColumnTypeRegistry(JdbcTypeRegistryFactory.defaultInstance())
+                        .setTypeMapping(typeMapping)
+                        .build();
         final ProjectionStorage<ProjectId> storage =
                 JdbcProjectionStorage.<ProjectId>newBuilder()
-                                     .setRecordStorage(entityStorage)
-                                     .setDataSource(dataSource)
-                                     .setMultitenant(false)
-                                     .setProjectionClass(projectionClass)
-                                     .setTypeMapping(typeMapping)
-                                     .build();
+                        .setRecordStorage(entityStorage)
+                        .setDataSource(dataSource)
+                        .setMultitenant(false)
+                        .setProjectionClass(projectionClass)
+                        .setTypeMapping(typeMapping)
+                        .build();
         return storage;
     }
 

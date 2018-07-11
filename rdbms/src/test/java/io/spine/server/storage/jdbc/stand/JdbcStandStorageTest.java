@@ -64,8 +64,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -102,10 +102,10 @@ class JdbcStandStorageTest extends StandStorageTest {
         when(dataSourceMock.getConnection(anyBoolean())).thenReturn(connectionMock);
 
         final StandStorage standStorage = JdbcStandStorage.<String>newBuilder()
-                                                          .setDataSource(dataSourceMock)
-                                                          .setMultitenant(false)
-                                                          .setTypeMapping(MYSQL_5_7)
-                                                          .build();
+                .setDataSource(dataSourceMock)
+                .setMultitenant(false)
+                .setTypeMapping(MYSQL_5_7)
+                .build();
 
         assertNotNull(standStorage);
         // Established connection with the DB
@@ -124,9 +124,9 @@ class JdbcStandStorageTest extends StandStorageTest {
         when(dataSourceMock.getConnection(anyBoolean())).thenReturn(connectionMock);
 
         final StandStorage standStorage = JdbcStandStorage.<String>newBuilder()
-                                                          .setDataSource(dataSourceMock)
-                                                          .setTypeMapping(MYSQL_5_7)
-                                                          .build();
+                .setDataSource(dataSourceMock)
+                .setTypeMapping(MYSQL_5_7)
+                .build();
 
         assertNotNull(standStorage);
         assertFalse(standStorage.isMultitenant());
@@ -236,7 +236,7 @@ class JdbcStandStorageTest extends StandStorageTest {
         }
         final Iterator<EntityRecord> readRecords = storage.readAll();
         int iteratorCounter = 0;
-        while(readRecords.hasNext()) {
+        while (readRecords.hasNext()) {
             assertTrue(records.contains(readRecords.next()));
             iteratorCounter++;
         }

@@ -26,9 +26,9 @@ import org.junit.jupiter.api.Test;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -98,12 +98,14 @@ class ConnectionWrapperTest {
 
     private static Connection mockConnection() {
         final Connection connection = mock(Connection.class);
-        @SuppressWarnings("NewExceptionWithoutArguments")
-        final Exception exception = new SQLException();
+        @SuppressWarnings("NewExceptionWithoutArguments") final Exception exception = new SQLException();
         try {
-            doThrow(exception).when(connection).commit();
-            doThrow(exception).when(connection).rollback();
-            doThrow(exception).when(connection).close();
+            doThrow(exception).when(connection)
+                              .commit();
+            doThrow(exception).when(connection)
+                              .rollback();
+            doThrow(exception).when(connection)
+                              .close();
         } catch (SQLException e) {
             fail("Didn't want to catch that.");
         }

@@ -65,8 +65,8 @@ class JdbcAggregateStorageVisibilityHandlingTest
     void updateEntityVisibility() {
         final ProjectId id = Sample.messageOfType(ProjectId.class);
         final LifecycleFlags archived = LifecycleFlags.newBuilder()
-                                              .setArchived(true)
-                                              .build();
+                                                      .setArchived(true)
+                                                      .build();
         final JdbcAggregateStorage<ProjectId> storage =
                 (JdbcAggregateStorage<ProjectId>) getAggregateStorage(TestAggregate.class);
         storage.writeLifecycleFlags(id, archived);
@@ -76,9 +76,9 @@ class JdbcAggregateStorageVisibilityHandlingTest
         assertEquals(archived, actualArchived.get());
 
         final LifecycleFlags archivedAndDeleted = LifecycleFlags.newBuilder()
-                                                        .setArchived(true)
-                                                        .setDeleted(true)
-                                                        .build();
+                                                                .setArchived(true)
+                                                                .setDeleted(true)
+                                                                .build();
         storage.writeLifecycleFlags(id, archivedAndDeleted);
 
         final Optional<LifecycleFlags> actualArchivedAndDeleted = storage.readLifecycleFlags(id);

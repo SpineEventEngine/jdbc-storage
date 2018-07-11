@@ -133,7 +133,7 @@ class QueryPredicatesTest {
     }
 
     @SuppressWarnings({"unchecked" /* Using raw types for mocks. */,
-                       "ResultOfMethodCallIgnored" /* Method expected to throw exception. */})
+            "ResultOfMethodCallIgnored" /* Method expected to throw exception. */})
     @Test
     @DisplayName("not accept non-comparable value")
     void notAcceptNonComparable() {
@@ -173,7 +173,7 @@ class QueryPredicatesTest {
     @DisplayName("not generate null filter for `LESS THAN`")
     void notGenerateNullFilterForLESSTHAN() {
         assertThrows(IllegalArgumentException.class,
-                     () ->  runNullFilterCreationFor(LESS_THAN));
+                     () -> runNullFilterCreationFor(LESS_THAN));
     }
 
     @Test
