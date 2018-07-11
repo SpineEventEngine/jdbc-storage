@@ -68,6 +68,7 @@ class QueryExecutorTest {
         return LogSingleton.INSTANCE.value;
     }
 
+    @SuppressWarnings("ImmutableEnumChecker") // SLF4J Logger is in fact immutable.
     private enum LogSingleton {
         INSTANCE;
         @SuppressWarnings("NonSerializableFieldInSerializableClass")

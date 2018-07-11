@@ -107,6 +107,8 @@ class JdbcRecordStorageTest extends RecordStorageTest<String, JdbcRecordStorage<
         close(storage);
     }
 
+    @SuppressWarnings("CheckReturnValue")
+    // Just check that operation is performed without exceptions.
     @Test
     @DisplayName("read by composite filter with column filters for same column")
     void readByCompositeFilter() {
