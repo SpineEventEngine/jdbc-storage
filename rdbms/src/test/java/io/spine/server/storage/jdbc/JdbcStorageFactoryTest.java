@@ -32,8 +32,8 @@ import io.spine.server.storage.RecordStorage;
 import io.spine.test.storage.Project;
 import io.spine.test.storage.ProjectVBuilder;
 import io.spine.validate.StringValueVBuilder;
-import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import javax.sql.DataSource;
 
@@ -51,7 +51,8 @@ import static org.mockito.Mockito.verify;
 /**
  * @author Alexander Litus
  */
-public class JdbcStorageFactoryShould {
+@DisplayName("JdbcStorageFactory should")
+class JdbcStorageFactoryTest {
 
     private final DataSourceConfig config = DataSourceConfig.newBuilder()
                                                             .setJdbcUrl(prefix("factoryTests"))
@@ -80,8 +81,8 @@ public class JdbcStorageFactoryShould {
     }
 
     @Test
-    @DisplayName("create singletenant record storage")
-    void createSingletenantRecordStorage() {
+    @DisplayName("create single tenant record storage")
+    void createSingleTenantRecordStorage() {
         final JdbcStorageFactory factory = newFactory(false);
         final RecordStorage<String> storage = factory.createRecordStorage(TestEntity.class);
         assertFalse(storage.isMultitenant());
@@ -97,8 +98,8 @@ public class JdbcStorageFactoryShould {
     }
 
     @Test
-    @DisplayName("create singletenant aggregate storage")
-    void createSingletenantAggregateStorage() {
+    @DisplayName("create single tenant aggregate storage")
+    void createSingleTenantAggregateStorage() {
         final JdbcStorageFactory factory = newFactory(false);
         final AggregateStorage<String> storage =
                 factory.createAggregateStorage(TestAggregate.class);
@@ -115,8 +116,8 @@ public class JdbcStorageFactoryShould {
     }
 
     @Test
-    @DisplayName("create singletenant projection storage")
-    void createSingletenantProjectionStorage() {
+    @DisplayName("create single tenant projection storage")
+    void createSingleTenantProjectionStorage() {
         final JdbcStorageFactory factory = newFactory(false);
         final ProjectionStorage<String> storage =
                 factory.createProjectionStorage(TestProjection.class);
@@ -132,8 +133,8 @@ public class JdbcStorageFactoryShould {
     }
 
     @Test
-    @DisplayName("create singletenant stand storage")
-    void createSingletenantStandStorage() {
+    @DisplayName("create single tenant stand storage")
+    void createSingleTenantStandStorage() {
         final JdbcStorageFactory factory = newFactory(false);
         final StandStorage storage = factory.createStandStorage();
         assertFalse(storage.isMultitenant());
@@ -154,7 +155,7 @@ public class JdbcStorageFactoryShould {
 
     @Test
     @DisplayName("have default column type registry")
-    void haveDefaultColumnTypeRegistry() {
+    void haveDefaultTypeRegistry() {
         final DataSourceWrapper dataSource = GivenDataSource.withoutSuperpowers();
         final JdbcStorageFactory factory = JdbcStorageFactory.newBuilder()
                                                              .setDataSource(dataSource)

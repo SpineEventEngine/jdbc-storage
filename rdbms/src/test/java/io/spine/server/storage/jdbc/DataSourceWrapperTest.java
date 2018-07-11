@@ -20,29 +20,26 @@
 
 package io.spine.server.storage.jdbc;
 
-import org.junit.Test;
+import io.spine.server.storage.jdbc.GivenDataSource.ClosableDataSource;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doThrow;
 
 /**
  * @author Andrey Lavrov
  */
-public class DataSourceWrapperShould {
+@DisplayName("DataSourceWrapper should")
+class DataSourceWrapperTest {
 
     @Test
-    @DisplayName("throw database exception if fail to close")
+    @DisplayName("throw DatabaseException if failing to close")
     void throwDatabaseExceptionIfFailToClose() throws Exception {
-        final GivenDataSource.ClosableDataSource dataSource = GivenDataSource.whichIsAutoCloseable();
-        doThrow(new Exception("")).when(dataSource).close();
+        final ClosableDataSource dataSource = GivenDataSource.whichIsAutoCloseable();
+        doThrow(new Exception("")).when(dataSource)
+                                  .close();
         final DataSourceWrapper wrapper = DataSourceWrapper.wrap(dataSource);
-
-        try {
-            wrapper.close();
-        } catch (DatabaseException expected) {
-            return;
-        }
-        fail();
+        assertThrows(DatabaseException.class, wrapper::close);
     }
 }

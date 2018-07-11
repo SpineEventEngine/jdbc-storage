@@ -21,16 +21,18 @@
 package io.spine.server.storage.jdbc;
 
 import io.spine.type.TypeName;
-import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
 import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Dmytro Grankin
  */
-public class TypeMappingBuilderShould {
+@DisplayName("TypeMappingBuilder should")
+class TypeMappingBuilderTest {
 
     @Test
     @DisplayName("override type names")
@@ -46,17 +48,17 @@ public class TypeMappingBuilderShould {
         assertEquals(nameReplacement, resultingName.value());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     @DisplayName("not allow empty type names")
-    void notAllowEmptyTypeNames() {
+    void rejectEmptyTypeNames() {
         final TypeMappingBuilder builder = TypeMappingBuilder.basicBuilder();
-        builder.add(BYTE_ARRAY, "");
+        assertThrows(IllegalArgumentException.class, () -> builder.add(BYTE_ARRAY, ""));
     }
 
-    @Test(expected = IllegalStateException.class)
-    @DisplayName("throw exception if not all types mapped")
-    void throwExceptionIfNotAllTypesMapped() {
+    @Test
+    @DisplayName("throw ISE if not all types are mapped")
+    void throwIfNotAllTypesMapped() {
         final TypeMappingBuilder builder = new TypeMappingBuilder();
-        builder.build();
+        assertThrows(IllegalStateException.class, builder::build);
     }
 }

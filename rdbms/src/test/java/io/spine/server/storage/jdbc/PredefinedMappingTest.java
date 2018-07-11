@@ -20,8 +20,8 @@
 
 package io.spine.server.storage.jdbc;
 
-import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -34,6 +34,7 @@ import static io.spine.test.Tests.nullRef;
 import static io.spine.util.Exceptions.illegalStateWithCauseOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -41,20 +42,21 @@ import static org.mockito.Mockito.mock;
 /**
  * @author Dmytro Grankin
  */
-public class PredefinedMappingShould {
+@DisplayName("PredefinedMapping should")
+class PredefinedMappingTest {
 
     private final PredefinedMapping mapping = POSTGRESQL_10_1;
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     @DisplayName("throw ISE if requested type has no mapping")
-    void throwISEIfRequestedTypeHasNoMapping() {
+    void throwOnNoMapping() {
         final Type notMappedType = nullRef();
-        MYSQL_5_7.typeNameFor(notMappedType);
+        assertThrows(IllegalStateException.class, () -> MYSQL_5_7.typeNameFor(notMappedType));
     }
 
     @Test
     @DisplayName("be selected by database product name and major version")
-    void beSelectedByDatabaseProductNameAndMajorVersion() {
+    void selectTypeMapping() {
         final DataSourceWrapper dataSource = dataSourceMock(mapping.getDatabaseProductName(),
                                                             mapping.getMajorVersion(),
                                                             mapping.getMinorVersion());
@@ -62,8 +64,8 @@ public class PredefinedMappingShould {
     }
 
     @Test
-    @DisplayName("not be selected if major versions different")
-    void notBeSelectedIfMajorVersionsDifferent() {
+    @DisplayName("not be selected if major versions are different")
+    void notSelectForDifferentVersion() {
         final String databaseProductName = mapping.getDatabaseProductName();
         final int differentVersion = mapping.getMajorVersion() + 1;
         final DataSourceWrapper dataSource = dataSourceMock(databaseProductName,

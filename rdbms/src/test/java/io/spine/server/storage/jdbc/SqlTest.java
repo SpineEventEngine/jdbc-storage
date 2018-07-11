@@ -20,26 +20,28 @@
 
 package io.spine.server.storage.jdbc;
 
-import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
+import static io.spine.test.DisplayNames.HAVE_PARAMETERLESS_CTOR;
 import static io.spine.test.Tests.assertHasPrivateParameterlessCtor;
 import static org.junit.Assert.assertEquals;
 
 /**
  * @author Dmytro Dashenkov
  */
-public class SqlShould {
+@DisplayName("Sql utility should")
+class SqlTest {
 
     @Test
-    @DisplayName("have private constructor")
-    void havePrivateConstructor() {
+    @DisplayName(HAVE_PARAMETERLESS_CTOR)
+    void haveUtilityConstructor() {
         assertHasPrivateParameterlessCtor(Sql.class);
     }
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     @Test
-    @DisplayName("provide valid sql tokens")
+    @DisplayName("provide valid SQL tokens")
     void provideValidSqlTokens() {
         final String createTableExpected = "CREATE TABLE";
         final String createTableActual = Sql.Query.CREATE_TABLE.toString()
@@ -54,7 +56,7 @@ public class SqlShould {
 
     @Test
     @DisplayName("provide tokens wrapped into whitespace")
-    void provideTokensWrappedIntoWhitespace() {
+    void provideWhitespaceTokens() {
         final String sumExpected = " SUM ";
         final String sumActual = Sql.Function.SUM.toString();
         assertEquals(sumExpected, sumActual);
