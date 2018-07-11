@@ -258,7 +258,7 @@ class JdbcStandStorageTest extends StandStorageTest {
 
         @SuppressWarnings("MethodWithMultipleLoops") // One loop for writing, the other for reading.
         @Test
-        @DisplayName("records by type url")
+        @DisplayName("records by type URL")
         void recordsByTypeUrl() {
             final StandStorage storage = getStorage();
 
