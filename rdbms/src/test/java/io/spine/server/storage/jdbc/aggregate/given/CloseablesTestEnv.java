@@ -20,7 +20,7 @@
 
 package io.spine.server.storage.jdbc.aggregate.given;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * @author Dmytro Dashenkov

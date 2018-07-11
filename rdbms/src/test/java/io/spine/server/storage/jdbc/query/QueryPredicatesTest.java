@@ -51,7 +51,7 @@ import static io.spine.server.storage.jdbc.query.QueryPredicates.nullFilter;
 import static io.spine.server.storage.jdbc.query.QueryPredicates.valueFilter;
 import static io.spine.test.DisplayNames.HAVE_PARAMETERLESS_CTOR;
 import static io.spine.test.Tests.assertHasPrivateParameterlessCtor;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;

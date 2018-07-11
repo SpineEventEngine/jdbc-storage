@@ -35,7 +35,7 @@ import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory
 import static io.spine.server.storage.jdbc.GivenDataSource.withoutSuperpowers;
 import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
 import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.KIND;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
