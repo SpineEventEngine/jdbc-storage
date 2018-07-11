@@ -46,7 +46,7 @@ class AggregateEventRecordTableTest {
 
     @Test
     @DisplayName("throw ISE on attempt to update event record")
-    void throwOnUpdateEventRecord() {
+    void throwOnEventRecordUpdate() {
         final AggregateEventRecordTable<String> table =
                 new AggregateEventRecordTable<>(AnAggregate.class, withoutSuperpowers(), MYSQL_5_7);
         assertThrows(IllegalStateException.class,

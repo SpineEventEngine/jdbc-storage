@@ -63,14 +63,14 @@ class DbIteratorTest {
 
         @Test
         @DisplayName("on close failure")
-        void throwDatabaseExceptionOnCloseFailure() {
+        void onCloseFailure() {
             final DbIterator iterator = faultyResultIterator();
             assertThrows(DatabaseException.class, iterator::close);
         }
 
         @Test
         @DisplayName("on read failure")
-        void throwDatabaseExceptionOnReadFailure() {
+        void onReadFailure() {
             final DbIterator iterator = sneakyResultIterator();
             assertThrows(DatabaseException.class, () -> {
                 if (iterator.hasNext()) {
@@ -82,7 +82,7 @@ class DbIteratorTest {
 
     @Test
     @DisplayName("allow `next` without `hasNext`")
-    void getNextWithoutHasNext() {
+    void allowNextWithoutHasNext() {
         final DbIterator iterator = nonEmptyIterator();
         iterator.next();
     }
@@ -126,7 +126,7 @@ class DbIteratorTest {
 
     @Test
     @DisplayName("throw NoSuchElementException if trying to get absent element")
-    void throwOnGetAbsentElement() {
+    void notGetAbsentElement() {
         final DbIterator iterator = emptyIterator();
 
         // Ignore that the element is absent.

@@ -69,7 +69,7 @@ class IdColumnTest {
 
     @Test
     @DisplayName("cast message IDs to string")
-    void castMessageIDsToString() {
+    void castMessageIdsToString() {
         final IdColumn<?> column = IdColumn.newInstance(MessageIdEntity.class, ID);
         assertEquals(STRING_255, column.getSqlType());
         assertTrue(Message.class.isAssignableFrom(column.getJavaType()));

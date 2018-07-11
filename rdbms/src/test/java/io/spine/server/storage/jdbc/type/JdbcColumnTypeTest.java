@@ -54,7 +54,7 @@ class JdbcColumnTypeTest {
 
     @Test
     @DisplayName("check converted value to be non-null")
-    void checkConvertedNotNull() {
+    void checkValueNotNull() {
         assertThrows(NullPointerException.class, () -> columnType.convertColumnValue(nullRef()));
     }
 }
