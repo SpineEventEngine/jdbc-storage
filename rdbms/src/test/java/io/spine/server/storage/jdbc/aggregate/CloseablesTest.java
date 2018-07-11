@@ -104,7 +104,7 @@ class CloseablesTest {
         }
 
         assertFalse(success);
-        assertTrue((stateful.isClosed()));
+        assertTrue(stateful.isClosed());
     }
 
     @Test
