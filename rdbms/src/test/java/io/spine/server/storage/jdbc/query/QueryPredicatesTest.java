@@ -212,7 +212,7 @@ class QueryPredicatesTest {
     }
 
     @Nested
-    @DisplayName("generate value filter for ")
+    @DisplayName("generate value filter for")
     class CreateValueFilterFor {
 
         @Test
