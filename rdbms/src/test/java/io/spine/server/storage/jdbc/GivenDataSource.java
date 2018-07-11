@@ -57,7 +57,7 @@ public class GivenDataSource {
         final HikariConfig config = new HikariConfig();
         final String dbUrl = prefix(dbName);
         config.setJdbcUrl(dbUrl);
-        // not setting username and password is OK for in-memory database
+        // Not setting username and password is OK for in-memory database.
         final DataSourceWrapper dataSource = DataSourceWrapper.wrap(new HikariDataSource(config));
         return dataSource;
     }
