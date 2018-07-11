@@ -63,7 +63,6 @@ class JdbcTypeRegistryFactoryTest {
         assertNotNull(registry);
         assertNotNull(registry.get(columnWithType(Version.class)));
         assertNotNull(registry.get(columnWithType(boolean.class)));
-        assertEquals(registry.get(columnWithType(String.class)),
-                     CustomType.INSTANCE);
+        assertEquals(registry.get(columnWithType(String.class)), CustomType.INSTANCE);
     }
 }

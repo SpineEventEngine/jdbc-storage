@@ -67,8 +67,7 @@ class AggregateEventRecordTableTest {
         AggregateEventRecord record = AggregateEventRecord.newBuilder()
                                                           .setSnapshot(snapshot)
                                                           .build();
-        InsertAggregateRecordQuery<String> query = table.composeInsertQuery(newUuid(),
-                                                                            record);
+        InsertAggregateRecordQuery<String> query = table.composeInsertQuery(newUuid(), record);
         query.execute();
 
         String expectedKind = record.getKindCase()
