@@ -155,7 +155,8 @@ class JdbcRecordStorageTest extends RecordStorageTest<String, JdbcRecordStorage<
     protected JdbcRecordStorage<String> newStorage(Class<? extends Entity> cls) {
         DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory("entityStorageTests");
         @SuppressWarnings("unchecked") // Test invariant.
-        Class<? extends Entity<String, ?>> entityClass = (Class<? extends Entity<String, ?>>) cls;
+                Class<? extends Entity<String, ?>> entityClass =
+                (Class<? extends Entity<String, ?>>) cls;
         JdbcRecordStorage<String> storage =
                 JdbcRecordStorage.<String>newBuilder()
                         .setDataSource(dataSource)

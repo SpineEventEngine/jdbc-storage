@@ -52,8 +52,8 @@ class JdbcProjectionStorageTest extends ProjectionStorageTest {
     protected ProjectionStorage<ProjectId> newStorage(Class<? extends Entity> entityClass) {
         DataSourceWrapper dataSource =
                 GivenDataSource.whichIsStoredInMemory("projectionStorageTests");
-        @SuppressWarnings("unchecked") // Required for the tests
-        Class<? extends Projection<ProjectId, ?, ?>> projectionClass =
+        @SuppressWarnings("unchecked") // Required for the tests.
+                Class<? extends Projection<ProjectId, ?, ?>> projectionClass =
                 (Class<? extends Projection<ProjectId, ?, ?>>) entityClass;
         TypeMapping typeMapping = MYSQL_5_7;
         JdbcRecordStorage<ProjectId> entityStorage =

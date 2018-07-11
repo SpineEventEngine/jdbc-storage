@@ -99,7 +99,7 @@ class ConnectionWrapperTest {
     private static Connection mockConnection() {
         Connection connection = mock(Connection.class);
         @SuppressWarnings("NewExceptionWithoutArguments") // For test we need only exception type.
-        Exception exception = new SQLException();
+                Exception exception = new SQLException();
         try {
             doThrow(exception).when(connection)
                               .commit();

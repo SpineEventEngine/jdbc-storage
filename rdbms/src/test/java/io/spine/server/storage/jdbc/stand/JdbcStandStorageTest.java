@@ -172,8 +172,8 @@ class JdbcStandStorageTest extends StandStorageTest {
         RecordReadRequest<AggregateStateId> request = new RecordReadRequest<>(id);
         Optional<EntityRecord> readRecord = storage.read(request);
         assertTrue(readRecord.isPresent());
-        @SuppressWarnings("OptionalGetWithoutIsPresent") // We do check if present
-        EntityRecord actualRecord = readRecord.get();
+        @SuppressWarnings("OptionalGetWithoutIsPresent") // We do check if present.
+                EntityRecord actualRecord = readRecord.get();
         assertEquals(actualRecord, record);
     }
 
