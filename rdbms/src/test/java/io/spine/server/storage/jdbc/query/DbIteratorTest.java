@@ -22,6 +22,7 @@ package io.spine.server.storage.jdbc.query;
 
 import io.spine.server.storage.jdbc.DatabaseException;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 
@@ -43,32 +44,40 @@ import static org.mockito.Mockito.verify;
 /**
  * @author Dmytro Dashenkov
  */
+@SuppressWarnings({"InnerClassMayBeStatic", "ClassCanBeStatic"})
+// JUnit nested classes cannot be static.
 @DisplayName("DbIterator should")
 class DbIteratorTest {
 
-    @Test
-    @DisplayName("throw DatabaseException on next check failure")
-    void throwDatabaseExceptionOnNextCheckFailure() {
-        final DbIterator iterator = faultyResultIterator();
-        assertThrows(DatabaseException.class, iterator::hasNext);
-    }
+    @SuppressWarnings("NonExceptionNameEndsWithException") // For test name clarity.
+    @Nested
+    @DisplayName("throw DatabaseException")
+    class ThrowDatabaseException {
 
-    @Test
-    @DisplayName("throw DatabaseException on close failure")
-    void throwDatabaseExceptionOnCloseFailure() {
-        final DbIterator iterator = faultyResultIterator();
-        assertThrows(DatabaseException.class, iterator::close);
-    }
+        @Test
+        @DisplayName("on next check failure")
+        void onNextCheckFailure() {
+            final DbIterator iterator = faultyResultIterator();
+            assertThrows(DatabaseException.class, iterator::hasNext);
+        }
 
-    @Test
-    @DisplayName("throw DatabaseException on read failure")
-    void throwDatabaseExceptionOnReadFailure() {
-        final DbIterator iterator = sneakyResultIterator();
-        assertThrows(DatabaseException.class, () -> {
-            if (iterator.hasNext()) {
-                iterator.next();
-            }
-        });
+        @Test
+        @DisplayName("on close failure")
+        void throwDatabaseExceptionOnCloseFailure() {
+            final DbIterator iterator = faultyResultIterator();
+            assertThrows(DatabaseException.class, iterator::close);
+        }
+
+        @Test
+        @DisplayName("on read failure")
+        void throwDatabaseExceptionOnReadFailure() {
+            final DbIterator iterator = sneakyResultIterator();
+            assertThrows(DatabaseException.class, () -> {
+                if (iterator.hasNext()) {
+                    iterator.next();
+                }
+            });
+        }
     }
 
     @Test
@@ -78,28 +87,33 @@ class DbIteratorTest {
         iterator.next();
     }
 
-    @Test
+    @Nested
     @DisplayName("close ResultSet")
-    void closeResultSet() throws SQLException {
-        final DbIterator iterator = nonEmptyIterator();
-        final ResultSet resultSet = iterator.getResultSet();
+    class CloseResultSet {
 
-        verify(resultSet, never()).close();
+        @Test
+        @DisplayName("when told to do so")
+        void whenTold() throws SQLException {
+            final DbIterator iterator = nonEmptyIterator();
+            final ResultSet resultSet = iterator.getResultSet();
 
-        iterator.close();
-        assertClosed(iterator);
-    }
+            verify(resultSet, never()).close();
 
-    @Test
-    @DisplayName("close ResultSet if no more elements are present to iterate")
-    void closeResultSetWhenEmpty() throws SQLException {
-        final DbIterator iterator = emptyIterator();
-        final ResultSet resultSet = iterator.getResultSet();
+            iterator.close();
+            assertClosed(iterator);
+        }
 
-        verify(resultSet, never()).close();
+        @Test
+        @DisplayName("when no more elements are present to iterate")
+        void whenNoElementsPresent() throws SQLException {
+            final DbIterator iterator = emptyIterator();
+            final ResultSet resultSet = iterator.getResultSet();
 
-        iterator.hasNext();
-        assertClosed(iterator);
+            verify(resultSet, never()).close();
+
+            iterator.hasNext();
+            assertClosed(iterator);
+        }
     }
 
     @SuppressWarnings("deprecation") // Need to use deprecated to make sure it's not supported.
@@ -133,7 +147,7 @@ class DbIteratorTest {
     }
 
     @Test
-    @DisplayName("obtain statement before result set closed")
+    @DisplayName("obtain statement before result set is closed")
     void getStatementBeforeClose() throws SQLException {
         final DbIterator iterator = emptyIterator();
         iterator.close();
@@ -147,7 +161,7 @@ class DbIteratorTest {
     }
 
     @Test
-    @DisplayName("obtain connection before statement closed")
+    @DisplayName("obtain connection before statement is closed")
     void getConnectionBeforeClose() throws SQLException {
         final DbIterator iterator = emptyIterator();
         iterator.close();

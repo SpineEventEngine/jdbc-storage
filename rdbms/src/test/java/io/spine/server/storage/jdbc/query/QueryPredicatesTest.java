@@ -30,6 +30,7 @@ import io.spine.server.entity.storage.EntityColumn;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static com.querydsl.core.types.dsl.Expressions.FALSE;
@@ -60,6 +61,9 @@ import static org.mockito.Mockito.when;
 /**
  * @author Dmytro Grankin
  */
+@SuppressWarnings({"InnerClassMayBeStatic", "ClassCanBeStatic"
+        /* JUnit nested classes cannot be static. */,
+        "DuplicateStringLiteralInspection" /* Common test display names. */})
 @DisplayName("QueryPredicates should")
 class QueryPredicatesTest {
 
@@ -71,22 +75,27 @@ class QueryPredicatesTest {
         assertHasPrivateParameterlessCtor(QueryPredicates.class);
     }
 
-    @Test
-    @DisplayName("join predicates using `EITHER` operator")
-    void joinPredicatesUsingEitherOperator() {
-        final BooleanExpression left = TRUE;
-        final BooleanExpression right = FALSE;
-        final Predicate result = joinPredicates(left, right, EITHER);
-        assertEquals(left.or(right), result);
-    }
+    @Nested
+    @DisplayName("join predicates using operator")
+    class JoinPredicatesUsing {
 
-    @Test
-    @DisplayName("join predicates using `ALL` operator")
-    void joinPredicatesUsingAllOperator() {
-        final BooleanExpression left = TRUE;
-        final BooleanExpression right = FALSE;
-        final Predicate result = joinPredicates(left, right, ALL);
-        assertEquals(left.and(right), result);
+        @Test
+        @DisplayName("`EITHER`")
+        void either() {
+            final BooleanExpression left = TRUE;
+            final BooleanExpression right = FALSE;
+            final Predicate result = joinPredicates(left, right, EITHER);
+            assertEquals(left.or(right), result);
+        }
+
+        @Test
+        @DisplayName("`ALL`")
+        void all() {
+            final BooleanExpression left = TRUE;
+            final BooleanExpression right = FALSE;
+            final Predicate result = joinPredicates(left, right, ALL);
+            assertEquals(left.and(right), result);
+        }
     }
 
     @Test
@@ -162,79 +171,89 @@ class QueryPredicatesTest {
         assertEquals(path.isNull(), predicate);
     }
 
-    @Test
-    @DisplayName("not generate null filter for `GREATER THAN`")
-    void notGenerateNullFilterForGREATERTHAN() {
-        assertThrows(IllegalArgumentException.class,
-                     () -> runNullFilterCreationFor(GREATER_THAN));
+    @Nested
+    @DisplayName("not generate null filter for")
+    class NotCreateNullFilterFor {
+
+        @Test
+        @DisplayName("`GREATER THAN`")
+        void greaterThan() {
+            assertThrows(IllegalArgumentException.class,
+                         () -> runNullFilterCreationFor(GREATER_THAN));
+        }
+
+        @Test
+        @DisplayName("`LESS THAN`")
+        void lessThan() {
+            assertThrows(IllegalArgumentException.class,
+                         () -> runNullFilterCreationFor(LESS_THAN));
+        }
+
+        @Test
+        @DisplayName("`GREATER OR EQUAL`")
+        void greaterOrEqual() {
+            assertThrows(IllegalArgumentException.class,
+                         () -> runNullFilterCreationFor(GREATER_OR_EQUAL));
+        }
+
+        @Test
+        @DisplayName("`LESS OR EQUAL`")
+        void lessOrEqual() {
+            assertThrows(IllegalArgumentException.class,
+                         () -> runNullFilterCreationFor(LESS_OR_EQUAL));
+        }
+
+        @Test
+        @DisplayName("`UNRECOGNIZED`")
+        void unrecognized() {
+            assertThrows(IllegalArgumentException.class,
+                         () -> runNullFilterCreationFor(UNRECOGNIZED));
+        }
     }
 
-    @Test
-    @DisplayName("not generate null filter for `LESS THAN`")
-    void notGenerateNullFilterForLESSTHAN() {
-        assertThrows(IllegalArgumentException.class,
-                     () -> runNullFilterCreationFor(LESS_THAN));
-    }
+    @Nested
+    @DisplayName("generate value filter for ")
+    class CreateValueFilterFor {
 
-    @Test
-    @DisplayName("not generate null filter for `GREATER OR EQUAL`")
-    void notGenerateNullFilterForGREATEROREQUAL() {
-        assertThrows(IllegalArgumentException.class,
-                     () -> runNullFilterCreationFor(GREATER_OR_EQUAL));
-    }
+        @Test
+        @DisplayName("`EQUAL`")
+        void equal() {
+            final ComparablePath<Comparable> path = comparablePath(Comparable.class, "");
+            final Predicate predicate = valueFilter(EQUAL, path, COLUMN_FILTER_VALUE);
+            assertEquals(path.eq(COLUMN_FILTER_VALUE), predicate);
+        }
 
-    @Test
-    @DisplayName("not generate null filter for `LESS OR EQUAL`")
-    void notGenerateNullFilterForLESSOREQUAL() {
-        assertThrows(IllegalArgumentException.class,
-                     () -> runNullFilterCreationFor(LESS_OR_EQUAL));
-    }
+        @Test
+        @DisplayName("`GREATER THAN`")
+        void greaterThan() {
+            final ComparablePath<Comparable> path = comparablePath(Comparable.class, "");
+            final Predicate predicate = valueFilter(GREATER_THAN, path, COLUMN_FILTER_VALUE);
+            assertEquals(path.gt(COLUMN_FILTER_VALUE), predicate);
+        }
 
-    @Test
-    @DisplayName("not generate null filter for `UNRECOGNIZED`")
-    void notGenerateNullFilterForUNRECOGNIZED() {
-        assertThrows(IllegalArgumentException.class,
-                     () -> runNullFilterCreationFor(UNRECOGNIZED));
-    }
+        @Test
+        @DisplayName("`LESS THAN`")
+        void lessThan() {
+            final ComparablePath<Comparable> path = comparablePath(Comparable.class, "");
+            final Predicate predicate = valueFilter(LESS_THAN, path, COLUMN_FILTER_VALUE);
+            assertEquals(path.lt(COLUMN_FILTER_VALUE), predicate);
+        }
 
-    @Test
-    @DisplayName("generate value filter for `EQUAL`")
-    void generateValueFilterForEQUAL() {
-        final ComparablePath<Comparable> path = comparablePath(Comparable.class, "");
-        final Predicate predicate = valueFilter(EQUAL, path, COLUMN_FILTER_VALUE);
-        assertEquals(path.eq(COLUMN_FILTER_VALUE), predicate);
-    }
+        @Test
+        @DisplayName("`GREATER OR EQUAL`")
+        void greaterOrEqual() {
+            final ComparablePath<Comparable> path = comparablePath(Comparable.class, "");
+            final Predicate predicate = valueFilter(GREATER_OR_EQUAL, path, COLUMN_FILTER_VALUE);
+            assertEquals(path.goe(COLUMN_FILTER_VALUE), predicate);
+        }
 
-    @Test
-    @DisplayName("generate value filter for `GREATER THAN`")
-    void generateValueFilterForGREATERTHAN() {
-        final ComparablePath<Comparable> path = comparablePath(Comparable.class, "");
-        final Predicate predicate = valueFilter(GREATER_THAN, path, COLUMN_FILTER_VALUE);
-        assertEquals(path.gt(COLUMN_FILTER_VALUE), predicate);
-    }
-
-    @Test
-    @DisplayName("generate value filter for `LESS THAN`")
-    void generateValueFilterForLESSTHAN() {
-        final ComparablePath<Comparable> path = comparablePath(Comparable.class, "");
-        final Predicate predicate = valueFilter(LESS_THAN, path, COLUMN_FILTER_VALUE);
-        assertEquals(path.lt(COLUMN_FILTER_VALUE), predicate);
-    }
-
-    @Test
-    @DisplayName("generate value filter for `GREATER OR EQUAL`")
-    void generateValueFilterForGREATEROREQUAL() {
-        final ComparablePath<Comparable> path = comparablePath(Comparable.class, "");
-        final Predicate predicate = valueFilter(GREATER_OR_EQUAL, path, COLUMN_FILTER_VALUE);
-        assertEquals(path.goe(COLUMN_FILTER_VALUE), predicate);
-    }
-
-    @Test
-    @DisplayName("generate value filter for `LESS OR EQUAL`")
-    void generateValueFilterForLESSOREQUAL() {
-        final ComparablePath<Comparable> path = comparablePath(Comparable.class, "");
-        final Predicate predicate = valueFilter(LESS_OR_EQUAL, path, COLUMN_FILTER_VALUE);
-        assertEquals(path.loe(COLUMN_FILTER_VALUE), predicate);
+        @Test
+        @DisplayName("`LESS OR EQUAL`")
+        void lessOrEqual() {
+            final ComparablePath<Comparable> path = comparablePath(Comparable.class, "");
+            final Predicate predicate = valueFilter(LESS_OR_EQUAL, path, COLUMN_FILTER_VALUE);
+            assertEquals(path.loe(COLUMN_FILTER_VALUE), predicate);
+        }
     }
 
     @Test

@@ -46,6 +46,7 @@ import io.spine.test.storage.Project;
 import io.spine.test.storage.ProjectId;
 import io.spine.testdata.Sample;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static io.spine.base.Identifier.newUuid;
@@ -62,7 +63,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 /**
  * @author Alexander Litus
  */
-@SuppressWarnings("DuplicateStringLiteralInspection") // Common test display names.
+@SuppressWarnings({"InnerClassMayBeStatic", "ClassCanBeStatic"
+        /* JUnit nested classes cannot be static. */,
+        "DuplicateStringLiteralInspection" /* Common test display names. */})
 @DisplayName("JdbcRecordStorage should")
 class JdbcRecordStorageTest extends RecordStorageTest<String, JdbcRecordStorage<String>> {
 
@@ -124,23 +127,28 @@ class JdbcRecordStorageTest extends RecordStorageTest<String, JdbcRecordStorage<
         close(storage);
     }
 
-    @Test
-    @DisplayName("require non-null entity class")
-    void rejectNullEntityClass() {
-        final Class<? extends Entity<Object, ?>> nullEntityCls = nullRef();
-        assertThrows(NullPointerException.class,
-                     () -> JdbcRecordStorage.newBuilder()
-                                            .setEntityClass(nullEntityCls));
-    }
+    @Nested
+    @DisplayName("require non-null")
+    class RequireNonNull {
 
-    @Test
-    @DisplayName("require non-null column type registry")
-    void rejectNullColumnTypeRegistry() {
-        final ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> registry
-                = nullRef();
-        assertThrows(NullPointerException.class,
-                     () -> JdbcRecordStorage.newBuilder()
-                                            .setColumnTypeRegistry(registry));
+        @Test
+        @DisplayName("entity class")
+        void entityClass() {
+            final Class<? extends Entity<Object, ?>> nullEntityCls = nullRef();
+            assertThrows(NullPointerException.class,
+                         () -> JdbcRecordStorage.newBuilder()
+                                                .setEntityClass(nullEntityCls));
+        }
+
+        @Test
+        @DisplayName("column type registry")
+        void columnTypeRegistry() {
+            ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> registry =
+                    nullRef();
+            assertThrows(NullPointerException.class,
+                         () -> JdbcRecordStorage.newBuilder()
+                                                .setColumnTypeRegistry(registry));
+        }
     }
 
     @Override

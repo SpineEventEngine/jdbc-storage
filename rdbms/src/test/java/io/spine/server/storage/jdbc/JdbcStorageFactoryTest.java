@@ -33,6 +33,7 @@ import io.spine.test.storage.Project;
 import io.spine.test.storage.ProjectVBuilder;
 import io.spine.validate.StringValueVBuilder;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import javax.sql.DataSource;
@@ -51,6 +52,7 @@ import static org.mockito.Mockito.verify;
 /**
  * @author Alexander Litus
  */
+@SuppressWarnings("DuplicateStringLiteralInspection") // Common test display names.
 @DisplayName("JdbcStorageFactory should")
 class JdbcStorageFactoryTest {
 
@@ -63,7 +65,7 @@ class JdbcStorageFactoryTest {
 
     @Test
     @DisplayName("allow to use custom data source")
-    void allowToUseCustomDataSource() {
+    void allowCustomDataSource() {
         final JdbcStorageFactory factory = JdbcStorageFactory.newBuilder()
                                                              .setDataSource(mock(DataSource.class))
                                                              .setTypeMapping(MYSQL_5_7)
@@ -72,72 +74,92 @@ class JdbcStorageFactoryTest {
         assertNotNull(factory);
     }
 
-    @Test
-    @DisplayName("create multitenant record storage")
-    void createMultitenantRecordStorage() {
-        final JdbcStorageFactory factory = newFactory(true);
-        final RecordStorage<String> storage = factory.createRecordStorage(TestEntity.class);
-        assertTrue(storage.isMultitenant());
+    @Nested
+    @DisplayName("create record storage")
+    class CreateRecordStorage {
+
+        @Test
+        @DisplayName("which is multitenant")
+        void multitenant() {
+            final JdbcStorageFactory factory = newFactory(true);
+            final RecordStorage<String> storage = factory.createRecordStorage(TestEntity.class);
+            assertTrue(storage.isMultitenant());
+        }
+
+        @Test
+        @DisplayName("which is single tenant")
+        void singleTenant() {
+            final JdbcStorageFactory factory = newFactory(false);
+            final RecordStorage<String> storage = factory.createRecordStorage(TestEntity.class);
+            assertFalse(storage.isMultitenant());
+        }
     }
 
-    @Test
-    @DisplayName("create single tenant record storage")
-    void createSingleTenantRecordStorage() {
-        final JdbcStorageFactory factory = newFactory(false);
-        final RecordStorage<String> storage = factory.createRecordStorage(TestEntity.class);
-        assertFalse(storage.isMultitenant());
+    @Nested
+    @DisplayName("create aggregate storage")
+    class CreateAggregateStorage {
+
+        @Test
+        @DisplayName("which is multitenant")
+        void multitenant() {
+            final JdbcStorageFactory factory = newFactory(true);
+            final AggregateStorage<String> storage =
+                    factory.createAggregateStorage(TestAggregate.class);
+            assertTrue(storage.isMultitenant());
+        }
+
+        @Test
+        @DisplayName("which is single tenant")
+        void singleTenant() {
+            final JdbcStorageFactory factory = newFactory(false);
+            final AggregateStorage<String> storage =
+                    factory.createAggregateStorage(TestAggregate.class);
+            assertFalse(storage.isMultitenant());
+        }
     }
 
-    @Test
-    @DisplayName("create multitenant aggregate storage")
-    void createMultitenantAggregateStorage() {
-        final JdbcStorageFactory factory = newFactory(true);
-        final AggregateStorage<String> storage =
-                factory.createAggregateStorage(TestAggregate.class);
-        assertTrue(storage.isMultitenant());
+    @Nested
+    @DisplayName("create projection storage")
+    class CreateProjectionStorage {
+
+        @Test
+        @DisplayName("which is multitenant")
+        void multitenant() {
+            final JdbcStorageFactory factory = newFactory(true);
+            final ProjectionStorage<String> storage =
+                    factory.createProjectionStorage(TestProjection.class);
+            assertTrue(storage.isMultitenant());
+        }
+
+        @Test
+        @DisplayName("which is single tenant")
+        void singleTenant() {
+            final JdbcStorageFactory factory = newFactory(false);
+            final ProjectionStorage<String> storage =
+                    factory.createProjectionStorage(TestProjection.class);
+            assertFalse(storage.isMultitenant());
+        }
     }
 
-    @Test
-    @DisplayName("create single tenant aggregate storage")
-    void createSingleTenantAggregateStorage() {
-        final JdbcStorageFactory factory = newFactory(false);
-        final AggregateStorage<String> storage =
-                factory.createAggregateStorage(TestAggregate.class);
-        assertFalse(storage.isMultitenant());
-    }
+    @Nested
+    @DisplayName("create stand storage")
+    class CreateStandStorage {
 
-    @Test
-    @DisplayName("create multitenant projection storage")
-    void createMultitenantProjectionStorage() {
-        final JdbcStorageFactory factory = newFactory(true);
-        final ProjectionStorage<String> storage =
-                factory.createProjectionStorage(TestProjection.class);
-        assertTrue(storage.isMultitenant());
-    }
+        @Test
+        @DisplayName("which is multitenant")
+        void multitenant() {
+            final JdbcStorageFactory factory = newFactory(true);
+            final StandStorage storage = factory.createStandStorage();
+            assertTrue(storage.isMultitenant());
+        }
 
-    @Test
-    @DisplayName("create single tenant projection storage")
-    void createSingleTenantProjectionStorage() {
-        final JdbcStorageFactory factory = newFactory(false);
-        final ProjectionStorage<String> storage =
-                factory.createProjectionStorage(TestProjection.class);
-        assertFalse(storage.isMultitenant());
-    }
-
-    @Test
-    @DisplayName("create multitenant stand storage")
-    void createMultitenantStandStorage() {
-        final JdbcStorageFactory factory = newFactory(true);
-        final StandStorage storage = factory.createStandStorage();
-        assertTrue(storage.isMultitenant());
-    }
-
-    @Test
-    @DisplayName("create single tenant stand storage")
-    void createSingleTenantStandStorage() {
-        final JdbcStorageFactory factory = newFactory(false);
-        final StandStorage storage = factory.createStandStorage();
-        assertFalse(storage.isMultitenant());
+        @Test
+        @DisplayName("which is single tenant")
+        void singleTenant() {
+            final JdbcStorageFactory factory = newFactory(false);
+            final StandStorage storage = factory.createStandStorage();
+            assertFalse(storage.isMultitenant());
+        }
     }
 
     @Test
@@ -193,7 +215,7 @@ class JdbcStorageFactoryTest {
 
     @Test
     @DisplayName("use MySQL mapping by default")
-    void useMySQLMappingByDefault() {
+    void useMySqlMappingByDefault() {
         final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(newUuid());
         final JdbcStorageFactory factory = JdbcStorageFactory.newBuilder()
                                                              .setMultitenant(false)

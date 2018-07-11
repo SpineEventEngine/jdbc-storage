@@ -35,7 +35,7 @@ class DataSourceWrapperTest {
 
     @Test
     @DisplayName("throw DatabaseException if failing to close")
-    void throwDatabaseExceptionIfFailToClose() throws Exception {
+    void throwIfFailToClose() throws Exception {
         final ClosableDataSource dataSource = GivenDataSource.whichIsAutoCloseable();
         doThrow(new Exception("")).when(dataSource)
                                   .close();

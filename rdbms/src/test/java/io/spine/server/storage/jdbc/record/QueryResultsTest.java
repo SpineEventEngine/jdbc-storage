@@ -37,5 +37,4 @@ class QueryResultsTest {
     void haveUtilityConstructor() {
         assertHasPrivateParameterlessCtor(QueryResults.class);
     }
-
 }

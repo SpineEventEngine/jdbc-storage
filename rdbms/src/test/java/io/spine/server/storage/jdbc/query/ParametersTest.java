@@ -39,7 +39,7 @@ class ParametersTest {
 
     @Test
     @DisplayName("check identifier uniqueness for single parameter")
-    void checkUniqueIdForSingle() {
+    void checkIdUniqueForSingle() {
         assertThrows(IllegalArgumentException.class,
                      () -> Parameters.newBuilder()
                                      .addParameter(ID, PARAMETER)
@@ -48,7 +48,7 @@ class ParametersTest {
 
     @Test
     @DisplayName("check identifier uniqueness for multiple parameters")
-    void checkUniqueIdForMultiple() {
+    void checkIdUniqueForMultiple() {
         final Parameters.Builder commonParameters = Parameters.newBuilder()
                                                               .addParameter(ID, PARAMETER);
         final Parameters buildedCommonParameters = commonParameters.build();

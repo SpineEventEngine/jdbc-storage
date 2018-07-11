@@ -42,6 +42,7 @@ import io.spine.test.commandservice.customer.Customer;
 import io.spine.test.storage.Project;
 import io.spine.type.TypeUrl;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.sql.PreparedStatement;
@@ -75,6 +76,8 @@ import static org.mockito.Mockito.when;
 /**
  * @author Dmytro Dashenkov
  */
+@SuppressWarnings({"InnerClassMayBeStatic", "ClassCanBeStatic"})
+// JUnit nested classes cannot be static.
 @DisplayName("JdbcStandStorage should")
 class JdbcStandStorageTest extends StandStorageTest {
 
@@ -90,67 +93,72 @@ class JdbcStandStorageTest extends StandStorageTest {
         return storage;
     }
 
-    @SuppressWarnings("unchecked") // For mocks.
-    @Test
-    @DisplayName("initialize properly with all builder fields")
-    void initializeProperlyWithAllBuilderFields() {
-        final DataSourceWrapper dataSourceMock = mock(DataSourceWrapper.class);
-        final ConnectionWrapper connectionMock = mock(ConnectionWrapper.class);
-        final PreparedStatement statementMock = mock(PreparedStatement.class);
+    @Nested
+    @DisplayName("initialize properly when")
+    class InitializeProperly {
 
-        when(connectionMock.prepareStatement(anyString())).thenReturn(statementMock);
-        when(dataSourceMock.getConnection(anyBoolean())).thenReturn(connectionMock);
+        @SuppressWarnings("unchecked") // For mocks.
+        @Test
+        @DisplayName("all builder fields are set")
+        void withAllBuilderFields() {
+            final DataSourceWrapper dataSourceMock = mock(DataSourceWrapper.class);
+            final ConnectionWrapper connectionMock = mock(ConnectionWrapper.class);
+            final PreparedStatement statementMock = mock(PreparedStatement.class);
 
-        final StandStorage standStorage = JdbcStandStorage.<String>newBuilder()
-                .setDataSource(dataSourceMock)
-                .setMultitenant(false)
-                .setTypeMapping(MYSQL_5_7)
-                .build();
+            when(connectionMock.prepareStatement(anyString())).thenReturn(statementMock);
+            when(dataSourceMock.getConnection(anyBoolean())).thenReturn(connectionMock);
 
-        assertNotNull(standStorage);
-        // Established connection with the DB
-        verify(dataSourceMock).getConnection(anyBoolean());
+            final StandStorage standStorage = JdbcStandStorage.<String>newBuilder()
+                    .setDataSource(dataSourceMock)
+                    .setMultitenant(false)
+                    .setTypeMapping(MYSQL_5_7)
+                    .build();
+
+            assertNotNull(standStorage);
+            // Established connection with the DB
+            verify(dataSourceMock).getConnection(anyBoolean());
+        }
+
+        @SuppressWarnings("unchecked") // For mocks.
+        @Test
+        @DisplayName("multitenancy is not set")
+        void withoutMultitenancy() {
+            final DataSourceWrapper dataSourceMock = mock(DataSourceWrapper.class);
+            final ConnectionWrapper connectionMock = mock(ConnectionWrapper.class);
+            final PreparedStatement statementMock = mock(PreparedStatement.class);
+
+            when(connectionMock.prepareStatement(anyString())).thenReturn(statementMock);
+            when(dataSourceMock.getConnection(anyBoolean())).thenReturn(connectionMock);
+
+            final StandStorage standStorage = JdbcStandStorage.<String>newBuilder()
+                    .setDataSource(dataSourceMock)
+                    .setTypeMapping(MYSQL_5_7)
+                    .build();
+
+            assertNotNull(standStorage);
+            assertFalse(standStorage.isMultitenant());
+        }
     }
 
-    @SuppressWarnings("unchecked") // For mocks.
-    @Test
-    @DisplayName("initialize properly without multitenancy")
-    void initializeProperlyWithoutMultitenancy() {
-        final DataSourceWrapper dataSourceMock = mock(DataSourceWrapper.class);
-        final ConnectionWrapper connectionMock = mock(ConnectionWrapper.class);
-        final PreparedStatement statementMock = mock(PreparedStatement.class);
+    @Nested
+    @DisplayName("fail to initialize when")
+    class FailToInitialize {
 
-        when(connectionMock.prepareStatement(anyString())).thenReturn(statementMock);
-        when(dataSourceMock.getConnection(anyBoolean())).thenReturn(connectionMock);
+        @Test
+        @DisplayName("builder is empty")
+        void withEmptyBuilder() {
+            assertThrows(IllegalStateException.class, () -> JdbcStandStorage.newBuilder()
+                                                                            .build());
+        }
 
-        final StandStorage standStorage = JdbcStandStorage.<String>newBuilder()
-                .setDataSource(dataSourceMock)
-                .setTypeMapping(MYSQL_5_7)
-                .build();
-
-        assertNotNull(standStorage);
-        assertFalse(standStorage.isMultitenant());
+        @Test
+        @DisplayName("data source is not set")
+        void withoutDataSource() {
+            assertThrows(IllegalStateException.class, () -> JdbcStandStorage.newBuilder()
+                                                                            .setMultitenant(false)
+                                                                            .build());
+        }
     }
-
-    @Test
-    @DisplayName("fail to initialize with empty builder")
-    void failToInitializeWithEmptyBuilder() {
-        assertThrows(IllegalStateException.class, () -> JdbcStandStorage.newBuilder()
-                                                                        .build());
-    }
-
-    @Test
-    @DisplayName("fail to initialize without data source")
-    void failToInitializeWithoutDataSource() {
-        assertThrows(IllegalStateException.class, () -> JdbcStandStorage.newBuilder()
-                                                                        .setMultitenant(false)
-                                                                        .build());
-    }
-
-    /*
-     * Read-write positive tests
-     * -------------------------
-     */
 
     @Test
     @DisplayName("write data to store")
@@ -221,90 +229,91 @@ class JdbcStandStorageTest extends StandStorageTest {
         assertThat(records, empty());
     }
 
-    @SuppressWarnings("MethodWithMultipleLoops")
-    @Test
-    @DisplayName("read all from database")
-    void readAllFromDatabase() {
-        final StandStorage storage = getStorage();
+    @Nested
+    @DisplayName("read all")
+    class ReadAll {
 
-        final Collection<Given.TestAggregate> testData = testAggregates(10);
+        @SuppressWarnings("MethodWithMultipleLoops") // One loop for writing, the other for reading.
+        @Test
+        @DisplayName("existing records")
+        void existingRecords() {
+            final StandStorage storage = getStorage();
 
-        final List<EntityRecord> records = new ArrayList<>();
+            final Collection<Given.TestAggregate> testData = testAggregates(10);
 
-        for (Aggregate aggregate : testData) {
-            records.add(writeToStorage(aggregate, storage, Project.class));
-        }
-        final Iterator<EntityRecord> readRecords = storage.readAll();
-        int iteratorCounter = 0;
-        while (readRecords.hasNext()) {
-            assertTrue(records.contains(readRecords.next()));
-            iteratorCounter++;
-        }
+            final List<EntityRecord> records = new ArrayList<>();
 
-        assertEquals(records.size(), iteratorCounter);
-    }
+            for (Aggregate aggregate : testData) {
+                records.add(writeToStorage(aggregate, storage, Project.class));
+            }
+            final Iterator<EntityRecord> readRecords = storage.readAll();
+            int iteratorCounter = 0;
+            while (readRecords.hasNext()) {
+                assertTrue(records.contains(readRecords.next()));
+                iteratorCounter++;
+            }
 
-    @Test
-    @DisplayName("read all by type url")
-    void readAllByTypeUrl() {
-        final StandStorage storage = getStorage();
-
-        final int aggregatesCount = 5;
-        final List<Given.TestAggregate> aggregates = testAggregates(aggregatesCount);
-        final TestAggregate2 differentAggregate = new TestAggregate2("i_am_different");
-
-        for (Aggregate aggregate : aggregates) {
-            writeToStorage(aggregate, storage, Project.class);
+            assertEquals(records.size(), iteratorCounter);
         }
 
-        final EntityRecord differentRecord =
-                writeToStorage(differentAggregate, storage, Customer.class);
+        @SuppressWarnings("MethodWithMultipleLoops") // One loop for writing, the other for reading.
+        @Test
+        @DisplayName("records by type url")
+        void recordsByTypeUrl() {
+            final StandStorage storage = getStorage();
 
-        final Iterator<EntityRecord> records = storage.readAllByType(TypeUrl.of(Project.class));
-        final Collection<EntityRecord> readRecords = newArrayList(records);
-        assertSize(aggregatesCount, readRecords);
-        boolean hasRecord = false;
-        for (EntityRecord record : readRecords) {
-            if (record.equals(differentRecord)) {
-                hasRecord = true;
+            final int aggregatesCount = 5;
+            final List<Given.TestAggregate> aggregates = testAggregates(aggregatesCount);
+            final TestAggregate2 differentAggregate = new TestAggregate2("i_am_different");
+
+            for (Aggregate aggregate : aggregates) {
+                writeToStorage(aggregate, storage, Project.class);
+            }
+
+            final EntityRecord differentRecord =
+                    writeToStorage(differentAggregate, storage, Customer.class);
+
+            final Iterator<EntityRecord> records = storage.readAllByType(TypeUrl.of(Project.class));
+            final Collection<EntityRecord> readRecords = newArrayList(records);
+            assertSize(aggregatesCount, readRecords);
+            boolean hasRecord = false;
+            for (EntityRecord record : readRecords) {
+                if (record.equals(differentRecord)) {
+                    hasRecord = true;
+                }
+            }
+            assertFalse(hasRecord);
+        }
+
+        @SuppressWarnings("MethodWithMultipleLoops") // One loop for writing, the other for reading.
+        @Test
+        @DisplayName("records by type and apply field mask")
+        void recordsByTypeAndMask() {
+            final StandStorage storage = getStorage();
+
+            final List<Given.TestAggregate> aggregates = testAggregatesWithState(5);
+
+            for (Aggregate aggregate : aggregates) {
+                writeToStorage(aggregate, storage, Project.class);
+            }
+
+            final FieldMask namesMask = FieldMask.newBuilder()
+                                                 .addPaths(Project.getDescriptor()
+                                                                  .getFields()
+                                                                  .get(1)
+                                                                  .getFullName())
+                                                 .build();
+
+            final Iterator<EntityRecord> records = storage.readAllByType(
+                    TypeUrl.of(Project.class), namesMask);
+
+            while (records.hasNext()) {
+                final Project project = AnyPacker.unpack(records.next()
+                                                                .getState());
+                assertMatches(project, namesMask);
             }
         }
-        assertFalse(hasRecord);
     }
-
-    @SuppressWarnings("MethodWithMultipleLoops")
-    @Test
-    @DisplayName("read by type and apply field mask")
-    void readByTypeAndMask() {
-        final StandStorage storage = getStorage();
-
-        final List<Given.TestAggregate> aggregates = testAggregatesWithState(5);
-
-        for (Aggregate aggregate : aggregates) {
-            writeToStorage(aggregate, storage, Project.class);
-        }
-
-        final FieldMask namesMask = FieldMask.newBuilder()
-                                             .addPaths(Project.getDescriptor()
-                                                              .getFields()
-                                                              .get(1)
-                                                              .getFullName())
-                                             .build();
-
-        final Iterator<EntityRecord> records = storage.readAllByType(
-                TypeUrl.of(Project.class), namesMask);
-
-        while (records.hasNext()) {
-            final Project project = AnyPacker.unpack(records.next()
-                                                            .getState());
-            assertMatches(project, namesMask);
-        }
-    }
-
-    /*
-     * Misc
-     * ----
-     */
 
     @Test
     @DisplayName("be auto-closable")
@@ -315,29 +324,34 @@ class JdbcStandStorageTest extends StandStorageTest {
         }
     }
 
-    @Test
-    @DisplayName("fail to write data after closed")
-    void failToWriteAfterClosed() throws Exception {
-        final StandStorage storage = getStorage();
+    @Nested
+    @DisplayName("if closed, throw ISE on")
+    class ThrowIfClosed {
 
-        assertTrue(storage.isOpen());
-        storage.close();
-        assertTrue(storage.isClosed());
+        @Test
+        @DisplayName("writing data")
+        void onDataWrite() throws Exception {
+            final StandStorage storage = getStorage();
 
-        assertThrows(IllegalStateException.class,
-                     () -> writeToStorage(new TestAggregate("42"), storage, Project.class));
-    }
+            assertTrue(storage.isOpen());
+            storage.close();
+            assertTrue(storage.isClosed());
 
-    @Test
-    @DisplayName("fail to read data after closed")
-    void failToReadAfterClosed() throws Exception {
-        final StandStorage storage = getStorage();
+            assertThrows(IllegalStateException.class,
+                         () -> writeToStorage(new TestAggregate("42"), storage, Project.class));
+        }
 
-        assertTrue(storage.isOpen());
-        storage.close();
-        assertTrue(storage.isClosed());
+        @Test
+        @DisplayName("reading data")
+        void onDataRead() throws Exception {
+            final StandStorage storage = getStorage();
 
-        assertThrows(IllegalStateException.class, storage::readAll);
+            assertTrue(storage.isOpen());
+            storage.close();
+            assertTrue(storage.isClosed());
+
+            assertThrows(IllegalStateException.class, storage::readAll);
+        }
     }
 
     private static void assertMatches(Message message, FieldMask fieldMask) {

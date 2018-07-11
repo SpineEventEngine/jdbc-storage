@@ -56,7 +56,7 @@ class SqlTest {
 
     @Test
     @DisplayName("provide tokens wrapped into whitespace")
-    void provideWhitespaceTokens() {
+    void provideTokensWithWhitespaces() {
         final String sumExpected = " SUM ";
         final String sumActual = Sql.Function.SUM.toString();
         assertEquals(sumExpected, sumActual);
