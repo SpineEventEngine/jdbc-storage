@@ -33,10 +33,15 @@ import io.spine.test.storage.ProjectVBuilder;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * @author Alexander Aleksandrov
+ * @author Dmytro Grankin
+ * @author Dmytro Dashenkov
+ */
 public class Given {
 
+    /** Prevents instantiation of this utility class. */
     private Given() {
-        // Prevent utility class instantiation.
     }
 
     public static class TestAggregate extends Aggregate<String, Project, ProjectVBuilder> {

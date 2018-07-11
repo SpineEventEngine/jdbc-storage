@@ -75,7 +75,8 @@ import static org.mockito.Mockito.when;
 /**
  * @author Dmytro Dashenkov
  */
-public class JdbcStandStorageShould extends StandStorageTest {
+@DisplayName("JdbcStandStorage should")
+class JdbcStandStorageTest extends StandStorageTest {
 
     @Override
     protected StandStorage newStorage(Class<? extends Entity> entityClass) {
@@ -89,12 +90,7 @@ public class JdbcStandStorageShould extends StandStorageTest {
         return storage;
     }
 
-    /*
-     * Initialize tests
-     * ----------------
-     */
-
-    @SuppressWarnings("unchecked") // For mocks
+    @SuppressWarnings("unchecked") // For mocks.
     @Test
     @DisplayName("initialize properly with all builder fields")
     void initializeProperlyWithAllBuilderFields() {
@@ -116,7 +112,7 @@ public class JdbcStandStorageShould extends StandStorageTest {
         verify(dataSourceMock).getConnection(anyBoolean());
     }
 
-    @SuppressWarnings("unchecked") // For mocks
+    @SuppressWarnings("unchecked") // For mocks.
     @Test
     @DisplayName("initialize properly without multitenancy")
     void initializeProperlyWithoutMultitenancy() {
@@ -207,7 +203,7 @@ public class JdbcStandStorageShould extends StandStorageTest {
     }
 
     @Test
-    @DisplayName("handle wrong ids silently")
+    @DisplayName("handle wrong IDs silently")
     void handleWrongIdsSilently() {
         final StandStorage storage = getStorage();
 
@@ -279,7 +275,7 @@ public class JdbcStandStorageShould extends StandStorageTest {
     @SuppressWarnings("MethodWithMultipleLoops")
     @Test
     @DisplayName("read by type and apply field mask")
-    void readByTypeAndApplyFieldMask() {
+    void readByTypeAndMask() {
         final StandStorage storage = getStorage();
 
         final List<Given.TestAggregate> aggregates = testAggregatesWithState(5);
@@ -311,7 +307,7 @@ public class JdbcStandStorageShould extends StandStorageTest {
      */
 
     @Test
-    @DisplayName("be auto closable")
+    @DisplayName("be auto-closable")
     void beAutoClosable() throws Exception {
         try (StandStorage storage = getStorage()) {
             assertTrue(storage.isOpen());
@@ -321,7 +317,7 @@ public class JdbcStandStorageShould extends StandStorageTest {
 
     @Test
     @DisplayName("fail to write data after closed")
-    void failToWriteDataAfterClosed() throws Exception {
+    void failToWriteAfterClosed() throws Exception {
         final StandStorage storage = getStorage();
 
         assertTrue(storage.isOpen());
@@ -334,7 +330,7 @@ public class JdbcStandStorageShould extends StandStorageTest {
 
     @Test
     @DisplayName("fail to read data after closed")
-    void failToReadDataAfterClosed() throws Exception {
+    void failToReadAfterClosed() throws Exception {
         final StandStorage storage = getStorage();
 
         assertTrue(storage.isOpen());
