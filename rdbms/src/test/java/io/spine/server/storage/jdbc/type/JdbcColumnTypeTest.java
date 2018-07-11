@@ -22,19 +22,21 @@ package io.spine.server.storage.jdbc.type;
 
 import io.spine.server.storage.jdbc.query.Parameter;
 import io.spine.server.storage.jdbc.query.Parameters;
-import io.spine.test.Tests;
-import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;
 
 import static io.spine.base.Identifier.newUuid;
+import static io.spine.test.Tests.nullRef;
 import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Dmytro Dashenkov
  */
-public class JdbcColumnTypeShould {
+@DisplayName("JdbcColumnType should")
+class JdbcColumnTypeTest {
 
     private final JdbcColumnType<String, ?> columnType = JdbcColumnTypes.stringType();
 
@@ -50,9 +52,9 @@ public class JdbcColumnTypeShould {
         assertNull(parameter.getValue());
     }
 
-    @Test(expected = NullPointerException.class)
-    @DisplayName("check converted value to be nonnull")
-    void checkConvertedValueToBeNonnull() {
-        columnType.convertColumnValue(Tests.<String>nullRef());
+    @Test
+    @DisplayName("check converted value to be non-null")
+    void checkConvertedNotNull() {
+        assertThrows(NullPointerException.class, () -> columnType.convertColumnValue(nullRef()));
     }
 }

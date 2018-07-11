@@ -18,64 +18,34 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.type;
+package io.spine.server.storage.jdbc.type.given;
 
-import io.spine.core.Version;
-import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.entity.storage.EntityColumn;
 import io.spine.server.storage.jdbc.Type;
 import io.spine.server.storage.jdbc.query.Parameters;
-import org.junit.Test;
-import org.junit.jupiter.api.DisplayName;
+import io.spine.server.storage.jdbc.type.JdbcColumnType;
 
-import static io.spine.test.Tests.assertHasPrivateParameterlessCtor;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
  * @author Dmytro Dashenkov
+ * @author Dmytro Kuzmin
  */
-public class JdbcTypeRegistryFactoryShould {
+public class JdbcTypeRegistryFactoryTestEnv {
 
-    @Test
-    @DisplayName("have private util ctor")
-    void havePrivateUtilCtor() {
-        assertHasPrivateParameterlessCtor(JdbcTypeRegistryFactory.class);
+    /** Prevents instantiation of this utility class. */
+    private JdbcTypeRegistryFactoryTestEnv() {
     }
 
-    @Test
-    @DisplayName("provide default type registry for required types")
-    void provideDefaultTypeRegistryForRequiredTypes() {
-        final ColumnTypeRegistry<?> registry = JdbcTypeRegistryFactory.defaultInstance();
-        assertNotNull(registry);
-        assertNotNull(registry.get(columnWithType(Version.class)));
-        assertNotNull(registry.get(columnWithType(boolean.class)));
-    }
-
-    @Test
-    @DisplayName("provide builder for extending defaults")
-    void provideBuilderForExtendingDefaults() {
-        final ColumnTypeRegistry<?> registry =
-                JdbcTypeRegistryFactory.predefinedValuesAnd()
-                                       .put(String.class, CustomType.INSTANCE)
-                                       .build();
-        assertNotNull(registry);
-        assertNotNull(registry.get(columnWithType(Version.class)));
-        assertNotNull(registry.get(columnWithType(boolean.class)));
-        assertEquals(registry.get(columnWithType(String.class)),
-                     CustomType.INSTANCE);
-    }
-
-    private static EntityColumn columnWithType(Class<?> cls) {
+    public static EntityColumn columnWithType(Class<?> cls) {
         final EntityColumn column = mock(EntityColumn.class);
         when(column.getType()).thenReturn(cls);
         when(column.getPersistedType()).thenReturn(cls);
         return column;
     }
 
-    private enum CustomType implements JdbcColumnType<String, String> {
+    public enum CustomType implements JdbcColumnType<String, String> {
 
         INSTANCE;
 
