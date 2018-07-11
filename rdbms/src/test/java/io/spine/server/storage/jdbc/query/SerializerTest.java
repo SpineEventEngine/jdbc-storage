@@ -46,7 +46,7 @@ class SerializerTest {
 
     @Test
     @DisplayName("serialize and deserialize message")
-    void serializeAndDeserialize() {
+    void serializeAndDeserializeMsg() {
         StringValue expected = StringValue
                 .getDefaultInstance()
                 .toBuilder()
