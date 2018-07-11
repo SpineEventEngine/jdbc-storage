@@ -80,6 +80,7 @@ class DbIteratorTest {
         }
     }
 
+    @SuppressWarnings("CheckReturnValue") // Just check that method runs without errors.
     @Test
     @DisplayName("allow `next` without `hasNext`")
     void allowNextWithoutHasNext() {
@@ -103,6 +104,7 @@ class DbIteratorTest {
             assertClosed(iterator);
         }
 
+        @SuppressWarnings("CheckReturnValue") // Call `hasNext` method just to close iterator.
         @Test
         @DisplayName("when no more elements are present to iterate")
         void whenNoElementsPresent() throws SQLException {
@@ -124,6 +126,7 @@ class DbIteratorTest {
         assertThrows(UnsupportedOperationException.class, iterator::remove);
     }
 
+    @SuppressWarnings("CheckReturnValue") // Ignore `hasNext` method result on purpose.
     @Test
     @DisplayName("throw NoSuchElementException if trying to get absent element")
     void notGetAbsentElement() {

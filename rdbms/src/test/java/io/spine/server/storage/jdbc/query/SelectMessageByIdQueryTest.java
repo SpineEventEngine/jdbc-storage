@@ -52,6 +52,7 @@ class SelectMessageByIdQueryTest {
 
     private final ASelectMessageByIdQuery.Builder builder = selectMessageBuilder();
 
+    @SuppressWarnings("CheckReturnValue") // Run method to close result set.
     @Test
     @DisplayName("close result set")
     void closeResultSet() throws SQLException {

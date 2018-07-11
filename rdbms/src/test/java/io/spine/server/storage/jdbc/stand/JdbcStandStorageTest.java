@@ -21,6 +21,7 @@
 package io.spine.server.storage.jdbc.stand;
 
 import com.google.common.base.Optional;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.FieldMask;
 import com.google.protobuf.Message;
@@ -366,6 +367,7 @@ class JdbcStandStorageTest extends StandStorageTest {
         }
     }
 
+    @CanIgnoreReturnValue
     private static EntityRecord writeToStorage(Aggregate<?, ?, ?> aggregate,
                                                StandStorage storage,
                                                Class<? extends Message> stateClass) {

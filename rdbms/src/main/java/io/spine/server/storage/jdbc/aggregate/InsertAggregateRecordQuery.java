@@ -20,6 +20,7 @@
 
 package io.spine.server.storage.jdbc.aggregate;
 
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.protobuf.Timestamp;
 import com.querydsl.sql.dml.SQLInsertClause;
 import io.spine.core.Event;
@@ -50,6 +51,7 @@ class InsertAggregateRecordQuery<I> extends IdAwareQuery<I> implements WriteQuer
         this.record = builder.record;
     }
 
+    @CanIgnoreReturnValue
     @Override
     public long execute() {
         Timestamp recordTimestamp = record.getTimestamp();
