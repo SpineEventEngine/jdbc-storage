@@ -216,11 +216,11 @@ class JdbcStandStorageTest extends StandStorageTest {
         final StandStorage storage = getStorage();
 
         final TypeUrl typeUrl = TypeUrl.of(Project.class);
-        final String repeatingInvalidId = "invalid-id-1";
+        final String repeatingInvalidId = "invalid-ID-1";
 
         final Collection<AggregateStateId> ids = new LinkedList<>();
         ids.add(AggregateStateId.of(repeatingInvalidId, typeUrl));
-        ids.add(AggregateStateId.of("invalid-id-2", typeUrl));
+        ids.add(AggregateStateId.of("invalid-ID-2", typeUrl));
         ids.add(AggregateStateId.of(repeatingInvalidId, typeUrl));
 
         final Collection<?> records = newArrayList(storage.readMultiple(ids));
