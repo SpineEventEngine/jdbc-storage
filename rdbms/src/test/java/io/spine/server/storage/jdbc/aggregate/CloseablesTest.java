@@ -62,7 +62,7 @@ class CloseablesTest {
     }
 
     @SuppressWarnings("MethodWithMultipleLoops")
-    // Two loops - one for data set up and one for checks
+    // Two loops - one for data set up and one for checks.
     @Test
     @DisplayName("close all passed instances")
     void closeAll() {
