@@ -29,8 +29,8 @@ import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.entity.storage.EntityColumn;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
-import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import static com.querydsl.core.types.dsl.Expressions.FALSE;
 import static com.querydsl.core.types.dsl.Expressions.TRUE;
@@ -49,8 +49,10 @@ import static io.spine.server.storage.jdbc.query.QueryPredicates.columnMatchFilt
 import static io.spine.server.storage.jdbc.query.QueryPredicates.joinPredicates;
 import static io.spine.server.storage.jdbc.query.QueryPredicates.nullFilter;
 import static io.spine.server.storage.jdbc.query.QueryPredicates.valueFilter;
+import static io.spine.test.DisplayNames.HAVE_PARAMETERLESS_CTOR;
 import static io.spine.test.Tests.assertHasPrivateParameterlessCtor;
 import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -58,18 +60,19 @@ import static org.mockito.Mockito.when;
 /**
  * @author Dmytro Grankin
  */
-public class QueryPredicatesShould {
+@DisplayName("QueryPredicates should")
+class QueryPredicatesTest {
 
     private static final String COLUMN_FILTER_VALUE = "test";
 
     @Test
-    @DisplayName("have the private utility ctor")
-    void haveThePrivateUtilityCtor() {
+    @DisplayName(HAVE_PARAMETERLESS_CTOR)
+    void haveUtilityConstructor() {
         assertHasPrivateParameterlessCtor(QueryPredicates.class);
     }
 
     @Test
-    @DisplayName("join predicates using either operator")
+    @DisplayName("join predicates using `EITHER` operator")
     void joinPredicatesUsingEitherOperator() {
         final BooleanExpression left = TRUE;
         final BooleanExpression right = FALSE;
@@ -78,7 +81,7 @@ public class QueryPredicatesShould {
     }
 
     @Test
-    @DisplayName("join predicates using all operator")
+    @DisplayName("join predicates using `ALL` operator")
     void joinPredicatesUsingAllOperator() {
         final BooleanExpression left = TRUE;
         final BooleanExpression right = FALSE;
@@ -86,15 +89,18 @@ public class QueryPredicatesShould {
         assertEquals(left.and(right), result);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    @DisplayName("throw exception for unsupported operator")
-    void throwExceptionForUnsupportedOperator() {
-        joinPredicates(TRUE, TRUE, CompositeColumnFilter.CompositeOperator.UNRECOGNIZED);
+    @Test
+    @DisplayName("throw IAE for unsupported operator")
+    void throwForUnsupportedOperator() {
+        assertThrows(IllegalArgumentException.class,
+                     () -> joinPredicates(TRUE,
+                                          TRUE,
+                                          CompositeColumnFilter.CompositeOperator.UNRECOGNIZED));
     }
 
     @Test
-    @DisplayName("create equal predicate for null value")
-    void createEqualPredicateForNullValue() {
+    @DisplayName("create `EQUAL` predicate for null value")
+    void createEqualForNull() {
         final EntityColumn column = stringColumnMock();
         when(column.toPersistedValue(any())).thenReturn(null);
 
@@ -111,9 +117,9 @@ public class QueryPredicatesShould {
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored") // Method expected to throw exception.
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     @DisplayName("not create ordering predicate for null value")
-    void notCreateOrderingPredicateForNullValue() {
+    void notCreateOrderingForNull() {
         final EntityColumn column = stringColumnMock();
         when(column.toPersistedValue(any())).thenReturn(null);
 
@@ -121,14 +127,16 @@ public class QueryPredicatesShould {
                 = JdbcTypeRegistryFactory.defaultInstance();
 
         final ColumnFilter filter = gt(column.getStoredName(), COLUMN_FILTER_VALUE);
-        columnMatchFilter(column, filter, registry);
+
+        assertThrows(IllegalArgumentException.class,
+                     () -> columnMatchFilter(column, filter, registry));
     }
 
     @SuppressWarnings({"unchecked" /* Using raw types for mocks. */,
                        "ResultOfMethodCallIgnored" /* Method expected to throw exception. */})
-    @Test(expected = IllegalArgumentException.class)
-    @DisplayName("not accept non comparable value")
-    void notAcceptNonComparableValue() {
+    @Test
+    @DisplayName("not accept non-comparable value")
+    void notAcceptNonComparable() {
         final EntityColumn column = stringColumnMock();
         when(column.toPersistedValue(any())).thenReturn("test value");
 
@@ -141,49 +149,56 @@ public class QueryPredicatesShould {
                                                               .build();
 
         final ColumnFilter filter = eq(column.getStoredName(), COLUMN_FILTER_VALUE);
-        columnMatchFilter(column, filter, registry);
+
+        assertThrows(IllegalArgumentException.class,
+                     () -> columnMatchFilter(column, filter, registry));
     }
 
     @Test
-    @DisplayName("generate null filter for EQUAL")
-    void generateNullFilterForEQUAL() {
+    @DisplayName("generate null filter for `EQUAL`")
+    void createNullFilterForEqual() {
         final ComparablePath<Comparable> path = comparablePath(Comparable.class, "");
         final Predicate predicate = nullFilter(EQUAL, path);
         assertEquals(path.isNull(), predicate);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    @DisplayName("not generate null filter for GREATER THAN")
+    @Test
+    @DisplayName("not generate null filter for `GREATER THAN`")
     void notGenerateNullFilterForGREATERTHAN() {
-        runNullFilterCreationFor(GREATER_THAN);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    @DisplayName("not generate null filter for LESS THAN")
-    void notGenerateNullFilterForLESSTHAN() {
-        runNullFilterCreationFor(LESS_THAN);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    @DisplayName("not generate null filter for GREATER OR EQUAL")
-    void notGenerateNullFilterForGREATEROREQUAL() {
-        runNullFilterCreationFor(GREATER_OR_EQUAL);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    @DisplayName("not generate null filter for LESS OR EQUAL")
-    void notGenerateNullFilterForLESSOREQUAL() {
-        runNullFilterCreationFor(LESS_OR_EQUAL);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    @DisplayName("not generate null filter for UNRECOGNIZED")
-    void notGenerateNullFilterForUNRECOGNIZED() {
-        runNullFilterCreationFor(UNRECOGNIZED);
+        assertThrows(IllegalArgumentException.class,
+                     () -> runNullFilterCreationFor(GREATER_THAN));
     }
 
     @Test
-    @DisplayName("generate value filter for EQUAL")
+    @DisplayName("not generate null filter for `LESS THAN`")
+    void notGenerateNullFilterForLESSTHAN() {
+        assertThrows(IllegalArgumentException.class,
+                     () ->  runNullFilterCreationFor(LESS_THAN));
+    }
+
+    @Test
+    @DisplayName("not generate null filter for `GREATER OR EQUAL`")
+    void notGenerateNullFilterForGREATEROREQUAL() {
+        assertThrows(IllegalArgumentException.class,
+                     () -> runNullFilterCreationFor(GREATER_OR_EQUAL));
+    }
+
+    @Test
+    @DisplayName("not generate null filter for `LESS OR EQUAL`")
+    void notGenerateNullFilterForLESSOREQUAL() {
+        assertThrows(IllegalArgumentException.class,
+                     () -> runNullFilterCreationFor(LESS_OR_EQUAL));
+    }
+
+    @Test
+    @DisplayName("not generate null filter for `UNRECOGNIZED`")
+    void notGenerateNullFilterForUNRECOGNIZED() {
+        assertThrows(IllegalArgumentException.class,
+                     () -> runNullFilterCreationFor(UNRECOGNIZED));
+    }
+
+    @Test
+    @DisplayName("generate value filter for `EQUAL`")
     void generateValueFilterForEQUAL() {
         final ComparablePath<Comparable> path = comparablePath(Comparable.class, "");
         final Predicate predicate = valueFilter(EQUAL, path, COLUMN_FILTER_VALUE);
@@ -191,7 +206,7 @@ public class QueryPredicatesShould {
     }
 
     @Test
-    @DisplayName("generate value filter for GREATER THAN")
+    @DisplayName("generate value filter for `GREATER THAN`")
     void generateValueFilterForGREATERTHAN() {
         final ComparablePath<Comparable> path = comparablePath(Comparable.class, "");
         final Predicate predicate = valueFilter(GREATER_THAN, path, COLUMN_FILTER_VALUE);
@@ -199,7 +214,7 @@ public class QueryPredicatesShould {
     }
 
     @Test
-    @DisplayName("generate value filter for LESS THAN")
+    @DisplayName("generate value filter for `LESS THAN`")
     void generateValueFilterForLESSTHAN() {
         final ComparablePath<Comparable> path = comparablePath(Comparable.class, "");
         final Predicate predicate = valueFilter(LESS_THAN, path, COLUMN_FILTER_VALUE);
@@ -207,7 +222,7 @@ public class QueryPredicatesShould {
     }
 
     @Test
-    @DisplayName("generate value filter for GREATER OR EQUAL")
+    @DisplayName("generate value filter for `GREATER OR EQUAL`")
     void generateValueFilterForGREATEROREQUAL() {
         final ComparablePath<Comparable> path = comparablePath(Comparable.class, "");
         final Predicate predicate = valueFilter(GREATER_OR_EQUAL, path, COLUMN_FILTER_VALUE);
@@ -215,17 +230,18 @@ public class QueryPredicatesShould {
     }
 
     @Test
-    @DisplayName("generate value filter for LESS OR EQUAL")
+    @DisplayName("generate value filter for `LESS OR EQUAL`")
     void generateValueFilterForLESSOREQUAL() {
         final ComparablePath<Comparable> path = comparablePath(Comparable.class, "");
         final Predicate predicate = valueFilter(LESS_OR_EQUAL, path, COLUMN_FILTER_VALUE);
         assertEquals(path.loe(COLUMN_FILTER_VALUE), predicate);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    @DisplayName("not generate value filter for UNRECOGNIZED")
-    void notGenerateValueFilterForUNRECOGNIZED() {
-        runValueFilterCreationFor(UNRECOGNIZED);
+    @Test
+    @DisplayName("not generate value filter for `UNRECOGNIZED`")
+    void notCreateValueFilterForUnrecognized() {
+        assertThrows(IllegalArgumentException.class,
+                     () -> runValueFilterCreationFor(UNRECOGNIZED));
     }
 
     private static EntityColumn stringColumnMock() {

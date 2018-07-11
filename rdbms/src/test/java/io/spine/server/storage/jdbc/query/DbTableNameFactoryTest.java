@@ -21,12 +21,13 @@
 package io.spine.server.storage.jdbc.query;
 
 import com.google.common.testing.NullPointerTester;
-import com.google.protobuf.StringValue;
-import io.spine.server.entity.AbstractEntity;
-import org.junit.Test;
+import io.spine.server.storage.jdbc.query.given.DbTableNameFactoryTestEnv.TestEntity;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import static io.spine.server.storage.jdbc.query.DbTableNameFactory.newTableName;
+import static io.spine.test.DisplayNames.HAVE_PARAMETERLESS_CTOR;
+import static io.spine.test.DisplayNames.NOT_ACCEPT_NULLS;
 import static io.spine.test.Tests.assertHasPrivateParameterlessCtor;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -34,18 +35,19 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Alexander Litus
  */
-public class DbTableNameFactoryShould {
+@DisplayName("DbTableNameFactory should")
+class DbTableNameFactoryTest {
 
     private final Class<TestEntity> entityClass = TestEntity.class;
 
     @Test
-    @DisplayName("have private utility constructor")
-    void havePrivateUtilityConstructor() {
+    @DisplayName(HAVE_PARAMETERLESS_CTOR)
+    void haveUtilityConstructor() {
         assertHasPrivateParameterlessCtor(DbTableNameFactory.class);
     }
 
     @Test
-    @DisplayName("pass null tolerance check")
+    @DisplayName(NOT_ACCEPT_NULLS)
     void passNullToleranceCheck() {
         final NullPointerTester tester = new NullPointerTester();
         tester.testStaticMethods(DbTableNameFactory.class, NullPointerTester.Visibility.PACKAGE);
@@ -53,7 +55,7 @@ public class DbTableNameFactoryShould {
 
     @Test
     @DisplayName("return table name which starts with entity class name")
-    void returnTableNameWhichStartsWithEntityClassName() {
+    void returnTableName() {
         final String tableName = newTableName(entityClass);
         final String className = entityClass.getSimpleName();
         assertTrue(tableName.startsWith(className));
@@ -61,14 +63,7 @@ public class DbTableNameFactoryShould {
 
     @Test
     @DisplayName("produce same name for same class")
-    void produceSameNameForSameClass() {
+    void produceSameForSameClass() {
         assertEquals(newTableName(entityClass), newTableName(entityClass));
-    }
-
-    private static class TestEntity extends AbstractEntity<String, StringValue> {
-
-        private TestEntity(String id) {
-            super(id);
-        }
     }
 }

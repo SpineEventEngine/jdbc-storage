@@ -18,38 +18,25 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.query;
+package io.spine.server.storage.jdbc.query.given;
 
 import com.google.protobuf.StringValue;
-import org.junit.Test;
-import org.junit.jupiter.api.DisplayName;
-
-import static io.spine.base.Identifier.newUuid;
-import static io.spine.test.Tests.assertHasPrivateParameterlessCtor;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import io.spine.server.entity.AbstractEntity;
 
 /**
  * @author Alexander Litus
+ * @author Dmytro Kuzmin
  */
-public class SerializerShould {
+public class DbTableNameFactoryTestEnv {
 
-    @Test
-    @DisplayName("have private utility constructor")
-    void havePrivateUtilityConstructor() {
-        assertHasPrivateParameterlessCtor(Serializer.class);
+    /** Prevents instantiation of this utility class. */
+    private DbTableNameFactoryTestEnv() {
     }
 
-    @Test
-    @DisplayName("serialize and deserialize message")
-    void serializeAndDeserializeMessage() {
-        final StringValue expected = StringValue
-                .getDefaultInstance().toBuilder().setValue(newUuid()).build();
+    public static class TestEntity extends AbstractEntity<String, StringValue> {
 
-        final byte[] bytes = Serializer.serialize(expected);
-        assertTrue(bytes.length > 0);
-
-        final StringValue actual = Serializer.deserialize(bytes, expected.getDescriptorForType());
-        assertEquals(expected, actual);
+        private TestEntity(String id) {
+            super(id);
+        }
     }
 }

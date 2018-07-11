@@ -23,8 +23,8 @@ package io.spine.server.storage.jdbc.query;
 import io.spine.server.storage.jdbc.ConnectionWrapper;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
-import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +32,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import static io.spine.base.Identifier.newUuid;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
@@ -42,11 +43,12 @@ import static org.mockito.Mockito.spy;
 /**
  * @author Dmytro Dashenkov
  */
-public class QueryExecutorShould {
+@DisplayName("QueryExecutor should")
+class QueryExecutorTest {
 
-    @Test(expected = DatabaseException.class)
-    @DisplayName("handle sql exception on query execution")
-    void handleSqlExceptionOnQueryExecution() throws SQLException {
+    @Test
+    @DisplayName("handle SQL exception on query execution")
+    void handleExceptionOnExecution() throws SQLException {
         final DataSourceWrapper dataSource = mock(DataSourceWrapper.class);
         final ConnectionWrapper connection = mock(ConnectionWrapper.class);
         final PreparedStatement statement = mock(PreparedStatement.class);
@@ -58,7 +60,8 @@ public class QueryExecutorShould {
         doThrow(SQLException.class).when(statement)
                                    .execute();
         final QueryExecutor query = spy(new QueryExecutor(dataSource, log()));
-        query.execute(newUuid());
+
+        assertThrows(DatabaseException.class, () -> query.execute(newUuid()));
     }
 
     private static Logger log() {
@@ -68,6 +71,6 @@ public class QueryExecutorShould {
     private enum LogSingleton {
         INSTANCE;
         @SuppressWarnings("NonSerializableFieldInSerializableClass")
-        private final Logger value = LoggerFactory.getLogger(QueryExecutorShould.class);
+        private final Logger value = LoggerFactory.getLogger(QueryExecutorTest.class);
     }
 }

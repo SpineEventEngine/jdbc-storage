@@ -27,8 +27,8 @@ import com.querydsl.sql.SQLQuery;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.query.given.Given.ASelectMessageByIdQuery;
-import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -38,6 +38,7 @@ import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory
 import static io.spine.server.storage.jdbc.query.IdColumn.typeString;
 import static io.spine.server.storage.jdbc.query.given.Given.selectMessageBuilder;
 import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -46,7 +47,8 @@ import static org.mockito.Mockito.verify;
 /**
  * @author Dmytro Grankin
  */
-public class SelectMessageByIdQueryShould {
+@DisplayName("SelectMessageByIdQuery should")
+class SelectMessageByIdQueryTest {
 
     private final ASelectMessageByIdQuery.Builder builder = selectMessageBuilder();
 
@@ -69,8 +71,8 @@ public class SelectMessageByIdQueryShould {
         verify(resultSet).close();
     }
 
-    @Test(expected = DatabaseException.class)
-    @DisplayName("handle sql exception")
+    @Test
+    @DisplayName("handle SQL exception")
     void handleSqlException() throws SQLException {
         final SQLQuery underlyingQuery = mock(SQLQuery.class);
         final ResultSet resultSet = mock(ResultSet.class);
@@ -86,12 +88,13 @@ public class SelectMessageByIdQueryShould {
                                                      .setId(newUuid())
                                                      .setIdColumn(typeString(newUuid()))
                                                      .build();
-        query.execute();
+
+        assertThrows(DatabaseException.class, query::execute);
     }
 
     @Test
     @DisplayName("return null on deserialization if column is null")
-    void returnNullOnDeserializationIfColumnIsNull() throws SQLException {
+    void returnNullForNullColumn() throws SQLException {
         final ResultSet resultSet = mock(ResultSet.class);
         final DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
         final Descriptors.Descriptor messageDescriptor = StringValue.getDescriptor();

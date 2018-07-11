@@ -20,44 +20,49 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 
 import static io.spine.base.Identifier.newUuid;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Dmytro Grankin
  */
-public class ParametersShould {
+@DisplayName("Parameters should")
+class ParametersTest {
 
     private static final String ID = newUuid();
     private static final Parameter PARAMETER = Parameter.of(new Object());
 
-    @Test(expected = IllegalArgumentException.class)
-    @DisplayName("check identifiers uniqueness for single parameter")
-    void checkIdentifiersUniquenessForSingleParameter() {
-        Parameters.newBuilder()
-                  .addParameter(ID, PARAMETER)
-                  .addParameter(ID, PARAMETER);
+    @Test
+    @DisplayName("check identifier uniqueness for single parameter")
+    void checkUniqueIdForSingle() {
+        assertThrows(IllegalArgumentException.class,
+                     () -> Parameters.newBuilder()
+                                     .addParameter(ID, PARAMETER)
+                                     .addParameter(ID, PARAMETER));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    @DisplayName("check identifiers uniqueness for multiple parameters")
-    void checkIdentifiersUniquenessForMultipleParameters() {
+    @Test
+    @DisplayName("check identifier uniqueness for multiple parameters")
+    void checkUniqueIdForMultiple() {
         final Parameters.Builder commonParameters = Parameters.newBuilder()
                                                               .addParameter(ID, PARAMETER);
         final Parameters buildedCommonParameters = commonParameters.build();
-        commonParameters.addParameters(buildedCommonParameters);
+
+        assertThrows(IllegalArgumentException.class,
+                     () -> commonParameters.addParameters(buildedCommonParameters));
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
     @DisplayName("not allow modify identifiers")
-    void notAllowModifyIdentifiers() {
+    void notAllowModifyId() {
         final Parameters parameters = Parameters.empty();
         final Set<String> identifiers = parameters.getIdentifiers();
         final String newIdentifier = newUuid();
-        identifiers.add(newIdentifier);
+        assertThrows(UnsupportedOperationException.class, () -> identifiers.add(newIdentifier));
     }
 }

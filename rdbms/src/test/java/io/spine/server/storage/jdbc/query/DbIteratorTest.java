@@ -21,60 +21,59 @@
 package io.spine.server.storage.jdbc.query;
 
 import io.spine.server.storage.jdbc.DatabaseException;
-import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.NoSuchElementException;
 
-import static org.junit.Assert.fail;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
+import static io.spine.server.storage.jdbc.query.given.DbIteratorTestEnv.emptyIterator;
+import static io.spine.server.storage.jdbc.query.given.DbIteratorTestEnv.faultyResultIterator;
+import static io.spine.server.storage.jdbc.query.given.DbIteratorTestEnv.nonEmptyIterator;
+import static io.spine.server.storage.jdbc.query.given.DbIteratorTestEnv.sneakyResultIterator;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
  * @author Dmytro Dashenkov
  */
-public class DbIteratorShould {
+@DisplayName("DbIterator should")
+class DbIteratorTest {
 
-    private static final byte[] EMPTY_BYTES = new byte[0];
-
-    @Test(expected = DatabaseException.class)
+    @Test
     @DisplayName("throw DatabaseException on next check failure")
     void throwDatabaseExceptionOnNextCheckFailure() {
         final DbIterator iterator = faultyResultIterator();
-        iterator.hasNext();
-    }
-
-    @Test(expected = DatabaseException.class)
-    @DisplayName("throw DatabaseException on close failure")
-    void throwDatabaseExceptionOnCloseFailure() {
-        final DbIterator iterator = faultyResultIterator();
-        iterator.close();
-    }
-
-    @Test(expected = DatabaseException.class)
-    @DisplayName("throw DatabaseException on read failure")
-    void throwDatabaseExceptionOnReadFailure() {
-        final DbIterator iterator = sneakyResultIterator();
-        if (iterator.hasNext()) {
-            iterator.next();
-        }
+        assertThrows(DatabaseException.class, iterator::hasNext);
     }
 
     @Test
-    @DisplayName("allow next without hasNext")
-    void allowNextWithoutHasNext() {
+    @DisplayName("throw DatabaseException on close failure")
+    void throwDatabaseExceptionOnCloseFailure() {
+        final DbIterator iterator = faultyResultIterator();
+        assertThrows(DatabaseException.class, iterator::close);
+    }
+
+    @Test
+    @DisplayName("throw DatabaseException on read failure")
+    void throwDatabaseExceptionOnReadFailure() {
+        final DbIterator iterator = sneakyResultIterator();
+        assertThrows(DatabaseException.class, () -> {
+            if (iterator.hasNext()) {
+                iterator.next();
+            }
+        });
+    }
+
+    @Test
+    @DisplayName("allow `next` without `hasNext`")
+    void getNextWithoutHasNext() {
         final DbIterator iterator = nonEmptyIterator();
         iterator.next();
     }
@@ -92,8 +91,8 @@ public class DbIteratorShould {
     }
 
     @Test
-    @DisplayName("close ResultSet if no more elements to iterate")
-    void closeResultSetIfNoMoreElementsToIterate() throws SQLException {
+    @DisplayName("close ResultSet if no more elements are present to iterate")
+    void closeResultSetWhenEmpty() throws SQLException {
         final DbIterator iterator = emptyIterator();
         final ResultSet resultSet = iterator.getResultSet();
 
@@ -103,27 +102,27 @@ public class DbIteratorShould {
         assertClosed(iterator);
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @SuppressWarnings("deprecation") // Need to use deprecated to make sure it's not supported.
+    @Test
     @DisplayName("not support removal")
     void notSupportRemoval() {
         final DbIterator iterator = emptyIterator();
-        iterator.remove();
-    }
-
-    @Test(expected = NoSuchElementException.class)
-    @DisplayName("throw if trying to get absent element")
-    void throwIfTryingToGetAbsentElement() {
-        final DbIterator iterator = emptyIterator();
-
-        // Ignore that the element is absent
-        iterator.hasNext();
-
-        // Get an error
-        iterator.next();
+        assertThrows(UnsupportedOperationException.class, iterator::remove);
     }
 
     @Test
-    @DisplayName("check if result set closed")
+    @DisplayName("throw NoSuchElementException if trying to get absent element")
+    void throwOnGetAbsentElement() {
+        final DbIterator iterator = emptyIterator();
+
+        // Ignore that the element is absent.
+        iterator.hasNext();
+
+        assertThrows(NoSuchElementException.class, iterator::next);
+    }
+
+    @Test
+    @DisplayName("check if result set is closed")
     void checkIfResultSetClosed() throws SQLException {
         final DbIterator iterator = emptyIterator();
         iterator.close();
@@ -135,7 +134,7 @@ public class DbIteratorShould {
 
     @Test
     @DisplayName("obtain statement before result set closed")
-    void obtainStatementBeforeResultSetClosed() throws SQLException {
+    void getStatementBeforeClose() throws SQLException {
         final DbIterator iterator = emptyIterator();
         iterator.close();
 
@@ -149,7 +148,7 @@ public class DbIteratorShould {
 
     @Test
     @DisplayName("obtain connection before statement closed")
-    void obtainConnectionBeforeStatementClosed() throws SQLException {
+    void getConnectionBeforeClose() throws SQLException {
         final DbIterator iterator = emptyIterator();
         iterator.close();
 
@@ -162,73 +161,6 @@ public class DbIteratorShould {
              .close();
     }
 
-    private static DbIterator emptyIterator() {
-        final ResultSet resultSet = baseResultSetMock();
-        try {
-            when(resultSet.next()).thenReturn(false);
-        } catch (SQLException e) {
-            fail(e.getMessage());
-        }
-
-        final DbIterator iterator = new AnIterator(resultSet);
-        return iterator;
-    }
-
-    private static DbIterator faultyResultIterator() {
-        final ResultSet resultSet = baseResultSetMock();
-        try {
-            final Exception failure = new SQLException("Faulty Result in action");
-            when(resultSet.next()).thenThrow(failure);
-            doThrow(failure).when(resultSet)
-                            .close();
-        } catch (SQLException e) {
-            fail(e.getMessage());
-        }
-
-        final DbIterator iterator = new AnIterator(resultSet);
-        return iterator;
-    }
-
-    private static DbIterator sneakyResultIterator() {
-        final ResultSet resultSet = baseResultSetMock();
-        final DbIterator iterator = spy(new AnIterator(resultSet));
-        try {
-            when(resultSet.next()).thenReturn(true);
-            when(iterator.readResult())
-                    .thenThrow(new SQLException("Read is not allowed; I'm sneaky"));
-        } catch (SQLException e) {
-            fail(e.getMessage());
-        }
-        return iterator;
-    }
-
-    private static DbIterator nonEmptyIterator() {
-        final ResultSet resultSet = baseResultSetMock();
-        try {
-            when(resultSet.next()).thenReturn(true);
-            when(resultSet.getBytes(any(String.class))).thenReturn(EMPTY_BYTES);
-        } catch (SQLException e) {
-            fail(e.getMessage());
-        }
-
-        final DbIterator iterator = new AnIterator(resultSet);
-        return iterator;
-    }
-
-    private static ResultSet baseResultSetMock() {
-        final ResultSet resultSet = mock(ResultSet.class);
-        final PreparedStatement statement = mock(PreparedStatement.class);
-        final Connection connection = mock(Connection.class);
-        try {
-            when(statement.executeQuery()).thenReturn(resultSet);
-            when(resultSet.getStatement()).thenReturn(statement);
-            when(statement.getConnection()).thenReturn(connection);
-        } catch (SQLException e) {
-            fail(e.getMessage());
-        }
-        return resultSet;
-    }
-
     private static void assertClosed(DbIterator<?> iterator) throws SQLException {
         final ResultSet resultSet = iterator.getResultSet();
         final Statement statement = resultSet.getStatement();
@@ -236,17 +168,5 @@ public class DbIteratorShould {
         verify(resultSet).close();
         verify(statement).close();
         verify(connection).close();
-    }
-
-    private static class AnIterator extends DbIterator {
-
-        private AnIterator(ResultSet resultSet) {
-            super(resultSet, "");
-        }
-
-        @Override
-        protected Object readResult() throws SQLException {
-            return getResultSet();
-        }
     }
 }

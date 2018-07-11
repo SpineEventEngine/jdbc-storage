@@ -28,8 +28,8 @@ import io.spine.server.storage.jdbc.ConnectionWrapper;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.query.given.Given.AStorageQuery;
-import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -39,6 +39,7 @@ import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory
 import static io.spine.server.storage.jdbc.query.AbstractQuery.createFactory;
 import static io.spine.server.storage.jdbc.query.given.Given.storageQueryBuilder;
 import static java.sql.ResultSet.HOLD_CURSORS_OVER_COMMIT;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -49,7 +50,8 @@ import static org.mockito.Mockito.verify;
 /**
  * @author Dmytro Grankin
  */
-public class AbstractQueryShould {
+@DisplayName("AbstractQuery should")
+class AbstractQueryTest {
 
     private final DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
     private final AStorageQuery query = storageQueryBuilder().setTableName(newUuid())
@@ -70,15 +72,14 @@ public class AbstractQueryShould {
         verify(connection).close();
     }
 
-
     /**
-     * <p>A commit is executed after a query execution, but a {@code ResultSet} should be used
-     * after this, hence the result set should not be closed. This test verifies it despite
-     * a JDBC implementation.
+     * A commit is executed after a query execution, but a {@code ResultSet} should be used after
+     * this, hence the result set should not be closed. This test verifies that the correct
+     * holdability was set, assuming that the JDBC implementation does the rest correctly.
      */
     @Test
-    @DisplayName("set hold cursors over commit for connection")
-    void setHoldCursorsOverCommitForConnection() throws SQLException {
+    @DisplayName("set `HOLD_CURSORS_OVER_COMMIT` for connection")
+    void holdCursorsOverCommit() throws SQLException {
         final DataSourceWrapper dataSourceSpy = spy(dataSource);
         final ConnectionWrapper connectionWrapper = spy(dataSourceSpy.getConnection(true));
         final Connection connection = spy(connectionWrapper.get());
@@ -94,9 +95,9 @@ public class AbstractQueryShould {
         verify(connectionFromFactory).setHoldability(HOLD_CURSORS_OVER_COMMIT);
     }
 
-    @Test(expected = DatabaseException.class)
-    @DisplayName("handle sql exception on transaction rollback")
-    void handleSqlExceptionOnTransactionRollback() throws SQLException {
+    @Test
+    @DisplayName("handle SQL exception on transaction rollback")
+    void handleExceptionOnRollback() throws SQLException {
         final Configuration configuration = query.factory()
                                                  .getConfiguration();
         final SQLListenerContext context = mock(SQLListenerContext.class);
@@ -106,12 +107,12 @@ public class AbstractQueryShould {
         doReturn(connection).when(context)
                             .getConnection();
         final SQLListeners listeners = configuration.getListeners();
-        listeners.exception(context);
+        assertThrows(DatabaseException.class, () -> listeners.exception(context));
     }
 
-    @Test(expected = DatabaseException.class)
-    @DisplayName("handle sql exception on transaction commit")
-    void handleSqlExceptionOnTransactionCommit() throws SQLException {
+    @Test
+    @DisplayName("handle SQL exception on transaction commit")
+    void handleExceptionOnCommit() throws SQLException {
         final Configuration configuration = query.factory()
                                                  .getConfiguration();
         final SQLListenerContext context = mock(SQLListenerContext.class);
@@ -121,6 +122,6 @@ public class AbstractQueryShould {
         doReturn(connection).when(context)
                             .getConnection();
         final SQLListeners listeners = configuration.getListeners();
-        listeners.executed(context);
+        assertThrows(DatabaseException.class, () -> listeners.executed(context));
     }
 }

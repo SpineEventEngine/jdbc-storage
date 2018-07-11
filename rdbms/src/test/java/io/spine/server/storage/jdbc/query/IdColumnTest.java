@@ -21,14 +21,15 @@
 package io.spine.server.storage.jdbc.query;
 
 import com.google.protobuf.Message;
-import com.google.protobuf.StringValue;
-import io.spine.server.entity.AbstractEntity;
-import io.spine.test.entity.ProjectId;
-import org.junit.Test;
+import io.spine.server.storage.jdbc.query.given.IdColumnTestEnv.IntIdEntity;
+import io.spine.server.storage.jdbc.query.given.IdColumnTestEnv.LongIdEntity;
+import io.spine.server.storage.jdbc.query.given.IdColumnTestEnv.MessageIdEntity;
+import io.spine.server.storage.jdbc.query.given.IdColumnTestEnv.StringIdEntity;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
-import static io.spine.server.storage.jdbc.Type.LONG;
 import static io.spine.server.storage.jdbc.Type.INT;
+import static io.spine.server.storage.jdbc.Type.LONG;
 import static io.spine.server.storage.jdbc.Type.STRING_255;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
@@ -37,12 +38,13 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Dmytro Dashenkov
  */
-public class IdColumnShould {
+@DisplayName("IdColumn should")
+class IdColumnTest {
 
-    private static final String ID = "id";
+    private static final String ID = "ID";
 
     @Test
-    @DisplayName("have bigint impl")
+    @DisplayName("have `bigint` implementation")
     void haveBigintImpl() {
         final IdColumn<?> column = IdColumn.newInstance(LongIdEntity.class, ID);
         assertEquals(LONG, column.getSqlType());
@@ -50,7 +52,7 @@ public class IdColumnShould {
     }
 
     @Test
-    @DisplayName("have int impl")
+    @DisplayName("have `int` implementation")
     void haveIntImpl() {
         final IdColumn<?> column = IdColumn.newInstance(IntIdEntity.class, ID);
         assertEquals(INT, column.getSqlType());
@@ -58,8 +60,8 @@ public class IdColumnShould {
     }
 
     @Test
-    @DisplayName("have varchar255 impl")
-    void haveVarchar255Impl() {
+    @DisplayName("have `varchar255` implementation")
+    void haveStringImpl() {
         final IdColumn<?> column = IdColumn.newInstance(StringIdEntity.class, ID);
         assertEquals(STRING_255, column.getSqlType());
         assertSame(String.class, column.getJavaType());
@@ -78,29 +80,5 @@ public class IdColumnShould {
     void storeColumnName() {
         final IdColumn<String> column = IdColumn.newInstance(StringIdEntity.class, ID);
         assertEquals(ID, column.getColumnName());
-    }
-
-    private static class LongIdEntity extends AbstractEntity<Long, StringValue> {
-        protected LongIdEntity(Long id) {
-            super(id);
-        }
-    }
-
-    private static class IntIdEntity extends AbstractEntity<Integer, StringValue> {
-        protected IntIdEntity(Integer id) {
-            super(id);
-        }
-    }
-
-    private static class StringIdEntity extends AbstractEntity<String, StringValue> {
-        protected StringIdEntity(String id) {
-            super(id);
-        }
-    }
-
-    private static class MessageIdEntity extends AbstractEntity<ProjectId, StringValue> {
-        protected MessageIdEntity(ProjectId id) {
-            super(id);
-        }
     }
 }
