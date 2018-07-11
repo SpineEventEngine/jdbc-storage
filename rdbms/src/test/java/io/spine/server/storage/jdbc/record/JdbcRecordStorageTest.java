@@ -62,8 +62,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 /**
  * @author Alexander Litus
  */
-public class JdbcRecordStorageShould
-        extends RecordStorageTest<String, JdbcRecordStorage<String>> {
+@SuppressWarnings("DuplicateStringLiteralInspection") // Common test display names.
+@DisplayName("JdbcRecordStorage should")
+class JdbcRecordStorageTest extends RecordStorageTest<String, JdbcRecordStorage<String>> {
 
     @Test
     @DisplayName("clear itself")
@@ -83,8 +84,8 @@ public class JdbcRecordStorageShould
     }
 
     @Test
-    @DisplayName("throw exception when closing twice")
-    void throwExceptionWhenClosingTwice() throws Exception {
+    @DisplayName("throw ISE when closing twice")
+    void throwOnClosingTwice() throws Exception {
         final RecordStorage<?> storage = getStorage();
         storage.close();
         assertThrows(IllegalStateException.class, storage::close);
@@ -92,7 +93,7 @@ public class JdbcRecordStorageShould
 
     @Test
     @DisplayName("use column names for storing")
-    void useColumnNamesForStoring() {
+    void useColumnNames() {
         final JdbcRecordStorage<String> storage = newStorage(TestEntityWithStringId.class);
         final int entityColumnIndex = RecordTable.StandardColumn.values().length;
         final String customColumnName = storage.getTable()
@@ -105,7 +106,7 @@ public class JdbcRecordStorageShould
 
     @Test
     @DisplayName("read by composite filter with column filters for same column")
-    void readByCompositeFilterWithColumnFiltersForSameColumn() {
+    void readByCompositeFilter() {
         final JdbcRecordStorage<String> storage = newStorage(TestEntityWithStringId.class);
         final String columnName = "value";
         final ColumnFilter lessThan = lt(columnName, -5);
@@ -124,8 +125,8 @@ public class JdbcRecordStorageShould
     }
 
     @Test
-    @DisplayName("require non null entity class")
-    void requireNonNullEntityClass() {
+    @DisplayName("require non-null entity class")
+    void rejectNullEntityClass() {
         final Class<? extends Entity<Object, ?>> nullEntityCls = nullRef();
         assertThrows(NullPointerException.class,
                      () -> JdbcRecordStorage.newBuilder()
@@ -133,8 +134,8 @@ public class JdbcRecordStorageShould
     }
 
     @Test
-    @DisplayName("require non null column type registry")
-    void requireNonNullColumnTypeRegistry() {
+    @DisplayName("require non-null column type registry")
+    void rejectNullColumnTypeRegistry() {
         final ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> registry
                 = nullRef();
         assertThrows(NullPointerException.class,

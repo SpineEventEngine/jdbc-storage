@@ -32,8 +32,8 @@ public class JdbcRecordStorageTestEnv {
 
     public static final String COLUMN_NAME_FOR_STORING = "customName";
 
+    /** Prevents instantiation of this utility class. */
     private JdbcRecordStorageTestEnv() {
-        // Prevent instantiation of this utility class.
     }
 
     public static class TestCounterEntityJdbc extends TestCounterEntity<String> {
