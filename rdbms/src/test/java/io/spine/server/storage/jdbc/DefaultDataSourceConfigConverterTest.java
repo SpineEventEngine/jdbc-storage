@@ -44,7 +44,7 @@ class DefaultDataSourceConfigConverterTest {
     @Test
     @DisplayName(NOT_ACCEPT_NULLS)
     void passNullToleranceCheck() {
-        final NullPointerTester tester = new NullPointerTester();
+        NullPointerTester tester = new NullPointerTester();
         tester.setDefault(DataSourceConfig.class, mock(DataSourceConfig.class));
         tester.testStaticMethods(DefaultDataSourceConfigConverter.class,
                                  NullPointerTester.Visibility.PACKAGE);

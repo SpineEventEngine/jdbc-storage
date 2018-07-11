@@ -45,33 +45,33 @@ class ConnectionWrapperTest {
     @Test
     @DisplayName("store and retrieve connection")
     void storeAndRetrieveConnection() {
-        final Connection connection = mockConnection();
-        final ConnectionWrapper wrapper = ConnectionWrapper.wrap(connection);
-        final Connection stored = wrapper.get();
+        Connection connection = mockConnection();
+        ConnectionWrapper wrapper = ConnectionWrapper.wrap(connection);
+        Connection stored = wrapper.get();
         assertTrue(stored == connection); // Same object.
     }
 
     @Test
     @DisplayName("throw DatabaseException in case of SQLException on commit")
     void handleExceptionOnCommit() {
-        final Connection connection = mockConnection();
-        final ConnectionWrapper wrapper = ConnectionWrapper.wrap(connection);
+        Connection connection = mockConnection();
+        ConnectionWrapper wrapper = ConnectionWrapper.wrap(connection);
         assertThrows(DatabaseException.class, wrapper::commit);
     }
 
     @Test
     @DisplayName("throw DatabaseException in case of SQLException on rollback")
     void handleExceptionOnRollback() {
-        final Connection connection = mockConnection();
-        final ConnectionWrapper wrapper = ConnectionWrapper.wrap(connection);
+        Connection connection = mockConnection();
+        ConnectionWrapper wrapper = ConnectionWrapper.wrap(connection);
         assertThrows(DatabaseException.class, wrapper::rollback);
     }
 
     @Test
     @DisplayName("throw DatabaseException in case of SQLException on close")
     void handleExceptionOnClose() {
-        final Connection connection = mockConnection();
-        final ConnectionWrapper wrapper = ConnectionWrapper.wrap(connection);
+        Connection connection = mockConnection();
+        ConnectionWrapper wrapper = ConnectionWrapper.wrap(connection);
         assertThrows(DatabaseException.class, wrapper::close);
     }
 
@@ -80,9 +80,9 @@ class ConnectionWrapperTest {
     @DisplayName("throw DatabaseException in case of SQLException on preparing statement")
     void handleExceptionOnPrepareStatement()
             throws SQLException {
-        final Connection connection = mockConnection();
+        Connection connection = mockConnection();
         when(connection.prepareStatement(anyString())).thenThrow(SQLException.class);
-        final ConnectionWrapper wrapper = ConnectionWrapper.wrap(connection);
+        ConnectionWrapper wrapper = ConnectionWrapper.wrap(connection);
         assertThrows(DatabaseException.class,
                      () -> wrapper.prepareStatement("SOME SQL STATEMENT."));
     }
@@ -90,15 +90,16 @@ class ConnectionWrapperTest {
     @Test
     @DisplayName("rollback transaction successfully")
     void rollbackTransaction() throws SQLException {
-        final Connection connection = mock(Connection.class);
-        final ConnectionWrapper wrapper = ConnectionWrapper.wrap(connection);
+        Connection connection = mock(Connection.class);
+        ConnectionWrapper wrapper = ConnectionWrapper.wrap(connection);
         wrapper.rollback();
         verify(connection).rollback();
     }
 
     private static Connection mockConnection() {
-        final Connection connection = mock(Connection.class);
-        @SuppressWarnings("NewExceptionWithoutArguments") final Exception exception = new SQLException();
+        Connection connection = mock(Connection.class);
+        @SuppressWarnings("NewExceptionWithoutArguments") // For test we need only exception type.
+        Exception exception = new SQLException();
         try {
             doThrow(exception).when(connection)
                               .commit();

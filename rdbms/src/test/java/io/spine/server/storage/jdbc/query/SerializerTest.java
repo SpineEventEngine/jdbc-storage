@@ -47,16 +47,16 @@ class SerializerTest {
     @Test
     @DisplayName("serialize and deserialize message")
     void serializeAndDeserialize() {
-        final StringValue expected = StringValue
+        StringValue expected = StringValue
                 .getDefaultInstance()
                 .toBuilder()
                 .setValue(newUuid())
                 .build();
 
-        final byte[] bytes = serialize(expected);
+        byte[] bytes = serialize(expected);
         assertTrue(bytes.length > 0);
 
-        final StringValue actual = deserialize(bytes, expected.getDescriptorForType());
+        StringValue actual = deserialize(bytes, expected.getDescriptorForType());
         assertEquals(expected, actual);
     }
 }

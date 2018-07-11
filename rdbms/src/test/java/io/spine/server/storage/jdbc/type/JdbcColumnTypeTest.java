@@ -43,12 +43,12 @@ class JdbcColumnTypeTest {
     @Test
     @DisplayName("set null to parameters")
     void setNullToParameters() throws SQLException {
-        final String identifier = newUuid();
-        final Parameters.Builder builder = Parameters.newBuilder();
+        String identifier = newUuid();
+        Parameters.Builder builder = Parameters.newBuilder();
         columnType.setNull(builder, identifier);
 
-        final Parameters allParameters = builder.build();
-        final Parameter parameter = allParameters.getParameter(identifier);
+        Parameters allParameters = builder.build();
+        Parameter parameter = allParameters.getParameter(identifier);
         assertNull(parameter.getValue());
     }
 

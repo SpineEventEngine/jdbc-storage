@@ -72,15 +72,15 @@ class JdbcRecordStorageTest extends RecordStorageTest<String, JdbcRecordStorage<
     @Test
     @DisplayName("clear itself")
     void clearItself() {
-        final JdbcRecordStorage<String> storage = getStorage();
-        final String id = newUuid();
-        final EntityRecord entityRecord = newStorageRecord();
+        JdbcRecordStorage<String> storage = getStorage();
+        String id = newUuid();
+        EntityRecord entityRecord = newStorageRecord();
 
-        final EntityRecordWithColumns record = EntityRecordWithColumns.of(entityRecord);
+        EntityRecordWithColumns record = EntityRecordWithColumns.of(entityRecord);
         storage.writeRecord(id, record);
         storage.clear();
 
-        final Optional<EntityRecord> actual = storage.readRecord(id);
+        Optional<EntityRecord> actual = storage.readRecord(id);
         assertNotNull(actual);
         assertFalse(actual.isPresent());
         close(storage);
@@ -89,7 +89,7 @@ class JdbcRecordStorageTest extends RecordStorageTest<String, JdbcRecordStorage<
     @Test
     @DisplayName("throw ISE when closing twice")
     void throwOnClosingTwice() throws Exception {
-        final RecordStorage<?> storage = getStorage();
+        RecordStorage<?> storage = getStorage();
         storage.close();
         assertThrows(IllegalStateException.class, storage::close);
     }
@@ -97,12 +97,12 @@ class JdbcRecordStorageTest extends RecordStorageTest<String, JdbcRecordStorage<
     @Test
     @DisplayName("use column names for storing")
     void useColumnNames() {
-        final JdbcRecordStorage<String> storage = newStorage(TestEntityWithStringId.class);
-        final int entityColumnIndex = RecordTable.StandardColumn.values().length;
-        final String customColumnName = storage.getTable()
-                                               .getTableColumns()
-                                               .get(entityColumnIndex)
-                                               .name();
+        JdbcRecordStorage<String> storage = newStorage(TestEntityWithStringId.class);
+        int entityColumnIndex = RecordTable.StandardColumn.values().length;
+        String customColumnName = storage.getTable()
+                                         .getTableColumns()
+                                         .get(entityColumnIndex)
+                                         .name();
         assertEquals(JdbcRecordStorageTestEnv.COLUMN_NAME_FOR_STORING, customColumnName);
         close(storage);
     }
@@ -110,19 +110,19 @@ class JdbcRecordStorageTest extends RecordStorageTest<String, JdbcRecordStorage<
     @Test
     @DisplayName("read by composite filter with column filters for same column")
     void readByCompositeFilter() {
-        final JdbcRecordStorage<String> storage = newStorage(TestEntityWithStringId.class);
-        final String columnName = "value";
-        final ColumnFilter lessThan = lt(columnName, -5);
-        final ColumnFilter greaterThan = gt(columnName, 5);
-        final CompositeColumnFilter columnFilter = CompositeColumnFilter.newBuilder()
-                                                                        .addFilter(lessThan)
-                                                                        .addFilter(greaterThan)
-                                                                        .setOperator(ALL)
-                                                                        .build();
-        final EntityFilters entityFilters = EntityFilters.newBuilder()
-                                                         .addFilter(columnFilter)
-                                                         .build();
-        final EntityQuery<String> query = EntityQueries.from(entityFilters, storage);
+        JdbcRecordStorage<String> storage = newStorage(TestEntityWithStringId.class);
+        String columnName = "value";
+        ColumnFilter lessThan = lt(columnName, -5);
+        ColumnFilter greaterThan = gt(columnName, 5);
+        CompositeColumnFilter columnFilter = CompositeColumnFilter.newBuilder()
+                                                                  .addFilter(lessThan)
+                                                                  .addFilter(greaterThan)
+                                                                  .setOperator(ALL)
+                                                                  .build();
+        EntityFilters entityFilters = EntityFilters.newBuilder()
+                                                   .addFilter(columnFilter)
+                                                   .build();
+        EntityQuery<String> query = EntityQueries.from(entityFilters, storage);
         storage.readAll(query, FieldMask.getDefaultInstance());
         close(storage);
     }
@@ -134,7 +134,7 @@ class JdbcRecordStorageTest extends RecordStorageTest<String, JdbcRecordStorage<
         @Test
         @DisplayName("entity class")
         void entityClass() {
-            final Class<? extends Entity<Object, ?>> nullEntityCls = nullRef();
+            Class<? extends Entity<Object, ?>> nullEntityCls = nullRef();
             assertThrows(NullPointerException.class,
                          () -> JdbcRecordStorage.newBuilder()
                                                 .setEntityClass(nullEntityCls));
@@ -153,12 +153,10 @@ class JdbcRecordStorageTest extends RecordStorageTest<String, JdbcRecordStorage<
 
     @Override
     protected JdbcRecordStorage<String> newStorage(Class<? extends Entity> cls) {
-        final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(
-                "entityStorageTests");
+        DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory("entityStorageTests");
         @SuppressWarnings("unchecked") // Test invariant.
-        final Class<? extends Entity<String, ?>> entityClass =
-                (Class<? extends Entity<String, ?>>) cls;
-        final JdbcRecordStorage<String> storage =
+        Class<? extends Entity<String, ?>> entityClass = (Class<? extends Entity<String, ?>>) cls;
+        JdbcRecordStorage<String> storage =
                 JdbcRecordStorage.<String>newBuilder()
                         .setDataSource(dataSource)
                         .setEntityClass(entityClass)
@@ -176,7 +174,7 @@ class JdbcRecordStorageTest extends RecordStorageTest<String, JdbcRecordStorage<
 
     @Override
     protected Message newState(String id) {
-        final Project.Builder builder = Sample.builderForType(Project.class);
+        Project.Builder builder = Sample.builderForType(Project.class);
         builder.setId(ProjectId.newBuilder()
                                .setId(id));
         return builder.build();

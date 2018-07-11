@@ -50,13 +50,13 @@ class JdbcProjectionStorageTest extends ProjectionStorageTest {
 
     @Override
     protected ProjectionStorage<ProjectId> newStorage(Class<? extends Entity> entityClass) {
-        final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(
-                "projectionStorageTests");
+        DataSourceWrapper dataSource =
+                GivenDataSource.whichIsStoredInMemory("projectionStorageTests");
         @SuppressWarnings("unchecked") // Required for the tests
-        final Class<? extends Projection<ProjectId, ?, ?>> projectionClass =
+        Class<? extends Projection<ProjectId, ?, ?>> projectionClass =
                 (Class<? extends Projection<ProjectId, ?, ?>>) entityClass;
-        final TypeMapping typeMapping = MYSQL_5_7;
-        final JdbcRecordStorage<ProjectId> entityStorage =
+        TypeMapping typeMapping = MYSQL_5_7;
+        JdbcRecordStorage<ProjectId> entityStorage =
                 JdbcRecordStorage.<ProjectId>newBuilder()
                         .setDataSource(dataSource)
                         .setMultitenant(false)
@@ -64,7 +64,7 @@ class JdbcProjectionStorageTest extends ProjectionStorageTest {
                         .setColumnTypeRegistry(JdbcTypeRegistryFactory.defaultInstance())
                         .setTypeMapping(typeMapping)
                         .build();
-        final ProjectionStorage<ProjectId> storage =
+        ProjectionStorage<ProjectId> storage =
                 JdbcProjectionStorage.<ProjectId>newBuilder()
                         .setRecordStorage(entityStorage)
                         .setDataSource(dataSource)
@@ -78,7 +78,7 @@ class JdbcProjectionStorageTest extends ProjectionStorageTest {
     @Test
     @DisplayName("throw ISE when closing twice")
     void throwOnClosingTwice() throws Exception {
-        final ProjectionStorage<?> storage = getStorage();
+        ProjectionStorage<?> storage = getStorage();
         storage.close();
         assertThrows(IllegalStateException.class, storage::close);
     }
@@ -86,7 +86,7 @@ class JdbcProjectionStorageTest extends ProjectionStorageTest {
     @Test
     @DisplayName("accept datasource in builder even though it is not used")
     void acceptDatasourceInBuilder() {
-        final StorageBuilder<?, ?> builder =
+        StorageBuilder<?, ?> builder =
                 JdbcProjectionStorage.newBuilder()
                                      .setDataSource(GivenDataSource.withoutSuperpowers());
         assertNotNull(builder);
@@ -95,7 +95,7 @@ class JdbcProjectionStorageTest extends ProjectionStorageTest {
     @Test
     @DisplayName("require non-null projection class")
     void rejectNullProjectionClass() {
-        final Class<? extends Projection<Object, ?, ?>> nullClass = nullRef();
+        Class<? extends Projection<Object, ?, ?>> nullClass = nullRef();
         assertThrows(NullPointerException.class,
                      () -> JdbcProjectionStorage.newBuilder()
                                                 .setProjectionClass(nullClass));
@@ -104,7 +104,7 @@ class JdbcProjectionStorageTest extends ProjectionStorageTest {
     @Test
     @DisplayName("require non-null record storage")
     void rejectNullRecordStorage() {
-        final JdbcRecordStorage<Object> nullStorage = nullRef();
+        JdbcRecordStorage<Object> nullStorage = nullRef();
         assertThrows(NullPointerException.class,
                      () -> JdbcProjectionStorage.newBuilder()
                                                 .setRecordStorage(nullStorage));

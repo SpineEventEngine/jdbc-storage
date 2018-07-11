@@ -83,13 +83,12 @@ class JdbcStandStorageTest extends StandStorageTest {
 
     @Override
     protected StandStorage newStorage(Class<? extends Entity> entityClass) {
-        final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(
-                "StandStorageTests");
-        final StandStorage storage = JdbcStandStorage.newBuilder()
-                                                     .setDataSource(dataSource)
-                                                     .setMultitenant(false)
-                                                     .setTypeMapping(MYSQL_5_7)
-                                                     .build();
+        DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory("StandStorageTests");
+        StandStorage storage = JdbcStandStorage.newBuilder()
+                                               .setDataSource(dataSource)
+                                               .setMultitenant(false)
+                                               .setTypeMapping(MYSQL_5_7)
+                                               .build();
         return storage;
     }
 
@@ -101,14 +100,14 @@ class JdbcStandStorageTest extends StandStorageTest {
         @Test
         @DisplayName("all builder fields are set")
         void withAllBuilderFields() {
-            final DataSourceWrapper dataSourceMock = mock(DataSourceWrapper.class);
-            final ConnectionWrapper connectionMock = mock(ConnectionWrapper.class);
-            final PreparedStatement statementMock = mock(PreparedStatement.class);
+            DataSourceWrapper dataSourceMock = mock(DataSourceWrapper.class);
+            ConnectionWrapper connectionMock = mock(ConnectionWrapper.class);
+            PreparedStatement statementMock = mock(PreparedStatement.class);
 
             when(connectionMock.prepareStatement(anyString())).thenReturn(statementMock);
             when(dataSourceMock.getConnection(anyBoolean())).thenReturn(connectionMock);
 
-            final StandStorage standStorage = JdbcStandStorage.<String>newBuilder()
+            StandStorage standStorage = JdbcStandStorage.<String>newBuilder()
                     .setDataSource(dataSourceMock)
                     .setMultitenant(false)
                     .setTypeMapping(MYSQL_5_7)
@@ -123,14 +122,14 @@ class JdbcStandStorageTest extends StandStorageTest {
         @Test
         @DisplayName("multitenancy is not set")
         void withoutMultitenancy() {
-            final DataSourceWrapper dataSourceMock = mock(DataSourceWrapper.class);
-            final ConnectionWrapper connectionMock = mock(ConnectionWrapper.class);
-            final PreparedStatement statementMock = mock(PreparedStatement.class);
+            DataSourceWrapper dataSourceMock = mock(DataSourceWrapper.class);
+            ConnectionWrapper connectionMock = mock(ConnectionWrapper.class);
+            PreparedStatement statementMock = mock(PreparedStatement.class);
 
             when(connectionMock.prepareStatement(anyString())).thenReturn(statementMock);
             when(dataSourceMock.getConnection(anyBoolean())).thenReturn(connectionMock);
 
-            final StandStorage standStorage = JdbcStandStorage.<String>newBuilder()
+            StandStorage standStorage = JdbcStandStorage.<String>newBuilder()
                     .setDataSource(dataSourceMock)
                     .setTypeMapping(MYSQL_5_7)
                     .build();
@@ -163,44 +162,43 @@ class JdbcStandStorageTest extends StandStorageTest {
     @Test
     @DisplayName("write data to store")
     void writeDataToStore() {
-        final StandStorage storage = getStorage();
+        StandStorage storage = getStorage();
 
-        final TestAggregate aggregate = new TestAggregate("some_id");
+        TestAggregate aggregate = new TestAggregate("some_id");
 
-        final EntityRecord record = writeToStorage(aggregate, storage, Project.class);
+        EntityRecord record = writeToStorage(aggregate, storage, Project.class);
 
-        final AggregateStateId id = AggregateStateId.of(aggregate.getId(),
-                                                        TypeUrl.of(Project.class));
-        final RecordReadRequest<AggregateStateId> request = new RecordReadRequest<>(id);
-        final Optional<EntityRecord> readRecord = storage.read(request);
+        AggregateStateId id = AggregateStateId.of(aggregate.getId(), TypeUrl.of(Project.class));
+        RecordReadRequest<AggregateStateId> request = new RecordReadRequest<>(id);
+        Optional<EntityRecord> readRecord = storage.read(request);
         assertTrue(readRecord.isPresent());
         @SuppressWarnings("OptionalGetWithoutIsPresent") // We do check if present
-        final EntityRecord actualRecord = readRecord.get();
+        EntityRecord actualRecord = readRecord.get();
         assertEquals(actualRecord, record);
     }
 
     @Test
     @DisplayName("perform bulk read operations")
     void performBulkReadOperations() {
-        final StandStorage storage = getStorage();
+        StandStorage storage = getStorage();
 
-        final Collection<Given.TestAggregate> testData = testAggregates(10);
+        Collection<Given.TestAggregate> testData = testAggregates(10);
 
-        final List<EntityRecord> records = new ArrayList<>();
+        List<EntityRecord> records = new ArrayList<>();
 
         for (Aggregate aggregate : testData) {
             records.add(writeToStorage(aggregate, storage, Project.class));
         }
 
-        final TypeUrl typeUrl = TypeUrl.of(Project.class);
-        final Collection<AggregateStateId> ids = new LinkedList<>();
+        TypeUrl typeUrl = TypeUrl.of(Project.class);
+        Collection<AggregateStateId> ids = new LinkedList<>();
         ids.add(AggregateStateId.of("1", typeUrl));
         ids.add(AggregateStateId.of("2", typeUrl));
         ids.add(AggregateStateId.of("3", typeUrl));
         ids.add(AggregateStateId.of("5", typeUrl));
         ids.add(AggregateStateId.of("8", typeUrl));
 
-        final Collection<EntityRecord> readRecords = newArrayList(storage.readMultiple(ids));
+        Collection<EntityRecord> readRecords = newArrayList(storage.readMultiple(ids));
         assertEquals(ids.size(), readRecords.size());
 
         assertContains(records.get(1), readRecords);
@@ -213,17 +211,17 @@ class JdbcStandStorageTest extends StandStorageTest {
     @Test
     @DisplayName("handle wrong IDs silently")
     void handleWrongIdsSilently() {
-        final StandStorage storage = getStorage();
+        StandStorage storage = getStorage();
 
-        final TypeUrl typeUrl = TypeUrl.of(Project.class);
-        final String repeatingInvalidId = "invalid-ID-1";
+        TypeUrl typeUrl = TypeUrl.of(Project.class);
+        String repeatingInvalidId = "invalid-ID-1";
 
-        final Collection<AggregateStateId> ids = new LinkedList<>();
+        Collection<AggregateStateId> ids = new LinkedList<>();
         ids.add(AggregateStateId.of(repeatingInvalidId, typeUrl));
         ids.add(AggregateStateId.of("invalid-ID-2", typeUrl));
         ids.add(AggregateStateId.of(repeatingInvalidId, typeUrl));
 
-        final Collection<?> records = newArrayList(storage.readMultiple(ids));
+        Collection<?> records = newArrayList(storage.readMultiple(ids));
 
         assertNotNull(records);
         assertThat(records, empty());
@@ -237,16 +235,16 @@ class JdbcStandStorageTest extends StandStorageTest {
         @Test
         @DisplayName("existing records")
         void existingRecords() {
-            final StandStorage storage = getStorage();
+            StandStorage storage = getStorage();
 
-            final Collection<Given.TestAggregate> testData = testAggregates(10);
+            Collection<Given.TestAggregate> testData = testAggregates(10);
 
-            final List<EntityRecord> records = new ArrayList<>();
+            List<EntityRecord> records = new ArrayList<>();
 
             for (Aggregate aggregate : testData) {
                 records.add(writeToStorage(aggregate, storage, Project.class));
             }
-            final Iterator<EntityRecord> readRecords = storage.readAll();
+            Iterator<EntityRecord> readRecords = storage.readAll();
             int iteratorCounter = 0;
             while (readRecords.hasNext()) {
                 assertTrue(records.contains(readRecords.next()));
@@ -260,21 +258,21 @@ class JdbcStandStorageTest extends StandStorageTest {
         @Test
         @DisplayName("records by type URL")
         void recordsByTypeUrl() {
-            final StandStorage storage = getStorage();
+            StandStorage storage = getStorage();
 
-            final int aggregatesCount = 5;
-            final List<Given.TestAggregate> aggregates = testAggregates(aggregatesCount);
-            final TestAggregate2 differentAggregate = new TestAggregate2("i_am_different");
+            int aggregatesCount = 5;
+            List<Given.TestAggregate> aggregates = testAggregates(aggregatesCount);
+            TestAggregate2 differentAggregate = new TestAggregate2("i_am_different");
 
             for (Aggregate aggregate : aggregates) {
                 writeToStorage(aggregate, storage, Project.class);
             }
 
-            final EntityRecord differentRecord =
+            EntityRecord differentRecord =
                     writeToStorage(differentAggregate, storage, Customer.class);
 
-            final Iterator<EntityRecord> records = storage.readAllByType(TypeUrl.of(Project.class));
-            final Collection<EntityRecord> readRecords = newArrayList(records);
+            Iterator<EntityRecord> records = storage.readAllByType(TypeUrl.of(Project.class));
+            Collection<EntityRecord> readRecords = newArrayList(records);
             assertSize(aggregatesCount, readRecords);
             boolean hasRecord = false;
             for (EntityRecord record : readRecords) {
@@ -289,27 +287,27 @@ class JdbcStandStorageTest extends StandStorageTest {
         @Test
         @DisplayName("records by type and apply field mask")
         void recordsByTypeAndMask() {
-            final StandStorage storage = getStorage();
+            StandStorage storage = getStorage();
 
-            final List<Given.TestAggregate> aggregates = testAggregatesWithState(5);
+            List<Given.TestAggregate> aggregates = testAggregatesWithState(5);
 
             for (Aggregate aggregate : aggregates) {
                 writeToStorage(aggregate, storage, Project.class);
             }
 
-            final FieldMask namesMask = FieldMask.newBuilder()
-                                                 .addPaths(Project.getDescriptor()
-                                                                  .getFields()
-                                                                  .get(1)
-                                                                  .getFullName())
-                                                 .build();
+            FieldMask namesMask = FieldMask.newBuilder()
+                                           .addPaths(Project.getDescriptor()
+                                                            .getFields()
+                                                            .get(1)
+                                                            .getFullName())
+                                           .build();
 
-            final Iterator<EntityRecord> records = storage.readAllByType(
-                    TypeUrl.of(Project.class), namesMask);
+            Iterator<EntityRecord> records =
+                    storage.readAllByType(TypeUrl.of(Project.class), namesMask);
 
             while (records.hasNext()) {
-                final Project project = AnyPacker.unpack(records.next()
-                                                                .getState());
+                Project project = AnyPacker.unpack(records.next()
+                                                          .getState());
                 assertMatches(project, namesMask);
             }
         }
@@ -331,7 +329,7 @@ class JdbcStandStorageTest extends StandStorageTest {
         @Test
         @DisplayName("writing data")
         void onDataWrite() throws Exception {
-            final StandStorage storage = getStorage();
+            StandStorage storage = getStorage();
 
             assertTrue(storage.isOpen());
             storage.close();
@@ -344,7 +342,7 @@ class JdbcStandStorageTest extends StandStorageTest {
         @Test
         @DisplayName("reading data")
         void onDataRead() throws Exception {
-            final StandStorage storage = getStorage();
+            StandStorage storage = getStorage();
 
             assertTrue(storage.isOpen());
             storage.close();
@@ -355,7 +353,7 @@ class JdbcStandStorageTest extends StandStorageTest {
     }
 
     private static void assertMatches(Message message, FieldMask fieldMask) {
-        final List<String> paths = fieldMask.getPathsList();
+        List<String> paths = fieldMask.getPathsList();
         for (Descriptors.FieldDescriptor field : message.getDescriptorForType()
                                                         .getFields()) {
 
@@ -371,12 +369,12 @@ class JdbcStandStorageTest extends StandStorageTest {
     private static EntityRecord writeToStorage(Aggregate<?, ?, ?> aggregate,
                                                StandStorage storage,
                                                Class<? extends Message> stateClass) {
-        final AggregateStateId id = AggregateStateId.of(aggregate.getId(), TypeUrl.of(stateClass));
-        final Version version = Version.newBuilder()
-                                       .setNumber(1)
-                                       .setTimestamp(Time.getCurrentTime())
-                                       .build();
-        final EntityRecord record =
+        AggregateStateId id = AggregateStateId.of(aggregate.getId(), TypeUrl.of(stateClass));
+        Version version = Version.newBuilder()
+                                 .setNumber(1)
+                                 .setTimestamp(Time.getCurrentTime())
+                                 .build();
+        EntityRecord record =
                 EntityRecord.newBuilder()
                             .setState(AnyPacker.pack(aggregate.getState()))
                             .setVersion(version)

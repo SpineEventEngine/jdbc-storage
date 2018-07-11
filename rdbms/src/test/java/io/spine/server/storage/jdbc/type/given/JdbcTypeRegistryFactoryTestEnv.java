@@ -39,7 +39,7 @@ public class JdbcTypeRegistryFactoryTestEnv {
     }
 
     public static EntityColumn columnWithType(Class<?> cls) {
-        final EntityColumn column = mock(EntityColumn.class);
+        EntityColumn column = mock(EntityColumn.class);
         when(column.getType()).thenReturn(cls);
         when(column.getPersistedType()).thenReturn(cls);
         return column;

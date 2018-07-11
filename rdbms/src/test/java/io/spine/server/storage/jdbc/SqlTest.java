@@ -43,30 +43,30 @@ class SqlTest {
     @Test
     @DisplayName("provide valid SQL tokens")
     void provideValidSqlTokens() {
-        final String createTableExpected = "CREATE TABLE";
-        final String createTableActual = Sql.Query.CREATE_TABLE.toString()
-                                                               .trim();
+        String createTableExpected = "CREATE TABLE";
+        String createTableActual = Sql.Query.CREATE_TABLE.toString()
+                                                         .trim();
         assertEquals(createTableExpected, createTableActual);
 
-        final String countExpected = "COUNT";
-        final String countActual = Sql.Function.COUNT.toString()
-                                                     .trim();
+        String countExpected = "COUNT";
+        String countActual = Sql.Function.COUNT.toString()
+                                               .trim();
         assertEquals(countExpected, countActual);
     }
 
     @Test
     @DisplayName("provide tokens wrapped into whitespace")
     void provideTokensWithWhitespaces() {
-        final String sumExpected = " SUM ";
-        final String sumActual = Sql.Function.SUM.toString();
+        String sumExpected = " SUM ";
+        String sumActual = Sql.Function.SUM.toString();
         assertEquals(sumExpected, sumActual);
 
-        final String primaryKeyExpected = " PRIMARY KEY ";
-        final String primaryKeyActual = Sql.Query.PRIMARY_KEY.toString();
+        String primaryKeyExpected = " PRIMARY KEY ";
+        String primaryKeyActual = Sql.Query.PRIMARY_KEY.toString();
         assertEquals(primaryKeyExpected, primaryKeyActual);
 
-        final String commaExpected = " , ";
-        final String commaActual = Sql.BuildingBlock.COMMA.toString();
+        String commaExpected = " , ";
+        String commaActual = Sql.BuildingBlock.COMMA.toString();
         assertEquals(commaExpected, commaActual);
     }
 }

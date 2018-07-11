@@ -47,21 +47,21 @@ public class DbIteratorTestEnv {
     }
 
     public static DbIterator emptyIterator() {
-        final ResultSet resultSet = baseResultSetMock();
+        ResultSet resultSet = baseResultSetMock();
         try {
             when(resultSet.next()).thenReturn(false);
         } catch (SQLException e) {
             fail(e.getMessage());
         }
 
-        final DbIterator iterator = new AnIterator(resultSet);
+        DbIterator iterator = new AnIterator(resultSet);
         return iterator;
     }
 
     public static DbIterator faultyResultIterator() {
-        final ResultSet resultSet = baseResultSetMock();
+        ResultSet resultSet = baseResultSetMock();
         try {
-            final Exception failure = new SQLException("Faulty Result in action");
+            Exception failure = new SQLException("Faulty Result in action");
             when(resultSet.next()).thenThrow(failure);
             doThrow(failure).when(resultSet)
                             .close();
@@ -69,13 +69,13 @@ public class DbIteratorTestEnv {
             fail(e.getMessage());
         }
 
-        final DbIterator iterator = new AnIterator(resultSet);
+        DbIterator iterator = new AnIterator(resultSet);
         return iterator;
     }
 
     public static DbIterator sneakyResultIterator() {
-        final ResultSet resultSet = baseResultSetMock();
-        final AnIterator iterator = spy(new AnIterator(resultSet));
+        ResultSet resultSet = baseResultSetMock();
+        AnIterator iterator = spy(new AnIterator(resultSet));
         try {
             when(resultSet.next()).thenReturn(true);
             when(iterator.readResult())
@@ -87,7 +87,7 @@ public class DbIteratorTestEnv {
     }
 
     public static DbIterator nonEmptyIterator() {
-        final ResultSet resultSet = baseResultSetMock();
+        ResultSet resultSet = baseResultSetMock();
         try {
             when(resultSet.next()).thenReturn(true);
             when(resultSet.getBytes(any(String.class))).thenReturn(EMPTY_BYTES);
@@ -95,14 +95,14 @@ public class DbIteratorTestEnv {
             fail(e.getMessage());
         }
 
-        final DbIterator iterator = new AnIterator(resultSet);
+        DbIterator iterator = new AnIterator(resultSet);
         return iterator;
     }
 
     private static ResultSet baseResultSetMock() {
-        final ResultSet resultSet = mock(ResultSet.class);
-        final PreparedStatement statement = mock(PreparedStatement.class);
-        final Connection connection = mock(Connection.class);
+        ResultSet resultSet = mock(ResultSet.class);
+        PreparedStatement statement = mock(PreparedStatement.class);
+        Connection connection = mock(Connection.class);
         try {
             when(statement.executeQuery()).thenReturn(resultSet);
             when(resultSet.getStatement()).thenReturn(statement);

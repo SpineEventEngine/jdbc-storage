@@ -37,28 +37,28 @@ class TypeMappingBuilderTest {
     @Test
     @DisplayName("override type names")
     void overrideTypeNames() {
-        final Type type = BYTE_ARRAY;
-        final String originalName = "original";
-        final String nameReplacement = "replacement";
-        final TypeMapping mapping = TypeMappingBuilder.basicBuilder()
-                                                      .add(type, originalName)
-                                                      .add(type, nameReplacement)
-                                                      .build();
-        final TypeName resultingName = mapping.typeNameFor(type);
+        Type type = BYTE_ARRAY;
+        String originalName = "original";
+        String nameReplacement = "replacement";
+        TypeMapping mapping = TypeMappingBuilder.basicBuilder()
+                                                .add(type, originalName)
+                                                .add(type, nameReplacement)
+                                                .build();
+        TypeName resultingName = mapping.typeNameFor(type);
         assertEquals(nameReplacement, resultingName.value());
     }
 
     @Test
     @DisplayName("not allow empty type names")
     void rejectEmptyTypeNames() {
-        final TypeMappingBuilder builder = TypeMappingBuilder.basicBuilder();
+        TypeMappingBuilder builder = TypeMappingBuilder.basicBuilder();
         assertThrows(IllegalArgumentException.class, () -> builder.add(BYTE_ARRAY, ""));
     }
 
     @Test
     @DisplayName("throw ISE if not all types are mapped")
     void throwIfNotAllTypesMapped() {
-        final TypeMappingBuilder builder = new TypeMappingBuilder();
+        TypeMappingBuilder builder = new TypeMappingBuilder();
         assertThrows(IllegalStateException.class, builder::build);
     }
 }

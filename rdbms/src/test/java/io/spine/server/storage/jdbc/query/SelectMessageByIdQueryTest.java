@@ -55,18 +55,18 @@ class SelectMessageByIdQueryTest {
     @Test
     @DisplayName("close result set")
     void closeResultSet() throws SQLException {
-        final SQLQuery underlyingQuery = mock(SQLQuery.class);
-        final ResultSet resultSet = mock(ResultSet.class);
+        SQLQuery underlyingQuery = mock(SQLQuery.class);
+        ResultSet resultSet = mock(ResultSet.class);
 
         doReturn(resultSet).when(underlyingQuery)
                            .getResults();
-        final DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
-        final ASelectMessageByIdQuery query = builder.setTableName(newUuid())
-                                                     .setQuery(underlyingQuery)
-                                                     .setDataSource(dataSource)
-                                                     .setId(newUuid())
-                                                     .setIdColumn(typeString(newUuid()))
-                                                     .build();
+        DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
+        ASelectMessageByIdQuery query = builder.setTableName(newUuid())
+                                               .setQuery(underlyingQuery)
+                                               .setDataSource(dataSource)
+                                               .setId(newUuid())
+                                               .setIdColumn(typeString(newUuid()))
+                                               .build();
         query.execute();
         verify(resultSet).close();
     }
@@ -74,20 +74,20 @@ class SelectMessageByIdQueryTest {
     @Test
     @DisplayName("handle SQL exception")
     void handleSqlException() throws SQLException {
-        final SQLQuery underlyingQuery = mock(SQLQuery.class);
-        final ResultSet resultSet = mock(ResultSet.class);
+        SQLQuery underlyingQuery = mock(SQLQuery.class);
+        ResultSet resultSet = mock(ResultSet.class);
 
         doReturn(resultSet).when(underlyingQuery)
                            .getResults();
         doThrow(SQLException.class).when(resultSet)
                                    .next();
-        final DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
-        final ASelectMessageByIdQuery query = builder.setTableName(newUuid())
-                                                     .setQuery(underlyingQuery)
-                                                     .setDataSource(dataSource)
-                                                     .setId(newUuid())
-                                                     .setIdColumn(typeString(newUuid()))
-                                                     .build();
+        DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
+        ASelectMessageByIdQuery query = builder.setTableName(newUuid())
+                                               .setQuery(underlyingQuery)
+                                               .setDataSource(dataSource)
+                                               .setId(newUuid())
+                                               .setIdColumn(typeString(newUuid()))
+                                               .build();
 
         assertThrows(DatabaseException.class, query::execute);
     }
@@ -95,17 +95,17 @@ class SelectMessageByIdQueryTest {
     @Test
     @DisplayName("return null on deserialization if column is null")
     void returnNullForNullColumn() throws SQLException {
-        final ResultSet resultSet = mock(ResultSet.class);
-        final DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
-        final Descriptors.Descriptor messageDescriptor = StringValue.getDescriptor();
-        final ASelectMessageByIdQuery query = builder.setTableName(newUuid())
-                                                     .setMessageColumnName(newUuid())
-                                                     .setMessageDescriptor(messageDescriptor)
-                                                     .setDataSource(dataSource)
-                                                     .setId(newUuid())
-                                                     .setIdColumn(typeString(newUuid()))
-                                                     .build();
-        final Message deserialized = query.readMessage(resultSet);
+        ResultSet resultSet = mock(ResultSet.class);
+        DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
+        Descriptors.Descriptor messageDescriptor = StringValue.getDescriptor();
+        ASelectMessageByIdQuery query = builder.setTableName(newUuid())
+                                               .setMessageColumnName(newUuid())
+                                               .setMessageDescriptor(messageDescriptor)
+                                               .setDataSource(dataSource)
+                                               .setId(newUuid())
+                                               .setIdColumn(typeString(newUuid()))
+                                               .build();
+        Message deserialized = query.readMessage(resultSet);
         assertNull(deserialized);
     }
 }

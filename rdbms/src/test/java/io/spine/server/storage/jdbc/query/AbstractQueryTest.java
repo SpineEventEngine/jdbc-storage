@@ -61,10 +61,10 @@ class AbstractQueryTest {
     @Test
     @DisplayName("close connection")
     void closeConnection() throws SQLException {
-        final Configuration configuration = query.factory()
-                                                 .getConfiguration();
-        final SQLListenerContext context = mock(SQLListenerContext.class);
-        final Connection connection = mock(Connection.class);
+        Configuration configuration = query.factory()
+                                           .getConfiguration();
+        SQLListenerContext context = mock(SQLListenerContext.class);
+        Connection connection = mock(Connection.class);
         doReturn(connection).when(context)
                             .getConnection();
         configuration.getListeners()
@@ -80,15 +80,15 @@ class AbstractQueryTest {
     @Test
     @DisplayName("set `HOLD_CURSORS_OVER_COMMIT` for connection")
     void holdCursorsOverCommit() throws SQLException {
-        final DataSourceWrapper dataSourceSpy = spy(dataSource);
-        final ConnectionWrapper connectionWrapper = spy(dataSourceSpy.getConnection(true));
-        final Connection connection = spy(connectionWrapper.get());
+        DataSourceWrapper dataSourceSpy = spy(dataSource);
+        ConnectionWrapper connectionWrapper = spy(dataSourceSpy.getConnection(true));
+        Connection connection = spy(connectionWrapper.get());
         doReturn(connectionWrapper).when(dataSourceSpy)
                                    .getConnection(anyBoolean());
         doReturn(connection).when(connectionWrapper)
                             .get();
-        final AbstractSQLQueryFactory<?> factory = createFactory(dataSourceSpy);
-        final Connection connectionFromFactory = factory.getConnection();
+        AbstractSQLQueryFactory<?> factory = createFactory(dataSourceSpy);
+        Connection connectionFromFactory = factory.getConnection();
 
         // The test can only verify that the holdability was set.
         // The result of the operation depends on a JDBC implementation.
@@ -98,30 +98,30 @@ class AbstractQueryTest {
     @Test
     @DisplayName("handle SQL exception on transaction rollback")
     void handleExceptionOnRollback() throws SQLException {
-        final Configuration configuration = query.factory()
-                                                 .getConfiguration();
-        final SQLListenerContext context = mock(SQLListenerContext.class);
-        final Connection connection = mock(Connection.class);
+        Configuration configuration = query.factory()
+                                           .getConfiguration();
+        SQLListenerContext context = mock(SQLListenerContext.class);
+        Connection connection = mock(Connection.class);
         doThrow(SQLException.class).when(connection)
                                    .rollback();
         doReturn(connection).when(context)
                             .getConnection();
-        final SQLListeners listeners = configuration.getListeners();
+        SQLListeners listeners = configuration.getListeners();
         assertThrows(DatabaseException.class, () -> listeners.exception(context));
     }
 
     @Test
     @DisplayName("handle SQL exception on transaction commit")
     void handleExceptionOnCommit() throws SQLException {
-        final Configuration configuration = query.factory()
-                                                 .getConfiguration();
-        final SQLListenerContext context = mock(SQLListenerContext.class);
-        final Connection connection = mock(Connection.class);
+        Configuration configuration = query.factory()
+                                           .getConfiguration();
+        SQLListenerContext context = mock(SQLListenerContext.class);
+        Connection connection = mock(Connection.class);
         doThrow(SQLException.class).when(connection)
                                    .commit();
         doReturn(connection).when(context)
                             .getConnection();
-        final SQLListeners listeners = configuration.getListeners();
+        SQLListeners listeners = configuration.getListeners();
         assertThrows(DatabaseException.class, () -> listeners.executed(context));
     }
 }

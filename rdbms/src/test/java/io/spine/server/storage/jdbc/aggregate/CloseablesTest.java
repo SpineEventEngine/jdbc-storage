@@ -66,8 +66,8 @@ class CloseablesTest {
     @Test
     @DisplayName("close all passed instances")
     void closeAll() {
-        final int count = 10;
-        final Set<StatefulClosable> closeables = new HashSet<>(count);
+        int count = 10;
+        Set<StatefulClosable> closeables = new HashSet<>(count);
         for (int i = 0; i < count; i++) {
             closeables.add(new StatefulClosable());
         }
@@ -82,19 +82,18 @@ class CloseablesTest {
     @Test
     @DisplayName("throw ISE when closing fails")
     void throwOnCloseFailure() {
-        final AutoCloseable closeable = new FaultyClosable();
+        AutoCloseable closeable = new FaultyClosable();
         assertThrows(IllegalStateException.class, () -> Closeables.closeAll(singleton(closeable)));
     }
 
     @Test
     @DisplayName("try to close all instances")
     void tryToCloseAll() {
-        final AutoCloseable faulty = new FaultyClosable();
-        final StatefulClosable stateful = new StatefulClosable();
+        AutoCloseable faulty = new FaultyClosable();
+        StatefulClosable stateful = new StatefulClosable();
 
         // Needs to be ordered.
-        final Collection<AutoCloseable> closeables =
-                Lists.newArrayList(faulty, stateful);
+        Collection<AutoCloseable> closeables = Lists.newArrayList(faulty, stateful);
         boolean success;
         try {
             Closeables.closeAll(closeables);
@@ -110,13 +109,12 @@ class CloseablesTest {
     @Test
     @DisplayName("throw exception with aggregating cause upon multiple failures")
     void throwAggregatedFailures() {
-        final Collection<AutoCloseable> closeables =
-                Sets.newHashSet(new FaultyClosable(),
-                                new FaultyClosable());
+        Collection<AutoCloseable> closeables = Sets.newHashSet(new FaultyClosable(),
+                                                               new FaultyClosable());
         try {
             Closeables.closeAll(closeables);
         } catch (IllegalStateException e) {
-            final Throwable cause = e.getCause();
+            Throwable cause = e.getCause();
             assertThat(cause, instanceOf(MultipleExceptionsOnClose.class));
         }
     }

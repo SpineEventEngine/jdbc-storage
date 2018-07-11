@@ -43,15 +43,15 @@ class SelectTimestampQueryTest {
     @Test
     @DisplayName("return null if `seconds` and `nanos` fields are nulls")
     void returnNullForEmptyTimestamp() throws SQLException {
-        final ResultSet resultSet = mock(ResultSet.class);
-        final DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
-        final SelectTimestampQuery query = SelectTimestampQuery.newBuilder()
-                                                               .setTableName(newUuid())
-                                                               .setDataSource(dataSource)
-                                                               .setId(newUuid())
-                                                               .setIdColumn(typeString(newUuid()))
-                                                               .build();
-        final Message deserialized = query.readMessage(resultSet);
+        ResultSet resultSet = mock(ResultSet.class);
+        DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
+        SelectTimestampQuery query = SelectTimestampQuery.newBuilder()
+                                                         .setTableName(newUuid())
+                                                         .setDataSource(dataSource)
+                                                         .setId(newUuid())
+                                                         .setIdColumn(typeString(newUuid()))
+                                                         .build();
+        Message deserialized = query.readMessage(resultSet);
         assertNull(deserialized);
     }
 }

@@ -57,21 +57,21 @@ class DbIteratorTest {
         @Test
         @DisplayName("on `hasNext` check failure")
         void onNextCheckFailure() {
-            final DbIterator iterator = faultyResultIterator();
+            DbIterator iterator = faultyResultIterator();
             assertThrows(DatabaseException.class, iterator::hasNext);
         }
 
         @Test
         @DisplayName("on close failure")
         void onCloseFailure() {
-            final DbIterator iterator = faultyResultIterator();
+            DbIterator iterator = faultyResultIterator();
             assertThrows(DatabaseException.class, iterator::close);
         }
 
         @Test
         @DisplayName("on read failure")
         void onReadFailure() {
-            final DbIterator iterator = sneakyResultIterator();
+            DbIterator iterator = sneakyResultIterator();
             assertThrows(DatabaseException.class, () -> {
                 if (iterator.hasNext()) {
                     iterator.next();
@@ -83,7 +83,7 @@ class DbIteratorTest {
     @Test
     @DisplayName("allow `next` without `hasNext`")
     void allowNextWithoutHasNext() {
-        final DbIterator iterator = nonEmptyIterator();
+        DbIterator iterator = nonEmptyIterator();
         iterator.next();
     }
 
@@ -94,8 +94,8 @@ class DbIteratorTest {
         @Test
         @DisplayName("when told to do so")
         void whenTold() throws SQLException {
-            final DbIterator iterator = nonEmptyIterator();
-            final ResultSet resultSet = iterator.getResultSet();
+            DbIterator iterator = nonEmptyIterator();
+            ResultSet resultSet = iterator.getResultSet();
 
             verify(resultSet, never()).close();
 
@@ -106,8 +106,8 @@ class DbIteratorTest {
         @Test
         @DisplayName("when no more elements are present to iterate")
         void whenNoElementsPresent() throws SQLException {
-            final DbIterator iterator = emptyIterator();
-            final ResultSet resultSet = iterator.getResultSet();
+            DbIterator iterator = emptyIterator();
+            ResultSet resultSet = iterator.getResultSet();
 
             verify(resultSet, never()).close();
 
@@ -120,14 +120,14 @@ class DbIteratorTest {
     @Test
     @DisplayName("not support removal")
     void notSupportRemoval() {
-        final DbIterator iterator = emptyIterator();
+        DbIterator iterator = emptyIterator();
         assertThrows(UnsupportedOperationException.class, iterator::remove);
     }
 
     @Test
     @DisplayName("throw NoSuchElementException if trying to get absent element")
     void notGetAbsentElement() {
-        final DbIterator iterator = emptyIterator();
+        DbIterator iterator = emptyIterator();
 
         // Ignore that the element is absent.
         iterator.hasNext();
@@ -138,10 +138,10 @@ class DbIteratorTest {
     @Test
     @DisplayName("check if result set is closed")
     void checkIfResultSetClosed() throws SQLException {
-        final DbIterator iterator = emptyIterator();
+        DbIterator iterator = emptyIterator();
         iterator.close();
 
-        final ResultSet resultSet = iterator.getResultSet();
+        ResultSet resultSet = iterator.getResultSet();
         verify(resultSet).isClosed();
         verify(resultSet).close();
     }
@@ -149,11 +149,11 @@ class DbIteratorTest {
     @Test
     @DisplayName("obtain statement before result set is closed")
     void getStatementBeforeClose() throws SQLException {
-        final DbIterator iterator = emptyIterator();
+        DbIterator iterator = emptyIterator();
         iterator.close();
 
-        final ResultSet resultSet = iterator.getResultSet();
-        final InOrder order = inOrder(resultSet);
+        ResultSet resultSet = iterator.getResultSet();
+        InOrder order = inOrder(resultSet);
         order.verify(resultSet)
              .getStatement();
         order.verify(resultSet)
@@ -163,12 +163,12 @@ class DbIteratorTest {
     @Test
     @DisplayName("obtain connection before statement is closed")
     void getConnectionBeforeClose() throws SQLException {
-        final DbIterator iterator = emptyIterator();
+        DbIterator iterator = emptyIterator();
         iterator.close();
 
-        final Statement statement = iterator.getResultSet()
-                                            .getStatement();
-        final InOrder order = inOrder(statement);
+        Statement statement = iterator.getResultSet()
+                                      .getStatement();
+        InOrder order = inOrder(statement);
         order.verify(statement)
              .getConnection();
         order.verify(statement)
@@ -176,9 +176,9 @@ class DbIteratorTest {
     }
 
     private static void assertClosed(DbIterator<?> iterator) throws SQLException {
-        final ResultSet resultSet = iterator.getResultSet();
-        final Statement statement = resultSet.getStatement();
-        final Connection connection = statement.getConnection();
+        ResultSet resultSet = iterator.getResultSet();
+        Statement statement = resultSet.getStatement();
+        Connection connection = statement.getConnection();
         verify(resultSet).close();
         verify(statement).close();
         verify(connection).close();

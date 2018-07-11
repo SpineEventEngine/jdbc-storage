@@ -47,9 +47,9 @@ class JdbcAggregateStorageVisibilityHandlingTest
     @Override
     protected AggregateStorage<ProjectId> getAggregateStorage(
             Class<? extends Aggregate<ProjectId, ?, ?>> aggregateClass) {
-        final DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(
+        DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(
                 "aggregateStorageStatusHandlingTests");
-        final JdbcAggregateStorage<ProjectId> storage =
+        JdbcAggregateStorage<ProjectId> storage =
                 JdbcAggregateStorage.<ProjectId>newBuilder()
                         .setMultitenant(false)
                         .setAggregateClass(TestAggregate.class)
@@ -63,25 +63,25 @@ class JdbcAggregateStorageVisibilityHandlingTest
     @Test
     @DisplayName("update entity visibility")
     void updateEntityVisibility() {
-        final ProjectId id = Sample.messageOfType(ProjectId.class);
-        final LifecycleFlags archived = LifecycleFlags.newBuilder()
-                                                      .setArchived(true)
-                                                      .build();
-        final JdbcAggregateStorage<ProjectId> storage =
+        ProjectId id = Sample.messageOfType(ProjectId.class);
+        LifecycleFlags archived = LifecycleFlags.newBuilder()
+                                                .setArchived(true)
+                                                .build();
+        JdbcAggregateStorage<ProjectId> storage =
                 (JdbcAggregateStorage<ProjectId>) getAggregateStorage(TestAggregate.class);
         storage.writeLifecycleFlags(id, archived);
 
-        final Optional<LifecycleFlags> actualArchived = storage.readLifecycleFlags(id);
+        Optional<LifecycleFlags> actualArchived = storage.readLifecycleFlags(id);
         assertTrue(actualArchived.isPresent());
         assertEquals(archived, actualArchived.get());
 
-        final LifecycleFlags archivedAndDeleted = LifecycleFlags.newBuilder()
-                                                                .setArchived(true)
-                                                                .setDeleted(true)
-                                                                .build();
+        LifecycleFlags archivedAndDeleted = LifecycleFlags.newBuilder()
+                                                          .setArchived(true)
+                                                          .setDeleted(true)
+                                                          .build();
         storage.writeLifecycleFlags(id, archivedAndDeleted);
 
-        final Optional<LifecycleFlags> actualArchivedAndDeleted = storage.readLifecycleFlags(id);
+        Optional<LifecycleFlags> actualArchivedAndDeleted = storage.readLifecycleFlags(id);
         assertTrue(actualArchivedAndDeleted.isPresent());
         assertEquals(archivedAndDeleted, actualArchivedAndDeleted.get());
     }

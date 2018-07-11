@@ -50,37 +50,37 @@ class PredefinedMappingTest {
     @Test
     @DisplayName("throw ISE if requested type has no mapping")
     void throwOnNoMapping() {
-        final Type notMappedType = nullRef();
+        Type notMappedType = nullRef();
         assertThrows(IllegalStateException.class, () -> MYSQL_5_7.typeNameFor(notMappedType));
     }
 
     @Test
     @DisplayName("be selected by database product name and major version")
     void selectTypeMapping() {
-        final DataSourceWrapper dataSource = dataSourceMock(mapping.getDatabaseProductName(),
-                                                            mapping.getMajorVersion(),
-                                                            mapping.getMinorVersion());
+        DataSourceWrapper dataSource = dataSourceMock(mapping.getDatabaseProductName(),
+                                                      mapping.getMajorVersion(),
+                                                      mapping.getMinorVersion());
         assertEquals(mapping, select(dataSource));
     }
 
     @Test
     @DisplayName("not be selected if major versions are different")
     void notSelectForDifferentVersion() {
-        final String databaseProductName = mapping.getDatabaseProductName();
-        final int differentVersion = mapping.getMajorVersion() + 1;
-        final DataSourceWrapper dataSource = dataSourceMock(databaseProductName,
-                                                            differentVersion,
-                                                            differentVersion);
+        String databaseProductName = mapping.getDatabaseProductName();
+        int differentVersion = mapping.getMajorVersion() + 1;
+        DataSourceWrapper dataSource = dataSourceMock(databaseProductName,
+                                                      differentVersion,
+                                                      differentVersion);
         assertNotEquals(mapping, select(dataSource));
     }
 
     private static DataSourceWrapper dataSourceMock(String databaseProductName,
                                                     int majorVersion,
                                                     int minorVersion) {
-        final DataSourceWrapper dataSource = mock(DataSourceWrapper.class);
-        final ConnectionWrapper connectionWrapper = mock(ConnectionWrapper.class);
-        final Connection connection = mock(Connection.class);
-        final DatabaseMetaData metadata = mock(DatabaseMetaData.class);
+        DataSourceWrapper dataSource = mock(DataSourceWrapper.class);
+        ConnectionWrapper connectionWrapper = mock(ConnectionWrapper.class);
+        Connection connection = mock(Connection.class);
+        DatabaseMetaData metadata = mock(DatabaseMetaData.class);
         doReturn(connectionWrapper).when(dataSource)
                                    .getConnection(anyBoolean());
         doReturn(connection).when(connectionWrapper)

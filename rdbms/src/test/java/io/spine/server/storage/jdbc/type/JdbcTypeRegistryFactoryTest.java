@@ -47,7 +47,7 @@ class JdbcTypeRegistryFactoryTest {
     @Test
     @DisplayName("provide default type registry for required types")
     void provideDefaultRegistry() {
-        final ColumnTypeRegistry<?> registry = JdbcTypeRegistryFactory.defaultInstance();
+        ColumnTypeRegistry<?> registry = JdbcTypeRegistryFactory.defaultInstance();
         assertNotNull(registry);
         assertNotNull(registry.get(columnWithType(Version.class)));
         assertNotNull(registry.get(columnWithType(boolean.class)));
@@ -56,7 +56,7 @@ class JdbcTypeRegistryFactoryTest {
     @Test
     @DisplayName("provide builder for extending defaults")
     void provideBuilder() {
-        final ColumnTypeRegistry<?> registry =
+        ColumnTypeRegistry<?> registry =
                 JdbcTypeRegistryFactory.predefinedValuesAnd()
                                        .put(String.class, CustomType.INSTANCE)
                                        .build();

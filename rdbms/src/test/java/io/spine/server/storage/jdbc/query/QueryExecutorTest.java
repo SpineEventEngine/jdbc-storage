@@ -49,9 +49,9 @@ class QueryExecutorTest {
     @Test
     @DisplayName("handle SQL exception on query execution")
     void handleExceptionOnExecution() throws SQLException {
-        final DataSourceWrapper dataSource = mock(DataSourceWrapper.class);
-        final ConnectionWrapper connection = mock(ConnectionWrapper.class);
-        final PreparedStatement statement = mock(PreparedStatement.class);
+        DataSourceWrapper dataSource = mock(DataSourceWrapper.class);
+        ConnectionWrapper connection = mock(ConnectionWrapper.class);
+        PreparedStatement statement = mock(PreparedStatement.class);
 
         doReturn(connection).when(dataSource)
                             .getConnection(anyBoolean());
@@ -59,7 +59,7 @@ class QueryExecutorTest {
                            .prepareStatement(anyString());
         doThrow(SQLException.class).when(statement)
                                    .execute();
-        final QueryExecutor query = spy(new QueryExecutor(dataSource, log()));
+        QueryExecutor query = spy(new QueryExecutor(dataSource, log()));
 
         assertThrows(DatabaseException.class, () -> query.execute(newUuid()));
     }

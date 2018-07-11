@@ -49,9 +49,9 @@ class ParametersTest {
     @Test
     @DisplayName("check identifier uniqueness for multiple parameters")
     void checkIdUniqueForMultiple() {
-        final Parameters.Builder commonParameters = Parameters.newBuilder()
-                                                              .addParameter(ID, PARAMETER);
-        final Parameters buildedCommonParameters = commonParameters.build();
+        Parameters.Builder commonParameters = Parameters.newBuilder()
+                                                        .addParameter(ID, PARAMETER);
+        Parameters buildedCommonParameters = commonParameters.build();
 
         assertThrows(IllegalArgumentException.class,
                      () -> commonParameters.addParameters(buildedCommonParameters));
@@ -60,9 +60,9 @@ class ParametersTest {
     @Test
     @DisplayName("not allow modify identifiers")
     void notAllowModifyId() {
-        final Parameters parameters = Parameters.empty();
-        final Set<String> identifiers = parameters.getIdentifiers();
-        final String newIdentifier = newUuid();
+        Parameters parameters = Parameters.empty();
+        Set<String> identifiers = parameters.getIdentifiers();
+        String newIdentifier = newUuid();
         assertThrows(UnsupportedOperationException.class, () -> identifiers.add(newIdentifier));
     }
 }

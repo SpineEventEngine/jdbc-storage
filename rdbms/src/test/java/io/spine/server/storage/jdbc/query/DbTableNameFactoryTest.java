@@ -49,15 +49,15 @@ class DbTableNameFactoryTest {
     @Test
     @DisplayName(NOT_ACCEPT_NULLS)
     void passNullToleranceCheck() {
-        final NullPointerTester tester = new NullPointerTester();
+        NullPointerTester tester = new NullPointerTester();
         tester.testStaticMethods(DbTableNameFactory.class, NullPointerTester.Visibility.PACKAGE);
     }
 
     @Test
     @DisplayName("return table name which starts with entity class name")
     void returnTableName() {
-        final String tableName = newTableName(entityClass);
-        final String className = entityClass.getSimpleName();
+        String tableName = newTableName(entityClass);
+        String className = entityClass.getSimpleName();
         assertTrue(tableName.startsWith(className));
     }
 

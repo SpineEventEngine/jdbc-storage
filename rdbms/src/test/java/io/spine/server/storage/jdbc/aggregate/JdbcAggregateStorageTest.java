@@ -61,7 +61,7 @@ class JdbcAggregateStorageTest extends AggregateStorageTest {
     @Test
     @DisplayName("throw ISE when closing twice")
     void throwOnClosingTwice() throws Exception {
-        final AggregateStorage<?> storage = getStorage();
+        AggregateStorage<?> storage = getStorage();
         storage.close();
         assertThrows(IllegalStateException.class, storage::close);
     }
@@ -69,37 +69,36 @@ class JdbcAggregateStorageTest extends AggregateStorageTest {
     @Test
     @DisplayName("return history iterator with specified batch size")
     void returnHistoryIterator() throws SQLException {
-        final int batchSize = 10;
-        final AggregateReadRequest<ProjectId> request = new AggregateReadRequest<>(newId(),
-                                                                                   batchSize);
-        final DbIterator<AggregateEventRecord> iterator =
+        int batchSize = 10;
+        AggregateReadRequest<ProjectId> request = new AggregateReadRequest<>(newId(), batchSize);
+        DbIterator<AggregateEventRecord> iterator =
                 (DbIterator<AggregateEventRecord>) storage.historyBackward(request);
 
         // Use `PreparedStatement.getFetchSize()` instead of `ResultSet.getFetchSize()`,
         // because the result of the latter depends on a JDBC driver implementation.
-        final int fetchSize = iterator.getResultSet()
-                                      .getStatement()
-                                      .getFetchSize();
+        int fetchSize = iterator.getResultSet()
+                                .getStatement()
+                                .getFetchSize();
         assertEquals(batchSize, fetchSize);
     }
 
     @Test
     @DisplayName("close history iterator")
     void closeHistoryIterator() throws SQLException {
-        final AggregateReadRequest<ProjectId> request = newReadRequest(newId());
-        final DbIterator<AggregateEventRecord> iterator =
+        AggregateReadRequest<ProjectId> request = newReadRequest(newId());
+        DbIterator<AggregateEventRecord> iterator =
                 (DbIterator<AggregateEventRecord>) storage.historyBackward(request);
 
         storage.close();
-        final boolean historyIteratorClosed = iterator.getResultSet()
-                                                      .isClosed();
+        boolean historyIteratorClosed = iterator.getResultSet()
+                                                .isClosed();
         assertTrue(historyIteratorClosed);
     }
 
     @Test
     @DisplayName("require non-null aggregate class")
     void rejectNullAggregateClass() {
-        final Class<? extends Aggregate<Object, ?, ?>> nullClass = nullRef();
+        Class<? extends Aggregate<Object, ?, ?>> nullClass = nullRef();
         assertThrows(NullPointerException.class,
                      () -> JdbcAggregateStorage.newBuilder()
                                                .setAggregateClass(nullClass));
@@ -115,13 +114,13 @@ class JdbcAggregateStorageTest extends AggregateStorageTest {
     protected <I> JdbcAggregateStorage<I> newStorage(
             Class<? extends I> idClass,
             Class<? extends Aggregate<I, ?, ?>> aggregateClass) {
-        final DataSourceWrapper dataSource = whichIsStoredInMemory("aggregateStorageTests");
-        final JdbcAggregateStorage.Builder<I> builder = JdbcAggregateStorage.newBuilder();
-        final JdbcAggregateStorage<I> storage = builder.setMultitenant(false)
-                                                       .setDataSource(dataSource)
-                                                       .setAggregateClass(aggregateClass)
-                                                       .setTypeMapping(MYSQL_5_7)
-                                                       .build();
+        DataSourceWrapper dataSource = whichIsStoredInMemory("aggregateStorageTests");
+        JdbcAggregateStorage.Builder<I> builder = JdbcAggregateStorage.newBuilder();
+        JdbcAggregateStorage<I> storage = builder.setMultitenant(false)
+                                                 .setDataSource(dataSource)
+                                                 .setAggregateClass(aggregateClass)
+                                                 .setTypeMapping(MYSQL_5_7)
+                                                 .build();
         return storage;
     }
 }

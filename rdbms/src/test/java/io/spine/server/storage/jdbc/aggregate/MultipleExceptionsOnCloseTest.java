@@ -36,17 +36,17 @@ class MultipleExceptionsOnCloseTest {
     @Test
     @DisplayName("describe all given exceptions in `toString`")
     void provideToString() {
-        final String message1 = "message1";
-        final String message2 = "message2";
-        final String message3 = "message3";
-        final IllegalStateException ex1 = new IllegalStateException(message1);
-        final IllegalStateException ex2 = new IllegalStateException(message2);
-        final IllegalStateException ex3 = new IllegalStateException(message3);
+        String message1 = "message1";
+        String message2 = "message2";
+        String message3 = "message3";
+        IllegalStateException ex1 = new IllegalStateException(message1);
+        IllegalStateException ex2 = new IllegalStateException(message2);
+        IllegalStateException ex3 = new IllegalStateException(message3);
 
-        final MultipleExceptionsOnClose aggregatingException =
+        MultipleExceptionsOnClose aggregatingException =
                 new MultipleExceptionsOnClose(newArrayList(ex1, ex2, ex3));
 
-        final String stringName = "Exception description";
+        String stringName = "Exception description";
         assertContains(stringName,
                        ex1.toString(),
                        aggregatingException.toString());
@@ -61,8 +61,8 @@ class MultipleExceptionsOnCloseTest {
     @Test
     @DisplayName("be direct subclass of Throwable")
     void beSubclassOfThrowable() {
-        final Class<MultipleExceptionsOnClose> clazz = MultipleExceptionsOnClose.class;
-        final Class<? super MultipleExceptionsOnClose> superclass = clazz.getSuperclass();
+        Class<MultipleExceptionsOnClose> clazz = MultipleExceptionsOnClose.class;
+        Class<? super MultipleExceptionsOnClose> superclass = clazz.getSuperclass();
         assertEquals(Throwable.class, superclass);
     }
 }

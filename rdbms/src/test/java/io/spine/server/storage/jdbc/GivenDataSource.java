@@ -54,11 +54,11 @@ public class GivenDataSource {
     }
 
     public static DataSourceWrapper whichIsStoredInMemory(String dbName) {
-        final HikariConfig config = new HikariConfig();
-        final String dbUrl = prefix(dbName);
+        HikariConfig config = new HikariConfig();
+        String dbUrl = prefix(dbName);
         config.setJdbcUrl(dbUrl);
         // Not setting username and password is OK for in-memory database.
-        final DataSourceWrapper dataSource = DataSourceWrapper.wrap(new HikariDataSource(config));
+        DataSourceWrapper dataSource = DataSourceWrapper.wrap(new HikariDataSource(config));
         return dataSource;
     }
 

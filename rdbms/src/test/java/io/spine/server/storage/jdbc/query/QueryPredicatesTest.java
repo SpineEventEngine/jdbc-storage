@@ -82,18 +82,18 @@ class QueryPredicatesTest {
         @Test
         @DisplayName("`EITHER`")
         void either() {
-            final BooleanExpression left = TRUE;
-            final BooleanExpression right = FALSE;
-            final Predicate result = joinPredicates(left, right, EITHER);
+            BooleanExpression left = TRUE;
+            BooleanExpression right = FALSE;
+            Predicate result = joinPredicates(left, right, EITHER);
             assertEquals(left.or(right), result);
         }
 
         @Test
         @DisplayName("`ALL`")
         void all() {
-            final BooleanExpression left = TRUE;
-            final BooleanExpression right = FALSE;
-            final Predicate result = joinPredicates(left, right, ALL);
+            BooleanExpression left = TRUE;
+            BooleanExpression right = FALSE;
+            Predicate result = joinPredicates(left, right, ALL);
             assertEquals(left.and(right), result);
         }
     }
@@ -110,18 +110,18 @@ class QueryPredicatesTest {
     @Test
     @DisplayName("create `EQUAL` predicate for null value")
     void createEqualForNull() {
-        final EntityColumn column = stringColumnMock();
+        EntityColumn column = stringColumnMock();
         when(column.toPersistedValue(any())).thenReturn(null);
 
-        final ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> registry
+        ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> registry
                 = JdbcTypeRegistryFactory.defaultInstance();
 
-        final ColumnFilter filter = eq(column.getStoredName(), COLUMN_FILTER_VALUE);
-        final Predicate predicate = columnMatchFilter(column, filter, registry);
+        ColumnFilter filter = eq(column.getStoredName(), COLUMN_FILTER_VALUE);
+        Predicate predicate = columnMatchFilter(column, filter, registry);
 
-        final ComparablePath<Comparable> columnPath = comparablePath(Comparable.class,
-                                                                     column.getStoredName());
-        final BooleanExpression isNullPredicate = columnPath.isNull();
+        ComparablePath<Comparable> columnPath = comparablePath(Comparable.class,
+                                                               column.getStoredName());
+        BooleanExpression isNullPredicate = columnPath.isNull();
         assertEquals(isNullPredicate, predicate);
     }
 
@@ -129,13 +129,13 @@ class QueryPredicatesTest {
     @Test
     @DisplayName("not create ordering predicate for null value")
     void notCreateOrderingForNull() {
-        final EntityColumn column = stringColumnMock();
+        EntityColumn column = stringColumnMock();
         when(column.toPersistedValue(any())).thenReturn(null);
 
-        final ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> registry
+        ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> registry
                 = JdbcTypeRegistryFactory.defaultInstance();
 
-        final ColumnFilter filter = gt(column.getStoredName(), COLUMN_FILTER_VALUE);
+        ColumnFilter filter = gt(column.getStoredName(), COLUMN_FILTER_VALUE);
 
         assertThrows(IllegalArgumentException.class,
                      () -> columnMatchFilter(column, filter, registry));
@@ -146,18 +146,18 @@ class QueryPredicatesTest {
     @Test
     @DisplayName("not accept non-comparable value")
     void notAcceptNonComparable() {
-        final EntityColumn column = stringColumnMock();
+        EntityColumn column = stringColumnMock();
         when(column.toPersistedValue(any())).thenReturn("test value");
 
-        final JdbcColumnType type = mock(JdbcColumnType.class);
-        final Object nonComparableValue = new Object();
+        JdbcColumnType type = mock(JdbcColumnType.class);
+        Object nonComparableValue = new Object();
         when(type.convertColumnValue(any())).thenReturn(nonComparableValue);
 
-        final ColumnTypeRegistry registry = ColumnTypeRegistry.newBuilder()
-                                                              .put(String.class, type)
-                                                              .build();
+        ColumnTypeRegistry registry = ColumnTypeRegistry.newBuilder()
+                                                        .put(String.class, type)
+                                                        .build();
 
-        final ColumnFilter filter = eq(column.getStoredName(), COLUMN_FILTER_VALUE);
+        ColumnFilter filter = eq(column.getStoredName(), COLUMN_FILTER_VALUE);
 
         assertThrows(IllegalArgumentException.class,
                      () -> columnMatchFilter(column, filter, registry));
@@ -166,8 +166,8 @@ class QueryPredicatesTest {
     @Test
     @DisplayName("generate null filter for `EQUAL`")
     void createNullFilterForEqual() {
-        final ComparablePath<Comparable> path = comparablePath(Comparable.class, "");
-        final Predicate predicate = nullFilter(EQUAL, path);
+        ComparablePath<Comparable> path = comparablePath(Comparable.class, "");
+        Predicate predicate = nullFilter(EQUAL, path);
         assertEquals(path.isNull(), predicate);
     }
 
@@ -218,40 +218,40 @@ class QueryPredicatesTest {
         @Test
         @DisplayName("`EQUAL`")
         void equal() {
-            final ComparablePath<Comparable> path = comparablePath(Comparable.class, "");
-            final Predicate predicate = valueFilter(EQUAL, path, COLUMN_FILTER_VALUE);
+            ComparablePath<Comparable> path = comparablePath(Comparable.class, "");
+            Predicate predicate = valueFilter(EQUAL, path, COLUMN_FILTER_VALUE);
             assertEquals(path.eq(COLUMN_FILTER_VALUE), predicate);
         }
 
         @Test
         @DisplayName("`GREATER THAN`")
         void greaterThan() {
-            final ComparablePath<Comparable> path = comparablePath(Comparable.class, "");
-            final Predicate predicate = valueFilter(GREATER_THAN, path, COLUMN_FILTER_VALUE);
+            ComparablePath<Comparable> path = comparablePath(Comparable.class, "");
+            Predicate predicate = valueFilter(GREATER_THAN, path, COLUMN_FILTER_VALUE);
             assertEquals(path.gt(COLUMN_FILTER_VALUE), predicate);
         }
 
         @Test
         @DisplayName("`LESS THAN`")
         void lessThan() {
-            final ComparablePath<Comparable> path = comparablePath(Comparable.class, "");
-            final Predicate predicate = valueFilter(LESS_THAN, path, COLUMN_FILTER_VALUE);
+            ComparablePath<Comparable> path = comparablePath(Comparable.class, "");
+            Predicate predicate = valueFilter(LESS_THAN, path, COLUMN_FILTER_VALUE);
             assertEquals(path.lt(COLUMN_FILTER_VALUE), predicate);
         }
 
         @Test
         @DisplayName("`GREATER OR EQUAL`")
         void greaterOrEqual() {
-            final ComparablePath<Comparable> path = comparablePath(Comparable.class, "");
-            final Predicate predicate = valueFilter(GREATER_OR_EQUAL, path, COLUMN_FILTER_VALUE);
+            ComparablePath<Comparable> path = comparablePath(Comparable.class, "");
+            Predicate predicate = valueFilter(GREATER_OR_EQUAL, path, COLUMN_FILTER_VALUE);
             assertEquals(path.goe(COLUMN_FILTER_VALUE), predicate);
         }
 
         @Test
         @DisplayName("`LESS OR EQUAL`")
         void lessOrEqual() {
-            final ComparablePath<Comparable> path = comparablePath(Comparable.class, "");
-            final Predicate predicate = valueFilter(LESS_OR_EQUAL, path, COLUMN_FILTER_VALUE);
+            ComparablePath<Comparable> path = comparablePath(Comparable.class, "");
+            Predicate predicate = valueFilter(LESS_OR_EQUAL, path, COLUMN_FILTER_VALUE);
             assertEquals(path.loe(COLUMN_FILTER_VALUE), predicate);
         }
     }
@@ -264,7 +264,7 @@ class QueryPredicatesTest {
     }
 
     private static EntityColumn stringColumnMock() {
-        final EntityColumn column = mock(EntityColumn.class);
+        EntityColumn column = mock(EntityColumn.class);
         when(column.getStoredName()).thenReturn("test column");
         when(column.getType()).thenReturn(String.class);
         when(column.getPersistedType()).thenReturn(String.class);
@@ -273,13 +273,13 @@ class QueryPredicatesTest {
 
     @SuppressWarnings("ResultOfMethodCallIgnored") // Method called to throw exception.
     private static void runNullFilterCreationFor(ColumnFilter.Operator operator) {
-        final ComparablePath<Comparable> path = comparablePath(Comparable.class, "");
+        ComparablePath<Comparable> path = comparablePath(Comparable.class, "");
         nullFilter(operator, path);
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored") // Method called to throw exception.
     private static void runValueFilterCreationFor(ColumnFilter.Operator operator) {
-        final ComparablePath<Comparable> path = comparablePath(Comparable.class, "");
+        ComparablePath<Comparable> path = comparablePath(Comparable.class, "");
         valueFilter(operator, path, COLUMN_FILTER_VALUE);
     }
 }
