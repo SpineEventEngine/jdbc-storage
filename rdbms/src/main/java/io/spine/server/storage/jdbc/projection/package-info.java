@@ -23,7 +23,10 @@
  * {@link io.spine.server.projection.ProjectionStorage ProjectionStorage}.
  */
 
+@CheckReturnValue
 @ParametersAreNonnullByDefault
 package io.spine.server.storage.jdbc.projection;
+
+import com.google.errorprone.annotations.CheckReturnValue;
 
 import javax.annotation.ParametersAreNonnullByDefault;

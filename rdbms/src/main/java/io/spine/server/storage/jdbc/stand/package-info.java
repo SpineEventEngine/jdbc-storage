@@ -22,7 +22,10 @@
  * The JDBC-based implementation of the {@link io.spine.server.stand.StandStorage StandStorage}.
  */
 
+@CheckReturnValue
 @ParametersAreNonnullByDefault
 package io.spine.server.storage.jdbc.stand;
+
+import com.google.errorprone.annotations.CheckReturnValue;
 
 import javax.annotation.ParametersAreNonnullByDefault;

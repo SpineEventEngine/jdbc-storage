@@ -23,7 +23,10 @@
  *
  * @see io.spine.server.storage.jdbc.JdbcStorageFactory for the library entry point
  */
+@CheckReturnValue
 @ParametersAreNonnullByDefault
 package io.spine.server.storage.jdbc;
+
+import com.google.errorprone.annotations.CheckReturnValue;
 
 import javax.annotation.ParametersAreNonnullByDefault;
