@@ -28,6 +28,11 @@ import javax.sql.DataSource;
 import static io.spine.base.Identifier.newUuid;
 import static org.mockito.Mockito.mock;
 
+/**
+ * @author Alexander Litus
+ * @author Dmytro Dashenkov
+ * @author Dmytro Grankin
+ */
 public class GivenDataSource {
 
     /**
@@ -49,11 +54,11 @@ public class GivenDataSource {
     }
 
     public static DataSourceWrapper whichIsStoredInMemory(String dbName) {
-        final HikariConfig config = new HikariConfig();
-        final String dbUrl = prefix(dbName);
+        HikariConfig config = new HikariConfig();
+        String dbUrl = prefix(dbName);
         config.setJdbcUrl(dbUrl);
-        // not setting username and password is OK for in-memory database
-        final DataSourceWrapper dataSource = DataSourceWrapper.wrap(new HikariDataSource(config));
+        // Not setting username and password is OK for in-memory database.
+        DataSourceWrapper dataSource = DataSourceWrapper.wrap(new HikariDataSource(config));
         return dataSource;
     }
 

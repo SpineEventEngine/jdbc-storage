@@ -44,8 +44,8 @@ import io.spine.server.storage.jdbc.JdbcStorageFactory;
 import io.spine.server.storage.jdbc.StorageBuilder;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
@@ -75,7 +75,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
         super(builder.isMultitenant(), builder.getEntityClass());
         this.dataSource = builder.getDataSource();
         this.entityClass = builder.getEntityClass();
-        final Collection<EntityColumn> entityColumns = entityColumnCache().getColumns();
+        Collection<EntityColumn> entityColumns = entityColumnCache().getColumns();
         this.table = new RecordTable<>(entityClass, dataSource, builder.getColumnTypeRegistry(),
                                        builder.getTypeMapping(), entityColumns);
         table.create();
@@ -90,7 +90,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     public boolean delete(I id) {
         checkNotNull(id);
 
-        final boolean result = table.delete(id);
+        boolean result = table.delete(id);
         return result;
     }
 
@@ -101,7 +101,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
      */
     @Override
     protected Optional<EntityRecord> readRecord(I id) throws DatabaseException {
-        final EntityRecord record = table.read(id);
+        EntityRecord record = table.read(id);
         return Optional.fromNullable(record);
     }
 
@@ -113,7 +113,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     @Override
     protected Iterator<EntityRecord> readMultipleRecords(Iterable<I> ids,
                                                          FieldMask fieldMask) {
-        final Iterator<EntityRecord> records = table.readByQuery(toQuery(ids), fieldMask);
+        Iterator<EntityRecord> records = table.readByQuery(toQuery(ids), fieldMask);
         return records;
     }
 
@@ -124,13 +124,13 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
 
     @Override
     protected Iterator<EntityRecord> readAllRecords(FieldMask fieldMask) {
-        final Iterator<EntityRecord> records = table.readByQuery(emptyQuery(), fieldMask);
+        Iterator<EntityRecord> records = table.readByQuery(emptyQuery(), fieldMask);
         return records;
     }
 
     @Override
     protected Iterator<EntityRecord> readAllRecords(EntityQuery<I> query, FieldMask fieldMask) {
-        final Iterator<EntityRecord> records = table.readByQuery(query, fieldMask);
+        Iterator<EntityRecord> records = table.readByQuery(query, fieldMask);
         return records;
     }
 
@@ -138,7 +138,6 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     protected void writeRecord(I id, EntityRecordWithColumns record) {
         table.write(id, record);
     }
-
 
     @Override
     protected void writeRecords(Map<I, EntityRecordWithColumns> records) {
@@ -167,22 +166,19 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
                 EntityFilters.getDefaultInstance(),
                 getThis());
         if (EntityWithLifecycle.class.isAssignableFrom(entityClass)) {
-            @SuppressWarnings("unchecked") // Checked with the if statement.
-            final Class<EntityWithLifecycle<I, ?>> cls =
-                    (Class<EntityWithLifecycle<I, ?>>) entityClass;
             query = query.withLifecycleFlags(getThis());
         }
         return query;
     }
 
     private EntityQuery<I> toQuery(Iterable<? extends I> ids) {
-        final Iterable<EntityId> entityIds = transform(ids, AggregateStateIdToEntityId.INSTANCE);
-        final EntityIdFilter idFilter = EntityIdFilter.newBuilder()
-                                                      .addAllIds(entityIds)
-                                                      .build();
-        final EntityFilters entityFilters = EntityFilters.newBuilder()
-                                                         .setIdFilter(idFilter)
-                                                         .build();
+        Iterable<EntityId> entityIds = transform(ids, AggregateStateIdToEntityId.INSTANCE);
+        EntityIdFilter idFilter = EntityIdFilter.newBuilder()
+                                                .addAllIds(entityIds)
+                                                .build();
+        EntityFilters entityFilters = EntityFilters.newBuilder()
+                                                   .setIdFilter(idFilter)
+                                                   .build();
         return EntityQueries.from(entityFilters, getThis());
     }
 
@@ -264,10 +260,10 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
         @Override
         public EntityId apply(@Nullable Object genericId) {
             checkNotNull(genericId);
-            final Any content = Identifier.pack(genericId);
-            final EntityId id = EntityId.newBuilder()
-                                        .setId(content)
-                                        .build();
+            Any content = Identifier.pack(genericId);
+            EntityId id = EntityId.newBuilder()
+                                  .setId(content)
+                                  .build();
             return id;
         }
     }

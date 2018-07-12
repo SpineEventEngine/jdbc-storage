@@ -33,10 +33,15 @@ import io.spine.test.storage.ProjectVBuilder;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * @author Alexander Aleksandrov
+ * @author Dmytro Grankin
+ * @author Dmytro Dashenkov
+ */
 public class Given {
 
+    /** Prevents instantiation of this utility class. */
     private Given() {
-        // Prevent utility class instantiation.
     }
 
     public static class TestAggregate extends Aggregate<String, Project, ProjectVBuilder> {
@@ -70,7 +75,7 @@ public class Given {
     }
 
     public static List<TestAggregate> testAggregates(int amount) {
-        final List<TestAggregate> aggregates = new LinkedList<>();
+        List<TestAggregate> aggregates = new LinkedList<>();
 
         for (int i = 0; i < amount; i++) {
             aggregates.add(new TestAggregate(String.valueOf(i)));
@@ -80,19 +85,18 @@ public class Given {
     }
 
     public static List<TestAggregate> testAggregatesWithState(int amount) {
-        final List<TestAggregate> aggregates = new LinkedList<>();
+        List<TestAggregate> aggregates = new LinkedList<>();
 
         for (int i = 0; i < amount; i++) {
-            final TestAggregate aggregate = new TestAggregate(
-                    String.valueOf(i));
-            final ProjectId projectId = ProjectId.newBuilder()
-                                                 .setId(aggregate.getId())
-                                                 .build();
-            final Project state = Project.newBuilder()
-                                         .setId(projectId)
-                                         .setName("Some project")
-                                         .setStatus(Project.Status.CREATED)
-                                         .build();
+            TestAggregate aggregate = new TestAggregate(String.valueOf(i));
+            ProjectId projectId = ProjectId.newBuilder()
+                                           .setId(aggregate.getId())
+                                           .build();
+            Project state = Project.newBuilder()
+                                   .setId(projectId)
+                                   .setName("Some project")
+                                   .setStatus(Project.Status.CREATED)
+                                   .build();
 
             aggregate.setState(state);
 

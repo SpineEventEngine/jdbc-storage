@@ -21,8 +21,7 @@
 package io.spine.server.storage.jdbc;
 
 import io.spine.server.storage.StorageField;
-
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * An interface for the database table columns representation.

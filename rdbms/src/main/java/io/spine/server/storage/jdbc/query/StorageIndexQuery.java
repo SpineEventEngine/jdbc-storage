@@ -43,11 +43,11 @@ class StorageIndexQuery<I> extends AbstractQuery implements SelectQuery<Iterator
 
     @Override
     public Iterator<I> execute() {
-        final String columnName = idColumn.getColumnName();
-        final ResultSet resultSet = factory().select(pathOf(columnName))
-                                             .from(table())
-                                             .getResults();
-        final Iterator<I> result = create(resultSet, columnName, idColumn.getJavaType());
+        String columnName = idColumn.getColumnName();
+        ResultSet resultSet = factory().select(pathOf(columnName))
+                                       .from(table())
+                                       .getResults();
+        Iterator<I> result = create(resultSet, columnName, idColumn.getJavaType());
         return result;
     }
 

@@ -29,9 +29,9 @@ import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.Type;
 import io.spine.server.storage.jdbc.TypeMapping;
 import io.spine.type.TypeName;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 
-import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -134,8 +134,8 @@ public abstract class AbstractTable<I, R, W> {
      * <p>{@code CREATE TABLE IF NOT EXISTS $TableName ( $Columns );}
      */
     public void create() {
-        final QueryExecutor queryExecutor = new QueryExecutor(dataSource, log());
-        final String createTableSql = composeCreateTableSql();
+        QueryExecutor queryExecutor = new QueryExecutor(dataSource, log());
+        String createTableSql = composeCreateTableSql();
         queryExecutor.execute(createTableSql);
     }
 
@@ -146,13 +146,13 @@ public abstract class AbstractTable<I, R, W> {
      * @return {@code true} if there is a record with such ID in the table, {@code false} otherwise
      */
     protected boolean containsRecord(I id) {
-        final ContainsQuery.Builder<I> builder = ContainsQuery.newBuilder();
-        final ContainsQuery<I> query = builder.setIdColumn(idColumn)
-                                              .setId(id)
-                                              .setTableName(name)
-                                              .setDataSource(dataSource)
-                                              .build();
-        final boolean result = query.execute();
+        ContainsQuery.Builder<I> builder = ContainsQuery.newBuilder();
+        ContainsQuery<I> query = builder.setIdColumn(idColumn)
+                                        .setId(id)
+                                        .setTableName(name)
+                                        .setDataSource(dataSource)
+                                        .build();
+        boolean result = query.execute();
         return result;
     }
 
@@ -162,10 +162,9 @@ public abstract class AbstractTable<I, R, W> {
      * @param id ID to search by
      * @return table record or {@code null} if there is no record with given ID
      */
-    @Nullable
-    public R read(I id) {
-        final SelectQuery<R> query = composeSelectQuery(id);
-        final R result = query.execute();
+    public @Nullable R read(I id) {
+        SelectQuery<R> query = composeSelectQuery(id);
+        R result = query.execute();
         return result;
     }
 
@@ -193,12 +192,12 @@ public abstract class AbstractTable<I, R, W> {
      * @see io.spine.server.storage.Storage#index()
      */
     public Iterator<I> index() {
-        final StorageIndexQuery.Builder<I> builder = StorageIndexQuery.newBuilder();
-        final StorageIndexQuery<I> query = builder.setDataSource(dataSource)
-                                                  .setTableName(name)
-                                                  .setIdColumn(idColumn)
-                                                  .build();
-        final Iterator<I> result = query.execute();
+        StorageIndexQuery.Builder<I> builder = StorageIndexQuery.newBuilder();
+        StorageIndexQuery<I> query = builder.setDataSource(dataSource)
+                                            .setTableName(name)
+                                            .setIdColumn(idColumn)
+                                            .build();
+        Iterator<I> result = query.execute();
         return result;
     }
 
@@ -209,7 +208,7 @@ public abstract class AbstractTable<I, R, W> {
      * @param record the record to insert
      */
     public void insert(I id, W record) {
-        final WriteQuery query = composeInsertQuery(id, record);
+        WriteQuery query = composeInsertQuery(id, record);
         query.execute();
     }
 
@@ -220,7 +219,7 @@ public abstract class AbstractTable<I, R, W> {
      * @param record the new state of the record
      */
     public void update(I id, W record) {
-        final WriteQuery query = composeUpdateQuery(id, record);
+        WriteQuery query = composeUpdateQuery(id, record);
         query.execute();
     }
 
@@ -234,7 +233,7 @@ public abstract class AbstractTable<I, R, W> {
     @SuppressWarnings("ReturnOfCollectionOrArrayField") // Returns immutable collection
     final ImmutableList<? extends TableColumn> getColumns() {
         if (columns == null) {
-            final List<? extends TableColumn> tableColumnsType = getTableColumns();
+            List<? extends TableColumn> tableColumnsType = getTableColumns();
             columns = ImmutableList.copyOf(tableColumnsType);
         }
         return columns;
@@ -259,22 +258,22 @@ public abstract class AbstractTable<I, R, W> {
     protected abstract SelectQuery<R> composeSelectQuery(I id);
 
     private String composeCreateTableSql() {
-        final Iterable<? extends TableColumn> columns = getColumns();
-        final StringBuilder sql = new StringBuilder();
+        Iterable<? extends TableColumn> columns = getColumns();
+        StringBuilder sql = new StringBuilder();
         sql.append(CREATE_IF_MISSING)
            .append(getName())
            .append(BRACKET_OPEN);
-        final Set<String> primaryKey = new HashSet<>();
+        Set<String> primaryKey = new HashSet<>();
         for (Iterator<? extends TableColumn> iterator = columns.iterator(); iterator.hasNext(); ) {
-            final TableColumn column = iterator.next();
-            final String name = column.name();
-            final Type type = ensureIdType(column);
-            final TypeName typeName = typeMapping.typeNameFor(type);
+            TableColumn column = iterator.next();
+            String name = column.name();
+            Type type = ensureIdType(column);
+            TypeName typeName = typeMapping.typeNameFor(type);
             sql.append(name)
                .append(' ')
                .append(typeName);
             if (COLUMN_DEFAULTS.containsKey(name)) {
-                final Object defaultValue = COLUMN_DEFAULTS.get(name);
+                Object defaultValue = COLUMN_DEFAULTS.get(name);
                 sql.append(DEFAULT)
                    .append(defaultValue);
             }
@@ -290,8 +289,8 @@ public abstract class AbstractTable<I, R, W> {
             }
         }
         if (!primaryKey.isEmpty()) {
-            final String columnNames = Joiner.on(COMMA.toString())
-                                             .join(primaryKey);
+            String columnNames = Joiner.on(COMMA.toString())
+                                       .join(primaryKey);
             sql.append(PRIMARY_KEY)
                .append(BRACKET_OPEN)
                .append(columnNames)
@@ -299,12 +298,12 @@ public abstract class AbstractTable<I, R, W> {
         }
         sql.append(BRACKET_CLOSE)
            .append(SEMICOLON);
-        final String result = sql.toString();
+        String result = sql.toString();
         return result;
     }
 
     private Type getIdType() {
-        final Type idType = getIdColumn().getSqlType();
+        Type idType = getIdColumn().getSqlType();
         return idType;
     }
 
@@ -320,8 +319,8 @@ public abstract class AbstractTable<I, R, W> {
      */
     private Type ensureIdType(TableColumn column) {
         Type type = column.type();
-        final boolean isIdColumn = column.equals(getIdColumnDeclaration());
-        final boolean typeUnknown = type == null;
+        boolean isIdColumn = column.equals(getIdColumnDeclaration());
+        boolean typeUnknown = type == null;
         if (isIdColumn && typeUnknown) {
             type = getIdType();
         }
@@ -336,13 +335,13 @@ public abstract class AbstractTable<I, R, W> {
      *         {@code false} if the row was not found
      */
     public boolean delete(I id) {
-        final DeleteRecordQuery.Builder<I> builder = DeleteRecordQuery.newBuilder();
-        final DeleteRecordQuery<I> query = builder.setTableName(name)
-                                                  .setIdColumn(getIdColumn())
-                                                  .setId(id)
-                                                  .setDataSource(dataSource)
-                                                  .build();
-        final long rowsAffected = query.execute();
+        DeleteRecordQuery.Builder<I> builder = DeleteRecordQuery.newBuilder();
+        DeleteRecordQuery<I> query = builder.setTableName(name)
+                                            .setIdColumn(getIdColumn())
+                                            .setId(id)
+                                            .setDataSource(dataSource)
+                                            .build();
+        long rowsAffected = query.execute();
         return rowsAffected != 0;
     }
 
@@ -350,10 +349,10 @@ public abstract class AbstractTable<I, R, W> {
      * Deletes all the records from the table.
      */
     public void deleteAll() {
-        final DeleteAllQuery query = DeleteAllQuery.newBuilder()
-                                                   .setTableName(name)
-                                                   .setDataSource(dataSource)
-                                                   .build();
+        DeleteAllQuery query = DeleteAllQuery.newBuilder()
+                                             .setTableName(name)
+                                             .setDataSource(dataSource)
+                                             .build();
         query.execute();
     }
 

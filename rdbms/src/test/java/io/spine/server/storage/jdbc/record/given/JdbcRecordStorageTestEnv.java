@@ -22,7 +22,7 @@ package io.spine.server.storage.jdbc.record.given;
 
 import io.spine.server.entity.AbstractEntity;
 import io.spine.server.entity.storage.Column;
-import io.spine.server.storage.RecordStorageShould.TestCounterEntity;
+import io.spine.server.storage.given.RecordStorageTestEnv.TestCounterEntity;
 import io.spine.test.storage.Project;
 
 /**
@@ -32,8 +32,8 @@ public class JdbcRecordStorageTestEnv {
 
     public static final String COLUMN_NAME_FOR_STORING = "customName";
 
+    /** Prevents instantiation of this utility class. */
     private JdbcRecordStorageTestEnv() {
-        // Prevent instantiation of this utility class.
     }
 
     public static class TestCounterEntityJdbc extends TestCounterEntity<String> {
@@ -47,6 +47,7 @@ public class JdbcRecordStorageTestEnv {
             super(id);
         }
 
+        @SuppressWarnings("unused") // Reflective access.
         @Column(name = COLUMN_NAME_FOR_STORING)
         public int getValue() {
             return 0;

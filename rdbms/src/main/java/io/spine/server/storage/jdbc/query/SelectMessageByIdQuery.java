@@ -20,12 +20,13 @@
 
 package io.spine.server.storage.jdbc.query;
 
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Message;
 import com.querydsl.sql.AbstractSQLQuery;
 import io.spine.server.storage.jdbc.DatabaseException;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-import javax.annotation.Nullable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -57,14 +58,13 @@ public abstract class SelectMessageByIdQuery<I, M extends Message> extends Abstr
      * @throws DatabaseException if an error occurs during an interaction with the DB
      * @see Serializer#deserialize
      */
-    @Nullable
     @Override
-    public final M execute() throws DatabaseException {
-        try (ResultSet resultSet = getQuery().getResults()){
+    public final @Nullable M execute() throws DatabaseException {
+        try (ResultSet resultSet = getQuery().getResults()) {
             if (!resultSet.next()) {
                 return null;
             }
-            final M message = readMessage(resultSet);
+            M message = readMessage(resultSet);
             return message;
         } catch (SQLException e) {
             throw new DatabaseException(e);
@@ -87,15 +87,14 @@ public abstract class SelectMessageByIdQuery<I, M extends Message> extends Abstr
      * @return a message instance or {@code null} if the row does not contain the needed data
      * @throws SQLException if an error occurs during an interaction with the DB
      */
-    @Nullable
-    protected M readMessage(ResultSet resultSet) throws SQLException {
+    protected @Nullable M readMessage(ResultSet resultSet) throws SQLException {
         checkNotNull(messageColumnName);
         checkNotNull(messageDescriptor);
-        final byte[] bytes = resultSet.getBytes(messageColumnName);
+        byte[] bytes = resultSet.getBytes(messageColumnName);
         if (bytes == null) {
             return null;
         }
-        final M message = Serializer.deserialize(bytes, messageDescriptor);
+        M message = Serializer.deserialize(bytes, messageDescriptor);
         return message;
     }
 
@@ -109,11 +108,13 @@ public abstract class SelectMessageByIdQuery<I, M extends Message> extends Abstr
         private String messageColumnName;
         private Descriptor messageDescriptor;
 
+        @CanIgnoreReturnValue
         protected B setMessageColumnName(String messageColumnName) {
             this.messageColumnName = messageColumnName;
             return getThis();
         }
 
+        @CanIgnoreReturnValue
         protected B setMessageDescriptor(Descriptor messageDescriptor) {
             this.messageDescriptor = messageDescriptor;
             return getThis();

@@ -20,7 +20,8 @@
 
 package io.spine.server.storage.jdbc;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.Driver;
@@ -56,20 +57,13 @@ public class DataSourceConfig {
     /**
      * Optional
      */
-    @Nullable
-    private final Boolean autoCommit;
-    @Nullable
-    private final Long connectionTimeout;
-    @Nullable
-    private final Long idleTimeout;
-    @Nullable
-    private final Long maxLifetime;
-    @Nullable
-    private final String connectionTestQuery;
-    @Nullable
-    private final Integer maxPoolSize;
-    @Nullable
-    private final String poolName;
+    private final @Nullable Boolean autoCommit;
+    private final @Nullable Long connectionTimeout;
+    private final @Nullable Long idleTimeout;
+    private final @Nullable Long maxLifetime;
+    private final @Nullable String connectionTestQuery;
+    private final @Nullable Integer maxPoolSize;
+    private final @Nullable String poolName;
 
     private DataSourceConfig(Builder builder) {
         this.dataSourceClassName = builder.getDataSourceClassName();
@@ -98,88 +92,77 @@ public class DataSourceConfig {
     /**
      * See {@link Builder#setDataSourceClassName(String)}.
      */
-    @Nullable
-    public String getDataSourceClassName() {
+    public @Nullable String getDataSourceClassName() {
         return dataSourceClassName;
     }
 
     /**
      * See {@link Builder#setJdbcUrl(String)}.
      */
-    @Nullable
-    public String getJdbcUrl() {
+    public @Nullable String getJdbcUrl() {
         return jdbcUrl;
     }
 
     /**
      * See {@link Builder#setUsername(String)}.
      */
-    @Nullable
-    public String getUsername() {
+    public @Nullable String getUsername() {
         return username;
     }
 
     /**
      * See {@link Builder#setPassword(String)}.
      */
-    @Nullable
-    public String getPassword() {
+    public @Nullable String getPassword() {
         return password;
     }
 
     /**
      * See {@link Builder#setAutoCommit(Boolean)}.
      */
-    @Nullable
-    public Boolean getAutoCommit() {
+    public @Nullable Boolean getAutoCommit() {
         return autoCommit;
     }
 
     /**
      * See {@link Builder#setConnectionTimeout(Long)}.
      */
-    @Nullable
-    public Long getConnectionTimeout() {
+    public @Nullable Long getConnectionTimeout() {
         return connectionTimeout;
     }
 
     /**
      * See {@link Builder#setIdleTimeout(Long)}.
      */
-    @Nullable
-    public Long getIdleTimeout() {
+    public @Nullable Long getIdleTimeout() {
         return idleTimeout;
     }
 
     /**
      * See {@link Builder#setMaxLifetime(Long)}.
      */
-    @Nullable
-    public Long getMaxLifetime() {
+    public @Nullable Long getMaxLifetime() {
         return maxLifetime;
     }
 
     /**
      * See {@link Builder#setConnectionTestQuery(String)}.
      */
-    @Nullable
-    public String getConnectionTestQuery() {
+    public @Nullable String getConnectionTestQuery() {
         return connectionTestQuery;
     }
 
     /**
      * See {@link Builder#setMaxPoolSize(Integer)}.
      */
-    @Nullable
-    public Integer getMaxPoolSize() {
+    public @Nullable Integer getMaxPoolSize() {
         return maxPoolSize;
     }
 
     /**
      * See {@link Builder#setPoolName(String)}.
      */
-    @Nullable
-    public String getPoolName() {
+    public @Nullable String getPoolName() {
         return poolName;
     }
 
@@ -199,20 +182,13 @@ public class DataSourceConfig {
         /**
          * Optional
          */
-        @Nullable
-        private Boolean autoCommit;
-        @Nullable
-        private Long connectionTimeout;
-        @Nullable
-        private Long idleTimeout;
-        @Nullable
-        private String connectionTestQuery;
-        @Nullable
-        private Long maxLifetime;
-        @Nullable
-        private Integer maxPoolSize;
-        @Nullable
-        private String poolName;
+        private @Nullable Boolean autoCommit;
+        private @Nullable Long connectionTimeout;
+        private @Nullable Long idleTimeout;
+        private @Nullable String connectionTestQuery;
+        private @Nullable Long maxLifetime;
+        private @Nullable Integer maxPoolSize;
+        private @Nullable String poolName;
 
         /**
          * Builds a config.
@@ -241,7 +217,7 @@ public class DataSourceConfig {
                 checkState(!poolName.isEmpty(), "poolName");
             }
 
-            final DataSourceConfig config = new DataSourceConfig(this);
+            DataSourceConfig config = new DataSourceConfig(this);
             return config;
         }
 
@@ -396,8 +372,7 @@ public class DataSourceConfig {
         /**
          * See {@link #setConnectionTimeout(Long)}.
          */
-        @Nullable
-        public Long getConnectionTimeout() {
+        public @Nullable Long getConnectionTimeout() {
             return connectionTimeout;
         }
 
@@ -421,8 +396,7 @@ public class DataSourceConfig {
         /**
          * See {@link #setIdleTimeout(Long)}.
          */
-        @Nullable
-        public Long getIdleTimeout() {
+        public @Nullable Long getIdleTimeout() {
             return idleTimeout;
         }
 
@@ -447,8 +421,7 @@ public class DataSourceConfig {
         /**
          * See {@link #setMaxLifetime(Long)}.
          */
-        @Nullable
-        public Long getMaxLifetime() {
+        public @Nullable Long getMaxLifetime() {
             return maxLifetime;
         }
 
@@ -478,8 +451,7 @@ public class DataSourceConfig {
         /**
          * See {@link #setConnectionTestQuery(String)}.
          */
-        @Nullable
-        public String getConnectionTestQuery() {
+        public @Nullable String getConnectionTestQuery() {
             return connectionTestQuery;
         }
 
@@ -507,8 +479,7 @@ public class DataSourceConfig {
         /**
          * See {@link #setMaxPoolSize(Integer)}.
          */
-        @Nullable
-        public Integer getMaxPoolSize() {
+        public @Nullable Integer getMaxPoolSize() {
             return maxPoolSize;
         }
 
@@ -538,8 +509,7 @@ public class DataSourceConfig {
         /**
          * See {@link #setPoolName(String)}.
          */
-        @Nullable
-        public String getPoolName() {
+        public @Nullable String getPoolName() {
             return poolName;
         }
 

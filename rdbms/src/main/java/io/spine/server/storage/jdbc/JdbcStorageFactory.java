@@ -100,40 +100,40 @@ public class JdbcStorageFactory implements StorageFactory {
     @Override
     public <I> AggregateStorage<I> createAggregateStorage(
             Class<? extends Aggregate<I, ?, ?>> aggregateClass) {
-        final JdbcAggregateStorage<I> storage =
+        JdbcAggregateStorage<I> storage =
                 JdbcAggregateStorage.<I>newBuilder()
-                                    .setAggregateClass(aggregateClass)
-                                    .setMultitenant(multitenant)
-                                    .setDataSource(dataSource)
-                                    .setTypeMapping(typeMapping)
-                                    .build();
+                        .setAggregateClass(aggregateClass)
+                        .setMultitenant(multitenant)
+                        .setDataSource(dataSource)
+                        .setTypeMapping(typeMapping)
+                        .build();
         return storage;
     }
 
     @Override
     public <I> JdbcRecordStorage<I> createRecordStorage(Class<? extends Entity<I, ?>> entityClass) {
-        final JdbcRecordStorage<I> recordStorage =
+        JdbcRecordStorage<I> recordStorage =
                 JdbcRecordStorage.<I>newBuilder()
-                                 .setMultitenant(multitenant)
-                                 .setEntityClass(entityClass)
-                                 .setDataSource(dataSource)
-                                 .setColumnTypeRegistry(columnTypeRegistry)
-                                 .setTypeMapping(typeMapping)
-                                 .build();
+                        .setMultitenant(multitenant)
+                        .setEntityClass(entityClass)
+                        .setDataSource(dataSource)
+                        .setColumnTypeRegistry(columnTypeRegistry)
+                        .setTypeMapping(typeMapping)
+                        .build();
         return recordStorage;
     }
 
     @Override
     public <I> ProjectionStorage<I> createProjectionStorage(
             Class<? extends Projection<I, ?, ?>> projectionClass) {
-        final JdbcRecordStorage<I> entityStorage = createRecordStorage(projectionClass);
-        final ProjectionStorage<I> storage = JdbcProjectionStorage.<I>newBuilder()
-                                                                  .setMultitenant(multitenant)
-                                                                  .setDataSource(dataSource)
-                                                                  .setRecordStorage(entityStorage)
-                                                                  .setProjectionClass(projectionClass)
-                                                                  .setTypeMapping(typeMapping)
-                                                                  .build();
+        JdbcRecordStorage<I> entityStorage = createRecordStorage(projectionClass);
+        ProjectionStorage<I> storage = JdbcProjectionStorage.<I>newBuilder()
+                .setMultitenant(multitenant)
+                .setDataSource(dataSource)
+                .setRecordStorage(entityStorage)
+                .setProjectionClass(projectionClass)
+                .setTypeMapping(typeMapping)
+                .build();
         return storage;
     }
 
@@ -220,7 +220,7 @@ public class JdbcStorageFactory implements StorageFactory {
          * @see DefaultDataSourceConfigConverter#convert(DataSourceConfig)
          */
         public Builder setDataSource(DataSourceConfig dataSource) {
-            final HikariConfig hikariConfig = DefaultDataSourceConfigConverter.convert(dataSource);
+            HikariConfig hikariConfig = DefaultDataSourceConfigConverter.convert(dataSource);
             this.dataSource = DataSourceWrapper.wrap(new HikariDataSource(hikariConfig));
             return this;
         }

@@ -29,8 +29,8 @@ import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.FieldMasks;
 import io.spine.server.storage.jdbc.query.MessageDbIterator;
 import io.spine.type.TypeUrl;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-import javax.annotation.Nullable;
 import java.sql.ResultSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -61,28 +61,28 @@ final class QueryResults {
      * @see RecordTable
      */
     static Iterator<EntityRecord> parse(ResultSet resultSet, FieldMask fieldMask) {
-        final Iterator<EntityRecord> recordIterator =
+        Iterator<EntityRecord> recordIterator =
                 new MessageDbIterator<>(resultSet, ENTITY.name(), EntityRecord.getDescriptor());
-        final Iterator<EntityRecord> result = transform(recordIterator, maskFields(fieldMask));
+        Iterator<EntityRecord> result = transform(recordIterator, maskFields(fieldMask));
         return result;
     }
 
     private static Any maskFieldsOfState(EntityRecord record, FieldMask fieldMask) {
-        final Message message = AnyPacker.unpack(record.getState());
-        final TypeUrl typeUrl = from(message.getDescriptorForType());
-        final Message result = FieldMasks.applyMask(fieldMask, message, typeUrl);
+        Message message = AnyPacker.unpack(record.getState());
+        TypeUrl typeUrl = from(message.getDescriptorForType());
+        Message result = FieldMasks.applyMask(fieldMask, message, typeUrl);
         return AnyPacker.pack(result);
     }
 
-    private static Function<EntityRecord, EntityRecord> maskFields(final FieldMask fieldMask) {
+    private static Function<EntityRecord, EntityRecord> maskFields(FieldMask fieldMask) {
         return new Function<EntityRecord, EntityRecord>() {
             @Override
             public EntityRecord apply(@Nullable EntityRecord entityRecord) {
                 checkNotNull(entityRecord);
-                final Any maskedState = maskFieldsOfState(entityRecord, fieldMask);
-                final EntityRecord result = entityRecord.toBuilder()
-                                                        .setState(maskedState)
-                                                        .build();
+                Any maskedState = maskFieldsOfState(entityRecord, fieldMask);
+                EntityRecord result = entityRecord.toBuilder()
+                                                  .setState(maskedState)
+                                                  .build();
                 return result;
             }
         };

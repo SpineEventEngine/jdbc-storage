@@ -58,8 +58,8 @@ abstract class IndexIterator<I> extends DbIterator<I> {
         checkNotNull(resultSet);
         checkNotNull(columnName);
         checkNotNull(idType);
-        final Class<I> wrapper = Primitives.wrap(idType);
-        final IndexIterator<I> result;
+        Class<I> wrapper = Primitives.wrap(idType);
+        IndexIterator<I> result;
         if (String.class.equals(idType)) {
             result = (IndexIterator<I>) new StringIndexIterator(resultSet, columnName);
         } else if (Integer.class == wrapper || Long.class == wrapper) {
@@ -86,7 +86,7 @@ abstract class IndexIterator<I> extends DbIterator<I> {
 
         @Override
         protected String readResult() throws SQLException {
-            final String result = getResultSet().getString(getColumnName());
+            String result = getResultSet().getString(getColumnName());
             return result;
         }
     }
@@ -105,7 +105,7 @@ abstract class IndexIterator<I> extends DbIterator<I> {
 
         @Override
         protected Number readResult() throws SQLException {
-            final Number result = getResultSet().getLong(getColumnName());
+            Number result = getResultSet().getLong(getColumnName());
             return result;
         }
     }
@@ -129,8 +129,8 @@ abstract class IndexIterator<I> extends DbIterator<I> {
 
         @Override
         protected M readResult() throws SQLException {
-            final String rawId = getResultSet().getString(getColumnName());
-            final M messageId = fromJson(rawId, idClass);
+            String rawId = getResultSet().getString(getColumnName());
+            M messageId = fromJson(rawId, idClass);
             return messageId;
         }
     }

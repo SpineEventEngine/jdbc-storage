@@ -24,8 +24,8 @@ import com.google.protobuf.Timestamp;
 import com.querydsl.sql.AbstractSQLQuery;
 import io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column;
 import io.spine.server.storage.jdbc.query.SelectMessageByIdQuery;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-import javax.annotation.Nullable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -46,22 +46,21 @@ class SelectTimestampQuery extends SelectMessageByIdQuery<String, Timestamp> {
 
     @Override
     protected AbstractSQLQuery<?, ?> getQuery() {
-        final AbstractSQLQuery<?, ?> query = factory().select(pathOf(SECONDS), pathOf(NANOS))
-                                                      .from(table())
-                                                      .where(hasId());
+        AbstractSQLQuery<?, ?> query = factory().select(pathOf(SECONDS), pathOf(NANOS))
+                                                .from(table())
+                                                .where(hasId());
         return query;
     }
 
-    @SuppressWarnings("MethodDoesntCallSuperMethod") // Override default Message storing policy
-    @Nullable
     @Override
-    protected Timestamp readMessage(ResultSet resultSet) throws SQLException {
-        final long seconds = resultSet.getLong(Column.SECONDS.name());
-        final int nanos = resultSet.getInt(Column.NANOS.name());
-        final Timestamp time = Timestamp.newBuilder()
-                                        .setSeconds(seconds)
-                                        .setNanos(nanos)
-                                        .build();
+    @SuppressWarnings("MethodDoesntCallSuperMethod") // Override default Message storing policy.
+    protected @Nullable Timestamp readMessage(ResultSet resultSet) throws SQLException {
+        long seconds = resultSet.getLong(Column.SECONDS.name());
+        int nanos = resultSet.getInt(Column.NANOS.name());
+        Timestamp time = Timestamp.newBuilder()
+                                  .setSeconds(seconds)
+                                  .setNanos(nanos)
+                                  .build();
         if (isDefault(time)) {
             return null;
         }

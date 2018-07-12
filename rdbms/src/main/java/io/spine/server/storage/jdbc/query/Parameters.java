@@ -21,6 +21,7 @@
 package io.spine.server.storage.jdbc.query;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 
 import java.util.Map;
 import java.util.Set;
@@ -67,7 +68,7 @@ public final class Parameters {
      */
     public Parameter getParameter(String identifier) {
         checkArgument(parameters.containsKey(identifier));
-        final Parameter value = parameters.get(identifier);
+        Parameter value = parameters.get(identifier);
         return value;
     }
 
@@ -108,6 +109,7 @@ public final class Parameters {
          * @param identifier the identifier for a parameter
          * @param parameter the {@link Parameter} to add
          */
+        @CanIgnoreReturnValue
         public Builder addParameter(String identifier, Parameter parameter) {
             checkNotNull(identifier);
             checkArgument(!parameters.containsKey(identifier));
@@ -121,6 +123,7 @@ public final class Parameters {
          * @param otherParameters the parameters to add
          * @throws IllegalArgumentException if duplicated identifiers were found
          */
+        @CanIgnoreReturnValue
         public Builder addParameters(Parameters otherParameters) {
             checkArgument(disjoint(parameters.keySet(), otherParameters.parameters.keySet()));
             parameters.putAll(otherParameters.parameters);

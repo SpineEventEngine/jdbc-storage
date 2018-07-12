@@ -1,16 +1,22 @@
 ext {
     artifactId = 'jdbc-rdbms'
+
+    // Versions of libraries for working with JDBC.
+    hsqldbVersion = '2.3.3'
+    h2Version = '1.4.196'
+    hikariVersion = '2.4.3'
+    querydslVersion = '4.1.4'
 }
 
 dependencies {
-    compile group: 'org.hsqldb', name: 'hsqldb', version: '2.3.3'
-    compile group: 'com.h2database', name: 'h2', version: '1.4.196'
+    implementation group: 'org.hsqldb', name: 'hsqldb', version: hsqldbVersion
+    implementation group: 'com.h2database', name: 'h2', version: h2Version
 
-    compile group: 'com.zaxxer', name: 'HikariCP', version: hikariVersion
+    implementation group: 'com.zaxxer', name: 'HikariCP', version: hikariVersion
 
-    compile (group: 'com.querydsl', name: 'querydsl-sql', version: querydslVersion) {
+    implementation (group: 'com.querydsl', name: 'querydsl-sql', version: querydslVersion) {
         exclude group: 'com.google.guava'
     }
 
-    testCompile 'org.mockito:mockito-core:2.+'
+    testImplementation deps.test.mockito
 }

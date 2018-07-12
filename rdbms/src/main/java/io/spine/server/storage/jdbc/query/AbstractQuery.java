@@ -63,7 +63,7 @@ public abstract class AbstractQuery implements StorageQuery {
     private final PathBuilder<Object> pathBuilder;
 
     protected AbstractQuery(Builder<? extends Builder, ? extends StorageQuery> builder) {
-        final String tableName = builder.tableName;
+        String tableName = builder.tableName;
         this.queryFactory = createFactory(builder.dataSource);
         this.tablePath = new RelationalPathBase<>(Object.class, tableName, tableName, tableName);
         this.pathBuilder = new PathBuilder<>(Object.class, tableName);
@@ -102,7 +102,7 @@ public abstract class AbstractQuery implements StorageQuery {
     }
 
     protected OrderSpecifier<Comparable> orderBy(TableColumn column, Order order) {
-        final PathBuilder<Comparable> columnPath = pathBuilder.get(column.name(), Comparable.class);
+        PathBuilder<Comparable> columnPath = pathBuilder.get(column.name(), Comparable.class);
         return new OrderSpecifier<>(order, columnPath);
     }
 
@@ -127,11 +127,11 @@ public abstract class AbstractQuery implements StorageQuery {
      */
     @VisibleForTesting
     static AbstractSQLQueryFactory<?> createFactory(final DataSourceWrapper dataSource) {
-        final Provider<Connection> connectionProvider = new Provider<Connection>() {
+        Provider<Connection> connectionProvider = new Provider<Connection>() {
             @Override
             public Connection get() {
-                final Connection connection = dataSource.getConnection(false)
-                                                        .get();
+                Connection connection = dataSource.getConnection(false)
+                                                  .get();
                 try {
                     connection.setHoldability(HOLD_CURSORS_OVER_COMMIT);
                     return connection;
@@ -140,8 +140,8 @@ public abstract class AbstractQuery implements StorageQuery {
                 }
             }
         };
-        final SQLTemplates templates = getDialectTemplates(dataSource);
-        final Configuration configuration = new Configuration(templates);
+        SQLTemplates templates = getDialectTemplates(dataSource);
+        Configuration configuration = new Configuration(templates);
         configuration.addListener(TransactionHandler.INSTANCE);
         configuration.addListener(SQLCloseListener.DEFAULT);
         return new SQLQueryFactory(configuration, connectionProvider);
@@ -155,9 +155,9 @@ public abstract class AbstractQuery implements StorageQuery {
      */
     private static SQLTemplates getDialectTemplates(DataSourceWrapper dataSource) {
         try (ConnectionWrapper connection = dataSource.getConnection(true)) {
-            final DatabaseMetaData metaData = connection.get()
-                                                        .getMetaData();
-            final SQLTemplatesRegistry templatesRegistry = new SQLTemplatesRegistry();
+            DatabaseMetaData metaData = connection.get()
+                                                  .getMetaData();
+            SQLTemplatesRegistry templatesRegistry = new SQLTemplatesRegistry();
             return templatesRegistry.getTemplates(metaData);
         } catch (SQLException e) {
             throw new DatabaseException(e);
@@ -180,7 +180,7 @@ public abstract class AbstractQuery implements StorageQuery {
          */
         public final Q build() {
             checkPreconditions();
-            final Q result = doBuild();
+            Q result = doBuild();
             checkNotNull(result, "The query must not be null.");
             return result;
         }
@@ -250,7 +250,7 @@ public abstract class AbstractQuery implements StorageQuery {
 
         @Override
         public void executed(SQLListenerContext context) {
-            final Connection connection = context.getConnection();
+            Connection connection = context.getConnection();
             if (connection != null) {
                 try {
                     connection.commit();
@@ -262,7 +262,7 @@ public abstract class AbstractQuery implements StorageQuery {
 
         @Override
         public void exception(SQLListenerContext context) {
-            final Connection connection = context.getConnection();
+            Connection connection = context.getConnection();
             if (connection != null) {
                 try {
                     connection.rollback();

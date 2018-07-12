@@ -40,8 +40,8 @@ public abstract class AbstractSelectByIdQuery<I, R> extends IdAwareQuery<I> impl
      * @return a predicate to match records
      */
     protected Predicate hasId() {
-        final Object idValue = getNormalizedId();
-        final BooleanExpression hasId = idPath().eq(idValue);
+        Object idValue = getNormalizedId();
+        BooleanExpression hasId = idPath().eq(idValue);
         return hasId;
     }
 

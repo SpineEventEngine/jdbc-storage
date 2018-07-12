@@ -35,8 +35,8 @@ class DeleteRecordQuery<I> extends IdAwareQuery<I> implements WriteQuery {
 
     @Override
     public long execute() {
-        final SQLDeleteClause query = factory().delete(table())
-                                               .where(idPath().eq(getNormalizedId()));
+        SQLDeleteClause query = factory().delete(table())
+                                         .where(idPath().eq(getNormalizedId()));
         return query.execute();
     }
 

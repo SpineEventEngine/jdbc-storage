@@ -23,7 +23,10 @@
  * {@link io.spine.server.aggregate.AggregateStorage AggregateStorage}.
  */
 
+@CheckReturnValue
 @ParametersAreNonnullByDefault
 package io.spine.server.storage.jdbc.aggregate;
+
+import com.google.errorprone.annotations.CheckReturnValue;
 
 import javax.annotation.ParametersAreNonnullByDefault;

@@ -65,9 +65,9 @@ abstract class WriteEntityQuery<I, C extends StoreClause<C>> extends AbstractQue
 
     @Override
     public long execute() {
-        final C clause = createClause();
+        C clause = createClause();
         for (I id : records.keySet()) {
-            final EntityRecordWithColumns record = records.get(id);
+            EntityRecordWithColumns record = records.get(id);
             setEntityColumns(clause, record);
 
             clause.set(pathOf(ENTITY), serialize(record.getRecord()));
@@ -105,11 +105,11 @@ abstract class WriteEntityQuery<I, C extends StoreClause<C>> extends AbstractQue
     protected abstract C createClause();
 
     private void setEntityColumns(C clause, EntityRecordWithColumns record) {
-        final Parameters parameters = createParametersFromColumns(record);
-        final Set<String> identifiers = parameters.getIdentifiers();
+        Parameters parameters = createParametersFromColumns(record);
+        Set<String> identifiers = parameters.getIdentifiers();
         for (String identifier : identifiers) {
-            final Object parameterValue = parameters.getParameter(identifier)
-                                                    .getValue();
+            Object parameterValue = parameters.getParameter(identifier)
+                                              .getValue();
             clause.set(pathOf(identifier), parameterValue);
         }
     }
@@ -122,7 +122,7 @@ abstract class WriteEntityQuery<I, C extends StoreClause<C>> extends AbstractQue
      * @return query parameters from entity columns
      */
     private Parameters createParametersFromColumns(EntityRecordWithColumns record) {
-        final Parameters.Builder parameters = Parameters.newBuilder();
+        Parameters.Builder parameters = Parameters.newBuilder();
         if (record.hasColumns()) {
             ColumnRecords.feedColumnsTo(parameters,
                                         record,

@@ -49,12 +49,12 @@ class DbTableNameFactory {
      * @return a table name from the class
      */
     static String newTableName(Class<? extends Entity<?, ?>> cls) {
-        final int shortPackageId = cls.getPackage()
-                                      .hashCode();
+        int shortPackageId = cls.getPackage()
+                                .hashCode();
         // The minus is an invalid sign in a table name.
-        final int validPackageId = Math.abs(shortPackageId);
-        final String packageIdAsString = String.valueOf(validPackageId);
-        final String result = cls.getSimpleName() + '_' + packageIdAsString;
+        int validPackageId = Math.abs(shortPackageId);
+        String packageIdAsString = String.valueOf(validPackageId);
+        String result = cls.getSimpleName() + '_' + packageIdAsString;
         return result;
     }
 }

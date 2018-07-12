@@ -46,10 +46,10 @@ class UpdateLifecycleFlagsQuery<I> extends IdAwareQuery<I> implements WriteQuery
 
     @Override
     public long execute() {
-        final SQLUpdateClause query = factory().update(table())
-                                               .where(idPath().eq(getNormalizedId()))
-                                               .set(pathOf(ARCHIVED), entityStatus.getArchived())
-                                               .set(pathOf(DELETED), entityStatus.getDeleted());
+        SQLUpdateClause query = factory().update(table())
+                                         .where(idPath().eq(getNormalizedId()))
+                                         .set(pathOf(ARCHIVED), entityStatus.getArchived())
+                                         .set(pathOf(DELETED), entityStatus.getDeleted());
         return query.execute();
     }
 

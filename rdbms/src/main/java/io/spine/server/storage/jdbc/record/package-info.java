@@ -22,7 +22,10 @@
  * The JDBC-based implementation of the {@link io.spine.server.storage.RecordStorage RecordStorage}.
  */
 
+@CheckReturnValue
 @ParametersAreNonnullByDefault
 package io.spine.server.storage.jdbc.record;
+
+import com.google.errorprone.annotations.CheckReturnValue;
 
 import javax.annotation.ParametersAreNonnullByDefault;

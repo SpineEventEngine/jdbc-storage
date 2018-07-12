@@ -30,8 +30,8 @@ import io.spine.server.storage.jdbc.query.SelectMessageByIdQuery;
  */
 public class Given {
 
+    /** Prevents instantiation of this utility class. */
     private Given() {
-        // Prevent instantiation of this utility class.
     }
 
     /**

@@ -79,8 +79,8 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
      */
     protected JdbcAggregateStorage(Builder<I> builder) {
         super(builder.isMultitenant());
-        final Class<? extends Aggregate<I, ?, ?>> aggregateClass = builder.getAggregateClass();
-        final TypeMapping mapping = builder.getTypeMapping();
+        Class<? extends Aggregate<I, ?, ?>> aggregateClass = builder.getAggregateClass();
+        TypeMapping mapping = builder.getTypeMapping();
         this.dataSource = builder.getDataSource();
         this.mainTable = new AggregateEventRecordTable<>(aggregateClass, dataSource, mapping);
         this.lifecycleFlagsTable = new LifecycleFlagsTable<>(aggregateClass, dataSource, mapping);
@@ -98,10 +98,10 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     @Override
     public int readEventCountAfterLastSnapshot(I id) {
         checkNotClosed();
-        final Integer value = eventCountTable.read(id);
-        final int result = value == null
-                           ? 0
-                           : value;
+        Integer value = eventCountTable.read(id);
+        int result = value == null
+                     ? 0
+                     : value;
         return result;
     }
 
@@ -145,10 +145,10 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
             throws DatabaseException {
         checkNotNull(request);
 
-        final I id = request.getRecordId();
-        final int fetchSize = request.getBatchSize();
-        final SelectEventRecordsById<I> query = mainTable.composeSelectQuery(id);
-        final DbIterator<AggregateEventRecord> historyIterator = query.execute(fetchSize);
+        I id = request.getRecordId();
+        int fetchSize = request.getBatchSize();
+        SelectEventRecordsById<I> query = mainTable.composeSelectQuery(id);
+        DbIterator<AggregateEventRecord> historyIterator = query.execute(fetchSize);
         iterators.add(historyIterator);
         return historyIterator;
     }

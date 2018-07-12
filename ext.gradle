@@ -18,15 +18,10 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-final def JDBC_VERSION = '0.10.41-SNAPSHOT'
+final def SPINE_VERSION = '0.10.46-SNAPSHOT'
 
 ext {
-    jdbcVersion = JDBC_VERSION
-    coreVersion = '0.10.41-SNAPSHOT'
-    baseVersion = '0.10.40-SNAPSHOT'
-    guavaVersion = '25.1-jre'
-
-    // Versions of libraries for working with JDBC.
-    hikariVersion = '2.4.3'
-    querydslVersion = '4.1.4'
+    versionToPublish = SPINE_VERSION
+    spineBaseVersion = '0.10.46-SNAPSHOT'
+    spineCoreVersion = '0.10.46-SNAPSHOT'
 }

@@ -48,9 +48,9 @@ public final class Serializer {
      */
     public static byte[] serialize(Message message) {
         checkNotNull(message);
-        final Any any = AnyPacker.pack(message);
-        final byte[] bytes = any.getValue()
-                                .toByteArray();
+        Any any = AnyPacker.pack(message);
+        byte[] bytes = any.getValue()
+                          .toByteArray();
         return bytes;
     }
 
@@ -64,13 +64,13 @@ public final class Serializer {
      */
     static <M extends Message> M deserialize(byte[] bytes, Descriptor messageDescriptor) {
         checkNotNull(bytes);
-        final Any.Builder builder = Any.newBuilder();
-        final String typeUrlValue = TypeUrl.from(messageDescriptor)
-                                           .value();
+        Any.Builder builder = Any.newBuilder();
+        String typeUrlValue = TypeUrl.from(messageDescriptor)
+                                     .value();
         builder.setTypeUrl(typeUrlValue);
-        final ByteString byteString = ByteString.copyFrom(bytes);
+        ByteString byteString = ByteString.copyFrom(bytes);
         builder.setValue(byteString);
-        final M message = AnyPacker.unpack(builder.build());
+        M message = AnyPacker.unpack(builder.build());
         return message;
     }
 }

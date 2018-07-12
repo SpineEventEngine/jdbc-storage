@@ -37,9 +37,9 @@ class UpdateEventCountQuery<I> extends WriteEventCountQuery<I> {
 
     @Override
     public long execute() {
-        final SQLUpdateClause query = factory().update(table())
-                                               .where(idPath().eq(getNormalizedId()))
-                                               .set(pathOf(EVENT_COUNT), getEventCount());
+        SQLUpdateClause query = factory().update(table())
+                                         .where(idPath().eq(getNormalizedId()))
+                                         .set(pathOf(EVENT_COUNT), getEventCount());
         return query.execute();
     }
 

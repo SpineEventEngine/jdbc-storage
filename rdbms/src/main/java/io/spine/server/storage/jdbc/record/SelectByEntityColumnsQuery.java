@@ -63,14 +63,14 @@ final class SelectByEntityColumnsQuery<I> extends AbstractQuery
 
     @Override
     public Iterator<EntityRecord> execute() {
-        final Predicate inIds = inIds(idColumn, entityQuery.getIds());
-        final Predicate matchParameters = matchParameters(entityQuery.getParameters(),
-                                                          columnTypeRegistry);
-        final AbstractSQLQuery<Object, ?> query = factory().select(pathOf(ENTITY))
-                                                           .where(inIds)
-                                                           .where(matchParameters)
-                                                           .from(table());
-        final ResultSet resultSet = query.getResults();
+        Predicate inIds = inIds(idColumn, entityQuery.getIds());
+        Predicate matchParameters = matchParameters(entityQuery.getParameters(),
+                                                    columnTypeRegistry);
+        AbstractSQLQuery<Object, ?> query = factory().select(pathOf(ENTITY))
+                                                     .where(inIds)
+                                                     .where(matchParameters)
+                                                     .from(table());
+        ResultSet resultSet = query.getResults();
         return QueryResults.parse(resultSet, fieldMask);
     }
 

@@ -20,6 +20,7 @@
 
 package io.spine.server.storage.jdbc.aggregate;
 
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.protobuf.Timestamp;
 import com.querydsl.sql.dml.SQLInsertClause;
 import io.spine.core.Event;
@@ -50,26 +51,26 @@ class InsertAggregateRecordQuery<I> extends IdAwareQuery<I> implements WriteQuer
         this.record = builder.record;
     }
 
+    @CanIgnoreReturnValue
     @Override
     public long execute() {
-        final Timestamp recordTimestamp = record.getTimestamp();
-        final String kindValue = record.getKindCase()
-                                       .toString();
-        final SQLInsertClause query = factory().insert(table())
-                                               .set(idPath(), getNormalizedId())
-                                               .set(pathOf(AGGREGATE), serialize(record))
-                                               .set(pathOf(KIND), kindValue)
-                                               .set(pathOf(VERSION), getVersionNumberOfRecord())
-                                               .set(pathOf(TIMESTAMP), recordTimestamp.getSeconds())
-                                               .set(pathOf(TIMESTAMP_NANOS),
-                                                    recordTimestamp.getNanos());
+        Timestamp recordTimestamp = record.getTimestamp();
+        String kindValue = record.getKindCase()
+                                 .toString();
+        SQLInsertClause query = factory().insert(table())
+                                         .set(idPath(), getNormalizedId())
+                                         .set(pathOf(AGGREGATE), serialize(record))
+                                         .set(pathOf(KIND), kindValue)
+                                         .set(pathOf(VERSION), getVersionNumberOfRecord())
+                                         .set(pathOf(TIMESTAMP), recordTimestamp.getSeconds())
+                                         .set(pathOf(TIMESTAMP_NANOS), recordTimestamp.getNanos());
         return query.execute();
     }
 
     private int getVersionNumberOfRecord() {
-        final int versionNumber;
+        int versionNumber;
 
-        final Event event = record.getEvent();
+        Event event = record.getEvent();
         if (isDefault(event)) {
             versionNumber = record.getSnapshot()
                                   .getVersion()
