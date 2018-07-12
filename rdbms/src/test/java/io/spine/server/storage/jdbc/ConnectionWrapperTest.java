@@ -78,8 +78,7 @@ class ConnectionWrapperTest {
     @SuppressWarnings("JDBCPrepareStatementWithNonConstantString") // OK for a mock setup.
     @Test
     @DisplayName("throw DatabaseException in case of SQLException on preparing statement")
-    void handleExceptionOnPrepareStatement()
-            throws SQLException {
+    void handleExceptionOnPrepareStatement() throws SQLException {
         Connection connection = mockConnection();
         when(connection.prepareStatement(anyString())).thenThrow(SQLException.class);
         ConnectionWrapper wrapper = ConnectionWrapper.wrap(connection);
