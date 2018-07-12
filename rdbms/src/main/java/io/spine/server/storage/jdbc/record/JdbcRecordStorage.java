@@ -166,8 +166,6 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
                 EntityFilters.getDefaultInstance(),
                 getThis());
         if (EntityWithLifecycle.class.isAssignableFrom(entityClass)) {
-            @SuppressWarnings("unchecked") // Checked with the if statement.
-            Class<EntityWithLifecycle<I, ?>> cls = (Class<EntityWithLifecycle<I, ?>>) entityClass;
             query = query.withLifecycleFlags(getThis());
         }
         return query;
