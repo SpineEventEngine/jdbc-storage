@@ -20,7 +20,6 @@
 
 package io.spine.server.storage.jdbc.aggregate;
 
-import com.google.common.base.Optional;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.aggregate.AggregateReadRequest;
@@ -34,6 +33,7 @@ import io.spine.server.storage.jdbc.query.DbIterator;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Lists.newLinkedList;
@@ -107,7 +107,7 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
 
     @Override
     public Optional<LifecycleFlags> readLifecycleFlags(I id) {
-        return Optional.fromNullable(lifecycleFlagsTable.read(id));
+        return Optional.ofNullable(lifecycleFlagsTable.read(id));
     }
 
     @Override

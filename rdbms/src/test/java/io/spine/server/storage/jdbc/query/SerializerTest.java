@@ -27,8 +27,8 @@ import org.junit.jupiter.api.Test;
 import static io.spine.base.Identifier.newUuid;
 import static io.spine.server.storage.jdbc.query.Serializer.deserialize;
 import static io.spine.server.storage.jdbc.query.Serializer.serialize;
-import static io.spine.test.DisplayNames.HAVE_PARAMETERLESS_CTOR;
-import static io.spine.test.Tests.assertHasPrivateParameterlessCtor;
+import static io.spine.testing.DisplayNames.HAVE_PARAMETERLESS_CTOR;
+import static io.spine.testing.Tests.assertHasPrivateParameterlessCtor;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

@@ -22,7 +22,6 @@ package io.spine.server.storage.jdbc.record;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
-import com.google.common.base.Optional;
 import com.google.protobuf.Any;
 import com.google.protobuf.FieldMask;
 import io.spine.base.Identifier;
@@ -49,6 +48,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Iterables.transform;
@@ -102,7 +102,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     @Override
     protected Optional<EntityRecord> readRecord(I id) throws DatabaseException {
         EntityRecord record = table.read(id);
-        return Optional.fromNullable(record);
+        return Optional.ofNullable(record);
     }
 
     @Override

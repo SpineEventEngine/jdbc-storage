@@ -20,7 +20,6 @@
 
 package io.spine.server.storage.jdbc.aggregate;
 
-import com.google.common.base.Optional;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateStorage;
 import io.spine.server.aggregate.AggregateStorageVisibilityHandlingTest;
@@ -32,6 +31,8 @@ import io.spine.test.aggregate.ProjectId;
 import io.spine.testdata.Sample;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.util.Optional;
 
 import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
 import static org.junit.jupiter.api.Assertions.assertEquals;

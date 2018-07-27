@@ -22,7 +22,6 @@ package io.spine.server.storage.jdbc.stand;
 
 import com.google.common.base.Converter;
 import com.google.common.base.Function;
-import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterators;
 import com.google.protobuf.Any;
@@ -49,6 +48,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -164,7 +164,7 @@ public class JdbcStandStorage extends StandStorage {
         List<EntityRecord> readList = newArrayList(read);
         checkState(readList.size() <= 1);
         if (readList.isEmpty()) {
-            return Optional.absent();
+            return Optional.empty();
         } else {
             return Optional.of(readList.get(0));
         }

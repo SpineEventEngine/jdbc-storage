@@ -20,7 +20,6 @@
 
 package io.spine.server.storage.jdbc.record;
 
-import com.google.common.base.Optional;
 import com.google.protobuf.FieldMask;
 import com.google.protobuf.Message;
 import io.spine.client.ColumnFilter;
@@ -49,12 +48,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import static io.spine.base.Identifier.newUuid;
+import java.util.Optional;
+
 import static io.spine.client.ColumnFilters.gt;
 import static io.spine.client.ColumnFilters.lt;
 import static io.spine.client.CompositeColumnFilter.CompositeOperator.ALL;
 import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
-import static io.spine.test.Tests.nullRef;
+import static io.spine.testing.Tests.nullRef;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -67,13 +67,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
         /* JUnit nested classes cannot be static. */,
         "DuplicateStringLiteralInspection" /* Common test display names. */})
 @DisplayName("JdbcRecordStorage should")
-class JdbcRecordStorageTest extends RecordStorageTest<String, JdbcRecordStorage<String>> {
+class JdbcRecordStorageTest extends RecordStorageTest<JdbcRecordStorage<ProjectId>> {
 
     @Test
     @DisplayName("clear itself")
     void clearItself() {
-        JdbcRecordStorage<String> storage = getStorage();
-        String id = newUuid();
+        JdbcRecordStorage<ProjectId> storage = getStorage();
+        ProjectId id = newId();
         EntityRecord entityRecord = newStorageRecord();
 
         EntityRecordWithColumns record = EntityRecordWithColumns.of(entityRecord);
@@ -97,7 +97,7 @@ class JdbcRecordStorageTest extends RecordStorageTest<String, JdbcRecordStorage<
     @Test
     @DisplayName("use column names for storing")
     void useColumnNames() {
-        JdbcRecordStorage<String> storage = newStorage(TestEntityWithStringId.class);
+        JdbcRecordStorage<ProjectId> storage = newStorage(TestEntityWithStringId.class);
         int entityColumnIndex = RecordTable.StandardColumn.values().length;
         String customColumnName = storage.getTable()
                                          .getTableColumns()
@@ -112,7 +112,7 @@ class JdbcRecordStorageTest extends RecordStorageTest<String, JdbcRecordStorage<
     @Test
     @DisplayName("read by composite filter with column filters for same column")
     void readByCompositeFilter() {
-        JdbcRecordStorage<String> storage = newStorage(TestEntityWithStringId.class);
+        JdbcRecordStorage<ProjectId> storage = newStorage(TestEntityWithStringId.class);
         String columnName = "value";
         ColumnFilter lessThan = lt(columnName, -5);
         ColumnFilter greaterThan = gt(columnName, 5);
@@ -124,7 +124,7 @@ class JdbcRecordStorageTest extends RecordStorageTest<String, JdbcRecordStorage<
         EntityFilters entityFilters = EntityFilters.newBuilder()
                                                    .addFilter(columnFilter)
                                                    .build();
-        EntityQuery<String> query = EntityQueries.from(entityFilters, storage);
+        EntityQuery<ProjectId> query = EntityQueries.from(entityFilters, storage);
         storage.readAll(query, FieldMask.getDefaultInstance());
         close(storage);
     }
@@ -154,13 +154,13 @@ class JdbcRecordStorageTest extends RecordStorageTest<String, JdbcRecordStorage<
     }
 
     @Override
-    protected JdbcRecordStorage<String> newStorage(Class<? extends Entity> cls) {
+    protected JdbcRecordStorage<ProjectId> newStorage(Class<? extends Entity> cls) {
         DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory("entityStorageTests");
         @SuppressWarnings("unchecked") // Test invariant.
-                Class<? extends Entity<String, ?>> entityClass =
-                (Class<? extends Entity<String, ?>>) cls;
-        JdbcRecordStorage<String> storage =
-                JdbcRecordStorage.<String>newBuilder()
+                Class<? extends Entity<ProjectId, ?>> entityClass =
+                (Class<? extends Entity<ProjectId, ?>>) cls;
+        JdbcRecordStorage<ProjectId> storage =
+                JdbcRecordStorage.<ProjectId>newBuilder()
                         .setDataSource(dataSource)
                         .setEntityClass(entityClass)
                         .setMultitenant(false)
@@ -171,15 +171,9 @@ class JdbcRecordStorageTest extends RecordStorageTest<String, JdbcRecordStorage<
     }
 
     @Override
-    protected String newId() {
-        return newUuid();
-    }
-
-    @Override
-    protected Message newState(String id) {
+    protected Message newState(ProjectId id) {
         Project.Builder builder = Sample.builderForType(Project.class);
-        builder.setId(ProjectId.newBuilder()
-                               .setId(id));
+        builder.setId(id);
         return builder.build();
     }
 

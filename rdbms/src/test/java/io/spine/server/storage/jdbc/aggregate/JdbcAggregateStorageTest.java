@@ -37,7 +37,7 @@ import java.sql.SQLException;
 
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
 import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
-import static io.spine.test.Tests.nullRef;
+import static io.spine.testing.Tests.nullRef;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
