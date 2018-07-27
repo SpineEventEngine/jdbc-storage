@@ -57,7 +57,8 @@ class UpdateLifecycleFlagsQuery<I> extends IdAwareQuery<I> implements WriteQuery
         return new Builder<>();
     }
 
-    static class Builder<I> extends IdAwareQuery.Builder<I, Builder<I>, UpdateLifecycleFlagsQuery<I>> {
+    static class Builder<I>
+            extends IdAwareQuery.Builder<I, Builder<I>, UpdateLifecycleFlagsQuery<I>> {
 
         private LifecycleFlags entityStatus;
 

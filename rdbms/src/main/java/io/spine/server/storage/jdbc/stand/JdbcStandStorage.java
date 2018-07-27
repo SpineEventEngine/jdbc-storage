@@ -21,8 +21,6 @@
 package io.spine.server.storage.jdbc.stand;
 
 import com.google.common.base.Converter;
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
 import com.google.common.collect.Iterators;
 import com.google.protobuf.Any;
 import com.google.protobuf.FieldMask;
@@ -49,15 +47,17 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
-import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Iterators.filter;
 import static com.google.common.collect.Lists.newArrayList;
 import static io.spine.protobuf.TypeConverter.toAny;
 import static io.spine.util.Exceptions.illegalStateWithCauseOf;
 import static java.util.Collections.singleton;
+import static java.util.stream.StreamSupport.stream;
 
 /**
  * JDBC-based implementation of {@link StandStorage}.
@@ -135,16 +135,13 @@ public class JdbcStandStorage extends StandStorage {
     public Iterator<EntityRecord> readAllByType(TypeUrl type, FieldMask fieldMask) {
         Iterator<EntityRecord> allRecords = readAll(fieldMask);
         String requiredTypeUrl = type.value();
-        Iterator<EntityRecord> result = filter(allRecords, new Predicate<EntityRecord>() {
-            // TODO:2017-07-14:dmytro.dashenkov: Replace in-memory filtering with SQL query.
-            // https://github.com/SpineEventEngine/jdbc-storage/issues/30
-            @Override
-            public boolean apply(@Nullable EntityRecord entityRecord) {
-                checkNotNull(entityRecord);
-                String typeUrl = entityRecord.getState()
-                                             .getTypeUrl();
-                return typeUrl.equals(requiredTypeUrl);
-            }
+        // TODO:2017-07-14:dmytro.dashenkov: Replace in-memory filtering with SQL query.
+        // https://github.com/SpineEventEngine/jdbc-storage/issues/30
+        Iterator<EntityRecord> result = filter(allRecords, entityRecord -> {
+            checkNotNull(entityRecord);
+            String typeUrl = entityRecord.getState()
+                                         .getTypeUrl();
+            return typeUrl.equals(requiredTypeUrl);
         });
         return result;
     }
@@ -232,7 +229,9 @@ public class JdbcStandStorage extends StandStorage {
     }
 
     private EntityQuery<String> idsToQuery(Iterable<AggregateStateId> ids) {
-        Iterable<EntityId> entityIds = transform(ids, AggregateStateIdToEntityId.INSTANCE);
+        Iterable<EntityId> entityIds = stream(ids.spliterator(), false)
+                .map(AggregateStateIdToEntityId.INSTANCE)
+                .collect(Collectors.toList());
         EntityIdFilter idFilter = EntityIdFilter.newBuilder()
                                                 .addAllIds(entityIds)
                                                 .build();

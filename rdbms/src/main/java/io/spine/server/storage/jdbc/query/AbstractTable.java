@@ -85,9 +85,9 @@ public abstract class AbstractTable<I, R, W> {
      * the default values of the Columns as the map values.
      */
     private static final ImmutableMap<String, Object> COLUMN_DEFAULTS =
-            ImmutableMap.<String, Object>of(archived.name(), false,
-                                            deleted.name(), false,
-                                            version.name(), 0);
+            ImmutableMap.of(archived.name(), false,
+                            deleted.name(), false,
+                            version.name(), 0);
     private final String name;
     private final IdColumn<I> idColumn;
     private final DataSourceWrapper dataSource;

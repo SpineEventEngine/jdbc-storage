@@ -20,7 +20,6 @@
 
 package io.spine.server.storage.jdbc.record;
 
-import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.protobuf.FieldMask;
 import io.spine.server.entity.Entity;
@@ -44,9 +43,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.collect.Collections2.transform;
 import static com.google.common.collect.Lists.newLinkedList;
 import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
 import static java.util.Collections.addAll;
@@ -83,7 +83,9 @@ class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumn
     protected List<TableColumn> getTableColumns() {
         List<TableColumn> columns = newLinkedList();
         addAll(columns, StandardColumn.values());
-        Collection<TableColumn> tableColumns = transform(entityColumns, new ColumnAdapter());
+        Collection<TableColumn> tableColumns = entityColumns.stream()
+                                                            .map(new ColumnAdapter())
+                                                            .collect(Collectors.toList());
         columns.addAll(tableColumns);
         return columns;
     }
