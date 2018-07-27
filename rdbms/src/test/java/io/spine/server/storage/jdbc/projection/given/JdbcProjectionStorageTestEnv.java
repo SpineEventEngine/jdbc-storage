@@ -33,7 +33,7 @@ public class JdbcProjectionStorageTestEnv {
     private JdbcProjectionStorageTestEnv() {
     }
 
-    public static class TestEntity extends RecordStorageTestEnv.TestCounterEntity<ProjectId> {
+    public static class TestEntity extends RecordStorageTestEnv.TestCounterEntity {
         protected TestEntity(ProjectId id) {
             super(id);
         }

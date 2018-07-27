@@ -20,7 +20,6 @@
 
 package io.spine.server.storage.jdbc.record;
 
-import com.google.common.base.Function;
 import com.google.protobuf.Any;
 import com.google.protobuf.FieldMask;
 import com.google.protobuf.Message;
@@ -34,11 +33,15 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.sql.ResultSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Spliterator;
+import java.util.function.Function;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.collect.Iterators.transform;
 import static io.spine.server.storage.jdbc.record.RecordTable.StandardColumn.ENTITY;
 import static io.spine.type.TypeUrl.from;
+import static java.util.Spliterators.spliteratorUnknownSize;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.StreamSupport.stream;
 
 /**
  * Utility class for parsing the results of a DB query ({@link ResultSet}) into the
@@ -63,7 +66,11 @@ final class QueryResults {
     static Iterator<EntityRecord> parse(ResultSet resultSet, FieldMask fieldMask) {
         Iterator<EntityRecord> recordIterator =
                 new MessageDbIterator<>(resultSet, ENTITY.name(), EntityRecord.getDescriptor());
-        Iterator<EntityRecord> result = transform(recordIterator, maskFields(fieldMask));
+        Spliterator<EntityRecord> recordSpliterator = spliteratorUnknownSize(recordIterator, 0);
+        Iterator<EntityRecord> result = stream(recordSpliterator, false)
+                .map(maskFields(fieldMask))
+                .collect(toList())
+                .iterator();
         return result;
     }
 
@@ -75,16 +82,13 @@ final class QueryResults {
     }
 
     private static Function<EntityRecord, EntityRecord> maskFields(FieldMask fieldMask) {
-        return new Function<EntityRecord, EntityRecord>() {
-            @Override
-            public EntityRecord apply(@Nullable EntityRecord entityRecord) {
-                checkNotNull(entityRecord);
-                Any maskedState = maskFieldsOfState(entityRecord, fieldMask);
-                EntityRecord result = entityRecord.toBuilder()
-                                                  .setState(maskedState)
-                                                  .build();
-                return result;
-            }
+        return entityRecord -> {
+            checkNotNull(entityRecord);
+            Any maskedState = maskFieldsOfState(entityRecord, fieldMask);
+            EntityRecord result = entityRecord.toBuilder()
+                                              .setState(maskedState)
+                                              .build();
+            return result;
         };
     }
 }

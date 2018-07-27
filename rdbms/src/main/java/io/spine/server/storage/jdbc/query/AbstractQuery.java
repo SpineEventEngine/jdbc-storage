@@ -127,17 +127,14 @@ public abstract class AbstractQuery implements StorageQuery {
      */
     @VisibleForTesting
     static AbstractSQLQueryFactory<?> createFactory(final DataSourceWrapper dataSource) {
-        Provider<Connection> connectionProvider = new Provider<Connection>() {
-            @Override
-            public Connection get() {
-                Connection connection = dataSource.getConnection(false)
-                                                  .get();
-                try {
-                    connection.setHoldability(HOLD_CURSORS_OVER_COMMIT);
-                    return connection;
-                } catch (SQLException e) {
-                    throw new DatabaseException(e);
-                }
+        Provider<Connection> connectionProvider = () -> {
+            Connection connection = dataSource.getConnection(false)
+                                              .get();
+            try {
+                connection.setHoldability(HOLD_CURSORS_OVER_COMMIT);
+                return connection;
+            } catch (SQLException e) {
+                throw new DatabaseException(e);
             }
         };
         SQLTemplates templates = getDialectTemplates(dataSource);

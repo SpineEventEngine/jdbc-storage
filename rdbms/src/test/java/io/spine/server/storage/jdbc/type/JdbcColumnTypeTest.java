@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Test;
 import java.sql.SQLException;
 
 import static io.spine.base.Identifier.newUuid;
-import static io.spine.test.Tests.nullRef;
+import static io.spine.testing.Tests.nullRef;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 

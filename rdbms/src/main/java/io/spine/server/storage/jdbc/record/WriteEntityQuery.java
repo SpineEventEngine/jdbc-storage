@@ -127,7 +127,7 @@ abstract class WriteEntityQuery<I, C extends StoreClause<C>> extends AbstractQue
             ColumnRecords.feedColumnsTo(parameters,
                                         record,
                                         columnTypeRegistry,
-                                        Functions.<String>identity());
+                                        Functions.identity());
         }
         return parameters.build();
     }

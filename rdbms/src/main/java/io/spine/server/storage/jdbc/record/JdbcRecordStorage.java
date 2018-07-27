@@ -21,8 +21,6 @@
 package io.spine.server.storage.jdbc.record;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
 import com.google.protobuf.Any;
 import com.google.protobuf.FieldMask;
 import io.spine.base.Identifier;
@@ -49,9 +47,12 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.collect.Iterables.transform;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.StreamSupport.stream;
 
 /**
  * The implementation of the entity storage based on the RDBMS.
@@ -102,7 +103,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     @Override
     protected Optional<EntityRecord> readRecord(I id) throws DatabaseException {
         EntityRecord record = table.read(id);
-        return Optional.fromNullable(record);
+        return Optional.ofNullable(record);
     }
 
     @Override
@@ -172,7 +173,9 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     }
 
     private EntityQuery<I> toQuery(Iterable<? extends I> ids) {
-        Iterable<EntityId> entityIds = transform(ids, AggregateStateIdToEntityId.INSTANCE);
+        Iterable<EntityId> entityIds = stream(ids.spliterator(), false)
+                .map(AggregateStateIdToEntityId.INSTANCE)
+                .collect(toList());
         EntityIdFilter idFilter = EntityIdFilter.newBuilder()
                                                 .addAllIds(entityIds)
                                                 .build();

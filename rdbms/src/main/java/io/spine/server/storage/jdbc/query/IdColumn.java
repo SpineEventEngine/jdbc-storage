@@ -24,7 +24,6 @@ import com.google.protobuf.Message;
 import io.spine.annotation.Internal;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.entity.Entity;
-import io.spine.server.entity.EntityClass;
 import io.spine.server.storage.jdbc.Type;
 
 import java.util.Collection;
@@ -32,6 +31,7 @@ import java.util.Collection;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Lists.newLinkedList;
 import static io.spine.json.Json.toCompactJson;
+import static io.spine.server.entity.model.EntityClass.asEntityClass;
 
 /**
  * A helper class for setting the {@link Entity} ID into {@linkplain Parameters query parameters}.
@@ -59,7 +59,7 @@ public abstract class IdColumn<I> {
     static <I> IdColumn<I> newInstance(Class<? extends Entity<I, ?>> entityClass,
                                        String columnName) {
         IdColumn<I> helper;
-        Class<?> idClass = new EntityClass<Entity>(entityClass).getIdClass();
+        Class<?> idClass = asEntityClass(entityClass).getIdClass();
         if (idClass == Long.class) {
             helper = (IdColumn<I>) new LongIdColumn(columnName);
         } else if (idClass == Integer.class) {

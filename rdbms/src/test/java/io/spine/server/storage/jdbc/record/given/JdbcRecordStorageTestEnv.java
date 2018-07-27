@@ -24,6 +24,7 @@ import io.spine.server.entity.AbstractEntity;
 import io.spine.server.entity.storage.Column;
 import io.spine.server.storage.given.RecordStorageTestEnv.TestCounterEntity;
 import io.spine.test.storage.Project;
+import io.spine.test.storage.ProjectId;
 
 /**
  * @author Dmytro Grankin
@@ -36,8 +37,8 @@ public class JdbcRecordStorageTestEnv {
     private JdbcRecordStorageTestEnv() {
     }
 
-    public static class TestCounterEntityJdbc extends TestCounterEntity<String> {
-        protected TestCounterEntityJdbc(String id) {
+    public static class TestCounterEntityJdbc extends TestCounterEntity {
+        protected TestCounterEntityJdbc(ProjectId id) {
             super(id);
         }
     }

@@ -20,7 +20,6 @@
 
 package io.spine.server.storage.jdbc.stand;
 
-import com.google.common.base.Optional;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.FieldMask;
@@ -52,6 +51,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
@@ -59,8 +59,8 @@ import static io.spine.server.storage.jdbc.stand.given.Given.TestAggregate;
 import static io.spine.server.storage.jdbc.stand.given.Given.TestAggregate2;
 import static io.spine.server.storage.jdbc.stand.given.Given.testAggregates;
 import static io.spine.server.storage.jdbc.stand.given.Given.testAggregatesWithState;
-import static io.spine.test.Verify.assertContains;
-import static io.spine.test.Verify.assertSize;
+import static io.spine.testing.Verify.assertContains;
+import static io.spine.testing.Verify.assertSize;
 import static junit.framework.TestCase.assertEquals;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
