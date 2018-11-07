@@ -1,9 +1,9 @@
 buildscript {
     // Define the versions of the library and its dependencies.
     // As long as `buildscript` section is always evaluated first, we need to apply
-    // `ext.gradle` explicitly here.
+    // `version.gradle` explicitly here.
     apply from: "$rootDir/config/gradle/dependencies.gradle"
-    apply from: "$rootDir/ext.gradle"
+    apply from: "$rootDir/version.gradle"
 }
 
 ext {
