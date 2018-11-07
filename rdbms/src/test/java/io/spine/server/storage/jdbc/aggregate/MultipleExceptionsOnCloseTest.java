@@ -24,7 +24,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static io.spine.testing.Verify.assertContains;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -46,16 +47,9 @@ class MultipleExceptionsOnCloseTest {
         MultipleExceptionsOnClose aggregatingException =
                 new MultipleExceptionsOnClose(newArrayList(ex1, ex2, ex3));
 
-        String stringName = "Exception description";
-        assertContains(stringName,
-                       ex1.toString(),
-                       aggregatingException.toString());
-        assertContains(stringName,
-                       ex2.toString(),
-                       aggregatingException.toString());
-        assertContains(stringName,
-                       ex3.toString(),
-                       aggregatingException.toString());
+        assertThat(aggregatingException.toString(), containsString(ex1.toString()));
+        assertThat(aggregatingException.toString(), containsString(ex2.toString()));
+        assertThat(aggregatingException.toString(), containsString(ex3.toString()));
     }
 
     @Test

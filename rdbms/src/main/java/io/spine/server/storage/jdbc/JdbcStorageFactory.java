@@ -29,12 +29,10 @@ import io.spine.server.entity.Entity;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.projection.Projection;
 import io.spine.server.projection.ProjectionStorage;
-import io.spine.server.stand.StandStorage;
 import io.spine.server.storage.StorageFactory;
 import io.spine.server.storage.jdbc.aggregate.JdbcAggregateStorage;
 import io.spine.server.storage.jdbc.projection.JdbcProjectionStorage;
 import io.spine.server.storage.jdbc.record.JdbcRecordStorage;
-import io.spine.server.storage.jdbc.stand.JdbcStandStorage;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
 
@@ -86,15 +84,6 @@ public class JdbcStorageFactory implements StorageFactory {
     @Override
     public boolean isMultitenant() {
         return multitenant;
-    }
-
-    @Override
-    public StandStorage createStandStorage() {
-        return JdbcStandStorage.newBuilder()
-                               .setDataSource(dataSource)
-                               .setMultitenant(isMultitenant())
-                               .setTypeMapping(typeMapping)
-                               .build();
     }
 
     @Override

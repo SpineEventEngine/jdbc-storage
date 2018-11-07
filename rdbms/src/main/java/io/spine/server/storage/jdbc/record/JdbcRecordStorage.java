@@ -27,6 +27,8 @@ import io.spine.base.Identifier;
 import io.spine.client.EntityFilters;
 import io.spine.client.EntityId;
 import io.spine.client.EntityIdFilter;
+import io.spine.client.OrderBy;
+import io.spine.client.Pagination;
 import io.spine.server.entity.Entity;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.EntityWithLifecycle;
@@ -165,9 +167,11 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     private EntityQuery<I> emptyQuery() {
         EntityQuery<I> query = EntityQueries.from(
                 EntityFilters.getDefaultInstance(),
+                OrderBy.getDefaultInstance(),
+                Pagination.getDefaultInstance(),
                 getThis());
         if (EntityWithLifecycle.class.isAssignableFrom(entityClass)) {
-            query = query.withLifecycleFlags(getThis());
+            query = query.withActiveLifecycle(getThis());
         }
         return query;
     }
@@ -182,7 +186,10 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
         EntityFilters entityFilters = EntityFilters.newBuilder()
                                                    .setIdFilter(idFilter)
                                                    .build();
-        return EntityQueries.from(entityFilters, getThis());
+        return EntityQueries.from(entityFilters,
+                                  OrderBy.getDefaultInstance(),
+                                  Pagination.getDefaultInstance(),
+                                  getThis());
     }
 
     private RecordStorage<I> getThis() {

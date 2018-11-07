@@ -23,7 +23,6 @@ package io.spine.server.storage.jdbc;
 import io.spine.server.aggregate.AggregateStorage;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.projection.ProjectionStorage;
-import io.spine.server.stand.StandStorage;
 import io.spine.server.storage.RecordStorage;
 import io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.TestAggregate;
 import io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.TestEntity;
@@ -133,27 +132,6 @@ class JdbcStorageFactoryTest {
             JdbcStorageFactory factory = newFactory(false);
             ProjectionStorage<String> storage =
                     factory.createProjectionStorage(TestProjection.class);
-            assertFalse(storage.isMultitenant());
-        }
-    }
-
-    @Nested
-    @DisplayName("create stand storage")
-    class CreateStandStorage {
-
-        @Test
-        @DisplayName("which is multitenant")
-        void multitenant() {
-            JdbcStorageFactory factory = newFactory(true);
-            StandStorage storage = factory.createStandStorage();
-            assertTrue(storage.isMultitenant());
-        }
-
-        @Test
-        @DisplayName("which is single tenant")
-        void singleTenant() {
-            JdbcStorageFactory factory = newFactory(false);
-            StandStorage storage = factory.createStandStorage();
             assertFalse(storage.isMultitenant());
         }
     }

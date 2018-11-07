@@ -27,8 +27,6 @@ import io.spine.protobuf.AnyPacker;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.FieldMasks;
 import io.spine.server.storage.jdbc.query.MessageDbIterator;
-import io.spine.type.TypeUrl;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.sql.ResultSet;
 import java.util.Iterator;
@@ -38,7 +36,6 @@ import java.util.function.Function;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static io.spine.server.storage.jdbc.record.RecordTable.StandardColumn.ENTITY;
-import static io.spine.type.TypeUrl.from;
 import static java.util.Spliterators.spliteratorUnknownSize;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.StreamSupport.stream;
@@ -76,8 +73,7 @@ final class QueryResults {
 
     private static Any maskFieldsOfState(EntityRecord record, FieldMask fieldMask) {
         Message message = AnyPacker.unpack(record.getState());
-        TypeUrl typeUrl = from(message.getDescriptorForType());
-        Message result = FieldMasks.applyMask(fieldMask, message, typeUrl);
+        Message result = FieldMasks.applyMask(fieldMask, message);
         return AnyPacker.pack(result);
     }
 
