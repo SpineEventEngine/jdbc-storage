@@ -47,9 +47,10 @@ class MultipleExceptionsOnCloseTest {
         MultipleExceptionsOnClose aggregatingException =
                 new MultipleExceptionsOnClose(newArrayList(ex1, ex2, ex3));
 
-        assertThat(aggregatingException.toString(), containsString(ex1.toString()));
-        assertThat(aggregatingException.toString(), containsString(ex2.toString()));
-        assertThat(aggregatingException.toString(), containsString(ex3.toString()));
+        String exceptionsDescription = aggregatingException.toString();
+        assertThat(exceptionsDescription, containsString(ex1.toString()));
+        assertThat(exceptionsDescription, containsString(ex2.toString()));
+        assertThat(exceptionsDescription, containsString(ex3.toString()));
     }
 
     @Test
