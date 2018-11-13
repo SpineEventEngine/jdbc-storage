@@ -31,7 +31,6 @@ import io.spine.server.storage.jdbc.query.PairedValue;
 
 import java.sql.ResultSet;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.function.Function;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -64,6 +63,8 @@ final class QueryResults {
      *         the type of the queried entity ID
      * @param fieldMask
      *         the {@code FieldMask} to apply to the results
+     * @param <I>
+     *         the compile-time type of the queried entity ID
      * @return an {@code Iterator} over the query results
      * @see RecordTable
      */
