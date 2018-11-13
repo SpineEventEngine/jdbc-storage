@@ -18,14 +18,42 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+package io.spine.server.storage.jdbc.query;
+
+import io.spine.server.entity.EntityRecord;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
- * The JDBC-based implementation of the {@link io.spine.server.stand.StandStorage StandStorage}.
+ * A combination of the {@link EntityRecord} and its ID for iterating over the SQL query response.
+ *
+ * @param <I>
+ *         the ID type
  */
+public final class EntityRecordWithId<I> {
 
-@CheckReturnValue
-@ParametersAreNonnullByDefault
-package io.spine.server.storage.jdbc.stand;
+    private final I id;
+    private final EntityRecord record;
 
-import com.google.errorprone.annotations.CheckReturnValue;
+    private EntityRecordWithId(I id, EntityRecord record) {
+        this.id = id;
+        this.record = record;
+    }
 
-import javax.annotation.ParametersAreNonnullByDefault;
+    /**
+     * Creates a new {@code EntityRecordWithId} instance.
+     */
+    public static <I> EntityRecordWithId<I> of(I id, EntityRecord record) {
+        checkNotNull(id);
+        checkNotNull(record);
+        return new EntityRecordWithId<>(id, record);
+    }
+
+    public I id() {
+        return id;
+    }
+
+    public EntityRecord record() {
+        return record;
+    }
+}

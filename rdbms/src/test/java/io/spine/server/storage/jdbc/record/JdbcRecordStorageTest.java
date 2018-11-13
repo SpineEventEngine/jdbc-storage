@@ -25,6 +25,8 @@ import com.google.protobuf.Message;
 import io.spine.client.ColumnFilter;
 import io.spine.client.CompositeColumnFilter;
 import io.spine.client.EntityFilters;
+import io.spine.client.OrderBy;
+import io.spine.client.Pagination;
 import io.spine.server.entity.Entity;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
@@ -124,7 +126,10 @@ class JdbcRecordStorageTest extends RecordStorageTest<JdbcRecordStorage<ProjectI
         EntityFilters entityFilters = EntityFilters.newBuilder()
                                                    .addFilter(columnFilter)
                                                    .build();
-        EntityQuery<ProjectId> query = EntityQueries.from(entityFilters, storage);
+        EntityQuery<ProjectId> query = EntityQueries.from(entityFilters,
+                                                          OrderBy.getDefaultInstance(),
+                                                          Pagination.getDefaultInstance(),
+                                                          storage);
         storage.readAll(query, FieldMask.getDefaultInstance());
         close(storage);
     }

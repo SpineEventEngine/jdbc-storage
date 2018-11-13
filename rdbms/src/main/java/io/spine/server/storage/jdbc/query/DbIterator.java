@@ -22,6 +22,7 @@ package io.spine.server.storage.jdbc.query;
 
 import com.google.common.annotations.VisibleForTesting;
 import io.spine.annotation.Internal;
+import io.spine.server.entity.EntityRecord;
 import io.spine.server.storage.jdbc.DatabaseException;
 
 import java.io.Closeable;
@@ -31,6 +32,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * An iterator over a {@link ResultSet} of storage records.
@@ -42,27 +45,64 @@ import java.util.NoSuchElementException;
  *
  * <p><b>NOTE:</b> {@code remove} operation is not supported.
  *
- * @param <R> type of storage records
+ * @param <R>
+ *         the type of storage records
  * @author Alexander Litus
  */
 @Internal
 public abstract class DbIterator<R> implements Iterator<R>, Closeable {
 
     private final ResultSet resultSet;
-    private final String columnName;
     private boolean hasNextCalled = false;
     private boolean nextCalled = true;
     private boolean memoizedHasNext = false;
 
-    /**
-     * Creates a new iterator instance.
-     *
-     * @param resultSet  the results of a DB query to iterate over
-     * @param columnName a name of a serialized storage record column
-     */
-    protected DbIterator(ResultSet resultSet, String columnName) {
+    private DbIterator(ResultSet resultSet) {
         this.resultSet = resultSet;
-        this.columnName = columnName;
+    }
+
+    /**
+     * Creates a {@code DbIterator} over the given {@code ResultSet}.
+     *
+     * @param resultSet
+     *         the results of a DB query to iterate over
+     * @param columnReader
+     *         the column reader which extracts the required column values from the result set
+     * @param <R>
+     *         the type of storage records
+     * @return a new instance of {@code DbIterator}
+     */
+    public static <R> DbIterator<R> createFor(ResultSet resultSet, ColumnReader<R> columnReader) {
+        checkNotNull(resultSet);
+        checkNotNull(columnReader);
+        return new SingleColumnIterator<>(resultSet, columnReader);
+    }
+
+    /**
+     * Creates a {@code DbIterator} for the simultaneous iteration over the column records and
+     * their IDs in the {@code ResultSet}.
+     *
+     * <p>The result of the simultaneous value extraction performed by the column readers is
+     * represented as {@link EntityRecordWithId}.
+     *
+     * @param resultSet
+     *         the results of a DB query to iterate over
+     * @param idColumnReader
+     *         the reader of the ID column
+     * @param recordColumnReader
+     *         the reader of the column storing entity records
+     * @param <I>
+     *         the type of the storage record IDs
+     * @return a new instance of {@code DbIterator}
+     */
+    public static <I> DbIterator<EntityRecordWithId<I>>
+    createFor(ResultSet resultSet,
+              ColumnReader<I> idColumnReader,
+              ColumnReader<EntityRecord> recordColumnReader) {
+        checkNotNull(resultSet);
+        checkNotNull(idColumnReader);
+        checkNotNull(recordColumnReader);
+        return new RecordWithIdIterator<>(resultSet, idColumnReader, recordColumnReader);
     }
 
     /**
@@ -117,12 +157,8 @@ public abstract class DbIterator<R> implements Iterator<R>, Closeable {
     protected abstract R readResult() throws SQLException;
 
     @VisibleForTesting
-    public ResultSet getResultSet() {
+    public ResultSet resultSet() {
         return resultSet;
-    }
-
-    protected String getColumnName() {
-        return columnName;
     }
 
     /**
@@ -171,5 +207,74 @@ public abstract class DbIterator<R> implements Iterator<R>, Closeable {
 
     private static NoSuchElementException noSuchElement() {
         throw new NoSuchElementException("No elements remained.");
+    }
+
+    /**
+     * A {@code DbIterator} that iterates over a single column in the given {@code ResultSet}.
+     *
+     * @param <R>
+     *         the type of the storage records
+     */
+    private static class SingleColumnIterator<R> extends DbIterator<R> {
+
+        private final ColumnReader<R> columnReader;
+
+        /**
+         * Creates a new instance of the {@code SingleColumnIterator}.
+         *
+         * @param resultSet
+         *         the SQL query results to iterate over
+         * @param columnReader
+         *         the column reader which extracts column values from the {@code ResultSet}
+         */
+        private SingleColumnIterator(ResultSet resultSet, ColumnReader<R> columnReader) {
+            super(resultSet);
+            this.columnReader = columnReader;
+        }
+
+        @Override
+        protected R readResult() throws SQLException {
+            R result = columnReader.readValue(resultSet());
+            return result;
+        }
+    }
+
+    /**
+     * A {@code DbIterator} which simultaneously iterates over the records and their IDs in the
+     * {@code ResultSet}.
+     *
+     * @param <I>
+     *         the type of the record IDs
+     */
+    private static class RecordWithIdIterator<I> extends DbIterator<EntityRecordWithId<I>> {
+
+        private final ColumnReader<I> idColumnReader;
+        private final ColumnReader<EntityRecord> recordColumnReader;
+
+        /**
+         * Creates a new instance of the {@code RecordWithIdIterator}.
+         *
+         * @param resultSet
+         *         the SQL query results to iterate over
+         * @param idColumnReader
+         *         the reader of the ID column values
+         * @param recordColumnReader
+         *         the reader of the column storing entity records
+         */
+        private RecordWithIdIterator(ResultSet resultSet,
+                                     ColumnReader<I> idColumnReader,
+                                     ColumnReader<EntityRecord> recordColumnReader) {
+            super(resultSet);
+            this.idColumnReader = idColumnReader;
+            this.recordColumnReader = recordColumnReader;
+        }
+
+        @Override
+        protected EntityRecordWithId<I> readResult() throws SQLException {
+            I id = idColumnReader.readValue(resultSet());
+            EntityRecord record = recordColumnReader.readValue(resultSet());
+            EntityRecordWithId<I> result = EntityRecordWithId.of(id, record);
+            return result;
+        }
     }
 }

@@ -18,10 +18,28 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-final def SPINE_VERSION = '0.10.80-SNAPSHOT'
+package io.spine.server.storage.jdbc.query;
 
-ext {
-    versionToPublish = SPINE_VERSION
-    spineBaseVersion = '0.10.56-SNAPSHOT'
-    spineCoreVersion = '0.10.80-SNAPSHOT'
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
+/**
+ * The reader for the columns which store strings.
+ *
+ * <p>The read result will also be a {@code String}.
+ */
+final class StringColumnReader extends ColumnReader<String> {
+
+    StringColumnReader(String columnName) {
+        super(columnName);
+    }
+
+    @Override
+    public String readValue(ResultSet resultSet) throws SQLException {
+        checkNotNull(resultSet);
+        String result = resultSet.getString(columnName());
+        return result;
+    }
 }

@@ -26,22 +26,20 @@ import com.google.protobuf.Message;
 import io.spine.protobuf.AnyPacker;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.FieldMasks;
-import io.spine.server.storage.jdbc.query.MessageDbIterator;
-import io.spine.type.TypeUrl;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import io.spine.server.storage.jdbc.query.ColumnReader;
+import io.spine.server.storage.jdbc.query.DbIterator;
+import io.spine.server.storage.jdbc.query.EntityRecordWithId;
 
 import java.sql.ResultSet;
 import java.util.Iterator;
-import java.util.Map;
-import java.util.Spliterator;
 import java.util.function.Function;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.Streams.stream;
+import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.idReader;
+import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.messageReader;
 import static io.spine.server.storage.jdbc.record.RecordTable.StandardColumn.ENTITY;
-import static io.spine.type.TypeUrl.from;
-import static java.util.Spliterators.spliteratorUnknownSize;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.StreamSupport.stream;
+import static io.spine.server.storage.jdbc.record.RecordTable.StandardColumn.ID;
 
 /**
  * Utility class for parsing the results of a DB query ({@link ResultSet}) into the
@@ -51,44 +49,58 @@ import static java.util.stream.StreamSupport.stream;
  */
 final class QueryResults {
 
+    /** Prevents the utility class instantiation. */
     private QueryResults() {
-        // Prevent utility class instantiation.
     }
 
     /**
-     * Transforms results of SQL query results into ID-to-{@link EntityRecord} {@link Map}.
+     * Creates an {@code Iterator} over the results of the SQL query.
      *
-     * @param resultSet Results of the query
-     * @param fieldMask {@code FieldMask} to apply to the results
-     * @return ID-to-{@link EntityRecord} {@link Map} representing the query results
+     * <p>The results are represented as {@link EntityRecordWithId}.
+     *
+     * @param resultSet
+     *         the result of the query
+     * @param idType
+     *         the type of the queried entity ID
+     * @param fieldMask
+     *         the {@code FieldMask} to apply to the results
+     * @param <I>
+     *         the compile-time type of the queried entity ID
+     * @return an {@code Iterator} over the query results
      * @see RecordTable
      */
-    static Iterator<EntityRecord> parse(ResultSet resultSet, FieldMask fieldMask) {
-        Iterator<EntityRecord> recordIterator =
-                new MessageDbIterator<>(resultSet, ENTITY.name(), EntityRecord.getDescriptor());
-        Spliterator<EntityRecord> recordSpliterator = spliteratorUnknownSize(recordIterator, 0);
-        Iterator<EntityRecord> result = stream(recordSpliterator, false)
+    static <I> Iterator<EntityRecordWithId<I>>
+    parse(ResultSet resultSet, Class<I> idType, FieldMask fieldMask) {
+        ColumnReader<I> idColumnReader = idReader(ID.name(), idType);
+        ColumnReader<EntityRecord> recordColumnReader =
+                messageReader(ENTITY.name(), EntityRecord.getDescriptor());
+        Iterator<EntityRecordWithId<I>> dbIterator = DbIterator.createFor(
+                resultSet,
+                idColumnReader,
+                recordColumnReader
+        );
+        Iterator<EntityRecordWithId<I>> result = stream(dbIterator)
                 .map(maskFields(fieldMask))
-                .collect(toList())
                 .iterator();
         return result;
     }
 
-    private static Any maskFieldsOfState(EntityRecord record, FieldMask fieldMask) {
-        Message message = AnyPacker.unpack(record.getState());
-        TypeUrl typeUrl = from(message.getDescriptorForType());
-        Message result = FieldMasks.applyMask(fieldMask, message, typeUrl);
-        return AnyPacker.pack(result);
-    }
-
-    private static Function<EntityRecord, EntityRecord> maskFields(FieldMask fieldMask) {
-        return entityRecord -> {
-            checkNotNull(entityRecord);
-            Any maskedState = maskFieldsOfState(entityRecord, fieldMask);
-            EntityRecord result = entityRecord.toBuilder()
+    private static <I> Function<EntityRecordWithId<I>, EntityRecordWithId<I>>
+    maskFields(FieldMask fieldMask) {
+        return value -> {
+            checkNotNull(value);
+            EntityRecord record = value.record();
+            Any maskedState = maskFieldsOfState(record, fieldMask);
+            EntityRecord maskedRecord = record.toBuilder()
                                               .setState(maskedState)
                                               .build();
-            return result;
+            return EntityRecordWithId.of(value.id(), maskedRecord);
         };
+    }
+
+    private static Any maskFieldsOfState(EntityRecord record, FieldMask fieldMask) {
+        Message message = AnyPacker.unpack(record.getState());
+        Message result = FieldMasks.applyMask(fieldMask, message);
+        return AnyPacker.pack(result);
     }
 }

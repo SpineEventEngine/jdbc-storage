@@ -20,35 +20,44 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Message;
-import io.spine.annotation.Internal;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static io.spine.server.storage.jdbc.query.Serializer.deserialize;
+import static io.spine.json.Json.fromJson;
 
 /**
- * An iterator over the message records of a table.
+ * The reader for the columns which store {@link Message} values in JSON format.
  *
- * @author Dmytro Dashenkov
+ * <p>The result of the read operation is always a Protobuf {@link Message}.
+ *
+ * @param <M>
+ * @see io.spine.json.Json
  */
-@Internal
-public class MessageDbIterator<M extends Message> extends DbIterator<M> {
+final class MessageColumnReader<M extends Message> extends ColumnReader<M> {
 
-    private final Descriptor messageDescriptor;
+    private final Class<M> messageClass;
 
-    public MessageDbIterator(ResultSet resultSet, String columnName, Descriptor messageDescriptor) {
-        super(resultSet, columnName);
-        this.messageDescriptor = checkNotNull(messageDescriptor);
+    /**
+     * Creates a new {@code MessageColumnReader} instance.
+     *
+     * @param columnName
+     *         the name of the column to read
+     * @param messageClass
+     *         the type of messages stored in the column
+     */
+    MessageColumnReader(String columnName, Class<M> messageClass) {
+        super(columnName);
+        this.messageClass = messageClass;
     }
 
     @Override
-    protected M readResult() throws SQLException {
-        byte[] bytes = getResultSet().getBytes(getColumnName());
-        M result = deserialize(bytes, messageDescriptor);
+    public M readValue(ResultSet resultSet) throws SQLException {
+        checkNotNull(resultSet);
+        String messageJson = resultSet.getString(columnName());
+        M result = fromJson(messageJson, messageClass);
         return result;
     }
 }

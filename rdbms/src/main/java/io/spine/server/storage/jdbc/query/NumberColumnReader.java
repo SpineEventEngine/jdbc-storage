@@ -18,14 +18,28 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+package io.spine.server.storage.jdbc.query;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
- * Test environment classes for tests of the {@link io.spine.server.storage.jdbc.stand} package.
+ * The reader for the columns which store {@link Integer} or {@link Long} entries.
+ *
+ * <p>The read result will be the {@link Number}.
  */
+final class NumberColumnReader extends ColumnReader<Number> {
 
-@CheckReturnValue
-@ParametersAreNonnullByDefault
-package io.spine.server.storage.jdbc.stand.given;
+    NumberColumnReader(String columnName) {
+        super(columnName);
+    }
 
-import com.google.errorprone.annotations.CheckReturnValue;
-
-import javax.annotation.ParametersAreNonnullByDefault;
+    @Override
+    public Number readValue(ResultSet resultSet) throws SQLException {
+        checkNotNull(resultSet);
+        Number result = resultSet.getLong(columnName());
+        return result;
+    }
+}

@@ -32,6 +32,7 @@ import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.Type;
 import io.spine.server.storage.jdbc.TypeMapping;
+import io.spine.server.storage.jdbc.query.EntityRecordWithId;
 import io.spine.server.storage.jdbc.query.EntityTable;
 import io.spine.server.storage.jdbc.query.SelectQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
@@ -48,6 +49,7 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Lists.newLinkedList;
+import static com.google.common.collect.Streams.stream;
 import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
 import static java.util.Collections.addAll;
 
@@ -144,7 +146,37 @@ class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumn
         }
     }
 
+    /**
+     * Executes an {@code EntityQuery} and returns an {@link EntityRecord} or {@code null} for each
+     * of the designated IDs.
+     *
+     * <p>The resulting {@code Iterator} is guaranteed to have the same number of entries as the
+     * number of IDs in the {@code EntityQuery}.
+     *
+     * <p>The resulting record fields are masked by the given {@code FieldMask}.
+     */
+    Iterator<EntityRecord> readByIds(EntityQuery<I> entityQuery, FieldMask fieldMask) {
+        Iterator<EntityRecordWithId<I>> response = executeQuery(entityQuery, fieldMask);
+        Iterator<EntityRecord> records = extractRecordsForIds(entityQuery.getIds(), response);
+        return records;
+    }
+
+    /**
+     * Executes an {@code EntityQuery} and returns all records that match.
+     *
+     * <p>The resulting record fields are masked by the given {@code FieldMask}.
+     *
+     * <p>This method is more effective performance-wise than its
+     * {@link #readByIds(EntityQuery, FieldMask)} counterpart.
+     */
     Iterator<EntityRecord> readByQuery(EntityQuery<I> entityQuery, FieldMask fieldMask) {
+        Iterator<EntityRecordWithId<I>> response = executeQuery(entityQuery, fieldMask);
+        Iterator<EntityRecord> records = extractRecords(response);
+        return records;
+    }
+
+    private Iterator<EntityRecordWithId<I>>
+    executeQuery(EntityQuery<I> entityQuery, FieldMask fieldMask) {
         SelectByEntityColumnsQuery.Builder<I> builder = SelectByEntityColumnsQuery.newBuilder();
         SelectByEntityColumnsQuery<I> query = builder.setDataSource(getDataSource())
                                                      .setTableName(getName())
@@ -153,7 +185,27 @@ class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumn
                                                      .setEntityQuery(entityQuery)
                                                      .setFieldMask(fieldMask)
                                                      .build();
-        Iterator<EntityRecord> result = query.execute();
+        Iterator<EntityRecordWithId<I>> queryResult = query.execute();
+        return queryResult;
+    }
+
+    private Iterator<EntityRecord>
+    extractRecordsForIds(Iterable<I> ids, Iterator<EntityRecordWithId<I>> queryResponse) {
+        Map<I, EntityRecord> presentRecords = new HashMap<>();
+        queryResponse.forEachRemaining(
+                record -> presentRecords.put(record.id(), record.record())
+        );
+        Iterator<EntityRecord> result = stream(ids)
+                .map(presentRecords::get)
+                .iterator();
+        return result;
+    }
+
+    private Iterator<EntityRecord>
+    extractRecords(Iterator<EntityRecordWithId<I>> queryResponse) {
+        Iterator<EntityRecord> result = stream(queryResponse)
+                .map(EntityRecordWithId::record)
+                .iterator();
         return result;
     }
 

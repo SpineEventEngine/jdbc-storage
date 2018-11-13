@@ -22,7 +22,7 @@ package io.spine.server.storage.jdbc.aggregate;
 
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateStorage;
-import io.spine.server.aggregate.AggregateStorageVisibilityHandlingTest;
+import io.spine.server.aggregate.AggregateStorageLifecycleFlagsHandlingTest;
 import io.spine.server.entity.LifecycleFlags;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.GivenDataSource;
@@ -43,7 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 @DisplayName("JdbcAggregateStorage, when saving aggregate with lifecycle flags, should")
 class JdbcAggregateStorageVisibilityHandlingTest
-        extends AggregateStorageVisibilityHandlingTest {
+        extends AggregateStorageLifecycleFlagsHandlingTest {
 
     @Override
     protected AggregateStorage<ProjectId> getAggregateStorage(

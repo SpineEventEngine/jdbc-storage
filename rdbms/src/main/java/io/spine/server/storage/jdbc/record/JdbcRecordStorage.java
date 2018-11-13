@@ -27,9 +27,10 @@ import io.spine.base.Identifier;
 import io.spine.client.EntityFilters;
 import io.spine.client.EntityId;
 import io.spine.client.EntityIdFilter;
+import io.spine.client.OrderBy;
+import io.spine.client.Pagination;
 import io.spine.server.entity.Entity;
 import io.spine.server.entity.EntityRecord;
-import io.spine.server.entity.EntityWithLifecycle;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.entity.storage.EntityColumn;
 import io.spine.server.entity.storage.EntityQueries;
@@ -65,7 +66,6 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
 
     private final DataSourceWrapper dataSource;
     private final RecordTable<I> table;
-    private final Class<? extends Entity<I, ?>> entityClass;
 
     /**
      * Creates a new instance using the builder.
@@ -75,7 +75,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     protected JdbcRecordStorage(Builder<I> builder) throws DatabaseException {
         super(builder.isMultitenant(), builder.getEntityClass());
         this.dataSource = builder.getDataSource();
-        this.entityClass = builder.getEntityClass();
+        Class<? extends Entity<I, ?>> entityClass = builder.getEntityClass();
         Collection<EntityColumn> entityColumns = entityColumnCache().getColumns();
         this.table = new RecordTable<>(entityClass, dataSource, builder.getColumnTypeRegistry(),
                                        builder.getTypeMapping(), entityColumns);
@@ -112,9 +112,10 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     }
 
     @Override
-    protected Iterator<EntityRecord> readMultipleRecords(Iterable<I> ids,
-                                                         FieldMask fieldMask) {
-        Iterator<EntityRecord> records = table.readByQuery(toQuery(ids), fieldMask);
+    protected Iterator<@Nullable EntityRecord> readMultipleRecords(Iterable<I> ids,
+                                                                   FieldMask fieldMask) {
+        EntityQuery<I> query = toQuery(ids);
+        Iterator<EntityRecord> records = table.readByIds(query, fieldMask);
         return records;
     }
 
@@ -131,7 +132,8 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
 
     @Override
     protected Iterator<EntityRecord> readAllRecords(EntityQuery<I> query, FieldMask fieldMask) {
-        Iterator<EntityRecord> records = table.readByQuery(query, fieldMask);
+        EntityQuery<I> completeQuery = appendLifecycleFilters(query);
+        Iterator<EntityRecord> records = table.readByQuery(completeQuery, fieldMask);
         return records;
     }
 
@@ -165,14 +167,14 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     private EntityQuery<I> emptyQuery() {
         EntityQuery<I> query = EntityQueries.from(
                 EntityFilters.getDefaultInstance(),
+                OrderBy.getDefaultInstance(),
+                Pagination.getDefaultInstance(),
                 getThis());
-        if (EntityWithLifecycle.class.isAssignableFrom(entityClass)) {
-            query = query.withLifecycleFlags(getThis());
-        }
-        return query;
+        EntityQuery<I> result = appendLifecycleFilters(query);
+        return result;
     }
 
-    private EntityQuery<I> toQuery(Iterable<? extends I> ids) {
+    private EntityQuery<I> toQuery(Iterable<I> ids) {
         Iterable<EntityId> entityIds = stream(ids.spliterator(), false)
                 .map(AggregateStateIdToEntityId.INSTANCE)
                 .collect(toList());
@@ -182,7 +184,19 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
         EntityFilters entityFilters = EntityFilters.newBuilder()
                                                    .setIdFilter(idFilter)
                                                    .build();
-        return EntityQueries.from(entityFilters, getThis());
+        EntityQuery<I> query = EntityQueries.from(entityFilters,
+                                                  OrderBy.getDefaultInstance(),
+                                                  Pagination.getDefaultInstance(),
+                                                  getThis());
+        EntityQuery<I> result = appendLifecycleFilters(query);
+        return result;
+    }
+
+    private EntityQuery<I> appendLifecycleFilters(EntityQuery<I> query) {
+        if (isLifecycleSupported() && !query.isLifecycleAttributesSet()) {
+            return query.withActiveLifecycle(this);
+        }
+        return query;
     }
 
     private RecordStorage<I> getThis() {
