@@ -54,12 +54,17 @@ final class QueryResults {
     }
 
     /**
-     * Transforms results of SQL query results into ID-to-{@link EntityRecord} {@link Map}.
+     * Creates an {@code Iterator} over the results of the SQL query.
      *
-     * @param resultSet Results of the query
+     * <p>The results are represented as ID-to-{@code EntityRecord} {@link PairedValue}.
+     *
+     * @param resultSet
+     *         the result of the query
      * @param idType
-     * @param fieldMask {@code FieldMask} to apply to the results
-     * @return ID-to-{@link EntityRecord} {@link Map} representing the query results
+     *         the type of the queried entity ID
+     * @param fieldMask
+     *         the {@code FieldMask} to apply to the results
+     * @return an {@code Iterator} over the query results
      * @see RecordTable
      */
     static <I> Iterator<PairedValue<I, EntityRecord>>

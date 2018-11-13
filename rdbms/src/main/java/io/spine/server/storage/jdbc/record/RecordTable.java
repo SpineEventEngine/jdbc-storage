@@ -39,7 +39,6 @@ import io.spine.server.storage.jdbc.query.WriteQuery;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -147,15 +146,32 @@ class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumn
         }
     }
 
+    /**
+     * Executes an {@code EntityQuery} and returns an {@link EntityRecord} or {@code null} for each
+     * of the designated IDs.
+     *
+     * <p>The resulting {@code Iterator} is guaranteed to have the same number of entries as the
+     * number of IDs in {@code EntityQuery}.
+     *
+     * <p>The resulting record fields are masked by the given {@code FieldMask}.
+     */
     Iterator<EntityRecord> readByIds(EntityQuery<I> entityQuery, FieldMask fieldMask) {
         Iterator<PairedValue<I, EntityRecord>> response = executeQuery(entityQuery, fieldMask);
-        Iterator<EntityRecord> records = getRecordsForIds(entityQuery.getIds(), response);
+        Iterator<EntityRecord> records = extractRecordsForIds(entityQuery.getIds(), response);
         return records;
     }
 
+    /**
+     * Executes an {@code EntityQuery} and returns all records that match.
+     *
+     * <p>The resulting record fields are masked by the given {@code FieldMask}.
+     *
+     * <p>This method is more effective performance-wise than its
+     * {@link #readByIds(EntityQuery, FieldMask)} counterpart.
+     */
     Iterator<EntityRecord> readByQuery(EntityQuery<I> entityQuery, FieldMask fieldMask) {
         Iterator<PairedValue<I, EntityRecord>> response = executeQuery(entityQuery, fieldMask);
-        Iterator<EntityRecord> records = getPresentRecords(response);
+        Iterator<EntityRecord> records = extractRecords(response);
         return records;
     }
 
@@ -174,7 +190,7 @@ class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumn
     }
 
     private Iterator<EntityRecord>
-    getRecordsForIds(Iterable<I> ids, Iterator<PairedValue<I, EntityRecord>> queryResponse) {
+    extractRecordsForIds(Iterable<I> ids, Iterator<PairedValue<I, EntityRecord>> queryResponse) {
         Map<I, EntityRecord> presentRecords = new HashMap<>();
         queryResponse.forEachRemaining(
                 record -> presentRecords.put(record.aValue(), record.bValue())
@@ -186,7 +202,7 @@ class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumn
     }
 
     private Iterator<EntityRecord>
-    getPresentRecords(Iterator<PairedValue<I, EntityRecord>> queryResponse) {
+    extractRecords(Iterator<PairedValue<I, EntityRecord>> queryResponse) {
         Iterator<EntityRecord> result = stream(queryResponse)
                 .map(PairedValue::bValue)
                 .iterator();
