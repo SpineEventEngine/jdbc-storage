@@ -24,12 +24,11 @@ import com.google.protobuf.FieldMask;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.sql.AbstractSQLQuery;
-import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.entity.storage.EntityQuery;
 import io.spine.server.storage.jdbc.query.AbstractQuery;
+import io.spine.server.storage.jdbc.query.EntityRecordWithId;
 import io.spine.server.storage.jdbc.query.IdColumn;
-import io.spine.server.storage.jdbc.query.PairedValue;
 import io.spine.server.storage.jdbc.query.SelectQuery;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
 
@@ -50,7 +49,7 @@ import static io.spine.server.storage.jdbc.record.RecordTable.StandardColumn.ID;
  * @author Dmytro Grankin
  */
 final class SelectByEntityColumnsQuery<I> extends AbstractQuery
-        implements SelectQuery<Iterator<PairedValue<I, EntityRecord>>> {
+        implements SelectQuery<Iterator<EntityRecordWithId<I>>> {
 
     private final EntityQuery<I> entityQuery;
     private final FieldMask fieldMask;
@@ -66,7 +65,7 @@ final class SelectByEntityColumnsQuery<I> extends AbstractQuery
     }
 
     @Override
-    public Iterator<PairedValue<I, EntityRecord>> execute() {
+    public Iterator<EntityRecordWithId<I>> execute() {
         Predicate inIds = inIds(idColumn, entityQuery.getIds());
         Predicate matchParameters = matchParameters(entityQuery.getParameters(),
                                                     columnTypeRegistry);

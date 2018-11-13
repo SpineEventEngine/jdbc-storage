@@ -20,42 +20,40 @@
 
 package io.spine.server.storage.jdbc.query;
 
+import io.spine.server.entity.EntityRecord;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A combination of two values for iterating over the SQL query results.
+ * A combination of {@link EntityRecord} and its ID for iterating over the SQL query response.
  *
- * <p>Nulls are not accepted as values for the usage convenience.
- *
- * @param <A>
- *         the first value type
- * @param <B>
- *         the second value type
+ * @param <I>
+ *         the ID type
  */
-public final class PairedValue<A, B> {
+public final class EntityRecordWithId<I> {
 
-    private final A aValue;
-    private final B bValue;
+    private final I id;
+    private final EntityRecord record;
 
-    private PairedValue(A aValue, B bValue) {
-        this.aValue = aValue;
-        this.bValue = bValue;
+    private EntityRecordWithId(I id, EntityRecord record) {
+        this.id = id;
+        this.record = record;
     }
 
     /**
-     * Creates a {@code PairedValue} instance for the two given values.
+     * Creates a new {@code EntityRecordWithId} instance.
      */
-    public static <A, B> PairedValue<A, B> of(A a, B b) {
-        checkNotNull(a);
-        checkNotNull(b);
-        return new PairedValue<>(a, b);
+    public static <I> EntityRecordWithId<I> of(I id, EntityRecord record) {
+        checkNotNull(id);
+        checkNotNull(record);
+        return new EntityRecordWithId<>(id, record);
     }
 
-    public A aValue() {
-        return aValue;
+    public I id() {
+        return id;
     }
 
-    public B bValue() {
-        return bValue;
+    public EntityRecord record() {
+        return record;
     }
 }

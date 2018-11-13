@@ -27,7 +27,7 @@ import io.spine.protobuf.AnyPacker;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.FieldMasks;
 import io.spine.server.storage.jdbc.query.DbIterator;
-import io.spine.server.storage.jdbc.query.PairedValue;
+import io.spine.server.storage.jdbc.query.EntityRecordWithId;
 
 import java.sql.ResultSet;
 import java.util.Iterator;
@@ -55,7 +55,7 @@ final class QueryResults {
     /**
      * Creates an {@code Iterator} over the results of the SQL query.
      *
-     * <p>The results are represented as ID-to-{@code EntityRecord} {@link PairedValue}.
+     * <p>The results are represented as {@link EntityRecordWithId}.
      *
      * @param resultSet
      *         the result of the query
@@ -68,29 +68,29 @@ final class QueryResults {
      * @return an {@code Iterator} over the query results
      * @see RecordTable
      */
-    static <I> Iterator<PairedValue<I, EntityRecord>>
+    static <I> Iterator<EntityRecordWithId<I>>
     parse(ResultSet resultSet, Class<I> idType, FieldMask fieldMask) {
-        Iterator<PairedValue<I, EntityRecord>> dbIterator = DbIterator.createFor(
+        Iterator<EntityRecordWithId<I>> dbIterator = DbIterator.createFor(
                 resultSet,
                 idColumn(ID.name(), idType),
                 messageColumn(ENTITY.name(), EntityRecord.getDescriptor())
         );
-        Iterator<PairedValue<I, EntityRecord>> result = stream(dbIterator)
+        Iterator<EntityRecordWithId<I>> result = stream(dbIterator)
                 .map(maskFields(fieldMask))
                 .iterator();
         return result;
     }
 
-    private static <I> Function<PairedValue<I, EntityRecord>, PairedValue<I, EntityRecord>>
+    private static <I> Function<EntityRecordWithId<I>, EntityRecordWithId<I>>
     maskFields(FieldMask fieldMask) {
         return value -> {
             checkNotNull(value);
-            EntityRecord record = value.bValue();
+            EntityRecord record = value.record();
             Any maskedState = maskFieldsOfState(record, fieldMask);
             EntityRecord maskedRecord = record.toBuilder()
                                               .setState(maskedState)
                                               .build();
-            return PairedValue.of(value.aValue(), maskedRecord);
+            return EntityRecordWithId.of(value.id(), maskedRecord);
         };
     }
 

@@ -32,8 +32,8 @@ import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.Type;
 import io.spine.server.storage.jdbc.TypeMapping;
+import io.spine.server.storage.jdbc.query.EntityRecordWithId;
 import io.spine.server.storage.jdbc.query.EntityTable;
-import io.spine.server.storage.jdbc.query.PairedValue;
 import io.spine.server.storage.jdbc.query.SelectQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
@@ -156,7 +156,7 @@ class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumn
      * <p>The resulting record fields are masked by the given {@code FieldMask}.
      */
     Iterator<EntityRecord> readByIds(EntityQuery<I> entityQuery, FieldMask fieldMask) {
-        Iterator<PairedValue<I, EntityRecord>> response = executeQuery(entityQuery, fieldMask);
+        Iterator<EntityRecordWithId<I>> response = executeQuery(entityQuery, fieldMask);
         Iterator<EntityRecord> records = extractRecordsForIds(entityQuery.getIds(), response);
         return records;
     }
@@ -170,12 +170,12 @@ class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumn
      * {@link #readByIds(EntityQuery, FieldMask)} counterpart.
      */
     Iterator<EntityRecord> readByQuery(EntityQuery<I> entityQuery, FieldMask fieldMask) {
-        Iterator<PairedValue<I, EntityRecord>> response = executeQuery(entityQuery, fieldMask);
+        Iterator<EntityRecordWithId<I>> response = executeQuery(entityQuery, fieldMask);
         Iterator<EntityRecord> records = extractRecords(response);
         return records;
     }
 
-    private Iterator<PairedValue<I, EntityRecord>>
+    private Iterator<EntityRecordWithId<I>>
     executeQuery(EntityQuery<I> entityQuery, FieldMask fieldMask) {
         SelectByEntityColumnsQuery.Builder<I> builder = SelectByEntityColumnsQuery.newBuilder();
         SelectByEntityColumnsQuery<I> query = builder.setDataSource(getDataSource())
@@ -185,15 +185,15 @@ class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumn
                                                      .setEntityQuery(entityQuery)
                                                      .setFieldMask(fieldMask)
                                                      .build();
-        Iterator<PairedValue<I, EntityRecord>> queryResult = query.execute();
+        Iterator<EntityRecordWithId<I>> queryResult = query.execute();
         return queryResult;
     }
 
     private Iterator<EntityRecord>
-    extractRecordsForIds(Iterable<I> ids, Iterator<PairedValue<I, EntityRecord>> queryResponse) {
+    extractRecordsForIds(Iterable<I> ids, Iterator<EntityRecordWithId<I>> queryResponse) {
         Map<I, EntityRecord> presentRecords = new HashMap<>();
         queryResponse.forEachRemaining(
-                record -> presentRecords.put(record.aValue(), record.bValue())
+                record -> presentRecords.put(record.id(), record.record())
         );
         Iterator<EntityRecord> result = stream(ids)
                 .map(presentRecords::get)
@@ -202,9 +202,9 @@ class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumn
     }
 
     private Iterator<EntityRecord>
-    extractRecords(Iterator<PairedValue<I, EntityRecord>> queryResponse) {
+    extractRecords(Iterator<EntityRecordWithId<I>> queryResponse) {
         Iterator<EntityRecord> result = stream(queryResponse)
-                .map(PairedValue::bValue)
+                .map(EntityRecordWithId::record)
                 .iterator();
         return result;
     }

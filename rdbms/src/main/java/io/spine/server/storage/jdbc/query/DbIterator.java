@@ -22,6 +22,7 @@ package io.spine.server.storage.jdbc.query;
 
 import com.google.common.annotations.VisibleForTesting;
 import io.spine.annotation.Internal;
+import io.spine.server.entity.EntityRecord;
 import io.spine.server.storage.jdbc.DatabaseException;
 
 import java.io.Closeable;
@@ -77,30 +78,30 @@ public abstract class DbIterator<R> implements Iterator<R>, Closeable {
     }
 
     /**
-     * Creates a {@code DbIterator} for the simultaneous iteration over two columns in the
-     * {@code ResultSet}.
+     * Creates a {@code DbIterator} for the simultaneous iteration over the column records and
+     * their IDs in the {@code ResultSet}.
      *
      * <p>The result of simultaneous value extraction performed by the column readers is
-     * represented as {@link PairedValue}.
+     * represented as {@link EntityRecordWithId}.
      *
      * @param resultSet
      *         the results of a DB query to iterate over
-     * @param columnReader1
-     *         the reader for the first of the columns
-     * @param columnReader2
-     *         the reader for the second of the columns
-     * @param <R1>
-     *         the type of the storage records of the first column
-     * @param <R2>
-     *         the type of the storage records of the second column
-     * @return a new instance of {@code DbIterator} for iterating over two columns
+     * @param idReader
+     *         the reader of the ID column
+     * @param recordReader
+     *         the reader of the column storing entity records
+     * @param <I>
+     *         the type of the storage record IDs
+     * @return a new instance of {@code DbIterator}
      */
-    public static <R1, R2> DbIterator<PairedValue<R1, R2>>
-    createFor(ResultSet resultSet, ColumnReader<R1> columnReader1, ColumnReader<R2> columnReader2) {
+    public static <I> DbIterator<EntityRecordWithId<I>>
+    createFor(ResultSet resultSet,
+              ColumnReader<I> idReader,
+              ColumnReader<EntityRecord> recordReader) {
         checkNotNull(resultSet);
-        checkNotNull(columnReader1);
-        checkNotNull(columnReader2);
-        return new PairedColumnIterator<>(resultSet, columnReader1, columnReader2);
+        checkNotNull(idReader);
+        checkNotNull(recordReader);
+        return new RecordWithIdIterator<>(resultSet, idReader, recordReader);
     }
 
     /**
@@ -223,25 +224,24 @@ public abstract class DbIterator<R> implements Iterator<R>, Closeable {
         }
     }
 
-    private static class PairedColumnIterator<R1, R2>
-            extends DbIterator<PairedValue<R1, R2>> {
+    private static class RecordWithIdIterator<I> extends DbIterator<EntityRecordWithId<I>> {
 
-        private final ColumnReader<R1> columnReader1;
-        private final ColumnReader<R2> columnReader2;
+        private final ColumnReader<I> idReader;
+        private final ColumnReader<EntityRecord> recordReader;
 
-        private PairedColumnIterator(ResultSet resultSet,
-                                     ColumnReader<R1> columnReader1,
-                                     ColumnReader<R2> columnReader2) {
+        private RecordWithIdIterator(ResultSet resultSet,
+                                     ColumnReader<I> idReader,
+                                     ColumnReader<EntityRecord> recordReader) {
             super(resultSet);
-            this.columnReader1 = columnReader1;
-            this.columnReader2 = columnReader2;
+            this.idReader = idReader;
+            this.recordReader = recordReader;
         }
 
         @Override
-        protected PairedValue<R1, R2> readResult() throws SQLException {
-            R1 value1 = columnReader1.readValue(resultSet());
-            R2 value2 = columnReader2.readValue(resultSet());
-            PairedValue<R1, R2> result = PairedValue.of(value1, value2);
+        protected EntityRecordWithId<I> readResult() throws SQLException {
+            I id = idReader.readValue(resultSet());
+            EntityRecord record = recordReader.readValue(resultSet());
+            EntityRecordWithId<I> result = EntityRecordWithId.of(id, record);
             return result;
         }
     }
