@@ -46,7 +46,7 @@ public abstract class ColumnReader<R> {
         this.columnName = columnName;
     }
 
-    protected String columnName() {
+    String columnName() {
         return columnName;
     }
 
