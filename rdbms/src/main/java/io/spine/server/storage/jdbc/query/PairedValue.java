@@ -20,17 +20,34 @@
 
 package io.spine.server.storage.jdbc.query;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+/**
+ * A combination of two values for iterating over the SQL query results.
+ *
+ * <p>Nulls are not accepted as values for the usage convenience.
+ *
+ * @param <A>
+ *         the first value type
+ * @param <B>
+ *         the second value type
+ */
 public class PairedValue<A, B> {
 
     private final A aValue;
     private final B bValue;
 
-    public PairedValue(A aValue, B bValue) {
+    private PairedValue(A aValue, B bValue) {
         this.aValue = aValue;
         this.bValue = bValue;
     }
 
-    public static <A, B> PairedValue<A, B> of (A a, B b) {
+    /**
+     * Creates a {@code PairedValue} instance for the two given values.
+     */
+    public static <A, B> PairedValue<A, B> of(A a, B b) {
+        checkNotNull(a);
+        checkNotNull(b);
         return new PairedValue<>(a, b);
     }
 
