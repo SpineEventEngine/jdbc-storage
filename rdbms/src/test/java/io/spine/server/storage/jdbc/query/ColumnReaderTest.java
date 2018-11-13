@@ -43,7 +43,7 @@ class ColumnReaderTest {
     private static final String COLUMN_NAME = "column_name";
 
     @Test
-    @DisplayName("read value of ID column of Number type")
+    @DisplayName("read the value of an ID column of Number type")
     void readNumberId() throws SQLException {
         ResultSet resultSet = mock(ResultSet.class);
         Long id = 42L;
@@ -54,7 +54,7 @@ class ColumnReaderTest {
     }
 
     @Test
-    @DisplayName("read value of ID column of String type")
+    @DisplayName("read the value of an ID column of String type")
     void readStringId() throws SQLException {
         ResultSet resultSet = mock(ResultSet.class);
         String id = "theString";
@@ -65,7 +65,7 @@ class ColumnReaderTest {
     }
 
     @Test
-    @DisplayName("read value of ID column of Message type")
+    @DisplayName("read the value of an ID column of Message type")
     void readMessageId() throws SQLException {
         ResultSet resultSet = mock(ResultSet.class);
         StringValue id = StringValue
@@ -80,7 +80,7 @@ class ColumnReaderTest {
     }
 
     @Test
-    @DisplayName("read value of column storing serialized messages")
+    @DisplayName("read the value of a column storing serialized messages")
     void readSerializedMessage() throws SQLException {
         ResultSet resultSet = mock(ResultSet.class);
         Int32Value columnValue = Int32Value

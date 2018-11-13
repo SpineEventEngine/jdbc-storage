@@ -151,7 +151,7 @@ class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumn
      * of the designated IDs.
      *
      * <p>The resulting {@code Iterator} is guaranteed to have the same number of entries as the
-     * number of IDs in {@code EntityQuery}.
+     * number of IDs in the {@code EntityQuery}.
      *
      * <p>The resulting record fields are masked by the given {@code FieldMask}.
      */

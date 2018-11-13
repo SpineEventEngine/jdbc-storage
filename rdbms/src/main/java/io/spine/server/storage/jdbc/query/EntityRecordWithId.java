@@ -25,7 +25,7 @@ import io.spine.server.entity.EntityRecord;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A combination of {@link EntityRecord} and its ID for iterating over the SQL query response.
+ * A combination of the {@link EntityRecord} and its ID for iterating over the SQL query response.
  *
  * @param <I>
  *         the ID type

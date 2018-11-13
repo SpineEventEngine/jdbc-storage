@@ -45,7 +45,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * <p><b>NOTE:</b> {@code remove} operation is not supported.
  *
- * @param <R> type of storage records
+ * @param <R>
+ *         the type of storage records
  * @author Alexander Litus
  */
 @Internal
@@ -66,7 +67,7 @@ public abstract class DbIterator<R> implements Iterator<R>, Closeable {
      * @param resultSet
      *         the results of a DB query to iterate over
      * @param columnReader
-     *         the column reader which extracts required column values from the result set
+     *         the column reader which extracts the required column values from the result set
      * @param <R>
      *         the type of storage records
      * @return a new instance of {@code DbIterator}
@@ -81,7 +82,7 @@ public abstract class DbIterator<R> implements Iterator<R>, Closeable {
      * Creates a {@code DbIterator} for the simultaneous iteration over the column records and
      * their IDs in the {@code ResultSet}.
      *
-     * <p>The result of simultaneous value extraction performed by the column readers is
+     * <p>The result of the simultaneous value extraction performed by the column readers is
      * represented as {@link EntityRecordWithId}.
      *
      * @param resultSet

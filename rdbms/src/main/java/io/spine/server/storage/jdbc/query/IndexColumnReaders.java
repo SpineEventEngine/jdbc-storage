@@ -44,7 +44,7 @@ final class IndexColumnReaders {
      *         the type of the IDs stored in column
      * @param <I>
      *         the compile-time type of the IDs
-     * @return a new instance of {@code ColumnReader}
+     * @return a new instance of the {@code ColumnReader}
      */
     @SuppressWarnings({"unchecked" /* Logically checked by if statements. */,
             "IfStatementWithTooManyBranches" /* Required to differentiate between reader types. */})

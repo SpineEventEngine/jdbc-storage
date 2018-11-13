@@ -26,7 +26,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * A reader of the designated column value in the current row of {@link ResultSet}.
+ * A reader of the designated column value in the current row of the {@link ResultSet}.
  *
  * @param <R>
  *         the type of read operation result
@@ -57,8 +57,8 @@ public abstract class ColumnReader<R> {
      *         the result set to read the column value from
      * @return the read operation result
      * @throws SQLException
-     *         if the error occurs during read operation, e.g. column with such name doesn't exist
-     *         or the {@code ResultSet} is closed
+     *         if an error occurs during the read operation, e.g. the column doesn't exist or the
+     *         {@code ResultSet} is closed
      */
     public abstract R readValue(ResultSet resultSet) throws SQLException;
 }

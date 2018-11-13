@@ -37,8 +37,8 @@ public final class ColumnReaderFactory {
     /**
      * Creates a reader for the column storing index values.
      *
-     * <p>The index values are stored in DB differently from other column values, for example
-     * Protobuf {@link Message} is serialized to JSON instead of {@code bytes}.
+     * <p>The index values are stored in the DB differently from the other column values, for
+     * example a Protobuf {@link Message} is serialized to JSON instead of {@code bytes}.
      *
      * @param columnName
      *         the name of the column to create the reader for
