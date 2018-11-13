@@ -208,10 +208,24 @@ public abstract class DbIterator<R> implements Iterator<R>, Closeable {
         throw new NoSuchElementException("No elements remained.");
     }
 
+    /**
+     * A {@code DbIterator} that iterates over a single column in the given {@code ResultSet}.
+     *
+     * @param <R>
+     *         the type of the storage records
+     */
     private static class SingleColumnIterator<R> extends DbIterator<R> {
 
         private final ColumnReader<R> columnReader;
 
+        /**
+         * Creates a new instance of the {@code SingleColumnIterator}.
+         *
+         * @param resultSet
+         *         the SQL query results to iterate over
+         * @param columnReader
+         *         the column reader which extracts column values from the {@code ResultSet}
+         */
         private SingleColumnIterator(ResultSet resultSet, ColumnReader<R> columnReader) {
             super(resultSet);
             this.columnReader = columnReader;
@@ -224,11 +238,28 @@ public abstract class DbIterator<R> implements Iterator<R>, Closeable {
         }
     }
 
+    /**
+     * A {@code DbIterator} which simultaneously iterates over the records and their IDs in the
+     * {@code ResultSet}.
+     *
+     * @param <I>
+     *         the type of the record IDs
+     */
     private static class RecordWithIdIterator<I> extends DbIterator<EntityRecordWithId<I>> {
 
         private final ColumnReader<I> idReader;
         private final ColumnReader<EntityRecord> recordReader;
 
+        /**
+         * Creates a new instance of the {@code RecordWithIdIterator}.
+         *
+         * @param resultSet
+         *         the SQL query results to iterate over
+         * @param idReader
+         *         the reader of the ID column values
+         * @param recordReader
+         *         the reader of the column storing entity records
+         */
         private RecordWithIdIterator(ResultSet resultSet,
                                      ColumnReader<I> idReader,
                                      ColumnReader<EntityRecord> recordReader) {
