@@ -30,7 +30,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * <p>The read result will also be a {@code String}.
  */
-class StringColumnReader extends ColumnReader<String> {
+final class StringColumnReader extends ColumnReader<String> {
 
     StringColumnReader(String columnName) {
         super(columnName);

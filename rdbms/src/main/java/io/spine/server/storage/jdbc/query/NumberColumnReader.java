@@ -30,7 +30,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * <p>The read result will be the {@link Number}.
  */
-class NumberColumnReader extends ColumnReader<Number> {
+final class NumberColumnReader extends ColumnReader<Number> {
 
     NumberColumnReader(String columnName) {
         super(columnName);

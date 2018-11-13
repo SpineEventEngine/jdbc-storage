@@ -36,7 +36,7 @@ import static io.spine.json.Json.fromJson;
  * @param <M>
  * @see io.spine.json.Json
  */
-class MessageColumnReader<M extends Message> extends ColumnReader<M> {
+final class MessageColumnReader<M extends Message> extends ColumnReader<M> {
 
     private final Class<M> messageClass;
 

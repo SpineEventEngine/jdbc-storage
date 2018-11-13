@@ -37,7 +37,7 @@ import static io.spine.server.storage.jdbc.query.Serializer.deserialize;
  * @param <M>
  *         the type of the messages stored in the column
  */
-class MessageBytesColumnReader<M extends Message> extends ColumnReader<M> {
+final class MessageBytesColumnReader<M extends Message> extends ColumnReader<M> {
 
     private final Descriptor messageDescriptor;
 

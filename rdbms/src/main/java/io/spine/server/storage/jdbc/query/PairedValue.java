@@ -32,7 +32,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @param <B>
  *         the second value type
  */
-public class PairedValue<A, B> {
+public final class PairedValue<A, B> {
 
     private final A aValue;
     private final B bValue;
