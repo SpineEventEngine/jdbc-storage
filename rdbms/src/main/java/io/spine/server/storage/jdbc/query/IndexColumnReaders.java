@@ -27,7 +27,7 @@ import static io.spine.util.Exceptions.newIllegalArgumentException;
 
 /**
  * A helper class that allows to distinguish between the different {@link ColumnReader} types for
- * the different ID types.
+ * the different ID columns.
  */
 final class IndexColumnReaders {
 
