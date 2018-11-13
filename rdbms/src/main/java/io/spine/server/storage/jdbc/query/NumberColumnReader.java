@@ -32,7 +32,7 @@ class NumberColumnReader extends ColumnReader<Number> {
     }
 
     @Override
-    public Number read(ResultSet resultSet) throws SQLException {
+    public Number readValue(ResultSet resultSet) throws SQLException {
         checkNotNull(resultSet);
         Number result = resultSet.getLong(columnName());
         return result;

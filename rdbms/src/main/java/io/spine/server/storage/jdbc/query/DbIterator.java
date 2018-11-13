@@ -187,7 +187,7 @@ public abstract class DbIterator<R> implements Iterator<R>, Closeable {
 
         @Override
         protected R readResult() throws SQLException {
-            R result = columnReader.read(resultSet());
+            R result = columnReader.readValue(resultSet());
             return result;
         }
     }
@@ -208,8 +208,8 @@ public abstract class DbIterator<R> implements Iterator<R>, Closeable {
 
         @Override
         protected PairedValue<R1, R2> readResult() throws SQLException {
-            R1 value1 = columnReader1.read(resultSet());
-            R2 value2 = columnReader2.read(resultSet());
+            R1 value1 = columnReader1.readValue(resultSet());
+            R2 value2 = columnReader2.readValue(resultSet());
             PairedValue<R1, R2> result = PairedValue.of(value1, value2);
             return result;
         }

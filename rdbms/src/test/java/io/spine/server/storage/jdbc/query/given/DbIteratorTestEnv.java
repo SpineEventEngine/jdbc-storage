@@ -116,7 +116,7 @@ public class DbIteratorTestEnv {
                 resultSet,
                 new ColumnReader<ResultSet>("") {
                     @Override
-                    public ResultSet read(ResultSet resultSet) throws SQLException {
+                    public ResultSet readValue(ResultSet resultSet) throws SQLException {
                         return resultSet;
                     }
                 }
@@ -129,7 +129,7 @@ public class DbIteratorTestEnv {
                 resultSet,
                 new ColumnReader<ResultSet>("") {
                     @Override
-                    public ResultSet read(ResultSet resultSet) throws SQLException {
+                    public ResultSet readValue(ResultSet resultSet) throws SQLException {
                         throw new SQLException("Read is not allowed; I'm sneaky");
                     }
                 }

@@ -35,5 +35,5 @@ public abstract class ColumnReader<R> {
         return columnName;
     }
 
-    public abstract R read(ResultSet resultSet) throws SQLException;
+    public abstract R readValue(ResultSet resultSet) throws SQLException;
 }

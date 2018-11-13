@@ -38,7 +38,7 @@ class MessageColumnReader<M extends Message> extends ColumnReader<M> {
     }
 
     @Override
-    public M read(ResultSet resultSet) throws SQLException {
+    public M readValue(ResultSet resultSet) throws SQLException {
         checkNotNull(resultSet);
         String rawId = resultSet.getString(columnName());
         M messageId = fromJson(rawId, idType);

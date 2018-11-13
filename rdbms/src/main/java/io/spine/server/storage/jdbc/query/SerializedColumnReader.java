@@ -44,7 +44,7 @@ class SerializedColumnReader<M extends Message> extends ColumnReader<M> {
     }
 
     @Override
-    public M read(ResultSet resultSet) throws SQLException {
+    public M readValue(ResultSet resultSet) throws SQLException {
         checkNotNull(resultSet);
         byte[] bytes = resultSet.getBytes(columnName());
         M result = deserialize(bytes, messageDescriptor);
