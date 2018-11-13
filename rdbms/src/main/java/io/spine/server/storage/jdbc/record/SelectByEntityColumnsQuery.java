@@ -29,7 +29,6 @@ import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.entity.storage.EntityQuery;
 import io.spine.server.storage.jdbc.query.AbstractQuery;
 import io.spine.server.storage.jdbc.query.IdColumn;
-import io.spine.server.storage.jdbc.query.IdWithMessage;
 import io.spine.server.storage.jdbc.query.PairedValue;
 import io.spine.server.storage.jdbc.query.SelectQuery;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
