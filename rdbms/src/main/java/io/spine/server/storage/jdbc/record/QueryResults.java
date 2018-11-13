@@ -26,6 +26,7 @@ import com.google.protobuf.Message;
 import io.spine.protobuf.AnyPacker;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.FieldMasks;
+import io.spine.server.storage.jdbc.query.ColumnReader;
 import io.spine.server.storage.jdbc.query.DbIterator;
 import io.spine.server.storage.jdbc.query.EntityRecordWithId;
 
@@ -35,8 +36,8 @@ import java.util.function.Function;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Streams.stream;
-import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.idColumn;
-import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.messageColumn;
+import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.idReader;
+import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.messageReader;
 import static io.spine.server.storage.jdbc.record.RecordTable.StandardColumn.ENTITY;
 import static io.spine.server.storage.jdbc.record.RecordTable.StandardColumn.ID;
 
@@ -70,10 +71,13 @@ final class QueryResults {
      */
     static <I> Iterator<EntityRecordWithId<I>>
     parse(ResultSet resultSet, Class<I> idType, FieldMask fieldMask) {
+        ColumnReader<I> idColumnReader = idReader(ID.name(), idType);
+        ColumnReader<EntityRecord> recordColumnReader =
+                messageReader(ENTITY.name(), EntityRecord.getDescriptor());
         Iterator<EntityRecordWithId<I>> dbIterator = DbIterator.createFor(
                 resultSet,
-                idColumn(ID.name(), idType),
-                messageColumn(ENTITY.name(), EntityRecord.getDescriptor())
+                idColumnReader,
+                recordColumnReader
         );
         Iterator<EntityRecordWithId<I>> result = stream(dbIterator)
                 .map(maskFields(fieldMask))

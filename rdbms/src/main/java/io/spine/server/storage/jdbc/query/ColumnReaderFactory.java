@@ -24,13 +24,8 @@ import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Message;
 import io.spine.annotation.Internal;
 
-import java.sql.ResultSet;
-
 /**
  * The factory which creates {@link ColumnReader} instances.
- *
- * <p>The factory method names are optimized for usage in
- * {@link DbIterator#createFor(ResultSet, ColumnReader)}.
  */
 @Internal
 public final class ColumnReaderFactory {
@@ -53,7 +48,7 @@ public final class ColumnReaderFactory {
      *         the compile-time type of the IDs stored in the column
      * @return the {@code ColumnReader} instance for the given column
      */
-    public static <I> ColumnReader<I> idColumn(String columnName, Class<I> idType) {
+    public static <I> ColumnReader<I> idReader(String columnName, Class<I> idType) {
         return IndexColumnReaders.create(columnName, idType);
     }
 
@@ -69,7 +64,7 @@ public final class ColumnReaderFactory {
      * @return the {@code ColumnReader} for the given column
      */
     public static <M extends Message> MessageBytesColumnReader<M>
-    messageColumn(String columnName, Descriptor messageDescriptor) {
+    messageReader(String columnName, Descriptor messageDescriptor) {
         return MessageBytesColumnReader.create(columnName, messageDescriptor);
     }
 }

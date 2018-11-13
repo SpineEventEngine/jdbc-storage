@@ -24,7 +24,8 @@ import java.sql.ResultSet;
 import java.util.Iterator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.idColumn;
+import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.idReader;
+import static io.spine.server.storage.jdbc.query.DbIterator.createFor;
 
 /**
  * A query for all the IDs in a certain table.
@@ -48,10 +49,8 @@ class StorageIndexQuery<I> extends AbstractQuery implements SelectQuery<Iterator
                                        .from(table())
                                        .getResults();
         Class<I> columnType = idColumn.getJavaType();
-        DbIterator<I> result = DbIterator.createFor(
-                resultSet,
-                idColumn(columnName, columnType)
-        );
+        ColumnReader<I> idColumnReader = idReader(columnName, columnType);
+        DbIterator<I> result = createFor(resultSet, idColumnReader);
         return result;
     }
 

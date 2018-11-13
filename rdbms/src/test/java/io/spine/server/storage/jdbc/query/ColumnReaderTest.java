@@ -30,8 +30,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static io.spine.json.Json.toCompactJson;
-import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.idColumn;
-import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.messageColumn;
+import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.idReader;
+import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.messageReader;
 import static io.spine.server.storage.jdbc.query.Serializer.serialize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -48,7 +48,7 @@ class ColumnReaderTest {
         ResultSet resultSet = mock(ResultSet.class);
         Long id = 42L;
         when(resultSet.getLong(COLUMN_NAME)).thenReturn(id);
-        ColumnReader<Long> reader = idColumn(COLUMN_NAME, Long.class);
+        ColumnReader<Long> reader = idReader(COLUMN_NAME, Long.class);
         Long acquiredId = reader.readValue(resultSet);
         assertEquals(id, acquiredId);
     }
@@ -59,7 +59,7 @@ class ColumnReaderTest {
         ResultSet resultSet = mock(ResultSet.class);
         String id = "theString";
         when(resultSet.getString(COLUMN_NAME)).thenReturn(id);
-        ColumnReader<String> reader = idColumn(COLUMN_NAME, String.class);
+        ColumnReader<String> reader = idReader(COLUMN_NAME, String.class);
         String acquiredId = reader.readValue(resultSet);
         assertEquals(id, acquiredId);
     }
@@ -74,7 +74,7 @@ class ColumnReaderTest {
                 .build();
         String idJson = toCompactJson(id);
         when(resultSet.getString(COLUMN_NAME)).thenReturn(idJson);
-        ColumnReader<StringValue> reader = idColumn(COLUMN_NAME, StringValue.class);
+        ColumnReader<StringValue> reader = idReader(COLUMN_NAME, StringValue.class);
         StringValue acquiredId = reader.readValue(resultSet);
         assertEquals(id, acquiredId);
     }
@@ -89,7 +89,7 @@ class ColumnReaderTest {
                 .build();
         byte[] serializedValue = serialize(columnValue);
         when(resultSet.getBytes(COLUMN_NAME)).thenReturn(serializedValue);
-        ColumnReader<Message> reader = messageColumn(COLUMN_NAME, Int32Value.getDescriptor());
+        ColumnReader<Message> reader = messageReader(COLUMN_NAME, Int32Value.getDescriptor());
         Message acquiredValue = reader.readValue(resultSet);
         assertEquals(columnValue, acquiredValue);
     }

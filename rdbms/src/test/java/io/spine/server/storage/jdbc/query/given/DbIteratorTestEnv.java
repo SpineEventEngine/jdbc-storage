@@ -28,6 +28,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import static io.spine.server.storage.jdbc.query.DbIterator.createFor;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
@@ -112,28 +113,24 @@ public class DbIteratorTestEnv {
     }
 
     private static DbIterator anIterator(ResultSet resultSet) {
-        DbIterator<ResultSet> result = DbIterator.createFor(
-                resultSet,
-                new ColumnReader<ResultSet>("") {
-                    @Override
-                    public ResultSet readValue(ResultSet resultSet) throws SQLException {
-                        return resultSet;
-                    }
-                }
-        );
+        ColumnReader<ResultSet> identityReader = new ColumnReader<ResultSet>("") {
+            @Override
+            public ResultSet readValue(ResultSet resultSet) throws SQLException {
+                return resultSet;
+            }
+        };
+        DbIterator<ResultSet> result = createFor(resultSet, identityReader);
         return result;
     }
 
     private static DbIterator throwingIterator(ResultSet resultSet) {
-        DbIterator<ResultSet> result = DbIterator.createFor(
-                resultSet,
-                new ColumnReader<ResultSet>("") {
-                    @Override
-                    public ResultSet readValue(ResultSet resultSet) throws SQLException {
-                        throw new SQLException("Read is not allowed; I'm sneaky");
-                    }
-                }
-        );
+        ColumnReader<ResultSet> throwingReader = new ColumnReader<ResultSet>("") {
+            @Override
+            public ResultSet readValue(ResultSet resultSet) throws SQLException {
+                throw new SQLException("Read is not allowed; I'm sneaky");
+            }
+        };
+        DbIterator<ResultSet> result = createFor(resultSet, throwingReader);
         return result;
     }
 }
