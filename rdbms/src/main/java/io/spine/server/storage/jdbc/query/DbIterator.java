@@ -86,9 +86,9 @@ public abstract class DbIterator<R> implements Iterator<R>, Closeable {
      *
      * @param resultSet
      *         the results of a DB query to iterate over
-     * @param idReader
+     * @param idColumnReader
      *         the reader of the ID column
-     * @param recordReader
+     * @param recordColumnReader
      *         the reader of the column storing entity records
      * @param <I>
      *         the type of the storage record IDs
@@ -96,12 +96,12 @@ public abstract class DbIterator<R> implements Iterator<R>, Closeable {
      */
     public static <I> DbIterator<EntityRecordWithId<I>>
     createFor(ResultSet resultSet,
-              ColumnReader<I> idReader,
-              ColumnReader<EntityRecord> recordReader) {
+              ColumnReader<I> idColumnReader,
+              ColumnReader<EntityRecord> recordColumnReader) {
         checkNotNull(resultSet);
-        checkNotNull(idReader);
-        checkNotNull(recordReader);
-        return new RecordWithIdIterator<>(resultSet, idReader, recordReader);
+        checkNotNull(idColumnReader);
+        checkNotNull(recordColumnReader);
+        return new RecordWithIdIterator<>(resultSet, idColumnReader, recordColumnReader);
     }
 
     /**
@@ -247,31 +247,31 @@ public abstract class DbIterator<R> implements Iterator<R>, Closeable {
      */
     private static class RecordWithIdIterator<I> extends DbIterator<EntityRecordWithId<I>> {
 
-        private final ColumnReader<I> idReader;
-        private final ColumnReader<EntityRecord> recordReader;
+        private final ColumnReader<I> idColumnReader;
+        private final ColumnReader<EntityRecord> recordColumnReader;
 
         /**
          * Creates a new instance of the {@code RecordWithIdIterator}.
          *
          * @param resultSet
          *         the SQL query results to iterate over
-         * @param idReader
+         * @param idColumnReader
          *         the reader of the ID column values
-         * @param recordReader
+         * @param recordColumnReader
          *         the reader of the column storing entity records
          */
         private RecordWithIdIterator(ResultSet resultSet,
-                                     ColumnReader<I> idReader,
-                                     ColumnReader<EntityRecord> recordReader) {
+                                     ColumnReader<I> idColumnReader,
+                                     ColumnReader<EntityRecord> recordColumnReader) {
             super(resultSet);
-            this.idReader = idReader;
-            this.recordReader = recordReader;
+            this.idColumnReader = idColumnReader;
+            this.recordColumnReader = recordColumnReader;
         }
 
         @Override
         protected EntityRecordWithId<I> readResult() throws SQLException {
-            I id = idReader.readValue(resultSet());
-            EntityRecord record = recordReader.readValue(resultSet());
+            I id = idColumnReader.readValue(resultSet());
+            EntityRecord record = recordColumnReader.readValue(resultSet());
             EntityRecordWithId<I> result = EntityRecordWithId.of(id, record);
             return result;
         }
