@@ -49,7 +49,6 @@ import java.util.NoSuchElementException;
 public abstract class DbIterator<R> implements Iterator<R>, Closeable {
 
     private final ResultSet resultSet;
-    private final String columnName;
     private boolean hasNextCalled = false;
     private boolean nextCalled = true;
     private boolean memoizedHasNext = false;
@@ -57,12 +56,20 @@ public abstract class DbIterator<R> implements Iterator<R>, Closeable {
     /**
      * Creates a new iterator instance.
      *
-     * @param resultSet  the results of a DB query to iterate over
-     * @param columnName a name of a serialized storage record column
+     * @param resultSet
+     *         the results of a DB query to iterate over
      */
-    protected DbIterator(ResultSet resultSet, String columnName) {
+    private DbIterator(ResultSet resultSet) {
         this.resultSet = resultSet;
-        this.columnName = columnName;
+    }
+
+    public static <R> DbIterator<R> createFor(ResultSet resultSet, ColumnReader<R> columnReader) {
+        return new SingleColumnIterator<>(resultSet, columnReader);
+    }
+
+    public static <R1, R2> DbIterator<PairedValue<R1, R2>>
+    createFor(ResultSet resultSet, ColumnReader<R1> columnReader1, ColumnReader<R2> columnReader2) {
+        return new PairedColumnIterator<>(resultSet, columnReader1, columnReader2);
     }
 
     /**
@@ -117,12 +124,8 @@ public abstract class DbIterator<R> implements Iterator<R>, Closeable {
     protected abstract R readResult() throws SQLException;
 
     @VisibleForTesting
-    public ResultSet getResultSet() {
+    public ResultSet resultSet() {
         return resultSet;
-    }
-
-    protected String getColumnName() {
-        return columnName;
     }
 
     /**
@@ -171,5 +174,44 @@ public abstract class DbIterator<R> implements Iterator<R>, Closeable {
 
     private static NoSuchElementException noSuchElement() {
         throw new NoSuchElementException("No elements remained.");
+    }
+
+    private static class SingleColumnIterator<R> extends DbIterator<R> {
+
+        private final ColumnReader<R> columnReader;
+
+        private SingleColumnIterator(ResultSet resultSet, ColumnReader<R> columnReader) {
+            super(resultSet);
+            this.columnReader = columnReader;
+        }
+
+        @Override
+        protected R readResult() throws SQLException {
+            R result = columnReader.read(resultSet());
+            return result;
+        }
+    }
+
+    private static class PairedColumnIterator<R1, R2>
+            extends DbIterator<PairedValue<R1, R2>> {
+
+        private final ColumnReader<R1> columnReader1;
+        private final ColumnReader<R2> columnReader2;
+
+        private PairedColumnIterator(ResultSet resultSet,
+                                     ColumnReader<R1> columnReader1,
+                                     ColumnReader<R2> columnReader2) {
+            super(resultSet);
+            this.columnReader1 = columnReader1;
+            this.columnReader2 = columnReader2;
+        }
+
+        @Override
+        protected PairedValue<R1, R2> readResult() throws SQLException {
+            R1 value1 = columnReader1.read(resultSet());
+            R2 value2 = columnReader2.read(resultSet());
+            PairedValue<R1, R2> result = PairedValue.of(value1, value2);
+            return result;
+        }
     }
 }

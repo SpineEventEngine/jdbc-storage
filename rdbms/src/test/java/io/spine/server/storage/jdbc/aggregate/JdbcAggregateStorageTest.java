@@ -76,7 +76,7 @@ class JdbcAggregateStorageTest extends AggregateStorageTest {
 
         // Use `PreparedStatement.getFetchSize()` instead of `ResultSet.getFetchSize()`,
         // because the result of the latter depends on a JDBC driver implementation.
-        int fetchSize = iterator.getResultSet()
+        int fetchSize = iterator.resultSet()
                                 .getStatement()
                                 .getFetchSize();
         assertEquals(batchSize, fetchSize);
@@ -90,7 +90,7 @@ class JdbcAggregateStorageTest extends AggregateStorageTest {
                 (DbIterator<AggregateEventRecord>) storage.historyBackward(request);
 
         storage.close();
-        boolean historyIteratorClosed = iterator.getResultSet()
+        boolean historyIteratorClosed = iterator.resultSet()
                                                 .isClosed();
         assertTrue(historyIteratorClosed);
     }

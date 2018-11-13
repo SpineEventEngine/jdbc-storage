@@ -96,7 +96,7 @@ class DbIteratorTest {
         @DisplayName("when told to do so")
         void whenTold() throws SQLException {
             DbIterator iterator = nonEmptyIterator();
-            ResultSet resultSet = iterator.getResultSet();
+            ResultSet resultSet = iterator.resultSet();
 
             verify(resultSet, never()).close();
 
@@ -109,7 +109,7 @@ class DbIteratorTest {
         @DisplayName("when no more elements are present to iterate")
         void whenNoElementsPresent() throws SQLException {
             DbIterator iterator = emptyIterator();
-            ResultSet resultSet = iterator.getResultSet();
+            ResultSet resultSet = iterator.resultSet();
 
             verify(resultSet, never()).close();
 
@@ -144,7 +144,7 @@ class DbIteratorTest {
         DbIterator iterator = emptyIterator();
         iterator.close();
 
-        ResultSet resultSet = iterator.getResultSet();
+        ResultSet resultSet = iterator.resultSet();
         verify(resultSet).isClosed();
         verify(resultSet).close();
     }
@@ -155,7 +155,7 @@ class DbIteratorTest {
         DbIterator iterator = emptyIterator();
         iterator.close();
 
-        ResultSet resultSet = iterator.getResultSet();
+        ResultSet resultSet = iterator.resultSet();
         InOrder order = inOrder(resultSet);
         order.verify(resultSet)
              .getStatement();
@@ -169,7 +169,7 @@ class DbIteratorTest {
         DbIterator iterator = emptyIterator();
         iterator.close();
 
-        Statement statement = iterator.getResultSet()
+        Statement statement = iterator.resultSet()
                                       .getStatement();
         InOrder order = inOrder(statement);
         order.verify(statement)
@@ -179,7 +179,7 @@ class DbIteratorTest {
     }
 
     private static void assertClosed(DbIterator<?> iterator) throws SQLException {
-        ResultSet resultSet = iterator.getResultSet();
+        ResultSet resultSet = iterator.resultSet();
         Statement statement = resultSet.getStatement();
         Connection connection = statement.getConnection();
         verify(resultSet).close();

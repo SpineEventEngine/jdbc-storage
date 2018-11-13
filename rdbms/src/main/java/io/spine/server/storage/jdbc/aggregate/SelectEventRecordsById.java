@@ -26,7 +26,6 @@ import com.querydsl.sql.StatementOptions;
 import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.storage.jdbc.query.AbstractSelectByIdQuery;
 import io.spine.server.storage.jdbc.query.DbIterator;
-import io.spine.server.storage.jdbc.query.MessageDbIterator;
 
 import java.sql.ResultSet;
 
@@ -35,6 +34,7 @@ import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.C
 import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.TIMESTAMP;
 import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.TIMESTAMP_NANOS;
 import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.VERSION;
+import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.messageColumn;
 
 /**
  * A query that selects {@linkplain AggregateEventRecord event records} by an aggregate ID.
@@ -63,9 +63,12 @@ class SelectEventRecordsById<I> extends AbstractSelectByIdQuery<I, DbIterator<Ag
                                                   .setFetchSize(fetchSize)
                                                   .build());
         ResultSet resultSet = query.getResults();
-        return new MessageDbIterator<>(resultSet,
-                                       AGGREGATE.name(),
-                                       AggregateEventRecord.getDescriptor());
+
+        DbIterator<AggregateEventRecord> dbIterator = DbIterator.createFor(
+                resultSet,
+                messageColumn(AGGREGATE.name(), AggregateEventRecord.getDescriptor())
+        );
+        return dbIterator;
     }
 
     @Override

@@ -20,6 +20,7 @@
 
 package io.spine.server.storage.jdbc.query.given;
 
+import io.spine.server.storage.jdbc.query.ColumnReader;
 import io.spine.server.storage.jdbc.query.DbIterator;
 
 import java.sql.Connection;
@@ -31,7 +32,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 /**
@@ -54,7 +54,7 @@ public class DbIteratorTestEnv {
             fail(e.getMessage());
         }
 
-        DbIterator iterator = new AnIterator(resultSet);
+        DbIterator iterator = anIterator(resultSet);
         return iterator;
     }
 
@@ -69,17 +69,15 @@ public class DbIteratorTestEnv {
             fail(e.getMessage());
         }
 
-        DbIterator iterator = new AnIterator(resultSet);
+        DbIterator iterator = anIterator(resultSet);
         return iterator;
     }
 
     public static DbIterator sneakyResultIterator() {
         ResultSet resultSet = baseResultSetMock();
-        AnIterator iterator = spy(new AnIterator(resultSet));
+        DbIterator iterator = throwingIterator(resultSet);
         try {
             when(resultSet.next()).thenReturn(true);
-            when(iterator.readResult())
-                    .thenThrow(new SQLException("Read is not allowed; I'm sneaky"));
         } catch (SQLException e) {
             fail(e.getMessage());
         }
@@ -95,7 +93,7 @@ public class DbIteratorTestEnv {
             fail(e.getMessage());
         }
 
-        DbIterator iterator = new AnIterator(resultSet);
+        DbIterator iterator = anIterator(resultSet);
         return iterator;
     }
 
@@ -113,15 +111,29 @@ public class DbIteratorTestEnv {
         return resultSet;
     }
 
-    private static class AnIterator extends DbIterator {
+    private static DbIterator anIterator(ResultSet resultSet) {
+        DbIterator<ResultSet> result = DbIterator.createFor(
+                resultSet,
+                new ColumnReader<ResultSet>("") {
+                    @Override
+                    public ResultSet read(ResultSet resultSet) throws SQLException {
+                        return resultSet;
+                    }
+                }
+        );
+        return result;
+    }
 
-        private AnIterator(ResultSet resultSet) {
-            super(resultSet, "");
-        }
-
-        @Override
-        public Object readResult() throws SQLException {
-            return getResultSet();
-        }
+    private static DbIterator throwingIterator(ResultSet resultSet) {
+        DbIterator<ResultSet> result = DbIterator.createFor(
+                resultSet,
+                new ColumnReader<ResultSet>("") {
+                    @Override
+                    public ResultSet read(ResultSet resultSet) throws SQLException {
+                        throw new SQLException("Read is not allowed; I'm sneaky");
+                    }
+                }
+        );
+        return result;
     }
 }

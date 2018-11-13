@@ -27,7 +27,7 @@ public abstract class ColumnReader<R> {
 
     private final String columnName;
 
-    ColumnReader(String columnName) {
+    protected ColumnReader(String columnName) {
         this.columnName = columnName;
     }
 

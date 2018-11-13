@@ -29,7 +29,6 @@ import io.spine.client.EntityId;
 import io.spine.client.EntityIdFilter;
 import io.spine.client.OrderBy;
 import io.spine.client.Pagination;
-import io.spine.protobuf.AnyPacker;
 import io.spine.server.entity.Entity;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
@@ -42,7 +41,7 @@ import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.JdbcStorageFactory;
 import io.spine.server.storage.jdbc.StorageBuilder;
-import io.spine.server.storage.jdbc.query.IdWithMessage;
+import io.spine.server.storage.jdbc.query.PairedValue;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -71,7 +70,6 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
 
     private final DataSourceWrapper dataSource;
     private final RecordTable<I> table;
-    private final Class<? extends Entity<I, ?>> entityClass;
 
     /**
      * Creates a new instance using the builder.
@@ -81,7 +79,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     protected JdbcRecordStorage(Builder<I> builder) throws DatabaseException {
         super(builder.isMultitenant(), builder.getEntityClass());
         this.dataSource = builder.getDataSource();
-        this.entityClass = builder.getEntityClass();
+        Class<? extends Entity<I, ?>> entityClass = builder.getEntityClass();
         Collection<EntityColumn> entityColumns = entityColumnCache().getColumns();
         this.table = new RecordTable<>(entityClass, dataSource, builder.getColumnTypeRegistry(),
                                        builder.getTypeMapping(), entityColumns);
@@ -117,27 +115,12 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
         return readMultipleRecords(ids, FieldMask.getDefaultInstance());
     }
 
-    @SuppressWarnings("unchecked") // Logically correct.
     @Override
     protected Iterator<@Nullable EntityRecord> readMultipleRecords(Iterable<I> ids,
                                                                    FieldMask fieldMask) {
-        Collection<EntityRecord> records = new ArrayList<>();
         EntityQuery<I> query = toQuery(ids);
-        Iterator<IdWithMessage<I, EntityRecord>> resultIterator = table.readByQuery(query, fieldMask);
-        Map<I, EntityRecord> presentRecords = new HashMap<>();
-        resultIterator.forEachRemaining(
-                record -> presentRecords.put(record.id(), record.message())
-        );
-        for (I id : ids) {
-            EntityRecord record = presentRecords.get(id);
-            if (record != null) {
-                records.add(record);
-            } else {
-                records.add(null);
-            }
-        }
-        Iterator<EntityRecord> recordsIterator = records.iterator();
-        return recordsIterator;
+        Iterator<EntityRecord> records = table.readByIds(query, fieldMask);
+        return records;
     }
 
     @Override
@@ -147,22 +130,15 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
 
     @Override
     protected Iterator<EntityRecord> readAllRecords(FieldMask fieldMask) {
-        Iterator<IdWithMessage<I, EntityRecord>> records =
-                table.readByQuery(emptyQuery(), fieldMask);
-        Iterator<EntityRecord> result = stream(records)
-                .map(IdWithMessage::message)
-                .iterator();
-        return result;
+        Iterator<EntityRecord> records = table.readByQuery(emptyQuery(), fieldMask);
+        return records;
     }
 
     @Override
     protected Iterator<EntityRecord> readAllRecords(EntityQuery<I> query, FieldMask fieldMask) {
         EntityQuery<I> completeQuery = appendLifecycleFilters(query);
-        Iterator<IdWithMessage<I, EntityRecord>> records = table.readByQuery(completeQuery, fieldMask);
-        Iterator<EntityRecord> result = stream(records)
-                .map(IdWithMessage::message)
-                .iterator();
-        return result;
+        Iterator<EntityRecord> records = table.readByQuery(completeQuery, fieldMask);
+        return records;
     }
 
     @Override

@@ -30,6 +30,7 @@ import io.spine.server.entity.storage.EntityQuery;
 import io.spine.server.storage.jdbc.query.AbstractQuery;
 import io.spine.server.storage.jdbc.query.IdColumn;
 import io.spine.server.storage.jdbc.query.IdWithMessage;
+import io.spine.server.storage.jdbc.query.PairedValue;
 import io.spine.server.storage.jdbc.query.SelectQuery;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
 
@@ -50,7 +51,7 @@ import static io.spine.server.storage.jdbc.record.RecordTable.StandardColumn.ID;
  * @author Dmytro Grankin
  */
 final class SelectByEntityColumnsQuery<I> extends AbstractQuery
-        implements SelectQuery<Iterator<IdWithMessage<I, EntityRecord>>> {
+        implements SelectQuery<Iterator<PairedValue<I, EntityRecord>>> {
 
     private final EntityQuery<I> entityQuery;
     private final FieldMask fieldMask;
@@ -66,7 +67,7 @@ final class SelectByEntityColumnsQuery<I> extends AbstractQuery
     }
 
     @Override
-    public Iterator<IdWithMessage<I, EntityRecord>> execute() {
+    public Iterator<PairedValue<I, EntityRecord>> execute() {
         Predicate inIds = inIds(idColumn, entityQuery.getIds());
         Predicate matchParameters = matchParameters(entityQuery.getParameters(),
                                                     columnTypeRegistry);

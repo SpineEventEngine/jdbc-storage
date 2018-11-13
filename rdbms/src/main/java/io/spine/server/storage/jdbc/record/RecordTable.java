@@ -33,12 +33,13 @@ import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.Type;
 import io.spine.server.storage.jdbc.TypeMapping;
 import io.spine.server.storage.jdbc.query.EntityTable;
-import io.spine.server.storage.jdbc.query.IdWithMessage;
+import io.spine.server.storage.jdbc.query.PairedValue;
 import io.spine.server.storage.jdbc.query.SelectQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -49,6 +50,7 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Lists.newLinkedList;
+import static com.google.common.collect.Streams.stream;
 import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
 import static java.util.Collections.addAll;
 
@@ -145,8 +147,20 @@ class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumn
         }
     }
 
-    Iterator<IdWithMessage<I, EntityRecord>> readByQuery(EntityQuery<I> entityQuery,
-                                                         FieldMask fieldMask) {
+    Iterator<EntityRecord> readByIds(EntityQuery<I> entityQuery, FieldMask fieldMask) {
+        Iterator<PairedValue<I, EntityRecord>> response = executeQuery(entityQuery, fieldMask);
+        Iterator<EntityRecord> records = getRecordsForIds(entityQuery.getIds(), response);
+        return records;
+    }
+
+    Iterator<EntityRecord> readByQuery(EntityQuery<I> entityQuery, FieldMask fieldMask) {
+        Iterator<PairedValue<I, EntityRecord>> response = executeQuery(entityQuery, fieldMask);
+        Iterator<EntityRecord> records = getPresentRecords(response);
+        return records;
+    }
+
+    private Iterator<PairedValue<I, EntityRecord>>
+    executeQuery(EntityQuery<I> entityQuery, FieldMask fieldMask) {
         SelectByEntityColumnsQuery.Builder<I> builder = SelectByEntityColumnsQuery.newBuilder();
         SelectByEntityColumnsQuery<I> query = builder.setDataSource(getDataSource())
                                                      .setTableName(getName())
@@ -155,7 +169,27 @@ class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumn
                                                      .setEntityQuery(entityQuery)
                                                      .setFieldMask(fieldMask)
                                                      .build();
-        Iterator<IdWithMessage<I, EntityRecord>> result = query.execute();
+        Iterator<PairedValue<I, EntityRecord>> queryResult = query.execute();
+        return queryResult;
+    }
+
+    private Iterator<EntityRecord>
+    getRecordsForIds(Iterable<I> ids, Iterator<PairedValue<I, EntityRecord>> queryResponse) {
+        Map<I, EntityRecord> presentRecords = new HashMap<>();
+        queryResponse.forEachRemaining(
+                record -> presentRecords.put(record.aValue(), record.bValue())
+        );
+        Iterator<EntityRecord> result = stream(ids)
+                .map(presentRecords::get)
+                .iterator();
+        return result;
+    }
+
+    private Iterator<EntityRecord>
+    getPresentRecords(Iterator<PairedValue<I, EntityRecord>> queryResponse) {
+        Iterator<EntityRecord> result = stream(queryResponse)
+                .map(PairedValue::bValue)
+                .iterator();
         return result;
     }
 

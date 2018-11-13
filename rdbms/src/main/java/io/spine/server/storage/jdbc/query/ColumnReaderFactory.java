@@ -23,18 +23,17 @@ package io.spine.server.storage.jdbc.query;
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Message;
 
-final class ColumnReaderFactory {
+public final class ColumnReaderFactory {
 
     private ColumnReaderFactory() {
     }
 
-    static <I> ColumnReader<I> idReader(String columnName, Class<I> idType) {
+    public static <I> ColumnReader<I> idColumn(String columnName, Class<I> idType) {
         return IndexColumnReaders.create(columnName, idType);
     }
 
-    @SuppressWarnings("unchecked") // Logically correct.
-    static <M extends Message> SerializedColumnReader<M>
-    messageReader(String columnName, Descriptor messageDescriptor) {
+    public static <M extends Message> SerializedColumnReader<M>
+    messageColumn(String columnName, Descriptor messageDescriptor) {
         return SerializedColumnReader.create(columnName, messageDescriptor);
     }
 }

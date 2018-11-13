@@ -20,35 +20,25 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+public class PairedValue<A, B> {
 
-import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.idReader;
+    private final A aValue;
+    private final B bValue;
 
-/**
- * An iterator over the IDs of a table.
- *
- * @author Dmytro Dashenkov
- */
-class IndexIterator<I> extends DbIterator<I> {
-
-    private final Class<I> idType;
-
-    /**
-     * Creates a new iterator instance.
-     *  @param resultSet  a result set of IDs (will be closed on a {@link #close()})
-     * @param columnName a name of a serialized storage record column
-     * @param idType
-     */
-    IndexIterator(ResultSet resultSet, String columnName, Class<I> idType) {
-        super(resultSet, columnName);
-        this.idType = idType;
+    public PairedValue(A aValue, B bValue) {
+        this.aValue = aValue;
+        this.bValue = bValue;
     }
 
-    @Override
-    protected I readResult() throws SQLException {
-        ColumnReader<I> columnReader = idReader(getColumnName(), idType);
-        I result = columnReader.read(getResultSet());
-        return result;
+    public static <A, B> PairedValue<A, B> of (A a, B b) {
+        return new PairedValue<>(a, b);
+    }
+
+    public A aValue() {
+        return aValue;
+    }
+
+    public B bValue() {
+        return bValue;
     }
 }

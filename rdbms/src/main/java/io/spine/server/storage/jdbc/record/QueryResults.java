@@ -26,8 +26,8 @@ import com.google.protobuf.Message;
 import io.spine.protobuf.AnyPacker;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.FieldMasks;
-import io.spine.server.storage.jdbc.query.IdWithMessage;
-import io.spine.server.storage.jdbc.query.IndexWithMessageIterator;
+import io.spine.server.storage.jdbc.query.DbIterator;
+import io.spine.server.storage.jdbc.query.PairedValue;
 
 import java.sql.ResultSet;
 import java.util.Iterator;
@@ -36,6 +36,8 @@ import java.util.function.Function;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Streams.stream;
+import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.idColumn;
+import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.messageColumn;
 import static io.spine.server.storage.jdbc.record.RecordTable.StandardColumn.ENTITY;
 import static io.spine.server.storage.jdbc.record.RecordTable.StandardColumn.ID;
 
@@ -47,8 +49,8 @@ import static io.spine.server.storage.jdbc.record.RecordTable.StandardColumn.ID;
  */
 final class QueryResults {
 
+    /** Prevents the utility class instantiation. */
     private QueryResults() {
-        // Prevent utility class instantiation.
     }
 
     /**
@@ -60,41 +62,35 @@ final class QueryResults {
      * @return ID-to-{@link EntityRecord} {@link Map} representing the query results
      * @see RecordTable
      */
-    @SuppressWarnings("unchecked")
-    static <I> Iterator<IdWithMessage<I, EntityRecord>>
+    static <I> Iterator<PairedValue<I, EntityRecord>>
     parse(ResultSet resultSet, Class<I> idType, FieldMask fieldMask) {
-        IndexWithMessageIterator<I, EntityRecord> iterator = IndexWithMessageIterator
-                .newBuilder()
-                .setResultSet(resultSet)
-                .setColumnName(ENTITY.name())
-                .setIdColumnName(ID.name())
-                .setIdType(idType)
-                .setMessageDescriptor(EntityRecord.getDescriptor())
-                .build();
-        Iterator<IdWithMessage<I, EntityRecord>> result = stream(iterator)
+        Iterator<PairedValue<I, EntityRecord>> dbIterator = DbIterator.createFor(
+                resultSet,
+                idColumn(ID.name(), idType),
+                messageColumn(ENTITY.name(), EntityRecord.getDescriptor())
+        );
+        Iterator<PairedValue<I, EntityRecord>> result = stream(dbIterator)
                 .map(maskFields(fieldMask))
                 .iterator();
         return result;
+    }
+
+    private static <I> Function<PairedValue<I, EntityRecord>, PairedValue<I, EntityRecord>>
+    maskFields(FieldMask fieldMask) {
+        return value -> {
+            checkNotNull(value);
+            EntityRecord record = value.bValue();
+            Any maskedState = maskFieldsOfState(record, fieldMask);
+            EntityRecord maskedRecord = record.toBuilder()
+                                              .setState(maskedState)
+                                              .build();
+            return PairedValue.of(value.aValue(), maskedRecord);
+        };
     }
 
     private static Any maskFieldsOfState(EntityRecord record, FieldMask fieldMask) {
         Message message = AnyPacker.unpack(record.getState());
         Message result = FieldMasks.applyMask(fieldMask, message);
         return AnyPacker.pack(result);
-    }
-
-    private static <I> Function<IdWithMessage<I, EntityRecord>, IdWithMessage<I, EntityRecord>>
-    maskFields(FieldMask fieldMask) {
-        return idWithMessage -> {
-            checkNotNull(idWithMessage);
-            EntityRecord message = idWithMessage.message();
-            Any maskedState = maskFieldsOfState(message, fieldMask);
-            EntityRecord newRecord = message.toBuilder()
-                                         .setState(maskedState)
-                                         .build();
-            IdWithMessage<I, EntityRecord> result =
-                    new IdWithMessage<>(idWithMessage.id(), newRecord);
-            return result;
-        };
     }
 }

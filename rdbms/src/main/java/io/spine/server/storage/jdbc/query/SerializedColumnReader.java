@@ -38,8 +38,9 @@ class SerializedColumnReader<M extends Message> extends ColumnReader<M> {
         this.messageDescriptor = messageDescriptor;
     }
 
-    static SerializedColumnReader create(String columnName, Descriptor messageDescriptor) {
-        return new SerializedColumnReader(columnName, messageDescriptor);
+    static <M extends Message> SerializedColumnReader<M>
+    create(String columnName, Descriptor messageDescriptor) {
+        return new SerializedColumnReader<>(columnName, messageDescriptor);
     }
 
     @Override
