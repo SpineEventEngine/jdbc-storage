@@ -32,6 +32,8 @@ import java.sql.Statement;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * An iterator over a {@link ResultSet} of storage records.
  *
@@ -53,22 +55,51 @@ public abstract class DbIterator<R> implements Iterator<R>, Closeable {
     private boolean nextCalled = true;
     private boolean memoizedHasNext = false;
 
-    /**
-     * Creates a new iterator instance.
-     *
-     * @param resultSet
-     *         the results of a DB query to iterate over
-     */
     private DbIterator(ResultSet resultSet) {
         this.resultSet = resultSet;
     }
 
+    /**
+     * Creates a {@code DbIterator} over the given {@code ResultSet}.
+     *
+     * @param resultSet
+     *         the results of a DB query to iterate over
+     * @param columnReader
+     *         the column reader which extract required column values from the result set
+     * @param <R>
+     *         the type of storage records
+     * @return a new instance of {@code DbIterator}
+     */
     public static <R> DbIterator<R> createFor(ResultSet resultSet, ColumnReader<R> columnReader) {
+        checkNotNull(resultSet);
+        checkNotNull(columnReader);
         return new SingleColumnIterator<>(resultSet, columnReader);
     }
 
+    /**
+     * Creates a {@code DbIterator} for the simultaneous iteration over two columns in the
+     * {@code ResultSet}.
+     *
+     * <p>The result of simultaneous value extraction performed by the column readers is
+     * represented as {@link PairedValue}.
+     *
+     * @param resultSet
+     *         the results of a DB query to iterate over
+     * @param columnReader1
+     *         the reader for the first of the columns
+     * @param columnReader2
+     *         the reader for the second of the columns
+     * @param <R1>
+     *         the type of the storage records of the first column
+     * @param <R2>
+     *         the type of the storage records of the second column
+     * @return a new instance of {@code DbIterator} for iterating over two columns
+     */
     public static <R1, R2> DbIterator<PairedValue<R1, R2>>
     createFor(ResultSet resultSet, ColumnReader<R1> columnReader1, ColumnReader<R2> columnReader2) {
+        checkNotNull(resultSet);
+        checkNotNull(columnReader1);
+        checkNotNull(columnReader2);
         return new PairedColumnIterator<>(resultSet, columnReader1, columnReader2);
     }
 
