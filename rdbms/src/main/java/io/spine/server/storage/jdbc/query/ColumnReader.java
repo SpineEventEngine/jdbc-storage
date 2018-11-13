@@ -57,7 +57,7 @@ public abstract class ColumnReader<R> {
      *         the result set to read the column value from
      * @return the read operation result
      * @throws SQLException
-     *         if the error occurs during read operation e.g. column with such name doesn't exist
+     *         if the error occurs during read operation, e.g. column with such name doesn't exist
      *         or the {@code ResultSet} is closed
      */
     public abstract R readValue(ResultSet resultSet) throws SQLException;
