@@ -25,6 +25,11 @@ import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * The reader for the columns which store strings.
+ *
+ * <p>The read result will also be a {@code String}.
+ */
 class StringColumnReader extends ColumnReader<String> {
 
     StringColumnReader(String columnName) {

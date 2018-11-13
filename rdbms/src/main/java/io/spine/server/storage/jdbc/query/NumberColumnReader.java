@@ -25,6 +25,11 @@ import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * The reader for columns which store {@link Integer} or {@link Long} entries.
+ *
+ * <p>The read result will be the {@link Number}.
+ */
 class NumberColumnReader extends ColumnReader<Number> {
 
     NumberColumnReader(String columnName) {

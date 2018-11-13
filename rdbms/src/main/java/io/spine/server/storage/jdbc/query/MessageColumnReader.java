@@ -28,20 +28,36 @@ import java.sql.SQLException;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static io.spine.json.Json.fromJson;
 
+/**
+ * The reader for columns which store {@link Message} values in JSON format.
+ *
+ * <p>The result of read operation is always a Protobuf {@link Message}.
+ *
+ * @param <M>
+ * @see io.spine.json.Json
+ */
 class MessageColumnReader<M extends Message> extends ColumnReader<M> {
 
-    private final Class<M> idType;
+    private final Class<M> messageClass;
 
-    MessageColumnReader(String columnName, Class<M> idType) {
+    /**
+     * Creates a new {@code MessageColumnReader} instance.
+     *
+     * @param columnName
+     *         the name of the column to read
+     * @param messageClass
+     *         the type of messages stored in the column
+     */
+    MessageColumnReader(String columnName, Class<M> messageClass) {
         super(columnName);
-        this.idType = idType;
+        this.messageClass = messageClass;
     }
 
     @Override
     public M readValue(ResultSet resultSet) throws SQLException {
         checkNotNull(resultSet);
-        String rawId = resultSet.getString(columnName());
-        M messageId = fromJson(rawId, idType);
-        return messageId;
+        String messageJson = resultSet.getString(columnName());
+        M result = fromJson(messageJson, messageClass);
+        return result;
     }
 }

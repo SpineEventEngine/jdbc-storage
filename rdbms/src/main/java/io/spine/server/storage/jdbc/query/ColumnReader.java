@@ -20,13 +20,28 @@
 
 package io.spine.server.storage.jdbc.query;
 
+import io.spine.annotation.Internal;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * A reader of the designated column value in the current row of {@link ResultSet}.
+ *
+ * @param <R>
+ *         the type of read operation result
+ */
+@Internal
 public abstract class ColumnReader<R> {
 
     private final String columnName;
 
+    /**
+     * Creates a new {@code ColumnReader} for the specified column.
+     *
+     * @param columnName
+     *         the name of the column to read
+     */
     protected ColumnReader(String columnName) {
         this.columnName = columnName;
     }
@@ -35,5 +50,15 @@ public abstract class ColumnReader<R> {
         return columnName;
     }
 
+    /**
+     * Reads the value of the designated column in the current row of the {@link ResultSet}.
+     *
+     * @param resultSet
+     *         the result set to read the column value from
+     * @return the read operation result
+     * @throws SQLException
+     *         if the error occurs during read operation e.g. column with such name doesn't exist
+     *         or the {@code ResultSet} is closed
+     */
     public abstract R readValue(ResultSet resultSet) throws SQLException;
 }

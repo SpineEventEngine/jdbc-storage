@@ -29,18 +29,34 @@ import java.sql.SQLException;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static io.spine.server.storage.jdbc.query.Serializer.deserialize;
 
-class SerializedColumnReader<M extends Message> extends ColumnReader<M> {
+/**
+ * The reader for the columns which store Protobuf messages in serialized form.
+ *
+ * <p>The result of the read operation will be the deserialized {@link Message}.
+ *
+ * @param <M>
+ *         the type of the messages stored in the column
+ */
+class MessageBytesColumnReader<M extends Message> extends ColumnReader<M> {
 
     private final Descriptor messageDescriptor;
 
-    private SerializedColumnReader(String columnName, Descriptor messageDescriptor) {
+    private MessageBytesColumnReader(String columnName, Descriptor messageDescriptor) {
         super(columnName);
         this.messageDescriptor = messageDescriptor;
     }
 
-    static <M extends Message> SerializedColumnReader<M>
+    /**
+     * Creates a new instance of the {@code MessageBytesColumnReader}.
+     *
+     * @param columnName
+     *         the name of the column to read
+     * @param messageDescriptor
+     *         the {@code Descriptor} of the column message type
+     */
+    static <M extends Message> MessageBytesColumnReader<M>
     create(String columnName, Descriptor messageDescriptor) {
-        return new SerializedColumnReader<>(columnName, messageDescriptor);
+        return new MessageBytesColumnReader<>(columnName, messageDescriptor);
     }
 
     @Override

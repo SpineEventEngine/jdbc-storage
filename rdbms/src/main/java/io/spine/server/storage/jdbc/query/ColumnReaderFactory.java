@@ -22,18 +22,53 @@ package io.spine.server.storage.jdbc.query;
 
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Message;
+import io.spine.annotation.Internal;
 
+import java.sql.ResultSet;
+
+/**
+ * The factory which creates {@link ColumnReader} instances.
+ *
+ * <p>The factory method names are optimized for usage in
+ * {@link DbIterator#createFor(ResultSet, ColumnReader)}.
+ */
+@Internal
 public final class ColumnReaderFactory {
 
     private ColumnReaderFactory() {
     }
 
+    /**
+     * Creates a reader for the column storing index values.
+     *
+     * <p>The index values are stored in DB differently from other column values, for example
+     * Protobuf {@link Message} is serialized to JSON instead of {@code bytes}.
+     *
+     * @param columnName
+     *         the name of the column to create the reader for
+     * @param idType
+     *         the class of the IDs stored by the column
+     * @param <I>
+     *         the compile-time type of the IDs stored in the column
+     * @return the {@code ColumnReader} instance for the given column
+     */
     public static <I> ColumnReader<I> idColumn(String columnName, Class<I> idType) {
         return IndexColumnReaders.create(columnName, idType);
     }
 
-    public static <M extends Message> SerializedColumnReader<M>
+    /**
+     * Creates a reader for the column storing serialized Protobuf {@linkplain Message messages}.
+     *
+     * @param columnName
+     *         the name of the column to create the reader for
+     * @param messageDescriptor
+     *         the descriptor of the column message type
+     * @param <M>
+     *         the compile-time type of the messages stored in the column
+     * @return the {@code ColumnReader} for the given column
+     */
+    public static <M extends Message> MessageBytesColumnReader<M>
     messageColumn(String columnName, Descriptor messageDescriptor) {
-        return SerializedColumnReader.create(columnName, messageDescriptor);
+        return MessageBytesColumnReader.create(columnName, messageDescriptor);
     }
 }

@@ -39,7 +39,7 @@ final class IndexColumnReaders {
         } else if (Integer.class == wrapper || Long.class == wrapper) {
             return (ColumnReader<I>) new NumberColumnReader(columnName);
         } else if (Message.class.isAssignableFrom(idType)) {
-            return (ColumnReader<I>) new MessageColumnReader(columnName, idType);
+            return new MessageColumnReader(columnName, idType);
         } else {
             throw newIllegalArgumentException("ID type '%s' is not supported.", idType);
         }
