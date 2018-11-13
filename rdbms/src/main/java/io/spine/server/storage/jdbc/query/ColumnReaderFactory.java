@@ -35,6 +35,7 @@ import java.sql.ResultSet;
 @Internal
 public final class ColumnReaderFactory {
 
+    /** Prevents instantiation of this utility class. */
     private ColumnReaderFactory() {
     }
 

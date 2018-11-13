@@ -31,6 +31,7 @@ import static io.spine.util.Exceptions.newIllegalArgumentException;
  */
 final class IndexColumnReaders {
 
+    /** Prevents instantiation of this utility class. */
     private IndexColumnReaders() {
     }
 
