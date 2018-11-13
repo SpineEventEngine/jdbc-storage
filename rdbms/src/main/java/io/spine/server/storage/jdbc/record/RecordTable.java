@@ -33,6 +33,7 @@ import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.Type;
 import io.spine.server.storage.jdbc.TypeMapping;
 import io.spine.server.storage.jdbc.query.EntityTable;
+import io.spine.server.storage.jdbc.query.IdWithMessage;
 import io.spine.server.storage.jdbc.query.SelectQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
@@ -144,7 +145,8 @@ class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumn
         }
     }
 
-    Iterator<EntityRecord> readByQuery(EntityQuery<I> entityQuery, FieldMask fieldMask) {
+    Iterator<IdWithMessage<I, EntityRecord>> readByQuery(EntityQuery<I> entityQuery,
+                                                         FieldMask fieldMask) {
         SelectByEntityColumnsQuery.Builder<I> builder = SelectByEntityColumnsQuery.newBuilder();
         SelectByEntityColumnsQuery<I> query = builder.setDataSource(getDataSource())
                                                      .setTableName(getName())
@@ -153,7 +155,7 @@ class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumn
                                                      .setEntityQuery(entityQuery)
                                                      .setFieldMask(fieldMask)
                                                      .build();
-        Iterator<EntityRecord> result = query.execute();
+        Iterator<IdWithMessage<I, EntityRecord>> result = query.execute();
         return result;
     }
 

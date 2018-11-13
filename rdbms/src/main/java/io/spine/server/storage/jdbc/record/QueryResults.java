@@ -26,19 +26,18 @@ import com.google.protobuf.Message;
 import io.spine.protobuf.AnyPacker;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.FieldMasks;
-import io.spine.server.storage.jdbc.query.MessageDbIterator;
+import io.spine.server.storage.jdbc.query.IdWithMessage;
+import io.spine.server.storage.jdbc.query.IndexWithMessageIterator;
 
 import java.sql.ResultSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Spliterator;
 import java.util.function.Function;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.Streams.stream;
 import static io.spine.server.storage.jdbc.record.RecordTable.StandardColumn.ENTITY;
-import static java.util.Spliterators.spliteratorUnknownSize;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.StreamSupport.stream;
+import static io.spine.server.storage.jdbc.record.RecordTable.StandardColumn.ID;
 
 /**
  * Utility class for parsing the results of a DB query ({@link ResultSet}) into the
@@ -56,17 +55,24 @@ final class QueryResults {
      * Transforms results of SQL query results into ID-to-{@link EntityRecord} {@link Map}.
      *
      * @param resultSet Results of the query
+     * @param idType
      * @param fieldMask {@code FieldMask} to apply to the results
      * @return ID-to-{@link EntityRecord} {@link Map} representing the query results
      * @see RecordTable
      */
-    static Iterator<EntityRecord> parse(ResultSet resultSet, FieldMask fieldMask) {
-        Iterator<EntityRecord> recordIterator =
-                new MessageDbIterator<>(resultSet, ENTITY.name(), EntityRecord.getDescriptor());
-        Spliterator<EntityRecord> recordSpliterator = spliteratorUnknownSize(recordIterator, 0);
-        Iterator<EntityRecord> result = stream(recordSpliterator, false)
+    @SuppressWarnings("unchecked")
+    static <I> Iterator<IdWithMessage<I, EntityRecord>>
+    parse(ResultSet resultSet, Class<I> idType, FieldMask fieldMask) {
+        IndexWithMessageIterator<I, EntityRecord> iterator = IndexWithMessageIterator
+                .newBuilder()
+                .setResultSet(resultSet)
+                .setColumnName(ENTITY.name())
+                .setIdColumnName(ID.name())
+                .setIdType(idType)
+                .setMessageDescriptor(EntityRecord.getDescriptor())
+                .build();
+        Iterator<IdWithMessage<I, EntityRecord>> result = stream(iterator)
                 .map(maskFields(fieldMask))
-                .collect(toList())
                 .iterator();
         return result;
     }
@@ -77,13 +83,17 @@ final class QueryResults {
         return AnyPacker.pack(result);
     }
 
-    private static Function<EntityRecord, EntityRecord> maskFields(FieldMask fieldMask) {
-        return entityRecord -> {
-            checkNotNull(entityRecord);
-            Any maskedState = maskFieldsOfState(entityRecord, fieldMask);
-            EntityRecord result = entityRecord.toBuilder()
-                                              .setState(maskedState)
-                                              .build();
+    private static <I> Function<IdWithMessage<I, EntityRecord>, IdWithMessage<I, EntityRecord>>
+    maskFields(FieldMask fieldMask) {
+        return idWithMessage -> {
+            checkNotNull(idWithMessage);
+            EntityRecord message = idWithMessage.message();
+            Any maskedState = maskFieldsOfState(message, fieldMask);
+            EntityRecord newRecord = message.toBuilder()
+                                         .setState(maskedState)
+                                         .build();
+            IdWithMessage<I, EntityRecord> result =
+                    new IdWithMessage<>(idWithMessage.id(), newRecord);
             return result;
         };
     }

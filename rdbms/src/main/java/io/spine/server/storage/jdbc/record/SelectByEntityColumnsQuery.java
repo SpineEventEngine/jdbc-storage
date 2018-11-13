@@ -21,6 +21,7 @@
 package io.spine.server.storage.jdbc.record;
 
 import com.google.protobuf.FieldMask;
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.sql.AbstractSQLQuery;
 import io.spine.server.entity.EntityRecord;
@@ -28,6 +29,7 @@ import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.entity.storage.EntityQuery;
 import io.spine.server.storage.jdbc.query.AbstractQuery;
 import io.spine.server.storage.jdbc.query.IdColumn;
+import io.spine.server.storage.jdbc.query.IdWithMessage;
 import io.spine.server.storage.jdbc.query.SelectQuery;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
 
@@ -38,7 +40,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static io.spine.server.storage.jdbc.query.QueryPredicates.inIds;
 import static io.spine.server.storage.jdbc.query.QueryPredicates.matchParameters;
+import static io.spine.server.storage.jdbc.record.QueryResults.parse;
 import static io.spine.server.storage.jdbc.record.RecordTable.StandardColumn.ENTITY;
+import static io.spine.server.storage.jdbc.record.RecordTable.StandardColumn.ID;
 
 /**
  * A query selecting the records from the {@link RecordTable RecordTable} by an {@link EntityQuery}.
@@ -46,7 +50,7 @@ import static io.spine.server.storage.jdbc.record.RecordTable.StandardColumn.ENT
  * @author Dmytro Grankin
  */
 final class SelectByEntityColumnsQuery<I> extends AbstractQuery
-        implements SelectQuery<Iterator<EntityRecord>> {
+        implements SelectQuery<Iterator<IdWithMessage<I, EntityRecord>>> {
 
     private final EntityQuery<I> entityQuery;
     private final FieldMask fieldMask;
@@ -62,16 +66,16 @@ final class SelectByEntityColumnsQuery<I> extends AbstractQuery
     }
 
     @Override
-    public Iterator<EntityRecord> execute() {
+    public Iterator<IdWithMessage<I, EntityRecord>> execute() {
         Predicate inIds = inIds(idColumn, entityQuery.getIds());
         Predicate matchParameters = matchParameters(entityQuery.getParameters(),
                                                     columnTypeRegistry);
-        AbstractSQLQuery<Object, ?> query = factory().select(pathOf(ENTITY))
-                                                     .where(inIds)
-                                                     .where(matchParameters)
-                                                     .from(table());
+        AbstractSQLQuery<Tuple, ?> query = factory().select(pathOf(ID), pathOf(ENTITY))
+                                                    .where(inIds)
+                                                    .where(matchParameters)
+                                                    .from(table());
         ResultSet resultSet = query.getResults();
-        return QueryResults.parse(resultSet, fieldMask);
+        return parse(resultSet, idColumn.getJavaType(), fieldMask);
     }
 
     static <I> Builder<I> newBuilder() {

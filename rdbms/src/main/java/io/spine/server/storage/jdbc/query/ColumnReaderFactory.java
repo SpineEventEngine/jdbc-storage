@@ -20,35 +20,21 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import com.google.protobuf.Descriptors.Descriptor;
+import com.google.protobuf.Message;
 
-import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.idReader;
+final class ColumnReaderFactory {
 
-/**
- * An iterator over the IDs of a table.
- *
- * @author Dmytro Dashenkov
- */
-class IndexIterator<I> extends DbIterator<I> {
-
-    private final Class<I> idType;
-
-    /**
-     * Creates a new iterator instance.
-     *  @param resultSet  a result set of IDs (will be closed on a {@link #close()})
-     * @param columnName a name of a serialized storage record column
-     * @param idType
-     */
-    IndexIterator(ResultSet resultSet, String columnName, Class<I> idType) {
-        super(resultSet, columnName);
-        this.idType = idType;
+    private ColumnReaderFactory() {
     }
 
-    @Override
-    protected I readResult() throws SQLException {
-        ColumnReader<I> columnReader = idReader(getColumnName(), idType);
-        I result = columnReader.read(getResultSet());
-        return result;
+    static <I> ColumnReader<I> idReader(String columnName, Class<I> idType) {
+        return IndexColumnReaders.create(columnName, idType);
+    }
+
+    @SuppressWarnings("unchecked") // Logically correct.
+    static <M extends Message> SerializedColumnReader<M>
+    messageReader(String columnName, Descriptor messageDescriptor) {
+        return SerializedColumnReader.create(columnName, messageDescriptor);
     }
 }

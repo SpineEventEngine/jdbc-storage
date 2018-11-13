@@ -28,7 +28,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static io.spine.server.storage.jdbc.query.Serializer.deserialize;
+import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.messageReader;
 
 /**
  * An iterator over the message records of a table.
@@ -47,8 +47,8 @@ public class MessageDbIterator<M extends Message> extends DbIterator<M> {
 
     @Override
     protected M readResult() throws SQLException {
-        byte[] bytes = getResultSet().getBytes(getColumnName());
-        M result = deserialize(bytes, messageDescriptor);
+        ColumnReader<M> columnReader = messageReader(getColumnName(), messageDescriptor);
+        M result = columnReader.read(getResultSet());
         return result;
     }
 }

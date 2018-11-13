@@ -23,32 +23,18 @@ package io.spine.server.storage.jdbc.query;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.idReader;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-/**
- * An iterator over the IDs of a table.
- *
- * @author Dmytro Dashenkov
- */
-class IndexIterator<I> extends DbIterator<I> {
+class StringColumnReader extends ColumnReader<String> {
 
-    private final Class<I> idType;
-
-    /**
-     * Creates a new iterator instance.
-     *  @param resultSet  a result set of IDs (will be closed on a {@link #close()})
-     * @param columnName a name of a serialized storage record column
-     * @param idType
-     */
-    IndexIterator(ResultSet resultSet, String columnName, Class<I> idType) {
-        super(resultSet, columnName);
-        this.idType = idType;
+    StringColumnReader(String columnName) {
+        super(columnName);
     }
 
     @Override
-    protected I readResult() throws SQLException {
-        ColumnReader<I> columnReader = idReader(getColumnName(), idType);
-        I result = columnReader.read(getResultSet());
+    public String read(ResultSet resultSet) throws SQLException {
+        checkNotNull(resultSet);
+        String result = resultSet.getString(columnName());
         return result;
     }
 }

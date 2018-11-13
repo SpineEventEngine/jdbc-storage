@@ -29,6 +29,7 @@ import io.spine.client.EntityId;
 import io.spine.client.EntityIdFilter;
 import io.spine.client.OrderBy;
 import io.spine.client.Pagination;
+import io.spine.protobuf.AnyPacker;
 import io.spine.server.entity.Entity;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
@@ -41,20 +42,23 @@ import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.JdbcStorageFactory;
 import io.spine.server.storage.jdbc.StorageBuilder;
+import io.spine.server.storage.jdbc.query.IdWithMessage;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static java.util.Collections.singletonList;
+import static com.google.common.collect.Streams.stream;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.StreamSupport.stream;
 
 /**
  * The implementation of the entity storage based on the RDBMS.
@@ -113,14 +117,24 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
         return readMultipleRecords(ids, FieldMask.getDefaultInstance());
     }
 
+    @SuppressWarnings("unchecked") // Logically correct.
     @Override
     protected Iterator<@Nullable EntityRecord> readMultipleRecords(Iterable<I> ids,
                                                                    FieldMask fieldMask) {
         Collection<EntityRecord> records = new ArrayList<>();
+        EntityQuery<I> query = toQuery(ids);
+        Iterator<IdWithMessage<I, EntityRecord>> resultIterator = table.readByQuery(query, fieldMask);
+        Map<I, EntityRecord> presentRecords = new HashMap<>();
+        resultIterator.forEachRemaining(
+                record -> presentRecords.put(record.id(), record.message())
+        );
         for (I id : ids) {
-            EntityQuery<I> query = toQuery(id);
-            EntityRecord recordOrNull = readRecordOrNull(query, fieldMask);
-            records.add(recordOrNull);
+            EntityRecord record = presentRecords.get(id);
+            if (record != null) {
+                records.add(record);
+            } else {
+                records.add(null);
+            }
         }
         Iterator<EntityRecord> recordsIterator = records.iterator();
         return recordsIterator;
@@ -133,15 +147,22 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
 
     @Override
     protected Iterator<EntityRecord> readAllRecords(FieldMask fieldMask) {
-        Iterator<EntityRecord> records = table.readByQuery(emptyQuery(), fieldMask);
-        return records;
+        Iterator<IdWithMessage<I, EntityRecord>> records =
+                table.readByQuery(emptyQuery(), fieldMask);
+        Iterator<EntityRecord> result = stream(records)
+                .map(IdWithMessage::message)
+                .iterator();
+        return result;
     }
 
     @Override
     protected Iterator<EntityRecord> readAllRecords(EntityQuery<I> query, FieldMask fieldMask) {
         EntityQuery<I> completeQuery = appendLifecycleFilters(query);
-        Iterator<EntityRecord> records = table.readByQuery(completeQuery, fieldMask);
-        return records;
+        Iterator<IdWithMessage<I, EntityRecord>> records = table.readByQuery(completeQuery, fieldMask);
+        Iterator<EntityRecord> result = stream(records)
+                .map(IdWithMessage::message)
+                .iterator();
+        return result;
     }
 
     @Override
@@ -171,11 +192,6 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
         table.deleteAll();
     }
 
-    private @Nullable EntityRecord readRecordOrNull(EntityQuery<I> query, FieldMask fieldMask) {
-        Iterator<EntityRecord> resultIterator = table.readByQuery(query, fieldMask);
-        return resultIterator.hasNext() ? resultIterator.next() : null;
-    }
-
     private EntityQuery<I> emptyQuery() {
         EntityQuery<I> query = EntityQueries.from(
                 EntityFilters.getDefaultInstance(),
@@ -186,9 +202,10 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
         return result;
     }
 
-    private EntityQuery<I> toQuery(I id) {
-        EntityId entityId = AggregateStateIdToEntityId.INSTANCE.apply(id);
-        List<EntityId> entityIds = singletonList(entityId);
+    private EntityQuery<I> toQuery(Iterable<I> ids) {
+        Iterable<EntityId> entityIds = stream(ids.spliterator(), false)
+                .map(AggregateStateIdToEntityId.INSTANCE)
+                .collect(toList());
         EntityIdFilter idFilter = EntityIdFilter.newBuilder()
                                                 .addAllIds(entityIds)
                                                 .build();

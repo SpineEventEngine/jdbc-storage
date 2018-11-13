@@ -18,37 +18,25 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.query;
+package io.spine.server.storage.jdbc.record;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import io.spine.server.entity.EntityRecord;
 
-import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.idReader;
+class EntityRecordWithId<I> {
 
-/**
- * An iterator over the IDs of a table.
- *
- * @author Dmytro Dashenkov
- */
-class IndexIterator<I> extends DbIterator<I> {
+    private final I id;
+    private final EntityRecord record;
 
-    private final Class<I> idType;
-
-    /**
-     * Creates a new iterator instance.
-     *  @param resultSet  a result set of IDs (will be closed on a {@link #close()})
-     * @param columnName a name of a serialized storage record column
-     * @param idType
-     */
-    IndexIterator(ResultSet resultSet, String columnName, Class<I> idType) {
-        super(resultSet, columnName);
-        this.idType = idType;
+    EntityRecordWithId(I id, EntityRecord record) {
+        this.id = id;
+        this.record = record;
     }
 
-    @Override
-    protected I readResult() throws SQLException {
-        ColumnReader<I> columnReader = idReader(getColumnName(), idType);
-        I result = columnReader.read(getResultSet());
-        return result;
+    I id() {
+        return id;
+    }
+
+    EntityRecord record() {
+        return record;
     }
 }

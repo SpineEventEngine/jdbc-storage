@@ -20,35 +20,33 @@
 
 package io.spine.server.storage.jdbc.query;
 
+import com.google.protobuf.Descriptors.Descriptor;
+import com.google.protobuf.Message;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.idReader;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static io.spine.server.storage.jdbc.query.Serializer.deserialize;
 
-/**
- * An iterator over the IDs of a table.
- *
- * @author Dmytro Dashenkov
- */
-class IndexIterator<I> extends DbIterator<I> {
+class SerializedColumnReader<M extends Message> extends ColumnReader<M> {
 
-    private final Class<I> idType;
+    private final Descriptor messageDescriptor;
 
-    /**
-     * Creates a new iterator instance.
-     *  @param resultSet  a result set of IDs (will be closed on a {@link #close()})
-     * @param columnName a name of a serialized storage record column
-     * @param idType
-     */
-    IndexIterator(ResultSet resultSet, String columnName, Class<I> idType) {
-        super(resultSet, columnName);
-        this.idType = idType;
+    private SerializedColumnReader(String columnName, Descriptor messageDescriptor) {
+        super(columnName);
+        this.messageDescriptor = messageDescriptor;
+    }
+
+    static SerializedColumnReader create(String columnName, Descriptor messageDescriptor) {
+        return new SerializedColumnReader(columnName, messageDescriptor);
     }
 
     @Override
-    protected I readResult() throws SQLException {
-        ColumnReader<I> columnReader = idReader(getColumnName(), idType);
-        I result = columnReader.read(getResultSet());
+    public M read(ResultSet resultSet) throws SQLException {
+        checkNotNull(resultSet);
+        byte[] bytes = resultSet.getBytes(columnName());
+        M result = deserialize(bytes, messageDescriptor);
         return result;
     }
 }

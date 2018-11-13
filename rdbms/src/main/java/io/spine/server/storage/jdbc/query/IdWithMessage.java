@@ -20,35 +20,23 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import com.google.protobuf.Message;
 
-import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.idReader;
+public final class IdWithMessage<I, M extends Message> {
 
-/**
- * An iterator over the IDs of a table.
- *
- * @author Dmytro Dashenkov
- */
-class IndexIterator<I> extends DbIterator<I> {
+    private final I id;
+    private final M message;
 
-    private final Class<I> idType;
-
-    /**
-     * Creates a new iterator instance.
-     *  @param resultSet  a result set of IDs (will be closed on a {@link #close()})
-     * @param columnName a name of a serialized storage record column
-     * @param idType
-     */
-    IndexIterator(ResultSet resultSet, String columnName, Class<I> idType) {
-        super(resultSet, columnName);
-        this.idType = idType;
+    public IdWithMessage(I id, M message) {
+        this.id = id;
+        this.message = message;
     }
 
-    @Override
-    protected I readResult() throws SQLException {
-        ColumnReader<I> columnReader = idReader(getColumnName(), idType);
-        I result = columnReader.read(getResultSet());
-        return result;
+    public I id() {
+        return id;
+    }
+
+    public M message() {
+        return message;
     }
 }

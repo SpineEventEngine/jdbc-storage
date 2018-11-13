@@ -20,35 +20,28 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import com.google.common.primitives.Primitives;
+import com.google.protobuf.Message;
 
-import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.idReader;
+import static io.spine.util.Exceptions.newIllegalArgumentException;
 
-/**
- * An iterator over the IDs of a table.
- *
- * @author Dmytro Dashenkov
- */
-class IndexIterator<I> extends DbIterator<I> {
+final class IndexColumnReaders {
 
-    private final Class<I> idType;
-
-    /**
-     * Creates a new iterator instance.
-     *  @param resultSet  a result set of IDs (will be closed on a {@link #close()})
-     * @param columnName a name of a serialized storage record column
-     * @param idType
-     */
-    IndexIterator(ResultSet resultSet, String columnName, Class<I> idType) {
-        super(resultSet, columnName);
-        this.idType = idType;
+    private IndexColumnReaders() {
     }
 
-    @Override
-    protected I readResult() throws SQLException {
-        ColumnReader<I> columnReader = idReader(getColumnName(), idType);
-        I result = columnReader.read(getResultSet());
-        return result;
+    @SuppressWarnings({"unchecked" /* Logically checked by if statements. */,
+            "IfStatementWithTooManyBranches" /* Required to differentiate between reader types. */})
+    static <I> ColumnReader<I> create(String columnName, Class<I> idType) {
+        Class<I> wrapper = Primitives.wrap(idType);
+        if (String.class.equals(idType)) {
+            return (ColumnReader<I>) new StringColumnReader(columnName);
+        } else if (Integer.class == wrapper || Long.class == wrapper) {
+            return (ColumnReader<I>) new NumberColumnReader(columnName);
+        } else if (Message.class.isAssignableFrom(idType)) {
+            return (ColumnReader<I>) new MessageColumnReader(columnName, idType);
+        } else {
+            throw newIllegalArgumentException("ID type '%s' is not supported.", idType);
+        }
     }
 }
