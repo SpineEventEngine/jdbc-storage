@@ -25,11 +25,26 @@ import com.google.protobuf.Message;
 
 import static io.spine.util.Exceptions.newIllegalArgumentException;
 
+/**
+ * A helper class that allows to distinguish between the different {@link ColumnReader} types for
+ * the different ID types.
+ */
 final class IndexColumnReaders {
 
     private IndexColumnReaders() {
     }
 
+    /**
+     * Creates a new iterator for the column storing entity IDs.
+     *
+     * @param columnName
+     *         the name of the ID column
+     * @param idType
+     *         the type of the IDs stored in column
+     * @param <I>
+     *         the compile-time type of the IDs
+     * @return a new instance of {@code ColumnReader}
+     */
     @SuppressWarnings({"unchecked" /* Logically checked by if statements. */,
             "IfStatementWithTooManyBranches" /* Required to differentiate between reader types. */})
     static <I> ColumnReader<I> create(String columnName, Class<I> idType) {
