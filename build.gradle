@@ -7,7 +7,7 @@ buildscript {
 }
 
 ext {
-    publishPlugin = "$rootDir/scripts/publish.gradle"
+    publishPlugin = "$rootDir/config/scripts/publish.gradle"
     credentialsPropertyFile = 'credentials.properties'
     projectsToPublish = ['rdbms']
 }
