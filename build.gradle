@@ -7,7 +7,6 @@ buildscript {
 }
 
 ext {
-    publishPlugin = "$rootDir/config/scripts/publish.gradle"
     credentialsPropertyFile = 'credentials.properties'
     projectsToPublish = ['rdbms']
 }
@@ -101,4 +100,5 @@ subprojects {
     check.dependsOn jacocoTestReport
 }
 
-apply from: publishPlugin
+apply from: deps.scripts.jacoco
+apply from: deps.scripts.publish
