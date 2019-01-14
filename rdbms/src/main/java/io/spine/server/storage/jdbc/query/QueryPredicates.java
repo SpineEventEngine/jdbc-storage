@@ -47,13 +47,11 @@ import static io.spine.util.Exceptions.newIllegalArgumentException;
 
 /**
  * A utility methods to work with {@linkplain Predicate predicates}.
- *
- * @author Dmytro Grankin
  */
 public class QueryPredicates {
 
+    /** Prevent instantiation of this utility class. */
     private QueryPredicates() {
-        // Prevent instantiation of this utility class.
     }
 
     /**
@@ -132,7 +130,8 @@ public class QueryPredicates {
         ComparablePath<Comparable> columnPath = comparablePath(Comparable.class, columnName);
         JdbcColumnType<? super Object, ? super Object> columnType =
                 columnTypeRegistry.get(column);
-        Object javaValue = toObject(filter.getValue(), column.getType());
+        Class<?> type = column.getType();
+        Object javaValue = toObject(filter.getValue(), type);
         Serializable persistedValue = column.toPersistedValue(javaValue);
 
         if (persistedValue == null) {

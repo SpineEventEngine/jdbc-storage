@@ -35,7 +35,7 @@ subprojects {
 
     repositories {
         mavenLocal()
-        mavenCentral()
+        google()
 
         maven { url = repos.spine }
         maven { url = repos.spineSnapshots }
