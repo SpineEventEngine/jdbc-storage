@@ -7,7 +7,6 @@ buildscript {
 }
 
 ext {
-    publishPlugin = "$rootDir/scripts/publish.gradle"
     credentialsPropertyFile = 'credentials.properties'
     projectsToPublish = ['rdbms']
 }
@@ -21,7 +20,7 @@ allprojects {
 }
 
 subprojects {
-    apply plugin: 'java'
+    apply plugin: 'java-library'
     apply plugin: 'maven-publish'
 
     sourceCompatibility = 1.8
@@ -36,7 +35,7 @@ subprojects {
 
     repositories {
         mavenLocal()
-        mavenCentral()
+        jcenter()
 
         maven { url = repos.spine }
         maven { url = repos.spineSnapshots }
@@ -98,7 +97,13 @@ subprojects {
         classifier "test"
     }
 
+    task javadocJar(type: Jar, dependsOn: 'javadoc') {
+        from ("$projectDir/build/docs/javadoc")
+        classifier "javadoc"
+    }
+    
     check.dependsOn jacocoTestReport
 }
 
-apply from: publishPlugin
+apply from: deps.scripts.jacoco
+apply from: deps.scripts.publish
