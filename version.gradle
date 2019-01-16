@@ -18,10 +18,10 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-final def SPINE_VERSION = '1.0.0-pre1'
+final def SPINE_VERSION = '1.0.0-pre3'
 
 ext {
     versionToPublish = SPINE_VERSION
-    spineBaseVersion = '1.0.0-pre1'
-    spineCoreVersion = '1.0.0-pre1'
+    spineBaseVersion = SPINE_VERSION
+    spineCoreVersion = SPINE_VERSION
 }
