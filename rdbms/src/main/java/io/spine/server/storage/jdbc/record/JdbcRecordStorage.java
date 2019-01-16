@@ -193,7 +193,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     }
 
     private EntityQuery<I> appendLifecycleFilters(EntityQuery<I> query) {
-        if (isLifecycleSupported() && !query.isLifecycleAttributesSet()) {
+        if (!query.isLifecycleAttributesSet()) {
             return query.withActiveLifecycle(this);
         }
         return query;

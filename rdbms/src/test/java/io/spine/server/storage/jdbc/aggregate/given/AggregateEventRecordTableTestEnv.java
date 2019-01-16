@@ -20,21 +20,17 @@
 
 package io.spine.server.storage.jdbc.aggregate.given;
 
-import com.google.protobuf.StringValue;
 import io.spine.server.aggregate.Aggregate;
-import io.spine.validate.StringValueVBuilder;
+import io.spine.test.storage.Project;
+import io.spine.test.storage.ProjectVBuilder;
 
-/**
- * @author Dmytro Grankin
- * @author Dmytro Kuzmin
- */
 public class AggregateEventRecordTableTestEnv {
 
     /** Prevents instantiation of this utility class. */
     private AggregateEventRecordTableTestEnv() {
     }
 
-    public static class AnAggregate extends Aggregate<String, StringValue, StringValueVBuilder> {
+    public static class AnAggregate extends Aggregate<String, Project, ProjectVBuilder> {
         private AnAggregate(String id) {
             super(id);
         }

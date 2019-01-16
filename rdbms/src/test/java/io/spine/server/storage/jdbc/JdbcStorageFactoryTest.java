@@ -24,6 +24,7 @@ import io.spine.server.aggregate.AggregateStorage;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.projection.ProjectionStorage;
 import io.spine.server.storage.RecordStorage;
+import io.spine.server.storage.StorageFactory;
 import io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.TestAggregate;
 import io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.TestEntity;
 import io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.TestProjection;
@@ -171,7 +172,7 @@ class JdbcStorageFactoryTest {
                                                        .setTypeMapping(MYSQL_5_7)
                                                        .build();
         assertTrue(factory.isMultitenant());
-        JdbcStorageFactory singleTenantFactory = factory.toSingleTenant();
+        StorageFactory singleTenantFactory = factory.toSingleTenant();
         assertFalse(singleTenantFactory.isMultitenant());
     }
 

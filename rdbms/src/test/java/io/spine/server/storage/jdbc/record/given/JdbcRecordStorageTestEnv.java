@@ -26,9 +26,6 @@ import io.spine.server.storage.given.RecordStorageTestEnv.TestCounterEntity;
 import io.spine.test.storage.Project;
 import io.spine.test.storage.ProjectId;
 
-/**
- * @author Dmytro Grankin
- */
 public class JdbcRecordStorageTestEnv {
 
     public static final String COLUMN_NAME_FOR_STORING = "customName";

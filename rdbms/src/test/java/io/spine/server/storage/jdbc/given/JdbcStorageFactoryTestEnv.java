@@ -26,12 +26,7 @@ import io.spine.server.entity.AbstractEntity;
 import io.spine.server.projection.Projection;
 import io.spine.test.storage.Project;
 import io.spine.test.storage.ProjectVBuilder;
-import io.spine.validate.StringValueVBuilder;
 
-/**
- * @author Alexander Litus
- * @author Dmytro Kuzmin
- */
 public class JdbcStorageFactoryTestEnv {
 
     /** Prevents instantiation of this utility class. */
@@ -45,7 +40,7 @@ public class JdbcStorageFactoryTestEnv {
         }
     }
 
-    public static class TestAggregate extends Aggregate<String, StringValue, StringValueVBuilder> {
+    public static class TestAggregate extends Aggregate<String, Project, ProjectVBuilder> {
 
         private TestAggregate(String id) {
             super(id);
