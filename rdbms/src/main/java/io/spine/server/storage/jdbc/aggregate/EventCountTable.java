@@ -1,5 +1,5 @@
 /*
- * Copyright 2018, TeamDev. All rights reserved.
+ * Copyright 2019, TeamDev. All rights reserved.
  *
  * Redistribution and use in source and/or binary forms, with or without
  * modification, must retain the above copyright notice and the following
@@ -36,9 +36,7 @@ import static io.spine.server.storage.jdbc.Type.INT;
 import static io.spine.server.storage.jdbc.aggregate.EventCountTable.Column.ID;
 
 /**
- * A table for storing the
- * {@link io.spine.server.aggregate.AggregateStorage#readEventCountAfterLastSnapshot(Object)
- * event count after the last snapshot}.
+ * A table for storing the event counts after the last snapshot.
  *
  * <p>This table exists for the performance reasons. It acts as a cache for data
  * that is used in the command handling lifecycle.
