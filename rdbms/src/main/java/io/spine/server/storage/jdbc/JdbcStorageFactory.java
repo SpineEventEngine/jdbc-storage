@@ -1,5 +1,5 @@
 /*
- * Copyright 2018, TeamDev. All rights reserved.
+ * Copyright 2019, TeamDev. All rights reserved.
  *
  * Redistribution and use in source and/or binary forms, with or without
  * modification, must retain the above copyright notice and the following
@@ -23,6 +23,7 @@ package io.spine.server.storage.jdbc;
 import com.google.common.annotations.VisibleForTesting;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import io.spine.core.BoundedContextName;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateStorage;
 import io.spine.server.entity.Entity;
@@ -69,16 +70,20 @@ public class JdbcStorageFactory implements StorageFactory {
     }
 
     @Override
-    public JdbcStorageFactory toSingleTenant() {
-        if (isMultitenant()) {
-            return newBuilder().setColumnTypeRegistry(columnTypeRegistry)
-                               .setDataSource(dataSource)
-                               .setTypeMapping(typeMapping)
-                               .setMultitenant(false)
-                               .build();
-        } else {
-            return this;
-        }
+    public StorageFactory toSingleTenant() {
+        return isMultitenant()
+               ? copyFor(BoundedContextName.getDefaultInstance(), false)
+               : this;
+    }
+
+    @Override
+    public StorageFactory copyFor(BoundedContextName name, boolean multitenant) {
+        JdbcStorageFactory copy = newBuilder().setColumnTypeRegistry(columnTypeRegistry)
+                                               .setDataSource(dataSource)
+                                               .setTypeMapping(typeMapping)
+                                               .setMultitenant(multitenant)
+                                               .build();
+        return copy;
     }
 
     @Override

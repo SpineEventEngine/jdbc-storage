@@ -1,5 +1,5 @@
 /*
- * Copyright 2018, TeamDev. All rights reserved.
+ * Copyright 2019, TeamDev. All rights reserved.
  *
  * Redistribution and use in source and/or binary forms, with or without
  * modification, must retain the above copyright notice and the following
@@ -38,7 +38,7 @@ import io.spine.server.storage.RecordStorageTest;
 import io.spine.server.storage.given.RecordStorageTestEnv.TestCounterEntity;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.GivenDataSource;
-import io.spine.server.storage.jdbc.record.given.JdbcRecordStorageTestEnv;
+import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.record.given.JdbcRecordStorageTestEnv.TestCounterEntityJdbc;
 import io.spine.server.storage.jdbc.record.given.JdbcRecordStorageTestEnv.TestEntityWithStringId;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
@@ -50,24 +50,28 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.Optional;
 
+import static com.google.common.truth.Truth.assertThat;
 import static io.spine.client.ColumnFilters.gt;
 import static io.spine.client.ColumnFilters.lt;
 import static io.spine.client.CompositeColumnFilter.CompositeOperator.ALL;
+import static io.spine.server.storage.LifecycleFlagField.archived;
+import static io.spine.server.storage.LifecycleFlagField.deleted;
+import static io.spine.server.storage.VersionField.version;
 import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
+import static io.spine.server.storage.jdbc.record.given.JdbcRecordStorageTestEnv.COLUMN_NAME_FOR_STORING;
 import static io.spine.testing.Tests.nullRef;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-/**
- * @author Alexander Litus
- */
-@SuppressWarnings({"InnerClassMayBeStatic", "ClassCanBeStatic"
-        /* JUnit nested classes cannot be static. */,
-        "DuplicateStringLiteralInspection" /* Common test display names. */})
+@SuppressWarnings({
+        "InnerClassMayBeStatic", "ClassCanBeStatic", /* JUnit nested classes cannot be static. */
+        "DuplicateStringLiteralInspection" /* Common test display names. */
+})
 @DisplayName("JdbcRecordStorage should")
 class JdbcRecordStorageTest extends RecordStorageTest<JdbcRecordStorage<ProjectId>> {
 
@@ -90,7 +94,7 @@ class JdbcRecordStorageTest extends RecordStorageTest<JdbcRecordStorage<ProjectI
 
     @Test
     @DisplayName("throw ISE when closing twice")
-    void throwOnClosingTwice() throws Exception {
+    void throwOnClosingTwice() {
         RecordStorage<?> storage = getStorage();
         storage.close();
         assertThrows(IllegalStateException.class, storage::close);
@@ -100,12 +104,15 @@ class JdbcRecordStorageTest extends RecordStorageTest<JdbcRecordStorage<ProjectI
     @DisplayName("use column names for storing")
     void useColumnNames() {
         JdbcRecordStorage<ProjectId> storage = newStorage(TestEntityWithStringId.class);
-        int entityColumnIndex = RecordTable.StandardColumn.values().length;
-        String customColumnName = storage.getTable()
-                                         .getTableColumns()
-                                         .get(entityColumnIndex)
-                                         .name();
-        assertEquals(JdbcRecordStorageTestEnv.COLUMN_NAME_FOR_STORING, customColumnName);
+        List<String> columns = storage.getTable()
+                                      .getTableColumns()
+                                      .stream()
+                                      .map(TableColumn::name)
+                                      .collect(toList());
+        assertThat(columns).containsAllOf(archived.name(),
+                                          deleted.name(),
+                                          version.name(),
+                                          COLUMN_NAME_FOR_STORING);
         close(storage);
     }
 
