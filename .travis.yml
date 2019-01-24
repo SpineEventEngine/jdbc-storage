@@ -5,7 +5,7 @@ before_install:
   - pip install --user codecov
 
 script:
-  - ./gradlew build --debug
+  - ./gradlew build --stacktrace
 
   # Decrypt and unarchive Maven credentials.
   - openssl aes-256-cbc -K $encrypted_4ded43a06dc3_key -iv $encrypted_4ded43a06dc3_iv -in credentials.tar.enc -out credentials.tar -d
