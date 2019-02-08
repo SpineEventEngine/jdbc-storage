@@ -22,11 +22,11 @@ package io.spine.server.storage.jdbc.record;
 
 import com.google.protobuf.FieldMask;
 import com.google.protobuf.Message;
-import io.spine.client.ColumnFilter;
-import io.spine.client.CompositeColumnFilter;
-import io.spine.client.EntityFilters;
+import io.spine.client.CompositeFilter;
+import io.spine.client.Filter;
 import io.spine.client.OrderBy;
 import io.spine.client.Pagination;
+import io.spine.client.TargetFilters;
 import io.spine.server.entity.Entity;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
@@ -54,9 +54,9 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.google.common.truth.Truth.assertThat;
-import static io.spine.client.ColumnFilters.gt;
-import static io.spine.client.ColumnFilters.lt;
-import static io.spine.client.CompositeColumnFilter.CompositeOperator.ALL;
+import static io.spine.client.CompositeFilter.CompositeOperator.ALL;
+import static io.spine.client.Filters.gt;
+import static io.spine.client.Filters.lt;
 import static io.spine.server.storage.LifecycleFlagField.archived;
 import static io.spine.server.storage.LifecycleFlagField.deleted;
 import static io.spine.server.storage.VersionField.version;
@@ -123,17 +123,19 @@ class JdbcRecordStorageTest extends RecordStorageTest<JdbcRecordStorage<ProjectI
     void readByCompositeFilter() {
         JdbcRecordStorage<ProjectId> storage = newStorage(TestEntityWithStringId.class);
         String columnName = "value";
-        ColumnFilter lessThan = lt(columnName, -5);
-        ColumnFilter greaterThan = gt(columnName, 5);
-        CompositeColumnFilter columnFilter = CompositeColumnFilter.newBuilder()
-                                                                  .addFilter(lessThan)
-                                                                  .addFilter(greaterThan)
-                                                                  .setOperator(ALL)
-                                                                  .build();
-        EntityFilters entityFilters = EntityFilters.newBuilder()
-                                                   .addFilter(columnFilter)
-                                                   .build();
-        EntityQuery<ProjectId> query = EntityQueries.from(entityFilters,
+        Filter lessThan = lt(columnName, -5);
+        Filter greaterThan = gt(columnName, 5);
+        CompositeFilter columnFilter = CompositeFilter
+                .newBuilder()
+                .addFilter(lessThan)
+                .addFilter(greaterThan)
+                .setOperator(ALL)
+                .build();
+        TargetFilters filters = TargetFilters
+                .newBuilder()
+                .addFilter(columnFilter)
+                .build();
+        EntityQuery<ProjectId> query = EntityQueries.from(filters,
                                                           OrderBy.getDefaultInstance(),
                                                           Pagination.getDefaultInstance(),
                                                           storage);
