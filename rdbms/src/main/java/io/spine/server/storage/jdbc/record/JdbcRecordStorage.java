@@ -24,11 +24,11 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.protobuf.Any;
 import com.google.protobuf.FieldMask;
 import io.spine.base.Identifier;
-import io.spine.client.EntityFilters;
 import io.spine.client.EntityId;
-import io.spine.client.EntityIdFilter;
+import io.spine.client.IdFilter;
 import io.spine.client.OrderBy;
 import io.spine.client.Pagination;
+import io.spine.client.TargetFilters;
 import io.spine.server.entity.Entity;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
@@ -58,8 +58,8 @@ import static java.util.stream.StreamSupport.stream;
 /**
  * The implementation of the entity storage based on the RDBMS.
  *
- * @param <I> the type of entity IDs
- * @author Alexander Litus
+ * @param <I>
+ *         the type of entity IDs
  * @see JdbcStorageFactory
  */
 public class JdbcRecordStorage<I> extends RecordStorage<I> {
@@ -70,7 +70,8 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     /**
      * Creates a new instance using the builder.
      *
-     * @param builder the storage builder
+     * @param builder
+     *         the storage builder
      */
     protected JdbcRecordStorage(Builder<I> builder) throws DatabaseException {
         super(builder.isMultitenant(), builder.getEntityClass());
@@ -96,9 +97,11 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     }
 
     /**
-     * {@inheritDoc}
+     * Reads the record by the passed identifier.
      *
-     * @throws DatabaseException if an error occurs during an interaction with the DB
+     * @return a resulting {@code EntityRecord}, or {@code Optional.empty()} if nothing found
+     * @throws DatabaseException
+     *         if an error occurs during an interaction with the DB
      */
     @Override
     protected Optional<EntityRecord> readRecord(I id) throws DatabaseException {
@@ -158,7 +161,8 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
      *
      * <p>Used for testing purposes.
      *
-     * @throws DatabaseException if an error occurs during an interaction with the DB
+     * @throws DatabaseException
+     *         if an error occurs during an interaction with the DB
      */
     void clear() throws DatabaseException {
         table.deleteAll();
@@ -166,7 +170,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
 
     private EntityQuery<I> emptyQuery() {
         EntityQuery<I> query = EntityQueries.from(
-                EntityFilters.getDefaultInstance(),
+                TargetFilters.getDefaultInstance(),
                 OrderBy.getDefaultInstance(),
                 Pagination.getDefaultInstance(),
                 getThis());
@@ -175,13 +179,13 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     }
 
     private EntityQuery<I> toQuery(Iterable<I> ids) {
-        Iterable<EntityId> entityIds = stream(ids.spliterator(), false)
-                .map(AggregateStateIdToEntityId.INSTANCE)
+        Iterable<Any> entityIds = stream(ids.spliterator(), false)
+                .map(Identifier::pack)
                 .collect(toList());
-        EntityIdFilter idFilter = EntityIdFilter.newBuilder()
-                                                .addAllIds(entityIds)
-                                                .build();
-        EntityFilters entityFilters = EntityFilters.newBuilder()
+        IdFilter idFilter = IdFilter.newBuilder()
+                                    .addAllIds(entityIds)
+                                    .build();
+        TargetFilters entityFilters = TargetFilters.newBuilder()
                                                    .setIdFilter(idFilter)
                                                    .build();
         EntityQuery<I> query = EntityQueries.from(entityFilters,
@@ -236,7 +240,10 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
         }
 
         /**
-         * @param entityClass the class of entities to be stored
+         * Sets the entity class.
+         *
+         * @param entityClass
+         *         the class of entities to be stored
          */
         public Builder<I> setEntityClass(Class<? extends Entity<I, ?>> entityClass) {
             this.entityClass = checkNotNull(entityClass);
@@ -244,7 +251,10 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
         }
 
         /**
-         * @param columnTypeRegistry the registry of entity columns to be used
+         * Sets the column type registry.
+         *
+         * @param columnTypeRegistry
+         *         the registry of entity columns to be used
          */
         public Builder<I> setColumnTypeRegistry(
                 ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>>
