@@ -23,8 +23,8 @@ package io.spine.server.storage.jdbc.query;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.ComparablePath;
-import io.spine.client.ColumnFilter;
-import io.spine.client.CompositeColumnFilter;
+import io.spine.client.CompositeFilter;
+import io.spine.client.Filter;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.entity.storage.EntityColumn;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
@@ -36,16 +36,16 @@ import org.junit.jupiter.api.Test;
 import static com.querydsl.core.types.dsl.Expressions.FALSE;
 import static com.querydsl.core.types.dsl.Expressions.TRUE;
 import static com.querydsl.core.types.dsl.Expressions.comparablePath;
-import static io.spine.client.ColumnFilter.Operator.EQUAL;
-import static io.spine.client.ColumnFilter.Operator.GREATER_OR_EQUAL;
-import static io.spine.client.ColumnFilter.Operator.GREATER_THAN;
-import static io.spine.client.ColumnFilter.Operator.LESS_OR_EQUAL;
-import static io.spine.client.ColumnFilter.Operator.LESS_THAN;
-import static io.spine.client.ColumnFilter.Operator.UNRECOGNIZED;
-import static io.spine.client.ColumnFilters.eq;
-import static io.spine.client.ColumnFilters.gt;
-import static io.spine.client.CompositeColumnFilter.CompositeOperator.ALL;
-import static io.spine.client.CompositeColumnFilter.CompositeOperator.EITHER;
+import static io.spine.client.CompositeFilter.CompositeOperator.ALL;
+import static io.spine.client.CompositeFilter.CompositeOperator.EITHER;
+import static io.spine.client.Filter.Operator.EQUAL;
+import static io.spine.client.Filter.Operator.GREATER_OR_EQUAL;
+import static io.spine.client.Filter.Operator.GREATER_THAN;
+import static io.spine.client.Filter.Operator.LESS_OR_EQUAL;
+import static io.spine.client.Filter.Operator.LESS_THAN;
+import static io.spine.client.Filter.Operator.UNRECOGNIZED;
+import static io.spine.client.Filters.eq;
+import static io.spine.client.Filters.gt;
 import static io.spine.server.storage.jdbc.query.QueryPredicates.columnMatchFilter;
 import static io.spine.server.storage.jdbc.query.QueryPredicates.joinPredicates;
 import static io.spine.server.storage.jdbc.query.QueryPredicates.nullFilter;
@@ -58,9 +58,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/**
- * @author Dmytro Grankin
- */
 @SuppressWarnings({"InnerClassMayBeStatic", "ClassCanBeStatic"
         /* JUnit nested classes cannot be static. */,
         "DuplicateStringLiteralInspection" /* Common test display names. */})
@@ -104,7 +101,7 @@ class QueryPredicatesTest {
         assertThrows(IllegalArgumentException.class,
                      () -> joinPredicates(TRUE,
                                           TRUE,
-                                          CompositeColumnFilter.CompositeOperator.UNRECOGNIZED));
+                                          CompositeFilter.CompositeOperator.UNRECOGNIZED));
     }
 
     @Test
@@ -116,7 +113,7 @@ class QueryPredicatesTest {
         ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> registry
                 = JdbcTypeRegistryFactory.defaultInstance();
 
-        ColumnFilter filter = eq(column.getStoredName(), COLUMN_FILTER_VALUE);
+        Filter filter = eq(column.getStoredName(), COLUMN_FILTER_VALUE);
         Predicate predicate = columnMatchFilter(column, filter, registry);
 
         ComparablePath<Comparable> columnPath = comparablePath(Comparable.class,
@@ -135,7 +132,7 @@ class QueryPredicatesTest {
         ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> registry
                 = JdbcTypeRegistryFactory.defaultInstance();
 
-        ColumnFilter filter = gt(column.getStoredName(), COLUMN_FILTER_VALUE);
+        Filter filter = gt(column.getStoredName(), COLUMN_FILTER_VALUE);
 
         assertThrows(IllegalArgumentException.class,
                      () -> columnMatchFilter(column, filter, registry));
@@ -157,7 +154,7 @@ class QueryPredicatesTest {
                                                         .put(String.class, type)
                                                         .build();
 
-        ColumnFilter filter = eq(column.getStoredName(), COLUMN_FILTER_VALUE);
+        Filter filter = eq(column.getStoredName(), COLUMN_FILTER_VALUE);
 
         assertThrows(IllegalArgumentException.class,
                      () -> columnMatchFilter(column, filter, registry));
@@ -272,13 +269,13 @@ class QueryPredicatesTest {
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored") // Method called to throw exception.
-    private static void runNullFilterCreationFor(ColumnFilter.Operator operator) {
+    private static void runNullFilterCreationFor(Filter.Operator operator) {
         ComparablePath<Comparable> path = comparablePath(Comparable.class, "");
         nullFilter(operator, path);
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored") // Method called to throw exception.
-    private static void runValueFilterCreationFor(ColumnFilter.Operator operator) {
+    private static void runValueFilterCreationFor(Filter.Operator operator) {
         ComparablePath<Comparable> path = comparablePath(Comparable.class, "");
         valueFilter(operator, path, COLUMN_FILTER_VALUE);
     }

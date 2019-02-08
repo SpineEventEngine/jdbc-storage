@@ -25,8 +25,9 @@ import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.ComparablePath;
 import com.querydsl.core.types.dsl.PathBuilder;
-import io.spine.client.ColumnFilter;
-import io.spine.client.CompositeColumnFilter;
+import io.spine.client.CompositeFilter;
+import io.spine.client.Filter;
+import io.spine.client.Filter.Operator;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.entity.storage.CompositeQueryParameter;
 import io.spine.server.entity.storage.EntityColumn;
@@ -59,9 +60,12 @@ public class QueryPredicates {
      *
      * <p>If there are no IDs, the resulting predicate will return {@code true} always.
      *
-     * @param column the {@link IdColumn} describing ID to match against
-     * @param ids    the IDs to match
-     * @param <I>    the type of IDs
+     * @param column
+     *         the {@link IdColumn} describing ID to match against
+     * @param ids
+     *         the IDs to match
+     * @param <I>
+     *         the type of IDs
      * @return the predicate for the IDs
      */
     public static <I> Predicate inIds(IdColumn<I> column, Collection<I> ids) {
@@ -77,12 +81,16 @@ public class QueryPredicates {
     /**
      * Obtains a predicate to match entity records by the specified parameters.
      *
-     * @param parameters         the query parameters to compose the predicate
-     * @param columnTypeRegistry the registry of entity column type to use
+     * @param parameters
+     *         the query parameters to compose the predicate
+     * @param columnTypeRegistry
+     *         the registry of entity column type to use
      * @return the predicate for columns
      */
-    public static Predicate matchParameters(QueryParameters parameters,
-                                            ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> columnTypeRegistry) {
+    public static Predicate
+    matchParameters(QueryParameters parameters,
+                    ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>>
+                            columnTypeRegistry) {
         BooleanExpression result = TRUE;
         for (CompositeQueryParameter parameter : parameters) {
             result = result.and(predicateFrom(parameter, columnTypeRegistry));
@@ -90,11 +98,13 @@ public class QueryPredicates {
         return result;
     }
 
-    private static Predicate predicateFrom(CompositeQueryParameter parameter,
-                                           ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> columnTypeRegistry) {
+    private static Predicate
+    predicateFrom(CompositeQueryParameter parameter,
+                  ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>>
+                          columnTypeRegistry) {
         Predicate result = TRUE;
-        for (Map.Entry<EntityColumn, ColumnFilter> columnWithFilter : parameter.getFilters()
-                                                                               .entries()) {
+        for (Map.Entry<EntityColumn, Filter> columnWithFilter : parameter.getFilters()
+                                                                         .entries()) {
             Predicate predicate = columnMatchFilter(columnWithFilter.getKey(),
                                                     columnWithFilter.getValue(),
                                                     columnTypeRegistry);
@@ -107,7 +117,7 @@ public class QueryPredicates {
     @VisibleForTesting
     static Predicate joinPredicates(Predicate left,
                                     Predicate right,
-                                    CompositeColumnFilter.CompositeOperator operator) {
+                                    CompositeFilter.CompositeOperator operator) {
         checkArgument(operator.getNumber() > 0, operator.name());
         switch (operator) {
             case EITHER:
@@ -121,9 +131,11 @@ public class QueryPredicates {
     }
 
     @VisibleForTesting
-    static Predicate columnMatchFilter(EntityColumn column, ColumnFilter filter,
-                                       ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> columnTypeRegistry) {
-        ColumnFilter.Operator operator = filter.getOperator();
+    static Predicate
+    columnMatchFilter(EntityColumn column, Filter filter,
+                      ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>>
+                              columnTypeRegistry) {
+        Operator operator = filter.getOperator();
         checkArgument(operator.getNumber() > 0, operator.name());
 
         String columnName = column.getStoredName();
@@ -162,7 +174,7 @@ public class QueryPredicates {
 
     @SuppressWarnings("EnumSwitchStatementWhichMissesCases") // OK for the Protobuf enum switch.
     @VisibleForTesting
-    static Predicate nullFilter(ColumnFilter.Operator operator,
+    static Predicate nullFilter(Operator operator,
                                 ComparablePath<Comparable> columnPath) {
         switch (operator) {
             case EQUAL:
@@ -180,7 +192,7 @@ public class QueryPredicates {
 
     @SuppressWarnings("EnumSwitchStatementWhichMissesCases") // OK for the Protobuf enum switch.
     @VisibleForTesting
-    static Predicate valueFilter(ColumnFilter.Operator operator,
+    static Predicate valueFilter(Operator operator,
                                  ComparablePath<Comparable> columnPath,
                                  Comparable columnValue) {
         switch (operator) {
