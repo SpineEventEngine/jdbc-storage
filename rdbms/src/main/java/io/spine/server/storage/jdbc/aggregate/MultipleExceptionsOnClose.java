@@ -31,8 +31,6 @@ import static java.lang.System.lineSeparator;
 /**
  * An {@link Exception} telling that there were <b>multiple</b> exceptions while trying to
  * {@link Closeables#closeAll(Iterable)} close} multiple closeables.
- *
- * @author Dmytro Dashenkov
  */
 final class MultipleExceptionsOnClose extends Throwable {
 
