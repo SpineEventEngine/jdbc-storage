@@ -37,7 +37,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @param <I> a type of storage message IDs
  * @param <M> a type of messages to read
- * @author Dmytro Grankin
  */
 public abstract class SelectMessageByIdQuery<I, M extends Message> extends AbstractSelectByIdQuery<I, M> {
 
@@ -94,7 +93,9 @@ public abstract class SelectMessageByIdQuery<I, M extends Message> extends Abstr
         if (bytes == null) {
             return null;
         }
-        M message = Serializer.deserialize(bytes, messageDescriptor);
+
+        @SuppressWarnings("unchecked") // It's up to user to provide correct binary data for unpack.
+        M message = (M) Serializer.deserialize(bytes, messageDescriptor);
         return message;
     }
 

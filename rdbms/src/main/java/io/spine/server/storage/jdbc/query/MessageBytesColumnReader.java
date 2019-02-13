@@ -63,7 +63,9 @@ final class MessageBytesColumnReader<M extends Message> extends ColumnReader<M> 
     public M readValue(ResultSet resultSet) throws SQLException {
         checkNotNull(resultSet);
         byte[] bytes = resultSet.getBytes(columnName());
-        M result = deserialize(bytes, messageDescriptor);
+
+        @SuppressWarnings("unchecked") // It's up to user to provide correct binary data for unpack.
+        M result = (M) deserialize(bytes, messageDescriptor);
         return result;
     }
 }

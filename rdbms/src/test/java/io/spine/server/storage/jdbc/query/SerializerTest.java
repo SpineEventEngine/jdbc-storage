@@ -32,9 +32,6 @@ import static io.spine.testing.Tests.assertHasPrivateParameterlessCtor;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * @author Alexander Litus
- */
 @DisplayName("Serializer should")
 class SerializerTest {
 
@@ -56,7 +53,7 @@ class SerializerTest {
         byte[] bytes = serialize(expected);
         assertTrue(bytes.length > 0);
 
-        StringValue actual = deserialize(bytes, expected.getDescriptorForType());
+        StringValue actual = (StringValue) deserialize(bytes, expected.getDescriptorForType());
         assertEquals(expected, actual);
     }
 }

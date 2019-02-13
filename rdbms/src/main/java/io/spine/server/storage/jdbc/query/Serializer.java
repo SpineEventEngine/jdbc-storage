@@ -59,11 +59,9 @@ public final class Serializer {
      *
      * @param bytes             the serialized message
      * @param messageDescriptor the descriptor of a message
-     * @param <M>               the type of message expected
      * @return a message instance
      */
-    @SuppressWarnings("unchecked") // It's up to user to provide correct binary data for unpack.
-    static <M extends Message> M deserialize(byte[] bytes, Descriptor messageDescriptor) {
+    static Message deserialize(byte[] bytes, Descriptor messageDescriptor) {
         checkNotNull(bytes);
         Any.Builder builder = Any.newBuilder();
         String typeUrlValue = TypeUrl.from(messageDescriptor)
@@ -71,7 +69,7 @@ public final class Serializer {
         builder.setTypeUrl(typeUrlValue);
         ByteString byteString = ByteString.copyFrom(bytes);
         builder.setValue(byteString);
-        M message = (M) AnyPacker.unpack(builder.build());
-        return message;
+        Message result = AnyPacker.unpack(builder.build());
+        return result;
     }
 }
