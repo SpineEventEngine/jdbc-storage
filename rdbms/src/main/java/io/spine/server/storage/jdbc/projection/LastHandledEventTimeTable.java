@@ -20,6 +20,7 @@
 
 package io.spine.server.storage.jdbc.projection;
 
+import com.google.common.collect.ImmutableList;
 import com.google.protobuf.Timestamp;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.TableColumn;
@@ -31,7 +32,6 @@ import io.spine.server.storage.jdbc.query.WriteQuery;
 
 import java.util.List;
 
-import static com.google.common.collect.ImmutableList.copyOf;
 import static io.spine.server.storage.jdbc.Type.INT;
 import static io.spine.server.storage.jdbc.Type.LONG;
 import static io.spine.server.storage.jdbc.Type.STRING_255;
@@ -59,7 +59,7 @@ class LastHandledEventTimeTable extends AbstractTable<String, Timestamp, Timesta
 
     @Override
     protected List<? extends TableColumn> getTableColumns() {
-        return copyOf(Column.values());
+        return ImmutableList.copyOf(Column.values());
     }
 
     @Override
