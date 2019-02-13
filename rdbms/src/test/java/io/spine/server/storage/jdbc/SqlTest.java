@@ -27,9 +27,6 @@ import static io.spine.testing.DisplayNames.HAVE_PARAMETERLESS_CTOR;
 import static io.spine.testing.Tests.assertHasPrivateParameterlessCtor;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * @author Dmytro Dashenkov
- */
 @DisplayName("Sql utility should")
 class SqlTest {
 
