@@ -20,6 +20,8 @@
 
 package io.spine.server.storage.jdbc;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.errorprone.annotations.Immutable;
 import io.spine.type.TypeName;
 
 import java.util.EnumMap;
@@ -107,12 +109,13 @@ public class TypeMappingBuilder {
     /**
      * A {@link TypeMapping}, which is created by the {@link TypeMappingBuilder}.
      */
+    @Immutable
     private static final class TypeMappingImpl implements TypeMapping {
 
-        private final Map<Type, TypeName> mappedTypes;
+        private final ImmutableMap<Type, TypeName> mappedTypes;
 
         private TypeMappingImpl(Map<Type, TypeName> mappedTypes) {
-            this.mappedTypes = mappedTypes;
+            this.mappedTypes = ImmutableMap.copyOf(mappedTypes);
         }
 
         @Override
