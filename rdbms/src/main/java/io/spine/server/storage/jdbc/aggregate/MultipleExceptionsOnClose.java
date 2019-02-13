@@ -22,6 +22,7 @@ package io.spine.server.storage.jdbc.aggregate;
 
 import com.google.common.base.Throwables;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import static java.lang.String.format;
@@ -40,7 +41,7 @@ final class MultipleExceptionsOnClose extends Throwable {
 
     MultipleExceptionsOnClose(Collection<Exception> exceptions) {
         super(format("%s fatal exceptions.", exceptions.size()));
-        this.exceptions = exceptions;
+        this.exceptions = new ArrayList<>(exceptions);
     }
 
     /**
@@ -49,13 +50,10 @@ final class MultipleExceptionsOnClose extends Throwable {
      * @return the description for all the exceptions
      */
     @Override
-    public String toString() {
+    public String getMessage() {
         @SuppressWarnings("StringBufferWithoutInitialCapacity")
         // We don't know the size of the stacktrace.
         StringBuilder builder = new StringBuilder();
-        String selfInfo = super.toString();
-        builder.append(selfInfo)
-               .append(lineSeparator());
         for (Exception exception : exceptions) {
             String stackTrace = Throwables.getStackTraceAsString(exception);
             builder.append(stackTrace)
