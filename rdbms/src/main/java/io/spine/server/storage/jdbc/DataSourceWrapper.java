@@ -21,8 +21,7 @@
 package io.spine.server.storage.jdbc;
 
 import io.spine.annotation.Internal;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.spine.logging.Logging;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -30,16 +29,13 @@ import java.sql.SQLException;
 
 /**
  * Wrapper for {@link DataSource} instances.
- *
- * @author Alexander Litus
- * @author Andrey Lavrov
  */
 @Internal
-public class DataSourceWrapper implements AutoCloseable {
+public class DataSourceWrapper implements AutoCloseable, Logging {
 
     private final DataSource dataSource;
 
-    /** Wraps custom {@link DataSource} implementation */
+    /** Wraps custom {@link DataSource} implementation. */
     static DataSourceWrapper wrap(DataSource dataSource) {
         return new DataSourceWrapper(dataSource);
     }
@@ -61,7 +57,7 @@ public class DataSourceWrapper implements AutoCloseable {
             ConnectionWrapper wrapper = ConnectionWrapper.wrap(connection);
             return wrapper;
         } catch (SQLException e) {
-            log().error("Failed to get connection.", e);
+            _error("Failed to get connection.", e);
             throw new DatabaseException(e);
         }
     }
@@ -79,21 +75,11 @@ public class DataSourceWrapper implements AutoCloseable {
             try {
                 ((AutoCloseable) dataSource).close();
             } catch (Exception e) {
-                log().error("Error occurred while closing DataSource ", e);
+                _error("Error occurred while closing DataSource ", e);
                 throw new DatabaseException(e);
             }
             return;
         }
-        log().warn("Close method is not implemented in " + dataSource.getClass());
-    }
-
-    private static Logger log() {
-        return LogSingleton.INSTANCE.value;
-    }
-
-    private enum LogSingleton {
-        INSTANCE;
-        @SuppressWarnings("NonSerializableFieldInSerializableClass")
-        private final Logger value = LoggerFactory.getLogger(DataSourceWrapper.class);
+        _warn("Close method is not implemented in " + dataSource.getClass());
     }
 }
