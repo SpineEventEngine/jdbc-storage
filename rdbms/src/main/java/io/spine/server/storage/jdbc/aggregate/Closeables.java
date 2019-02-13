@@ -20,15 +20,13 @@
 
 package io.spine.server.storage.jdbc.aggregate;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A utility class for working with {@link AutoCloseable} instances.
- *
- * @author Dmytro Dashenkov
  */
 class Closeables {
 
@@ -50,7 +48,7 @@ class Closeables {
      */
     static void closeAll(Iterable<? extends AutoCloseable> closeables) {
         checkNotNull(closeables);
-        Collection<Exception> exceptions = new LinkedList<>();
+        Collection<Exception> exceptions = new ArrayList<>();
         for (AutoCloseable closable : closeables) {
             try {
                 closable.close();

@@ -28,10 +28,8 @@ package io.spine.server.storage.jdbc;
  *
  * <p>All the {@code enum} values have a valid token string representation, i.e.
  * {@link Enum#toString() toString()} method returns a valid SQL token wrapped into the whitespaces.
- *
- * @author Dmytro Dashenkov
  */
-@SuppressWarnings("UtilityClass")
+@SuppressWarnings({"UtilityClass", "PMD.MissingStaticMethodInNonInstantiatableClass"})
 public final class Sql {
 
     private Sql() {

@@ -21,6 +21,7 @@
 package io.spine.server.storage.jdbc;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.errorprone.annotations.Immutable;
 import io.spine.type.TypeName;
 
 import java.sql.DatabaseMetaData;
@@ -31,9 +32,8 @@ import static io.spine.server.storage.jdbc.TypeMappingBuilder.basicBuilder;
 
 /**
  * Predefined {@linkplain TypeMapping type mappings} for different databases.
- *
- * @author Dmytro Grankin
  */
+@Immutable
 public enum PredefinedMapping implements TypeMapping {
 
     MYSQL_5_7("MySQL", 5, 7, basicBuilder()),

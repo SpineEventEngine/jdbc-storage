@@ -20,6 +20,7 @@
 
 package io.spine.server.storage.jdbc;
 
+import com.google.errorprone.annotations.Immutable;
 import io.spine.type.TypeName;
 
 /**
@@ -33,6 +34,7 @@ import io.spine.type.TypeName;
  *
  * @author Dmytro Grankin
  */
+@Immutable
 public interface TypeMapping {
 
     /**
