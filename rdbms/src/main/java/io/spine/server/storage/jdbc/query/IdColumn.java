@@ -59,7 +59,7 @@ public abstract class IdColumn<I> {
     static <I> IdColumn<I> newInstance(Class<? extends Entity<I, ?>> entityClass,
                                        String columnName) {
         IdColumn<I> helper;
-        Class<?> idClass = asEntityClass(entityClass).getIdClass();
+        Class<?> idClass = asEntityClass(entityClass).idClass();
         if (idClass == Long.class) {
             helper = (IdColumn<I>) new LongIdColumn(columnName);
         } else if (idClass == Integer.class) {
