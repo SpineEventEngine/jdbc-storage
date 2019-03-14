@@ -41,13 +41,12 @@ import static com.google.common.base.Strings.isNullOrEmpty;
  * connection pool comes with <b>sane</b> defaults that perform well in most deployments without
  * additional tweaking. Every property is optional unless it is marked as required.
  *
- * @author Alexander Litus
  * @see Builder
  */
 public class DataSourceConfig {
 
     /**
-     * Required
+     * Required parameters.
      */
     private final String dataSourceClassName;
     private final String jdbcUrl;
@@ -55,7 +54,7 @@ public class DataSourceConfig {
     private final String password;
 
     /**
-     * Optional
+     * Optional parameters.
      */
     private final @Nullable Boolean autoCommit;
     private final @Nullable Long connectionTimeout;
@@ -172,7 +171,7 @@ public class DataSourceConfig {
     public static class Builder {
 
         /**
-         * Required
+         * Required parameters.
          */
         private String dataSourceClassName;
         private String jdbcUrl;
@@ -180,7 +179,7 @@ public class DataSourceConfig {
         private String password;
 
         /**
-         * Optional
+         * Optional parameters.
          */
         private @Nullable Boolean autoCommit;
         private @Nullable Long connectionTimeout;
@@ -234,7 +233,8 @@ public class DataSourceConfig {
          * <p>This property is <b>required</b> if {@code jdbcUrl} is not set.
          *
          * <p>Consult the documentation for your specific JDBC driver to get this class name,
-         * or see <a href="https://github.com/brettwooldridge/HikariCP#popular-datasource-class-names">popular classes</a>.
+         * or see <a href="https://github.com/brettwooldridge/HikariCP#popular-datasource-class-names">popular
+         * classes</a>.
          *
          * <p><b>NOTE:</b> XA data sources are not supported.
          * XA requires a real transaction manager like
@@ -246,7 +246,8 @@ public class DataSourceConfig {
          *
          * <p>Default: none
          *
-         * @param dataSourceClassName the class name to set
+         * @param dataSourceClassName
+         *         the class name to set
          */
         public Builder setDataSourceClassName(String dataSourceClassName) {
             this.dataSourceClassName = dataSourceClassName;
@@ -284,7 +285,8 @@ public class DataSourceConfig {
          *
          * <p>Default: none
          *
-         * @param jdbcUrl a database url of the form {@code jdbc:subprotocol:subname}
+         * @param jdbcUrl
+         *         a database url of the form {@code jdbc:subprotocol:subname}
          */
         public Builder setJdbcUrl(String jdbcUrl) {
             this.jdbcUrl = jdbcUrl;
@@ -313,7 +315,8 @@ public class DataSourceConfig {
          *
          * <p>Default: none
          *
-         * @param username the username to set
+         * @param username
+         *         the username to set
          */
         public Builder setUsername(String username) {
             this.username = username;
@@ -342,7 +345,8 @@ public class DataSourceConfig {
          *
          * <p>Default: none
          *
-         * @param password the password to set
+         * @param password
+         *         the password to set
          */
         public Builder setPassword(String password) {
             this.password = password;
@@ -361,7 +365,8 @@ public class DataSourceConfig {
          *
          * <p>Default: {@code true}
          *
-         * @param autoCommit the value to set
+         * @param autoCommit
+         *         the value to set
          * @see Connection#setAutoCommit(boolean)
          */
         public Builder setAutoCommit(Boolean autoCommit) {
@@ -386,7 +391,8 @@ public class DataSourceConfig {
          *
          * <p>Default: 30 000 (30 seconds)
          *
-         * @param connectionTimeout the number of milliseconds to set
+         * @param connectionTimeout
+         *         the number of milliseconds to set
          */
         public Builder setConnectionTimeout(Long connectionTimeout) {
             this.connectionTimeout = connectionTimeout;
@@ -411,7 +417,8 @@ public class DataSourceConfig {
          *
          * <p>Default: 600 000 (10 minutes)
          *
-         * @param idleTimeout the timeout in milliseconds
+         * @param idleTimeout
+         *         the timeout in milliseconds
          */
         public Builder setIdleTimeout(Long idleTimeout) {
             this.idleTimeout = idleTimeout;
@@ -441,7 +448,8 @@ public class DataSourceConfig {
          *
          * <p>Default: 1 800 000 (30 minutes)
          *
-         * @param maxLifetime the number of milliseconds to set
+         * @param maxLifetime
+         *         the number of milliseconds to set
          */
         public Builder setMaxLifetime(Long maxLifetime) {
             this.maxLifetime = maxLifetime;
@@ -469,7 +477,8 @@ public class DataSourceConfig {
          *
          * <p>Default: none
          *
-         * @param connectionTestQuery the query to set
+         * @param connectionTestQuery
+         *         the query to set
          */
         public Builder setConnectionTestQuery(String connectionTestQuery) {
             this.connectionTestQuery = connectionTestQuery;
@@ -498,7 +507,8 @@ public class DataSourceConfig {
          *
          * <p>Default: 10
          *
-         * @param maxPoolSize the value to set
+         * @param maxPoolSize
+         *         the value to set
          * @see #setConnectionTimeout(Long)
          */
         public Builder setMaxPoolSize(Integer maxPoolSize) {
@@ -519,7 +529,8 @@ public class DataSourceConfig {
          *
          * <p>Default: auto-generated
          *
-         * @param poolName the name to set
+         * @param poolName
+         *         the name to set
          */
         public Builder setPoolName(String poolName) {
             this.poolName = poolName;

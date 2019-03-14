@@ -44,9 +44,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Creates storages based on JDBC-compliant RDBMS.
  *
- * @author Alexander Litus
- * @author Andrey Lavrov
- * @author Dmytro Dashenkov
  * @see DataSourceConfig
  * @see JdbcTypeRegistryFactory
  */
@@ -79,10 +76,10 @@ public class JdbcStorageFactory implements StorageFactory {
     @Override
     public StorageFactory copyFor(BoundedContextName name, boolean multitenant) {
         JdbcStorageFactory copy = newBuilder().setColumnTypeRegistry(columnTypeRegistry)
-                                               .setDataSource(dataSource)
-                                               .setTypeMapping(typeMapping)
-                                               .setMultitenant(multitenant)
-                                               .build();
+                                              .setDataSource(dataSource)
+                                              .setTypeMapping(typeMapping)
+                                              .setMultitenant(multitenant)
+                                              .build();
         return copy;
     }
 
@@ -171,8 +168,9 @@ public class JdbcStorageFactory implements StorageFactory {
          * <p>To reuse the existent {@linkplain JdbcColumnType column types}, use
          * {@link JdbcTypeRegistryFactory#predefinedValuesAnd() JdbcTypeRegistryFactory.predefinedValuesAnd()}.
          *
-         * @param columnTypeRegistry the custom {@link ColumnTypeRegistry} to use in the generated
-         *                           storages
+         * @param columnTypeRegistry
+         *         the custom {@link ColumnTypeRegistry} to use in the generated
+         *         storages
          */
         public Builder setColumnTypeRegistry(
                 ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>>
@@ -233,7 +231,8 @@ public class JdbcStorageFactory implements StorageFactory {
          * <p>If there is no mapping for the database,
          * {@linkplain PredefinedMapping#MYSQL_5_7 mapping for MySQL 5.7} is used.
          *
-         * @param typeMapping the custom type mapping
+         * @param typeMapping
+         *         the custom type mapping
          */
         public Builder setTypeMapping(TypeMapping typeMapping) {
             this.typeMapping = checkNotNull(typeMapping);

@@ -22,8 +22,6 @@ package io.spine.server.storage.jdbc;
 
 /**
  * Signals that an error occurred during an interaction with the DB.
- *
- * @author Alexander Litus
  */
 public class DatabaseException extends RuntimeException {
 

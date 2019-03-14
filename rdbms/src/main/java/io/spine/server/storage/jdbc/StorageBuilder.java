@@ -33,9 +33,10 @@ import static com.google.common.base.Preconditions.checkState;
  *
  * <p>Each setter method returns an instance of the builder itself ({@code this}).
  *
- * @param <B> type of the builder itself; used to construct call chains
- * @param <S> type of the built storage
- * @author Dmytro Dashenkov
+ * @param <B>
+ *         type of the builder itself; used to construct call chains
+ * @param <S>
+ *         type of the built storage
  */
 @Internal
 public abstract class StorageBuilder<B extends StorageBuilder<B, S>, S extends Storage> {
@@ -49,7 +50,10 @@ public abstract class StorageBuilder<B extends StorageBuilder<B, S>, S extends S
     }
 
     /**
-     * @param multitenant determines if the storage is multitenant or not
+     * Specifies the multitenant behavior.
+     *
+     * @param multitenant
+     *         determines if the storage is multitenant or not
      * @see Storage#isMultitenant()
      */
     public B setMultitenant(boolean multitenant) {
@@ -62,7 +66,10 @@ public abstract class StorageBuilder<B extends StorageBuilder<B, S>, S extends S
     }
 
     /**
-     * @param dataSource the {@linkplain DataSourceWrapper} used by the storage
+     * Sets the data source.
+     *
+     * @param dataSource
+     *         the {@linkplain DataSourceWrapper} used by the storage
      */
     public B setDataSource(DataSourceWrapper dataSource) {
         this.dataSource = dataSource;
@@ -74,7 +81,10 @@ public abstract class StorageBuilder<B extends StorageBuilder<B, S>, S extends S
     }
 
     /**
-     * @param typeMapping the type mapping for the usage in queries
+     * Sets the type mapping schema.
+     *
+     * @param typeMapping
+     *         the type mapping for the usage in queries
      */
     public B setTypeMapping(TypeMapping typeMapping) {
         this.typeMapping = checkNotNull(typeMapping);
@@ -102,14 +112,15 @@ public abstract class StorageBuilder<B extends StorageBuilder<B, S>, S extends S
      *
      * <p>Override this method to modify these preconditions.
      *
-     * @throws IllegalStateException upon a precondition violation
+     * @throws IllegalStateException
+     *         upon a precondition violation
      */
     protected void checkPreconditions() throws IllegalStateException {
-        checkState(dataSource != null, "Data source must not be null");
+        checkState(dataSource != null, "Storage data source must not be null");
     }
 
     /**
-     * Returns current instance of {@linkplain StorageBuilder}.
+     * Returns current instance of {@code StorageBuilder}.
      *
      * <p>Used in setters to avoid extra unchecked casts.
      *
