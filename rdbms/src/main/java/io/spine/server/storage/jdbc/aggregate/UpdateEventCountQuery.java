@@ -45,7 +45,6 @@ class UpdateEventCountQuery<I> extends WriteEventCountQuery<I> {
         return new Builder<>();
     }
 
-    @SuppressWarnings("ClassNameSameAsAncestorName")
     static class Builder<I> extends WriteEventCountQuery.Builder<Builder<I>,
                                                                  UpdateEventCountQuery<I>,
                                                                  I> {

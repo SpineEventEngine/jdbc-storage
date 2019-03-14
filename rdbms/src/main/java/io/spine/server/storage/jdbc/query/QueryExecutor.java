@@ -32,8 +32,6 @@ import static java.lang.String.format;
 
 /**
  * A helper class for execution of SQL queries.
- *
- * @author Dmytro Dashenkov
  */
 class QueryExecutor {
 

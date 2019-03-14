@@ -41,8 +41,6 @@ import static io.spine.server.storage.jdbc.query.IdColumn.typeString;
 /**
  * A table for storing the last handled by
  * a {@link io.spine.server.projection.ProjectionRepository} event time.
- *
- * @author Dmytro Dashenkov
  */
 class LastHandledEventTimeTable extends AbstractTable<String, Timestamp, Timestamp> {
 

@@ -49,7 +49,6 @@ class SelectEventCountByIdQuery<I> extends AbstractSelectByIdQuery<I, Integer> {
         return new Builder<>();
     }
 
-    @SuppressWarnings("ClassNameSameAsAncestorName")
     static class Builder<I> extends AbstractSelectByIdQuery.Builder<I,
                                                                     Builder<I>,
                                                                     SelectEventCountByIdQuery<I>> {

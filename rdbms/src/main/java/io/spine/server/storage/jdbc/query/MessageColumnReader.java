@@ -34,7 +34,7 @@ import static io.spine.json.Json.fromJson;
  * <p>The result of the read operation is always a Protobuf {@link Message}.
  *
  * @param <M>
- * @see io.spine.json.Json
+ * @see io.spine.json.Json Json
  */
 final class MessageColumnReader<M extends Message> extends ColumnReader<M> {
 

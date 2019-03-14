@@ -28,7 +28,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * An abstract base for queries, which work with a {@link IdColumn single ID}.
  *
  * @param <I> the ID type
- * @author Dmytro Grankin
  */
 public abstract class IdAwareQuery<I> extends AbstractQuery {
 

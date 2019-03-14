@@ -22,8 +22,6 @@ package io.spine.server.storage.jdbc.query;
 
 /**
  * A marker interface for an SQL query.
- *
- * @author Dmytro Grankin
  */
 public interface StorageQuery {
 }

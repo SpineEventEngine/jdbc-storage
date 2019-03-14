@@ -132,7 +132,6 @@ abstract class WriteEntityQuery<I, C extends StoreClause<C>> extends AbstractQue
         return parameters.build();
     }
 
-    @SuppressWarnings("ClassNameSameAsAncestorName")
     abstract static class Builder<B extends Builder<B, Q, I>,
                                   Q extends WriteEntityQuery,
                                   I>

@@ -37,7 +37,6 @@ import static io.spine.server.entity.model.EntityClass.asEntityClass;
  * A helper class for setting the {@link Entity} ID into {@linkplain Parameters query parameters}.
  *
  * @param <I> the type of {@link Entity} IDs
- * @author Alexander Litus
  */
 @Internal
 public abstract class IdColumn<I> {

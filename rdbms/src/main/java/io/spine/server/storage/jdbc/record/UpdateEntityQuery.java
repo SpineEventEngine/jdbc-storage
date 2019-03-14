@@ -56,7 +56,6 @@ class UpdateEntityQuery<I> extends WriteEntityQuery<I, SQLUpdateClause> {
         return new Builder<>();
     }
 
-    @SuppressWarnings("ClassNameSameAsAncestorName")
     static class Builder<I> extends WriteEntityQuery.Builder<Builder<I>,
                                                              UpdateEntityQuery,
                                                              I> {

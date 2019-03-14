@@ -40,7 +40,6 @@ abstract class WriteEventCountQuery<I> extends IdAwareQuery<I> implements WriteQ
         return eventCount;
     }
 
-    @SuppressWarnings("ClassNameSameAsAncestorName")
     abstract static class Builder<B extends Builder<B, Q, I>, Q extends WriteEventCountQuery<I>, I>
             extends IdAwareQuery.Builder<I, B, Q> {
 

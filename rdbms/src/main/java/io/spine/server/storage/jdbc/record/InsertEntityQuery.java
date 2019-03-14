@@ -56,7 +56,6 @@ class InsertEntityQuery<I> extends WriteEntityQuery<I, SQLInsertClause> {
         return new Builder<>();
     }
 
-    @SuppressWarnings("ClassNameSameAsAncestorName")
     static class Builder<I> extends WriteEntityQuery.Builder<Builder<I>,
                                                              InsertEntityQuery,
                                                              I> {

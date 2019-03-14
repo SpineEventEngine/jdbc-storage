@@ -35,8 +35,6 @@ import static io.spine.validate.Validate.isDefault;
 
 /**
  * A query that selects timestamp from the {@link LastHandledEventTimeTable}.
- *
- * @author Dmytro Grankin
  */
 class SelectTimestampQuery extends SelectMessageByIdQuery<String, Timestamp> {
 
@@ -53,7 +51,6 @@ class SelectTimestampQuery extends SelectMessageByIdQuery<String, Timestamp> {
     }
 
     @Override
-    @SuppressWarnings("MethodDoesntCallSuperMethod") // Override default Message storing policy.
     protected @Nullable Timestamp readMessage(ResultSet resultSet) throws SQLException {
         long seconds = resultSet.getLong(Column.SECONDS.name());
         int nanos = resultSet.getInt(Column.NANOS.name());
@@ -71,7 +68,6 @@ class SelectTimestampQuery extends SelectMessageByIdQuery<String, Timestamp> {
         return new Builder();
     }
 
-    @SuppressWarnings("ClassNameSameAsAncestorName")
     static class Builder extends SelectMessageByIdQuery.Builder<Builder,
                                                                 SelectTimestampQuery,
                                                                 String,

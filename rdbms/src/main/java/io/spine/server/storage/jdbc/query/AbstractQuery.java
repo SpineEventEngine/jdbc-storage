@@ -224,7 +224,7 @@ public abstract class AbstractQuery implements StorageQuery {
         }
 
         /**
-         * Sets the table name to use as a target for the query
+         * Sets the table name to use as a target for the query.
          *
          * @param tableName the table name for the query
          */
