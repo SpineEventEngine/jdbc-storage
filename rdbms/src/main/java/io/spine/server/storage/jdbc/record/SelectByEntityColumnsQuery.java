@@ -45,8 +45,6 @@ import static io.spine.server.storage.jdbc.record.RecordTable.StandardColumn.ID;
 
 /**
  * A query selecting the records from the {@link RecordTable RecordTable} by an {@link EntityQuery}.
- *
- * @author Dmytro Grankin
  */
 final class SelectByEntityColumnsQuery<I> extends AbstractQuery
         implements SelectQuery<Iterator<EntityRecordWithId<I>>> {

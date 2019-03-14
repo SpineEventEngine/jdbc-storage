@@ -26,8 +26,6 @@ import io.spine.server.storage.jdbc.query.Parameters;
 /**
  * The implementation base for the JDBC-storage
  * {@linkplain io.spine.server.entity.storage.ColumnType ColumnTypes}.
- *
- * @author Alexander Aleksandrov
  */
 @SPI
 public abstract class AbstractJdbcColumnType<J, C> implements JdbcColumnType<J, C> {

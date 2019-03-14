@@ -57,8 +57,6 @@ import static java.util.Collections.addAll;
  * A table for storing the {@linkplain EntityRecord entity records}.
  *
  * <p>Used in the {@link JdbcRecordStorage}.
- *
- * @author Dmytro Dashenkov
  */
 class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumns> {
 

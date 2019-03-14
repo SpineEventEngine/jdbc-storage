@@ -27,8 +27,6 @@ import io.spine.server.storage.jdbc.query.IdColumn;
 
 /**
  * A query that updates {@link EntityRecord} in the {@link RecordTable}.
- *
- * @author Dmytro Grankin
  */
 class UpdateEntityQuery<I> extends WriteEntityQuery<I, SQLUpdateClause> {
 

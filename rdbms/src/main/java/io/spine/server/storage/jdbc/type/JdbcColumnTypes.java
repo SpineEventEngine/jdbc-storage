@@ -28,8 +28,6 @@ import io.spine.server.storage.jdbc.Type;
 
 /**
  * A factory for basic {@link JdbcColumnType} implementations.
- *
- * @author Alexander Aleksandrov
  */
 final class JdbcColumnTypes {
 
@@ -38,50 +36,49 @@ final class JdbcColumnTypes {
     }
 
     /**
-     * @return new instance of {@link JdbcColumnType} for {@code boolean} columns
+     * Returns new instance of {@link JdbcColumnType} for {@code boolean} columns.
      */
     static JdbcColumnType<Boolean, ?> booleanType() {
         return new BooleanColumnType();
     }
 
     /**
-     * @return new instance of {@link JdbcColumnType} for {@code String} columns
+     * Returns new instance of {@link JdbcColumnType} for {@code String} columns.
      */
     static JdbcColumnType<String, ?> stringType() {
         return new StringColumnType();
     }
 
     /**
-     * @return new instance of {@link JdbcColumnType} for {@code int} columns
+     * Returns new instance of {@link JdbcColumnType} for {@code int} columns.
      */
     static JdbcColumnType<Integer, ?> integerType() {
         return new IntegerColumnType();
     }
 
     /**
-     * @return new instance of {@link JdbcColumnType} for {@code long} columns
+     * Returns new instance of {@link JdbcColumnType} for {@code long} columns.
      */
     static JdbcColumnType<Long, ?> longType() {
         return new LongColumnType();
     }
 
     /**
-     * @return new instance of {@link JdbcColumnType} for {@link Version} columns
+     * Returns new instance of {@link JdbcColumnType} for {@link Version} columns.
      */
     static JdbcColumnType<Version, ?> versionType() {
         return new VersionColumnType();
     }
 
     /**
-     * @return new instance of {@link JdbcColumnType} for {@link Timestamp} columns
+     * Returns new instance of {@link JdbcColumnType} for {@link Timestamp} columns.
      */
     static JdbcColumnType<Timestamp, ?> timestampType() {
         return new TimestampColumnType();
     }
 
     /**
-     * @return new instance of {@link JdbcColumnType} for
-     * {@link AbstractMessage Message} columns
+     * Returns new instance of {@link JdbcColumnType} for {@link AbstractMessage Message} columns.
      * @see io.spine.server.entity.storage.ColumnTypeRegistry#get
      */
     static JdbcColumnType<AbstractMessage, ?> messageType() {

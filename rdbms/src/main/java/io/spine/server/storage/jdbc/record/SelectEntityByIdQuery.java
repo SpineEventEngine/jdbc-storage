@@ -29,8 +29,6 @@ import static io.spine.server.storage.jdbc.record.RecordTable.StandardColumn.ENT
 
 /**
  * A query that selects {@link EntityRecord} by an ID.
- *
- * @author Dmytro Grankin
  */
 class SelectEntityByIdQuery<I> extends SelectMessageByIdQuery<I, EntityRecord> {
 

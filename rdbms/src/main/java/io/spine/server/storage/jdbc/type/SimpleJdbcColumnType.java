@@ -31,11 +31,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * {@link io.spine.server.entity.storage.ColumnType#convertColumnValue convertColumnValue()} method
  * is an identity function.
  *
- * <p>The implementation is so that
- * the {@link io.spine.server.entity.storage.ColumnType#convertColumnValue convertColumnValue()}
- * method throws a {@link NullPointerException} if the value is equal to {@code null}.
- *
- * @author Alexander Aleksandrov
+ * @implNote The {@link io.spine.server.entity.storage.ColumnType#convertColumnValue
+ *         convertColumnValue()} method throws a {@link NullPointerException} if the value
+ *         is equal to {@code null}.
  */
 @SPI
 public abstract class SimpleJdbcColumnType<T> extends AbstractJdbcColumnType<T, T> {

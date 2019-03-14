@@ -34,8 +34,6 @@ import static io.spine.server.storage.jdbc.type.JdbcColumnTypes.versionType;
 
 /**
  * A factory of the JDBC-specific {@linkplain ColumnTypeRegistry ColumnTypeRegistries}.
- *
- * @author Alexander Aleksandrov
  */
 public final class JdbcTypeRegistryFactory {
 
