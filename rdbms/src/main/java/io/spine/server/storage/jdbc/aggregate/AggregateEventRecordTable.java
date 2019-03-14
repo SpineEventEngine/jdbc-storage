@@ -41,8 +41,6 @@ import static io.spine.util.Exceptions.newIllegalStateException;
 
 /**
  * A table for storing the {@linkplain AggregateEventRecord aggregate event records}.
- *
- * @author Dmytro Dashenkov
  */
 class AggregateEventRecordTable<I> extends EntityTable<I,
                                                        DbIterator<AggregateEventRecord>,

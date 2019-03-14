@@ -33,8 +33,6 @@ import static io.spine.server.storage.jdbc.aggregate.LifecycleFlagsTable.Column.
 /**
  * The query for creating a new record in the table storing
  * the {@linkplain LifecycleFlags entity lifecycle flags}.
- *
- * @author Dmytro Grankin
  */
 class InsertLifecycleFlagsQuery<I> extends IdAwareQuery<I> implements WriteQuery {
 
@@ -80,7 +78,8 @@ class InsertLifecycleFlagsQuery<I> extends IdAwareQuery<I> implements WriteQuery
         @Override
         protected void checkPreconditions() throws IllegalStateException {
             super.checkPreconditions();
-            checkState(entityStatus != null, "Entity status is not set.");
+            checkState(entityStatus != null,
+                       "Entity status is not set for `InsertLifecycleFlagsQuery`.");
         }
 
         @Override
