@@ -31,8 +31,6 @@ import io.spine.type.TypeName;
  *
  * <p>A type mapping provides a flexible way to point out
  * database specific names of {@linkplain Type types}.
- *
- * @author Dmytro Grankin
  */
 @Immutable
 public interface TypeMapping {
@@ -40,9 +38,11 @@ public interface TypeMapping {
     /**
      * Obtains the name of the specified {@link Type}.
      *
-     * @param type the type to get the name
+     * @param type
+     *         the type to get the name
      * @return the type name
-     * @throws IllegalStateException if the name for the specified type is not defined
+     * @throws IllegalStateException
+     *         if the name for the specified type is not defined
      */
     TypeName typeNameFor(Type type);
 }

@@ -40,8 +40,8 @@ import static com.google.common.base.Preconditions.checkState;
 /**
  * The implementation of the projection storage based on the RDBMS.
  *
- * @param <I> a type of projection IDs
- * @author Alexander Litus
+ * @param <I>
+ *         a type of projection IDs
  * @see JdbcStorageFactory
  */
 public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
@@ -55,7 +55,8 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
     /**
      * Creates a new instance using the builder.
      *
-     * @param builder the storage builder
+     * @param builder
+     *         the storage builder
      */
     protected JdbcProjectionStorage(Builder<I> builder) throws DatabaseException {
         super(builder.isMultitenant());
@@ -135,7 +136,8 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
      * The builder for {@link JdbcProjectionStorage}.
      */
     public static class Builder<I> extends StorageBuilder<Builder<I>,
-                                                          JdbcProjectionStorage<I>> {
+            JdbcProjectionStorage<I>> {
+
         private JdbcRecordStorage<I> recordStorage;
         private Class<? extends Projection<I, ?, ?>> projectionClass;
 
@@ -153,7 +155,7 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
         }
 
         /**
-         * @param recordStorage a {@link RecordStorage} for the internal usage
+         * Sets a {@link RecordStorage} to store projection instances.
          */
         public Builder<I> setRecordStorage(JdbcRecordStorage<I> recordStorage) {
             this.recordStorage = checkNotNull(recordStorage);
@@ -163,7 +165,7 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
         /**
          * {@inheritDoc}
          *
-         * <p>The {@link JdbcProjectionStorage.Builder} checks the {@code recordStorage} and
+         * <p>The {@code JdbcProjectionStorage.Builder} checks the {@code recordStorage} and
          * {@code queryFactory} fields to be set.
          */
         @Override
@@ -179,7 +181,7 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
         }
 
         /**
-         * @param projectionClass the class of projections to be stored
+         * Sets the class of projections to be stored.
          */
         public Builder<I> setProjectionClass(Class<? extends Projection<I, ?, ?>> projectionClass) {
             this.projectionClass = checkNotNull(projectionClass);

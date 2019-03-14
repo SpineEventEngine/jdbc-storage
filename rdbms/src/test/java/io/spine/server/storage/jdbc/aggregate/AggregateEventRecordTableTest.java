@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test;
 
 import static com.querydsl.core.types.ExpressionUtils.path;
 import static io.spine.base.Identifier.newUuid;
-import static io.spine.base.Time.getCurrentTime;
+import static io.spine.base.Time.currentTime;
 import static io.spine.core.Versions.newVersion;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
 import static io.spine.server.storage.jdbc.GivenDataSource.withoutSuperpowers;
@@ -38,9 +38,6 @@ import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.C
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-/**
- * @author Dmytro Grankin
- */
 @DisplayName("AggregateEventRecordTable should")
 class AggregateEventRecordTableTest {
 
@@ -62,7 +59,7 @@ class AggregateEventRecordTableTest {
         table.create();
 
         Snapshot snapshot = Snapshot.newBuilder()
-                                    .setVersion(newVersion(5, getCurrentTime()))
+                                    .setVersion(newVersion(5, currentTime()))
                                     .build();
         AggregateEventRecord record = AggregateEventRecord.newBuilder()
                                                           .setSnapshot(snapshot)

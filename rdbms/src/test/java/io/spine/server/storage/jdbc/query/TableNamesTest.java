@@ -25,7 +25,7 @@ import io.spine.server.storage.jdbc.query.given.DbTableNameFactoryTestEnv.TestEn
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static io.spine.server.storage.jdbc.query.DbTableNameFactory.newTableName;
+import static io.spine.server.storage.jdbc.query.TableNames.newTableName;
 import static io.spine.testing.DisplayNames.HAVE_PARAMETERLESS_CTOR;
 import static io.spine.testing.DisplayNames.NOT_ACCEPT_NULLS;
 import static io.spine.testing.Tests.assertHasPrivateParameterlessCtor;
@@ -35,22 +35,22 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Alexander Litus
  */
-@DisplayName("DbTableNameFactory should")
-class DbTableNameFactoryTest {
+@DisplayName("TableNames should")
+class TableNamesTest {
 
     private final Class<TestEntity> entityClass = TestEntity.class;
 
     @Test
     @DisplayName(HAVE_PARAMETERLESS_CTOR)
     void haveUtilityConstructor() {
-        assertHasPrivateParameterlessCtor(DbTableNameFactory.class);
+        assertHasPrivateParameterlessCtor(TableNames.class);
     }
 
     @Test
     @DisplayName(NOT_ACCEPT_NULLS)
     void passNullToleranceCheck() {
         NullPointerTester tester = new NullPointerTester();
-        tester.testStaticMethods(DbTableNameFactory.class, NullPointerTester.Visibility.PACKAGE);
+        tester.testStaticMethods(TableNames.class, NullPointerTester.Visibility.PACKAGE);
     }
 
     @Test

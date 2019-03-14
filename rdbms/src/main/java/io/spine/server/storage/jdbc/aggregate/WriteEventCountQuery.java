@@ -26,8 +26,6 @@ import io.spine.server.storage.jdbc.query.WriteQuery;
 /**
  * An abstract base for queries, which write an event count after the last
  * {@link io.spine.server.aggregate.Snapshot Snapshot} into the {@link EventCountTable}.
- *
- * @author Dmytro Grankin
  */
 abstract class WriteEventCountQuery<I> extends IdAwareQuery<I> implements WriteQuery {
 
@@ -42,7 +40,6 @@ abstract class WriteEventCountQuery<I> extends IdAwareQuery<I> implements WriteQ
         return eventCount;
     }
 
-    @SuppressWarnings("ClassNameSameAsAncestorName")
     abstract static class Builder<B extends Builder<B, Q, I>, Q extends WriteEventCountQuery<I>, I>
             extends IdAwareQuery.Builder<I, B, Q> {
 

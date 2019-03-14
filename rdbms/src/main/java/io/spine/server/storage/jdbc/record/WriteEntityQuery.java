@@ -48,7 +48,6 @@ import static io.spine.server.storage.jdbc.record.RecordTable.StandardColumn.ENT
  *
  * @param <I> the type of IDs
  * @param <C> the type of {@link StoreClause}
- * @author Dmytro Grankin
  */
 abstract class WriteEntityQuery<I, C extends StoreClause<C>> extends AbstractQuery implements WriteQuery {
 
@@ -132,7 +131,6 @@ abstract class WriteEntityQuery<I, C extends StoreClause<C>> extends AbstractQue
         return parameters.build();
     }
 
-    @SuppressWarnings("ClassNameSameAsAncestorName")
     abstract static class Builder<B extends Builder<B, Q, I>,
                                   Q extends WriteEntityQuery,
                                   I>

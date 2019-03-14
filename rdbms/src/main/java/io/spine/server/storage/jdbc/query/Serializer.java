@@ -31,8 +31,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A utility class for serializing/deserializing messages.
- *
- * @author Alexander Litus
  */
 public final class Serializer {
 

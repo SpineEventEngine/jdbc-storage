@@ -29,9 +29,6 @@ import javax.sql.DataSource;
  *
  * <p>The default implementation is:
  * <a href="https://github.com/brettwooldridge/HikariCP">HikariCP</a> connection pool.
- *
- * @author Alexander Litus
- * @author Andrey Lavrov
  */
 class DefaultDataSourceConfigConverter {
 

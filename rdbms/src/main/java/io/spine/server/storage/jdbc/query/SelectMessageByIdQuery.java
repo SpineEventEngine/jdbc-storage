@@ -99,7 +99,6 @@ public abstract class SelectMessageByIdQuery<I, M extends Message> extends Abstr
         return message;
     }
 
-    @SuppressWarnings("ClassNameSameAsAncestorName")
     protected abstract static class Builder<B extends Builder<B, Q, I, R>,
                                             Q extends SelectMessageByIdQuery<I, R>,
                                             I,

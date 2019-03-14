@@ -38,8 +38,6 @@ import static io.spine.server.storage.jdbc.aggregate.LifecycleFlagsTable.Column.
 
 /**
  * A table for storing the {@link LifecycleFlags} of an {@link Aggregate}.
- *
- * @author Dmytro Dashenkov
  */
 class LifecycleFlagsTable<I> extends EntityTable<I, LifecycleFlags, LifecycleFlags> {
 

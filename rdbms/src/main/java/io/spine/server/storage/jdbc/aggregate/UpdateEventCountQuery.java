@@ -26,8 +26,6 @@ import static io.spine.server.storage.jdbc.aggregate.EventCountTable.Column.EVEN
 
 /**
  * A query that updates event count in the {@link EventCountTable}.
- *
- * @author Dmytro Grankin
  */
 class UpdateEventCountQuery<I> extends WriteEventCountQuery<I> {
 
@@ -47,7 +45,6 @@ class UpdateEventCountQuery<I> extends WriteEventCountQuery<I> {
         return new Builder<>();
     }
 
-    @SuppressWarnings("ClassNameSameAsAncestorName")
     static class Builder<I> extends WriteEventCountQuery.Builder<Builder<I>,
                                                                  UpdateEventCountQuery<I>,
                                                                  I> {

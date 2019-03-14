@@ -28,30 +28,28 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  *
  * <p>It's recommended to implement this interface in an {@code enum}, since it's API is sharpened
  * to be overridden with the {@code enum} default methods.
- *
- * @author Dmytro Dashenkov
  */
 public interface TableColumn extends StorageField {
 
     /**
-     * @return the name of the column
+     * Returns the name of the column.
      */
     String name();
 
     /**
-     * @return the {@link Type} of the column
-     *         or {@code null} if the type is unknown at the compile time
+     * Returns the {@link Type} of the column
+     * or {@code null} if the type is unknown at the compile time.
      */
     @Nullable
     Type type();
 
     /**
-     * @return {@code true} is this column is a primary key of the table, {@code false} otherwise
+     * Returns {@code true} is this column is a primary key of the table, {@code false} otherwise.
      */
     boolean isPrimaryKey();
 
     /**
-     * @return {@code true} if this column may contain {@code NULL} values, {@code false} otherwise
+     * Returns {@code true} if this column may contain {@code NULL} values, {@code false} otherwise.
      */
     boolean isNullable();
 }

@@ -24,8 +24,6 @@ import com.google.errorprone.annotations.CanIgnoreReturnValue;
 
 /**
  * A query which makes changes in a data source.
- *
- * @author Dmytro Grankin
  */
 public interface WriteQuery extends StorageQuery {
 

@@ -38,8 +38,6 @@ import static java.util.Collections.disjoint;
  * in a query where a parameter should be inserted.
  *
  * <p>This class allows to encapsulate setting of parameters to a concrete implementation.
- *
- * @author Dmytro Grankin
  */
 public final class Parameters {
 

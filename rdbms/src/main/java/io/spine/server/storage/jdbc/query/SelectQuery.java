@@ -24,7 +24,6 @@ package io.spine.server.storage.jdbc.query;
  * An interface for {@code SELECT} queries.
  *
  * @param <R> the result type
- * @author Dmytro Grankin
  */
 public interface SelectQuery<R> {
 

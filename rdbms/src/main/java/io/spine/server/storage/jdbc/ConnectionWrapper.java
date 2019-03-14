@@ -28,8 +28,6 @@ import java.sql.SQLException;
 
 /**
  * The wrapper for {@link Connection} instances.
- *
- * @author Alexander Litus
  */
 @Internal
 public class ConnectionWrapper implements AutoCloseable {

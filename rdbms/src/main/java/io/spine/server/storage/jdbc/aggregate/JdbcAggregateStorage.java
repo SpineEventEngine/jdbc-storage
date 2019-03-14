@@ -44,14 +44,13 @@ import static io.spine.server.storage.jdbc.aggregate.Closeables.closeAll;
  *
  * <p>This storage contains 3 tables by default:
  * <ul>
- *     <li>{@link AggregateEventRecordTable}
- *     <li>{@link LifecycleFlagsTable}
- *     <li>{@link EventCountTable}
+ * <li>{@link AggregateEventRecordTable}
+ * <li>{@link LifecycleFlagsTable}
+ * <li>{@link EventCountTable}
  * </ul>
  *
- * @param <I> the type of aggregate IDs
- * @author Alexander Litus
- * @author Dmytro Dashenkov
+ * @param <I>
+ *         the type of aggregate IDs
  */
 public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
 
@@ -75,7 +74,8 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     /**
      * Creates a new instance using the builder.
      *
-     * @param builder the storage builder
+     * @param builder
+     *         the storage builder
      */
     protected JdbcAggregateStorage(Builder<I> builder) {
         super(builder.isMultitenant());
@@ -124,7 +124,10 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     /**
      * {@inheritDoc}
      *
-     * @throws DatabaseException if an error occurs during an interaction with the DB
+     * <p>Any exceptions occurred in this operation are propagated as {@link DatabaseException}.
+     *
+     * @throws DatabaseException
+     *         if an error occurs during an interaction with the DB
      */
     @Override
     protected void writeRecord(I id, AggregateEventRecord record) throws DatabaseException {
@@ -138,7 +141,8 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
      * {@link Iterator#next()}.
      *
      * @return a new {@link DbIterator} instance
-     * @throws DatabaseException if an error occurs during an interaction with the DB
+     * @throws DatabaseException
+     *         if an error occurs during an interaction with the DB
      */
     @Override
     protected Iterator<AggregateEventRecord> historyBackward(AggregateReadRequest<I> request)
@@ -159,7 +163,8 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
      * <p>Unclosed {@linkplain #iterators history iterators}
      * produced by this storage will be closed together with the storage.
      *
-     * @throws DatabaseException if the underlying datasource cannot be closed
+     * @throws DatabaseException
+     *         if the underlying datasource cannot be closed
      */
     @Override
     public void close() throws DatabaseException {
@@ -210,7 +215,7 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
         }
 
         /**
-         * @param aggregateClass the class of aggregates to be stored
+         * Sets the class of aggregates to be stored.
          */
         public Builder<I> setAggregateClass(Class<? extends Aggregate<I, ?, ?>> aggregateClass) {
             this.aggregateClass = checkNotNull(aggregateClass);

@@ -29,8 +29,6 @@ import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.
 
 /**
  * A query that inserts a new {@link Timestamp} into the {@link LastHandledEventTimeTable}.
- *
- * @author Dmytro Grankin
  */
 class InsertTimestampQuery extends WriteTimestampQuery {
 
@@ -51,7 +49,6 @@ class InsertTimestampQuery extends WriteTimestampQuery {
         return new Builder();
     }
 
-    @SuppressWarnings("ClassNameSameAsAncestorName")
     static class Builder extends WriteTimestampQuery.Builder<Builder, InsertTimestampQuery> {
 
         @Override

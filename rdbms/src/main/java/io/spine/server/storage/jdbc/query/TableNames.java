@@ -26,13 +26,11 @@ import java.sql.DatabaseMetaData;
 
 /**
  * A utility class which provides strings valid for DB table names.
- *
- * @author Alexander Litus
  */
 @SuppressWarnings("UtilityClass")
-class DbTableNameFactory {
+class TableNames {
 
-    private DbTableNameFactory() {
+    private TableNames() {
         // Prevent instantiation of this utility class.
     }
 

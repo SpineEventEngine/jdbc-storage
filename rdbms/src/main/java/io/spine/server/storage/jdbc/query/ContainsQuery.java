@@ -26,8 +26,6 @@ import static com.querydsl.sql.SQLExpressions.count;
 
 /**
  * A query that checks if the table contains a record with the given ID.
- *
- * @author Dmytro Grankin
  */
 class ContainsQuery<I> extends IdAwareQuery<I> implements SelectQuery<Boolean> {
 
@@ -36,7 +34,7 @@ class ContainsQuery<I> extends IdAwareQuery<I> implements SelectQuery<Boolean> {
     }
 
     /**
-     * @return {@code true} if there is at least one record with given ID, {@code} false otherwise
+     * Returns {@code true} if there is at least one record with given ID, {@code} false otherwise.
      */
     @Override
     public Boolean execute() {

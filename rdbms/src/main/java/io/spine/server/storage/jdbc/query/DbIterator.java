@@ -47,7 +47,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @param <R>
  *         the type of storage records
- * @author Alexander Litus
  */
 @Internal
 public abstract class DbIterator<R> implements Iterator<R>, Closeable {
@@ -109,8 +108,6 @@ public abstract class DbIterator<R> implements Iterator<R>, Closeable {
      * {@inheritDoc}
      *
      * <p>Calls {@link #close()}, if {@link ResultSet#next()} returns {@code false}.
-     *
-     * @return {@inheritDoc}
      */
     @Override
     public boolean hasNext() {

@@ -26,8 +26,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * A parameter of an SQL query.
  *
  * <p>The class is a DTO containing a parameter value.
- *
- * @author Dmytro Grankin
  */
 public final class Parameter {
 

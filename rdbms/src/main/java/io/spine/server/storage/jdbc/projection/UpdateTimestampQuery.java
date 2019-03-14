@@ -30,8 +30,6 @@ import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.
 
 /**
  * A query that updates {@link Timestamp} in the {@link LastHandledEventTimeTable}.
- *
- * @author Dmytro Grankin
  */
 class UpdateTimestampQuery extends WriteTimestampQuery {
 
@@ -53,7 +51,6 @@ class UpdateTimestampQuery extends WriteTimestampQuery {
         return new Builder();
     }
 
-    @SuppressWarnings("ClassNameSameAsAncestorName")
     static class Builder extends WriteTimestampQuery.Builder<Builder, UpdateTimestampQuery> {
 
         @Override

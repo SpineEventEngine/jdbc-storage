@@ -27,8 +27,6 @@ import static io.spine.server.storage.jdbc.aggregate.EventCountTable.Column.EVEN
 /**
  * A query that inserts a new aggregate event count after the last snapshot into the
  * {@link EventCountTable}.
- *
- * @author Dmytro Grankin
  */
 class InsertEventCountQuery<I> extends WriteEventCountQuery<I> {
 
@@ -48,7 +46,6 @@ class InsertEventCountQuery<I> extends WriteEventCountQuery<I> {
         return new Builder<>();
     }
 
-    @SuppressWarnings("ClassNameSameAsAncestorName")
     static class Builder<I> extends WriteEventCountQuery.Builder<Builder<I>,
                                                                  InsertEventCountQuery<I>,
                                                                  I> {

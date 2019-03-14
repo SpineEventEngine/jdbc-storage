@@ -24,8 +24,6 @@ import com.querydsl.sql.dml.SQLDeleteClause;
 
 /**
  * A query for deleting one or many items by an ID.
- *
- * @author Dmytro Grankin
  */
 class DeleteRecordQuery<I> extends IdAwareQuery<I> implements WriteQuery {
 

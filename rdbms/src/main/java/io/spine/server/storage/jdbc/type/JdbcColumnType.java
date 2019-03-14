@@ -30,7 +30,6 @@ import io.spine.server.storage.jdbc.query.Parameters;
  * <p>Uses {@linkplain Parameters.Builder parameters builder} as the record type and
  * {@code String} as the column identifier type.
  *
- * @author Alexander Aleksandrov
  * @see AbstractJdbcColumnType for the skeleton implementation
  */
 @SPI

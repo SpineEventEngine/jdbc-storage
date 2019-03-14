@@ -33,8 +33,6 @@ import static io.spine.server.storage.jdbc.aggregate.LifecycleFlagsTable.Column.
 
 /**
  * The query selecting one {@linkplain LifecycleFlags entity lifecycle flags} by ID.
- *
- * @author Dmytro Grankin
  */
 class SelectLifecycleFlagsQuery<I> extends SelectMessageByIdQuery<I, LifecycleFlags> {
 
@@ -50,8 +48,6 @@ class SelectLifecycleFlagsQuery<I> extends SelectMessageByIdQuery<I, LifecycleFl
         return query;
     }
 
-    @SuppressWarnings("MethodDoesntCallSuperMethod")
-    // Override the mechanism of the Message restoring
     @Override
     protected LifecycleFlags readMessage(ResultSet resultSet) throws SQLException {
         boolean archived = resultSet.getBoolean(Column.ARCHIVED.name());

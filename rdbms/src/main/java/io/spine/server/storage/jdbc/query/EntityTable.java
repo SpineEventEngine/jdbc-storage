@@ -25,12 +25,10 @@ import io.spine.server.entity.Entity;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.TypeMapping;
 
-import static io.spine.server.storage.jdbc.query.DbTableNameFactory.newTableName;
+import static io.spine.server.storage.jdbc.query.TableNames.newTableName;
 
 /**
  * A common base for the storage tables, that are used to maintain {@linkplain Entity entities}.
- *
- * @author Dmytro Dashenkov
  */
 @Internal
 public abstract class EntityTable<I, R, W> extends AbstractTable<I, R, W> {

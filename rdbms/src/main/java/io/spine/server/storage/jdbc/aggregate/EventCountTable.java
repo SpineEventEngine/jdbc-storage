@@ -46,8 +46,6 @@ import static io.spine.server.storage.jdbc.aggregate.EventCountTable.Column.ID;
  * due to a massive table scanning involved.
  *
  * <p>Used in the {@link JdbcAggregateStorage}.
- *
- * @author Dmytro Dashenkov
  */
 class EventCountTable<I> extends EntityTable<I, Integer, Integer> {
 

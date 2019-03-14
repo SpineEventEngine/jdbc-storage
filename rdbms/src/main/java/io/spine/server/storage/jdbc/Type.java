@@ -26,8 +26,6 @@ package io.spine.server.storage.jdbc;
  * <p>These types are abstract and have no relation to a particular SQL database.
  *
  * <p>The names of the types for a particular database are specified by a {@link TypeMapping}.
- *
- * @author Dmytro Grankin
  */
 public enum Type {
 

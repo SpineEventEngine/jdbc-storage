@@ -44,8 +44,6 @@ import static io.spine.server.storage.jdbc.record.RecordTable.StandardColumn.ID;
 /**
  * Utility class for parsing the results of a DB query ({@link ResultSet}) into the
  * required in-memory representation.
- *
- * @author Dmytro Dashenkov
  */
 final class QueryResults {
 

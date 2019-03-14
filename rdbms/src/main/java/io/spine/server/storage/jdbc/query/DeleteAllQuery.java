@@ -25,8 +25,6 @@ import com.querydsl.sql.dml.SQLDeleteClause;
 
 /**
  * A query that deletes all rows from a table.
- *
- * @author Dmytro Grankin
  */
 class DeleteAllQuery extends AbstractQuery implements WriteQuery {
 
@@ -45,7 +43,6 @@ class DeleteAllQuery extends AbstractQuery implements WriteQuery {
         return new Builder();
     }
 
-    @SuppressWarnings("ClassNameSameAsAncestorName")
     static class Builder extends AbstractQuery.Builder<Builder, DeleteAllQuery> {
 
         @Override

@@ -43,8 +43,6 @@ import static io.spine.server.storage.jdbc.query.DbIterator.createFor;
  *
  * <p>Resulting records are ordered by version descending. If the version is the same for
  * several records, they will be ordered by creation time descending.
- *
- * @author Dmytro Grankin
  */
 class SelectEventRecordsById<I> extends AbstractSelectByIdQuery<I, DbIterator<AggregateEventRecord>> {
 
