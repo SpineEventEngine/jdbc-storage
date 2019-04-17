@@ -54,6 +54,8 @@ subprojects {
     apply plugin: 'pmd'
     apply plugin: 'maven-publish'
 
+    apply from: deps.scripts.projectLicenseReport
+
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
 
@@ -128,3 +130,4 @@ subprojects {
 
 apply from: deps.scripts.jacoco
 apply from: deps.scripts.publish
+apply from: deps.scripts.repoLicenseReport
