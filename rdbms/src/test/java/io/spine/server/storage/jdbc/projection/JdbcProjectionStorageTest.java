@@ -49,7 +49,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class JdbcProjectionStorageTest extends ProjectionStorageTest {
 
     @Override
-    protected ProjectionStorage<ProjectId> newStorage(Class<? extends Entity> entityClass) {
+    protected ProjectionStorage<ProjectId> newStorage(Class<? extends Entity<?, ?>> entityClass) {
         DataSourceWrapper dataSource =
                 GivenDataSource.whichIsStoredInMemory("projectionStorageTests");
         @SuppressWarnings("unchecked") // Required for the tests.
