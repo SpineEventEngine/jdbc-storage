@@ -18,7 +18,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-buildscript {final scriptHandler ->
+buildscript { final scriptHandler ->
     // Define the versions of the library and its dependencies.
     // As long as `buildscript` section is always evaluated first, we need to apply
     // `version.gradle` explicitly here.
@@ -53,7 +53,7 @@ subprojects {
     apply plugin: 'net.ltgt.errorprone'
     apply plugin: 'pmd'
     apply plugin: 'maven-publish'
-
+    apply from: deps.scripts.javadocOptions
     apply from: deps.scripts.projectLicenseReport
 
     sourceCompatibility = 1.8
@@ -119,10 +119,10 @@ subprojects {
     }
 
     task javadocJar(type: Jar, dependsOn: 'javadoc') {
-        from ("$projectDir/build/docs/javadoc")
+        from("$projectDir/build/docs/javadoc")
         classifier "javadoc"
     }
-    
+
     check.dependsOn jacocoTestReport
 
     apply from: deps.scripts.pmd
