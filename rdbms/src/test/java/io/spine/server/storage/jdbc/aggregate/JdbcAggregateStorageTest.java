@@ -106,7 +106,7 @@ class JdbcAggregateStorageTest extends AggregateStorageTest {
 
     @SuppressWarnings("unchecked") // It is OK for a test.
     @Override
-    protected AggregateStorage<ProjectId> newStorage(Class<? extends Entity> aClass) {
+    protected AggregateStorage<ProjectId> newStorage(Class<? extends Entity<?, ?>> aClass) {
         return newStorage(ProjectId.class, (Class<? extends Aggregate<ProjectId, ?, ?>>) aClass);
     }
 

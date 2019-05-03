@@ -109,10 +109,9 @@ class JdbcRecordStorageTest extends RecordStorageTest<JdbcRecordStorage<ProjectI
                                       .stream()
                                       .map(TableColumn::name)
                                       .collect(toList());
-        assertThat(columns).containsAllOf(archived.name(),
-                                          deleted.name(),
-                                          version.name(),
-                                          COLUMN_NAME_FOR_STORING);
+        assertThat(columns).containsAtLeast(archived.name(),
+                                            deleted.name(),
+                                            COLUMN_NAME_FOR_STORING);
         close(storage);
     }
 
@@ -168,7 +167,7 @@ class JdbcRecordStorageTest extends RecordStorageTest<JdbcRecordStorage<ProjectI
     }
 
     @Override
-    protected JdbcRecordStorage<ProjectId> newStorage(Class<? extends Entity> cls) {
+    protected JdbcRecordStorage<ProjectId> newStorage(Class<? extends Entity<?, ?>> cls) {
         DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory("entityStorageTests");
         @SuppressWarnings("unchecked") // Test invariant.
                 Class<? extends Entity<ProjectId, ?>> entityClass =
