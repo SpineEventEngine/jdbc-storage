@@ -73,6 +73,15 @@ class AggregateEventRecordTable<I> extends EntityTable<I,
         return query;
     }
 
+    SelectAllEventRecords composeSelectAllQuery() {
+        SelectAllEventRecords query = SelectAllEventRecords
+                .newBuilder()
+                .setTableName(getName())
+                .setDataSource(getDataSource())
+                .build();
+        return query;
+    }
+
     @Override
     protected InsertAggregateRecordQuery<I> composeInsertQuery(I id, AggregateEventRecord record) {
         InsertAggregateRecordQuery.Builder<I> builder = InsertAggregateRecordQuery.newBuilder();

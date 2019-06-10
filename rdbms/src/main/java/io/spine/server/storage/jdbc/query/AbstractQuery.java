@@ -53,8 +53,6 @@ import static java.sql.ResultSet.HOLD_CURSORS_OVER_COMMIT;
 
 /**
  * The implementation base for the queries to an SQL-compliant database.
- *
- * @author Dmytro Grankin
  */
 public abstract class AbstractQuery implements StorageQuery {
 

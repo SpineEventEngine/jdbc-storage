@@ -62,11 +62,6 @@ public class JdbcStorageFactory implements StorageFactory {
     }
 
     @Override
-    public ColumnTypeRegistry getTypeRegistry() {
-        return columnTypeRegistry;
-    }
-
-    @Override
     public StorageFactory toSingleTenant() {
         return isMultitenant()
                ? copyFor(BoundedContextName.getDefaultInstance(), false)

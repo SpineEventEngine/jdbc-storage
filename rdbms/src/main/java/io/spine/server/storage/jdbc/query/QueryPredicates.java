@@ -138,11 +138,11 @@ public class QueryPredicates {
         Operator operator = filter.getOperator();
         checkArgument(operator.getNumber() > 0, operator.name());
 
-        String columnName = column.getStoredName();
+        String columnName = column.storedName();
         ComparablePath<Comparable> columnPath = comparablePath(Comparable.class, columnName);
         JdbcColumnType<? super Object, ? super Object> columnType =
                 columnTypeRegistry.get(column);
-        Class<?> type = column.getType();
+        Class<?> type = column.type();
         Object javaValue = toObject(filter.getValue(), type);
         Serializable persistedValue = column.toPersistedValue(javaValue);
 

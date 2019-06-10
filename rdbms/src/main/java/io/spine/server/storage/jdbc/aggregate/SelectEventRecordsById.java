@@ -36,7 +36,6 @@ import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.C
 import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.TIMESTAMP_NANOS;
 import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.VERSION;
 import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.messageReader;
-import static io.spine.server.storage.jdbc.query.DbIterator.createFor;
 
 /**
  * A query that selects {@linkplain AggregateEventRecord event records} by an aggregate ID.
@@ -44,7 +43,8 @@ import static io.spine.server.storage.jdbc.query.DbIterator.createFor;
  * <p>Resulting records are ordered by version descending. If the version is the same for
  * several records, they will be ordered by creation time descending.
  */
-class SelectEventRecordsById<I> extends AbstractSelectByIdQuery<I, DbIterator<AggregateEventRecord>> {
+final class SelectEventRecordsById<I>
+        extends AbstractSelectByIdQuery<I, DbIterator<AggregateEventRecord>> {
 
     private SelectEventRecordsById(Builder<I> builder) {
         super(builder);
@@ -55,10 +55,11 @@ class SelectEventRecordsById<I> extends AbstractSelectByIdQuery<I, DbIterator<Ag
         OrderSpecifier<Comparable> bySeconds = orderBy(TIMESTAMP, DESC);
         OrderSpecifier<Comparable> byNanos = orderBy(TIMESTAMP_NANOS, DESC);
 
-        AbstractSQLQuery<Object, ?> query = factory().select(pathOf(AGGREGATE))
-                                                     .from(table())
-                                                     .where(hasId())
-                                                     .orderBy(byVersion, bySeconds, byNanos);
+        AbstractSQLQuery<Object, ?> query = factory()
+                .select(pathOf(AGGREGATE))
+                .from(table())
+                .where(hasId())
+                .orderBy(byVersion, bySeconds, byNanos);
         query.setStatementOptions(StatementOptions.builder()
                                                   .setFetchSize(fetchSize)
                                                   .build());
@@ -66,7 +67,8 @@ class SelectEventRecordsById<I> extends AbstractSelectByIdQuery<I, DbIterator<Ag
 
         ColumnReader<AggregateEventRecord> aggregateColumnReader =
                 messageReader(AGGREGATE.name(), AggregateEventRecord.getDescriptor());
-        DbIterator<AggregateEventRecord> dbIterator = createFor(resultSet, aggregateColumnReader);
+        DbIterator<AggregateEventRecord> dbIterator =
+                DbIterator.over(resultSet, aggregateColumnReader);
         return dbIterator;
     }
 

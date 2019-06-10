@@ -21,7 +21,6 @@
 package io.spine.server.storage.jdbc;
 
 import io.spine.server.aggregate.AggregateStorage;
-import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.projection.ProjectionStorage;
 import io.spine.server.storage.RecordStorage;
 import io.spine.server.storage.StorageFactory;
@@ -148,18 +147,6 @@ class JdbcStorageFactoryTest {
                                                        .build();
         factory.close();
         verify(mock).close();
-    }
-
-    @Test
-    @DisplayName("have default column type registry")
-    void haveDefaultTypeRegistry() {
-        DataSourceWrapper dataSource = GivenDataSource.withoutSuperpowers();
-        JdbcStorageFactory factory = JdbcStorageFactory.newBuilder()
-                                                       .setDataSource(dataSource)
-                                                       .setTypeMapping(MYSQL_5_7)
-                                                       .build();
-        ColumnTypeRegistry<?> registry = factory.getTypeRegistry();
-        assertNotNull(registry);
     }
 
     @Test
