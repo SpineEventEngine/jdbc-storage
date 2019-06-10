@@ -21,6 +21,8 @@
 package io.spine.server.storage.jdbc.aggregate;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Multimap;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
@@ -32,12 +34,14 @@ import io.spine.server.storage.jdbc.query.EntityTable;
 import io.spine.server.storage.jdbc.query.WriteQuery;
 
 import java.util.List;
+import java.util.Map;
 
 import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
 import static io.spine.server.storage.jdbc.Type.INT;
 import static io.spine.server.storage.jdbc.Type.LONG;
 import static io.spine.server.storage.jdbc.Type.STRING_255;
 import static io.spine.util.Exceptions.newIllegalStateException;
+import static java.util.stream.Collectors.toList;
 
 /**
  * A table for storing the {@linkplain AggregateEventRecord aggregate event records}.
@@ -62,6 +66,12 @@ class AggregateEventRecordTable<I> extends EntityTable<I,
         return ImmutableList.copyOf(Column.values());
     }
 
+    @CanIgnoreReturnValue
+    long delete(Multimap<I, AggregateEventRecord> records) {
+        DeleteAggregateRecordsQuery<I> query = composeDeleteQuery(records);
+        return query.execute();
+    }
+
     @Override
     protected SelectEventRecordsById<I> composeSelectQuery(I id) {
         SelectEventRecordsById.Builder<I> builder = SelectEventRecordsById.newBuilder();
@@ -70,15 +80,6 @@ class AggregateEventRecordTable<I> extends EntityTable<I,
                                                  .setIdColumn(getIdColumn())
                                                  .setId(id)
                                                  .build();
-        return query;
-    }
-
-    EventRecordsWithIdQuery<I> composeEventRecordsWithIdQuery() {
-        EventRecordsWithIdQuery.Builder<I> builder = EventRecordsWithIdQuery.newBuilder();
-        EventRecordsWithIdQuery<I> query = builder.setTableName(getName())
-                                                  .setDataSource(getDataSource())
-                                                  .setIdColumn(getIdColumn())
-                                                  .build();
         return query;
     }
 
@@ -91,6 +92,35 @@ class AggregateEventRecordTable<I> extends EntityTable<I,
                                                      .setId(id)
                                                      .setRecord(record)
                                                      .build();
+        return query;
+    }
+
+    EventRecordsWithIdQuery<I> composeEventRecordsWithIdQuery() {
+        EventRecordsWithIdQuery.Builder<I> builder = EventRecordsWithIdQuery.newBuilder();
+        EventRecordsWithIdQuery<I> query = builder.setTableName(getName())
+                                                  .setDataSource(getDataSource())
+                                                  .setIdColumn(getIdColumn())
+                                                  .build();
+        return query;
+    }
+
+    private DeleteAggregateRecordsQuery<I>
+    composeDeleteQuery(Multimap<I, AggregateEventRecord> records) {
+        List<I> ids = records.entries()
+                             .stream()
+                             .map(Map.Entry::getKey)
+                             .collect(toList());
+        List<AggregateEventRecord> eventRecords = records.entries()
+                                                         .stream()
+                                                         .map(Map.Entry::getValue)
+                                                         .collect(toList());
+        DeleteAggregateRecordsQuery.Builder<I> builder = DeleteAggregateRecordsQuery.newBuilder();
+        DeleteAggregateRecordsQuery<I> query = builder.setTableName(getName())
+                                                      .setDataSource(getDataSource())
+                                                      .setIdColumn(getIdColumn())
+                                                      .setIds(ids)
+                                                      .setRecords(eventRecords)
+                                                      .build();
         return query;
     }
 

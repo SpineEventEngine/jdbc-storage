@@ -345,32 +345,11 @@ public abstract class AbstractTable<I, R, W> implements Logging {
      * @return {@code true} if the row was deleted successfully,
      *         {@code false} if the row was not found
      */
-    @CanIgnoreReturnValue
     public boolean delete(I id) {
         DeleteRecordQuery.Builder<I> builder = DeleteRecordQuery.newBuilder();
         DeleteRecordQuery<I> query = builder.setTableName(name)
                                             .setIdColumn(getIdColumn())
                                             .setId(id)
-                                            .setDataSource(dataSource)
-                                            .build();
-        long rowsAffected = query.execute();
-        return rowsAffected != 0;
-    }
-
-    /**
-     * Deletes rows in the table corresponding to the given set of IDs.
-     *
-     * @param ids
-     *         a set of IDs
-     * @return {@code true} if at least one row was deleted,
-     *         {@code false} otherwise
-     */
-    @CanIgnoreReturnValue
-    public boolean delete(Iterable<I> ids) {
-        DeleteRecordQuery.Builder<I> builder = DeleteRecordQuery.newBuilder();
-        DeleteRecordQuery<I> query = builder.setTableName(name)
-                                            .setIdColumn(getIdColumn())
-                                            .setIds(ids)
                                             .setDataSource(dataSource)
                                             .build();
         long rowsAffected = query.execute();

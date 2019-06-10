@@ -20,6 +20,8 @@
 
 package io.spine.server.storage.jdbc.aggregate;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import com.google.protobuf.Timestamp;
 import com.google.protobuf.util.Timestamps;
 import io.spine.server.aggregate.Aggregate;
@@ -36,7 +38,6 @@ import io.spine.server.storage.jdbc.query.DbIterator.DoubleColumnRecord;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -189,14 +190,15 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
 
     private void truncate(int snapshotIndex, Predicate<AggregateEventRecord> predicate) {
         DbIterator<DoubleColumnRecord<I, AggregateEventRecord>> records = historyBackward();
-        List<I> toDelete = gatherIdsToDelete(records, snapshotIndex, predicate);
+        Multimap<I, AggregateEventRecord> toDelete =
+                recordsToDelete(records, snapshotIndex, predicate);
         mainTable.delete(toDelete);
     }
 
-    private List<I> gatherIdsToDelete(
+    private Multimap<I, AggregateEventRecord> recordsToDelete(
             DbIterator<DoubleColumnRecord<I, AggregateEventRecord>> records,
             int snapshotIndex, Predicate<AggregateEventRecord> predicate) {
-        List<I> toDelete = newLinkedList();
+        Multimap<I, AggregateEventRecord> toDelete = HashMultimap.create();
         Map<I, Integer> snapshotsHitById = newHashMap();
         while (records.hasNext()) {
             DoubleColumnRecord<I, AggregateEventRecord> record = records.next();
@@ -206,7 +208,7 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
                                ? snapshotsHitById.get(id)
                                : 0;
             if (snapshotsHit > snapshotIndex && predicate.test(eventRecord)) {
-                toDelete.add(id);
+                toDelete.put(id, eventRecord);
             }
             if (eventRecord.getKindCase() == SNAPSHOT) {
                 snapshotsHitById.put(id, snapshotsHit + 1);

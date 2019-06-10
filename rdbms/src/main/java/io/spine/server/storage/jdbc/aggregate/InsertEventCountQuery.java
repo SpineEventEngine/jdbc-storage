@@ -38,7 +38,7 @@ final class InsertEventCountQuery<I> extends WriteEventCountQuery<I> {
     public long execute() {
         SQLInsertClause query = factory().insert(table())
                                          .set(pathOf(EVENT_COUNT), getEventCount());
-        return insertId(query).execute();
+        return setId(query).execute();
     }
 
     static <I> Builder<I> newBuilder() {

@@ -61,7 +61,7 @@ final class InsertAggregateRecordQuery<I> extends IdAwareQuery<I> implements Wri
                                          .set(pathOf(VERSION), getVersionNumberOfRecord())
                                          .set(pathOf(TIMESTAMP), recordTimestamp.getSeconds())
                                          .set(pathOf(TIMESTAMP_NANOS), recordTimestamp.getNanos());
-        return insertId(query).execute();
+        return setId(query).execute();
     }
 
     private int getVersionNumberOfRecord() {

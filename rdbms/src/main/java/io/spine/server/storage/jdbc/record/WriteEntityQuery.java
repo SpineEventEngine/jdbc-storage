@@ -46,10 +46,14 @@ import static io.spine.server.storage.jdbc.record.RecordTable.StandardColumn.ENT
  *
  * <p>An overhead for multiple records will be the same as for a single record.
  *
- * @param <I> the type of IDs
- * @param <C> the type of {@link StoreClause}
+ * @param <I>
+ *         the type of IDs
+ * @param <C>
+ *         the type of {@link StoreClause}
  */
-abstract class WriteEntityQuery<I, C extends StoreClause<C>> extends AbstractQuery implements WriteQuery {
+abstract class WriteEntityQuery<I, C extends StoreClause<C>>
+        extends AbstractQuery
+        implements WriteQuery {
 
     private final IdColumn<I> idColumn;
     private final Map<I, EntityRecordWithColumns> records;

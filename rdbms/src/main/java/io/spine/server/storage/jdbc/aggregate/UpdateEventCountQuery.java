@@ -37,7 +37,7 @@ final class UpdateEventCountQuery<I> extends WriteEventCountQuery<I> {
     public long execute() {
         SQLUpdateClause query = factory().update(table())
                                          .set(pathOf(EVENT_COUNT), getEventCount());
-        return insertId(query).execute();
+        return setId(query).execute();
     }
 
     static <I> Builder<I> newBuilder() {

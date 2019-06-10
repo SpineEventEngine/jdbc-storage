@@ -24,12 +24,34 @@ import com.google.protobuf.StringValue;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.entity.AbstractEntity;
 import io.spine.server.projection.Projection;
+import io.spine.server.storage.jdbc.DataSourceConfig;
+import io.spine.server.storage.jdbc.JdbcStorageFactory;
 import io.spine.test.storage.Project;
+
+import static io.spine.server.storage.jdbc.GivenDataSource.prefix;
+import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
+import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
 
 public class JdbcStorageFactoryTestEnv {
 
     /** Prevents instantiation of this utility class. */
     private JdbcStorageFactoryTestEnv() {
+    }
+
+    private static final DataSourceConfig CONFIG = DataSourceConfig
+            .newBuilder()
+            .setJdbcUrl(prefix("factoryTests"))
+            .setUsername("SA")
+            .setPassword("pwd")
+            .setMaxPoolSize(12)
+            .build();
+
+    public static JdbcStorageFactory newFactory(boolean multitenant) {
+        return JdbcStorageFactory.newBuilder()
+                                 .setDataSource(CONFIG)
+                                 .setMultitenant(multitenant)
+                                 .setTypeMapping(MYSQL_5_7)
+                                 .build();
     }
 
     public static class TestEntity extends AbstractEntity<String, StringValue> {

@@ -20,12 +20,15 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableList;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.dml.StoreClause;
 import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.PathBuilder;
 
 import java.util.Collection;
+import java.util.Iterator;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -38,7 +41,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public abstract class IdAwareQuery<I> extends AbstractQuery {
 
-    private final ImmutableSet<I> ids;
+    private final ImmutableList<I> ids;
     private final IdColumn<I> idColumn;
 
     protected IdAwareQuery(Builder<I, ? extends Builder, ? extends IdAwareQuery> builder) {
@@ -51,12 +54,13 @@ public abstract class IdAwareQuery<I> extends AbstractQuery {
      * Adds the ID binding to the given {@code INSERT} or {@code UPDATE} clause.
      *
      * @throws IllegalArgumentException
-     *         if multiple IDs were specified for the query in {@code Builder}
+     *         if multiple IDs were specified for the clause in {@code Builder}
      */
-    protected <C extends StoreClause<C>> C insertId(C query) {
+    protected <C extends StoreClause<C>> C setId(C clause) {
         checkArgument(hasSingleId(),
-                      "Record modification queries only accept a single ID as input");
-        return query.set(idPath(), normalizedIds());
+                      "Record modification clauses only accept a single ID as input");
+        // todo redo.
+        return clause.set(idPath(), normalizedIds().iterator().next());
     }
 
     /**
@@ -65,6 +69,21 @@ public abstract class IdAwareQuery<I> extends AbstractQuery {
      */
     protected Predicate idMatches() {
         return idPath().in(normalizedIds());
+    }
+
+    protected Predicate idMatches(Collection<Predicate> perIdPredicates) {
+        Collection<Object> normalizedIds = normalizedIds();
+        checkArgument(normalizedIds.size() == perIdPredicates.size(),
+                      "Lol kek");
+        BooleanBuilder predicateBuilder = new BooleanBuilder();
+        Iterator<Object> ids = normalizedIds.iterator();
+        Iterator<Predicate> predicates = perIdPredicates.iterator();
+        while (ids.hasNext() && predicates.hasNext()) {
+            BooleanExpression idMatches = idPath().eq(ids.next());
+            Predicate predicate = idMatches.and(predicates.next());
+            predicateBuilder.or(predicate);
+        }
+        return predicateBuilder.getValue();
     }
 
     private boolean hasSingleId() {
@@ -85,15 +104,15 @@ public abstract class IdAwareQuery<I> extends AbstractQuery {
             extends AbstractQuery.Builder<B, Q> {
 
         private IdColumn<I> idColumn;
-        private ImmutableSet<I> ids;
+        private ImmutableList<I> ids;
 
         public B setId(I id) {
-            this.ids = ImmutableSet.of(id);
+            this.ids = ImmutableList.of(id);
             return getThis();
         }
 
         public B setIds(Iterable<I> ids) {
-            this.ids = ImmutableSet.copyOf(ids);
+            this.ids = ImmutableList.copyOf(ids);
             return getThis();
         }
 
