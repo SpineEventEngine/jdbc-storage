@@ -39,10 +39,8 @@ import static io.spine.validate.Validate.isDefault;
 /**
  * A query that inserts a new {@link AggregateEventRecord} into
  * the {@link AggregateEventRecordTable}.
- *
- * @author Dmytro Grankin
  */
-class InsertAggregateRecordQuery<I> extends IdAwareQuery<I> implements WriteQuery {
+final class InsertAggregateRecordQuery<I> extends IdAwareQuery<I> implements WriteQuery {
 
     private final AggregateEventRecord record;
 
@@ -58,13 +56,12 @@ class InsertAggregateRecordQuery<I> extends IdAwareQuery<I> implements WriteQuer
         String kindValue = record.getKindCase()
                                  .toString();
         SQLInsertClause query = factory().insert(table())
-                                         .set(idPath(), getNormalizedId())
                                          .set(pathOf(AGGREGATE), serialize(record))
                                          .set(pathOf(KIND), kindValue)
                                          .set(pathOf(VERSION), getVersionNumberOfRecord())
                                          .set(pathOf(TIMESTAMP), recordTimestamp.getSeconds())
                                          .set(pathOf(TIMESTAMP_NANOS), recordTimestamp.getNanos());
-        return query.execute();
+        return insertId(query).execute();
     }
 
     private int getVersionNumberOfRecord() {

@@ -22,14 +22,17 @@ package io.spine.server.storage.jdbc.aggregate;
 
 import com.querydsl.core.Fetchable;
 import com.querydsl.core.types.dsl.PathBuilder;
-import io.spine.server.storage.jdbc.query.AbstractSelectByIdQuery;
+import io.spine.server.storage.jdbc.query.IdAwareQuery;
+import io.spine.server.storage.jdbc.query.SelectQuery;
 
 import static io.spine.server.storage.jdbc.aggregate.EventCountTable.Column.EVENT_COUNT;
 
 /**
  * A query that selects event count by corresponding aggregate ID.
  */
-class SelectEventCountByIdQuery<I> extends AbstractSelectByIdQuery<I, Integer> {
+final class SelectEventCountByIdQuery<I>
+        extends IdAwareQuery<I>
+        implements SelectQuery<Integer> {
 
     private SelectEventCountByIdQuery(Builder<I> builder) {
         super(builder);
@@ -40,7 +43,7 @@ class SelectEventCountByIdQuery<I> extends AbstractSelectByIdQuery<I, Integer> {
         PathBuilder<Integer> eventCount = pathOf(EVENT_COUNT.name(), Integer.class);
         Fetchable<Integer> query = factory().select(eventCount)
                                             .from(table())
-                                            .where(hasId());
+                                            .where(idMatches());
         Integer result = query.fetchOne();
         return result;
     }
@@ -49,9 +52,9 @@ class SelectEventCountByIdQuery<I> extends AbstractSelectByIdQuery<I, Integer> {
         return new Builder<>();
     }
 
-    static class Builder<I> extends AbstractSelectByIdQuery.Builder<I,
-                                                                    Builder<I>,
-                                                                    SelectEventCountByIdQuery<I>> {
+    static class Builder<I> extends IdAwareQuery.Builder<I,
+                                                         Builder<I>,
+                                                         SelectEventCountByIdQuery<I>> {
         @Override
         protected SelectEventCountByIdQuery<I> doBuild() {
             return new SelectEventCountByIdQuery<>(this);

@@ -23,9 +23,9 @@ package io.spine.server.storage.jdbc.query;
 import com.querydsl.sql.dml.SQLDeleteClause;
 
 /**
- * A query for deleting one or many items by an ID.
+ * A query for deleting one or many items by their ID.
  */
-class DeleteRecordQuery<I> extends IdAwareQuery<I> implements WriteQuery {
+final class DeleteRecordQuery<I> extends IdAwareQuery<I> implements WriteQuery {
 
     DeleteRecordQuery(Builder<I> builder) {
         super(builder);
@@ -34,7 +34,7 @@ class DeleteRecordQuery<I> extends IdAwareQuery<I> implements WriteQuery {
     @Override
     public long execute() {
         SQLDeleteClause query = factory().delete(table())
-                                         .where(idPath().eq(getNormalizedId()));
+                                         .where(idMatches());
         return query.execute();
     }
 

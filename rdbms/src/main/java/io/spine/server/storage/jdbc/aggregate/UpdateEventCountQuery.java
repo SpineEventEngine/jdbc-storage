@@ -27,7 +27,7 @@ import static io.spine.server.storage.jdbc.aggregate.EventCountTable.Column.EVEN
 /**
  * A query that updates event count in the {@link EventCountTable}.
  */
-class UpdateEventCountQuery<I> extends WriteEventCountQuery<I> {
+final class UpdateEventCountQuery<I> extends WriteEventCountQuery<I> {
 
     private UpdateEventCountQuery(Builder<I> builder) {
         super(builder);
@@ -36,9 +36,8 @@ class UpdateEventCountQuery<I> extends WriteEventCountQuery<I> {
     @Override
     public long execute() {
         SQLUpdateClause query = factory().update(table())
-                                         .where(idPath().eq(getNormalizedId()))
                                          .set(pathOf(EVENT_COUNT), getEventCount());
-        return query.execute();
+        return insertId(query).execute();
     }
 
     static <I> Builder<I> newBuilder() {

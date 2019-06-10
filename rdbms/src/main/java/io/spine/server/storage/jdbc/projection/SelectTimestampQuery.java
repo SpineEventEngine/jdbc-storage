@@ -36,7 +36,7 @@ import static io.spine.validate.Validate.isDefault;
 /**
  * A query that selects timestamp from the {@link LastHandledEventTimeTable}.
  */
-class SelectTimestampQuery extends SelectMessageByIdQuery<String, Timestamp> {
+final class SelectTimestampQuery extends SelectMessageByIdQuery<String, Timestamp> {
 
     private SelectTimestampQuery(Builder builder) {
         super(builder);
@@ -46,7 +46,7 @@ class SelectTimestampQuery extends SelectMessageByIdQuery<String, Timestamp> {
     protected AbstractSQLQuery<?, ?> getQuery() {
         AbstractSQLQuery<?, ?> query = factory().select(pathOf(SECONDS), pathOf(NANOS))
                                                 .from(table())
-                                                .where(hasId());
+                                                .where(idMatches());
         return query;
     }
 

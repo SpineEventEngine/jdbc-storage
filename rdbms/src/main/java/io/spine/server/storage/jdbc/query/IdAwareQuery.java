@@ -20,32 +20,63 @@
 
 package io.spine.server.storage.jdbc.query;
 
+import com.google.common.collect.ImmutableSet;
+import com.querydsl.core.dml.StoreClause;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.PathBuilder;
 
+import java.util.Collection;
+
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * An abstract base for queries, which work with a {@link IdColumn single ID}.
+ * An abstract base for queries, which operate on a fixed set of {@link IdColumn IDs}.
  *
- * @param <I> the ID type
+ * @param <I>
+ *         the ID type
  */
 public abstract class IdAwareQuery<I> extends AbstractQuery {
 
-    private final I id;
+    private final ImmutableSet<I> ids;
     private final IdColumn<I> idColumn;
 
     protected IdAwareQuery(Builder<I, ? extends Builder, ? extends IdAwareQuery> builder) {
         super(builder);
-        this.id = checkNotNull(builder.id);
+        this.ids = checkNotNull(builder.ids);
         this.idColumn = checkNotNull(builder.idColumn);
     }
 
-    protected PathBuilder<Object> idPath() {
-        return pathOf(idColumn.columnName());
+    /**
+     * Adds the ID binding to the given {@code INSERT} or {@code UPDATE} clause.
+     *
+     * @throws IllegalArgumentException
+     *         if multiple IDs were specified for the query in {@code Builder}
+     */
+    protected <C extends StoreClause<C>> C insertId(C query) {
+        checkArgument(hasSingleId(),
+                      "Record modification queries only accept a single ID as input");
+        return query.set(idPath(), normalizedIds());
     }
 
-    protected Object getNormalizedId() {
-        return idColumn.normalize(id);
+    /**
+     * Returns a {@code Predicate} to check if the value of the ID column matches the stored
+     * set of IDs.
+     */
+    protected Predicate idMatches() {
+        return idPath().in(normalizedIds());
+    }
+
+    private boolean hasSingleId() {
+        return ids.size() == 1;
+    }
+
+    private Collection<Object> normalizedIds() {
+        return idColumn.normalize(ids);
+    }
+
+    private PathBuilder<Object> idPath() {
+        return pathOf(idColumn.columnName());
     }
 
     protected abstract static class Builder<I,
@@ -54,10 +85,15 @@ public abstract class IdAwareQuery<I> extends AbstractQuery {
             extends AbstractQuery.Builder<B, Q> {
 
         private IdColumn<I> idColumn;
-        private I id;
+        private ImmutableSet<I> ids;
 
         public B setId(I id) {
-            this.id = id;
+            this.ids = ImmutableSet.of(id);
+            return getThis();
+        }
+
+        public B setIds(Iterable<I> ids) {
+            this.ids = ImmutableSet.copyOf(ids);
             return getThis();
         }
 

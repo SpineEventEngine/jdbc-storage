@@ -34,7 +34,7 @@ import static io.spine.server.storage.jdbc.aggregate.LifecycleFlagsTable.Column.
 /**
  * The query selecting one {@linkplain LifecycleFlags entity lifecycle flags} by ID.
  */
-class SelectLifecycleFlagsQuery<I> extends SelectMessageByIdQuery<I, LifecycleFlags> {
+final class SelectLifecycleFlagsQuery<I> extends SelectMessageByIdQuery<I, LifecycleFlags> {
 
     private SelectLifecycleFlagsQuery(Builder<I> builder) {
         super(builder);
@@ -44,7 +44,7 @@ class SelectLifecycleFlagsQuery<I> extends SelectMessageByIdQuery<I, LifecycleFl
     protected AbstractSQLQuery<?, ?> getQuery() {
         AbstractSQLQuery<?, ?> query = factory().select(pathOf(ARCHIVED), pathOf(DELETED))
                                                 .from(table())
-                                                .where(hasId());
+                                                .where(idMatches());
         return query;
     }
 

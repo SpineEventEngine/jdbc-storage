@@ -25,9 +25,9 @@ import com.querydsl.sql.AbstractSQLQuery;
 import static com.querydsl.sql.SQLExpressions.count;
 
 /**
- * A query that checks if the table contains a record with the given ID.
+ * A query that checks if the table contains a record with one of the specified IDs.
  */
-class ContainsQuery<I> extends IdAwareQuery<I> implements SelectQuery<Boolean> {
+final class ContainsQuery<I> extends IdAwareQuery<I> implements SelectQuery<Boolean> {
 
     private ContainsQuery(Builder<I> builder) {
         super(builder);
@@ -40,7 +40,7 @@ class ContainsQuery<I> extends IdAwareQuery<I> implements SelectQuery<Boolean> {
     public Boolean execute() {
         AbstractSQLQuery<Long, ?> query = factory().select(count())
                                                    .from(table())
-                                                   .where(idPath().eq(getNormalizedId()));
+                                                   .where(idMatches());
         long recordsCount = query.fetchOne();
         return recordsCount > 0;
     }

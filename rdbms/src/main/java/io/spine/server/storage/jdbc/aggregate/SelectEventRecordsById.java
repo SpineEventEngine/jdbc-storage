@@ -24,9 +24,10 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.sql.AbstractSQLQuery;
 import com.querydsl.sql.StatementOptions;
 import io.spine.server.aggregate.AggregateEventRecord;
-import io.spine.server.storage.jdbc.query.AbstractSelectByIdQuery;
 import io.spine.server.storage.jdbc.query.ColumnReader;
 import io.spine.server.storage.jdbc.query.DbIterator;
+import io.spine.server.storage.jdbc.query.IdAwareQuery;
+import io.spine.server.storage.jdbc.query.SelectQuery;
 
 import java.sql.ResultSet;
 
@@ -44,7 +45,8 @@ import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.messageRead
  * several records, they will be ordered by creation time descending.
  */
 final class SelectEventRecordsById<I>
-        extends AbstractSelectByIdQuery<I, DbIterator<AggregateEventRecord>> {
+        extends IdAwareQuery<I>
+        implements SelectQuery<DbIterator<AggregateEventRecord>> {
 
     private SelectEventRecordsById(Builder<I> builder) {
         super(builder);
@@ -58,7 +60,7 @@ final class SelectEventRecordsById<I>
         AbstractSQLQuery<Object, ?> query = factory()
                 .select(pathOf(AGGREGATE))
                 .from(table())
-                .where(hasId())
+                .where(idMatches())
                 .orderBy(byVersion, bySeconds, byNanos);
         query.setStatementOptions(StatementOptions.builder()
                                                   .setFetchSize(fetchSize)
@@ -82,9 +84,9 @@ final class SelectEventRecordsById<I>
         return new Builder<>();
     }
 
-    static class Builder<I> extends AbstractSelectByIdQuery.Builder<I,
-                                                                    Builder<I>,
-                                                                    SelectEventRecordsById<I>> {
+    static class Builder<I> extends IdAwareQuery.Builder<I,
+                                                         Builder<I>,
+                                                         SelectEventRecordsById<I>> {
 
         @Override
         protected SelectEventRecordsById<I> doBuild() {

@@ -190,6 +190,7 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     private void truncate(int snapshotIndex, Predicate<AggregateEventRecord> predicate) {
         DbIterator<DoubleColumnRecord<I, AggregateEventRecord>> records = historyBackward();
         List<I> toDelete = gatherIdsToDelete(records, snapshotIndex, predicate);
+        mainTable.delete(toDelete);
     }
 
     private List<I> gatherIdsToDelete(
