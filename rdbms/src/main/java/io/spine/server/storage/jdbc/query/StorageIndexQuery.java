@@ -29,7 +29,8 @@ import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.idReader;
 /**
  * A query for all the IDs in a certain table.
  *
- * @param <I> the type of IDs
+ * @param <I>
+ *         the type of IDs
  */
 class StorageIndexQuery<I> extends AbstractQuery implements SelectQuery<Iterator<I>> {
 
@@ -42,11 +43,11 @@ class StorageIndexQuery<I> extends AbstractQuery implements SelectQuery<Iterator
 
     @Override
     public Iterator<I> execute() {
-        String columnName = idColumn.getColumnName();
+        String columnName = idColumn.columnName();
         ResultSet resultSet = factory().select(pathOf(columnName))
                                        .from(table())
                                        .getResults();
-        Class<I> columnType = idColumn.getJavaType();
+        Class<I> columnType = idColumn.javaType();
         ColumnReader<I> idColumnReader = idReader(columnName, columnType);
         DbIterator<I> result = DbIterator.over(resultSet, idColumnReader);
         return result;

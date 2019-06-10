@@ -20,6 +20,8 @@
 
 package io.spine.server.storage.jdbc.aggregate;
 
+import com.google.protobuf.Timestamp;
+import com.google.protobuf.util.Timestamps;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.aggregate.AggregateReadRequest;
@@ -30,13 +32,19 @@ import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.StorageBuilder;
 import io.spine.server.storage.jdbc.TypeMapping;
 import io.spine.server.storage.jdbc.query.DbIterator;
+import io.spine.server.storage.jdbc.query.DbIterator.DoubleColumnRecord;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Lists.newLinkedList;
+import static com.google.common.collect.Maps.newHashMap;
+import static io.spine.server.aggregate.AggregateEventRecord.KindCase.SNAPSHOT;
 import static io.spine.server.storage.jdbc.aggregate.Closeables.closeAll;
 
 /**
@@ -155,6 +163,55 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
         DbIterator<AggregateEventRecord> historyIterator = query.execute(fetchSize);
         iterators.add(historyIterator);
         return historyIterator;
+    }
+
+    /**
+     * Traverses all records in the storage from latest to earliest.
+     */
+    private DbIterator<DoubleColumnRecord<I, AggregateEventRecord>> historyBackward() {
+        EventRecordsWithIdQuery<I> query = mainTable.composeEventRecordsWithIdQuery();
+        DbIterator<DoubleColumnRecord<I, AggregateEventRecord>> historyIterator = query.execute();
+        iterators.add(historyIterator);
+        return historyIterator;
+    }
+
+    @Override
+    protected void truncate(int snapshotIndex) {
+        truncate(snapshotIndex, record -> true);
+    }
+
+    @Override
+    protected void truncate(int snapshotIndex, Timestamp date) {
+        Predicate<AggregateEventRecord> predicate =
+                record -> Timestamps.compare(date, record.getTimestamp()) > 0;
+        truncate(snapshotIndex, predicate);
+    }
+
+    private void truncate(int snapshotIndex, Predicate<AggregateEventRecord> predicate) {
+        DbIterator<DoubleColumnRecord<I, AggregateEventRecord>> records = historyBackward();
+        List<I> toDelete = gatherIdsToDelete(records, snapshotIndex, predicate);
+    }
+
+    private List<I> gatherIdsToDelete(
+            DbIterator<DoubleColumnRecord<I, AggregateEventRecord>> records,
+            int snapshotIndex, Predicate<AggregateEventRecord> predicate) {
+        List<I> toDelete = newLinkedList();
+        Map<I, Integer> snapshotsHitById = newHashMap();
+        while (records.hasNext()) {
+            DoubleColumnRecord<I, AggregateEventRecord> record = records.next();
+            I id = record.first();
+            AggregateEventRecord eventRecord = record.second();
+            int snapshotsHit = snapshotsHitById.get(id) != null
+                               ? snapshotsHitById.get(id)
+                               : 0;
+            if (snapshotsHit > snapshotIndex && predicate.test(eventRecord)) {
+                toDelete.add(id);
+            }
+            if (eventRecord.getKindCase() == SNAPSHOT) {
+                snapshotsHitById.put(id, snapshotsHit + 1);
+            }
+        }
+        return toDelete;
     }
 
     /**

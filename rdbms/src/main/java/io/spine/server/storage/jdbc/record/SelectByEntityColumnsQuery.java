@@ -73,7 +73,7 @@ final class SelectByEntityColumnsQuery<I> extends AbstractQuery
                                                     .where(matchParameters)
                                                     .from(table());
         ResultSet resultSet = query.getResults();
-        Class<I> idType = idColumn.getJavaType();
+        Class<I> idType = idColumn.javaType();
         return parse(resultSet, idType, fieldMask);
     }
 

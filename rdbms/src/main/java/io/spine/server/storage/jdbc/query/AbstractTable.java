@@ -301,7 +301,7 @@ public abstract class AbstractTable<I, R, W> implements Logging {
     }
 
     private Type getIdType() {
-        Type idType = getIdColumn().getSqlType();
+        Type idType = getIdColumn().sqlType();
         return idType;
     }
 

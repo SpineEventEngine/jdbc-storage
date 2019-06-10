@@ -73,7 +73,7 @@ public class QueryPredicates {
             return TRUE;
         }
 
-        PathBuilder<Object> id = new PathBuilder<>(Object.class, column.getColumnName());
+        PathBuilder<Object> id = new PathBuilder<>(Object.class, column.columnName());
         Collection<Object> normalizedIds = column.normalize(ids);
         return id.in(normalizedIds);
     }

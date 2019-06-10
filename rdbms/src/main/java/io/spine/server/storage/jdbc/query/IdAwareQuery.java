@@ -41,7 +41,7 @@ public abstract class IdAwareQuery<I> extends AbstractQuery {
     }
 
     protected PathBuilder<Object> idPath() {
-        return pathOf(idColumn.getColumnName());
+        return pathOf(idColumn.columnName());
     }
 
     protected Object getNormalizedId() {
