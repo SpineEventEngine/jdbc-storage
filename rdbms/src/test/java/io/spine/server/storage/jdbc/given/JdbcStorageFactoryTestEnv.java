@@ -25,7 +25,6 @@ import io.spine.server.aggregate.Aggregate;
 import io.spine.server.entity.AbstractEntity;
 import io.spine.server.projection.Projection;
 import io.spine.test.storage.Project;
-import io.spine.test.storage.ProjectVBuilder;
 
 public class JdbcStorageFactoryTestEnv {
 
@@ -40,14 +39,14 @@ public class JdbcStorageFactoryTestEnv {
         }
     }
 
-    public static class TestAggregate extends Aggregate<String, Project, ProjectVBuilder> {
+    public static class TestAggregate extends Aggregate<String, Project, Project.Builder> {
 
         private TestAggregate(String id) {
             super(id);
         }
     }
 
-    public static class TestProjection extends Projection<String, Project, ProjectVBuilder> {
+    public static class TestProjection extends Projection<String, Project, Project.Builder> {
 
         private TestProjection(String id) {
             super(id);

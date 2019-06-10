@@ -28,10 +28,6 @@ import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/**
- * @author Dmytro Dashenkov
- * @author Dmytro Kuzmin
- */
 public class JdbcTypeRegistryFactoryTestEnv {
 
     /** Prevents instantiation of this utility class. */
@@ -40,8 +36,8 @@ public class JdbcTypeRegistryFactoryTestEnv {
 
     public static EntityColumn columnWithType(Class<?> cls) {
         EntityColumn column = mock(EntityColumn.class);
-        when(column.getType()).thenReturn(cls);
-        when(column.getPersistedType()).thenReturn(cls);
+        when(column.type()).thenReturn(cls);
+        when(column.persistedType()).thenReturn(cls);
         return column;
     }
 

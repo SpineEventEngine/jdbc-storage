@@ -23,19 +23,14 @@ package io.spine.server.storage.jdbc.aggregate.given;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.test.aggregate.Project;
 import io.spine.test.aggregate.ProjectId;
-import io.spine.test.aggregate.ProjectVBuilder;
 
-/**
- * @author Dmytro Dashenkov
- * @author Dmytro Kuzmin
- */
 public class JdbcAggregateStorageVisibilityHandlingTestEnv {
 
     /** Prevents instantiation of this utility class. */
     private JdbcAggregateStorageVisibilityHandlingTestEnv() {
     }
 
-    public static class TestAggregate extends Aggregate<ProjectId, Project, ProjectVBuilder> {
+    public static class TestAggregate extends Aggregate<ProjectId, Project, Project.Builder> {
 
         protected TestAggregate(ProjectId id) {
             super(id);

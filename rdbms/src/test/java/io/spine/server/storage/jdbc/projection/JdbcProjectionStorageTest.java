@@ -41,9 +41,6 @@ import static io.spine.testing.Tests.nullRef;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-/**
- * @author Alexander Litus
- */
 @SuppressWarnings("DuplicateStringLiteralInspection") // Common test display names.
 @DisplayName("JdbcProjectionStorage should")
 class JdbcProjectionStorageTest extends ProjectionStorageTest {
@@ -77,8 +74,8 @@ class JdbcProjectionStorageTest extends ProjectionStorageTest {
 
     @Test
     @DisplayName("throw ISE when closing twice")
-    void throwOnClosingTwice() throws Exception {
-        ProjectionStorage<?> storage = getStorage();
+    void throwOnClosingTwice() {
+        ProjectionStorage<?> storage = storage();
         storage.close();
         assertThrows(IllegalStateException.class, storage::close);
     }

@@ -55,13 +55,13 @@ class JdbcAggregateStorageTest extends AggregateStorageTest {
     @Override
     public void setUpAbstractStorageTest() {
         super.setUpAbstractStorageTest();
-        storage = (JdbcAggregateStorage<ProjectId>) getStorage();
+        storage = (JdbcAggregateStorage<ProjectId>) storage();
     }
 
     @Test
     @DisplayName("throw ISE when closing twice")
     void throwOnClosingTwice() throws Exception {
-        AggregateStorage<?> storage = getStorage();
+        AggregateStorage<?> storage = storage();
         storage.close();
         assertThrows(IllegalStateException.class, storage::close);
     }
