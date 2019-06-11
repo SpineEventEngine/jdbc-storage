@@ -70,7 +70,7 @@ class AggregateEventRecordTable<I> extends EntityTable<I,
      * <p>As records in the table can share a common {@code Aggregate} ID, the deletion is
      * performed by the unique ID-to-record combination.
      *
-     * @return how many table rows were actually deleted
+     * @return how many table rows have been deleted
      */
     @CanIgnoreReturnValue
     long delete(Multimap<I, AggregateEventRecord> records) {
