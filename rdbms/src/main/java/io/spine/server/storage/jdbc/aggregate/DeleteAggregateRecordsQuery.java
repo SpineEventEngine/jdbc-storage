@@ -36,6 +36,17 @@ import java.util.Map;
 import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.AGGREGATE;
 import static io.spine.server.storage.jdbc.query.Serializer.serialize;
 
+/**
+ * A query that deletes the specified {@link AggregateEventRecord aggregate event records} from the
+ * table.
+ *
+ * <p>As records in table can share a common {@code Aggregate} ID, and the record state can in
+ * theory be equal to other record's state, the deletion is done by the unique
+ * "{@code Aggregate}_ID-to-record_state" combination.
+ *
+ * @param <I>
+ *         the type of {@code Aggregate} IDs
+ */
 final class DeleteAggregateRecordsQuery<I> extends AbstractQuery implements WriteQuery {
 
     private final IdColumn<I> idColumn;

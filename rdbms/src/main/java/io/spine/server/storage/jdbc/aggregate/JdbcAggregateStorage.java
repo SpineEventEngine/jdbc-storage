@@ -197,7 +197,8 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
 
     private Multimap<I, AggregateEventRecord> recordsToDelete(
             DbIterator<DoubleColumnRecord<I, AggregateEventRecord>> records,
-            int snapshotIndex, Predicate<AggregateEventRecord> predicate) {
+            int snapshotIndex,
+            Predicate<AggregateEventRecord> predicate) {
         Multimap<I, AggregateEventRecord> toDelete = HashMultimap.create();
         Map<I, Integer> snapshotsHitById = newHashMap();
         while (records.hasNext()) {

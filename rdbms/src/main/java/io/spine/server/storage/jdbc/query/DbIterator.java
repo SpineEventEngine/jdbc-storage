@@ -294,9 +294,6 @@ public abstract class DbIterator<R> implements Iterator<R>, Closeable {
             this.second = second;
         }
 
-        /**
-         * Creates a new {@code DoubleColumnRecord} instance.
-         */
         public static <V1, V> DoubleColumnRecord<V1, V> of(V1 first, V second) {
             checkNotNull(first);
             checkNotNull(second);

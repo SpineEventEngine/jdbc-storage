@@ -23,7 +23,7 @@ package io.spine.server.storage.jdbc.query;
 import com.querydsl.sql.dml.SQLDeleteClause;
 
 /**
- * A query for deleting one or many items by their ID.
+ * A query for deleting one or many items by an ID.
  */
 final class DeleteRecordQuery<I> extends IdAwareQuery<I> implements WriteQuery {
 
