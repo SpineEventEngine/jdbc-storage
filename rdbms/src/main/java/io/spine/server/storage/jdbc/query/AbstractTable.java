@@ -23,7 +23,6 @@ package io.spine.server.storage.jdbc.query;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import io.spine.annotation.Internal;
 import io.spine.logging.Logging;
 import io.spine.server.storage.jdbc.DataSourceWrapper;

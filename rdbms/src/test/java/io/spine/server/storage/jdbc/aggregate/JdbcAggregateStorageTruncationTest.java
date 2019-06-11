@@ -18,26 +18,19 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-ext {
-    artifactId = 'jdbc-rdbms'
+package io.spine.server.storage.jdbc.aggregate;
 
-    // Versions of libraries for working with JDBC.
-    hsqldbVersion = '2.3.3'
-    h2Version = '1.4.196'
-    hikariVersion = '2.4.3'
-    querydslVersion = '4.1.4'
-}
+import io.spine.server.aggregate.AggregateStorageTruncationTest;
+import io.spine.server.storage.StorageFactory;
+import org.junit.jupiter.api.DisplayName;
 
-dependencies {
-    implementation group: 'org.hsqldb', name: 'hsqldb', version: hsqldbVersion
-    implementation group: 'com.h2database', name: 'h2', version: h2Version
+import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.newFactory;
 
-    implementation group: 'com.zaxxer', name: 'HikariCP', version: hikariVersion
+@DisplayName("JdbcAggregateStorage after truncation should")
+public class JdbcAggregateStorageTruncationTest extends AggregateStorageTruncationTest {
 
-    implementation (group: 'com.querydsl', name: 'querydsl-sql', version: querydslVersion) {
-        exclude group: 'com.google.guava'
+    @Override
+    protected StorageFactory storageFactory() {
+        return newFactory(false);
     }
-
-    testImplementation deps.test.mockito
-    testImplementation deps.grpc.grpcStub
 }
