@@ -40,7 +40,7 @@ final class ContainsQuery<I> extends IdAwareQuery<I> implements SelectQuery<Bool
     public Boolean execute() {
         AbstractSQLQuery<Long, ?> query = factory().select(count())
                                                    .from(table())
-                                                   .where(idMatches());
+                                                   .where(idEquals());
         long recordsCount = query.fetchOne();
         return recordsCount > 0;
     }

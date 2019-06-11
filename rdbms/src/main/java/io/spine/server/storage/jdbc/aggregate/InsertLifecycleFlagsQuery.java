@@ -45,10 +45,10 @@ final class InsertLifecycleFlagsQuery<I> extends IdAwareQuery<I> implements Writ
 
     @Override
     public long execute() {
-        SQLInsertClause query = factory().insert(table())
-                                         .set(pathOf(ARCHIVED), entityStatus.getArchived())
-                                         .set(pathOf(DELETED), entityStatus.getDeleted());
-        return setId(query).execute();
+        SQLInsertClause query = insertWithId()
+                .set(pathOf(ARCHIVED), entityStatus.getArchived())
+                .set(pathOf(DELETED), entityStatus.getDeleted());
+        return query.execute();
     }
 
     static <I> Builder<I> newBuilder() {

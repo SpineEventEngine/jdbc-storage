@@ -55,13 +55,13 @@ final class InsertAggregateRecordQuery<I> extends IdAwareQuery<I> implements Wri
         Timestamp recordTimestamp = record.getTimestamp();
         String kindValue = record.getKindCase()
                                  .toString();
-        SQLInsertClause query = factory().insert(table())
-                                         .set(pathOf(AGGREGATE), serialize(record))
-                                         .set(pathOf(KIND), kindValue)
-                                         .set(pathOf(VERSION), getVersionNumberOfRecord())
-                                         .set(pathOf(TIMESTAMP), recordTimestamp.getSeconds())
-                                         .set(pathOf(TIMESTAMP_NANOS), recordTimestamp.getNanos());
-        return setId(query).execute();
+        SQLInsertClause query = insertWithId()
+                .set(pathOf(AGGREGATE), serialize(record))
+                .set(pathOf(KIND), kindValue)
+                .set(pathOf(VERSION), getVersionNumberOfRecord())
+                .set(pathOf(TIMESTAMP), recordTimestamp.getSeconds())
+                .set(pathOf(TIMESTAMP_NANOS), recordTimestamp.getNanos());
+        return query.execute();
     }
 
     private int getVersionNumberOfRecord() {

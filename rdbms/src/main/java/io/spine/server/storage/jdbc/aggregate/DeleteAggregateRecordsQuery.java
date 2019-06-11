@@ -20,36 +20,67 @@
 
 package io.spine.server.storage.jdbc.aggregate;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.sql.dml.SQLDeleteClause;
 import io.spine.server.aggregate.AggregateEventRecord;
-import io.spine.server.storage.jdbc.query.IdAwareQuery;
-import io.spine.server.storage.jdbc.query.Serializer;
+import io.spine.server.storage.jdbc.query.AbstractQuery;
+import io.spine.server.storage.jdbc.query.IdColumn;
 import io.spine.server.storage.jdbc.query.WriteQuery;
 
-import static com.google.common.collect.ImmutableList.toImmutableList;
+import java.util.Map;
+
 import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.AGGREGATE;
+import static io.spine.server.storage.jdbc.query.Serializer.serialize;
 
-final class DeleteAggregateRecordsQuery<I> extends IdAwareQuery<I> implements WriteQuery {
+final class DeleteAggregateRecordsQuery<I> extends AbstractQuery implements WriteQuery {
 
-    private final ImmutableList<AggregateEventRecord> records;
+    private final IdColumn<I> idColumn;
+    private final Multimap<I, AggregateEventRecord> records;
 
     private DeleteAggregateRecordsQuery(Builder<I> builder) {
         super(builder);
+        this.idColumn = builder.idColumn;
         this.records = builder.records;
     }
 
     @Override
     public long execute() {
-        ImmutableList<Predicate> predicates = records
-                .stream()
-                .map(Serializer::serialize)
-                .map(pathOf(AGGREGATE)::eq)
-                .collect(toImmutableList());
         SQLDeleteClause query = factory().delete(table())
-                                         .where(idMatches(predicates));
+                                         .where(buildPredicate());
         return query.execute();
+    }
+
+    @SuppressWarnings("CheckReturnValue") // Calling the builder method.
+    private Predicate buildPredicate() {
+        BooleanBuilder predicateBuilder = new BooleanBuilder();
+        records.entries()
+               .stream()
+               .map(this::toPredicate)
+               .forEach(predicateBuilder::or);
+        return predicateBuilder.getValue();
+    }
+
+    private Predicate toPredicate(Map.Entry<I, AggregateEventRecord> entry) {
+        I id = entry.getKey();
+        AggregateEventRecord record = entry.getValue();
+        Predicate predicate = idMatches(id).and(recordMatches(record));
+        return predicate;
+    }
+
+    private BooleanExpression idMatches(I id) {
+        Object normalizedId = idColumn.normalize(id);
+        BooleanExpression predicate = pathOf(idColumn.columnName()).eq(normalizedId);
+        return predicate;
+    }
+
+    private BooleanExpression recordMatches(AggregateEventRecord record) {
+        byte[] serializedRecord = serialize(record);
+        BooleanExpression predicate = pathOf(AGGREGATE).eq(serializedRecord);
+        return predicate;
     }
 
     static <I> Builder<I> newBuilder() {
@@ -57,12 +88,18 @@ final class DeleteAggregateRecordsQuery<I> extends IdAwareQuery<I> implements Wr
     }
 
     static class Builder<I>
-            extends IdAwareQuery.Builder<I, Builder<I>, DeleteAggregateRecordsQuery<I>> {
+            extends AbstractQuery.Builder<Builder<I>, DeleteAggregateRecordsQuery<I>> {
 
-        private ImmutableList<AggregateEventRecord> records;
+        private IdColumn<I> idColumn;
+        private Multimap<I, AggregateEventRecord> records;
 
-        Builder<I> setRecords(Iterable<AggregateEventRecord> records) {
-            this.records = ImmutableList.copyOf(records);
+        Builder<I> setIdColumn(IdColumn<I> idColumn) {
+            this.idColumn = idColumn;
+            return getThis();
+        }
+
+        Builder<I> setRecords(Multimap<I, AggregateEventRecord> records) {
+            this.records = HashMultimap.create(records);
             return getThis();
         }
 

@@ -46,7 +46,7 @@ final class SelectTimestampQuery extends SelectMessageByIdQuery<String, Timestam
     protected AbstractSQLQuery<?, ?> getQuery() {
         AbstractSQLQuery<?, ?> query = factory().select(pathOf(SECONDS), pathOf(NANOS))
                                                 .from(table())
-                                                .where(idMatches());
+                                                .where(idEquals());
         return query;
     }
 

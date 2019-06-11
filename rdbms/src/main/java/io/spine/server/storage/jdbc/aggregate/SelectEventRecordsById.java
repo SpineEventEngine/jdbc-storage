@@ -60,7 +60,7 @@ final class SelectEventRecordsById<I>
         AbstractSQLQuery<Object, ?> query = factory()
                 .select(pathOf(AGGREGATE))
                 .from(table())
-                .where(idMatches())
+                .where(idEquals())
                 .orderBy(byVersion, bySeconds, byNanos);
         query.setStatementOptions(StatementOptions.builder()
                                                   .setFetchSize(fetchSize)

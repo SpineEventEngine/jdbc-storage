@@ -40,7 +40,7 @@ final class SelectEntityByIdQuery<I> extends SelectMessageByIdQuery<I, EntityRec
     protected AbstractSQLQuery<?, ?> getQuery() {
         AbstractSQLQuery<?, ?> query = factory().select(all)
                                                 .from(table())
-                                                .where(idMatches());
+                                                .where(idEquals());
         return query;
     }
 

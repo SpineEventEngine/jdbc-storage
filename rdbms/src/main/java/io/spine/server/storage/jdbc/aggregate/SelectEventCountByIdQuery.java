@@ -43,7 +43,7 @@ final class SelectEventCountByIdQuery<I>
         PathBuilder<Integer> eventCount = pathOf(EVENT_COUNT.name(), Integer.class);
         Fetchable<Integer> query = factory().select(eventCount)
                                             .from(table())
-                                            .where(idMatches());
+                                            .where(idEquals());
         Integer result = query.fetchOne();
         return result;
     }

@@ -42,9 +42,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * @author Alexander Litus
- */
 @SuppressWarnings("DuplicateStringLiteralInspection") // Common test display names.
 @DisplayName("JdbcAggregateStorage should")
 class JdbcAggregateStorageTest extends AggregateStorageTest {
@@ -60,7 +57,7 @@ class JdbcAggregateStorageTest extends AggregateStorageTest {
 
     @Test
     @DisplayName("throw ISE when closing twice")
-    void throwOnClosingTwice() throws Exception {
+    void throwOnClosingTwice() {
         AggregateStorage<?> storage = storage();
         storage.close();
         assertThrows(IllegalStateException.class, storage::close);
