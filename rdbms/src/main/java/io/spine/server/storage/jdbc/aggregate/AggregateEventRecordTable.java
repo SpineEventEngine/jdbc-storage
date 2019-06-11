@@ -67,8 +67,8 @@ class AggregateEventRecordTable<I> extends EntityTable<I,
     /**
      * Deletes rows in the table which correspond to the given {@code Aggregate} event records.
      *
-     * <p>As records in the table share a common {@code Aggregate} ID, the deletion is performed by
-     * the unique ID-to-record combination.
+     * <p>As records in the table can share a common {@code Aggregate} ID, the deletion is
+     * performed by the unique ID-to-record combination.
      *
      * @return how many table rows were actually deleted
      */

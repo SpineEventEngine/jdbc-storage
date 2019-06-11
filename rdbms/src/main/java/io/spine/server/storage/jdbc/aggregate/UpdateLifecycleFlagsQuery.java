@@ -44,10 +44,9 @@ final class UpdateLifecycleFlagsQuery<I> extends IdAwareQuery<I> implements Writ
 
     @Override
     public long execute() {
-        SQLUpdateClause query =
-                updateById()
-                        .set(pathOf(ARCHIVED), entityStatus.getArchived())
-                        .set(pathOf(DELETED), entityStatus.getDeleted());
+        SQLUpdateClause query = updateById()
+                .set(pathOf(ARCHIVED), entityStatus.getArchived())
+                .set(pathOf(DELETED), entityStatus.getDeleted());
         return query.execute();
     }
 
