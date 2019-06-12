@@ -21,8 +21,8 @@
 package io.spine.server.storage.jdbc.aggregate;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Multimap;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import io.spine.core.Version;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
@@ -65,16 +65,13 @@ class AggregateEventRecordTable<I> extends EntityTable<I,
     }
 
     /**
-     * Deletes rows in the table which correspond to the given {@code Aggregate} event records.
-     *
-     * <p>As records in the table can share a common {@code Aggregate} ID, the deletion is
-     * performed by the unique ID-to-record combination.
+     * Deletes aggregate event records that are older than the specified {@code version}.
      *
      * @return how many table rows have been deleted
      */
     @CanIgnoreReturnValue
-    long delete(Multimap<I, AggregateEventRecord> records) {
-        DeleteAggregateRecordsQuery<I> query = composeDeleteQuery(records);
+    long deletePriorRecords(I id, Version version) {
+        DeleteRecordsByVersionQuery<I> query = composeDeleteQuery(id, version);
         return query.execute();
     }
 
@@ -110,13 +107,13 @@ class AggregateEventRecordTable<I> extends EntityTable<I,
         return query;
     }
 
-    private DeleteAggregateRecordsQuery<I>
-    composeDeleteQuery(Multimap<I, AggregateEventRecord> records) {
-        DeleteAggregateRecordsQuery.Builder<I> builder = DeleteAggregateRecordsQuery.newBuilder();
-        DeleteAggregateRecordsQuery<I> query = builder.setTableName(getName())
+    private DeleteRecordsByVersionQuery<I> composeDeleteQuery(I id, Version version) {
+        DeleteRecordsByVersionQuery.Builder<I> builder = DeleteRecordsByVersionQuery.newBuilder();
+        DeleteRecordsByVersionQuery<I> query = builder.setTableName(getName())
                                                       .setDataSource(getDataSource())
                                                       .setIdColumn(getIdColumn())
-                                                      .setRecords(records)
+                                                      .setId(id)
+                                                      .setVersion(version)
                                                       .build();
         return query;
     }

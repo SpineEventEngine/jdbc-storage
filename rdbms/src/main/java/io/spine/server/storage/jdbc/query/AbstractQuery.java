@@ -23,6 +23,7 @@ package io.spine.server.storage.jdbc.query;
 import com.google.common.annotations.VisibleForTesting;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.dsl.ComparablePath;
 import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.sql.AbstractSQLQueryFactory;
 import com.querydsl.sql.Configuration;
@@ -97,6 +98,11 @@ public abstract class AbstractQuery implements StorageQuery {
 
     protected <T> PathBuilder<T> pathOf(String columnName, Class<T> type) {
         return pathBuilder.get(columnName, type);
+    }
+
+    protected <T extends Comparable> ComparablePath<T>
+    comparablePathOf(String columnName, Class<T> type) {
+        return pathBuilder.getComparable(columnName, type);
     }
 
     protected OrderSpecifier<Comparable> orderBy(TableColumn column, Order order) {

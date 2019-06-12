@@ -192,7 +192,6 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
         DbIterator<DoubleColumnRecord<I, AggregateEventRecord>> records = historyBackward();
         Multimap<I, AggregateEventRecord> toDelete =
                 recordsToDelete(records, snapshotIndex, predicate);
-        mainTable.delete(toDelete);
     }
 
     private Multimap<I, AggregateEventRecord> recordsToDelete(
