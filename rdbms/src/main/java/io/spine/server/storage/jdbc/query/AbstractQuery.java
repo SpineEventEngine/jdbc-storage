@@ -25,6 +25,7 @@ import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.ComparablePath;
 import com.querydsl.core.types.dsl.PathBuilder;
+import com.querydsl.core.types.dsl.SimpleExpression;
 import com.querydsl.sql.AbstractSQLQueryFactory;
 import com.querydsl.sql.Configuration;
 import com.querydsl.sql.RelationalPath;
@@ -57,15 +58,22 @@ import static java.sql.ResultSet.HOLD_CURSORS_OVER_COMMIT;
  */
 public abstract class AbstractQuery implements StorageQuery {
 
+    /**
+     * The default main table alias for usage in sub-queries.
+     */
+    private static final String DEFAULT_TABLE_ALIAS = "main_table";
+
     private final AbstractSQLQueryFactory<?> queryFactory;
     private final RelationalPathBase<Object> tablePath;
     private final PathBuilder<Object> pathBuilder;
+    private final PathBuilder<Object> aliasedPathBuilder;
 
     protected AbstractQuery(Builder<? extends Builder, ? extends StorageQuery> builder) {
         String tableName = builder.tableName;
         this.queryFactory = createFactory(builder.dataSource);
         this.tablePath = new RelationalPathBase<>(Object.class, tableName, tableName, tableName);
         this.pathBuilder = new PathBuilder<>(Object.class, tableName);
+        this.aliasedPathBuilder = new PathBuilder<>(Object.class, DEFAULT_TABLE_ALIAS);
     }
 
     /**
@@ -76,6 +84,10 @@ public abstract class AbstractQuery implements StorageQuery {
     @VisibleForTesting
     public RelationalPath<Object> table() {
         return tablePath;
+    }
+
+    protected SimpleExpression<Object> tableAlias() {
+        return tablePath.as(DEFAULT_TABLE_ALIAS);
     }
 
     /**
@@ -101,8 +113,17 @@ public abstract class AbstractQuery implements StorageQuery {
     }
 
     protected <T extends Comparable> ComparablePath<T>
-    comparablePathOf(String columnName, Class<T> type) {
-        return pathBuilder.getComparable(columnName, type);
+    comparablePathOf(TableColumn column, Class<T> type) {
+        return pathBuilder.getComparable(column.name(), type);
+    }
+
+    protected PathBuilder<Object> aliasedPathOf(TableColumn column) {
+        return aliasedPathBuilder.get(column.name());
+    }
+
+    protected <T extends Comparable> ComparablePath<T>
+    aliasedComparablePathOf(TableColumn column, Class<T> type) {
+        return aliasedPathBuilder.getComparable(column.name(), type);
     }
 
     protected OrderSpecifier<Comparable> orderBy(TableColumn column, Order order) {

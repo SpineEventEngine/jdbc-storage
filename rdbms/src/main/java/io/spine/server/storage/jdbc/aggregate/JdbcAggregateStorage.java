@@ -20,10 +20,7 @@
 
 package io.spine.server.storage.jdbc.aggregate;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
 import com.google.protobuf.Timestamp;
-import com.google.protobuf.util.Timestamps;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.aggregate.AggregateReadRequest;
@@ -35,17 +32,15 @@ import io.spine.server.storage.jdbc.StorageBuilder;
 import io.spine.server.storage.jdbc.TypeMapping;
 import io.spine.server.storage.jdbc.query.DbIterator;
 import io.spine.server.storage.jdbc.query.DbIterator.DoubleColumnRecord;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Optional;
-import java.util.function.Predicate;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Lists.newLinkedList;
-import static com.google.common.collect.Maps.newHashMap;
-import static io.spine.server.aggregate.AggregateEventRecord.KindCase.SNAPSHOT;
+import static com.google.common.collect.Streams.stream;
 import static io.spine.server.storage.jdbc.aggregate.Closeables.closeAll;
 
 /**
@@ -166,55 +161,30 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
         return historyIterator;
     }
 
-    /**
-     * Traverses all records in the storage from latest to earliest.
-     */
-    private DbIterator<DoubleColumnRecord<I, AggregateEventRecord>> historyBackward() {
-        EventRecordsWithIdQuery<I> query = mainTable.composeEventRecordsWithIdQuery();
-        DbIterator<DoubleColumnRecord<I, AggregateEventRecord>> historyIterator = query.execute();
-        iterators.add(historyIterator);
-        return historyIterator;
-    }
-
     @Override
     protected void truncate(int snapshotIndex) {
-        truncate(snapshotIndex, record -> true);
+        doTruncate(snapshotIndex, null);
     }
 
     @Override
     protected void truncate(int snapshotIndex, Timestamp date) {
-        Predicate<AggregateEventRecord> predicate =
-                record -> Timestamps.compare(date, record.getTimestamp()) > 0;
-        truncate(snapshotIndex, predicate);
+        doTruncate(snapshotIndex, date);
     }
 
-    private void truncate(int snapshotIndex, Predicate<AggregateEventRecord> predicate) {
-        DbIterator<DoubleColumnRecord<I, AggregateEventRecord>> records = historyBackward();
-        Multimap<I, AggregateEventRecord> toDelete =
-                recordsToDelete(records, snapshotIndex, predicate);
+    private void doTruncate(int snapshotIndex, @Nullable Timestamp date) {
+        DbIterator<DoubleColumnRecord<I, Integer>> records =
+                selectVersionsToPersist(snapshotIndex, date);
+        stream(records)
+                .forEach(record -> mainTable.deletePriorRecords(record.first(), record.second()));
     }
 
-    private Multimap<I, AggregateEventRecord> recordsToDelete(
-            DbIterator<DoubleColumnRecord<I, AggregateEventRecord>> records,
-            int snapshotIndex,
-            Predicate<AggregateEventRecord> predicate) {
-        Multimap<I, AggregateEventRecord> toDelete = HashMultimap.create();
-        Map<I, Integer> snapshotsHitById = newHashMap();
-        while (records.hasNext()) {
-            DoubleColumnRecord<I, AggregateEventRecord> record = records.next();
-            I id = record.first();
-            AggregateEventRecord eventRecord = record.second();
-            int snapshotsHit = snapshotsHitById.get(id) != null
-                               ? snapshotsHitById.get(id)
-                               : 0;
-            if (snapshotsHit > snapshotIndex && predicate.test(eventRecord)) {
-                toDelete.put(id, eventRecord);
-            }
-            if (eventRecord.getKindCase() == SNAPSHOT) {
-                snapshotsHitById.put(id, snapshotsHit + 1);
-            }
-        }
-        return toDelete;
+    private DbIterator<DoubleColumnRecord<I, Integer>>
+    selectVersionsToPersist(int snapshotIndex, @Nullable Timestamp date) {
+        SelectVersionBySnapshot<I> query =
+                mainTable.composeSelectVersionQuery(snapshotIndex, date);
+        DbIterator<DoubleColumnRecord<I, Integer>> iterator = query.execute();
+        iterators.add(iterator);
+        return iterator;
     }
 
     /**

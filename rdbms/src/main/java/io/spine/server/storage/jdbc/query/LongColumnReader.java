@@ -26,20 +26,18 @@ import java.sql.SQLException;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * The reader for the columns which store {@link Integer} or {@link Long} entries.
- *
- * <p>The read result will be the {@link Number}.
+ * The reader for the columns which store {@link Long} entries.
  */
-final class NumberColumnReader extends ColumnReader<Number> {
+final class LongColumnReader extends ColumnReader<Long> {
 
-    NumberColumnReader(String columnName) {
+    LongColumnReader(String columnName) {
         super(columnName);
     }
 
     @Override
-    public Number readValue(ResultSet resultSet) throws SQLException {
+    public Long readValue(ResultSet resultSet) throws SQLException {
         checkNotNull(resultSet);
-        Number result = resultSet.getLong(columnName());
+        Long result = resultSet.getLong(columnName());
         return result;
     }
 }

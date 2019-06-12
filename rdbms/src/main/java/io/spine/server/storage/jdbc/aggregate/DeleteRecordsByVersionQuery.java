@@ -22,7 +22,6 @@ package io.spine.server.storage.jdbc.aggregate;
 
 import com.querydsl.core.types.Predicate;
 import com.querydsl.sql.dml.SQLDeleteClause;
-import io.spine.core.Version;
 import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.storage.jdbc.query.IdAwareQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
@@ -42,7 +41,7 @@ import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.C
  */
 final class DeleteRecordsByVersionQuery<I> extends IdAwareQuery<I> implements WriteQuery {
 
-    private final Version version;
+    private final Integer version;
 
     private DeleteRecordsByVersionQuery(Builder<I> builder) {
         super(builder);
@@ -51,9 +50,8 @@ final class DeleteRecordsByVersionQuery<I> extends IdAwareQuery<I> implements Wr
 
     @Override
     public long execute() {
-        int versionNumber = version.getNumber();
         Predicate versionIsPrior =
-                comparablePathOf(VERSION.name(), Integer.class).lt(versionNumber);
+                comparablePathOf(VERSION, Integer.class).lt(version);
         SQLDeleteClause query = factory().delete(table())
                                          .where(idEquals())
                                          .where(versionIsPrior);
@@ -66,9 +64,9 @@ final class DeleteRecordsByVersionQuery<I> extends IdAwareQuery<I> implements Wr
 
     static class Builder<I> extends IdAwareQuery.Builder<I, Builder<I>, DeleteRecordsByVersionQuery<I>> {
 
-        private Version version;
+        private Integer version;
 
-        Builder<I> setVersion(Version version) {
+        Builder<I> setVersion(Integer version) {
             this.version = version;
             return getThis();
         }
