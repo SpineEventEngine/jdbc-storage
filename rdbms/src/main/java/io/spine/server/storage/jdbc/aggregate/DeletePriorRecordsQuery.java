@@ -22,28 +22,22 @@ package io.spine.server.storage.jdbc.aggregate;
 
 import com.querydsl.core.types.Predicate;
 import com.querydsl.sql.dml.SQLDeleteClause;
-import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.storage.jdbc.query.IdAwareQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
 
 import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.VERSION;
 
 /**
- * A query that deletes the specified {@link AggregateEventRecord aggregate event records} from the
- * table.
- *
- * <p>As records in table can share a common {@code Aggregate} ID, and the record state can in
- * theory be equal to other record's state, the deletion is done by the unique
- * "{@code Aggregate}_ID-to-record_state" combination.
+ * A query that deletes records prior to the specified {@code version} in the table.
  *
  * @param <I>
  *         the type of {@code Aggregate} IDs
  */
-final class DeleteRecordsByVersionQuery<I> extends IdAwareQuery<I> implements WriteQuery {
+final class DeletePriorRecordsQuery<I> extends IdAwareQuery<I> implements WriteQuery {
 
     private final Integer version;
 
-    private DeleteRecordsByVersionQuery(Builder<I> builder) {
+    private DeletePriorRecordsQuery(Builder<I> builder) {
         super(builder);
         this.version = builder.version;
     }
@@ -62,7 +56,7 @@ final class DeleteRecordsByVersionQuery<I> extends IdAwareQuery<I> implements Wr
         return new Builder<>();
     }
 
-    static class Builder<I> extends IdAwareQuery.Builder<I, Builder<I>, DeleteRecordsByVersionQuery<I>> {
+    static class Builder<I> extends IdAwareQuery.Builder<I, Builder<I>, DeletePriorRecordsQuery<I>> {
 
         private Integer version;
 
@@ -72,8 +66,8 @@ final class DeleteRecordsByVersionQuery<I> extends IdAwareQuery<I> implements Wr
         }
 
         @Override
-        protected DeleteRecordsByVersionQuery<I> doBuild() {
-            return new DeleteRecordsByVersionQuery<>(this);
+        protected DeletePriorRecordsQuery<I> doBuild() {
+            return new DeletePriorRecordsQuery<>(this);
         }
 
         @Override

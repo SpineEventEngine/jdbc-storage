@@ -72,7 +72,7 @@ class AggregateEventRecordTable<I> extends EntityTable<I,
      */
     @CanIgnoreReturnValue
     long deletePriorRecords(I id, Integer version) {
-        DeleteRecordsByVersionQuery<I> query = composeDeleteQuery(id, version);
+        DeletePriorRecordsQuery<I> query = composeDeleteQuery(id, version);
         return query.execute();
     }
 
@@ -111,14 +111,14 @@ class AggregateEventRecordTable<I> extends EntityTable<I,
         return query;
     }
 
-    private DeleteRecordsByVersionQuery<I> composeDeleteQuery(I id, Integer version) {
-        DeleteRecordsByVersionQuery.Builder<I> builder = DeleteRecordsByVersionQuery.newBuilder();
-        DeleteRecordsByVersionQuery<I> query = builder.setTableName(getName())
-                                                      .setDataSource(getDataSource())
-                                                      .setIdColumn(getIdColumn())
-                                                      .setId(id)
-                                                      .setVersion(version)
-                                                      .build();
+    private DeletePriorRecordsQuery<I> composeDeleteQuery(I id, Integer version) {
+        DeletePriorRecordsQuery.Builder<I> builder = DeletePriorRecordsQuery.newBuilder();
+        DeletePriorRecordsQuery<I> query = builder.setTableName(getName())
+                                                  .setDataSource(getDataSource())
+                                                  .setIdColumn(getIdColumn())
+                                                  .setId(id)
+                                                  .setVersion(version)
+                                                  .build();
         return query;
     }
 
