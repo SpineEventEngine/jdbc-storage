@@ -59,6 +59,9 @@ import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.intReader;
  * newer than the {@code date} and corresponds to a snapshot older or equal to
  * the one at {@code snapshotIndex}.
  *
+ * <p>The {@linkplain io.spine.core.Version version} is stored and operated on in {@link Integer}
+ * form for convenience.
+ *
  * @param <I>
  *         the type of the record IDs
  */
