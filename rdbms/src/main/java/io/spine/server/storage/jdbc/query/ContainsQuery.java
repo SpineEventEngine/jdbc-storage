@@ -25,7 +25,7 @@ import com.querydsl.sql.AbstractSQLQuery;
 import static com.querydsl.sql.SQLExpressions.count;
 
 /**
- * A query that checks if the table contains a record with one of the specified IDs.
+ * A query that checks if the table contains a record with the given ID.
  */
 final class ContainsQuery<I> extends IdAwareQuery<I> implements SelectQuery<Boolean> {
 
