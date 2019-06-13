@@ -44,12 +44,14 @@ final class DeletePriorRecordsQuery<I> extends IdAwareQuery<I> implements WriteQ
 
     @Override
     public long execute() {
-        Predicate versionIsPrior =
-                comparablePathOf(VERSION, Integer.class).lt(version);
         SQLDeleteClause query = factory().delete(table())
                                          .where(idEquals())
-                                         .where(versionIsPrior);
+                                         .where(versionIsPrior());
         return query.execute();
+    }
+
+    private Predicate versionIsPrior() {
+        return comparablePathOf(VERSION, Integer.class).lt(version);
     }
 
     static <I> Builder<I> newBuilder() {
