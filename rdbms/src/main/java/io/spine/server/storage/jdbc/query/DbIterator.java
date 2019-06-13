@@ -238,16 +238,16 @@ public abstract class DbIterator<R> implements Iterator<R>, Closeable {
      * A {@code DbIterator} that iterates over a pair of columns in the given {@code ResultSet}
      * simultaneously.
      *
-     * @param <R1>
+     * @param <A>
      *         the type of the storage records in the first column
-     * @param <R2>
+     * @param <B>
      *         the type of the storage records in the second column
      */
-    private static class DoubleColumnIterator<R1, R2>
-            extends DbIterator<DoubleColumnRecord<R1, R2>> {
+    private static class DoubleColumnIterator<A, B>
+            extends DbIterator<DoubleColumnRecord<A, B>> {
 
-        private final ColumnReader<R1> firstColumnReader;
-        private final ColumnReader<R2> secondColumnReader;
+        private final ColumnReader<A> firstColumnReader;
+        private final ColumnReader<B> secondColumnReader;
 
         /**
          * Creates a new instance of the {@code DoubleColumnIterator}.
@@ -260,18 +260,18 @@ public abstract class DbIterator<R> implements Iterator<R>, Closeable {
          *         the reader for the values of the second column
          */
         private DoubleColumnIterator(ResultSet resultSet,
-                                     ColumnReader<R1> firstColumnReader,
-                                     ColumnReader<R2> secondColumnReader) {
+                                     ColumnReader<A> firstColumnReader,
+                                     ColumnReader<B> secondColumnReader) {
             super(resultSet);
             this.firstColumnReader = firstColumnReader;
             this.secondColumnReader = secondColumnReader;
         }
 
         @Override
-        protected DoubleColumnRecord<R1, R2> readResult() throws SQLException {
-            R1 value1 = firstColumnReader.readValue(resultSet());
-            R2 value2 = secondColumnReader.readValue(resultSet());
-            DoubleColumnRecord<R1, R2> result = DoubleColumnRecord.of(value1, value2);
+        protected DoubleColumnRecord<A, B> readResult() throws SQLException {
+            A value1 = firstColumnReader.readValue(resultSet());
+            B value2 = secondColumnReader.readValue(resultSet());
+            DoubleColumnRecord<A, B> result = DoubleColumnRecord.of(value1, value2);
             return result;
         }
     }
@@ -279,32 +279,32 @@ public abstract class DbIterator<R> implements Iterator<R>, Closeable {
     /**
      * A holder of a pair of column values for the simultaneous iteration over a {@link ResultSet}.
      *
-     * @param <V1>
+     * @param <A>
      *         the type of the first column value
-     * @param <V2>
+     * @param <B>
      *         the type of the second column value
      */
-    public static final class DoubleColumnRecord<V1, V2> {
+    public static final class DoubleColumnRecord<A, B> {
 
-        private final V1 first;
-        private final V2 second;
+        private final A first;
+        private final B second;
 
-        private DoubleColumnRecord(V1 first, V2 second) {
+        private DoubleColumnRecord(A first, B second) {
             this.first = first;
             this.second = second;
         }
 
-        public static <V1, V> DoubleColumnRecord<V1, V> of(V1 first, V second) {
+        public static <A, B> DoubleColumnRecord<A, B> of(A first, B second) {
             checkNotNull(first);
             checkNotNull(second);
             return new DoubleColumnRecord<>(first, second);
         }
 
-        public V1 first() {
+        public A first() {
             return first;
         }
 
-        public V2 second() {
+        public B second() {
             return second;
         }
     }
