@@ -82,24 +82,22 @@ public abstract class DbIterator<R> implements Iterator<R>, Closeable {
      *
      * @param resultSet
      *         the results of a DB query to iterate over
-     * @param idColumnReader
-     *         the reader of the ID column
-     * @param valueColumnReader
-     *         the reader of the column storing entity records
-     * @param <I>
-     *         the type of the storage record IDs
-     * @param <V>
-     *         the type of the column value
+     * @param columnReaderA
+     *         the reader of the first column
+     * @param columnReaderB
+     *         the reader of the second column
+     * @param <A>
+     *         the type of values in the first column
+     * @param <B>
+     *         the type of values in the second column
      * @return a new instance of {@code DbIterator}
      */
-    public static <I, V> DbIterator<DoubleColumnRecord<I, V>>
-    over(ResultSet resultSet,
-         ColumnReader<I> idColumnReader,
-         ColumnReader<V> valueColumnReader) {
+    public static <A, B> DbIterator<DoubleColumnRecord<A, B>>
+    over(ResultSet resultSet, ColumnReader<A> columnReaderA, ColumnReader<B> columnReaderB) {
         checkNotNull(resultSet);
-        checkNotNull(idColumnReader);
-        checkNotNull(valueColumnReader);
-        return new DoubleColumnIterator<>(resultSet, idColumnReader, valueColumnReader);
+        checkNotNull(columnReaderA);
+        checkNotNull(columnReaderB);
+        return new DoubleColumnIterator<>(resultSet, columnReaderA, columnReaderB);
     }
 
     /**
