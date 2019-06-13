@@ -53,14 +53,14 @@ import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.idReader;
 import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.intReader;
 
 /**
- * Selects the version which corresponds to the specified {@code snapshotIndex}.
+ * Selects the version which corresponds to the specified {@code snapshotIndex} for each
+ * aggregate ID.
  *
- * <p>In case the {@link Timestamp date} is specified, selects the minimum version which is both
- * newer than the {@code date} and corresponds to a snapshot older or equal to
- * the one at {@code snapshotIndex}.
+ * <p>In case the {@link Timestamp date} is specified, selects the minimum version between those
+ * corresponding to the events at {@code date} and those corresponding to a {@code snapshotIndex}.
  *
  * <p>The {@linkplain io.spine.core.Version version} is stored and operated on in {@link Integer}
- * form for convenience.
+ * format for convenience.
  *
  * @param <I>
  *         the type of the record IDs
@@ -84,7 +84,7 @@ final class SelectVersionBySnapshot<I>
      * Runs a query which finds the minimum version between those newer or corresponding to
      * the {@code snapshotIndex} and those newer or corresponding to the {@code date}.
      *
-     * <p>The result are given on the per-aggregate-ID basis.
+     * <p>The results are given on the per-aggregate-ID basis.
      */
     @Override
     public DbIterator<DoubleColumnRecord<I, Integer>> execute() {
