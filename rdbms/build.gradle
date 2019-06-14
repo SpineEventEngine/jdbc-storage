@@ -39,5 +39,4 @@ dependencies {
     }
 
     testImplementation deps.test.mockito
-    testImplementation deps.grpc.grpcStub
 }
