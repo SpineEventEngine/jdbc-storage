@@ -38,5 +38,7 @@ dependencies {
         exclude group: 'com.google.guava'
     }
 
+    testImplementation deps.test.mockito
+    testImplementation "net.bytebuddy:byte-buddy:1.7.9"
     testImplementation deps.grpc.grpcStub
 }
