@@ -25,9 +25,6 @@ import com.querydsl.sql.AbstractSQLQuery;
 import io.spine.server.storage.jdbc.query.AbstractQuery;
 import io.spine.server.storage.jdbc.query.SelectMessageByIdQuery;
 
-/**
- * @author Dmytro Grankin
- */
 public class Given {
 
     /** Prevents instantiation of this utility class. */
@@ -35,14 +32,14 @@ public class Given {
     }
 
     /**
-     * @return the new builder for the test {@link SelectMessageByIdQuery} implementation
+     * Returns the new builder for the test {@link SelectMessageByIdQuery} implementation.
      */
     public static ASelectMessageByIdQuery.Builder selectMessageBuilder() {
         return new ASelectMessageByIdQuery.Builder();
     }
 
     /**
-     * @return the new builder for the test {@link AbstractQuery} implementation
+     * Returns the new builder for the test {@link AbstractQuery} implementation.
      */
     public static AStorageQuery.Builder storageQueryBuilder() {
         return new AStorageQuery.Builder();

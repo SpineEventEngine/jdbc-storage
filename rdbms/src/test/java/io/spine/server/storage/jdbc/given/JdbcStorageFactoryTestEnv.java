@@ -24,13 +24,33 @@ import com.google.protobuf.StringValue;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.entity.AbstractEntity;
 import io.spine.server.projection.Projection;
+import io.spine.server.storage.jdbc.DataSourceConfig;
+import io.spine.server.storage.jdbc.JdbcStorageFactory;
 import io.spine.test.storage.Project;
-import io.spine.test.storage.ProjectVBuilder;
+
+import static io.spine.server.storage.jdbc.GivenDataSource.prefix;
+import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
 
 public class JdbcStorageFactoryTestEnv {
 
     /** Prevents instantiation of this utility class. */
     private JdbcStorageFactoryTestEnv() {
+    }
+
+    private static final DataSourceConfig CONFIG = DataSourceConfig
+            .newBuilder()
+            .setJdbcUrl(prefix("factoryTests"))
+            .setUsername("SA")
+            .setPassword("pwd")
+            .setMaxPoolSize(30)
+            .build();
+
+    public static JdbcStorageFactory newFactory(boolean multitenant) {
+        return JdbcStorageFactory.newBuilder()
+                                 .setDataSource(CONFIG)
+                                 .setMultitenant(multitenant)
+                                 .setTypeMapping(MYSQL_5_7)
+                                 .build();
     }
 
     public static class TestEntity extends AbstractEntity<String, StringValue> {
@@ -40,14 +60,14 @@ public class JdbcStorageFactoryTestEnv {
         }
     }
 
-    public static class TestAggregate extends Aggregate<String, Project, ProjectVBuilder> {
+    public static class TestAggregate extends Aggregate<String, Project, Project.Builder> {
 
         private TestAggregate(String id) {
             super(id);
         }
     }
 
-    public static class TestProjection extends Projection<String, Project, ProjectVBuilder> {
+    public static class TestProjection extends Projection<String, Project, Project.Builder> {
 
         private TestProjection(String id) {
             super(id);

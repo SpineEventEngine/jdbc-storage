@@ -28,7 +28,7 @@ import static io.spine.server.storage.jdbc.aggregate.EventCountTable.Column.EVEN
  * A query that inserts a new aggregate event count after the last snapshot into the
  * {@link EventCountTable}.
  */
-class InsertEventCountQuery<I> extends WriteEventCountQuery<I> {
+final class InsertEventCountQuery<I> extends WriteEventCountQuery<I> {
 
     private InsertEventCountQuery(Builder<I> builder) {
         super(builder);
@@ -36,9 +36,8 @@ class InsertEventCountQuery<I> extends WriteEventCountQuery<I> {
 
     @Override
     public long execute() {
-        SQLInsertClause query = factory().insert(table())
-                                         .set(idPath(), getNormalizedId())
-                                         .set(pathOf(EVENT_COUNT), getEventCount());
+        SQLInsertClause query = insertWithId()
+                .set(pathOf(EVENT_COUNT), getEventCount());
         return query.execute();
     }
 

@@ -22,7 +22,6 @@ package io.spine.server.storage.jdbc.query;
 
 import com.google.common.annotations.VisibleForTesting;
 import io.spine.annotation.Internal;
-import io.spine.server.entity.EntityRecord;
 import io.spine.server.storage.jdbc.DatabaseException;
 
 import java.io.Closeable;
@@ -71,37 +70,34 @@ public abstract class DbIterator<R> implements Iterator<R>, Closeable {
      *         the type of storage records
      * @return a new instance of {@code DbIterator}
      */
-    public static <R> DbIterator<R> createFor(ResultSet resultSet, ColumnReader<R> columnReader) {
+    public static <R> DbIterator<R> over(ResultSet resultSet, ColumnReader<R> columnReader) {
         checkNotNull(resultSet);
         checkNotNull(columnReader);
         return new SingleColumnIterator<>(resultSet, columnReader);
     }
 
     /**
-     * Creates a {@code DbIterator} for the simultaneous iteration over the column records and
+     * Creates a {@code DbIterator} for the simultaneous iteration over the entity records and
      * their IDs in the {@code ResultSet}.
-     *
-     * <p>The result of the simultaneous value extraction performed by the column readers is
-     * represented as {@link EntityRecordWithId}.
      *
      * @param resultSet
      *         the results of a DB query to iterate over
-     * @param idColumnReader
-     *         the reader of the ID column
-     * @param recordColumnReader
-     *         the reader of the column storing entity records
-     * @param <I>
-     *         the type of the storage record IDs
+     * @param columnReaderA
+     *         the reader of the first column
+     * @param columnReaderB
+     *         the reader of the second column
+     * @param <A>
+     *         the type of values in the first column
+     * @param <B>
+     *         the type of values in the second column
      * @return a new instance of {@code DbIterator}
      */
-    public static <I> DbIterator<EntityRecordWithId<I>>
-    createFor(ResultSet resultSet,
-              ColumnReader<I> idColumnReader,
-              ColumnReader<EntityRecord> recordColumnReader) {
+    public static <A, B> DbIterator<DoubleColumnRecord<A, B>>
+    over(ResultSet resultSet, ColumnReader<A> columnReaderA, ColumnReader<B> columnReaderB) {
         checkNotNull(resultSet);
-        checkNotNull(idColumnReader);
-        checkNotNull(recordColumnReader);
-        return new RecordWithIdIterator<>(resultSet, idColumnReader, recordColumnReader);
+        checkNotNull(columnReaderA);
+        checkNotNull(columnReaderB);
+        return new DoubleColumnIterator<>(resultSet, columnReaderA, columnReaderB);
     }
 
     /**
@@ -237,41 +233,77 @@ public abstract class DbIterator<R> implements Iterator<R>, Closeable {
     }
 
     /**
-     * A {@code DbIterator} which simultaneously iterates over the records and their IDs in the
-     * {@code ResultSet}.
+     * A {@code DbIterator} that iterates over a pair of columns in the given {@code ResultSet}
+     * simultaneously.
      *
-     * @param <I>
-     *         the type of the record IDs
+     * @param <A>
+     *         the type of the storage records in the first column
+     * @param <B>
+     *         the type of the storage records in the second column
      */
-    private static class RecordWithIdIterator<I> extends DbIterator<EntityRecordWithId<I>> {
+    private static class DoubleColumnIterator<A, B>
+            extends DbIterator<DoubleColumnRecord<A, B>> {
 
-        private final ColumnReader<I> idColumnReader;
-        private final ColumnReader<EntityRecord> recordColumnReader;
+        private final ColumnReader<A> firstColumnReader;
+        private final ColumnReader<B> secondColumnReader;
 
         /**
-         * Creates a new instance of the {@code RecordWithIdIterator}.
+         * Creates a new instance of the {@code DoubleColumnIterator}.
          *
          * @param resultSet
          *         the SQL query results to iterate over
-         * @param idColumnReader
-         *         the reader of the ID column values
-         * @param recordColumnReader
-         *         the reader of the column storing entity records
+         * @param firstColumnReader
+         *         the reader for the values of the first column
+         * @param secondColumnReader
+         *         the reader for the values of the second column
          */
-        private RecordWithIdIterator(ResultSet resultSet,
-                                     ColumnReader<I> idColumnReader,
-                                     ColumnReader<EntityRecord> recordColumnReader) {
+        private DoubleColumnIterator(ResultSet resultSet,
+                                     ColumnReader<A> firstColumnReader,
+                                     ColumnReader<B> secondColumnReader) {
             super(resultSet);
-            this.idColumnReader = idColumnReader;
-            this.recordColumnReader = recordColumnReader;
+            this.firstColumnReader = firstColumnReader;
+            this.secondColumnReader = secondColumnReader;
         }
 
         @Override
-        protected EntityRecordWithId<I> readResult() throws SQLException {
-            I id = idColumnReader.readValue(resultSet());
-            EntityRecord record = recordColumnReader.readValue(resultSet());
-            EntityRecordWithId<I> result = EntityRecordWithId.of(id, record);
+        protected DoubleColumnRecord<A, B> readResult() throws SQLException {
+            A value1 = firstColumnReader.readValue(resultSet());
+            B value2 = secondColumnReader.readValue(resultSet());
+            DoubleColumnRecord<A, B> result = DoubleColumnRecord.of(value1, value2);
             return result;
+        }
+    }
+
+    /**
+     * A holder of a pair of column values for the simultaneous iteration over a {@link ResultSet}.
+     *
+     * @param <A>
+     *         the type of the first column value
+     * @param <B>
+     *         the type of the second column value
+     */
+    public static final class DoubleColumnRecord<A, B> {
+
+        private final A first;
+        private final B second;
+
+        private DoubleColumnRecord(A first, B second) {
+            this.first = first;
+            this.second = second;
+        }
+
+        public static <A, B> DoubleColumnRecord<A, B> of(A first, B second) {
+            checkNotNull(first);
+            checkNotNull(second);
+            return new DoubleColumnRecord<>(first, second);
+        }
+
+        public A first() {
+            return first;
+        }
+
+        public B second() {
+            return second;
         }
     }
 }

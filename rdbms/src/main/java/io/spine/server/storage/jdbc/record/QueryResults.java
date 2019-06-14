@@ -28,7 +28,7 @@ import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.FieldMasks;
 import io.spine.server.storage.jdbc.query.ColumnReader;
 import io.spine.server.storage.jdbc.query.DbIterator;
-import io.spine.server.storage.jdbc.query.EntityRecordWithId;
+import io.spine.server.storage.jdbc.query.DbIterator.DoubleColumnRecord;
 
 import java.sql.ResultSet;
 import java.util.Iterator;
@@ -54,7 +54,7 @@ final class QueryResults {
     /**
      * Creates an {@code Iterator} over the results of the SQL query.
      *
-     * <p>The results are represented as {@link EntityRecordWithId}.
+     * <p>The results are represented as {@link DoubleColumnRecord}.
      *
      * @param resultSet
      *         the result of the query
@@ -67,32 +67,33 @@ final class QueryResults {
      * @return an {@code Iterator} over the query results
      * @see RecordTable
      */
-    static <I> Iterator<EntityRecordWithId<I>>
+    static <I> Iterator<DoubleColumnRecord<I, EntityRecord>>
     parse(ResultSet resultSet, Class<I> idType, FieldMask fieldMask) {
         ColumnReader<I> idColumnReader = idReader(ID.name(), idType);
         ColumnReader<EntityRecord> recordColumnReader =
                 messageReader(ENTITY.name(), EntityRecord.getDescriptor());
-        Iterator<EntityRecordWithId<I>> dbIterator = DbIterator.createFor(
+        Iterator<DoubleColumnRecord<I, EntityRecord>> dbIterator = DbIterator.over(
                 resultSet,
                 idColumnReader,
                 recordColumnReader
         );
-        Iterator<EntityRecordWithId<I>> result = stream(dbIterator)
+        Iterator<DoubleColumnRecord<I, EntityRecord>> result = stream(dbIterator)
                 .map(maskFields(fieldMask))
                 .iterator();
         return result;
     }
 
-    private static <I> Function<EntityRecordWithId<I>, EntityRecordWithId<I>>
+    private static <I>
+    Function<DoubleColumnRecord<I, EntityRecord>, DoubleColumnRecord<I, EntityRecord>>
     maskFields(FieldMask fieldMask) {
-        return value -> {
-            checkNotNull(value);
-            EntityRecord record = value.record();
-            Any maskedState = maskFieldsOfState(record, fieldMask);
-            EntityRecord maskedRecord = record.toBuilder()
+        return record -> {
+            checkNotNull(record);
+            EntityRecord entityRecord = record.second();
+            Any maskedState = maskFieldsOfState(entityRecord, fieldMask);
+            EntityRecord maskedRecord = entityRecord.toBuilder()
                                               .setState(maskedState)
                                               .build();
-            return EntityRecordWithId.of(value.id(), maskedRecord);
+            return DoubleColumnRecord.of(record.first(), maskedRecord);
         };
     }
 

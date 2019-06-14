@@ -21,7 +21,6 @@
 package io.spine.server.storage.jdbc;
 
 import io.spine.server.aggregate.AggregateStorage;
-import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.projection.ProjectionStorage;
 import io.spine.server.storage.RecordStorage;
 import io.spine.server.storage.StorageFactory;
@@ -35,8 +34,8 @@ import org.junit.jupiter.api.Test;
 import javax.sql.DataSource;
 
 import static io.spine.base.Identifier.newUuid;
-import static io.spine.server.storage.jdbc.GivenDataSource.prefix;
 import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
+import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.newFactory;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -45,19 +44,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-/**
- * @author Alexander Litus
- */
 @SuppressWarnings("DuplicateStringLiteralInspection") // Common test display names.
 @DisplayName("JdbcStorageFactory should")
 class JdbcStorageFactoryTest {
-
-    private final DataSourceConfig config = DataSourceConfig.newBuilder()
-                                                            .setJdbcUrl(prefix("factoryTests"))
-                                                            .setUsername("SA")
-                                                            .setPassword("pwd")
-                                                            .setMaxPoolSize(12)
-                                                            .build();
 
     @Test
     @DisplayName("allow to use custom data source")
@@ -151,18 +140,6 @@ class JdbcStorageFactoryTest {
     }
 
     @Test
-    @DisplayName("have default column type registry")
-    void haveDefaultTypeRegistry() {
-        DataSourceWrapper dataSource = GivenDataSource.withoutSuperpowers();
-        JdbcStorageFactory factory = JdbcStorageFactory.newBuilder()
-                                                       .setDataSource(dataSource)
-                                                       .setTypeMapping(MYSQL_5_7)
-                                                       .build();
-        ColumnTypeRegistry<?> registry = factory.getTypeRegistry();
-        assertNotNull(registry);
-    }
-
-    @Test
     @DisplayName("generate single tenant view")
     void generateSingleTenantView() {
         DataSourceWrapper dataSource = GivenDataSource.withoutSuperpowers();
@@ -197,13 +174,5 @@ class JdbcStorageFactoryTest {
                                                        .setDataSource(dataSource)
                                                        .build();
         assertEquals(MYSQL_5_7, factory.getTypeMapping());
-    }
-
-    private JdbcStorageFactory newFactory(boolean multitenant) {
-        return JdbcStorageFactory.newBuilder()
-                                 .setDataSource(config)
-                                 .setMultitenant(multitenant)
-                                 .setTypeMapping(MYSQL_5_7)
-                                 .build();
     }
 }

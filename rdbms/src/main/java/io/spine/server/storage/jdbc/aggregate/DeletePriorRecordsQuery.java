@@ -20,37 +20,56 @@
 
 package io.spine.server.storage.jdbc.aggregate;
 
-import com.querydsl.sql.dml.SQLUpdateClause;
+import com.querydsl.core.types.Predicate;
+import com.querydsl.sql.dml.SQLDeleteClause;
+import io.spine.server.storage.jdbc.query.IdAwareQuery;
+import io.spine.server.storage.jdbc.query.WriteQuery;
 
-import static io.spine.server.storage.jdbc.aggregate.EventCountTable.Column.EVENT_COUNT;
+import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.VERSION;
 
 /**
- * A query that updates event count in the {@link EventCountTable}.
+ * A query that deletes records prior to the specified {@code version} in the table.
+ *
+ * @param <I>
+ *         the type of {@code Aggregate} IDs
  */
-final class UpdateEventCountQuery<I> extends WriteEventCountQuery<I> {
+final class DeletePriorRecordsQuery<I> extends IdAwareQuery<I> implements WriteQuery {
 
-    private UpdateEventCountQuery(Builder<I> builder) {
+    private final Integer version;
+
+    private DeletePriorRecordsQuery(Builder<I> builder) {
         super(builder);
+        this.version = builder.version;
     }
 
     @Override
     public long execute() {
-        SQLUpdateClause query = updateById()
-                .set(pathOf(EVENT_COUNT), getEventCount());
+        SQLDeleteClause query = factory().delete(table())
+                                         .where(idEquals())
+                                         .where(versionIsPrior());
         return query.execute();
+    }
+
+    private Predicate versionIsPrior() {
+        return comparablePathOf(VERSION, Integer.class).lt(version);
     }
 
     static <I> Builder<I> newBuilder() {
         return new Builder<>();
     }
 
-    static class Builder<I> extends WriteEventCountQuery.Builder<Builder<I>,
-                                                                 UpdateEventCountQuery<I>,
-                                                                 I> {
+    static class Builder<I> extends IdAwareQuery.Builder<I, Builder<I>, DeletePriorRecordsQuery<I>> {
+
+        private Integer version;
+
+        Builder<I> setVersion(Integer version) {
+            this.version = version;
+            return getThis();
+        }
 
         @Override
-        protected UpdateEventCountQuery<I> doBuild() {
-            return new UpdateEventCountQuery<>(this);
+        protected DeletePriorRecordsQuery<I> doBuild() {
+            return new DeletePriorRecordsQuery<>(this);
         }
 
         @Override

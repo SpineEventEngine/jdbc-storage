@@ -20,14 +20,18 @@
 
 package io.spine.server.storage.jdbc.query;
 
+import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.PathBuilder;
+import com.querydsl.sql.dml.SQLInsertClause;
+import com.querydsl.sql.dml.SQLUpdateClause;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * An abstract base for queries, which work with a {@link IdColumn single ID}.
  *
- * @param <I> the ID type
+ * @param <I>
+ *         the ID type
  */
 public abstract class IdAwareQuery<I> extends AbstractQuery {
 
@@ -40,12 +44,32 @@ public abstract class IdAwareQuery<I> extends AbstractQuery {
         this.idColumn = checkNotNull(builder.idColumn);
     }
 
-    protected PathBuilder<Object> idPath() {
-        return pathOf(idColumn.getColumnName());
+    /**
+     * Returns a {@code Predicate} to check if the value of the ID column matches the stored
+     * set of IDs.
+     */
+    protected Predicate idEquals() {
+        return idPath().eq(normalizedId());
     }
 
-    protected Object getNormalizedId() {
+    protected SQLInsertClause insertWithId() {
+        SQLInsertClause query = factory().insert(table())
+                                         .set(idPath(), normalizedId());
+        return query;
+    }
+
+    protected SQLUpdateClause updateById() {
+        SQLUpdateClause query = factory().update(table())
+                                         .set(idPath(), normalizedId());
+        return query;
+    }
+
+    private Object normalizedId() {
         return idColumn.normalize(id);
+    }
+
+    private PathBuilder<Object> idPath() {
+        return pathOf(idColumn.columnName());
     }
 
     protected abstract static class Builder<I,

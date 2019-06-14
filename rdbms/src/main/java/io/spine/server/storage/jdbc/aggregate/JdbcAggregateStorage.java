@@ -20,6 +20,7 @@
 
 package io.spine.server.storage.jdbc.aggregate;
 
+import com.google.protobuf.Timestamp;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.aggregate.AggregateReadRequest;
@@ -30,6 +31,8 @@ import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.StorageBuilder;
 import io.spine.server.storage.jdbc.TypeMapping;
 import io.spine.server.storage.jdbc.query.DbIterator;
+import io.spine.server.storage.jdbc.query.DbIterator.DoubleColumnRecord;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -37,6 +40,7 @@ import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Lists.newLinkedList;
+import static com.google.common.collect.Streams.stream;
 import static io.spine.server.storage.jdbc.aggregate.Closeables.closeAll;
 
 /**
@@ -155,6 +159,32 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
         DbIterator<AggregateEventRecord> historyIterator = query.execute(fetchSize);
         iterators.add(historyIterator);
         return historyIterator;
+    }
+
+    @Override
+    protected void truncate(int snapshotIndex) {
+        doTruncate(snapshotIndex, null);
+    }
+
+    @Override
+    protected void truncate(int snapshotIndex, Timestamp date) {
+        doTruncate(snapshotIndex, date);
+    }
+
+    private void doTruncate(int snapshotIndex, @Nullable Timestamp date) {
+        DbIterator<DoubleColumnRecord<I, Integer>> records =
+                selectVersionsToPersist(snapshotIndex, date);
+        stream(records)
+                .forEach(record -> mainTable.deletePriorRecords(record.first(), record.second()));
+    }
+
+    private DbIterator<DoubleColumnRecord<I, Integer>>
+    selectVersionsToPersist(int snapshotIndex, @Nullable Timestamp date) {
+        SelectVersionBySnapshot<I> query =
+                mainTable.composeSelectVersionQuery(snapshotIndex, date);
+        DbIterator<DoubleColumnRecord<I, Integer>> iterator = query.execute();
+        iterators.add(iterator);
+        return iterator;
     }
 
     /**

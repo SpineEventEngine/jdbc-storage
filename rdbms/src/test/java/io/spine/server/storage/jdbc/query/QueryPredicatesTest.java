@@ -113,11 +113,11 @@ class QueryPredicatesTest {
         ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> registry
                 = JdbcTypeRegistryFactory.defaultInstance();
 
-        Filter filter = eq(column.getStoredName(), COLUMN_FILTER_VALUE);
+        Filter filter = eq(column.storedName(), COLUMN_FILTER_VALUE);
         Predicate predicate = columnMatchFilter(column, filter, registry);
 
         ComparablePath<Comparable> columnPath = comparablePath(Comparable.class,
-                                                               column.getStoredName());
+                                                               column.storedName());
         BooleanExpression isNullPredicate = columnPath.isNull();
         assertEquals(isNullPredicate, predicate);
     }
@@ -132,7 +132,7 @@ class QueryPredicatesTest {
         ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> registry
                 = JdbcTypeRegistryFactory.defaultInstance();
 
-        Filter filter = gt(column.getStoredName(), COLUMN_FILTER_VALUE);
+        Filter filter = gt(column.storedName(), COLUMN_FILTER_VALUE);
 
         assertThrows(IllegalArgumentException.class,
                      () -> columnMatchFilter(column, filter, registry));
@@ -154,7 +154,7 @@ class QueryPredicatesTest {
                                                         .put(String.class, type)
                                                         .build();
 
-        Filter filter = eq(column.getStoredName(), COLUMN_FILTER_VALUE);
+        Filter filter = eq(column.storedName(), COLUMN_FILTER_VALUE);
 
         assertThrows(IllegalArgumentException.class,
                      () -> columnMatchFilter(column, filter, registry));
@@ -262,9 +262,9 @@ class QueryPredicatesTest {
 
     private static EntityColumn stringColumnMock() {
         EntityColumn column = mock(EntityColumn.class);
-        when(column.getStoredName()).thenReturn("test column");
-        when(column.getType()).thenReturn(String.class);
-        when(column.getPersistedType()).thenReturn(String.class);
+        when(column.storedName()).thenReturn("test column");
+        when(column.type()).thenReturn(String.class);
+        when(column.persistedType()).thenReturn(String.class);
         return column;
     }
 

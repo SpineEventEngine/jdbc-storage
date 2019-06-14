@@ -30,7 +30,7 @@ import static io.spine.server.storage.jdbc.record.RecordTable.StandardColumn.ENT
 /**
  * A query that selects {@link EntityRecord} by an ID.
  */
-class SelectEntityByIdQuery<I> extends SelectMessageByIdQuery<I, EntityRecord> {
+final class SelectEntityByIdQuery<I> extends SelectMessageByIdQuery<I, EntityRecord> {
 
     private SelectEntityByIdQuery(Builder<I> builder) {
         super(builder);
@@ -40,7 +40,7 @@ class SelectEntityByIdQuery<I> extends SelectMessageByIdQuery<I, EntityRecord> {
     protected AbstractSQLQuery<?, ?> getQuery() {
         AbstractSQLQuery<?, ?> query = factory().select(all)
                                                 .from(table())
-                                                .where(hasId());
+                                                .where(idEquals());
         return query;
     }
 

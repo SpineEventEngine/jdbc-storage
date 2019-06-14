@@ -28,7 +28,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import static io.spine.server.storage.jdbc.query.DbIterator.createFor;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
@@ -119,7 +118,7 @@ public class DbIteratorTestEnv {
                 return resultSet;
             }
         };
-        DbIterator<ResultSet> result = createFor(resultSet, identityReader);
+        DbIterator<ResultSet> result = DbIterator.over(resultSet, identityReader);
         return result;
     }
 
@@ -130,7 +129,7 @@ public class DbIteratorTestEnv {
                 throw new SQLException("Read is not allowed; I'm sneaky");
             }
         };
-        DbIterator<ResultSet> result = createFor(resultSet, throwingReader);
+        DbIterator<ResultSet> result = DbIterator.over(resultSet, throwingReader);
         return result;
     }
 }

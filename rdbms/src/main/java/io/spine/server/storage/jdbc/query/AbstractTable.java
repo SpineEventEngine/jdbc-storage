@@ -65,8 +65,10 @@ import static io.spine.server.storage.jdbc.Sql.Query.PRIMARY_KEY;
  * <p>A table provides a sufficient API for performing the database interaction. However, it never
  * performs any validation or data transformation, but only invokes the appropriate queries.
  *
- * @param <I> type of ID of the records stored in the table
- * @param <R> result type of the read operation
+ * @param <I>
+ *         a type of ID of the records stored in the table
+ * @param <R>
+ *         a result type of the read operation
  * @see TableColumn
  */
 @Internal
@@ -140,7 +142,8 @@ public abstract class AbstractTable<I, R, W> implements Logging {
     /**
      * Checks if the table contains a record with given ID.
      *
-     * @param id ID to check
+     * @param id
+     *         an ID to check
      * @return {@code true} if there is a record with such ID in the table, {@code false} otherwise
      */
     protected boolean containsRecord(I id) {
@@ -157,7 +160,8 @@ public abstract class AbstractTable<I, R, W> implements Logging {
     /**
      * Reads a record with the given ID from the table.
      *
-     * @param id ID to search by
+     * @param id
+     *         an ID to search by
      * @return table record or {@code null} if there is no record with given ID
      */
     public @Nullable R read(I id) {
@@ -172,8 +176,10 @@ public abstract class AbstractTable<I, R, W> implements Logging {
      * <p>If the table {@linkplain #containsRecord(Object) contains} a record with the given ID,
      * the operation is treated as an {@code UPDATE}, otherwise - as an {@code INSERT}.
      *
-     * @param id     ID to write the record under
-     * @param record the record to write
+     * @param id
+     *         an ID to write the record under
+     * @param record
+     *         the record to write
      */
     public void write(I id, W record) {
         if (containsRecord(id)) {
@@ -202,8 +208,10 @@ public abstract class AbstractTable<I, R, W> implements Logging {
     /**
      * Inserts the record into the table using the specified ID.
      *
-     * @param id     the ID for the record
-     * @param record the record to insert
+     * @param id
+     *         an ID for the record
+     * @param record
+     *         a record to insert
      */
     public void insert(I id, W record) {
         WriteQuery query = composeInsertQuery(id, record);
@@ -213,8 +221,10 @@ public abstract class AbstractTable<I, R, W> implements Logging {
     /**
      * Updates the record with the specified ID for the table.
      *
-     * @param id     the ID of the record
-     * @param record the new state of the record
+     * @param id
+     *         an ID of the record
+     * @param record
+     *         a new state of the record
      */
     public void update(I id, W record) {
         WriteQuery query = composeUpdateQuery(id, record);
@@ -301,7 +311,7 @@ public abstract class AbstractTable<I, R, W> implements Logging {
     }
 
     private Type getIdType() {
-        Type idType = getIdColumn().getSqlType();
+        Type idType = getIdColumn().sqlType();
         return idType;
     }
 
@@ -312,7 +322,8 @@ public abstract class AbstractTable<I, R, W> implements Logging {
      * at the compile time, returns {@linkplain #getIdType() the ID type},
      * which is determined at the runtime.
      *
-     * @param column the column the type of which will be handled
+     * @param column
+     *         the column whose type will be handled
      * @return the SQL type of the column
      */
     private Type ensureIdType(TableColumn column) {
@@ -328,7 +339,8 @@ public abstract class AbstractTable<I, R, W> implements Logging {
     /**
      * Deletes a row in the table corresponding to the given ID.
      *
-     * @param id ID to search by
+     * @param id
+     *         an ID to search by
      * @return {@code true} if the row was deleted successfully,
      *         {@code false} if the row was not found
      */

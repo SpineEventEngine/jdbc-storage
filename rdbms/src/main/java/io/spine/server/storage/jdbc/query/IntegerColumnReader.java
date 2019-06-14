@@ -20,40 +20,24 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import io.spine.server.entity.EntityRecord;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A combination of the {@link EntityRecord} and its ID for iterating over the SQL query response.
- *
- * @param <I>
- *         the ID type
+ * The reader for the columns which store {@link Integer} entries.
  */
-public final class EntityRecordWithId<I> {
+final class IntegerColumnReader extends ColumnReader<Integer> {
 
-    private final I id;
-    private final EntityRecord record;
-
-    private EntityRecordWithId(I id, EntityRecord record) {
-        this.id = id;
-        this.record = record;
+    IntegerColumnReader(String columnName) {
+        super(columnName);
     }
 
-    /**
-     * Creates a new {@code EntityRecordWithId} instance.
-     */
-    public static <I> EntityRecordWithId<I> of(I id, EntityRecord record) {
-        checkNotNull(id);
-        checkNotNull(record);
-        return new EntityRecordWithId<>(id, record);
-    }
-
-    public I id() {
-        return id;
-    }
-
-    public EntityRecord record() {
-        return record;
+    @Override
+    public Integer readValue(ResultSet resultSet) throws SQLException {
+        checkNotNull(resultSet);
+        Integer result = resultSet.getInt(columnName());
+        return result;
     }
 }

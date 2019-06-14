@@ -21,6 +21,7 @@
 package io.spine.server.storage.jdbc.record;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableSet;
 import com.google.protobuf.FieldMask;
 import io.spine.server.entity.Entity;
 import io.spine.server.entity.EntityRecord;
@@ -32,7 +33,7 @@ import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.Type;
 import io.spine.server.storage.jdbc.TypeMapping;
-import io.spine.server.storage.jdbc.query.EntityRecordWithId;
+import io.spine.server.storage.jdbc.query.DbIterator.DoubleColumnRecord;
 import io.spine.server.storage.jdbc.query.EntityTable;
 import io.spine.server.storage.jdbc.query.SelectQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
@@ -58,7 +59,7 @@ import static java.util.Collections.addAll;
  *
  * <p>Used in the {@link JdbcRecordStorage}.
  */
-class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumns> {
+final class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumns> {
 
     private final ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> typeRegistry;
     private final Collection<EntityColumn> entityColumns;
@@ -71,7 +72,7 @@ class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumn
                 Collection<EntityColumn> entityColumns) {
         super(entityClass, StandardColumn.ID.name(), dataSource, typeMapping);
         this.typeRegistry = columnTypeRegistry;
-        this.entityColumns = entityColumns;
+        this.entityColumns = ImmutableSet.copyOf(entityColumns);
     }
 
     @Override
@@ -154,7 +155,8 @@ class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumn
      * <p>The resulting record fields are masked by the given {@code FieldMask}.
      */
     Iterator<EntityRecord> readByIds(EntityQuery<I> entityQuery, FieldMask fieldMask) {
-        Iterator<EntityRecordWithId<I>> response = executeQuery(entityQuery, fieldMask);
+        Iterator<DoubleColumnRecord<I, EntityRecord>> response =
+                executeQuery(entityQuery, fieldMask);
         Iterator<EntityRecord> records = extractRecordsForIds(entityQuery.getIds(), response);
         return records;
     }
@@ -168,12 +170,13 @@ class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumn
      * {@link #readByIds(EntityQuery, FieldMask)} counterpart.
      */
     Iterator<EntityRecord> readByQuery(EntityQuery<I> entityQuery, FieldMask fieldMask) {
-        Iterator<EntityRecordWithId<I>> response = executeQuery(entityQuery, fieldMask);
+        Iterator<DoubleColumnRecord<I, EntityRecord>> response =
+                executeQuery(entityQuery, fieldMask);
         Iterator<EntityRecord> records = extractRecords(response);
         return records;
     }
 
-    private Iterator<EntityRecordWithId<I>>
+    private Iterator<DoubleColumnRecord<I, EntityRecord>>
     executeQuery(EntityQuery<I> entityQuery, FieldMask fieldMask) {
         SelectByEntityColumnsQuery.Builder<I> builder = SelectByEntityColumnsQuery.newBuilder();
         SelectByEntityColumnsQuery<I> query = builder.setDataSource(getDataSource())
@@ -183,15 +186,16 @@ class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumn
                                                      .setEntityQuery(entityQuery)
                                                      .setFieldMask(fieldMask)
                                                      .build();
-        Iterator<EntityRecordWithId<I>> queryResult = query.execute();
+        Iterator<DoubleColumnRecord<I, EntityRecord>> queryResult = query.execute();
         return queryResult;
     }
 
     private Iterator<EntityRecord>
-    extractRecordsForIds(Iterable<I> ids, Iterator<EntityRecordWithId<I>> queryResponse) {
+    extractRecordsForIds(Iterable<I> ids,
+                         Iterator<DoubleColumnRecord<I, EntityRecord>> queryResponse) {
         Map<I, EntityRecord> presentRecords = new HashMap<>();
         queryResponse.forEachRemaining(
-                record -> presentRecords.put(record.id(), record.record())
+                record -> presentRecords.put(record.first(), record.second())
         );
         Iterator<EntityRecord> result = stream(ids)
                 .map(presentRecords::get)
@@ -200,9 +204,9 @@ class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumn
     }
 
     private Iterator<EntityRecord>
-    extractRecords(Iterator<EntityRecordWithId<I>> queryResponse) {
+    extractRecords(Iterator<DoubleColumnRecord<I, EntityRecord>> queryResponse) {
         Iterator<EntityRecord> result = stream(queryResponse)
-                .map(EntityRecordWithId::record)
+                .map(DoubleColumnRecord::second)
                 .iterator();
         return result;
     }
@@ -297,7 +301,7 @@ class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumn
 
         @Override
         public String name() {
-            return column.getStoredName();
+            return column.storedName();
         }
 
         @Override

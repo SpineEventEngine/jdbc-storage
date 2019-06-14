@@ -91,7 +91,6 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     @Override
     public boolean delete(I id) {
         checkNotNull(id);
-
         boolean result = table.delete(id);
         return result;
     }

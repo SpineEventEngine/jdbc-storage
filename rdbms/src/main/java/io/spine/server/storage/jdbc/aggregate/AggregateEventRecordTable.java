@@ -21,6 +21,8 @@
 package io.spine.server.storage.jdbc.aggregate;
 
 import com.google.common.collect.ImmutableList;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.protobuf.Timestamp;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
@@ -30,6 +32,7 @@ import io.spine.server.storage.jdbc.TypeMapping;
 import io.spine.server.storage.jdbc.query.DbIterator;
 import io.spine.server.storage.jdbc.query.EntityTable;
 import io.spine.server.storage.jdbc.query.WriteQuery;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.List;
 
@@ -62,6 +65,17 @@ class AggregateEventRecordTable<I> extends EntityTable<I,
         return ImmutableList.copyOf(Column.values());
     }
 
+    /**
+     * Deletes aggregate event records that are older than the specified {@code version}.
+     *
+     * @return how many table rows have been deleted
+     */
+    @CanIgnoreReturnValue
+    long deletePriorRecords(I id, Integer version) {
+        DeletePriorRecordsQuery<I> query = composeDeleteQuery(id, version);
+        return query.execute();
+    }
+
     @Override
     protected SelectEventRecordsById<I> composeSelectQuery(I id) {
         SelectEventRecordsById.Builder<I> builder = SelectEventRecordsById.newBuilder();
@@ -82,6 +96,29 @@ class AggregateEventRecordTable<I> extends EntityTable<I,
                                                      .setId(id)
                                                      .setRecord(record)
                                                      .build();
+        return query;
+    }
+
+    SelectVersionBySnapshot<I>
+    composeSelectVersionQuery(int snapshotIndex, @Nullable Timestamp date) {
+        SelectVersionBySnapshot.Builder<I> builder = SelectVersionBySnapshot.newBuilder();
+        SelectVersionBySnapshot<I> query = builder.setTableName(getName())
+                                                  .setDataSource(getDataSource())
+                                                  .setIdColumn(getIdColumn())
+                                                  .setSnapshotIndex(snapshotIndex)
+                                                  .setDate(date)
+                                                  .build();
+        return query;
+    }
+
+    private DeletePriorRecordsQuery<I> composeDeleteQuery(I id, Integer version) {
+        DeletePriorRecordsQuery.Builder<I> builder = DeletePriorRecordsQuery.newBuilder();
+        DeletePriorRecordsQuery<I> query = builder.setTableName(getName())
+                                                  .setDataSource(getDataSource())
+                                                  .setIdColumn(getIdColumn())
+                                                  .setId(id)
+                                                  .setVersion(version)
+                                                  .build();
         return query;
     }
 

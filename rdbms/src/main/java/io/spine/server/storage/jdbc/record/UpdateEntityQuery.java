@@ -41,7 +41,7 @@ class UpdateEntityQuery<I> extends WriteEntityQuery<I, SQLUpdateClause> {
 
     @Override
     protected void setIdValue(SQLUpdateClause clause, IdColumn<I> idColumn, Object normalizedId) {
-        PathBuilder<Object> idPath = pathOf(idColumn.getColumnName());
+        PathBuilder<Object> idPath = pathOf(idColumn.columnName());
         clause.where(idPath.eq(normalizedId));
     }
 

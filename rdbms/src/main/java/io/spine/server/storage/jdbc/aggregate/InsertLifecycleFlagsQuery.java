@@ -34,7 +34,7 @@ import static io.spine.server.storage.jdbc.aggregate.LifecycleFlagsTable.Column.
  * The query for creating a new record in the table storing
  * the {@linkplain LifecycleFlags entity lifecycle flags}.
  */
-class InsertLifecycleFlagsQuery<I> extends IdAwareQuery<I> implements WriteQuery {
+final class InsertLifecycleFlagsQuery<I> extends IdAwareQuery<I> implements WriteQuery {
 
     private final LifecycleFlags entityStatus;
 
@@ -45,10 +45,9 @@ class InsertLifecycleFlagsQuery<I> extends IdAwareQuery<I> implements WriteQuery
 
     @Override
     public long execute() {
-        SQLInsertClause query = factory().insert(table())
-                                         .set(idPath(), getNormalizedId())
-                                         .set(pathOf(ARCHIVED), entityStatus.getArchived())
-                                         .set(pathOf(DELETED), entityStatus.getDeleted());
+        SQLInsertClause query = insertWithId()
+                .set(pathOf(ARCHIVED), entityStatus.getArchived())
+                .set(pathOf(DELETED), entityStatus.getDeleted());
         return query.execute();
     }
 

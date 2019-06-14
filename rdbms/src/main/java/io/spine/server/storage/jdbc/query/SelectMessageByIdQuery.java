@@ -38,7 +38,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @param <I> a type of storage message IDs
  * @param <M> a type of messages to read
  */
-public abstract class SelectMessageByIdQuery<I, M extends Message> extends AbstractSelectByIdQuery<I, M> {
+public abstract class SelectMessageByIdQuery<I, M extends Message>
+        extends IdAwareQuery<I>
+        implements SelectQuery<M> {
 
     private final String messageColumnName;
     private final Descriptor messageDescriptor;
@@ -103,7 +105,7 @@ public abstract class SelectMessageByIdQuery<I, M extends Message> extends Abstr
                                             Q extends SelectMessageByIdQuery<I, R>,
                                             I,
                                             R extends Message>
-            extends AbstractSelectByIdQuery.Builder<I, B, Q> {
+            extends IdAwareQuery.Builder<I, B, Q> {
 
         private String messageColumnName;
         private Descriptor messageDescriptor;

@@ -89,13 +89,13 @@ public abstract class IdColumn<I> {
     /**
      * Returns the {@link Type} of the column with which this helper instance works.
      */
-    public abstract Type getSqlType();
+    public abstract Type sqlType();
 
     /**
      * Retrieves the {@linkplain Class Java class} of the ID before
      * {@linkplain #normalize(Object) normalization}.
      */
-    public abstract Class<I> getJavaType();
+    public abstract Class<I> javaType();
 
     /**
      * Normalizes the identifier before setting it to a {@link Parameter}.
@@ -127,7 +127,7 @@ public abstract class IdColumn<I> {
         return result;
     }
 
-    public String getColumnName() {
+    public String columnName() {
         return columnName;
     }
 
@@ -154,12 +154,12 @@ public abstract class IdColumn<I> {
         }
 
         @Override
-        public Type getSqlType() {
+        public Type sqlType() {
             return Type.LONG;
         }
 
         @Override
-        public Class<Long> getJavaType() {
+        public Class<Long> javaType() {
             return Long.class;
         }
 
@@ -179,12 +179,12 @@ public abstract class IdColumn<I> {
         }
 
         @Override
-        public Type getSqlType() {
+        public Type sqlType() {
             return Type.INT;
         }
 
         @Override
-        public Class<Integer> getJavaType() {
+        public Class<Integer> javaType() {
             return Integer.class;
         }
 
@@ -205,7 +205,7 @@ public abstract class IdColumn<I> {
         }
 
         @Override
-        public Type getSqlType() {
+        public Type sqlType() {
             return Type.STRING_255;
         }
     }
@@ -225,7 +225,7 @@ public abstract class IdColumn<I> {
         }
 
         @Override
-        public Class<String> getJavaType() {
+        public Class<String> javaType() {
             return String.class;
         }
     }
@@ -251,7 +251,7 @@ public abstract class IdColumn<I> {
         }
 
         @Override
-        public Class<M> getJavaType() {
+        public Class<M> javaType() {
             return cls;
         }
     }

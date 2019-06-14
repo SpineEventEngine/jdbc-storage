@@ -18,35 +18,19 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.query;
+package io.spine.server.storage.jdbc.aggregate;
 
-import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.dsl.BooleanExpression;
+import io.spine.server.aggregate.AggregateStorageTruncationTest;
+import io.spine.server.storage.StorageFactory;
+import org.junit.jupiter.api.DisplayName;
 
-/**
- * An abstract base for the queries which read a single record by an ID.
- */
-public abstract class AbstractSelectByIdQuery<I, R>
-        extends IdAwareQuery<I> implements SelectQuery<R> {
+import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.newFactory;
 
-    protected AbstractSelectByIdQuery(Builder<I, ? extends Builder, ? extends StorageQuery> b) {
-        super(b);
-    }
+@DisplayName("JdbcAggregateStorage after truncation should")
+public class JdbcAggregateStorageTruncationTest extends AggregateStorageTruncationTest {
 
-    /**
-     * Obtains a {@link Predicate} for the query.
-     *
-     * @return a predicate to match records
-     */
-    protected Predicate hasId() {
-        Object idValue = getNormalizedId();
-        BooleanExpression hasId = idPath().eq(idValue);
-        return hasId;
-    }
-
-    protected abstract static class Builder<I,
-                                            B extends Builder<I, B, Q>,
-                                            Q extends AbstractSelectByIdQuery<I, ?>>
-            extends IdAwareQuery.Builder<I, B, Q> {
+    @Override
+    protected StorageFactory storageFactory() {
+        return newFactory(false);
     }
 }

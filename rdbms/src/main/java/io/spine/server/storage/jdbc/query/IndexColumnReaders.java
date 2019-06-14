@@ -52,8 +52,10 @@ final class IndexColumnReaders {
         Class<I> wrapper = Primitives.wrap(idType);
         if (String.class.equals(idType)) {
             return (ColumnReader<I>) new StringColumnReader(columnName);
-        } else if (Integer.class == wrapper || Long.class == wrapper) {
-            return (ColumnReader<I>) new NumberColumnReader(columnName);
+        } else if (Integer.class == wrapper) {
+            return (ColumnReader<I>) new IntegerColumnReader(columnName);
+        } else if (Long.class == wrapper) {
+            return (ColumnReader<I>) new LongColumnReader(columnName);
         } else if (Message.class.isAssignableFrom(idType)) {
             return new MessageColumnReader(columnName, idType);
         } else {

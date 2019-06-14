@@ -33,7 +33,7 @@ import static io.spine.server.storage.jdbc.aggregate.LifecycleFlagsTable.Column.
 /**
  * The query updating {@linkplain LifecycleFlags entity lifecycle flags}.
  */
-class UpdateLifecycleFlagsQuery<I> extends IdAwareQuery<I> implements WriteQuery {
+final class UpdateLifecycleFlagsQuery<I> extends IdAwareQuery<I> implements WriteQuery {
 
     private final LifecycleFlags entityStatus;
 
@@ -44,10 +44,9 @@ class UpdateLifecycleFlagsQuery<I> extends IdAwareQuery<I> implements WriteQuery
 
     @Override
     public long execute() {
-        SQLUpdateClause query = factory().update(table())
-                                         .where(idPath().eq(getNormalizedId()))
-                                         .set(pathOf(ARCHIVED), entityStatus.getArchived())
-                                         .set(pathOf(DELETED), entityStatus.getDeleted());
+        SQLUpdateClause query = updateById()
+                .set(pathOf(ARCHIVED), entityStatus.getArchived())
+                .set(pathOf(DELETED), entityStatus.getDeleted());
         return query.execute();
     }
 
