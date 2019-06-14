@@ -5,6 +5,7 @@ before_install:
   - pip install --user codecov
 
 script:
+  - ./gradlew :rdbms:dependencies
   - ./gradlew build --stacktrace
 
   # Decrypt and unarchive Maven credentials.
