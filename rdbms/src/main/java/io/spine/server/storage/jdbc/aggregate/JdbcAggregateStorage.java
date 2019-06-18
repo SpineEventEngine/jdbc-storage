@@ -46,12 +46,11 @@ import static io.spine.server.storage.jdbc.aggregate.Closeables.closeAll;
 /**
  * The implementation of the aggregate storage based on the RDBMS.
  *
- * <p>This storage contains 3 tables by default:
- * <ul>
+ * <p>This storage contains two tables by default:
+ * <ol>
  * <li>{@link AggregateEventRecordTable}
  * <li>{@link LifecycleFlagsTable}
- * <li>{@link EventCountTable}
- * </ul>
+ * </ol>
  *
  * @param <I>
  *         the type of aggregate IDs
@@ -73,7 +72,6 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     private final Collection<DbIterator> iterators = newLinkedList();
     private final AggregateEventRecordTable<I> mainTable;
     private final LifecycleFlagsTable<I> lifecycleFlagsTable;
-    private final EventCountTable<I> eventCountTable;
 
     /**
      * Creates a new instance using the builder.
@@ -88,25 +86,13 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
         this.dataSource = builder.getDataSource();
         this.mainTable = new AggregateEventRecordTable<>(aggregateClass, dataSource, mapping);
         this.lifecycleFlagsTable = new LifecycleFlagsTable<>(aggregateClass, dataSource, mapping);
-        this.eventCountTable = new EventCountTable<>(aggregateClass, dataSource, mapping);
         mainTable.create();
         lifecycleFlagsTable.create();
-        eventCountTable.create();
     }
 
     @Override
     public Iterator<I> index() {
         return mainTable.index();
-    }
-
-    @Override
-    public int readEventCountAfterLastSnapshot(I id) {
-        checkNotClosed();
-        Integer value = eventCountTable.read(id);
-        int result = value == null
-                     ? 0
-                     : value;
-        return result;
     }
 
     @Override
@@ -117,12 +103,6 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     @Override
     public void writeLifecycleFlags(I id, LifecycleFlags status) {
         lifecycleFlagsTable.write(id, status);
-    }
-
-    @Override
-    public void writeEventCountAfterLastSnapshot(I id, int count) {
-        checkNotClosed();
-        eventCountTable.write(id, count);
     }
 
     /**
@@ -153,8 +133,8 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
             throws DatabaseException {
         checkNotNull(request);
 
-        I id = request.getRecordId();
-        int fetchSize = request.getBatchSize();
+        I id = request.recordId();
+        int fetchSize = request.batchSize();
         SelectEventRecordsById<I> query = mainTable.composeSelectQuery(id);
         DbIterator<AggregateEventRecord> historyIterator = query.execute(fetchSize);
         iterators.add(historyIterator);
