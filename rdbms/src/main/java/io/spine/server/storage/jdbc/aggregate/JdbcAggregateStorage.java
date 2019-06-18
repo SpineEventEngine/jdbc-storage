@@ -48,8 +48,8 @@ import static io.spine.server.storage.jdbc.aggregate.Closeables.closeAll;
  *
  * <p>This storage contains two tables by default:
  * <ol>
- * <li>{@link AggregateEventRecordTable}
- * <li>{@link LifecycleFlagsTable}
+ *     <li>{@link AggregateEventRecordTable}
+ *     <li>{@link LifecycleFlagsTable}
  * </ol>
  *
  * @param <I>
