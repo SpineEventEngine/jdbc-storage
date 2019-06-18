@@ -440,7 +440,7 @@ public class DataSourceConfig {
          *
          * <p>An in-use connection is never retired, only when it is closed will it is removed then.
          *
-         * <b>NOTE:</b> It is strongly recommended to set this value,
+         * <p><b>NOTE:</b> It is strongly recommended to set this value,
          * and it should be at least 30 seconds less than any database-level connection timeout.
          *
          * <p>A value of 0 indicates no maximum lifetime (infinite lifetime), subject of course to
