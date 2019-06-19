@@ -182,7 +182,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
                 .map(Identifier::pack)
                 .collect(toList());
         IdFilter idFilter = IdFilter.newBuilder()
-                                    .addAllIds(entityIds)
+                                    .addAllId(entityIds)
                                     .build();
         TargetFilters entityFilters = TargetFilters.newBuilder()
                                                    .setIdFilter(idFilter)
