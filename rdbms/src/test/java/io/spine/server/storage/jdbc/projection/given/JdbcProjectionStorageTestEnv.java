@@ -23,10 +23,6 @@ package io.spine.server.storage.jdbc.projection.given;
 import io.spine.server.storage.given.RecordStorageTestEnv;
 import io.spine.test.storage.ProjectId;
 
-/**
- * @author Alexander Litus
- * @author Dmytro Kuzmin
- */
 public class JdbcProjectionStorageTestEnv {
 
     /** Prevents instantiation of this utility class. */

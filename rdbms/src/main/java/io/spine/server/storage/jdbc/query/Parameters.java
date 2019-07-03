@@ -60,9 +60,11 @@ public final class Parameters {
     /**
      * Obtains a {@link Parameter} by the specified identifier.
      *
-     * @param identifier a parameter identifier
+     * @param identifier
+     *         a parameter identifier
      * @return the query parameter
-     * @throws IllegalArgumentException if there is no parameters with the specified identifier
+     * @throws IllegalArgumentException
+     *         if there is no parameters with the specified identifier
      */
     public Parameter getParameter(String identifier) {
         checkArgument(parameters.containsKey(identifier));
@@ -104,8 +106,10 @@ public final class Parameters {
         /**
          * Adds a parameters with the specified identifier.
          *
-         * @param identifier the identifier for a parameter
-         * @param parameter the {@link Parameter} to add
+         * @param identifier
+         *         the identifier for a parameter
+         * @param parameter
+         *         the {@link Parameter} to add
          */
         @CanIgnoreReturnValue
         public Builder addParameter(String identifier, Parameter parameter) {
@@ -118,8 +122,10 @@ public final class Parameters {
         /**
          * Adds {@linkplain Parameters parameters with identifiers} to the builder.
          *
-         * @param otherParameters the parameters to add
-         * @throws IllegalArgumentException if duplicated identifiers were found
+         * @param otherParameters
+         *         the parameters to add
+         * @throws IllegalArgumentException
+         *         if duplicated identifiers were found
          */
         @CanIgnoreReturnValue
         public Builder addParameters(Parameters otherParameters) {
@@ -129,7 +135,7 @@ public final class Parameters {
         }
 
         /**
-         * @return the assembled {@code Parameters}
+         * Returns the assembled {@code Parameters}.
          */
         public Parameters build() {
             return new Parameters(this);

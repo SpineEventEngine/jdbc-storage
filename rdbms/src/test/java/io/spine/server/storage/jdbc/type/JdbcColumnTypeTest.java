@@ -32,9 +32,6 @@ import static io.spine.testing.Tests.nullRef;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-/**
- * @author Dmytro Dashenkov
- */
 @DisplayName("JdbcColumnType should")
 class JdbcColumnTypeTest {
 

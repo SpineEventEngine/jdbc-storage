@@ -40,8 +40,10 @@ public abstract class EntityTable<I, R, W> extends AbstractTable<I, R, W> {
      *
      * <p>The table will have a name based on the FQN name of the given {@link Entity} class.
      *
-     * @param entityClass the {@link Class} of the {@link Entity} to store
-     * @param dataSource  an instance of {@link DataSourceWrapper} to use
+     * @param entityClass
+     *         the {@link Class} of the {@link Entity} to store
+     * @param dataSource
+     *         an instance of {@link DataSourceWrapper} to use
      */
     protected EntityTable(Class<? extends Entity<I, ?>> entityClass,
                           String idColumnName,
@@ -56,9 +58,12 @@ public abstract class EntityTable<I, R, W> extends AbstractTable<I, R, W> {
      * <p>The table will have a name based on the FQN name of
      * the given {@link Entity} class and the given postfix.
      *
-     * @param tableNamePostfix the postfix for the the table name
-     * @param entityClass      the {@link Class} of the {@link Entity} to store
-     * @param dataSource       an instance of {@link DataSourceWrapper} to use
+     * @param tableNamePostfix
+     *         the postfix for the the table name
+     * @param entityClass
+     *         the {@link Class} of the {@link Entity} to store
+     * @param dataSource
+     *         an instance of {@link DataSourceWrapper} to use
      */
     protected EntityTable(String tableNamePostfix,
                           Class<? extends Entity<I, ?>> entityClass,

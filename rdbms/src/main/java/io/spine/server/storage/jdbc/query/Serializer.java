@@ -41,7 +41,8 @@ public final class Serializer {
     /**
      * Serializes a message to an array of bytes.
      *
-     * @param message the message to serialize
+     * @param message
+     *         the message to serialize
      * @return a byte array
      */
     public static byte[] serialize(Message message) {

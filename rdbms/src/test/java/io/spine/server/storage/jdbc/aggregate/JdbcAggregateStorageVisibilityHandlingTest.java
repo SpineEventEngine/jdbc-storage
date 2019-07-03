@@ -38,9 +38,6 @@ import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * @author Dmytro Dashenkov
- */
 @DisplayName("JdbcAggregateStorage, when saving aggregate with lifecycle flags, should")
 class JdbcAggregateStorageVisibilityHandlingTest
         extends AggregateStorageLifecycleFlagsHandlingTest {

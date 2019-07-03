@@ -39,9 +39,6 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
-/**
- * @author Dmytro Grankin
- */
 @DisplayName("PredefinedMapping should")
 class PredefinedMappingTest {
 

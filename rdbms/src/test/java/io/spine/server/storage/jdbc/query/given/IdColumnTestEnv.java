@@ -24,10 +24,6 @@ import com.google.protobuf.StringValue;
 import io.spine.server.entity.AbstractEntity;
 import io.spine.test.entity.ProjectId;
 
-/**
- * @author Dmytro Dashenkov
- * @author Dmytro Kuzmin
- */
 public class IdColumnTestEnv {
 
     /** Prevents instantiation of this utility class. */

@@ -47,9 +47,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
-/**
- * @author Dmytro Grankin
- */
 @DisplayName("AbstractQuery should")
 class AbstractQueryTest {
 

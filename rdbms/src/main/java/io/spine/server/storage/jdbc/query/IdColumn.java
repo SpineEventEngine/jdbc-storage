@@ -36,7 +36,8 @@ import static io.spine.server.entity.model.EntityClass.asEntityClass;
 /**
  * A helper class for setting the {@link Entity} ID into {@linkplain Parameters query parameters}.
  *
- * @param <I> the type of {@link Entity} IDs
+ * @param <I>
+ *         the type of {@link Entity} IDs
  */
 @Internal
 public abstract class IdColumn<I> {
@@ -46,8 +47,10 @@ public abstract class IdColumn<I> {
     /**
      * Creates a new instance.
      *
-     * @param entityClass a class of an {@link Entity} or an {@link Aggregate}
-     * @param <I>         the type of {@link Entity} IDs
+     * @param entityClass
+     *         a class of an {@link Entity} or an {@link Aggregate}
+     * @param <I>
+     *         the type of {@link Entity} IDs
      * @return a new helper instance
      */
     @SuppressWarnings({
@@ -75,7 +78,8 @@ public abstract class IdColumn<I> {
     /**
      * Creates a {@link StringIdColumn} with the specified column name.
      *
-     * @param columnName the name of the ID column
+     * @param columnName
+     *         the name of the ID column
      * @return the {@code IdColumn}
      */
     public static IdColumn<String> typeString(String columnName) {
@@ -107,7 +111,8 @@ public abstract class IdColumn<I> {
      * <p>If an ID type is a simple type as {@code String}, {@code Integer}, etc
      * the method may return the same value.
      *
-     * @param id the identifier to normalize
+     * @param id
+     *         the identifier to normalize
      * @return the normalized ID
      */
     public abstract Object normalize(I id);
@@ -115,7 +120,8 @@ public abstract class IdColumn<I> {
     /**
      * {@linkplain #normalize(Object) Normalizes} the specified IDs.
      *
-     * @param ids the IDs to normalize
+     * @param ids
+     *         the IDs to normalize
      * @return the normalized IDs
      */
     public Collection<Object> normalize(Iterable<I> ids) {
@@ -134,9 +140,12 @@ public abstract class IdColumn<I> {
     /**
      * Sets an ID parameter to the given value.
      *
-     * @param idName     the name of the ID
-     * @param id         the ID value to set
-     * @param parameters the parameters to set the ID
+     * @param idName
+     *         the name of the ID
+     * @param id
+     *         the ID value to set
+     * @param parameters
+     *         the parameters to set the ID
      */
     public void setId(String idName, I id, Parameters.Builder parameters) {
         Object normalizedId = normalize(id);

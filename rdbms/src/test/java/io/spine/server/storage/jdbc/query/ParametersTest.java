@@ -28,9 +28,6 @@ import java.util.Set;
 import static io.spine.base.Identifier.newUuid;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-/**
- * @author Dmytro Grankin
- */
 @DisplayName("Parameters should")
 class ParametersTest {
 

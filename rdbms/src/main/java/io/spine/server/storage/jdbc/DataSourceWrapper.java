@@ -47,7 +47,8 @@ public class DataSourceWrapper implements AutoCloseable, Logging {
     /**
      * Retrieves a wrapped connection with the given auto commit mode.
      *
-     * @throws DatabaseException if an error occurs during an interaction with the DB
+     * @throws DatabaseException
+     *         if an error occurs during an interaction with the DB
      * @see Connection#setAutoCommit(boolean)
      */
     public ConnectionWrapper getConnection(boolean autoCommit) throws DatabaseException {
@@ -67,7 +68,8 @@ public class DataSourceWrapper implements AutoCloseable, Logging {
      *
      * <p>Otherwise a warning is logged.
      *
-     * @throws DatabaseException if the {@link DataSource} throws an exception
+     * @throws DatabaseException
+     *         if the {@link DataSource} throws an exception
      */
     @Override
     public void close() throws DatabaseException {

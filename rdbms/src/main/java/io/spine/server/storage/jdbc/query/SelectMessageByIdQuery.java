@@ -35,8 +35,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * A query which obtains a {@link Message} by an ID.
  *
- * @param <I> a type of storage message IDs
- * @param <M> a type of messages to read
+ * @param <I>
+ *         a type of storage message IDs
+ * @param <M>
+ *         a type of messages to read
  */
 public abstract class SelectMessageByIdQuery<I, M extends Message>
         extends IdAwareQuery<I>
@@ -56,7 +58,8 @@ public abstract class SelectMessageByIdQuery<I, M extends Message>
      * Executes a query, obtains a serialized message and deserializes it.
      *
      * @return a message or {@code null} if there is no needed data
-     * @throws DatabaseException if an error occurs during an interaction with the DB
+     * @throws DatabaseException
+     *         if an error occurs during an interaction with the DB
      * @see Serializer#deserialize
      */
     @Override
@@ -84,9 +87,11 @@ public abstract class SelectMessageByIdQuery<I, M extends Message>
      *
      * <p>The default implementation reads a message as byte array and deserializes it.
      *
-     * @param resultSet a data set with the cursor pointed to the first row
+     * @param resultSet
+     *         a data set with the cursor pointed to the first row
      * @return a message instance or {@code null} if the row does not contain the needed data
-     * @throws SQLException if an error occurs during an interaction with the DB
+     * @throws SQLException
+     *         if an error occurs during an interaction with the DB
      */
     protected @Nullable M readMessage(ResultSet resultSet) throws SQLException {
         checkNotNull(messageColumnName);

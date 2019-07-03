@@ -87,16 +87,20 @@ abstract class WriteEntityQuery<I, C extends StoreClause<C>>
      *
      * <p>After a batch was added, the clause can be used to prepare and add the next batch.
      *
-     * @param clause the clause to add a batch for
+     * @param clause
+     *         the clause to add a batch for
      */
     protected abstract void addBatch(C clause);
 
     /**
      * Sets an ID value to the specified {@linkplain StoreClause clause}.
      *
-     * @param clause       the clause to set ID
-     * @param idColumn     the {@link IdColumn} representing the ID
-     * @param normalizedId the {@linkplain IdColumn#normalize(Object) ID value} to set
+     * @param clause
+     *         the clause to set ID
+     * @param idColumn
+     *         the {@link IdColumn} representing the ID
+     * @param normalizedId
+     *         the {@linkplain IdColumn#normalize(Object) ID value} to set
      */
     protected abstract void setIdValue(C clause, IdColumn<I> idColumn, Object normalizedId);
 
@@ -121,7 +125,8 @@ abstract class WriteEntityQuery<I, C extends StoreClause<C>>
      * Creates {@link Parameters} from
      * {@linkplain EntityRecordWithColumns#hasColumns() entity columns}.
      *
-     * @param record the record to extract entity column values
+     * @param record
+     *         the record to extract entity column values
      * @return query parameters from entity columns
      */
     private Parameters createParametersFromColumns(EntityRecordWithColumns record) {

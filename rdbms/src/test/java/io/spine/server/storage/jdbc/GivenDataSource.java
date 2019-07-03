@@ -28,11 +28,6 @@ import javax.sql.DataSource;
 import static io.spine.base.Identifier.newUuid;
 import static org.mockito.Mockito.mock;
 
-/**
- * @author Alexander Litus
- * @author Dmytro Dashenkov
- * @author Dmytro Grankin
- */
 public class GivenDataSource {
 
     /**

@@ -55,7 +55,8 @@ public class ConnectionWrapper implements AutoCloseable {
     /**
      * Wraps {@link Connection#prepareStatement(String)} method.
      *
-     * @throws DatabaseException if SQLException occurs
+     * @throws DatabaseException
+     *         if SQLException occurs
      */
     public PreparedStatement prepareStatement(String sql) {
         try {
@@ -71,7 +72,8 @@ public class ConnectionWrapper implements AutoCloseable {
     /**
      * Wraps {@link Connection#commit()} method.
      *
-     * @throws DatabaseException if SQLException occurs
+     * @throws DatabaseException
+     *         if SQLException occurs
      */
     public void commit() {
         try {
@@ -84,7 +86,8 @@ public class ConnectionWrapper implements AutoCloseable {
     /**
      * Wraps {@link Connection#rollback()} method.
      *
-     * @throws DatabaseException if SQLException occurs
+     * @throws DatabaseException
+     *         if SQLException occurs
      */
     public void rollback() {
         try {
@@ -97,7 +100,8 @@ public class ConnectionWrapper implements AutoCloseable {
     /**
      * Wraps {@link Connection#close()} method.
      *
-     * @throws DatabaseException if SQLException occurs
+     * @throws DatabaseException
+     *         if SQLException occurs
      */
     @Override
     public void close() {
