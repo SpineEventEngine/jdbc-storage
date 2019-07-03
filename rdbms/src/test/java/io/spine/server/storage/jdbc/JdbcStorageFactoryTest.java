@@ -23,7 +23,6 @@ package io.spine.server.storage.jdbc;
 import io.spine.server.aggregate.AggregateStorage;
 import io.spine.server.projection.ProjectionStorage;
 import io.spine.server.storage.RecordStorage;
-import io.spine.server.storage.StorageFactory;
 import io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.TestAggregate;
 import io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.TestEntity;
 import io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.TestProjection;
@@ -35,11 +34,12 @@ import javax.sql.DataSource;
 
 import static io.spine.base.Identifier.newUuid;
 import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
+import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.multitenantSpec;
 import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.newFactory;
+import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.singletenantSpec;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -51,10 +51,11 @@ class JdbcStorageFactoryTest {
     @Test
     @DisplayName("allow to use custom data source")
     void allowCustomDataSource() {
-        JdbcStorageFactory factory = JdbcStorageFactory.newBuilder()
-                                                       .setDataSource(mock(DataSource.class))
-                                                       .setTypeMapping(MYSQL_5_7)
-                                                       .build();
+        JdbcStorageFactory factory = JdbcStorageFactory
+                .newBuilder()
+                .setDataSource(mock(DataSource.class))
+                .setTypeMapping(MYSQL_5_7)
+                .build();
 
         assertNotNull(factory);
     }
@@ -66,16 +67,18 @@ class JdbcStorageFactoryTest {
         @Test
         @DisplayName("which is multitenant")
         void multitenant() {
-            JdbcStorageFactory factory = newFactory(true);
-            RecordStorage<String> storage = factory.createRecordStorage(TestEntity.class);
+            JdbcStorageFactory factory = newFactory();
+            RecordStorage<String> storage =
+                    factory.createRecordStorage(multitenantSpec(), TestEntity.class);
             assertTrue(storage.isMultitenant());
         }
 
         @Test
         @DisplayName("which is single tenant")
         void singleTenant() {
-            JdbcStorageFactory factory = newFactory(false);
-            RecordStorage<String> storage = factory.createRecordStorage(TestEntity.class);
+            JdbcStorageFactory factory = newFactory();
+            RecordStorage<String> storage =
+                    factory.createRecordStorage(singletenantSpec(), TestEntity.class);
             assertFalse(storage.isMultitenant());
         }
     }
@@ -87,18 +90,18 @@ class JdbcStorageFactoryTest {
         @Test
         @DisplayName("which is multitenant")
         void multitenant() {
-            JdbcStorageFactory factory = newFactory(true);
+            JdbcStorageFactory factory = newFactory();
             AggregateStorage<String> storage =
-                    factory.createAggregateStorage(TestAggregate.class);
+                    factory.createAggregateStorage(multitenantSpec(), TestAggregate.class);
             assertTrue(storage.isMultitenant());
         }
 
         @Test
         @DisplayName("which is single tenant")
         void singleTenant() {
-            JdbcStorageFactory factory = newFactory(false);
+            JdbcStorageFactory factory = newFactory();
             AggregateStorage<String> storage =
-                    factory.createAggregateStorage(TestAggregate.class);
+                    factory.createAggregateStorage(singletenantSpec(), TestAggregate.class);
             assertFalse(storage.isMultitenant());
         }
     }
@@ -110,18 +113,18 @@ class JdbcStorageFactoryTest {
         @Test
         @DisplayName("which is multitenant")
         void multitenant() {
-            JdbcStorageFactory factory = newFactory(true);
+            JdbcStorageFactory factory = newFactory();
             ProjectionStorage<String> storage =
-                    factory.createProjectionStorage(TestProjection.class);
+                    factory.createProjectionStorage(multitenantSpec(), TestProjection.class);
             assertTrue(storage.isMultitenant());
         }
 
         @Test
         @DisplayName("which is single tenant")
         void singleTenant() {
-            JdbcStorageFactory factory = newFactory(false);
+            JdbcStorageFactory factory = newFactory();
             ProjectionStorage<String> storage =
-                    factory.createProjectionStorage(TestProjection.class);
+                    factory.createProjectionStorage(singletenantSpec(), TestProjection.class);
             assertFalse(storage.isMultitenant());
         }
     }
@@ -130,49 +133,23 @@ class JdbcStorageFactoryTest {
     @DisplayName("close datastore on close")
     void closeDatastoreOnClose() {
         DataSourceWrapper mock = GivenDataSource.withoutSuperpowers();
-        JdbcStorageFactory factory = JdbcStorageFactory.newBuilder()
-                                                       .setDataSource(mock)
-                                                       .setMultitenant(false)
-                                                       .setTypeMapping(MYSQL_5_7)
-                                                       .build();
+        JdbcStorageFactory factory = JdbcStorageFactory
+                .newBuilder()
+                .setDataSource(mock)
+                .setTypeMapping(MYSQL_5_7)
+                .build();
         factory.close();
         verify(mock).close();
-    }
-
-    @Test
-    @DisplayName("generate single tenant view")
-    void generateSingleTenantView() {
-        DataSourceWrapper dataSource = GivenDataSource.withoutSuperpowers();
-        JdbcStorageFactory factory = JdbcStorageFactory.newBuilder()
-                                                       .setMultitenant(true)
-                                                       .setDataSource(dataSource)
-                                                       .setTypeMapping(MYSQL_5_7)
-                                                       .build();
-        assertTrue(factory.isMultitenant());
-        StorageFactory singleTenantFactory = factory.toSingleTenant();
-        assertFalse(singleTenantFactory.isMultitenant());
-    }
-
-    @Test
-    @DisplayName("use self as single tenant view")
-    void useSelfAsSingleTenantView() {
-        DataSourceWrapper dataSource = GivenDataSource.withoutSuperpowers();
-        JdbcStorageFactory factory = JdbcStorageFactory.newBuilder()
-                                                       .setMultitenant(false)
-                                                       .setDataSource(dataSource)
-                                                       .setTypeMapping(MYSQL_5_7)
-                                                       .build();
-        assertSame(factory, factory.toSingleTenant());
     }
 
     @Test
     @DisplayName("use MySQL mapping by default")
     void useMySqlMappingByDefault() {
         DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(newUuid());
-        JdbcStorageFactory factory = JdbcStorageFactory.newBuilder()
-                                                       .setMultitenant(false)
-                                                       .setDataSource(dataSource)
-                                                       .build();
+        JdbcStorageFactory factory = JdbcStorageFactory
+                .newBuilder()
+                .setDataSource(dataSource)
+                .build();
         assertEquals(MYSQL_5_7, factory.getTypeMapping());
     }
 }

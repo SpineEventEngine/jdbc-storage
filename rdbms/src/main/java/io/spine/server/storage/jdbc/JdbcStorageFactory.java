@@ -23,7 +23,7 @@ package io.spine.server.storage.jdbc;
 import com.google.common.annotations.VisibleForTesting;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import io.spine.core.BoundedContextName;
+import io.spine.server.ContextSpec;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateStorage;
 import io.spine.server.entity.Entity;
@@ -50,46 +50,22 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class JdbcStorageFactory implements StorageFactory {
 
     private final DataSourceWrapper dataSource;
-    private final boolean multitenant;
     private final ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> columnTypeRegistry;
     private final TypeMapping typeMapping;
 
     private JdbcStorageFactory(Builder builder) {
         this.dataSource = checkNotNull(builder.dataSource);
-        this.multitenant = builder.multitenant;
         this.columnTypeRegistry = builder.columnTypeRegistry;
         this.typeMapping = checkNotNull(builder.typeMapping);
     }
 
     @Override
-    public StorageFactory toSingleTenant() {
-        return isMultitenant()
-               ? copyFor(BoundedContextName.getDefaultInstance(), false)
-               : this;
-    }
-
-    @Override
-    public StorageFactory copyFor(BoundedContextName name, boolean multitenant) {
-        JdbcStorageFactory copy = newBuilder().setColumnTypeRegistry(columnTypeRegistry)
-                                              .setDataSource(dataSource)
-                                              .setTypeMapping(typeMapping)
-                                              .setMultitenant(multitenant)
-                                              .build();
-        return copy;
-    }
-
-    @Override
-    public boolean isMultitenant() {
-        return multitenant;
-    }
-
-    @Override
     public <I> AggregateStorage<I> createAggregateStorage(
-            Class<? extends Aggregate<I, ?, ?>> aggregateClass) {
+            ContextSpec context, Class<? extends Aggregate<I, ?, ?>> aggregateClass) {
         JdbcAggregateStorage<I> storage =
                 JdbcAggregateStorage.<I>newBuilder()
                         .setAggregateClass(aggregateClass)
-                        .setMultitenant(multitenant)
+                        .setMultitenant(context.isMultitenant())
                         .setDataSource(dataSource)
                         .setTypeMapping(typeMapping)
                         .build();
@@ -97,11 +73,12 @@ public class JdbcStorageFactory implements StorageFactory {
     }
 
     @Override
-    public <I> JdbcRecordStorage<I> createRecordStorage(Class<? extends Entity<I, ?>> entityClass) {
+    public <I> JdbcRecordStorage<I> createRecordStorage(
+            ContextSpec context, Class<? extends Entity<I, ?>> entityClass) {
         JdbcRecordStorage<I> recordStorage =
                 JdbcRecordStorage.<I>newBuilder()
-                        .setMultitenant(multitenant)
                         .setEntityClass(entityClass)
+                        .setMultitenant(context.isMultitenant())
                         .setDataSource(dataSource)
                         .setColumnTypeRegistry(columnTypeRegistry)
                         .setTypeMapping(typeMapping)
@@ -111,10 +88,10 @@ public class JdbcStorageFactory implements StorageFactory {
 
     @Override
     public <I> ProjectionStorage<I> createProjectionStorage(
-            Class<? extends Projection<I, ?, ?>> projectionClass) {
-        JdbcRecordStorage<I> entityStorage = createRecordStorage(projectionClass);
+            ContextSpec context, Class<? extends Projection<I, ?, ?>> projectionClass) {
+        JdbcRecordStorage<I> entityStorage = createRecordStorage(context, projectionClass);
         ProjectionStorage<I> storage = JdbcProjectionStorage.<I>newBuilder()
-                .setMultitenant(multitenant)
+                .setMultitenant(context.isMultitenant())
                 .setDataSource(dataSource)
                 .setRecordStorage(entityStorage)
                 .setProjectionClass(projectionClass)
@@ -146,7 +123,6 @@ public class JdbcStorageFactory implements StorageFactory {
     public static class Builder {
 
         private DataSourceWrapper dataSource;
-        private boolean multitenant;
         private ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> columnTypeRegistry;
         private TypeMapping typeMapping;
 
@@ -171,14 +147,6 @@ public class JdbcStorageFactory implements StorageFactory {
                 ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>>
                         columnTypeRegistry) {
             this.columnTypeRegistry = columnTypeRegistry;
-            return this;
-        }
-
-        /**
-         * Sets optional field {@code isMultitenant}. {@code false} is used by default.
-         */
-        public Builder setMultitenant(boolean multitenant) {
-            this.multitenant = multitenant;
             return this;
         }
 
@@ -235,7 +203,7 @@ public class JdbcStorageFactory implements StorageFactory {
         }
 
         /**
-         * @return new instance of {@code JdbcStorageFactory}
+         * Returns a new instance of {@code JdbcStorageFactory}.
          */
         public JdbcStorageFactory build() {
             if (columnTypeRegistry == null) {

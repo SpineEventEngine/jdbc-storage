@@ -43,7 +43,8 @@ class TableNames {
      * <p>A package name should be compacted, because a
      * {@linkplain DatabaseMetaData#getMaxTableNameLength() length} of the table has restrictions.
      *
-     * @param cls a class of an {@linkplain Entity}
+     * @param cls
+     *         a class of an {@linkplain Entity}
      * @return a table name from the class
      */
     static String newTableName(Class<? extends Entity<?, ?>> cls) {
