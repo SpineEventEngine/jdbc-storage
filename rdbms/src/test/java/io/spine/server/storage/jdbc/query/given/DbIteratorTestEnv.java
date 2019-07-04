@@ -34,10 +34,6 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/**
- * @author Dmytro Dashenkov
- * @author Dmytro Kuzmin
- */
 public class DbIteratorTestEnv {
 
     private static final byte[] EMPTY_BYTES = new byte[0];

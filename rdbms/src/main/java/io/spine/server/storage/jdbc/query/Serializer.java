@@ -41,7 +41,8 @@ public final class Serializer {
     /**
      * Serializes a message to an array of bytes.
      *
-     * @param message the message to serialize
+     * @param message
+     *         the message to serialize
      * @return a byte array
      */
     public static byte[] serialize(Message message) {
@@ -55,8 +56,10 @@ public final class Serializer {
     /**
      * Deserializes a {@link Message}.
      *
-     * @param bytes             the serialized message
-     * @param messageDescriptor the descriptor of a message
+     * @param bytes
+     *         the serialized message
+     * @param messageDescriptor
+     *         the descriptor of a message
      * @return a message instance
      */
     static Message deserialize(byte[] bytes, Descriptor messageDescriptor) {

@@ -82,8 +82,10 @@ public class TypeMappingBuilder {
      *
      * <p>Overrides the name of the type if it is already specified.
      *
-     * @param type the type for the mapping
-     * @param name the custom name for the type
+     * @param type
+     *         the type for the mapping
+     * @param name
+     *         the custom name for the type
      * @return the builder instance
      */
     public TypeMappingBuilder add(Type type, String name) {
@@ -96,7 +98,8 @@ public class TypeMappingBuilder {
      * Creates {@link TypeMapping} from the builder.
      *
      * @return a new type mapping
-     * @throws IllegalStateException if not all the {@linkplain Type types} were mapped
+     * @throws IllegalStateException
+     *         if not all the {@linkplain Type types} were mapped
      */
     public TypeMapping build() {
         int typesCount = Type.values().length;

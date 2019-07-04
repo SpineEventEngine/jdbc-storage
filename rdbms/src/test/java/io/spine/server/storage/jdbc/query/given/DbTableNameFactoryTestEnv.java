@@ -23,10 +23,6 @@ package io.spine.server.storage.jdbc.query.given;
 import com.google.protobuf.StringValue;
 import io.spine.server.entity.AbstractEntity;
 
-/**
- * @author Alexander Litus
- * @author Dmytro Kuzmin
- */
 public class DbTableNameFactoryTestEnv {
 
     /** Prevents instantiation of this utility class. */

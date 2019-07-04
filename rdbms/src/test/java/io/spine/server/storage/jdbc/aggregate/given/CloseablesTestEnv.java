@@ -22,10 +22,6 @@ package io.spine.server.storage.jdbc.aggregate.given;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-/**
- * @author Dmytro Dashenkov
- * @author Dmytro Kuzmin
- */
 public class CloseablesTestEnv {
 
     /** Prevents instantiation of this utility class. */

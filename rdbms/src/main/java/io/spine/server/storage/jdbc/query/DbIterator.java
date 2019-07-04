@@ -157,7 +157,8 @@ public abstract class DbIterator<R> implements Iterator<R>, Closeable {
     /**
      * Removal is unsupported.
      *
-     * @throws UnsupportedOperationException always
+     * @throws UnsupportedOperationException
+     *         always
      * @deprecated as unsupported
      */
     @Override
@@ -171,7 +172,8 @@ public abstract class DbIterator<R> implements Iterator<R>, Closeable {
      *
      * <p>This method should be called either manually or called by {@link #hasNext()}.
      *
-     * @throws DatabaseException if {@code SQLException} is occurred
+     * @throws DatabaseException
+     *         if {@code SQLException} occurred
      */
     @Override
     public void close() throws DatabaseException {

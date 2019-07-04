@@ -31,6 +31,6 @@ public class JdbcAggregateStorageTruncationTest extends AggregateStorageTruncati
 
     @Override
     protected StorageFactory storageFactory() {
-        return newFactory(false);
+        return newFactory();
     }
 }

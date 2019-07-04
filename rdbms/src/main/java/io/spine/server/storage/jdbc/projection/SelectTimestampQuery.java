@@ -54,10 +54,11 @@ final class SelectTimestampQuery extends SelectMessageByIdQuery<String, Timestam
     protected @Nullable Timestamp readMessage(ResultSet resultSet) throws SQLException {
         long seconds = resultSet.getLong(Column.SECONDS.name());
         int nanos = resultSet.getInt(Column.NANOS.name());
-        Timestamp time = Timestamp.newBuilder()
-                                  .setSeconds(seconds)
-                                  .setNanos(nanos)
-                                  .build();
+        Timestamp time = Timestamp
+                .newBuilder()
+                .setSeconds(seconds)
+                .setNanos(nanos)
+                .build();
         if (isDefault(time)) {
             return null;
         }

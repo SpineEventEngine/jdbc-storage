@@ -64,7 +64,8 @@ public enum PredefinedMapping implements TypeMapping {
      * <p>The {@linkplain DatabaseMetaData#getDatabaseProductName() database product name} and
      * the version are taken into account during the selection.
      *
-     * @param dataSource the data source to test suitability
+     * @param dataSource
+     *         the data source to test suitability
      * @return the type mapping for the used database or {@linkplain PredefinedMapping#MYSQL_5_7
      *         mapping for MySQL 5.7} if there is no standard mapping for the database
      */

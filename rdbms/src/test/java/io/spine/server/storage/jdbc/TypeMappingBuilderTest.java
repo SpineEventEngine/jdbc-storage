@@ -28,9 +28,6 @@ import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-/**
- * @author Dmytro Grankin
- */
 @DisplayName("TypeMappingBuilder should")
 class TypeMappingBuilderTest {
 

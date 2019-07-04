@@ -38,7 +38,8 @@ public final class Parameter {
     /**
      * Creates a parameter using the specified parameters.
      *
-     * @param value the parameter value
+     * @param value
+     *         the parameter value
      * @return a new {@code Parameter} instance
      */
     public static Parameter of(@Nullable Object value) {

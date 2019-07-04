@@ -42,9 +42,10 @@ class Closeables {
      * <p>The very first {@linkplain Exception} caught will be propagated in
      * an {@link IllegalStateException}.
      *
-     * @param closeables instances to close
-     * @throws IllegalStateException if {@linkplain AutoCloseable#close() close()} throws
-     *                               an {@link Exception}
+     * @param closeables
+     *         instances to close
+     * @throws IllegalStateException
+     *         if {@linkplain AutoCloseable#close() close()} throws an {@link Exception}
      */
     static void closeAll(Iterable<? extends AutoCloseable> closeables) {
         checkNotNull(closeables);

@@ -28,9 +28,6 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * @author Dmytro Dashenkov
- */
 @DisplayName("MultipleExceptionsOnClose should")
 class MultipleExceptionsOnCloseTest {
 

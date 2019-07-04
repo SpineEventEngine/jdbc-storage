@@ -147,7 +147,8 @@ public abstract class AbstractQuery implements StorageQuery {
      * {@link java.sql.ResultSet#HOLD_CURSORS_OVER_COMMIT HOLD_CURSORS_OVER_COMMIT} option is used
      * for the underlying {@linkplain Connection#setHoldability(int) connection}.
      *
-     * @param dataSource the data source to produce connections
+     * @param dataSource
+     *         the data source to produce connections
      * @return the query factory
      */
     @VisibleForTesting
@@ -172,7 +173,8 @@ public abstract class AbstractQuery implements StorageQuery {
     /**
      * Obtains {@linkplain SQLTemplates templates} for the JDBC dialect.
      *
-     * @param dataSource the data source to get {@linkplain java.sql.DatabaseMetaData DB metadata}
+     * @param dataSource
+     *         the data source to get {@linkplain java.sql.DatabaseMetaData DB metadata}
      * @return templates for a particular JDBC implementation
      */
     private static SQLTemplates getDialectTemplates(DataSourceWrapper dataSource) {
@@ -222,7 +224,8 @@ public abstract class AbstractQuery implements StorageQuery {
          *
          * <p>Override this method to modify these preconditions.
          *
-         * @throws IllegalStateException upon a precondition violation
+         * @throws IllegalStateException
+         *         upon a precondition violation
          */
         protected void checkPreconditions() throws IllegalStateException {
             checkState(dataSource != null, "Data source must not be null");
@@ -241,7 +244,8 @@ public abstract class AbstractQuery implements StorageQuery {
         /**
          * Sets the {@linkplain DataSourceWrapper data source} to be used for query execution.
          *
-         * @param dataSource the data source to use
+         * @param dataSource
+         *         the data source to use
          */
         public B setDataSource(DataSourceWrapper dataSource) {
             this.dataSource = checkNotNull(dataSource);
@@ -251,7 +255,8 @@ public abstract class AbstractQuery implements StorageQuery {
         /**
          * Sets the table name to use as a target for the query.
          *
-         * @param tableName the table name for the query
+         * @param tableName
+         *         the table name for the query
          */
         public B setTableName(String tableName) {
             checkArgument(!isNullOrEmpty(tableName));

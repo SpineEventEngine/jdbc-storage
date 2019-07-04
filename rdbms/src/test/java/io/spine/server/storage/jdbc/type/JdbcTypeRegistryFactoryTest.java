@@ -32,9 +32,6 @@ import static io.spine.testing.Tests.assertHasPrivateParameterlessCtor;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-/**
- * @author Dmytro Dashenkov
- */
 @DisplayName("JdbcTypeRegistryFactory should")
 class JdbcTypeRegistryFactoryTest {
 

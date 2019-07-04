@@ -21,6 +21,7 @@
 package io.spine.server.storage.jdbc.given;
 
 import com.google.protobuf.StringValue;
+import io.spine.server.ContextSpec;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.entity.AbstractEntity;
 import io.spine.server.projection.Projection;
@@ -45,12 +46,19 @@ public class JdbcStorageFactoryTestEnv {
             .setMaxPoolSize(30)
             .build();
 
-    public static JdbcStorageFactory newFactory(boolean multitenant) {
+    public static JdbcStorageFactory newFactory() {
         return JdbcStorageFactory.newBuilder()
                                  .setDataSource(CONFIG)
-                                 .setMultitenant(multitenant)
                                  .setTypeMapping(MYSQL_5_7)
                                  .build();
+    }
+
+    public static ContextSpec multitenantSpec() {
+        return ContextSpec.multitenant(JdbcStorageFactoryTestEnv.class.getName());
+    }
+
+    public static ContextSpec singletenantSpec() {
+        return ContextSpec.singleTenant(JdbcStorageFactoryTestEnv.class.getName());
     }
 
     public static class TestEntity extends AbstractEntity<String, StringValue> {
