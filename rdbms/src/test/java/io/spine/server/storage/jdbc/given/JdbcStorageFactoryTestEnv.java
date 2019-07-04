@@ -21,6 +21,7 @@
 package io.spine.server.storage.jdbc.given;
 
 import com.google.protobuf.StringValue;
+import io.spine.core.TenantId;
 import io.spine.server.ContextSpec;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.entity.AbstractEntity;
@@ -28,6 +29,9 @@ import io.spine.server.projection.Projection;
 import io.spine.server.storage.jdbc.DataSourceConfig;
 import io.spine.server.storage.jdbc.JdbcStorageFactory;
 import io.spine.test.storage.Project;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static io.spine.server.storage.jdbc.GivenDataSource.prefix;
 import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
@@ -49,6 +53,15 @@ public class JdbcStorageFactoryTestEnv {
     public static JdbcStorageFactory newFactory() {
         return JdbcStorageFactory.newBuilder()
                                  .setDataSource(CONFIG)
+                                 .setTypeMapping(MYSQL_5_7)
+                                 .build();
+    }
+
+    public static JdbcStorageFactory newMultiSourceFactory() {
+        Map<TenantId, DataSourceConfig> dataSources = new HashMap<>();
+        dataSources.put(TenantId.getDefaultInstance(), CONFIG);
+        return JdbcStorageFactory.newBuilder()
+                                 .setDataSourcePerTenant(dataSources)
                                  .setTypeMapping(MYSQL_5_7)
                                  .build();
     }

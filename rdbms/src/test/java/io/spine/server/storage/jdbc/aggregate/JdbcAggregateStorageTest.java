@@ -26,7 +26,7 @@ import io.spine.server.aggregate.AggregateReadRequest;
 import io.spine.server.aggregate.AggregateStorage;
 import io.spine.server.aggregate.AggregateStorageTest;
 import io.spine.server.entity.Entity;
-import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.DataSourceSupplier;
 import io.spine.server.storage.jdbc.query.DbIterator;
 import io.spine.test.aggregate.ProjectId;
 import org.junit.jupiter.api.BeforeEach;
@@ -111,10 +111,10 @@ class JdbcAggregateStorageTest extends AggregateStorageTest {
     protected <I> JdbcAggregateStorage<I> newStorage(
             Class<? extends I> idClass,
             Class<? extends Aggregate<I, ?, ?>> aggregateClass) {
-        DataSourceWrapper dataSource = whichIsStoredInMemory("aggregateStorageTests");
+        DataSourceSupplier dataSource = whichIsStoredInMemory("aggregateStorageTests");
         JdbcAggregateStorage.Builder<I> builder = JdbcAggregateStorage.newBuilder();
         JdbcAggregateStorage<I> storage = builder.setMultitenant(false)
-                                                 .setDataSource(dataSource)
+                                                 .setDataSourceSupplier(dataSource)
                                                  .setAggregateClass(aggregateClass)
                                                  .setTypeMapping(MYSQL_5_7)
                                                  .build();

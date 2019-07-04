@@ -24,7 +24,7 @@ import com.google.protobuf.Descriptors;
 import com.google.protobuf.Message;
 import com.google.protobuf.StringValue;
 import com.querydsl.sql.SQLQuery;
-import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.DataSourceSupplier;
 import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.query.given.Given.ASelectMessageByIdQuery;
 import org.junit.jupiter.api.DisplayName;
@@ -58,7 +58,7 @@ class SelectMessageByIdQueryTest {
 
         doReturn(resultSet).when(underlyingQuery)
                            .getResults();
-        DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
+        DataSourceSupplier dataSource = whichIsStoredInMemory(newUuid());
         ASelectMessageByIdQuery query = builder.setTableName(newUuid())
                                                .setQuery(underlyingQuery)
                                                .setDataSource(dataSource)
@@ -79,7 +79,7 @@ class SelectMessageByIdQueryTest {
                            .getResults();
         doThrow(SQLException.class).when(resultSet)
                                    .next();
-        DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
+        DataSourceSupplier dataSource = whichIsStoredInMemory(newUuid());
         ASelectMessageByIdQuery query = builder.setTableName(newUuid())
                                                .setQuery(underlyingQuery)
                                                .setDataSource(dataSource)
@@ -94,7 +94,7 @@ class SelectMessageByIdQueryTest {
     @DisplayName("return null on deserialization if column is null")
     void returnNullForNullColumn() throws SQLException {
         ResultSet resultSet = mock(ResultSet.class);
-        DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
+        DataSourceSupplier dataSource = whichIsStoredInMemory(newUuid());
         Descriptors.Descriptor messageDescriptor = StringValue.getDescriptor();
         ASelectMessageByIdQuery query = builder.setTableName(newUuid())
                                                .setMessageColumnName(newUuid())

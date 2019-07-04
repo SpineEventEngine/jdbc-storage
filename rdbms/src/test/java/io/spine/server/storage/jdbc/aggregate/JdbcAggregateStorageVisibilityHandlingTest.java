@@ -24,7 +24,7 @@ import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateStorage;
 import io.spine.server.aggregate.AggregateStorageLifecycleFlagsHandlingTest;
 import io.spine.server.entity.LifecycleFlags;
-import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.DataSourceSupplier;
 import io.spine.server.storage.jdbc.GivenDataSource;
 import io.spine.server.storage.jdbc.aggregate.given.JdbcAggregateStorageVisibilityHandlingTestEnv.TestAggregate;
 import io.spine.test.aggregate.ProjectId;
@@ -45,13 +45,13 @@ class JdbcAggregateStorageVisibilityHandlingTest
     @Override
     protected AggregateStorage<ProjectId> getAggregateStorage(
             Class<? extends Aggregate<ProjectId, ?, ?>> aggregateClass) {
-        DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(
+        DataSourceSupplier dataSource = GivenDataSource.whichIsStoredInMemory(
                 "aggregateStorageStatusHandlingTests");
         JdbcAggregateStorage<ProjectId> storage =
                 JdbcAggregateStorage.<ProjectId>newBuilder()
                         .setMultitenant(false)
                         .setAggregateClass(TestAggregate.class)
-                        .setDataSource(dataSource)
+                        .setDataSourceSupplier(dataSource)
                         .setTypeMapping(MYSQL_5_7)
                         .build();
         return storage;

@@ -36,7 +36,7 @@ import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.RecordStorage;
 import io.spine.server.storage.RecordStorageTest;
 import io.spine.server.storage.given.RecordStorageTestEnv.TestCounterEntity;
-import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.DataSourceSupplier;
 import io.spine.server.storage.jdbc.GivenDataSource;
 import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.record.given.JdbcRecordStorageTestEnv.TestCounterEntityJdbc;
@@ -167,13 +167,13 @@ class JdbcRecordStorageTest extends RecordStorageTest<JdbcRecordStorage<ProjectI
 
     @Override
     protected JdbcRecordStorage<ProjectId> newStorage(Class<? extends Entity<?, ?>> cls) {
-        DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory("entityStorageTests");
+        DataSourceSupplier dataSource = GivenDataSource.whichIsStoredInMemory("entityStorageTests");
         @SuppressWarnings("unchecked") // Test invariant.
                 Class<? extends Entity<ProjectId, ?>> entityClass =
                 (Class<? extends Entity<ProjectId, ?>>) cls;
         JdbcRecordStorage<ProjectId> storage =
                 JdbcRecordStorage.<ProjectId>newBuilder()
-                        .setDataSource(dataSource)
+                        .setDataSourceSupplier(dataSource)
                         .setEntityClass(entityClass)
                         .setMultitenant(false)
                         .setColumnTypeRegistry(JdbcTypeRegistryFactory.defaultInstance())

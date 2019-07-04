@@ -21,8 +21,10 @@
 package io.spine.server.storage.jdbc;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Maps;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import io.spine.core.TenantId;
 import io.spine.server.ContextSpec;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateStorage;
@@ -36,9 +38,14 @@ import io.spine.server.storage.jdbc.projection.JdbcProjectionStorage;
 import io.spine.server.storage.jdbc.record.JdbcRecordStorage;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
+import org.junit.jupiter.api.Disabled;
 
+import javax.annotation.Nullable;
 import javax.sql.DataSource;
+import java.util.HashMap;
+import java.util.Map;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -47,14 +54,28 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @see DataSourceConfig
  * @see JdbcTypeRegistryFactory
  */
+@Disabled
 public class JdbcStorageFactory implements StorageFactory {
 
+    // todo need to change this API
+    private static final String TENANCY_TYPES_MIXED =
+            "Use either `setDataSourcePerTenant` for multitenant environment or " +
+            "`setDataSource` for the single tenant one";
+
+    @Nullable
     private final DataSourceWrapper dataSource;
+
+    @Nullable
+    private final Map<TenantId, DataSourceWrapper> dataSourcePerTenant;
+
+    private final Map<ContextSpec, DataSourceSupplier> supplierPerContext =
+            Maps.newConcurrentMap();
     private final ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> columnTypeRegistry;
     private final TypeMapping typeMapping;
 
     private JdbcStorageFactory(Builder builder) {
-        this.dataSource = checkNotNull(builder.dataSource);
+        this.dataSource = builder.dataSource;
+        this.dataSourcePerTenant = builder.dataSourcePerTenant;
         this.columnTypeRegistry = builder.columnTypeRegistry;
         this.typeMapping = checkNotNull(builder.typeMapping);
     }
@@ -66,7 +87,7 @@ public class JdbcStorageFactory implements StorageFactory {
                 JdbcAggregateStorage.<I>newBuilder()
                         .setAggregateClass(aggregateClass)
                         .setMultitenant(context.isMultitenant())
-                        .setDataSource(dataSource)
+                        .setDataSourceSupplier(dataSourceSupplierFor(context))
                         .setTypeMapping(typeMapping)
                         .build();
         return storage;
@@ -79,7 +100,7 @@ public class JdbcStorageFactory implements StorageFactory {
                 JdbcRecordStorage.<I>newBuilder()
                         .setEntityClass(entityClass)
                         .setMultitenant(context.isMultitenant())
-                        .setDataSource(dataSource)
+                        .setDataSourceSupplier(dataSourceSupplierFor(context))
                         .setColumnTypeRegistry(columnTypeRegistry)
                         .setTypeMapping(typeMapping)
                         .build();
@@ -92,7 +113,7 @@ public class JdbcStorageFactory implements StorageFactory {
         JdbcRecordStorage<I> entityStorage = createRecordStorage(context, projectionClass);
         ProjectionStorage<I> storage = JdbcProjectionStorage.<I>newBuilder()
                 .setMultitenant(context.isMultitenant())
-                .setDataSource(dataSource)
+                .setDataSourceSupplier(dataSourceSupplierFor(context))
                 .setRecordStorage(entityStorage)
                 .setProjectionClass(projectionClass)
                 .setTypeMapping(typeMapping)
@@ -105,7 +126,7 @@ public class JdbcStorageFactory implements StorageFactory {
      */
     @Override
     public void close() {
-        dataSource.close();
+        supplierPerContext.values().forEach(DataSourceSupplier::closeAll);
     }
 
     @VisibleForTesting
@@ -113,16 +134,38 @@ public class JdbcStorageFactory implements StorageFactory {
         return typeMapping;
     }
 
-    public static Builder newBuilder() {
-        return new Builder();
-    }
-
     /**
      * Builds instances of {@code JdbcStorageFactory}.
      */
+    private DataSourceSupplier dataSourceSupplierFor(ContextSpec context) {
+        if (!supplierPerContext.containsKey(context)) {
+            DataSourceSupplier supplier = createDataSourceSupplier(context);
+            supplierPerContext.put(context, supplier);
+        }
+        return supplierPerContext.get(context);
+    }
+
+    private DataSourceSupplier createDataSourceSupplier(ContextSpec context) {
+        if (context.isMultitenant()) {
+            checkNotNull(dataSourcePerTenant);
+            return new MultitenantDataSourceSupplier(dataSourcePerTenant);
+        }
+        // todo if we make user specify multiple data sources we somehow need to accept the default
+        //  one for single tenant contexts.
+        checkNotNull(dataSource);
+        return new SingleTenantDataSourceSupplier(dataSource);
+    }
+
+    public static Builder newBuilder() {
+        return new Builder();
+    }
     public static class Builder {
 
+
+        @Nullable
         private DataSourceWrapper dataSource;
+        @Nullable
+        private Map<TenantId, DataSourceWrapper> dataSourcePerTenant;
         private ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> columnTypeRegistry;
         private TypeMapping typeMapping;
 
@@ -154,6 +197,7 @@ public class JdbcStorageFactory implements StorageFactory {
          * Sets required field {@code dataSource}.
          */
         public Builder setDataSource(DataSourceWrapper dataSource) {
+            checkArgument(dataSourcePerTenant == null, TENANCY_TYPES_MIXED);
             this.dataSource = dataSource;
             return this;
         }
@@ -164,6 +208,7 @@ public class JdbcStorageFactory implements StorageFactory {
          * @see DataSourceWrapper#wrap(DataSource)
          */
         public Builder setDataSource(DataSource dataSource) {
+            checkArgument(dataSourcePerTenant == null, TENANCY_TYPES_MIXED);
             this.dataSource = DataSourceWrapper.wrap(dataSource);
             return this;
         }
@@ -177,6 +222,18 @@ public class JdbcStorageFactory implements StorageFactory {
         public Builder setDataSource(DataSourceConfig dataSource) {
             HikariConfig hikariConfig = DefaultDataSourceConfigConverter.convert(dataSource);
             this.dataSource = DataSourceWrapper.wrap(new HikariDataSource(hikariConfig));
+            return this;
+        }
+
+        public Builder setDataSourcePerTenant(Map<TenantId, DataSourceConfig> dataSourcePerTenant) {
+            checkArgument(dataSource == null, TENANCY_TYPES_MIXED);
+            this.dataSourcePerTenant = new HashMap<>();
+            dataSourcePerTenant.forEach((tenantId, config) -> {
+                HikariConfig hikariConfig = DefaultDataSourceConfigConverter.convert(config);
+                DataSourceWrapper wrapper =
+                        DataSourceWrapper.wrap(new HikariDataSource(hikariConfig));
+                this.dataSourcePerTenant.put(tenantId, wrapper);
+            });
             return this;
         }
 
@@ -210,6 +267,7 @@ public class JdbcStorageFactory implements StorageFactory {
                 columnTypeRegistry = JdbcTypeRegistryFactory.defaultInstance();
             }
             if (typeMapping == null) {
+                // todo store type mapping on per-data-source basis
                 typeMapping = PredefinedMapping.select(dataSource);
             }
             return new JdbcStorageFactory(this);

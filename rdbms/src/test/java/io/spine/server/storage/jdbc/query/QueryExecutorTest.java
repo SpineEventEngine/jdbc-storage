@@ -21,6 +21,7 @@
 package io.spine.server.storage.jdbc.query;
 
 import io.spine.server.storage.jdbc.ConnectionWrapper;
+import io.spine.server.storage.jdbc.DataSourceSupplier;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
 import org.junit.jupiter.api.DisplayName;
@@ -56,7 +57,10 @@ class QueryExecutorTest {
                            .prepareStatement(anyString());
         doThrow(SQLException.class).when(statement)
                                    .execute();
-        QueryExecutor query = spy(new QueryExecutor(dataSource, log()));
+        DataSourceSupplier supplier = mock(DataSourceSupplier.class);
+        doReturn(dataSource).when(supplier)
+                            .get();
+        QueryExecutor query = spy(new QueryExecutor(supplier, log()));
 
         assertThrows(DatabaseException.class, () -> query.execute(newUuid()));
     }

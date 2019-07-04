@@ -63,7 +63,7 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
         this.recordStorage = builder.getRecordStorage();
         this.projectionId = builder.getProjectionClass()
                                    .getName();
-        this.table = new LastHandledEventTimeTable(builder.getDataSource(),
+        this.table = new LastHandledEventTimeTable(builder.dataSourceSupplier(),
                                                    builder.getTypeMapping());
         table.create();
     }

@@ -40,20 +40,17 @@ public class GivenDataSource {
     private GivenDataSource() {
     }
 
-    public static DataSourceWrapper withoutSuperpowers() {
-        return mock(DataSourceWrapper.class);
+    public static DataSourceSupplier withoutSuperpowers() {
+        return mock(DataSourceSupplier.class);
     }
 
-    public static ClosableDataSource whichIsAutoCloseable() {
-        return mock(ClosableDataSource.class);
-    }
-
-    public static DataSourceWrapper whichIsStoredInMemory(String dbName) {
+    public static DataSourceSupplier whichIsStoredInMemory(String dbName) {
         HikariConfig config = new HikariConfig();
         String dbUrl = prefix(dbName);
         config.setJdbcUrl(dbUrl);
         // Not setting username and password is OK for in-memory database.
-        DataSourceWrapper dataSource = DataSourceWrapper.wrap(new HikariDataSource(config));
+        DataSource hikariDataSource = new HikariDataSource(config);
+        DataSourceSupplier dataSource = SingleTenantDataSourceSupplier.wrap(hikariDataSource);
         return dataSource;
     }
 
@@ -62,6 +59,6 @@ public class GivenDataSource {
     }
 
     @SuppressWarnings("InterfaceNeverImplemented")
-    public interface ClosableDataSource extends DataSource, AutoCloseable {
+    interface ClosableDataSource extends DataSource, AutoCloseable {
     }
 }

@@ -36,6 +36,7 @@ import static io.spine.base.Identifier.newUuid;
 import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
 import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.multitenantSpec;
 import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.newFactory;
+import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.newMultiSourceFactory;
 import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.singletenantSpec;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -67,7 +68,7 @@ class JdbcStorageFactoryTest {
         @Test
         @DisplayName("which is multitenant")
         void multitenant() {
-            JdbcStorageFactory factory = newFactory();
+            JdbcStorageFactory factory = newMultiSourceFactory();
             RecordStorage<String> storage =
                     factory.createRecordStorage(multitenantSpec(), TestEntity.class);
             assertTrue(storage.isMultitenant());
@@ -90,7 +91,7 @@ class JdbcStorageFactoryTest {
         @Test
         @DisplayName("which is multitenant")
         void multitenant() {
-            JdbcStorageFactory factory = newFactory();
+            JdbcStorageFactory factory = newMultiSourceFactory();
             AggregateStorage<String> storage =
                     factory.createAggregateStorage(multitenantSpec(), TestAggregate.class);
             assertTrue(storage.isMultitenant());
@@ -113,7 +114,7 @@ class JdbcStorageFactoryTest {
         @Test
         @DisplayName("which is multitenant")
         void multitenant() {
-            JdbcStorageFactory factory = newFactory();
+            JdbcStorageFactory factory = newMultiSourceFactory();
             ProjectionStorage<String> storage =
                     factory.createProjectionStorage(multitenantSpec(), TestProjection.class);
             assertTrue(storage.isMultitenant());
@@ -132,7 +133,7 @@ class JdbcStorageFactoryTest {
     @Test
     @DisplayName("close datastore on close")
     void closeDatastoreOnClose() {
-        DataSourceWrapper mock = GivenDataSource.withoutSuperpowers();
+        DataSourceWrapper mock = mock(DataSourceWrapper.class);
         JdbcStorageFactory factory = JdbcStorageFactory
                 .newBuilder()
                 .setDataSource(mock)
@@ -145,10 +146,10 @@ class JdbcStorageFactoryTest {
     @Test
     @DisplayName("use MySQL mapping by default")
     void useMySqlMappingByDefault() {
-        DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(newUuid());
+        DataSourceSupplier dataSource = GivenDataSource.whichIsStoredInMemory(newUuid());
         JdbcStorageFactory factory = JdbcStorageFactory
                 .newBuilder()
-                .setDataSource(dataSource)
+                .setDataSource(dataSource.get())
                 .build();
         assertEquals(MYSQL_5_7, factory.getTypeMapping());
     }

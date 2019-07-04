@@ -21,7 +21,7 @@
 package io.spine.server.storage.jdbc.query;
 
 import io.spine.server.storage.jdbc.ConnectionWrapper;
-import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.DataSourceSupplier;
 import io.spine.server.storage.jdbc.DatabaseException;
 import org.slf4j.Logger;
 
@@ -35,10 +35,10 @@ import static java.lang.String.format;
  */
 class QueryExecutor {
 
-    private final DataSourceWrapper dataSource;
+    private final DataSourceSupplier dataSource;
     private final Logger logger;
 
-    QueryExecutor(DataSourceWrapper dataSource, Logger logger) {
+    QueryExecutor(DataSourceSupplier dataSource, Logger logger) {
         this.dataSource = dataSource;
         this.logger = logger;
     }
@@ -47,7 +47,7 @@ class QueryExecutor {
      * Executes the given SQL query and ignores the result.
      */
     void execute(String query) {
-        try (ConnectionWrapper connection = dataSource.getConnection(true);
+        try (ConnectionWrapper connection = dataSource.get().getConnection(true);
              PreparedStatement statement = connection.prepareStatement(query)) {
             statement.execute();
         } catch (SQLException e) {

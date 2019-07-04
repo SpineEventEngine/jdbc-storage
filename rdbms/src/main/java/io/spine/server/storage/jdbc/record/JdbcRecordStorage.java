@@ -37,7 +37,7 @@ import io.spine.server.entity.storage.EntityQueries;
 import io.spine.server.entity.storage.EntityQuery;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.RecordStorage;
-import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.DataSourceSupplier;
 import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.JdbcStorageFactory;
 import io.spine.server.storage.jdbc.StorageBuilder;
@@ -64,7 +64,7 @@ import static java.util.stream.StreamSupport.stream;
  */
 public class JdbcRecordStorage<I> extends RecordStorage<I> {
 
-    private final DataSourceWrapper dataSource;
+    private final DataSourceSupplier dataSource;
     private final RecordTable<I> table;
 
     /**
@@ -75,7 +75,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
      */
     protected JdbcRecordStorage(Builder<I> builder) throws DatabaseException {
         super(builder.isMultitenant(), builder.getEntityClass());
-        this.dataSource = builder.getDataSource();
+        this.dataSource = builder.dataSourceSupplier();
         Class<? extends Entity<I, ?>> entityClass = builder.getEntityClass();
         Collection<EntityColumn> entityColumns = entityColumnCache().getColumns();
         this.table = new RecordTable<>(entityClass, dataSource, builder.getColumnTypeRegistry(),
@@ -152,7 +152,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     @Override
     public void close() throws DatabaseException {
         super.close();
-        dataSource.close();
+        dataSource.closeAll();
     }
 
     /**

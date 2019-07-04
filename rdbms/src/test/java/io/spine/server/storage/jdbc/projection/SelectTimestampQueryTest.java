@@ -21,7 +21,7 @@
 package io.spine.server.storage.jdbc.projection;
 
 import com.google.protobuf.Message;
-import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.DataSourceSupplier;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -41,7 +41,7 @@ class SelectTimestampQueryTest {
     @DisplayName("return null if `seconds` and `nanos` fields are nulls")
     void returnNullForEmptyTimestamp() throws SQLException {
         ResultSet resultSet = mock(ResultSet.class);
-        DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
+        DataSourceSupplier dataSource = whichIsStoredInMemory(newUuid());
         SelectTimestampQuery query = SelectTimestampQuery.newBuilder()
                                                          .setTableName(newUuid())
                                                          .setDataSource(dataSource)

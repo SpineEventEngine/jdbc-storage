@@ -38,6 +38,7 @@ import com.querydsl.sql.SQLQueryFactory;
 import com.querydsl.sql.SQLTemplates;
 import com.querydsl.sql.SQLTemplatesRegistry;
 import io.spine.server.storage.jdbc.ConnectionWrapper;
+import io.spine.server.storage.jdbc.DataSourceSupplier;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.TableColumn;
@@ -152,9 +153,10 @@ public abstract class AbstractQuery implements StorageQuery {
      * @return the query factory
      */
     @VisibleForTesting
-    static AbstractSQLQueryFactory<?> createFactory(final DataSourceWrapper dataSource) {
+    static AbstractSQLQueryFactory<?> createFactory(final DataSourceSupplier dataSource) {
         Provider<Connection> connectionProvider = () -> {
-            Connection connection = dataSource.getConnection(false)
+            Connection connection = dataSource.get()
+                                              .getConnection(false)
                                               .get();
             try {
                 connection.setHoldability(HOLD_CURSORS_OVER_COMMIT);
@@ -177,8 +179,8 @@ public abstract class AbstractQuery implements StorageQuery {
      *         the data source to get {@linkplain java.sql.DatabaseMetaData DB metadata}
      * @return templates for a particular JDBC implementation
      */
-    private static SQLTemplates getDialectTemplates(DataSourceWrapper dataSource) {
-        try (ConnectionWrapper connection = dataSource.getConnection(true)) {
+    private static SQLTemplates getDialectTemplates(DataSourceSupplier dataSource) {
+        try (ConnectionWrapper connection = dataSource.get().getConnection(true)) {
             DatabaseMetaData metaData = connection.get()
                                                   .getMetaData();
             SQLTemplatesRegistry templatesRegistry = new SQLTemplatesRegistry();
@@ -193,7 +195,7 @@ public abstract class AbstractQuery implements StorageQuery {
      */
     protected abstract static class Builder<B extends Builder<B, Q>, Q extends AbstractQuery> {
 
-        private DataSourceWrapper dataSource;
+        private DataSourceSupplier dataSource;
         private String tableName;
 
         /**
@@ -247,7 +249,7 @@ public abstract class AbstractQuery implements StorageQuery {
          * @param dataSource
          *         the data source to use
          */
-        public B setDataSource(DataSourceWrapper dataSource) {
+        public B setDataSource(DataSourceSupplier dataSource) {
             this.dataSource = checkNotNull(dataSource);
             return getThis();
         }

@@ -42,7 +42,7 @@ import static com.google.common.base.Preconditions.checkState;
 public abstract class StorageBuilder<B extends StorageBuilder<B, S>, S extends Storage> {
 
     private boolean multitenant;
-    private DataSourceWrapper dataSource;
+    private DataSourceSupplier dataSourceSupplier;
     private TypeMapping typeMapping;
 
     public boolean isMultitenant() {
@@ -61,18 +61,18 @@ public abstract class StorageBuilder<B extends StorageBuilder<B, S>, S extends S
         return getThis();
     }
 
-    public DataSourceWrapper getDataSource() {
-        return dataSource;
+    public DataSourceSupplier dataSourceSupplier() {
+        return dataSourceSupplier;
     }
 
     /**
      * Sets the data source.
      *
-     * @param dataSource
+     * @param dataSourceSupplier
      *         the {@linkplain DataSourceWrapper} used by the storage
      */
-    public B setDataSource(DataSourceWrapper dataSource) {
-        this.dataSource = dataSource;
+    public B setDataSourceSupplier(DataSourceSupplier dataSourceSupplier) {
+        this.dataSourceSupplier = dataSourceSupplier;
         return getThis();
     }
 
@@ -107,7 +107,7 @@ public abstract class StorageBuilder<B extends StorageBuilder<B, S>, S extends S
     /**
      * Checks the preconditions of the storage construction.
      *
-     * <p>Default implementation checks that the field {@link #dataSource}
+     * <p>Default implementation checks that the field {@link #dataSourceSupplier}
      * was set to a non-null value.
      *
      * <p>Override this method to modify these preconditions.
@@ -116,7 +116,7 @@ public abstract class StorageBuilder<B extends StorageBuilder<B, S>, S extends S
      *         upon a precondition violation
      */
     protected void checkPreconditions() throws IllegalStateException {
-        checkState(dataSource != null, "Storage data source must not be null");
+        checkState(dataSourceSupplier != null, "Storage data source must not be null");
     }
 
     /**

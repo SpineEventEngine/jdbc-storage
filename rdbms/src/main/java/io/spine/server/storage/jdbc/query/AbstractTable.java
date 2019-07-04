@@ -25,7 +25,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.spine.annotation.Internal;
 import io.spine.logging.Logging;
-import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.DataSourceSupplier;
 import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.Type;
 import io.spine.server.storage.jdbc.TypeMapping;
@@ -90,7 +90,7 @@ public abstract class AbstractTable<I, R, W> implements Logging {
                             version.name(), 0);
     private final String name;
     private final IdColumn<I> idColumn;
-    private final DataSourceWrapper dataSource;
+    private final DataSourceSupplier dataSource;
     private final TypeMapping typeMapping;
 
     /**
@@ -103,7 +103,7 @@ public abstract class AbstractTable<I, R, W> implements Logging {
     private ImmutableList<? extends TableColumn> columns;
 
     protected AbstractTable(String name, IdColumn<I> idColumn,
-                            DataSourceWrapper dataSource, TypeMapping typeMapping) {
+                            DataSourceSupplier dataSource, TypeMapping typeMapping) {
         this.name = checkNotNull(name);
         this.idColumn = checkNotNull(idColumn);
         this.dataSource = checkNotNull(dataSource);
@@ -255,7 +255,7 @@ public abstract class AbstractTable<I, R, W> implements Logging {
         return idColumn;
     }
 
-    protected DataSourceWrapper getDataSource() {
+    protected DataSourceSupplier getDataSource() {
         return dataSource;
     }
 

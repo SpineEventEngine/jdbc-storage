@@ -22,7 +22,7 @@ package io.spine.server.storage.jdbc.aggregate;
 
 import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.aggregate.Snapshot;
-import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.DataSourceSupplier;
 import io.spine.server.storage.jdbc.aggregate.given.AggregateEventRecordTableTestEnv.AnAggregate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -53,7 +53,7 @@ class AggregateEventRecordTableTest {
     @Test
     @DisplayName("store record kind in string representation")
     void storeRecordKind() {
-        DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
+        DataSourceSupplier dataSource = whichIsStoredInMemory(newUuid());
         AggregateEventRecordTable<String> table =
                 new AggregateEventRecordTable<>(AnAggregate.class, dataSource, MYSQL_5_7);
         table.create();

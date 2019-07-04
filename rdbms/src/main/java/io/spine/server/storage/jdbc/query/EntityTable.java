@@ -22,6 +22,7 @@ package io.spine.server.storage.jdbc.query;
 
 import io.spine.annotation.Internal;
 import io.spine.server.entity.Entity;
+import io.spine.server.storage.jdbc.DataSourceSupplier;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.TypeMapping;
 
@@ -39,15 +40,14 @@ public abstract class EntityTable<I, R, W> extends AbstractTable<I, R, W> {
      * Creates a new instance of the {@code EntityTable}.
      *
      * <p>The table will have a name based on the FQN name of the given {@link Entity} class.
-     *
-     * @param entityClass
+     *  @param entityClass
      *         the {@link Class} of the {@link Entity} to store
      * @param dataSource
      *         an instance of {@link DataSourceWrapper} to use
      */
     protected EntityTable(Class<? extends Entity<I, ?>> entityClass,
                           String idColumnName,
-                          DataSourceWrapper dataSource,
+                          DataSourceSupplier dataSource,
                           TypeMapping typeMapping) {
         this("", entityClass, idColumnName, dataSource, typeMapping);
     }
@@ -57,18 +57,17 @@ public abstract class EntityTable<I, R, W> extends AbstractTable<I, R, W> {
      *
      * <p>The table will have a name based on the FQN name of
      * the given {@link Entity} class and the given postfix.
-     *
-     * @param tableNamePostfix
+     *  @param tableNamePostfix
      *         the postfix for the the table name
      * @param entityClass
      *         the {@link Class} of the {@link Entity} to store
      * @param dataSource
-     *         an instance of {@link DataSourceWrapper} to use
+ *         an instance of {@link DataSourceWrapper} to use
      */
     protected EntityTable(String tableNamePostfix,
                           Class<? extends Entity<I, ?>> entityClass,
                           String idColumnName,
-                          DataSourceWrapper dataSource,
+                          DataSourceSupplier dataSource,
                           TypeMapping typeMapping) {
         super(newTableName(entityClass) + tableNamePostfix,
               IdColumn.newInstance(entityClass, idColumnName),

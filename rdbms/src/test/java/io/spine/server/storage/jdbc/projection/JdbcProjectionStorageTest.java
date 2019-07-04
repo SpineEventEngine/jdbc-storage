@@ -25,7 +25,7 @@ import io.spine.server.projection.Projection;
 import io.spine.server.projection.ProjectionStorage;
 import io.spine.server.projection.ProjectionStorageTest;
 import io.spine.server.storage.given.RecordStorageTestEnv.TestCounterEntity;
-import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.DataSourceSupplier;
 import io.spine.server.storage.jdbc.GivenDataSource;
 import io.spine.server.storage.jdbc.StorageBuilder;
 import io.spine.server.storage.jdbc.TypeMapping;
@@ -47,7 +47,7 @@ class JdbcProjectionStorageTest extends ProjectionStorageTest {
 
     @Override
     protected ProjectionStorage<ProjectId> newStorage(Class<? extends Entity<?, ?>> entityClass) {
-        DataSourceWrapper dataSource =
+        DataSourceSupplier dataSource =
                 GivenDataSource.whichIsStoredInMemory("projectionStorageTests");
         @SuppressWarnings("unchecked") // Required for the tests.
                 Class<? extends Projection<ProjectId, ?, ?>> projectionClass =
@@ -55,7 +55,7 @@ class JdbcProjectionStorageTest extends ProjectionStorageTest {
         TypeMapping typeMapping = MYSQL_5_7;
         JdbcRecordStorage<ProjectId> entityStorage =
                 JdbcRecordStorage.<ProjectId>newBuilder()
-                        .setDataSource(dataSource)
+                        .setDataSourceSupplier(dataSource)
                         .setMultitenant(false)
                         .setEntityClass(projectionClass)
                         .setColumnTypeRegistry(JdbcTypeRegistryFactory.defaultInstance())
@@ -64,7 +64,7 @@ class JdbcProjectionStorageTest extends ProjectionStorageTest {
         ProjectionStorage<ProjectId> storage =
                 JdbcProjectionStorage.<ProjectId>newBuilder()
                         .setRecordStorage(entityStorage)
-                        .setDataSource(dataSource)
+                        .setDataSourceSupplier(dataSource)
                         .setMultitenant(false)
                         .setProjectionClass(projectionClass)
                         .setTypeMapping(typeMapping)
@@ -85,7 +85,7 @@ class JdbcProjectionStorageTest extends ProjectionStorageTest {
     void acceptDatasourceInBuilder() {
         StorageBuilder<?, ?> builder =
                 JdbcProjectionStorage.newBuilder()
-                                     .setDataSource(GivenDataSource.withoutSuperpowers());
+                                     .setDataSourceSupplier(GivenDataSource.withoutSuperpowers());
         assertNotNull(builder);
     }
 

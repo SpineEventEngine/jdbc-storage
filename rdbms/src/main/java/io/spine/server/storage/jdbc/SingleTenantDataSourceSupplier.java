@@ -20,24 +20,28 @@
 
 package io.spine.server.storage.jdbc;
 
-import io.spine.server.storage.jdbc.GivenDataSource.ClosableDataSource;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import javax.sql.DataSource;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
+final class SingleTenantDataSourceSupplier implements DataSourceSupplier {
 
-@DisplayName("DataSourceWrapper should")
-class DataSourceWrapperTest {
+    private final DataSourceWrapper dataSource;
 
-    @Test
-    @DisplayName("throw DatabaseException if failing to close")
-    void throwIfFailToClose() throws Exception {
-        ClosableDataSource source = mock(ClosableDataSource.class);
-        doThrow(new Exception("")).when(source)
-                                  .close();
-        DataSourceWrapper wrapper = DataSourceWrapper.wrap(source);
-        assertThrows(DatabaseException.class, wrapper::close);
+    SingleTenantDataSourceSupplier(DataSourceWrapper dataSource) {
+        this.dataSource = dataSource;
+    }
+
+    static SingleTenantDataSourceSupplier wrap(DataSource dataSource) {
+        DataSourceWrapper wrapper = DataSourceWrapper.wrap(dataSource);
+        return new SingleTenantDataSourceSupplier(wrapper);
+    }
+
+    @Override
+    public DataSourceWrapper get() {
+        return dataSource;
+    }
+
+    @Override
+    public void closeAll() {
+        dataSource.close();
     }
 }

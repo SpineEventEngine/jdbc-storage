@@ -23,7 +23,7 @@ package io.spine.server.storage.jdbc.aggregate;
 import com.google.common.collect.ImmutableList;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.entity.LifecycleFlags;
-import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.DataSourceSupplier;
 import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.Type;
 import io.spine.server.storage.jdbc.TypeMapping;
@@ -44,7 +44,7 @@ class LifecycleFlagsTable<I> extends EntityTable<I, LifecycleFlags, LifecycleFla
     private static final String TABLE_NAME_POSTFIX = "_visibility";
 
     LifecycleFlagsTable(Class<? extends Aggregate<I, ?, ?>> aggregateClass,
-                        DataSourceWrapper dataSource,
+                        DataSourceSupplier dataSource,
                         TypeMapping typeMapping) {
         super(TABLE_NAME_POSTFIX, aggregateClass, ID.name(), dataSource, typeMapping);
     }

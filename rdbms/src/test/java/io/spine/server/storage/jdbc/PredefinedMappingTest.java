@@ -72,8 +72,8 @@ class PredefinedMappingTest {
     }
 
     private static DataSourceWrapper dataSourceMock(String databaseProductName,
-                                                    int majorVersion,
-                                                    int minorVersion) {
+                                                     int majorVersion,
+                                                     int minorVersion) {
         DataSourceWrapper dataSource = mock(DataSourceWrapper.class);
         ConnectionWrapper connectionWrapper = mock(ConnectionWrapper.class);
         Connection connection = mock(Connection.class);

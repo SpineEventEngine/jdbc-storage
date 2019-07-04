@@ -25,7 +25,7 @@ import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.protobuf.Timestamp;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateEventRecord;
-import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.DataSourceSupplier;
 import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.Type;
 import io.spine.server.storage.jdbc.TypeMapping;
@@ -50,7 +50,7 @@ class AggregateEventRecordTable<I> extends EntityTable<I,
                                                        AggregateEventRecord> {
 
     AggregateEventRecordTable(Class<? extends Aggregate<I, ?, ?>> entityClass,
-                              DataSourceWrapper dataSource,
+                              DataSourceSupplier dataSource,
                               TypeMapping typeMapping) {
         super(entityClass, Column.ID.name(), dataSource, typeMapping);
     }

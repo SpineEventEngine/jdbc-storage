@@ -26,7 +26,7 @@ import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.aggregate.AggregateReadRequest;
 import io.spine.server.aggregate.AggregateStorage;
 import io.spine.server.entity.LifecycleFlags;
-import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.DataSourceSupplier;
 import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.StorageBuilder;
 import io.spine.server.storage.jdbc.TypeMapping;
@@ -57,7 +57,7 @@ import static io.spine.server.storage.jdbc.aggregate.Closeables.closeAll;
  */
 public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
 
-    private final DataSourceWrapper dataSource;
+    private final DataSourceSupplier dataSource;
 
     /**
      * The {@linkplain #historyBackward(AggregateReadRequest) history} iterators,
@@ -83,7 +83,7 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
         super(builder.isMultitenant());
         Class<? extends Aggregate<I, ?, ?>> aggregateClass = builder.getAggregateClass();
         TypeMapping mapping = builder.getTypeMapping();
-        this.dataSource = builder.getDataSource();
+        this.dataSource = builder.dataSourceSupplier();
         this.mainTable = new AggregateEventRecordTable<>(aggregateClass, dataSource, mapping);
         this.lifecycleFlagsTable = new LifecycleFlagsTable<>(aggregateClass, dataSource, mapping);
         mainTable.create();
@@ -180,7 +180,7 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     public void close() throws DatabaseException {
         super.close();
         closeAll(iterators);
-        dataSource.close();
+        dataSource.closeAll();
         iterators.clear();
     }
 
