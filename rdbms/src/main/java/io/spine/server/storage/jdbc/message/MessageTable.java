@@ -27,8 +27,8 @@ import io.spine.server.storage.jdbc.TypeMapping;
 import io.spine.server.storage.jdbc.query.AbstractTable;
 import io.spine.server.storage.jdbc.query.IdColumn;
 import io.spine.server.storage.jdbc.query.SelectQuery;
-import io.spine.server.storage.jdbc.query.WriteQuery;
 
+import java.util.List;
 import java.util.function.Function;
 
 public abstract class MessageTable<I, M extends Message> extends AbstractTable<I, M, M> {
@@ -48,19 +48,35 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
                                                 .setIdColumn(idColumn())
                                                 .setId(id)
                                                 .setMessage(record)
+                                                .setColumns(columns())
                                                 .build();
         return query;
     }
 
     @Override
-    protected WriteQuery composeUpdateQuery(I id, M record) {
-        return null;
+    protected UpdateMessageQuery<I, M> composeUpdateQuery(I id, M record) {
+        UpdateMessageQuery.Builder<I, M> builder = UpdateMessageQuery.newBuilder();
+        UpdateMessageQuery<I, M> query = builder.setTableName(name())
+                                                .setDataSource(dataSource())
+                                                .setIdColumn(idColumn())
+                                                .setId(id)
+                                                .setMessage(record)
+                                                .setColumns(columns())
+                                                .build();
+        return query;
     }
 
     @Override
     protected SelectQuery<M> composeSelectQuery(I id) {
         return null;
     }
+
+    @Override
+    protected List<? extends TableColumn> tableColumns() {
+        return columns();
+    }
+
+    protected abstract List<? extends Column<M>> columns();
 
     public interface Column<M extends Message> extends TableColumn {
 

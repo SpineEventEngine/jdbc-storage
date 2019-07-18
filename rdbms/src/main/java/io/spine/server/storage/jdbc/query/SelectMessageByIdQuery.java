@@ -64,7 +64,7 @@ public abstract class SelectMessageByIdQuery<I, M extends Message>
      */
     @Override
     public final @Nullable M execute() throws DatabaseException {
-        try (ResultSet resultSet = getQuery().getResults()) {
+        try (ResultSet resultSet = query().getResults()) {
             if (!resultSet.next()) {
                 return null;
             }
@@ -80,7 +80,7 @@ public abstract class SelectMessageByIdQuery<I, M extends Message>
      *
      * @return a query, which is ready for execution
      */
-    protected abstract AbstractSQLQuery<?, ?> getQuery();
+    protected abstract AbstractSQLQuery<?, ?> query();
 
     /**
      * Retrieves a message from a DB result set.

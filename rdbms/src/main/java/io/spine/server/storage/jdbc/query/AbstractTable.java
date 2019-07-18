@@ -70,6 +70,7 @@ import static io.spine.server.storage.jdbc.Sql.Query.PRIMARY_KEY;
  *         a result type of a write operation by a single ID
  * @see TableColumn
  */
+@SuppressWarnings("ClassWithTooManyMethods") // The class has to cover a lot of use cases.
 @Internal
 public abstract class AbstractTable<I, R, W> implements Logging {
 
@@ -234,9 +235,6 @@ public abstract class AbstractTable<I, R, W> implements Logging {
 
     /**
      * Obtains the map of column defaults for this table.
-     *
-     * <p>Default values are set for the columns that are critical to be initialized in the system
-     * while still can be omitted in the write request.
      */
     protected ImmutableMap<String, Object> columnDefaults() {
         return ImmutableMap.of();

@@ -37,7 +37,7 @@ final class SelectEntityByIdQuery<I> extends SelectMessageByIdQuery<I, EntityRec
     }
 
     @Override
-    protected AbstractSQLQuery<?, ?> getQuery() {
+    protected AbstractSQLQuery<?, ?> query() {
         AbstractSQLQuery<?, ?> query = factory().select(all)
                                                 .from(table())
                                                 .where(idEquals());

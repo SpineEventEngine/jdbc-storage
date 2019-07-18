@@ -33,6 +33,7 @@ import io.spine.server.storage.jdbc.query.IdColumn;
 import io.spine.server.storage.jdbc.query.SelectQuery;
 import io.spine.string.Stringifiers;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 import static io.spine.server.storage.jdbc.Type.BOOLEAN;
@@ -60,7 +61,7 @@ final class InboxMessageTable extends MessageTable<InboxMessageId, InboxMessage>
     }
 
     @Override
-    protected List<? extends TableColumn> tableColumns() {
+    protected List<Column> columns() {
         return ImmutableList.copyOf(Column.values());
     }
 
@@ -70,8 +71,7 @@ final class InboxMessageTable extends MessageTable<InboxMessageId, InboxMessage>
 
     enum Column implements MessageTable.Column<InboxMessage> {
 
-        ID(STRING_255, message -> message.getId()
-                                         .getUuid()),
+        ID(InboxMessage::getId),
 
         SIGNAL_ID(STRING_255, message -> message.getSignalId()
                                                 .getValue()),
@@ -100,6 +100,7 @@ final class InboxMessageTable extends MessageTable<InboxMessageId, InboxMessage>
         WHEN_RECEIVED_NANOS(INT, message -> message.getWhenReceived()
                                                    .getNanos());
 
+        @Nullable
         private final Type type;
         private final Getter<InboxMessage> getter;
 
@@ -108,6 +109,12 @@ final class InboxMessageTable extends MessageTable<InboxMessageId, InboxMessage>
             this.getter = getter;
         }
 
+        Column(Getter<InboxMessage> getter) {
+            this.type = null;
+            this.getter = getter;
+        }
+
+        @Nullable
         @Override
         public Type type() {
             return type;
