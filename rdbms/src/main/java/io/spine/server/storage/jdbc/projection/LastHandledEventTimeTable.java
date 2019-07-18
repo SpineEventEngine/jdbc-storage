@@ -51,12 +51,12 @@ class LastHandledEventTimeTable extends AbstractTable<String, Timestamp, Timesta
     }
 
     @Override
-    protected Column getIdColumnDeclaration() {
+    protected Column idColumnDeclaration() {
         return PROJECTION_TYPE;
     }
 
     @Override
-    protected List<? extends TableColumn> getTableColumns() {
+    protected List<? extends TableColumn> tableColumns() {
         return ImmutableList.copyOf(Column.values());
     }
 

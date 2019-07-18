@@ -100,15 +100,15 @@ public abstract class AbstractTable<I, R, W> implements Logging {
      * <pre>
      *     {@code
      *     \@Override
-     *      public Column getIdColumnDeclaration() {
-     *          return Column.id;
+     *      public Column idColumnDeclaration() {
+     *          return Column.ID;
      *      }
      *     }
      * </pre>
      */
-    protected abstract TableColumn getIdColumnDeclaration();
+    protected abstract TableColumn idColumnDeclaration();
 
-    protected abstract List<? extends TableColumn> getTableColumns();
+    protected abstract List<? extends TableColumn> tableColumns();
 
     /**
      * Creates current table in the database if it does not exist yet.
@@ -224,7 +224,7 @@ public abstract class AbstractTable<I, R, W> implements Logging {
     @SuppressWarnings("ReturnOfCollectionOrArrayField") // Returns immutable collection
     final ImmutableList<? extends TableColumn> columns() {
         if (columns == null) {
-            List<? extends TableColumn> tableColumnsType = getTableColumns();
+            List<? extends TableColumn> tableColumnsType = tableColumns();
             columns = ImmutableList.copyOf(tableColumnsType);
         }
         return columns;
@@ -321,7 +321,7 @@ public abstract class AbstractTable<I, R, W> implements Logging {
      */
     private Type ensureIdType(TableColumn column) {
         Type type = column.type();
-        boolean isIdColumn = column.equals(getIdColumnDeclaration());
+        boolean isIdColumn = column.equals(idColumnDeclaration());
         boolean typeUnknown = type == null;
         if (isIdColumn && typeUnknown) {
             type = getIdType();

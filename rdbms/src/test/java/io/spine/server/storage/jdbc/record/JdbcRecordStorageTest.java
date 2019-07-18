@@ -104,7 +104,7 @@ class JdbcRecordStorageTest extends RecordStorageTest<JdbcRecordStorage<ProjectI
     void useColumnNames() {
         JdbcRecordStorage<ProjectId> storage = newStorage(TestEntityWithStringId.class);
         List<String> columns = storage.getTable()
-                                      .getTableColumns()
+                                      .tableColumns()
                                       .stream()
                                       .map(TableColumn::name)
                                       .collect(toList());

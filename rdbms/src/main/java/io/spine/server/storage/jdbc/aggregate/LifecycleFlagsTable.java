@@ -50,12 +50,12 @@ class LifecycleFlagsTable<I> extends EntityTable<I, LifecycleFlags, LifecycleFla
     }
 
     @Override
-    protected Column getIdColumnDeclaration() {
+    protected Column idColumnDeclaration() {
         return ID;
     }
 
     @Override
-    protected List<? extends TableColumn> getTableColumns() {
+    protected List<? extends TableColumn> tableColumns() {
         return ImmutableList.copyOf(Column.values());
     }
 

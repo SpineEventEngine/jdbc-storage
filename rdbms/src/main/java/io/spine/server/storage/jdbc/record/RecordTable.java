@@ -76,12 +76,12 @@ final class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWith
     }
 
     @Override
-    protected StandardColumn getIdColumnDeclaration() {
+    protected StandardColumn idColumnDeclaration() {
         return StandardColumn.ID;
     }
 
     @Override
-    protected List<TableColumn> getTableColumns() {
+    protected List<TableColumn> tableColumns() {
         List<TableColumn> columns = newLinkedList();
         addAll(columns, StandardColumn.values());
         Collection<TableColumn> tableColumns = entityColumns.stream()

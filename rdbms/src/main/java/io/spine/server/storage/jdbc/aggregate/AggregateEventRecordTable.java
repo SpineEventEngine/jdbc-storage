@@ -56,12 +56,12 @@ class AggregateEventRecordTable<I> extends EntityTable<I,
     }
 
     @Override
-    protected Column getIdColumnDeclaration() {
+    protected Column idColumnDeclaration() {
         return Column.ID;
     }
 
     @Override
-    protected List<? extends TableColumn> getTableColumns() {
+    protected List<? extends TableColumn> tableColumns() {
         return ImmutableList.copyOf(Column.values());
     }
 
