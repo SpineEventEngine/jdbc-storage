@@ -20,11 +20,15 @@
 
 package io.spine.server.storage.jdbc.query;
 
+import com.google.common.collect.ImmutableMap;
 import io.spine.annotation.Internal;
 import io.spine.server.entity.Entity;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.TypeMapping;
 
+import static io.spine.server.storage.LifecycleFlagField.archived;
+import static io.spine.server.storage.LifecycleFlagField.deleted;
+import static io.spine.server.storage.VersionField.version;
 import static io.spine.server.storage.jdbc.query.TableNames.newTableName;
 
 /**
@@ -33,6 +37,20 @@ import static io.spine.server.storage.jdbc.query.TableNames.newTableName;
 @Internal
 public abstract class EntityTable<I, R, W> extends AbstractTable<I, R, W> {
 
+    /**
+     * A map of the Spine common Entity Columns to their default values.
+     *
+     * <p>Some write operations may not include these columns. Though, they are required for
+     * the framework to work properly. Hence, the tables which include them should make these
+     * values {@code DEFAULT} for these columns.
+     *
+     * <p>The map stores the names of the Entity Columns as a string keys for simplicity and
+     * the default values of the Columns as the map values.
+     */
+    private static final ImmutableMap<String, Object> COLUMN_DEFAULTS =
+            ImmutableMap.of(archived.name(), false,
+                            deleted.name(), false,
+                            version.name(), 0);
     private final Class<? extends Entity<I, ?>> entityClass;
 
     /**
@@ -77,7 +95,13 @@ public abstract class EntityTable<I, R, W> extends AbstractTable<I, R, W> {
         this.entityClass = entityClass;
     }
 
-    protected Class<? extends Entity<I, ?>> getEntityClass() {
+    @Override
+    protected ImmutableMap<String, Object> columnDefaults() {
+        return COLUMN_DEFAULTS;
+    }
+
+    // TODO:2019-07-18:dmytro.kuzmin:WIP: Seems unused, remove together with the field.
+    public Class<? extends Entity<I, ?>> entityClass() {
         return entityClass;
     }
 }

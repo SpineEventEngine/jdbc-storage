@@ -38,9 +38,6 @@ import java.util.List;
 import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static io.spine.server.storage.LifecycleFlagField.archived;
-import static io.spine.server.storage.LifecycleFlagField.deleted;
-import static io.spine.server.storage.VersionField.version;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.COMMA;
@@ -74,20 +71,6 @@ import static io.spine.server.storage.jdbc.Sql.Query.PRIMARY_KEY;
 @Internal
 public abstract class AbstractTable<I, R, W> implements Logging {
 
-    /**
-     * A map of the Spine common Entity Columns to their default values.
-     *
-     * <p>Some write operations may not include these columns. Though, they are required for
-     * the framework to work properly. Hence, the tables which include them should make these values
-     * {@code DEFAULT} for these columns.
-     *
-     * <p>The map stores the names of the Entity Columns as a string keys for simplicity and
-     * the default values of the Columns as the map values.
-     */
-    private static final ImmutableMap<String, Object> COLUMN_DEFAULTS =
-            ImmutableMap.of(archived.name(), false,
-                            deleted.name(), false,
-                            version.name(), 0);
     private final String name;
     private final IdColumn<I> idColumn;
     private final DataSourceWrapper dataSource;
@@ -98,7 +81,7 @@ public abstract class AbstractTable<I, R, W> implements Logging {
      *
      * <p>This field is effectively final but is initialized lazily.
      *
-     * @see #getColumns() for the initialization
+     * @see #columns() for the initialization
      */
     private ImmutableList<? extends TableColumn> columns;
 
@@ -239,12 +222,22 @@ public abstract class AbstractTable<I, R, W> implements Logging {
      * @return the initialized {@link List} of the table columns
      */
     @SuppressWarnings("ReturnOfCollectionOrArrayField") // Returns immutable collection
-    final ImmutableList<? extends TableColumn> getColumns() {
+    final ImmutableList<? extends TableColumn> columns() {
         if (columns == null) {
             List<? extends TableColumn> tableColumnsType = getTableColumns();
             columns = ImmutableList.copyOf(tableColumnsType);
         }
         return columns;
+    }
+
+    /**
+     * Obtains the map of column defaults for this table.
+     *
+     * <p>Default values are set for the columns that are critical to be initialized in the system
+     * while still can be omitted in the write request.
+     */
+    protected ImmutableMap<String, Object> columnDefaults() {
+        return ImmutableMap.of();
     }
 
     protected String getName() {
@@ -266,7 +259,7 @@ public abstract class AbstractTable<I, R, W> implements Logging {
     protected abstract SelectQuery<R> composeSelectQuery(I id);
 
     private String composeCreateTableSql() {
-        Iterable<? extends TableColumn> columns = getColumns();
+        Iterable<? extends TableColumn> columns = columns();
         StringBuilder sql = new StringBuilder();
         sql.append(CREATE_IF_MISSING)
            .append(getName())
@@ -280,8 +273,8 @@ public abstract class AbstractTable<I, R, W> implements Logging {
             sql.append(name)
                .append(' ')
                .append(typeName);
-            if (COLUMN_DEFAULTS.containsKey(name)) {
-                Object defaultValue = COLUMN_DEFAULTS.get(name);
+            if (columnDefaults().containsKey(name)) {
+                Object defaultValue = columnDefaults().get(name);
                 sql.append(DEFAULT)
                    .append(defaultValue);
             }

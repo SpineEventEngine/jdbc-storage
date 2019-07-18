@@ -26,8 +26,10 @@ import com.zaxxer.hikari.HikariDataSource;
 import io.spine.server.ContextSpec;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateStorage;
+import io.spine.server.delivery.InboxStorage;
 import io.spine.server.entity.Entity;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
+import io.spine.server.event.EventStore;
 import io.spine.server.projection.Projection;
 import io.spine.server.projection.ProjectionStorage;
 import io.spine.server.storage.StorageFactory;
@@ -98,6 +100,16 @@ public class JdbcStorageFactory implements StorageFactory {
                 .setTypeMapping(typeMapping)
                 .build();
         return storage;
+    }
+
+    @Override
+    public InboxStorage createInboxStorage(boolean multitenant) {
+        return null;
+    }
+
+    @Override
+    public EventStore createEventStore(ContextSpec context) {
+        return null;
     }
 
     /**
