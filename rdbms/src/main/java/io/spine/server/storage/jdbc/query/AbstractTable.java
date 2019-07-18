@@ -65,7 +65,9 @@ import static io.spine.server.storage.jdbc.Sql.Query.PRIMARY_KEY;
  * @param <I>
  *         a type of ID of the records stored in the table
  * @param <R>
- *         a result type of the read operation
+ *         a result type of a read operation by a single ID
+ * @param <W>
+ *         a result type of a write operation by a single ID
  * @see TableColumn
  */
 @Internal
@@ -240,15 +242,15 @@ public abstract class AbstractTable<I, R, W> implements Logging {
         return ImmutableMap.of();
     }
 
-    protected String getName() {
+    protected String name() {
         return name;
     }
 
-    protected IdColumn<I> getIdColumn() {
+    protected IdColumn<I> idColumn() {
         return idColumn;
     }
 
-    protected DataSourceWrapper getDataSource() {
+    protected DataSourceWrapper dataSource() {
         return dataSource;
     }
 
@@ -262,7 +264,7 @@ public abstract class AbstractTable<I, R, W> implements Logging {
         Iterable<? extends TableColumn> columns = columns();
         StringBuilder sql = new StringBuilder();
         sql.append(CREATE_IF_MISSING)
-           .append(getName())
+           .append(name())
            .append(BRACKET_OPEN);
         Set<String> primaryKey = new HashSet<>();
         for (Iterator<? extends TableColumn> iterator = columns.iterator(); iterator.hasNext(); ) {
@@ -304,7 +306,7 @@ public abstract class AbstractTable<I, R, W> implements Logging {
     }
 
     private Type getIdType() {
-        Type idType = getIdColumn().sqlType();
+        Type idType = idColumn().sqlType();
         return idType;
     }
 
@@ -340,7 +342,7 @@ public abstract class AbstractTable<I, R, W> implements Logging {
     public boolean delete(I id) {
         DeleteRecordQuery.Builder<I> builder = DeleteRecordQuery.newBuilder();
         DeleteRecordQuery<I> query = builder.setTableName(name)
-                                            .setIdColumn(getIdColumn())
+                                            .setIdColumn(idColumn())
                                             .setId(id)
                                             .setDataSource(dataSource)
                                             .build();

@@ -26,7 +26,7 @@ import io.spine.server.delivery.InboxReadRequest;
 import io.spine.server.delivery.InboxStorage;
 import io.spine.server.delivery.Page;
 import io.spine.server.delivery.ShardIndex;
-import io.spine.server.storage.jdbc.JdbcMessageStorage;
+import io.spine.server.storage.jdbc.message.JdbcMessageStorage;
 
 import java.util.Iterator;
 

@@ -79,9 +79,9 @@ class AggregateEventRecordTable<I> extends EntityTable<I,
     @Override
     protected SelectEventRecordsById<I> composeSelectQuery(I id) {
         SelectEventRecordsById.Builder<I> builder = SelectEventRecordsById.newBuilder();
-        SelectEventRecordsById<I> query = builder.setTableName(getName())
-                                                 .setDataSource(getDataSource())
-                                                 .setIdColumn(getIdColumn())
+        SelectEventRecordsById<I> query = builder.setTableName(name())
+                                                 .setDataSource(dataSource())
+                                                 .setIdColumn(idColumn())
                                                  .setId(id)
                                                  .build();
         return query;
@@ -90,9 +90,9 @@ class AggregateEventRecordTable<I> extends EntityTable<I,
     @Override
     protected InsertAggregateRecordQuery<I> composeInsertQuery(I id, AggregateEventRecord record) {
         InsertAggregateRecordQuery.Builder<I> builder = InsertAggregateRecordQuery.newBuilder();
-        InsertAggregateRecordQuery<I> query = builder.setTableName(getName())
-                                                     .setDataSource(getDataSource())
-                                                     .setIdColumn(getIdColumn())
+        InsertAggregateRecordQuery<I> query = builder.setTableName(name())
+                                                     .setDataSource(dataSource())
+                                                     .setIdColumn(idColumn())
                                                      .setId(id)
                                                      .setRecord(record)
                                                      .build();
@@ -102,9 +102,9 @@ class AggregateEventRecordTable<I> extends EntityTable<I,
     SelectVersionBySnapshot<I>
     composeSelectVersionQuery(int snapshotIndex, @Nullable Timestamp date) {
         SelectVersionBySnapshot.Builder<I> builder = SelectVersionBySnapshot.newBuilder();
-        SelectVersionBySnapshot<I> query = builder.setTableName(getName())
-                                                  .setDataSource(getDataSource())
-                                                  .setIdColumn(getIdColumn())
+        SelectVersionBySnapshot<I> query = builder.setTableName(name())
+                                                  .setDataSource(dataSource())
+                                                  .setIdColumn(idColumn())
                                                   .setSnapshotIndex(snapshotIndex)
                                                   .setDate(date)
                                                   .build();
@@ -113,9 +113,9 @@ class AggregateEventRecordTable<I> extends EntityTable<I,
 
     private DeletePriorRecordsQuery<I> composeDeleteQuery(I id, Integer version) {
         DeletePriorRecordsQuery.Builder<I> builder = DeletePriorRecordsQuery.newBuilder();
-        DeletePriorRecordsQuery<I> query = builder.setTableName(getName())
-                                                  .setDataSource(getDataSource())
-                                                  .setIdColumn(getIdColumn())
+        DeletePriorRecordsQuery<I> query = builder.setTableName(name())
+                                                  .setDataSource(dataSource())
+                                                  .setIdColumn(idColumn())
                                                   .setId(id)
                                                   .setVersion(version)
                                                   .build();

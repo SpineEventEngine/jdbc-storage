@@ -28,10 +28,10 @@ import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.Type;
 import io.spine.server.storage.jdbc.TypeMapping;
-import io.spine.server.storage.jdbc.query.AbstractTable;
+import io.spine.server.storage.jdbc.message.MessageTable;
 import io.spine.server.storage.jdbc.query.IdColumn;
 import io.spine.server.storage.jdbc.query.SelectQuery;
-import io.spine.server.storage.jdbc.query.WriteQuery;
+import io.spine.string.Stringifiers;
 
 import java.util.List;
 
@@ -45,7 +45,7 @@ import static io.spine.server.storage.jdbc.delivery.InboxMessageTable.Column.ID;
 /**
  * A table in the DB responsible for storing the {@link io.spine.server.delivery.Inbox Inbox} data.
  */
-final class InboxMessageTable extends AbstractTable<InboxMessageId, InboxMessage, InboxMessage> {
+final class InboxMessageTable extends MessageTable<InboxMessageId, InboxMessage> {
 
     InboxMessageTable(String name,
                       IdColumn<InboxMessageId> idColumn,
@@ -64,43 +64,48 @@ final class InboxMessageTable extends AbstractTable<InboxMessageId, InboxMessage
         return ImmutableList.copyOf(Column.values());
     }
 
-    @Override
-    protected WriteQuery composeInsertQuery(InboxMessageId id, InboxMessage record) {
-        return null;
-    }
-
-    @Override
-    protected WriteQuery composeUpdateQuery(InboxMessageId id, InboxMessage record) {
-        return null;
-    }
-
-    @Override
-    protected SelectQuery<InboxMessage> composeSelectQuery(InboxMessageId id) {
-        return null;
-    }
-
     SelectQuery<InboxMessage> composeSelectByShardIndexQuery(ShardIndex index) {
         return null;
     }
 
-    enum Column implements TableColumn {
+    enum Column implements MessageTable.Column<InboxMessage> {
 
-        ID(STRING_255),
-        SIGNAL_ID(STRING_255),
-        INBOX_ID(STRING_255),
-        SHARD_INDEX(LONG),
-        OF_TOTAL_SHARDS(LONG),
-        IS_EVENT(BOOLEAN),
-        IS_COMMAND(BOOLEAN),
-        LABEL(STRING),
-        STATUS(STRING),
-        WHEN_RECEIVED(LONG),
-        WHEN_RECEIVED_NANOS(INT);
+        ID(STRING_255, message -> message.getId()
+                                         .getUuid()),
+
+        SIGNAL_ID(STRING_255, message -> message.getSignalId()
+                                                .getValue()),
+
+        INBOX_ID(STRING_255, message -> Stringifiers.toString(message.getInboxId())),
+
+        SHARD_INDEX(LONG, message -> message.getShardIndex()
+                                            .getIndex()),
+
+        OF_TOTAL_SHARDS(LONG, message -> message.getShardIndex()
+                                                .getOfTotal()),
+
+        IS_EVENT(BOOLEAN, InboxMessage::hasEvent),
+
+        IS_COMMAND(BOOLEAN, InboxMessage::hasCommand),
+
+        LABEL(STRING, message -> message.getLabel()
+                                        .toString()),
+
+        STATUS(STRING, message -> message.getStatus()
+                                         .toString()),
+
+        WHEN_RECEIVED(LONG, message -> message.getWhenReceived()
+                                              .getSeconds()),
+
+        WHEN_RECEIVED_NANOS(INT, message -> message.getWhenReceived()
+                                                   .getNanos());
 
         private final Type type;
+        private final Getter<InboxMessage> getter;
 
-        Column(Type type) {
+        Column(Type type, Getter<InboxMessage> getter) {
             this.type = type;
+            this.getter = getter;
         }
 
         @Override
@@ -116,6 +121,11 @@ final class InboxMessageTable extends AbstractTable<InboxMessageId, InboxMessage
         @Override
         public boolean isNullable() {
             return false;
+        }
+
+        @Override
+        public Getter<InboxMessage> getter() {
+            return getter;
         }
     }
 }

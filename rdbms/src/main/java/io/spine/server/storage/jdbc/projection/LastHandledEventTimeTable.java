@@ -63,10 +63,10 @@ class LastHandledEventTimeTable extends AbstractTable<String, Timestamp, Timesta
     @Override
     protected SelectQuery<Timestamp> composeSelectQuery(String id) {
         SelectTimestampQuery.Builder builder = SelectTimestampQuery.newBuilder();
-        SelectTimestampQuery query = builder.setTableName(getName())
-                                            .setDataSource(getDataSource())
+        SelectTimestampQuery query = builder.setTableName(name())
+                                            .setDataSource(dataSource())
                                             .setId(id)
-                                            .setIdColumn(getIdColumn())
+                                            .setIdColumn(idColumn())
                                             .build();
         return query;
     }
@@ -74,8 +74,8 @@ class LastHandledEventTimeTable extends AbstractTable<String, Timestamp, Timesta
     @Override
     protected WriteQuery composeInsertQuery(String id, Timestamp record) {
         InsertTimestampQuery.Builder builder = InsertTimestampQuery.newBuilder();
-        InsertTimestampQuery query = builder.setTableName(getName())
-                                            .setDataSource(getDataSource())
+        InsertTimestampQuery query = builder.setTableName(name())
+                                            .setDataSource(dataSource())
                                             .setId(id)
                                             .setTimestamp(record)
                                             .build();
@@ -85,8 +85,8 @@ class LastHandledEventTimeTable extends AbstractTable<String, Timestamp, Timesta
     @Override
     protected WriteQuery composeUpdateQuery(String id, Timestamp record) {
         UpdateTimestampQuery.Builder builder = UpdateTimestampQuery.newBuilder();
-        UpdateTimestampQuery query = builder.setTableName(getName())
-                                            .setDataSource(getDataSource())
+        UpdateTimestampQuery query = builder.setTableName(name())
+                                            .setDataSource(dataSource())
                                             .setId(id)
                                             .setTimestamp(record)
                                             .build();

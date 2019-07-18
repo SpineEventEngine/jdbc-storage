@@ -62,9 +62,9 @@ class LifecycleFlagsTable<I> extends EntityTable<I, LifecycleFlags, LifecycleFla
     @Override
     protected SelectQuery<LifecycleFlags> composeSelectQuery(I id) {
         SelectLifecycleFlagsQuery.Builder<I> builder = SelectLifecycleFlagsQuery.newBuilder();
-        SelectQuery<LifecycleFlags> query = builder.setTableName(getName())
-                                                   .setDataSource(getDataSource())
-                                                   .setIdColumn(getIdColumn())
+        SelectQuery<LifecycleFlags> query = builder.setTableName(name())
+                                                   .setDataSource(dataSource())
+                                                   .setIdColumn(idColumn())
                                                    .setId(id)
                                                    .build();
         return query;
@@ -73,11 +73,11 @@ class LifecycleFlagsTable<I> extends EntityTable<I, LifecycleFlags, LifecycleFla
     @Override
     protected WriteQuery composeInsertQuery(I id, LifecycleFlags record) {
         InsertLifecycleFlagsQuery.Builder<I> builder = InsertLifecycleFlagsQuery.newBuilder();
-        WriteQuery query = builder.setTableName(getName())
+        WriteQuery query = builder.setTableName(name())
                                   .setId(id)
                                   .setLifecycleFlags(record)
-                                  .setDataSource(getDataSource())
-                                  .setIdColumn(getIdColumn())
+                                  .setDataSource(dataSource())
+                                  .setIdColumn(idColumn())
                                   .build();
         return query;
     }
@@ -85,11 +85,11 @@ class LifecycleFlagsTable<I> extends EntityTable<I, LifecycleFlags, LifecycleFla
     @Override
     protected WriteQuery composeUpdateQuery(I id, LifecycleFlags record) {
         UpdateLifecycleFlagsQuery.Builder<I> builder = UpdateLifecycleFlagsQuery.newBuilder();
-        WriteQuery query = builder.setTableName(getName())
-                                  .setDataSource(getDataSource())
+        WriteQuery query = builder.setTableName(name())
+                                  .setDataSource(dataSource())
                                   .setId(id)
                                   .setLifecycleFlags(record)
-                                  .setIdColumn(getIdColumn())
+                                  .setIdColumn(idColumn())
                                   .build();
         return query;
     }
