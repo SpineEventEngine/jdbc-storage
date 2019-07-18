@@ -45,21 +45,6 @@ public class JdbcInboxStorage
         return null;
     }
 
-    @Override
-    public void write(InboxMessage message) {
-
-    }
-
-    @Override
-    public void writeAll(Iterable<InboxMessage> messages) {
-
-    }
-
-    @Override
-    public void removeAll(Iterable<InboxMessage> messages) {
-
-    }
-
     /**
      * Always throws an {@link UnsupportedOperationException}.
      */

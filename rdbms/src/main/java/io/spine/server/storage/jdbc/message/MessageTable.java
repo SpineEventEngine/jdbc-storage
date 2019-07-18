@@ -57,6 +57,9 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
         this.typeUrl = TypeUrl.of(messageClass);
     }
 
+    public void write(M record) {
+    }
+
     @Override
     protected InsertMessageQuery<I, M> composeInsertQuery(I id, M record) {
         InsertMessageQuery.Builder<I, M> builder = InsertMessageQuery.newBuilder();

@@ -21,6 +21,7 @@
 package io.spine.server.storage.jdbc.message;
 
 import com.google.protobuf.Message;
+import io.spine.server.delivery.InboxMessage;
 import io.spine.server.storage.AbstractStorage;
 import io.spine.server.storage.ReadRequest;
 import io.spine.server.storage.jdbc.query.AbstractTable;
@@ -50,5 +51,17 @@ public abstract class JdbcMessageStorage<I,
     @Override
     public void write(I id, M record) {
         table.write(id, record);
+    }
+
+    public void write(InboxMessage message) {
+
+    }
+
+    public void writeAll(Iterable<InboxMessage> messages) {
+
+    }
+
+    public void removeAll(Iterable<InboxMessage> messages) {
+
     }
 }
