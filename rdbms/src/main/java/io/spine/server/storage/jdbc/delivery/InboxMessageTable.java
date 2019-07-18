@@ -34,7 +34,6 @@ import io.spine.server.storage.jdbc.query.SelectQuery;
 import io.spine.string.Stringifiers;
 
 import javax.annotation.Nullable;
-import java.util.List;
 
 import static io.spine.server.storage.jdbc.Type.BOOLEAN;
 import static io.spine.server.storage.jdbc.Type.INT;
@@ -61,7 +60,7 @@ final class InboxMessageTable extends MessageTable<InboxMessageId, InboxMessage>
     }
 
     @Override
-    protected List<Column> columns() {
+    protected ImmutableList<Column> columns() {
         return ImmutableList.copyOf(Column.values());
     }
 
