@@ -59,7 +59,7 @@ public abstract class IdColumn<I> {
     }
 
     /**
-     * Wraps a given ID {@code column}.
+     * Wraps a given ID {@code column} of a primitive type.
      *
      * <p>The column should have the ID SQL type pre-set.
      *
