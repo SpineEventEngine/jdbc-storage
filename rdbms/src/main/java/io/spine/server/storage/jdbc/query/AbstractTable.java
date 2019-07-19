@@ -70,7 +70,7 @@ import static io.spine.server.storage.jdbc.Sql.Query.PRIMARY_KEY;
  *         a result type of a write operation by a single ID
  * @see TableColumn
  */
-@SuppressWarnings("ClassWithTooManyMethods") // The class has to cover a lot of use cases.
+@SuppressWarnings("ClassWithTooManyMethods") // The class covers a lot of storage use cases.
 @Internal
 public abstract class AbstractTable<I, R, W> implements Logging {
 
