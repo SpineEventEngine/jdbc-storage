@@ -84,7 +84,7 @@ final class SelectVersionBySnapshot<I>
      * Runs a query which finds the minimum version between those newer or corresponding to
      * the {@code snapshotIndex} and those newer or corresponding to the {@code date}.
      *
-     * <p>The results are given on the per-aggregate-ID basis.
+     * <p>The results are given on a per-aggregate-ID basis.
      */
     @Override
     public DbIterator<DoubleColumnRecord<I, Integer>> execute() {

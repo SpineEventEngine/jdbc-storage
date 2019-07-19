@@ -44,14 +44,14 @@ abstract class WriteMessageQuery<I, M extends Message>
 
     @Override
     public long execute() {
-        StoreClause<?> query = baseOperation();
+        StoreClause<?> query = query();
         columns.forEach(
                 column -> query.set(pathOf(column), column.getter().apply(message))
         );
         return query.execute();
     }
 
-    protected abstract StoreClause<?> baseOperation();
+    protected abstract StoreClause<?> query();
 
     abstract static class Builder<I,
                                   M extends Message,

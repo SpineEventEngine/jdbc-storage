@@ -21,6 +21,7 @@
 package io.spine.server.storage.jdbc.delivery;
 
 import com.google.common.collect.ImmutableList;
+import com.google.protobuf.Descriptors.Descriptor;
 import io.spine.server.delivery.InboxMessage;
 import io.spine.server.delivery.InboxMessageId;
 import io.spine.server.delivery.Page;
@@ -51,6 +52,11 @@ final class InboxMessageTable extends MessageTable<InboxMessageId, InboxMessage>
                       DataSourceWrapper dataSource,
                       TypeMapping typeMapping) {
         super(name, idColumn, dataSource, typeMapping);
+    }
+
+    @Override
+    protected Descriptor messageDescriptor() {
+        return InboxMessage.getDescriptor();
     }
 
     @Override

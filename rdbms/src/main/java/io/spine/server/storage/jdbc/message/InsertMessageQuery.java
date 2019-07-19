@@ -30,7 +30,7 @@ final class InsertMessageQuery<I, M extends Message> extends WriteMessageQuery<I
     }
 
     @Override
-    protected StoreClause<?> baseOperation() {
+    protected StoreClause<?> query() {
         return insertWithId();
     }
 

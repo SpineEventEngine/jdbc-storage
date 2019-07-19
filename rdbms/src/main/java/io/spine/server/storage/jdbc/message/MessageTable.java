@@ -21,6 +21,7 @@
 package io.spine.server.storage.jdbc.message;
 
 import com.google.common.collect.ImmutableList;
+import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Message;
 import io.spine.reflect.GenericTypeIndex;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
@@ -28,9 +29,10 @@ import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.Type;
 import io.spine.server.storage.jdbc.TypeMapping;
 import io.spine.server.storage.jdbc.query.AbstractTable;
+import io.spine.server.storage.jdbc.query.DbIterator;
 import io.spine.server.storage.jdbc.query.IdColumn;
-import io.spine.type.TypeUrl;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.function.Function;
 
@@ -46,28 +48,15 @@ import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
  */
 public abstract class MessageTable<I, M extends Message> extends AbstractTable<I, M, M> {
 
-    private final TypeUrl typeUrl;
-
     protected MessageTable(String name,
                            IdColumn<I> idColumn,
                            DataSourceWrapper dataSource,
                            TypeMapping typeMapping) {
         super(name, idColumn, dataSource, typeMapping);
-        @SuppressWarnings("unchecked")      // Ensured by the class declaration.
-                Class<M> messageClass = (Class<M>) GenericParameter.MESSAGE.argumentIn(getClass());
-        this.typeUrl = TypeUrl.of(messageClass);
     }
 
     void write(M record) {
         write(idOf(record), record);
-    }
-
-    @SuppressWarnings("unchecked") // Ensured by class declaration.
-    private I idOf(M record) {
-        Column<M> column = (Column<M>) idColumn().column();
-        I id = (I) column.getter()
-                         .apply(record);
-        return id;
     }
 
     void writeAll(Iterable<M> messages) {
@@ -76,6 +65,29 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
 
     void removeAll(Iterable<M> messages) {
         // NO-OP for now.
+    }
+
+    Iterator<M> readAll(Iterable<I> ids) {
+        SelectMessagesInBulk.Builder<I, M> builder = SelectMessagesInBulk.newBuilder();
+        SelectMessagesInBulk<I, M> query = builder.setTableName(name())
+                                                  .setDataSource(dataSource())
+                                                  .setIdColumn(idColumn())
+                                                  .setIds(ids)
+                                                  .setBytesColumn(bytesColumn())
+                                                  .setMessageDescriptor(messageDescriptor())
+                                                  .build();
+        DbIterator<M> result = query.execute();
+        return result;
+    }
+
+    protected abstract Descriptor messageDescriptor();
+
+    @SuppressWarnings("unchecked") // Ensured by class declaration.
+    private I idOf(M record) {
+        Column<M> column = (Column<M>) idColumn().column();
+        I id = (I) column.getter()
+                         .apply(record);
+        return id;
     }
 
     @Override
@@ -112,7 +124,7 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
                                                .setIdColumn(idColumn())
                                                .setId(id)
                                                .setBytesColumn(bytesColumn())
-                                               .setTypeUrl(typeUrl)
+                                               .setMessageDescriptor(messageDescriptor())
                                                .doBuild();
         return query;
     }

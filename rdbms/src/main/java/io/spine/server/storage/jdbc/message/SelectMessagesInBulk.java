@@ -20,49 +20,49 @@
 
 package io.spine.server.storage.jdbc.message;
 
+import com.google.common.collect.ImmutableList;
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Message;
 import com.querydsl.sql.AbstractSQLQuery;
-import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.TableColumn;
-import io.spine.server.storage.jdbc.query.ColumnReader;
-import io.spine.server.storage.jdbc.query.IdAwareQuery;
+import io.spine.server.storage.jdbc.query.AbstractQuery;
+import io.spine.server.storage.jdbc.query.DbIterator;
+import io.spine.server.storage.jdbc.query.IdColumn;
 import io.spine.server.storage.jdbc.query.SelectQuery;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
 
 import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.messageReader;
 
-final class SelectMessageById<I, M extends Message>
-        extends IdAwareQuery<I>
-        implements SelectQuery<M> {
+final class SelectMessagesInBulk<I, M extends Message>
+        extends AbstractQuery
+        implements SelectQuery<DbIterator<M>> {
 
+    private final ImmutableList<I> ids;
+    private final IdColumn idColumn;
     private final TableColumn bytesColumn;
     private final Descriptor messageDescriptor;
 
-    private SelectMessageById(Builder<I, M> builder) {
+    private SelectMessagesInBulk(Builder<I, M> builder) {
         super(builder);
+        this.ids = builder.ids;
+        this.idColumn = builder.idColumn;
         this.bytesColumn = builder.bytesColumn;
         this.messageDescriptor = builder.messageDescriptor;
     }
 
     @Override
-    public final @Nullable M execute() throws DatabaseException {
-        try (ResultSet resultSet = query().getResults()) {
-            ColumnReader<M> reader = messageReader(bytesColumn.name(), messageDescriptor);
-            M result = reader.readValue(resultSet);
-            return result;
-        } catch (SQLException e) {
-            throw new DatabaseException(e);
-        }
+    public DbIterator<M> execute() {
+        ResultSet results = query().getResults();
+        DbIterator<M> iterator =
+                DbIterator.over(results, messageReader(bytesColumn.name(), messageDescriptor));
+        return iterator;
     }
 
     private AbstractSQLQuery<Object, ?> query() {
         return factory().select(pathOf(bytesColumn))
                         .from(table())
-                        .where(idEquals());
+                        .where(pathOf(idColumn.columnName()).in(ids));
     }
 
     static <I, M extends Message> Builder<I, M> newBuilder() {
@@ -70,10 +70,22 @@ final class SelectMessageById<I, M extends Message>
     }
 
     static class Builder<I, M extends Message>
-            extends IdAwareQuery.Builder<I, Builder<I, M>, SelectMessageById<I, M>> {
+            extends AbstractQuery.Builder<Builder<I, M>, SelectMessagesInBulk<I, M>> {
 
+        private ImmutableList<I> ids;
+        private IdColumn idColumn;
         private TableColumn bytesColumn;
         private Descriptor messageDescriptor;
+
+        Builder<I, M> setIds(Iterable<I> ids) {
+            this.ids = ImmutableList.copyOf(ids);
+            return getThis();
+        }
+
+        Builder<I, M> setIdColumn(IdColumn idColumn) {
+            this.idColumn = idColumn;
+            return getThis();
+        }
 
         Builder<I, M> setBytesColumn(TableColumn bytesColumn) {
             this.bytesColumn = bytesColumn;
@@ -91,8 +103,8 @@ final class SelectMessageById<I, M extends Message>
         }
 
         @Override
-        protected SelectMessageById<I, M> doBuild() {
-            return new SelectMessageById<>(this);
+        protected SelectMessagesInBulk<I, M> doBuild() {
+            return new SelectMessagesInBulk<>(this);
         }
     }
 }

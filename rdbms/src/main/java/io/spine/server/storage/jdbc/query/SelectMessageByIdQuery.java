@@ -40,6 +40,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @param <M>
  *         a type of messages to read
  */
+// TODO:2019-07-19:dmytro.kuzmin:WIP Remove this or integrate somehow with tools added to `message`
+//  package
 public abstract class SelectMessageByIdQuery<I, M extends Message>
         extends IdAwareQuery<I>
         implements SelectQuery<M> {
