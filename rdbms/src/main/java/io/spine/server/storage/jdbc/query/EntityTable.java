@@ -24,6 +24,7 @@ import com.google.common.collect.ImmutableMap;
 import io.spine.annotation.Internal;
 import io.spine.server.entity.Entity;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.TypeMapping;
 
 import static io.spine.server.storage.LifecycleFlagField.archived;
@@ -51,7 +52,6 @@ public abstract class EntityTable<I, R, W> extends AbstractTable<I, R, W> {
             ImmutableMap.of(archived.name(), false,
                             deleted.name(), false,
                             version.name(), 0);
-    private final Class<? extends Entity<I, ?>> entityClass;
 
     /**
      * Creates a new instance of the {@code EntityTable}.
@@ -64,10 +64,10 @@ public abstract class EntityTable<I, R, W> extends AbstractTable<I, R, W> {
      *         an instance of {@link DataSourceWrapper} to use
      */
     protected EntityTable(Class<? extends Entity<I, ?>> entityClass,
-                          String idColumnName,
+                          TableColumn idColumn,
                           DataSourceWrapper dataSource,
                           TypeMapping typeMapping) {
-        this("", entityClass, idColumnName, dataSource, typeMapping);
+        this("", entityClass, idColumn, dataSource, typeMapping);
     }
 
     /**
@@ -85,23 +85,17 @@ public abstract class EntityTable<I, R, W> extends AbstractTable<I, R, W> {
      */
     protected EntityTable(String tableNamePostfix,
                           Class<? extends Entity<I, ?>> entityClass,
-                          String idColumnName,
+                          TableColumn idColumn,
                           DataSourceWrapper dataSource,
                           TypeMapping typeMapping) {
         super(newTableName(entityClass) + tableNamePostfix,
-              IdColumn.newInstance(entityClass, idColumnName),
+              IdColumn.ofEntityClass(idColumn, entityClass),
               dataSource,
               typeMapping);
-        this.entityClass = entityClass;
     }
 
     @Override
     protected ImmutableMap<String, Object> columnDefaults() {
         return COLUMN_DEFAULTS;
-    }
-
-    // TODO:2019-07-18:dmytro.kuzmin:WIP: Seems unused, remove together with the field.
-    public Class<? extends Entity<I, ?>> entityClass() {
-        return entityClass;
     }
 }

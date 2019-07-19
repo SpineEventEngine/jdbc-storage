@@ -58,6 +58,7 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
     }
 
     public void write(M record) {
+        // NO-OP for now.
     }
 
     @Override

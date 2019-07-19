@@ -70,7 +70,6 @@ import static io.spine.server.storage.jdbc.Sql.Query.PRIMARY_KEY;
  *         a result type of a write operation by a single ID
  * @see TableColumn
  */
-@SuppressWarnings("ClassWithTooManyMethods") // The class covers a lot of storage use cases.
 @Internal
 public abstract class AbstractTable<I, R, W> implements Logging {
 
@@ -95,21 +94,6 @@ public abstract class AbstractTable<I, R, W> implements Logging {
         this.dataSource = checkNotNull(dataSource);
         this.typeMapping = checkNotNull(typeMapping);
     }
-
-    /**
-     * Retrieves the enum object representing the table ID column.
-     *
-     * <p>Example:
-     * <pre>
-     *     {@code
-     *     \@Override
-     *      public Column idColumnDeclaration() {
-     *          return Column.ID;
-     *      }
-     *     }
-     * </pre>
-     */
-    protected abstract TableColumn idColumnDeclaration();
 
     protected abstract List<? extends TableColumn> tableColumns();
 
@@ -268,7 +252,7 @@ public abstract class AbstractTable<I, R, W> implements Logging {
         for (Iterator<? extends TableColumn> iterator = columns.iterator(); iterator.hasNext(); ) {
             TableColumn column = iterator.next();
             String name = column.name();
-            Type type = ensureIdType(column);
+            Type type = typeOf(column);
             TypeName typeName = typeMapping.typeNameFor(type);
             sql.append(name)
                .append(' ')
@@ -303,30 +287,20 @@ public abstract class AbstractTable<I, R, W> implements Logging {
         return result;
     }
 
-    private Type getIdType() {
-        Type idType = idColumn().sqlType();
-        return idType;
-    }
-
     /**
      * Obtains the type of the specified column.
      *
-     * <p>If the column is the ID and its type is {@linkplain TableColumn#type() unknown}
-     * at the compile time, returns {@linkplain #getIdType() the ID type},
-     * which is determined at the runtime.
+     * <p>If the column is an ID column, the correct type is obtained from its
+     * {@linkplain IdColumn wrapper}, otherwise the column type is returned as-is.
      *
-     * @param column
-     *         the column whose type will be handled
-     * @return the SQL type of the column
+     * <p>It's also assumed that non-ID columns always have their SQL type set.
      */
-    private Type ensureIdType(TableColumn column) {
-        Type type = column.type();
-        boolean isIdColumn = column.equals(idColumnDeclaration());
-        boolean typeUnknown = type == null;
-        if (isIdColumn && typeUnknown) {
-            type = getIdType();
+    private Type typeOf(TableColumn column) {
+        boolean isIdColumn = column.equals(idColumn.column());
+        if (isIdColumn) {
+            return idColumn.sqlType();
         }
-        return type;
+        return checkNotNull(column.type());
     }
 
     /**

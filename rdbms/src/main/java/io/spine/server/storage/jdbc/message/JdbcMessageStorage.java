@@ -54,14 +54,14 @@ public abstract class JdbcMessageStorage<I,
     }
 
     public void write(InboxMessage message) {
-
+        // NO-OP for now.
     }
 
     public void writeAll(Iterable<InboxMessage> messages) {
-
+        // NO-OP for now.
     }
 
     public void removeAll(Iterable<InboxMessage> messages) {
-
+        // NO-OP for now.
     }
 }

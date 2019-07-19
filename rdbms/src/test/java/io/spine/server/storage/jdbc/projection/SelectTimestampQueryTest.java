@@ -30,7 +30,7 @@ import java.sql.SQLException;
 
 import static io.spine.base.Identifier.newUuid;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
-import static io.spine.server.storage.jdbc.query.IdColumn.typeString;
+import static io.spine.server.storage.jdbc.given.Column.stringIdColumn;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 
@@ -46,7 +46,7 @@ class SelectTimestampQueryTest {
                                                          .setTableName(newUuid())
                                                          .setDataSource(dataSource)
                                                          .setId(newUuid())
-                                                         .setIdColumn(typeString(newUuid()))
+                                                         .setIdColumn(stringIdColumn())
                                                          .build();
         Message deserialized = query.readMessage(resultSet);
         assertNull(deserialized);

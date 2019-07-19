@@ -25,7 +25,7 @@ import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.sql.dml.SQLUpdateClause;
 
 import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.NANOS;
-import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.PROJECTION_TYPE;
+import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.PROJECTION_CLASS;
 import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.SECONDS;
 
 /**
@@ -39,7 +39,7 @@ class UpdateTimestampQuery extends WriteTimestampQuery {
 
     @Override
     public long execute() {
-        PathBuilder<Object> id = pathOf(PROJECTION_TYPE);
+        PathBuilder<Object> id = pathOf(PROJECTION_CLASS);
         SQLUpdateClause query = factory().update(table())
                                          .where(id.eq(getIdValue()))
                                          .set(pathOf(SECONDS), getTimestamp().getSeconds())

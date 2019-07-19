@@ -25,7 +25,6 @@ import io.spine.server.delivery.InboxMessage;
 import io.spine.server.delivery.InboxMessageId;
 import io.spine.server.delivery.ShardIndex;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.Type;
 import io.spine.server.storage.jdbc.TypeMapping;
 import io.spine.server.storage.jdbc.message.MessageTable;
@@ -40,7 +39,6 @@ import static io.spine.server.storage.jdbc.Type.INT;
 import static io.spine.server.storage.jdbc.Type.LONG;
 import static io.spine.server.storage.jdbc.Type.STRING;
 import static io.spine.server.storage.jdbc.Type.STRING_255;
-import static io.spine.server.storage.jdbc.delivery.InboxMessageTable.Column.ID;
 
 /**
  * A table in the DB responsible for storing the {@link io.spine.server.delivery.Inbox Inbox} data.
@@ -52,11 +50,6 @@ final class InboxMessageTable extends MessageTable<InboxMessageId, InboxMessage>
                       DataSourceWrapper dataSource,
                       TypeMapping typeMapping) {
         super(name, idColumn, dataSource, typeMapping);
-    }
-
-    @Override
-    protected TableColumn idColumnDeclaration() {
-        return ID;
     }
 
     @Override

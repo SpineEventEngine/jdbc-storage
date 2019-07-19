@@ -24,28 +24,91 @@ import com.google.protobuf.Message;
 import io.spine.annotation.Internal;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.entity.Entity;
+import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.Type;
 
 import java.util.Collection;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Lists.newLinkedList;
 import static io.spine.json.Json.toCompactJson;
 import static io.spine.server.entity.model.EntityClass.asEntityClass;
+import static io.spine.server.storage.jdbc.Type.INT;
+import static io.spine.server.storage.jdbc.Type.LONG;
+import static io.spine.server.storage.jdbc.Type.STRING;
+import static io.spine.server.storage.jdbc.Type.STRING_255;
+import static io.spine.util.Exceptions.newIllegalArgumentException;
 
 /**
- * A helper class for setting the {@link Entity} ID into {@linkplain Parameters query parameters}.
+ * A wrapper for the column which stores a primary key in a DB {@linkplain AbstractTable table}.
  *
  * @param <I>
- *         the type of {@link Entity} IDs
+ *         the ID type
  */
 @Internal
 public abstract class IdColumn<I> {
 
-    private final String columnName;
+    /**
+     * The underlying {@link TableColumn storage field}.
+     */
+    private final TableColumn column;
+
+    private IdColumn(TableColumn column) {
+        this.column = column;
+    }
 
     /**
-     * Creates a new instance.
+     * Wraps a given ID {@code column}.
+     *
+     * <p>The column should have the ID SQL type pre-set.
+     *
+     * <p>This also implies that actual ID values will be primitive and matching to the SQL type
+     * set.
+     *
+     * @see #of(TableColumn, Class) for {@link Message}-type ID column creation
+     * @see #ofEntityClass(TableColumn, Class) for {@link Entity} ID column creation
+     */
+    @SuppressWarnings("unchecked") // It's up to caller to keep the ID class and SQL type in sync.
+    public static <I> IdColumn<I> of(TableColumn column) {
+        checkNotNull(column);
+        Type type = checkNotNull(column.type(),
+                                 "Please use other suitable method overload if ID SQL type is " +
+                                 "unknown at compile time");
+        switch (type) {
+            case INT:
+                return (IdColumn<I>) new IntIdColumn(column);
+            case LONG:
+                return (IdColumn<I>) new LongIdColumn(column);
+            case STRING_255:
+            case STRING:
+                return (IdColumn<I>) new StringIdColumn(column);
+            case BOOLEAN:
+            case BYTE_ARRAY:
+            default:
+                throw newIllegalArgumentException("Unexpected ID column SQL type: %s",
+                                                  type);
+        }
+    }
+
+    /**
+     * Wraps a given ID {@code column} of {@link Message} type.
+     *
+     * <p>The column shouldn't have an SQL type pre-set.
+     */
+    public static <I extends Message> IdColumn<I> of(TableColumn column, Class<I> messageClass) {
+        checkNotNull(column);
+        checkNotNull(messageClass);
+        checkArgument(column.type() == null,
+                      "Message-type IDs follow the predefined conversion rules of `IdColumn` " +
+                      "and shouldn't have an SQL type set on their own");
+        return new MessageIdColumn<>(column, messageClass);
+    }
+
+    /**
+     * Wraps a given {@link Entity} ID column.
+     *
+     * <p>{@code Entity} ID type is calculated at runtime from the class's generic parameters.
      *
      * @param entityClass
      *         a class of an {@link Entity} or an {@link Aggregate}
@@ -58,36 +121,26 @@ public abstract class IdColumn<I> {
             "IfStatementWithTooManyBranches", // OK for a factory method
             "ChainOfInstanceofChecks"         // which depends on the built object target type.
     })
-    static <I> IdColumn<I> newInstance(Class<? extends Entity<I, ?>> entityClass,
-                                       String columnName) {
-        IdColumn<I> helper;
+    public static <I> IdColumn<I>
+    ofEntityClass(TableColumn column, Class<? extends Entity<I, ?>> entityClass) {
+        checkNotNull(column);
+        checkNotNull(entityClass);
+        checkArgument(column.type() == null,
+                      "Entity ID type is calculated at runtime and shouldn't have an SQL type " +
+                      "pre-set");
         Class<?> idClass = asEntityClass(entityClass).idClass();
         if (idClass == Long.class) {
-            helper = (IdColumn<I>) new LongIdColumn(columnName);
+            return  (IdColumn<I>) new LongIdColumn(column);
         } else if (idClass == Integer.class) {
-            helper = (IdColumn<I>) new IntIdColumn(columnName);
+            return  (IdColumn<I>) new IntIdColumn(column);
         } else if (idClass == String.class) {
-            helper = (IdColumn<I>) new StringIdColumn(columnName);
-        } else {
+            return  (IdColumn<I>) new StringIdColumn(column);
+        } else if (Message.class.isAssignableFrom(idClass)) {
             Class<? extends Message> messageClass = (Class<? extends Message>) idClass;
-            helper = (IdColumn<I>) new MessageIdColumn(messageClass, columnName);
+            return  (IdColumn<I>) new MessageIdColumn(column, messageClass);
+        } else {
+            throw newIllegalArgumentException("Unexpected entity ID class %s", idClass.getName());
         }
-        return helper;
-    }
-
-    /**
-     * Creates a {@link StringIdColumn} with the specified column name.
-     *
-     * @param columnName
-     *         the name of the ID column
-     * @return the {@code IdColumn}
-     */
-    public static IdColumn<String> typeString(String columnName) {
-        return new StringIdColumn(columnName);
-    }
-
-    protected IdColumn(String columnName) {
-        this.columnName = checkNotNull(columnName);
     }
 
     /**
@@ -134,7 +187,11 @@ public abstract class IdColumn<I> {
     }
 
     public String columnName() {
-        return columnName;
+        return column.name();
+    }
+
+    protected TableColumn column() {
+        return column;
     }
 
     /**
@@ -158,13 +215,13 @@ public abstract class IdColumn<I> {
      */
     private static class LongIdColumn extends IdColumn<Long> {
 
-        private LongIdColumn(String columnName) {
-            super(columnName);
+        private LongIdColumn(TableColumn column) {
+            super(column);
         }
 
         @Override
         public Type sqlType() {
-            return Type.LONG;
+            return LONG;
         }
 
         @Override
@@ -183,13 +240,13 @@ public abstract class IdColumn<I> {
      */
     private static class IntIdColumn extends IdColumn<Integer> {
 
-        private IntIdColumn(String columnName) {
-            super(columnName);
+        private IntIdColumn(TableColumn column) {
+            super(column);
         }
 
         @Override
         public Type sqlType() {
-            return Type.INT;
+            return INT;
         }
 
         @Override
@@ -204,28 +261,12 @@ public abstract class IdColumn<I> {
     }
 
     /**
-     * Helps to work with columns which contain either {@link Message} or {@code string}
-     * {@link Entity} IDs.
-     */
-    private abstract static class StringOrMessageIdColumn<I> extends IdColumn<I> {
-
-        private StringOrMessageIdColumn(String columnName) {
-            super(columnName);
-        }
-
-        @Override
-        public Type sqlType() {
-            return Type.STRING_255;
-        }
-    }
-
-    /**
      * Helps to work with columns which contain {@code String} {@link Entity} IDs.
      */
-    private static class StringIdColumn extends StringOrMessageIdColumn<String> {
+    private static class StringIdColumn extends IdColumn<String> {
 
-        private StringIdColumn(String columnName) {
-            super(columnName);
+        private StringIdColumn(TableColumn column) {
+            super(column);
         }
 
         @Override
@@ -234,17 +275,22 @@ public abstract class IdColumn<I> {
         }
 
         @Override
+        public Type sqlType() {
+            return column().type() == STRING ? STRING : STRING_255;
+        }
+
+        @Override
         public Class<String> javaType() {
             return String.class;
         }
     }
 
-    private static class MessageIdColumn<M extends Message> extends StringOrMessageIdColumn<M> {
+    private static class MessageIdColumn<M extends Message> extends IdColumn<M> {
 
         private final Class<M> cls;
 
-        private MessageIdColumn(Class<M> cls, String columnName) {
-            super(columnName);
+        private MessageIdColumn(TableColumn column, Class<M> cls) {
+            super(column);
             this.cls = cls;
         }
 
@@ -257,6 +303,11 @@ public abstract class IdColumn<I> {
         @Override
         public String normalize(M id) {
             return toCompactJson(id);
+        }
+
+        @Override
+        public Type sqlType() {
+            return STRING_255;
         }
 
         @Override

@@ -52,12 +52,7 @@ class AggregateEventRecordTable<I> extends EntityTable<I,
     AggregateEventRecordTable(Class<? extends Aggregate<I, ?, ?>> entityClass,
                               DataSourceWrapper dataSource,
                               TypeMapping typeMapping) {
-        super(entityClass, Column.ID.name(), dataSource, typeMapping);
-    }
-
-    @Override
-    protected Column idColumnDeclaration() {
-        return Column.ID;
+        super(entityClass, Column.ID, dataSource, typeMapping);
     }
 
     @Override

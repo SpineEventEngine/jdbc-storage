@@ -52,6 +52,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Lists.newLinkedList;
 import static com.google.common.collect.Streams.stream;
 import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
+import static io.spine.server.storage.jdbc.record.RecordTable.StandardColumn.ID;
 import static java.util.Collections.addAll;
 
 /**
@@ -70,14 +71,9 @@ final class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWith
                         columnTypeRegistry,
                 TypeMapping typeMapping,
                 Collection<EntityColumn> entityColumns) {
-        super(entityClass, StandardColumn.ID.name(), dataSource, typeMapping);
+        super(entityClass, ID, dataSource, typeMapping);
         this.typeRegistry = columnTypeRegistry;
         this.entityColumns = ImmutableSet.copyOf(entityColumns);
-    }
-
-    @Override
-    protected StandardColumn idColumnDeclaration() {
-        return StandardColumn.ID;
     }
 
     @Override

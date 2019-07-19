@@ -24,7 +24,7 @@ import com.google.protobuf.Timestamp;
 import com.querydsl.sql.dml.SQLInsertClause;
 
 import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.NANOS;
-import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.PROJECTION_TYPE;
+import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.PROJECTION_CLASS;
 import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.SECONDS;
 
 /**
@@ -39,7 +39,7 @@ class InsertTimestampQuery extends WriteTimestampQuery {
     @Override
     public long execute() {
         SQLInsertClause query = factory().insert(table())
-                                         .set(pathOf(PROJECTION_TYPE), getIdValue())
+                                         .set(pathOf(PROJECTION_CLASS), getIdValue())
                                          .set(pathOf(SECONDS), getTimestamp().getSeconds())
                                          .set(pathOf(NANOS), getTimestamp().getNanos());
         return query.execute();

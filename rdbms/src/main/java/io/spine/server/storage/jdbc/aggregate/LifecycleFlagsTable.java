@@ -46,12 +46,7 @@ class LifecycleFlagsTable<I> extends EntityTable<I, LifecycleFlags, LifecycleFla
     LifecycleFlagsTable(Class<? extends Aggregate<I, ?, ?>> aggregateClass,
                         DataSourceWrapper dataSource,
                         TypeMapping typeMapping) {
-        super(TABLE_NAME_POSTFIX, aggregateClass, ID.name(), dataSource, typeMapping);
-    }
-
-    @Override
-    protected Column idColumnDeclaration() {
-        return ID;
+        super(TABLE_NAME_POSTFIX, aggregateClass, ID, dataSource, typeMapping);
     }
 
     @Override
