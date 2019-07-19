@@ -67,7 +67,7 @@ import static io.spine.server.storage.jdbc.Sql.Query.PRIMARY_KEY;
  * @param <R>
  *         a result type of a read operation by a single ID
  * @param <W>
- *         a result type of a write operation by a single ID
+ *         a type of stored records
  * @see TableColumn
  */
 @Internal

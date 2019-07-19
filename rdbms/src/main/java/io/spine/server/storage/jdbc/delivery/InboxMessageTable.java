@@ -23,6 +23,7 @@ package io.spine.server.storage.jdbc.delivery;
 import com.google.common.collect.ImmutableList;
 import io.spine.server.delivery.InboxMessage;
 import io.spine.server.delivery.InboxMessageId;
+import io.spine.server.delivery.Page;
 import io.spine.server.delivery.ShardIndex;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.Type;
@@ -57,7 +58,11 @@ final class InboxMessageTable extends MessageTable<InboxMessageId, InboxMessage>
         return ImmutableList.copyOf(Column.values());
     }
 
-    SelectQuery<InboxMessage> composeSelectByShardIndexQuery(ShardIndex index) {
+    Page<InboxMessage> readAll(ShardIndex index) {
+        return null;
+    }
+
+    private SelectQuery<InboxMessage> composeSelectByShardIndexQuery(ShardIndex index) {
         return null;
     }
 

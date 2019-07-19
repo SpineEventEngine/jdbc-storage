@@ -190,7 +190,7 @@ public abstract class IdColumn<I> {
         return column.name();
     }
 
-    protected TableColumn column() {
+    public TableColumn column() {
         return column;
     }
 

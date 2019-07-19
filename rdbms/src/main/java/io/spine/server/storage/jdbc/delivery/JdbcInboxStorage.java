@@ -33,7 +33,10 @@ import java.util.Iterator;
 import static io.spine.util.Exceptions.unsupported;
 
 public class JdbcInboxStorage
-        extends JdbcMessageStorage<InboxMessageId, InboxMessage, InboxReadRequest, InboxMessageTable>
+        extends JdbcMessageStorage<InboxMessageId,
+                                   InboxMessage,
+                                   InboxReadRequest,
+                                   InboxMessageTable>
         implements InboxStorage {
 
     protected JdbcInboxStorage(boolean multitenant, InboxMessageTable table) {

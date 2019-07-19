@@ -21,17 +21,15 @@
 package io.spine.server.storage.jdbc.message;
 
 import com.google.protobuf.Message;
-import io.spine.server.delivery.InboxMessage;
 import io.spine.server.storage.AbstractStorage;
 import io.spine.server.storage.ReadRequest;
-import io.spine.server.storage.jdbc.query.AbstractTable;
 
 import java.util.Optional;
 
 public abstract class JdbcMessageStorage<I,
-        M extends Message,
-        R extends ReadRequest<I>,
-        T extends AbstractTable<I, M, M>>
+                                         M extends Message,
+                                         R extends ReadRequest<I>,
+                                         T extends MessageTable<I, M>>
         extends AbstractStorage<I, M, R> {
 
     private final T table;
@@ -53,15 +51,19 @@ public abstract class JdbcMessageStorage<I,
         table.write(id, record);
     }
 
-    public void write(InboxMessage message) {
-        // NO-OP for now.
+    public void write(M message) {
+        table.write(message);
     }
 
-    public void writeAll(Iterable<InboxMessage> messages) {
-        // NO-OP for now.
+    public void writeAll(Iterable<M> messages) {
+        table.writeAll(messages);
     }
 
-    public void removeAll(Iterable<InboxMessage> messages) {
-        // NO-OP for now.
+    public void removeAll(Iterable<M> messages) {
+        table.removeAll(messages);
+    }
+
+    protected T table() {
+        return table;
     }
 }

@@ -22,7 +22,6 @@ package io.spine.server.storage.jdbc.message;
 
 import com.google.common.collect.ImmutableList;
 import com.google.protobuf.Message;
-import io.spine.protobuf.AnyPacker;
 import io.spine.reflect.GenericTypeIndex;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.TableColumn;
@@ -38,10 +37,12 @@ import java.util.function.Function;
 import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
 
 /**
- * A table storing a single {@link Message} type by ID.
+ * A table storing a single {@link Message} type.
  *
- * @param <I> the {@code Message} ID type
- * @param <M> the {@code Message} type
+ * @param <I>
+ *         the {@code Message} ID type
+ * @param <M>
+ *         the {@code Message} type
  */
 public abstract class MessageTable<I, M extends Message> extends AbstractTable<I, M, M> {
 
@@ -57,7 +58,23 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
         this.typeUrl = TypeUrl.of(messageClass);
     }
 
-    public void write(M record) {
+    void write(M record) {
+        write(idOf(record), record);
+    }
+
+    @SuppressWarnings("unchecked") // Ensured by class declaration.
+    private I idOf(M record) {
+        Column<M> column = (Column<M>) idColumn().column();
+        I id = (I) column.getter()
+                         .apply(record);
+        return id;
+    }
+
+    void writeAll(Iterable<M> messages) {
+        // NO-OP for now.
+    }
+
+    void removeAll(Iterable<M> messages) {
         // NO-OP for now.
     }
 
@@ -94,7 +111,7 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
                                                .setDataSource(dataSource())
                                                .setIdColumn(idColumn())
                                                .setId(id)
-                                               .setBytesColumn(DefaultColumn.bytes())
+                                               .setBytesColumn(bytesColumn())
                                                .setTypeUrl(typeUrl)
                                                .doBuild();
         return query;
@@ -104,12 +121,21 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
     protected List<? extends Column<M>> tableColumns() {
         ImmutableList.Builder<Column<M>> columns = ImmutableList.builder();
         columns.addAll(columns());
-        columns.add(DefaultColumn.bytes());
+        columns.add(bytesColumn());
         return columns.build();
     }
 
     protected abstract ImmutableList<? extends Column<M>> columns();
 
+    /**
+     * Represents a {@code MessageTable} column.
+     *
+     * <p>Unlike the ordinary {@link TableColumn}, carries the information on how to extract its
+     * data from the given record.
+     *
+     * @param <M>
+     *         the type of messages stored in table
+     */
     public interface Column<M extends Message> extends TableColumn {
 
         Getter<M> getter();
@@ -119,35 +145,27 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
         }
     }
 
-    private static class DefaultColumn<M extends Message> implements Column<M> {
+    private static <M extends Message> BytesColumn<M> bytesColumn() {
+        return new BytesColumn<>();
+    }
 
-        private final String name;
-        private final Type type;
-        private final Getter<M> getter;
+    private static class BytesColumn<M extends Message> implements Column<M> {
 
-        private DefaultColumn(String name, Type type, Getter<M> getter) {
-            this.name = name;
-            this.type = type;
-            this.getter = getter;
-        }
-
-        private static <M extends Message> DefaultColumn<M> bytes() {
-            return new DefaultColumn<>("bytes", BYTE_ARRAY, AnyPacker::pack);
-        }
+        private static final String NAME = "bytes";
 
         @Override
         public Getter<M> getter() {
-            return getter;
+            return Message::toByteArray;
         }
 
         @Override
         public String name() {
-            return name;
+            return NAME;
         }
 
         @Override
         public Type type() {
-            return type;
+            return BYTE_ARRAY;
         }
 
         @Override
