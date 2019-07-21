@@ -58,7 +58,7 @@ public class DataSourceWrapper implements AutoCloseable, Logging {
             ConnectionWrapper wrapper = ConnectionWrapper.wrap(connection);
             return wrapper;
         } catch (SQLException e) {
-            _error("Failed to get connection.", e);
+            _error().log("Failed to get connection.", e);
             throw new DatabaseException(e);
         }
     }
@@ -77,11 +77,11 @@ public class DataSourceWrapper implements AutoCloseable, Logging {
             try {
                 ((AutoCloseable) dataSource).close();
             } catch (Exception e) {
-                _error("Error occurred while closing DataSource ", e);
+                _error().log("Error occurred while closing DataSource ", e);
                 throw new DatabaseException(e);
             }
             return;
         }
-        _warn("Close method is not implemented in " + dataSource.getClass());
+        _warn().log("Close method is not implemented in " + dataSource.getClass());
     }
 }

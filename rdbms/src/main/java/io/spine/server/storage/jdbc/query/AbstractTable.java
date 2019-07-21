@@ -104,7 +104,7 @@ public abstract class AbstractTable<I, R, W> implements Logging {
      * <p>{@code CREATE TABLE IF NOT EXISTS $TableName ( $Columns );}
      */
     public void create() {
-        QueryExecutor queryExecutor = new QueryExecutor(dataSource, log());
+        QueryExecutor queryExecutor = new QueryExecutor(dataSource, logger());
         String createTableSql = composeCreateTableSql();
         queryExecutor.execute(createTableSql);
     }

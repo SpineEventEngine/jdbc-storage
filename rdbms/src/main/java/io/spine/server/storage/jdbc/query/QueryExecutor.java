@@ -20,15 +20,13 @@
 
 package io.spine.server.storage.jdbc.query;
 
+import com.google.common.flogger.FluentLogger;
 import io.spine.server.storage.jdbc.ConnectionWrapper;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
-import org.slf4j.Logger;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-
-import static java.lang.String.format;
 
 /**
  * A helper class for execution of SQL queries.
@@ -36,9 +34,9 @@ import static java.lang.String.format;
 class QueryExecutor {
 
     private final DataSourceWrapper dataSource;
-    private final Logger logger;
+    private final FluentLogger logger;
 
-    QueryExecutor(DataSourceWrapper dataSource, Logger logger) {
+    QueryExecutor(DataSourceWrapper dataSource, FluentLogger logger) {
         this.dataSource = dataSource;
         this.logger = logger;
     }
@@ -51,8 +49,8 @@ class QueryExecutor {
              PreparedStatement statement = connection.prepareStatement(query)) {
             statement.execute();
         } catch (SQLException e) {
-            String errorMsg = format("Error executing statement %s", query);
-            logger.error(errorMsg, e);
+            logger.atSevere()
+                  .log("Error executing statement %s: %s", query, e.getMessage());
             throw new DatabaseException(e);
         }
     }
