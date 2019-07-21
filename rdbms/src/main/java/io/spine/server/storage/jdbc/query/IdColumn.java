@@ -73,8 +73,8 @@ public abstract class IdColumn<I> {
     public static <I> IdColumn<I> of(TableColumn column) {
         checkNotNull(column);
         Type type = checkNotNull(column.type(),
-                                 "Please use other suitable method overload if ID SQL type is " +
-                                 "unknown at compile time");
+                                 "Please use other suitable method overload if ID column SQL " +
+                                 "type is unknown at compile time");
         switch (type) {
             case INT:
                 return (IdColumn<I>) new IntIdColumn(column);

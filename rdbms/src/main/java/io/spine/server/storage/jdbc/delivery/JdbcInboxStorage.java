@@ -45,7 +45,7 @@ public class JdbcInboxStorage
 
     @Override
     public Page<InboxMessage> readAll(ShardIndex index) {
-        return null;
+        return table().readAll(index);
     }
 
     /**

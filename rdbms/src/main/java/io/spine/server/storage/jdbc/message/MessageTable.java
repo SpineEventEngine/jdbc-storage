@@ -44,7 +44,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
 /**
- * A table storing a single {@link Message} type.
+ * A DB table storing a single {@link Message} type.
  *
  * @param <I>
  *         the {@code Message} ID type

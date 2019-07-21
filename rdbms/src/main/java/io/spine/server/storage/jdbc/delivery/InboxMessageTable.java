@@ -47,11 +47,10 @@ import static io.spine.server.storage.jdbc.Type.STRING_255;
  */
 final class InboxMessageTable extends MessageTable<InboxMessageId, InboxMessage> {
 
-    InboxMessageTable(String name,
-                      IdColumn<InboxMessageId> idColumn,
-                      DataSourceWrapper dataSource,
-                      TypeMapping typeMapping) {
-        super(name, idColumn, dataSource, typeMapping);
+    private static final String NAME = "inbox";
+
+    InboxMessageTable(DataSourceWrapper dataSource, TypeMapping typeMapping) {
+        super(NAME, IdColumn.of(Column.ID, InboxMessageId.class), dataSource, typeMapping);
     }
 
     @Override
