@@ -97,7 +97,6 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
                                                   .setDataSource(dataSource())
                                                   .setIdColumn(idColumn())
                                                   .setIds(ids)
-                                                  .setMessageBytesColumn(bytesColumn())
                                                   .setMessageDescriptor(messageDescriptor())
                                                   .build();
         DbIterator<M> result = query.execute();
@@ -180,7 +179,6 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
                                                .setDataSource(dataSource())
                                                .setIdColumn(idColumn())
                                                .setId(id)
-                                               .setMessageBytesColumn(bytesColumn())
                                                .setMessageDescriptor(messageDescriptor())
                                                .doBuild();
         return query;

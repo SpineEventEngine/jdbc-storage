@@ -24,7 +24,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Message;
 import com.querydsl.sql.AbstractSQLQuery;
-import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.query.AbstractQuery;
 import io.spine.server.storage.jdbc.query.DbIterator;
 import io.spine.server.storage.jdbc.query.IdColumn;
@@ -32,6 +31,7 @@ import io.spine.server.storage.jdbc.query.SelectQuery;
 
 import java.sql.ResultSet;
 
+import static io.spine.server.storage.jdbc.message.MessageTable.bytesColumn;
 import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.messageReader;
 
 final class SelectMessagesInBulk<I, M extends Message>
@@ -40,14 +40,12 @@ final class SelectMessagesInBulk<I, M extends Message>
 
     private final ImmutableList<I> ids;
     private final IdColumn idColumn;
-    private final TableColumn messageBytesColumn;
     private final Descriptor messageDescriptor;
 
     private SelectMessagesInBulk(Builder<I, M> builder) {
         super(builder);
         this.ids = builder.ids;
         this.idColumn = builder.idColumn;
-        this.messageBytesColumn = builder.messageBytesColumn;
         this.messageDescriptor = builder.messageDescriptor;
     }
 
@@ -56,12 +54,12 @@ final class SelectMessagesInBulk<I, M extends Message>
         ResultSet results = query().getResults();
         DbIterator<M> iterator =
                 DbIterator.over(results,
-                                messageReader(messageBytesColumn.name(), messageDescriptor));
+                                messageReader(bytesColumn().name(), messageDescriptor));
         return iterator;
     }
 
     private AbstractSQLQuery<Object, ?> query() {
-        return factory().select(pathOf(messageBytesColumn))
+        return factory().select(pathOf(bytesColumn()))
                         .from(table())
                         .where(pathOf(idColumn).in(ids));
     }
@@ -75,7 +73,6 @@ final class SelectMessagesInBulk<I, M extends Message>
 
         private ImmutableList<I> ids;
         private IdColumn idColumn;
-        private TableColumn messageBytesColumn;
         private Descriptor messageDescriptor;
 
         Builder<I, M> setIds(Iterable<I> ids) {
@@ -85,11 +82,6 @@ final class SelectMessagesInBulk<I, M extends Message>
 
         Builder<I, M> setIdColumn(IdColumn idColumn) {
             this.idColumn = idColumn;
-            return getThis();
-        }
-
-        Builder<I, M> setMessageBytesColumn(TableColumn messageBytesColumn) {
-            this.messageBytesColumn = messageBytesColumn;
             return getThis();
         }
 
