@@ -18,54 +18,49 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.record;
+package io.spine.server.storage.jdbc.message;
 
-import com.querydsl.core.types.dsl.PathBuilder;
+import com.google.protobuf.Message;
 import com.querydsl.sql.dml.SQLUpdateClause;
-import io.spine.server.entity.EntityRecord;
-import io.spine.server.storage.jdbc.query.IdColumn;
 
-/**
- * A query that updates {@link EntityRecord} in the {@link RecordTable}.
- */
-class UpdateEntityQuery<I> extends WriteEntityQuery<I, SQLUpdateClause> {
+public class UpdateMessagesInBulk<I, M extends Message>
+        extends WriteMessagesInBulk<I, M, SQLUpdateClause> {
 
-    private UpdateEntityQuery(Builder<I> builder) {
+    private UpdateMessagesInBulk(Builder<I, M> builder) {
         super(builder);
     }
 
     @Override
-    protected void addBatch(SQLUpdateClause clause) {
-        clause.addBatch();
-    }
-
-    @Override
-    protected void setIdValue(SQLUpdateClause clause, IdColumn<I> idColumn, Object normalizedId) {
-        PathBuilder<Object> idPath = pathOf(idColumn);
-        clause.where(idPath.eq(normalizedId));
-    }
-
-    @Override
-    protected SQLUpdateClause createClause() {
+    protected SQLUpdateClause clause() {
         return factory().update(table());
     }
 
-    static <I> Builder<I> newBuilder() {
+    @Override
+    protected void setIdClause(SQLUpdateClause query, I id, M record) {
+        query.where(pathOf(idColumn())
+                            .eq(idColumn().normalize(id)));
+    }
+
+    @Override
+    protected void addBatch(SQLUpdateClause query) {
+        query.addBatch();
+    }
+
+    static <I, M extends Message> Builder<I, M> newBuilder() {
         return new Builder<>();
     }
 
-    static class Builder<I> extends WriteEntityQuery.Builder<Builder<I>,
-                                                             UpdateEntityQuery,
-                                                             I> {
+    static class Builder<I, M extends Message>
+            extends WriteMessagesInBulk.Builder<I, M, Builder<I, M>, UpdateMessagesInBulk<I, M>> {
 
         @Override
-        protected UpdateEntityQuery doBuild() {
-            return new UpdateEntityQuery<>(this);
+        protected Builder<I, M> getThis() {
+            return this;
         }
 
         @Override
-        protected Builder<I> getThis() {
-            return this;
+        protected UpdateMessagesInBulk<I, M> doBuild() {
+            return new UpdateMessagesInBulk<>(this);
         }
     }
 }

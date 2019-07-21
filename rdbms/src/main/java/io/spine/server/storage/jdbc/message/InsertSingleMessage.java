@@ -23,15 +23,15 @@ package io.spine.server.storage.jdbc.message;
 import com.google.protobuf.Message;
 import com.querydsl.core.dml.StoreClause;
 
-final class UpdateMessageQuery<I, M extends Message> extends WriteMessageQuery<I, M> {
+final class InsertSingleMessage<I, M extends Message> extends WriteSingleMessage<I, M> {
 
-    private UpdateMessageQuery(Builder<I, M> builder) {
+    private InsertSingleMessage(Builder<I, M> builder) {
         super(builder);
     }
 
     @Override
-    protected StoreClause<?> query() {
-        return updateById();
+    protected StoreClause<?> clause() {
+        return insertWithId();
     }
 
     static <I, M extends Message> Builder<I, M> newBuilder() {
@@ -39,7 +39,7 @@ final class UpdateMessageQuery<I, M extends Message> extends WriteMessageQuery<I
     }
 
     static class Builder<I, M extends Message>
-            extends WriteMessageQuery.Builder<I, M, Builder<I, M>, UpdateMessageQuery<I, M>> {
+            extends WriteSingleMessage.Builder<I, M, Builder<I, M>, InsertSingleMessage<I, M>> {
 
         @Override
         protected Builder<I, M> getThis() {
@@ -47,8 +47,8 @@ final class UpdateMessageQuery<I, M extends Message> extends WriteMessageQuery<I
         }
 
         @Override
-        protected UpdateMessageQuery<I, M> doBuild() {
-            return new UpdateMessageQuery<>(this);
+        protected InsertSingleMessage<I, M> doBuild() {
+            return new InsertSingleMessage<>(this);
         }
     }
 }

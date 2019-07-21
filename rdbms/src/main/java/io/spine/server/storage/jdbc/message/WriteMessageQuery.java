@@ -20,56 +20,48 @@
 
 package io.spine.server.storage.jdbc.message;
 
-import com.google.common.collect.ImmutableList;
 import com.google.protobuf.Message;
 import com.querydsl.core.dml.StoreClause;
+import com.querydsl.core.types.dsl.PathBuilder;
 import io.spine.server.storage.jdbc.message.MessageTable.Column;
-import io.spine.server.storage.jdbc.query.IdAwareQuery;
+import io.spine.server.storage.jdbc.query.IdColumn;
 import io.spine.server.storage.jdbc.query.WriteQuery;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.Streams.stream;
 
-abstract class WriteMessageQuery<I, M extends Message>
-        extends IdAwareQuery<I>
-        implements WriteQuery {
+/**
+ * A common interface for {@linkplain io.spine.server.storage.jdbc.query.AbstractQuery queries}
+ * that write one or more messages to the {@link MessageTable}.
+ */
+interface WriteMessageQuery<I, M extends Message> extends WriteQuery {
 
-    private final M message;
-    private final ImmutableList<? extends Column<M>> columns;
-
-    WriteMessageQuery(Builder<I, M, ? extends Builder, ? extends WriteMessageQuery> builder) {
-        super(builder);
-        this.message = checkNotNull(builder.message);
-        this.columns = checkNotNull(builder.columns);
+    default void setColumnValues(StoreClause<?> query, M record) {
+        checkNotNull(query);
+        checkNotNull(record);
+        stream(columns())
+                .filter(column -> !isIdColumn(column))
+                .forEach(column -> setColumnValue(query, column, record));
     }
 
-    @Override
-    public long execute() {
-        StoreClause<?> query = query();
-        columns.forEach(
-                column -> query.set(pathOf(column), column.getter().apply(message))
-        );
-        return query.execute();
+    default boolean isIdColumn(Column<M> column) {
+        checkNotNull(column);
+        return idColumn().column()
+                         .equals(column);
     }
 
-    protected abstract StoreClause<?> query();
+    default void setColumnValue(StoreClause<?> query, Column<M> column, M record) {
+        checkNotNull(query);
+        checkNotNull(column);
+        checkNotNull(record);
 
-    abstract static class Builder<I,
-                                  M extends Message,
-                                  B extends Builder<I, M, B, Q>,
-                                  Q extends WriteMessageQuery<I, M>>
-            extends IdAwareQuery.Builder<I, B, Q> {
-
-        private M message;
-        private ImmutableList<? extends Column<M>> columns;
-
-        B setMessage(M message) {
-            this.message = message;
-            return getThis();
-        }
-
-        B setColumns(Iterable<? extends Column<M>> columns) {
-            this.columns = ImmutableList.copyOf(columns);
-            return getThis();
-        }
+        query.set(pathOf(column), column.getter()
+                                        .apply(record));
     }
+
+    Iterable<? extends Column<M>> columns();
+
+    IdColumn<I> idColumn();
+
+    PathBuilder<Object> pathOf(Column<M> column);
 }

@@ -104,6 +104,10 @@ public abstract class AbstractQuery implements StorageQuery {
         return pathOf(column.name());
     }
 
+    protected PathBuilder<Object> pathOf(IdColumn<?> idColumn) {
+        return pathOf(idColumn.columnName());
+    }
+
     protected PathBuilder<Object> pathOf(String columnName) {
         return pathBuilder.get(columnName);
     }

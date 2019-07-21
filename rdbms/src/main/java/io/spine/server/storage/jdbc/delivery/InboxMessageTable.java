@@ -60,7 +60,7 @@ final class InboxMessageTable extends MessageTable<InboxMessageId, InboxMessage>
     }
 
     @Override
-    protected ImmutableList<Column> columns() {
+    protected ImmutableList<Column> messageSpecificColumns() {
         return ImmutableList.copyOf(Column.values());
     }
 

@@ -40,14 +40,14 @@ final class SelectMessagesInBulk<I, M extends Message>
 
     private final ImmutableList<I> ids;
     private final IdColumn idColumn;
-    private final TableColumn bytesColumn;
+    private final TableColumn messageBytesColumn;
     private final Descriptor messageDescriptor;
 
     private SelectMessagesInBulk(Builder<I, M> builder) {
         super(builder);
         this.ids = builder.ids;
         this.idColumn = builder.idColumn;
-        this.bytesColumn = builder.bytesColumn;
+        this.messageBytesColumn = builder.messageBytesColumn;
         this.messageDescriptor = builder.messageDescriptor;
     }
 
@@ -55,14 +55,14 @@ final class SelectMessagesInBulk<I, M extends Message>
     public DbIterator<M> execute() {
         ResultSet results = query().getResults();
         DbIterator<M> iterator =
-                DbIterator.over(results, messageReader(bytesColumn.name(), messageDescriptor));
+                DbIterator.over(results, messageReader(messageBytesColumn.name(), messageDescriptor));
         return iterator;
     }
 
     private AbstractSQLQuery<Object, ?> query() {
-        return factory().select(pathOf(bytesColumn))
+        return factory().select(pathOf(messageBytesColumn))
                         .from(table())
-                        .where(pathOf(idColumn.columnName()).in(ids));
+                        .where(pathOf(idColumn).in(ids));
     }
 
     static <I, M extends Message> Builder<I, M> newBuilder() {
@@ -74,7 +74,7 @@ final class SelectMessagesInBulk<I, M extends Message>
 
         private ImmutableList<I> ids;
         private IdColumn idColumn;
-        private TableColumn bytesColumn;
+        private TableColumn messageBytesColumn;
         private Descriptor messageDescriptor;
 
         Builder<I, M> setIds(Iterable<I> ids) {
@@ -87,8 +87,8 @@ final class SelectMessagesInBulk<I, M extends Message>
             return getThis();
         }
 
-        Builder<I, M> setBytesColumn(TableColumn bytesColumn) {
-            this.bytesColumn = bytesColumn;
+        Builder<I, M> setMessageBytesColumn(TableColumn messageBytesColumn) {
+            this.messageBytesColumn = messageBytesColumn;
             return getThis();
         }
 

@@ -21,17 +21,29 @@
 package io.spine.server.storage.jdbc.message;
 
 import com.google.protobuf.Message;
-import com.querydsl.core.dml.StoreClause;
+import com.querydsl.sql.dml.SQLInsertClause;
 
-final class InsertMessageQuery<I, M extends Message> extends WriteMessageQuery<I, M> {
+final class InsertMessagesInBulk<I, M extends Message>
+        extends WriteMessagesInBulk<I, M, SQLInsertClause> {
 
-    private InsertMessageQuery(Builder<I, M> builder) {
+    private InsertMessagesInBulk(Builder<I, M> builder) {
         super(builder);
     }
 
     @Override
-    protected StoreClause<?> query() {
-        return insertWithId();
+    protected SQLInsertClause clause() {
+        return factory().insert(table());
+    }
+
+    @Override
+    protected void setIdClause(SQLInsertClause query, I id, M record) {
+        query.set(pathOf(idColumn()),
+                  idColumn().normalize(id));
+    }
+
+    @Override
+    protected void addBatch(SQLInsertClause query) {
+        query.addBatch();
     }
 
     static <I, M extends Message> Builder<I, M> newBuilder() {
@@ -39,7 +51,7 @@ final class InsertMessageQuery<I, M extends Message> extends WriteMessageQuery<I
     }
 
     static class Builder<I, M extends Message>
-            extends WriteMessageQuery.Builder<I, M, Builder<I, M>, InsertMessageQuery<I, M>> {
+            extends WriteMessagesInBulk.Builder<I, M, Builder<I, M>, InsertMessagesInBulk<I, M>> {
 
         @Override
         protected Builder<I, M> getThis() {
@@ -47,8 +59,8 @@ final class InsertMessageQuery<I, M extends Message> extends WriteMessageQuery<I
         }
 
         @Override
-        protected InsertMessageQuery<I, M> doBuild() {
-            return new InsertMessageQuery<>(this);
+        protected InsertMessagesInBulk<I, M> doBuild() {
+            return new InsertMessagesInBulk<>(this);
         }
     }
 }

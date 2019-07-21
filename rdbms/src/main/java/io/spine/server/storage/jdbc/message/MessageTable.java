@@ -32,11 +32,17 @@ import io.spine.server.storage.jdbc.query.AbstractTable;
 import io.spine.server.storage.jdbc.query.DbIterator;
 import io.spine.server.storage.jdbc.query.IdColumn;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
+import static com.google.common.base.Functions.identity;
+import static com.google.common.collect.Streams.stream;
 import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 /**
  * A table storing a single {@link Message} type.
@@ -59,11 +65,21 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
         write(idOf(record), record);
     }
 
-    void writeAll(Iterable<M> messages) {
-        // NO-OP for now.
+    void writeAll(Iterable<M> records) {
+        Collection<I> existingIds = existingIds(records);
+
+        Map<I, M> existingRecords = stream(records)
+                .filter(record -> existingIds.contains(idOf(record)))
+                .collect(toMap(this::idOf, identity()));
+        Map<I, M> newRecords = stream(records)
+                .filter(record -> !existingIds.contains(idOf(record)))
+                .collect(toMap(this::idOf, identity()));
+
+        updateAll(existingRecords);
+        insertAll(newRecords);
     }
 
-    void removeAll(Iterable<M> messages) {
+    void removeAll(Iterable<M> records) {
         // NO-OP for now.
     }
 
@@ -73,16 +89,49 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
                                                   .setDataSource(dataSource())
                                                   .setIdColumn(idColumn())
                                                   .setIds(ids)
-                                                  .setBytesColumn(bytesColumn())
+                                                  .setMessageBytesColumn(bytesColumn())
                                                   .setMessageDescriptor(messageDescriptor())
                                                   .build();
         DbIterator<M> result = query.execute();
         return result;
     }
 
+    private Collection<I> existingIds(Iterable<M> records) {
+        Iterable<I> ids = stream(records)
+                .map(this::idOf)
+                .collect(toList());
+
+        List<I> existingIds = stream(readAll(ids))
+                .map(this::idOf)
+                .collect(toList());
+        return existingIds;
+    }
+
+    private void insertAll(Map<I, M> records) {
+        InsertMessagesInBulk.Builder<I, M> builder = InsertMessagesInBulk.newBuilder();
+        InsertMessagesInBulk<I, M> query = builder.setTableName(name())
+                                                  .setDataSource(dataSource())
+                                                  .setIdColumn(idColumn())
+                                                  .setColumns(tableColumns())
+                                                  .setRecords(records)
+                                                  .build();
+        query.execute();
+    }
+
+    private void updateAll(Map<I, M> records) {
+        UpdateMessagesInBulk.Builder<I, M> builder = UpdateMessagesInBulk.newBuilder();
+        UpdateMessagesInBulk<I, M> query = builder.setTableName(name())
+                                                  .setDataSource(dataSource())
+                                                  .setIdColumn(idColumn())
+                                                  .setColumns(tableColumns())
+                                                  .setRecords(records)
+                                                  .build();
+        query.execute();
+    }
+
     protected abstract Descriptor messageDescriptor();
 
-    @SuppressWarnings("unchecked") // Ensured by class declaration.
+    @SuppressWarnings("unchecked") // Ensured by descendant classes declaration.
     private I idOf(M record) {
         Column<M> column = (Column<M>) idColumn().column();
         I id = (I) column.getter()
@@ -91,28 +140,28 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
     }
 
     @Override
-    protected InsertMessageQuery<I, M> composeInsertQuery(I id, M record) {
-        InsertMessageQuery.Builder<I, M> builder = InsertMessageQuery.newBuilder();
-        InsertMessageQuery<I, M> query = builder.setTableName(name())
-                                                .setDataSource(dataSource())
-                                                .setIdColumn(idColumn())
-                                                .setId(id)
-                                                .setMessage(record)
-                                                .setColumns(columns())
-                                                .build();
+    protected InsertSingleMessage<I, M> composeInsertQuery(I id, M record) {
+        InsertSingleMessage.Builder<I, M> builder = InsertSingleMessage.newBuilder();
+        InsertSingleMessage<I, M> query = builder.setTableName(name())
+                                                 .setDataSource(dataSource())
+                                                 .setIdColumn(idColumn())
+                                                 .setId(id)
+                                                 .setMessage(record)
+                                                 .setColumns(tableColumns())
+                                                 .build();
         return query;
     }
 
     @Override
-    protected UpdateMessageQuery<I, M> composeUpdateQuery(I id, M record) {
-        UpdateMessageQuery.Builder<I, M> builder = UpdateMessageQuery.newBuilder();
-        UpdateMessageQuery<I, M> query = builder.setTableName(name())
-                                                .setDataSource(dataSource())
-                                                .setIdColumn(idColumn())
-                                                .setId(id)
-                                                .setMessage(record)
-                                                .setColumns(columns())
-                                                .build();
+    protected UpdateSingleMessage<I, M> composeUpdateQuery(I id, M record) {
+        UpdateSingleMessage.Builder<I, M> builder = UpdateSingleMessage.newBuilder();
+        UpdateSingleMessage<I, M> query = builder.setTableName(name())
+                                                 .setDataSource(dataSource())
+                                                 .setIdColumn(idColumn())
+                                                 .setId(id)
+                                                 .setMessage(record)
+                                                 .setColumns(tableColumns())
+                                                 .build();
         return query;
     }
 
@@ -132,12 +181,20 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
     @Override
     protected List<? extends Column<M>> tableColumns() {
         ImmutableList.Builder<Column<M>> columns = ImmutableList.builder();
-        columns.addAll(columns());
-        columns.add(bytesColumn());
+        columns.addAll(messageSpecificColumns());
+        columns.addAll(commonColumns());
         return columns.build();
     }
 
-    protected abstract ImmutableList<? extends Column<M>> columns();
+    protected abstract ImmutableList<? extends Column<M>> messageSpecificColumns();
+
+    private ImmutableList<? extends Column<M>> commonColumns() {
+        return ImmutableList.of(bytesColumn());
+    }
+
+    private static <M extends Message> BytesColumn<M> bytesColumn() {
+        return new BytesColumn<>();
+    }
 
     /**
      * Represents a {@code MessageTable} column.
@@ -145,8 +202,7 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
      * <p>Unlike the ordinary {@link TableColumn}, carries the information on how to extract its
      * data from the given record.
      *
-     * @param <M>
-     *         the type of messages stored in table
+     * @param <M> the type of messages stored in table
      */
     public interface Column<M extends Message> extends TableColumn {
 
@@ -155,10 +211,6 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
         @FunctionalInterface
         interface Getter<M extends Message> extends Function<M, Object> {
         }
-    }
-
-    private static <M extends Message> BytesColumn<M> bytesColumn() {
-        return new BytesColumn<>();
     }
 
     private static class BytesColumn<M extends Message> implements Column<M> {
