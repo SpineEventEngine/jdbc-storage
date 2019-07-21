@@ -194,9 +194,9 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
         return columns.build();
     }
 
-    protected abstract ImmutableList<? extends Column<M>> messageSpecificColumns();
+    protected abstract Iterable<? extends Column<M>> messageSpecificColumns();
 
-    private ImmutableList<? extends Column<M>> commonColumns() {
+    private Iterable<? extends Column<M>> commonColumns() {
         return ImmutableList.of(bytesColumn());
     }
 
