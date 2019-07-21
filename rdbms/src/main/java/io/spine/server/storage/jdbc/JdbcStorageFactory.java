@@ -33,6 +33,7 @@ import io.spine.server.projection.Projection;
 import io.spine.server.projection.ProjectionStorage;
 import io.spine.server.storage.StorageFactory;
 import io.spine.server.storage.jdbc.aggregate.JdbcAggregateStorage;
+import io.spine.server.storage.jdbc.delivery.JdbcInboxStorage;
 import io.spine.server.storage.jdbc.projection.JdbcProjectionStorage;
 import io.spine.server.storage.jdbc.record.JdbcRecordStorage;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
@@ -103,7 +104,13 @@ public class JdbcStorageFactory implements StorageFactory {
 
     @Override
     public InboxStorage createInboxStorage(boolean multitenant) {
-        return null;
+        JdbcInboxStorage storage = JdbcInboxStorage
+                .newBuilder()
+                .setMultitenant(multitenant)
+                .setDataSource(dataSource)
+                .setTypeMapping(typeMapping)
+                .build();
+        return storage;
     }
 
     /**
