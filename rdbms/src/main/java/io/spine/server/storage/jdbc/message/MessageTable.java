@@ -23,7 +23,6 @@ package io.spine.server.storage.jdbc.message;
 import com.google.common.collect.ImmutableList;
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Message;
-import io.spine.reflect.GenericTypeIndex;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.Type;
@@ -80,7 +79,16 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
     }
 
     void removeAll(Iterable<M> records) {
-        // NO-OP for now.
+        List<I> ids = stream(records)
+                .map(this::idOf)
+                .collect(toList());
+        DeleteMessagesInBulk.Builder<I> builder = DeleteMessagesInBulk.newBuilder();
+        DeleteMessagesInBulk<I> query = builder.setTableName(name())
+                                               .setDataSource(dataSource())
+                                               .setIdColumn(idColumn())
+                                               .setIds(ids)
+                                               .build();
+        query.execute();
     }
 
     Iterator<M> readAll(Iterable<I> ids) {
@@ -240,35 +248,6 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
         @Override
         public boolean isNullable() {
             return false;
-        }
-    }
-
-    /**
-     * Enumeration of generic type parameters of this abstract class.
-     */
-    private enum GenericParameter implements GenericTypeIndex<MessageTable> {
-
-        /**
-         * The index of the declaration of the generic parameter type {@code <I>} in
-         * the {@link MessageTable} abstract class.
-         */
-        ID(0),
-
-        /**
-         * The index of the declaration of the generic parameter type {@code <M>}
-         * in the {@link MessageTable} abstract class.
-         */
-        MESSAGE(1);
-
-        private final int index;
-
-        GenericParameter(int index) {
-            this.index = index;
-        }
-
-        @Override
-        public int index() {
-            return index;
         }
     }
 }

@@ -52,7 +52,7 @@ abstract class WriteMessagesInBulk<I, M extends Message, C extends StoreClause<C
     public long execute() {
         C query = clause();
         records.forEach((id, record) -> addToBatch(query, id, record));
-        return 0;
+        return query.execute();
     }
 
     protected abstract C clause();

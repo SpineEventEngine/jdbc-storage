@@ -55,7 +55,8 @@ final class SelectMessagesInBulk<I, M extends Message>
     public DbIterator<M> execute() {
         ResultSet results = query().getResults();
         DbIterator<M> iterator =
-                DbIterator.over(results, messageReader(messageBytesColumn.name(), messageDescriptor));
+                DbIterator.over(results,
+                                messageReader(messageBytesColumn.name(), messageDescriptor));
         return iterator;
     }
 
