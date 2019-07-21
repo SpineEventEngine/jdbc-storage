@@ -30,6 +30,8 @@ import io.spine.server.storage.jdbc.message.JdbcMessageStorage;
 
 import java.util.Optional;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static io.spine.base.Time.currentTime;
 import static io.spine.util.Exceptions.unsupported;
 
 public class JdbcShardedWorkRegistry
@@ -46,7 +48,40 @@ public class JdbcShardedWorkRegistry
 
     @Override
     public Optional<ShardProcessingSession> pickUp(ShardIndex index, NodeId nodeId) {
-        return Optional.empty();
+        checkNotNull(index);
+        checkNotNull(nodeId);
+
+        boolean pickedAlready = isPickedAlready(index);
+        if (pickedAlready) {
+            return Optional.empty();
+        }
+        ShardSessionRecord ssr = newRecord(index, nodeId);
+        write(ssr);
+
+        JdbcShardProcessingSession result =
+                new JdbcShardProcessingSession(ssr, () -> clearNode(ssr));
+        return Optional.of(result);
+    }
+
+    private boolean isPickedAlready(ShardIndex index) {
+        ShardSessionRecord record = table().read(index);
+        boolean alreadyPicked = record != null && record.hasPickedBy();
+        return alreadyPicked;
+    }
+
+    private static ShardSessionRecord newRecord(ShardIndex index, NodeId nodeId) {
+        return ShardSessionRecord.newBuilder()
+                                 .setIndex(index)
+                                 .setPickedBy(nodeId)
+                                 .setWhenLastPicked(currentTime())
+                                 .vBuild();
+    }
+
+    private void clearNode(ShardSessionRecord record) {
+        ShardSessionRecord updated = record.toBuilder()
+                                           .clearPickedBy()
+                                           .vBuild();
+        write(updated);
     }
 
     public static class Builder extends StorageBuilder<Builder, JdbcShardedWorkRegistry> {
