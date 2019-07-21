@@ -26,6 +26,8 @@ import io.spine.server.delivery.InboxReadRequest;
 import io.spine.server.delivery.InboxStorage;
 import io.spine.server.delivery.Page;
 import io.spine.server.delivery.ShardIndex;
+import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.StorageBuilder;
 import io.spine.server.storage.jdbc.message.JdbcMessageStorage;
 
 import java.util.Iterator;
@@ -39,8 +41,12 @@ public class JdbcInboxStorage
                                    InboxMessageTable>
         implements InboxStorage {
 
-    protected JdbcInboxStorage(boolean multitenant, InboxMessageTable table) {
-        super(multitenant, table);
+    private final DataSourceWrapper dataSource;
+
+    private JdbcInboxStorage(Builder builder) {
+        super(builder.isMultitenant(),
+              new InboxMessageTable(builder.getDataSource(), builder.getTypeMapping()));
+        this.dataSource = builder.getDataSource();
     }
 
     @Override
@@ -54,7 +60,30 @@ public class JdbcInboxStorage
     @Override
     public Iterator<InboxMessageId> index() {
         throw unsupported(
-            "`JdbcInboxStorage` does not provide `index` capabilities " +
-            "due to the enormous number of records stored.");
+                "`JdbcInboxStorage` does not provide `index` capabilities " +
+                "due to the enormous number of records stored.");
+    }
+
+    @Override
+    public void close() {
+        super.close();
+        dataSource.close();
+    }
+
+    public static Builder newBuilder() {
+        return new Builder();
+    }
+
+    public static class Builder extends StorageBuilder<Builder, JdbcInboxStorage> {
+
+        @Override
+        protected Builder getThis() {
+            return this;
+        }
+
+        @Override
+        protected JdbcInboxStorage doBuild() {
+            return new JdbcInboxStorage(this);
+        }
     }
 }
