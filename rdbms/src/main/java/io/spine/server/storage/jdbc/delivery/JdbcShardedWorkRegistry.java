@@ -20,47 +20,42 @@
 
 package io.spine.server.storage.jdbc.delivery;
 
-import io.spine.server.delivery.InboxMessage;
-import io.spine.server.delivery.InboxMessageId;
-import io.spine.server.delivery.InboxReadRequest;
-import io.spine.server.delivery.InboxStorage;
-import io.spine.server.delivery.Page;
+import io.spine.server.NodeId;
 import io.spine.server.delivery.ShardIndex;
-import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.delivery.ShardProcessingSession;
+import io.spine.server.delivery.ShardSessionRecord;
+import io.spine.server.delivery.ShardedWorkRegistry;
 import io.spine.server.storage.jdbc.StorageBuilder;
 import io.spine.server.storage.jdbc.message.JdbcMessageStorage;
 
-public class JdbcInboxStorage
-        extends JdbcMessageStorage<InboxMessageId,
-                                   InboxMessage,
-                                   InboxReadRequest,
-                                   InboxMessageTable>
-        implements InboxStorage {
+import java.util.Optional;
 
-    private final DataSourceWrapper dataSource;
+import static io.spine.util.Exceptions.unsupported;
 
-    private JdbcInboxStorage(Builder builder) {
-        super(builder.isMultitenant(),
-              new InboxMessageTable(builder.getDataSource(), builder.getTypeMapping()));
-        this.dataSource = builder.getDataSource();
+public class JdbcShardedWorkRegistry
+        extends JdbcMessageStorage<ShardIndex,
+                                   ShardSessionRecord,
+                                   ShardSessionReadRequest,
+                                   ShardedWorkRegistryTable>
+        implements ShardedWorkRegistry {
+
+    private JdbcShardedWorkRegistry(Builder builder) {
+        super(false,
+              new ShardedWorkRegistryTable(builder.getDataSource(), builder.getTypeMapping()));
     }
 
     @Override
-    public Page<InboxMessage> readAll(ShardIndex index) {
-        return table().readAll(index);
+    public Optional<ShardProcessingSession> pickUp(ShardIndex index, NodeId nodeId) {
+        return Optional.empty();
     }
 
-    @Override
-    public void close() {
-        super.close();
-        dataSource.close();
-    }
+    public static class Builder extends StorageBuilder<Builder, JdbcShardedWorkRegistry> {
 
-    public static Builder newBuilder() {
-        return new Builder();
-    }
-
-    public static class Builder extends StorageBuilder<Builder, JdbcInboxStorage> {
+        @Override
+        public Builder setMultitenant(boolean multitenant) {
+            throw unsupported("`JdbcShardedWorkRegistry` is an application-wide instance " +
+                              "and therefore always single-tenant");
+        }
 
         @Override
         protected Builder getThis() {
@@ -68,8 +63,8 @@ public class JdbcInboxStorage
         }
 
         @Override
-        protected JdbcInboxStorage doBuild() {
-            return new JdbcInboxStorage(this);
+        protected JdbcShardedWorkRegistry doBuild() {
+            return new JdbcShardedWorkRegistry(this);
         }
     }
 }

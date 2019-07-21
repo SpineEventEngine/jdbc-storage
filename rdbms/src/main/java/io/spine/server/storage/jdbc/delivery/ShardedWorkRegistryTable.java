@@ -22,40 +22,30 @@ package io.spine.server.storage.jdbc.delivery;
 
 import com.google.common.collect.ImmutableList;
 import com.google.protobuf.Descriptors.Descriptor;
-import io.spine.server.delivery.InboxMessage;
-import io.spine.server.delivery.InboxMessageId;
-import io.spine.server.delivery.Page;
 import io.spine.server.delivery.ShardIndex;
+import io.spine.server.delivery.ShardSessionRecord;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.Type;
 import io.spine.server.storage.jdbc.TypeMapping;
 import io.spine.server.storage.jdbc.message.MessageTable;
 import io.spine.server.storage.jdbc.query.IdColumn;
-import io.spine.server.storage.jdbc.query.SelectQuery;
-import io.spine.string.Stringifiers;
 
-import javax.annotation.Nullable;
-
-import static io.spine.server.storage.jdbc.Type.BOOLEAN;
 import static io.spine.server.storage.jdbc.Type.INT;
 import static io.spine.server.storage.jdbc.Type.LONG;
-import static io.spine.server.storage.jdbc.Type.STRING;
 import static io.spine.server.storage.jdbc.Type.STRING_255;
 
-/**
- * A table in the DB responsible for storing the {@link io.spine.server.delivery.Inbox Inbox} data.
- */
-final class InboxMessageTable extends MessageTable<InboxMessageId, InboxMessage> {
+public class ShardedWorkRegistryTable extends MessageTable<ShardIndex, ShardSessionRecord> {
 
-    private static final String NAME = "inbox";
+    private static final String NAME = "shard_session_registry";
 
-    InboxMessageTable(DataSourceWrapper dataSource, TypeMapping typeMapping) {
-        super(NAME, IdColumn.of(Column.ID, InboxMessageId.class), dataSource, typeMapping);
+    ShardedWorkRegistryTable(DataSourceWrapper dataSource,
+                             TypeMapping typeMapping) {
+        super(NAME, IdColumn.of(Column.ID), dataSource, typeMapping);
     }
 
     @Override
     protected Descriptor messageDescriptor() {
-        return InboxMessage.getDescriptor();
+        return ShardSessionRecord.getDescriptor();
     }
 
     @Override
@@ -63,60 +53,31 @@ final class InboxMessageTable extends MessageTable<InboxMessageId, InboxMessage>
         return ImmutableList.copyOf(Column.values());
     }
 
-    Page<InboxMessage> readAll(ShardIndex index) {
-        return null;
-    }
+    private enum Column implements MessageTable.Column<ShardSessionRecord> {
 
-    private SelectQuery<InboxMessage> composeSelectByShardIndexQuery(ShardIndex index) {
-        return null;
-    }
+        ID(LONG, m -> m.getIndex()
+                       .getIndex()),
 
-    private enum Column implements MessageTable.Column<InboxMessage> {
-
-        ID(InboxMessage::getId),
-
-        SIGNAL_ID(STRING_255, m -> m.getSignalId()
-                                    .getValue()),
-
-        INBOX_ID(STRING_255, m -> Stringifiers.toString(m.getInboxId())),
-
-        SHARD_INDEX(LONG, m -> m.getShardIndex()
-                                .getIndex()),
-
-        OF_TOTAL_SHARDS(LONG, m -> m.getShardIndex()
+        OF_TOTAL_SHARDS(LONG, m -> m.getIndex()
                                     .getOfTotal()),
 
-        IS_EVENT(BOOLEAN, InboxMessage::hasEvent),
+        NODE_ID(STRING_255, m -> m.getPickedBy()
+                                  .getValue()),
 
-        IS_COMMAND(BOOLEAN, InboxMessage::hasCommand),
+        WHEN_LAST_PICKED(LONG, m -> m.getWhenLastPicked()
+                                     .getSeconds()),
 
-        LABEL(STRING, m -> m.getLabel()
-                            .toString()),
+        WHEN_LAST_PICKED_NANOS(INT, m -> m.getWhenLastPicked()
+                                          .getNanos());
 
-        STATUS(STRING, m -> m.getStatus()
-                             .toString()),
-
-        WHEN_RECEIVED(LONG, m -> m.getWhenReceived()
-                                  .getSeconds()),
-
-        WHEN_RECEIVED_NANOS(INT, m -> m.getWhenReceived()
-                                       .getNanos());
-
-        @Nullable
         private final Type type;
-        private final Getter<InboxMessage> getter;
+        private final Getter<ShardSessionRecord> getter;
 
-        Column(Type type, Getter<InboxMessage> getter) {
+        Column(Type type, Getter<ShardSessionRecord> getter) {
             this.type = type;
             this.getter = getter;
         }
 
-        Column(Getter<InboxMessage> getter) {
-            this.type = null;
-            this.getter = getter;
-        }
-
-        @Nullable
         @Override
         public Type type() {
             return type;
@@ -133,7 +94,7 @@ final class InboxMessageTable extends MessageTable<InboxMessageId, InboxMessage>
         }
 
         @Override
-        public Getter<InboxMessage> getter() {
+        public Getter<ShardSessionRecord> getter() {
             return getter;
         }
     }

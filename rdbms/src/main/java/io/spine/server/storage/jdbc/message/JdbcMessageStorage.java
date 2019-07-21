@@ -24,7 +24,10 @@ import com.google.protobuf.Message;
 import io.spine.server.storage.AbstractStorage;
 import io.spine.server.storage.ReadRequest;
 
+import java.util.Iterator;
 import java.util.Optional;
+
+import static io.spine.util.Exceptions.unsupported;
 
 public abstract class JdbcMessageStorage<I,
                                          M extends Message,
@@ -65,5 +68,15 @@ public abstract class JdbcMessageStorage<I,
 
     protected T table() {
         return table;
+    }
+
+    /**
+     * Always throws an {@link UnsupportedOperationException}.
+     */
+    @Override
+    public Iterator<I> index() {
+        throw unsupported(
+                "`JdbcMessageStorage` does not provide `index` capabilities " +
+                "due to the enormous number of records stored.");
     }
 }
