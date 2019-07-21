@@ -39,19 +39,19 @@ final class SelectMessageById<I, M extends Message>
         extends IdAwareQuery<I>
         implements SelectQuery<M> {
 
-    private final TableColumn bytesColumn;
+    private final TableColumn messageBytesColumn;
     private final Descriptor messageDescriptor;
 
     private SelectMessageById(Builder<I, M> builder) {
         super(builder);
-        this.bytesColumn = builder.bytesColumn;
+        this.messageBytesColumn = builder.messageBytesColumn;
         this.messageDescriptor = builder.messageDescriptor;
     }
 
     @Override
     public final @Nullable M execute() throws DatabaseException {
         try (ResultSet resultSet = query().getResults()) {
-            ColumnReader<M> reader = messageReader(bytesColumn.name(), messageDescriptor);
+            ColumnReader<M> reader = messageReader(messageBytesColumn.name(), messageDescriptor);
             M result = reader.readValue(resultSet);
             return result;
         } catch (SQLException e) {
@@ -60,7 +60,7 @@ final class SelectMessageById<I, M extends Message>
     }
 
     private AbstractSQLQuery<Object, ?> query() {
-        return factory().select(pathOf(bytesColumn))
+        return factory().select(pathOf(messageBytesColumn))
                         .from(table())
                         .where(idEquals());
     }
@@ -72,11 +72,11 @@ final class SelectMessageById<I, M extends Message>
     static class Builder<I, M extends Message>
             extends IdAwareQuery.Builder<I, Builder<I, M>, SelectMessageById<I, M>> {
 
-        private TableColumn bytesColumn;
+        private TableColumn messageBytesColumn;
         private Descriptor messageDescriptor;
 
-        Builder<I, M> setBytesColumn(TableColumn bytesColumn) {
-            this.bytesColumn = bytesColumn;
+        Builder<I, M> setMessageBytesColumn(TableColumn messageBytesColumn) {
+            this.messageBytesColumn = messageBytesColumn;
             return getThis();
         }
 

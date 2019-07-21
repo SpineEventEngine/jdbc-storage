@@ -53,7 +53,7 @@ public class ShardedWorkRegistryTable extends MessageTable<ShardIndex, ShardSess
         return ImmutableList.copyOf(Column.values());
     }
 
-    private enum Column implements MessageTable.Column<ShardSessionRecord> {
+    enum Column implements MessageTable.Column<ShardSessionRecord> {
 
         ID(LONG, m -> m.getIndex()
                        .getIndex()),

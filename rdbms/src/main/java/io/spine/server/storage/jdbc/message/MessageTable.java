@@ -180,7 +180,7 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
                                                .setDataSource(dataSource())
                                                .setIdColumn(idColumn())
                                                .setId(id)
-                                               .setBytesColumn(bytesColumn())
+                                               .setMessageBytesColumn(bytesColumn())
                                                .setMessageDescriptor(messageDescriptor())
                                                .doBuild();
         return query;
@@ -200,7 +200,7 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
         return ImmutableList.of(bytesColumn());
     }
 
-    private static <M extends Message> BytesColumn<M> bytesColumn() {
+    public static <M extends Message> BytesColumn<M> bytesColumn() {
         return new BytesColumn<>();
     }
 
@@ -221,7 +221,7 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
         }
     }
 
-    private static class BytesColumn<M extends Message> implements Column<M> {
+    public static class BytesColumn<M extends Message> implements Column<M> {
 
         private static final String NAME = "bytes";
 

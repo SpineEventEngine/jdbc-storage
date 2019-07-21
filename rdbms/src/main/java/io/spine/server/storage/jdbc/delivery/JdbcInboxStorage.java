@@ -37,11 +37,20 @@ public class JdbcInboxStorage
                                    InboxMessageTable>
         implements InboxStorage {
 
+    /**
+     * The maximum number of {@linkplain InboxMessage inbox messages} that are kept in memory
+     * simultaneously during storage reads.
+     *
+     * <p>This value can be overridden using {@link Builder#setReadBatchSize(int)}.
+     */
+    private static final int DEFAULT_READ_BATCH_SIZE = 500;
+
     private final DataSourceWrapper dataSource;
 
     private JdbcInboxStorage(Builder builder) {
-        super(builder.isMultitenant(),
-              new InboxMessageTable(builder.getDataSource(), builder.getTypeMapping()));
+        super(builder.isMultitenant(), new InboxMessageTable(builder.getDataSource(),
+                                                             builder.getTypeMapping(),
+                                                             builder.readBatchSize));
         this.dataSource = builder.getDataSource();
     }
 
@@ -61,6 +70,13 @@ public class JdbcInboxStorage
     }
 
     public static class Builder extends StorageBuilder<Builder, JdbcInboxStorage> {
+
+        private int readBatchSize = DEFAULT_READ_BATCH_SIZE;
+
+        public Builder setReadBatchSize(int readBatchSize) {
+            this.readBatchSize = readBatchSize;
+            return getThis();
+        }
 
         @Override
         protected Builder getThis() {

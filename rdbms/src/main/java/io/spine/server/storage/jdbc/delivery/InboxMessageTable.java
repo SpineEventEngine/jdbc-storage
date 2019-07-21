@@ -30,8 +30,8 @@ import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.Type;
 import io.spine.server.storage.jdbc.TypeMapping;
 import io.spine.server.storage.jdbc.message.MessageTable;
+import io.spine.server.storage.jdbc.query.DbIterator;
 import io.spine.server.storage.jdbc.query.IdColumn;
-import io.spine.server.storage.jdbc.query.SelectQuery;
 import io.spine.string.Stringifiers;
 
 import javax.annotation.Nullable;
@@ -49,8 +49,11 @@ final class InboxMessageTable extends MessageTable<InboxMessageId, InboxMessage>
 
     private static final String NAME = "inbox";
 
-    InboxMessageTable(DataSourceWrapper dataSource, TypeMapping typeMapping) {
+    private final int readBatchSize;
+
+    InboxMessageTable(DataSourceWrapper dataSource, TypeMapping typeMapping, int readBatchSize) {
         super(NAME, IdColumn.of(Column.ID, InboxMessageId.class), dataSource, typeMapping);
+        this.readBatchSize = readBatchSize;
     }
 
     @Override
@@ -64,14 +67,21 @@ final class InboxMessageTable extends MessageTable<InboxMessageId, InboxMessage>
     }
 
     Page<InboxMessage> readAll(ShardIndex index) {
-        return null;
+        SelectByShardIndexQuery query = composeSelectByShardIndexQuery(index);
+        DbIterator<InboxMessage> iterator = query.execute();
+        return new InboxPage(iterator, readBatchSize);
     }
 
-    private SelectQuery<InboxMessage> composeSelectByShardIndexQuery(ShardIndex index) {
-        return null;
+    private SelectByShardIndexQuery composeSelectByShardIndexQuery(ShardIndex index) {
+        SelectByShardIndexQuery.Builder builder = SelectByShardIndexQuery.newBuilder();
+        SelectByShardIndexQuery query = builder.setTableName(name())
+                                               .setDataSource(dataSource())
+                                               .setShardIndex(index)
+                                               .build();
+        return query;
     }
 
-    private enum Column implements MessageTable.Column<InboxMessage> {
+    enum Column implements MessageTable.Column<InboxMessage> {
 
         ID(InboxMessage::getId),
 
