@@ -21,6 +21,7 @@
 package io.spine.server.storage.jdbc;
 
 import io.spine.server.aggregate.AggregateStorage;
+import io.spine.server.delivery.InboxStorage;
 import io.spine.server.projection.ProjectionStorage;
 import io.spine.server.storage.RecordStorage;
 import io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.TestAggregate;
@@ -132,7 +133,9 @@ class JdbcStorageFactoryTest {
     @Test
     @DisplayName("create inbox storage")
     void createInboxStorage() {
-        // todo
+        JdbcStorageFactory factory = newFactory();
+        InboxStorage inboxStorage = factory.createInboxStorage(false);
+        assertFalse(inboxStorage.isMultitenant());
     }
 
     @Test
