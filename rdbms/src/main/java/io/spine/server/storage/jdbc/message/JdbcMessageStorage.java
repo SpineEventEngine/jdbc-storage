@@ -40,6 +40,7 @@ public abstract class JdbcMessageStorage<I,
     protected JdbcMessageStorage(boolean multitenant, T table) {
         super(multitenant);
         this.table = table;
+        this.table.create();
     }
 
     @Override
