@@ -27,6 +27,7 @@ import io.spine.server.storage.ReadRequest;
 import java.util.Iterator;
 import java.util.Optional;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static io.spine.util.Exceptions.unsupported;
 
 public abstract class JdbcMessageStorage<I,
@@ -45,6 +46,9 @@ public abstract class JdbcMessageStorage<I,
 
     @Override
     public Optional<M> read(R request) {
+        checkNotNull(request);
+        checkNotClosed();
+
         I id = request.recordId();
         M result = table.read(id);
         return Optional.ofNullable(result);
@@ -52,18 +56,31 @@ public abstract class JdbcMessageStorage<I,
 
     @Override
     public void write(I id, M record) {
+        checkNotNull(id);
+        checkNotNull(record);
+        checkNotClosed();
+
         table.write(id, record);
     }
 
     public void write(M message) {
+        checkNotNull(message);
+        checkNotClosed();
+
         table.write(message);
     }
 
     public void writeAll(Iterable<M> messages) {
+        checkNotNull(messages);
+        checkNotClosed();
+
         table.writeAll(messages);
     }
 
     public void removeAll(Iterable<M> messages) {
+        checkNotNull(messages);
+        checkNotClosed();
+
         table.removeAll(messages);
     }
 
