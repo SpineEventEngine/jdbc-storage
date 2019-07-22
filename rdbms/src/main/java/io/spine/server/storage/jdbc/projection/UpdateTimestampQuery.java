@@ -37,6 +37,7 @@ class UpdateTimestampQuery extends WriteTimestampQuery {
         super(builder);
     }
 
+    @SuppressWarnings("ProtoTimestampGetSecondsGetNano") // `getNanos()` method is used on purpose.
     @Override
     public long execute() {
         PathBuilder<Object> id = pathOf(PROJECTION_CLASS);

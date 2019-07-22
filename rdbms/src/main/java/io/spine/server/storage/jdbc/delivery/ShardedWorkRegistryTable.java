@@ -87,6 +87,10 @@ final class ShardedWorkRegistryTable extends MessageTable<ShardIndex, ShardSessi
         return query;
     }
 
+    /**
+     * The columns of {@link ShardSessionRecord} DB representation.
+     */
+    @SuppressWarnings("ProtoTimestampGetSecondsGetNano") // `getNanos()` method is used on purpose.
     enum Column implements MessageTable.Column<ShardSessionRecord> {
 
         ID(ShardSessionRecord::getIndex),

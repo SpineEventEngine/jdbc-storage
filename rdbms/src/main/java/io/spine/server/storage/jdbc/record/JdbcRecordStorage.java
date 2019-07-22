@@ -24,7 +24,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.protobuf.Any;
 import com.google.protobuf.FieldMask;
 import io.spine.base.Identifier;
-import io.spine.client.EntityId;
 import io.spine.client.IdFilter;
 import io.spine.client.ResponseFormat;
 import io.spine.client.TargetFilters;
@@ -48,7 +47,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.stream.Collectors.toList;
@@ -252,20 +250,6 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
         @Override
         public JdbcRecordStorage<I> doBuild() {
             return new JdbcRecordStorage<>(this);
-        }
-    }
-
-    private enum AggregateStateIdToEntityId implements Function<Object, EntityId> {
-        INSTANCE;
-
-        @Override
-        public EntityId apply(@Nullable Object genericId) {
-            checkNotNull(genericId);
-            Any content = Identifier.pack(genericId);
-            EntityId id = EntityId.newBuilder()
-                                  .setId(content)
-                                  .build();
-            return id;
         }
     }
 

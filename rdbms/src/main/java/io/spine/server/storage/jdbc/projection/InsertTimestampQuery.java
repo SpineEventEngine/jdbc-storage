@@ -36,6 +36,7 @@ class InsertTimestampQuery extends WriteTimestampQuery {
         super(builder);
     }
 
+    @SuppressWarnings("ProtoTimestampGetSecondsGetNano") // `getNanos()` method is used on purpose.
     @Override
     public long execute() {
         SQLInsertClause query = factory().insert(table())

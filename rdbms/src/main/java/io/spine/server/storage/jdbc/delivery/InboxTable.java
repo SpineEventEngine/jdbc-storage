@@ -89,6 +89,7 @@ final class InboxTable extends MessageTable<InboxMessageId, InboxMessage> {
     /**
      * The columns of {@link InboxMessage} DB representation.
      */
+    @SuppressWarnings("ProtoTimestampGetSecondsGetNano") // `getNanos()` method is used on purpose.
     enum Column implements MessageTable.Column<InboxMessage> {
 
         ID(InboxMessage::getId),
