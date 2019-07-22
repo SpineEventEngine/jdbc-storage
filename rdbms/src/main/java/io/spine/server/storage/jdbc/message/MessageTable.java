@@ -44,12 +44,12 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
 /**
- * A DB table storing a single {@link Message} type.
+ * An SQL table storing a single {@link Message} type.
  *
  * @param <I>
- *         the {@code Message} ID type
+ *         the record ID type
  * @param <M>
- *         the {@code Message} type
+ *         the message type
  */
 public abstract class MessageTable<I, M extends Message> extends AbstractTable<I, M, M> {
 
@@ -60,16 +60,32 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
         super(name, idColumn, dataSource, typeMapping);
     }
 
+    /**
+     * Obtains multiple messages from the table by IDs.
+     *
+     * <p>The non-existent IDs are ignored.
+     */
     Iterator<M> readAll(Iterable<I> ids) {
         SelectMessagesInBulk<I, M> query = composeSelectMessagesInBulkQuery(ids);
         Iterator<M> result = query.execute();
         return result;
     }
 
+    /**
+     * Writes a single message to the storage.
+     *
+     * <p>If a record with the same ID already exists, it is overwritten.
+     */
     void write(M record) {
         write(idOf(record), record);
     }
 
+    /**
+     * Writes multiple records to the storage in a batch.
+     *
+     * <p>If some of the records have IDs that already exist, the respective records in the DB are
+     * overwritten.
+     */
     void writeAll(Iterable<M> records) {
         Collection<I> existingIds = existingIds(records);
 
@@ -84,6 +100,11 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
         insertAll(newRecords);
     }
 
+    /**
+     * Removes multiple records from the table in a bulk.
+     *
+     * <p>Non-existent records are ignored.
+     */
     void removeAll(Iterable<M> records) {
         List<I> ids = stream(records)
                 .map(this::idOf)
@@ -113,6 +134,9 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
         query.execute();
     }
 
+    /**
+     * Obtains a {@code Descriptor} of the stored message type.
+     */
     protected abstract Descriptor messageDescriptor();
 
     @SuppressWarnings("unchecked") // Ensured by descendant classes declaration.
@@ -131,8 +155,14 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
         return columns.build();
     }
 
+    /**
+     * Obtains columns specific to a concrete subtype of the {@code MessageTable}.
+     */
     protected abstract Iterable<? extends Column<M>> messageSpecificColumns();
 
+    /**
+     * Obtains columns common for all {@code MessageTable} descendants.
+     */
     private Iterable<? extends Column<M>> commonColumns() {
         return ImmutableList.of(bytesColumn());
     }
@@ -218,6 +248,9 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
         return query;
     }
 
+    /**
+     * Obtains a column responsible for storing serialized message bytes.
+     */
     public static <M extends Message> BytesColumn<M> bytesColumn() {
         return new BytesColumn<>();
     }
@@ -228,7 +261,8 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
      * <p>Unlike the ordinary {@link TableColumn}, carries the information on how to extract its
      * data from the given record.
      *
-     * @param <M> the type of messages stored in table
+     * @param <M>
+     *         the type of messages stored in table
      */
     public interface Column<M extends Message> extends TableColumn {
 
@@ -240,6 +274,19 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
         }
     }
 
+    /**
+     * A column responsible for storing serialized message bytes.
+     *
+     * <p>This column is present in any {@code MessageTable} instance and serves for convenient
+     * message {@link io.spine.server.storage.jdbc.query.Serializer deserialization}.
+     *
+     * <p>The column getter can be applied to an arbitrary message and is parameterized only to
+     * enable usage along with message-specific table
+     * {@linkplain #messageSpecificColumns() columns}.
+     *
+     * @param <M>
+     *         the type of messages stored in the table
+     */
     public static class BytesColumn<M extends Message> implements Column<M> {
 
         private static final String NAME = "bytes";

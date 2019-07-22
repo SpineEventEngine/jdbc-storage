@@ -23,6 +23,14 @@ package io.spine.server.storage.jdbc.message;
 import com.google.protobuf.Message;
 import com.querydsl.sql.dml.SQLInsertClause;
 
+/**
+ * Inserts multiple messages to the {@link MessageTable} in a batch.
+ *
+ * @param <I>
+ *         the record ID type
+ * @param <M>
+ *         the message type
+ */
 final class InsertMessagesInBulk<I, M extends Message>
         extends WriteMessagesInBulk<I, M, SQLInsertClause> {
 

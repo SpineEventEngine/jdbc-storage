@@ -19,8 +19,8 @@
  */
 
 /**
- * This package contains the routines of storing Protobuf
- * {@linkplain com.google.protobuf.Message messages} in the database.
+ * This package contains the {@link io.spine.server.storage.jdbc.message.JdbcMessageStorage} which
+ * enables storing of plain Protobuf messages to the database, and related classes.
  */
 
 @Internal

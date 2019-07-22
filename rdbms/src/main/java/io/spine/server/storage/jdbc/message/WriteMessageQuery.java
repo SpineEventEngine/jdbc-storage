@@ -36,14 +36,23 @@ import static com.google.common.collect.Streams.stream;
  */
 interface WriteMessageQuery<I, M extends Message> extends WriteQuery {
 
+    /**
+     * Adds a value binding to the {@code query} for each {@code record} field, respective to the
+     * table {@linkplain #columns() columns}.
+     */
     default void setColumnValues(StoreClause<?> query, M record) {
         checkNotNull(query);
         checkNotNull(record);
+
         stream(columns())
                 .filter(column -> !isIdColumn(column))
                 .forEach(column -> setColumnValue(query, column, record));
     }
 
+    /**
+     * Adds a single value binding to the {@code query}, using the value of a specific
+     * {@code column} in a {@code record}.
+     */
     default void setColumnValue(StoreClause<?> query, Column<M> column, M record) {
         checkNotNull(query);
         checkNotNull(column);
@@ -53,15 +62,28 @@ interface WriteMessageQuery<I, M extends Message> extends WriteQuery {
                                         .apply(record));
     }
 
+    /**
+     * Checks if the column is an {@link IdColumn} in this table.
+     */
     default boolean isIdColumn(Column<M> column) {
         checkNotNull(column);
+
         return idColumn().column()
                          .equals(column);
     }
 
+    /**
+     * Obtains the columns of the table this query is applied to.
+     */
     Iterable<? extends Column<M>> columns();
 
+    /**
+     * Obtains the ID column of the table this query is applied to.
+     */
     IdColumn<I> idColumn();
 
+    /**
+     * Obtains the path of the given {@code column} respective to the processed table.
+     */
     PathBuilder<Object> pathOf(Column<M> column);
 }

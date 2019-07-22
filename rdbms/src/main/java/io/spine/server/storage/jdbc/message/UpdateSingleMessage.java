@@ -23,6 +23,14 @@ package io.spine.server.storage.jdbc.message;
 import com.google.protobuf.Message;
 import com.querydsl.core.dml.StoreClause;
 
+/**
+ * Updates a single record in a {@link MessageTable}.
+ *
+ * @param <I>
+ *         the record ID type
+ * @param <M>
+ *         the message type
+ */
 final class UpdateSingleMessage<I, M extends Message> extends WriteSingleMessage<I, M> {
 
     private UpdateSingleMessage(Builder<I, M> builder) {

@@ -32,6 +32,16 @@ import io.spine.server.storage.jdbc.query.IdColumn;
 
 import java.util.Map;
 
+/**
+ * An abstract base for queries that write multiple messages to a {@link MessageTable} in a batch.
+ *
+ * @param <I>
+ *         the record ID type
+ * @param <M>
+ *         the message type
+ * @param <C>
+ *         the type of SQL clause
+ */
 abstract class WriteMessagesInBulk<I, M extends Message, C extends StoreClause<C>>
         extends AbstractQuery
         implements WriteMessageQuery<I, M> {
@@ -58,6 +68,9 @@ abstract class WriteMessagesInBulk<I, M extends Message, C extends StoreClause<C
         return query.execute();
     }
 
+    /**
+     * Obtains an SQL clause to use, basically {@code INSERT} or {@code UPDATE}.
+     */
     protected abstract C clause();
 
     private void addToBatch(C query, I id, M record) {
@@ -66,8 +79,14 @@ abstract class WriteMessagesInBulk<I, M extends Message, C extends StoreClause<C
         addBatch(query);
     }
 
+    /**
+     * Sets the ID clause for the given {@code record}.
+     */
     protected abstract void setIdClause(C query, I id, M record);
 
+    /**
+     * Adds current state of the {@code query} to the processing batch.
+     */
     protected abstract void addBatch(C query);
 
     @Override

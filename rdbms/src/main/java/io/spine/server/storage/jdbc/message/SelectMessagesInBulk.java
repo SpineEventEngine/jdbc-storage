@@ -37,6 +37,14 @@ import static io.spine.server.storage.jdbc.message.MessageTable.bytesColumn;
 import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.messageReader;
 import static java.util.stream.Collectors.toList;
 
+/**
+ * Selects multiple messages from the {@link MessageTable} by their IDs.
+ *
+ * @param <I>
+ *         the ID type
+ * @param <M>
+ *         the message type
+ */
 final class SelectMessagesInBulk<I, M extends Message>
         extends AbstractQuery
         implements SelectQuery<Iterator<M>> {

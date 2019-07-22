@@ -23,6 +23,11 @@ package io.spine.server.storage.jdbc.delivery;
 import io.spine.server.delivery.ShardProcessingSession;
 import io.spine.server.delivery.ShardSessionRecord;
 
+/**
+ * A JDBC-specific implementation of {@link ShardProcessingSession}.
+ *
+ * <p>After completion just runs some pre-defined callback.
+ */
 final class JdbcShardProcessingSession extends ShardProcessingSession {
 
     private final Runnable completionCallback;

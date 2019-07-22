@@ -31,6 +31,12 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
+/**
+ * Deletes multiple messages by IDs from the {@link MessageTable}.
+ *
+ * @param <I>
+ *         the ID type
+ */
 final class DeleteMessagesInBulk<I> extends AbstractQuery implements WriteQuery {
 
     private final ImmutableList<I> ids;

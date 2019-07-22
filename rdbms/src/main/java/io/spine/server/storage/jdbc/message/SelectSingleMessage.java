@@ -26,6 +26,14 @@ import io.spine.server.storage.jdbc.query.SelectMessageByIdQuery;
 
 import static io.spine.server.storage.jdbc.message.MessageTable.bytesColumn;
 
+/**
+ * Selects a single message from the {@link MessageTable} by its ID.
+ *
+ * @param <I>
+ *         the ID type
+ * @param <M>
+ *         the message type
+ */
 final class SelectSingleMessage<I, M extends Message> extends SelectMessageByIdQuery<I, M> {
 
     private SelectSingleMessage(Builder<I, M> builder) {

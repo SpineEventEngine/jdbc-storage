@@ -34,6 +34,11 @@ import java.util.Iterator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * A JDBC-based implementation of the {@link InboxStorage}.
+ *
+ * <p>All inbox messages reside in a separate SQL {@linkplain InboxTable table}.
+ */
 public class JdbcInboxStorage
         extends JdbcMessageStorage<InboxMessageId,
                                    InboxMessage,
@@ -67,10 +72,15 @@ public class JdbcInboxStorage
         checkNotNull(index);
         checkNotClosed();
 
-        Iterator<InboxMessage> iterator = table().readAll(index.getIndex());
+        Iterator<InboxMessage> iterator = table().readAll(index);
         return new InboxPage(iterator, readBatchSize);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>Closes the underlying data source.
+     */
     @Override
     public void close() {
         super.close();

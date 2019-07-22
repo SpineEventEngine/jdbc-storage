@@ -31,6 +31,12 @@ import static io.spine.server.storage.jdbc.delivery.InboxTable.Column.WHEN_RECEI
 import static io.spine.server.storage.jdbc.delivery.InboxTable.Column.WHEN_RECEIVED_NANOS;
 import static io.spine.server.storage.jdbc.message.MessageTable.bytesColumn;
 
+/**
+ * Selects messages from the {@link InboxTable} at a given
+ * {@link io.spine.server.delivery.ShardIndex ShardIndex}.
+ *
+ * <p>Messages are ordered from oldest to newest.
+ */
 final class SelectInboxMessagesByShardIndex extends SelectByShardIndexQuery<InboxMessage> {
 
     private SelectInboxMessagesByShardIndex(Builder builder) {

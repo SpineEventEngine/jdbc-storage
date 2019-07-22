@@ -37,6 +37,12 @@ import static com.google.common.collect.Streams.stream;
 import static io.spine.base.Time.currentTime;
 import static io.spine.util.Exceptions.unsupported;
 
+/**
+ * A JDBC-based implementation of the {@link ShardedWorkRegistry}.
+ *
+ * <p>Represents an SQL table of {@linkplain ShardSessionRecord session records} with the
+ * appropriate accessor methods.
+ */
 public class JdbcShardedWorkRegistry
         extends JdbcMessageStorage<ShardIndex,
                                    ShardSessionRecord,
@@ -67,6 +73,9 @@ public class JdbcShardedWorkRegistry
         return Optional.of(result);
     }
 
+    /**
+     * Tells if the session with the passed index is currently picked by any node.
+     */
     private boolean isPickedAlready(ShardIndex index) {
         Iterator<ShardSessionRecord> records = readByIndex(index);
         long nodesWithShard = stream(records)
@@ -75,9 +84,12 @@ public class JdbcShardedWorkRegistry
         return nodesWithShard > 0;
     }
 
+    /**
+     * Reads all messages belonging to a {@linkplain ShardIndex#getIndex() shard index}.
+     */
     @VisibleForTesting
     Iterator<ShardSessionRecord> readByIndex(ShardIndex index) {
-        return table().readByIndex(index.getIndex());
+        return table().readByIndex(index);
     }
 
     private static ShardSessionRecord newRecord(ShardIndex index, NodeId nodeId) {

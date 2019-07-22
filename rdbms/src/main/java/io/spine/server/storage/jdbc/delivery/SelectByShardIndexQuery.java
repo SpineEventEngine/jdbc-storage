@@ -23,6 +23,7 @@ package io.spine.server.storage.jdbc.delivery;
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Message;
 import com.querydsl.sql.AbstractSQLQuery;
+import io.spine.server.delivery.ShardIndex;
 import io.spine.server.storage.jdbc.query.AbstractQuery;
 import io.spine.server.storage.jdbc.query.DbIterator;
 import io.spine.server.storage.jdbc.query.SelectQuery;
@@ -33,16 +34,26 @@ import java.util.Iterator;
 import static io.spine.server.storage.jdbc.message.MessageTable.bytesColumn;
 import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.messageReader;
 
+/**
+ * An abstract base for queries that select messages at a given {@link ShardIndex}.
+ *
+ * <p><b>NOTE:</b> queries of this type operate on the shard index
+ * {@linkplain ShardIndex#getIndex() itself} exclusively. The
+ * {@link ShardIndex#getOfTotal() ofTotal} parameter is ignored.
+ *
+ * @param <M>
+ *         the message type
+ */
 abstract class SelectByShardIndexQuery<M extends Message>
         extends AbstractQuery
         implements SelectQuery<Iterator<M>> {
 
-    private final long shardIndex;
+    private final ShardIndex index;
 
     SelectByShardIndexQuery(
             Builder<? extends Builder, ? extends SelectByShardIndexQuery> builder) {
         super(builder);
-        this.shardIndex = builder.shardIndex;
+        this.index = builder.shardIndex;
     }
 
     @Override
@@ -59,16 +70,16 @@ abstract class SelectByShardIndexQuery<M extends Message>
     protected abstract Descriptor messageDescriptor();
 
     protected long shardIndex() {
-        return shardIndex;
+        return index.getIndex();
     }
 
     abstract static class Builder<B extends Builder<B, Q>, Q extends SelectByShardIndexQuery>
             extends AbstractQuery.Builder<B, Q> {
 
-        private long shardIndex;
+        private ShardIndex shardIndex;
 
-        B setShardIndex(long shardIndex) {
-            this.shardIndex = shardIndex;
+        B setShardIndex(ShardIndex index) {
+            this.shardIndex = index;
             return getThis();
         }
     }

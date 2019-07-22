@@ -24,6 +24,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.protobuf.Descriptors.Descriptor;
 import io.spine.server.delivery.InboxMessage;
 import io.spine.server.delivery.InboxMessageId;
+import io.spine.server.delivery.ShardIndex;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.Type;
 import io.spine.server.storage.jdbc.TypeMapping;
@@ -42,6 +43,9 @@ import static io.spine.server.storage.jdbc.Type.STRING_255;
 
 /**
  * A table in the DB responsible for storing the {@link io.spine.server.delivery.Inbox Inbox} data.
+ *
+ * <p>Basically stores the {@linkplain InboxMessage inbox messages} on a field-by-field basis in
+ * the appropriate SQL format.
  */
 final class InboxTable extends MessageTable<InboxMessageId, InboxMessage> {
 
@@ -61,22 +65,30 @@ final class InboxTable extends MessageTable<InboxMessageId, InboxMessage> {
         return ImmutableList.copyOf(Column.values());
     }
 
-    Iterator<InboxMessage> readAll(long shardIndex) {
-        SelectInboxMessagesByShardIndex query = composeSelectByShardIndexQuery(shardIndex);
+    /**
+     * Obtains all inbox messages that belong to a specified {@code shardIndex}.
+     *
+     * <p>The messages are ordered from oldest to newest.
+     */
+    Iterator<InboxMessage> readAll(ShardIndex index) {
+        SelectInboxMessagesByShardIndex query = composeSelectByShardIndexQuery(index);
         Iterator<InboxMessage> iterator = query.execute();
         return iterator;
     }
 
-    private SelectInboxMessagesByShardIndex composeSelectByShardIndexQuery(long shardIndex) {
+    private SelectInboxMessagesByShardIndex composeSelectByShardIndexQuery(ShardIndex index) {
         SelectInboxMessagesByShardIndex.Builder builder =
                 SelectInboxMessagesByShardIndex.newBuilder();
         SelectInboxMessagesByShardIndex query = builder.setTableName(name())
                                                        .setDataSource(dataSource())
-                                                       .setShardIndex(shardIndex)
+                                                       .setShardIndex(index)
                                                        .build();
         return query;
     }
 
+    /**
+     * The columns of {@link InboxMessage} DB representation.
+     */
     enum Column implements MessageTable.Column<InboxMessage> {
 
         ID(InboxMessage::getId),

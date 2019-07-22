@@ -27,15 +27,20 @@ import io.spine.server.delivery.Page;
 import java.util.Iterator;
 import java.util.Optional;
 
+/**
+ * A page of messages obtained from the {@link JdbcInboxStorage}.
+ *
+ * <p>Will be no bigger than the specified {@link #batchSize}.
+ */
 final class InboxPage implements Page<InboxMessage> {
 
     private final Iterator<InboxMessage> iterator;
-    private final int size;
+    private final int batchSize;
     private final ImmutableList<InboxMessage> contents;
 
     InboxPage(Iterator<InboxMessage> iterator, int size) {
         this.iterator = iterator;
-        this.size = size;
+        this.batchSize = size;
         ImmutableList.Builder<InboxMessage> builder = transform(iterator, size);
         contents = builder.build();
     }
@@ -67,7 +72,7 @@ final class InboxPage implements Page<InboxMessage> {
         if (!iterator.hasNext()) {
             return Optional.empty();
         }
-        InboxPage page = new InboxPage(iterator, size);
+        InboxPage page = new InboxPage(iterator, batchSize);
         return Optional.of(page);
     }
 }

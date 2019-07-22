@@ -31,6 +31,14 @@ import io.spine.server.storage.jdbc.query.IdColumn;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * An abstract base for queries that store a single message to a {@link MessageTable}.
+ *
+ * @param <I>
+ *         the record ID type
+ * @param <M>
+ *         the message type
+ */
 abstract class WriteSingleMessage<I, M extends Message>
         extends IdAwareQuery<I>
         implements WriteMessageQuery<I, M> {
@@ -52,6 +60,9 @@ abstract class WriteSingleMessage<I, M extends Message>
         return query.execute();
     }
 
+    /**
+     * Obtains an SQL clause to use, basically {@code INSERT} or {@code UPDATE}.
+     */
     protected abstract StoreClause<?> clause();
 
     @Override

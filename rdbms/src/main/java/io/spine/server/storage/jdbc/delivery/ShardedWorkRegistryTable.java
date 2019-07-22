@@ -37,6 +37,15 @@ import static io.spine.server.storage.jdbc.Type.INT;
 import static io.spine.server.storage.jdbc.Type.LONG;
 import static io.spine.server.storage.jdbc.Type.STRING_255;
 
+/**
+ * A table storing shard session {@linkplain ShardSessionRecord records}.
+ *
+ * <p>The {@link ShardIndex} message is used as an ID for records, so there can be multiple session
+ * records per shard index {@linkplain ShardIndex#getIndex() itself}.
+ *
+ * <p>The {@link #readByIndex(ShardIndex)} method can be used to retrieve items belonging to a
+ * concrete {@linkplain ShardIndex#getIndex() shard index}.
+ */
 final class ShardedWorkRegistryTable extends MessageTable<ShardIndex, ShardSessionRecord> {
 
     private static final String NAME = "shard_session_registry";
@@ -56,18 +65,24 @@ final class ShardedWorkRegistryTable extends MessageTable<ShardIndex, ShardSessi
         return ImmutableList.copyOf(Column.values());
     }
 
-    Iterator<ShardSessionRecord> readByIndex(long shardIndex) {
-        SelectShardSessionsByShardIndex query = composeSelectByShardIndexQuery(shardIndex);
+    /**
+     * Obtains all session records belonging to a given shard index.
+     *
+     * <p>Record filtering is based only on a shard index
+     * {@linkplain ShardIndex#getIndex() itself}, thus {@code Iterator} as the result.
+     */
+    Iterator<ShardSessionRecord> readByIndex(ShardIndex index) {
+        SelectShardSessionsByShardIndex query = composeSelectByShardIndexQuery(index);
         Iterator<ShardSessionRecord> iterator = query.execute();
         return iterator;
     }
 
-    private SelectShardSessionsByShardIndex composeSelectByShardIndexQuery(long shardIndex) {
+    private SelectShardSessionsByShardIndex composeSelectByShardIndexQuery(ShardIndex index) {
         SelectShardSessionsByShardIndex.Builder builder =
                 SelectShardSessionsByShardIndex.newBuilder();
         SelectShardSessionsByShardIndex query = builder.setTableName(name())
                                                        .setDataSource(dataSource())
-                                                       .setShardIndex(shardIndex)
+                                                       .setShardIndex(index)
                                                        .build();
         return query;
     }

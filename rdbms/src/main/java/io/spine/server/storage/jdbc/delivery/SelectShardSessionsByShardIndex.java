@@ -27,6 +27,9 @@ import io.spine.server.delivery.ShardSessionRecord;
 import static io.spine.server.storage.jdbc.delivery.ShardedWorkRegistryTable.Column.SHARD_INDEX;
 import static io.spine.server.storage.jdbc.message.MessageTable.bytesColumn;
 
+/**
+ * Selects shard session {@linkplain ShardSessionRecord records} based on the given shard index.
+ */
 final class SelectShardSessionsByShardIndex extends SelectByShardIndexQuery<ShardSessionRecord> {
 
     private SelectShardSessionsByShardIndex(Builder builder) {

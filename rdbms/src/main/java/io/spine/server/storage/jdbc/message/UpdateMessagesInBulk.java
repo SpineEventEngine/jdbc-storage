@@ -23,6 +23,14 @@ package io.spine.server.storage.jdbc.message;
 import com.google.protobuf.Message;
 import com.querydsl.sql.dml.SQLUpdateClause;
 
+/**
+ * Updates multiple messages in the {@link MessageTable} in a bulk.
+ *
+ * @param <I>
+ *         the record ID type
+ * @param <M>
+ *         the message type
+ */
 public class UpdateMessagesInBulk<I, M extends Message>
         extends WriteMessagesInBulk<I, M, SQLUpdateClause> {
 

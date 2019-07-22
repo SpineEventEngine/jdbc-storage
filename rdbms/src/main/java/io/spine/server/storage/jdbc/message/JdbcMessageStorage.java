@@ -30,6 +30,18 @@ import java.util.Optional;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static io.spine.util.Exceptions.unsupported;
 
+/**
+ * A storage which stores plain messages in a single SQL {@linkplain MessageTable table}.
+ *
+ * @param <I>
+ *         the record ID type
+ * @param <M>
+ *         the stored message type
+ * @param <R>
+ *         the read request type
+ * @param <T>
+ *         the type of used {@link MessageTable}
+ */
 public abstract class JdbcMessageStorage<I,
                                          M extends Message,
                                          R extends ReadRequest<I>,
