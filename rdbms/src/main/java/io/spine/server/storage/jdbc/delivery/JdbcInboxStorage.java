@@ -29,6 +29,7 @@ import io.spine.server.delivery.ShardIndex;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.StorageBuilder;
 import io.spine.server.storage.jdbc.message.JdbcMessageStorage;
+import io.spine.server.storage.jdbc.query.DbIterator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -39,28 +40,33 @@ public class JdbcInboxStorage
                                    InboxTable>
         implements InboxStorage {
 
+    private static final int DEFAULT_READ_BATCH_SIZE = 500;
+
+    private final DataSourceWrapper dataSource;
+
     /**
      * The maximum number of {@linkplain InboxMessage inbox messages} that are kept in memory
      * simultaneously during storage reads.
      *
      * <p>This value can be overridden using {@link Builder#setReadBatchSize(int)}.
+     *
+     * <p>Defaults to {@link #DEFAULT_READ_BATCH_SIZE}.
      */
-    private static final int DEFAULT_READ_BATCH_SIZE = 500;
-
-    private final DataSourceWrapper dataSource;
+    private final int readBatchSize;
 
     private JdbcInboxStorage(Builder builder) {
         super(builder.isMultitenant(), new InboxTable(builder.getDataSource(),
-                                                      builder.getTypeMapping(),
-                                                      builder.readBatchSize));
+                                                      builder.getTypeMapping()));
         this.dataSource = builder.getDataSource();
+        this.readBatchSize = builder.readBatchSize;
     }
 
     @Override
     public Page<InboxMessage> readAll(ShardIndex index) {
         checkNotNull(index);
         checkNotClosed();
-        return table().readAll(index);
+        DbIterator<InboxMessage> iterator = table().readAll(index);
+        return new InboxPage(iterator, readBatchSize);
     }
 
     @Override

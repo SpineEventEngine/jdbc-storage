@@ -24,7 +24,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.protobuf.Descriptors.Descriptor;
 import io.spine.server.delivery.InboxMessage;
 import io.spine.server.delivery.InboxMessageId;
-import io.spine.server.delivery.Page;
 import io.spine.server.delivery.ShardIndex;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.Type;
@@ -49,11 +48,8 @@ final class InboxTable extends MessageTable<InboxMessageId, InboxMessage> {
 
     private static final String NAME = "inbox";
 
-    private final int readBatchSize;
-
-    InboxTable(DataSourceWrapper dataSource, TypeMapping typeMapping, int readBatchSize) {
+    InboxTable(DataSourceWrapper dataSource, TypeMapping typeMapping) {
         super(NAME, IdColumn.of(Column.ID, InboxMessageId.class), dataSource, typeMapping);
-        this.readBatchSize = readBatchSize;
     }
 
     @Override
@@ -66,10 +62,10 @@ final class InboxTable extends MessageTable<InboxMessageId, InboxMessage> {
         return ImmutableList.copyOf(Column.values());
     }
 
-    Page<InboxMessage> readAll(ShardIndex index) {
+    DbIterator<InboxMessage> readAll(ShardIndex index) {
         SelectByShardIndexQuery query = composeSelectByShardIndexQuery(index);
         DbIterator<InboxMessage> iterator = query.execute();
-        return new InboxPage(iterator, readBatchSize);
+        return iterator;
     }
 
     private SelectByShardIndexQuery composeSelectByShardIndexQuery(ShardIndex index) {
