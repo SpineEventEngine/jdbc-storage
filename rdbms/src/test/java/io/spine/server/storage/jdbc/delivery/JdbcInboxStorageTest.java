@@ -35,7 +35,6 @@ import io.spine.server.delivery.ShardIndex;
 import io.spine.server.entity.Entity;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.delivery.given.TestInboxMessage;
-import io.spine.server.storage.jdbc.delivery.given.TestShardIndex;
 import io.spine.server.storage.jdbc.message.JdbcMessageStorageTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -54,10 +53,10 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @DisplayName("JdbcInboxStorage should")
-final class JdbcInboxStorageTest extends JdbcMessageStorageTest<InboxMessageId,
-                                                                InboxMessage,
-                                                                InboxReadRequest,
-                                                                JdbcInboxStorage> {
+class JdbcInboxStorageTest extends JdbcMessageStorageTest<InboxMessageId,
+                                                          InboxMessage,
+                                                          InboxReadRequest,
+                                                          JdbcInboxStorage> {
 
     @Test
     @DisplayName(NOT_ACCEPT_NULLS)
@@ -88,7 +87,7 @@ final class JdbcInboxStorageTest extends JdbcMessageStorageTest<InboxMessageId,
     @Test
     @DisplayName("read messages by `ShardIndex`")
     void readByShardIndex() {
-        ShardIndex index = TestShardIndex.generate();
+        ShardIndex index = newIndex();
         ImmutableList<InboxMessage> messages = generateMultiple(20, index);
         storage().writeAll(messages);
 
@@ -98,7 +97,7 @@ final class JdbcInboxStorageTest extends JdbcMessageStorageTest<InboxMessageId,
     @Test
     @DisplayName("remove selected `InboxMessage` instances")
     void removeMessages() {
-        ShardIndex index = TestShardIndex.generate();
+        ShardIndex index = newIndex();
         ImmutableList<InboxMessage> messages = generateMultiple(20, index);
         InboxStorage storage = storage();
         storage.writeAll(messages);
@@ -125,7 +124,7 @@ final class JdbcInboxStorageTest extends JdbcMessageStorageTest<InboxMessageId,
     void doNothingIfRemovingInexistentMessages() {
 
         InboxStorage storage = storage();
-        ShardIndex index = TestShardIndex.generate();
+        ShardIndex index = newIndex();
         checkEmpty(storage, index);
 
         ImmutableList<InboxMessage> messages = generateMultiple(40, index);
@@ -138,7 +137,7 @@ final class JdbcInboxStorageTest extends JdbcMessageStorageTest<InboxMessageId,
     @DisplayName("mark messages delivered")
     void markMessagedDelivered() {
 
-        ShardIndex index = TestShardIndex.generate();
+        ShardIndex index = newIndex();
         ImmutableList<InboxMessage> messages = generateMultiple(10, index);
         InboxStorage storage = storage();
         storage.writeAll(messages);
@@ -180,7 +179,7 @@ final class JdbcInboxStorageTest extends JdbcMessageStorageTest<InboxMessageId,
                 .setReadBatchSize(readBatchSize)
                 .build();
 
-        ShardIndex index = TestShardIndex.generate();
+        ShardIndex index = newIndex();
         ImmutableList<InboxMessage> messages = generateMultiple(30, index);
         storage.writeAll(messages);
 

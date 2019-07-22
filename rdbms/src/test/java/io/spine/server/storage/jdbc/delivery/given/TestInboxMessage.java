@@ -63,7 +63,7 @@ public final class TestInboxMessage {
      * Generates a new {@link InboxMessage} with a random shard index.
      */
     public static InboxMessage generate() {
-        ShardIndex shardIndex = TestShardIndex.generate();
+        ShardIndex shardIndex = TestShardIndex.newIndex();
         return generate(shardIndex, currentTime());
     }
 

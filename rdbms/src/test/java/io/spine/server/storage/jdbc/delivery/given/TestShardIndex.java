@@ -22,8 +22,6 @@ package io.spine.server.storage.jdbc.delivery.given;
 
 import io.spine.server.delivery.ShardIndex;
 
-import java.security.SecureRandom;
-
 import static com.google.common.base.Preconditions.checkArgument;
 
 /**
@@ -31,17 +29,15 @@ import static com.google.common.base.Preconditions.checkArgument;
  */
 public final class TestShardIndex {
 
-    private static final SecureRandom random = new SecureRandom();
-
     private TestShardIndex() {
     }
 
     /**
-     * Generates a new {@link ShardIndex} with random but still valid values.
+     * Generates a new {@link ShardIndex} with some pre-defined values.
      */
-    public static ShardIndex generate() {
-        int shardIndex = random.nextInt(100);
-        int totalShards = random.nextInt(100) + 100;
+    public static ShardIndex newIndex() {
+        int shardIndex = 5;
+        int totalShards = 23;
         return newIndex(shardIndex, totalShards);
     }
 
