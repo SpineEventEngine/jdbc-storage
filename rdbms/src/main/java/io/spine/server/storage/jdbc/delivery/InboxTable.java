@@ -28,11 +28,11 @@ import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.Type;
 import io.spine.server.storage.jdbc.TypeMapping;
 import io.spine.server.storage.jdbc.message.MessageTable;
-import io.spine.server.storage.jdbc.query.DbIterator;
 import io.spine.server.storage.jdbc.query.IdColumn;
 import io.spine.string.Stringifiers;
 
 import javax.annotation.Nullable;
+import java.util.Iterator;
 
 import static io.spine.server.storage.jdbc.Type.BOOLEAN;
 import static io.spine.server.storage.jdbc.Type.INT;
@@ -61,9 +61,9 @@ final class InboxTable extends MessageTable<InboxMessageId, InboxMessage> {
         return ImmutableList.copyOf(Column.values());
     }
 
-    DbIterator<InboxMessage> readAll(long shardIndex) {
+    Iterator<InboxMessage> readAll(long shardIndex) {
         SelectInboxMessagesByShardIndex query = composeSelectByShardIndexQuery(shardIndex);
-        DbIterator<InboxMessage> iterator = query.execute();
+        Iterator<InboxMessage> iterator = query.execute();
         return iterator;
     }
 

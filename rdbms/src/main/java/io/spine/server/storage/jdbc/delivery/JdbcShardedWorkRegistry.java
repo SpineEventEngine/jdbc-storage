@@ -28,8 +28,8 @@ import io.spine.server.delivery.ShardSessionRecord;
 import io.spine.server.delivery.ShardedWorkRegistry;
 import io.spine.server.storage.jdbc.StorageBuilder;
 import io.spine.server.storage.jdbc.message.JdbcMessageStorage;
-import io.spine.server.storage.jdbc.query.DbIterator;
 
+import java.util.Iterator;
 import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -68,7 +68,7 @@ public class JdbcShardedWorkRegistry
     }
 
     private boolean isPickedAlready(ShardIndex index) {
-        DbIterator<ShardSessionRecord> records = readByIndex(index);
+        Iterator<ShardSessionRecord> records = readByIndex(index);
         long nodesWithShard = stream(records)
                 .filter(ShardSessionRecord::hasPickedBy)
                 .count();
@@ -76,7 +76,7 @@ public class JdbcShardedWorkRegistry
     }
 
     @VisibleForTesting
-    DbIterator<ShardSessionRecord> readByIndex(ShardIndex index) {
+    Iterator<ShardSessionRecord> readByIndex(ShardIndex index) {
         return table().readByIndex(index.getIndex());
     }
 

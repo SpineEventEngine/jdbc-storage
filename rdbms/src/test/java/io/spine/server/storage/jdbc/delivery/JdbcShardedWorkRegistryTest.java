@@ -31,10 +31,10 @@ import io.spine.server.delivery.ShardSessionRecord;
 import io.spine.server.entity.Entity;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.message.JdbcMessageStorageTest;
-import io.spine.server.storage.jdbc.query.DbIterator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.Iterator;
 import java.util.Optional;
 
 import static com.google.common.truth.Truth.assertThat;
@@ -169,7 +169,7 @@ class JdbcShardedWorkRegistryTest extends JdbcMessageStorageTest<ShardIndex,
     }
 
     private ShardSessionRecord readSingleRecord(ShardIndex index) {
-        DbIterator<ShardSessionRecord> records = storage().readByIndex(index);
+        Iterator<ShardSessionRecord> records = storage().readByIndex(index);
         assertTrue(records.hasNext());
 
         return records.next();

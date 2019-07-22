@@ -28,10 +28,10 @@ import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.Type;
 import io.spine.server.storage.jdbc.TypeMapping;
 import io.spine.server.storage.jdbc.message.MessageTable;
-import io.spine.server.storage.jdbc.query.DbIterator;
 import io.spine.server.storage.jdbc.query.IdColumn;
 
 import javax.annotation.Nullable;
+import java.util.Iterator;
 
 import static io.spine.server.storage.jdbc.Type.INT;
 import static io.spine.server.storage.jdbc.Type.LONG;
@@ -56,9 +56,9 @@ final class ShardedWorkRegistryTable extends MessageTable<ShardIndex, ShardSessi
         return ImmutableList.copyOf(Column.values());
     }
 
-    DbIterator<ShardSessionRecord> readByIndex(long shardIndex) {
+    Iterator<ShardSessionRecord> readByIndex(long shardIndex) {
         SelectShardSessionsByShardIndex query = composeSelectByShardIndexQuery(shardIndex);
-        DbIterator<ShardSessionRecord> iterator = query.execute();
+        Iterator<ShardSessionRecord> iterator = query.execute();
         return iterator;
     }
 

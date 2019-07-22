@@ -30,6 +30,7 @@ import io.spine.server.storage.jdbc.query.IdColumn;
 import io.spine.server.storage.jdbc.query.SelectQuery;
 
 import java.sql.ResultSet;
+import java.util.Iterator;
 import java.util.List;
 
 import static io.spine.server.storage.jdbc.message.MessageTable.bytesColumn;
@@ -38,7 +39,7 @@ import static java.util.stream.Collectors.toList;
 
 final class SelectMessagesInBulk<I, M extends Message>
         extends AbstractQuery
-        implements SelectQuery<DbIterator<M>> {
+        implements SelectQuery<Iterator<M>> {
 
     private final ImmutableList<I> ids;
     private final IdColumn<I> idColumn;
@@ -52,7 +53,7 @@ final class SelectMessagesInBulk<I, M extends Message>
     }
 
     @Override
-    public DbIterator<M> execute() {
+    public Iterator<M> execute() {
         ResultSet results = query().getResults();
         DbIterator<M> iterator =
                 DbIterator.over(results,

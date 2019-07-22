@@ -23,18 +23,17 @@ package io.spine.server.storage.jdbc.delivery;
 import com.google.common.collect.ImmutableList;
 import io.spine.server.delivery.InboxMessage;
 import io.spine.server.delivery.Page;
-import io.spine.server.storage.jdbc.query.DbIterator;
 
 import java.util.Iterator;
 import java.util.Optional;
 
 final class InboxPage implements Page<InboxMessage> {
 
-    private final DbIterator<InboxMessage> iterator;
+    private final Iterator<InboxMessage> iterator;
     private final int size;
     private final ImmutableList<InboxMessage> contents;
 
-    InboxPage(DbIterator<InboxMessage> iterator, int size) {
+    InboxPage(Iterator<InboxMessage> iterator, int size) {
         this.iterator = iterator;
         this.size = size;
         ImmutableList.Builder<InboxMessage> builder = transform(iterator, size);

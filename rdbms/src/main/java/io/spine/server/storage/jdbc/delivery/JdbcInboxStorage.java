@@ -29,7 +29,8 @@ import io.spine.server.delivery.ShardIndex;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.StorageBuilder;
 import io.spine.server.storage.jdbc.message.JdbcMessageStorage;
-import io.spine.server.storage.jdbc.query.DbIterator;
+
+import java.util.Iterator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -66,7 +67,7 @@ public class JdbcInboxStorage
         checkNotNull(index);
         checkNotClosed();
 
-        DbIterator<InboxMessage> iterator = table().readAll(index.getIndex());
+        Iterator<InboxMessage> iterator = table().readAll(index.getIndex());
         return new InboxPage(iterator, readBatchSize);
     }
 

@@ -21,6 +21,7 @@
 package io.spine.server.storage.jdbc.message;
 
 import com.google.common.collect.ImmutableList;
+import com.google.errorprone.annotations.Immutable;
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Message;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
@@ -28,9 +29,7 @@ import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.Type;
 import io.spine.server.storage.jdbc.TypeMapping;
 import io.spine.server.storage.jdbc.query.AbstractTable;
-import io.spine.server.storage.jdbc.query.DbIterator;
 import io.spine.server.storage.jdbc.query.IdColumn;
-import jdk.nashorn.internal.ir.annotations.Immutable;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -63,7 +62,7 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
 
     Iterator<M> readAll(Iterable<I> ids) {
         SelectMessagesInBulk<I, M> query = composeSelectMessagesInBulkQuery(ids);
-        DbIterator<M> result = query.execute();
+        Iterator<M> result = query.execute();
         return result;
     }
 

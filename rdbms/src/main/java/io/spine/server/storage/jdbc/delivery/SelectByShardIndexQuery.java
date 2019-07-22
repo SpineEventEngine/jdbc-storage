@@ -28,13 +28,14 @@ import io.spine.server.storage.jdbc.query.DbIterator;
 import io.spine.server.storage.jdbc.query.SelectQuery;
 
 import java.sql.ResultSet;
+import java.util.Iterator;
 
 import static io.spine.server.storage.jdbc.message.MessageTable.bytesColumn;
 import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.messageReader;
 
 abstract class SelectByShardIndexQuery<M extends Message>
         extends AbstractQuery
-        implements SelectQuery<DbIterator<M>> {
+        implements SelectQuery<Iterator<M>> {
 
     private final long shardIndex;
 
@@ -45,7 +46,7 @@ abstract class SelectByShardIndexQuery<M extends Message>
     }
 
     @Override
-    public DbIterator<M> execute() {
+    public Iterator<M> execute() {
         ResultSet resultSet = query().getResults();
         DbIterator<M> iterator =
                 DbIterator.over(resultSet,
