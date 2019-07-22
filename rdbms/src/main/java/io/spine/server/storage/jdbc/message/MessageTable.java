@@ -60,6 +60,12 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
         super(name, idColumn, dataSource, typeMapping);
     }
 
+    Iterator<M> readAll(Iterable<I> ids) {
+        SelectMessagesInBulk<I, M> query = composeSelectMessagesInBulkQuery(ids);
+        DbIterator<M> result = query.execute();
+        return result;
+    }
+
     void write(M record) {
         write(idOf(record), record);
     }
@@ -82,25 +88,8 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
         List<I> ids = stream(records)
                 .map(this::idOf)
                 .collect(toList());
-        DeleteMessagesInBulk.Builder<I> builder = DeleteMessagesInBulk.newBuilder();
-        DeleteMessagesInBulk<I> query = builder.setTableName(name())
-                                               .setDataSource(dataSource())
-                                               .setIdColumn(idColumn())
-                                               .setIds(ids)
-                                               .build();
+        DeleteMessagesInBulk<I> query = composeDeleteMessagesInBulkQuery(ids);
         query.execute();
-    }
-
-    Iterator<M> readAll(Iterable<I> ids) {
-        SelectMessagesInBulk.Builder<I, M> builder = SelectMessagesInBulk.newBuilder();
-        SelectMessagesInBulk<I, M> query = builder.setTableName(name())
-                                                  .setDataSource(dataSource())
-                                                  .setIdColumn(idColumn())
-                                                  .setIds(ids)
-                                                  .setMessageDescriptor(messageDescriptor())
-                                                  .build();
-        DbIterator<M> result = query.execute();
-        return result;
     }
 
     private Collection<I> existingIds(Iterable<M> records) {
@@ -115,24 +104,12 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
     }
 
     private void insertAll(Map<I, M> records) {
-        InsertMessagesInBulk.Builder<I, M> builder = InsertMessagesInBulk.newBuilder();
-        InsertMessagesInBulk<I, M> query = builder.setTableName(name())
-                                                  .setDataSource(dataSource())
-                                                  .setIdColumn(idColumn())
-                                                  .setColumns(tableColumns())
-                                                  .setRecords(records)
-                                                  .build();
+        InsertMessagesInBulk<I, M> query = composeInsertMessagesInBulkQuery(records);
         query.execute();
     }
 
     private void updateAll(Map<I, M> records) {
-        UpdateMessagesInBulk.Builder<I, M> builder = UpdateMessagesInBulk.newBuilder();
-        UpdateMessagesInBulk<I, M> query = builder.setTableName(name())
-                                                  .setDataSource(dataSource())
-                                                  .setIdColumn(idColumn())
-                                                  .setColumns(tableColumns())
-                                                  .setRecords(records)
-                                                  .build();
+        UpdateMessagesInBulk<I, M> query = composeUpdateMessagesInBulkQuery(records);
         query.execute();
     }
 
@@ -144,6 +121,20 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
         I id = (I) column.getter()
                          .apply(record);
         return id;
+    }
+
+    @Override
+    protected List<? extends Column<M>> tableColumns() {
+        ImmutableList.Builder<Column<M>> columns = ImmutableList.builder();
+        columns.addAll(messageSpecificColumns());
+        columns.addAll(commonColumns());
+        return columns.build();
+    }
+
+    protected abstract Iterable<? extends Column<M>> messageSpecificColumns();
+
+    private Iterable<? extends Column<M>> commonColumns() {
+        return ImmutableList.of(bytesColumn());
     }
 
     @Override
@@ -184,18 +175,47 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
         return query;
     }
 
-    @Override
-    protected List<? extends Column<M>> tableColumns() {
-        ImmutableList.Builder<Column<M>> columns = ImmutableList.builder();
-        columns.addAll(messageSpecificColumns());
-        columns.addAll(commonColumns());
-        return columns.build();
+    private SelectMessagesInBulk<I, M> composeSelectMessagesInBulkQuery(Iterable<I> ids) {
+        SelectMessagesInBulk.Builder<I, M> builder = SelectMessagesInBulk.newBuilder();
+        SelectMessagesInBulk<I, M> query = builder.setTableName(name())
+                                                  .setDataSource(dataSource())
+                                                  .setIdColumn(idColumn())
+                                                  .setIds(ids)
+                                                  .setMessageDescriptor(messageDescriptor())
+                                                  .build();
+        return query;
     }
 
-    protected abstract Iterable<? extends Column<M>> messageSpecificColumns();
+    private InsertMessagesInBulk<I, M> composeInsertMessagesInBulkQuery(Map<I, M> records) {
+        InsertMessagesInBulk.Builder<I, M> builder = InsertMessagesInBulk.newBuilder();
+        InsertMessagesInBulk<I, M> query = builder.setTableName(name())
+                                                  .setDataSource(dataSource())
+                                                  .setIdColumn(idColumn())
+                                                  .setColumns(tableColumns())
+                                                  .setRecords(records)
+                                                  .build();
+        return query;
+    }
 
-    private Iterable<? extends Column<M>> commonColumns() {
-        return ImmutableList.of(bytesColumn());
+    private UpdateMessagesInBulk<I, M> composeUpdateMessagesInBulkQuery(Map<I, M> records) {
+        UpdateMessagesInBulk.Builder<I, M> builder = UpdateMessagesInBulk.newBuilder();
+        UpdateMessagesInBulk<I, M> query = builder.setTableName(name())
+                                                  .setDataSource(dataSource())
+                                                  .setIdColumn(idColumn())
+                                                  .setColumns(tableColumns())
+                                                  .setRecords(records)
+                                                  .build();
+        return query;
+    }
+
+    private DeleteMessagesInBulk<I> composeDeleteMessagesInBulkQuery(List<I> ids) {
+        DeleteMessagesInBulk.Builder<I> builder = DeleteMessagesInBulk.newBuilder();
+        DeleteMessagesInBulk<I> query = builder.setTableName(name())
+                                               .setDataSource(dataSource())
+                                               .setIdColumn(idColumn())
+                                               .setIds(ids)
+                                               .build();
+        return query;
     }
 
     public static <M extends Message> BytesColumn<M> bytesColumn() {

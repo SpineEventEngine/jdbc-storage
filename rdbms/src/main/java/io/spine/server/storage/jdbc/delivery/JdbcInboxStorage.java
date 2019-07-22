@@ -65,6 +65,7 @@ public class JdbcInboxStorage
     public Page<InboxMessage> readAll(ShardIndex index) {
         checkNotNull(index);
         checkNotClosed();
+
         DbIterator<InboxMessage> iterator = table().readAll(index);
         return new InboxPage(iterator, readBatchSize);
     }
