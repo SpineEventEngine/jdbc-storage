@@ -130,6 +130,12 @@ class JdbcStorageFactoryTest {
     }
 
     @Test
+    @DisplayName("create inbox storage")
+    void createInboxStorage() {
+        // todo
+    }
+
+    @Test
     @DisplayName("close datastore on close")
     void closeDatastoreOnClose() {
         DataSourceWrapper mock = GivenDataSource.withoutSuperpowers();

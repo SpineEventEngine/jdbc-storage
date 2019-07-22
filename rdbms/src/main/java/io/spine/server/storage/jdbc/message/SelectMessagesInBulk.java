@@ -30,16 +30,18 @@ import io.spine.server.storage.jdbc.query.IdColumn;
 import io.spine.server.storage.jdbc.query.SelectQuery;
 
 import java.sql.ResultSet;
+import java.util.List;
 
 import static io.spine.server.storage.jdbc.message.MessageTable.bytesColumn;
 import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.messageReader;
+import static java.util.stream.Collectors.toList;
 
 final class SelectMessagesInBulk<I, M extends Message>
         extends AbstractQuery
         implements SelectQuery<DbIterator<M>> {
 
     private final ImmutableList<I> ids;
-    private final IdColumn idColumn;
+    private final IdColumn<I> idColumn;
     private final Descriptor messageDescriptor;
 
     private SelectMessagesInBulk(Builder<I, M> builder) {
@@ -59,9 +61,13 @@ final class SelectMessagesInBulk<I, M extends Message>
     }
 
     private AbstractSQLQuery<Object, ?> query() {
+        List<Object> normalizedIds = ids
+                .stream()
+                .map(idColumn::normalize)
+                .collect(toList());
         return factory().select(pathOf(bytesColumn()))
                         .from(table())
-                        .where(pathOf(idColumn).in(ids));
+                        .where(pathOf(idColumn).in(normalizedIds));
     }
 
     static <I, M extends Message> Builder<I, M> newBuilder() {
@@ -72,7 +78,7 @@ final class SelectMessagesInBulk<I, M extends Message>
             extends AbstractQuery.Builder<Builder<I, M>, SelectMessagesInBulk<I, M>> {
 
         private ImmutableList<I> ids;
-        private IdColumn idColumn;
+        private IdColumn<I> idColumn;
         private Descriptor messageDescriptor;
 
         Builder<I, M> setIds(Iterable<I> ids) {
@@ -80,7 +86,7 @@ final class SelectMessagesInBulk<I, M extends Message>
             return getThis();
         }
 
-        Builder<I, M> setIdColumn(IdColumn idColumn) {
+        Builder<I, M> setIdColumn(IdColumn<I> idColumn) {
             this.idColumn = idColumn;
             return getThis();
         }

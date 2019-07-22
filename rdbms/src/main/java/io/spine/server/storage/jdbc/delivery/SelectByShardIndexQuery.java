@@ -62,7 +62,7 @@ final class SelectByShardIndexQuery
         OrderSpecifier<Comparable> byNanos = orderBy(WHEN_RECEIVED_NANOS, ASC);
         return factory().select(pathOf(bytesColumn()))
                         .from(table())
-                        .where(pathOf(SHARD_INDEX).eq(shardIndex))
+                        .where(pathOf(SHARD_INDEX).eq(shardIndex.getIndex()))
                         .orderBy(bySeconds, byNanos);
     }
 
