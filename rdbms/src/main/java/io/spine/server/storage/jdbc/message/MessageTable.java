@@ -164,14 +164,14 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
     }
 
     @Override
-    protected SelectMessageById<I, M> composeSelectQuery(I id) {
-        SelectMessageById.Builder<I, M> builder = SelectMessageById.newBuilder();
-        SelectMessageById<I, M> query = builder.setTableName(name())
-                                               .setDataSource(dataSource())
-                                               .setIdColumn(idColumn())
-                                               .setId(id)
-                                               .setMessageDescriptor(messageDescriptor())
-                                               .doBuild();
+    protected SelectSingleMessage<I, M> composeSelectQuery(I id) {
+        SelectSingleMessage.Builder<I, M> builder = SelectSingleMessage.newBuilder();
+        SelectSingleMessage<I, M> query = builder.setTableName(name())
+                                                 .setDataSource(dataSource())
+                                                 .setIdColumn(idColumn())
+                                                 .setId(id)
+                                                 .setMessageDescriptor(messageDescriptor())
+                                                 .doBuild();
         return query;
     }
 

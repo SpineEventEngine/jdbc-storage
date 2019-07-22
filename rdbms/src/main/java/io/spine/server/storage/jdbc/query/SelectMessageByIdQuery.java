@@ -40,8 +40,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @param <M>
  *         a type of messages to read
  */
-// TODO:2019-07-19:dmytro.kuzmin:WIP Remove this or integrate somehow with tools added to `message`
-//  package
 public abstract class SelectMessageByIdQuery<I, M extends Message>
         extends IdAwareQuery<I>
         implements SelectQuery<M> {
@@ -118,13 +116,13 @@ public abstract class SelectMessageByIdQuery<I, M extends Message>
         private Descriptor messageDescriptor;
 
         @CanIgnoreReturnValue
-        protected B setMessageColumnName(String messageColumnName) {
+        public B setMessageColumnName(String messageColumnName) {
             this.messageColumnName = messageColumnName;
             return getThis();
         }
 
         @CanIgnoreReturnValue
-        protected B setMessageDescriptor(Descriptor messageDescriptor) {
+        public B setMessageDescriptor(Descriptor messageDescriptor) {
             this.messageDescriptor = messageDescriptor;
             return getThis();
         }

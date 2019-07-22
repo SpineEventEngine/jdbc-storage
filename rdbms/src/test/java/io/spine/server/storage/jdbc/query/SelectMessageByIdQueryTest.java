@@ -91,7 +91,7 @@ class SelectMessageByIdQueryTest {
     }
 
     @Test
-    @DisplayName("return null on deserialization if column is null")
+    @DisplayName("return `null` on deserialization if column is `null`")
     void returnNullForNullColumn() throws SQLException {
         ResultSet resultSet = mock(ResultSet.class);
         DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());

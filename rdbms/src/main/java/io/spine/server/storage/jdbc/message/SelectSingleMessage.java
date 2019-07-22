@@ -20,47 +20,20 @@
 
 package io.spine.server.storage.jdbc.message;
 
-import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Message;
 import com.querydsl.sql.AbstractSQLQuery;
-import io.spine.server.storage.jdbc.DatabaseException;
-import io.spine.server.storage.jdbc.query.ColumnReader;
-import io.spine.server.storage.jdbc.query.IdAwareQuery;
-import io.spine.server.storage.jdbc.query.SelectQuery;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import io.spine.server.storage.jdbc.query.SelectMessageByIdQuery;
 
 import static io.spine.server.storage.jdbc.message.MessageTable.bytesColumn;
-import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.messageReader;
 
-final class SelectMessageById<I, M extends Message>
-        extends IdAwareQuery<I>
-        implements SelectQuery<M> {
+final class SelectSingleMessage<I, M extends Message> extends SelectMessageByIdQuery<I, M> {
 
-    private final Descriptor messageDescriptor;
-
-    private SelectMessageById(Builder<I, M> builder) {
+    private SelectSingleMessage(Builder<I, M> builder) {
         super(builder);
-        this.messageDescriptor = builder.messageDescriptor;
     }
 
     @Override
-    public final @Nullable M execute() throws DatabaseException {
-        try (ResultSet resultSet = query().getResults()) {
-            if (!resultSet.next()) {
-                return null;
-            }
-            ColumnReader<M> reader = messageReader(bytesColumn().name(), messageDescriptor);
-            M result = reader.readValue(resultSet);
-            return result;
-        } catch (SQLException e) {
-            throw new DatabaseException(e);
-        }
-    }
-
-    private AbstractSQLQuery<Object, ?> query() {
+    protected AbstractSQLQuery<Object, ?> query() {
         return factory().select(pathOf(bytesColumn()))
                         .from(table())
                         .where(idEquals());
@@ -71,14 +44,7 @@ final class SelectMessageById<I, M extends Message>
     }
 
     static class Builder<I, M extends Message>
-            extends IdAwareQuery.Builder<I, Builder<I, M>, SelectMessageById<I, M>> {
-
-        private Descriptor messageDescriptor;
-
-        Builder<I, M> setMessageDescriptor(Descriptor messageDescriptor) {
-            this.messageDescriptor = messageDescriptor;
-            return getThis();
-        }
+            extends SelectMessageByIdQuery.Builder<Builder<I, M>, SelectSingleMessage<I, M>, I, M> {
 
         @Override
         protected Builder<I, M> getThis() {
@@ -86,8 +52,9 @@ final class SelectMessageById<I, M extends Message>
         }
 
         @Override
-        protected SelectMessageById<I, M> doBuild() {
-            return new SelectMessageById<>(this);
+        protected SelectSingleMessage<I, M> doBuild() {
+            setMessageColumnName(bytesColumn().name());
+            return new SelectSingleMessage<>(this);
         }
     }
 }
