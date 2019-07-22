@@ -45,13 +45,13 @@ import static io.spine.server.storage.jdbc.Type.STRING_255;
 /**
  * A table in the DB responsible for storing the {@link io.spine.server.delivery.Inbox Inbox} data.
  */
-final class InboxMessageTable extends MessageTable<InboxMessageId, InboxMessage> {
+final class InboxTable extends MessageTable<InboxMessageId, InboxMessage> {
 
     private static final String NAME = "inbox";
 
     private final int readBatchSize;
 
-    InboxMessageTable(DataSourceWrapper dataSource, TypeMapping typeMapping, int readBatchSize) {
+    InboxTable(DataSourceWrapper dataSource, TypeMapping typeMapping, int readBatchSize) {
         super(NAME, IdColumn.of(Column.ID, InboxMessageId.class), dataSource, typeMapping);
         this.readBatchSize = readBatchSize;
     }

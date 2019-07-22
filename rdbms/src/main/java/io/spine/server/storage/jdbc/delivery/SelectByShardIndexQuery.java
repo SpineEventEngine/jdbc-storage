@@ -31,9 +31,9 @@ import io.spine.server.storage.jdbc.query.SelectQuery;
 import java.sql.ResultSet;
 
 import static com.querydsl.core.types.Order.ASC;
-import static io.spine.server.storage.jdbc.delivery.InboxMessageTable.Column.SHARD_INDEX;
-import static io.spine.server.storage.jdbc.delivery.InboxMessageTable.Column.WHEN_RECEIVED;
-import static io.spine.server.storage.jdbc.delivery.InboxMessageTable.Column.WHEN_RECEIVED_NANOS;
+import static io.spine.server.storage.jdbc.delivery.InboxTable.Column.SHARD_INDEX;
+import static io.spine.server.storage.jdbc.delivery.InboxTable.Column.WHEN_RECEIVED;
+import static io.spine.server.storage.jdbc.delivery.InboxTable.Column.WHEN_RECEIVED_NANOS;
 import static io.spine.server.storage.jdbc.message.MessageTable.bytesColumn;
 import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.messageReader;
 
