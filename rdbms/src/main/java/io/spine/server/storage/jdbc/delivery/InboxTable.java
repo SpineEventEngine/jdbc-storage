@@ -24,7 +24,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.protobuf.Descriptors.Descriptor;
 import io.spine.server.delivery.InboxMessage;
 import io.spine.server.delivery.InboxMessageId;
-import io.spine.server.delivery.ShardIndex;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.Type;
 import io.spine.server.storage.jdbc.TypeMapping;
@@ -62,18 +61,19 @@ final class InboxTable extends MessageTable<InboxMessageId, InboxMessage> {
         return ImmutableList.copyOf(Column.values());
     }
 
-    DbIterator<InboxMessage> readAll(ShardIndex index) {
-        SelectByShardIndexQuery query = composeSelectByShardIndexQuery(index);
+    DbIterator<InboxMessage> readAll(long shardIndex) {
+        SelectInboxMessagesByShardIndex query = composeSelectByShardIndexQuery(shardIndex);
         DbIterator<InboxMessage> iterator = query.execute();
         return iterator;
     }
 
-    private SelectByShardIndexQuery composeSelectByShardIndexQuery(ShardIndex index) {
-        SelectByShardIndexQuery.Builder builder = SelectByShardIndexQuery.newBuilder();
-        SelectByShardIndexQuery query = builder.setTableName(name())
-                                               .setDataSource(dataSource())
-                                               .setShardIndex(index)
-                                               .build();
+    private SelectInboxMessagesByShardIndex composeSelectByShardIndexQuery(long shardIndex) {
+        SelectInboxMessagesByShardIndex.Builder builder =
+                SelectInboxMessagesByShardIndex.newBuilder();
+        SelectInboxMessagesByShardIndex query = builder.setTableName(name())
+                                                       .setDataSource(dataSource())
+                                                       .setShardIndex(shardIndex)
+                                                       .build();
         return query;
     }
 

@@ -28,7 +28,10 @@ import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.Type;
 import io.spine.server.storage.jdbc.TypeMapping;
 import io.spine.server.storage.jdbc.message.MessageTable;
+import io.spine.server.storage.jdbc.query.DbIterator;
 import io.spine.server.storage.jdbc.query.IdColumn;
+
+import javax.annotation.Nullable;
 
 import static io.spine.server.storage.jdbc.Type.INT;
 import static io.spine.server.storage.jdbc.Type.LONG;
@@ -40,7 +43,7 @@ final class ShardedWorkRegistryTable extends MessageTable<ShardIndex, ShardSessi
 
     ShardedWorkRegistryTable(DataSourceWrapper dataSource,
                              TypeMapping typeMapping) {
-        super(NAME, IdColumn.of(Column.ID), dataSource, typeMapping);
+        super(NAME, IdColumn.of(Column.ID, ShardIndex.class), dataSource, typeMapping);
     }
 
     @Override
@@ -53,10 +56,28 @@ final class ShardedWorkRegistryTable extends MessageTable<ShardIndex, ShardSessi
         return ImmutableList.copyOf(Column.values());
     }
 
+    DbIterator<ShardSessionRecord> readByIndex(long shardIndex) {
+        SelectShardSessionsByShardIndex query = composeSelectByShardIndexQuery(shardIndex);
+        DbIterator<ShardSessionRecord> iterator = query.execute();
+        return iterator;
+    }
+
+    private SelectShardSessionsByShardIndex composeSelectByShardIndexQuery(long shardIndex) {
+        SelectShardSessionsByShardIndex.Builder builder =
+                SelectShardSessionsByShardIndex.newBuilder();
+        SelectShardSessionsByShardIndex query = builder.setTableName(name())
+                                                       .setDataSource(dataSource())
+                                                       .setShardIndex(shardIndex)
+                                                       .build();
+        return query;
+    }
+
     enum Column implements MessageTable.Column<ShardSessionRecord> {
 
-        ID(LONG, m -> m.getIndex()
-                       .getIndex()),
+        ID(ShardSessionRecord::getIndex),
+
+        SHARD_INDEX(LONG, m -> m.getIndex()
+                                .getIndex()),
 
         OF_TOTAL_SHARDS(LONG, m -> m.getIndex()
                                     .getOfTotal()),
@@ -70,14 +91,21 @@ final class ShardedWorkRegistryTable extends MessageTable<ShardIndex, ShardSessi
         WHEN_LAST_PICKED_NANOS(INT, m -> m.getWhenLastPicked()
                                           .getNanos());
 
+        @Nullable
         private final Type type;
         private final Getter<ShardSessionRecord> getter;
+
+        Column(Getter<ShardSessionRecord> getter) {
+            this.type = null;
+            this.getter = getter;
+        }
 
         Column(Type type, Getter<ShardSessionRecord> getter) {
             this.type = type;
             this.getter = getter;
         }
 
+        @Nullable
         @Override
         public Type type() {
             return type;
