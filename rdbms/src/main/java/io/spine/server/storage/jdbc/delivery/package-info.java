@@ -19,7 +19,8 @@
  */
 
 /**
- * todo
+ * Contains the {@linkplain io.spine.server.storage.jdbc.delivery.JdbcInboxStorage implementation}
+ * of {@code InboxStorage} and other mechanisms of message delivery.
  */
 
 @CheckReturnValue
