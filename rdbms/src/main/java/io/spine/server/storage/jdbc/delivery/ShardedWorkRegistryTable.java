@@ -34,7 +34,7 @@ import static io.spine.server.storage.jdbc.Type.INT;
 import static io.spine.server.storage.jdbc.Type.LONG;
 import static io.spine.server.storage.jdbc.Type.STRING_255;
 
-public class ShardedWorkRegistryTable extends MessageTable<ShardIndex, ShardSessionRecord> {
+final class ShardedWorkRegistryTable extends MessageTable<ShardIndex, ShardSessionRecord> {
 
     private static final String NAME = "shard_session_registry";
 
