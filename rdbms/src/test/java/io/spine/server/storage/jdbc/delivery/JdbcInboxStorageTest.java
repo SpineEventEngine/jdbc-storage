@@ -40,6 +40,8 @@ import io.spine.server.storage.jdbc.message.JdbcMessageStorageTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.Optional;
+
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static io.spine.server.delivery.InboxMessageStatus.TO_DELIVER;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
@@ -67,6 +69,30 @@ final class JdbcInboxStorageTest extends JdbcMessageStorageTest<InboxMessageId,
                 .setDefault(InboxReadRequest.class,
                             new InboxReadRequest(InboxMessageId.getDefaultInstance()))
                 .testAllPublicInstanceMethods(storage());
+    }
+
+    @Test
+    @DisplayName("read and write a single `InboxMessage`")
+    void readAndWriteInboxMessage() {
+        InboxMessage message = TestInboxMessage.generate();
+        storage().write(message);
+
+        InboxReadRequest request = new InboxReadRequest(message.getId());
+        Optional<InboxMessage> result = storage().read(request);
+        assertTrue(result.isPresent());
+
+        InboxMessage actualMessage = result.get();
+        assertEquals(message, actualMessage);
+    }
+
+    @Test
+    @DisplayName("read messages by `ShardIndex`")
+    void readByShardIndex() {
+        ShardIndex index = TestShardIndex.generate();
+        ImmutableList<InboxMessage> messages = generateMultiple(20, index);
+        storage().writeAll(messages);
+
+        readAllAndCompare(storage(), index, messages);
     }
 
     @Test
@@ -141,14 +167,36 @@ final class JdbcInboxStorageTest extends JdbcMessageStorageTest<InboxMessageId,
         assertTrue(readResult.containsAll(originalMarkedDelivered));
     }
 
+    @Test
+    @DisplayName("allow setting read batch size in builder")
+    void setReadBatchSize() {
+        DataSourceWrapper dataSource = whichIsStoredInMemory("inboxStorageBatchSizeTest");
+        int readBatchSize = 20;
+        JdbcInboxStorage storage = JdbcInboxStorage
+                .newBuilder()
+                .setDataSource(dataSource)
+                .setMultitenant(false)
+                .setTypeMapping(MYSQL_5_7)
+                .setReadBatchSize(readBatchSize)
+                .build();
+
+        ShardIndex index = TestShardIndex.generate();
+        ImmutableList<InboxMessage> messages = generateMultiple(30, index);
+        storage.writeAll(messages);
+
+        Page<InboxMessage> page = storage.readAll(index);
+        assertEquals(readBatchSize, page.size());
+    }
+
     @Override
     protected JdbcInboxStorage newStorage(Class<? extends Entity<?, ?>> ignored) {
         DataSourceWrapper dataSource = whichIsStoredInMemory("jdbcInboxStorageTest");
-        JdbcInboxStorage storage = JdbcInboxStorage.newBuilder()
-                                                   .setDataSource(dataSource)
-                                                   .setMultitenant(false)
-                                                   .setTypeMapping(MYSQL_5_7)
-                                                   .build();
+        JdbcInboxStorage storage = JdbcInboxStorage
+                .newBuilder()
+                .setDataSource(dataSource)
+                .setMultitenant(false)
+                .setTypeMapping(MYSQL_5_7)
+                .build();
         return storage;
     }
 
