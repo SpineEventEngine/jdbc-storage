@@ -32,10 +32,9 @@ import io.spine.server.delivery.InboxReadRequest;
 import io.spine.server.delivery.InboxStorage;
 import io.spine.server.delivery.Page;
 import io.spine.server.delivery.ShardIndex;
-import io.spine.server.entity.Entity;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.delivery.given.TestInboxMessage;
-import io.spine.server.storage.jdbc.message.JdbcMessageStorageTest;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -53,10 +52,20 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @DisplayName("JdbcInboxStorage should")
-class JdbcInboxStorageTest extends JdbcMessageStorageTest<InboxMessageId,
-                                                          InboxMessage,
-                                                          InboxReadRequest,
-                                                          JdbcInboxStorage> {
+class JdbcInboxStorageTest {
+
+    private JdbcInboxStorage storage;
+
+    @BeforeEach
+    void setUp() {
+        DataSourceWrapper dataSource = whichIsStoredInMemory("jdbcInboxStorageTest");
+        storage = JdbcInboxStorage
+                .newBuilder()
+                .setDataSource(dataSource)
+                .setMultitenant(false)
+                .setTypeMapping(MYSQL_5_7)
+                .build();
+    }
 
     @Test
     @DisplayName(NOT_ACCEPT_NULLS)
@@ -67,17 +76,17 @@ class JdbcInboxStorageTest extends JdbcMessageStorageTest<InboxMessageId,
                 .setDefault(InboxMessageId.class, InboxMessageId.getDefaultInstance())
                 .setDefault(InboxReadRequest.class,
                             new InboxReadRequest(InboxMessageId.getDefaultInstance()))
-                .testAllPublicInstanceMethods(storage());
+                .testAllPublicInstanceMethods(storage);
     }
 
     @Test
     @DisplayName("read and write a single `InboxMessage`")
     void readAndWriteInboxMessage() {
         InboxMessage message = TestInboxMessage.generate();
-        storage().write(message);
+        storage.write(message);
 
         InboxReadRequest request = new InboxReadRequest(message.getId());
-        Optional<InboxMessage> result = storage().read(request);
+        Optional<InboxMessage> result = storage.read(request);
         assertTrue(result.isPresent());
 
         InboxMessage actualMessage = result.get();
@@ -85,13 +94,13 @@ class JdbcInboxStorageTest extends JdbcMessageStorageTest<InboxMessageId,
     }
 
     @Test
-    @DisplayName("read messages by `ShardIndex`")
+    @DisplayName("read messages at a `ShardIndex`")
     void readByShardIndex() {
         ShardIndex index = newIndex();
         ImmutableList<InboxMessage> messages = generateMultiple(20, index);
-        storage().writeAll(messages);
+        storage.writeAll(messages);
 
-        readAllAndCompare(storage(), index, messages);
+        readAllAndCompare(storage, index, messages);
     }
 
     @Test
@@ -99,7 +108,6 @@ class JdbcInboxStorageTest extends JdbcMessageStorageTest<InboxMessageId,
     void removeMessages() {
         ShardIndex index = newIndex();
         ImmutableList<InboxMessage> messages = generateMultiple(20, index);
-        InboxStorage storage = storage();
         storage.writeAll(messages);
 
         readAllAndCompare(storage, index, messages);
@@ -123,7 +131,6 @@ class JdbcInboxStorageTest extends JdbcMessageStorageTest<InboxMessageId,
     @DisplayName("do nothing if removing inexistent `InboxMessage` instances")
     void doNothingIfRemovingInexistentMessages() {
 
-        InboxStorage storage = storage();
         ShardIndex index = newIndex();
         checkEmpty(storage, index);
 
@@ -139,7 +146,6 @@ class JdbcInboxStorageTest extends JdbcMessageStorageTest<InboxMessageId,
 
         ShardIndex index = newIndex();
         ImmutableList<InboxMessage> messages = generateMultiple(10, index);
-        InboxStorage storage = storage();
         storage.writeAll(messages);
 
         ImmutableList<InboxMessage> nonDelivered = readAllAndCompare(storage, index, messages);
@@ -185,33 +191,6 @@ class JdbcInboxStorageTest extends JdbcMessageStorageTest<InboxMessageId,
 
         Page<InboxMessage> page = storage.readAll(index);
         assertEquals(readBatchSize, page.size());
-    }
-
-    @Override
-    protected JdbcInboxStorage newStorage(Class<? extends Entity<?, ?>> ignored) {
-        DataSourceWrapper dataSource = whichIsStoredInMemory("jdbcInboxStorageTest");
-        JdbcInboxStorage storage = JdbcInboxStorage
-                .newBuilder()
-                .setDataSource(dataSource)
-                .setMultitenant(false)
-                .setTypeMapping(MYSQL_5_7)
-                .build();
-        return storage;
-    }
-
-    @Override
-    protected InboxMessage newStorageRecord() {
-        return TestInboxMessage.generate();
-    }
-
-    @Override
-    protected InboxMessageId newId() {
-        return InboxMessageId.generate();
-    }
-
-    @Override
-    protected InboxReadRequest newReadRequest(InboxMessageId inboxMessageId) {
-        return new InboxReadRequest(inboxMessageId);
     }
 
     @CanIgnoreReturnValue

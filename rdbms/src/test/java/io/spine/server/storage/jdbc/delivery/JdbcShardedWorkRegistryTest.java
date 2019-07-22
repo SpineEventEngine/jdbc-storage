@@ -28,9 +28,8 @@ import io.spine.server.NodeId;
 import io.spine.server.delivery.ShardIndex;
 import io.spine.server.delivery.ShardProcessingSession;
 import io.spine.server.delivery.ShardSessionRecord;
-import io.spine.server.entity.Entity;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.message.JdbcMessageStorageTest;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -38,7 +37,6 @@ import java.util.Iterator;
 import java.util.Optional;
 
 import static com.google.common.truth.Truth.assertThat;
-import static io.spine.base.Time.currentTime;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
 import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
 import static io.spine.server.storage.jdbc.delivery.given.TestShardIndex.newIndex;
@@ -47,14 +45,23 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @DisplayName("JdbcShardedWorkRegistry should")
-class JdbcShardedWorkRegistryTest extends JdbcMessageStorageTest<ShardIndex,
-                                                                 ShardSessionRecord,
-                                                                 ShardSessionReadRequest,
-                                                                 JdbcShardedWorkRegistry> {
+class JdbcShardedWorkRegistryTest {
 
     private static final ShardIndex index = newIndex(1, 15);
 
     private static final NodeId nodeId = newNode();
+
+    private JdbcShardedWorkRegistry registry;
+
+    @BeforeEach
+    void setUp() {
+        DataSourceWrapper dataSource = whichIsStoredInMemory("jdbcShardedWorkRegistryTest");
+        registry = JdbcShardedWorkRegistry
+                .newBuilder()
+                .setDataSource(dataSource)
+                .setTypeMapping(MYSQL_5_7)
+                .build();
+    }
 
     @Test
     @DisplayName(NOT_ACCEPT_NULLS)
@@ -65,13 +72,13 @@ class JdbcShardedWorkRegistryTest extends JdbcMessageStorageTest<ShardIndex,
                 .setDefault(ShardSessionRecord.class, ShardSessionRecord.getDefaultInstance())
                 .setDefault(ShardSessionReadRequest.class,
                             new ShardSessionReadRequest(newIndex(6, 10)))
-                .testAllPublicInstanceMethods(storage());
+                .testAllPublicInstanceMethods(registry);
     }
 
     @Test
     @DisplayName("pick up the shard and write a corresponding record to the storage")
     void pickUp() {
-        Optional<ShardProcessingSession> session = storage().pickUp(index, nodeId);
+        Optional<ShardProcessingSession> session = registry.pickUp(index, nodeId);
         assertTrue(session.isPresent());
         assertThat(session.get()
                           .shardIndex()).isEqualTo(index);
@@ -85,28 +92,28 @@ class JdbcShardedWorkRegistryTest extends JdbcMessageStorageTest<ShardIndex,
     @DisplayName("not be able to pick up the shard if it's already picked up")
     void cannotPickUpIfTaken() {
 
-        Optional<ShardProcessingSession> session = storage().pickUp(index, nodeId);
+        Optional<ShardProcessingSession> session = registry.pickUp(index, nodeId);
         assertTrue(session.isPresent());
 
-        Optional<ShardProcessingSession> sameIdxSameNode = storage().pickUp(index, nodeId);
+        Optional<ShardProcessingSession> sameIdxSameNode = registry.pickUp(index, nodeId);
         assertFalse(sameIdxSameNode.isPresent());
 
-        Optional<ShardProcessingSession> sameIdxAnotherNode = storage().pickUp(index, newNode());
+        Optional<ShardProcessingSession> sameIdxAnotherNode = registry.pickUp(index, newNode());
         assertFalse(sameIdxAnotherNode.isPresent());
 
         ShardIndex anotherIdx = newIndex(24, 100);
-        Optional<ShardProcessingSession> anotherIdxSameNode = storage().pickUp(anotherIdx, nodeId);
+        Optional<ShardProcessingSession> anotherIdxSameNode = registry.pickUp(anotherIdx, nodeId);
         assertTrue(anotherIdxSameNode.isPresent());
 
         Optional<ShardProcessingSession> anotherIdxAnotherNode =
-                storage().pickUp(anotherIdx, newNode());
+                registry.pickUp(anotherIdx, newNode());
         assertFalse(anotherIdxAnotherNode.isPresent());
     }
 
     @Test
     @DisplayName("complete the shard session (once picked up) and make it available for picking up")
     void completeSessionAndMakeItAvailable() {
-        Optional<ShardProcessingSession> optional = storage().pickUp(index, nodeId);
+        Optional<ShardProcessingSession> optional = registry.pickUp(index, nodeId);
         assertTrue(optional.isPresent());
 
         Timestamp whenPickedFirst = readSingleRecord(index).getWhenLastPicked();
@@ -118,7 +125,7 @@ class JdbcShardedWorkRegistryTest extends JdbcMessageStorageTest<ShardIndex,
         assertFalse(completedRecord.hasPickedBy());
 
         NodeId anotherNode = newNode();
-        Optional<ShardProcessingSession> anotherOptional = storage().pickUp(index, anotherNode);
+        Optional<ShardProcessingSession> anotherOptional = registry.pickUp(index, anotherNode);
         assertTrue(anotherOptional.isPresent());
 
         ShardSessionRecord secondSessionRecord = readSingleRecord(index);
@@ -128,50 +135,16 @@ class JdbcShardedWorkRegistryTest extends JdbcMessageStorageTest<ShardIndex,
         assertTrue(Timestamps.compare(whenPickedFirst, whenPickedSecond) < 0);
     }
 
-    @Override
-    protected JdbcShardedWorkRegistry newStorage(Class<? extends Entity<?, ?>> aClass) {
-        DataSourceWrapper dataSource = whichIsStoredInMemory("jdbcShardedWorkRegistryTest");
-        JdbcShardedWorkRegistry registry = JdbcShardedWorkRegistry
-                .newBuilder()
-                .setDataSource(dataSource)
-                .setTypeMapping(MYSQL_5_7)
-                .build();
-        return registry;
-    }
+    private ShardSessionRecord readSingleRecord(ShardIndex index) {
+        Iterator<ShardSessionRecord> records = registry.readByIndex(index);
+        assertTrue(records.hasNext());
 
-    @Override
-    protected ShardSessionRecord newStorageRecord() {
-        ShardIndex index = newIndex();
-        NodeId node = newNode();
-        ShardSessionRecord record = ShardSessionRecord
-                .newBuilder()
-                .setIndex(index)
-                .setPickedBy(node)
-                .setWhenLastPicked(currentTime())
-                .build();
-        return record;
-    }
-
-    @Override
-    protected ShardIndex newId() {
-        return newIndex();
-    }
-
-    @Override
-    protected ShardSessionReadRequest newReadRequest(ShardIndex shardIndex) {
-        return new ShardSessionReadRequest(shardIndex);
+        return records.next();
     }
 
     private static NodeId newNode() {
         return NodeId.newBuilder()
                      .setValue(Identifier.newUuid())
                      .vBuild();
-    }
-
-    private ShardSessionRecord readSingleRecord(ShardIndex index) {
-        Iterator<ShardSessionRecord> records = storage().readByIndex(index);
-        assertTrue(records.hasNext());
-
-        return records.next();
     }
 }
