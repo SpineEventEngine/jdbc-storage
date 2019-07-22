@@ -23,6 +23,7 @@ package io.spine.server.storage.jdbc.record;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableSet;
 import com.google.protobuf.FieldMask;
+import io.spine.client.ResponseFormat;
 import io.spine.server.entity.Entity;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
@@ -160,16 +161,24 @@ final class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWith
     /**
      * Executes an {@code EntityQuery} and returns all records that match.
      *
-     * <p>The resulting record fields are masked by the given {@code FieldMask}.
+     * <p>The resulting record fields are formatted according to the given {@code ResponseFormat}.
      *
      * <p>This method is more effective performance-wise than its
      * {@link #readByIds(EntityQuery, FieldMask)} counterpart.
      */
-    Iterator<EntityRecord> readByQuery(EntityQuery<I> entityQuery, FieldMask fieldMask) {
+    Iterator<EntityRecord> readByQuery(EntityQuery<I> entityQuery, ResponseFormat format) {
         Iterator<DoubleColumnRecord<I, EntityRecord>> response =
-                executeQuery(entityQuery, fieldMask);
+                executeQuery(entityQuery, format.getFieldMask());
         Iterator<EntityRecord> records = extractRecords(response);
         return records;
+    }
+
+    /**
+     * Reads all {@linkplain EntityRecord entity records} from the table.
+     */
+    Iterator<EntityRecord> readAll(ResponseFormat format) {
+        Iterator<EntityRecord> result = executeSelectAllQuery(format.getFieldMask());
+        return result;
     }
 
     private Iterator<DoubleColumnRecord<I, EntityRecord>>
@@ -184,6 +193,16 @@ final class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWith
                                                      .build();
         Iterator<DoubleColumnRecord<I, EntityRecord>> queryResult = query.execute();
         return queryResult;
+    }
+
+    private Iterator<EntityRecord> executeSelectAllQuery(FieldMask fieldMask) {
+        SelectAllQuery.Builder builder = SelectAllQuery.newBuilder();
+        SelectAllQuery query = builder.setDataSource(dataSource())
+                                      .setTableName(name())
+                                      .setFieldMask(fieldMask)
+                                      .build();
+        Iterator<EntityRecord> result = query.execute();
+        return result;
     }
 
     private Iterator<EntityRecord>

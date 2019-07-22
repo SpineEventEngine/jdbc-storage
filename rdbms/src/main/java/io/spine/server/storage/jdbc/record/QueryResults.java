@@ -29,6 +29,7 @@ import io.spine.server.entity.FieldMasks;
 import io.spine.server.storage.jdbc.query.ColumnReader;
 import io.spine.server.storage.jdbc.query.DbIterator;
 import io.spine.server.storage.jdbc.query.DbIterator.DoubleColumnRecord;
+import io.spine.server.storage.jdbc.record.RecordTable.StandardColumn;
 
 import java.sql.ResultSet;
 import java.util.Iterator;
@@ -38,12 +39,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Streams.stream;
 import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.idReader;
 import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.messageReader;
-import static io.spine.server.storage.jdbc.record.RecordTable.StandardColumn.ENTITY;
-import static io.spine.server.storage.jdbc.record.RecordTable.StandardColumn.ID;
 
 /**
- * Utility class for parsing the results of a DB query ({@link ResultSet}) into the
- * required in-memory representation.
+ * Utility class for parsing the results of entity queries.
  */
 final class QueryResults {
 
@@ -52,7 +50,32 @@ final class QueryResults {
     }
 
     /**
-     * Creates an {@code Iterator} over the results of the SQL query.
+     * Creates an {@code Iterator} over the results of a single-column entity query.
+     *
+     * <p>Assumes the query was run over a single
+     * {@linkplain StandardColumn#ENTITY column storing message bytes}.
+     *
+     * @param resultSet
+     *         the result of the query
+     * @param fieldMask
+     *         the {@code FieldMask} to apply to the results
+     * @return an {@code Iterator} over the query results
+     */
+    static Iterator<EntityRecord> parse(ResultSet resultSet, FieldMask fieldMask) {
+        ColumnReader<EntityRecord> recordColumnReader =
+                messageReader(StandardColumn.ENTITY.name(), EntityRecord.getDescriptor());
+        DbIterator<EntityRecord> iterator = DbIterator.over(resultSet, recordColumnReader);
+        Iterator<EntityRecord> result = stream(iterator)
+                .map(maskSingleRecord(fieldMask))
+                .iterator();
+        return result;
+    }
+
+    /**
+     * Creates an {@code Iterator} over the results of a double-column SQL query.
+     *
+     * <p>Assumes the query was run over entity {@linkplain StandardColumn#ID ID column} and
+     * {@linkplain StandardColumn#ENTITY message-bytes column} simultaneously.
      *
      * <p>The results are represented as {@link DoubleColumnRecord}.
      *
@@ -69,9 +92,9 @@ final class QueryResults {
      */
     static <I> Iterator<DoubleColumnRecord<I, EntityRecord>>
     parse(ResultSet resultSet, Class<I> idType, FieldMask fieldMask) {
-        ColumnReader<I> idColumnReader = idReader(ID.name(), idType);
+        ColumnReader<I> idColumnReader = idReader(StandardColumn.ID.name(), idType);
         ColumnReader<EntityRecord> recordColumnReader =
-                messageReader(ENTITY.name(), EntityRecord.getDescriptor());
+                messageReader(StandardColumn.ENTITY.name(), EntityRecord.getDescriptor());
         Iterator<DoubleColumnRecord<I, EntityRecord>> dbIterator = DbIterator.over(
                 resultSet,
                 idColumnReader,
@@ -83,18 +106,27 @@ final class QueryResults {
         return result;
     }
 
+    private static Function<EntityRecord, EntityRecord> maskSingleRecord(FieldMask fieldMask) {
+        return record -> maskedRecord(record, fieldMask);
+    }
+
     private static <I>
     Function<DoubleColumnRecord<I, EntityRecord>, DoubleColumnRecord<I, EntityRecord>>
     maskFields(FieldMask fieldMask) {
         return record -> {
             checkNotNull(record);
             EntityRecord entityRecord = record.second();
-            Any maskedState = maskFieldsOfState(entityRecord, fieldMask);
-            EntityRecord maskedRecord = entityRecord.toBuilder()
-                                              .setState(maskedState)
-                                              .build();
+            EntityRecord maskedRecord = maskedRecord(entityRecord, fieldMask);
             return DoubleColumnRecord.of(record.first(), maskedRecord);
         };
+    }
+
+    private static EntityRecord maskedRecord(EntityRecord entityRecord, FieldMask fieldMask) {
+        Any maskedState = maskFieldsOfState(entityRecord, fieldMask);
+        EntityRecord maskedRecord = entityRecord.toBuilder()
+                                                .setState(maskedState)
+                                                .build();
+        return maskedRecord;
     }
 
     private static Any maskFieldsOfState(EntityRecord record, FieldMask fieldMask) {
