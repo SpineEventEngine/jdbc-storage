@@ -30,8 +30,8 @@ import io.spine.server.storage.jdbc.TypeMapping;
 import io.spine.server.storage.jdbc.message.MessageTable;
 import io.spine.server.storage.jdbc.query.IdColumn;
 import io.spine.string.Stringifiers;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.Iterator;
 
 import static io.spine.server.storage.jdbc.Type.BOOLEAN;
@@ -108,8 +108,7 @@ final class InboxTable extends MessageTable<InboxMessageId, InboxMessage> {
         WHEN_RECEIVED_NANOS(INT, m -> m.getWhenReceived()
                                        .getNanos());
 
-        @Nullable
-        private final Type type;
+        private final @Nullable Type type;
         private final Getter<InboxMessage> getter;
 
         Column(Type type, Getter<InboxMessage> getter) {
@@ -122,9 +121,8 @@ final class InboxTable extends MessageTable<InboxMessageId, InboxMessage> {
             this.getter = getter;
         }
 
-        @Nullable
         @Override
-        public Type type() {
+        public @Nullable Type type() {
             return type;
         }
 
