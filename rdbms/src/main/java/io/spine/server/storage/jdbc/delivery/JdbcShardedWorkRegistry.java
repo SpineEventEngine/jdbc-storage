@@ -50,6 +50,7 @@ public class JdbcShardedWorkRegistry
     public Optional<ShardProcessingSession> pickUp(ShardIndex index, NodeId nodeId) {
         checkNotNull(index);
         checkNotNull(nodeId);
+        checkNotClosed();
 
         boolean pickedAlready = isPickedAlready(index);
         if (pickedAlready) {

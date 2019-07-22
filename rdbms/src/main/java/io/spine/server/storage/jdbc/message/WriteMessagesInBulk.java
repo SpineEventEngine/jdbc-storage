@@ -50,6 +50,9 @@ abstract class WriteMessagesInBulk<I, M extends Message, C extends StoreClause<C
     @CanIgnoreReturnValue
     @Override
     public long execute() {
+        if (records.isEmpty()) {
+            return 0;
+        }
         C query = clause();
         records.forEach((id, record) -> addToBatch(query, id, record));
         return query.execute();

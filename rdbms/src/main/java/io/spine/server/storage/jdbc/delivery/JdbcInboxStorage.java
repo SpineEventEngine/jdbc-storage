@@ -30,11 +30,13 @@ import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.StorageBuilder;
 import io.spine.server.storage.jdbc.message.JdbcMessageStorage;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 public class JdbcInboxStorage
         extends JdbcMessageStorage<InboxMessageId,
                                    InboxMessage,
                                    InboxReadRequest,
-        InboxTable>
+                                   InboxTable>
         implements InboxStorage {
 
     /**
@@ -56,6 +58,8 @@ public class JdbcInboxStorage
 
     @Override
     public Page<InboxMessage> readAll(ShardIndex index) {
+        checkNotNull(index);
+        checkNotClosed();
         return table().readAll(index);
     }
 
