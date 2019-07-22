@@ -44,12 +44,6 @@ interface WriteMessageQuery<I, M extends Message> extends WriteQuery {
                 .forEach(column -> setColumnValue(query, column, record));
     }
 
-    default boolean isIdColumn(Column<M> column) {
-        checkNotNull(column);
-        return idColumn().column()
-                         .equals(column);
-    }
-
     default void setColumnValue(StoreClause<?> query, Column<M> column, M record) {
         checkNotNull(query);
         checkNotNull(column);
@@ -57,6 +51,12 @@ interface WriteMessageQuery<I, M extends Message> extends WriteQuery {
 
         query.set(pathOf(column), column.getter()
                                         .apply(record));
+    }
+
+    default boolean isIdColumn(Column<M> column) {
+        checkNotNull(column);
+        return idColumn().column()
+                         .equals(column);
     }
 
     Iterable<? extends Column<M>> columns();
