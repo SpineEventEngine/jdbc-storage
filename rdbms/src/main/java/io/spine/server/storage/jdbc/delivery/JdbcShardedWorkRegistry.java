@@ -85,12 +85,16 @@ public class JdbcShardedWorkRegistry
         write(updated);
     }
 
+    public static Builder newBuilder() {
+        return new Builder();
+    }
+
     public static class Builder extends StorageBuilder<Builder, JdbcShardedWorkRegistry> {
 
         @Override
         public Builder setMultitenant(boolean multitenant) {
             throw unsupported("`JdbcShardedWorkRegistry` is an application-wide instance " +
-                              "and therefore always single-tenant");
+                              "and therefore is always single-tenant");
         }
 
         @Override
