@@ -49,6 +49,9 @@ final class SelectMessageById<I, M extends Message>
     @Override
     public final @Nullable M execute() throws DatabaseException {
         try (ResultSet resultSet = query().getResults()) {
+            if (!resultSet.next()) {
+                return null;
+            }
             ColumnReader<M> reader = messageReader(bytesColumn().name(), messageDescriptor);
             M result = reader.readValue(resultSet);
             return result;
