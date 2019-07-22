@@ -20,25 +20,113 @@
 
 package io.spine.server.storage.jdbc.delivery;
 
+import com.google.common.testing.NullPointerTester;
+import com.google.protobuf.Timestamp;
+import com.google.protobuf.util.Timestamps;
 import io.spine.base.Identifier;
 import io.spine.server.NodeId;
 import io.spine.server.delivery.ShardIndex;
+import io.spine.server.delivery.ShardProcessingSession;
 import io.spine.server.delivery.ShardSessionRecord;
 import io.spine.server.entity.Entity;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.message.JdbcMessageStorageTest;
+import io.spine.server.storage.jdbc.query.DbIterator;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
+import java.util.Optional;
+
+import static com.google.common.truth.Truth.assertThat;
 import static io.spine.base.Time.currentTime;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
 import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
 import static io.spine.server.storage.jdbc.delivery.given.TestShardIndex.newIndex;
+import static io.spine.testing.DisplayNames.NOT_ACCEPT_NULLS;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 @DisplayName("JdbcShardedWorkRegistry should")
 class JdbcShardedWorkRegistryTest extends JdbcMessageStorageTest<ShardIndex,
                                                                  ShardSessionRecord,
                                                                  ShardSessionReadRequest,
                                                                  JdbcShardedWorkRegistry> {
+
+    private static final ShardIndex index = newIndex(1, 15);
+
+    private static final NodeId nodeId = newNode();
+
+    @Test
+    @DisplayName(NOT_ACCEPT_NULLS)
+    void passNullToleranceCheck() {
+        new NullPointerTester()
+                .setDefault(NodeId.class, newNode())
+                .setDefault(ShardIndex.class, newIndex(4, 5))
+                .setDefault(ShardSessionRecord.class, ShardSessionRecord.getDefaultInstance())
+                .setDefault(ShardSessionReadRequest.class,
+                            new ShardSessionReadRequest(newIndex(6, 10)))
+                .testAllPublicInstanceMethods(storage());
+    }
+
+    @Test
+    @DisplayName("pick up the shard and write a corresponding record to the storage")
+    void pickUp() {
+        Optional<ShardProcessingSession> session = storage().pickUp(index, nodeId);
+        assertTrue(session.isPresent());
+        assertThat(session.get()
+                          .shardIndex()).isEqualTo(index);
+
+        ShardSessionRecord record = readSingleRecord(index);
+        assertThat(record.getIndex()).isEqualTo(index);
+        assertThat(record.getPickedBy()).isEqualTo(nodeId);
+    }
+
+    @Test
+    @DisplayName("not be able to pick up the shard if it's already picked up")
+    void cannotPickUpIfTaken() {
+
+        Optional<ShardProcessingSession> session = storage().pickUp(index, nodeId);
+        assertTrue(session.isPresent());
+
+        Optional<ShardProcessingSession> sameIdxSameNode = storage().pickUp(index, nodeId);
+        assertFalse(sameIdxSameNode.isPresent());
+
+        Optional<ShardProcessingSession> sameIdxAnotherNode = storage().pickUp(index, newNode());
+        assertFalse(sameIdxAnotherNode.isPresent());
+
+        ShardIndex anotherIdx = newIndex(24, 100);
+        Optional<ShardProcessingSession> anotherIdxSameNode = storage().pickUp(anotherIdx, nodeId);
+        assertTrue(anotherIdxSameNode.isPresent());
+
+        Optional<ShardProcessingSession> anotherIdxAnotherNode =
+                storage().pickUp(anotherIdx, newNode());
+        assertFalse(anotherIdxAnotherNode.isPresent());
+    }
+
+    @Test
+    @DisplayName("complete the shard session (once picked up) and make it available for picking up")
+    void completeSessionAndMakeItAvailable() {
+        Optional<ShardProcessingSession> optional = storage().pickUp(index, nodeId);
+        assertTrue(optional.isPresent());
+
+        Timestamp whenPickedFirst = readSingleRecord(index).getWhenLastPicked();
+
+        JdbcShardProcessingSession session = (JdbcShardProcessingSession) optional.get();
+        session.complete();
+
+        ShardSessionRecord completedRecord = readSingleRecord(index);
+        assertFalse(completedRecord.hasPickedBy());
+
+        NodeId anotherNode = newNode();
+        Optional<ShardProcessingSession> anotherOptional = storage().pickUp(index, anotherNode);
+        assertTrue(anotherOptional.isPresent());
+
+        ShardSessionRecord secondSessionRecord = readSingleRecord(index);
+        assertThat(secondSessionRecord.getPickedBy()).isEqualTo(anotherNode);
+
+        Timestamp whenPickedSecond = secondSessionRecord.getWhenLastPicked();
+        assertTrue(Timestamps.compare(whenPickedFirst, whenPickedSecond) < 0);
+    }
 
     @Override
     protected JdbcShardedWorkRegistry newStorage(Class<? extends Entity<?, ?>> aClass) {
@@ -78,5 +166,12 @@ class JdbcShardedWorkRegistryTest extends JdbcMessageStorageTest<ShardIndex,
         return NodeId.newBuilder()
                      .setValue(Identifier.newUuid())
                      .vBuild();
+    }
+
+    private ShardSessionRecord readSingleRecord(ShardIndex index) {
+        DbIterator<ShardSessionRecord> records = storage().readByIndex(index);
+        assertTrue(records.hasNext());
+
+        return records.next();
     }
 }

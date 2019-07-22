@@ -30,6 +30,7 @@ import io.spine.server.storage.jdbc.TypeMapping;
 import io.spine.server.storage.jdbc.query.AbstractTable;
 import io.spine.server.storage.jdbc.query.DbIterator;
 import io.spine.server.storage.jdbc.query.IdColumn;
+import jdk.nashorn.internal.ir.annotations.Immutable;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -234,6 +235,7 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
 
         Getter<M> getter();
 
+        @Immutable
         @FunctionalInterface
         interface Getter<M extends Message> extends Function<M, Object> {
         }
