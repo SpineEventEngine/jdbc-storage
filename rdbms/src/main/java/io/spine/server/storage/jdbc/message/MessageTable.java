@@ -161,7 +161,7 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
     protected abstract Iterable<? extends Column<M>> messageSpecificColumns();
 
     /**
-     * Obtains columns common for all {@code MessageTable} descendants.
+     * Obtains columns common for all {@code MessageTable} instances.
      */
     private Iterable<? extends Column<M>> commonColumns() {
         return ImmutableList.of(bytesColumn());
@@ -277,8 +277,8 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
     /**
      * A column responsible for storing serialized message bytes.
      *
-     * <p>This column is present in any {@code MessageTable} instance and serves for convenient
-     * message {@link io.spine.server.storage.jdbc.query.Serializer deserialization}.
+     * <p>This column is present in any {@code MessageTable} and serves for convenient record
+     * {@link io.spine.server.storage.jdbc.query.Serializer deserialization}.
      *
      * <p>The column getter can be applied to an arbitrary message and is parameterized only to
      * enable usage along with message-specific table

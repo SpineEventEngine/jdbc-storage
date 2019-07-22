@@ -75,6 +75,11 @@ public abstract class JdbcMessageStorage<I,
         table.write(id, record);
     }
 
+    /**
+     * Writes a single message to the storage.
+     *
+     * <p>If the record with same ID already exists, it's overwritten.
+     */
     public void write(M message) {
         checkNotNull(message);
         checkNotClosed();
@@ -82,6 +87,11 @@ public abstract class JdbcMessageStorage<I,
         table.write(message);
     }
 
+    /**
+     * Writes the given messages to the storage.
+     *
+     * <p>If some of the given message IDs already exists, the respective records are overwritten.
+     */
     public void writeAll(Iterable<M> messages) {
         checkNotNull(messages);
         checkNotClosed();
@@ -89,6 +99,11 @@ public abstract class JdbcMessageStorage<I,
         table.writeAll(messages);
     }
 
+    /**
+     * Removes the given messages from the storage.
+     *
+     * <p>The messages which are not found are ignored.
+     */
     public void removeAll(Iterable<M> messages) {
         checkNotNull(messages);
         checkNotClosed();

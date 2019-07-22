@@ -61,10 +61,10 @@ public abstract class IdColumn<I> {
     /**
      * Wraps a given ID {@code column} of a primitive type.
      *
-     * <p>The column should have the ID SQL type pre-set.
+     * <p>The column should have a valid SQL type.
      *
-     * <p>This also implies that actual ID values will be primitive and matching to the SQL type
-     * set.
+     * <p>This also implies that actual ID values will be primitive and matching to the column SQL
+     * type.
      *
      * @see #of(TableColumn, Class) for {@link Message}-type ID column creation
      * @see #ofEntityClass(TableColumn, Class) for {@link Entity} ID column creation
@@ -94,7 +94,7 @@ public abstract class IdColumn<I> {
     /**
      * Wraps a given ID {@code column} of {@link Message} type.
      *
-     * <p>The column shouldn't have an SQL type pre-set.
+     * <p>The column should have an SQL type set to {@code null}.
      */
     public static <I extends Message> IdColumn<I> of(TableColumn column, Class<I> messageClass) {
         checkNotNull(column);
@@ -108,7 +108,10 @@ public abstract class IdColumn<I> {
     /**
      * Wraps a given {@link Entity} ID column.
      *
-     * <p>{@code Entity} ID type is calculated at runtime from the class's generic parameters.
+     * <p>The column should have an SQL type set to {@code null}.
+     *
+     * <p>The column type is calculated at runtime according to the generic parameters of the
+     * {@code Entity} {@linkplain io.spine.server.entity.model.EntityClass class}.
      *
      * @param entityClass
      *         a class of an {@link Entity} or an {@link Aggregate}

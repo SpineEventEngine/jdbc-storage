@@ -35,7 +35,8 @@ import static io.spine.server.storage.jdbc.message.MessageTable.bytesColumn;
 import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.messageReader;
 
 /**
- * An abstract base for queries that select messages at a given {@link ShardIndex}.
+ * An abstract base for queries that select messages belonging to a shard at a given
+ * {@link ShardIndex}.
  *
  * <p><b>NOTE:</b> queries of this type operate on the shard index
  * {@linkplain ShardIndex#getIndex() itself} exclusively. The

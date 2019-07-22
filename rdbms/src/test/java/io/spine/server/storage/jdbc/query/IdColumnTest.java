@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Test;
 import static io.spine.server.storage.jdbc.Type.INT;
 import static io.spine.server.storage.jdbc.Type.LONG;
 import static io.spine.server.storage.jdbc.Type.STRING_255;
-import static io.spine.server.storage.jdbc.given.Column.unknownTypeColumn;
+import static io.spine.server.storage.jdbc.given.Column.idTableColumn;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -42,7 +42,7 @@ class IdColumnTest {
     @Test
     @DisplayName("have `bigint` implementation")
     void haveBigintImpl() {
-        IdColumn<?> column = IdColumn.ofEntityClass(unknownTypeColumn(), LongIdEntity.class);
+        IdColumn<?> column = IdColumn.ofEntityClass(idTableColumn(), LongIdEntity.class);
         assertEquals(LONG, column.sqlType());
         assertSame(Long.class, column.javaType());
     }
@@ -50,7 +50,7 @@ class IdColumnTest {
     @Test
     @DisplayName("have `int` implementation")
     void haveIntImpl() {
-        IdColumn<?> column = IdColumn.ofEntityClass(unknownTypeColumn(), IntIdEntity.class);
+        IdColumn<?> column = IdColumn.ofEntityClass(idTableColumn(), IntIdEntity.class);
         assertEquals(INT, column.sqlType());
         assertSame(Integer.class, column.javaType());
     }
@@ -58,7 +58,7 @@ class IdColumnTest {
     @Test
     @DisplayName("have `varchar255` implementation")
     void haveStringImpl() {
-        IdColumn<?> column = IdColumn.ofEntityClass(unknownTypeColumn(), StringIdEntity.class);
+        IdColumn<?> column = IdColumn.ofEntityClass(idTableColumn(), StringIdEntity.class);
         assertEquals(STRING_255, column.sqlType());
         assertSame(String.class, column.javaType());
     }
@@ -66,7 +66,7 @@ class IdColumnTest {
     @Test
     @DisplayName("cast message IDs to string")
     void castMessageIdsToString() {
-        IdColumn<?> column = IdColumn.ofEntityClass(unknownTypeColumn(), MessageIdEntity.class);
+        IdColumn<?> column = IdColumn.ofEntityClass(idTableColumn(), MessageIdEntity.class);
         assertEquals(STRING_255, column.sqlType());
         assertTrue(Message.class.isAssignableFrom(column.javaType()));
     }
@@ -75,7 +75,7 @@ class IdColumnTest {
     @DisplayName("store column name")
     void storeColumnName() {
         IdColumn<String> column =
-                IdColumn.ofEntityClass(unknownTypeColumn(), StringIdEntity.class);
-        assertEquals(unknownTypeColumn().name(), column.columnName());
+                IdColumn.ofEntityClass(idTableColumn(), StringIdEntity.class);
+        assertEquals(idTableColumn().name(), column.columnName());
     }
 }

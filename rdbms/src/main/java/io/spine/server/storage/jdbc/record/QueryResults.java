@@ -75,7 +75,7 @@ final class QueryResults {
      * Creates an {@code Iterator} over the results of a double-column SQL query.
      *
      * <p>Assumes the query was run over entity {@linkplain StandardColumn#ID ID column} and
-     * {@linkplain StandardColumn#ENTITY message-bytes column} simultaneously.
+     * {@linkplain StandardColumn#ENTITY message-bytes column}.
      *
      * <p>The results are represented as {@link DoubleColumnRecord}.
      *

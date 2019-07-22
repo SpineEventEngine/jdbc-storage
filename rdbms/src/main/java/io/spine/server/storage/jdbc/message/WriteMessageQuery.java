@@ -63,7 +63,7 @@ interface WriteMessageQuery<I, M extends Message> extends WriteQuery {
     }
 
     /**
-     * Checks if the column is an {@link IdColumn} in this table.
+     * Checks if the column is an {@link IdColumn} in a processed table.
      */
     default boolean isIdColumn(Column<M> column) {
         checkNotNull(column);

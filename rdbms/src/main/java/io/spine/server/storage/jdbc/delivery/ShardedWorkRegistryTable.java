@@ -68,8 +68,8 @@ final class ShardedWorkRegistryTable extends MessageTable<ShardIndex, ShardSessi
     /**
      * Obtains all session records belonging to a given shard index.
      *
-     * <p>Record filtering is based only on a shard index
-     * {@linkplain ShardIndex#getIndex() itself}, thus {@code Iterator} as the result.
+     * <p>Record filtering is based on the {@link Column#SHARD_INDEX} column which represents the
+     * shard index {@linkplain ShardIndex#getIndex() value} itself.
      */
     Iterator<ShardSessionRecord> readByIndex(ShardIndex index) {
         SelectShardSessionsByShardIndex query = composeSelectByShardIndexQuery(index);

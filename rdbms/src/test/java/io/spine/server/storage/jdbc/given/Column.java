@@ -38,18 +38,18 @@ public final class Column {
         return IdColumn.of(stringTableColumn());
     }
 
+    public static TableColumn idTableColumn() {
+        return GivenIdColumn.ID;
+    }
+
     public static TableColumn stringTableColumn() {
         return GivenIdColumn.STRING;
     }
 
-    public static TableColumn unknownTypeColumn() {
-        return GivenIdColumn.UNKNOWN;
-    }
-
     private enum GivenIdColumn implements TableColumn {
 
-        STRING(STRING_255),
-        UNKNOWN(null);
+        ID(null),
+        STRING(STRING_255);
 
         @Nullable
         private final Type type;

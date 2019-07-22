@@ -32,8 +32,8 @@ import static io.spine.server.storage.jdbc.delivery.InboxTable.Column.WHEN_RECEI
 import static io.spine.server.storage.jdbc.message.MessageTable.bytesColumn;
 
 /**
- * Selects messages from the {@link InboxTable} at a given
- * {@link io.spine.server.delivery.ShardIndex ShardIndex}.
+ * Selects messages from the {@link InboxTable} that belong to a shard at a given
+ * {@link io.spine.server.delivery.ShardIndex index}.
  *
  * <p>Messages are ordered from oldest to newest.
  */
