@@ -41,7 +41,7 @@ final class SelectLifecycleFlagsQuery<I> extends SelectMessageByIdQuery<I, Lifec
     }
 
     @Override
-    protected AbstractSQLQuery<?, ?> getQuery() {
+    protected AbstractSQLQuery<?, ?> query() {
         AbstractSQLQuery<?, ?> query = factory().select(pathOf(ARCHIVED), pathOf(DELETED))
                                                 .from(table())
                                                 .where(idEquals());

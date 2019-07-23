@@ -24,10 +24,8 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.protobuf.Any;
 import com.google.protobuf.FieldMask;
 import io.spine.base.Identifier;
-import io.spine.client.EntityId;
 import io.spine.client.IdFilter;
-import io.spine.client.OrderBy;
-import io.spine.client.Pagination;
+import io.spine.client.ResponseFormat;
 import io.spine.client.TargetFilters;
 import io.spine.server.entity.Entity;
 import io.spine.server.entity.EntityRecord;
@@ -49,7 +47,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.stream.Collectors.toList;
@@ -109,11 +106,6 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     }
 
     @Override
-    protected Iterator<EntityRecord> readMultipleRecords(Iterable<I> ids) {
-        return readMultipleRecords(ids, FieldMask.getDefaultInstance());
-    }
-
-    @Override
     protected Iterator<@Nullable EntityRecord> readMultipleRecords(Iterable<I> ids,
                                                                    FieldMask fieldMask) {
         EntityQuery<I> query = toQuery(ids);
@@ -122,20 +114,14 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     }
 
     @Override
-    protected Iterator<EntityRecord> readAllRecords() {
-        return readAllRecords(FieldMask.getDefaultInstance());
+    protected Iterator<EntityRecord> readAllRecords(ResponseFormat responseFormat) {
+        return table.readAll(responseFormat);
     }
 
     @Override
-    protected Iterator<EntityRecord> readAllRecords(FieldMask fieldMask) {
-        Iterator<EntityRecord> records = table.readByQuery(emptyQuery(), fieldMask);
-        return records;
-    }
-
-    @Override
-    protected Iterator<EntityRecord> readAllRecords(EntityQuery<I> query, FieldMask fieldMask) {
+    protected Iterator<EntityRecord> readAllRecords(EntityQuery<I> query, ResponseFormat format) {
         EntityQuery<I> completeQuery = appendLifecycleFilters(query);
-        Iterator<EntityRecord> records = table.readByQuery(completeQuery, fieldMask);
+        Iterator<EntityRecord> records = table.readByQuery(completeQuery, format);
         return records;
     }
 
@@ -167,16 +153,6 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
         table.deleteAll();
     }
 
-    private EntityQuery<I> emptyQuery() {
-        EntityQuery<I> query = EntityQueries.from(
-                TargetFilters.getDefaultInstance(),
-                OrderBy.getDefaultInstance(),
-                Pagination.getDefaultInstance(),
-                getThis());
-        EntityQuery<I> result = appendLifecycleFilters(query);
-        return result;
-    }
-
     private EntityQuery<I> toQuery(Iterable<I> ids) {
         Iterable<Any> entityIds = stream(ids.spliterator(), false)
                 .map(Identifier::pack)
@@ -187,10 +163,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
         TargetFilters entityFilters = TargetFilters.newBuilder()
                                                    .setIdFilter(idFilter)
                                                    .build();
-        EntityQuery<I> query = EntityQueries.from(entityFilters,
-                                                  OrderBy.getDefaultInstance(),
-                                                  Pagination.getDefaultInstance(),
-                                                  getThis());
+        EntityQuery<I> query = EntityQueries.from(entityFilters, getThis());
         EntityQuery<I> result = appendLifecycleFilters(query);
         return result;
     }
@@ -277,20 +250,6 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
         @Override
         public JdbcRecordStorage<I> doBuild() {
             return new JdbcRecordStorage<>(this);
-        }
-    }
-
-    private enum AggregateStateIdToEntityId implements Function<Object, EntityId> {
-        INSTANCE;
-
-        @Override
-        public EntityId apply(@Nullable Object genericId) {
-            checkNotNull(genericId);
-            Any content = Identifier.pack(genericId);
-            EntityId id = EntityId.newBuilder()
-                                  .setId(content)
-                                  .build();
-            return id;
         }
     }
 

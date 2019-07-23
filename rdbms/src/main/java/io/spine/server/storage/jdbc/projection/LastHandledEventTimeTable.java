@@ -27,6 +27,7 @@ import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.Type;
 import io.spine.server.storage.jdbc.TypeMapping;
 import io.spine.server.storage.jdbc.query.AbstractTable;
+import io.spine.server.storage.jdbc.query.IdColumn;
 import io.spine.server.storage.jdbc.query.SelectQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
 
@@ -35,8 +36,7 @@ import java.util.List;
 import static io.spine.server.storage.jdbc.Type.INT;
 import static io.spine.server.storage.jdbc.Type.LONG;
 import static io.spine.server.storage.jdbc.Type.STRING_255;
-import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.PROJECTION_TYPE;
-import static io.spine.server.storage.jdbc.query.IdColumn.typeString;
+import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.PROJECTION_CLASS;
 
 /**
  * A table for storing the last handled by
@@ -47,26 +47,21 @@ class LastHandledEventTimeTable extends AbstractTable<String, Timestamp, Timesta
     private static final String TABLE_NAME = "projection_last_handled_event_time";
 
     LastHandledEventTimeTable(DataSourceWrapper dataSource, TypeMapping typeMapping) {
-        super(TABLE_NAME, typeString(PROJECTION_TYPE.name()), dataSource, typeMapping);
+        super(TABLE_NAME, IdColumn.of(PROJECTION_CLASS), dataSource, typeMapping);
     }
 
     @Override
-    protected Column getIdColumnDeclaration() {
-        return PROJECTION_TYPE;
-    }
-
-    @Override
-    protected List<? extends TableColumn> getTableColumns() {
+    protected List<? extends TableColumn> tableColumns() {
         return ImmutableList.copyOf(Column.values());
     }
 
     @Override
     protected SelectQuery<Timestamp> composeSelectQuery(String id) {
         SelectTimestampQuery.Builder builder = SelectTimestampQuery.newBuilder();
-        SelectTimestampQuery query = builder.setTableName(getName())
-                                            .setDataSource(getDataSource())
+        SelectTimestampQuery query = builder.setTableName(name())
+                                            .setDataSource(dataSource())
                                             .setId(id)
-                                            .setIdColumn(getIdColumn())
+                                            .setIdColumn(idColumn())
                                             .build();
         return query;
     }
@@ -74,8 +69,8 @@ class LastHandledEventTimeTable extends AbstractTable<String, Timestamp, Timesta
     @Override
     protected WriteQuery composeInsertQuery(String id, Timestamp record) {
         InsertTimestampQuery.Builder builder = InsertTimestampQuery.newBuilder();
-        InsertTimestampQuery query = builder.setTableName(getName())
-                                            .setDataSource(getDataSource())
+        InsertTimestampQuery query = builder.setTableName(name())
+                                            .setDataSource(dataSource())
                                             .setId(id)
                                             .setTimestamp(record)
                                             .build();
@@ -85,8 +80,8 @@ class LastHandledEventTimeTable extends AbstractTable<String, Timestamp, Timesta
     @Override
     protected WriteQuery composeUpdateQuery(String id, Timestamp record) {
         UpdateTimestampQuery.Builder builder = UpdateTimestampQuery.newBuilder();
-        UpdateTimestampQuery query = builder.setTableName(getName())
-                                            .setDataSource(getDataSource())
+        UpdateTimestampQuery query = builder.setTableName(name())
+                                            .setDataSource(dataSource())
                                             .setId(id)
                                             .setTimestamp(record)
                                             .build();
@@ -98,7 +93,7 @@ class LastHandledEventTimeTable extends AbstractTable<String, Timestamp, Timesta
      */
     enum Column implements TableColumn {
 
-        PROJECTION_TYPE(STRING_255),
+        PROJECTION_CLASS(STRING_255),
         SECONDS(LONG),
         NANOS(INT);
 
@@ -115,7 +110,7 @@ class LastHandledEventTimeTable extends AbstractTable<String, Timestamp, Timesta
 
         @Override
         public boolean isPrimaryKey() {
-            return this == PROJECTION_TYPE;
+            return this == PROJECTION_CLASS;
         }
 
         @Override

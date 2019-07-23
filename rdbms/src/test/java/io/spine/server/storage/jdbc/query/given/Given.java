@@ -55,7 +55,7 @@ public class Given {
         }
 
         @Override
-        protected AbstractSQLQuery<?, ?> getQuery() {
+        protected AbstractSQLQuery<?, ?> query() {
             return query;
         }
 

@@ -20,12 +20,10 @@
 
 package io.spine.server.storage.jdbc.record;
 
-import com.google.protobuf.FieldMask;
 import com.google.protobuf.Message;
 import io.spine.client.CompositeFilter;
 import io.spine.client.Filter;
-import io.spine.client.OrderBy;
-import io.spine.client.Pagination;
+import io.spine.client.ResponseFormat;
 import io.spine.client.TargetFilters;
 import io.spine.server.entity.Entity;
 import io.spine.server.entity.EntityRecord;
@@ -104,7 +102,7 @@ class JdbcRecordStorageTest extends RecordStorageTest<JdbcRecordStorage<ProjectI
     void useColumnNames() {
         JdbcRecordStorage<ProjectId> storage = newStorage(TestEntityWithStringId.class);
         List<String> columns = storage.getTable()
-                                      .getTableColumns()
+                                      .tableColumns()
                                       .stream()
                                       .map(TableColumn::name)
                                       .collect(toList());
@@ -133,11 +131,8 @@ class JdbcRecordStorageTest extends RecordStorageTest<JdbcRecordStorage<ProjectI
                 .newBuilder()
                 .addFilter(columnFilter)
                 .build();
-        EntityQuery<ProjectId> query = EntityQueries.from(filters,
-                                                          OrderBy.getDefaultInstance(),
-                                                          Pagination.getDefaultInstance(),
-                                                          storage);
-        storage.readAll(query, FieldMask.getDefaultInstance());
+        EntityQuery<ProjectId> query = EntityQueries.from(filters, storage);
+        storage.readAll(query, ResponseFormat.getDefaultInstance());
         close(storage);
     }
 

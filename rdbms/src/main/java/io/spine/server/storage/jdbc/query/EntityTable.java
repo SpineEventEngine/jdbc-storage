@@ -20,11 +20,16 @@
 
 package io.spine.server.storage.jdbc.query;
 
+import com.google.common.collect.ImmutableMap;
 import io.spine.annotation.Internal;
 import io.spine.server.entity.Entity;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.TypeMapping;
 
+import static io.spine.server.storage.LifecycleFlagField.archived;
+import static io.spine.server.storage.LifecycleFlagField.deleted;
+import static io.spine.server.storage.VersionField.version;
 import static io.spine.server.storage.jdbc.query.TableNames.newTableName;
 
 /**
@@ -33,7 +38,20 @@ import static io.spine.server.storage.jdbc.query.TableNames.newTableName;
 @Internal
 public abstract class EntityTable<I, R, W> extends AbstractTable<I, R, W> {
 
-    private final Class<? extends Entity<I, ?>> entityClass;
+    /**
+     * A map of the Spine common Entity Columns to their default values.
+     *
+     * <p>Some write operations may not include these columns. Though, they are required for
+     * the framework to work properly. Hence, the tables which include them should make these
+     * values {@code DEFAULT} for these columns.
+     *
+     * <p>The map stores the names of the Entity Columns as a string keys for simplicity and
+     * the default values of the Columns as the map values.
+     */
+    private static final ImmutableMap<String, Object> COLUMN_DEFAULTS =
+            ImmutableMap.of(archived.name(), false,
+                            deleted.name(), false,
+                            version.name(), 0);
 
     /**
      * Creates a new instance of the {@code EntityTable}.
@@ -46,10 +64,10 @@ public abstract class EntityTable<I, R, W> extends AbstractTable<I, R, W> {
      *         an instance of {@link DataSourceWrapper} to use
      */
     protected EntityTable(Class<? extends Entity<I, ?>> entityClass,
-                          String idColumnName,
+                          TableColumn idColumn,
                           DataSourceWrapper dataSource,
                           TypeMapping typeMapping) {
-        this("", entityClass, idColumnName, dataSource, typeMapping);
+        this("", entityClass, idColumn, dataSource, typeMapping);
     }
 
     /**
@@ -67,17 +85,17 @@ public abstract class EntityTable<I, R, W> extends AbstractTable<I, R, W> {
      */
     protected EntityTable(String tableNamePostfix,
                           Class<? extends Entity<I, ?>> entityClass,
-                          String idColumnName,
+                          TableColumn idColumn,
                           DataSourceWrapper dataSource,
                           TypeMapping typeMapping) {
         super(newTableName(entityClass) + tableNamePostfix,
-              IdColumn.newInstance(entityClass, idColumnName),
+              IdColumn.ofEntityClass(idColumn, entityClass),
               dataSource,
               typeMapping);
-        this.entityClass = entityClass;
     }
 
-    protected Class<? extends Entity<I, ?>> getEntityClass() {
-        return entityClass;
+    @Override
+    protected ImmutableMap<String, Object> columnDefaults() {
+        return COLUMN_DEFAULTS;
     }
 }

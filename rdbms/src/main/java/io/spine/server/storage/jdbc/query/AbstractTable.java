@@ -38,9 +38,6 @@ import java.util.List;
 import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static io.spine.server.storage.LifecycleFlagField.archived;
-import static io.spine.server.storage.LifecycleFlagField.deleted;
-import static io.spine.server.storage.VersionField.version;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.COMMA;
@@ -68,26 +65,14 @@ import static io.spine.server.storage.jdbc.Sql.Query.PRIMARY_KEY;
  * @param <I>
  *         a type of ID of the records stored in the table
  * @param <R>
- *         a result type of the read operation
+ *         a result type of a read operation by a single ID
+ * @param <W>
+ *         a type of stored records
  * @see TableColumn
  */
 @Internal
 public abstract class AbstractTable<I, R, W> implements Logging {
 
-    /**
-     * A map of the Spine common Entity Columns to their default values.
-     *
-     * <p>Some write operations may not include these columns. Though, they are required for
-     * the framework to work properly. Hence, the tables which include them should make these values
-     * {@code DEFAULT} for these columns.
-     *
-     * <p>The map stores the names of the Entity Columns as a string keys for simplicity and
-     * the default values of the Columns as the map values.
-     */
-    private static final ImmutableMap<String, Object> COLUMN_DEFAULTS =
-            ImmutableMap.of(archived.name(), false,
-                            deleted.name(), false,
-                            version.name(), 0);
     private final String name;
     private final IdColumn<I> idColumn;
     private final DataSourceWrapper dataSource;
@@ -98,7 +83,7 @@ public abstract class AbstractTable<I, R, W> implements Logging {
      *
      * <p>This field is effectively final but is initialized lazily.
      *
-     * @see #getColumns() for the initialization
+     * @see #columns() for the initialization
      */
     private ImmutableList<? extends TableColumn> columns;
 
@@ -110,22 +95,7 @@ public abstract class AbstractTable<I, R, W> implements Logging {
         this.typeMapping = checkNotNull(typeMapping);
     }
 
-    /**
-     * Retrieves the enum object representing the table ID column.
-     *
-     * <p>Example:
-     * <pre>
-     *     {@code
-     *     \@Override
-     *      public Column getIdColumnDeclaration() {
-     *          return Column.id;
-     *      }
-     *     }
-     * </pre>
-     */
-    protected abstract TableColumn getIdColumnDeclaration();
-
-    protected abstract List<? extends TableColumn> getTableColumns();
+    protected abstract List<? extends TableColumn> tableColumns();
 
     /**
      * Creates current table in the database if it does not exist yet.
@@ -134,7 +104,7 @@ public abstract class AbstractTable<I, R, W> implements Logging {
      * <p>{@code CREATE TABLE IF NOT EXISTS $TableName ( $Columns );}
      */
     public void create() {
-        QueryExecutor queryExecutor = new QueryExecutor(dataSource, log());
+        QueryExecutor queryExecutor = new QueryExecutor(dataSource, logger());
         String createTableSql = composeCreateTableSql();
         queryExecutor.execute(createTableSql);
     }
@@ -239,23 +209,30 @@ public abstract class AbstractTable<I, R, W> implements Logging {
      * @return the initialized {@link List} of the table columns
      */
     @SuppressWarnings("ReturnOfCollectionOrArrayField") // Returns immutable collection
-    final ImmutableList<? extends TableColumn> getColumns() {
+    final ImmutableList<? extends TableColumn> columns() {
         if (columns == null) {
-            List<? extends TableColumn> tableColumnsType = getTableColumns();
+            List<? extends TableColumn> tableColumnsType = tableColumns();
             columns = ImmutableList.copyOf(tableColumnsType);
         }
         return columns;
     }
 
-    protected String getName() {
+    /**
+     * Obtains the map of column defaults for this table.
+     */
+    protected ImmutableMap<String, Object> columnDefaults() {
+        return ImmutableMap.of();
+    }
+
+    protected String name() {
         return name;
     }
 
-    protected IdColumn<I> getIdColumn() {
+    protected IdColumn<I> idColumn() {
         return idColumn;
     }
 
-    protected DataSourceWrapper getDataSource() {
+    protected DataSourceWrapper dataSource() {
         return dataSource;
     }
 
@@ -266,22 +243,22 @@ public abstract class AbstractTable<I, R, W> implements Logging {
     protected abstract SelectQuery<R> composeSelectQuery(I id);
 
     private String composeCreateTableSql() {
-        Iterable<? extends TableColumn> columns = getColumns();
+        Iterable<? extends TableColumn> columns = columns();
         StringBuilder sql = new StringBuilder();
         sql.append(CREATE_IF_MISSING)
-           .append(getName())
+           .append(name())
            .append(BRACKET_OPEN);
         Set<String> primaryKey = new HashSet<>();
         for (Iterator<? extends TableColumn> iterator = columns.iterator(); iterator.hasNext(); ) {
             TableColumn column = iterator.next();
             String name = column.name();
-            Type type = ensureIdType(column);
+            Type type = typeOf(column);
             TypeName typeName = typeMapping.typeNameFor(type);
             sql.append(name)
                .append(' ')
                .append(typeName);
-            if (COLUMN_DEFAULTS.containsKey(name)) {
-                Object defaultValue = COLUMN_DEFAULTS.get(name);
+            if (columnDefaults().containsKey(name)) {
+                Object defaultValue = columnDefaults().get(name);
                 sql.append(DEFAULT)
                    .append(defaultValue);
             }
@@ -310,30 +287,20 @@ public abstract class AbstractTable<I, R, W> implements Logging {
         return result;
     }
 
-    private Type getIdType() {
-        Type idType = getIdColumn().sqlType();
-        return idType;
-    }
-
     /**
      * Obtains the type of the specified column.
      *
-     * <p>If the column is the ID and its type is {@linkplain TableColumn#type() unknown}
-     * at the compile time, returns {@linkplain #getIdType() the ID type},
-     * which is determined at the runtime.
+     * <p>If the column is an ID column, the correct type is obtained from its
+     * {@linkplain IdColumn wrapper}, otherwise the column type is returned as-is.
      *
-     * @param column
-     *         the column whose type will be handled
-     * @return the SQL type of the column
+     * <p>It's also assumed that non-ID columns always have their SQL type set.
      */
-    private Type ensureIdType(TableColumn column) {
-        Type type = column.type();
-        boolean isIdColumn = column.equals(getIdColumnDeclaration());
-        boolean typeUnknown = type == null;
-        if (isIdColumn && typeUnknown) {
-            type = getIdType();
+    private Type typeOf(TableColumn column) {
+        boolean isIdColumn = column.equals(idColumn.column());
+        if (isIdColumn) {
+            return idColumn.sqlType();
         }
-        return type;
+        return checkNotNull(column.type());
     }
 
     /**
@@ -347,7 +314,7 @@ public abstract class AbstractTable<I, R, W> implements Logging {
     public boolean delete(I id) {
         DeleteRecordQuery.Builder<I> builder = DeleteRecordQuery.newBuilder();
         DeleteRecordQuery<I> query = builder.setTableName(name)
-                                            .setIdColumn(getIdColumn())
+                                            .setIdColumn(idColumn())
                                             .setId(id)
                                             .setDataSource(dataSource)
                                             .build();

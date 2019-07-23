@@ -64,12 +64,16 @@ public abstract class IdAwareQuery<I> extends AbstractQuery {
         return query;
     }
 
+    protected IdColumn<I> idColumn() {
+        return idColumn;
+    }
+
     private Object normalizedId() {
         return idColumn.normalize(id);
     }
 
     private PathBuilder<Object> idPath() {
-        return pathOf(idColumn.columnName());
+        return pathOf(idColumn);
     }
 
     protected abstract static class Builder<I,

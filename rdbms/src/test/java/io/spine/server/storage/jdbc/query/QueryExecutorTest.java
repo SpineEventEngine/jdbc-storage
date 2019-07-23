@@ -20,13 +20,12 @@
 
 package io.spine.server.storage.jdbc.query;
 
+import io.spine.logging.Logging;
 import io.spine.server.storage.jdbc.ConnectionWrapper;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -41,7 +40,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 
 @DisplayName("QueryExecutor should")
-class QueryExecutorTest {
+class QueryExecutorTest implements Logging {
 
     @Test
     @DisplayName("handle SQL exception on query execution")
@@ -56,19 +55,8 @@ class QueryExecutorTest {
                            .prepareStatement(anyString());
         doThrow(SQLException.class).when(statement)
                                    .execute();
-        QueryExecutor query = spy(new QueryExecutor(dataSource, log()));
+        QueryExecutor query = spy(new QueryExecutor(dataSource, logger()));
 
         assertThrows(DatabaseException.class, () -> query.execute(newUuid()));
-    }
-
-    private static Logger log() {
-        return LogSingleton.INSTANCE.value;
-    }
-
-    @SuppressWarnings("ImmutableEnumChecker") // SLF4J Logger is in fact immutable.
-    private enum LogSingleton {
-        INSTANCE;
-        @SuppressWarnings("NonSerializableFieldInSerializableClass")
-        private final Logger value = LoggerFactory.getLogger(QueryExecutorTest.class);
     }
 }
