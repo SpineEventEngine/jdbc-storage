@@ -23,10 +23,12 @@
  * of {@code InboxStorage} and other mechanisms of message delivery.
  */
 
+@Experimental
 @CheckReturnValue
 @ParametersAreNonnullByDefault
 package io.spine.server.storage.jdbc.delivery;
 
 import com.google.errorprone.annotations.CheckReturnValue;
+import io.spine.annotation.Experimental;
 
 import javax.annotation.ParametersAreNonnullByDefault;

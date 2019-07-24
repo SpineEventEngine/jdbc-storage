@@ -20,10 +20,12 @@
 /**
  * This package provides classes for JDBC column types.
  */
+@Experimental
 @CheckReturnValue
 @ParametersAreNonnullByDefault
 package io.spine.server.storage.jdbc.type;
 
 import com.google.errorprone.annotations.CheckReturnValue;
+import io.spine.annotation.Experimental;
 
 import javax.annotation.ParametersAreNonnullByDefault;

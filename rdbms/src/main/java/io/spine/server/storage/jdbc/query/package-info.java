@@ -26,11 +26,13 @@
  */
 
 @Internal
+@Experimental
 @CheckReturnValue
 @ParametersAreNonnullByDefault
 package io.spine.server.storage.jdbc.query;
 
 import com.google.errorprone.annotations.CheckReturnValue;
+import io.spine.annotation.Experimental;
 import io.spine.annotation.Internal;
 
 import javax.annotation.ParametersAreNonnullByDefault;
