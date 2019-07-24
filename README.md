@@ -2,6 +2,11 @@
 
 Support of storage in JDBC-compliant databases.
 
+At this point, this library is **experimental**, and its API is a subject for future changes.
+
+For the production use, consider NoSQL storage implementations such as Google Cloud Datastore. 
+See [gcloud-java](https://github.com/SpineEventEngine/gcloud-java/) for Google Cloud support.  
+
 ### Configuration
 
 To support working with different JDBC drivers, the library uses [Querydsl](http://www.querydsl.com/)

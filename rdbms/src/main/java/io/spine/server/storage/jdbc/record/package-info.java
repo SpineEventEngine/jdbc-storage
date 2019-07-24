@@ -24,8 +24,10 @@
 
 @CheckReturnValue
 @ParametersAreNonnullByDefault
+@Experimental
 package io.spine.server.storage.jdbc.record;
 
 import com.google.errorprone.annotations.CheckReturnValue;
+import io.spine.annotation.Experimental;
 
 import javax.annotation.ParametersAreNonnullByDefault;
