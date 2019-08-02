@@ -117,7 +117,7 @@ class JdbcRecordStorageTest extends RecordStorageTest<JdbcRecordStorage<ProjectI
     @DisplayName("read by composite filter with column filters for same column")
     void readByCompositeFilter() {
         JdbcRecordStorage<ProjectId> storage = newStorage(TestEntityWithStringId.class);
-        String columnName = "value";
+        String columnName = COLUMN_NAME_FOR_STORING;
         Filter lessThan = lt(columnName, -5);
         Filter greaterThan = gt(columnName, 5);
         CompositeFilter columnFilter = CompositeFilter
