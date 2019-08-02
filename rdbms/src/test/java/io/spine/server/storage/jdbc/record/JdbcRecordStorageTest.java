@@ -37,7 +37,6 @@ import io.spine.server.storage.given.RecordStorageTestEnv.TestCounterEntity;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.GivenDataSource;
 import io.spine.server.storage.jdbc.TableColumn;
-import io.spine.server.storage.jdbc.record.given.JdbcRecordStorageTestEnv.TestCounterEntityJdbc;
 import io.spine.server.storage.jdbc.record.given.JdbcRecordStorageTestEnv.TestEntityWithStringId;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
@@ -186,6 +185,6 @@ class JdbcRecordStorageTest extends RecordStorageTest<JdbcRecordStorage<ProjectI
 
     @Override
     protected Class<? extends TestCounterEntity> getTestEntityClass() {
-        return TestCounterEntityJdbc.class;
+        return TestCounterEntity.class;
     }
 }

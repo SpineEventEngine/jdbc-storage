@@ -316,7 +316,7 @@ final class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWith
 
         @Override
         public String name() {
-            return column.storedName();
+            return column.name();
         }
 
         @Override
