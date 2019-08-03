@@ -37,7 +37,6 @@ import io.spine.server.storage.given.RecordStorageTestEnv.TestCounterEntity;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.GivenDataSource;
 import io.spine.server.storage.jdbc.TableColumn;
-import io.spine.server.storage.jdbc.record.given.JdbcRecordStorageTestEnv.TestCounterEntityJdbc;
 import io.spine.server.storage.jdbc.record.given.JdbcRecordStorageTestEnv.TestEntityWithStringId;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
 import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
@@ -118,7 +117,7 @@ class JdbcRecordStorageTest extends RecordStorageTest<JdbcRecordStorage<ProjectI
     @DisplayName("read by composite filter with column filters for same column")
     void readByCompositeFilter() {
         JdbcRecordStorage<ProjectId> storage = newStorage(TestEntityWithStringId.class);
-        String columnName = "value";
+        String columnName = COLUMN_NAME_FOR_STORING;
         Filter lessThan = lt(columnName, -5);
         Filter greaterThan = gt(columnName, 5);
         CompositeFilter columnFilter = CompositeFilter
@@ -186,6 +185,6 @@ class JdbcRecordStorageTest extends RecordStorageTest<JdbcRecordStorage<ProjectI
 
     @Override
     protected Class<? extends TestCounterEntity> getTestEntityClass() {
-        return TestCounterEntityJdbc.class;
+        return TestCounterEntity.class;
     }
 }

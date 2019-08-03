@@ -44,6 +44,7 @@ class StorageIndexQuery<I> extends AbstractQuery implements SelectQuery<Iterator
     @Override
     public Iterator<I> execute() {
         ResultSet resultSet = factory().select(pathOf(idColumn))
+                                       .distinct()
                                        .from(table())
                                        .getResults();
         Class<I> columnType = idColumn.javaType();

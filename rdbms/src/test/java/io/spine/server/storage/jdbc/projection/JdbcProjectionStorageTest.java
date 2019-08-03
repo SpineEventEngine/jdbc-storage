@@ -29,7 +29,6 @@ import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.GivenDataSource;
 import io.spine.server.storage.jdbc.StorageBuilder;
 import io.spine.server.storage.jdbc.TypeMapping;
-import io.spine.server.storage.jdbc.projection.given.JdbcProjectionStorageTestEnv.TestEntity;
 import io.spine.server.storage.jdbc.record.JdbcRecordStorage;
 import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
 import io.spine.test.storage.ProjectId;
@@ -109,6 +108,6 @@ class JdbcProjectionStorageTest extends ProjectionStorageTest {
 
     @Override
     protected Class<? extends TestCounterEntity> getTestEntityClass() {
-        return TestEntity.class;
+        return TestCounterEntity.class;
     }
 }
