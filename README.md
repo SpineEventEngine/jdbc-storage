@@ -19,14 +19,7 @@ dependencies {
 }
 ```
 
-Maven:
-```xml
-  <groupId>io.spine</groupId>
-  <artifactId>spine-rdbms</artifactId>
-  <version>1.0.0</version>
-```
-
-These artifacts should be used as a part of the Spine server application.
+This artifact should be used as a part of the Spine server application.
  
 For the details on setting up the server environment please refer to [Spine Bootstrap Gradle plugin](https://github.com/SpineEventEngine/bootstrap/) 
 and [Spine `core` modules](https://github.com/SpineEventEngine/core-java/) documentation. 
