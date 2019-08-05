@@ -5,7 +5,31 @@ Support of storage in JDBC-compliant databases.
 At this point, this library is **experimental**, and its API is a subject for future changes.
 
 For the production use, consider NoSQL storage implementations such as Google Cloud Datastore. 
-See [gcloud-java](https://github.com/SpineEventEngine/gcloud-java/) for Google Cloud support.  
+See [gcloud-java](https://github.com/SpineEventEngine/gcloud-java/) for Google Cloud support.
+  
+### Artifacts
+
+Gradle:
+
+```groovy
+dependencies {
+    implementation (
+        "io.spine:spine-rdbms:1.0.0"
+    )
+}
+```
+
+Maven:
+```xml
+  <groupId>io.spine</groupId>
+  <artifactId>spine-rdbms</artifactId>
+  <version>1.0.0</version>
+```
+
+These artifacts should be used as a part of the Spine server application.
+ 
+For the details on setting up the server environment please refer to [Spine Bootstrap Gradle plugin](https://github.com/SpineEventEngine/bootstrap/) 
+and [Spine `core` modules](https://github.com/SpineEventEngine/core-java/) documentation. 
 
 ### Configuration
 
