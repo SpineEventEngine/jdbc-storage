@@ -91,11 +91,6 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     }
 
     @Override
-    public Iterator<I> index() {
-        return mainTable.index();
-    }
-
-    @Override
     public Optional<LifecycleFlags> readLifecycleFlags(I id) {
         return Optional.ofNullable(lifecycleFlagsTable.read(id));
     }
@@ -149,6 +144,11 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     @Override
     protected void truncate(int snapshotIndex, Timestamp date) {
         doTruncate(snapshotIndex, date);
+    }
+
+    @Override
+    protected Iterator<I> distinctAggregateIds() {
+        return mainTable.index();
     }
 
     private void doTruncate(int snapshotIndex, @Nullable Timestamp date) {
