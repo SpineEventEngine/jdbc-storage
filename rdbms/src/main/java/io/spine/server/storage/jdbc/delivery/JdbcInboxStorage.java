@@ -46,34 +46,32 @@ public class JdbcInboxStorage
                                    InboxTable>
         implements InboxStorage {
 
-    private static final int DEFAULT_READ_BATCH_SIZE = 500;
 
     private final DataSourceWrapper dataSource;
-
-    /**
-     * The maximum number of {@linkplain InboxMessage inbox messages} that are kept in memory
-     * simultaneously during storage reads.
-     *
-     * <p>This value can be overridden using {@link Builder#setReadBatchSize(int)}.
-     *
-     * <p>Defaults to {@link #DEFAULT_READ_BATCH_SIZE}.
-     */
-    private final int readBatchSize;
 
     private JdbcInboxStorage(Builder builder) {
         super(builder.isMultitenant(), new InboxTable(builder.getDataSource(),
                                                       builder.getTypeMapping()));
         this.dataSource = builder.getDataSource();
-        this.readBatchSize = builder.readBatchSize;
     }
 
+    /**
+     * Reads the contents of the {@code Inbox} filtering by the provided shard index.
+     *
+     * @implNote There is no effective way to paginate relational tables via JDBC —
+     *         especially if the actual content of the table is constantly changing, like in
+     *         the table storing {@code InboxMessage}s.
+     *         This method reads all the content for the shard into memory and emulates the
+     *         actual pagination.
+     *         See the <a href="https://github.com/SpineEventEngine/jdbc-storage/issues/136">
+     *         respective issue</a>.
+     */
     @Override
-    public Page<InboxMessage> readAll(ShardIndex index) {
+    public Page<InboxMessage> readAll(ShardIndex index, int pageSize) {
         checkNotNull(index);
         checkNotClosed();
-
         Iterator<InboxMessage> iterator = table().readAll(index);
-        return new InboxPage(iterator, readBatchSize);
+        return new InboxPage(iterator, pageSize);
     }
 
     /**
@@ -92,13 +90,6 @@ public class JdbcInboxStorage
     }
 
     public static class Builder extends StorageBuilder<Builder, JdbcInboxStorage> {
-
-        private int readBatchSize = DEFAULT_READ_BATCH_SIZE;
-
-        public Builder setReadBatchSize(int readBatchSize) {
-            this.readBatchSize = readBatchSize;
-            return getThis();
-        }
 
         @Override
         protected Builder getThis() {

@@ -21,6 +21,11 @@
 package io.spine.server.storage.jdbc.delivery;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableList;
+import com.google.protobuf.Duration;
+import com.google.protobuf.Timestamp;
+import com.google.protobuf.util.Durations;
+import io.spine.logging.Logging;
 import io.spine.server.NodeId;
 import io.spine.server.delivery.ShardIndex;
 import io.spine.server.delivery.ShardProcessingSession;
@@ -28,12 +33,15 @@ import io.spine.server.delivery.ShardSessionRecord;
 import io.spine.server.delivery.ShardedWorkRegistry;
 import io.spine.server.storage.jdbc.StorageBuilder;
 import io.spine.server.storage.jdbc.message.JdbcMessageStorage;
+import io.spine.string.Stringifiers;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Streams.stream;
+import static com.google.protobuf.util.Timestamps.between;
 import static io.spine.base.Time.currentTime;
 import static io.spine.util.Exceptions.unsupported;
 
@@ -48,7 +56,7 @@ public class JdbcShardedWorkRegistry
                                    ShardSessionRecord,
                                    ShardSessionReadRequest,
                                    ShardedWorkRegistryTable>
-        implements ShardedWorkRegistry {
+        implements ShardedWorkRegistry, Logging {
 
     private JdbcShardedWorkRegistry(Builder builder) {
         super(false,
@@ -56,7 +64,7 @@ public class JdbcShardedWorkRegistry
     }
 
     @Override
-    public Optional<ShardProcessingSession> pickUp(ShardIndex index, NodeId nodeId) {
+    public synchronized Optional<ShardProcessingSession> pickUp(ShardIndex index, NodeId nodeId) {
         checkNotNull(index);
         checkNotNull(nodeId);
         checkNotClosed();
@@ -68,9 +76,43 @@ public class JdbcShardedWorkRegistry
         ShardSessionRecord ssr = newRecord(index, nodeId);
         write(ssr);
 
-        JdbcShardProcessingSession result =
-                new JdbcShardProcessingSession(ssr, () -> clearNode(ssr));
-        return Optional.of(result);
+        boolean writeConsistent = checkConsistency(index, ssr);
+        if (writeConsistent) {
+            ShardProcessingSession result = new JdbcShardProcessingSession(ssr, () -> clearNode(ssr));
+            return Optional.of(result);
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public Iterable<ShardIndex> releaseExpiredSessions(Duration inactivityPeriod) {
+        checkNotNull(inactivityPeriod);
+
+        ImmutableList<ShardSessionRecord> allRecords =  ImmutableList.copyOf(readAll());
+        ImmutableList.Builder<ShardIndex> resultBuilder = ImmutableList.builder();
+        for (ShardSessionRecord record : allRecords) {
+            Timestamp whenPicked = record.getWhenLastPicked();
+            Duration elapsed = between(whenPicked, currentTime());
+
+            int comparison = Durations.compare(elapsed, inactivityPeriod);
+            if (comparison >= 0) {
+                clearNode(record);
+                resultBuilder.add(record.getIndex());
+            }
+        }
+        return resultBuilder.build();
+    }
+
+    private boolean checkConsistency(ShardIndex index, ShardSessionRecord ssr) {
+        List<ShardSessionRecord> records = ImmutableList.copyOf(readByIndex(index));
+        if (records.size() > 1) {
+            _warn().log("Several `ShardSessionRecord`s found for index %s.",
+                        Stringifiers.toString(index));
+        }
+        ShardSessionRecord fromStorage = records.iterator()
+                                                .next();
+        return fromStorage.equals(ssr);
     }
 
     /**
@@ -91,6 +133,14 @@ public class JdbcShardedWorkRegistry
     Iterator<ShardSessionRecord> readByIndex(ShardIndex index) {
         return table().readByIndex(index);
     }
+
+    /**
+     * Reads all messages from the storage.
+     */
+    private Iterator<ShardSessionRecord> readAll() {
+        return table().readAll();
+    }
+
 
     private static ShardSessionRecord newRecord(ShardIndex index, NodeId nodeId) {
         return ShardSessionRecord.newBuilder()

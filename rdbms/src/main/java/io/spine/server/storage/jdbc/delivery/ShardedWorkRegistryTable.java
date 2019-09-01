@@ -50,8 +50,7 @@ final class ShardedWorkRegistryTable extends MessageTable<ShardIndex, ShardSessi
 
     private static final String NAME = "shard_session_registry";
 
-    ShardedWorkRegistryTable(DataSourceWrapper dataSource,
-                             TypeMapping typeMapping) {
+    ShardedWorkRegistryTable(DataSourceWrapper dataSource, TypeMapping typeMapping) {
         super(NAME, IdColumn.of(Column.ID, ShardIndex.class), dataSource, typeMapping);
     }
 
@@ -72,12 +71,21 @@ final class ShardedWorkRegistryTable extends MessageTable<ShardIndex, ShardSessi
      * shard index {@linkplain ShardIndex#getIndex() value} itself.
      */
     Iterator<ShardSessionRecord> readByIndex(ShardIndex index) {
-        SelectShardSessionsByShardIndex query = composeSelectByShardIndexQuery(index);
+        SelectShardSessionsByShardIndex query = selectByIndex(index);
         Iterator<ShardSessionRecord> iterator = query.execute();
         return iterator;
     }
 
-    private SelectShardSessionsByShardIndex composeSelectByShardIndexQuery(ShardIndex index) {
+    /**
+     * Obtains all session records.
+     */
+    Iterator<ShardSessionRecord> readAll() {
+        SelectAllShardSessions query = selectAll();
+        Iterator<ShardSessionRecord> iterator = query.execute();
+        return iterator;
+    }
+
+    private SelectShardSessionsByShardIndex selectByIndex(ShardIndex index) {
         SelectShardSessionsByShardIndex.Builder builder =
                 SelectShardSessionsByShardIndex.newBuilder();
         SelectShardSessionsByShardIndex query = builder.setTableName(name())
@@ -87,10 +95,18 @@ final class ShardedWorkRegistryTable extends MessageTable<ShardIndex, ShardSessi
         return query;
     }
 
+    private SelectAllShardSessions selectAll() {
+        SelectAllShardSessions.Builder builder = SelectAllShardSessions.newBuilder();
+        SelectAllShardSessions query = builder.setTableName(name())
+                                              .setDataSource(dataSource())
+                                              .build();
+        return query;
+    }
+
     /**
      * The columns of {@link ShardSessionRecord} DB representation.
      */
-    @SuppressWarnings("ProtoTimestampGetSecondsGetNano") // `getNanos()` method is used on purpose.
+    @SuppressWarnings("ProtoTimestampGetSecondsGetNano")    // `getNanos()` method is used on purpose.
     enum Column implements MessageTable.Column<ShardSessionRecord> {
 
         ID(ShardSessionRecord::getIndex),
