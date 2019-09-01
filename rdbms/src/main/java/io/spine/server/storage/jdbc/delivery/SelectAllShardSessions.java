@@ -71,6 +71,7 @@ public final class SelectAllShardSessions extends AbstractQuery
             extends AbstractQuery.Builder<Builder, SelectAllShardSessions> {
 
         private Builder() {
+            super();
         }
 
         @Override
