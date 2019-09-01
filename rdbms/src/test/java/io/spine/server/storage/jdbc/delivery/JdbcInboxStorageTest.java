@@ -30,6 +30,7 @@ import io.spine.server.delivery.InboxMessageId;
 import io.spine.server.delivery.InboxMessageStatus;
 import io.spine.server.delivery.InboxReadRequest;
 import io.spine.server.delivery.InboxStorage;
+import io.spine.server.delivery.InboxStorageTest;
 import io.spine.server.delivery.Page;
 import io.spine.server.delivery.ShardIndex;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
@@ -52,12 +53,13 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @DisplayName("JdbcInboxStorage should")
-class JdbcInboxStorageTest {
+class JdbcInboxStorageTest extends InboxStorageTest {
 
     private JdbcInboxStorage storage;
 
+    @Override
     @BeforeEach
-    void setUp() {
+    protected void setUp() {
         DataSourceWrapper dataSource = whichIsStoredInMemory("jdbcInboxStorageTest");
         storage = JdbcInboxStorage
                 .newBuilder()
@@ -65,6 +67,12 @@ class JdbcInboxStorageTest {
                 .setMultitenant(false)
                 .setTypeMapping(MYSQL_5_7)
                 .build();
+        super.setUp();
+    }
+
+    @Override
+    protected InboxStorage storage() {
+        return storage;
     }
 
     @Test
@@ -166,37 +174,17 @@ class JdbcInboxStorageTest {
                                .collect(toImmutableList());
 
         // Check that both `TO_DELIVER` message and those marked `DELIVERED` are stored as expected.
-        ImmutableList<InboxMessage> readResult = storage.readAll(index)
+        ImmutableList<InboxMessage> readResult = storage.readAll(index, Integer.MAX_VALUE)
                                                         .contents();
         assertTrue(readResult.contains(remainingNonDelivered));
         assertTrue(readResult.containsAll(originalMarkedDelivered));
     }
 
-    @Test
-    @DisplayName("allow setting read batch size in builder")
-    void setReadBatchSize() {
-        DataSourceWrapper dataSource = whichIsStoredInMemory("inboxStorageBatchSizeTest");
-        int readBatchSize = 20;
-        JdbcInboxStorage storage = JdbcInboxStorage
-                .newBuilder()
-                .setDataSource(dataSource)
-                .setMultitenant(false)
-                .setTypeMapping(MYSQL_5_7)
-                .setReadBatchSize(readBatchSize)
-                .build();
-
-        ShardIndex index = newIndex();
-        ImmutableList<InboxMessage> messages = generateMultiple(30, index);
-        storage.writeAll(messages);
-
-        Page<InboxMessage> page = storage.readAll(index);
-        assertEquals(readBatchSize, page.size());
-    }
 
     @CanIgnoreReturnValue
     private static ImmutableList<InboxMessage>
     readAllAndCompare(InboxStorage storage, ShardIndex idx, ImmutableList<InboxMessage> expected) {
-        Page<InboxMessage> page = storage.readAll(idx);
+        Page<InboxMessage> page = storage.readAll(idx, Integer.MAX_VALUE);
         assertEquals(expected.size(), page.size());
 
         ImmutableList<InboxMessage> contents = page.contents();
@@ -205,7 +193,7 @@ class JdbcInboxStorageTest {
     }
 
     private static void checkEmpty(InboxStorage storage, ShardIndex index) {
-        Page<InboxMessage> emptyPage = storage.readAll(index);
+        Page<InboxMessage> emptyPage = storage.readAll(index, Integer.MAX_VALUE);
         assertEquals(0, emptyPage.size());
         assertTrue(emptyPage.contents()
                             .isEmpty());

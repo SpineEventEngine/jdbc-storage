@@ -59,8 +59,7 @@ public abstract class IdAwareQuery<I> extends AbstractQuery {
     }
 
     protected SQLUpdateClause updateById() {
-        SQLUpdateClause query = factory().update(table())
-                                         .set(idPath(), normalizedId());
+        SQLUpdateClause query = factory().update(table()).where(idEquals());
         return query;
     }
 

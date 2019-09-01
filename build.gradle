@@ -60,6 +60,7 @@ subprojects {
     targetCompatibility = 1.8
 
     defaultRepositories(project)
+    forceConfiguration(project)
 
     dependencies {
 

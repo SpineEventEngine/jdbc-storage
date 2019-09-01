@@ -28,6 +28,8 @@ import io.spine.server.NodeId;
 import io.spine.server.delivery.ShardIndex;
 import io.spine.server.delivery.ShardProcessingSession;
 import io.spine.server.delivery.ShardSessionRecord;
+import io.spine.server.delivery.ShardedWorkRegistry;
+import io.spine.server.delivery.ShardedWorkRegistryTest;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -45,7 +47,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @DisplayName("JdbcShardedWorkRegistry should")
-class JdbcShardedWorkRegistryTest {
+class JdbcShardedWorkRegistryTest extends ShardedWorkRegistryTest {
 
     private static final ShardIndex index = newIndex(1, 15);
 
@@ -61,6 +63,11 @@ class JdbcShardedWorkRegistryTest {
                 .setDataSource(dataSource)
                 .setTypeMapping(MYSQL_5_7)
                 .build();
+    }
+
+    @Override
+    protected ShardedWorkRegistry registry() {
+        return registry;
     }
 
     @Test
