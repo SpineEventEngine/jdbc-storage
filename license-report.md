@@ -1,6 +1,6 @@
 
     
-# Dependencies of `io.spine:spine-rdbms:1.0.3`
+# Dependencies of `io.spine:spine-rdbms:1.1.0`
 
 ## Runtime
 1. **Group:** com.google.auto.value **Name:** auto-value-annotations **Version:** 1.6.3
@@ -77,8 +77,6 @@
 
 1. **Group:** com.h2database **Name:** h2 **Version:** 1.4.196
      * **Manifest license URL:** [http://www.h2database.com/html/license.html](http://www.h2database.com/html/license.html)
-     * **POM Project URL:** [http://www.h2database.com](http://www.h2database.com)
-     * **POM License: MPL 2.0 or EPL 1.0** - [http://h2database.com/html/license.html](http://h2database.com/html/license.html)
 
 1. **Group:** com.infradna.tool **Name:** bridge-method-annotation **Version:** 1.13
      * **POM License: MIT License** - [http://www.opensource.org/licenses/mit-license.php](http://www.opensource.org/licenses/mit-license.php)
@@ -110,8 +108,6 @@
 
 1. **Group:** joda-time **Name:** joda-time **Version:** 1.6
      * **Manifest License:** Apache 2.0 (Not packaged)
-     * **POM Project URL:** [http://joda-time.sourceforge.net](http://joda-time.sourceforge.net)
-     * **POM License: Apache 2** - [http://www.apache.org/licenses/](http://www.apache.org/licenses/)
 
 1. **Group:** junit **Name:** junit **Version:** 4.12
      * **POM Project URL:** [http://junit.org](http://junit.org)
@@ -154,8 +150,6 @@
      * **POM License: New BSD License** - [http://www.opensource.org/licenses/bsd-license.php](http://www.opensource.org/licenses/bsd-license.php)
 
 1. **Group:** org.hsqldb **Name:** hsqldb **Version:** 2.3.3
-     * **POM Project URL:** [http://hsqldb.org](http://hsqldb.org)
-     * **POM License: HSQLDB License, a BSD open source license** - [http://hsqldb.org/web/hsqlLicense.html](http://hsqldb.org/web/hsqlLicense.html)
 
 1. **Group:** org.junit.jupiter **Name:** junit-jupiter-api **Version:** 5.5.1
      * **POM Project URL:** [https://junit.org/junit5/](https://junit.org/junit5/)
@@ -298,8 +292,6 @@
 
 1. **Group:** com.h2database **Name:** h2 **Version:** 1.4.196
      * **Manifest license URL:** [http://www.h2database.com/html/license.html](http://www.h2database.com/html/license.html)
-     * **POM Project URL:** [http://www.h2database.com](http://www.h2database.com)
-     * **POM License: MPL 2.0 or EPL 1.0** - [http://h2database.com/html/license.html](http://h2database.com/html/license.html)
 
 1. **Group:** com.infradna.tool **Name:** bridge-method-annotation **Version:** 1.13
      * **POM License: MIT License** - [http://www.opensource.org/licenses/mit-license.php](http://www.opensource.org/licenses/mit-license.php)
@@ -348,8 +340,6 @@
 
 1. **Group:** joda-time **Name:** joda-time **Version:** 1.6
      * **Manifest License:** Apache 2.0 (Not packaged)
-     * **POM Project URL:** [http://joda-time.sourceforge.net](http://joda-time.sourceforge.net)
-     * **POM License: Apache 2** - [http://www.apache.org/licenses/](http://www.apache.org/licenses/)
 
 1. **Group:** junit **Name:** junit **Version:** 4.12
      * **POM Project URL:** [http://junit.org](http://junit.org)
@@ -426,8 +416,6 @@
      * **POM License: New BSD License** - [http://www.opensource.org/licenses/bsd-license.php](http://www.opensource.org/licenses/bsd-license.php)
 
 1. **Group:** org.hsqldb **Name:** hsqldb **Version:** 2.3.3
-     * **POM Project URL:** [http://hsqldb.org](http://hsqldb.org)
-     * **POM License: HSQLDB License, a BSD open source license** - [http://hsqldb.org/web/hsqlLicense.html](http://hsqldb.org/web/hsqlLicense.html)
 
 1. **Group:** org.jacoco **Name:** org.jacoco.agent **Version:** 0.8.4
      * **Manifest license URL:** [http://www.eclipse.org/legal/epl-v10.html](http://www.eclipse.org/legal/epl-v10.html)
@@ -516,4 +504,4 @@
  The dependencies distributed under several licenses, are used according their commercial-use-friendly license.
 
 
-This report was generated on **Sun Sep 01 21:48:00 EEST 2019** using [Gradle-License-Report plugin](https://github.com/jk1/Gradle-License-Report) by Evgeny Naumenko, licensed under [Apache 2.0 License](https://github.com/jk1/Gradle-License-Report/blob/master/LICENSE).
+This report was generated on **Mon Sep 16 11:36:23 EEST 2019** using [Gradle-License-Report plugin](https://github.com/jk1/Gradle-License-Report) by Evgeny Naumenko, licensed under [Apache 2.0 License](https://github.com/jk1/Gradle-License-Report/blob/master/LICENSE).
