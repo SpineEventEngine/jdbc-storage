@@ -29,7 +29,6 @@ import io.spine.server.storage.jdbc.message.JdbcMessageStorage;
 
 import java.util.Iterator;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static io.spine.util.Exceptions.unsupported;
 
 /**
@@ -50,10 +49,7 @@ public class JdbcSessionStorage
     }
 
     protected JdbcSessionStorage(DataSourceWrapper dataSource, TypeMapping typeMapping) {
-        super(true, new ShardedWorkRegistryTable(
-                checkNotNull(dataSource),
-                checkNotNull(typeMapping)
-        ));
+        super(true, new ShardedWorkRegistryTable(dataSource, typeMapping));
     }
 
     /**
