@@ -50,9 +50,9 @@ public class JdbcInboxStorage
     private final DataSourceWrapper dataSource;
 
     private JdbcInboxStorage(Builder builder) {
-        super(builder.isMultitenant(), new InboxTable(builder.getDataSource(),
-                                                      builder.getTypeMapping()));
-        this.dataSource = builder.getDataSource();
+        super(builder.isMultitenant(), new InboxTable(builder.dataSource(),
+                                                      builder.typeMapping()));
+        this.dataSource = builder.dataSource();
     }
 
     /**
