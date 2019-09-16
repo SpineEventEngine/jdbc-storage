@@ -61,7 +61,7 @@ public abstract class StorageBuilder<B extends StorageBuilder<B, S>, S extends S
         return getThis();
     }
 
-    public DataSourceWrapper getDataSource() {
+    public DataSourceWrapper dataSource() {
         return dataSource;
     }
 
@@ -76,7 +76,7 @@ public abstract class StorageBuilder<B extends StorageBuilder<B, S>, S extends S
         return getThis();
     }
 
-    public TypeMapping getTypeMapping() {
+    public TypeMapping typeMapping() {
         return typeMapping;
     }
 

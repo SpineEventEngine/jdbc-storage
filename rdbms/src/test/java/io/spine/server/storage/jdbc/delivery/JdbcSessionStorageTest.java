@@ -18,10 +18,21 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-final def SPINE_VERSION = '1.1.0'
+package io.spine.server.storage.jdbc.delivery;
 
-ext {
-    versionToPublish = SPINE_VERSION
-    spineBaseVersion = SPINE_VERSION
-    spineCoreVersion = SPINE_VERSION
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+@DisplayName("JdbcSessionStorage should")
+class JdbcSessionStorageTest {
+
+    @Test
+    @DisplayName("not allow changing tenancy attribute")
+    void notAllowSingleTenant() {
+        JdbcSessionStorage.Builder builder = JdbcSessionStorage.newBuilder();
+        assertThrows(UnsupportedOperationException.class,
+                     () -> builder.setMultitenant(false));
+    }
 }
