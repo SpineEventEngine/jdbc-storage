@@ -22,20 +22,38 @@ package io.spine.server.storage.jdbc.delivery;
 
 import io.spine.server.delivery.ShardIndex;
 import io.spine.server.delivery.ShardSessionRecord;
+import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.StorageBuilder;
+import io.spine.server.storage.jdbc.TypeMapping;
 import io.spine.server.storage.jdbc.message.JdbcMessageStorage;
 
 import java.util.Iterator;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static io.spine.util.Exceptions.unsupported;
 
-public final class JdbcSessionStorage extends JdbcMessageStorage<ShardIndex,
-                                                          ShardSessionRecord,
-                                                          ShardSessionReadRequest,
-                                                          ShardedWorkRegistryTable> {
+/**
+ * A JDBC-based storage for work session records.
+ *
+ * <p>This storage is always multitenant.
+ *
+ * <p>Stores all the records in a single table regardless of target entity type, shard, etc.
+ */
+public class JdbcSessionStorage
+        extends JdbcMessageStorage<ShardIndex,
+                                   ShardSessionRecord,
+                                   ShardSessionReadRequest,
+                                   ShardedWorkRegistryTable> {
 
     private JdbcSessionStorage(Builder builder) {
-        super(false, new ShardedWorkRegistryTable(builder.dataSource(), builder.typeMapping()));
+        this(builder.dataSource(), builder.typeMapping());
+    }
+
+    protected JdbcSessionStorage(DataSourceWrapper dataSource, TypeMapping typeMapping) {
+        super(true, new ShardedWorkRegistryTable(
+                checkNotNull(dataSource),
+                checkNotNull(typeMapping)
+        ));
     }
 
     /**
@@ -45,11 +63,19 @@ public final class JdbcSessionStorage extends JdbcMessageStorage<ShardIndex,
         return table().readAll();
     }
 
+    /**
+     * Creates a new instance of {@code Builder} for {@code JdbcSessionStorage} instances.
+     *
+     * @return new instance of {@code Builder}
+     */
     public static Builder newBuilder() {
         return new Builder();
     }
 
-    public static class Builder extends StorageBuilder<Builder, JdbcSessionStorage> {
+    /**
+     * A builder for the {@code JdbcSessionStorage} instances.
+     */
+    public static final class Builder extends StorageBuilder<Builder, JdbcSessionStorage> {
 
         /**
          * Prevents direct instantiation.
@@ -61,7 +87,7 @@ public final class JdbcSessionStorage extends JdbcMessageStorage<ShardIndex,
         @Override
         public Builder setMultitenant(boolean multitenant) {
             throw unsupported("`JdbcShardedWorkRegistry` is an application-wide instance " +
-                                      "and therefore is always single-tenant");
+                                      "and therefore is always multitenant.");
         }
 
         @Override

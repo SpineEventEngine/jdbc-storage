@@ -114,6 +114,9 @@ public class JdbcStorageFactory implements StorageFactory {
         return storage;
     }
 
+    /**
+     * Creates a new storage for work session records based on JDBC.
+     */
     public JdbcSessionStorage createSessionStorage() {
         return JdbcSessionStorage
                 .newBuilder()
