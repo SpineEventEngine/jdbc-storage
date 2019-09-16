@@ -47,6 +47,12 @@ public class JdbcShardedWorkRegistry
 
     private final JdbcSessionStorage storage;
 
+    /**
+     * Creates a new registry.
+     *
+     * @param storageFactory
+     *         the storage factory for creating a storage for this registry
+     */
     public JdbcShardedWorkRegistry(JdbcStorageFactory storageFactory) {
         super();
         checkNotNull(storageFactory);
@@ -61,8 +67,7 @@ public class JdbcShardedWorkRegistry
 
     private boolean pickedBy(ShardIndex index, NodeId nodeId) {
         Optional<ShardSessionRecord> stored = find(index);
-        return stored.map(record -> record.getPickedBy()
-                                          .equals(nodeId))
+        return stored.map(record -> record.getPickedBy().equals(nodeId))
                      .orElse(false);
     }
 
