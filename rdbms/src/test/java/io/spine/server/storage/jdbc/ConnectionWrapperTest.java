@@ -26,86 +26,59 @@ import org.junit.jupiter.api.Test;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import static com.google.common.truth.Truth.assertThat;
+import static io.spine.base.Identifier.newUuid;
+import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @DisplayName("ConnectionWrapper should")
 class ConnectionWrapperTest {
 
-    @SuppressWarnings("ObjectEquality")
+    private final DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
+
     @Test
     @DisplayName("store and retrieve connection")
     void storeAndRetrieveConnection() {
-        Connection connection = mockConnection();
+        Connection connection = connection();
         ConnectionWrapper wrapper = ConnectionWrapper.wrap(connection);
         Connection stored = wrapper.get();
-        assertTrue(stored == connection); // Same object.
+        assertThat(stored)
+                .isSameInstanceAs(connection);
     }
 
     @Test
-    @DisplayName("throw DatabaseException in case of SQLException on commit")
-    void handleExceptionOnCommit() {
-        Connection connection = mockConnection();
+    @DisplayName("throw `DatabaseException` in case of `SQLException` on commit")
+    void handleExceptionOnCommit() throws SQLException {
+        Connection connection = connection();
+        // Close the connection so it can't commit.
+        connection.close();
         ConnectionWrapper wrapper = ConnectionWrapper.wrap(connection);
         assertThrows(DatabaseException.class, wrapper::commit);
     }
 
     @Test
-    @DisplayName("throw DatabaseException in case of SQLException on rollback")
-    void handleExceptionOnRollback() {
-        Connection connection = mockConnection();
+    @DisplayName("throw `DatabaseException` in case of `SQLException` on rollback")
+    void handleExceptionOnRollback() throws SQLException {
+        Connection connection = connection();
+        // Close the connection so the rollback is not available.
+        connection.close();
         ConnectionWrapper wrapper = ConnectionWrapper.wrap(connection);
         assertThrows(DatabaseException.class, wrapper::rollback);
     }
 
     @Test
-    @DisplayName("throw DatabaseException in case of SQLException on close")
-    void handleExceptionOnClose() {
-        Connection connection = mockConnection();
-        ConnectionWrapper wrapper = ConnectionWrapper.wrap(connection);
-        assertThrows(DatabaseException.class, wrapper::close);
-    }
-
-    @SuppressWarnings("JDBCPrepareStatementWithNonConstantString") // OK for a mock setup.
-    @Test
-    @DisplayName("throw DatabaseException in case of SQLException on preparing statement")
+    @DisplayName("throw `DatabaseException` in case of `SQLException` on preparing statement")
     void handleExceptionOnPrepareStatement() throws SQLException {
-        Connection connection = mockConnection();
-        when(connection.prepareStatement(anyString())).thenThrow(SQLException.class);
+        Connection connection = connection();
+        // Close the connection so the statement cannot be prepared.
+        connection.close();
         ConnectionWrapper wrapper = ConnectionWrapper.wrap(connection);
         assertThrows(DatabaseException.class,
                      () -> wrapper.prepareStatement("SOME SQL STATEMENT."));
     }
 
-    @Test
-    @DisplayName("rollback transaction successfully")
-    void rollbackTransaction() throws SQLException {
-        Connection connection = mock(Connection.class);
-        ConnectionWrapper wrapper = ConnectionWrapper.wrap(connection);
-        wrapper.rollback();
-        verify(connection).rollback();
-    }
-
-    private static Connection mockConnection() {
-        Connection connection = mock(Connection.class);
-        @SuppressWarnings("NewExceptionWithoutArguments") // For test we need only exception type.
-                Exception exception = new SQLException();
-        try {
-            doThrow(exception).when(connection)
-                              .commit();
-            doThrow(exception).when(connection)
-                              .rollback();
-            doThrow(exception).when(connection)
-                              .close();
-        } catch (SQLException e) {
-            fail("Didn't want to catch that.");
-        }
-        return connection;
+    private Connection connection() {
+        ConnectionWrapper connection = dataSource.getConnection(false);
+        return connection.get();
     }
 }

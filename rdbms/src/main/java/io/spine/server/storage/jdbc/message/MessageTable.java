@@ -140,7 +140,7 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
     protected abstract Descriptor messageDescriptor();
 
     @SuppressWarnings("unchecked") // Ensured by descendant classes declaration.
-    private I idOf(M record) {
+    protected I idOf(M record) {
         Column<M> column = (Column<M>) idColumn().column();
         I id = (I) column.getter()
                          .apply(record);

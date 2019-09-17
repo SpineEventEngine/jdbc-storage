@@ -20,6 +20,7 @@
 
 package io.spine.server.storage.jdbc.query;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -224,11 +225,13 @@ public abstract class AbstractTable<I, R, W> implements Logging {
         return ImmutableMap.of();
     }
 
-    protected String name() {
+    @VisibleForTesting
+    public String name() {
         return name;
     }
 
-    protected IdColumn<I> idColumn() {
+    @VisibleForTesting
+    public IdColumn<I> idColumn() {
         return idColumn;
     }
 

@@ -24,9 +24,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.errorprone.annotations.Immutable;
 import io.spine.type.TypeName;
 
-import java.sql.DatabaseMetaData;
-import java.sql.SQLException;
-
 import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
 import static io.spine.server.storage.jdbc.TypeMappingBuilder.basicBuilder;
 
@@ -61,7 +58,7 @@ public enum PredefinedMapping implements TypeMapping {
     /**
      * Selects the type mapping for the specified data source.
      *
-     * <p>The {@linkplain DatabaseMetaData#getDatabaseProductName() database product name} and
+     * <p>The {@linkplain DataSourceMetaData#productName() database product name} and
      * the version are taken into account during the selection.
      *
      * @param dataSource
@@ -70,23 +67,17 @@ public enum PredefinedMapping implements TypeMapping {
      *         mapping for MySQL 5.7} if there is no standard mapping for the database
      */
     static TypeMapping select(DataSourceWrapper dataSource) {
-        try (final ConnectionWrapper connection = dataSource.getConnection(true)) {
-            DatabaseMetaData metaData = connection.get()
-                                                  .getMetaData();
-            for (PredefinedMapping mapping : values()) {
-                boolean nameMatch = metaData.getDatabaseProductName()
-                                            .equals(mapping.databaseProductName);
-                boolean versionMatch =
-                        metaData.getDatabaseMajorVersion() == mapping.majorVersion
-                        && metaData.getDatabaseMinorVersion() == mapping.minorVersion;
-                if (nameMatch && versionMatch) {
-                    return mapping;
-                }
+        DataSourceMetaData metaData = dataSource.metaData();
+        for (PredefinedMapping mapping : values()) {
+            boolean nameMatch = metaData.productName()
+                                        .equals(mapping.databaseProductName);
+            boolean versionMatch =
+                    metaData.majorVersion() == mapping.majorVersion
+                    && metaData.minorVersion() == mapping.minorVersion;
+            if (nameMatch && versionMatch) {
+                return mapping;
             }
-        } catch (SQLException e) {
-            throw new DatabaseException(e);
         }
-
         return MYSQL_5_7;
     }
 

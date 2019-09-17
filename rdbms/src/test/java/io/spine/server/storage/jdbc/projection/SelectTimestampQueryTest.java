@@ -21,6 +21,7 @@
 package io.spine.server.storage.jdbc.projection;
 
 import com.google.protobuf.Message;
+import com.google.protobuf.Timestamp;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,26 +29,39 @@ import org.junit.jupiter.api.Test;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import static com.google.common.truth.Truth.assertThat;
 import static io.spine.base.Identifier.newUuid;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
-import static io.spine.server.storage.jdbc.given.Column.stringIdColumn;
+import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.Mockito.mock;
 
 @DisplayName("SelectTimestampQuery should")
 class SelectTimestampQueryTest {
 
     @Test
-    @DisplayName("return null if `seconds` and `nanos` fields are nulls")
+    @DisplayName("return `null` if `seconds` and `nanos` fields are not set")
     void returnNullForEmptyTimestamp() throws SQLException {
-        ResultSet resultSet = mock(ResultSet.class);
         DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
+
+        LastHandledEventTimeTable table = new LastHandledEventTimeTable(dataSource, MYSQL_5_7);
+        table.create();
+        String tableName = table.name();
+
+        String id = newUuid();
+        table.composeInsertQuery(id, Timestamp.getDefaultInstance())
+             .execute();
+
         SelectTimestampQuery query = SelectTimestampQuery.newBuilder()
-                                                         .setTableName(newUuid())
+                                                         .setTableName(tableName)
                                                          .setDataSource(dataSource)
-                                                         .setId(newUuid())
-                                                         .setIdColumn(stringIdColumn())
+                                                         .setId(id)
+                                                         .setIdColumn(table.idColumn())
                                                          .build();
+        ResultSet resultSet = query.query()
+                                   .getResults();
+        assertThat(resultSet.next())
+                .isTrue();
+
         Message deserialized = query.readMessage(resultSet);
         assertNull(deserialized);
     }

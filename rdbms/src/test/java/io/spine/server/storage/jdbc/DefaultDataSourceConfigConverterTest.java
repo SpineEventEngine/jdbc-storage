@@ -27,7 +27,6 @@ import org.junit.jupiter.api.Test;
 import static io.spine.testing.DisplayNames.HAVE_PARAMETERLESS_CTOR;
 import static io.spine.testing.DisplayNames.NOT_ACCEPT_NULLS;
 import static io.spine.testing.Tests.assertHasPrivateParameterlessCtor;
-import static org.mockito.Mockito.mock;
 
 @DisplayName("DefaultDataSourceConfigConverter should")
 class DefaultDataSourceConfigConverterTest {
@@ -42,7 +41,13 @@ class DefaultDataSourceConfigConverterTest {
     @DisplayName(NOT_ACCEPT_NULLS)
     void passNullToleranceCheck() {
         NullPointerTester tester = new NullPointerTester();
-        tester.setDefault(DataSourceConfig.class, mock(DataSourceConfig.class));
+        DataSourceConfig dataSource = DataSourceConfig.newBuilder()
+                                                      .setDataSourceClassName("SomeClass")
+                                                      .setJdbcUrl("some:url")
+                                                      .setUsername("")
+                                                      .setPassword("")
+                                                      .build();
+        tester.setDefault(DataSourceConfig.class, dataSource);
         tester.testStaticMethods(DefaultDataSourceConfigConverter.class,
                                  NullPointerTester.Visibility.PACKAGE);
     }

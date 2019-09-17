@@ -116,6 +116,12 @@ all modules and does not describe the project structure per-subproject.
     <scope>test</scope>
   </dependency>
   <dependency>
+    <groupId>io.spine.tools</groupId>
+    <artifactId>spine-mute-logging</artifactId>
+    <version>1.0.3</version>
+    <scope>test</scope>
+  </dependency>
+  <dependency>
     <groupId>org.apiguardian</groupId>
     <artifactId>apiguardian-api</artifactId>
     <version>1.0.0</version>

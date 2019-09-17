@@ -20,22 +20,24 @@
 
 package io.spine.server.storage.jdbc;
 
-import io.spine.server.storage.jdbc.GivenDataSource.ClosableDataSource;
+import io.spine.testing.logging.MuteLogging;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import javax.sql.DataSource;
+
+import static io.spine.base.Identifier.newUuid;
+import static io.spine.server.storage.jdbc.GivenDataSource.whichIsThrowingOnClose;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.doThrow;
 
 @DisplayName("DataSourceWrapper should")
 class DataSourceWrapperTest {
 
     @Test
-    @DisplayName("throw DatabaseException if failing to close")
-    void throwIfFailToClose() throws Exception {
-        ClosableDataSource dataSource = GivenDataSource.whichIsAutoCloseable();
-        doThrow(new Exception("")).when(dataSource)
-                                  .close();
+    @MuteLogging
+    @DisplayName("throw `DatabaseException` if failing to close")
+    void throwIfFailToClose() {
+        DataSource dataSource = whichIsThrowingOnClose(newUuid());
         DataSourceWrapper wrapper = DataSourceWrapper.wrap(dataSource);
         assertThrows(DatabaseException.class, wrapper::close);
     }

@@ -80,6 +80,7 @@ subprojects {
                 classifier: 'test', excludes
 
         testImplementation group: 'io.spine', name: 'spine-testlib', version: spineBaseVersion
+        testImplementation "io.spine.tools:spine-mute-logging:$spineBaseVersion"
 
         errorprone deps.build.errorProneCore
         errorproneJavac deps.build.errorProneJavac

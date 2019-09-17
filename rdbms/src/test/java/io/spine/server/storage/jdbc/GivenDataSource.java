@@ -44,24 +44,95 @@ public class GivenDataSource {
         return mock(DataSourceWrapper.class);
     }
 
-    public static ClosableDataSource whichIsAutoCloseable() {
-        return mock(ClosableDataSource.class);
+    public static DataSourceWrapper whichIsStoredInMemory(String dbName) {
+        HikariConfig config = hikariConfig(dbName);
+        DataSourceWrapper dataSource = DataSourceWrapper.wrap(new HikariDataSource(config));
+        return dataSource;
     }
 
-    public static DataSourceWrapper whichIsStoredInMemory(String dbName) {
+    public static DataSourceWrapper
+    whichIsHoldingMetadata(String productName, int majorVersion, int minorVersion) {
+        DataSourceWrapper dataSource =
+                new DataSourceWithMetaData(productName, majorVersion, minorVersion);
+        return dataSource;
+    }
+
+    static DataSource whichIsThrowingOnClose(String dbName) {
+        HikariConfig config = hikariConfig(dbName);
+        DataSource dataSource = new ThrowingDataSource(config);
+        return dataSource;
+    }
+
+    private static HikariConfig hikariConfig(String dbName) {
         HikariConfig config = new HikariConfig();
         String dbUrl = prefix(dbName);
         config.setJdbcUrl(dbUrl);
         // Not setting username and password is OK for in-memory database.
-        DataSourceWrapper dataSource = DataSourceWrapper.wrap(new HikariDataSource(config));
-        return dataSource;
+        return config;
     }
 
     public static String prefix(String dbNamePrefix) {
         return HSQL_IN_MEMORY_DB_URL_PREFIX + dbNamePrefix + newUuid();
     }
 
-    @SuppressWarnings("InterfaceNeverImplemented")
-    public interface ClosableDataSource extends DataSource, AutoCloseable {
+    private static class ThrowingDataSource extends HikariDataSource {
+
+        private ThrowingDataSource(HikariConfig configuration) {
+            super(configuration);
+        }
+
+        @Override
+        public void close() {
+            throw new IllegalStateException("Ignore this error.");
+        }
+    }
+
+    /**
+     * A test data source whose only purpose is to return a given data source
+     * {@linkplain DataSourceWrapper#metaData() meta data}.
+     */
+    private static class DataSourceWithMetaData implements DataSourceWrapper {
+
+        private static final String UNSUPPORTED = "Operation unsupported.";
+
+        private final String productName;
+        private final int majorVersion;
+        private final int minorVersion;
+
+        private DataSourceWithMetaData(String productName, int majorVersion, int minorVersion) {
+            this.productName = productName;
+            this.majorVersion = majorVersion;
+            this.minorVersion = minorVersion;
+        }
+
+        @Override
+        public ConnectionWrapper getConnection(boolean autoCommit) {
+            throw new IllegalStateException(UNSUPPORTED);
+        }
+
+        @Override
+        public DataSourceMetaData metaData() throws DatabaseException {
+            return new DataSourceMetaData() {
+                @Override
+                public String productName() {
+                    return productName;
+                }
+
+                @Override
+                public int majorVersion() {
+                    return majorVersion;
+                }
+
+                @Override
+                public int minorVersion() {
+                    return minorVersion;
+                }
+            };
+        }
+
+        @Override
+        public void close() throws DatabaseException {
+            throw new IllegalStateException(UNSUPPORTED);
+        }
     }
 }
