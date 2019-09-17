@@ -34,24 +34,24 @@ import static io.spine.server.storage.jdbc.message.MessageTable.bytesColumn;
  * @param <M>
  *         the message type
  */
-final class SelectSingleMessage<I, M extends Message> extends SelectMessageByIdQuery<I, M> {
+public final class SelectSingleMessage<I, M extends Message> extends SelectMessageByIdQuery<I, M> {
 
     private SelectSingleMessage(Builder<I, M> builder) {
         super(builder);
     }
 
     @Override
-    protected AbstractSQLQuery<Object, ?> query() {
+    public AbstractSQLQuery<Object, ?> query() {
         return factory().select(pathOf(bytesColumn()))
                         .from(table())
                         .where(idEquals());
     }
 
-    static <I, M extends Message> Builder<I, M> newBuilder() {
+    public static <I, M extends Message> Builder<I, M> newBuilder() {
         return new Builder<>();
     }
 
-    static class Builder<I, M extends Message>
+    public static class Builder<I, M extends Message>
             extends SelectMessageByIdQuery.Builder<Builder<I, M>, SelectSingleMessage<I, M>, I, M> {
 
         @Override

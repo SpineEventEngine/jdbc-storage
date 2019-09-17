@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static io.spine.base.Identifier.newUuid;
-import static io.spine.server.storage.jdbc.GivenDataSource.whichIsHoldingMetadata;
+import static io.spine.server.storage.jdbc.GivenDataSource.whichHoldsMetadata;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
 import static io.spine.server.storage.jdbc.PredefinedMapping.H2_1_4;
 import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
@@ -155,7 +155,7 @@ class JdbcStorageFactoryTest {
     @Test
     @DisplayName("select mapping based on the given data source")
     void useMySqlMappingByDefault() {
-        DataSourceWrapper dataSource = whichIsHoldingMetadata(
+        DataSourceWrapper dataSource = whichHoldsMetadata(
                 MYSQL_5_7.getDatabaseProductName(),
                 MYSQL_5_7.getMajorVersion(),
                 MYSQL_5_7.getMinorVersion());

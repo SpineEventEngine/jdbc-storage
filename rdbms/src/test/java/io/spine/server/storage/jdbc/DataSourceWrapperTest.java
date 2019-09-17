@@ -20,14 +20,13 @@
 
 package io.spine.server.storage.jdbc;
 
+import io.spine.server.storage.jdbc.GivenDataSource.ThrowingHikariDataSource;
 import io.spine.testing.logging.MuteLogging;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import javax.sql.DataSource;
-
 import static io.spine.base.Identifier.newUuid;
-import static io.spine.server.storage.jdbc.GivenDataSource.whichIsThrowingOnClose;
+import static io.spine.server.storage.jdbc.GivenDataSource.whichIsThrowingByCommand;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("DataSourceWrapper should")
@@ -37,7 +36,8 @@ class DataSourceWrapperTest {
     @MuteLogging
     @DisplayName("throw `DatabaseException` if failing to close")
     void throwIfFailToClose() {
-        DataSource dataSource = whichIsThrowingOnClose(newUuid());
+        ThrowingHikariDataSource dataSource = whichIsThrowingByCommand(newUuid());
+        dataSource.setThrowOnClose(true);
         DataSourceWrapper wrapper = DataSourceWrapper.wrap(dataSource);
         assertThrows(DatabaseException.class, wrapper::close);
     }

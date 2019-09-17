@@ -28,6 +28,7 @@ import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.Type;
 import io.spine.server.storage.jdbc.TypeMapping;
 import io.spine.server.storage.jdbc.message.MessageTable;
+import io.spine.server.storage.jdbc.message.SelectSingleMessage;
 import io.spine.server.storage.jdbc.query.IdColumn;
 
 import java.sql.ResultSet;
@@ -64,6 +65,11 @@ public final class TimestampByString extends MessageTable<String, Timestamp> {
         ResultSet resultSet = query.query()
                                    .getResults();
         return resultSet;
+    }
+
+    @Override
+    public SelectSingleMessage<String, Timestamp> composeSelectQuery(String id) {
+        return super.composeSelectQuery(id);
     }
 
     @Override

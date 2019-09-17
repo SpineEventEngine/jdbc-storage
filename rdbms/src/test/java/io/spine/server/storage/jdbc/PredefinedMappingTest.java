@@ -24,7 +24,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static com.google.common.truth.Truth.assertThat;
-import static io.spine.server.storage.jdbc.GivenDataSource.whichIsHoldingMetadata;
+import static io.spine.server.storage.jdbc.GivenDataSource.whichHoldsMetadata;
 import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
 import static io.spine.server.storage.jdbc.PredefinedMapping.POSTGRESQL_10_1;
 import static io.spine.server.storage.jdbc.PredefinedMapping.select;
@@ -46,9 +46,9 @@ class PredefinedMappingTest {
     @Test
     @DisplayName("be selected by database product name and major version")
     void selectTypeMapping() {
-        DataSourceWrapper dataSource = whichIsHoldingMetadata(mapping.getDatabaseProductName(),
-                                                              mapping.getMajorVersion(),
-                                                              mapping.getMinorVersion());
+        DataSourceWrapper dataSource = whichHoldsMetadata(mapping.getDatabaseProductName(),
+                                                          mapping.getMajorVersion(),
+                                                          mapping.getMinorVersion());
         assertThat(select(dataSource)).isEqualTo(mapping);
     }
 
@@ -56,9 +56,9 @@ class PredefinedMappingTest {
     @DisplayName("not be selected if major versions are different")
     void notSelectForDifferentVersion() {
         int newMajorVersion = mapping.getMajorVersion() + 1;
-        DataSourceWrapper dataSource = whichIsHoldingMetadata(mapping.getDatabaseProductName(),
-                                                              newMajorVersion,
-                                                              mapping.getMinorVersion());
+        DataSourceWrapper dataSource = whichHoldsMetadata(mapping.getDatabaseProductName(),
+                                                          newMajorVersion,
+                                                          mapping.getMinorVersion());
         assertThat(select(dataSource)).isNotEqualTo(mapping);
     }
 }

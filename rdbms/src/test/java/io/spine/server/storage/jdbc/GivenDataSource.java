@@ -23,7 +23,8 @@ package io.spine.server.storage.jdbc;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
-import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 import static io.spine.base.Identifier.newUuid;
 
@@ -48,15 +49,15 @@ public class GivenDataSource {
     }
 
     public static DataSourceWrapper
-    whichIsHoldingMetadata(String productName, int majorVersion, int minorVersion) {
+    whichHoldsMetadata(String productName, int majorVersion, int minorVersion) {
         DataSourceWrapper dataSource =
                 new DataSourceWithMetaData(productName, majorVersion, minorVersion);
         return dataSource;
     }
 
-    static DataSource whichIsThrowingOnClose(String dbName) {
+    public static ThrowingHikariDataSource whichIsThrowingByCommand(String dbName) {
         HikariConfig config = hikariConfig(dbName);
-        DataSource dataSource = new ThrowingDataSource(config);
+        ThrowingHikariDataSource dataSource = new ThrowingHikariDataSource(config);
         return dataSource;
     }
 
@@ -124,15 +125,37 @@ public class GivenDataSource {
         }
     }
 
-    private static class ThrowingDataSource extends HikariDataSource {
+    public static class ThrowingHikariDataSource extends HikariDataSource {
 
-        private ThrowingDataSource(HikariConfig configuration) {
+        private boolean throwOnGetConnection;
+        private boolean throwOnClose;
+
+        private ThrowingHikariDataSource(HikariConfig configuration) {
             super(configuration);
         }
 
         @Override
+        public Connection getConnection() throws SQLException {
+            if (throwOnGetConnection) {
+                throw new SQLException("Ignore this SQL exception.");
+            }
+            return super.getConnection();
+        }
+
+        @Override
         public void close() {
-            throw new IllegalStateException("Ignore this error.");
+            if (throwOnClose) {
+                throw new IllegalStateException("Ignore this error.");
+            }
+            super.close();
+        }
+
+        public void setThrowOnGetConnection(boolean throwOnGetConnection) {
+            this.throwOnGetConnection = throwOnGetConnection;
+        }
+
+        public void setThrowOnClose(boolean throwOnClose) {
+            this.throwOnClose = throwOnClose;
         }
     }
 }
