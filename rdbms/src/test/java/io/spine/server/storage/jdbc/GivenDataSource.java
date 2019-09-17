@@ -26,7 +26,6 @@ import com.zaxxer.hikari.HikariDataSource;
 import javax.sql.DataSource;
 
 import static io.spine.base.Identifier.newUuid;
-import static org.mockito.Mockito.mock;
 
 public class GivenDataSource {
 
@@ -37,11 +36,9 @@ public class GivenDataSource {
     // See the details: https://github.com/SpineEventEngine/jdbc-storage/issues/37
     private static final String HSQL_IN_MEMORY_DB_URL_PREFIX = "jdbc:h2:mem:";
 
-    private GivenDataSource() {
-    }
+    private static final String UNSUPPORTED = "Operation unsupported.";
 
-    public static DataSourceWrapper withoutSuperpowers() {
-        return mock(DataSourceWrapper.class);
+    private GivenDataSource() {
     }
 
     public static DataSourceWrapper whichIsStoredInMemory(String dbName) {
@@ -75,25 +72,11 @@ public class GivenDataSource {
         return HSQL_IN_MEMORY_DB_URL_PREFIX + dbNamePrefix + newUuid();
     }
 
-    private static class ThrowingDataSource extends HikariDataSource {
-
-        private ThrowingDataSource(HikariConfig configuration) {
-            super(configuration);
-        }
-
-        @Override
-        public void close() {
-            throw new IllegalStateException("Ignore this error.");
-        }
-    }
-
     /**
      * A test data source whose only purpose is to return a given data source
      * {@linkplain DataSourceWrapper#metaData() meta data}.
      */
     private static class DataSourceWithMetaData implements DataSourceWrapper {
-
-        private static final String UNSUPPORTED = "Operation unsupported.";
 
         private final String productName;
         private final int majorVersion;
@@ -133,6 +116,23 @@ public class GivenDataSource {
         @Override
         public void close() throws DatabaseException {
             throw new IllegalStateException(UNSUPPORTED);
+        }
+
+        @Override
+        public boolean isClosed() {
+            return false;
+        }
+    }
+
+    private static class ThrowingDataSource extends HikariDataSource {
+
+        private ThrowingDataSource(HikariConfig configuration) {
+            super(configuration);
+        }
+
+        @Override
+        public void close() {
+            throw new IllegalStateException("Ignore this error.");
         }
     }
 }

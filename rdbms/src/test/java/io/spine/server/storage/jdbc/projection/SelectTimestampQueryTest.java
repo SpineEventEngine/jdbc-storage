@@ -32,7 +32,7 @@ import java.sql.SQLException;
 import static com.google.common.truth.Truth.assertThat;
 import static io.spine.base.Identifier.newUuid;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
-import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
+import static io.spine.server.storage.jdbc.PredefinedMapping.H2_1_4;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 @DisplayName("SelectTimestampQuery should")
@@ -43,7 +43,7 @@ class SelectTimestampQueryTest {
     void returnNullForEmptyTimestamp() throws SQLException {
         DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
 
-        LastHandledEventTimeTable table = new LastHandledEventTimeTable(dataSource, MYSQL_5_7);
+        LastHandledEventTimeTable table = new LastHandledEventTimeTable(dataSource, H2_1_4);
         table.create();
         String tableName = table.name();
 

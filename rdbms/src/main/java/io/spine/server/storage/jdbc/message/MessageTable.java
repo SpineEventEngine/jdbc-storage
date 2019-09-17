@@ -20,6 +20,7 @@
 
 package io.spine.server.storage.jdbc.message;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.annotations.Immutable;
 import com.google.protobuf.Descriptors.Descriptor;
@@ -31,6 +32,7 @@ import io.spine.server.storage.jdbc.TypeMapping;
 import io.spine.server.storage.jdbc.query.AbstractTable;
 import io.spine.server.storage.jdbc.query.IdColumn;
 
+import java.sql.ResultSet;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -65,10 +67,26 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
      *
      * <p>The non-existent IDs are ignored.
      */
-    Iterator<M> readAll(Iterable<I> ids) {
+    public Iterator<M> readAll(Iterable<I> ids) {
         SelectMessagesInBulk<I, M> query = composeSelectMessagesInBulkQuery(ids);
         Iterator<M> result = query.execute();
         return result;
+    }
+
+    @VisibleForTesting
+    public ResultSet resultSet(I id) {
+        SelectSingleMessage<I, M> query = composeSelectQuery(id);
+        ResultSet resultSet = query.query()
+                                   .getResults();
+        return resultSet;
+    }
+
+    @VisibleForTesting
+    public ResultSet resultSet(Iterable<I> ids) {
+        SelectMessagesInBulk<I, M> query = composeSelectMessagesInBulkQuery(ids);
+        ResultSet resultSet = query.query()
+                                   .getResults();
+        return resultSet;
     }
 
     /**
@@ -76,7 +94,7 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
      *
      * <p>If a record with the same ID already exists, it is overwritten.
      */
-    void write(M record) {
+    public void write(M record) {
         write(idOf(record), record);
     }
 
@@ -86,7 +104,7 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
      * <p>If some of the records have IDs that already exist, the respective records in the DB are
      * overwritten.
      */
-    void writeAll(Iterable<M> records) {
+    public void writeAll(Iterable<M> records) {
         Collection<I> existingIds = existingIds(records);
 
         Map<I, M> existingRecords = stream(records)
@@ -105,7 +123,7 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
      *
      * <p>Non-existent records are ignored.
      */
-    void removeAll(Iterable<M> records) {
+    public void removeAll(Iterable<M> records) {
         List<I> ids = stream(records)
                 .map(this::idOf)
                 .collect(toList());

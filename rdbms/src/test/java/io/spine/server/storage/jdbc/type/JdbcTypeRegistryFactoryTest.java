@@ -20,13 +20,14 @@
 
 package io.spine.server.storage.jdbc.type;
 
-import io.spine.core.Version;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.storage.jdbc.type.given.JdbcTypeRegistryFactoryTestEnv.CustomType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static io.spine.server.storage.jdbc.type.given.JdbcTypeRegistryFactoryTestEnv.columnWithType;
+import static io.spine.server.storage.jdbc.type.given.JdbcTypeRegistryFactoryTestEnv.booleanColumn;
+import static io.spine.server.storage.jdbc.type.given.JdbcTypeRegistryFactoryTestEnv.stringColumn;
+import static io.spine.server.storage.jdbc.type.given.JdbcTypeRegistryFactoryTestEnv.versionColumn;
 import static io.spine.testing.DisplayNames.HAVE_PARAMETERLESS_CTOR;
 import static io.spine.testing.Tests.assertHasPrivateParameterlessCtor;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -46,8 +47,8 @@ class JdbcTypeRegistryFactoryTest {
     void provideDefaultRegistry() {
         ColumnTypeRegistry<?> registry = JdbcTypeRegistryFactory.defaultInstance();
         assertNotNull(registry);
-        assertNotNull(registry.get(columnWithType(Version.class)));
-        assertNotNull(registry.get(columnWithType(boolean.class)));
+        assertNotNull(registry.get(versionColumn()));
+        assertNotNull(registry.get(booleanColumn()));
     }
 
     @Test
@@ -58,8 +59,8 @@ class JdbcTypeRegistryFactoryTest {
                                        .put(String.class, CustomType.INSTANCE)
                                        .build();
         assertNotNull(registry);
-        assertNotNull(registry.get(columnWithType(Version.class)));
-        assertNotNull(registry.get(columnWithType(boolean.class)));
-        assertEquals(registry.get(columnWithType(String.class)), CustomType.INSTANCE);
+        assertNotNull(registry.get(versionColumn()));
+        assertNotNull(registry.get(booleanColumn()));
+        assertEquals(registry.get(stringColumn()), CustomType.INSTANCE);
     }
 }

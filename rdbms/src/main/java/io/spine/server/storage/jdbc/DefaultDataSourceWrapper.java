@@ -27,6 +27,8 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
+import static com.google.common.base.Preconditions.checkState;
+
 /**
  * A default implementation of the {@link DataSourceWrapper}.
  */
@@ -34,13 +36,15 @@ import java.sql.SQLException;
 class DefaultDataSourceWrapper implements DataSourceWrapper, Logging {
 
     private final DataSource dataSource;
+    private boolean isClosed;
 
     DefaultDataSourceWrapper(DataSource dataSource) {
         this.dataSource = dataSource;
     }
 
     @Override
-    public ConnectionWrapper getConnection(boolean autoCommit) throws DatabaseException {
+    public ConnectionWrapper getConnection(boolean autoCommit) {
+        checkNotClosed();
         try {
             Connection connection = dataSource.getConnection();
             connection.setAutoCommit(autoCommit);
@@ -53,7 +57,8 @@ class DefaultDataSourceWrapper implements DataSourceWrapper, Logging {
     }
 
     @Override
-    public DataSourceMetaData metaData() throws DatabaseException {
+    public DataSourceMetaData metaData() {
+        checkNotClosed();
         try (final ConnectionWrapper connection = getConnection(true)) {
             DatabaseMetaData metaData = connection.get()
                                                   .getMetaData();
@@ -65,15 +70,16 @@ class DefaultDataSourceWrapper implements DataSourceWrapper, Logging {
     }
 
     /**
-     * Closes wrapped {@link DataSource} implementation if it implements {@link AutoCloseable}.
+     * {@inheritDoc}
+     *
+     * <p>Closes wrapped {@link DataSource} implementation if it implements {@link AutoCloseable}.
      *
      * <p>Otherwise a warning is logged.
-     *
-     * @throws DatabaseException
-     *         if the {@link DataSource} throws an exception
      */
     @Override
-    public void close() throws DatabaseException {
+    public void close() {
+        checkNotClosed();
+        isClosed = true;
         if (dataSource instanceof AutoCloseable) {
             try {
                 ((AutoCloseable) dataSource).close();
@@ -85,5 +91,14 @@ class DefaultDataSourceWrapper implements DataSourceWrapper, Logging {
         }
         _warn().log("Close method is not implemented in %s", dataSource.getClass()
                                                                        .getCanonicalName());
+    }
+
+    @Override
+    public boolean isClosed() {
+        return isClosed;
+    }
+
+    private void checkNotClosed() {
+        checkState(!isClosed(), "The data source is closed.");
     }
 }

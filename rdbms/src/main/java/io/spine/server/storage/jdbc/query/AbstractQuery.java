@@ -275,9 +275,10 @@ public abstract class AbstractQuery implements StorageQuery {
      * <p>{@linkplain Connection#commit() Commits} a transaction, that was successfully executed
      * or {@linkplain Connection#rollback() rollbacks} it otherwise.
      */
-    private static class TransactionHandler extends SQLBaseListener {
+    @VisibleForTesting
+    static class TransactionHandler extends SQLBaseListener {
 
-        private static final SQLListener INSTANCE = new TransactionHandler();
+        static final SQLListener INSTANCE = new TransactionHandler();
 
         @Override
         public void executed(SQLListenerContext context) {

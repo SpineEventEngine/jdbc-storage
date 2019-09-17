@@ -31,9 +31,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import javax.sql.DataSource;
-
+import static com.google.common.truth.Truth.assertThat;
 import static io.spine.base.Identifier.newUuid;
+import static io.spine.server.storage.jdbc.GivenDataSource.whichIsHoldingMetadata;
+import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
+import static io.spine.server.storage.jdbc.PredefinedMapping.H2_1_4;
 import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
 import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.multitenantSpec;
 import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.newFactory;
@@ -42,8 +44,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
 @SuppressWarnings("DuplicateStringLiteralInspection") // Common test display names.
 @DisplayName("JdbcStorageFactory should")
@@ -54,8 +54,8 @@ class JdbcStorageFactoryTest {
     void allowCustomDataSource() {
         JdbcStorageFactory factory = JdbcStorageFactory
                 .newBuilder()
-                .setDataSource(mock(DataSource.class))
-                .setTypeMapping(MYSQL_5_7)
+                .setDataSource(whichIsStoredInMemory(newUuid()))
+                .setTypeMapping(H2_1_4)
                 .build();
 
         assertNotNull(factory);
@@ -141,20 +141,24 @@ class JdbcStorageFactoryTest {
     @Test
     @DisplayName("close datastore on close")
     void closeDatastoreOnClose() {
-        DataSourceWrapper mock = GivenDataSource.withoutSuperpowers();
+        DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
         JdbcStorageFactory factory = JdbcStorageFactory
                 .newBuilder()
-                .setDataSource(mock)
-                .setTypeMapping(MYSQL_5_7)
+                .setDataSource(dataSource)
+                .setTypeMapping(H2_1_4)
                 .build();
         factory.close();
-        verify(mock).close();
+        assertThat(dataSource.isClosed())
+                .isTrue();
     }
 
     @Test
-    @DisplayName("use MySQL mapping by default")
+    @DisplayName("select mapping based on the given data source")
     void useMySqlMappingByDefault() {
-        DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(newUuid());
+        DataSourceWrapper dataSource = whichIsHoldingMetadata(
+                MYSQL_5_7.getDatabaseProductName(),
+                MYSQL_5_7.getMajorVersion(),
+                MYSQL_5_7.getMinorVersion());
         JdbcStorageFactory factory = JdbcStorageFactory
                 .newBuilder()
                 .setDataSource(dataSource)

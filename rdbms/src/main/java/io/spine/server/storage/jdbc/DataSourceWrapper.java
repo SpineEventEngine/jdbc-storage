@@ -36,6 +36,8 @@ public interface DataSourceWrapper extends AutoCloseable {
      *
      * @throws DatabaseException
      *         if an error occurs during an interaction with the DB
+     * @throws IllegalStateException
+     *         if the data source is closed
      * @see Connection#setAutoCommit(boolean)
      */
     ConnectionWrapper getConnection(boolean autoCommit) throws DatabaseException;
@@ -45,16 +47,25 @@ public interface DataSourceWrapper extends AutoCloseable {
      *
      * @throws DatabaseException
      *         if an error occurs during an interaction with the DB
+     * @throws IllegalStateException
+     *         if the data source is closed
      */
     DataSourceMetaData metaData() throws DatabaseException;
 
     /**
      * Closes the wrapped {@link DataSource}.
      *
-     * <p>Overridden from {@link AutoCloseable} to narrow down the thrown exception type.
+     * <p>Overridden from {@link AutoCloseable} to get rid of thrown exception type.
+     *
+     * @throws DatabaseException
+     *         if an error occurs during an interaction with the DB
+     * @throws IllegalStateException
+     *         if the data source is closed
      */
     @Override
-    void close() throws DatabaseException;
+    void close();
+
+    boolean isClosed();
 
     /** Wraps a {@link DataSource} implementation. */
     static DataSourceWrapper wrap(DataSource dataSource) {

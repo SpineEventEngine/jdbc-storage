@@ -56,7 +56,7 @@ import static io.spine.client.Filters.gt;
 import static io.spine.client.Filters.lt;
 import static io.spine.server.storage.LifecycleFlagField.archived;
 import static io.spine.server.storage.LifecycleFlagField.deleted;
-import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
+import static io.spine.server.storage.jdbc.PredefinedMapping.H2_1_4;
 import static io.spine.server.storage.jdbc.record.given.JdbcRecordStorageTestEnv.COLUMN_NAME_FOR_STORING;
 import static io.spine.testing.Tests.nullRef;
 import static java.util.stream.Collectors.toList;
@@ -171,7 +171,7 @@ class JdbcRecordStorageTest extends RecordStorageTest<JdbcRecordStorage<ProjectI
                         .setEntityClass(entityClass)
                         .setMultitenant(false)
                         .setColumnTypeRegistry(JdbcTypeRegistryFactory.defaultInstance())
-                        .setTypeMapping(MYSQL_5_7)
+                        .setTypeMapping(H2_1_4)
                         .build();
         return storage;
     }

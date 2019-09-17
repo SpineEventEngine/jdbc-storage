@@ -20,25 +20,57 @@
 
 package io.spine.server.storage.jdbc.type.given;
 
+import io.spine.core.Version;
+import io.spine.server.entity.storage.Column;
 import io.spine.server.entity.storage.EntityColumn;
 import io.spine.server.storage.jdbc.Type;
 import io.spine.server.storage.jdbc.query.Parameters;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import java.lang.reflect.Method;
 
+@SuppressWarnings("unused") // Entity columns are used reflectively.
 public class JdbcTypeRegistryFactoryTestEnv {
 
     /** Prevents instantiation of this utility class. */
     private JdbcTypeRegistryFactoryTestEnv() {
     }
 
-    public static EntityColumn columnWithType(Class<?> cls) {
-        EntityColumn column = mock(EntityColumn.class);
-        when(column.type()).thenReturn(cls);
-        when(column.persistedType()).thenReturn(cls);
-        return column;
+    public static EntityColumn booleanColumn() {
+        return column("getBoolean");
+    }
+
+    public static EntityColumn versionColumn() {
+        return column("getVersion");
+    }
+
+    public static EntityColumn stringColumn() {
+        return column("getString");
+    }
+
+    private static EntityColumn column(String name) {
+        try {
+            Method method = JdbcTypeRegistryFactoryTestEnv.class.getDeclaredMethod(name);
+            EntityColumn column = EntityColumn.from(method);
+            return column;
+        } catch (NoSuchMethodException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    @Column
+    public boolean getBoolean() {
+        return false;
+    }
+
+    @Column
+    public Version getVersion() {
+        return Version.getDefaultInstance();
+    }
+
+    @Column
+    public String getString() {
+        return "";
     }
 
     public enum CustomType implements JdbcColumnType<String, String> {

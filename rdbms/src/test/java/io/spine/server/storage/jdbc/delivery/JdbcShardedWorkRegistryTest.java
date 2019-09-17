@@ -40,7 +40,7 @@ import java.util.Optional;
 
 import static com.google.common.truth.Truth.assertThat;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
-import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
+import static io.spine.server.storage.jdbc.PredefinedMapping.H2_1_4;
 import static io.spine.server.storage.jdbc.delivery.given.TestShardIndex.newIndex;
 import static io.spine.testing.DisplayNames.NOT_ACCEPT_NULLS;
 import static org.junit.Assert.assertFalse;
@@ -61,7 +61,7 @@ class JdbcShardedWorkRegistryTest extends ShardedWorkRegistryTest {
         registry = JdbcShardedWorkRegistry
                 .newBuilder()
                 .setDataSource(dataSource)
-                .setTypeMapping(MYSQL_5_7)
+                .setTypeMapping(H2_1_4)
                 .build();
     }
 

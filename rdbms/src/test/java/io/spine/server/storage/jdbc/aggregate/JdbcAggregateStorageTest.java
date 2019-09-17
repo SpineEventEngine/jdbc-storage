@@ -36,7 +36,7 @@ import org.junit.jupiter.api.Test;
 import java.sql.SQLException;
 
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
-import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
+import static io.spine.server.storage.jdbc.PredefinedMapping.H2_1_4;
 import static io.spine.testing.Tests.nullRef;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -116,7 +116,7 @@ class JdbcAggregateStorageTest extends AggregateStorageTest {
         JdbcAggregateStorage<I> storage = builder.setMultitenant(false)
                                                  .setDataSource(dataSource)
                                                  .setAggregateClass(aggregateClass)
-                                                 .setTypeMapping(MYSQL_5_7)
+                                                 .setTypeMapping(H2_1_4)
                                                  .build();
         return storage;
     }

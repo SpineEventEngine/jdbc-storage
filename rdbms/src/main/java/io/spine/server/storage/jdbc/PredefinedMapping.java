@@ -34,7 +34,8 @@ import static io.spine.server.storage.jdbc.TypeMappingBuilder.basicBuilder;
 public enum PredefinedMapping implements TypeMapping {
 
     MYSQL_5_7("MySQL", 5, 7, basicBuilder()),
-    POSTGRESQL_10_1("PostgreSQL", 10, 1, basicBuilder().add(BYTE_ARRAY, "BYTEA"));
+    POSTGRESQL_10_1("PostgreSQL", 10, 1, basicBuilder().add(BYTE_ARRAY, "BYTEA")),
+    H2_1_4("H2", 1, 4, basicBuilder());
 
     @SuppressWarnings("NonSerializableFieldInSerializableClass")
     private final TypeMapping typeMapping;
