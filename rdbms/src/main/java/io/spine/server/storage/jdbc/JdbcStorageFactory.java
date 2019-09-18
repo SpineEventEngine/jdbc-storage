@@ -34,6 +34,7 @@ import io.spine.server.projection.ProjectionStorage;
 import io.spine.server.storage.StorageFactory;
 import io.spine.server.storage.jdbc.aggregate.JdbcAggregateStorage;
 import io.spine.server.storage.jdbc.delivery.JdbcInboxStorage;
+import io.spine.server.storage.jdbc.delivery.JdbcSessionStorage;
 import io.spine.server.storage.jdbc.projection.JdbcProjectionStorage;
 import io.spine.server.storage.jdbc.record.JdbcRecordStorage;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
@@ -111,6 +112,17 @@ public class JdbcStorageFactory implements StorageFactory {
                 .setTypeMapping(typeMapping)
                 .build();
         return storage;
+    }
+
+    /**
+     * Creates a new storage for work session records based on JDBC.
+     */
+    public JdbcSessionStorage createSessionStorage() {
+        return JdbcSessionStorage
+                .newBuilder()
+                .setDataSource(dataSource)
+                .setTypeMapping(typeMapping)
+                .build();
     }
 
     /**

@@ -31,18 +31,21 @@ import io.spine.server.delivery.ShardSessionRecord;
 import io.spine.server.delivery.ShardedWorkRegistry;
 import io.spine.server.delivery.ShardedWorkRegistryTest;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.JdbcStorageFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.Iterator;
 import java.util.Optional;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.Truth8.assertThat;
+import static com.google.common.util.concurrent.Uninterruptibles.sleepUninterruptibly;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
 import static io.spine.server.storage.jdbc.PredefinedMapping.H2_1_4;
 import static io.spine.server.storage.jdbc.delivery.given.TestShardIndex.newIndex;
 import static io.spine.testing.DisplayNames.NOT_ACCEPT_NULLS;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -58,11 +61,12 @@ class JdbcShardedWorkRegistryTest extends ShardedWorkRegistryTest {
     @BeforeEach
     void setUp() {
         DataSourceWrapper dataSource = whichIsStoredInMemory("jdbcShardedWorkRegistryTest");
-        registry = JdbcShardedWorkRegistry
+        JdbcStorageFactory storageFactory = JdbcStorageFactory
                 .newBuilder()
                 .setDataSource(dataSource)
                 .setTypeMapping(H2_1_4)
                 .build();
+        registry = new JdbcShardedWorkRegistry(storageFactory);
     }
 
     @Override
@@ -98,7 +102,6 @@ class JdbcShardedWorkRegistryTest extends ShardedWorkRegistryTest {
     @Test
     @DisplayName("not be able to pick up the shard if it's already picked up")
     void cannotPickUpIfTaken() {
-
         Optional<ShardProcessingSession> session = registry.pickUp(index, nodeId);
         assertTrue(session.isPresent());
 
@@ -131,6 +134,11 @@ class JdbcShardedWorkRegistryTest extends ShardedWorkRegistryTest {
         ShardSessionRecord completedRecord = readSingleRecord(index);
         assertFalse(completedRecord.hasPickedBy());
 
+        // On some platforms (namely some Windows distributions), Java cannot obtain current time
+        // with enough precision to compare timestamps in this test. By waiting for 1 second, we
+        // ensure that the timestamps will not accidentally be identical.
+        sleepUninterruptibly(1, SECONDS);
+
         NodeId anotherNode = newNode();
         Optional<ShardProcessingSession> anotherOptional = registry.pickUp(index, anotherNode);
         assertTrue(anotherOptional.isPresent());
@@ -143,10 +151,10 @@ class JdbcShardedWorkRegistryTest extends ShardedWorkRegistryTest {
     }
 
     private ShardSessionRecord readSingleRecord(ShardIndex index) {
-        Iterator<ShardSessionRecord> records = registry.readByIndex(index);
-        assertTrue(records.hasNext());
+        Optional<ShardSessionRecord> record = registry.find(index);
+        assertThat(record).isPresent();
 
-        return records.next();
+        return record.get();
     }
 
     private static NodeId newNode() {

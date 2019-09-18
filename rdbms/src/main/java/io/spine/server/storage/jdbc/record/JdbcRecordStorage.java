@@ -72,11 +72,11 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
      */
     protected JdbcRecordStorage(Builder<I> builder) throws DatabaseException {
         super(builder.isMultitenant(), builder.getEntityClass());
-        this.dataSource = builder.getDataSource();
+        this.dataSource = builder.dataSource();
         Class<? extends Entity<I, ?>> entityClass = builder.getEntityClass();
         Collection<EntityColumn> entityColumns = entityColumnCache().getColumns();
         this.table = new RecordTable<>(entityClass, dataSource, builder.getColumnTypeRegistry(),
-                                       builder.getTypeMapping(), entityColumns);
+                                       builder.typeMapping(), entityColumns);
         table.create();
     }
 

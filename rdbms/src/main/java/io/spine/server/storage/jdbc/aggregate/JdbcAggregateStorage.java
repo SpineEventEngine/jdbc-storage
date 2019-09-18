@@ -82,8 +82,8 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     protected JdbcAggregateStorage(Builder<I> builder) {
         super(builder.isMultitenant());
         Class<? extends Aggregate<I, ?, ?>> aggregateClass = builder.getAggregateClass();
-        TypeMapping mapping = builder.getTypeMapping();
-        this.dataSource = builder.getDataSource();
+        TypeMapping mapping = builder.typeMapping();
+        this.dataSource = builder.dataSource();
         this.mainTable = new AggregateEventRecordTable<>(aggregateClass, dataSource, mapping);
         this.lifecycleFlagsTable = new LifecycleFlagsTable<>(aggregateClass, dataSource, mapping);
         mainTable.create();

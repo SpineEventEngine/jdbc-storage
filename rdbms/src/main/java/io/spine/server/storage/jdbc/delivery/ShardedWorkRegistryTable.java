@@ -42,9 +42,6 @@ import static io.spine.server.storage.jdbc.Type.STRING_255;
  *
  * <p>The {@link ShardIndex} message is used as an ID for records, so there can be multiple session
  * records per shard index {@linkplain ShardIndex#getIndex() itself}.
- *
- * <p>The {@link #readByIndex(ShardIndex)} method can be used to retrieve items belonging to a
- * concrete {@linkplain ShardIndex#getIndex() shard index}.
  */
 final class ShardedWorkRegistryTable extends MessageTable<ShardIndex, ShardSessionRecord> {
 
@@ -65,34 +62,12 @@ final class ShardedWorkRegistryTable extends MessageTable<ShardIndex, ShardSessi
     }
 
     /**
-     * Obtains all session records belonging to a given shard index.
-     *
-     * <p>Record filtering is based on the {@link Column#SHARD_INDEX} column which represents the
-     * shard index {@linkplain ShardIndex#getIndex() value} itself.
-     */
-    Iterator<ShardSessionRecord> readByIndex(ShardIndex index) {
-        SelectShardSessionsByShardIndex query = selectByIndex(index);
-        Iterator<ShardSessionRecord> iterator = query.execute();
-        return iterator;
-    }
-
-    /**
      * Obtains all session records.
      */
     Iterator<ShardSessionRecord> readAll() {
         SelectAllShardSessions query = selectAll();
         Iterator<ShardSessionRecord> iterator = query.execute();
         return iterator;
-    }
-
-    private SelectShardSessionsByShardIndex selectByIndex(ShardIndex index) {
-        SelectShardSessionsByShardIndex.Builder builder =
-                SelectShardSessionsByShardIndex.newBuilder();
-        SelectShardSessionsByShardIndex query = builder.setTableName(name())
-                                                       .setDataSource(dataSource())
-                                                       .setShardIndex(index)
-                                                       .build();
-        return query;
     }
 
     private SelectAllShardSessions selectAll() {

@@ -20,30 +20,20 @@
 
 package io.spine.server.storage.jdbc.delivery;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableList;
 import com.google.protobuf.Duration;
-import com.google.protobuf.Timestamp;
-import com.google.protobuf.util.Durations;
 import io.spine.logging.Logging;
 import io.spine.server.NodeId;
+import io.spine.server.delivery.AbstractWorkRegistry;
 import io.spine.server.delivery.ShardIndex;
 import io.spine.server.delivery.ShardProcessingSession;
 import io.spine.server.delivery.ShardSessionRecord;
 import io.spine.server.delivery.ShardedWorkRegistry;
-import io.spine.server.storage.jdbc.StorageBuilder;
-import io.spine.server.storage.jdbc.message.JdbcMessageStorage;
-import io.spine.string.Stringifiers;
+import io.spine.server.storage.jdbc.JdbcStorageFactory;
 
 import java.util.Iterator;
-import java.util.List;
 import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.collect.Streams.stream;
-import static com.google.protobuf.util.Timestamps.between;
-import static io.spine.base.Time.currentTime;
-import static io.spine.util.Exceptions.unsupported;
 
 /**
  * A JDBC-based implementation of the {@link ShardedWorkRegistry}.
@@ -52,131 +42,58 @@ import static io.spine.util.Exceptions.unsupported;
  * appropriate accessor methods.
  */
 public class JdbcShardedWorkRegistry
-        extends JdbcMessageStorage<ShardIndex,
-                                   ShardSessionRecord,
-                                   ShardSessionReadRequest,
-                                   ShardedWorkRegistryTable>
-        implements ShardedWorkRegistry, Logging {
+        extends AbstractWorkRegistry
+        implements Logging {
 
-    private JdbcShardedWorkRegistry(Builder builder) {
-        super(false,
-              new ShardedWorkRegistryTable(builder.getDataSource(), builder.getTypeMapping()));
+    private final JdbcSessionStorage storage;
+
+    /**
+     * Creates a new registry.
+     *
+     * @param storageFactory
+     *         the storage factory for creating a storage for this registry
+     */
+    public JdbcShardedWorkRegistry(JdbcStorageFactory storageFactory) {
+        super();
+        checkNotNull(storageFactory);
+        this.storage = storageFactory.createSessionStorage();
     }
 
     @Override
     public synchronized Optional<ShardProcessingSession> pickUp(ShardIndex index, NodeId nodeId) {
-        checkNotNull(index);
-        checkNotNull(nodeId);
-        checkNotClosed();
+        Optional<ShardProcessingSession> picked = super.pickUp(index, nodeId);
+        return picked.filter(session -> pickedBy(index, nodeId));
+    }
 
-        boolean pickedAlready = isPickedAlready(index);
-        if (pickedAlready) {
-            return Optional.empty();
-        }
-        ShardSessionRecord ssr = newRecord(index, nodeId);
-        write(ssr);
-
-        boolean writeConsistent = checkConsistency(index, ssr);
-        if (writeConsistent) {
-            ShardProcessingSession result = new JdbcShardProcessingSession(ssr, () -> clearNode(ssr));
-            return Optional.of(result);
-        } else {
-            return Optional.empty();
-        }
+    private boolean pickedBy(ShardIndex index, NodeId nodeId) {
+        Optional<ShardSessionRecord> stored = find(index);
+        return stored.map(record -> record.getPickedBy().equals(nodeId))
+                     .orElse(false);
     }
 
     @Override
-    public Iterable<ShardIndex> releaseExpiredSessions(Duration inactivityPeriod) {
-        checkNotNull(inactivityPeriod);
-
-        ImmutableList<ShardSessionRecord> allRecords =  ImmutableList.copyOf(readAll());
-        ImmutableList.Builder<ShardIndex> resultBuilder = ImmutableList.builder();
-        for (ShardSessionRecord record : allRecords) {
-            Timestamp whenPicked = record.getWhenLastPicked();
-            Duration elapsed = between(whenPicked, currentTime());
-
-            int comparison = Durations.compare(elapsed, inactivityPeriod);
-            if (comparison >= 0) {
-                clearNode(record);
-                resultBuilder.add(record.getIndex());
-            }
-        }
-        return resultBuilder.build();
+    public synchronized Iterable<ShardIndex> releaseExpiredSessions(Duration inactivityPeriod) {
+        return super.releaseExpiredSessions(inactivityPeriod);
     }
 
-    private boolean checkConsistency(ShardIndex index, ShardSessionRecord ssr) {
-        List<ShardSessionRecord> records = ImmutableList.copyOf(readByIndex(index));
-        if (records.size() > 1) {
-            _warn().log("Several `ShardSessionRecord`s found for index %s.",
-                        Stringifiers.toString(index));
-        }
-        ShardSessionRecord fromStorage = records.iterator()
-                                                .next();
-        return fromStorage.equals(ssr);
+    @Override
+    protected Iterator<ShardSessionRecord> allRecords() {
+        return storage.readAll();
     }
 
-    /**
-     * Tells if the session with the passed index is currently picked by any node.
-     */
-    private boolean isPickedAlready(ShardIndex index) {
-        Iterator<ShardSessionRecord> records = readByIndex(index);
-        long nodesWithShard = stream(records)
-                .filter(ShardSessionRecord::hasPickedBy)
-                .count();
-        return nodesWithShard > 0;
+    @Override
+    protected void write(ShardSessionRecord session) {
+        storage.write(session.getIndex(), session);
     }
 
-    /**
-     * Reads all messages belonging to a {@linkplain ShardIndex#getIndex() shard index}.
-     */
-    @VisibleForTesting
-    Iterator<ShardSessionRecord> readByIndex(ShardIndex index) {
-        return table().readByIndex(index);
+    @Override
+    protected Optional<ShardSessionRecord> find(ShardIndex index) {
+        ShardSessionReadRequest request = new ShardSessionReadRequest(index);
+        return storage.read(request);
     }
 
-    /**
-     * Reads all messages from the storage.
-     */
-    private Iterator<ShardSessionRecord> readAll() {
-        return table().readAll();
-    }
-
-
-    private static ShardSessionRecord newRecord(ShardIndex index, NodeId nodeId) {
-        return ShardSessionRecord.newBuilder()
-                                 .setIndex(index)
-                                 .setPickedBy(nodeId)
-                                 .setWhenLastPicked(currentTime())
-                                 .vBuild();
-    }
-
-    private void clearNode(ShardSessionRecord record) {
-        ShardSessionRecord updated = record.toBuilder()
-                                           .clearPickedBy()
-                                           .vBuild();
-        write(updated);
-    }
-
-    public static Builder newBuilder() {
-        return new Builder();
-    }
-
-    public static class Builder extends StorageBuilder<Builder, JdbcShardedWorkRegistry> {
-
-        @Override
-        public Builder setMultitenant(boolean multitenant) {
-            throw unsupported("`JdbcShardedWorkRegistry` is an application-wide instance " +
-                              "and therefore is always single-tenant");
-        }
-
-        @Override
-        protected Builder getThis() {
-            return this;
-        }
-
-        @Override
-        protected JdbcShardedWorkRegistry doBuild() {
-            return new JdbcShardedWorkRegistry(this);
-        }
+    @Override
+    protected ShardProcessingSession asSession(ShardSessionRecord record) {
+        return new JdbcShardProcessingSession(record, () -> clearNode(record));
     }
 }
