@@ -20,96 +20,42 @@
 
 package io.spine.server.storage.jdbc.given.table;
 
-import com.google.common.collect.ImmutableList;
-import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Timestamp;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.Type;
 import io.spine.server.storage.jdbc.TypeMapping;
-import io.spine.server.storage.jdbc.given.query.SelectMessageId;
 import io.spine.server.storage.jdbc.message.MessageTable;
 import io.spine.server.storage.jdbc.query.IdColumn;
 
-import java.sql.ResultSet;
-
-import static io.spine.server.storage.jdbc.Type.INT;
 import static io.spine.server.storage.jdbc.Type.LONG;
 
 /**
  * Holds {@link Timestamp} records by {@code Long} IDs.
  */
-public final class TimestampByLong extends MessageTable<Long, Timestamp> {
+public final class TimestampByLong extends TimestampTable<Long> {
 
     private static final String NAME = "timestamp_by_long";
 
     public TimestampByLong(DataSourceWrapper dataSource, TypeMapping typeMapping) {
-        super(NAME, IdColumn.of(Column.ID), dataSource, typeMapping);
+        super(NAME, IdColumn.of(TheIdColumn.INSTANCE), dataSource, typeMapping);
     }
 
-    @Override
-    public void write(Timestamp record) {
-        super.write(record);
-    }
-
-    /**
-     * Reads a given ID back from the database as a {@link ResultSet}.
-     *
-     * <p>Allows to obtain a {@link ResultSet} with a message ID which is sometimes necessary in
-     * tests.
-     */
-    public ResultSet resultSetWithId(Long id) {
-        SelectMessageId.Builder<Long, Timestamp> queryBuilder = SelectMessageId
-                .<Long, Timestamp>newBuilder()
-                .setDataSource(dataSource())
-                .setTableName(name())
-                .setIdColumn(idColumn())
-                .setId(id);
-        SelectMessageId<Long, Timestamp> query = queryBuilder.build();
-        ResultSet resultSet = query.getResults();
-        return resultSet;
-    }
-
-    @Override
-    public Long idOf(Timestamp record) {
-        return super.idOf(record);
-    }
-
-    @Override
-    protected Descriptor messageDescriptor() {
-        return Timestamp.getDescriptor();
-    }
-
-    @Override
-    protected Iterable<Column> messageSpecificColumns() {
-        return ImmutableList.copyOf(Column.values());
-    }
-
-    enum Column implements MessageTable.Column<Timestamp> {
-        ID(LONG, Column::idOf),
-        SECONDS(LONG, Timestamp::getSeconds),
-        NANOS(INT, Timestamp::getNanos);
-
-        private final Type type;
-        private final Getter<Timestamp> getter;
-
-        Column(Type type, Getter<Timestamp> getter) {
-            this.type = type;
-            this.getter = getter;
-        }
+    public enum TheIdColumn implements MessageTable.Column<Timestamp> {
+        INSTANCE;
 
         @Override
         public Getter<Timestamp> getter() {
-            return getter;
+            return TheIdColumn::idOf;
         }
 
         @Override
         public Type type() {
-            return type;
+            return LONG;
         }
 
         @Override
         public boolean isPrimaryKey() {
-            return this == ID;
+            return true;
         }
 
         @Override
@@ -117,9 +63,9 @@ public final class TimestampByLong extends MessageTable<Long, Timestamp> {
             return false;
         }
 
-        private static long idOf(Timestamp timestamp) {
-            long id = timestamp.getSeconds() + timestamp.getNanos();
-            return id;
+        private static Long idOf(Timestamp timestamp) {
+            long result = timestamp.getSeconds() + timestamp.getNanos();
+            return result;
         }
     }
 }

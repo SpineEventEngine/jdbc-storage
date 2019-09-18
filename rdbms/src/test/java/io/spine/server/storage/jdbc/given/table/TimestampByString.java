@@ -20,122 +20,43 @@
 
 package io.spine.server.storage.jdbc.given.table;
 
-import com.google.common.collect.ImmutableList;
-import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Timestamp;
 import com.google.protobuf.util.Timestamps;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.Type;
 import io.spine.server.storage.jdbc.TypeMapping;
-import io.spine.server.storage.jdbc.given.query.SelectMessageId;
-import io.spine.server.storage.jdbc.given.query.SelectTimestampById;
 import io.spine.server.storage.jdbc.message.MessageTable;
 import io.spine.server.storage.jdbc.query.IdColumn;
 
-import java.sql.ResultSet;
-
-import static io.spine.server.storage.jdbc.Type.INT;
-import static io.spine.server.storage.jdbc.Type.LONG;
 import static io.spine.server.storage.jdbc.Type.STRING_255;
 
 /**
  * Holds {@link Timestamp} records by {@code String} IDs.
  */
-public final class TimestampByString extends MessageTable<String, Timestamp> {
+public final class TimestampByString extends TimestampTable<String> {
 
     private static final String NAME = "timestamp_by_string";
 
     public TimestampByString(DataSourceWrapper dataSource, TypeMapping typeMapping) {
-        super(NAME, IdColumn.of(Column.ID), dataSource, typeMapping);
+        super(NAME, IdColumn.of(TheIdColumn.INSTANCE), dataSource, typeMapping);
     }
 
-    @Override
-    public void write(Timestamp record) {
-        super.write(record);
-    }
-
-    @Override
-    public ResultSet resultSet(String id) {
-        return super.resultSet(id);
-    }
-
-    @Override
-    public ResultSet resultSet(Iterable<String> ids) {
-        return super.resultSet(ids);
-    }
-
-    /**
-     * Reads a given ID back from the database as a {@link ResultSet}.
-     *
-     * <p>Allows to obtain a {@link ResultSet} with a message ID which is sometimes necessary in
-     * tests.
-     */
-    public ResultSet resultSetWithId(String id) {
-        SelectMessageId.Builder<String, Timestamp> queryBuilder = SelectMessageId
-                .<String, Timestamp>newBuilder()
-                .setDataSource(dataSource())
-                .setTableName(name())
-                .setIdColumn(idColumn())
-                .setId(id);
-        SelectMessageId<String, Timestamp> query = queryBuilder.build();
-        ResultSet resultSet = query.getResults();
-        return resultSet;
-    }
-
-    public SelectTimestampById<String> composeSelectTimestampById(String id) {
-        SelectTimestampById.Builder<String> builder = SelectTimestampById
-                .<String>newBuilder()
-                .setDataSource(dataSource())
-                .setTableName(name())
-                .setMessageColumnName(bytesColumn().name())
-                .setMessageDescriptor(Timestamp.getDescriptor())
-                .setIdColumn(idColumn())
-                .setId(id);
-        SelectTimestampById<String> query = builder.build();
-        return query;
-    }
-
-    @Override
-    public String idOf(Timestamp record) {
-        return super.idOf(record);
-    }
-
-    @Override
-    protected Descriptor messageDescriptor() {
-        return Timestamp.getDescriptor();
-    }
-
-    @Override
-    protected Iterable<Column> messageSpecificColumns() {
-        return ImmutableList.copyOf(Column.values());
-    }
-
-    enum Column implements MessageTable.Column<Timestamp> {
-        ID(STRING_255, Timestamps::toString),
-        SECONDS(LONG, Timestamp::getSeconds),
-        NANOS(INT, Timestamp::getNanos);
-
-        private final Type type;
-        private final Getter<Timestamp> getter;
-
-        Column(Type type, Getter<Timestamp> getter) {
-            this.type = type;
-            this.getter = getter;
-        }
+    public enum TheIdColumn implements MessageTable.Column<Timestamp> {
+        INSTANCE;
 
         @Override
         public Getter<Timestamp> getter() {
-            return getter;
+            return Timestamps::toString;
         }
 
         @Override
         public Type type() {
-            return type;
+            return STRING_255;
         }
 
         @Override
         public boolean isPrimaryKey() {
-            return this == ID;
+            return true;
         }
 
         @Override

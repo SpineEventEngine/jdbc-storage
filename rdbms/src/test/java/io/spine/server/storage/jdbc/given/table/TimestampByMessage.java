@@ -20,113 +20,43 @@
 
 package io.spine.server.storage.jdbc.given.table;
 
-import com.google.common.collect.ImmutableList;
-import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.StringValue;
 import com.google.protobuf.Timestamp;
 import com.google.protobuf.util.Timestamps;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.Type;
 import io.spine.server.storage.jdbc.TypeMapping;
-import io.spine.server.storage.jdbc.given.query.SelectMessageId;
 import io.spine.server.storage.jdbc.message.MessageTable;
 import io.spine.server.storage.jdbc.query.IdColumn;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import java.sql.ResultSet;
-
-import static io.spine.server.storage.jdbc.Type.INT;
-import static io.spine.server.storage.jdbc.Type.LONG;
-
 /**
  * Holds {@link Timestamp} records by {@code StringValue} IDs.
  */
-public final class TimestampByMessage extends MessageTable<StringValue, Timestamp> {
+public final class TimestampByMessage extends TimestampTable<StringValue> {
 
     private static final String NAME = "timestamp_by_message";
 
     public TimestampByMessage(DataSourceWrapper dataSource, TypeMapping typeMapping) {
-        super(NAME, IdColumn.of(Column.ID, StringValue.class), dataSource, typeMapping);
+        super(NAME, IdColumn.of(TheIdColumn.INSTANCE, StringValue.class), dataSource, typeMapping);
     }
 
-    @Override
-    public void write(Timestamp record) {
-        super.write(record);
-    }
-
-    @Override
-    public ResultSet resultSet(StringValue id) {
-        return super.resultSet(id);
-    }
-
-    @Override
-    public ResultSet resultSet(Iterable<StringValue> ids) {
-        return super.resultSet(ids);
-    }
-
-    /**
-     * Reads a given ID back from the database as a {@link ResultSet}.
-     *
-     * <p>Allows to obtain a {@link ResultSet} with a message ID which is sometimes necessary in
-     * tests.
-     */
-    public ResultSet resultSetWithId(StringValue id) {
-        SelectMessageId.Builder<StringValue, Timestamp> queryBuilder = SelectMessageId
-                .<StringValue, Timestamp>newBuilder()
-                .setDataSource(dataSource())
-                .setTableName(name())
-                .setIdColumn(idColumn())
-                .setId(id);
-        SelectMessageId<StringValue, Timestamp> query = queryBuilder.build();
-        ResultSet resultSet = query.getResults();
-        return resultSet;
-    }
-
-    @Override
-    public StringValue idOf(Timestamp record) {
-        return super.idOf(record);
-    }
-
-    @Override
-    protected Descriptor messageDescriptor() {
-        return Timestamp.getDescriptor();
-    }
-
-    @Override
-    protected Iterable<Column> messageSpecificColumns() {
-        return ImmutableList.copyOf(Column.values());
-    }
-
-    enum Column implements MessageTable.Column<Timestamp> {
-        ID(Column::idOf),
-        SECONDS(LONG, Timestamp::getSeconds),
-        NANOS(INT, Timestamp::getNanos);
-
-        private final @Nullable Type type;
-        private final Getter<Timestamp> getter;
-
-        Column(@Nullable Type type, Getter<Timestamp> getter) {
-            this.type = type;
-            this.getter = getter;
-        }
-
-        Column(Getter<Timestamp> getter) {
-            this(null, getter);
-        }
+    public enum TheIdColumn implements MessageTable.Column<Timestamp> {
+        INSTANCE;
 
         @Override
         public Getter<Timestamp> getter() {
-            return getter;
+            return TheIdColumn::idOf;
         }
 
         @Override
         public @Nullable Type type() {
-            return type;
+            return null;
         }
 
         @Override
         public boolean isPrimaryKey() {
-            return this == ID;
+            return true;
         }
 
         @Override
@@ -135,12 +65,11 @@ public final class TimestampByMessage extends MessageTable<StringValue, Timestam
         }
 
         private static StringValue idOf(Timestamp timestamp) {
-            String value = Timestamps.toString(timestamp);
-            StringValue id = StringValue
+            StringValue result = StringValue
                     .newBuilder()
-                    .setValue(value)
+                    .setValue(Timestamps.toString(timestamp))
                     .build();
-            return id;
+            return result;
         }
     }
 }
