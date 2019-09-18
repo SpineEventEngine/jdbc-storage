@@ -19,12 +19,12 @@
  */
 
 /**
- * This package contains sample SQL tables that can be filled with data and then queried.
+ * This package contains sample SQL queries for storage tables.
  */
 
 @CheckReturnValue
 @ParametersAreNonnullByDefault
-package io.spine.server.storage.jdbc.given.table;
+package io.spine.server.storage.jdbc.given.query;
 
 import com.google.errorprone.annotations.CheckReturnValue;
 

@@ -28,6 +28,7 @@ import com.google.protobuf.util.Timestamps;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.Type;
 import io.spine.server.storage.jdbc.TypeMapping;
+import io.spine.server.storage.jdbc.given.query.SelectMessageId;
 import io.spine.server.storage.jdbc.message.MessageTable;
 import io.spine.server.storage.jdbc.query.IdColumn;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -48,6 +49,21 @@ public final class TimestampByMessage extends MessageTable<StringValue, Timestam
         super(NAME, IdColumn.of(Column.ID, StringValue.class), dataSource, typeMapping);
     }
 
+    @Override
+    public void write(Timestamp record) {
+        super.write(record);
+    }
+
+    @Override
+    public ResultSet resultSet(StringValue id) {
+        return super.resultSet(id);
+    }
+
+    @Override
+    public ResultSet resultSet(Iterable<StringValue> ids) {
+        return super.resultSet(ids);
+    }
+
     /**
      * Reads a given ID back from the database as a {@link ResultSet}.
      *
@@ -62,8 +78,7 @@ public final class TimestampByMessage extends MessageTable<StringValue, Timestam
                 .setIdColumn(idColumn())
                 .setId(id);
         SelectMessageId<StringValue, Timestamp> query = queryBuilder.build();
-        ResultSet resultSet = query.query()
-                                   .getResults();
+        ResultSet resultSet = query.getResults();
         return resultSet;
     }
 

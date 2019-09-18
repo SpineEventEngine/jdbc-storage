@@ -67,22 +67,32 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
      *
      * <p>The non-existent IDs are ignored.
      */
-    public Iterator<M> readAll(Iterable<I> ids) {
+    protected Iterator<M> readAll(Iterable<I> ids) {
         SelectMessagesInBulk<I, M> query = composeSelectMessagesInBulkQuery(ids);
         Iterator<M> result = query.execute();
         return result;
     }
 
+    /**
+     * Obtains a {@link ResultSet} over a given ID query.
+     *
+     * <p>A test-only method.
+     */
     @VisibleForTesting
-    public ResultSet resultSet(I id) {
+    protected ResultSet resultSet(I id) {
         SelectSingleMessage<I, M> query = composeSelectQuery(id);
         ResultSet resultSet = query.query()
                                    .getResults();
         return resultSet;
     }
 
+    /**
+     * Obtains a {@link ResultSet} over a given ID query.
+     *
+     * <p>A test-only method.
+     */
     @VisibleForTesting
-    public ResultSet resultSet(Iterable<I> ids) {
+    protected ResultSet resultSet(Iterable<I> ids) {
         SelectMessagesInBulk<I, M> query = composeSelectMessagesInBulkQuery(ids);
         ResultSet resultSet = query.query()
                                    .getResults();
@@ -94,7 +104,7 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
      *
      * <p>If a record with the same ID already exists, it is overwritten.
      */
-    public void write(M record) {
+    protected void write(M record) {
         write(idOf(record), record);
     }
 
@@ -104,7 +114,7 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
      * <p>If some of the records have IDs that already exist, the respective records in the DB are
      * overwritten.
      */
-    public void writeAll(Iterable<M> records) {
+    protected void writeAll(Iterable<M> records) {
         Collection<I> existingIds = existingIds(records);
 
         Map<I, M> existingRecords = stream(records)
@@ -123,7 +133,7 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
      *
      * <p>Non-existent records are ignored.
      */
-    public void removeAll(Iterable<M> records) {
+    protected void removeAll(Iterable<M> records) {
         List<I> ids = stream(records)
                 .map(this::idOf)
                 .collect(toList());

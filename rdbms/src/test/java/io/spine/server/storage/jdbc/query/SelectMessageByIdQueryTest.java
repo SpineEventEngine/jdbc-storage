@@ -27,7 +27,6 @@ import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.GivenDataSource.ThrowingHikariDataSource;
 import io.spine.server.storage.jdbc.given.table.TimestampByString;
-import io.spine.server.storage.jdbc.message.SelectSingleMessage;
 import io.spine.server.storage.jdbc.query.given.Given.ASelectMessageByIdQuery;
 import io.spine.testing.logging.MuteLogging;
 import org.junit.jupiter.api.DisplayName;
@@ -46,42 +45,29 @@ import static io.spine.server.storage.jdbc.message.MessageTable.bytesColumn;
 import static io.spine.server.storage.jdbc.query.given.Given.selectMessageBuilder;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-// TODO:2019-09-17:dmytro.kuzmin:WIP: Clean up.
 @DisplayName("SelectMessageByIdQuery should")
 class SelectMessageByIdQueryTest {
 
-    private final ASelectMessageByIdQuery.Builder builder = selectMessageBuilder();
+    private final ASelectMessageByIdQuery.Builder<String> builder = selectMessageBuilder();
 
     @SuppressWarnings("CheckReturnValue") // Run method to close result set.
     @Test
     @DisplayName("close result set")
     void closeResultSet() throws SQLException {
         DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
-        TimestampByString table = new TimestampByString(dataSource, H2_1_4);
-        table.create();
-        Timestamp timestamp = Timestamp
-                .newBuilder()
-                .setSeconds(42)
-                .setNanos(15)
-                .build();
+        TimestampByString table = table(dataSource);
+        Timestamp timestamp = timestamp();
         table.write(timestamp);
 
         String id = table.idOf(timestamp);
+        AbstractSQLQuery<Object, ?> underlyingQuery = table.composeSelectTimestampById(id)
+                                                           .query();
+        ASelectMessageByIdQuery query = query(dataSource, table, underlyingQuery);
 
-        SelectSingleMessage<String, Timestamp> selectMessageId = table.composeSelectQuery(id);
-
-        AbstractSQLQuery<Object, ?> underlyingQuery = selectMessageId.query();
-        ASelectMessageByIdQuery query = builder.setTableName(table.name())
-                                               .setQuery(underlyingQuery)
-                                               .setDataSource(dataSource)
-                                               .setId(newUuid())
-                                               .setIdColumn(stringIdColumn())
-                                               .setMessageColumnName(bytesColumn().name())
-                                               .setMessageDescriptor(Timestamp.getDescriptor())
-                                               .build();
         ResultSet results = underlyingQuery.getResults();
         query.execute();
-        assertThat(results.isClosed()).isTrue();
+        assertThat(results.isClosed())
+                .isTrue();
     }
 
     @Test
@@ -90,31 +76,16 @@ class SelectMessageByIdQueryTest {
     void handleSqlException() {
         ThrowingHikariDataSource underlyingDataSource = whichIsThrowingByCommand(newUuid());
         DataSourceWrapper dataSource = DataSourceWrapper.wrap(underlyingDataSource);
-        TimestampByString table = new TimestampByString(dataSource, H2_1_4);
-        table.create();
-        Timestamp timestamp = Timestamp
-                .newBuilder()
-                .setSeconds(42)
-                .setNanos(15)
-                .build();
+        TimestampByString table = table(dataSource);
+        Timestamp timestamp = timestamp();
         table.write(timestamp);
 
         String id = table.idOf(timestamp);
-
-        SelectSingleMessage<String, Timestamp> selectMessageId = table.composeSelectQuery(id);
-
-        AbstractSQLQuery<Object, ?> underlyingQuery = selectMessageId.query();
-        ASelectMessageByIdQuery query = builder.setTableName(table.name())
-                                               .setQuery(underlyingQuery)
-                                               .setDataSource(dataSource)
-                                               .setId(newUuid())
-                                               .setIdColumn(stringIdColumn())
-                                               .setMessageColumnName(bytesColumn().name())
-                                               .setMessageDescriptor(Timestamp.getDescriptor())
-                                               .build();
+        AbstractSQLQuery<Object, ?> underlyingQuery = table.composeSelectTimestampById(id)
+                                                           .query();
+        ASelectMessageByIdQuery query = query(dataSource, table, underlyingQuery);
 
         underlyingDataSource.setThrowOnGetConnection(true);
-
         assertThrows(DatabaseException.class, query::execute);
     }
 
@@ -122,24 +93,46 @@ class SelectMessageByIdQueryTest {
     @DisplayName("return `null` on deserialization if value is not present")
     void returnNullForValueNotPresent() {
         DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
-        TimestampByString table = new TimestampByString(dataSource, H2_1_4);
-        table.create();
+        TimestampByString table = table(dataSource);
         Timestamp timestamp = Timestamp.getDefaultInstance();
 
         String id = table.idOf(timestamp);
+        AbstractSQLQuery<Object, ?> underlyingQuery = table.composeSelectTimestampById(id)
+                                                           .query();
+        ASelectMessageByIdQuery query = query(dataSource, table, underlyingQuery);
 
-        SelectSingleMessage<String, Timestamp> selectMessageId = table.composeSelectQuery(id);
-
-        AbstractSQLQuery<Object, ?> underlyingQuery = selectMessageId.query();
-        ASelectMessageByIdQuery query = builder.setTableName(table.name())
-                                               .setQuery(underlyingQuery)
-                                               .setDataSource(dataSource)
-                                               .setId(newUuid())
-                                               .setIdColumn(stringIdColumn())
-                                               .setMessageColumnName(bytesColumn().name())
-                                               .setMessageDescriptor(Timestamp.getDescriptor())
-                                               .build();
         Message message = query.execute();
-        assertThat(message).isNull();
+        assertThat(message)
+                .isNull();
+    }
+
+    private ASelectMessageByIdQuery query(DataSourceWrapper dataSource,
+                                          TimestampByString table,
+                                          AbstractSQLQuery<Object, ?> underlyingQuery) {
+        ASelectMessageByIdQuery<String> query =
+                builder.setTableName(table.name())
+                       .setQuery(underlyingQuery)
+                       .setDataSource(dataSource)
+                       .setId(newUuid())
+                       .setIdColumn(stringIdColumn())
+                       .setMessageColumnName(bytesColumn().name())
+                       .setMessageDescriptor(Timestamp.getDescriptor())
+                       .build();
+        return query;
+    }
+
+    private static TimestampByString table(DataSourceWrapper dataSource) {
+        TimestampByString table = new TimestampByString(dataSource, H2_1_4);
+        table.create();
+        return table;
+    }
+
+    private static Timestamp timestamp() {
+        Timestamp timestamp = Timestamp
+                .newBuilder()
+                .setSeconds(42)
+                .setNanos(15)
+                .build();
+        return timestamp;
     }
 }

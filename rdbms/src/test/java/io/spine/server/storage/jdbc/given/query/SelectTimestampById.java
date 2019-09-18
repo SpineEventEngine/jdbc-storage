@@ -18,51 +18,53 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.message;
+package io.spine.server.storage.jdbc.given.query;
 
-import com.google.protobuf.Message;
+import com.google.protobuf.Timestamp;
 import com.querydsl.sql.AbstractSQLQuery;
 import io.spine.server.storage.jdbc.query.SelectMessageByIdQuery;
 
 import static io.spine.server.storage.jdbc.message.MessageTable.bytesColumn;
 
 /**
- * Selects a single message from the {@link MessageTable} by its ID.
+ * Selects a {@link Timestamp} by ID from the
+ * {@linkplain io.spine.server.storage.jdbc.message.MessageTable message table}.
  *
  * @param <I>
- *         the ID type
- * @param <M>
- *         the message type
+ *         the type of IDs
  */
-final class SelectSingleMessage<I, M extends Message> extends SelectMessageByIdQuery<I, M> {
+public class SelectTimestampById<I> extends SelectMessageByIdQuery<I, Timestamp> {
 
-    private SelectSingleMessage(Builder<I, M> builder) {
+    private SelectTimestampById(Builder<I> builder) {
         super(builder);
     }
 
     @Override
-    protected AbstractSQLQuery<Object, ?> query() {
+    public AbstractSQLQuery<Object, ?> query() {
         return factory().select(pathOf(bytesColumn()))
                         .from(table())
                         .where(idEquals());
     }
 
-    static <I, M extends Message> Builder<I, M> newBuilder() {
+    public static <I> Builder<I> newBuilder() {
         return new Builder<>();
     }
 
-    static class Builder<I, M extends Message>
-            extends SelectMessageByIdQuery.Builder<Builder<I, M>, SelectSingleMessage<I, M>, I, M> {
+    public static class Builder<I>
+            extends SelectMessageByIdQuery.Builder<Builder<I>,
+                                                   SelectTimestampById<I>,
+                                                   I,
+                                                   Timestamp> {
 
         @Override
-        protected Builder<I, M> getThis() {
+        protected Builder<I> getThis() {
             return this;
         }
 
         @Override
-        protected SelectSingleMessage<I, M> doBuild() {
+        protected SelectTimestampById<I> doBuild() {
             setMessageColumnName(bytesColumn().name());
-            return new SelectSingleMessage<>(this);
+            return new SelectTimestampById<>(this);
         }
     }
 }

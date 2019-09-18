@@ -29,9 +29,8 @@ import java.sql.SQLException;
 /**
  * The wrapper for {@link Connection} instances.
  */
-// TODO:2019-09-17:dmytro.kuzmin:WIP: Make `final` when all mocks are gone.
 @Internal
-public class ConnectionWrapper implements AutoCloseable {
+public final class ConnectionWrapper implements AutoCloseable {
 
     private final Connection connection;
 

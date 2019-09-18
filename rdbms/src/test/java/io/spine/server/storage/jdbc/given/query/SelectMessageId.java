@@ -18,12 +18,14 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.given.table;
+package io.spine.server.storage.jdbc.given.query;
 
 import com.google.protobuf.Message;
 import com.querydsl.sql.AbstractSQLQuery;
 import io.spine.server.storage.jdbc.message.MessageTable;
 import io.spine.server.storage.jdbc.query.IdAwareQuery;
+
+import java.sql.ResultSet;
 
 /**
  * A test query for selecting a {@code Message} ID from the {@link MessageTable}.
@@ -31,28 +33,35 @@ import io.spine.server.storage.jdbc.query.IdAwareQuery;
  * <p>Although selecting a message ID by ID is hardly a viable case in real life, it's sometimes
  * necessary in tests.
  *
+ * <p>The query result is returned as a {@link ResultSet}.
+ *
  * @param <I>
  *         the ID type
  * @param <M>
  *         the message type
  */
-final class SelectMessageId<I, M extends Message> extends IdAwareQuery<I> {
+public final class SelectMessageId<I, M extends Message> extends IdAwareQuery<I> {
 
     private SelectMessageId(Builder<I, M> builder) {
         super(builder);
     }
 
-    AbstractSQLQuery<Object, ?> query() {
+    public ResultSet getResults() {
+        ResultSet results = query().getResults();
+        return results;
+    }
+
+    private AbstractSQLQuery<Object, ?> query() {
         return factory().select(pathOf(idColumn().column()))
                         .from(table())
                         .where(idEquals());
     }
 
-    static <I, M extends Message> Builder<I, M> newBuilder() {
+    public static <I, M extends Message> Builder<I, M> newBuilder() {
         return new Builder<>();
     }
 
-    static class Builder<I, M extends Message>
+    public static class Builder<I, M extends Message>
             extends IdAwareQuery.Builder<I, Builder<I, M>, SelectMessageId<I, M>> {
 
         @Override

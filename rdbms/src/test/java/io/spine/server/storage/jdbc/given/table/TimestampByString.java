@@ -27,8 +27,9 @@ import com.google.protobuf.util.Timestamps;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.Type;
 import io.spine.server.storage.jdbc.TypeMapping;
+import io.spine.server.storage.jdbc.given.query.SelectMessageId;
+import io.spine.server.storage.jdbc.given.query.SelectTimestampById;
 import io.spine.server.storage.jdbc.message.MessageTable;
-import io.spine.server.storage.jdbc.message.SelectSingleMessage;
 import io.spine.server.storage.jdbc.query.IdColumn;
 
 import java.sql.ResultSet;
@@ -48,6 +49,21 @@ public final class TimestampByString extends MessageTable<String, Timestamp> {
         super(NAME, IdColumn.of(Column.ID), dataSource, typeMapping);
     }
 
+    @Override
+    public void write(Timestamp record) {
+        super.write(record);
+    }
+
+    @Override
+    public ResultSet resultSet(String id) {
+        return super.resultSet(id);
+    }
+
+    @Override
+    public ResultSet resultSet(Iterable<String> ids) {
+        return super.resultSet(ids);
+    }
+
     /**
      * Reads a given ID back from the database as a {@link ResultSet}.
      *
@@ -62,14 +78,21 @@ public final class TimestampByString extends MessageTable<String, Timestamp> {
                 .setIdColumn(idColumn())
                 .setId(id);
         SelectMessageId<String, Timestamp> query = queryBuilder.build();
-        ResultSet resultSet = query.query()
-                                   .getResults();
+        ResultSet resultSet = query.getResults();
         return resultSet;
     }
 
-    @Override
-    public SelectSingleMessage<String, Timestamp> composeSelectQuery(String id) {
-        return super.composeSelectQuery(id);
+    public SelectTimestampById<String> composeSelectTimestampById(String id) {
+        SelectTimestampById.Builder<String> builder = SelectTimestampById
+                .<String>newBuilder()
+                .setDataSource(dataSource())
+                .setTableName(name())
+                .setMessageColumnName(bytesColumn().name())
+                .setMessageDescriptor(Timestamp.getDescriptor())
+                .setIdColumn(idColumn())
+                .setId(id);
+        SelectTimestampById<String> query = builder.build();
+        return query;
     }
 
     @Override

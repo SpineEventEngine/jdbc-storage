@@ -34,8 +34,8 @@ public class Given {
     /**
      * Returns the new builder for the test {@link SelectMessageByIdQuery} implementation.
      */
-    public static ASelectMessageByIdQuery.Builder selectMessageBuilder() {
-        return new ASelectMessageByIdQuery.Builder();
+    public static <I> ASelectMessageByIdQuery.Builder<I> selectMessageBuilder() {
+        return new ASelectMessageByIdQuery.Builder<>();
     }
 
     /**
@@ -45,11 +45,11 @@ public class Given {
         return new AStorageQuery.Builder();
     }
 
-    public static class ASelectMessageByIdQuery extends SelectMessageByIdQuery<String, Message> {
+    public static class ASelectMessageByIdQuery<I> extends SelectMessageByIdQuery<I, Message> {
 
         private final AbstractSQLQuery<?, ?> query;
 
-        private ASelectMessageByIdQuery(Builder builder) {
+        private ASelectMessageByIdQuery(Builder<I> builder) {
             super(builder);
             this.query = builder.query;
         }
@@ -59,25 +59,26 @@ public class Given {
             return query;
         }
 
-        public static class Builder extends SelectMessageByIdQuery.Builder<Builder,
-                                                                           ASelectMessageByIdQuery,
-                                                                           String,
-                                                                           Message> {
+        public static class Builder<I>
+                extends SelectMessageByIdQuery.Builder<Builder<I>,
+                                                       ASelectMessageByIdQuery<I>,
+                                                       I,
+                                                       Message> {
 
             private AbstractSQLQuery<?, ?> query;
 
-            public Builder setQuery(AbstractSQLQuery<?, ?> query) {
+            public Builder<I> setQuery(AbstractSQLQuery<?, ?> query) {
                 this.query = query;
                 return this;
             }
 
             @Override
-            protected ASelectMessageByIdQuery doBuild() {
-                return new ASelectMessageByIdQuery(this);
+            protected ASelectMessageByIdQuery<I> doBuild() {
+                return new ASelectMessageByIdQuery<>(this);
             }
 
             @Override
-            protected Builder getThis() {
+            protected Builder<I> getThis() {
                 return this;
             }
         }

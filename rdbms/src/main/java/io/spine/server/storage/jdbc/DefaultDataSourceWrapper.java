@@ -32,8 +32,7 @@ import static com.google.common.base.Preconditions.checkState;
 /**
  * A default implementation of the {@link DataSourceWrapper}.
  */
-// TODO:2019-09-17:dmytro.kuzmin:WIP: Make `final` when all mocks are gone.
-class DefaultDataSourceWrapper implements DataSourceWrapper, Logging {
+final class DefaultDataSourceWrapper implements DataSourceWrapper, Logging {
 
     private final DataSource dataSource;
     private boolean isClosed;

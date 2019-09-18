@@ -43,7 +43,7 @@ public interface DataSourceWrapper extends AutoCloseable {
     ConnectionWrapper getConnection(boolean autoCommit) throws DatabaseException;
 
     /**
-     * Obtains the meta data like product name and version of the wrapped {@link DataSource}.
+     * Obtains the meta data of the wrapped {@link DataSource}.
      *
      * @throws DatabaseException
      *         if an error occurs during an interaction with the DB
