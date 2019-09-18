@@ -90,11 +90,7 @@ subprojects {
         implementation deps.build.errorProneAnnotations
         implementation deps.build.slf4j
 
-        testImplementation deps.test.junit5Api
         testImplementation deps.test.junit5Runner
-        testImplementation deps.test.hamcrest
-        testImplementation deps.test.mockito
-        testImplementation deps.test.guavaTestlib
     }
 
     test {

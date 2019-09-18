@@ -38,6 +38,5 @@ dependencies {
         exclude group: 'com.google.guava'
     }
 
-    testImplementation deps.test.mockito
     testImplementation deps.grpc.grpcStub
 }
