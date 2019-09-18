@@ -18,10 +18,14 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-final def SPINE_VERSION = '1.1.1-SNAPSHOT+1'
+/**
+ * This package contains sample SQL tables that can be filled with data and then queried.
+ */
 
-ext {
-    versionToPublish = SPINE_VERSION
-    spineBaseVersion = '1.1.0'
-    spineCoreVersion = SPINE_VERSION
-}
+@CheckReturnValue
+@ParametersAreNonnullByDefault
+package io.spine.server.storage.jdbc.given.table;
+
+import com.google.errorprone.annotations.CheckReturnValue;
+
+import javax.annotation.ParametersAreNonnullByDefault;

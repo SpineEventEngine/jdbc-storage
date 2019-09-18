@@ -65,7 +65,7 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
      *
      * <p>The non-existent IDs are ignored.
      */
-    Iterator<M> readAll(Iterable<I> ids) {
+    protected Iterator<M> readAll(Iterable<I> ids) {
         SelectMessagesInBulk<I, M> query = composeSelectMessagesInBulkQuery(ids);
         Iterator<M> result = query.execute();
         return result;
@@ -76,7 +76,7 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
      *
      * <p>If a record with the same ID already exists, it is overwritten.
      */
-    void write(M record) {
+    protected void write(M record) {
         write(idOf(record), record);
     }
 
@@ -86,7 +86,7 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
      * <p>If some of the records have IDs that already exist, the respective records in the DB are
      * overwritten.
      */
-    void writeAll(Iterable<M> records) {
+    protected void writeAll(Iterable<M> records) {
         Collection<I> existingIds = existingIds(records);
 
         Map<I, M> existingRecords = stream(records)
@@ -105,7 +105,7 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
      *
      * <p>Non-existent records are ignored.
      */
-    void removeAll(Iterable<M> records) {
+    protected void removeAll(Iterable<M> records) {
         List<I> ids = stream(records)
                 .map(this::idOf)
                 .collect(toList());
@@ -140,7 +140,7 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
     protected abstract Descriptor messageDescriptor();
 
     @SuppressWarnings("unchecked") // Ensured by descendant classes declaration.
-    private I idOf(M record) {
+    protected I idOf(M record) {
         Column<M> column = (Column<M>) idColumn().column();
         I id = (I) column.getter()
                          .apply(record);

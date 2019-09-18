@@ -20,90 +20,119 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import com.google.protobuf.Descriptors;
 import com.google.protobuf.Message;
-import com.google.protobuf.StringValue;
-import com.querydsl.sql.SQLQuery;
+import com.google.protobuf.Timestamp;
+import com.querydsl.sql.AbstractSQLQuery;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
+import io.spine.server.storage.jdbc.GivenDataSource.ThrowingHikariDataSource;
+import io.spine.server.storage.jdbc.given.table.TimestampByString;
 import io.spine.server.storage.jdbc.query.given.Given.ASelectMessageByIdQuery;
+import io.spine.testing.logging.MuteLogging;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import static com.google.common.truth.Truth.assertThat;
 import static io.spine.base.Identifier.newUuid;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
+import static io.spine.server.storage.jdbc.GivenDataSource.whichIsThrowingByCommand;
+import static io.spine.server.storage.jdbc.PredefinedMapping.H2_1_4;
 import static io.spine.server.storage.jdbc.given.Column.stringIdColumn;
+import static io.spine.server.storage.jdbc.message.MessageTable.bytesColumn;
 import static io.spine.server.storage.jdbc.query.given.Given.selectMessageBuilder;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
 @DisplayName("SelectMessageByIdQuery should")
 class SelectMessageByIdQueryTest {
 
-    private final ASelectMessageByIdQuery.Builder builder = selectMessageBuilder();
+    private final ASelectMessageByIdQuery.Builder<String> builder = selectMessageBuilder();
 
     @SuppressWarnings("CheckReturnValue") // Run method to close result set.
     @Test
     @DisplayName("close result set")
     void closeResultSet() throws SQLException {
-        SQLQuery underlyingQuery = mock(SQLQuery.class);
-        ResultSet resultSet = mock(ResultSet.class);
-
-        doReturn(resultSet).when(underlyingQuery)
-                           .getResults();
         DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
-        ASelectMessageByIdQuery query = builder.setTableName(newUuid())
-                                               .setQuery(underlyingQuery)
-                                               .setDataSource(dataSource)
-                                               .setId(newUuid())
-                                               .setIdColumn(stringIdColumn())
-                                               .build();
+        TimestampByString table = table(dataSource);
+        Timestamp timestamp = timestamp();
+        table.write(timestamp);
+
+        String id = table.idOf(timestamp);
+        AbstractSQLQuery<Object, ?> underlyingQuery = table.composeSelectTimestampById(id)
+                                                           .query();
+        ASelectMessageByIdQuery query = query(dataSource, table, underlyingQuery);
+
+        ResultSet results = underlyingQuery.getResults();
         query.execute();
-        verify(resultSet).close();
+        assertThat(results.isClosed())
+                .isTrue();
     }
 
     @Test
+    @MuteLogging
     @DisplayName("handle SQL exception")
-    void handleSqlException() throws SQLException {
-        SQLQuery underlyingQuery = mock(SQLQuery.class);
-        ResultSet resultSet = mock(ResultSet.class);
+    void handleSqlException() {
+        ThrowingHikariDataSource underlyingDataSource = whichIsThrowingByCommand(newUuid());
+        DataSourceWrapper dataSource = DataSourceWrapper.wrap(underlyingDataSource);
+        TimestampByString table = table(dataSource);
+        Timestamp timestamp = timestamp();
+        table.write(timestamp);
 
-        doReturn(resultSet).when(underlyingQuery)
-                           .getResults();
-        doThrow(SQLException.class).when(resultSet)
-                                   .next();
-        DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
-        ASelectMessageByIdQuery query = builder.setTableName(newUuid())
-                                               .setQuery(underlyingQuery)
-                                               .setDataSource(dataSource)
-                                               .setId(newUuid())
-                                               .setIdColumn(stringIdColumn())
-                                               .build();
+        String id = table.idOf(timestamp);
+        AbstractSQLQuery<Object, ?> underlyingQuery = table.composeSelectTimestampById(id)
+                                                           .query();
+        ASelectMessageByIdQuery query = query(dataSource, table, underlyingQuery);
 
+        underlyingDataSource.setThrowOnGetConnection(true);
         assertThrows(DatabaseException.class, query::execute);
     }
 
     @Test
-    @DisplayName("return `null` on deserialization if column is `null`")
-    void returnNullForNullColumn() throws SQLException {
-        ResultSet resultSet = mock(ResultSet.class);
+    @DisplayName("return `null` on deserialization if value is not present")
+    void returnNullForValueNotPresent() {
         DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
-        Descriptors.Descriptor messageDescriptor = StringValue.getDescriptor();
-        ASelectMessageByIdQuery query = builder.setTableName(newUuid())
-                                               .setMessageColumnName(newUuid())
-                                               .setMessageDescriptor(messageDescriptor)
-                                               .setDataSource(dataSource)
-                                               .setId(newUuid())
-                                               .setIdColumn(stringIdColumn())
-                                               .build();
-        Message deserialized = query.readMessage(resultSet);
-        assertNull(deserialized);
+        TimestampByString table = table(dataSource);
+        Timestamp timestamp = Timestamp.getDefaultInstance();
+
+        String id = table.idOf(timestamp);
+        AbstractSQLQuery<Object, ?> underlyingQuery = table.composeSelectTimestampById(id)
+                                                           .query();
+        ASelectMessageByIdQuery query = query(dataSource, table, underlyingQuery);
+
+        Message message = query.execute();
+        assertThat(message)
+                .isNull();
+    }
+
+    private ASelectMessageByIdQuery query(DataSourceWrapper dataSource,
+                                          TimestampByString table,
+                                          AbstractSQLQuery<Object, ?> underlyingQuery) {
+        ASelectMessageByIdQuery<String> query =
+                builder.setTableName(table.name())
+                       .setQuery(underlyingQuery)
+                       .setDataSource(dataSource)
+                       .setId(newUuid())
+                       .setIdColumn(stringIdColumn())
+                       .setMessageColumnName(bytesColumn().name())
+                       .setMessageDescriptor(Timestamp.getDescriptor())
+                       .build();
+        return query;
+    }
+
+    private static TimestampByString table(DataSourceWrapper dataSource) {
+        TimestampByString table = new TimestampByString(dataSource, H2_1_4);
+        table.create();
+        return table;
+    }
+
+    private static Timestamp timestamp() {
+        Timestamp timestamp = Timestamp
+                .newBuilder()
+                .setSeconds(42)
+                .setNanos(15)
+                .build();
+        return timestamp;
     }
 }

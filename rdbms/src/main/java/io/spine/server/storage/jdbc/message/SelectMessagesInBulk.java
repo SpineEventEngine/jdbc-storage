@@ -69,7 +69,7 @@ final class SelectMessagesInBulk<I, M extends Message>
         return iterator;
     }
 
-    private AbstractSQLQuery<Object, ?> query() {
+    AbstractSQLQuery<Object, ?> query() {
         List<Object> normalizedIds = ids
                 .stream()
                 .map(idColumn::normalize)

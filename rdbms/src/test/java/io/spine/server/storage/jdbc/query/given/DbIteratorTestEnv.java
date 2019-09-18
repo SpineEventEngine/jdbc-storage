@@ -20,97 +20,93 @@
 
 package io.spine.server.storage.jdbc.query.given;
 
+import com.google.protobuf.Timestamp;
+import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.given.table.TimestampByString;
 import io.spine.server.storage.jdbc.query.ColumnReader;
 import io.spine.server.storage.jdbc.query.DbIterator;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static io.spine.base.Identifier.newUuid;
+import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
+import static io.spine.server.storage.jdbc.PredefinedMapping.H2_1_4;
 
 public class DbIteratorTestEnv {
-
-    private static final byte[] EMPTY_BYTES = new byte[0];
 
     /** Prevents instantiation of this utility class. */
     private DbIteratorTestEnv() {
     }
 
     public static DbIterator emptyIterator() {
-        ResultSet resultSet = baseResultSetMock();
-        try {
-            when(resultSet.next()).thenReturn(false);
-        } catch (SQLException e) {
-            fail(e.getMessage());
-        }
-
+        ResultSet resultSet = emptyResultSet();
         DbIterator iterator = anIterator(resultSet);
         return iterator;
     }
 
-    public static DbIterator faultyResultIterator() {
-        ResultSet resultSet = baseResultSetMock();
-        try {
-            Exception failure = new SQLException("Faulty Result in action");
-            when(resultSet.next()).thenThrow(failure);
-            doThrow(failure).when(resultSet)
-                            .close();
-        } catch (SQLException e) {
-            fail(e.getMessage());
-        }
-
+    /**
+     * An iterator which produces failure on every operation except {@link DbIterator#close()}, as
+     * it's using a closed {@link ResultSet}.
+     */
+    public static DbIterator faultyResultIterator() throws SQLException {
+        ResultSet resultSet = closedResultSet();
         DbIterator iterator = anIterator(resultSet);
         return iterator;
     }
 
     public static DbIterator sneakyResultIterator() {
-        ResultSet resultSet = baseResultSetMock();
+        ResultSet resultSet = resultSetWithSingleResult();
         DbIterator iterator = throwingIterator(resultSet);
-        try {
-            when(resultSet.next()).thenReturn(true);
-        } catch (SQLException e) {
-            fail(e.getMessage());
-        }
         return iterator;
     }
 
     public static DbIterator nonEmptyIterator() {
-        ResultSet resultSet = baseResultSetMock();
-        try {
-            when(resultSet.next()).thenReturn(true);
-            when(resultSet.getBytes(any(String.class))).thenReturn(EMPTY_BYTES);
-        } catch (SQLException e) {
-            fail(e.getMessage());
-        }
-
+        ResultSet resultSet = resultSetWithSingleResult();
         DbIterator iterator = anIterator(resultSet);
         return iterator;
     }
 
-    private static ResultSet baseResultSetMock() {
-        ResultSet resultSet = mock(ResultSet.class);
-        PreparedStatement statement = mock(PreparedStatement.class);
-        Connection connection = mock(Connection.class);
-        try {
-            when(statement.executeQuery()).thenReturn(resultSet);
-            when(resultSet.getStatement()).thenReturn(statement);
-            when(statement.getConnection()).thenReturn(connection);
-        } catch (SQLException e) {
-            fail(e.getMessage());
-        }
+    private static ResultSet emptyResultSet() {
+        DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
+        TimestampByString table = new TimestampByString(dataSource, H2_1_4);
+        table.create();
+
+        ResultSet resultSet = table.resultSet(newUuid());
+        return resultSet;
+    }
+
+    private static ResultSet closedResultSet() throws SQLException {
+        DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
+        TimestampByString table = new TimestampByString(dataSource, H2_1_4);
+        table.create();
+
+        ResultSet resultSet = table.resultSet(newUuid());
+        resultSet.close();
+        return resultSet;
+    }
+
+    private static ResultSet resultSetWithSingleResult() {
+        DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
+        TimestampByString table = new TimestampByString(dataSource, H2_1_4);
+        table.create();
+
+        Timestamp timestamp = Timestamp
+                .newBuilder()
+                .setSeconds(142)
+                .setNanos(15)
+                .build();
+        table.write(timestamp);
+
+        String id = table.idOf(timestamp);
+        ResultSet resultSet = table.resultSet(id);
         return resultSet;
     }
 
     private static DbIterator anIterator(ResultSet resultSet) {
         ColumnReader<ResultSet> identityReader = new ColumnReader<ResultSet>("") {
             @Override
-            public ResultSet readValue(ResultSet resultSet) throws SQLException {
+            public ResultSet readValue(ResultSet resultSet) {
                 return resultSet;
             }
         };

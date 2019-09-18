@@ -18,9 +18,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.type.given;
+package io.spine.server.storage.jdbc.query.given;
 
-import io.spine.core.Version;
 import io.spine.server.entity.storage.Column;
 import io.spine.server.entity.storage.EntityColumn;
 import io.spine.server.storage.jdbc.Type;
@@ -29,28 +28,19 @@ import io.spine.server.storage.jdbc.type.JdbcColumnType;
 
 import java.lang.reflect.Method;
 
-@SuppressWarnings("unused") // Entity columns are used reflectively.
-public class JdbcTypeRegistryFactoryTestEnv {
+public final class QueryPredicatesTestEnv {
 
-    /** Prevents instantiation of this utility class. */
-    private JdbcTypeRegistryFactoryTestEnv() {
+    /** Prevents instantiation of this test env class. */
+    private QueryPredicatesTestEnv() {
     }
 
-    public static EntityColumn booleanColumn() {
-        return column("getBoolean");
-    }
-
-    public static EntityColumn versionColumn() {
-        return column("getVersion");
+    public static NonComparableType nonComparableType() {
+        return new NonComparableType();
     }
 
     public static EntityColumn stringColumn() {
-        return column("getString");
-    }
-
-    private static EntityColumn column(String name) {
         try {
-            Method method = JdbcTypeRegistryFactoryTestEnv.class.getDeclaredMethod(name);
+            Method method = QueryPredicatesTestEnv.class.getDeclaredMethod("getString");
             EntityColumn column = EntityColumn.from(method);
             return column;
         } catch (NoSuchMethodException e) {
@@ -59,43 +49,38 @@ public class JdbcTypeRegistryFactoryTestEnv {
     }
 
     @Column
-    public boolean getBoolean() {
-        return false;
-    }
-
-    @Column
-    public Version getVersion() {
-        return Version.getDefaultInstance();
-    }
-
-    @Column
     public String getString() {
         return "";
     }
 
-    public enum CustomType implements JdbcColumnType<String, String> {
-
-        INSTANCE;
+    /**
+     * Returns a non-comparable object on attempt to convert an entity column value.
+     *
+     * <p>An entity column with such type should not be accepted during the column filter creation.
+     */
+    private static class NonComparableType implements JdbcColumnType<String, Object> {
 
         @Override
-        public Type getType() {
-            return Type.STRING_255;
+        public Object convertColumnValue(String fieldValue) {
+            return new Object();
         }
 
         @Override
-        public String convertColumnValue(String fieldValue) {
-            return fieldValue;
-        }
-
-        @Override
-        public void setColumnValue(Parameters.Builder storageRecord, String value,
+        public void setColumnValue(Parameters.Builder storageRecord,
+                                   Object value,
                                    String columnIdentifier) {
-            // NoOp (as for tests)
+            // NO-OP. This method is not interesting for the test.
         }
 
         @Override
         public void setNull(Parameters.Builder storageRecord, String columnIdentifier) {
-            // NoOp (as for tests)
+            // NO-OP. This method is not interesting for the test.
+        }
+
+        @SuppressWarnings("ReturnOfNull") // OK for test.
+        @Override
+        public Type getType() {
+            return null;
         }
     }
 }

@@ -21,42 +21,25 @@
 package io.spine.server.storage.jdbc.query;
 
 import io.spine.logging.Logging;
-import io.spine.server.storage.jdbc.ConnectionWrapper;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-
 import static io.spine.base.Identifier.newUuid;
+import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 
 @DisplayName("QueryExecutor should")
 class QueryExecutorTest implements Logging {
 
     @Test
     @DisplayName("handle SQL exception on query execution")
-    void handleExceptionOnExecution() throws SQLException {
-        DataSourceWrapper dataSource = mock(DataSourceWrapper.class);
-        ConnectionWrapper connection = mock(ConnectionWrapper.class);
-        PreparedStatement statement = mock(PreparedStatement.class);
+    void handleExceptionOnExecution() {
+        DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
+        QueryExecutor executor = new QueryExecutor(dataSource, logger());
+        String erroneousQuery = "SELECT * FROM \"non-existent-table\"";
 
-        doReturn(connection).when(dataSource)
-                            .getConnection(anyBoolean());
-        doReturn(statement).when(connection)
-                           .prepareStatement(anyString());
-        doThrow(SQLException.class).when(statement)
-                                   .execute();
-        QueryExecutor query = spy(new QueryExecutor(dataSource, logger()));
-
-        assertThrows(DatabaseException.class, () -> query.execute(newUuid()));
+        assertThrows(DatabaseException.class, () -> executor.execute(erroneousQuery));
     }
 }

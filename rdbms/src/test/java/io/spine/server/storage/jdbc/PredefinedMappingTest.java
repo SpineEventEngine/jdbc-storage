@@ -23,21 +23,13 @@ package io.spine.server.storage.jdbc;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.SQLException;
-
+import static com.google.common.truth.Truth.assertThat;
+import static io.spine.server.storage.jdbc.GivenDataSource.whichHoldsMetadata;
 import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
 import static io.spine.server.storage.jdbc.PredefinedMapping.POSTGRESQL_10_1;
 import static io.spine.server.storage.jdbc.PredefinedMapping.select;
 import static io.spine.testing.Tests.nullRef;
-import static io.spine.util.Exceptions.illegalStateWithCauseOf;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 
 @DisplayName("PredefinedMapping should")
 class PredefinedMappingTest {
@@ -54,46 +46,21 @@ class PredefinedMappingTest {
     @Test
     @DisplayName("be selected by database product name and major version")
     void selectTypeMapping() {
-        DataSourceWrapper dataSource = dataSourceMock(mapping.getDatabaseProductName(),
-                                                      mapping.getMajorVersion(),
-                                                      mapping.getMinorVersion());
-        assertEquals(mapping, select(dataSource));
+        DataSourceWrapper dataSource = whichHoldsMetadata(mapping.getDatabaseProductName(),
+                                                          mapping.getMajorVersion(),
+                                                          mapping.getMinorVersion());
+        assertThat(select(dataSource))
+                .isEqualTo(mapping);
     }
 
     @Test
     @DisplayName("not be selected if major versions are different")
     void notSelectForDifferentVersion() {
-        String databaseProductName = mapping.getDatabaseProductName();
-        int differentVersion = mapping.getMajorVersion() + 1;
-        DataSourceWrapper dataSource = dataSourceMock(databaseProductName,
-                                                      differentVersion,
-                                                      differentVersion);
-        assertNotEquals(mapping, select(dataSource));
-    }
-
-    private static DataSourceWrapper dataSourceMock(String databaseProductName,
-                                                    int majorVersion,
-                                                    int minorVersion) {
-        DataSourceWrapper dataSource = mock(DataSourceWrapper.class);
-        ConnectionWrapper connectionWrapper = mock(ConnectionWrapper.class);
-        Connection connection = mock(Connection.class);
-        DatabaseMetaData metadata = mock(DatabaseMetaData.class);
-        doReturn(connectionWrapper).when(dataSource)
-                                   .getConnection(anyBoolean());
-        doReturn(connection).when(connectionWrapper)
-                            .get();
-        try {
-            doReturn(metadata).when(connection)
-                              .getMetaData();
-            doReturn(databaseProductName).when(metadata)
-                                         .getDatabaseProductName();
-            doReturn(majorVersion).when(metadata)
-                                  .getDatabaseMajorVersion();
-            doReturn(minorVersion).when(metadata)
-                                  .getDatabaseMinorVersion();
-            return dataSource;
-        } catch (SQLException e) {
-            throw illegalStateWithCauseOf(e);
-        }
+        int newMajorVersion = mapping.getMajorVersion() + 1;
+        DataSourceWrapper dataSource = whichHoldsMetadata(mapping.getDatabaseProductName(),
+                                                          newMajorVersion,
+                                                          mapping.getMinorVersion());
+        assertThat(select(dataSource))
+                .isNotEqualTo(mapping);
     }
 }

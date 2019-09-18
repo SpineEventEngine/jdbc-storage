@@ -42,7 +42,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth8.assertThat;
 import static com.google.common.util.concurrent.Uninterruptibles.sleepUninterruptibly;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
-import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
+import static io.spine.server.storage.jdbc.PredefinedMapping.H2_1_4;
 import static io.spine.server.storage.jdbc.delivery.given.TestShardIndex.newIndex;
 import static io.spine.testing.DisplayNames.NOT_ACCEPT_NULLS;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -64,7 +64,7 @@ class JdbcShardedWorkRegistryTest extends ShardedWorkRegistryTest {
         JdbcStorageFactory storageFactory = JdbcStorageFactory
                 .newBuilder()
                 .setDataSource(dataSource)
-                .setTypeMapping(MYSQL_5_7)
+                .setTypeMapping(H2_1_4)
                 .build();
         registry = new JdbcShardedWorkRegistry(storageFactory);
     }

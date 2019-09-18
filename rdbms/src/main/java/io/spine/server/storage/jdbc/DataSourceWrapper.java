@@ -21,67 +21,57 @@
 package io.spine.server.storage.jdbc;
 
 import io.spine.annotation.Internal;
-import io.spine.logging.Logging;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
-import java.sql.SQLException;
 
 /**
  * Wrapper for {@link DataSource} instances.
  */
 @Internal
-public class DataSourceWrapper implements AutoCloseable, Logging {
-
-    private final DataSource dataSource;
-
-    /** Wraps custom {@link DataSource} implementation. */
-    static DataSourceWrapper wrap(DataSource dataSource) {
-        return new DataSourceWrapper(dataSource);
-    }
-
-    protected DataSourceWrapper(DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
+public interface DataSourceWrapper extends AutoCloseable {
 
     /**
      * Retrieves a wrapped connection with the given auto commit mode.
      *
      * @throws DatabaseException
      *         if an error occurs during an interaction with the DB
+     * @throws IllegalStateException
+     *         if the data source is closed
      * @see Connection#setAutoCommit(boolean)
      */
-    public ConnectionWrapper getConnection(boolean autoCommit) throws DatabaseException {
-        try {
-            Connection connection = dataSource.getConnection();
-            connection.setAutoCommit(autoCommit);
-            ConnectionWrapper wrapper = ConnectionWrapper.wrap(connection);
-            return wrapper;
-        } catch (SQLException e) {
-            _error().log("Failed to get connection.", e);
-            throw new DatabaseException(e);
-        }
-    }
+    ConnectionWrapper getConnection(boolean autoCommit) throws DatabaseException;
 
     /**
-     * Closes wrapped {@link DataSource} implementation if it implements {@link AutoCloseable}.
-     *
-     * <p>Otherwise a warning is logged.
+     * Obtains the metadata of the wrapped {@link DataSource}.
      *
      * @throws DatabaseException
-     *         if the {@link DataSource} throws an exception
+     *         if an error occurs during an interaction with the DB
+     * @throws IllegalStateException
+     *         if the data source is closed
+     */
+    DataSourceMetaData metaData() throws DatabaseException;
+
+    /**
+     * Closes the wrapped {@link DataSource}.
+     *
+     * <p>Overridden from {@link AutoCloseable} to get rid of thrown exception type.
+     *
+     * @throws DatabaseException
+     *         if an error occurs during an interaction with the DB
+     * @throws IllegalStateException
+     *         if the data source is closed
      */
     @Override
-    public void close() throws DatabaseException {
-        if (dataSource instanceof AutoCloseable) {
-            try {
-                ((AutoCloseable) dataSource).close();
-            } catch (Exception e) {
-                _error().log("Error occurred while closing DataSource ", e);
-                throw new DatabaseException(e);
-            }
-            return;
-        }
-        _warn().log("Close method is not implemented in " + dataSource.getClass());
+    void close();
+
+    /**
+     * Returns {@code true} if the data source is closed, {@code false} otherwise.
+     */
+    boolean isClosed();
+
+    /** Wraps a {@link DataSource} implementation. */
+    static DataSourceWrapper wrap(DataSource dataSource) {
+        return new DefaultDataSourceWrapper(dataSource);
     }
 }

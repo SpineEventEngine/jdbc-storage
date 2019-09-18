@@ -26,7 +26,6 @@ import io.spine.server.projection.ProjectionStorage;
 import io.spine.server.projection.ProjectionStorageTest;
 import io.spine.server.storage.given.RecordStorageTestEnv.TestCounterEntity;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.GivenDataSource;
 import io.spine.server.storage.jdbc.StorageBuilder;
 import io.spine.server.storage.jdbc.TypeMapping;
 import io.spine.server.storage.jdbc.record.JdbcRecordStorage;
@@ -35,7 +34,9 @@ import io.spine.test.storage.ProjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
+import static io.spine.base.Identifier.newUuid;
+import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
+import static io.spine.server.storage.jdbc.PredefinedMapping.H2_1_4;
 import static io.spine.testing.Tests.nullRef;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -47,11 +48,11 @@ class JdbcProjectionStorageTest extends ProjectionStorageTest {
     @Override
     protected ProjectionStorage<ProjectId> newStorage(Class<? extends Entity<?, ?>> entityClass) {
         DataSourceWrapper dataSource =
-                GivenDataSource.whichIsStoredInMemory("projectionStorageTests");
+                whichIsStoredInMemory("projectionStorageTests");
         @SuppressWarnings("unchecked") // Required for the tests.
                 Class<? extends Projection<ProjectId, ?, ?>> projectionClass =
                 (Class<? extends Projection<ProjectId, ?, ?>>) entityClass;
-        TypeMapping typeMapping = MYSQL_5_7;
+        TypeMapping typeMapping = H2_1_4;
         JdbcRecordStorage<ProjectId> entityStorage =
                 JdbcRecordStorage.<ProjectId>newBuilder()
                         .setDataSource(dataSource)
@@ -84,7 +85,7 @@ class JdbcProjectionStorageTest extends ProjectionStorageTest {
     void acceptDatasourceInBuilder() {
         StorageBuilder<?, ?> builder =
                 JdbcProjectionStorage.newBuilder()
-                                     .setDataSource(GivenDataSource.withoutSuperpowers());
+                                     .setDataSource(whichIsStoredInMemory(newUuid()));
         assertNotNull(builder);
     }
 

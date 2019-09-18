@@ -30,7 +30,7 @@ import java.sql.SQLException;
  * The wrapper for {@link Connection} instances.
  */
 @Internal
-public class ConnectionWrapper implements AutoCloseable {
+public final class ConnectionWrapper implements AutoCloseable {
 
     private final Connection connection;
 
