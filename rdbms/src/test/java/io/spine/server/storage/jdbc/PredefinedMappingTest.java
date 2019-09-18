@@ -49,7 +49,8 @@ class PredefinedMappingTest {
         DataSourceWrapper dataSource = whichHoldsMetadata(mapping.getDatabaseProductName(),
                                                           mapping.getMajorVersion(),
                                                           mapping.getMinorVersion());
-        assertThat(select(dataSource)).isEqualTo(mapping);
+        assertThat(select(dataSource))
+                .isEqualTo(mapping);
     }
 
     @Test
@@ -59,6 +60,7 @@ class PredefinedMappingTest {
         DataSourceWrapper dataSource = whichHoldsMetadata(mapping.getDatabaseProductName(),
                                                           newMajorVersion,
                                                           mapping.getMinorVersion());
-        assertThat(select(dataSource)).isNotEqualTo(mapping);
+        assertThat(select(dataSource))
+                .isNotEqualTo(mapping);
     }
 }

@@ -39,7 +39,7 @@ import static io.spine.server.storage.jdbc.Type.LONG;
 /**
  * Holds {@link Timestamp} records by some ID.
  *
- * <p>Overrides several {@link MessageTable} methods to expose them to all tests.
+ * <p>Overrides several {@link MessageTable} methods to expose them to tests.
  *
  * @param <I>
  *         the ID type
@@ -78,7 +78,7 @@ abstract class TimestampTable<I> extends MessageTable<I, Timestamp> {
         return Timestamp.getDescriptor();
     }
 
-    @SuppressWarnings("unchecked") // Guaranteed by class descendants.
+    @SuppressWarnings("unchecked") // Ensured by class descendants.
     @Override
     protected Iterable<? extends MessageTable.Column<Timestamp>> messageSpecificColumns() {
         MessageTable.Column<Timestamp> idColumn =

@@ -23,11 +23,11 @@ package io.spine.server.storage.jdbc.query;
 import io.spine.logging.Logging;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
-import io.spine.server.storage.jdbc.GivenDataSource;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static io.spine.base.Identifier.newUuid;
+import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("QueryExecutor should")
@@ -36,9 +36,10 @@ class QueryExecutorTest implements Logging {
     @Test
     @DisplayName("handle SQL exception on query execution")
     void handleExceptionOnExecution() {
-        DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(newUuid());
+        DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
         QueryExecutor executor = new QueryExecutor(dataSource, logger());
         String erroneousQuery = "SELECT * FROM \"non-existent-table\"";
+
         assertThrows(DatabaseException.class, () -> executor.execute(erroneousQuery));
     }
 }

@@ -66,6 +66,7 @@ class AbstractQueryTest {
         Configuration configuration = query.factory()
                                            .getConfiguration();
         SQLListeners listeners = configuration.getListeners();
-        assertThat(listeners.getListeners()).contains(TransactionHandler.INSTANCE);
+        assertThat(listeners.getListeners())
+                .contains(TransactionHandler.INSTANCE);
     }
 }

@@ -35,7 +35,6 @@ import io.spine.server.storage.RecordStorage;
 import io.spine.server.storage.RecordStorageTest;
 import io.spine.server.storage.given.RecordStorageTestEnv.TestCounterEntity;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.GivenDataSource;
 import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.record.given.JdbcRecordStorageTestEnv.TestEntityWithStringId;
 import io.spine.server.storage.jdbc.type.JdbcColumnType;
@@ -56,6 +55,7 @@ import static io.spine.client.Filters.gt;
 import static io.spine.client.Filters.lt;
 import static io.spine.server.storage.LifecycleFlagField.archived;
 import static io.spine.server.storage.LifecycleFlagField.deleted;
+import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
 import static io.spine.server.storage.jdbc.PredefinedMapping.H2_1_4;
 import static io.spine.server.storage.jdbc.record.given.JdbcRecordStorageTestEnv.COLUMN_NAME_FOR_STORING;
 import static io.spine.testing.Tests.nullRef;
@@ -161,7 +161,7 @@ class JdbcRecordStorageTest extends RecordStorageTest<JdbcRecordStorage<ProjectI
 
     @Override
     protected JdbcRecordStorage<ProjectId> newStorage(Class<? extends Entity<?, ?>> cls) {
-        DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory("entityStorageTests");
+        DataSourceWrapper dataSource = whichIsStoredInMemory("entityStorageTests");
         @SuppressWarnings("unchecked") // Test invariant.
                 Class<? extends Entity<ProjectId, ?>> entityClass =
                 (Class<? extends Entity<ProjectId, ?>>) cls;

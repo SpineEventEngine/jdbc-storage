@@ -65,6 +65,9 @@ public interface DataSourceWrapper extends AutoCloseable {
     @Override
     void close();
 
+    /**
+     * Returns {@code true} if the data source is closed, {@code false} otherwise.
+     */
     boolean isClosed();
 
     /** Wraps a {@link DataSource} implementation. */

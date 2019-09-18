@@ -41,12 +41,13 @@ class DefaultDataSourceConfigConverterTest {
     @DisplayName(NOT_ACCEPT_NULLS)
     void passNullToleranceCheck() {
         NullPointerTester tester = new NullPointerTester();
-        DataSourceConfig dataSource = DataSourceConfig.newBuilder()
-                                                      .setDataSourceClassName("SomeClass")
-                                                      .setJdbcUrl("some:url")
-                                                      .setUsername("")
-                                                      .setPassword("")
-                                                      .build();
+        DataSourceConfig dataSource = DataSourceConfig
+                .newBuilder()
+                .setDataSourceClassName("SomeClass")
+                .setJdbcUrl("some:url")
+                .setUsername("")
+                .setPassword("")
+                .build();
         tester.setDefault(DataSourceConfig.class, dataSource);
         tester.testStaticMethods(DefaultDataSourceConfigConverter.class,
                                  NullPointerTester.Visibility.PACKAGE);

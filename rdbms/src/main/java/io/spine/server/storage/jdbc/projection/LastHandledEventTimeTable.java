@@ -20,6 +20,7 @@
 
 package io.spine.server.storage.jdbc.projection;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.protobuf.Timestamp;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
@@ -53,6 +54,18 @@ class LastHandledEventTimeTable extends AbstractTable<String, Timestamp, Timesta
     @Override
     protected List<? extends TableColumn> tableColumns() {
         return ImmutableList.copyOf(Column.values());
+    }
+
+    @VisibleForTesting
+    @Override
+    public String name() {
+        return super.name();
+    }
+
+    @VisibleForTesting
+    @Override
+    public IdColumn<String> idColumn() {
+        return super.idColumn();
     }
 
     @Override
