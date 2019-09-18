@@ -27,12 +27,11 @@ import io.spine.client.CompositeFilter;
 import io.spine.client.Filter;
 import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.entity.storage.EntityColumn;
-import io.spine.server.storage.jdbc.type.JdbcColumnType;
-import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import static com.google.common.truth.Truth.assertThat;
 import static com.querydsl.core.types.dsl.Expressions.FALSE;
 import static com.querydsl.core.types.dsl.Expressions.TRUE;
 import static com.querydsl.core.types.dsl.Expressions.comparablePath;
@@ -45,18 +44,16 @@ import static io.spine.client.Filter.Operator.LESS_OR_EQUAL;
 import static io.spine.client.Filter.Operator.LESS_THAN;
 import static io.spine.client.Filter.Operator.UNRECOGNIZED;
 import static io.spine.client.Filters.eq;
-import static io.spine.client.Filters.gt;
 import static io.spine.server.storage.jdbc.query.QueryPredicates.columnMatchFilter;
 import static io.spine.server.storage.jdbc.query.QueryPredicates.joinPredicates;
 import static io.spine.server.storage.jdbc.query.QueryPredicates.nullFilter;
 import static io.spine.server.storage.jdbc.query.QueryPredicates.valueFilter;
+import static io.spine.server.storage.jdbc.query.given.QueryPredicatesTestEnv.nonComparableType;
+import static io.spine.server.storage.jdbc.query.given.QueryPredicatesTestEnv.stringColumn;
 import static io.spine.testing.DisplayNames.HAVE_PARAMETERLESS_CTOR;
 import static io.spine.testing.Tests.assertHasPrivateParameterlessCtor;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 @SuppressWarnings({"InnerClassMayBeStatic", "ClassCanBeStatic"
         /* JUnit nested classes cannot be static. */,
@@ -82,7 +79,10 @@ class QueryPredicatesTest {
             BooleanExpression left = TRUE;
             BooleanExpression right = FALSE;
             Predicate result = joinPredicates(left, right, EITHER);
-            assertEquals(left.or(right), result);
+
+            BooleanExpression expected = left.or(right);
+            assertThat(result)
+                    .isEqualTo(expected);
         }
 
         @Test
@@ -91,7 +91,10 @@ class QueryPredicatesTest {
             BooleanExpression left = TRUE;
             BooleanExpression right = FALSE;
             Predicate result = joinPredicates(left, right, ALL);
-            assertEquals(left.and(right), result);
+
+            BooleanExpression expected = left.and(right);
+            assertThat(result)
+                    .isEqualTo(expected);
         }
     }
 
@@ -104,54 +107,15 @@ class QueryPredicatesTest {
                                           CompositeFilter.CompositeOperator.UNRECOGNIZED));
     }
 
-    @Test
-    @DisplayName("create `EQUAL` predicate for null value")
-    void createEqualForNull() {
-        EntityColumn column = stringColumnMock();
-        when(column.toPersistedValue(any())).thenReturn(null);
-
-        ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> registry
-                = JdbcTypeRegistryFactory.defaultInstance();
-
-        Filter filter = eq(column.name(), COLUMN_FILTER_VALUE);
-        Predicate predicate = columnMatchFilter(column, filter, registry);
-
-        ComparablePath<Comparable> columnPath = comparablePath(Comparable.class,
-                                                               column.name());
-        BooleanExpression isNullPredicate = columnPath.isNull();
-        assertEquals(isNullPredicate, predicate);
-    }
-
-    @SuppressWarnings("ResultOfMethodCallIgnored") // Method expected to throw exception.
-    @Test
-    @DisplayName("not create ordering predicate for null value")
-    void notCreateOrderingForNull() {
-        EntityColumn column = stringColumnMock();
-        when(column.toPersistedValue(any())).thenReturn(null);
-
-        ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> registry
-                = JdbcTypeRegistryFactory.defaultInstance();
-
-        Filter filter = gt(column.name(), COLUMN_FILTER_VALUE);
-
-        assertThrows(IllegalArgumentException.class,
-                     () -> columnMatchFilter(column, filter, registry));
-    }
-
-    @SuppressWarnings({"unchecked" /* Using raw types for mocks. */,
+    @SuppressWarnings({"unchecked" /* For brevity. */,
             "ResultOfMethodCallIgnored" /* Method expected to throw exception. */})
     @Test
     @DisplayName("not accept non-comparable value")
     void notAcceptNonComparable() {
-        EntityColumn column = stringColumnMock();
-        when(column.toPersistedValue(any())).thenReturn("test value");
-
-        JdbcColumnType type = mock(JdbcColumnType.class);
-        Object nonComparableValue = new Object();
-        when(type.convertColumnValue(any())).thenReturn(nonComparableValue);
+        EntityColumn column = stringColumn();
 
         ColumnTypeRegistry registry = ColumnTypeRegistry.newBuilder()
-                                                        .put(String.class, type)
+                                                        .put(String.class, nonComparableType())
                                                         .build();
 
         Filter filter = eq(column.name(), COLUMN_FILTER_VALUE);
@@ -258,14 +222,6 @@ class QueryPredicatesTest {
     void notCreateValueFilterForUnrecognized() {
         assertThrows(IllegalArgumentException.class,
                      () -> runValueFilterCreationFor(UNRECOGNIZED));
-    }
-
-    private static EntityColumn stringColumnMock() {
-        EntityColumn column = mock(EntityColumn.class);
-        when(column.name()).thenReturn("test column");
-        when(column.type()).thenReturn(String.class);
-        when(column.persistedType()).thenReturn(String.class);
-        return column;
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored") // Method called to throw exception.
