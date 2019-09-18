@@ -20,7 +20,6 @@
 
 package io.spine.server.storage.jdbc.message;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.annotations.Immutable;
 import com.google.protobuf.Descriptors.Descriptor;
@@ -32,7 +31,6 @@ import io.spine.server.storage.jdbc.TypeMapping;
 import io.spine.server.storage.jdbc.query.AbstractTable;
 import io.spine.server.storage.jdbc.query.IdColumn;
 
-import java.sql.ResultSet;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -71,32 +69,6 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
         SelectMessagesInBulk<I, M> query = composeSelectMessagesInBulkQuery(ids);
         Iterator<M> result = query.execute();
         return result;
-    }
-
-    /**
-     * Obtains a {@link ResultSet} over a given ID query.
-     *
-     * <p>A test-only method.
-     */
-    @VisibleForTesting
-    protected ResultSet resultSet(I id) {
-        SelectSingleMessage<I, M> query = composeSelectQuery(id);
-        ResultSet resultSet = query.query()
-                                   .getResults();
-        return resultSet;
-    }
-
-    /**
-     * Obtains a {@link ResultSet} over a given ID query.
-     *
-     * <p>A test-only method.
-     */
-    @VisibleForTesting
-    protected ResultSet resultSet(Iterable<I> ids) {
-        SelectMessagesInBulk<I, M> query = composeSelectMessagesInBulkQuery(ids);
-        ResultSet resultSet = query.query()
-                                   .getResults();
-        return resultSet;
     }
 
     /**

@@ -58,14 +58,10 @@ abstract class TimestampTable<I> extends MessageTable<I, Timestamp> {
         super.write(record);
     }
 
-    @Override
     public ResultSet resultSet(I id) {
-        return super.resultSet(id);
-    }
-
-    @Override
-    public ResultSet resultSet(Iterable<I> ids) {
-        return super.resultSet(ids);
+        SelectTimestampById<I> query = composeSelectTimestampById(id);
+        ResultSet resultSet = query.getResults();
+        return resultSet;
     }
 
     @Override

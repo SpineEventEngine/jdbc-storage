@@ -24,6 +24,8 @@ import com.google.protobuf.Timestamp;
 import com.querydsl.sql.AbstractSQLQuery;
 import io.spine.server.storage.jdbc.query.SelectMessageByIdQuery;
 
+import java.sql.ResultSet;
+
 import static io.spine.server.storage.jdbc.message.MessageTable.bytesColumn;
 
 /**
@@ -37,6 +39,11 @@ public class SelectTimestampById<I> extends SelectMessageByIdQuery<I, Timestamp>
 
     private SelectTimestampById(Builder<I> builder) {
         super(builder);
+    }
+
+    public ResultSet getResults() {
+        ResultSet results = query().getResults();
+        return results;
     }
 
     @Override
