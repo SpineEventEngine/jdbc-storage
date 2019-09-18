@@ -69,12 +69,12 @@ public final class QueryPredicatesTestEnv {
         public void setColumnValue(Parameters.Builder storageRecord,
                                    Object value,
                                    String columnIdentifier) {
-            // NO-OP. This method is not interesting for test.
+            // NO-OP. This method is not interesting for the test.
         }
 
         @Override
         public void setNull(Parameters.Builder storageRecord, String columnIdentifier) {
-            // NO-OP. This method is not interesting for test.
+            // NO-OP. This method is not interesting for the test.
         }
 
         @SuppressWarnings("ReturnOfNull") // OK for test.
