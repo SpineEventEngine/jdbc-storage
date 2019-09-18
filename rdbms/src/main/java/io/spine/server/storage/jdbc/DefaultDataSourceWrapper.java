@@ -62,7 +62,6 @@ final class DefaultDataSourceWrapper implements DataSourceWrapper, Logging {
             DatabaseMetaData metaData = connection.get()
                                                   .getMetaData();
             return DataSourceMetaData.of(metaData);
-
         } catch (SQLException e) {
             throw new DatabaseException(e);
         }
