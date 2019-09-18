@@ -75,7 +75,7 @@ public class GivenDataSource {
 
     /**
      * A test data source whose only purpose is to return a given data source
-     * {@linkplain DataSourceWrapper#metaData() meta data}.
+     * {@linkplain DataSourceWrapper#metaData() metadata}.
      */
     private static class DataSourceWithMetaData implements DataSourceWrapper {
 

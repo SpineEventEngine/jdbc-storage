@@ -46,7 +46,7 @@ class DataSourceWrapperTest {
     }
 
     @Test
-    @DisplayName("provide database meta data")
+    @DisplayName("provide database metadata")
     void returnMetaData() {
         DataSourceWrapper dataSourceWrapper = whichIsStoredInMemory(newUuid());
         DataSourceMetaData metaData = dataSourceWrapper.metaData();
@@ -61,7 +61,7 @@ class DataSourceWrapperTest {
 
     @Test
     @MuteLogging
-    @DisplayName("throw `DatabaseException` if failed to obtain a meta data")
+    @DisplayName("throw `DatabaseException` if failed to obtain a metadata")
     void throwOnGetMetaDataError() {
         ThrowingHikariDataSource dataSource = whichIsThrowingByCommand(newUuid());
         DataSourceWrapper wrapper = DataSourceWrapper.wrap(dataSource);
@@ -71,7 +71,7 @@ class DataSourceWrapperTest {
     }
 
     @Test
-    @DisplayName("throw ISE if obtaining meta data when already closed")
+    @DisplayName("throw ISE if obtaining metadata when already closed")
     void throwIseIfAlreadyClosed() {
         DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
         dataSource.close();

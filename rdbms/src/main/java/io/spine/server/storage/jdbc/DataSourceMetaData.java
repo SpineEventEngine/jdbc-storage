@@ -26,7 +26,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
 /**
- * A meta data of the {@linkplain javax.sql.DataSource data source}.
+ * A metadata of the {@linkplain javax.sql.DataSource data source}.
  */
 @Internal
 public interface DataSourceMetaData {
@@ -47,7 +47,7 @@ public interface DataSourceMetaData {
     int minorVersion();
 
     /**
-     * Wraps a given database {@linkplain DatabaseMetaData meta data}.
+     * Wraps a given database {@linkplain DatabaseMetaData metadata}.
      *
      * @throws DatabaseException
      *         in case something went wrong when interacting with database
