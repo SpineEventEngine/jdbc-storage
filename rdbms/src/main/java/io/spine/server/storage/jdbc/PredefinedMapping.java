@@ -59,8 +59,8 @@ public enum PredefinedMapping implements TypeMapping {
     /**
      * Selects the type mapping for the specified data source.
      *
-     * <p>The {@linkplain DataSourceMetaData#productName() database product name} and
-     * the version are taken into account during the selection.
+     * <p>The {@linkplain DataSourceMetaData#productName() database product name} and the version
+     * are taken into account during the selection.
      *
      * @param dataSource
      *         the data source to test suitability

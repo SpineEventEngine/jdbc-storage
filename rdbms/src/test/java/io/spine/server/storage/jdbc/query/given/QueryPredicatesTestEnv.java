@@ -66,7 +66,8 @@ public final class QueryPredicatesTestEnv {
         }
 
         @Override
-        public void setColumnValue(Parameters.Builder storageRecord, Object value,
+        public void setColumnValue(Parameters.Builder storageRecord,
+                                   Object value,
                                    String columnIdentifier) {
             // NO-OP. This method is not interesting for test.
         }
