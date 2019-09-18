@@ -119,7 +119,7 @@ class DbIteratorTest {
 
     @Test
     @DisplayName("do nothing on close if result set is already closed")
-    void checkIfResultSetClosed() throws SQLException {
+    void doNothingIfAlreadyClosed() throws SQLException {
         DbIterator iterator = emptyIterator();
 
         ResultSet resultSet = iterator.resultSet();

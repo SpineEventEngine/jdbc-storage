@@ -154,7 +154,7 @@ class JdbcStorageFactoryTest {
 
     @Test
     @DisplayName("select mapping based on the given data source")
-    void useMySqlMappingByDefault() {
+    void selectMapping() {
         DataSourceWrapper dataSource = whichHoldsMetadata(
                 MYSQL_5_7.getDatabaseProductName(),
                 MYSQL_5_7.getMajorVersion(),

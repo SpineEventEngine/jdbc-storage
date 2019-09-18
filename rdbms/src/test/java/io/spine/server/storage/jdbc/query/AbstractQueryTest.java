@@ -62,7 +62,7 @@ class AbstractQueryTest {
 
     @Test
     @DisplayName("specify a `TransactionHandler` as one of the transaction listeners")
-    void handleExceptionOnRollback() {
+    void injectTransactionHandler() {
         Configuration configuration = query.factory()
                                            .getConfiguration();
         SQLListeners listeners = configuration.getListeners();
