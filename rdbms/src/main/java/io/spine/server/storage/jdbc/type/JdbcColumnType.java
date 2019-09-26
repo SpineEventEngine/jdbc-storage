@@ -27,7 +27,7 @@ import io.spine.server.storage.jdbc.query.Parameters;
 /**
  * The contract of a {@link ColumnType} used by the JDBC storage.
  *
- * <p>Uses {@linkplain Parameters.Builder parameters builder} as the record type and
+ * <p>Uses {@linkplain Parameters parameters} builder as the record type and
  * {@code String} as the column identifier type.
  *
  * @see AbstractJdbcColumnType for the skeleton implementation
