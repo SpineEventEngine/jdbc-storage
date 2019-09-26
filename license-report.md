@@ -1,6 +1,6 @@
 
     
-# Dependencies of `io.spine:spine-rdbms:1.1.1-SNAPSHOT+1`
+# Dependencies of `io.spine:spine-rdbms:1.1.2`
 
 ## Runtime
 1. **Group:** com.google.auto.value **Name:** auto-value-annotations **Version:** 1.6.3
@@ -482,4 +482,4 @@
  The dependencies distributed under several licenses, are used according their commercial-use-friendly license.
 
 
-This report was generated on **Wed Sep 18 17:15:46 EEST 2019** using [Gradle-License-Report plugin](https://github.com/jk1/Gradle-License-Report) by Evgeny Naumenko, licensed under [Apache 2.0 License](https://github.com/jk1/Gradle-License-Report/blob/master/LICENSE).
+This report was generated on **Thu Sep 26 15:25:33 EEST 2019** using [Gradle-License-Report plugin](https://github.com/jk1/Gradle-License-Report) by Evgeny Naumenko, licensed under [Apache 2.0 License](https://github.com/jk1/Gradle-License-Report/blob/master/LICENSE).
