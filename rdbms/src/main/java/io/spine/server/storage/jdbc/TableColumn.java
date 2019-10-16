@@ -32,11 +32,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public interface TableColumn extends StorageField {
 
     /**
-     * Returns the name of the column.
-     */
-    String name();
-
-    /**
      * Returns the {@link Type} of the column
      * or {@code null} if the type is unknown at the compile time.
      */

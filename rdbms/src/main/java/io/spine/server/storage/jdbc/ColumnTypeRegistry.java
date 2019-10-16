@@ -17,28 +17,12 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package io.spine.server.storage.jdbc.type;
 
-import io.spine.annotation.SPI;
-import io.spine.server.entity.storage.ColumnType;
-import io.spine.server.storage.jdbc.Type;
-import io.spine.server.storage.jdbc.query.Parameters;
+package io.spine.server.storage.jdbc;
 
-/**
- * The contract of a {@link ColumnType} used by the JDBC storage.
- *
- * <p>Uses {@linkplain Parameters parameters} builder as the record type and
- * {@code String} as the column identifier type.
- *
- * @see AbstractJdbcColumnType for the skeleton implementation
- */
-@SPI
-public interface JdbcColumnType<J, C> extends ColumnType<J, C, Parameters.Builder, String> {
+public interface ColumnTypeRegistry {
 
-    /**
-     * Obtains {@link Type} representing this column.
-     *
-     * @return the type for the column
-     */
-    Type getType();
+    <T> PersistenceStrategy<T> persistenceStrategyFor(Class<T> clazz);
+
+    Type typeOf(Class<?> clazz);
 }

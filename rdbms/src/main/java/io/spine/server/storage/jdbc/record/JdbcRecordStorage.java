@@ -29,26 +29,25 @@ import io.spine.client.ResponseFormat;
 import io.spine.client.TargetFilters;
 import io.spine.server.entity.Entity;
 import io.spine.server.entity.EntityRecord;
-import io.spine.server.entity.storage.ColumnTypeRegistry;
-import io.spine.server.entity.storage.EntityColumn;
+import io.spine.server.entity.storage.Columns;
 import io.spine.server.entity.storage.EntityQueries;
 import io.spine.server.entity.storage.EntityQuery;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.RecordStorage;
+import io.spine.server.storage.jdbc.ColumnTypeRegistry;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
+import io.spine.server.storage.jdbc.DefaultColumnTypeRegistry;
 import io.spine.server.storage.jdbc.JdbcStorageFactory;
 import io.spine.server.storage.jdbc.StorageBuilder;
-import io.spine.server.storage.jdbc.type.JdbcColumnType;
-import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static io.spine.server.entity.model.EntityClass.asEntityClass;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.StreamSupport.stream;
 
@@ -71,12 +70,11 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
      *         the storage builder
      */
     protected JdbcRecordStorage(Builder<I> builder) throws DatabaseException {
-        super(builder.isMultitenant(), builder.getEntityClass());
+        super(asEntityClass(builder.getEntityClass()), builder.isMultitenant());
         this.dataSource = builder.dataSource();
         Class<? extends Entity<I, ?>> entityClass = builder.getEntityClass();
-        Collection<EntityColumn> entityColumns = entityColumnCache().getColumns();
-        this.table = new RecordTable<>(entityClass, dataSource, builder.getColumnTypeRegistry(),
-                                       builder.typeMapping(), entityColumns);
+        this.table = new RecordTable<>(entityClass, dataSource, builder.columnTypeRegistry(),
+                                       builder.typeMapping(), columns());
         table.create();
     }
 
@@ -133,6 +131,11 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     @Override
     protected void writeRecords(Map<I, EntityRecordWithColumns> records) {
         table.write(records);
+    }
+
+    @Override
+    public final Columns columns() {
+        return super.columns();
     }
 
     @Override
@@ -195,8 +198,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
             extends StorageBuilder<Builder<I>, JdbcRecordStorage<I>> {
 
         private Class<? extends Entity<I, ?>> entityClass;
-        private ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>>
-                columnTypeRegistry = JdbcTypeRegistryFactory.defaultInstance();
+        private ColumnTypeRegistry columnTypeRegistry = new DefaultColumnTypeRegistry();
 
         private Builder() {
             super();
@@ -228,15 +230,12 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
          * @param columnTypeRegistry
          *         the registry of entity columns to be used
          */
-        public Builder<I> setColumnTypeRegistry(
-                ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>>
-                        columnTypeRegistry) {
+        public Builder<I> setColumnTypeRegistry(ColumnTypeRegistry columnTypeRegistry) {
             this.columnTypeRegistry = checkNotNull(columnTypeRegistry);
             return this;
         }
 
-        public ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>>
-        getColumnTypeRegistry() {
+        public ColumnTypeRegistry columnTypeRegistry() {
             return columnTypeRegistry;
         }
 

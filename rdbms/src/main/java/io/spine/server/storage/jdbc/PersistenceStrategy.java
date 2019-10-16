@@ -17,15 +17,27 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-/**
- * This package provides classes for JDBC column types.
- */
-@Experimental
-@CheckReturnValue
-@ParametersAreNonnullByDefault
-package io.spine.server.storage.jdbc.type;
 
-import com.google.errorprone.annotations.CheckReturnValue;
-import io.spine.annotation.Experimental;
+package io.spine.server.storage.jdbc;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.function.Function;
+
+public interface PersistenceStrategy<T> extends Function<T, Object> {
+
+    /**
+     * A convenience shortcut.
+     *
+     * <p>...
+     */
+    @SuppressWarnings("unchecked") // It's up to caller to provide a valid object.
+    default @Nullable Object applyTo(@Nullable Object object) {
+        if (object == null) {
+            return null;
+        }
+        T value = (T) object;
+        Object result = apply(value);
+        return result;
+    }
+}

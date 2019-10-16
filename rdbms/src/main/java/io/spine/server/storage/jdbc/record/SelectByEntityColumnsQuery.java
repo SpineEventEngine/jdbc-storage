@@ -25,13 +25,12 @@ import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.sql.AbstractSQLQuery;
 import io.spine.server.entity.EntityRecord;
-import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.entity.storage.EntityQuery;
+import io.spine.server.storage.jdbc.ColumnTypeRegistry;
 import io.spine.server.storage.jdbc.query.AbstractQuery;
 import io.spine.server.storage.jdbc.query.DbIterator.DoubleColumnRecord;
 import io.spine.server.storage.jdbc.query.IdColumn;
 import io.spine.server.storage.jdbc.query.SelectQuery;
-import io.spine.server.storage.jdbc.type.JdbcColumnType;
 
 import java.sql.ResultSet;
 import java.util.Iterator;
@@ -52,7 +51,7 @@ final class SelectByEntityColumnsQuery<I> extends AbstractQuery
 
     private final EntityQuery<I> entityQuery;
     private final FieldMask fieldMask;
-    private final ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> columnTypeRegistry;
+    private final ColumnTypeRegistry columnTypeRegistry;
     private final IdColumn<I> idColumn;
 
     private SelectByEntityColumnsQuery(Builder<I> builder) {
@@ -86,7 +85,7 @@ final class SelectByEntityColumnsQuery<I> extends AbstractQuery
 
         private EntityQuery<I> entityQuery;
         private FieldMask fieldMask;
-        private ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> columnTypeRegistry;
+        private ColumnTypeRegistry columnTypeRegistry;
         private IdColumn<I> idColumn;
 
         private Builder() {
@@ -103,8 +102,7 @@ final class SelectByEntityColumnsQuery<I> extends AbstractQuery
             return this;
         }
 
-        Builder<I> setColumnTypeRegistry(
-                ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> registry) {
+        Builder<I> setColumnTypeRegistry(ColumnTypeRegistry registry) {
             this.columnTypeRegistry = checkNotNull(registry);
             return this;
         }

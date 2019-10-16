@@ -28,7 +28,6 @@ import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateStorage;
 import io.spine.server.delivery.InboxStorage;
 import io.spine.server.entity.Entity;
-import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.projection.Projection;
 import io.spine.server.projection.ProjectionStorage;
 import io.spine.server.storage.StorageFactory;
@@ -37,8 +36,6 @@ import io.spine.server.storage.jdbc.delivery.JdbcInboxStorage;
 import io.spine.server.storage.jdbc.delivery.JdbcSessionStorage;
 import io.spine.server.storage.jdbc.projection.JdbcProjectionStorage;
 import io.spine.server.storage.jdbc.record.JdbcRecordStorage;
-import io.spine.server.storage.jdbc.type.JdbcColumnType;
-import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
 
 import javax.sql.DataSource;
 
@@ -48,12 +45,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Creates storages based on JDBC-compliant RDBMS.
  *
  * @see DataSourceConfig
- * @see JdbcTypeRegistryFactory
  */
 public class JdbcStorageFactory implements StorageFactory {
 
     private final DataSourceWrapper dataSource;
-    private final ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> columnTypeRegistry;
+    private final ColumnTypeRegistry columnTypeRegistry;
     private final TypeMapping typeMapping;
 
     private JdbcStorageFactory(Builder builder) {
@@ -148,7 +144,7 @@ public class JdbcStorageFactory implements StorageFactory {
     public static class Builder {
 
         private DataSourceWrapper dataSource;
-        private ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> columnTypeRegistry;
+        private ColumnTypeRegistry columnTypeRegistry;
         private TypeMapping typeMapping;
 
         private Builder() {
@@ -158,19 +154,12 @@ public class JdbcStorageFactory implements StorageFactory {
         /**
          * Sets the {@link ColumnTypeRegistry} to use in the generated storages.
          *
-         * <p>The default value is
-         * {@link JdbcTypeRegistryFactory#defaultInstance() JdbcTypeRegistryFactory.defaultInstance()}.
-         *
-         * <p>To reuse the existent {@linkplain JdbcColumnType column types}, use
-         * {@link JdbcTypeRegistryFactory#predefinedValuesAnd() JdbcTypeRegistryFactory.predefinedValuesAnd()}.
+         * <p>The default value is a {@link DefaultColumnTypeRegistry}.
          *
          * @param columnTypeRegistry
-         *         the custom {@link ColumnTypeRegistry} to use in the generated
-         *         storages
+         *         the custom {@link ColumnTypeRegistry} to use in the generated storages
          */
-        public Builder setColumnTypeRegistry(
-                ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>>
-                        columnTypeRegistry) {
+        public Builder setColumnTypeRegistry(ColumnTypeRegistry columnTypeRegistry) {
             this.columnTypeRegistry = columnTypeRegistry;
             return this;
         }
@@ -232,7 +221,7 @@ public class JdbcStorageFactory implements StorageFactory {
          */
         public JdbcStorageFactory build() {
             if (columnTypeRegistry == null) {
-                columnTypeRegistry = JdbcTypeRegistryFactory.defaultInstance();
+                columnTypeRegistry = new DefaultColumnTypeRegistry();
             }
             if (typeMapping == null) {
                 typeMapping = PredefinedMapping.select(dataSource);

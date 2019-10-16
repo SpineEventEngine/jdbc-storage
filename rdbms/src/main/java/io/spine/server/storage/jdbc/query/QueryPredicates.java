@@ -28,13 +28,12 @@ import com.querydsl.core.types.dsl.PathBuilder;
 import io.spine.client.CompositeFilter;
 import io.spine.client.Filter;
 import io.spine.client.Filter.Operator;
-import io.spine.server.entity.storage.ColumnTypeRegistry;
+import io.spine.server.entity.storage.Column;
 import io.spine.server.entity.storage.CompositeQueryParameter;
-import io.spine.server.entity.storage.EntityColumn;
 import io.spine.server.entity.storage.QueryParameters;
-import io.spine.server.storage.jdbc.type.JdbcColumnType;
+import io.spine.server.storage.jdbc.ColumnTypeRegistry;
+import io.spine.server.storage.jdbc.PersistenceStrategy;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
 
@@ -88,9 +87,7 @@ public class QueryPredicates {
      * @return the predicate for columns
      */
     public static Predicate
-    matchParameters(QueryParameters parameters,
-                    ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>>
-                            columnTypeRegistry) {
+    matchParameters(QueryParameters parameters, ColumnTypeRegistry columnTypeRegistry) {
         BooleanExpression result = TRUE;
         for (CompositeQueryParameter parameter : parameters) {
             result = result.and(predicateFrom(parameter, columnTypeRegistry));
@@ -99,16 +96,14 @@ public class QueryPredicates {
     }
 
     private static Predicate
-    predicateFrom(CompositeQueryParameter parameter,
-                  ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>>
-                          columnTypeRegistry) {
+    predicateFrom(CompositeQueryParameter parameter, ColumnTypeRegistry columnTypeRegistry) {
         Predicate result = TRUE;
-        for (Map.Entry<EntityColumn, Filter> columnWithFilter : parameter.getFilters()
-                                                                         .entries()) {
+        for (Map.Entry<Column, Filter> columnWithFilter : parameter.filters()
+                                                                   .entries()) {
             Predicate predicate = columnMatchFilter(columnWithFilter.getKey(),
                                                     columnWithFilter.getValue(),
                                                     columnTypeRegistry);
-            result = joinPredicates(result, predicate, parameter.getOperator());
+            result = joinPredicates(result, predicate, parameter.operator());
         }
         return result;
     }
@@ -132,27 +127,23 @@ public class QueryPredicates {
 
     @VisibleForTesting
     static Predicate
-    columnMatchFilter(EntityColumn column, Filter filter,
-                      ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>>
-                              columnTypeRegistry) {
+    columnMatchFilter(Column column, Filter filter, ColumnTypeRegistry columnTypeRegistry) {
         Operator operator = filter.getOperator();
         checkArgument(operator.getNumber() > 0, operator.name());
 
-        String columnName = column.name();
+        String columnName = column.name()
+                                  .value();
         ComparablePath<Comparable> columnPath = comparablePath(Comparable.class, columnName);
-        JdbcColumnType<? super Object, ? super Object> columnType =
-                columnTypeRegistry.get(column);
         Class<?> type = column.type();
         Object javaValue = toObject(filter.getValue(), type);
-        Serializable persistedValue = column.toPersistedValue(javaValue);
-
-        if (persistedValue == null) {
+        PersistenceStrategy<?> strategy =
+                columnTypeRegistry.persistenceStrategyFor(javaValue.getClass());
+        Object valueForStoring = strategy.applyTo(javaValue);
+        if (valueForStoring == null) {
             return nullFilter(operator, columnPath);
         }
-
-        Object storedValue = columnType.convertColumnValue(persistedValue);
-        checkIsComparable(storedValue, javaValue);
-        Comparable columnValue = (Comparable) storedValue;
+        checkIsComparable(valueForStoring, javaValue);
+        Comparable columnValue = (Comparable) valueForStoring;
         return valueFilter(operator, columnPath, columnValue);
     }
 
