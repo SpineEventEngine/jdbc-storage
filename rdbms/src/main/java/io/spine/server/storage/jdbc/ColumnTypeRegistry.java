@@ -22,7 +22,10 @@ package io.spine.server.storage.jdbc;
 
 public interface ColumnTypeRegistry {
 
-    <T> PersistenceStrategy<T> persistenceStrategyFor(Class<T> clazz);
+    <T> PersistenceStrategy<T> persistenceStrategyOf(Class<T> clazz);
 
-    Type typeOf(Class<?> clazz);
+    default Type typeOf(Class<?> clazz) {
+        PersistenceStrategy<?> strategy = persistenceStrategyOf(clazz);
+        return strategy.persistAs();
+    }
 }

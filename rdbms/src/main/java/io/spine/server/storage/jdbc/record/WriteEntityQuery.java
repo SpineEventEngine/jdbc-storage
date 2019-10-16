@@ -134,7 +134,7 @@ abstract class WriteEntityQuery<I, C extends StoreClause<C>>
               .forEach(columnName -> {
                   Object columnValue = record.columnValue(columnName);
                   PersistenceStrategy<?> strategy =
-                          columnTypeRegistry.persistenceStrategyFor(columnValue.getClass());
+                          columnTypeRegistry.persistenceStrategyOf(columnValue.getClass());
                   Object valueForStoring = strategy.applyTo(columnValue);
                   parameters.addParameter(columnName.value(), Parameter.of(valueForStoring));
               });

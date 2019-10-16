@@ -137,7 +137,7 @@ public class QueryPredicates {
         Class<?> type = column.type();
         Object javaValue = toObject(filter.getValue(), type);
         PersistenceStrategy<?> strategy =
-                columnTypeRegistry.persistenceStrategyFor(javaValue.getClass());
+                columnTypeRegistry.persistenceStrategyOf(javaValue.getClass());
         Object valueForStoring = strategy.applyTo(javaValue);
         if (valueForStoring == null) {
             return nullFilter(operator, columnPath);

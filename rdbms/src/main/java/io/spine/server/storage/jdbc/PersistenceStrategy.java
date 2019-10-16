@@ -26,6 +26,8 @@ import java.util.function.Function;
 
 public interface PersistenceStrategy<T> extends Function<T, Object> {
 
+    Type persistAs();
+
     /**
      * A convenience shortcut.
      *
