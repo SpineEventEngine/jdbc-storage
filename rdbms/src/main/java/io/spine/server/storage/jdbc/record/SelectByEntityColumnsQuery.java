@@ -26,11 +26,11 @@ import com.querydsl.core.types.Predicate;
 import com.querydsl.sql.AbstractSQLQuery;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.storage.EntityQuery;
-import io.spine.server.storage.jdbc.ColumnTypeRegistry;
 import io.spine.server.storage.jdbc.query.AbstractQuery;
 import io.spine.server.storage.jdbc.query.DbIterator.DoubleColumnRecord;
 import io.spine.server.storage.jdbc.query.IdColumn;
 import io.spine.server.storage.jdbc.query.SelectQuery;
+import io.spine.server.storage.jdbc.type.JdbcTypeRegistry;
 
 import java.sql.ResultSet;
 import java.util.Iterator;
@@ -51,14 +51,14 @@ final class SelectByEntityColumnsQuery<I> extends AbstractQuery
 
     private final EntityQuery<I> entityQuery;
     private final FieldMask fieldMask;
-    private final ColumnTypeRegistry columnTypeRegistry;
+    private final JdbcTypeRegistry columnTypeRegistry;
     private final IdColumn<I> idColumn;
 
     private SelectByEntityColumnsQuery(Builder<I> builder) {
         super(builder);
         this.entityQuery = builder.entityQuery;
         this.fieldMask = builder.fieldMask;
-        this.columnTypeRegistry = builder.columnTypeRegistry;
+        this.columnTypeRegistry = builder.typeRegistry;
         this.idColumn = builder.idColumn;
     }
 
@@ -85,7 +85,7 @@ final class SelectByEntityColumnsQuery<I> extends AbstractQuery
 
         private EntityQuery<I> entityQuery;
         private FieldMask fieldMask;
-        private ColumnTypeRegistry columnTypeRegistry;
+        private JdbcTypeRegistry typeRegistry;
         private IdColumn<I> idColumn;
 
         private Builder() {
@@ -102,8 +102,8 @@ final class SelectByEntityColumnsQuery<I> extends AbstractQuery
             return this;
         }
 
-        Builder<I> setColumnTypeRegistry(ColumnTypeRegistry registry) {
-            this.columnTypeRegistry = checkNotNull(registry);
+        Builder<I> typeRegistry(JdbcTypeRegistry registry) {
+            this.typeRegistry = checkNotNull(registry);
             return this;
         }
 
@@ -123,7 +123,7 @@ final class SelectByEntityColumnsQuery<I> extends AbstractQuery
             checkState(idColumn != null, "IdColumn is not set.");
             checkState(fieldMask != null, "FieldMask is not set.");
             checkState(entityQuery != null, "EntityQuery is not set.");
-            checkState(columnTypeRegistry != null, "ColumnTypeRegistry is not set.");
+            checkState(typeRegistry != null, "ColumnTypeRegistry is not set.");
         }
 
         @Override

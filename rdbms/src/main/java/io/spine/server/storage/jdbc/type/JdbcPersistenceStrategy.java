@@ -20,18 +20,25 @@
 
 package io.spine.server.storage.jdbc.type;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import io.spine.server.entity.storage.PersistenceStrategy;
+import io.spine.server.storage.jdbc.Type;
 
-import static io.spine.testing.DisplayNames.HAVE_PARAMETERLESS_CTOR;
-import static io.spine.testing.Tests.assertHasPrivateParameterlessCtor;
+public final class JdbcPersistenceStrategy<T, R> implements PersistenceStrategy<T, R> {
 
-@DisplayName("JdbcColumnTypes should")
-class JdbcColumnTypesTest {
+    private final PersistenceStrategy<T, R> delegate;
+    private final Type type;
 
-    @Test
-    @DisplayName(HAVE_PARAMETERLESS_CTOR)
-    void haveUtilityConstructor() {
-        assertHasPrivateParameterlessCtor(JdbcColumnTypes.class);
+    public JdbcPersistenceStrategy(PersistenceStrategy<T, R> delegate, Type type) {
+        this.delegate = delegate;
+        this.type = type;
+    }
+
+    @Override
+    public R apply(T t) {
+        return delegate.apply(t);
+    }
+
+    public Type storeAs() {
+        return type;
     }
 }

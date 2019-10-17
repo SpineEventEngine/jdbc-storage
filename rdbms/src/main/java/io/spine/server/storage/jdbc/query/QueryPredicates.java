@@ -30,9 +30,9 @@ import io.spine.client.Filter;
 import io.spine.client.Filter.Operator;
 import io.spine.server.entity.storage.Column;
 import io.spine.server.entity.storage.CompositeQueryParameter;
+import io.spine.server.entity.storage.PersistenceStrategy;
 import io.spine.server.entity.storage.QueryParameters;
-import io.spine.server.storage.jdbc.ColumnTypeRegistry;
-import io.spine.server.storage.jdbc.PersistenceStrategy;
+import io.spine.server.storage.jdbc.type.JdbcTypeRegistry;
 
 import java.util.Collection;
 import java.util.Map;
@@ -82,27 +82,27 @@ public class QueryPredicates {
      *
      * @param parameters
      *         the query parameters to compose the predicate
-     * @param columnTypeRegistry
+     * @param typeRegistry
      *         the registry of entity column type to use
      * @return the predicate for columns
      */
     public static Predicate
-    matchParameters(QueryParameters parameters, ColumnTypeRegistry columnTypeRegistry) {
+    matchParameters(QueryParameters parameters, JdbcTypeRegistry typeRegistry) {
         BooleanExpression result = TRUE;
         for (CompositeQueryParameter parameter : parameters) {
-            result = result.and(predicateFrom(parameter, columnTypeRegistry));
+            result = result.and(predicateFrom(parameter, typeRegistry));
         }
         return result;
     }
 
     private static Predicate
-    predicateFrom(CompositeQueryParameter parameter, ColumnTypeRegistry columnTypeRegistry) {
+    predicateFrom(CompositeQueryParameter parameter, JdbcTypeRegistry typeRegistry) {
         Predicate result = TRUE;
         for (Map.Entry<Column, Filter> columnWithFilter : parameter.filters()
                                                                    .entries()) {
             Predicate predicate = columnMatchFilter(columnWithFilter.getKey(),
                                                     columnWithFilter.getValue(),
-                                                    columnTypeRegistry);
+                                                    typeRegistry);
             result = joinPredicates(result, predicate, parameter.operator());
         }
         return result;
@@ -127,7 +127,7 @@ public class QueryPredicates {
 
     @VisibleForTesting
     static Predicate
-    columnMatchFilter(Column column, Filter filter, ColumnTypeRegistry columnTypeRegistry) {
+    columnMatchFilter(Column column, Filter filter, JdbcTypeRegistry typeRegistry) {
         Operator operator = filter.getOperator();
         checkArgument(operator.getNumber() > 0, operator.name());
 
@@ -136,8 +136,8 @@ public class QueryPredicates {
         ComparablePath<Comparable> columnPath = comparablePath(Comparable.class, columnName);
         Class<?> type = column.type();
         Object javaValue = toObject(filter.getValue(), type);
-        PersistenceStrategy<?> strategy =
-                columnTypeRegistry.persistenceStrategyOf(javaValue.getClass());
+        PersistenceStrategy<?, ?> strategy =
+                typeRegistry.persistenceStrategyOf(javaValue.getClass());
         Object valueForStoring = strategy.applyTo(javaValue);
         if (valueForStoring == null) {
             return nullFilter(operator, columnPath);

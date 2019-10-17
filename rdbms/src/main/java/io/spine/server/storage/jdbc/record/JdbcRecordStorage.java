@@ -34,12 +34,11 @@ import io.spine.server.entity.storage.EntityQueries;
 import io.spine.server.entity.storage.EntityQuery;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.RecordStorage;
-import io.spine.server.storage.jdbc.ColumnTypeRegistry;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
-import io.spine.server.storage.jdbc.DefaultColumnTypeRegistry;
 import io.spine.server.storage.jdbc.JdbcStorageFactory;
 import io.spine.server.storage.jdbc.StorageBuilder;
+import io.spine.server.storage.jdbc.type.JdbcTypeRegistry;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Iterator;
@@ -73,7 +72,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
         super(asEntityClass(builder.getEntityClass()), builder.isMultitenant());
         this.dataSource = builder.dataSource();
         Class<? extends Entity<I, ?>> entityClass = builder.getEntityClass();
-        this.table = new RecordTable<>(entityClass, dataSource, builder.columnTypeRegistry(),
+        this.table = new RecordTable<>(entityClass, dataSource, builder.typeRegistry(),
                                        builder.typeMapping(), columns());
         table.create();
     }
@@ -198,7 +197,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
             extends StorageBuilder<Builder<I>, JdbcRecordStorage<I>> {
 
         private Class<? extends Entity<I, ?>> entityClass;
-        private ColumnTypeRegistry columnTypeRegistry = new DefaultColumnTypeRegistry();
+        private JdbcTypeRegistry typeRegistry = new JdbcTypeRegistry();
 
         private Builder() {
             super();
@@ -227,23 +226,23 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
         /**
          * Sets the column type registry.
          *
-         * @param columnTypeRegistry
+         * @param typeRegistry
          *         the registry of entity columns to be used
          */
-        public Builder<I> setColumnTypeRegistry(ColumnTypeRegistry columnTypeRegistry) {
-            this.columnTypeRegistry = checkNotNull(columnTypeRegistry);
+        public Builder<I> setTypeRegistry(JdbcTypeRegistry typeRegistry) {
+            this.typeRegistry = checkNotNull(typeRegistry);
             return this;
         }
 
-        public ColumnTypeRegistry columnTypeRegistry() {
-            return columnTypeRegistry;
+        public JdbcTypeRegistry typeRegistry() {
+            return typeRegistry;
         }
 
         @Override
         protected void checkPreconditions() throws IllegalStateException {
             super.checkPreconditions();
             checkNotNull(entityClass, "Entity class must be set");
-            checkNotNull(columnTypeRegistry, "Column type registry must not be null.");
+            checkNotNull(typeRegistry, "Column type registry must not be null.");
         }
 
         @Override

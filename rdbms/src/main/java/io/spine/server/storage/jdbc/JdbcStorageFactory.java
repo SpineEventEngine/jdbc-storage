@@ -28,6 +28,7 @@ import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateStorage;
 import io.spine.server.delivery.InboxStorage;
 import io.spine.server.entity.Entity;
+import io.spine.server.entity.storage.TypeRegistry;
 import io.spine.server.projection.Projection;
 import io.spine.server.projection.ProjectionStorage;
 import io.spine.server.storage.StorageFactory;
@@ -36,6 +37,7 @@ import io.spine.server.storage.jdbc.delivery.JdbcInboxStorage;
 import io.spine.server.storage.jdbc.delivery.JdbcSessionStorage;
 import io.spine.server.storage.jdbc.projection.JdbcProjectionStorage;
 import io.spine.server.storage.jdbc.record.JdbcRecordStorage;
+import io.spine.server.storage.jdbc.type.JdbcTypeRegistry;
 
 import javax.sql.DataSource;
 
@@ -49,12 +51,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class JdbcStorageFactory implements StorageFactory {
 
     private final DataSourceWrapper dataSource;
-    private final ColumnTypeRegistry columnTypeRegistry;
+    private final JdbcTypeRegistry columnTypeRegistry;
     private final TypeMapping typeMapping;
 
     private JdbcStorageFactory(Builder builder) {
         this.dataSource = checkNotNull(builder.dataSource);
-        this.columnTypeRegistry = builder.columnTypeRegistry;
+        this.columnTypeRegistry = builder.typeRegistry;
         this.typeMapping = checkNotNull(builder.typeMapping);
     }
 
@@ -79,7 +81,7 @@ public class JdbcStorageFactory implements StorageFactory {
                         .setEntityClass(entityClass)
                         .setMultitenant(context.isMultitenant())
                         .setDataSource(dataSource)
-                        .setColumnTypeRegistry(columnTypeRegistry)
+                        .setTypeRegistry(columnTypeRegistry)
                         .setTypeMapping(typeMapping)
                         .build();
         return recordStorage;
@@ -144,7 +146,7 @@ public class JdbcStorageFactory implements StorageFactory {
     public static class Builder {
 
         private DataSourceWrapper dataSource;
-        private ColumnTypeRegistry columnTypeRegistry;
+        private JdbcTypeRegistry typeRegistry;
         private TypeMapping typeMapping;
 
         private Builder() {
@@ -152,15 +154,16 @@ public class JdbcStorageFactory implements StorageFactory {
         }
 
         /**
-         * Sets the {@link ColumnTypeRegistry} to use in the generated storages.
+         * Sets the {@link io.spine.server.entity.storage.TypeRegistry} to use in the generated
+         * storages.
          *
-         * <p>The default value is a {@link DefaultColumnTypeRegistry}.
+         * <p>The default value is a {@link io.spine.server.storage.jdbc.type.JdbcTypeRegistry}.
          *
-         * @param columnTypeRegistry
-         *         the custom {@link ColumnTypeRegistry} to use in the generated storages
+         * @param typeRegistry
+         *         the custom {@link TypeRegistry} to use in the generated storages
          */
-        public Builder setColumnTypeRegistry(ColumnTypeRegistry columnTypeRegistry) {
-            this.columnTypeRegistry = columnTypeRegistry;
+        public Builder setTypeRegistry(JdbcTypeRegistry typeRegistry) {
+            this.typeRegistry = typeRegistry;
             return this;
         }
 
@@ -220,8 +223,8 @@ public class JdbcStorageFactory implements StorageFactory {
          * Returns a new instance of {@code JdbcStorageFactory}.
          */
         public JdbcStorageFactory build() {
-            if (columnTypeRegistry == null) {
-                columnTypeRegistry = new DefaultColumnTypeRegistry();
+            if (typeRegistry == null) {
+                typeRegistry = new JdbcTypeRegistry();
             }
             if (typeMapping == null) {
                 typeMapping = PredefinedMapping.select(dataSource);

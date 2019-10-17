@@ -27,18 +27,17 @@ import io.spine.client.ResponseFormat;
 import io.spine.client.TargetFilters;
 import io.spine.server.entity.Entity;
 import io.spine.server.entity.EntityRecord;
-import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.entity.storage.EntityQueries;
 import io.spine.server.entity.storage.EntityQuery;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.RecordStorage;
 import io.spine.server.storage.RecordStorageTest;
 import io.spine.server.storage.given.RecordStorageTestEnv.TestCounterEntity;
+import io.spine.server.storage.jdbc.ColumnTypeRegistry;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.DefaultColumnTypeRegistry;
 import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.record.given.JdbcRecordStorageTestEnv.TestEntityWithStringId;
-import io.spine.server.storage.jdbc.type.JdbcColumnType;
-import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
 import io.spine.test.storage.Project;
 import io.spine.test.storage.ProjectId;
 import io.spine.testdata.Sample;
@@ -78,7 +77,7 @@ class JdbcRecordStorageTest extends RecordStorageTest<JdbcRecordStorage<ProjectI
         ProjectId id = newId();
         EntityRecord entityRecord = newStorageRecord();
 
-        EntityRecordWithColumns record = EntityRecordWithColumns.of(entityRecord);
+        EntityRecordWithColumns record = EntityRecordWithColumns.of(entityRecord, storage);
         storage.writeRecord(id, record);
         storage.clear();
 
@@ -151,11 +150,10 @@ class JdbcRecordStorageTest extends RecordStorageTest<JdbcRecordStorage<ProjectI
         @Test
         @DisplayName("column type registry")
         void columnTypeRegistry() {
-            ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> registry =
-                    nullRef();
+            ColumnTypeRegistry registry = nullRef();
             assertThrows(NullPointerException.class,
                          () -> JdbcRecordStorage.newBuilder()
-                                                .setColumnTypeRegistry(registry));
+                                                .setTypeRegistry(registry));
         }
     }
 
@@ -170,7 +168,7 @@ class JdbcRecordStorageTest extends RecordStorageTest<JdbcRecordStorage<ProjectI
                         .setDataSource(dataSource)
                         .setEntityClass(entityClass)
                         .setMultitenant(false)
-                        .setColumnTypeRegistry(JdbcTypeRegistryFactory.defaultInstance())
+                        .setTypeRegistry(new DefaultColumnTypeRegistry())
                         .setTypeMapping(H2_1_4)
                         .build();
         return storage;

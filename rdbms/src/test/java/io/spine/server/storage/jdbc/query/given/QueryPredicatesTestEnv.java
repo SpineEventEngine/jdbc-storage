@@ -20,13 +20,14 @@
 
 package io.spine.server.storage.jdbc.query.given;
 
-import io.spine.server.entity.storage.Column;
 import io.spine.server.entity.storage.EntityColumn;
+import io.spine.server.storage.jdbc.ColumnTypeRegistry;
+import io.spine.server.storage.jdbc.PersistenceStrategy;
 import io.spine.server.storage.jdbc.Type;
-import io.spine.server.storage.jdbc.query.Parameters;
-import io.spine.server.storage.jdbc.type.JdbcColumnType;
 
 import java.lang.reflect.Method;
+
+import static io.spine.server.storage.jdbc.Type.STRING;
 
 public final class QueryPredicatesTestEnv {
 
@@ -48,39 +49,16 @@ public final class QueryPredicatesTestEnv {
         }
     }
 
-    @Column
-    public String getString() {
-        return "";
-    }
-
-    /**
-     * Returns a non-comparable object on attempt to convert an entity column value.
-     *
-     * <p>An entity column with such type should not be accepted during the column filter creation.
-     */
-    private static class NonComparableType implements JdbcColumnType<String, Object> {
+    private static class NonComparableRegistry implements ColumnTypeRegistry {
 
         @Override
-        public Object convertColumnValue(String fieldValue) {
-            return new Object();
+        public <T> PersistenceStrategy<T> persistenceStrategyOf(Class<T> clazz) {
+            return t -> new Object();
         }
 
         @Override
-        public void setColumnValue(Parameters.Builder storageRecord,
-                                   Object value,
-                                   String columnIdentifier) {
-            // NO-OP. This method is not interesting for the test.
-        }
-
-        @Override
-        public void setNull(Parameters.Builder storageRecord, String columnIdentifier) {
-            // NO-OP. This method is not interesting for the test.
-        }
-
-        @SuppressWarnings("ReturnOfNull") // OK for test.
-        @Override
-        public Type getType() {
-            return null;
+        public Type typeOf(Class<?> clazz) {
+            return STRING;
         }
     }
 }

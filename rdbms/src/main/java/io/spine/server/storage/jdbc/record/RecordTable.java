@@ -29,7 +29,6 @@ import io.spine.server.entity.storage.Column;
 import io.spine.server.entity.storage.Columns;
 import io.spine.server.entity.storage.EntityQuery;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
-import io.spine.server.storage.jdbc.ColumnTypeRegistry;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.Type;
@@ -38,6 +37,7 @@ import io.spine.server.storage.jdbc.query.DbIterator.DoubleColumnRecord;
 import io.spine.server.storage.jdbc.query.EntityTable;
 import io.spine.server.storage.jdbc.query.SelectQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
+import io.spine.server.storage.jdbc.type.JdbcTypeRegistry;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Collection;
@@ -62,16 +62,16 @@ import static java.util.Collections.addAll;
  */
 final class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumns> {
 
-    private final ColumnTypeRegistry typeRegistry;
+    private final JdbcTypeRegistry typeRegistry;
     private final Columns columns;
 
     RecordTable(Class<? extends Entity<I, ?>> entityClass,
                 DataSourceWrapper dataSource,
-                ColumnTypeRegistry columnTypeRegistry,
+                JdbcTypeRegistry typeRegistry,
                 TypeMapping typeMapping,
                 Columns columns) {
         super(entityClass, ID, dataSource, typeMapping);
-        this.typeRegistry = columnTypeRegistry;
+        this.typeRegistry = typeRegistry;
         this.columns = columns;
     }
 
@@ -104,7 +104,7 @@ final class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWith
         InsertEntityQuery query = builder.setDataSource(dataSource())
                                          .setTableName(name())
                                          .setIdColumn(idColumn())
-                                         .setColumnTypeRegistry(typeRegistry)
+                                         .setTypeRegistry(typeRegistry)
                                          .addRecord(id, record)
                                          .build();
         return query;
@@ -117,7 +117,7 @@ final class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWith
                                          .setDataSource(dataSource())
                                          .setIdColumn(idColumn())
                                          .addRecord(id, record)
-                                         .setColumnTypeRegistry(typeRegistry)
+                                         .setTypeRegistry(typeRegistry)
                                          .build();
         return query;
     }
@@ -186,7 +186,7 @@ final class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWith
         SelectByEntityColumnsQuery<I> query = builder.setDataSource(dataSource())
                                                      .setTableName(name())
                                                      .setIdColumn(idColumn())
-                                                     .setColumnTypeRegistry(typeRegistry)
+                                                     .typeRegistry(typeRegistry)
                                                      .setEntityQuery(entityQuery)
                                                      .setFieldMask(fieldMask)
                                                      .build();
@@ -230,7 +230,7 @@ final class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWith
         InsertEntityQuery query = builder.setDataSource(dataSource())
                                          .setTableName(name())
                                          .setIdColumn(idColumn())
-                                         .setColumnTypeRegistry(typeRegistry)
+                                         .setTypeRegistry(typeRegistry)
                                          .addRecords(records)
                                          .build();
         return query;
@@ -306,7 +306,7 @@ final class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWith
         private final Column column;
         private final Type type;
 
-        private ColumnWrapper(Column column, ColumnTypeRegistry typeRegistry) {
+        private ColumnWrapper(Column column, JdbcTypeRegistry typeRegistry) {
             this.column = column;
             this.type = typeRegistry.typeOf(column.type());
         }

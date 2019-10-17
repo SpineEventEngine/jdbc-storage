@@ -25,8 +25,8 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.ComparablePath;
 import io.spine.client.CompositeFilter;
 import io.spine.client.Filter;
-import io.spine.server.entity.storage.ColumnTypeRegistry;
-import io.spine.server.entity.storage.EntityColumn;
+import io.spine.server.entity.storage.Column;
+import io.spine.server.storage.jdbc.ColumnTypeRegistry;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -112,13 +112,13 @@ class QueryPredicatesTest {
     @Test
     @DisplayName("not accept non-comparable value")
     void notAcceptNonComparable() {
-        EntityColumn column = stringColumn();
+        Column column = stringColumn();
 
         ColumnTypeRegistry registry = ColumnTypeRegistry.newBuilder()
                                                         .put(String.class, nonComparableType())
                                                         .build();
 
-        Filter filter = eq(column.name(), COLUMN_FILTER_VALUE);
+        Filter filter = eq(column.name().value(), COLUMN_FILTER_VALUE);
 
         assertThrows(IllegalArgumentException.class,
                      () -> columnMatchFilter(column, filter, registry));

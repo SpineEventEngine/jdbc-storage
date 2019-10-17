@@ -58,7 +58,7 @@ class JdbcProjectionStorageTest extends ProjectionStorageTest {
                         .setDataSource(dataSource)
                         .setMultitenant(false)
                         .setEntityClass(projectionClass)
-                        .setColumnTypeRegistry(JdbcTypeRegistryFactory.defaultInstance())
+                        .setTypeRegistry(JdbcTypeRegistryFactory.defaultInstance())
                         .setTypeMapping(typeMapping)
                         .build();
         ProjectionStorage<ProjectId> storage =

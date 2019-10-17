@@ -22,14 +22,12 @@ package io.spine.server.storage.jdbc.record;
 
 import com.querydsl.core.dml.StoreClause;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
-import io.spine.server.storage.jdbc.ColumnTypeRegistry;
-import io.spine.server.storage.jdbc.DefaultColumnTypeRegistry;
-import io.spine.server.storage.jdbc.PersistenceStrategy;
 import io.spine.server.storage.jdbc.query.AbstractQuery;
 import io.spine.server.storage.jdbc.query.IdColumn;
 import io.spine.server.storage.jdbc.query.Parameter;
 import io.spine.server.storage.jdbc.query.Parameters;
 import io.spine.server.storage.jdbc.query.WriteQuery;
+import io.spine.server.storage.jdbc.type.JdbcTypeRegistry;
 
 import java.util.Map;
 import java.util.Set;
@@ -56,13 +54,13 @@ abstract class WriteEntityQuery<I, C extends StoreClause<C>>
 
     private final IdColumn<I> idColumn;
     private final Map<I, EntityRecordWithColumns> records;
-    private final ColumnTypeRegistry columnTypeRegistry;
+    private final JdbcTypeRegistry typeRegistry;
 
     WriteEntityQuery(Builder<? extends Builder, ? extends WriteEntityQuery, I> builder) {
         super(builder);
         this.idColumn = builder.idColumn;
         this.records = builder.records;
-        this.columnTypeRegistry = builder.columnTypeRegistry;
+        this.typeRegistry = builder.typeRegistry;
     }
 
     @Override
@@ -132,11 +130,8 @@ abstract class WriteEntityQuery<I, C extends StoreClause<C>>
         Parameters.Builder parameters = Parameters.newBuilder();
         record.columnNames()
               .forEach(columnName -> {
-                  Object columnValue = record.columnValue(columnName);
-                  PersistenceStrategy<?> strategy =
-                          columnTypeRegistry.persistenceStrategyOf(columnValue.getClass());
-                  Object valueForStoring = strategy.applyTo(columnValue);
-                  parameters.addParameter(columnName.value(), Parameter.of(valueForStoring));
+                  Object columnValue = record.columnValue(columnName, typeRegistry);
+                  parameters.addParameter(columnName.value(), Parameter.of(columnValue));
               });
         return parameters.build();
     }
@@ -148,10 +143,10 @@ abstract class WriteEntityQuery<I, C extends StoreClause<C>>
 
         private IdColumn<I> idColumn;
         private final Map<I, EntityRecordWithColumns> records = newLinkedHashMap();
-        private ColumnTypeRegistry columnTypeRegistry = new DefaultColumnTypeRegistry();
+        private JdbcTypeRegistry typeRegistry = new JdbcTypeRegistry();
 
-        B setColumnTypeRegistry(ColumnTypeRegistry columnTypeRegistry) {
-            this.columnTypeRegistry = columnTypeRegistry;
+        B setTypeRegistry(JdbcTypeRegistry typeRegistry) {
+            this.typeRegistry = typeRegistry;
             return getThis();
         }
 
