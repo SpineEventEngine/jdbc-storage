@@ -20,9 +20,9 @@
 
 package io.spine.server.storage.jdbc.query.given;
 
-import com.google.protobuf.StringValue;
 import io.spine.server.entity.AbstractEntity;
 import io.spine.test.entity.ProjectId;
+import io.spine.test.storage.Project;
 
 public class IdColumnTestEnv {
 
@@ -30,25 +30,25 @@ public class IdColumnTestEnv {
     private IdColumnTestEnv() {
     }
 
-    public static class LongIdEntity extends AbstractEntity<Long, StringValue> {
+    public static class LongIdEntity extends AbstractEntity<Long, Project> {
         protected LongIdEntity(Long id) {
             super(id);
         }
     }
 
-    public static class IntIdEntity extends AbstractEntity<Integer, StringValue> {
+    public static class IntIdEntity extends AbstractEntity<Integer, Project> {
         protected IntIdEntity(Integer id) {
             super(id);
         }
     }
 
-    public static class StringIdEntity extends AbstractEntity<String, StringValue> {
+    public static class StringIdEntity extends AbstractEntity<String, Project> {
         protected StringIdEntity(String id) {
             super(id);
         }
     }
 
-    public static class MessageIdEntity extends AbstractEntity<ProjectId, StringValue> {
+    public static class MessageIdEntity extends AbstractEntity<ProjectId, Project> {
         protected MessageIdEntity(ProjectId id) {
             super(id);
         }

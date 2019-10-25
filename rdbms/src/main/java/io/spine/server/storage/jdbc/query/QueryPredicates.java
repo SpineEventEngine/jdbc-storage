@@ -29,10 +29,10 @@ import io.spine.client.CompositeFilter;
 import io.spine.client.Filter;
 import io.spine.client.Filter.Operator;
 import io.spine.server.entity.storage.Column;
+import io.spine.server.entity.storage.ColumnStorageRule;
 import io.spine.server.entity.storage.CompositeQueryParameter;
-import io.spine.server.entity.storage.PersistenceStrategy;
 import io.spine.server.entity.storage.QueryParameters;
-import io.spine.server.storage.jdbc.type.JdbcTypeRegistry;
+import io.spine.server.storage.jdbc.type.JdbcColumnStorageRules;
 
 import java.util.Collection;
 import java.util.Map;
@@ -82,27 +82,27 @@ public class QueryPredicates {
      *
      * @param parameters
      *         the query parameters to compose the predicate
-     * @param typeRegistry
+     * @param columnStorageRules
      *         the registry of entity column type to use
      * @return the predicate for columns
      */
     public static Predicate
-    matchParameters(QueryParameters parameters, JdbcTypeRegistry typeRegistry) {
+    matchParameters(QueryParameters parameters, JdbcColumnStorageRules<?> columnStorageRules) {
         BooleanExpression result = TRUE;
         for (CompositeQueryParameter parameter : parameters) {
-            result = result.and(predicateFrom(parameter, typeRegistry));
+            result = result.and(predicateFrom(parameter, columnStorageRules));
         }
         return result;
     }
 
     private static Predicate
-    predicateFrom(CompositeQueryParameter parameter, JdbcTypeRegistry typeRegistry) {
+    predicateFrom(CompositeQueryParameter parameter, JdbcColumnStorageRules<?> columnStorageRules) {
         Predicate result = TRUE;
         for (Map.Entry<Column, Filter> columnWithFilter : parameter.filters()
                                                                    .entries()) {
             Predicate predicate = columnMatchFilter(columnWithFilter.getKey(),
                                                     columnWithFilter.getValue(),
-                                                    typeRegistry);
+                                                    columnStorageRules);
             result = joinPredicates(result, predicate, parameter.operator());
         }
         return result;
@@ -127,7 +127,7 @@ public class QueryPredicates {
 
     @VisibleForTesting
     static Predicate
-    columnMatchFilter(Column column, Filter filter, JdbcTypeRegistry typeRegistry) {
+    columnMatchFilter(Column column, Filter filter, JdbcColumnStorageRules<?> columnStorageRules) {
         Operator operator = filter.getOperator();
         checkArgument(operator.getNumber() > 0, operator.name());
 
@@ -136,8 +136,8 @@ public class QueryPredicates {
         ComparablePath<Comparable> columnPath = comparablePath(Comparable.class, columnName);
         Class<?> type = column.type();
         Object javaValue = toObject(filter.getValue(), type);
-        PersistenceStrategy<?, ?> strategy =
-                typeRegistry.persistenceStrategyOf(javaValue.getClass());
+        ColumnStorageRule<?, ?> strategy =
+                columnStorageRules.of(javaValue.getClass());
         Object valueForStoring = strategy.applyTo(javaValue);
         if (valueForStoring == null) {
             return nullFilter(operator, columnPath);

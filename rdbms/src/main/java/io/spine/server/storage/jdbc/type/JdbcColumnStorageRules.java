@@ -18,14 +18,12 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/**
- * Test environment classes for tests of the {@link io.spine.server.storage.jdbc.record} package.
- */
+package io.spine.server.storage.jdbc.type;
 
-@CheckReturnValue
-@ParametersAreNonnullByDefault
-package io.spine.server.storage.jdbc.record.given;
+import io.spine.server.entity.storage.ColumnStorageRules;
+import io.spine.server.storage.jdbc.Type;
 
-import com.google.errorprone.annotations.CheckReturnValue;
+public interface JdbcColumnStorageRules<R> extends ColumnStorageRules<R> {
 
-import javax.annotation.ParametersAreNonnullByDefault;
+    Type typeOf(Class<?> clazz);
+}

@@ -20,14 +20,12 @@
 
 package io.spine.server.storage.jdbc.query.given;
 
-import io.spine.server.entity.storage.EntityColumn;
-import io.spine.server.storage.jdbc.ColumnTypeRegistry;
-import io.spine.server.storage.jdbc.PersistenceStrategy;
-import io.spine.server.storage.jdbc.Type;
-
-import java.lang.reflect.Method;
-
-import static io.spine.server.storage.jdbc.Type.STRING;
+import io.spine.server.entity.storage.Column;
+import io.spine.server.entity.storage.ColumnName;
+import io.spine.server.entity.storage.ColumnStorageRule;
+import io.spine.server.entity.storage.Columns;
+import io.spine.server.storage.given.RecordStorageTestEnv.TestCounterEntity;
+import io.spine.server.storage.jdbc.type.DefaultJdbcStorageRules;
 
 public final class QueryPredicatesTestEnv {
 
@@ -35,30 +33,21 @@ public final class QueryPredicatesTestEnv {
     private QueryPredicatesTestEnv() {
     }
 
-    public static NonComparableType nonComparableType() {
-        return new NonComparableType();
+    public static Object nonComparableValue() {
+        return new Object();
     }
 
-    public static EntityColumn stringColumn() {
-        try {
-            Method method = QueryPredicatesTestEnv.class.getDeclaredMethod("getString");
-            EntityColumn column = EntityColumn.from(method);
-            return column;
-        } catch (NoSuchMethodException e) {
-            throw new IllegalStateException(e);
-        }
+    public static Column stringColumn() {
+        Column column = Columns.of(TestCounterEntity.class)
+                               .get(ColumnName.of("id_string"));
+        return column;
     }
 
-    private static class NonComparableRegistry implements ColumnTypeRegistry {
+    public static final class MapToNonComparable extends DefaultJdbcStorageRules {
 
         @Override
-        public <T> PersistenceStrategy<T> persistenceStrategyOf(Class<T> clazz) {
-            return t -> new Object();
-        }
-
-        @Override
-        public Type typeOf(Class<?> clazz) {
-            return STRING;
+        public ColumnStorageRule<?, ?> of(Class<?> type) {
+            return o -> nonComparableValue();
         }
     }
 }

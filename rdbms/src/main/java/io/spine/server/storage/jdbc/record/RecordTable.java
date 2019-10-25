@@ -37,7 +37,7 @@ import io.spine.server.storage.jdbc.query.DbIterator.DoubleColumnRecord;
 import io.spine.server.storage.jdbc.query.EntityTable;
 import io.spine.server.storage.jdbc.query.SelectQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
-import io.spine.server.storage.jdbc.type.JdbcTypeRegistry;
+import io.spine.server.storage.jdbc.type.JdbcColumnStorageRules;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Collection;
@@ -62,16 +62,16 @@ import static java.util.Collections.addAll;
  */
 final class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumns> {
 
-    private final JdbcTypeRegistry typeRegistry;
+    private final JdbcColumnStorageRules<?> columnStorageRules;
     private final Columns columns;
 
     RecordTable(Class<? extends Entity<I, ?>> entityClass,
                 DataSourceWrapper dataSource,
-                JdbcTypeRegistry typeRegistry,
+                JdbcColumnStorageRules<?> columnStorageRules,
                 TypeMapping typeMapping,
                 Columns columns) {
         super(entityClass, ID, dataSource, typeMapping);
-        this.typeRegistry = typeRegistry;
+        this.columnStorageRules = columnStorageRules;
         this.columns = columns;
     }
 
@@ -104,7 +104,7 @@ final class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWith
         InsertEntityQuery query = builder.setDataSource(dataSource())
                                          .setTableName(name())
                                          .setIdColumn(idColumn())
-                                         .setTypeRegistry(typeRegistry)
+                                         .setColumnStorageRules(columnStorageRules)
                                          .addRecord(id, record)
                                          .build();
         return query;
@@ -117,7 +117,7 @@ final class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWith
                                          .setDataSource(dataSource())
                                          .setIdColumn(idColumn())
                                          .addRecord(id, record)
-                                         .setTypeRegistry(typeRegistry)
+                                         .setColumnStorageRules(columnStorageRules)
                                          .build();
         return query;
     }
@@ -186,7 +186,7 @@ final class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWith
         SelectByEntityColumnsQuery<I> query = builder.setDataSource(dataSource())
                                                      .setTableName(name())
                                                      .setIdColumn(idColumn())
-                                                     .typeRegistry(typeRegistry)
+                                                     .setColumnStorageRules(columnStorageRules)
                                                      .setEntityQuery(entityQuery)
                                                      .setFieldMask(fieldMask)
                                                      .build();
@@ -230,7 +230,7 @@ final class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWith
         InsertEntityQuery query = builder.setDataSource(dataSource())
                                          .setTableName(name())
                                          .setIdColumn(idColumn())
-                                         .setTypeRegistry(typeRegistry)
+                                         .setColumnStorageRules(columnStorageRules)
                                          .addRecords(records)
                                          .build();
         return query;
@@ -289,7 +289,7 @@ final class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWith
         @Override
         public TableColumn apply(@Nullable Column column) {
             checkNotNull(column);
-            TableColumn result = new ColumnWrapper(column, typeRegistry);
+            TableColumn result = new ColumnWrapper(column, columnStorageRules);
             return result;
         }
     }
@@ -306,9 +306,9 @@ final class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWith
         private final Column column;
         private final Type type;
 
-        private ColumnWrapper(Column column, JdbcTypeRegistry typeRegistry) {
+        private ColumnWrapper(Column column, JdbcColumnStorageRules<?> columnStorageRules) {
             this.column = column;
-            this.type = typeRegistry.typeOf(column.type());
+            this.type = columnStorageRules.typeOf(column.type());
         }
 
         @Override

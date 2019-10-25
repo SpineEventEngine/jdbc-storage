@@ -27,7 +27,8 @@ import io.spine.server.storage.jdbc.query.IdColumn;
 import io.spine.server.storage.jdbc.query.Parameter;
 import io.spine.server.storage.jdbc.query.Parameters;
 import io.spine.server.storage.jdbc.query.WriteQuery;
-import io.spine.server.storage.jdbc.type.JdbcTypeRegistry;
+import io.spine.server.storage.jdbc.type.DefaultJdbcStorageRules;
+import io.spine.server.storage.jdbc.type.JdbcColumnStorageRules;
 
 import java.util.Map;
 import java.util.Set;
@@ -54,13 +55,13 @@ abstract class WriteEntityQuery<I, C extends StoreClause<C>>
 
     private final IdColumn<I> idColumn;
     private final Map<I, EntityRecordWithColumns> records;
-    private final JdbcTypeRegistry typeRegistry;
+    private final JdbcColumnStorageRules<?> columnStorageRules;
 
     WriteEntityQuery(Builder<? extends Builder, ? extends WriteEntityQuery, I> builder) {
         super(builder);
         this.idColumn = builder.idColumn;
         this.records = builder.records;
-        this.typeRegistry = builder.typeRegistry;
+        this.columnStorageRules = builder.columnStorageRules;
     }
 
     @Override
@@ -130,7 +131,7 @@ abstract class WriteEntityQuery<I, C extends StoreClause<C>>
         Parameters.Builder parameters = Parameters.newBuilder();
         record.columnNames()
               .forEach(columnName -> {
-                  Object columnValue = record.columnValue(columnName, typeRegistry);
+                  Object columnValue = record.columnValue(columnName, columnStorageRules);
                   parameters.addParameter(columnName.value(), Parameter.of(columnValue));
               });
         return parameters.build();
@@ -143,10 +144,10 @@ abstract class WriteEntityQuery<I, C extends StoreClause<C>>
 
         private IdColumn<I> idColumn;
         private final Map<I, EntityRecordWithColumns> records = newLinkedHashMap();
-        private JdbcTypeRegistry typeRegistry = new JdbcTypeRegistry();
+        private JdbcColumnStorageRules<?> columnStorageRules = new DefaultJdbcStorageRules();
 
-        B setTypeRegistry(JdbcTypeRegistry typeRegistry) {
-            this.typeRegistry = typeRegistry;
+        B setColumnStorageRules(JdbcColumnStorageRules<?> columnStorageRules) {
+            this.columnStorageRules = columnStorageRules;
             return getThis();
         }
 

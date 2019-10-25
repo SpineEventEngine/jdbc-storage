@@ -18,29 +18,27 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.record.given;
+package io.spine.server.storage.jdbc.type;
 
-import io.spine.server.entity.AbstractEntity;
-import io.spine.server.entity.storage.Column;
-import io.spine.test.storage.Project;
+import io.spine.server.entity.storage.ColumnStorageRule;
+import io.spine.server.storage.jdbc.Type;
 
-public class JdbcRecordStorageTestEnv {
+public final class JdbcStorageRule<T, R> implements ColumnStorageRule<T, R> {
 
-    public static final String COLUMN_NAME_FOR_STORING = "customName";
+    private final ColumnStorageRule<T, R> rule;
+    private final Type type;
 
-    /** Prevents instantiation of this utility class. */
-    private JdbcRecordStorageTestEnv() {
+    public JdbcStorageRule(ColumnStorageRule<T, R> rule, Type type) {
+        this.rule = rule;
+        this.type = type;
     }
 
-    public static class TestEntityWithStringId extends AbstractEntity<String, Project> {
-        protected TestEntityWithStringId(String id) {
-            super(id);
-        }
+    @Override
+    public R apply(T t) {
+        return rule.apply(t);
+    }
 
-        @SuppressWarnings("unused") // Reflective access.
-        @Column(name = COLUMN_NAME_FOR_STORING)
-        public int getValue() {
-            return 0;
-        }
+    public Type storeAs() {
+        return type;
     }
 }

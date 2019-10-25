@@ -21,10 +21,12 @@
 package io.spine.server.storage.jdbc.record;
 
 import com.google.protobuf.Message;
+import io.spine.base.Identifier;
 import io.spine.client.CompositeFilter;
 import io.spine.client.Filter;
 import io.spine.client.ResponseFormat;
 import io.spine.client.TargetFilters;
+import io.spine.protobuf.AnyPacker;
 import io.spine.server.entity.Entity;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.storage.EntityQueries;
@@ -33,11 +35,8 @@ import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.RecordStorage;
 import io.spine.server.storage.RecordStorageTest;
 import io.spine.server.storage.given.RecordStorageTestEnv.TestCounterEntity;
-import io.spine.server.storage.jdbc.ColumnTypeRegistry;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.DefaultColumnTypeRegistry;
-import io.spine.server.storage.jdbc.TableColumn;
-import io.spine.server.storage.jdbc.record.given.JdbcRecordStorageTestEnv.TestEntityWithStringId;
+import io.spine.server.storage.jdbc.type.DefaultJdbcStorageRules;
 import io.spine.test.storage.Project;
 import io.spine.test.storage.ProjectId;
 import io.spine.testdata.Sample;
@@ -45,20 +44,19 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
+import java.util.Iterator;
 import java.util.Optional;
 
 import static com.google.common.truth.Truth.assertThat;
+import static io.spine.base.Identifier.newUuid;
 import static io.spine.client.CompositeFilter.CompositeOperator.ALL;
 import static io.spine.client.Filters.gt;
 import static io.spine.client.Filters.lt;
-import static io.spine.server.storage.LifecycleFlagField.archived;
-import static io.spine.server.storage.LifecycleFlagField.deleted;
+import static io.spine.protobuf.AnyPacker.pack;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
 import static io.spine.server.storage.jdbc.PredefinedMapping.H2_1_4;
-import static io.spine.server.storage.jdbc.record.given.JdbcRecordStorageTestEnv.COLUMN_NAME_FOR_STORING;
+import static io.spine.test.storage.Project.Status.DONE;
 import static io.spine.testing.Tests.nullRef;
-import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -77,7 +75,7 @@ class JdbcRecordStorageTest extends RecordStorageTest<JdbcRecordStorage<ProjectI
         ProjectId id = newId();
         EntityRecord entityRecord = newStorageRecord();
 
-        EntityRecordWithColumns record = EntityRecordWithColumns.of(entityRecord, storage);
+        EntityRecordWithColumns record = EntityRecordWithColumns.create(entityRecord, storage);
         storage.writeRecord(id, record);
         storage.clear();
 
@@ -96,29 +94,29 @@ class JdbcRecordStorageTest extends RecordStorageTest<JdbcRecordStorage<ProjectI
     }
 
     @Test
-    @DisplayName("use column names for storing")
-    void useColumnNames() {
-        JdbcRecordStorage<ProjectId> storage = newStorage(TestEntityWithStringId.class);
-        List<String> columns = storage.getTable()
-                                      .tableColumns()
-                                      .stream()
-                                      .map(TableColumn::name)
-                                      .collect(toList());
-        assertThat(columns).containsAtLeast(archived.name(),
-                                            deleted.name(),
-                                            COLUMN_NAME_FOR_STORING);
-        close(storage);
-    }
-
-    @SuppressWarnings("CheckReturnValue")
-    // Just check that operation is performed without exceptions.
-    @Test
     @DisplayName("read by composite filter with column filters for same column")
     void readByCompositeFilter() {
-        JdbcRecordStorage<ProjectId> storage = newStorage(TestEntityWithStringId.class);
-        String columnName = COLUMN_NAME_FOR_STORING;
-        Filter lessThan = lt(columnName, -5);
-        Filter greaterThan = gt(columnName, 5);
+        JdbcRecordStorage<ProjectId> storage = newStorage(TestCounterEntity.class);
+        ProjectId id = ProjectId
+                .newBuilder()
+                .setId(newUuid())
+                .build();
+        TestCounterEntity entity = new TestCounterEntity(id);
+        entity.assignStatus(DONE);
+        EntityRecord record = EntityRecord
+                .newBuilder()
+                .setEntityId(Identifier.pack(id))
+                .setState(pack(entity.state()))
+                .setVersion(entity.version())
+                .setLifecycleFlags(entity.lifecycleFlags())
+                .build();
+        EntityRecordWithColumns recordWithColumns =
+                EntityRecordWithColumns.create(record, entity, storage);
+        storage.write(id, recordWithColumns);
+
+        String columnName = "project_status_value";
+        Filter lessThan = lt(columnName, 4);
+        Filter greaterThan = gt(columnName, 2);
         CompositeFilter columnFilter = CompositeFilter
                 .newBuilder()
                 .addFilter(lessThan)
@@ -130,7 +128,17 @@ class JdbcRecordStorageTest extends RecordStorageTest<JdbcRecordStorage<ProjectI
                 .addFilter(columnFilter)
                 .build();
         EntityQuery<ProjectId> query = EntityQueries.from(filters, storage);
-        storage.readAll(query, ResponseFormat.getDefaultInstance());
+        Iterator<EntityRecord> resultIterator =
+                storage.readAll(query, ResponseFormat.getDefaultInstance());
+
+        assertThat(resultIterator.hasNext())
+                .isTrue();
+
+        EntityRecord next = resultIterator.next();
+        ProjectId nextId = AnyPacker.unpack(next.getEntityId(), ProjectId.class);
+
+        assertThat(nextId).isEqualTo(id);
+
         close(storage);
     }
 
@@ -148,12 +156,12 @@ class JdbcRecordStorageTest extends RecordStorageTest<JdbcRecordStorage<ProjectI
         }
 
         @Test
-        @DisplayName("column type registry")
-        void columnTypeRegistry() {
-            ColumnTypeRegistry registry = nullRef();
+        @DisplayName("column storage rules")
+        void columnStorageRules() {
+            DefaultJdbcStorageRules storageRules = nullRef();
             assertThrows(NullPointerException.class,
                          () -> JdbcRecordStorage.newBuilder()
-                                                .setTypeRegistry(registry));
+                                                .setColumnStorageRules(storageRules));
         }
     }
 
@@ -168,7 +176,7 @@ class JdbcRecordStorageTest extends RecordStorageTest<JdbcRecordStorage<ProjectI
                         .setDataSource(dataSource)
                         .setEntityClass(entityClass)
                         .setMultitenant(false)
-                        .setTypeRegistry(new DefaultColumnTypeRegistry())
+                        .setColumnStorageRules(new DefaultJdbcStorageRules())
                         .setTypeMapping(H2_1_4)
                         .build();
         return storage;
