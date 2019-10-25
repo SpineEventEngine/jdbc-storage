@@ -79,7 +79,8 @@ final class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWith
     protected List<TableColumn> tableColumns() {
         List<TableColumn> columns = newLinkedList();
         addAll(columns, StandardColumn.values());
-        Collection<TableColumn> tableColumns = this.columns.columnList()
+        Collection<TableColumn> tableColumns = this.columns.allColumns()
+                                                           .values()
                                                            .stream()
                                                            .map(new ColumnAdapter())
                                                            .collect(Collectors.toList());

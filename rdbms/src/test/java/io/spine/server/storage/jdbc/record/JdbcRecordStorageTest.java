@@ -75,7 +75,7 @@ class JdbcRecordStorageTest extends RecordStorageTest<JdbcRecordStorage<ProjectI
         ProjectId id = newId();
         EntityRecord entityRecord = newStorageRecord();
 
-        EntityRecordWithColumns record = EntityRecordWithColumns.create(entityRecord, storage);
+        EntityRecordWithColumns record = EntityRecordWithColumns.of(entityRecord);
         storage.writeRecord(id, record);
         storage.clear();
 
@@ -111,7 +111,7 @@ class JdbcRecordStorageTest extends RecordStorageTest<JdbcRecordStorage<ProjectI
                 .setLifecycleFlags(entity.lifecycleFlags())
                 .build();
         EntityRecordWithColumns recordWithColumns =
-                EntityRecordWithColumns.create(record, entity, storage);
+                EntityRecordWithColumns.create(record, entity, storage.entityClass());
         storage.write(id, recordWithColumns);
 
         String columnName = "project_status_value";
