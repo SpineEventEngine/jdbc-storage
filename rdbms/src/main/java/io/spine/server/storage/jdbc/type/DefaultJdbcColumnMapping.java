@@ -27,91 +27,91 @@ import com.google.protobuf.Timestamp;
 import com.google.protobuf.util.Timestamps;
 import io.spine.core.Version;
 import io.spine.json.Json;
-import io.spine.server.entity.storage.AbstractStorageRules;
-import io.spine.server.entity.storage.ColumnStorageRule;
+import io.spine.server.entity.storage.AbstractColumnMapping;
+import io.spine.server.entity.storage.ColumnTypeMapping;
 import io.spine.server.storage.jdbc.Type;
 
-import static io.spine.server.entity.storage.ColumnStorageRule.identity;
+import static io.spine.server.entity.storage.ColumnTypeMapping.identity;
 import static io.spine.server.storage.jdbc.Type.BOOLEAN;
 import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
 import static io.spine.server.storage.jdbc.Type.INT;
 import static io.spine.server.storage.jdbc.Type.LONG;
 import static io.spine.server.storage.jdbc.Type.STRING;
 
-public class DefaultJdbcStorageRules
-        extends AbstractStorageRules<Object>
-        implements JdbcColumnStorageRules<Object> {
+public class DefaultJdbcColumnMapping
+        extends AbstractColumnMapping<Object>
+        implements JdbcColumnMapping<Object> {
 
     @Override
     public Type typeOf(Class<?> clazz) {
-        JdbcStorageRule<?, ?> persistenceStrategy =
-                (JdbcStorageRule<?, ? >) of(clazz);
+        JdbcColumnTypeMapping<?, ?> persistenceStrategy =
+                (JdbcColumnTypeMapping<?, ? >) of(clazz);
         Type type = persistenceStrategy.storeAs();
         return type;
     }
 
     @Override
     protected void
-    setupCustomRules(ImmutableMap.Builder<Class<?>, ColumnStorageRule<?, ?>> builder) {
+    setupCustomMapping(ImmutableMap.Builder<Class<?>, ColumnTypeMapping<?, ?>> builder) {
         builder.put(Timestamp.class, ofTimestamp());
         builder.put(Version.class, ofVersion());
     }
 
     @Override
-    protected ColumnStorageRule<String, String> ofString() {
-        return new JdbcStorageRule<>(identity(), STRING);
+    protected ColumnTypeMapping<String, String> ofString() {
+        return new JdbcColumnTypeMapping<>(identity(), STRING);
     }
 
     @Override
-    protected ColumnStorageRule<Integer, Integer> ofInteger() {
-        return new JdbcStorageRule<>(identity(), INT);
+    protected ColumnTypeMapping<Integer, Integer> ofInteger() {
+        return new JdbcColumnTypeMapping<>(identity(), INT);
     }
 
     @Override
-    protected ColumnStorageRule<Long, Long> ofLong() {
-        return new JdbcStorageRule<>(identity(), LONG);
+    protected ColumnTypeMapping<Long, Long> ofLong() {
+        return new JdbcColumnTypeMapping<>(identity(), LONG);
     }
 
     @Override
-    protected ColumnStorageRule<Float, Float> ofFloat() {
+    protected ColumnTypeMapping<Float, Float> ofFloat() {
         throw unsupportedType(Float.class);
     }
 
     @Override
-    protected ColumnStorageRule<Double, Double> ofDouble() {
+    protected ColumnTypeMapping<Double, Double> ofDouble() {
         throw unsupportedType(Double.class);
     }
 
     @Override
-    protected ColumnStorageRule<Boolean, Boolean> ofBoolean() {
-        return new JdbcStorageRule<>(identity(), BOOLEAN);
+    protected ColumnTypeMapping<Boolean, Boolean> ofBoolean() {
+        return new JdbcColumnTypeMapping<>(identity(), BOOLEAN);
     }
 
     @Override
-    protected ColumnStorageRule<ByteString, byte[]> ofByteString() {
-        return new JdbcStorageRule<>(ByteString::toByteArray, BYTE_ARRAY);
+    protected ColumnTypeMapping<ByteString, byte[]> ofByteString() {
+        return new JdbcColumnTypeMapping<>(ByteString::toByteArray, BYTE_ARRAY);
     }
 
     @Override
-    protected ColumnStorageRule<Enum<?>, Integer> ofEnum() {
-        return new JdbcStorageRule<>(Enum::ordinal, INT);
+    protected ColumnTypeMapping<Enum<?>, Integer> ofEnum() {
+        return new JdbcColumnTypeMapping<>(Enum::ordinal, INT);
     }
 
     @Override
-    protected ColumnStorageRule<Message, String> ofMessage() {
-        return new JdbcStorageRule<>(Json::toCompactJson, STRING);
+    protected ColumnTypeMapping<Message, String> ofMessage() {
+        return new JdbcColumnTypeMapping<>(Json::toCompactJson, STRING);
     }
 
     @Override
-    public ColumnStorageRule<?, ?> ofNull() {
+    public ColumnTypeMapping<?, ?> ofNull() {
         return identity();
     }
 
-    private static JdbcStorageRule<Timestamp, Long> ofTimestamp() {
-        return new JdbcStorageRule<>(Timestamps::toMillis, LONG);
+    private static JdbcColumnTypeMapping<Timestamp, Long> ofTimestamp() {
+        return new JdbcColumnTypeMapping<>(Timestamps::toMillis, LONG);
     }
 
-    private static JdbcStorageRule<Version, Integer> ofVersion() {
-        return new JdbcStorageRule<>(Version::getNumber, INT);
+    private static JdbcColumnTypeMapping<Version, Integer> ofVersion() {
+        return new JdbcColumnTypeMapping<>(Version::getNumber, INT);
     }
 }

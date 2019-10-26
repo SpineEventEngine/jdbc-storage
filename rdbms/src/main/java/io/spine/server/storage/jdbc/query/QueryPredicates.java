@@ -29,10 +29,10 @@ import io.spine.client.CompositeFilter;
 import io.spine.client.Filter;
 import io.spine.client.Filter.Operator;
 import io.spine.server.entity.storage.Column;
-import io.spine.server.entity.storage.ColumnStorageRule;
+import io.spine.server.entity.storage.ColumnTypeMapping;
 import io.spine.server.entity.storage.CompositeQueryParameter;
 import io.spine.server.entity.storage.QueryParameters;
-import io.spine.server.storage.jdbc.type.JdbcColumnStorageRules;
+import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 
 import java.util.Collection;
 import java.util.Map;
@@ -82,27 +82,27 @@ public class QueryPredicates {
      *
      * @param parameters
      *         the query parameters to compose the predicate
-     * @param columnStorageRules
-     *         the registry of entity column type to use
+     * @param columnMapping
+     *         the entity column mapping
      * @return the predicate for columns
      */
     public static Predicate
-    matchParameters(QueryParameters parameters, JdbcColumnStorageRules<?> columnStorageRules) {
+    matchParameters(QueryParameters parameters, JdbcColumnMapping<?> columnMapping) {
         BooleanExpression result = TRUE;
         for (CompositeQueryParameter parameter : parameters) {
-            result = result.and(predicateFrom(parameter, columnStorageRules));
+            result = result.and(predicateFrom(parameter, columnMapping));
         }
         return result;
     }
 
     private static Predicate
-    predicateFrom(CompositeQueryParameter parameter, JdbcColumnStorageRules<?> columnStorageRules) {
+    predicateFrom(CompositeQueryParameter parameter, JdbcColumnMapping<?> columnMapping) {
         Predicate result = TRUE;
         for (Map.Entry<Column, Filter> columnWithFilter : parameter.filters()
                                                                    .entries()) {
             Predicate predicate = columnMatchFilter(columnWithFilter.getKey(),
                                                     columnWithFilter.getValue(),
-                                                    columnStorageRules);
+                                                    columnMapping);
             result = joinPredicates(result, predicate, parameter.operator());
         }
         return result;
@@ -127,7 +127,7 @@ public class QueryPredicates {
 
     @VisibleForTesting
     static Predicate
-    columnMatchFilter(Column column, Filter filter, JdbcColumnStorageRules<?> columnStorageRules) {
+    columnMatchFilter(Column column, Filter filter, JdbcColumnMapping<?> columnMapping) {
         Operator operator = filter.getOperator();
         checkArgument(operator.getNumber() > 0, operator.name());
 
@@ -136,8 +136,8 @@ public class QueryPredicates {
         ComparablePath<Comparable> columnPath = comparablePath(Comparable.class, columnName);
         Class<?> type = column.type();
         Object javaValue = toObject(filter.getValue(), type);
-        ColumnStorageRule<?, ?> strategy =
-                columnStorageRules.of(javaValue.getClass());
+        ColumnTypeMapping<?, ?> strategy =
+                columnMapping.of(javaValue.getClass());
         Object valueForStoring = strategy.applyTo(javaValue);
         if (valueForStoring == null) {
             return nullFilter(operator, columnPath);

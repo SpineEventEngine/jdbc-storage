@@ -36,8 +36,8 @@ import io.spine.server.storage.jdbc.delivery.JdbcInboxStorage;
 import io.spine.server.storage.jdbc.delivery.JdbcSessionStorage;
 import io.spine.server.storage.jdbc.projection.JdbcProjectionStorage;
 import io.spine.server.storage.jdbc.record.JdbcRecordStorage;
-import io.spine.server.storage.jdbc.type.DefaultJdbcStorageRules;
-import io.spine.server.storage.jdbc.type.JdbcColumnStorageRules;
+import io.spine.server.storage.jdbc.type.DefaultJdbcColumnMapping;
+import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 
 import javax.sql.DataSource;
 
@@ -51,12 +51,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class JdbcStorageFactory implements StorageFactory {
 
     private final DataSourceWrapper dataSource;
-    private final JdbcColumnStorageRules<?> columnStorageRules;
+    private final JdbcColumnMapping<?> columnMapping;
     private final TypeMapping typeMapping;
 
     private JdbcStorageFactory(Builder builder) {
         this.dataSource = checkNotNull(builder.dataSource);
-        this.columnStorageRules = builder.columnStorageRules;
+        this.columnMapping = builder.columnMapping;
         this.typeMapping = checkNotNull(builder.typeMapping);
     }
 
@@ -81,7 +81,7 @@ public class JdbcStorageFactory implements StorageFactory {
                         .setEntityClass(entityClass)
                         .setMultitenant(context.isMultitenant())
                         .setDataSource(dataSource)
-                        .setColumnStorageRules(columnStorageRules)
+                        .setColumnMapping(columnMapping)
                         .setTypeMapping(typeMapping)
                         .build();
         return recordStorage;
@@ -146,7 +146,7 @@ public class JdbcStorageFactory implements StorageFactory {
     public static class Builder {
 
         private DataSourceWrapper dataSource;
-        private JdbcColumnStorageRules<?> columnStorageRules;
+        private JdbcColumnMapping<?> columnMapping;
         private TypeMapping typeMapping;
 
         private Builder() {
@@ -154,16 +154,16 @@ public class JdbcStorageFactory implements StorageFactory {
         }
 
         /**
-         * Sets the {@link io.spine.server.entity.storage.ColumnStorageRules} to use in the
-         * generated storages.
+         * Sets the {@linkplain io.spine.server.entity.storage.ColumnMapping column mapping} to use
+         * in the generated storages.
          *
-         * <p>The default value is a {@link DefaultJdbcStorageRules}.
+         * <p>The default value is a {@link DefaultJdbcColumnMapping}.
          *
-         * @param columnStorageRules
-         *         the custom column storage rules to use in the generated storages
+         * @param columnMapping
+         *         the column mapping to use in the generated storages
          */
-        public Builder setColumnStorageRules(JdbcColumnStorageRules<?> columnStorageRules) {
-            this.columnStorageRules = columnStorageRules;
+        public Builder setColumnMapping(JdbcColumnMapping<?> columnMapping) {
+            this.columnMapping = columnMapping;
             return this;
         }
 
@@ -223,8 +223,8 @@ public class JdbcStorageFactory implements StorageFactory {
          * Returns a new instance of {@code JdbcStorageFactory}.
          */
         public JdbcStorageFactory build() {
-            if (columnStorageRules == null) {
-                columnStorageRules = new DefaultJdbcStorageRules();
+            if (columnMapping == null) {
+                columnMapping = new DefaultJdbcColumnMapping();
             }
             if (typeMapping == null) {
                 typeMapping = PredefinedMapping.select(dataSource);

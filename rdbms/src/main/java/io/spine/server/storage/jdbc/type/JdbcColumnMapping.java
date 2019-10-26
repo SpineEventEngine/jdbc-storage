@@ -20,10 +20,10 @@
 
 package io.spine.server.storage.jdbc.type;
 
-import io.spine.server.entity.storage.ColumnStorageRules;
+import io.spine.server.entity.storage.ColumnMapping;
 import io.spine.server.storage.jdbc.Type;
 
-public interface JdbcColumnStorageRules<R> extends ColumnStorageRules<R> {
+public interface JdbcColumnMapping<R> extends ColumnMapping<R> {
 
     Type typeOf(Class<?> clazz);
 }

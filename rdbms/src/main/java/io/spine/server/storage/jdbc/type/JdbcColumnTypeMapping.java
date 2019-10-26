@@ -20,22 +20,22 @@
 
 package io.spine.server.storage.jdbc.type;
 
-import io.spine.server.entity.storage.ColumnStorageRule;
+import io.spine.server.entity.storage.ColumnTypeMapping;
 import io.spine.server.storage.jdbc.Type;
 
-public final class JdbcStorageRule<T, R> implements ColumnStorageRule<T, R> {
+public final class JdbcColumnTypeMapping<T, R> implements ColumnTypeMapping<T, R> {
 
-    private final ColumnStorageRule<T, R> rule;
+    private final ColumnTypeMapping<T, R> mapping;
     private final Type type;
 
-    public JdbcStorageRule(ColumnStorageRule<T, R> rule, Type type) {
-        this.rule = rule;
+    public JdbcColumnTypeMapping(ColumnTypeMapping<T, R> mapping, Type type) {
+        this.mapping = mapping;
         this.type = type;
     }
 
     @Override
     public R apply(T t) {
-        return rule.apply(t);
+        return mapping.apply(t);
     }
 
     public Type storeAs() {

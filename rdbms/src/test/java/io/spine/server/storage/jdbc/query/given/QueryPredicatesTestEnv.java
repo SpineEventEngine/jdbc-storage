@@ -22,19 +22,15 @@ package io.spine.server.storage.jdbc.query.given;
 
 import io.spine.server.entity.storage.Column;
 import io.spine.server.entity.storage.ColumnName;
-import io.spine.server.entity.storage.ColumnStorageRule;
+import io.spine.server.entity.storage.ColumnTypeMapping;
 import io.spine.server.entity.storage.Columns;
 import io.spine.server.storage.given.RecordStorageTestEnv.TestCounterEntity;
-import io.spine.server.storage.jdbc.type.DefaultJdbcStorageRules;
+import io.spine.server.storage.jdbc.type.DefaultJdbcColumnMapping;
 
 public final class QueryPredicatesTestEnv {
 
     /** Prevents instantiation of this test env class. */
     private QueryPredicatesTestEnv() {
-    }
-
-    public static Object nonComparableValue() {
-        return new Object();
     }
 
     public static Column stringColumn() {
@@ -43,11 +39,15 @@ public final class QueryPredicatesTestEnv {
         return column;
     }
 
-    public static final class MapToNonComparable extends DefaultJdbcStorageRules {
+    public static final class MapToNonComparable extends DefaultJdbcColumnMapping {
 
         @Override
-        public ColumnStorageRule<?, ?> of(Class<?> type) {
+        public ColumnTypeMapping<?, ?> of(Class<?> type) {
             return o -> nonComparableValue();
+        }
+
+        private static Object nonComparableValue() {
+            return new Object();
         }
     }
 }

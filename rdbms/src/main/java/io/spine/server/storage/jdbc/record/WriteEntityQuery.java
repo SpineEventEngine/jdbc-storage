@@ -27,8 +27,8 @@ import io.spine.server.storage.jdbc.query.IdColumn;
 import io.spine.server.storage.jdbc.query.Parameter;
 import io.spine.server.storage.jdbc.query.Parameters;
 import io.spine.server.storage.jdbc.query.WriteQuery;
-import io.spine.server.storage.jdbc.type.DefaultJdbcStorageRules;
-import io.spine.server.storage.jdbc.type.JdbcColumnStorageRules;
+import io.spine.server.storage.jdbc.type.DefaultJdbcColumnMapping;
+import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 
 import java.util.Map;
 import java.util.Set;
@@ -55,13 +55,13 @@ abstract class WriteEntityQuery<I, C extends StoreClause<C>>
 
     private final IdColumn<I> idColumn;
     private final Map<I, EntityRecordWithColumns> records;
-    private final JdbcColumnStorageRules<?> columnStorageRules;
+    private final JdbcColumnMapping<?> columnMapping;
 
     WriteEntityQuery(Builder<? extends Builder, ? extends WriteEntityQuery, I> builder) {
         super(builder);
         this.idColumn = builder.idColumn;
         this.records = builder.records;
-        this.columnStorageRules = builder.columnStorageRules;
+        this.columnMapping = builder.columnMapping;
     }
 
     @Override
@@ -131,7 +131,7 @@ abstract class WriteEntityQuery<I, C extends StoreClause<C>>
         Parameters.Builder parameters = Parameters.newBuilder();
         record.columnNames()
               .forEach(columnName -> {
-                  Object columnValue = record.columnValue(columnName, columnStorageRules);
+                  Object columnValue = record.columnValue(columnName, columnMapping);
                   parameters.addParameter(columnName.value(), Parameter.of(columnValue));
               });
         return parameters.build();
@@ -144,10 +144,10 @@ abstract class WriteEntityQuery<I, C extends StoreClause<C>>
 
         private IdColumn<I> idColumn;
         private final Map<I, EntityRecordWithColumns> records = newLinkedHashMap();
-        private JdbcColumnStorageRules<?> columnStorageRules = new DefaultJdbcStorageRules();
+        private JdbcColumnMapping<?> columnMapping = new DefaultJdbcColumnMapping();
 
-        B setColumnStorageRules(JdbcColumnStorageRules<?> columnStorageRules) {
-            this.columnStorageRules = columnStorageRules;
+        B setColumnMapping(JdbcColumnMapping<?> columnMapping) {
+            this.columnMapping = columnMapping;
             return getThis();
         }
 

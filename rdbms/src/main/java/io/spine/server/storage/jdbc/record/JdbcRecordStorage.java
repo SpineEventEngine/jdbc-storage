@@ -38,8 +38,8 @@ import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.JdbcStorageFactory;
 import io.spine.server.storage.jdbc.StorageBuilder;
-import io.spine.server.storage.jdbc.type.DefaultJdbcStorageRules;
-import io.spine.server.storage.jdbc.type.JdbcColumnStorageRules;
+import io.spine.server.storage.jdbc.type.DefaultJdbcColumnMapping;
+import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Iterator;
@@ -73,7 +73,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
         super(asEntityClass(builder.getEntityClass()), builder.isMultitenant());
         this.dataSource = builder.dataSource();
         Class<? extends Entity<I, ?>> entityClass = builder.getEntityClass();
-        this.table = new RecordTable<>(entityClass, dataSource, builder.columnStorageRules(),
+        this.table = new RecordTable<>(entityClass, dataSource, builder.columnMapping(),
                                        builder.typeMapping(), columns());
         table.create();
     }
@@ -198,7 +198,7 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
             extends StorageBuilder<Builder<I>, JdbcRecordStorage<I>> {
 
         private Class<? extends Entity<I, ?>> entityClass;
-        private JdbcColumnStorageRules<?> columnStorageRules = new DefaultJdbcStorageRules();
+        private JdbcColumnMapping<?> columnMapping = new DefaultJdbcColumnMapping();
 
         private Builder() {
             super();
@@ -225,25 +225,25 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
         }
 
         /**
-         * Sets the column type registry.
+         * Sets the column mapping for the storage.
          *
-         * @param columnStorageRules
-         *         the registry of storage rules for entity columns
+         * @param columnMapping
+         *         the mapping rules for entity columns
          */
-        public Builder<I> setColumnStorageRules(JdbcColumnStorageRules<?> columnStorageRules) {
-            this.columnStorageRules = checkNotNull(columnStorageRules);
+        public Builder<I> setColumnMapping(JdbcColumnMapping<?> columnMapping) {
+            this.columnMapping = checkNotNull(columnMapping);
             return this;
         }
 
-        public JdbcColumnStorageRules<?> columnStorageRules() {
-            return columnStorageRules;
+        public JdbcColumnMapping<?> columnMapping() {
+            return columnMapping;
         }
 
         @Override
         protected void checkPreconditions() throws IllegalStateException {
             super.checkPreconditions();
             checkNotNull(entityClass, "Entity class must be set");
-            checkNotNull(columnStorageRules, "Column storage rules must not be null.");
+            checkNotNull(columnMapping, "Column mapping must not be null.");
         }
 
         @Override

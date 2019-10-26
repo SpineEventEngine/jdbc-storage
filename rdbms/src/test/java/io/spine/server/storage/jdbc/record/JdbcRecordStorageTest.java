@@ -36,7 +36,7 @@ import io.spine.server.storage.RecordStorage;
 import io.spine.server.storage.RecordStorageTest;
 import io.spine.server.storage.given.RecordStorageTestEnv.TestCounterEntity;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.type.DefaultJdbcStorageRules;
+import io.spine.server.storage.jdbc.type.DefaultJdbcColumnMapping;
 import io.spine.test.storage.Project;
 import io.spine.test.storage.ProjectId;
 import io.spine.testdata.Sample;
@@ -155,13 +155,15 @@ class JdbcRecordStorageTest extends RecordStorageTest<JdbcRecordStorage<ProjectI
                                                 .setEntityClass(nullEntityCls));
         }
 
+        @SuppressWarnings({"CheckReturnValue", "ResultOfMethodCallIgnored"})
+        // Method called to throw exception.
         @Test
-        @DisplayName("column storage rules")
-        void columnStorageRules() {
-            DefaultJdbcStorageRules storageRules = nullRef();
+        @DisplayName("column mapping")
+        void columnMapping() {
+            DefaultJdbcColumnMapping columnMapping = nullRef();
             assertThrows(NullPointerException.class,
                          () -> JdbcRecordStorage.newBuilder()
-                                                .setColumnStorageRules(storageRules));
+                                                .setColumnMapping(columnMapping));
         }
     }
 
@@ -176,7 +178,7 @@ class JdbcRecordStorageTest extends RecordStorageTest<JdbcRecordStorage<ProjectI
                         .setDataSource(dataSource)
                         .setEntityClass(entityClass)
                         .setMultitenant(false)
-                        .setColumnStorageRules(new DefaultJdbcStorageRules())
+                        .setColumnMapping(new DefaultJdbcColumnMapping())
                         .setTypeMapping(H2_1_4)
                         .build();
         return storage;
