@@ -23,6 +23,9 @@ package io.spine.server.storage.jdbc.type;
 import io.spine.server.entity.storage.ColumnTypeMapping;
 import io.spine.server.storage.jdbc.Type;
 
+/**
+ * A single column type mapping which also stores the JDBC type of the column.
+ */
 public final class JdbcColumnTypeMapping<T, R> implements ColumnTypeMapping<T, R> {
 
     private final ColumnTypeMapping<T, R> mapping;

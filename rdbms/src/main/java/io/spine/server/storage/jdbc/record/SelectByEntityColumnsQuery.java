@@ -117,13 +117,14 @@ final class SelectByEntityColumnsQuery<I> extends AbstractQuery
          *
          * <p>Checks that all the builder fields were set to a non-{@code null} values.
          */
+        @SuppressWarnings("MethodWithMoreThanThreeNegations") // Needed for the check.
         @Override
         protected void checkPreconditions() throws IllegalStateException {
             super.checkPreconditions();
-            checkState(idColumn != null, "IdColumn is not set.");
-            checkState(fieldMask != null, "FieldMask is not set.");
-            checkState(entityQuery != null, "EntityQuery is not set.");
-            checkState(columnMapping != null, "ColumnTypeRegistry is not set.");
+            checkState(idColumn != null, "`IdColumn` is not set.");
+            checkState(fieldMask != null, "`FieldMask` is not set.");
+            checkState(entityQuery != null, "`EntityQuery` is not set.");
+            checkState(columnMapping != null, "`ColumnMapping` is not set.");
         }
 
         @Override

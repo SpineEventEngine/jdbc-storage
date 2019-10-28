@@ -21,12 +21,12 @@
 package io.spine.server.storage.jdbc.record;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableList;
 import com.google.protobuf.FieldMask;
 import io.spine.client.ResponseFormat;
 import io.spine.server.entity.Entity;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.storage.Column;
-import io.spine.server.entity.storage.Columns;
 import io.spine.server.entity.storage.EntityQuery;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
@@ -63,13 +63,13 @@ import static java.util.Collections.addAll;
 final class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumns> {
 
     private final JdbcColumnMapping<?> columnMapping;
-    private final Columns columns;
+    private final ImmutableList<Column> columns;
 
     RecordTable(Class<? extends Entity<I, ?>> entityClass,
                 DataSourceWrapper dataSource,
                 JdbcColumnMapping<?> columnMapping,
                 TypeMapping typeMapping,
-                Columns columns) {
+                ImmutableList<Column> columns) {
         super(entityClass, ID, dataSource, typeMapping);
         this.columnMapping = columnMapping;
         this.columns = columns;
@@ -79,9 +79,7 @@ final class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWith
     protected List<TableColumn> tableColumns() {
         List<TableColumn> columns = newLinkedList();
         addAll(columns, StandardColumn.values());
-        Collection<TableColumn> tableColumns = this.columns.allColumns()
-                                                           .values()
-                                                           .stream()
+        Collection<TableColumn> tableColumns = this.columns.stream()
                                                            .map(new ColumnAdapter())
                                                            .collect(Collectors.toList());
         columns.addAll(tableColumns);
@@ -330,8 +328,7 @@ final class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWith
 
         @Override
         public boolean isNullable() {
-            return true; // TODO:2017-07-21:dmytro.dashenkov: Use Column.isNullable.
-            // https://github.com/SpineEventEngine/jdbc-storage/issues/29
+            return true;
         }
 
         @Override

@@ -29,9 +29,9 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import static io.spine.protobuf.Messages.isDefault;
 import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.NANOS;
 import static io.spine.server.storage.jdbc.projection.LastHandledEventTimeTable.Column.SECONDS;
-import static io.spine.validate.Validate.isDefault;
 
 /**
  * A query that selects timestamp from the {@link LastHandledEventTimeTable}.

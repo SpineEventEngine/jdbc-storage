@@ -20,11 +20,10 @@
 
 package io.spine.server.storage.jdbc.query.given;
 
+import com.google.errorprone.annotations.Immutable;
 import io.spine.server.entity.storage.Column;
 import io.spine.server.entity.storage.ColumnName;
 import io.spine.server.entity.storage.ColumnTypeMapping;
-import io.spine.server.entity.storage.Columns;
-import io.spine.server.storage.given.RecordStorageTestEnv.TestCounterEntity;
 import io.spine.server.storage.jdbc.type.DefaultJdbcColumnMapping;
 
 public final class QueryPredicatesTestEnv {
@@ -34,15 +33,29 @@ public final class QueryPredicatesTestEnv {
     }
 
     public static Column stringColumn() {
-        Column column = Columns.of(TestCounterEntity.class)
-                               .get(ColumnName.of("id_string"));
-        return column;
+        return new StingColumn();
+    }
+
+    @Immutable
+    private static class StingColumn implements Column {
+
+        private static final ColumnName NAME = ColumnName.of("some_string_column");
+
+        @Override
+        public ColumnName name() {
+            return NAME;
+        }
+
+        @Override
+        public Class<?> type() {
+            return String.class;
+        }
     }
 
     public static final class MapToNonComparable extends DefaultJdbcColumnMapping {
 
         @Override
-        public ColumnTypeMapping<?, ?> of(Class<?> type) {
+        public <T> ColumnTypeMapping<T, ?> of(Class<T> type) {
             return o -> nonComparableValue();
         }
 

@@ -20,7 +20,6 @@
 
 package io.spine.server.storage.jdbc.record;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.protobuf.Any;
 import com.google.protobuf.FieldMask;
 import io.spine.base.Identifier;
@@ -29,7 +28,6 @@ import io.spine.client.ResponseFormat;
 import io.spine.client.TargetFilters;
 import io.spine.server.entity.Entity;
 import io.spine.server.entity.EntityRecord;
-import io.spine.server.entity.storage.Columns;
 import io.spine.server.entity.storage.EntityQueries;
 import io.spine.server.entity.storage.EntityQuery;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
@@ -47,7 +45,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static io.spine.server.entity.model.EntityClass.asEntityClass;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.StreamSupport.stream;
 
@@ -70,11 +67,11 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
      *         the storage builder
      */
     protected JdbcRecordStorage(Builder<I> builder) throws DatabaseException {
-        super(asEntityClass(builder.getEntityClass()), builder.isMultitenant());
+        super(builder.getEntityClass(), builder.isMultitenant());
         this.dataSource = builder.dataSource();
         Class<? extends Entity<I, ?>> entityClass = builder.getEntityClass();
         this.table = new RecordTable<>(entityClass, dataSource, builder.columnMapping(),
-                                       builder.typeMapping(), columns());
+                                       builder.typeMapping(), columnList());
         table.create();
     }
 
@@ -131,11 +128,6 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
     @Override
     protected void writeRecords(Map<I, EntityRecordWithColumns> records) {
         table.write(records);
-    }
-
-    @Override
-    public final Columns columns() {
-        return super.columns();
     }
 
     @Override
@@ -250,10 +242,5 @@ public class JdbcRecordStorage<I> extends RecordStorage<I> {
         public JdbcRecordStorage<I> doBuild() {
             return new JdbcRecordStorage<>(this);
         }
-    }
-
-    @VisibleForTesting
-    RecordTable<I> getTable() {
-        return table;
     }
 }

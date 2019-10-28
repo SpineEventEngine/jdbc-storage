@@ -37,7 +37,6 @@ import java.util.Iterator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
-import static io.spine.server.projection.model.ProjectionClass.asProjectionClass;
 
 /**
  * The implementation of the projection storage based on the RDBMS.
@@ -61,7 +60,7 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
      *         the storage builder
      */
     protected JdbcProjectionStorage(Builder<I> builder) throws DatabaseException {
-        super(asProjectionClass(builder.getProjectionClass()), builder.isMultitenant());
+        super(builder.getProjectionClass(), builder.isMultitenant());
         this.recordStorage = builder.getRecordStorage();
         this.projectionId = builder.getProjectionClass()
                                    .getName();

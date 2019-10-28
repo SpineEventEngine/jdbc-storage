@@ -38,15 +38,20 @@ import static io.spine.server.storage.jdbc.Type.INT;
 import static io.spine.server.storage.jdbc.Type.LONG;
 import static io.spine.server.storage.jdbc.Type.STRING;
 
+/**
+ * The default column mapping for all storages.
+ *
+ * <p>Users may extend this class to add own custom mapping for some of the stored types.
+ */
 public class DefaultJdbcColumnMapping
         extends AbstractColumnMapping<Object>
         implements JdbcColumnMapping<Object> {
 
     @Override
     public Type typeOf(Class<?> clazz) {
-        JdbcColumnTypeMapping<?, ?> persistenceStrategy =
+        JdbcColumnTypeMapping<?, ?> typeMapping =
                 (JdbcColumnTypeMapping<?, ? >) of(clazz);
-        Type type = persistenceStrategy.storeAs();
+        Type type = typeMapping.storeAs();
         return type;
     }
 

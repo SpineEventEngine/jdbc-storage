@@ -18,15 +18,15 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/**
+ * The classes related to the type mapping in JDBC.
+ */
+@Experimental
+@CheckReturnValue
+@ParametersAreNonnullByDefault
 package io.spine.server.storage.jdbc.type;
 
-import io.spine.server.entity.storage.ColumnMapping;
-import io.spine.server.storage.jdbc.Type;
+import com.google.errorprone.annotations.CheckReturnValue;
+import io.spine.annotation.Experimental;
 
-/**
- * The column mapping which also stores the JDBC type mapping information.
- */
-public interface JdbcColumnMapping<R> extends ColumnMapping<R> {
-
-    Type typeOf(Class<?> clazz);
-}
+import javax.annotation.ParametersAreNonnullByDefault;

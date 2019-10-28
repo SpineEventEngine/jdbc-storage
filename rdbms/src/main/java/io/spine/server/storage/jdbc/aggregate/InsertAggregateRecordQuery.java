@@ -28,13 +28,13 @@ import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.storage.jdbc.query.IdAwareQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
 
+import static io.spine.protobuf.Messages.isDefault;
 import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.AGGREGATE;
 import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.KIND;
 import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.TIMESTAMP;
 import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.TIMESTAMP_NANOS;
 import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.VERSION;
 import static io.spine.server.storage.jdbc.query.Serializer.serialize;
-import static io.spine.validate.Validate.isDefault;
 
 /**
  * A query that inserts a new {@link AggregateEventRecord} into

@@ -136,9 +136,9 @@ public class QueryPredicates {
         ComparablePath<Comparable> columnPath = comparablePath(Comparable.class, columnName);
         Class<?> type = column.type();
         Object javaValue = toObject(filter.getValue(), type);
-        ColumnTypeMapping<?, ?> strategy =
+        ColumnTypeMapping<?, ?> mapping =
                 columnMapping.of(javaValue.getClass());
-        Object valueForStoring = strategy.applyTo(javaValue);
+        Object valueForStoring = mapping.applyTo(javaValue);
         if (valueForStoring == null) {
             return nullFilter(operator, columnPath);
         }
