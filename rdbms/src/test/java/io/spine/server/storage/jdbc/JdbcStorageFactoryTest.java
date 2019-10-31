@@ -25,8 +25,11 @@ import io.spine.server.delivery.InboxStorage;
 import io.spine.server.projection.ProjectionStorage;
 import io.spine.server.storage.given.RecordStorageTestEnv.TestCounterEntity;
 import io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.TestAggregate;
+import io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.TestColumnMapping;
 import io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.TestProjection;
 import io.spine.server.storage.jdbc.record.JdbcRecordStorage;
+import io.spine.server.storage.jdbc.type.DefaultJdbcColumnMapping;
+import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 import io.spine.test.storage.ProjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -60,6 +63,29 @@ class JdbcStorageFactoryTest {
                 .build();
 
         assertNotNull(factory);
+    }
+
+    @Test
+    @DisplayName("allow to set custom column mapping")
+    void setColumnMapping() {
+        JdbcColumnMapping<String> columnMapping = new TestColumnMapping();
+        JdbcStorageFactory factory = JdbcStorageFactory
+                .newBuilder()
+                .setDataSource(whichIsStoredInMemory(newUuid()))
+                .setColumnMapping(columnMapping)
+                .build();
+        JdbcColumnMapping<?> mappingFromFactory = factory.columnMapping();
+
+        assertThat(mappingFromFactory).isEqualTo(columnMapping);
+    }
+
+    @Test
+    @DisplayName("have `DefaultJdbcColumnMapping` by default")
+    void haveDefaultColumnMapping() {
+        JdbcStorageFactory factory = newFactory();
+        JdbcColumnMapping<?> columnMapping = factory.columnMapping();
+
+        assertThat(columnMapping).isInstanceOf(DefaultJdbcColumnMapping.class);
     }
 
     @Nested

@@ -24,9 +24,12 @@ import com.google.protobuf.StringValue;
 import io.spine.server.ContextSpec;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.entity.AbstractEntity;
+import io.spine.server.entity.storage.ColumnTypeMapping;
 import io.spine.server.projection.Projection;
 import io.spine.server.storage.jdbc.DataSourceConfig;
 import io.spine.server.storage.jdbc.JdbcStorageFactory;
+import io.spine.server.storage.jdbc.Type;
+import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 import io.spine.test.storage.Project;
 
 import static io.spine.server.storage.jdbc.GivenDataSource.prefix;
@@ -79,6 +82,24 @@ public class JdbcStorageFactoryTestEnv {
 
         private TestProjection(String id) {
             super(id);
+        }
+    }
+
+    public static class TestColumnMapping implements JdbcColumnMapping<String> {
+
+        @Override
+        public Type typeOf(Class<?> columnType) {
+            return Type.STRING;
+        }
+
+        @Override
+        public <T> ColumnTypeMapping<T, ? extends String> of(Class<T> type) {
+            return o -> "always-the-same-string";
+        }
+
+        @Override
+        public ColumnTypeMapping<?, ? extends String> ofNull() {
+            return o -> "the-null";
         }
     }
 }

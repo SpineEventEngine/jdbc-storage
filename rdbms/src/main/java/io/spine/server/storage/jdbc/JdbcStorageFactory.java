@@ -136,6 +136,11 @@ public class JdbcStorageFactory implements StorageFactory {
         return typeMapping;
     }
 
+    @VisibleForTesting
+    JdbcColumnMapping<?> columnMapping() {
+        return columnMapping;
+    }
+
     public static Builder newBuilder() {
         return new Builder();
     }
