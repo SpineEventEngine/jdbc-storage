@@ -22,3 +22,4 @@ jobs:
 
     - name: Run tests with Gradle
       run: gradlew.bat build
+      shell: cmd

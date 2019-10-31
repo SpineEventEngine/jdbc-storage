@@ -21,13 +21,12 @@
 package io.spine.server.storage.jdbc.record;
 
 import com.google.common.base.Objects;
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableList;
 import com.google.protobuf.FieldMask;
 import io.spine.client.ResponseFormat;
 import io.spine.server.entity.Entity;
 import io.spine.server.entity.EntityRecord;
-import io.spine.server.entity.storage.ColumnTypeRegistry;
-import io.spine.server.entity.storage.EntityColumn;
+import io.spine.server.entity.storage.Column;
 import io.spine.server.entity.storage.EntityQuery;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
@@ -38,7 +37,7 @@ import io.spine.server.storage.jdbc.query.DbIterator.DoubleColumnRecord;
 import io.spine.server.storage.jdbc.query.EntityTable;
 import io.spine.server.storage.jdbc.query.SelectQuery;
 import io.spine.server.storage.jdbc.query.WriteQuery;
-import io.spine.server.storage.jdbc.type.JdbcColumnType;
+import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Collection;
@@ -63,27 +62,26 @@ import static java.util.Collections.addAll;
  */
 final class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWithColumns> {
 
-    private final ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> typeRegistry;
-    private final Collection<EntityColumn> entityColumns;
+    private final JdbcColumnMapping<?> columnMapping;
+    private final ImmutableList<Column> columns;
 
     RecordTable(Class<? extends Entity<I, ?>> entityClass,
                 DataSourceWrapper dataSource,
-                ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>>
-                        columnTypeRegistry,
+                JdbcColumnMapping<?> columnMapping,
                 TypeMapping typeMapping,
-                Collection<EntityColumn> entityColumns) {
+                ImmutableList<Column> columns) {
         super(entityClass, ID, dataSource, typeMapping);
-        this.typeRegistry = columnTypeRegistry;
-        this.entityColumns = ImmutableSet.copyOf(entityColumns);
+        this.columnMapping = columnMapping;
+        this.columns = columns;
     }
 
     @Override
     protected List<TableColumn> tableColumns() {
         List<TableColumn> columns = newLinkedList();
         addAll(columns, StandardColumn.values());
-        Collection<TableColumn> tableColumns = entityColumns.stream()
-                                                            .map(new ColumnAdapter())
-                                                            .collect(Collectors.toList());
+        Collection<TableColumn> tableColumns = this.columns.stream()
+                                                           .map(new ColumnAdapter())
+                                                           .collect(Collectors.toList());
         columns.addAll(tableColumns);
         return columns;
     }
@@ -105,7 +103,7 @@ final class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWith
         InsertEntityQuery query = builder.setDataSource(dataSource())
                                          .setTableName(name())
                                          .setIdColumn(idColumn())
-                                         .setColumnTypeRegistry(typeRegistry)
+                                         .setColumnMapping(columnMapping)
                                          .addRecord(id, record)
                                          .build();
         return query;
@@ -118,7 +116,7 @@ final class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWith
                                          .setDataSource(dataSource())
                                          .setIdColumn(idColumn())
                                          .addRecord(id, record)
-                                         .setColumnTypeRegistry(typeRegistry)
+                                         .setColumnMapping(columnMapping)
                                          .build();
         return query;
     }
@@ -187,7 +185,7 @@ final class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWith
         SelectByEntityColumnsQuery<I> query = builder.setDataSource(dataSource())
                                                      .setTableName(name())
                                                      .setIdColumn(idColumn())
-                                                     .setColumnTypeRegistry(typeRegistry)
+                                                     .setColumnMapping(columnMapping)
                                                      .setEntityQuery(entityQuery)
                                                      .setFieldMask(fieldMask)
                                                      .build();
@@ -231,7 +229,7 @@ final class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWith
         InsertEntityQuery query = builder.setDataSource(dataSource())
                                          .setTableName(name())
                                          .setIdColumn(idColumn())
-                                         .setColumnTypeRegistry(typeRegistry)
+                                         .setColumnMapping(columnMapping)
                                          .addRecords(records)
                                          .build();
         return query;
@@ -242,9 +240,9 @@ final class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWith
      * represented by the {@code RecordTable}.
      *
      * <p>Each table which contains the {@linkplain EntityRecord Entity Records} has these columns.
-     * It also may have the columns produced from the {@linkplain EntityColumn entity columns}.
+     * It also may have the columns produced from the {@linkplain Column entity columns}.
      *
-     * @see EntityColumnWrapper
+     * @see ColumnWrapper
      */
     enum StandardColumn implements TableColumn {
 
@@ -282,41 +280,40 @@ final class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWith
     }
 
     /**
-     * An adapter converting the {@linkplain EntityColumn entity columns}
+     * An adapter converting the {@linkplain Column columns}
      * into the {@link TableColumn} instances.
      */
-    private final class ColumnAdapter implements Function<EntityColumn, TableColumn> {
+    private final class ColumnAdapter implements Function<Column, TableColumn> {
 
         @Override
-        public TableColumn apply(@Nullable EntityColumn column) {
+        public TableColumn apply(@Nullable Column column) {
             checkNotNull(column);
-            TableColumn result = new EntityColumnWrapper(column, typeRegistry);
+            TableColumn result = new ColumnWrapper(column, columnMapping);
             return result;
         }
     }
 
     /**
-     * A wrapper type for {@link EntityColumn}.
+     * A wrapper type for {@link Column}.
      *
      * <p>Serves for accessing entity columns trough the {@link TableColumn} interface.
      *
      * @see StandardColumn
      */
-    private static final class EntityColumnWrapper implements TableColumn {
+    private static final class ColumnWrapper implements TableColumn {
 
-        private final EntityColumn column;
+        private final Column column;
         private final Type type;
 
-        private EntityColumnWrapper(EntityColumn column,
-                                    ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> typeRegistry) {
+        private ColumnWrapper(Column column, JdbcColumnMapping<?> columnMapping) {
             this.column = column;
-            this.type = typeRegistry.get(column)
-                                    .getType();
+            this.type = columnMapping.typeOf(column.type());
         }
 
         @Override
         public String name() {
-            return column.name();
+            return column.name()
+                         .value();
         }
 
         @Override
@@ -331,8 +328,7 @@ final class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWith
 
         @Override
         public boolean isNullable() {
-            return true; // TODO:2017-07-21:dmytro.dashenkov: Use Column.isNullable.
-            // https://github.com/SpineEventEngine/jdbc-storage/issues/29
+            return true;
         }
 
         @Override
@@ -343,7 +339,7 @@ final class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWith
             if (o == null || getClass() != o.getClass()) {
                 return false;
             }
-            EntityColumnWrapper that = (EntityColumnWrapper) o;
+            ColumnWrapper that = (ColumnWrapper) o;
             return Objects.equal(column, that.column) &&
                    type == that.type;
         }

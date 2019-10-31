@@ -17,8 +17,9 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 /**
- * This package provides classes for JDBC column types.
+ * The classes related to the type mapping in JDBC.
  */
 @Experimental
 @CheckReturnValue

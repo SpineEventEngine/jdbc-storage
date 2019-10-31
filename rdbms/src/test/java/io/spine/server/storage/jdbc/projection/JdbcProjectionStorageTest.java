@@ -29,7 +29,6 @@ import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.StorageBuilder;
 import io.spine.server.storage.jdbc.TypeMapping;
 import io.spine.server.storage.jdbc.record.JdbcRecordStorage;
-import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
 import io.spine.test.storage.ProjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -58,7 +57,6 @@ class JdbcProjectionStorageTest extends ProjectionStorageTest {
                         .setDataSource(dataSource)
                         .setMultitenant(false)
                         .setEntityClass(projectionClass)
-                        .setColumnTypeRegistry(JdbcTypeRegistryFactory.defaultInstance())
                         .setTypeMapping(typeMapping)
                         .build();
         ProjectionStorage<ProjectId> storage =

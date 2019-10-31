@@ -60,7 +60,7 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
      *         the storage builder
      */
     protected JdbcProjectionStorage(Builder<I> builder) throws DatabaseException {
-        super(builder.isMultitenant());
+        super(builder.getProjectionClass(), builder.isMultitenant());
         this.recordStorage = builder.getRecordStorage();
         this.projectionId = builder.getProjectionClass()
                                    .getName();

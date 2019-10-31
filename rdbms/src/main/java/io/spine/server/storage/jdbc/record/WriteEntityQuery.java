@@ -20,17 +20,15 @@
 
 package io.spine.server.storage.jdbc.record;
 
-import com.google.common.base.Functions;
 import com.querydsl.core.dml.StoreClause;
-import io.spine.server.entity.storage.ColumnRecords;
-import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.query.AbstractQuery;
 import io.spine.server.storage.jdbc.query.IdColumn;
+import io.spine.server.storage.jdbc.query.Parameter;
 import io.spine.server.storage.jdbc.query.Parameters;
 import io.spine.server.storage.jdbc.query.WriteQuery;
-import io.spine.server.storage.jdbc.type.JdbcColumnType;
-import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
+import io.spine.server.storage.jdbc.type.DefaultJdbcColumnMapping;
+import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 
 import java.util.Map;
 import java.util.Set;
@@ -57,13 +55,13 @@ abstract class WriteEntityQuery<I, C extends StoreClause<C>>
 
     private final IdColumn<I> idColumn;
     private final Map<I, EntityRecordWithColumns> records;
-    private final ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry;
+    private final JdbcColumnMapping<?> columnMapping;
 
     WriteEntityQuery(Builder<? extends Builder, ? extends WriteEntityQuery, I> builder) {
         super(builder);
         this.idColumn = builder.idColumn;
         this.records = builder.records;
-        this.columnTypeRegistry = builder.columnTypeRegistry;
+        this.columnMapping = builder.columnMapping;
     }
 
     @Override
@@ -73,7 +71,7 @@ abstract class WriteEntityQuery<I, C extends StoreClause<C>>
             EntityRecordWithColumns record = records.get(id);
             setEntityColumns(clause, record);
 
-            clause.set(pathOf(ENTITY), serialize(record.getRecord()));
+            clause.set(pathOf(ENTITY), serialize(record.record()));
             setIdValue(clause, idColumn, idColumn.normalize(id));
             addBatch(clause);
         }
@@ -131,12 +129,11 @@ abstract class WriteEntityQuery<I, C extends StoreClause<C>>
      */
     private Parameters createParametersFromColumns(EntityRecordWithColumns record) {
         Parameters.Builder parameters = Parameters.newBuilder();
-        if (record.hasColumns()) {
-            ColumnRecords.feedColumnsTo(parameters,
-                                        record,
-                                        columnTypeRegistry,
-                                        Functions.identity());
-        }
+        record.columnNames()
+              .forEach(columnName -> {
+                  Object columnValue = record.columnValue(columnName, columnMapping);
+                  parameters.addParameter(columnName.value(), Parameter.of(columnValue));
+              });
         return parameters.build();
     }
 
@@ -147,12 +144,10 @@ abstract class WriteEntityQuery<I, C extends StoreClause<C>>
 
         private IdColumn<I> idColumn;
         private final Map<I, EntityRecordWithColumns> records = newLinkedHashMap();
-        private ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry
-                = JdbcTypeRegistryFactory.defaultInstance();
+        private JdbcColumnMapping<?> columnMapping = new DefaultJdbcColumnMapping();
 
-        B setColumnTypeRegistry(
-                ColumnTypeRegistry<? extends JdbcColumnType<?, ?>> columnTypeRegistry) {
-            this.columnTypeRegistry = columnTypeRegistry;
+        B setColumnMapping(JdbcColumnMapping<?> columnMapping) {
+            this.columnMapping = columnMapping;
             return getThis();
         }
 

@@ -17,28 +17,16 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package io.spine.server.storage.jdbc.type;
 
-import io.spine.annotation.SPI;
-import io.spine.server.storage.jdbc.query.Parameter;
-import io.spine.server.storage.jdbc.query.Parameters;
+import io.spine.server.entity.storage.ColumnMapping;
+import io.spine.server.storage.jdbc.Type;
 
 /**
- * The implementation base for the JDBC-storage
- * {@linkplain io.spine.server.entity.storage.ColumnType ColumnTypes}.
+ * The column mapping which also stores the JDBC type mapping information.
  */
-@SPI
-public abstract class AbstractJdbcColumnType<J, C> implements JdbcColumnType<J, C> {
+public interface JdbcColumnMapping<R> extends ColumnMapping<R> {
 
-    @Override
-    public void setColumnValue(Parameters.Builder storageRecord, C value, String columnIdentifier) {
-        Parameter parameter = Parameter.of(value);
-        storageRecord.addParameter(columnIdentifier, parameter);
-    }
-
-    @Override
-    public void setNull(Parameters.Builder storageRecord, String columnIdentifier) {
-        Parameter nullParameter = Parameter.of(null);
-        storageRecord.addParameter(columnIdentifier, nullParameter);
-    }
+    Type typeOf(Class<?> columnType);
 }

@@ -20,18 +20,28 @@
 
 package io.spine.server.storage.jdbc.type;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import io.spine.server.entity.storage.ColumnTypeMapping;
+import io.spine.server.storage.jdbc.Type;
 
-import static io.spine.testing.DisplayNames.HAVE_PARAMETERLESS_CTOR;
-import static io.spine.testing.Tests.assertHasPrivateParameterlessCtor;
+/**
+ * A single column type mapping which also stores the JDBC type of the column.
+ */
+public final class JdbcColumnTypeMapping<T, R> implements ColumnTypeMapping<T, R> {
 
-@DisplayName("JdbcColumnTypes should")
-class JdbcColumnTypesTest {
+    private final ColumnTypeMapping<T, R> mapping;
+    private final Type type;
 
-    @Test
-    @DisplayName(HAVE_PARAMETERLESS_CTOR)
-    void haveUtilityConstructor() {
-        assertHasPrivateParameterlessCtor(JdbcColumnTypes.class);
+    public JdbcColumnTypeMapping(ColumnTypeMapping<T, R> mapping, Type type) {
+        this.mapping = mapping;
+        this.type = type;
+    }
+
+    @Override
+    public R apply(T t) {
+        return mapping.apply(t);
+    }
+
+    public Type storeAs() {
+        return type;
     }
 }

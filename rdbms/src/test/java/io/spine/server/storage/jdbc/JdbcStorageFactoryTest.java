@@ -23,10 +23,14 @@ package io.spine.server.storage.jdbc;
 import io.spine.server.aggregate.AggregateStorage;
 import io.spine.server.delivery.InboxStorage;
 import io.spine.server.projection.ProjectionStorage;
-import io.spine.server.storage.RecordStorage;
+import io.spine.server.storage.given.RecordStorageTestEnv.TestCounterEntity;
 import io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.TestAggregate;
-import io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.TestEntity;
+import io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.TestColumnMapping;
 import io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.TestProjection;
+import io.spine.server.storage.jdbc.record.JdbcRecordStorage;
+import io.spine.server.storage.jdbc.type.DefaultJdbcColumnMapping;
+import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
+import io.spine.test.storage.ProjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -61,6 +65,29 @@ class JdbcStorageFactoryTest {
         assertNotNull(factory);
     }
 
+    @Test
+    @DisplayName("allow to set custom column mapping")
+    void setColumnMapping() {
+        JdbcColumnMapping<String> columnMapping = new TestColumnMapping();
+        JdbcStorageFactory factory = JdbcStorageFactory
+                .newBuilder()
+                .setDataSource(whichIsStoredInMemory(newUuid()))
+                .setColumnMapping(columnMapping)
+                .build();
+        JdbcColumnMapping<?> mappingFromFactory = factory.columnMapping();
+
+        assertThat(mappingFromFactory).isEqualTo(columnMapping);
+    }
+
+    @Test
+    @DisplayName("have `DefaultJdbcColumnMapping` by default")
+    void haveDefaultColumnMapping() {
+        JdbcStorageFactory factory = newFactory();
+        JdbcColumnMapping<?> columnMapping = factory.columnMapping();
+
+        assertThat(columnMapping).isInstanceOf(DefaultJdbcColumnMapping.class);
+    }
+
     @Nested
     @DisplayName("create record storage")
     class CreateRecordStorage {
@@ -69,8 +96,8 @@ class JdbcStorageFactoryTest {
         @DisplayName("which is multitenant")
         void multitenant() {
             JdbcStorageFactory factory = newFactory();
-            RecordStorage<String> storage =
-                    factory.createRecordStorage(multitenantSpec(), TestEntity.class);
+            JdbcRecordStorage<ProjectId> storage =
+                    factory.createRecordStorage(multitenantSpec(), TestCounterEntity.class);
             assertTrue(storage.isMultitenant());
         }
 
@@ -78,8 +105,8 @@ class JdbcStorageFactoryTest {
         @DisplayName("which is single tenant")
         void singleTenant() {
             JdbcStorageFactory factory = newFactory();
-            RecordStorage<String> storage =
-                    factory.createRecordStorage(singletenantSpec(), TestEntity.class);
+            JdbcRecordStorage<ProjectId> storage =
+                    factory.createRecordStorage(singletenantSpec(), TestCounterEntity.class);
             assertFalse(storage.isMultitenant());
         }
     }

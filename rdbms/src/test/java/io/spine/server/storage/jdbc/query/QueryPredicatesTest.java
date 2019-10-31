@@ -25,8 +25,8 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.ComparablePath;
 import io.spine.client.CompositeFilter;
 import io.spine.client.Filter;
-import io.spine.server.entity.storage.ColumnTypeRegistry;
-import io.spine.server.entity.storage.EntityColumn;
+import io.spine.server.entity.storage.Column;
+import io.spine.server.storage.jdbc.query.given.QueryPredicatesTestEnv.MapToNonComparable;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -48,7 +48,6 @@ import static io.spine.server.storage.jdbc.query.QueryPredicates.columnMatchFilt
 import static io.spine.server.storage.jdbc.query.QueryPredicates.joinPredicates;
 import static io.spine.server.storage.jdbc.query.QueryPredicates.nullFilter;
 import static io.spine.server.storage.jdbc.query.QueryPredicates.valueFilter;
-import static io.spine.server.storage.jdbc.query.given.QueryPredicatesTestEnv.nonComparableType;
 import static io.spine.server.storage.jdbc.query.given.QueryPredicatesTestEnv.stringColumn;
 import static io.spine.testing.DisplayNames.HAVE_PARAMETERLESS_CTOR;
 import static io.spine.testing.Tests.assertHasPrivateParameterlessCtor;
@@ -98,6 +97,9 @@ class QueryPredicatesTest {
         }
     }
 
+
+    @SuppressWarnings({"CheckReturnValue", "ResultOfMethodCallIgnored"})
+    // Method expected to throw exception.
     @Test
     @DisplayName("throw IAE for unsupported operator")
     void throwForUnsupportedOperator() {
@@ -107,21 +109,17 @@ class QueryPredicatesTest {
                                           CompositeFilter.CompositeOperator.UNRECOGNIZED));
     }
 
-    @SuppressWarnings({"unchecked" /* For brevity. */,
-            "ResultOfMethodCallIgnored" /* Method expected to throw exception. */})
+    @SuppressWarnings({"CheckReturnValue", "ResultOfMethodCallIgnored"})
+    // Method expected to throw exception.
     @Test
     @DisplayName("not accept non-comparable value")
     void notAcceptNonComparable() {
-        EntityColumn column = stringColumn();
+        Column column = stringColumn();
 
-        ColumnTypeRegistry registry = ColumnTypeRegistry.newBuilder()
-                                                        .put(String.class, nonComparableType())
-                                                        .build();
-
-        Filter filter = eq(column.name(), COLUMN_FILTER_VALUE);
+        Filter filter = eq(column.name().value(), COLUMN_FILTER_VALUE);
 
         assertThrows(IllegalArgumentException.class,
-                     () -> columnMatchFilter(column, filter, registry));
+                     () -> columnMatchFilter(column, filter, new MapToNonComparable()));
     }
 
     @Test

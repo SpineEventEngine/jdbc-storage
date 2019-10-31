@@ -28,7 +28,6 @@ import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateStorage;
 import io.spine.server.delivery.InboxStorage;
 import io.spine.server.entity.Entity;
-import io.spine.server.entity.storage.ColumnTypeRegistry;
 import io.spine.server.projection.Projection;
 import io.spine.server.projection.ProjectionStorage;
 import io.spine.server.storage.StorageFactory;
@@ -37,8 +36,8 @@ import io.spine.server.storage.jdbc.delivery.JdbcInboxStorage;
 import io.spine.server.storage.jdbc.delivery.JdbcSessionStorage;
 import io.spine.server.storage.jdbc.projection.JdbcProjectionStorage;
 import io.spine.server.storage.jdbc.record.JdbcRecordStorage;
-import io.spine.server.storage.jdbc.type.JdbcColumnType;
-import io.spine.server.storage.jdbc.type.JdbcTypeRegistryFactory;
+import io.spine.server.storage.jdbc.type.DefaultJdbcColumnMapping;
+import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 
 import javax.sql.DataSource;
 
@@ -48,17 +47,16 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Creates storages based on JDBC-compliant RDBMS.
  *
  * @see DataSourceConfig
- * @see JdbcTypeRegistryFactory
  */
 public class JdbcStorageFactory implements StorageFactory {
 
     private final DataSourceWrapper dataSource;
-    private final ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> columnTypeRegistry;
+    private final JdbcColumnMapping<?> columnMapping;
     private final TypeMapping typeMapping;
 
     private JdbcStorageFactory(Builder builder) {
         this.dataSource = checkNotNull(builder.dataSource);
-        this.columnTypeRegistry = builder.columnTypeRegistry;
+        this.columnMapping = builder.columnMapping;
         this.typeMapping = checkNotNull(builder.typeMapping);
     }
 
@@ -83,7 +81,7 @@ public class JdbcStorageFactory implements StorageFactory {
                         .setEntityClass(entityClass)
                         .setMultitenant(context.isMultitenant())
                         .setDataSource(dataSource)
-                        .setColumnTypeRegistry(columnTypeRegistry)
+                        .setColumnMapping(columnMapping)
                         .setTypeMapping(typeMapping)
                         .build();
         return recordStorage;
@@ -138,6 +136,11 @@ public class JdbcStorageFactory implements StorageFactory {
         return typeMapping;
     }
 
+    @VisibleForTesting
+    JdbcColumnMapping<?> columnMapping() {
+        return columnMapping;
+    }
+
     public static Builder newBuilder() {
         return new Builder();
     }
@@ -148,7 +151,7 @@ public class JdbcStorageFactory implements StorageFactory {
     public static class Builder {
 
         private DataSourceWrapper dataSource;
-        private ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>> columnTypeRegistry;
+        private JdbcColumnMapping<?> columnMapping;
         private TypeMapping typeMapping;
 
         private Builder() {
@@ -156,22 +159,16 @@ public class JdbcStorageFactory implements StorageFactory {
         }
 
         /**
-         * Sets the {@link ColumnTypeRegistry} to use in the generated storages.
+         * Sets the {@linkplain io.spine.server.entity.storage.ColumnMapping column mapping} to use
+         * in the generated storages.
          *
-         * <p>The default value is
-         * {@link JdbcTypeRegistryFactory#defaultInstance() JdbcTypeRegistryFactory.defaultInstance()}.
+         * <p>The default value is a {@link DefaultJdbcColumnMapping}.
          *
-         * <p>To reuse the existent {@linkplain JdbcColumnType column types}, use
-         * {@link JdbcTypeRegistryFactory#predefinedValuesAnd() JdbcTypeRegistryFactory.predefinedValuesAnd()}.
-         *
-         * @param columnTypeRegistry
-         *         the custom {@link ColumnTypeRegistry} to use in the generated
-         *         storages
+         * @param columnMapping
+         *         the column mapping to use in the generated storages
          */
-        public Builder setColumnTypeRegistry(
-                ColumnTypeRegistry<? extends JdbcColumnType<? super Object, ? super Object>>
-                        columnTypeRegistry) {
-            this.columnTypeRegistry = columnTypeRegistry;
+        public Builder setColumnMapping(JdbcColumnMapping<?> columnMapping) {
+            this.columnMapping = columnMapping;
             return this;
         }
 
@@ -231,8 +228,8 @@ public class JdbcStorageFactory implements StorageFactory {
          * Returns a new instance of {@code JdbcStorageFactory}.
          */
         public JdbcStorageFactory build() {
-            if (columnTypeRegistry == null) {
-                columnTypeRegistry = JdbcTypeRegistryFactory.defaultInstance();
+            if (columnMapping == null) {
+                columnMapping = new DefaultJdbcColumnMapping();
             }
             if (typeMapping == null) {
                 typeMapping = PredefinedMapping.select(dataSource);
