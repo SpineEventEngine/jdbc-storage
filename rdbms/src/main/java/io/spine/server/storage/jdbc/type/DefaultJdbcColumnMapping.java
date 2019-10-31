@@ -31,6 +31,7 @@ import io.spine.server.entity.storage.AbstractColumnMapping;
 import io.spine.server.entity.storage.ColumnTypeMapping;
 import io.spine.server.storage.jdbc.Type;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static io.spine.server.entity.storage.ColumnTypeMapping.identity;
 import static io.spine.server.storage.jdbc.Type.BOOLEAN;
 import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
@@ -48,9 +49,10 @@ public class DefaultJdbcColumnMapping
         implements JdbcColumnMapping<Object> {
 
     @Override
-    public Type typeOf(Class<?> clazz) {
+    public Type typeOf(Class<?> columnType) {
+        checkNotNull(columnType);
         JdbcColumnTypeMapping<?, ?> typeMapping =
-                (JdbcColumnTypeMapping<?, ? >) of(clazz);
+                (JdbcColumnTypeMapping<?, ? >) of(columnType);
         Type type = typeMapping.storeAs();
         return type;
     }

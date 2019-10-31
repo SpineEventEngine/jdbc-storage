@@ -28,5 +28,5 @@ import io.spine.server.storage.jdbc.Type;
  */
 public interface JdbcColumnMapping<R> extends ColumnMapping<R> {
 
-    Type typeOf(Class<?> clazz);
+    Type typeOf(Class<?> columnType);
 }
