@@ -20,10 +20,8 @@
 
 package io.spine.server.storage.jdbc.given;
 
-import com.google.protobuf.StringValue;
 import io.spine.server.ContextSpec;
 import io.spine.server.aggregate.Aggregate;
-import io.spine.server.entity.AbstractEntity;
 import io.spine.server.entity.storage.ColumnTypeMapping;
 import io.spine.server.projection.Projection;
 import io.spine.server.storage.jdbc.DataSourceConfig;
@@ -62,13 +60,6 @@ public class JdbcStorageFactoryTestEnv {
 
     public static ContextSpec singletenantSpec() {
         return ContextSpec.singleTenant(JdbcStorageFactoryTestEnv.class.getName());
-    }
-
-    public static class TestEntity extends AbstractEntity<String, StringValue> {
-
-        private TestEntity(String id) {
-            super(id);
-        }
     }
 
     public static class TestAggregate extends Aggregate<String, Project, Project.Builder> {

@@ -14,7 +14,7 @@ Gradle:
 ```groovy
 dependencies {
     implementation (
-        "io.spine:spine-rdbms:1.1.2"
+        "io.spine:spine-rdbms:1.2.0"
     )
 }
 ```

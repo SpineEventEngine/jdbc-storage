@@ -20,8 +20,8 @@
 
 package io.spine.server.storage.jdbc.query.given;
 
-import com.google.protobuf.StringValue;
 import io.spine.server.entity.AbstractEntity;
+import io.spine.test.storage.Project;
 
 public class DbTableNameFactoryTestEnv {
 
@@ -29,7 +29,7 @@ public class DbTableNameFactoryTestEnv {
     private DbTableNameFactoryTestEnv() {
     }
 
-    public static class TestEntity extends AbstractEntity<String, StringValue> {
+    public static class TestEntity extends AbstractEntity<String, Project> {
 
         private TestEntity(String id) {
             super(id);
