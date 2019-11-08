@@ -20,7 +20,7 @@
 
 package io.spine.server.storage.jdbc.record;
 
-import com.google.protobuf.Message;
+import io.spine.base.EntityState;
 import io.spine.base.Identifier;
 import io.spine.client.CompositeFilter;
 import io.spine.client.Filter;
@@ -185,7 +185,7 @@ class JdbcRecordStorageTest extends RecordStorageTest<JdbcRecordStorage<ProjectI
     }
 
     @Override
-    protected Message newState(ProjectId id) {
+    protected EntityState newState(ProjectId id) {
         Project.Builder builder = Sample.builderForType(Project.class);
         builder.setId(id);
         return builder.build();
