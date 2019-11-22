@@ -12,7 +12,7 @@ all modules and does not describe the project structure per-subproject.
 
 <groupId>io.spine</groupId>
 <artifactId>jdbc-storage</artifactId>
-<version>1.2.0</version>
+<version>1.2.5</version>
 
 <inceptionYear>2015</inceptionYear>
 
@@ -70,19 +70,19 @@ all modules and does not describe the project structure per-subproject.
   <dependency>
     <groupId>io.spine</groupId>
     <artifactId>spine-server</artifactId>
-    <version>1.2.0</version>
+    <version>1.2.5</version>
     <scope>compile</scope>
   </dependency>
   <dependency>
     <groupId>io.spine</groupId>
     <artifactId>spine-testutil-server</artifactId>
-    <version>1.2.0</version>
+    <version>1.2.5</version>
     <scope>compile</scope>
   </dependency>
   <dependency>
     <groupId>org.checkerframework</groupId>
     <artifactId>checker-qual</artifactId>
-    <version>2.9.0</version>
+    <version>3.0.0</version>
     <scope>compile</scope>
   </dependency>
   <dependency>
@@ -94,25 +94,25 @@ all modules and does not describe the project structure per-subproject.
   <dependency>
     <groupId>io.grpc</groupId>
     <artifactId>grpc-stub</artifactId>
-    <version>1.24.1</version>
+    <version>1.25.0</version>
     <scope>test</scope>
   </dependency>
   <dependency>
     <groupId>io.spine</groupId>
     <artifactId>spine-testlib</artifactId>
-    <version>1.2.0</version>
+    <version>1.2.3</version>
     <scope>test</scope>
   </dependency>
   <dependency>
     <groupId>io.spine.tools</groupId>
     <artifactId>spine-mute-logging</artifactId>
-    <version>1.2.0</version>
+    <version>1.2.3</version>
     <scope>test</scope>
   </dependency>
   <dependency>
     <groupId>org.junit.jupiter</groupId>
     <artifactId>junit-jupiter-engine</artifactId>
-    <version>5.5.1</version>
+    <version>5.5.2</version>
     <scope>test</scope>
   </dependency>
   <dependency>
@@ -128,7 +128,7 @@ all modules and does not describe the project structure per-subproject.
   <dependency>
     <groupId>net.sourceforge.pmd</groupId>
     <artifactId>pmd-java</artifactId>
-    <version>6.16.0</version>
+    <version>6.19.0</version>
   </dependency>
   <dependency>
     <groupId>org.jacoco</groupId>

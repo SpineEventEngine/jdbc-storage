@@ -21,6 +21,7 @@
 package io.spine.server.storage.jdbc.delivery;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterators;
 import com.google.protobuf.Descriptors.Descriptor;
 import io.spine.server.delivery.InboxMessage;
 import io.spine.server.delivery.InboxMessageId;
@@ -34,6 +35,7 @@ import io.spine.string.Stringifiers;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Iterator;
+import java.util.Optional;
 
 import static io.spine.server.storage.jdbc.Type.BOOLEAN;
 import static io.spine.server.storage.jdbc.Type.INT;
@@ -74,6 +76,25 @@ final class InboxTable extends MessageTable<InboxMessageId, InboxMessage> {
         SelectInboxMessagesByShardIndex query = composeSelectByShardIndexQuery(index);
         Iterator<InboxMessage> iterator = query.execute();
         return iterator;
+    }
+
+    /**
+     * Obtains the oldest message in {@link io.spine.server.delivery.InboxMessageStatus#TO_DELIVER
+     * TO_DELIVER} status from the shard with the given {@code index}.
+     *
+     * <p>If there are no such messages in the specified shard, an {@code Optional.empty()}
+     * is returned.
+     */
+    Optional<InboxMessage> readOldestToDeliver(ShardIndex index) {
+        SelectOldestMessageToDeliver query =
+                SelectOldestMessageToDeliver.newBuilder()
+                                            .setDataSource(dataSource())
+                                            .setTableName(name())
+                                            .setShardIndex(index)
+                                            .build();
+        Iterator<InboxMessage> result = query.execute();
+        InboxMessage first = Iterators.getOnlyElement(result, null);
+        return Optional.ofNullable(first);
     }
 
     private SelectInboxMessagesByShardIndex composeSelectByShardIndexQuery(ShardIndex index) {
@@ -119,7 +140,10 @@ final class InboxTable extends MessageTable<InboxMessageId, InboxMessage> {
                                   .getSeconds()),
 
         WHEN_RECEIVED_NANOS(INT, m -> m.getWhenReceived()
-                                       .getNanos());
+                                       .getNanos()),
+
+        VERSION(INT, InboxMessage::getVersion);
+
 
         private final @Nullable Type type;
         private final Getter<InboxMessage> getter;

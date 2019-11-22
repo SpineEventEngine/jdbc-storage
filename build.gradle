@@ -46,6 +46,14 @@ allprojects {
 
     group = 'io.spine'
     version = versionToPublish
+
+    configurations {
+        all {
+            resolutionStrategy {
+                force group: 'io.spine', name: 'spine-base', version: spineBaseVersion
+            }
+        }
+    }
 }
 
 subprojects {

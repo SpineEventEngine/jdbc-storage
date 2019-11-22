@@ -31,6 +31,7 @@ import io.spine.server.storage.jdbc.StorageBuilder;
 import io.spine.server.storage.jdbc.message.JdbcMessageStorage;
 
 import java.util.Iterator;
+import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -72,6 +73,14 @@ public class JdbcInboxStorage
         checkNotClosed();
         Iterator<InboxMessage> iterator = table().readAll(index);
         return new InboxPage(iterator, pageSize);
+    }
+
+    @Override
+    public Optional<InboxMessage> oldestMessageToDeliver(ShardIndex index) {
+        checkNotNull(index);
+        checkNotClosed();
+        Optional<InboxMessage> result = table().readOldestToDeliver(index);
+        return result;
     }
 
     /**
