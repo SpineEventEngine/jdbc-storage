@@ -63,6 +63,7 @@ subprojects {
     apply plugin: 'maven-publish'
     apply from: deps.scripts.javadocOptions
     apply from: deps.scripts.projectLicenseReport
+    apply from: deps.scripts.testOutput
 
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
