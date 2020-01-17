@@ -1,6 +1,6 @@
 
     
-# Dependencies of `io.spine:spine-rdbms:1.3.0`
+# Dependencies of `io.spine:spine-rdbms:1.4.0`
 
 ## Runtime
 1. **Group:** com.google.auto.value **Name:** auto-value-annotations **Version:** 1.6.3
@@ -69,9 +69,9 @@
      * **POM Project URL:** [http://code.google.com/p/java-diff-utils/](http://code.google.com/p/java-diff-utils/)
      * **POM License: The Apache Software License, Version 2.0** - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
-1. **Group:** com.h2database **Name:** h2 **Version:** 1.4.196
-     * **POM Project URL:** [http://www.h2database.com](http://www.h2database.com)
-     * **POM License: MPL 2.0 or EPL 1.0** - [http://h2database.com/html/license.html](http://h2database.com/html/license.html)
+1. **Group:** com.h2database **Name:** h2 **Version:** 1.4.200
+     * **POM Project URL:** [https://h2database.com](https://h2database.com)
+     * **POM License: MPL 2.0 or EPL 1.0** - [https://h2database.com/html/license.html](https://h2database.com/html/license.html)
 
 1. **Group:** com.infradna.tool **Name:** bridge-method-annotation **Version:** 1.13
      * **POM License: MIT License** - [http://www.opensource.org/licenses/mit-license.php](http://www.opensource.org/licenses/mit-license.php)
@@ -79,16 +79,16 @@
 1. **Group:** com.mysema.commons **Name:** mysema-commons-lang **Version:** 0.2.4
      * **POM License: The Apache Software License, Version 2.0** - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
-1. **Group:** com.querydsl **Name:** querydsl-core **Version:** 4.1.4
+1. **Group:** com.querydsl **Name:** querydsl-core **Version:** 4.2.2
      * **Manifest Project URL:** [http://www.querydsl.com](http://www.querydsl.com)
      * **POM Project URL:** [${project.homepage}](${project.homepage})
      * **POM License: Apache License, Version 2.0** - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
-1. **Group:** com.querydsl **Name:** querydsl-sql **Version:** 4.1.4
+1. **Group:** com.querydsl **Name:** querydsl-sql **Version:** 4.2.2
      * **Manifest Project URL:** [http://www.querydsl.com](http://www.querydsl.com)
      * **POM License: Apache License, Version 2.0** - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
-1. **Group:** com.zaxxer **Name:** HikariCP **Version:** 2.4.3
+1. **Group:** com.zaxxer **Name:** HikariCP **Version:** 3.4.2
      * **Manifest Project URL:** [https://github.com/brettwooldridge](https://github.com/brettwooldridge)
      * **POM Project URL:** [https://github.com/brettwooldridge/HikariCP](https://github.com/brettwooldridge/HikariCP)
      * **POM License: The Apache Software License, Version 2.0** - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
@@ -134,7 +134,7 @@
 1. **Group:** org.hamcrest **Name:** hamcrest-core **Version:** 1.3
      * **POM License: New BSD License** - [http://www.opensource.org/licenses/bsd-license.php](http://www.opensource.org/licenses/bsd-license.php)
 
-1. **Group:** org.hsqldb **Name:** hsqldb **Version:** 2.3.3
+1. **Group:** org.hsqldb **Name:** hsqldb **Version:** 2.5.0
      * **POM Project URL:** [http://hsqldb.org](http://hsqldb.org)
      * **POM License: HSQLDB License, a BSD open source license** - [http://hsqldb.org/web/hsqlLicense.html](http://hsqldb.org/web/hsqlLicense.html)
 
@@ -258,9 +258,9 @@
      * **POM Project URL:** [http://code.google.com/p/java-diff-utils/](http://code.google.com/p/java-diff-utils/)
      * **POM License: The Apache Software License, Version 2.0** - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
-1. **Group:** com.h2database **Name:** h2 **Version:** 1.4.196
-     * **POM Project URL:** [http://www.h2database.com](http://www.h2database.com)
-     * **POM License: MPL 2.0 or EPL 1.0** - [http://h2database.com/html/license.html](http://h2database.com/html/license.html)
+1. **Group:** com.h2database **Name:** h2 **Version:** 1.4.200
+     * **POM Project URL:** [https://h2database.com](https://h2database.com)
+     * **POM License: MPL 2.0 or EPL 1.0** - [https://h2database.com/html/license.html](https://h2database.com/html/license.html)
 
 1. **Group:** com.infradna.tool **Name:** bridge-method-annotation **Version:** 1.13
      * **POM License: MIT License** - [http://www.opensource.org/licenses/mit-license.php](http://www.opensource.org/licenses/mit-license.php)
@@ -268,16 +268,16 @@
 1. **Group:** com.mysema.commons **Name:** mysema-commons-lang **Version:** 0.2.4
      * **POM License: The Apache Software License, Version 2.0** - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
-1. **Group:** com.querydsl **Name:** querydsl-core **Version:** 4.1.4
+1. **Group:** com.querydsl **Name:** querydsl-core **Version:** 4.2.2
      * **Manifest Project URL:** [http://www.querydsl.com](http://www.querydsl.com)
      * **POM Project URL:** [${project.homepage}](${project.homepage})
      * **POM License: Apache License, Version 2.0** - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
-1. **Group:** com.querydsl **Name:** querydsl-sql **Version:** 4.1.4
+1. **Group:** com.querydsl **Name:** querydsl-sql **Version:** 4.2.2
      * **Manifest Project URL:** [http://www.querydsl.com](http://www.querydsl.com)
      * **POM License: Apache License, Version 2.0** - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
-1. **Group:** com.zaxxer **Name:** HikariCP **Version:** 2.4.3
+1. **Group:** com.zaxxer **Name:** HikariCP **Version:** 3.4.2
      * **Manifest Project URL:** [https://github.com/brettwooldridge](https://github.com/brettwooldridge)
      * **POM Project URL:** [https://github.com/brettwooldridge/HikariCP](https://github.com/brettwooldridge/HikariCP)
      * **POM License: The Apache Software License, Version 2.0** - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
@@ -373,7 +373,7 @@
 1. **Group:** org.hamcrest **Name:** hamcrest-core **Version:** 1.3
      * **POM License: New BSD License** - [http://www.opensource.org/licenses/bsd-license.php](http://www.opensource.org/licenses/bsd-license.php)
 
-1. **Group:** org.hsqldb **Name:** hsqldb **Version:** 2.3.3
+1. **Group:** org.hsqldb **Name:** hsqldb **Version:** 2.5.0
      * **POM Project URL:** [http://hsqldb.org](http://hsqldb.org)
      * **POM License: HSQLDB License, a BSD open source license** - [http://hsqldb.org/web/hsqlLicense.html](http://hsqldb.org/web/hsqlLicense.html)
 
@@ -473,4 +473,4 @@
  The dependencies distributed under several licenses, are used according their commercial-use-friendly license.
 
 
-This report was generated on **Thu Jan 16 12:23:17 EET 2020** using [Gradle-License-Report plugin](https://github.com/jk1/Gradle-License-Report) by Evgeny Naumenko, licensed under [Apache 2.0 License](https://github.com/jk1/Gradle-License-Report/blob/master/LICENSE).
+This report was generated on **Fri Jan 17 14:37:42 EET 2020** using [Gradle-License-Report plugin](https://github.com/jk1/Gradle-License-Report) by Evgeny Naumenko, licensed under [Apache 2.0 License](https://github.com/jk1/Gradle-License-Report/blob/master/LICENSE).
