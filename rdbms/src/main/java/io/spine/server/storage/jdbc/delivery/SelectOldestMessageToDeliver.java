@@ -52,7 +52,6 @@ public class SelectOldestMessageToDeliver extends SelectByShardIndexQuery<InboxM
                                pathOf(InboxTable.Column.STATUS).eq(TO_DELIVER.toString()))
                         .orderBy(bySeconds, byNanos)
                         .limit(1);
-
     }
 
     @Override

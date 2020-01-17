@@ -20,10 +20,14 @@
 
 package io.spine.server.storage.jdbc;
 
+import com.querydsl.sql.SQLTemplates;
+import com.querydsl.sql.SQLTemplatesRegistry;
 import io.spine.annotation.Internal;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
 
 /**
  * Wrapper for {@link DataSource} instances.
@@ -51,6 +55,22 @@ public interface DataSourceWrapper extends AutoCloseable {
      *         if the data source is closed
      */
     DataSourceMetaData metaData() throws DatabaseException;
+
+    /**
+     * Obtains {@linkplain SQLTemplates templates} for the JDBC dialect.
+     *
+     * @return templates for a particular JDBC implementation
+     */
+    default SQLTemplates templates() {
+        try (ConnectionWrapper connection = getConnection(true)) {
+            DatabaseMetaData metaData = connection.get()
+                                                  .getMetaData();
+            SQLTemplatesRegistry templatesRegistry = new SQLTemplatesRegistry();
+            return templatesRegistry.getTemplates(metaData);
+        } catch (SQLException e) {
+            throw new DatabaseException(e);
+        }
+    }
 
     /**
      * Closes the wrapped {@link DataSource}.

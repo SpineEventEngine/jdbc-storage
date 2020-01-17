@@ -36,15 +36,12 @@ import com.querydsl.sql.SQLListener;
 import com.querydsl.sql.SQLListenerContext;
 import com.querydsl.sql.SQLQueryFactory;
 import com.querydsl.sql.SQLTemplates;
-import com.querydsl.sql.SQLTemplatesRegistry;
-import io.spine.server.storage.jdbc.ConnectionWrapper;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.TableColumn;
 
 import javax.inject.Provider;
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -167,29 +164,11 @@ public abstract class AbstractQuery implements StorageQuery {
                 throw new DatabaseException(e);
             }
         };
-        SQLTemplates templates = getDialectTemplates(dataSource);
+        SQLTemplates templates = dataSource.templates();
         Configuration configuration = new Configuration(templates);
         configuration.addListener(TransactionHandler.INSTANCE);
         configuration.addListener(SQLCloseListener.DEFAULT);
         return new SQLQueryFactory(configuration, connectionProvider);
-    }
-
-    /**
-     * Obtains {@linkplain SQLTemplates templates} for the JDBC dialect.
-     *
-     * @param dataSource
-     *         the data source to get {@linkplain java.sql.DatabaseMetaData DB metadata}
-     * @return templates for a particular JDBC implementation
-     */
-    private static SQLTemplates getDialectTemplates(DataSourceWrapper dataSource) {
-        try (ConnectionWrapper connection = dataSource.getConnection(true)) {
-            DatabaseMetaData metaData = connection.get()
-                                                  .getMetaData();
-            SQLTemplatesRegistry templatesRegistry = new SQLTemplatesRegistry();
-            return templatesRegistry.getTemplates(metaData);
-        } catch (SQLException e) {
-            throw new DatabaseException(e);
-        }
     }
 
     /**

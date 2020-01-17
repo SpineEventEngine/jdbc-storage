@@ -20,6 +20,7 @@
 
 package io.spine.server.storage.jdbc;
 
+import com.querydsl.sql.SQLTemplates;
 import io.spine.logging.Logging;
 
 import javax.sql.DataSource;
@@ -35,10 +36,12 @@ import static com.google.common.base.Preconditions.checkState;
 final class DefaultDataSourceWrapper implements DataSourceWrapper, Logging {
 
     private final DataSource dataSource;
+    private final SQLTemplates templates;
     private boolean isClosed;
 
     DefaultDataSourceWrapper(DataSource dataSource) {
         this.dataSource = dataSource;
+        this.templates = DataSourceWrapper.super.templates();
     }
 
     @Override
@@ -65,6 +68,11 @@ final class DefaultDataSourceWrapper implements DataSourceWrapper, Logging {
         } catch (SQLException e) {
             throw new DatabaseException(e);
         }
+    }
+
+    @Override
+    public SQLTemplates templates() {
+        return templates;
     }
 
     /**
