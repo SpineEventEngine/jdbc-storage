@@ -69,10 +69,6 @@
      * **POM Project URL:** [http://code.google.com/p/java-diff-utils/](http://code.google.com/p/java-diff-utils/)
      * **POM License: The Apache Software License, Version 2.0** - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
-1. **Group:** com.h2database **Name:** h2 **Version:** 1.4.200
-     * **POM Project URL:** [https://h2database.com](https://h2database.com)
-     * **POM License: MPL 2.0 or EPL 1.0** - [https://h2database.com/html/license.html](https://h2database.com/html/license.html)
-
 1. **Group:** com.infradna.tool **Name:** bridge-method-annotation **Version:** 1.13
      * **POM License: MIT License** - [http://www.opensource.org/licenses/mit-license.php](http://www.opensource.org/licenses/mit-license.php)
 
@@ -133,10 +129,6 @@
 
 1. **Group:** org.hamcrest **Name:** hamcrest-core **Version:** 1.3
      * **POM License: New BSD License** - [http://www.opensource.org/licenses/bsd-license.php](http://www.opensource.org/licenses/bsd-license.php)
-
-1. **Group:** org.hsqldb **Name:** hsqldb **Version:** 2.5.0
-     * **POM Project URL:** [http://hsqldb.org](http://hsqldb.org)
-     * **POM License: HSQLDB License, a BSD open source license** - [http://hsqldb.org/web/hsqlLicense.html](http://hsqldb.org/web/hsqlLicense.html)
 
 1. **Group:** org.junit.jupiter **Name:** junit-jupiter-api **Version:** 5.5.2
      * **POM Project URL:** [https://junit.org/junit5/](https://junit.org/junit5/)
@@ -473,4 +465,4 @@
  The dependencies distributed under several licenses, are used according their commercial-use-friendly license.
 
 
-This report was generated on **Fri Jan 17 14:37:42 EET 2020** using [Gradle-License-Report plugin](https://github.com/jk1/Gradle-License-Report) by Evgeny Naumenko, licensed under [Apache 2.0 License](https://github.com/jk1/Gradle-License-Report/blob/master/LICENSE).
+This report was generated on **Fri Jan 17 14:58:55 EET 2020** using [Gradle-License-Report plugin](https://github.com/jk1/Gradle-License-Report) by Evgeny Naumenko, licensed under [Apache 2.0 License](https://github.com/jk1/Gradle-License-Report/blob/master/LICENSE).

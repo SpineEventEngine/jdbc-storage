@@ -29,14 +29,13 @@ ext {
 }
 
 dependencies {
-    implementation group: 'org.hsqldb', name: 'hsqldb', version: hsqldbVersion
-    implementation group: 'com.h2database', name: 'h2', version: h2Version
-
-    implementation group: 'com.zaxxer', name: 'HikariCP', version: hikariVersion
-
-    implementation (group: 'com.querydsl', name: 'querydsl-sql', version: querydslVersion) {
+    api("com.querydsl:querydsl-sql:$querydslVersion") {
         exclude group: 'com.google.guava'
     }
 
+    implementation "com.zaxxer:HikariCP:$hikariVersion"
+
+    testImplementation "org.hsqldb:hsqldb:$hsqldbVersion"
+    testImplementation "com.h2database:h2:$h2Version"
     testImplementation deps.grpc.grpcStub
 }

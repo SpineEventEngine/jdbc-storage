@@ -50,12 +50,6 @@ all modules and does not describe the project structure per-subproject.
     <scope>compile</scope>
   </dependency>
   <dependency>
-    <groupId>com.h2database</groupId>
-    <artifactId>h2</artifactId>
-    <version>1.4.200</version>
-    <scope>compile</scope>
-  </dependency>
-  <dependency>
     <groupId>com.querydsl</groupId>
     <artifactId>querydsl-sql</artifactId>
     <version>4.2.2</version>
@@ -86,10 +80,10 @@ all modules and does not describe the project structure per-subproject.
     <scope>compile</scope>
   </dependency>
   <dependency>
-    <groupId>org.hsqldb</groupId>
-    <artifactId>hsqldb</artifactId>
-    <version>2.5.0</version>
-    <scope>compile</scope>
+    <groupId>com.h2database</groupId>
+    <artifactId>h2</artifactId>
+    <version>1.4.200</version>
+    <scope>test</scope>
   </dependency>
   <dependency>
     <groupId>io.grpc</groupId>
@@ -107,6 +101,12 @@ all modules and does not describe the project structure per-subproject.
     <groupId>io.spine.tools</groupId>
     <artifactId>spine-mute-logging</artifactId>
     <version>1.4.0</version>
+    <scope>test</scope>
+  </dependency>
+  <dependency>
+    <groupId>org.hsqldb</groupId>
+    <artifactId>hsqldb</artifactId>
+    <version>2.5.0</version>
     <scope>test</scope>
   </dependency>
   <dependency>
