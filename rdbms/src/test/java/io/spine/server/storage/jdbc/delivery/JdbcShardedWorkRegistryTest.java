@@ -1,5 +1,5 @@
 /*
- * Copyright 2019, TeamDev. All rights reserved.
+ * Copyright 2020, TeamDev. All rights reserved.
  *
  * Redistribution and use in source and/or binary forms, with or without
  * modification, must retain the above copyright notice and the following
@@ -36,6 +36,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
 import java.util.Optional;
 
 import static com.google.common.truth.Truth.assertThat;
@@ -45,7 +46,6 @@ import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory
 import static io.spine.server.storage.jdbc.PredefinedMapping.H2_1_4;
 import static io.spine.server.storage.jdbc.delivery.given.TestShardIndex.newIndex;
 import static io.spine.testing.DisplayNames.NOT_ACCEPT_NULLS;
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -137,7 +137,7 @@ class JdbcShardedWorkRegistryTest extends ShardedWorkRegistryTest {
         // On some platforms (namely some Windows distributions), Java cannot obtain current time
         // with enough precision to compare timestamps in this test. By waiting for 1 second, we
         // ensure that the timestamps will not accidentally be identical.
-        sleepUninterruptibly(1, SECONDS);
+        sleepUninterruptibly(Duration.ofSeconds(1));
 
         NodeId anotherNode = newNode();
         Optional<ShardProcessingSession> anotherOptional = registry.pickUp(index, anotherNode);
