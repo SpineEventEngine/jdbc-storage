@@ -39,15 +39,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.Optional;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static io.spine.server.delivery.InboxMessageStatus.DELIVERED;
 import static io.spine.server.delivery.InboxMessageStatus.TO_DELIVER;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
 import static io.spine.server.storage.jdbc.PredefinedMapping.H2_1_4;
 import static io.spine.server.storage.jdbc.delivery.given.TestInboxMessage.generateMultiple;
 import static io.spine.server.storage.jdbc.delivery.given.TestShardIndex.newIndex;
 import static io.spine.testing.DisplayNames.NOT_ACCEPT_NULLS;
+import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -165,7 +168,7 @@ class JdbcInboxStorageTest extends InboxStorageTest {
         InboxMessage remainingNonDelivered = iterator.next();
         ImmutableList<InboxMessage> toMarkDelivered = ImmutableList.copyOf(iterator);
 
-        storage.markDelivered(toMarkDelivered);
+        markDelivered(toMarkDelivered);
         ImmutableList<InboxMessage> originalMarkedDelivered =
                 toMarkDelivered.stream()
                                .map(m -> m.toBuilder()
@@ -180,6 +183,14 @@ class JdbcInboxStorageTest extends InboxStorageTest {
         assertTrue(readResult.containsAll(originalMarkedDelivered));
     }
 
+    private void markDelivered(ImmutableList<InboxMessage> messages) {
+        List<InboxMessage> nowDelivered = messages.stream()
+                                                  .map(m -> m.toBuilder()
+                                                             .setStatus(DELIVERED)
+                                                             .vBuild())
+                                                  .collect(toList());
+        storage.writeAll(nowDelivered);
+    }
 
     @CanIgnoreReturnValue
     private static ImmutableList<InboxMessage>

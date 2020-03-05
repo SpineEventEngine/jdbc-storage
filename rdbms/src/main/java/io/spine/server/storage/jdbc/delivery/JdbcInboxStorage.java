@@ -41,12 +41,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * <p>All inbox messages reside in a separate SQL {@linkplain InboxTable table}.
  */
 public class JdbcInboxStorage
-        extends JdbcMessageStorage<InboxMessageId,
-                                   InboxMessage,
-                                   InboxReadRequest,
-                                   InboxTable>
+        extends JdbcMessageStorage<InboxMessageId, InboxMessage, InboxReadRequest, InboxTable>
         implements InboxStorage {
-
 
     private final DataSourceWrapper dataSource;
 
@@ -76,7 +72,7 @@ public class JdbcInboxStorage
     }
 
     @Override
-    public Optional<InboxMessage> oldestMessageToDeliver(ShardIndex index) {
+    public Optional<InboxMessage> newestMessageToDeliver(ShardIndex index) {
         checkNotNull(index);
         checkNotClosed();
         Optional<InboxMessage> result = table().readOldestToDeliver(index);

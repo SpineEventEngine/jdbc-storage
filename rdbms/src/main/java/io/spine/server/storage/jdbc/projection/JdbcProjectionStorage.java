@@ -21,7 +21,6 @@
 package io.spine.server.storage.jdbc.projection;
 
 import com.google.protobuf.FieldMask;
-import com.google.protobuf.Timestamp;
 import io.spine.client.ResponseFormat;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.projection.Projection;
@@ -31,7 +30,6 @@ import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.JdbcStorageFactory;
 import io.spine.server.storage.jdbc.StorageBuilder;
 import io.spine.server.storage.jdbc.record.JdbcRecordStorage;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Iterator;
 
@@ -49,10 +47,6 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
 
     private final JdbcRecordStorage<I> recordStorage;
 
-    private final LastHandledEventTimeTable table;
-
-    private final String projectionId;
-
     /**
      * Creates a new instance using the builder.
      *
@@ -62,27 +56,11 @@ public class JdbcProjectionStorage<I> extends ProjectionStorage<I> {
     protected JdbcProjectionStorage(Builder<I> builder) throws DatabaseException {
         super(builder.getProjectionClass(), builder.isMultitenant());
         this.recordStorage = builder.getRecordStorage();
-        this.projectionId = builder.getProjectionClass()
-                                   .getName();
-        this.table = new LastHandledEventTimeTable(builder.dataSource(),
-                                                   builder.typeMapping());
-        table.create();
     }
 
     @Override
     public Iterator<I> index() {
         return recordStorage.index();
-    }
-
-    @Override
-    public void writeLastHandledEventTime(Timestamp time) throws DatabaseException {
-        table.write(projectionId, time);
-    }
-
-    @Override
-    public @Nullable Timestamp readLastHandledEventTime() throws DatabaseException {
-        Timestamp timestamp = table.read(projectionId);
-        return timestamp;
     }
 
     @Override

@@ -35,7 +35,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.protobuf.util.Timestamps.toMillis;
+import static com.google.protobuf.util.Timestamps.toNanos;
 import static io.spine.json.Json.toCompactJson;
 import static io.spine.server.storage.jdbc.Type.STRING;
 import static io.spine.testing.DisplayNames.NOT_ACCEPT_NULLS;
@@ -122,7 +122,7 @@ class DefaultJdbcColumnMappingTest {
     @Test
     @DisplayName("store `ByteString` as byte array")
     void storeByteStringAsByteArray() {
-        byte[] bytes = {1, 2, 3};
+        byte[] bytes = {(byte) 1, (byte) 2, (byte) 3};
         ByteString byteString = ByteString.copyFrom(bytes);
         assertConverts(byteString, bytes);
     }
@@ -149,14 +149,14 @@ class DefaultJdbcColumnMappingTest {
     }
 
     @Test
-    @DisplayName("store `Timestamp` as millis")
-    void storeTimestampAsMillis() {
+    @DisplayName("store `Timestamp` as nanos")
+    void storeTimestampAsNanos() {
         Timestamp timestamp = Timestamp
                 .newBuilder()
                 .setSeconds(432342)
                 .setNanos(12312)
                 .build();
-        assertConverts(timestamp, toMillis(timestamp));
+        assertConverts(timestamp, toNanos(timestamp));
     }
 
     @Test
