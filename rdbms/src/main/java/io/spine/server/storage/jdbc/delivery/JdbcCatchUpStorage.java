@@ -57,6 +57,9 @@ public class JdbcCatchUpStorage
         return table().readByType(projectionType);
     }
 
+    /**
+     * Creates a new instance of {@code Builder} for this storage.
+     */
     public static Builder newBuilder() {
         return new Builder();
     }
@@ -72,6 +75,9 @@ public class JdbcCatchUpStorage
         dataSource.close();
     }
 
+    /**
+     * A builder for {@link JdbcCatchUpStorage}.
+     */
     public static class Builder extends StorageBuilder<Builder, JdbcCatchUpStorage> {
 
         @Override
