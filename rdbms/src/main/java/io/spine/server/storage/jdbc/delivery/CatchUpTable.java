@@ -45,6 +45,14 @@ public class CatchUpTable extends MessageTable<CatchUpId, CatchUp> {
 
     private static final String NAME = "catchup";
 
+    /**
+     * Creates a new instance of the table.
+     *
+     * @param dataSource
+     *         wrapper over the RDBMS data source
+     * @param typeMapping
+     *         mapping of types, specific to the RDBMS for the current application
+     */
     CatchUpTable(DataSourceWrapper dataSource, TypeMapping typeMapping) {
         super(NAME, IdColumn.of(CatchUpTable.Column.ID, CatchUpId.class), dataSource, typeMapping);
     }
@@ -59,6 +67,9 @@ public class CatchUpTable extends MessageTable<CatchUpId, CatchUp> {
         return ImmutableList.copyOf(Column.values());
     }
 
+    /**
+     * Reads all {@code CatchUp} statuses by the type URL of the catching-up projection.
+     */
     Iterable<CatchUp> readByType(TypeUrl type) {
         SelectCatchUpByTypeQuery query = SelectCatchUpByTypeQuery
                 .newBuilder()
@@ -70,6 +81,12 @@ public class CatchUpTable extends MessageTable<CatchUpId, CatchUp> {
         return ImmutableList.copyOf(iterator);
     }
 
+    /**
+     * Reads all {@code CatchUp} statuses.
+     *
+     * @implNote Realistically, there should not be lots of the catch-up processes in the
+     *         system. Therefore, no pagination is implemented at this point.
+     */
     public Iterable<CatchUp> readAll() {
         SelectAllCatchUpsQuery query = SelectAllCatchUpsQuery
                 .newBuilder()
@@ -85,8 +102,14 @@ public class CatchUpTable extends MessageTable<CatchUpId, CatchUp> {
      */
     enum Column implements MessageTable.Column<CatchUp> {
 
+        /**
+         * Identifier of the {@code CatchUp}.
+         */
         ID(CatchUp::getId),
 
+        /**
+         * The type URL of the catching-up projection, stored as a {@code String}.
+         */
         PROJECTION_TYPE(STRING_255, (m) -> m.getId()
                                             .getProjectionType());
 
