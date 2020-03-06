@@ -29,7 +29,6 @@ import static com.querydsl.core.types.Order.DESC;
 import static io.spine.server.delivery.InboxMessageStatus.TO_DELIVER;
 import static io.spine.server.storage.jdbc.delivery.InboxTable.Column.SHARD_INDEX;
 import static io.spine.server.storage.jdbc.delivery.InboxTable.Column.WHEN_RECEIVED;
-import static io.spine.server.storage.jdbc.delivery.InboxTable.Column.WHEN_RECEIVED_NANOS;
 import static io.spine.server.storage.jdbc.message.MessageTable.bytesColumn;
 
 /**
@@ -44,13 +43,12 @@ public class SelectOldestMessageToDeliver extends SelectByShardIndexQuery<InboxM
 
     @Override
     protected AbstractSQLQuery<Object, ?> query() {
-        OrderSpecifier<Comparable> bySeconds = orderBy(WHEN_RECEIVED, DESC);
-        OrderSpecifier<Comparable> byNanos = orderBy(WHEN_RECEIVED_NANOS, DESC);
+        OrderSpecifier<Comparable> byTime = orderBy(WHEN_RECEIVED, DESC);
         return factory().select(pathOf(bytesColumn()))
                         .from(table())
                         .where(pathOf(SHARD_INDEX).eq(shardIndex()),
                                pathOf(InboxTable.Column.STATUS).eq(TO_DELIVER.toString()))
-                        .orderBy(bySeconds, byNanos)
+                        .orderBy(byTime)
                         .limit(1);
     }
 

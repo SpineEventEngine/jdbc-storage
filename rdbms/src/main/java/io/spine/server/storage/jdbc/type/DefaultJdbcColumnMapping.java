@@ -115,7 +115,7 @@ public class DefaultJdbcColumnMapping
     }
 
     private static JdbcColumnTypeMapping<Timestamp, Long> ofTimestamp() {
-        return new JdbcColumnTypeMapping<>(Timestamps::toMillis, LONG);
+        return new JdbcColumnTypeMapping<>(Timestamps::toNanos, LONG);
     }
 
     private static JdbcColumnTypeMapping<Version, Integer> ofVersion() {

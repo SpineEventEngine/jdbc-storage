@@ -26,12 +26,14 @@ import com.zaxxer.hikari.HikariDataSource;
 import io.spine.server.ContextSpec;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateStorage;
+import io.spine.server.delivery.CatchUpStorage;
 import io.spine.server.delivery.InboxStorage;
 import io.spine.server.entity.Entity;
 import io.spine.server.projection.Projection;
 import io.spine.server.projection.ProjectionStorage;
 import io.spine.server.storage.StorageFactory;
 import io.spine.server.storage.jdbc.aggregate.JdbcAggregateStorage;
+import io.spine.server.storage.jdbc.delivery.JdbcCatchUpStorage;
 import io.spine.server.storage.jdbc.delivery.JdbcInboxStorage;
 import io.spine.server.storage.jdbc.delivery.JdbcSessionStorage;
 import io.spine.server.storage.jdbc.projection.JdbcProjectionStorage;
@@ -104,6 +106,17 @@ public class JdbcStorageFactory implements StorageFactory {
     @Override
     public InboxStorage createInboxStorage(boolean multitenant) {
         JdbcInboxStorage storage = JdbcInboxStorage
+                .newBuilder()
+                .setMultitenant(multitenant)
+                .setDataSource(dataSource)
+                .setTypeMapping(typeMapping)
+                .build();
+        return storage;
+    }
+
+    @Override
+    public CatchUpStorage createCatchUpStorage(boolean multitenant) {
+        JdbcCatchUpStorage storage = JdbcCatchUpStorage
                 .newBuilder()
                 .setMultitenant(multitenant)
                 .setDataSource(dataSource)

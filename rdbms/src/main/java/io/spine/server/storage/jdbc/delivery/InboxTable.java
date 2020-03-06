@@ -23,6 +23,7 @@ package io.spine.server.storage.jdbc.delivery;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterators;
 import com.google.protobuf.Descriptors.Descriptor;
+import com.google.protobuf.util.Timestamps;
 import io.spine.server.delivery.InboxMessage;
 import io.spine.server.delivery.InboxMessageId;
 import io.spine.server.delivery.ShardIndex;
@@ -120,10 +121,12 @@ final class InboxTable extends MessageTable<InboxMessageId, InboxMessage> {
 
         INBOX_ID(STRING_255, m -> Stringifiers.toString(m.getInboxId())),
 
-        SHARD_INDEX(LONG, m -> m.getShardIndex()
+        SHARD_INDEX(LONG, m -> m.getId()
+                                .getIndex()
                                 .getIndex()),
 
-        OF_TOTAL_SHARDS(LONG, m -> m.getShardIndex()
+        OF_TOTAL_SHARDS(LONG, m -> m.getId()
+                                    .getIndex()
                                     .getOfTotal()),
 
         IS_EVENT(BOOLEAN, InboxMessage::hasEvent),
@@ -136,14 +139,9 @@ final class InboxTable extends MessageTable<InboxMessageId, InboxMessage> {
         STATUS(STRING, m -> m.getStatus()
                              .toString()),
 
-        WHEN_RECEIVED(LONG, m -> m.getWhenReceived()
-                                  .getSeconds()),
-
-        WHEN_RECEIVED_NANOS(INT, m -> m.getWhenReceived()
-                                       .getNanos()),
+        WHEN_RECEIVED(LONG, m -> Timestamps.toNanos(m.getWhenReceived())),
 
         VERSION(INT, InboxMessage::getVersion);
-
 
         private final @Nullable Type type;
         private final Getter<InboxMessage> getter;

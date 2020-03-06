@@ -28,7 +28,6 @@ import io.spine.server.delivery.InboxMessage;
 import static com.querydsl.core.types.Order.ASC;
 import static io.spine.server.storage.jdbc.delivery.InboxTable.Column.SHARD_INDEX;
 import static io.spine.server.storage.jdbc.delivery.InboxTable.Column.WHEN_RECEIVED;
-import static io.spine.server.storage.jdbc.delivery.InboxTable.Column.WHEN_RECEIVED_NANOS;
 import static io.spine.server.storage.jdbc.message.MessageTable.bytesColumn;
 
 /**
@@ -45,12 +44,11 @@ final class SelectInboxMessagesByShardIndex extends SelectByShardIndexQuery<Inbo
 
     @Override
     protected AbstractSQLQuery<Object, ?> query() {
-        OrderSpecifier<Comparable> bySeconds = orderBy(WHEN_RECEIVED, ASC);
-        OrderSpecifier<Comparable> byNanos = orderBy(WHEN_RECEIVED_NANOS, ASC);
+        OrderSpecifier<Comparable> byTime = orderBy(WHEN_RECEIVED, ASC);
         return factory().select(pathOf(bytesColumn()))
                         .from(table())
                         .where(pathOf(SHARD_INDEX).eq(shardIndex()))
-                        .orderBy(bySeconds, byNanos);
+                        .orderBy(byTime);
     }
 
     @Override
