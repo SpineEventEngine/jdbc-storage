@@ -18,10 +18,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-final def SPINE_VERSION = '1.5.0'
 
-ext {
-    versionToPublish = SPINE_VERSION
-    spineBaseVersion = SPINE_VERSION
-    spineCoreVersion = SPINE_VERSION
-}
+val spineCoreVersion by extra("1.5.14")
+val versionToPublish by extra(spineCoreVersion)
+val spineBaseVersion by extra("1.5.12")

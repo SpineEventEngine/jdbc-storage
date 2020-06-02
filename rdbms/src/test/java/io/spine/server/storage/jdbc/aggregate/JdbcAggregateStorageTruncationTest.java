@@ -20,8 +20,10 @@
 
 package io.spine.server.storage.jdbc.aggregate;
 
+import io.spine.server.ServerEnvironment;
 import io.spine.server.aggregate.AggregateStorageTruncationTest;
-import io.spine.server.storage.StorageFactory;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 
 import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.newFactory;
@@ -29,8 +31,14 @@ import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.newFa
 @DisplayName("JdbcAggregateStorage after truncation should")
 public class JdbcAggregateStorageTruncationTest extends AggregateStorageTruncationTest {
 
-    @Override
-    protected StorageFactory storageFactory() {
-        return newFactory();
+    @BeforeAll
+    static void prepareStorage() {
+        ServerEnvironment.instance()
+                         .configureStorageForTests(newFactory());
+    }
+
+    @AfterAll
+    static void resetStorage() {
+        ServerEnvironment.instance().reset();
     }
 }

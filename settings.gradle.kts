@@ -18,7 +18,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-rootProject.name = 'jdbc-storage'
+rootProject.name = "jdbc-storage"
 
-include ':rdbms'
-project(':rdbms').projectDir = "$rootDir/rdbms" as File
+include(":rdbms")
