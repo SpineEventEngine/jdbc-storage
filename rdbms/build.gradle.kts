@@ -19,10 +19,13 @@
  */
 
 import io.spine.gradle.internal.Deps
+import io.spine.gradle.internal.IncrementGuard
 
 plugins {
     `java-library`
 }
+
+apply<IncrementGuard>()
 
 extra["artifactId"] = "jdbc-rdbms"
 
