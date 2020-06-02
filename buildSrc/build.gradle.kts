@@ -18,10 +18,19 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-final def SPINE_VERSION = '1.5.0'
+plugins {
+    // Use Kotlin for `buildSrc`.
+    // https://kotlinlang.org/docs/reference/using-gradle.html#targeting-the-jvm
+    kotlin("jvm").version("1.3.72")
+}
 
-ext {
-    versionToPublish = SPINE_VERSION
-    spineBaseVersion = SPINE_VERSION
-    spineCoreVersion = SPINE_VERSION
+repositories {
+    mavenLocal()
+    jcenter()
+}
+
+val jacksonVersion = "2.11.0"
+
+dependencies {
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:$jacksonVersion")
 }

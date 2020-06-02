@@ -18,27 +18,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.aggregate;
 
-import io.spine.server.ServerEnvironment;
-import io.spine.server.aggregate.AggregateStorageTruncationTest;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-
-import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.newFactory;
-
-@DisplayName("JdbcAggregateStorage after truncation should")
-public class JdbcAggregateStorageTruncationTest extends AggregateStorageTruncationTest {
-
-    @BeforeAll
-    static void prepareStorage() {
-        ServerEnvironment.instance()
-                         .configureStorageForTests(newFactory());
-    }
-
-    @AfterAll
-    static void resetStorage() {
-        ServerEnvironment.instance().reset();
-    }
-}
+val spineCoreVersion by extra("1.5.14")
+val versionToPublish by extra(spineCoreVersion)
+val spineBaseVersion by extra("1.5.12")

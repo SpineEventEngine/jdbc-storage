@@ -18,24 +18,28 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-ext {
-    artifactId = 'jdbc-rdbms'
+import io.spine.gradle.internal.Deps
+import io.spine.gradle.internal.IncrementGuard
 
-    // Versions of libraries for working with JDBC.
-    hsqldbVersion = '2.5.0'
-    h2Version = '1.4.200'
-    hikariVersion = '3.4.2'
-    querydslVersion = '4.2.2'
+plugins {
+    `java-library`
 }
+
+apply<IncrementGuard>()
+
+extra["artifactId"] = "jdbc-rdbms"
+
+val querydslVersion = "4.2.2"
+val hikariVersion = "3.4.2"
+val hsqldbVersion = "2.5.0"
+val h2Version = "1.4.200"
 
 dependencies {
     api("com.querydsl:querydsl-sql:$querydslVersion") {
-        exclude group: 'com.google.guava'
+        exclude(group = "com.google.guava")
     }
-
-    implementation "com.zaxxer:HikariCP:$hikariVersion"
-
-    testImplementation "org.hsqldb:hsqldb:$hsqldbVersion"
-    testImplementation "com.h2database:h2:$h2Version"
-    testImplementation deps.grpc.grpcStub
+    implementation("com.zaxxer:HikariCP:$hikariVersion")
+    testImplementation("org.hsqldb:hsqldb:$hsqldbVersion")
+    testImplementation("com.h2database:h2:$h2Version")
+    testImplementation(Deps.grpc.stub)
 }
