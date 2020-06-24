@@ -20,6 +20,7 @@
 
 package io.spine.server.storage.jdbc.delivery;
 
+import io.spine.base.Tests;
 import io.spine.server.ServerEnvironment;
 import io.spine.server.delivery.DeliveryTest;
 import io.spine.server.storage.StorageFactory;
@@ -59,7 +60,7 @@ class JdbcDeliverySmokeTest extends DeliveryTest {
                 .setTypeMapping(H2_1_4)
                 .build();
         ServerEnvironment.instance()
-                         .configureStorageForTests(factory);
+                         .use(factory, Tests.class);
     }
 
     @AfterEach
