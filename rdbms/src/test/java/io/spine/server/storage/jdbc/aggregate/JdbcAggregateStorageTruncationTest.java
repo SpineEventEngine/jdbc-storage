@@ -20,6 +20,7 @@
 
 package io.spine.server.storage.jdbc.aggregate;
 
+import io.spine.base.Tests;
 import io.spine.server.ServerEnvironment;
 import io.spine.server.aggregate.AggregateStorageTruncationTest;
 import org.junit.jupiter.api.AfterAll;
@@ -34,7 +35,7 @@ public class JdbcAggregateStorageTruncationTest extends AggregateStorageTruncati
     @BeforeAll
     static void prepareStorage() {
         ServerEnvironment.instance()
-                         .configureStorageForTests(newFactory());
+                         .use(newFactory(), Tests.class);
     }
 
     @AfterAll
