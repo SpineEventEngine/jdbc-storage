@@ -20,11 +20,9 @@
 
 package io.spine.server.storage.jdbc.aggregate;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-import com.google.common.testing.NullPointerTester;
 import io.spine.server.storage.jdbc.aggregate.given.CloseablesTestEnv.FaultyClosable;
 import io.spine.server.storage.jdbc.aggregate.given.CloseablesTestEnv.StatefulClosable;
+import io.spine.testing.UtilityClassTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -32,36 +30,24 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import static io.spine.testing.DisplayNames.HAVE_PARAMETERLESS_CTOR;
-import static io.spine.testing.DisplayNames.NOT_ACCEPT_NULLS;
-import static io.spine.testing.Tests.assertHasPrivateParameterlessCtor;
+import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Sets.newHashSet;
+import static com.google.common.truth.Truth.assertThat;
 import static java.util.Collections.singleton;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@DisplayName("Closeables utility should")
-class CloseablesTest {
+@DisplayName("`Closeables` utility should")
+class CloseablesTest extends UtilityClassTest<Closeables> {
 
-    @Test
-    @DisplayName(HAVE_PARAMETERLESS_CTOR)
-    void haveUtilityConstructor() {
-        assertHasPrivateParameterlessCtor(Closeables.class);
+    CloseablesTest() {
+        super(Closeables.class);
     }
 
-    @Test
-    @DisplayName(NOT_ACCEPT_NULLS)
-    void passNullToleranceCheck() {
-        new NullPointerTester()
-                .testAllPublicStaticMethods(Closeables.class);
-    }
-
-    @SuppressWarnings("MethodWithMultipleLoops")
-    // Two loops - one for data set up and one for checks.
     @Test
     @DisplayName("close all passed instances")
+    @SuppressWarnings("MethodWithMultipleLoops") // one loop for data set up and one for checks.
     void closeAll() {
         int count = 10;
         Set<StatefulClosable> closeables = new HashSet<>(count);
@@ -90,7 +76,7 @@ class CloseablesTest {
         StatefulClosable stateful = new StatefulClosable();
 
         // Needs to be ordered.
-        Collection<AutoCloseable> closeables = Lists.newArrayList(faulty, stateful);
+        Collection<AutoCloseable> closeables = newArrayList(faulty, stateful);
         boolean success;
         try {
             Closeables.closeAll(closeables);
@@ -106,13 +92,14 @@ class CloseablesTest {
     @Test
     @DisplayName("throw exception with aggregating cause upon multiple failures")
     void throwAggregatedFailures() {
-        Collection<AutoCloseable> closeables = Sets.newHashSet(new FaultyClosable(),
-                                                               new FaultyClosable());
+        Collection<AutoCloseable> closeables =
+                newHashSet(new FaultyClosable(), new FaultyClosable());
         try {
             Closeables.closeAll(closeables);
         } catch (IllegalStateException e) {
             Throwable cause = e.getCause();
-            assertThat(cause, instanceOf(MultipleExceptionsOnClose.class));
+            assertThat(cause)
+                    .isInstanceOf(MultipleExceptionsOnClose.class);
         }
     }
 }

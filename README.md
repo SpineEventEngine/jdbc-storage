@@ -13,11 +13,9 @@ See [gcloud-java](https://github.com/SpineEventEngine/gcloud-java/) for Google C
 
 Gradle:
 
-```groovy
+```kotlin
 dependencies {
-    implementation (
-        "io.spine:spine-rdbms:1.6.0"
-    )
+    implementation("io.spine:spine-rdbms:1.6.0")
 }
 ```
 

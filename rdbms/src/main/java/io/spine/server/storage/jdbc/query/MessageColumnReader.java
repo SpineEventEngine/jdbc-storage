@@ -34,6 +34,7 @@ import static io.spine.json.Json.fromJson;
  * <p>The result of the read operation is always a Protobuf {@link Message}.
  *
  * @param <M>
+ *         the type of the column
  * @see io.spine.json.Json Json
  */
 final class MessageColumnReader<M extends Message> extends ColumnReader<M> {
@@ -50,7 +51,7 @@ final class MessageColumnReader<M extends Message> extends ColumnReader<M> {
      */
     MessageColumnReader(String columnName, Class<M> messageClass) {
         super(columnName);
-        this.messageClass = messageClass;
+        this.messageClass = checkNotNull(messageClass);
     }
 
     @Override

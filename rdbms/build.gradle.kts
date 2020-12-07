@@ -21,17 +21,13 @@
 import io.spine.gradle.internal.Deps
 import io.spine.gradle.internal.IncrementGuard
 
-plugins {
-    `java-library`
-}
-
 apply<IncrementGuard>()
 
 extra["artifactId"] = "jdbc-rdbms"
 
-val querydslVersion = "4.2.2"
-val hikariVersion = "3.4.2"
-val hsqldbVersion = "2.5.0"
+val querydslVersion = "4.4.0"
+val hikariVersion = "3.4.5"
+val hsqldbVersion = "2.5.1"
 val h2Version = "1.4.200"
 
 dependencies {

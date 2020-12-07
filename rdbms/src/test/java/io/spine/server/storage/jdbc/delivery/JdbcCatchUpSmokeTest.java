@@ -44,8 +44,8 @@ import static io.spine.server.storage.jdbc.PredefinedMapping.H2_1_4;
  * <p>The tests are extremely slow, so only a tiny portion of the original {@link CatchUpTest}
  * is launched.
  */
-@DisplayName("JDBC-backed `CatchUp` should ")
 @SlowTest
+@DisplayName("JDBC-backed `CatchUp` should ")
 class JdbcCatchUpSmokeTest extends CatchUpTest {
 
     private StorageFactory factory;
@@ -60,8 +60,9 @@ class JdbcCatchUpSmokeTest extends CatchUpTest {
                 .setDataSource(source)
                 .setTypeMapping(H2_1_4)
                 .build();
-        ServerEnvironment.instance()
-                         .use(factory, Tests.class);
+        ServerEnvironment
+                .when(Tests.class)
+                .use(factory);
     }
 
     @AfterEach

@@ -18,8 +18,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import io.spine.gradle.internal.Deps;
-import io.spine.gradle.internal.DependencyResolution;
+import io.spine.gradle.internal.DependencyResolution
+import io.spine.gradle.internal.Deps
 
 buildscript {
 
@@ -35,7 +35,7 @@ buildscript {
 }
 
 plugins {
-    java
+    `java-library`
     idea
     jacoco
     @Suppress("RemoveRedundantQualifierName") // Cannot use imports here.
@@ -70,7 +70,7 @@ subprojects {
         from(Deps.scripts.javacArgs(project))
         from(Deps.scripts.pmd(project))
     }
-    
+
     java {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -86,21 +86,24 @@ subprojects {
     dependencies {
         errorprone(Deps.build.errorProneCore)
         errorproneJavac(Deps.build.errorProneJavac)
-        
+
         implementation("io.spine:spine-server:$spineCoreVersion")
-        implementation("io.spine:spine-testutil-server:$spineCoreVersion")
         implementation(Deps.build.guava)
-        implementation(Deps.build.jsr305Annotations)
-        implementation(Deps.build.checkerAnnotations)
-        Deps.build.errorProneAnnotations.forEach { implementation(it) }
-        
+        compileOnlyApi(Deps.build.jsr305Annotations)
+        compileOnlyApi(Deps.build.checkerAnnotations)
+        Deps.build.errorProneAnnotations.forEach { compileOnlyApi(it) }
+
+        testImplementation(Deps.test.guavaTestlib)
+        Deps.test.junit5Api.forEach { testImplementation(it) }
+        Deps.test.truth.forEach { testImplementation(it) }
+        testImplementation("io.spine:spine-testutil-server:$spineCoreVersion")
         testImplementation(group = "io.spine",
-                           name = "spine-server",
-                           version = spineCoreVersion,
-                           classifier = "test")
+                name = "spine-server",
+                version = spineCoreVersion,
+                classifier = "test")
         testImplementation("io.spine:spine-testlib:$spineBaseVersion")
         testImplementation("io.spine.tools:spine-mute-logging:$spineBaseVersion")
-        testImplementation(Deps.test.junit5Runner)
+        testRuntimeOnly(Deps.test.junit5Runner)
     }
 
     tasks.test {
