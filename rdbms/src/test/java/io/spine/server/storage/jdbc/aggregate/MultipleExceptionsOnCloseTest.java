@@ -20,15 +20,15 @@
 
 package io.spine.server.storage.jdbc.aggregate;
 
+import com.google.common.truth.StringSubject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@DisplayName("MultipleExceptionsOnClose should")
+@DisplayName("`MultipleExceptionsOnClose` should")
 class MultipleExceptionsOnCloseTest {
 
     @Test
@@ -45,9 +45,10 @@ class MultipleExceptionsOnCloseTest {
                 new MultipleExceptionsOnClose(newArrayList(ex1, ex2, ex3));
 
         String exceptionsDescription = aggregatingException.toString();
-        assertThat(exceptionsDescription, containsString(ex1.toString()));
-        assertThat(exceptionsDescription, containsString(ex2.toString()));
-        assertThat(exceptionsDescription, containsString(ex3.toString()));
+        StringSubject exceptionSubject = assertThat(exceptionsDescription);
+        exceptionSubject.contains(ex1.toString());
+        exceptionSubject.contains(ex2.toString());
+        exceptionSubject.contains(ex3.toString());
     }
 
     @Test
