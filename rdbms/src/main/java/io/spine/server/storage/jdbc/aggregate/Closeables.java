@@ -28,8 +28,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * A utility class for working with {@link AutoCloseable} instances.
  */
-class Closeables {
+final class Closeables {
 
+    /**
+     * Prevents instantiation of this utility class.
+     */
     private Closeables() {
     }
 

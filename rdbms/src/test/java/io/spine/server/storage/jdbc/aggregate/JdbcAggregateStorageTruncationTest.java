@@ -29,17 +29,20 @@ import org.junit.jupiter.api.DisplayName;
 
 import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.newFactory;
 
-@DisplayName("JdbcAggregateStorage after truncation should")
-public class JdbcAggregateStorageTruncationTest extends AggregateStorageTruncationTest {
+@DisplayName("`JdbcAggregateStorage` after truncation should")
+class JdbcAggregateStorageTruncationTest extends AggregateStorageTruncationTest {
 
     @BeforeAll
     static void prepareStorage() {
-        ServerEnvironment.instance()
-                         .use(newFactory(), Tests.class);
+        ServerEnvironment
+                .when(Tests.class)
+                .use(newFactory());
     }
 
     @AfterAll
     static void resetStorage() {
-        ServerEnvironment.instance().reset();
+        ServerEnvironment
+                .instance()
+                .reset();
     }
 }

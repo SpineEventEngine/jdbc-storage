@@ -43,8 +43,8 @@ import static io.spine.server.storage.jdbc.PredefinedMapping.H2_1_4;
  * <p>The tests are extremely slow, so only a tiny portion of the original {@link DeliveryTest}
  * is launched.
  */
-@DisplayName("JDBC-backed `Delivery` should ")
 @SlowTest
+@DisplayName("JDBC-backed `Delivery` should ")
 class JdbcDeliverySmokeTest extends DeliveryTest {
 
     private StorageFactory factory;
@@ -59,8 +59,9 @@ class JdbcDeliverySmokeTest extends DeliveryTest {
                 .setDataSource(source)
                 .setTypeMapping(H2_1_4)
                 .build();
-        ServerEnvironment.instance()
-                         .use(factory, Tests.class);
+        ServerEnvironment
+                .when(Tests.class)
+                .use(factory);
     }
 
     @AfterEach
