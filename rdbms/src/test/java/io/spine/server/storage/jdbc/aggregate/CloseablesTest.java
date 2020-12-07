@@ -20,16 +20,15 @@
 
 package io.spine.server.storage.jdbc.aggregate;
 
-import com.google.common.collect.ImmutableSet;
 import io.spine.server.storage.jdbc.aggregate.given.CloseablesTestEnv.FaultyClosable;
 import io.spine.server.storage.jdbc.aggregate.given.CloseablesTestEnv.StatefulClosable;
 import io.spine.testing.UtilityClassTest;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
-import java.util.stream.IntStream;
+import java.util.HashSet;
+import java.util.Set;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
@@ -48,17 +47,19 @@ class CloseablesTest extends UtilityClassTest<Closeables> {
 
     @Test
     @DisplayName("close all passed instances")
+    @SuppressWarnings("MethodWithMultipleLoops") // one loop for data set up and one for checks.
     void closeAll() {
-        ImmutableSet<StatefulClosable> closeables = IntStream
-                .of(10)
-                .mapToObj(i -> new StatefulClosable())
-                .collect(ImmutableSet.toImmutableSet());
+        int count = 10;
+        Set<StatefulClosable> closeables = new HashSet<>(count);
+        for (int i = 0; i < count; i++) {
+            closeables.add(new StatefulClosable());
+        }
 
         Closeables.closeAll(closeables);
 
-        closeables.stream()
-                  .map(StatefulClosable::isClosed)
-                  .forEach(Assertions::assertTrue);
+        for (StatefulClosable sc : closeables) {
+            assertTrue(sc.isClosed());
+        }
     }
 
     @Test
