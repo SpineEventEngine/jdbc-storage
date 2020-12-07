@@ -35,7 +35,7 @@ buildscript {
 }
 
 plugins {
-    java
+    `java-library`
     idea
     jacoco
     @Suppress("RemoveRedundantQualifierName") // Cannot use imports here.
