@@ -15,14 +15,15 @@ Gradle:
 
 ```kotlin
 dependencies {
-    implementation("io.spine:spine-rdbms:1.6.0")
+    implementation("io.spine:spine-rdbms:1.7.0")
 }
 ```
 
 This artifact should be used as a part of the Spine server application.
  
-For the details on setting up the server environment please refer to [Spine Bootstrap Gradle plugin](https://github.com/SpineEventEngine/bootstrap/) 
-and [Spine `core` modules](https://github.com/SpineEventEngine/core-java/) documentation. 
+For the details on setting up the server environment please refer to 
+[Spine Bootstrap Gradle plugin](https://github.com/SpineEventEngine/bootstrap/) and 
+[Spine `core` modules](https://github.com/SpineEventEngine/core-java/) documentation. 
 
 ### Configuration
 
@@ -38,7 +39,7 @@ This is a responsibility of a developer.
 
 Here is an example of specifying the connection string:
 
-```
+```java
 final HikariConfig config = new HikariConfig();
 config.setJdbcUrl("jdbc:mysql://localhost:3306/DbName");
         
@@ -75,7 +76,7 @@ specified during creation of `JdbcStorageFactory`. There is the builder for this
 `TypeMappingBuilder.basicBuilder()`. This builder contains mappings for all types
 (equal to MySQL 5.7 mapping). So only required types should be overridden:
 
-```
+```java
 TypeMapping mapping = TypeMappingBuilder.basicBuilder()
                                         .add(Type.INT, "INT4")
                                         .add(Type.LONG, "INT8")
