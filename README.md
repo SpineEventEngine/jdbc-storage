@@ -40,10 +40,10 @@ This is a responsibility of a developer.
 Here is an example of specifying the connection string:
 
 ```java
-final HikariConfig config = new HikariConfig();
+HikariConfig config = new HikariConfig();
 config.setJdbcUrl("jdbc:mysql://localhost:3306/DbName");
         
-final DataSource dataSource = new HikariDataSource(config);
+DataSource dataSource = new HikariDataSource(config);
 JdbcStorageFactory.newBuilder()
                   .setDataSource(dataSource)
                   .build();
