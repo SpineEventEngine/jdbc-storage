@@ -24,7 +24,14 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-val spineBaseVersion: String by extra("2.0.0-SNAPSHOT.34")
-val spineCoreVersion: String by extra("2.0.0-SNAPSHOT.25")
-val versionToPublish: String by extra("2.0.0-SNAPSHOT.1")
+package io.spine.internal.dependency
 
+/**
+ * A Java implementation of JSON Web Token (JWT) - RFC 7519.
+ *
+ * [Java JWT](https://github.com/auth0/java-jwt)
+ */
+object JavaJwt {
+    private const val version = "3.14.0"
+    const val lib = "com.auth0:java-jwt:${version}"
+}

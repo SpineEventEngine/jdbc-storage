@@ -24,7 +24,14 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-val spineBaseVersion: String by extra("2.0.0-SNAPSHOT.34")
-val spineCoreVersion: String by extra("2.0.0-SNAPSHOT.25")
-val versionToPublish: String by extra("2.0.0-SNAPSHOT.1")
+package io.spine.internal.dependency
 
+// https://github.com/google/truth
+object Truth {
+    private const val version = "1.1.3"
+    val libs = listOf(
+        "com.google.truth:truth:${version}",
+        "com.google.truth.extensions:truth-java8-extension:${version}",
+        "com.google.truth.extensions:truth-proto-extension:${version}"
+    )
+}

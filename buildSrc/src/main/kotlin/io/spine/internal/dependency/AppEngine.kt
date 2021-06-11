@@ -24,7 +24,16 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-val spineBaseVersion: String by extra("2.0.0-SNAPSHOT.34")
-val spineCoreVersion: String by extra("2.0.0-SNAPSHOT.25")
-val versionToPublish: String by extra("2.0.0-SNAPSHOT.1")
+package io.spine.internal.dependency
 
+// https://cloud.google.com/java/docs/reference
+@Suppress("unused")
+object AppEngine {
+    private const val version = "1.9.82"
+    const val sdk          = "com.google.appengine:appengine-api-1.0-sdk:${version}"
+
+    object GradlePlugin {
+        private const val version = "2.2.0"
+        const val lib = "com.google.cloud.tools:appengine-gradle-plugin:${version}"
+    }
+}

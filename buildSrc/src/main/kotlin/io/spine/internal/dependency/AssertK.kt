@@ -24,7 +24,14 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-val spineBaseVersion: String by extra("2.0.0-SNAPSHOT.34")
-val spineCoreVersion: String by extra("2.0.0-SNAPSHOT.25")
-val versionToPublish: String by extra("2.0.0-SNAPSHOT.1")
+package io.spine.internal.dependency
 
+/**
+ * Assertion library for tests in Kotlin
+ *
+ * [AssertK](https://github.com/willowtreeapps/assertk)
+ */
+object AssertK {
+    private const val version = "0.23.1"
+    const val libJvm = "com.willowtreeapps.assertk:assertk-jvm:${version}"
+}

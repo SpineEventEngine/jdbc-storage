@@ -24,7 +24,15 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-val spineBaseVersion: String by extra("2.0.0-SNAPSHOT.34")
-val spineCoreVersion: String by extra("2.0.0-SNAPSHOT.25")
-val versionToPublish: String by extra("2.0.0-SNAPSHOT.1")
+package io.spine.internal.dependency
 
+/**
+ * Commons Logging is a transitive dependency which we don't use directly.
+ * We `force` it in [DependencyResolution.forceConfiguration].
+ *
+ * [Commons Logging](https://commons.apache.org/proper/commons-logging/)
+ */
+object CommonsLogging {
+    private const val version = "1.2"
+    const val lib = "commons-logging:commons-logging:${version}"
+}

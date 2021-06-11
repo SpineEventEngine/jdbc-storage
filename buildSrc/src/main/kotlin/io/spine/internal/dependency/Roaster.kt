@@ -24,7 +24,11 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-val spineBaseVersion: String by extra("2.0.0-SNAPSHOT.34")
-val spineCoreVersion: String by extra("2.0.0-SNAPSHOT.25")
-val versionToPublish: String by extra("2.0.0-SNAPSHOT.1")
+package io.spine.internal.dependency
 
+// https://github.com/forge/roaster
+object Roaster {
+    private const val version = "2.22.2.Final"
+    const val api = "org.jboss.forge.roaster:roaster-api:${version}"
+    const val jdt = "org.jboss.forge.roaster:roaster-jdt:${version}"
+}

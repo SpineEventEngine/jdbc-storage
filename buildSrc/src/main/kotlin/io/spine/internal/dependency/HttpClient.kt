@@ -24,7 +24,12 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-val spineBaseVersion: String by extra("2.0.0-SNAPSHOT.34")
-val spineCoreVersion: String by extra("2.0.0-SNAPSHOT.25")
-val versionToPublish: String by extra("2.0.0-SNAPSHOT.1")
+package io.spine.internal.dependency
 
+/**
+ * Google implementations of HTTP client.
+ */
+object HttpClient {
+    const val google = "com.google.http-client:google-http-client:1.39.1"
+    const val apache = "com.google.http-client:google-http-client-apache:2.1.2"
+}

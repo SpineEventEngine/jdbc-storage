@@ -24,7 +24,10 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-val spineBaseVersion: String by extra("2.0.0-SNAPSHOT.34")
-val spineCoreVersion: String by extra("2.0.0-SNAPSHOT.25")
-val versionToPublish: String by extra("2.0.0-SNAPSHOT.1")
+package io.spine.internal.dependency
 
+// This artifact which used to be a part of J2EE moved under Eclipse EE4J project.
+// https://github.com/eclipse-ee4j/common-annotations-api
+object JavaX {
+    const val annotations = "javax.annotation:javax.annotation-api:1.3.2"
+}

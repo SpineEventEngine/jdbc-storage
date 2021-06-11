@@ -24,7 +24,13 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-val spineBaseVersion: String by extra("2.0.0-SNAPSHOT.34")
-val spineCoreVersion: String by extra("2.0.0-SNAPSHOT.25")
-val versionToPublish: String by extra("2.0.0-SNAPSHOT.1")
+package io.spine.internal.dependency
 
+@Suppress("unused")
+object Jackson {
+    private const val version = "2.12.3"
+    // https://github.com/FasterXML/jackson-databind
+    const val databind = "com.fasterxml.jackson.core:jackson-databind:${version}"
+    // https://github.com/FasterXML/jackson-dataformat-xml/releases
+    const val dataformatXml = "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:${version}"
+}

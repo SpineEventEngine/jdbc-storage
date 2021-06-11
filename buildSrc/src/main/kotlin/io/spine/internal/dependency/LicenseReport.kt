@@ -24,7 +24,17 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-val spineBaseVersion: String by extra("2.0.0-SNAPSHOT.34")
-val spineCoreVersion: String by extra("2.0.0-SNAPSHOT.25")
-val versionToPublish: String by extra("2.0.0-SNAPSHOT.1")
+package io.spine.internal.dependency
 
+// https://github.com/jk1/Gradle-License-Report
+@Suppress("unused")
+object LicenseReport {
+    private const val version = "1.16"
+    const val lib = "com.github.jk1:gradle-license-report:${version}"
+
+    object GradlePlugin {
+        const val version = LicenseReport.version
+        const val id = "com.github.jk1.dependency-license-report"
+        const val lib = LicenseReport.lib
+    }
+}

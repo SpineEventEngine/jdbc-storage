@@ -24,7 +24,15 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-val spineBaseVersion: String by extra("2.0.0-SNAPSHOT.34")
-val spineCoreVersion: String by extra("2.0.0-SNAPSHOT.25")
-val versionToPublish: String by extra("2.0.0-SNAPSHOT.1")
+package io.spine.internal.dependency
 
+/**
+ * Gson is a transitive dependency which we don't use directly.
+ * We `force` it in [DependencyResolution.forceConfiguration()].
+ *
+ * [Gson](https://github.com/google/gson)
+ */
+object Gson {
+    private const val version = "2.8.6"
+    const val lib = "com.google.code.gson:gson:${version}"
+}

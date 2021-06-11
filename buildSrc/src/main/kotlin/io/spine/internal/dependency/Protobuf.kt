@@ -24,7 +24,21 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-val spineBaseVersion: String by extra("2.0.0-SNAPSHOT.34")
-val spineCoreVersion: String by extra("2.0.0-SNAPSHOT.25")
-val versionToPublish: String by extra("2.0.0-SNAPSHOT.1")
+package io.spine.internal.dependency
 
+// https://github.com/protocolbuffers/protobuf
+@Suppress("MemberVisibilityCanBePrivate") // used directly from outside
+object Protobuf {
+    const val version    = "3.17.0"
+    val libs = listOf(
+        "com.google.protobuf:protobuf-java:${version}",
+        "com.google.protobuf:protobuf-java-util:${version}"
+    )
+    const val compiler = "com.google.protobuf:protoc:${version}"
+
+    object GradlePlugin {
+        const val version = "0.8.16"
+        const val id = "com.google.protobuf"
+        const val lib = "com.google.protobuf:protobuf-gradle-plugin:${version}"
+    }
+}

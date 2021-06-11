@@ -24,57 +24,92 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import io.spine.gradle.internal.DependencyResolution
-import io.spine.gradle.internal.Deps
+import io.spine.internal.dependency.ErrorProne
+import io.spine.internal.dependency.JUnit
+import io.spine.internal.gradle.PublishingRepos
+import io.spine.internal.gradle.Scripts
+import io.spine.internal.gradle.applyStandard
+import io.spine.internal.gradle.forceVersions
+import io.spine.internal.gradle.spinePublishing
 
+
+@Suppress("RemoveRedundantQualifierName") // Cannot use imported things here.
 buildscript {
-
     apply(from = "$rootDir/version.gradle.kts")
+    io.spine.internal.gradle.doApplyStandard(repositories)
+    io.spine.internal.gradle.doForceVersions(configurations)
 
-    @Suppress("RemoveRedundantQualifierName") // Cannot use imports here.
-    val dependencyResolution = io.spine.gradle.internal.DependencyResolution
     val spineBaseVersion: String by extra
-    dependencyResolution.defaultRepositories(repositories)
+
     dependencies {
-        classpath("io.spine.tools:spine-model-compiler:$spineBaseVersion")
+        classpath("io.spine.tools:spine-mc-java:$spineBaseVersion")
+    }
+
+    configurations.all {
+        resolutionStrategy {
+            force(
+                io.spine.internal.dependency.Kotlin.stdLib,
+                io.spine.internal.dependency.Kotlin.stdLibCommon
+            )
+        }
     }
 }
 
 plugins {
     `java-library`
+    kotlin("jvm") version io.spine.internal.dependency.Kotlin.version
     idea
-    jacoco
-    @Suppress("RemoveRedundantQualifierName") // Cannot use imports here.
-    id("com.google.protobuf").version(io.spine.gradle.internal.Deps.versions.protobufPlugin)
-    @Suppress("RemoveRedundantQualifierName") // Cannot use imports here.
-    id("net.ltgt.errorprone").version(io.spine.gradle.internal.Deps.versions.errorPronePlugin)
+    io.spine.internal.dependency.Protobuf.GradlePlugin.apply {
+        id(id) version version
+    }
+    @Suppress("RemoveRedundantQualifierName") // Cannot use imported things here.
+    io.spine.internal.dependency.ErrorProne.GradlePlugin.apply {
+        id(id) version version
+    }
 }
 
 val credentialsPropertyFile: String by extra("credentials.properties")
 val projectsToPublish: List<String> by extra(listOf("rdbms"))
 
+spinePublishing {
+    targetRepositories.addAll(setOf(
+        PublishingRepos.cloudRepo
+    ))
+    projectsToPublish.add("rdbms")
+}
+
 allprojects {
+    apply(from = "$rootDir/version.gradle.kts")
+
     apply {
-        from("$rootDir/version.gradle.kts")
-        from("$rootDir/config/gradle/dependencies.gradle")
+        plugin("jacoco")
+        plugin("idea")
     }
 
-    group = "io.spine"
+    group = "io.spine.gcloud"
     version = extra["versionToPublish"]!!
+
+    repositories.applyStandard()
 }
 
 subprojects {
     apply {
         plugin("java-library")
+        plugin("com.google.protobuf")
         plugin("net.ltgt.errorprone")
+        plugin("io.spine.mc-java")
+        plugin("kotlin")
         plugin("pmd")
-        plugin("jacoco")
         plugin("maven-publish")
-        from(Deps.scripts.javadocOptions(project))
-        from(Deps.scripts.projectLicenseReport(project))
-        from(Deps.scripts.testOutput(project))
-        from(Deps.scripts.javacArgs(project))
-        from(Deps.scripts.pmd(project))
+
+        with(Scripts) {
+            from(javacArgs(project))
+            from(modelCompiler(project))
+            from(projectLicenseReport(project))
+            from(slowTests(project))
+            from(testOutput(project))
+            from(javadocOptions(project))
+        }
     }
 
     java {
@@ -82,46 +117,43 @@ subprojects {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 
-    DependencyResolution.defaultRepositories(repositories)
-    DependencyResolution.forceConfiguration(configurations)
-    DependencyResolution.excludeProtobufLite(configurations)
+    configurations.forceVersions()
+    configurations {
+        all {
+            resolutionStrategy {
+                force(
+                    io.spine.internal.dependency.Grpc.stub
+                )
+            }
+        }
+    }
 
     val spineBaseVersion: String by extra
     val spineCoreVersion: String by extra
 
     dependencies {
-        errorprone(Deps.build.errorProneCore)
-        errorproneJavac(Deps.build.errorProneJavac)
+
+        ErrorProne.apply {
+            errorprone(core)
+            errorproneJavac(javacPlugin)
+        }
 
         implementation("io.spine:spine-server:$spineCoreVersion")
-        implementation(Deps.build.guava)
-        compileOnlyApi(Deps.build.jsr305Annotations)
-        compileOnlyApi(Deps.build.checkerAnnotations)
-        Deps.build.errorProneAnnotations.forEach { compileOnlyApi(it) }
 
-        testImplementation(Deps.test.guavaTestlib)
-        Deps.test.junit5Api.forEach { testImplementation(it) }
-        Deps.test.truth.forEach { testImplementation(it) }
-        testImplementation("io.spine:spine-testutil-server:$spineCoreVersion")
+        testImplementation(JUnit.runner)
+        testImplementation("io.spine.tools:spine-testutil-server:$spineCoreVersion")
         testImplementation(group = "io.spine",
-                name = "spine-server",
-                version = spineCoreVersion,
-                classifier = "test")
-        testImplementation("io.spine:spine-testlib:$spineBaseVersion")
+            name = "spine-server",
+            version = spineCoreVersion,
+            classifier = "test")
+
+        testImplementation("io.spine.tools:spine-testlib:$spineBaseVersion")
         testImplementation("io.spine.tools:spine-mute-logging:$spineBaseVersion")
-        testRuntimeOnly(Deps.test.junit5Runner)
     }
 
     tasks.test {
         useJUnitPlatform {
             includeEngines("junit-jupiter")
-        }
-    }
-
-    tasks.jacocoTestReport {
-        reports {
-            xml.isEnabled = true
-            html.isEnabled = true
         }
     }
 
@@ -141,14 +173,62 @@ subprojects {
         dependsOn(tasks.javadoc)
     }
 
-    tasks.check {
-        dependsOn(tasks.jacocoTestReport)
+    val sourcesRootDir = "$projectDir/src"
+    val generatedRootDir = "$projectDir/generated"
+    val generatedJavaDir = "$generatedRootDir/main/java"
+    val generatedTestJavaDir = "$generatedRootDir/test/java"
+    val generatedGrpcDir = "$generatedRootDir/main/grpc"
+    val generatedTestGrpcDir = "$generatedRootDir/test/grpc"
+    val generatedSpineDir = "$generatedRootDir/main/spine"
+    val generatedTestSpineDir = "$generatedRootDir/test/spine"
+
+    sourceSets {
+        main {
+            java.srcDirs(generatedJavaDir, "$sourcesRootDir/main/java", generatedSpineDir)
+            resources.srcDir("$generatedRootDir/main/resources")
+            proto.srcDirs("$sourcesRootDir/main/proto")
+        }
+        test {
+            java.srcDirs(generatedTestJavaDir, "$sourcesRootDir/test/java", generatedTestSpineDir)
+            resources.srcDir("$generatedRootDir/test/resources")
+            proto.srcDir("$sourcesRootDir/test/proto")
+        }
     }
+
+    // Apply the same IDEA module configuration for each of sub-projects.
+    idea {
+        module {
+            generatedSourceDirs.addAll(files(
+                generatedJavaDir,
+                generatedGrpcDir,
+                generatedSpineDir,
+                generatedTestJavaDir,
+                generatedTestGrpcDir,
+                generatedTestSpineDir
+            ))
+            testSourceDirs.add(file(generatedTestJavaDir))
+
+            isDownloadJavadoc = true
+            isDownloadSources = true
+        }
+    }
+
+    apply(from = Scripts.updateGitHubPages(project))
+    afterEvaluate {
+        tasks.getByName("publish").dependsOn("updateGitHubPages")
+    }
+
+    apply(from = Scripts.pmd(project))
 }
 
 apply {
-    from(Deps.scripts.jacoco(project))
-    from(Deps.scripts.publish(project))
-    from(Deps.scripts.repoLicenseReport(project))
-    from(Deps.scripts.generatePom(project))
+    with(Scripts) {
+        // Aggregated coverage report across all subprojects.
+        from(jacoco(project))
+        // Generate a repository-wide report of 3rd-party dependencies and their licenses.
+        from(repoLicenseReport(project))
+        // Generate a `pom.xml` file containing first-level dependency of all projects
+        // in the repository.
+        from(generatePom(project))
+    }
 }

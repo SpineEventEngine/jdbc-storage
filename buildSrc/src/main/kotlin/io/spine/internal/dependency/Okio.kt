@@ -24,7 +24,14 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-val spineBaseVersion: String by extra("2.0.0-SNAPSHOT.34")
-val spineCoreVersion: String by extra("2.0.0-SNAPSHOT.25")
-val versionToPublish: String by extra("2.0.0-SNAPSHOT.1")
+package io.spine.internal.dependency
 
+/**
+ * Okio is a transitive dependency which we don't use directly.
+ * We `force` it in [DependencyResolution.forceConfiguration].
+ */
+object Okio {
+    // This is the last version before next major.
+    private const val version = "1.17.5"
+    const val lib = "com.squareup.okio:okio:${version}"
+}
