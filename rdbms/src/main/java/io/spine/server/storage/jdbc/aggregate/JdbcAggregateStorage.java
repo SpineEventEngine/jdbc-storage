@@ -106,16 +106,6 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
         mainTable.insert(id, record);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * <p><b>NOTE:</b> it is required to call {@link Iterator#hasNext()} before
-     * {@link Iterator#next()}.
-     *
-     * @return a new {@link DbIterator} instance
-     * @throws DatabaseException
-     *         if an error occurs during an interaction with the DB
-     */
     @Override
     protected Iterator<AggregateEventRecord> historyBackward(AggregateReadRequest<I> request)
             throws DatabaseException {
