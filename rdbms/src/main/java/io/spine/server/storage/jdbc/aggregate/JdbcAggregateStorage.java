@@ -26,6 +26,7 @@
 
 package io.spine.server.storage.jdbc.aggregate;
 
+import com.google.common.collect.ImmutableList;
 import com.google.protobuf.Timestamp;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.aggregate.AggregateEventRecord;
@@ -40,14 +41,11 @@ import io.spine.server.storage.jdbc.query.DbIterator;
 import io.spine.server.storage.jdbc.query.DbIterator.DoubleColumnRecord;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.collect.Lists.newLinkedList;
 import static com.google.common.collect.Streams.stream;
-import static io.spine.server.storage.jdbc.aggregate.Closeables.closeAll;
 
 /**
  * The implementation of the aggregate storage based on the RDBMS.
@@ -65,17 +63,6 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
 
     private final DataSourceWrapper dataSource;
 
-    /**
-     * The {@linkplain #historyBackward(AggregateReadRequest) history} iterators,
-     * which are not {@linkplain DbIterator#close() closed} yet.
-     *
-     * <p>{@link DbIterator} will be closed automatically only
-     * if all elements were {@linkplain DbIterator#hasNext() iterated}.
-     *
-     * <p>Because history iterators are used to go through a part of a history,
-     * they should be closed by the storage.
-     */
-    private final Collection<DbIterator> iterators = newLinkedList();
     private final AggregateEventRecordTable<I> mainTable;
     private final LifecycleFlagsTable<I> lifecycleFlagsTable;
 
@@ -119,16 +106,6 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
         mainTable.insert(id, record);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * <p><b>NOTE:</b> it is required to call {@link Iterator#hasNext()} before
-     * {@link Iterator#next()}.
-     *
-     * @return a new {@link DbIterator} instance
-     * @throws DatabaseException
-     *         if an error occurs during an interaction with the DB
-     */
     @Override
     protected Iterator<AggregateEventRecord> historyBackward(AggregateReadRequest<I> request)
             throws DatabaseException {
@@ -138,8 +115,9 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
         int fetchSize = request.batchSize();
         SelectEventRecordsById<I> query = mainTable.composeSelectQuery(id);
         DbIterator<AggregateEventRecord> historyIterator = query.execute(fetchSize);
-        iterators.add(historyIterator);
-        return historyIterator;
+        ImmutableList<AggregateEventRecord> records = ImmutableList.copyOf(historyIterator);
+        historyIterator.close();
+        return records.iterator();
     }
 
     @Override
@@ -157,11 +135,17 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
         return mainTable.index();
     }
 
+    @SuppressWarnings("TryFinallyCanBeTryWithResources")    /* For better readability. */
     private void doTruncate(int snapshotIndex, @Nullable Timestamp date) {
         DbIterator<DoubleColumnRecord<I, Integer>> records =
                 selectVersionsToPersist(snapshotIndex, date);
-        stream(records)
-                .forEach(record -> mainTable.deletePriorRecords(record.first(), record.second()));
+        try {
+            stream(records)
+                    .forEach(record -> mainTable.deletePriorRecords(record.first(),
+                                                                    record.second()));
+        } finally {
+            records.close();
+        }
     }
 
     private DbIterator<DoubleColumnRecord<I, Integer>>
@@ -169,15 +153,11 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
         SelectVersionBySnapshot<I> query =
                 mainTable.composeSelectVersionQuery(snapshotIndex, date);
         DbIterator<DoubleColumnRecord<I, Integer>> iterator = query.execute();
-        iterators.add(iterator);
         return iterator;
     }
 
     /**
      * Closes the storage.
-     *
-     * <p>Unclosed {@linkplain #iterators history iterators}
-     * produced by this storage will be closed together with the storage.
      *
      * @throws DatabaseException
      *         if the underlying datasource cannot be closed
@@ -185,9 +165,7 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     @Override
     public void close() throws DatabaseException {
         super.close();
-        closeAll(iterators);
         dataSource.close();
-        iterators.clear();
     }
 
     /**

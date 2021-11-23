@@ -27,39 +27,22 @@
 package io.spine.server.storage.jdbc.aggregate;
 
 import io.spine.server.aggregate.Aggregate;
-import io.spine.server.aggregate.AggregateEventRecord;
-import io.spine.server.aggregate.AggregateReadRequest;
 import io.spine.server.aggregate.AggregateStorage;
 import io.spine.server.aggregate.AggregateStorageTest;
 import io.spine.server.entity.Entity;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.query.DbIterator;
 import io.spine.test.aggregate.ProjectId;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import java.sql.SQLException;
 
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
 import static io.spine.server.storage.jdbc.PredefinedMapping.H2_1_4;
 import static io.spine.testing.Tests.nullRef;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SuppressWarnings("DuplicateStringLiteralInspection") // Common test display names.
 @DisplayName("JdbcAggregateStorage should")
 class JdbcAggregateStorageTest extends AggregateStorageTest {
-
-    private JdbcAggregateStorage<ProjectId> storage;
-
-    @BeforeEach
-    @Override
-    public void setUpAbstractStorageTest() {
-        super.setUpAbstractStorageTest();
-        storage = (JdbcAggregateStorage<ProjectId>) storage();
-    }
 
     @Test
     @DisplayName("throw ISE when closing twice")
@@ -67,35 +50,6 @@ class JdbcAggregateStorageTest extends AggregateStorageTest {
         AggregateStorage<?> storage = storage();
         storage.close();
         assertThrows(IllegalStateException.class, storage::close);
-    }
-
-    @Test
-    @DisplayName("return history iterator with specified batch size")
-    void returnHistoryIterator() throws SQLException {
-        int batchSize = 10;
-        AggregateReadRequest<ProjectId> request = new AggregateReadRequest<>(newId(), batchSize);
-        DbIterator<AggregateEventRecord> iterator =
-                (DbIterator<AggregateEventRecord>) storage.historyBackward(request);
-
-        // Use `PreparedStatement.getFetchSize()` instead of `ResultSet.getFetchSize()`,
-        // because the result of the latter depends on a JDBC driver implementation.
-        int fetchSize = iterator.resultSet()
-                                .getStatement()
-                                .getFetchSize();
-        assertEquals(batchSize, fetchSize);
-    }
-
-    @Test
-    @DisplayName("close history iterator")
-    void closeHistoryIterator() throws SQLException {
-        AggregateReadRequest<ProjectId> request = newReadRequest(newId());
-        DbIterator<AggregateEventRecord> iterator =
-                (DbIterator<AggregateEventRecord>) storage.historyBackward(request);
-
-        storage.close();
-        boolean historyIteratorClosed = iterator.resultSet()
-                                                .isClosed();
-        assertTrue(historyIteratorClosed);
     }
 
     @Test
