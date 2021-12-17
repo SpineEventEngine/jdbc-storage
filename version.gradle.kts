@@ -25,6 +25,6 @@
  */
 
 
-val spineCoreVersion by extra("1.7.0")
-val spineBaseVersion by extra("1.7.0")
-val versionToPublish by extra("1.7.1-SNAPSHOT.2")
+val spineCoreVersion by extra("1.8.0")
+val spineBaseVersion by extra("1.8.0")
+val versionToPublish by extra("1.8.0")
