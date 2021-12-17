@@ -30,6 +30,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.protobuf.Descriptors.Descriptor;
 import io.spine.server.delivery.ShardIndex;
 import io.spine.server.delivery.ShardSessionRecord;
+import io.spine.server.delivery.WorkerId;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.Type;
 import io.spine.server.storage.jdbc.TypeMapping;
@@ -98,8 +99,11 @@ final class ShardedWorkRegistryTable extends MessageTable<ShardIndex, ShardSessi
         OF_TOTAL_SHARDS(LONG, m -> m.getIndex()
                                     .getOfTotal()),
 
-        NODE_ID(STRING_255, m -> m.getPickedBy()
-                                  .getValue()),
+        WORKER_ID(STRING_255, m -> {
+                WorkerId worker = m.getWorker();
+                String result = worker.getNodeId().getValue() + '-' + worker.getValue();
+                return result;
+        }),
 
         WHEN_LAST_PICKED(LONG, m -> m.getWhenLastPicked()
                                      .getSeconds()),
