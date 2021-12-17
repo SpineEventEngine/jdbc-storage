@@ -36,6 +36,7 @@ import io.spine.server.delivery.ShardProcessingSession;
 import io.spine.server.delivery.ShardSessionRecord;
 import io.spine.server.delivery.ShardedWorkRegistry;
 import io.spine.server.delivery.ShardedWorkRegistryTest;
+import io.spine.server.delivery.WorkerId;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.JdbcStorageFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -52,10 +53,8 @@ import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory
 import static io.spine.server.storage.jdbc.PredefinedMapping.H2_1_4;
 import static io.spine.server.storage.jdbc.delivery.given.TestShardIndex.newIndex;
 import static io.spine.testing.DisplayNames.NOT_ACCEPT_NULLS;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
-@DisplayName("JdbcShardedWorkRegistry should")
+@DisplayName("`JdbcShardedWorkRegistry` should")
 class JdbcShardedWorkRegistryTest extends ShardedWorkRegistryTest {
 
     private static final ShardIndex index = newIndex(1, 15);
@@ -96,41 +95,43 @@ class JdbcShardedWorkRegistryTest extends ShardedWorkRegistryTest {
     @DisplayName("pick up the shard and write a corresponding record to the storage")
     void pickUp() {
         Optional<ShardProcessingSession> session = registry.pickUp(index, nodeId);
-        assertTrue(session.isPresent());
+        assertThat(session).isPresent();
         assertThat(session.get()
                           .shardIndex()).isEqualTo(index);
 
         ShardSessionRecord record = readSingleRecord(index);
         assertThat(record.getIndex()).isEqualTo(index);
-        assertThat(record.getPickedBy()).isEqualTo(nodeId);
+
+        WorkerId expectedWorker = registry.currentWorkerFor(nodeId);
+        assertThat(record.getWorker()).isEqualTo(expectedWorker);
     }
 
     @Test
     @DisplayName("not be able to pick up the shard if it's already picked up")
     void cannotPickUpIfTaken() {
         Optional<ShardProcessingSession> session = registry.pickUp(index, nodeId);
-        assertTrue(session.isPresent());
+        assertThat(session).isPresent();
 
         Optional<ShardProcessingSession> sameIdxSameNode = registry.pickUp(index, nodeId);
-        assertFalse(sameIdxSameNode.isPresent());
+        assertThat(sameIdxSameNode).isEmpty();
 
         Optional<ShardProcessingSession> sameIdxAnotherNode = registry.pickUp(index, newNode());
-        assertFalse(sameIdxAnotherNode.isPresent());
+        assertThat(sameIdxAnotherNode).isEmpty();
 
         ShardIndex anotherIdx = newIndex(24, 100);
         Optional<ShardProcessingSession> anotherIdxSameNode = registry.pickUp(anotherIdx, nodeId);
-        assertTrue(anotherIdxSameNode.isPresent());
+        assertThat(anotherIdxSameNode).isPresent();
 
         Optional<ShardProcessingSession> anotherIdxAnotherNode =
                 registry.pickUp(anotherIdx, newNode());
-        assertFalse(anotherIdxAnotherNode.isPresent());
+        assertThat(anotherIdxAnotherNode).isEmpty();
     }
 
     @Test
     @DisplayName("complete the shard session (once picked up) and make it available for picking up")
     void completeSessionAndMakeItAvailable() {
         Optional<ShardProcessingSession> optional = registry.pickUp(index, nodeId);
-        assertTrue(optional.isPresent());
+        assertThat(optional).isPresent();
 
         Timestamp whenPickedFirst = readSingleRecord(index).getWhenLastPicked();
 
@@ -138,7 +139,7 @@ class JdbcShardedWorkRegistryTest extends ShardedWorkRegistryTest {
         session.complete();
 
         ShardSessionRecord completedRecord = readSingleRecord(index);
-        assertFalse(completedRecord.hasPickedBy());
+        assertThat(completedRecord.hasWorker()).isFalse();
 
         // On some platforms (namely some Windows distributions), Java cannot obtain current time
         // with enough precision to compare timestamps in this test. By waiting for 1 second, we
@@ -147,13 +148,14 @@ class JdbcShardedWorkRegistryTest extends ShardedWorkRegistryTest {
 
         NodeId anotherNode = newNode();
         Optional<ShardProcessingSession> anotherOptional = registry.pickUp(index, anotherNode);
-        assertTrue(anotherOptional.isPresent());
+        assertThat(anotherOptional).isPresent();
 
         ShardSessionRecord secondSessionRecord = readSingleRecord(index);
-        assertThat(secondSessionRecord.getPickedBy()).isEqualTo(anotherNode);
+        WorkerId worker = registry.currentWorkerFor(anotherNode);
+        assertThat(secondSessionRecord.getWorker()).isEqualTo(worker);
 
         Timestamp whenPickedSecond = secondSessionRecord.getWhenLastPicked();
-        assertTrue(Timestamps.compare(whenPickedFirst, whenPickedSecond) < 0);
+        assertThat(Timestamps.compare(whenPickedFirst, whenPickedSecond) < 0).isTrue();
     }
 
     private ShardSessionRecord readSingleRecord(ShardIndex index) {

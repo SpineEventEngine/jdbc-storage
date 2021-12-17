@@ -34,6 +34,7 @@ import io.spine.server.delivery.ShardIndex;
 import io.spine.server.delivery.ShardProcessingSession;
 import io.spine.server.delivery.ShardSessionRecord;
 import io.spine.server.delivery.ShardedWorkRegistry;
+import io.spine.server.delivery.WorkerId;
 import io.spine.server.storage.jdbc.JdbcStorageFactory;
 
 import java.util.Iterator;
@@ -68,12 +69,27 @@ public class JdbcShardedWorkRegistry
     @Override
     public synchronized Optional<ShardProcessingSession> pickUp(ShardIndex index, NodeId nodeId) {
         Optional<ShardProcessingSession> picked = super.pickUp(index, nodeId);
-        return picked.filter(session -> pickedBy(index, nodeId));
+        WorkerId worker = currentWorkerFor(nodeId);
+        return picked.filter(session -> pickedBy(index, worker));
     }
 
-    private boolean pickedBy(ShardIndex index, NodeId nodeId) {
+    /**
+     * Creates a worker ID by combining the given node ID with the ID of the current Java thread,
+     * in which the execution in performed.
+     */
+    @Override
+    protected WorkerId currentWorkerFor(NodeId node) {
+        long threadId = Thread.currentThread().getId();
+        return WorkerId
+                .newBuilder()
+                .setNodeId(node)
+                .setValue(Long.toString(threadId))
+                .vBuild();
+    }
+
+    private boolean pickedBy(ShardIndex index, WorkerId worker) {
         Optional<ShardSessionRecord> stored = find(index);
-        return stored.map(record -> record.getPickedBy().equals(nodeId))
+        return stored.map(record -> record.getWorker().equals(worker))
                      .orElse(false);
     }
 
