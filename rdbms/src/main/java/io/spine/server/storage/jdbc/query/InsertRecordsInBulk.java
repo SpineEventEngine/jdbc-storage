@@ -28,11 +28,10 @@ package io.spine.server.storage.jdbc.query;
 
 import com.google.protobuf.Message;
 import com.querydsl.sql.dml.SQLInsertClause;
-import io.spine.server.storage.jdbc.record.NewRecordTable;
+import io.spine.server.storage.jdbc.record.RecordTable;
 
 /**
- * Inserts multiple records
- * to the {@link NewRecordTable} in a batch.
+ * Inserts multiple records to the {@link RecordTable} in a batch.
  *
  * //TODO:2021-06-18:alex.tymchenko: move this type.
  *

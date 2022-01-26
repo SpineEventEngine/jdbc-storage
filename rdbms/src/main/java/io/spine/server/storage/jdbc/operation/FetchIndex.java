@@ -28,7 +28,7 @@ package io.spine.server.storage.jdbc.operation;
 
 import com.google.protobuf.Message;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.record.NewRecordTable;
+import io.spine.server.storage.jdbc.record.RecordTable;
 import io.spine.server.storage.jdbc.query.StorageIndexQuery;
 
 import java.util.Iterator;
@@ -43,7 +43,7 @@ import java.util.Iterator;
  */
 public final class FetchIndex<I, R extends Message> extends Operation<I, R> {
 
-    FetchIndex(NewRecordTable<I, R> table, DataSourceWrapper dataSource) {
+    FetchIndex(RecordTable<I, R> table, DataSourceWrapper dataSource) {
         super(table, dataSource);
     }
 

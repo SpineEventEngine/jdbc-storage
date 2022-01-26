@@ -37,7 +37,7 @@ import com.querydsl.sql.AbstractSQLQuery;
 import io.spine.query.RecordQuery;
 import io.spine.query.SortBy;
 import io.spine.server.entity.FieldMasks;
-import io.spine.server.storage.jdbc.record.NewRecordTable;
+import io.spine.server.storage.jdbc.record.RecordTable;
 import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -54,8 +54,8 @@ import static io.spine.server.storage.jdbc.query.QueryPredicates.inIds;
 import static io.spine.server.storage.jdbc.query.QueryPredicates.matchPredicate;
 
 /**
- * Selects multiple records from the {@link NewRecordTable
- * NewRecordTable} by the passed {@link RecordQuery}.
+ * Selects multiple records from the {@link RecordTable RecordTable}
+ * by the passed {@link RecordQuery}.
  *
  * @param <I>
  *         the type of identifiers of the queried records

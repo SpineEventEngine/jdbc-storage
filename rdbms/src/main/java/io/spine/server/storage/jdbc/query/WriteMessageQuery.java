@@ -33,19 +33,15 @@ import io.spine.query.ColumnName;
 import io.spine.server.storage.RecordWithColumns;
 import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.record.JdbcRecord;
-import io.spine.server.storage.jdbc.query.IdColumn;
-import io.spine.server.storage.jdbc.query.WriteQuery;
-import io.spine.server.storage.jdbc.record.NewRecordTable;
+import io.spine.server.storage.jdbc.record.RecordTable;
 
 import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.collect.Streams.stream;
 
 /**
  * A common interface for {@linkplain io.spine.server.storage.jdbc.query.AbstractQuery queries}
- * that write one or more messages to the
- * {@link NewRecordTable NewRecordTable}}.
+ * that write one or more messages to the {@link RecordTable}.
  */
 interface WriteMessageQuery<I, R extends Message> extends WriteQuery {
 
@@ -58,25 +54,21 @@ interface WriteMessageQuery<I, R extends Message> extends WriteQuery {
         checkNotNull(record);
 
         var names = record.columns();
-
         for (var name : names) {
-            //TODO:2021-06-23:alex.tymchenko: address the column mapping here.
             var value = record.columnValue(name);
             setColumnValue(query, name, value);
         }
     }
 
     /**
-     * Adds a single value binding to the {@code query}, using the value of a specific
-     * {@code column} in a {@code record}.
+     * Adds a single value binding to the query, using the passed value for the column
+     * by the passed name.
      */
-    default void setColumnValue(StoreClause<?> query,
-                                ColumnName columnName,
-                                @Nullable Object value) {
+    default void setColumnValue(StoreClause<?> query, ColumnName column, @Nullable Object value) {
         checkNotNull(query);
-        checkNotNull(columnName);
+        checkNotNull(column);
 
-        query.set(pathOf(columnName), value);
+        query.set(pathOf(column), value);
     }
 
     /**

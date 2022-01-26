@@ -35,7 +35,7 @@ import io.spine.server.storage.jdbc.JdbcStorageFactory;
 import io.spine.server.storage.jdbc.given.query.SelectRecordId;
 import io.spine.server.storage.jdbc.given.query.SelectTimestampById;
 import io.spine.server.storage.jdbc.record.JdbcTableSpec;
-import io.spine.server.storage.jdbc.record.NewRecordTable;
+import io.spine.server.storage.jdbc.record.RecordTable;
 import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -48,12 +48,12 @@ import static io.spine.server.storage.jdbc.record.column.BytesColumn.bytesColumn
  *
  * //TODO:2022-01-26:alex.tymchenko: why do we need this at all?
  *
- * <p>Overrides several {@link NewRecordTable} methods to expose them to tests.
+ * <p>Overrides several {@link RecordTable} methods to expose them to tests.
  *
  * @param <I>
  *         the ID type
  */
-abstract class TimestampTable<I> extends NewRecordTable<I, Timestamp> {
+abstract class TimestampTable<I> extends RecordTable<I, Timestamp> {
 
     private final String name;
     private final MessageRecordSpec<I, Timestamp> timestampSpec;

@@ -28,7 +28,7 @@ package io.spine.server.storage.jdbc.operation;
 
 import com.google.protobuf.Message;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.record.NewRecordTable;
+import io.spine.server.storage.jdbc.record.RecordTable;
 import io.spine.server.storage.jdbc.query.DeleteAllQuery;
 
 /**
@@ -49,7 +49,7 @@ public class DeleteAll<I, R extends Message> extends Operation<I, R> {
      * @param dataSource
      *         the data source to use for connectivity
      */
-    protected DeleteAll(NewRecordTable<I, R> table, DataSourceWrapper dataSource) {
+    protected DeleteAll(RecordTable<I, R> table, DataSourceWrapper dataSource) {
         super(table, dataSource);
     }
 
@@ -61,8 +61,8 @@ public class DeleteAll<I, R extends Message> extends Operation<I, R> {
         query.execute();
     }
 
-    private DeleteAllQuery deleteAll() {
-        var query = DeleteAllQuery.newBuilder()
+    private DeleteAllQuery<I, R> deleteAll() {
+        var query = DeleteAllQuery.<I, R>newBuilder()
                 .setTableName(tableName())
                 .setDataSource(dataSource())
                 .build();

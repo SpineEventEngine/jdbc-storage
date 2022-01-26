@@ -29,13 +29,12 @@ package io.spine.server.storage.jdbc.given.query;
 import com.google.protobuf.Message;
 import com.querydsl.sql.AbstractSQLQuery;
 import io.spine.server.storage.jdbc.query.IdAwareQuery;
-import io.spine.server.storage.jdbc.record.NewRecordTable;
+import io.spine.server.storage.jdbc.record.RecordTable;
 
 import java.sql.ResultSet;
 
 /**
- * A test query for selecting a {@code Message} ID
- * from the {@link NewRecordTable}.
+ * A test query for selecting a {@code Message} ID from the {@link RecordTable}.
  *
  * //TODO:2022-01-18:alex.tymchenko: move this type.
  *

@@ -29,14 +29,14 @@ package io.spine.server.storage.jdbc.given.query;
 import com.google.protobuf.Timestamp;
 import com.querydsl.sql.AbstractSQLQuery;
 import io.spine.server.storage.jdbc.query.SelectMessageByIdQuery;
-import io.spine.server.storage.jdbc.record.NewRecordTable;
+import io.spine.server.storage.jdbc.record.RecordTable;
 
 import java.sql.ResultSet;
 
 import static io.spine.server.storage.jdbc.record.column.BytesColumn.bytesColumnName;
 
 /**
- * Selects a {@link Timestamp} by ID from the {@link NewRecordTable NewRecordTable}.
+ * Selects a {@link Timestamp} by ID from the {@link RecordTable RecordTable}.
  *
  * @param <I>
  *         the type of IDs

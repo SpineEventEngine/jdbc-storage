@@ -30,7 +30,7 @@ import com.google.protobuf.Message;
 import io.spine.query.RecordQuery;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.query.SelectMessagesByQuery;
-import io.spine.server.storage.jdbc.record.NewRecordTable;
+import io.spine.server.storage.jdbc.record.RecordTable;
 import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 
 import java.util.Iterator;
@@ -54,8 +54,10 @@ public class ReadManyByQuery<I, R extends Message> extends Operation<I, R> {
      *         table to write the records to
      * @param dataSource
      *         the data source to use for connectivity
+     * @param columnMapping
+     *         the mapping for the columns from Java to SQL-native types
      */
-    protected ReadManyByQuery(NewRecordTable<I, R> table,
+    protected ReadManyByQuery(RecordTable<I, R> table,
                               DataSourceWrapper dataSource,
                               JdbcColumnMapping columnMapping) {
         super(table, dataSource);
@@ -66,16 +68,14 @@ public class ReadManyByQuery<I, R extends Message> extends Operation<I, R> {
      * Reads the records by the given query.
      */
     public Iterator<R> execute(RecordQuery<I, R> query) {
-
         SelectMessagesByQuery.Builder<I, R> builder = SelectMessagesByQuery.newBuilder();
-        var sqlQuery =
-                builder.setDataSource(dataSource())
-                       .setTableName(tableName())
-                       .setQuery(query)
-                       .setIdColumn(idColumn())
-                       .setColumnMapping(columnMapping)
-                       .setRecordDescriptor(table().descriptor())
-                       .build();
+        var sqlQuery = builder.setDataSource(dataSource())
+                              .setTableName(tableName())
+                              .setQuery(query)
+                              .setIdColumn(idColumn())
+                              .setColumnMapping(columnMapping)
+                              .setRecordDescriptor(table().descriptor())
+                              .build();
         var queryResult = sqlQuery.execute();
         return queryResult;
     }

@@ -29,7 +29,7 @@ package io.spine.server.storage.jdbc.operation;
 import com.google.protobuf.Message;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.query.SelectMessagesByIds;
-import io.spine.server.storage.jdbc.record.NewRecordTable;
+import io.spine.server.storage.jdbc.record.RecordTable;
 
 import java.util.Iterator;
 
@@ -43,7 +43,7 @@ import java.util.Iterator;
  */
 public class ReadManyByIds<I, R extends Message> extends Operation<I, R>  {
 
-    public ReadManyByIds(NewRecordTable<I, R> table, DataSourceWrapper dataSource) {
+    public ReadManyByIds(RecordTable<I, R> table, DataSourceWrapper dataSource) {
         super(table, dataSource);
     }
 
@@ -55,13 +55,12 @@ public class ReadManyByIds<I, R extends Message> extends Operation<I, R>  {
 
     private SelectMessagesByIds<I, R> newSelectMany(Iterable<I> ids) {
         SelectMessagesByIds.Builder<I, R> builder = SelectMessagesByIds.newBuilder();
-        var query =
-                builder.setTableName(tableName())
-                       .setDataSource(dataSource())
-                       .setIdColumn(idColumn())
-                       .setIds(ids)
-                       .setMessageDescriptor(table().descriptor())
-                       .build();
+        var query = builder.setTableName(tableName())
+                           .setDataSource(dataSource())
+                           .setIdColumn(idColumn())
+                           .setIds(ids)
+                           .setMessageDescriptor(table().descriptor())
+                           .build();
         return query;
     }
 }

@@ -33,6 +33,7 @@ import io.spine.server.entity.Entity;
 import io.spine.server.storage.RecordSpec;
 import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.Type;
+import io.spine.server.storage.jdbc.record.RecordTable;
 import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 
 import java.util.Collection;
@@ -44,14 +45,12 @@ import static io.spine.json.Json.toCompactJson;
 import static io.spine.server.entity.model.EntityClass.asEntityClass;
 import static io.spine.server.storage.jdbc.Type.INT;
 import static io.spine.server.storage.jdbc.Type.LONG;
-import static io.spine.server.storage.jdbc.Type.STRING;
 import static io.spine.server.storage.jdbc.Type.STRING_255;
 import static io.spine.util.Exceptions.newIllegalArgumentException;
 import static java.util.Objects.requireNonNull;
 
 /**
- * A wrapper for the column which stores a primary key in a DB
- * {@linkplain io.spine.server.storage.jdbc.record.NewRecordTable table}.
+ * A wrapper for the column which stores a primary key in a DB {@linkplain RecordTable table}.
  *
  * @param <I>
  *         the ID type

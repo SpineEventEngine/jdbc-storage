@@ -33,13 +33,13 @@ import com.querydsl.core.types.dsl.PathBuilder;
 import io.spine.query.ColumnName;
 import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.record.JdbcRecord;
-import io.spine.server.storage.jdbc.record.NewRecordTable;
+import io.spine.server.storage.jdbc.record.RecordTable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * An abstract base for queries that write
- * a single record to a {@link NewRecordTable}.
+ * a single record to a {@link RecordTable}.
  *
  * //TODO:2022-01-17:alex.tymchenko: move this type.
  *

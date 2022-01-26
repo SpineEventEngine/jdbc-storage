@@ -30,7 +30,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Message;
 import com.querydsl.sql.AbstractSQLQuery;
-import io.spine.server.storage.jdbc.record.NewRecordTable;
+import io.spine.server.storage.jdbc.record.RecordTable;
 
 import java.util.Iterator;
 
@@ -39,15 +39,15 @@ import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.messageRead
 import static java.util.stream.Collectors.toList;
 
 /**
- * Selects multiple messages from
- * the {@link NewRecordTable} by their IDs.
+ * Selects multiple messages from the {@link RecordTable} by their IDs.
+ *
+ * //TODO:2021-06-18:alex.tymchenko: move this type.
  *
  * @param <I>
  *         the ID type
  * @param <R>
  *         the record type
  */
-//TODO:2021-06-18:alex.tymchenko: move this type.
 public final class SelectMessagesByIds<I, R extends Message>
         extends AbstractQuery
         implements SelectQuery<Iterator<R>> {

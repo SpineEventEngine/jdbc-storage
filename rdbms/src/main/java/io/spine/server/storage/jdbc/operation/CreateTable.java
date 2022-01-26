@@ -36,7 +36,7 @@ import io.spine.query.Column;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.TypeMapping;
-import io.spine.server.storage.jdbc.record.NewRecordTable;
+import io.spine.server.storage.jdbc.record.RecordTable;
 import io.spine.server.storage.jdbc.query.QueryExecutor;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -69,16 +69,14 @@ public class CreateTable<I, R extends Message> extends Operation<I, R> implement
      *
      * @param table
      *         a description of the table to create
-     * @param dataSource
+     * @param ds
      *         a data source to use for connectivity with the database instance
-     * @param typeMapping
+     * @param mapping
      *         the mapping of generic SQL types to the types used in a particular storage engine
      */
-    protected CreateTable(NewRecordTable<I, R> table,
-                          DataSourceWrapper dataSource,
-                          TypeMapping typeMapping) {
-        super(table, dataSource);
-        this.typeMapping = typeMapping;
+    protected CreateTable(RecordTable<I, R> table, DataSourceWrapper ds, TypeMapping mapping) {
+        super(table, ds);
+        this.typeMapping = mapping;
     }
 
     /**
@@ -167,34 +165,6 @@ public class CreateTable<I, R extends Message> extends Operation<I, R> implement
 
         return name;
     }
-
-    // Legacy code below:
-//    Iterable<? extends TableColumn> columns = columns();
-//        for (Iterator<? extends TableColumn> iterator = columns.iterator(); iterator.hasNext(); ) {
-//        TableColumn column = iterator.next();
-//        String name = column.name();
-//        io.spine.server.storage.jdbc.Type type = typeOf(column);
-//        TypeName typeName = typeMapping.typeNameFor(type);
-//        sql.append(name)
-//           .append(' ')
-//           .append(typeName);
-//        if (COLUMN_DEFAULTS.containsKey(name)) {
-//            Object defaultValue = COLUMN_DEFAULTS.get(name);
-//            sql.append(DEFAULT)
-//               .append(defaultValue);
-//        }
-//        if (!column.isNullable()) {
-//            sql.append(NOT)
-//               .append(NULL);
-//        }
-//        if (column.isPrimaryKey()) {
-//            primaryKey.add(name);
-//        }
-//        if (iterator.hasNext() || !primaryKey.isEmpty()) {
-//            sql.append(COMMA);
-//        }
-//    }
-    // End of the legacy code.
 
     /**
      * A map of the Spine common Entity Columns to their default values.

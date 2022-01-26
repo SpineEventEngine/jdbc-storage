@@ -28,7 +28,7 @@ package io.spine.server.storage.jdbc.operation.postgres;
 
 import com.google.protobuf.Message;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.record.NewRecordTable;
+import io.spine.server.storage.jdbc.record.RecordTable;
 import io.spine.server.storage.jdbc.operation.OperationFactory;
 import io.spine.server.storage.jdbc.operation.WriteBulk;
 
@@ -47,14 +47,12 @@ public class PostgresWriteBulk<I, R extends Message> extends WriteBulk<I, R> {
      *
      * @param table
      *         table to write records to
-     * @param dataSource
+     * @param ds
      *         data source to use for connectivity
-     * @param operations
+     * @param ops
      *         the factory to instantiate auxiliary operations
      */
-    public PostgresWriteBulk(NewRecordTable<I, R> table,
-                             DataSourceWrapper dataSource,
-                             OperationFactory operations) {
-        super(table, dataSource, operations);
+    public PostgresWriteBulk(RecordTable<I, R> table, DataSourceWrapper ds, OperationFactory ops) {
+        super(table, ds, ops);
     }
 }

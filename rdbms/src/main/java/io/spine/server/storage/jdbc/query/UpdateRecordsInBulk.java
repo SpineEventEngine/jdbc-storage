@@ -28,11 +28,10 @@ package io.spine.server.storage.jdbc.query;
 
 import com.google.protobuf.Message;
 import com.querydsl.sql.dml.SQLUpdateClause;
-import io.spine.server.storage.jdbc.record.NewRecordTable;
+import io.spine.server.storage.jdbc.record.RecordTable;
 
 /**
- * Updates multiple messages
- * in the {@link NewRecordTable} in a bulk.
+ * Updates multiple messages in the {@link RecordTable} in a bulk.
  *
  * //TODO:2021-06-18:alex.tymchenko: move this type.
  *

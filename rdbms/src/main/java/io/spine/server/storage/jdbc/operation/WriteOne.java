@@ -31,7 +31,7 @@ import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.query.InsertSingleRecord;
 import io.spine.server.storage.jdbc.query.UpdateSingleRecord;
 import io.spine.server.storage.jdbc.record.JdbcRecord;
-import io.spine.server.storage.jdbc.record.NewRecordTable;
+import io.spine.server.storage.jdbc.record.RecordTable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -56,7 +56,7 @@ public class WriteOne<I, R extends Message> extends Operation<I, R> {
      * @param dataSource
      *         the data source to use for connectivity
      */
-    protected WriteOne(NewRecordTable<I, R> table, DataSourceWrapper dataSource) {
+    protected WriteOne(RecordTable<I, R> table, DataSourceWrapper dataSource) {
         super(table, dataSource);
     }
 

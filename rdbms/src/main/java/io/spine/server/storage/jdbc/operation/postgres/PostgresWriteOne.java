@@ -28,7 +28,7 @@ package io.spine.server.storage.jdbc.operation.postgres;
 
 import com.google.protobuf.Message;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.record.NewRecordTable;
+import io.spine.server.storage.jdbc.record.RecordTable;
 import io.spine.server.storage.jdbc.operation.WriteOne;
 
 /**
@@ -49,7 +49,7 @@ public class PostgresWriteOne<I, R extends Message> extends WriteOne<I, R> {
      * @param dataSource
      *         data source to use
      */
-    public PostgresWriteOne(NewRecordTable<I, R> table, DataSourceWrapper dataSource) {
+    public PostgresWriteOne(RecordTable<I, R> table, DataSourceWrapper dataSource) {
         super(table, dataSource);
     }
 

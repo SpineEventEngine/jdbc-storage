@@ -29,7 +29,7 @@ package io.spine.server.storage.jdbc.operation;
 import com.google.protobuf.Message;
 import io.spine.annotation.SPI;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.record.NewRecordTable;
+import io.spine.server.storage.jdbc.record.RecordTable;
 import io.spine.server.storage.jdbc.query.ContainsQuery;
 import io.spine.server.storage.jdbc.query.IdColumn;
 
@@ -44,10 +44,10 @@ import io.spine.server.storage.jdbc.query.IdColumn;
 @SPI
 public abstract class Operation<I, R extends Message> {
 
-    private final NewRecordTable<I, R> table;
+    private final RecordTable<I, R> table;
     private final DataSourceWrapper dataSource;
 
-    protected Operation(NewRecordTable<I, R> table,
+    protected Operation(RecordTable<I, R> table,
                         DataSourceWrapper dataSource) {
         this.table = table;
         this.dataSource = dataSource;
@@ -56,7 +56,7 @@ public abstract class Operation<I, R extends Message> {
     /**
      * Returns the definition of the table over which this operation is executed.
      */
-    protected final NewRecordTable<I, R> table() {
+    protected final RecordTable<I, R> table() {
         return table;
     }
 

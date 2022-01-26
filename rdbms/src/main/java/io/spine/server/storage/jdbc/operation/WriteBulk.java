@@ -32,7 +32,7 @@ import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.query.InsertRecordsInBulk;
 import io.spine.server.storage.jdbc.query.UpdateRecordsInBulk;
 import io.spine.server.storage.jdbc.record.JdbcRecord;
-import io.spine.server.storage.jdbc.record.NewRecordTable;
+import io.spine.server.storage.jdbc.record.RecordTable;
 
 import java.util.Collection;
 
@@ -66,7 +66,7 @@ public class WriteBulk<I, R extends Message> extends Operation<I, R> {
      * @param operations
      *         the factory to instantiate auxiliary operations
      */
-    protected WriteBulk(NewRecordTable<I, R> table,
+    protected WriteBulk(RecordTable<I, R> table,
                         DataSourceWrapper dataSource,
                         OperationFactory operations) {
         super(table, dataSource);

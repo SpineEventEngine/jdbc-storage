@@ -29,7 +29,7 @@ package io.spine.server.storage.jdbc.operation;
 import com.google.protobuf.Message;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.TypeMapping;
-import io.spine.server.storage.jdbc.record.NewRecordTable;
+import io.spine.server.storage.jdbc.record.RecordTable;
 import io.spine.server.storage.jdbc.operation.mysql.MysqlWriteBulk;
 import io.spine.server.storage.jdbc.operation.mysql.MysqlWriteOne;
 import io.spine.server.storage.jdbc.operation.postgres.PostgresWriteBulk;
@@ -70,7 +70,7 @@ public final class OperationFactory {
         return new OperationFactory(dataSource, columnMapping, typeMapping);
     }
 
-    public <I, R extends Message> WriteOne<I, R> writeOne(NewRecordTable<I, R> table) {
+    public <I, R extends Message> WriteOne<I, R> writeOne(RecordTable<I, R> table) {
         if (engine == MySQL) {
             return new MysqlWriteOne<>(table, dataSource);
         }
@@ -81,7 +81,7 @@ public final class OperationFactory {
         return new WriteOne<>(table, dataSource);
     }
 
-    public <I, R extends Message> WriteBulk<I, R> writeBulk(NewRecordTable<I, R> table) {
+    public <I, R extends Message> WriteBulk<I, R> writeBulk(RecordTable<I, R> table) {
         if (engine == MySQL) {
             return new MysqlWriteBulk<>(table, dataSource, this);
         }
@@ -92,31 +92,31 @@ public final class OperationFactory {
         return new WriteBulk<>(table, dataSource, this);
     }
 
-    public <I, R extends Message> ReadManyByIds<I, R> readManyByIds(NewRecordTable<I, R> t) {
+    public <I, R extends Message> ReadManyByIds<I, R> readManyByIds(RecordTable<I, R> t) {
         return new ReadManyByIds<>(t, dataSource);
     }
 
-    public <I, R extends Message> ReadManyByQuery<I, R> readManyByQuery(NewRecordTable<I, R> t) {
+    public <I, R extends Message> ReadManyByQuery<I, R> readManyByQuery(RecordTable<I, R> t) {
         return new ReadManyByQuery<>(t, dataSource, columnMapping);
     }
 
-    public <I, R extends Message> DeleteOne<I, R> deleteOne(NewRecordTable<I, R> t) {
+    public <I, R extends Message> DeleteOne<I, R> deleteOne(RecordTable<I, R> t) {
         return new DeleteOne<>(t, dataSource);
     }
 
-    public <I, R extends Message> DeleteAll<I, R> deleteAll(NewRecordTable<I, R> t) {
+    public <I, R extends Message> DeleteAll<I, R> deleteAll(RecordTable<I, R> t) {
         return new DeleteAll<>(t, dataSource);
     }
 
-    public <I, R extends Message> DeleteManyByIds<I, R> deleteManyByIds(NewRecordTable<I, R> t) {
+    public <I, R extends Message> DeleteManyByIds<I, R> deleteManyByIds(RecordTable<I, R> t) {
         return new DeleteManyByIds<>(t, dataSource);
     }
 
-    public <I, R extends Message> CreateTable<I, R> createTable(NewRecordTable<I, R> t) {
+    public <I, R extends Message> CreateTable<I, R> createTable(RecordTable<I, R> t) {
         return new CreateTable<>(t, dataSource, typeMapping);
     }
 
-    public <I, R extends Message> FetchIndex<I, R> index(NewRecordTable<I, R> t) {
+    public <I, R extends Message> FetchIndex<I, R> index(RecordTable<I, R> t) {
         return new FetchIndex<>(t, dataSource);
     }
 }

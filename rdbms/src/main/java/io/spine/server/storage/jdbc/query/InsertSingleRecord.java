@@ -28,10 +28,10 @@ package io.spine.server.storage.jdbc.query;
 
 import com.google.protobuf.Message;
 import com.querydsl.core.dml.StoreClause;
-import io.spine.server.storage.jdbc.record.NewRecordTable;
+import io.spine.server.storage.jdbc.record.RecordTable;
 
 /**
- * Inserts a single message to the {@link NewRecordTable}.
+ * Inserts a single message to the {@link RecordTable}.
  *
  * //TODO:2021-06-18:alex.tymchenko: move this type.
  *

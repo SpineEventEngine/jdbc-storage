@@ -30,7 +30,7 @@ import io.spine.server.storage.RecordWithColumns;
 import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.Type;
 import io.spine.server.storage.jdbc.query.Serializer;
-import io.spine.server.storage.jdbc.record.NewRecordTable;
+import io.spine.server.storage.jdbc.record.RecordTable;
 import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -39,8 +39,8 @@ import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
 /**
  * A column responsible for storing serialized message bytes.
  *
- * <p>This column is present in any {@link NewRecordTable
- * NewRecordTable} and serves for convenient record
+ * <p>This column is present in any {@link RecordTable
+ * RecordTable} and serves for convenient record
  * {@link Serializer deserialization}.
  *
  * //TODO:2021-12-21:alex.tymchenko: review this paragraph.

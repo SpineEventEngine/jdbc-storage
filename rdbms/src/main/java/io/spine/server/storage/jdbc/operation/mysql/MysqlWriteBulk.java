@@ -28,7 +28,7 @@ package io.spine.server.storage.jdbc.operation.mysql;
 
 import com.google.protobuf.Message;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.record.NewRecordTable;
+import io.spine.server.storage.jdbc.record.RecordTable;
 import io.spine.server.storage.jdbc.operation.OperationFactory;
 import io.spine.server.storage.jdbc.operation.WriteBulk;
 
@@ -52,7 +52,7 @@ public class MysqlWriteBulk<I, R extends Message> extends WriteBulk<I, R> {
      * @param operations
      *         the operation factory to execute auxiliary calls
      */
-    public MysqlWriteBulk(NewRecordTable<I, R> table,
+    public MysqlWriteBulk(RecordTable<I, R> table,
                           DataSourceWrapper dataSource,
                           OperationFactory operations) {
         super(table, dataSource, operations);

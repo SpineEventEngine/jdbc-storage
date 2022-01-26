@@ -28,7 +28,7 @@ package io.spine.server.storage.jdbc.operation.mysql;
 
 import com.google.protobuf.Message;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.record.NewRecordTable;
+import io.spine.server.storage.jdbc.record.RecordTable;
 import io.spine.server.storage.jdbc.operation.WriteOne;
 
 /**
@@ -51,7 +51,7 @@ public final class MysqlWriteOne<I, R extends Message> extends WriteOne<I, R> {
      * @param dataSource
      *         data source to use
      */
-    public MysqlWriteOne(NewRecordTable<I, R> table, DataSourceWrapper dataSource) {
+    public MysqlWriteOne(RecordTable<I, R> table, DataSourceWrapper dataSource) {
         super(table, dataSource);
     }
 

@@ -40,7 +40,7 @@ import java.util.Iterator;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A storage which stores plain messages in a single SQL {@linkplain NewRecordTable table}.
+ * A storage which stores plain messages in a single SQL {@linkplain RecordTable table}.
  *
  * @param <I>
  *         the type of identifiers of stored records
@@ -49,14 +49,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class NewRecordStorage<I, R extends Message> extends RecordStorage<I, R> {
 
-    private final NewRecordTable<I, R> table;
+    private final RecordTable<I, R> table;
 
     public NewRecordStorage(ContextSpec contextSpec,
                             RecordSpec<I, R, ?> recordSpec,
                             JdbcStorageFactory factory) {
         super(contextSpec, recordSpec);
         var tableSpec = factory.tableSpecFor(recordSpec);
-        this.table = NewRecordTable.by(tableSpec, factory);
+        this.table = RecordTable.by(tableSpec, factory);
         this.table.create();
     }
 

@@ -26,7 +26,7 @@
 
 /**
  * This package describes the I/O operations performed
- * over the {@link io.spine.server.storage.jdbc.record.NewRecordTable DB tables.}
+ * over the {@linkplain io.spine.server.storage.jdbc.record.RecordTable DB tables}.
  */
 @CheckReturnValue
 @ParametersAreNonnullByDefault

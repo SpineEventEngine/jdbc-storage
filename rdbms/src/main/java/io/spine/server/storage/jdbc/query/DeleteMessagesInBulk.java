@@ -29,20 +29,20 @@ package io.spine.server.storage.jdbc.query;
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.protobuf.Message;
-import io.spine.server.storage.jdbc.record.NewRecordTable;
+import io.spine.server.storage.jdbc.record.RecordTable;
 
 import static java.util.stream.Collectors.toList;
 
 /**
- * Deletes multiple records by IDs
- * from the {@link NewRecordTable}.
+ * Deletes multiple records by IDs from the {@link RecordTable}.
  *
  * //TODO:2022-01-10:alex.tymchenko: re-document.
  * //TODO:2022-01-10:alex.tymchenko: move this type.
  *
  * @param <I>
  *         the ID type
- * @param <R> the type of the records to delete
+ * @param <R>
+ *         the type of the records to delete
  */
 public final class DeleteMessagesInBulk<I, R extends Message> extends AbstractQuery implements WriteQuery {
 

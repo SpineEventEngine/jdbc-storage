@@ -54,7 +54,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @param <R>
  *         the type of stored records
  */
-public class NewRecordTable<I, R extends Message> implements Logging {
+public class RecordTable<I, R extends Message> implements Logging {
 
     private final JdbcTableSpec<I, R> spec;
     private final OperationFactory operations;
@@ -63,8 +63,7 @@ public class NewRecordTable<I, R extends Message> implements Logging {
 
     private @MonotonicNonNull String name;
 
-    protected NewRecordTable(JdbcTableSpec<I, R> tableSpec,
-                             JdbcStorageFactory factory) {
+    protected RecordTable(JdbcTableSpec<I, R> tableSpec, JdbcStorageFactory factory) {
         spec = tableSpec;
         operations = factory.operations();
         dataSource = factory.dataSource();
@@ -82,11 +81,11 @@ public class NewRecordTable<I, R extends Message> implements Logging {
                          .toLowerCase();
     }
 
-    public static <I, R extends Message> NewRecordTable<I, R>
+    public static <I, R extends Message> RecordTable<I, R>
     by(JdbcTableSpec<I, R> spec, JdbcStorageFactory factory) {
         checkNotNull(spec);
         checkNotNull(factory);
-        return new NewRecordTable<>(spec, factory);
+        return new RecordTable<>(spec, factory);
     }
 
     /**
