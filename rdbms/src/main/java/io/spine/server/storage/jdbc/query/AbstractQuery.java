@@ -27,6 +27,7 @@
 package io.spine.server.storage.jdbc.query;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.protobuf.Message;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.ComparablePath;
@@ -41,9 +42,10 @@ import com.querydsl.sql.SQLCloseListener;
 import com.querydsl.sql.SQLListener;
 import com.querydsl.sql.SQLListenerContext;
 import com.querydsl.sql.SQLQueryFactory;
-import com.querydsl.sql.SQLTemplates;
+import io.spine.query.ColumnName;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
+import io.spine.server.storage.jdbc.record.JdbcTableSpec;
 import io.spine.server.storage.jdbc.TableColumn;
 
 import javax.inject.Provider;
@@ -71,8 +73,9 @@ public abstract class AbstractQuery implements StorageQuery {
     private final PathBuilder<Object> pathBuilder;
     private final PathBuilder<Object> aliasedPathBuilder;
 
-    protected AbstractQuery(Builder<? extends Builder, ? extends StorageQuery> builder) {
-        String tableName = builder.tableName;
+    protected AbstractQuery(Builder<?, ?, ? extends Builder<?, ?, ?, ?>,
+            ? extends StorageQuery> builder) {
+        var tableName = builder.tableName;
         this.queryFactory = createFactory(builder.dataSource);
         this.tablePath = new RelationalPathBase<>(Object.class, tableName, tableName, tableName);
         this.pathBuilder = new PathBuilder<>(Object.class, tableName);
@@ -111,6 +114,10 @@ public abstract class AbstractQuery implements StorageQuery {
         return pathOf(idColumn.columnName());
     }
 
+    protected PathBuilder<Object> pathOf(ColumnName column) {
+        return pathOf(column.value());
+    }
+
     protected PathBuilder<Object> pathOf(String columnName) {
         return pathBuilder.get(columnName);
     }
@@ -134,7 +141,7 @@ public abstract class AbstractQuery implements StorageQuery {
     }
 
     protected OrderSpecifier<Comparable> orderBy(TableColumn column, Order order) {
-        PathBuilder<Comparable> columnPath = pathBuilder.get(column.name(), Comparable.class);
+        var columnPath = pathBuilder.get(column.name(), Comparable.class);
         return new OrderSpecifier<>(order, columnPath);
     }
 
@@ -160,9 +167,9 @@ public abstract class AbstractQuery implements StorageQuery {
      */
     @VisibleForTesting
     static AbstractSQLQueryFactory<?> createFactory(final DataSourceWrapper dataSource) {
-        Provider<Connection> connectionProvider = () -> {
-            Connection connection = dataSource.getConnection(false)
-                                              .get();
+        var connectionProvider = (Provider<Connection>) () -> {
+            var connection = dataSource.getConnection(false)
+                                       .get();
             try {
                 connection.setHoldability(HOLD_CURSORS_OVER_COMMIT);
                 return connection;
@@ -170,8 +177,8 @@ public abstract class AbstractQuery implements StorageQuery {
                 throw new DatabaseException(e);
             }
         };
-        SQLTemplates templates = dataSource.templates();
-        Configuration configuration = new Configuration(templates);
+        var templates = dataSource.templates();
+        var configuration = new Configuration(templates);
         configuration.addListener(TransactionHandler.INSTANCE);
         configuration.addListener(SQLCloseListener.DEFAULT);
         return new SQLQueryFactory(configuration, connectionProvider);
@@ -180,9 +187,12 @@ public abstract class AbstractQuery implements StorageQuery {
     /**
      * An abstract builder for {@linkplain StorageQuery queries}.
      */
-    protected abstract static class Builder<B extends Builder<B, Q>, Q extends AbstractQuery> {
+    public abstract static class Builder<I, R extends Message,
+                                            B extends Builder<I, R, B, Q>,
+                                            Q extends AbstractQuery> {
 
         private DataSourceWrapper dataSource;
+        private JdbcTableSpec<I, R> tableSpec;
         private String tableName;
 
         /**
@@ -193,7 +203,7 @@ public abstract class AbstractQuery implements StorageQuery {
          */
         public final Q build() {
             checkPreconditions();
-            Q result = doBuild();
+            var result = doBuild();
             checkNotNull(result, "The query must not be null.");
             return result;
         }
@@ -252,6 +262,17 @@ public abstract class AbstractQuery implements StorageQuery {
             this.tableName = tableName;
             return getThis();
         }
+
+        /**
+         * Sets the specification of the table over which the operation is performed.
+         *
+         * @param spec
+         *         the table specification
+         */
+        public B setTableSpec(JdbcTableSpec<I, R> spec) {
+            this.tableSpec = checkNotNull(spec);
+            return getThis();
+        }
     }
 
     /**
@@ -267,7 +288,7 @@ public abstract class AbstractQuery implements StorageQuery {
 
         @Override
         public void executed(SQLListenerContext context) {
-            Connection connection = context.getConnection();
+            var connection = context.getConnection();
             if (connection != null) {
                 try {
                     connection.commit();
@@ -279,7 +300,7 @@ public abstract class AbstractQuery implements StorageQuery {
 
         @Override
         public void exception(SQLListenerContext context) {
-            Connection connection = context.getConnection();
+            var connection = context.getConnection();
             if (connection != null) {
                 try {
                     connection.rollback();

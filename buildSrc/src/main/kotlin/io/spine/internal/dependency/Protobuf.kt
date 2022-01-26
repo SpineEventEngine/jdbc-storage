@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2022, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,16 +29,25 @@ package io.spine.internal.dependency
 // https://github.com/protocolbuffers/protobuf
 @Suppress("MemberVisibilityCanBePrivate") // used directly from outside
 object Protobuf {
-    const val version    = "3.17.0"
+    private const val group = "com.google.protobuf"
+    const val version       = "3.19.3"
     val libs = listOf(
-        "com.google.protobuf:protobuf-java:${version}",
-        "com.google.protobuf:protobuf-java-util:${version}"
+        "${group}:protobuf-java:${version}",
+        "${group}:protobuf-java-util:${version}",
+        "${group}:protobuf-kotlin:${version}"
     )
-    const val compiler = "com.google.protobuf:protoc:${version}"
+    const val compiler = "${group}:protoc:${version}"
 
+    // https://github.com/google/protobuf-gradle-plugin/releases
     object GradlePlugin {
-        const val version = "0.8.16"
+        /**
+         * The version of this plugin is already specified in `buildSrc/build.gradle.kts` file.
+         * Thus, when applying the plugin in projects build files, only the [id] should be used.
+         *
+         * When changing the version, also change the version used in the `build.gradle.kts`.
+         */
+        const val version = "0.8.18"
         const val id = "com.google.protobuf"
-        const val lib = "com.google.protobuf:protobuf-gradle-plugin:${version}"
+        const val lib = "${group}:protobuf-gradle-plugin:${version}"
     }
 }

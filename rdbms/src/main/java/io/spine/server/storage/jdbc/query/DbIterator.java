@@ -117,7 +117,7 @@ public abstract class DbIterator<R> implements Iterator<R>, Closeable {
             return memoizedHasNext;
         }
         try {
-            boolean hasNextElem = resultSet.next();
+            var hasNextElem = resultSet.next();
             if (!hasNextElem) {
                 close();
             }
@@ -189,13 +189,13 @@ public abstract class DbIterator<R> implements Iterator<R>, Closeable {
                 // Get statement before closing the result set, because PostgreSQL doesn't allow
                 // to retrieve a statement if a result set is closed.
                 // The same strategy to obtain the connection is also safer.
-                Statement statement = resultSet.getStatement();
+                var statement = resultSet.getStatement();
                 resultSet.close();
-                boolean statementClosed = statement == null || statement.isClosed();
+                var statementClosed = statement == null || statement.isClosed();
                 if (!statementClosed) {
-                    Connection connection = statement.getConnection();
+                    var connection = statement.getConnection();
                     statement.close();
-                    boolean connectionClosed = connection == null || connection.isClosed();
+                    var connectionClosed = connection == null || connection.isClosed();
                     if (!connectionClosed) {
                         connection.close();
                     }
@@ -235,7 +235,7 @@ public abstract class DbIterator<R> implements Iterator<R>, Closeable {
 
         @Override
         protected R readResult() throws SQLException {
-            R result = columnReader.readValue(resultSet());
+            var result = columnReader.readValue(resultSet());
             return result;
         }
     }
@@ -275,9 +275,9 @@ public abstract class DbIterator<R> implements Iterator<R>, Closeable {
 
         @Override
         protected DoubleColumnRecord<A, B> readResult() throws SQLException {
-            A value1 = firstColumnReader.readValue(resultSet());
-            B value2 = secondColumnReader.readValue(resultSet());
-            DoubleColumnRecord<A, B> result = DoubleColumnRecord.of(value1, value2);
+            var value1 = firstColumnReader.readValue(resultSet());
+            var value2 = secondColumnReader.readValue(resultSet());
+            var result = DoubleColumnRecord.of(value1, value2);
             return result;
         }
     }

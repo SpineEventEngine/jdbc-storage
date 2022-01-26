@@ -26,11 +26,26 @@
 
 import io.spine.internal.dependency.ErrorProne
 import io.spine.internal.dependency.JUnit
-import io.spine.internal.gradle.PublishingRepos
-import io.spine.internal.gradle.Scripts
+import io.spine.internal.gradle.VersionWriter
 import io.spine.internal.gradle.applyStandard
+import io.spine.internal.gradle.checkstyle.CheckStyleConfig
 import io.spine.internal.gradle.forceVersions
-import io.spine.internal.gradle.spinePublishing
+import io.spine.internal.gradle.github.pages.updateGitHubPages
+import io.spine.internal.gradle.javac.configureErrorProne
+import io.spine.internal.gradle.javac.configureJavac
+import io.spine.internal.gradle.javadoc.JavadocConfig
+import io.spine.internal.gradle.kotlin.applyJvmToolchain
+import io.spine.internal.gradle.kotlin.setFreeCompilerArgs
+import io.spine.internal.gradle.publish.IncrementGuard
+import io.spine.internal.gradle.publish.Publish.Companion.publishProtoArtifact
+import io.spine.internal.gradle.publish.PublishingRepos
+import io.spine.internal.gradle.publish.spinePublishing
+import io.spine.internal.gradle.report.coverage.JacocoConfig
+import io.spine.internal.gradle.report.license.LicenseReporter
+import io.spine.internal.gradle.report.pom.PomGenerator
+import io.spine.internal.gradle.testing.configureLogging
+import io.spine.internal.gradle.testing.registerTestTasks
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 
 @Suppress("RemoveRedundantQualifierName") // Cannot use imported things here.
@@ -39,17 +54,19 @@ buildscript {
     io.spine.internal.gradle.doApplyStandard(repositories)
     io.spine.internal.gradle.doForceVersions(configurations)
 
+    val mcJavaVersion: String by extra
     val spineBaseVersion: String by extra
 
     dependencies {
-        classpath("io.spine.tools:spine-mc-java:$spineBaseVersion")
+        classpath("io.spine.tools:spine-mc-java:$mcJavaVersion")
     }
 
     configurations.all {
         resolutionStrategy {
             force(
                 io.spine.internal.dependency.Kotlin.stdLib,
-                io.spine.internal.dependency.Kotlin.stdLibCommon
+                io.spine.internal.dependency.Kotlin.stdLibCommon,
+                "io.spine:spine-base:$spineBaseVersion"
             )
         }
     }
@@ -57,15 +74,11 @@ buildscript {
 
 plugins {
     `java-library`
-    kotlin("jvm") version io.spine.internal.dependency.Kotlin.version
+    kotlin("jvm")
     idea
-    io.spine.internal.dependency.Protobuf.GradlePlugin.apply {
-        id(id) version version
-    }
-    @Suppress("RemoveRedundantQualifierName") // Cannot use imported things here.
-    io.spine.internal.dependency.ErrorProne.GradlePlugin.apply {
-        id(id) version version
-    }
+    id(io.spine.internal.dependency.Protobuf.GradlePlugin.id)
+    id(io.spine.internal.dependency.ErrorProne.GradlePlugin.id)
+
 }
 
 val credentialsPropertyFile: String by extra("credentials.properties")
@@ -101,41 +114,47 @@ subprojects {
         plugin("kotlin")
         plugin("pmd")
         plugin("maven-publish")
-
-        with(Scripts) {
-            from(javacArgs(project))
-            from(modelCompiler(project))
-            from(projectLicenseReport(project))
-            from(slowTests(project))
-            from(testOutput(project))
-            from(javadocOptions(project))
-        }
     }
 
-    java {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+    tasks.withType<JavaCompile> {
+        configureJavac()
+        configureErrorProne()
     }
+
+    @Suppress("MagicNumber")
+    val javaVersion = 11
+    kotlin {
+        applyJvmToolchain(javaVersion)
+        explicitApi()
+    }
+
+    tasks.withType<KotlinCompile>().configureEach {
+        kotlinOptions.jvmTarget = JavaVersion.VERSION_11.toString()
+        setFreeCompilerArgs()
+    }
+
+    val spineBaseVersion: String by extra
+    val spineCoreVersion: String by extra
+
 
     configurations.forceVersions()
     configurations {
         all {
             resolutionStrategy {
                 force(
-                    io.spine.internal.dependency.Grpc.stub
+                    io.spine.internal.dependency.Grpc.stub,
+                    io.spine.internal.dependency.Grpc.api,
+
+                    "io.spine:spine-base:$spineBaseVersion"
                 )
             }
         }
     }
 
-    val spineBaseVersion: String by extra
-    val spineCoreVersion: String by extra
-
     dependencies {
 
         ErrorProne.apply {
             errorprone(core)
-            errorproneJavac(javacPlugin)
         }
 
         implementation("io.spine:spine-server:$spineCoreVersion")
@@ -148,12 +167,15 @@ subprojects {
             classifier = "test")
 
         testImplementation("io.spine.tools:spine-testlib:$spineBaseVersion")
-        testImplementation("io.spine.tools:spine-mute-logging:$spineBaseVersion")
     }
 
-    tasks.test {
-        useJUnitPlatform {
-            includeEngines("junit-jupiter")
+    tasks {
+        registerTestTasks()
+        test {
+            useJUnitPlatform {
+                includeEngines("junit-jupiter")
+            }
+            configureLogging()
         }
     }
 
@@ -184,7 +206,8 @@ subprojects {
 
     sourceSets {
         main {
-            java.srcDirs(generatedJavaDir, "$sourcesRootDir/main/java", generatedSpineDir)
+            //TODO:2022-01-26:alex.tymchenko: remove this eventually.
+            // java.srcDirs(generatedJavaDir, "$sourcesRootDir/main/java", generatedSpineDir)
             resources.srcDir("$generatedRootDir/main/resources")
             proto.srcDirs("$sourcesRootDir/main/proto")
         }
@@ -213,22 +236,21 @@ subprojects {
         }
     }
 
-    apply(from = Scripts.updateGitHubPages(project))
-    afterEvaluate {
-        tasks.getByName("publish").dependsOn("updateGitHubPages")
-    }
+    apply<IncrementGuard>()
+    apply<VersionWriter>()
+    publishProtoArtifact(project)
+    LicenseReporter.generateReportIn(project)
+    JavadocConfig.applyTo(project)
+    CheckStyleConfig.applyTo(project)
 
-    apply(from = Scripts.pmd(project))
+    updateGitHubPages(project.version.toString()) {
+        allowInternalJavadoc.set(true)
+        rootFolder.set(rootDir)
+    }
+    project.tasks["publish"].dependsOn("${project.path}:updateGitHubPages")
 }
 
-apply {
-    with(Scripts) {
-        // Aggregated coverage report across all subprojects.
-        from(jacoco(project))
-        // Generate a repository-wide report of 3rd-party dependencies and their licenses.
-        from(repoLicenseReport(project))
-        // Generate a `pom.xml` file containing first-level dependency of all projects
-        // in the repository.
-        from(generatePom(project))
-    }
-}
+
+JacocoConfig.applyTo(project)
+PomGenerator.applyTo(project)
+LicenseReporter.mergeAllReports(project)

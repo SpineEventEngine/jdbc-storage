@@ -26,47 +26,48 @@
 
 package io.spine.server.storage.jdbc.query.given;
 
-import com.google.errorprone.annotations.Immutable;
-import io.spine.server.entity.storage.Column;
-import io.spine.server.entity.storage.ColumnName;
-import io.spine.server.entity.storage.ColumnTypeMapping;
-import io.spine.server.storage.jdbc.type.DefaultJdbcColumnMapping;
+//import com.google.errorprone.annotations.Immutable;
+//import io.spine.server.entity.storage.Column;
+//import io.spine.server.entity.storage.ColumnName;
+//import io.spine.server.entity.storage.ColumnTypeMapping;
+//import io.spine.server.storage.jdbc.type.DefaultJdbcColumnMapping;
 
+//TODO:2021-12-28:alex.tymchenko: migrate?
 public final class QueryPredicatesTestEnv {
 
     /** Prevents instantiation of this test env class. */
     private QueryPredicatesTestEnv() {
     }
 
-    public static Column stringColumn() {
-        return new StingColumn();
-    }
-
-    @Immutable
-    private static class StingColumn implements Column {
-
-        private static final ColumnName NAME = ColumnName.of("some_string_column");
-
-        @Override
-        public ColumnName name() {
-            return NAME;
-        }
-
-        @Override
-        public Class<?> type() {
-            return String.class;
-        }
-    }
-
-    public static final class MapToNonComparable extends DefaultJdbcColumnMapping {
-
-        @Override
-        public <T> ColumnTypeMapping<T, ?> of(Class<T> type) {
-            return o -> nonComparableValue();
-        }
-
-        private static Object nonComparableValue() {
-            return new Object();
-        }
-    }
+//    public static Column stringColumn() {
+//        return new StingColumn();
+//    }
+//
+//    @Immutable
+//    private static class StingColumn implements Column {
+//
+//        private static final ColumnName NAME = ColumnName.of("some_string_column");
+//
+//        @Override
+//        public ColumnName name() {
+//            return NAME;
+//        }
+//
+//        @Override
+//        public Class<?> type() {
+//            return String.class;
+//        }
+//    }
+//
+//    public static final class MapToNonComparable extends DefaultJdbcColumnMapping {
+//
+//        @Override
+//        public <T> ColumnTypeMapping<T, ?> of(Class<T> type) {
+//            return o -> nonComparableValue();
+//        }
+//
+//        private static Object nonComparableValue() {
+//            return new Object();
+//        }
+//    }
 }

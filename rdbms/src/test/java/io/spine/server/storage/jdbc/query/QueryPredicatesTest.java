@@ -27,12 +27,9 @@
 package io.spine.server.storage.jdbc.query;
 
 import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.ComparablePath;
 import io.spine.client.CompositeFilter;
 import io.spine.client.Filter;
-import io.spine.server.entity.storage.Column;
-import io.spine.server.storage.jdbc.query.given.QueryPredicatesTestEnv.MapToNonComparable;
+//import io.spine.server.storage.jdbc.query.given.QueryPredicatesTestEnv.MapToNonComparable;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -49,17 +46,17 @@ import static io.spine.client.Filter.Operator.GREATER_THAN;
 import static io.spine.client.Filter.Operator.LESS_OR_EQUAL;
 import static io.spine.client.Filter.Operator.LESS_THAN;
 import static io.spine.client.Filter.Operator.UNRECOGNIZED;
-import static io.spine.client.Filters.eq;
-import static io.spine.server.storage.jdbc.query.QueryPredicates.columnMatchFilter;
-import static io.spine.server.storage.jdbc.query.QueryPredicates.joinPredicates;
+//import static io.spine.server.storage.jdbc.query.QueryPredicates.columnMatchFilter;
+//import static io.spine.server.storage.jdbc.query.QueryPredicates.joinPredicates;
 import static io.spine.server.storage.jdbc.query.QueryPredicates.nullFilter;
 import static io.spine.server.storage.jdbc.query.QueryPredicates.valueFilter;
-import static io.spine.server.storage.jdbc.query.given.QueryPredicatesTestEnv.stringColumn;
+//import static io.spine.server.storage.jdbc.query.given.QueryPredicatesTestEnv.stringColumn;
+import static io.spine.testing.Assertions.assertHasPrivateParameterlessCtor;
 import static io.spine.testing.DisplayNames.HAVE_PARAMETERLESS_CTOR;
-import static io.spine.testing.Tests.assertHasPrivateParameterlessCtor;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+//TODO:2021-12-21:alex.tymchenko: migrate?
 @SuppressWarnings({"InnerClassMayBeStatic", "ClassCanBeStatic"
         /* JUnit nested classes cannot be static. */,
         "DuplicateStringLiteralInspection" /* Common test display names. */})
@@ -74,169 +71,169 @@ class QueryPredicatesTest {
         assertHasPrivateParameterlessCtor(QueryPredicates.class);
     }
 
-    @Nested
-    @DisplayName("join predicates using operator")
-    class JoinPredicatesUsing {
+//    @Nested
+//    @DisplayName("join predicates using operator")
+//    class JoinPredicatesUsing {
+//
+//        @Test
+//        @DisplayName("`EITHER`")
+//        void either() {
+//            var left = TRUE;
+//            var right = FALSE;
+//            Predicate result = joinPredicates(left, right, EITHER);
+//
+//            var expected = left.or(right);
+//            assertThat(result)
+//                    .isEqualTo(expected);
+//        }
+//
+//        @Test
+//        @DisplayName("`ALL`")
+//        void all() {
+//            var left = TRUE;
+//            var right = FALSE;
+//            Predicate result = joinPredicates(left, right, ALL);
+//
+//            var expected = left.and(right);
+//            assertThat(result)
+//                    .isEqualTo(expected);
+//        }
+//    }
 
-        @Test
-        @DisplayName("`EITHER`")
-        void either() {
-            BooleanExpression left = TRUE;
-            BooleanExpression right = FALSE;
-            Predicate result = joinPredicates(left, right, EITHER);
+//
+//    @SuppressWarnings({"CheckReturnValue", "ResultOfMethodCallIgnored"})
+//    // Method expected to throw exception.
+//    @Test
+//    @DisplayName("throw IAE for unsupported operator")
+//    void throwForUnsupportedOperator() {
+//        assertThrows(IllegalArgumentException.class,
+//                     () -> joinPredicates(TRUE,
+//                                          TRUE,
+//                                          CompositeFilter.CompositeOperator.UNRECOGNIZED));
+//    }
 
-            BooleanExpression expected = left.or(right);
-            assertThat(result)
-                    .isEqualTo(expected);
-        }
+//    @SuppressWarnings({"CheckReturnValue", "ResultOfMethodCallIgnored"})
+//    // Method expected to throw exception.
+//    @Test
+//    @DisplayName("not accept non-comparable value")
+//    void notAcceptNonComparable() {
+//        var column = stringColumn();
+//
+//        var filter = eq(column.name().value(), COLUMN_FILTER_VALUE);
+//
+//        assertThrows(IllegalArgumentException.class,
+//                     () -> columnMatchFilter(column, filter, new MapToNonComparable()));
+//    }
 
-        @Test
-        @DisplayName("`ALL`")
-        void all() {
-            BooleanExpression left = TRUE;
-            BooleanExpression right = FALSE;
-            Predicate result = joinPredicates(left, right, ALL);
+//    @Test
+//    @DisplayName("generate null filter for `EQUAL`")
+//    void createNullFilterForEqual() {
+//        var path = comparablePath(Comparable.class, "");
+//        var predicate = nullFilter(EQUAL, path);
+//        assertEquals(path.isNull(), predicate);
+//    }
 
-            BooleanExpression expected = left.and(right);
-            assertThat(result)
-                    .isEqualTo(expected);
-        }
-    }
+//    @Nested
+//    @DisplayName("not generate null filter for")
+//    class NotCreateNullFilterFor {
+//
+//        @Test
+//        @DisplayName("`GREATER THAN`")
+//        void greaterThan() {
+//            assertThrows(IllegalArgumentException.class,
+//                         () -> runNullFilterCreationFor(GREATER_THAN));
+//        }
+//
+//        @Test
+//        @DisplayName("`LESS THAN`")
+//        void lessThan() {
+//            assertThrows(IllegalArgumentException.class,
+//                         () -> runNullFilterCreationFor(LESS_THAN));
+//        }
+//
+//        @Test
+//        @DisplayName("`GREATER OR EQUAL`")
+//        void greaterOrEqual() {
+//            assertThrows(IllegalArgumentException.class,
+//                         () -> runNullFilterCreationFor(GREATER_OR_EQUAL));
+//        }
+//
+//        @Test
+//        @DisplayName("`LESS OR EQUAL`")
+//        void lessOrEqual() {
+//            assertThrows(IllegalArgumentException.class,
+//                         () -> runNullFilterCreationFor(LESS_OR_EQUAL));
+//        }
+//
+//        @Test
+//        @DisplayName("`UNRECOGNIZED`")
+//        void unrecognized() {
+//            assertThrows(IllegalArgumentException.class,
+//                         () -> runNullFilterCreationFor(UNRECOGNIZED));
+//        }
+//    }
 
-
-    @SuppressWarnings({"CheckReturnValue", "ResultOfMethodCallIgnored"})
-    // Method expected to throw exception.
-    @Test
-    @DisplayName("throw IAE for unsupported operator")
-    void throwForUnsupportedOperator() {
-        assertThrows(IllegalArgumentException.class,
-                     () -> joinPredicates(TRUE,
-                                          TRUE,
-                                          CompositeFilter.CompositeOperator.UNRECOGNIZED));
-    }
-
-    @SuppressWarnings({"CheckReturnValue", "ResultOfMethodCallIgnored"})
-    // Method expected to throw exception.
-    @Test
-    @DisplayName("not accept non-comparable value")
-    void notAcceptNonComparable() {
-        Column column = stringColumn();
-
-        Filter filter = eq(column.name().value(), COLUMN_FILTER_VALUE);
-
-        assertThrows(IllegalArgumentException.class,
-                     () -> columnMatchFilter(column, filter, new MapToNonComparable()));
-    }
-
-    @Test
-    @DisplayName("generate null filter for `EQUAL`")
-    void createNullFilterForEqual() {
-        ComparablePath<Comparable> path = comparablePath(Comparable.class, "");
-        Predicate predicate = nullFilter(EQUAL, path);
-        assertEquals(path.isNull(), predicate);
-    }
-
-    @Nested
-    @DisplayName("not generate null filter for")
-    class NotCreateNullFilterFor {
-
-        @Test
-        @DisplayName("`GREATER THAN`")
-        void greaterThan() {
-            assertThrows(IllegalArgumentException.class,
-                         () -> runNullFilterCreationFor(GREATER_THAN));
-        }
-
-        @Test
-        @DisplayName("`LESS THAN`")
-        void lessThan() {
-            assertThrows(IllegalArgumentException.class,
-                         () -> runNullFilterCreationFor(LESS_THAN));
-        }
-
-        @Test
-        @DisplayName("`GREATER OR EQUAL`")
-        void greaterOrEqual() {
-            assertThrows(IllegalArgumentException.class,
-                         () -> runNullFilterCreationFor(GREATER_OR_EQUAL));
-        }
-
-        @Test
-        @DisplayName("`LESS OR EQUAL`")
-        void lessOrEqual() {
-            assertThrows(IllegalArgumentException.class,
-                         () -> runNullFilterCreationFor(LESS_OR_EQUAL));
-        }
-
-        @Test
-        @DisplayName("`UNRECOGNIZED`")
-        void unrecognized() {
-            assertThrows(IllegalArgumentException.class,
-                         () -> runNullFilterCreationFor(UNRECOGNIZED));
-        }
-    }
-
-    @Nested
-    @DisplayName("generate value filter for")
-    class CreateValueFilterFor {
-
-        @Test
-        @DisplayName("`EQUAL`")
-        void equal() {
-            ComparablePath<Comparable> path = comparablePath(Comparable.class, "");
-            Predicate predicate = valueFilter(EQUAL, path, COLUMN_FILTER_VALUE);
-            assertEquals(path.eq(COLUMN_FILTER_VALUE), predicate);
-        }
-
-        @Test
-        @DisplayName("`GREATER THAN`")
-        void greaterThan() {
-            ComparablePath<Comparable> path = comparablePath(Comparable.class, "");
-            Predicate predicate = valueFilter(GREATER_THAN, path, COLUMN_FILTER_VALUE);
-            assertEquals(path.gt(COLUMN_FILTER_VALUE), predicate);
-        }
-
-        @Test
-        @DisplayName("`LESS THAN`")
-        void lessThan() {
-            ComparablePath<Comparable> path = comparablePath(Comparable.class, "");
-            Predicate predicate = valueFilter(LESS_THAN, path, COLUMN_FILTER_VALUE);
-            assertEquals(path.lt(COLUMN_FILTER_VALUE), predicate);
-        }
-
-        @Test
-        @DisplayName("`GREATER OR EQUAL`")
-        void greaterOrEqual() {
-            ComparablePath<Comparable> path = comparablePath(Comparable.class, "");
-            Predicate predicate = valueFilter(GREATER_OR_EQUAL, path, COLUMN_FILTER_VALUE);
-            assertEquals(path.goe(COLUMN_FILTER_VALUE), predicate);
-        }
-
-        @Test
-        @DisplayName("`LESS OR EQUAL`")
-        void lessOrEqual() {
-            ComparablePath<Comparable> path = comparablePath(Comparable.class, "");
-            Predicate predicate = valueFilter(LESS_OR_EQUAL, path, COLUMN_FILTER_VALUE);
-            assertEquals(path.loe(COLUMN_FILTER_VALUE), predicate);
-        }
-    }
-
-    @Test
-    @DisplayName("not generate value filter for `UNRECOGNIZED`")
-    void notCreateValueFilterForUnrecognized() {
-        assertThrows(IllegalArgumentException.class,
-                     () -> runValueFilterCreationFor(UNRECOGNIZED));
-    }
-
-    @SuppressWarnings("ResultOfMethodCallIgnored") // Method called to throw exception.
-    private static void runNullFilterCreationFor(Filter.Operator operator) {
-        ComparablePath<Comparable> path = comparablePath(Comparable.class, "");
-        nullFilter(operator, path);
-    }
-
-    @SuppressWarnings("ResultOfMethodCallIgnored") // Method called to throw exception.
-    private static void runValueFilterCreationFor(Filter.Operator operator) {
-        ComparablePath<Comparable> path = comparablePath(Comparable.class, "");
-        valueFilter(operator, path, COLUMN_FILTER_VALUE);
-    }
+//    @Nested
+//    @DisplayName("generate value filter for")
+//    class CreateValueFilterFor {
+//
+//        @Test
+//        @DisplayName("`EQUAL`")
+//        void equal() {
+//            var path = comparablePath(Comparable.class, "");
+//            var predicate = valueFilter(EQUAL, path, COLUMN_FILTER_VALUE);
+//            assertEquals(path.eq(COLUMN_FILTER_VALUE), predicate);
+//        }
+//
+//        @Test
+//        @DisplayName("`GREATER THAN`")
+//        void greaterThan() {
+//            var path = comparablePath(Comparable.class, "");
+//            var predicate = valueFilter(GREATER_THAN, path, COLUMN_FILTER_VALUE);
+//            assertEquals(path.gt(COLUMN_FILTER_VALUE), predicate);
+//        }
+//
+//        @Test
+//        @DisplayName("`LESS THAN`")
+//        void lessThan() {
+//            var path = comparablePath(Comparable.class, "");
+//            var predicate = valueFilter(LESS_THAN, path, COLUMN_FILTER_VALUE);
+//            assertEquals(path.lt(COLUMN_FILTER_VALUE), predicate);
+//        }
+//
+//        @Test
+//        @DisplayName("`GREATER OR EQUAL`")
+//        void greaterOrEqual() {
+//            var path = comparablePath(Comparable.class, "");
+//            var predicate = valueFilter(GREATER_OR_EQUAL, path, COLUMN_FILTER_VALUE);
+//            assertEquals(path.goe(COLUMN_FILTER_VALUE), predicate);
+//        }
+//
+//        @Test
+//        @DisplayName("`LESS OR EQUAL`")
+//        void lessOrEqual() {
+//            var path = comparablePath(Comparable.class, "");
+//            var predicate = valueFilter(LESS_OR_EQUAL, path, COLUMN_FILTER_VALUE);
+//            assertEquals(path.loe(COLUMN_FILTER_VALUE), predicate);
+//        }
+//    }
+//
+//    @Test
+//    @DisplayName("not generate value filter for `UNRECOGNIZED`")
+//    void notCreateValueFilterForUnrecognized() {
+//        assertThrows(IllegalArgumentException.class,
+//                     () -> runValueFilterCreationFor(UNRECOGNIZED));
+//    }
+//
+//    @SuppressWarnings("ResultOfMethodCallIgnored") // Method called to throw exception.
+//    private static void runNullFilterCreationFor(Filter.Operator operator) {
+//        var path = comparablePath(Comparable.class, "");
+//        nullFilter(operator, path);
+//    }
+//
+//    @SuppressWarnings("ResultOfMethodCallIgnored") // Method called to throw exception.
+//    private static void runValueFilterCreationFor(Filter.Operator operator) {
+//        var path = comparablePath(Comparable.class, "");
+//        valueFilter(operator, path, COLUMN_FILTER_VALUE);
+//    }
 }

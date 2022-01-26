@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2022, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,8 +36,6 @@ object Scripts {
     fun testArtifacts(p: Project)          = p.script("test-artifacts.gradle")
     fun testOutput(p: Project)             = p.script("test-output.gradle")
     fun slowTests(p: Project)              = p.script("slow-tests.gradle")
-    fun javadocOptions(p: Project)         = p.script("javadoc-options.gradle")
-    fun filterInternalJavadocs(p: Project) = p.script("filter-internal-javadoc.gradle")
     fun jacoco(p: Project)                 = p.script("jacoco.gradle")
     fun publish(p: Project)                = p.script("publish.gradle")
     fun publishProto(p: Project)           = p.script("publish-proto.gradle")
@@ -49,15 +47,14 @@ object Scripts {
     fun updatePackageVersion(p: Project)   = p.script("js/update-package-version.gradle")
     fun dartBuildTasks(p: Project)         = p.script("dart/build-tasks.gradle")
     fun pubPublishTasks(p: Project)        = p.script("dart/pub-publish-tasks.gradle")
+
+    @Deprecated("Use `pmd-settings` script plugin instead")
     fun pmd(p: Project)                    = p.script("pmd.gradle")
-    fun checkstyle(p: Project)             = p.script("checkstyle.gradle")
+
     fun runBuild(p: Project)               = p.script("run-build.gradle")
-    fun modelCompiler(p: Project)          = p.script("model-compiler.gradle")
     fun licenseReportCommon(p: Project)    = p.script("license-report-common.gradle")
     fun projectLicenseReport(p: Project)   = p.script("license-report-project.gradle")
     fun repoLicenseReport(p: Project)      = p.script("license-report-repo.gradle")
-    fun generatePom(p: Project)            = p.script("generate-pom.gradle")
-    fun updateGitHubPages(p: Project)      = p.script("update-gh-pages.gradle")
 
     private fun Project.script(name: String) = "${rootDir}$commonPath${name}"
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2022, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,9 +28,15 @@ package io.spine.internal.dependency
 
 @Suppress("unused")
 object Jackson {
-    private const val version = "2.12.3"
+    private const val version = "2.13.1"
+    // https://github.com/FasterXML/jackson-core
+    const val core = "com.fasterxml.jackson.core:jackson-core:${version}"
     // https://github.com/FasterXML/jackson-databind
     const val databind = "com.fasterxml.jackson.core:jackson-databind:${version}"
     // https://github.com/FasterXML/jackson-dataformat-xml/releases
     const val dataformatXml = "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:${version}"
+    // https://github.com/FasterXML/jackson-dataformats-text/releases
+    const val dataformatYaml = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${version}"
+    // https://github.com/FasterXML/jackson-module-kotlin/releases
+    const val moduleKotlin = "com.fasterxml.jackson.module:jackson-module-kotlin:${version}"
 }

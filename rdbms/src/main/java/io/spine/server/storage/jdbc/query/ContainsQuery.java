@@ -26,16 +26,19 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import com.querydsl.sql.AbstractSQLQuery;
+import com.google.protobuf.Message;
 
 import static com.querydsl.sql.SQLExpressions.count;
 
 /**
  * A query that checks if the table contains a record with the given ID.
  */
-final class ContainsQuery<I> extends IdAwareQuery<I> implements SelectQuery<Boolean> {
+//TODO:2021-06-18:alex.tymchenko: move this type.
+public final class ContainsQuery<I, R extends Message>
+        extends IdAwareQuery<I, R>
+        implements SelectQuery<Boolean> {
 
-    private ContainsQuery(Builder<I> builder) {
+    private ContainsQuery(Builder<I, R> builder) {
         super(builder);
     }
 
@@ -44,26 +47,27 @@ final class ContainsQuery<I> extends IdAwareQuery<I> implements SelectQuery<Bool
      */
     @Override
     public Boolean execute() {
-        AbstractSQLQuery<Long, ?> query = factory().select(count())
-                                                   .from(table())
-                                                   .where(idEquals());
+        var query = factory().select(count())
+                             .from(table())
+                             .where(idEquals());
         long recordsCount = query.fetchOne();
         return recordsCount > 0;
     }
 
-    static <I> Builder<I> newBuilder() {
+    public static <I, R extends Message> Builder<I, R> newBuilder() {
         return new Builder<>();
     }
 
-    static class Builder<I> extends IdAwareQuery.Builder<I, Builder<I>, ContainsQuery<I>> {
+    public static class Builder<I, R extends Message>
+            extends IdAwareQuery.Builder<I, R, Builder<I, R>, ContainsQuery<I, R>> {
 
         @Override
-        protected ContainsQuery<I> doBuild() {
+        protected ContainsQuery<I, R> doBuild() {
             return new ContainsQuery<>(this);
         }
 
         @Override
-        protected Builder<I> getThis() {
+        protected Builder<I, R> getThis() {
             return this;
         }
     }

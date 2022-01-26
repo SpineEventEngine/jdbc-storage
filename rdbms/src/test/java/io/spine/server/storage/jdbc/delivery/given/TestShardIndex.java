@@ -42,8 +42,8 @@ public final class TestShardIndex {
      * Generates a new {@link ShardIndex} with some pre-defined values.
      */
     public static ShardIndex newIndex() {
-        int shardIndex = 5;
-        int totalShards = 23;
+        var shardIndex = 5;
+        var totalShards = 23;
         return newIndex(shardIndex, totalShards);
     }
 

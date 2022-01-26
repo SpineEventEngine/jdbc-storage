@@ -63,8 +63,8 @@ final class MessageColumnReader<M extends Message> extends ColumnReader<M> {
     @Override
     public M readValue(ResultSet resultSet) throws SQLException {
         checkNotNull(resultSet);
-        String messageJson = resultSet.getString(columnName());
-        M result = fromJson(messageJson, messageClass);
+        var messageJson = resultSet.getString(columnName());
+        var result = fromJson(messageJson, messageClass);
         return result;
     }
 }

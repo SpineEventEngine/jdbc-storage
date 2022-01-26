@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2022, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,8 +26,11 @@
 
 package io.spine.internal.dependency
 
-// This artifact which used to be a part of J2EE moved under Eclipse EE4J project.
-// https://github.com/eclipse-ee4j/common-annotations-api
+@Suppress("unused")
 object JavaX {
+    // This artifact which used to be a part of J2EE moved under Eclipse EE4J project.
+    // https://github.com/eclipse-ee4j/common-annotations-api
     const val annotations = "javax.annotation:javax.annotation-api:1.3.2"
+
+    const val servletApi = "javax.servlet:javax.servlet-api:3.1.0"
 }

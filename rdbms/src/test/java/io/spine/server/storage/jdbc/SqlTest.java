@@ -29,11 +29,11 @@ package io.spine.server.storage.jdbc;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static io.spine.testing.Assertions.assertHasPrivateParameterlessCtor;
 import static io.spine.testing.DisplayNames.HAVE_PARAMETERLESS_CTOR;
-import static io.spine.testing.Tests.assertHasPrivateParameterlessCtor;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@DisplayName("Sql utility should")
+@DisplayName("`Sql` utility should")
 class SqlTest {
 
     @Test
@@ -46,30 +46,30 @@ class SqlTest {
     @Test
     @DisplayName("provide valid SQL tokens")
     void provideValidSqlTokens() {
-        String createTableExpected = "CREATE TABLE";
-        String createTableActual = Sql.Query.CREATE_TABLE.toString()
-                                                         .trim();
+        var createTableExpected = "CREATE TABLE";
+        var createTableActual = Sql.Query.CREATE_TABLE.toString()
+                                                      .trim();
         assertEquals(createTableExpected, createTableActual);
 
-        String countExpected = "COUNT";
-        String countActual = Sql.Function.COUNT.toString()
-                                               .trim();
+        var countExpected = "COUNT";
+        var countActual = Sql.Function.COUNT.toString()
+                                            .trim();
         assertEquals(countExpected, countActual);
     }
 
     @Test
     @DisplayName("provide tokens wrapped into whitespace")
     void provideTokensWithWhitespaces() {
-        String sumExpected = " SUM ";
-        String sumActual = Sql.Function.SUM.toString();
+        var sumExpected = " SUM ";
+        var sumActual = Sql.Function.SUM.toString();
         assertEquals(sumExpected, sumActual);
 
-        String primaryKeyExpected = " PRIMARY KEY ";
-        String primaryKeyActual = Sql.Query.PRIMARY_KEY.toString();
+        var primaryKeyExpected = " PRIMARY KEY ";
+        var primaryKeyActual = Sql.Query.PRIMARY_KEY.toString();
         assertEquals(primaryKeyExpected, primaryKeyActual);
 
-        String commaExpected = " , ";
-        String commaActual = Sql.BuildingBlock.COMMA.toString();
+        var commaExpected = " , ";
+        var commaActual = Sql.BuildingBlock.COMMA.toString();
         assertEquals(commaExpected, commaActual);
     }
 }

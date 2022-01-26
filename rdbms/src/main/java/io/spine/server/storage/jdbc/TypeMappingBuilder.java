@@ -74,12 +74,12 @@ public class TypeMappingBuilder {
      * @return the builder containing names for all types
      */
     public static TypeMappingBuilder basicBuilder() {
-        TypeMappingBuilder builder = new TypeMappingBuilder().add(BYTE_ARRAY, "BLOB")
-                                                             .add(INT, "INT")
-                                                             .add(LONG, "BIGINT")
-                                                             .add(STRING_255, "VARCHAR(255)")
-                                                             .add(STRING, "TEXT")
-                                                             .add(BOOLEAN, "BOOLEAN");
+        var builder = new TypeMappingBuilder().add(BYTE_ARRAY, "BLOB")
+                                              .add(INT, "INT")
+                                              .add(LONG, "BIGINT")
+                                              .add(STRING_255, "VARCHAR(255)")
+                                              .add(STRING, "TEXT")
+                                              .add(BOOLEAN, "BOOLEAN");
         return builder;
     }
 
@@ -108,7 +108,7 @@ public class TypeMappingBuilder {
      *         if not all the {@linkplain Type types} were mapped
      */
     public TypeMapping build() {
-        int typesCount = Type.values().length;
+        var typesCount = Type.values().length;
         checkState(mappedTypes.size() == typesCount,
                    "A mapping should contain names for all types (%s), " +
                    "but only (%s) types were mapped.", typesCount, mappedTypes.size());
@@ -131,7 +131,7 @@ public class TypeMappingBuilder {
         public TypeName typeNameFor(Type type) {
             checkState(mappedTypes.containsKey(type),
                        "The type mapping does not define a name for %s type.", type);
-            TypeName typeName = mappedTypes.get(type);
+            var typeName = mappedTypes.get(type);
             return typeName;
         }
     }

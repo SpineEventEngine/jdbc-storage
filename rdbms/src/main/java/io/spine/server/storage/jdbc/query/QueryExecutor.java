@@ -37,12 +37,13 @@ import java.sql.SQLException;
 /**
  * A helper class for execution of SQL queries.
  */
-class QueryExecutor {
+//TODO:2021-06-18:alex.tymchenko: move this type.
+public class QueryExecutor {
 
     private final DataSourceWrapper dataSource;
     private final FluentLogger logger;
 
-    QueryExecutor(DataSourceWrapper dataSource, FluentLogger logger) {
+    public QueryExecutor(DataSourceWrapper dataSource, FluentLogger logger) {
         this.dataSource = dataSource;
         this.logger = logger;
     }
@@ -50,9 +51,9 @@ class QueryExecutor {
     /**
      * Executes the given SQL query and ignores the result.
      */
-    void execute(String query) {
-        try (ConnectionWrapper connection = dataSource.getConnection(true);
-             PreparedStatement statement = connection.prepareStatement(query)) {
+    public void execute(String query) {
+        try (var connection = dataSource.getConnection(true);
+             var statement = connection.prepareStatement(query)) {
             statement.execute();
         } catch (SQLException e) {
             logger.atSevere()

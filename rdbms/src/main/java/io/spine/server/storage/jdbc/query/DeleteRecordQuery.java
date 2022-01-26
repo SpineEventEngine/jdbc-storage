@@ -26,37 +26,56 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import com.querydsl.sql.dml.SQLDeleteClause;
+import com.google.protobuf.Message;
 
 /**
  * A query for deleting one or many items by an ID.
+ *
+ * @param <I>
+ *         the type of identifiers of the records to delete
  */
-final class DeleteRecordQuery<I> extends IdAwareQuery<I> implements WriteQuery {
+//TODO:2021-06-24:alex.tymchenko: move this type.
+public final class DeleteRecordQuery<I, R extends Message>
+        extends IdAwareQuery<I, R> implements WriteQuery {
 
-    DeleteRecordQuery(Builder<I> builder) {
+    DeleteRecordQuery(Builder<I, R> builder) {
         super(builder);
     }
 
     @Override
     public long execute() {
-        SQLDeleteClause query = factory().delete(table())
-                                         .where(idEquals());
+        var query = factory().delete(table())
+                             .where(idEquals());
         return query.execute();
     }
 
-    static <I> Builder<I> newBuilder() {
+    /**
+     * Creates a new instance of the {@code Builder} for this type.
+     *
+     * @param <I>
+     *         the type of identifiers of the records to delete
+     * @return a new {@code Builder} instance
+     */
+    public static <I, R extends Message> Builder<I, R> newBuilder() {
         return new Builder<>();
     }
 
-    static class Builder<I> extends IdAwareQuery.Builder<I, Builder<I>, DeleteRecordQuery<I>> {
+    /**
+     * A builder of {@code DeleteRecordQuery}.
+     *
+     * @param <I>
+     *         the type of identifiers of the records to delete
+     */
+    public static class Builder<I, R extends Message>
+            extends IdAwareQuery.Builder<I, R, Builder<I, R>, DeleteRecordQuery<I, R>> {
 
         @Override
-        protected DeleteRecordQuery<I> doBuild() {
+        protected DeleteRecordQuery<I, R> doBuild() {
             return new DeleteRecordQuery<>(this);
         }
 
         @Override
-        protected Builder<I> getThis() {
+        protected Builder<I, R> getThis() {
             return this;
         }
     }

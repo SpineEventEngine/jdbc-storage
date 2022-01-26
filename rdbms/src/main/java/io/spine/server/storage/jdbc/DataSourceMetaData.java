@@ -60,9 +60,9 @@ public interface DataSourceMetaData {
      */
     static DataSourceMetaData of(DatabaseMetaData metaData) throws DatabaseException {
         try {
-            String productName = metaData.getDatabaseProductName();
-            int majorVersion = metaData.getDatabaseMajorVersion();
-            int minorVersion = metaData.getDatabaseMinorVersion();
+            var productName = metaData.getDatabaseProductName();
+            var majorVersion = metaData.getDatabaseMajorVersion();
+            var minorVersion = metaData.getDatabaseMinorVersion();
 
             return new DataSourceMetaData() {
                 @Override

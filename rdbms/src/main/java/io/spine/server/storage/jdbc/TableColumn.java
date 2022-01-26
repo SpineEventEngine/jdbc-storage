@@ -26,31 +26,79 @@
 
 package io.spine.server.storage.jdbc;
 
-import io.spine.server.storage.StorageField;
+import io.spine.query.ColumnName;
+import io.spine.server.storage.RecordWithColumns;
+import io.spine.server.storage.jdbc.query.IdColumn;
+import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.util.function.Function;
+
 /**
- * An interface for the database table columns representation.
- *
- * <p>It's recommended to implement this interface in an {@code enum}, since it's API is sharpened
- * to be overridden with the {@code enum} default methods.
+ * A representation of a table column in RDBMS.
  */
-public interface TableColumn extends StorageField {
+public class TableColumn {
+
+    private final String name;
+    private final JdbcColumnMapping mapping;
+    private final Class<?> type;
+    private final @Nullable Function<@Nullable Object, @Nullable Object> adaptValue;
+
+    public TableColumn(String name, Class<?> type, JdbcColumnMapping mapping) {
+        this.name = name;
+        this.type = type;
+        this.mapping = mapping;
+        this.adaptValue = null;
+    }
+
+    public TableColumn(String name, Class<?> valueType, JdbcColumnMapping mapping,
+                       Function<@Nullable Object, @Nullable Object> adaptValue) {
+        this.name = name;
+        this.type = valueType;
+        this.mapping = mapping;
+        this.adaptValue = adaptValue;
+    }
 
     /**
-     * Returns the {@link Type} of the column
-     * or {@code null} if the type is unknown at the compile time.
+     * The column name.
      */
-    @Nullable
-    Type type();
+    public String name() {
+        return name;
+    }
+
+    /**
+     * Returns the {@linkplain Type SQL type} of the column,
+     * or {@code null} if the type is unknown at compile-time.
+     */
+    public @Nullable Type type() {
+        return mapping.typeOf(type);
+    }
 
     /**
      * Returns {@code true} is this column is a primary key of the table, {@code false} otherwise.
      */
-    boolean isPrimaryKey();
+    public boolean isPrimaryKey() {
+        return IdColumn.ID_COLUMN_NAME.equals(name);
+    }
 
     /**
      * Returns {@code true} if this column may contain {@code NULL} values, {@code false} otherwise.
+     *
+     * <p>By default, returns {@code false}.
      */
-    boolean isNullable();
+    public boolean isNullable() {
+        return false;
+    }
+
+    public @Nullable Object valueIn(RecordWithColumns<?, ?> record) {
+        var columnName = ColumnName.of(name());
+        @Nullable Object result;
+        if (adaptValue != null) {
+            var value = record.columnValue(columnName);
+            result = adaptValue.apply(value);
+        } else {
+            result = record.columnValue(columnName, mapping);
+        }
+        return result;
+    }
 }

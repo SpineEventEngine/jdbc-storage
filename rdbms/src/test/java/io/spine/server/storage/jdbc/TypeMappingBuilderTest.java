@@ -26,7 +26,6 @@
 
 package io.spine.server.storage.jdbc;
 
-import io.spine.type.TypeName;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -34,34 +33,34 @@ import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@DisplayName("TypeMappingBuilder should")
+@DisplayName("`TypeMappingBuilder` should")
 class TypeMappingBuilderTest {
 
     @Test
     @DisplayName("override type names")
     void overrideTypeNames() {
-        Type type = BYTE_ARRAY;
-        String originalName = "original";
-        String nameReplacement = "replacement";
-        TypeMapping mapping = TypeMappingBuilder.basicBuilder()
-                                                .add(type, originalName)
-                                                .add(type, nameReplacement)
-                                                .build();
-        TypeName resultingName = mapping.typeNameFor(type);
+        var type = BYTE_ARRAY;
+        var originalName = "original";
+        var nameReplacement = "replacement";
+        var mapping = TypeMappingBuilder.basicBuilder()
+                                        .add(type, originalName)
+                                        .add(type, nameReplacement)
+                                        .build();
+        var resultingName = mapping.typeNameFor(type);
         assertEquals(nameReplacement, resultingName.value());
     }
 
     @Test
     @DisplayName("not allow empty type names")
     void rejectEmptyTypeNames() {
-        TypeMappingBuilder builder = TypeMappingBuilder.basicBuilder();
+        var builder = TypeMappingBuilder.basicBuilder();
         assertThrows(IllegalArgumentException.class, () -> builder.add(BYTE_ARRAY, ""));
     }
 
     @Test
     @DisplayName("throw ISE if not all types are mapped")
     void throwIfNotAllTypesMapped() {
-        TypeMappingBuilder builder = new TypeMappingBuilder();
+        var builder = new TypeMappingBuilder();
         assertThrows(IllegalStateException.class, builder::build);
     }
 }

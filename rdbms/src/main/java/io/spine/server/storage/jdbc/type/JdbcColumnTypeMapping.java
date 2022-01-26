@@ -26,11 +26,16 @@
 
 package io.spine.server.storage.jdbc.type;
 
-import io.spine.server.entity.storage.ColumnTypeMapping;
+import io.spine.server.storage.ColumnTypeMapping;
 import io.spine.server.storage.jdbc.Type;
 
 /**
- * A single column type mapping which also stores the JDBC type of the column.
+ * A single column type mapping which also stores the RDBMS type of the column.
+ *
+ * @param <T>
+ *         the type of the original column values
+ * @param <R>
+ *         the type of the values to store in RDBMS
  */
 public final class JdbcColumnTypeMapping<T, R> implements ColumnTypeMapping<T, R> {
 
@@ -44,7 +49,11 @@ public final class JdbcColumnTypeMapping<T, R> implements ColumnTypeMapping<T, R
 
     @Override
     public R apply(T t) {
-        return mapping.apply(t);
+        try {
+            return mapping.apply(t);
+        } catch (RuntimeException e) {
+            throw new IllegalStateException("Error converting the column value.", e);
+        }
     }
 
     public Type storeAs() {

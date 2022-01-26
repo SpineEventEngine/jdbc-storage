@@ -34,7 +34,7 @@ import java.util.Set;
 import static io.spine.base.Identifier.newUuid;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@DisplayName("Parameters should")
+@DisplayName("`Parameters` should")
 class ParametersTest {
 
     private static final String ID = newUuid();
@@ -52,9 +52,9 @@ class ParametersTest {
     @Test
     @DisplayName("check identifier uniqueness for multiple parameters")
     void checkIdUniqueForMultiple() {
-        Parameters.Builder commonParameters = Parameters.newBuilder()
+        var commonParameters = Parameters.newBuilder()
                                                         .addParameter(ID, PARAMETER);
-        Parameters buildedCommonParameters = commonParameters.build();
+        var buildedCommonParameters = commonParameters.build();
 
         assertThrows(IllegalArgumentException.class,
                      () -> commonParameters.addParameters(buildedCommonParameters));
@@ -63,9 +63,9 @@ class ParametersTest {
     @Test
     @DisplayName("not allow modify identifiers")
     void notAllowModifyId() {
-        Parameters parameters = Parameters.empty();
-        Set<String> identifiers = parameters.getIdentifiers();
-        String newIdentifier = newUuid();
+        var parameters = Parameters.empty();
+        var identifiers = parameters.getIdentifiers();
+        var newIdentifier = newUuid();
         assertThrows(UnsupportedOperationException.class, () -> identifiers.add(newIdentifier));
     }
 }

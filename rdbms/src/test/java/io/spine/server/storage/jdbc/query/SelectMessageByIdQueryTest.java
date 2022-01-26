@@ -26,19 +26,17 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import com.google.protobuf.Message;
 import com.google.protobuf.Timestamp;
 import com.querydsl.sql.AbstractSQLQuery;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
-import io.spine.server.storage.jdbc.GivenDataSource.ThrowingHikariDataSource;
+import io.spine.server.storage.jdbc.JdbcStorageFactory;
 import io.spine.server.storage.jdbc.given.table.TimestampByString;
 import io.spine.server.storage.jdbc.query.given.Given.ASelectMessageByIdQuery;
-import io.spine.testing.logging.MuteLogging;
+import io.spine.testing.logging.mute.MuteLogging;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static com.google.common.truth.Truth.assertThat;
@@ -47,11 +45,11 @@ import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsThrowingByCommand;
 import static io.spine.server.storage.jdbc.PredefinedMapping.H2_1_4;
 import static io.spine.server.storage.jdbc.given.Column.stringIdColumn;
-import static io.spine.server.storage.jdbc.message.MessageTable.bytesColumn;
+import static io.spine.server.storage.jdbc.record.column.BytesColumn.bytesColumnName;
 import static io.spine.server.storage.jdbc.query.given.Given.selectMessageBuilder;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@DisplayName("SelectMessageByIdQuery should")
+@DisplayName("`SelectMessageByIdQuery` should")
 class SelectMessageByIdQueryTest {
 
     private final ASelectMessageByIdQuery.Builder<String> builder = selectMessageBuilder();
@@ -60,17 +58,17 @@ class SelectMessageByIdQueryTest {
     @Test
     @DisplayName("close result set")
     void closeResultSet() throws SQLException {
-        DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
-        TimestampByString table = table(dataSource);
-        Timestamp timestamp = timestamp();
+        var dataSource = whichIsStoredInMemory(newUuid());
+        var table = table(dataSource);
+        var timestamp = timestamp();
         table.write(timestamp);
 
-        String id = table.idOf(timestamp);
-        AbstractSQLQuery<Object, ?> underlyingQuery = table.composeSelectTimestampById(id)
-                                                           .query();
-        ASelectMessageByIdQuery query = query(dataSource, table, underlyingQuery);
+        var id = table.idOf(timestamp);
+        var underlyingQuery = table.composeSelectTimestampById(id)
+                                   .query();
+        var query = query(dataSource, table, underlyingQuery);
 
-        ResultSet results = underlyingQuery.getResults();
+        var results = underlyingQuery.getResults();
         query.execute();
         assertThat(results.isClosed())
                 .isTrue();
@@ -80,16 +78,16 @@ class SelectMessageByIdQueryTest {
     @MuteLogging
     @DisplayName("handle SQL exception")
     void handleSqlException() {
-        ThrowingHikariDataSource underlyingDataSource = whichIsThrowingByCommand(newUuid());
-        DataSourceWrapper dataSource = DataSourceWrapper.wrap(underlyingDataSource);
-        TimestampByString table = table(dataSource);
-        Timestamp timestamp = timestamp();
+        var underlyingDataSource = whichIsThrowingByCommand(newUuid());
+        var dataSource = DataSourceWrapper.wrap(underlyingDataSource);
+        var table = table(dataSource);
+        var timestamp = timestamp();
         table.write(timestamp);
 
-        String id = table.idOf(timestamp);
-        AbstractSQLQuery<Object, ?> underlyingQuery = table.composeSelectTimestampById(id)
-                                                           .query();
-        ASelectMessageByIdQuery query = query(dataSource, table, underlyingQuery);
+        var id = table.idOf(timestamp);
+        var underlyingQuery = table.composeSelectTimestampById(id)
+                                   .query();
+        var query = query(dataSource, table, underlyingQuery);
 
         underlyingDataSource.setThrowOnGetConnection(true);
         assertThrows(DatabaseException.class, query::execute);
@@ -98,43 +96,48 @@ class SelectMessageByIdQueryTest {
     @Test
     @DisplayName("return `null` on deserialization if value is not present")
     void returnNullForValueNotPresent() {
-        DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
-        TimestampByString table = table(dataSource);
-        Timestamp timestamp = Timestamp.getDefaultInstance();
+        var dataSource = whichIsStoredInMemory(newUuid());
+        var table = table(dataSource);
+        var timestamp = Timestamp.getDefaultInstance();
 
-        String id = table.idOf(timestamp);
-        AbstractSQLQuery<Object, ?> underlyingQuery = table.composeSelectTimestampById(id)
-                                                           .query();
-        ASelectMessageByIdQuery query = query(dataSource, table, underlyingQuery);
+        var id = table.idOf(timestamp);
+        var underlyingQuery = table.composeSelectTimestampById(id)
+                                   .query();
+        var query = query(dataSource, table, underlyingQuery);
 
-        Message message = query.execute();
+        var message = query.execute();
         assertThat(message)
                 .isNull();
     }
 
-    private ASelectMessageByIdQuery query(DataSourceWrapper dataSource,
-                                          TimestampByString table,
-                                          AbstractSQLQuery<Object, ?> underlyingQuery) {
-        ASelectMessageByIdQuery<String> query =
+    private ASelectMessageByIdQuery<String>
+    query(DataSourceWrapper dataSource,
+          TimestampByString table,
+          AbstractSQLQuery<Object, ?> underlyingQuery) {
+        var query =
                 builder.setTableName(table.name())
                        .setQuery(underlyingQuery)
                        .setDataSource(dataSource)
                        .setId(newUuid())
                        .setIdColumn(stringIdColumn())
-                       .setMessageColumnName(bytesColumn().name())
+                       .setMessageColumnName(bytesColumnName())
                        .setMessageDescriptor(Timestamp.getDescriptor())
                        .build();
         return query;
     }
 
     private static TimestampByString table(DataSourceWrapper dataSource) {
-        TimestampByString table = new TimestampByString(dataSource, H2_1_4);
+        var factory = JdbcStorageFactory.newBuilder()
+                .setDataSource(dataSource)
+                .setTypeMapping(H2_1_4)
+                .build();
+        var table = new TimestampByString(factory);
         table.create();
         return table;
     }
 
     private static Timestamp timestamp() {
-        Timestamp timestamp = Timestamp
+        var timestamp = Timestamp
                 .newBuilder()
                 .setSeconds(42)
                 .setNanos(15)

@@ -26,27 +26,27 @@
 
 package io.spine.server.storage.jdbc.aggregate;
 
-import io.spine.base.Tests;
+import io.spine.environment.Tests;
 import io.spine.server.ServerEnvironment;
-import io.spine.server.aggregate.AggregateStorageTruncationTest;
+import io.spine.server.aggregate.AggregateHistoryTruncationTest;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 
 import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.newFactory;
 
-@DisplayName("`JdbcAggregateStorage` after truncation should")
-class JdbcAggregateStorageTruncationTest extends AggregateStorageTruncationTest {
+@DisplayName("RDBMS-backed `AggregateStorage` after truncation should")
+class JdbcAggregateStorageTruncationTest extends AggregateHistoryTruncationTest {
 
     @BeforeAll
-    static void prepareStorage() {
+    static void setUpClass() {
         ServerEnvironment
                 .when(Tests.class)
-                .use(newFactory());
+                .useStorageFactory((env) -> newFactory());
     }
 
     @AfterAll
-    static void resetStorage() {
+    static void tearDownClass() {
         ServerEnvironment
                 .instance()
                 .reset();

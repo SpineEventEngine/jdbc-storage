@@ -33,12 +33,12 @@ import org.junit.jupiter.api.Test;
 import static io.spine.base.Identifier.newUuid;
 import static io.spine.server.storage.jdbc.query.Serializer.deserialize;
 import static io.spine.server.storage.jdbc.query.Serializer.serialize;
+import static io.spine.testing.Assertions.assertHasPrivateParameterlessCtor;
 import static io.spine.testing.DisplayNames.HAVE_PARAMETERLESS_CTOR;
-import static io.spine.testing.Tests.assertHasPrivateParameterlessCtor;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@DisplayName("Serializer should")
+@DisplayName("`Serializer` should")
 class SerializerTest {
 
     @Test
@@ -50,16 +50,16 @@ class SerializerTest {
     @Test
     @DisplayName("serialize and deserialize message")
     void serializeAndDeserializeMsg() {
-        StringValue expected = StringValue
+        var expected = StringValue
                 .getDefaultInstance()
                 .toBuilder()
                 .setValue(newUuid())
                 .build();
 
-        byte[] bytes = serialize(expected);
+        var bytes = serialize(expected);
         assertTrue(bytes.length > 0);
 
-        StringValue actual = (StringValue) deserialize(bytes, expected.getDescriptorForType());
+        var actual = (StringValue) deserialize(bytes, expected.getDescriptorForType());
         assertEquals(expected, actual);
     }
 }

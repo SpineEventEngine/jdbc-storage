@@ -26,42 +26,35 @@
 
 package io.spine.server.storage.jdbc.aggregate;
 
-import com.google.common.truth.StringSubject;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
-import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.truth.Truth.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-@DisplayName("`MultipleExceptionsOnClose` should")
+//TODO:2021-07-01:alex.tymchenko: kill?
+//@DisplayName("`MultipleExceptionsOnClose` should")
 class MultipleExceptionsOnCloseTest {
 
-    @Test
-    @DisplayName("describe all given exceptions in `toString`")
-    void provideToString() {
-        String message1 = "message1";
-        String message2 = "message2";
-        String message3 = "message3";
-        IllegalStateException ex1 = new IllegalStateException(message1);
-        IllegalStateException ex2 = new IllegalStateException(message2);
-        IllegalStateException ex3 = new IllegalStateException(message3);
-
-        MultipleExceptionsOnClose aggregatingException =
-                new MultipleExceptionsOnClose(newArrayList(ex1, ex2, ex3));
-
-        String exceptionsDescription = aggregatingException.toString();
-        StringSubject exceptionSubject = assertThat(exceptionsDescription);
-        exceptionSubject.contains(ex1.toString());
-        exceptionSubject.contains(ex2.toString());
-        exceptionSubject.contains(ex3.toString());
-    }
-
-    @Test
-    @DisplayName("be direct subclass of Throwable")
-    void beSubclassOfThrowable() {
-        Class<MultipleExceptionsOnClose> clazz = MultipleExceptionsOnClose.class;
-        Class<? super MultipleExceptionsOnClose> superclass = clazz.getSuperclass();
-        assertEquals(Throwable.class, superclass);
-    }
+//    @Test
+//    @DisplayName("describe all given exceptions in `toString`")
+//    void provideToString() {
+//        String message1 = "message1";
+//        String message2 = "message2";
+//        String message3 = "message3";
+//        IllegalStateException ex1 = new IllegalStateException(message1);
+//        IllegalStateException ex2 = new IllegalStateException(message2);
+//        IllegalStateException ex3 = new IllegalStateException(message3);
+//
+//        MultipleExceptionsOnClose aggregatingException =
+//                new MultipleExceptionsOnClose(newArrayList(ex1, ex2, ex3));
+//
+//        String exceptionsDescription = aggregatingException.toString();
+//        StringSubject exceptionSubject = assertThat(exceptionsDescription);
+//        exceptionSubject.contains(ex1.toString());
+//        exceptionSubject.contains(ex2.toString());
+//        exceptionSubject.contains(ex3.toString());
+//    }
+//
+//    @Test
+//    @DisplayName("be direct subclass of `Throwable`")
+//    void beSubclassOfThrowable() {
+//        Class<MultipleExceptionsOnClose> clazz = MultipleExceptionsOnClose.class;
+//        Class<? super MultipleExceptionsOnClose> superclass = clazz.getSuperclass();
+//        assertEquals(Throwable.class, superclass);
+//    }
 }

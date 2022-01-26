@@ -29,8 +29,9 @@ package io.spine.server.storage.jdbc.given;
 import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.Type;
 import io.spine.server.storage.jdbc.query.IdColumn;
-
-import javax.annotation.Nullable;
+import io.spine.server.storage.jdbc.type.DefaultJdbcColumnMapping;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import static io.spine.server.storage.jdbc.Type.STRING_255;
 
@@ -45,39 +46,26 @@ public final class Column {
     }
 
     public static TableColumn idTableColumn() {
-        return GivenIdColumn.ID;
+        return newIdColumn(null);
     }
 
     public static TableColumn stringTableColumn() {
-        return GivenIdColumn.STRING;
+        return newIdColumn(STRING_255);
     }
 
-    private enum GivenIdColumn implements TableColumn {
+    @NonNull
+    private static TableColumn newIdColumn(final @Nullable Type type) {
+        return new TableColumn("ID", String.class, new DefaultJdbcColumnMapping()) {
 
-        ID(null),
-        STRING(STRING_255);
+            @Override
+            public boolean isPrimaryKey() {
+                return true;
+            }
 
-        @Nullable
-        private final Type type;
-
-        GivenIdColumn(@Nullable Type type) {
-            this.type = type;
-        }
-
-        @Nullable
-        @Override
-        public Type type() {
-            return type;
-        }
-
-        @Override
-        public boolean isPrimaryKey() {
-            return true;
-        }
-
-        @Override
-        public boolean isNullable() {
-            return false;
-        }
+            @Override
+            public Type type() {
+                return type;
+            }
+        };
     }
 }

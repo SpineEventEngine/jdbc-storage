@@ -28,12 +28,14 @@ package io.spine.server.storage.jdbc.delivery;
 
 import com.google.protobuf.Duration;
 import io.spine.logging.Logging;
+import io.spine.server.ContextSpec;
 import io.spine.server.NodeId;
 import io.spine.server.delivery.AbstractWorkRegistry;
 import io.spine.server.delivery.ShardIndex;
 import io.spine.server.delivery.ShardProcessingSession;
 import io.spine.server.delivery.ShardSessionRecord;
 import io.spine.server.delivery.ShardedWorkRegistry;
+import io.spine.server.delivery.WorkerId;
 import io.spine.server.storage.jdbc.JdbcStorageFactory;
 
 import java.util.Iterator;
@@ -47,9 +49,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * <p>Represents an SQL table of {@linkplain ShardSessionRecord session records} with the
  * appropriate accessor methods.
  */
-public class JdbcShardedWorkRegistry
-        extends AbstractWorkRegistry
-        implements Logging {
+public class JdbcShardedWorkRegistry extends AbstractWorkRegistry implements Logging {
 
     private final JdbcSessionStorage storage;
 
@@ -59,21 +59,31 @@ public class JdbcShardedWorkRegistry
      * @param storageFactory
      *         the storage factory for creating a storage for this registry
      */
-    public JdbcShardedWorkRegistry(JdbcStorageFactory storageFactory) {
+    public JdbcShardedWorkRegistry(JdbcStorageFactory storageFactory, ContextSpec context) {
         super();
         checkNotNull(storageFactory);
-        this.storage = storageFactory.createSessionStorage();
+        this.storage = storageFactory.createSessionStorage(context);
     }
 
     @Override
     public synchronized Optional<ShardProcessingSession> pickUp(ShardIndex index, NodeId nodeId) {
-        Optional<ShardProcessingSession> picked = super.pickUp(index, nodeId);
-        return picked.filter(session -> pickedBy(index, nodeId));
+        var picked = super.pickUp(index, nodeId);
+        var worker = currentWorkerFor(nodeId);
+        return picked.filter(session -> pickedBy(index, worker));
     }
 
-    private boolean pickedBy(ShardIndex index, NodeId nodeId) {
-        Optional<ShardSessionRecord> stored = find(index);
-        return stored.map(record -> record.getPickedBy().equals(nodeId))
+    @Override
+    protected WorkerId currentWorkerFor(NodeId id) {
+        var threadName = Thread.currentThread().getName();
+        return WorkerId.newBuilder()
+                .setNodeId(id)
+                .setValue(threadName)
+                .vBuild();
+    }
+
+    private boolean pickedBy(ShardIndex index, WorkerId worker) {
+        var stored = find(index);
+        return stored.map(record -> record.getWorker().equals(worker))
                      .orElse(false);
     }
 
@@ -94,8 +104,7 @@ public class JdbcShardedWorkRegistry
 
     @Override
     protected Optional<ShardSessionRecord> find(ShardIndex index) {
-        ShardSessionReadRequest request = new ShardSessionReadRequest(index);
-        return storage.read(request);
+        return storage.read(index);
     }
 
     @Override

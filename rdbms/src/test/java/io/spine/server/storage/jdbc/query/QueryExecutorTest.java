@@ -36,15 +36,15 @@ import static io.spine.base.Identifier.newUuid;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@DisplayName("QueryExecutor should")
+@DisplayName("`QueryExecutor` should")
 class QueryExecutorTest implements Logging {
 
     @Test
     @DisplayName("handle SQL exception on query execution")
     void handleExceptionOnExecution() {
-        DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
-        QueryExecutor executor = new QueryExecutor(dataSource, logger());
-        String erroneousQuery = "SELECT * FROM \"non-existent-table\"";
+        var dataSource = whichIsStoredInMemory(newUuid());
+        var executor = new QueryExecutor(dataSource, logger());
+        var erroneousQuery = "SELECT * FROM \"non-existent-table\"";
 
         assertThrows(DatabaseException.class, () -> executor.execute(erroneousQuery));
     }

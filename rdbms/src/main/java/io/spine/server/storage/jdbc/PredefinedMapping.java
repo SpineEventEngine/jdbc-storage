@@ -74,11 +74,11 @@ public enum PredefinedMapping implements TypeMapping {
      *         mapping for MySQL 5.7} if there is no standard mapping for the database
      */
     static TypeMapping select(DataSourceWrapper dataSource) {
-        DataSourceMetaData metaData = dataSource.metaData();
-        for (PredefinedMapping mapping : values()) {
-            boolean nameMatch = metaData.productName()
-                                        .equals(mapping.databaseProductName);
-            boolean versionMatch =
+        var metaData = dataSource.metaData();
+        for (var mapping : values()) {
+            var nameMatch = metaData.productName()
+                                    .equals(mapping.databaseProductName);
+            var versionMatch =
                     metaData.majorVersion() == mapping.majorVersion
                     && metaData.minorVersion() == mapping.minorVersion;
             if (nameMatch && versionMatch) {

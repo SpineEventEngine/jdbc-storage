@@ -43,7 +43,8 @@ import static io.spine.server.storage.jdbc.query.Serializer.deserialize;
  * @param <M>
  *         the type of the messages stored in the column
  */
-final class MessageBytesColumnReader<M extends Message> extends ColumnReader<M> {
+//TODO:2021-06-30:alex.tymchenko: move this type!
+public final class MessageBytesColumnReader<M extends Message> extends ColumnReader<M> {
 
     private final Descriptor messageDescriptor;
 
@@ -68,10 +69,10 @@ final class MessageBytesColumnReader<M extends Message> extends ColumnReader<M> 
     @Override
     public M readValue(ResultSet resultSet) throws SQLException {
         checkNotNull(resultSet);
-        byte[] bytes = resultSet.getBytes(columnName());
+        var bytes = resultSet.getBytes(columnName());
 
         @SuppressWarnings("unchecked") // It's up to user to provide correct binary data for unpack.
-        M result = (M) deserialize(bytes, messageDescriptor);
+        var result = (M) deserialize(bytes, messageDescriptor);
         return result;
     }
 }

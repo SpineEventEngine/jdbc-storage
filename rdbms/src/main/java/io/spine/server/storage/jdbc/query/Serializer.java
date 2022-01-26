@@ -53,9 +53,9 @@ public final class Serializer {
      */
     public static byte[] serialize(Message message) {
         checkNotNull(message);
-        Any any = AnyPacker.pack(message);
-        byte[] bytes = any.getValue()
-                          .toByteArray();
+        var any = AnyPacker.pack(message);
+        var bytes = any.getValue()
+                       .toByteArray();
         return bytes;
     }
 
@@ -70,13 +70,13 @@ public final class Serializer {
      */
     static Message deserialize(byte[] bytes, Descriptor messageDescriptor) {
         checkNotNull(bytes);
-        Any.Builder builder = Any.newBuilder();
-        String typeUrlValue = TypeUrl.from(messageDescriptor)
-                                     .value();
+        var builder = Any.newBuilder();
+        var typeUrlValue = TypeUrl.from(messageDescriptor)
+                                  .value();
         builder.setTypeUrl(typeUrlValue);
-        ByteString byteString = ByteString.copyFrom(bytes);
+        var byteString = ByteString.copyFrom(bytes);
         builder.setValue(byteString);
-        Message result = AnyPacker.unpack(builder.build());
+        var result = AnyPacker.unpack(builder.build());
         return result;
     }
 }

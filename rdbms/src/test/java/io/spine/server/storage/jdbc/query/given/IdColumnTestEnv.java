@@ -26,9 +26,12 @@
 
 package io.spine.server.storage.jdbc.query.given;
 
+import com.google.protobuf.Timestamp;
 import io.spine.server.entity.AbstractEntity;
-import io.spine.test.entity.ProjectId;
-import io.spine.test.storage.Project;
+import io.spine.server.test.shared.IntIdAggregate;
+import io.spine.server.test.shared.LongIdAggregate;
+import io.spine.server.test.shared.StringProjection;
+import io.spine.server.test.shared.TimestampIdAggregate;
 
 public class IdColumnTestEnv {
 
@@ -36,26 +39,26 @@ public class IdColumnTestEnv {
     private IdColumnTestEnv() {
     }
 
-    public static class LongIdEntity extends AbstractEntity<Long, Project> {
+    public static class LongIdEntity extends AbstractEntity<Long, LongIdAggregate> {
         protected LongIdEntity(Long id) {
             super(id);
         }
     }
 
-    public static class IntIdEntity extends AbstractEntity<Integer, Project> {
+    public static class IntIdEntity extends AbstractEntity<Integer, IntIdAggregate> {
         protected IntIdEntity(Integer id) {
             super(id);
         }
     }
 
-    public static class StringIdEntity extends AbstractEntity<String, Project> {
+    public static class StringIdEntity extends AbstractEntity<String, StringProjection> {
         protected StringIdEntity(String id) {
             super(id);
         }
     }
 
-    public static class MessageIdEntity extends AbstractEntity<ProjectId, Project> {
-        protected MessageIdEntity(ProjectId id) {
+    public static class MessageIdEntity extends AbstractEntity<Timestamp, TimestampIdAggregate> {
+        protected MessageIdEntity(Timestamp id) {
             super(id);
         }
     }

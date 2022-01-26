@@ -27,6 +27,7 @@
 package io.spine.server.storage.jdbc.query.given;
 
 import com.google.protobuf.Message;
+import com.google.protobuf.StringValue;
 import com.querydsl.sql.AbstractSQLQuery;
 import io.spine.server.storage.jdbc.query.AbstractQuery;
 import io.spine.server.storage.jdbc.query.SelectMessageByIdQuery;
@@ -66,10 +67,9 @@ public class Given {
         }
 
         public static class Builder<I>
-                extends SelectMessageByIdQuery.Builder<Builder<I>,
-                                                       ASelectMessageByIdQuery<I>,
-                                                       I,
-                                                       Message> {
+                extends SelectMessageByIdQuery.Builder<I, Message, Builder<I>,
+                                                       ASelectMessageByIdQuery<I>
+                > {
 
             private AbstractSQLQuery<?, ?> query;
 
@@ -96,7 +96,8 @@ public class Given {
             super(builder);
         }
 
-        public static class Builder extends AbstractQuery.Builder<Builder, AStorageQuery> {
+        public static class Builder
+                extends AbstractQuery.Builder<String, StringValue, Builder, AStorageQuery> {
 
             @Override
             protected AStorageQuery doBuild() {

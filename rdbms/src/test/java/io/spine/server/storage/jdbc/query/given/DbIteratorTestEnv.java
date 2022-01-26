@@ -27,7 +27,8 @@
 package io.spine.server.storage.jdbc.query.given;
 
 import com.google.protobuf.Timestamp;
-import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.JdbcStorageFactory;
+import io.spine.server.storage.jdbc.PredefinedMapping;
 import io.spine.server.storage.jdbc.given.table.TimestampByString;
 import io.spine.server.storage.jdbc.query.ColumnReader;
 import io.spine.server.storage.jdbc.query.DbIterator;
@@ -46,8 +47,8 @@ public class DbIteratorTestEnv {
     }
 
     public static DbIterator emptyIterator() {
-        ResultSet resultSet = emptyResultSet();
-        DbIterator iterator = anIterator(resultSet);
+        var resultSet = emptyResultSet();
+        var iterator = anIterator(resultSet);
         return iterator;
     }
 
@@ -56,78 +57,88 @@ public class DbIteratorTestEnv {
      * it's using a closed {@link ResultSet}.
      */
     public static DbIterator faultyResultIterator() throws SQLException {
-        ResultSet resultSet = closedResultSet();
-        DbIterator iterator = anIterator(resultSet);
+        var resultSet = closedResultSet();
+        var iterator = anIterator(resultSet);
         return iterator;
     }
 
     public static DbIterator sneakyResultIterator() {
-        ResultSet resultSet = resultSetWithSingleResult();
-        DbIterator iterator = throwingIterator(resultSet);
+        var resultSet = resultSetWithSingleResult();
+        var iterator = throwingIterator(resultSet);
         return iterator;
     }
 
     public static DbIterator nonEmptyIterator() {
-        ResultSet resultSet = resultSetWithSingleResult();
-        DbIterator iterator = anIterator(resultSet);
+        var resultSet = resultSetWithSingleResult();
+        var iterator = anIterator(resultSet);
         return iterator;
     }
 
     private static ResultSet emptyResultSet() {
-        DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
-        TimestampByString table = new TimestampByString(dataSource, H2_1_4);
+        var table = table();
         table.create();
 
-        ResultSet resultSet = table.resultSet(newUuid());
+        var resultSet = table.resultSet(newUuid());
         return resultSet;
     }
 
     private static ResultSet closedResultSet() throws SQLException {
-        DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
-        TimestampByString table = new TimestampByString(dataSource, H2_1_4);
+        var table = table();
         table.create();
 
-        ResultSet resultSet = table.resultSet(newUuid());
+        var resultSet = table.resultSet(newUuid());
         resultSet.close();
         return resultSet;
     }
 
     private static ResultSet resultSetWithSingleResult() {
-        DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
-        TimestampByString table = new TimestampByString(dataSource, H2_1_4);
+        var table = table();
         table.create();
 
-        Timestamp timestamp = Timestamp
+        var timestamp = Timestamp
                 .newBuilder()
                 .setSeconds(142)
                 .setNanos(15)
                 .build();
         table.write(timestamp);
 
-        String id = table.idOf(timestamp);
-        ResultSet resultSet = table.resultSet(id);
+        var id = table.idOf(timestamp);
+        var resultSet = table.resultSet(id);
         return resultSet;
     }
 
+    private static TimestampByString table() {
+        var factory = inMemoryFactory(H2_1_4);
+        var table = new TimestampByString(factory);
+        return table;
+    }
+
+    private static JdbcStorageFactory inMemoryFactory(PredefinedMapping typeMapping) {
+        return JdbcStorageFactory.newBuilder()
+                .setTypeMapping(typeMapping)
+                .setDataSource(whichIsStoredInMemory(newUuid()))
+                .build();
+    }
+
     private static DbIterator anIterator(ResultSet resultSet) {
-        ColumnReader<ResultSet> identityReader = new ColumnReader<ResultSet>("") {
+        var identityReader = new ColumnReader<ResultSet>("") {
             @Override
             public ResultSet readValue(ResultSet resultSet) {
                 return resultSet;
             }
         };
-        DbIterator<ResultSet> result = DbIterator.over(resultSet, identityReader);
+        var result = DbIterator.over(resultSet, identityReader);
         return result;
     }
 
     private static DbIterator throwingIterator(ResultSet resultSet) {
-        ColumnReader<ResultSet> throwingReader = new ColumnReader<ResultSet>("") {
+        var throwingReader = new ColumnReader<ResultSet>("") {
             @Override
             public ResultSet readValue(ResultSet resultSet) throws SQLException {
                 throw new SQLException("Read is not allowed; I'm sneaky");
             }
         };
-        DbIterator<ResultSet> result = DbIterator.over(resultSet, throwingReader);
+        var result = DbIterator.over(resultSet, throwingReader);
         return result;
     }
 }

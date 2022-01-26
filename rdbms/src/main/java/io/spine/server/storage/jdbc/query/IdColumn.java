@@ -30,8 +30,10 @@ import com.google.protobuf.Message;
 import io.spine.annotation.Internal;
 import io.spine.server.aggregate.Aggregate;
 import io.spine.server.entity.Entity;
+import io.spine.server.storage.RecordSpec;
 import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.Type;
+import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 
 import java.util.Collection;
 
@@ -45,9 +47,11 @@ import static io.spine.server.storage.jdbc.Type.LONG;
 import static io.spine.server.storage.jdbc.Type.STRING;
 import static io.spine.server.storage.jdbc.Type.STRING_255;
 import static io.spine.util.Exceptions.newIllegalArgumentException;
+import static java.util.Objects.requireNonNull;
 
 /**
- * A wrapper for the column which stores a primary key in a DB {@linkplain AbstractTable table}.
+ * A wrapper for the column which stores a primary key in a DB
+ * {@linkplain io.spine.server.storage.jdbc.record.NewRecordTable table}.
  *
  * @param <I>
  *         the ID type
@@ -55,6 +59,7 @@ import static io.spine.util.Exceptions.newIllegalArgumentException;
 @Internal
 public abstract class IdColumn<I> {
 
+    public static final String ID_COLUMN_NAME = "ID";
     /**
      * The underlying {@link TableColumn storage field}.
      */
@@ -78,8 +83,8 @@ public abstract class IdColumn<I> {
     @SuppressWarnings("unchecked") // It's up to caller to keep the ID class and SQL type in sync.
     public static <I> IdColumn<I> of(TableColumn column) {
         checkNotNull(column);
-        Type type = checkNotNull(column.type(),
-                                 "Please use other suitable method overload if ID column SQL " +
+        var type = requireNonNull(column.type(),
+                                  "Please use other suitable method overload if ID column SQL " +
                                  "type is unknown at compile time");
         switch (type) {
             case INT:
@@ -94,6 +99,29 @@ public abstract class IdColumn<I> {
             default:
                 throw newIllegalArgumentException("Unexpected ID column SQL type: %s",
                                                   type);
+        }
+    }
+
+    //TODO:2021-06-18:alex.tymchenko: document this one!
+    @SuppressWarnings({
+            "unchecked", // ID runtime type is checked with if statements.
+            "IfStatementWithTooManyBranches", // OK for a factory method.
+            "ChainOfInstanceofChecks"         // which depends on the built object target type.
+    })
+    public static <I> IdColumn<I> of(RecordSpec<I, ?, ?> spec, JdbcColumnMapping mapping) {
+        var idType = spec.idType();
+        var column = new TableColumn(ID_COLUMN_NAME, idType, mapping);
+        if (idType == Long.class) {
+            return  (IdColumn<I>) new LongIdColumn(column);
+        } else if (idType == Integer.class) {
+            return  (IdColumn<I>) new IntIdColumn(column);
+        } else if (idType == String.class) {
+            return  (IdColumn<I>) new StringIdColumn(column);
+        } else if (Message.class.isAssignableFrom(idType)) {
+            var messageClass = (Class<? extends Message>) idType;
+            return  (IdColumn<I>) new MessageIdColumn<>(column, messageClass);
+        } else {
+            throw newIllegalArgumentException("Unexpected entity ID class %s", idType.getName());
         }
     }
 
@@ -137,7 +165,7 @@ public abstract class IdColumn<I> {
         checkArgument(column.type() == null,
                       "Entity ID type is calculated at runtime and shouldn't have an SQL type " +
                       "pre-set");
-        Class<?> idClass = asEntityClass(entityClass).idClass();
+        var idClass = asEntityClass(entityClass).idClass();
         if (idClass == Long.class) {
             return  (IdColumn<I>) new LongIdColumn(column);
         } else if (idClass == Integer.class) {
@@ -145,10 +173,10 @@ public abstract class IdColumn<I> {
         } else if (idClass == String.class) {
             return  (IdColumn<I>) new StringIdColumn(column);
         } else if (Message.class.isAssignableFrom(idClass)) {
-            Class<? extends Message> messageClass = (Class<? extends Message>) idClass;
+            var messageClass = (Class<? extends Message>) idClass;
             return  (IdColumn<I>) new MessageIdColumn(column, messageClass);
         } else {
-            throw newIllegalArgumentException("Unexpected entity ID class %s", idClass.getName());
+            throw newIllegalArgumentException("Unexpected entity ID class `%s`.", idClass.getName());
         }
     }
 
@@ -188,8 +216,8 @@ public abstract class IdColumn<I> {
      */
     public Collection<Object> normalize(Iterable<I> ids) {
         Collection<Object> result = newLinkedList();
-        for (I id : ids) {
-            Object normalizedId = normalize(id);
+        for (var id : ids) {
+            var normalizedId = normalize(id);
             result.add(normalizedId);
         }
         return result;
@@ -214,8 +242,8 @@ public abstract class IdColumn<I> {
      *         the parameters to set the ID
      */
     public void setId(String idName, I id, Parameters.Builder parameters) {
-        Object normalizedId = normalize(id);
-        Parameter parameter = Parameter.of(normalizedId);
+        var normalizedId = normalize(id);
+        var parameter = Parameter.of(normalizedId);
         parameters.addParameter(idName, parameter);
     }
 
@@ -285,7 +313,7 @@ public abstract class IdColumn<I> {
 
         @Override
         public Type sqlType() {
-            return column().type() == STRING ? STRING : STRING_255;
+            return STRING_255;
         }
 
         @Override
@@ -324,4 +352,5 @@ public abstract class IdColumn<I> {
             return cls;
         }
     }
+
 }

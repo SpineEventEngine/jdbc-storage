@@ -42,19 +42,19 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * A query which obtains a {@link Message} by an ID.
  *
  * @param <I>
- *         a type of storage message IDs
- * @param <M>
- *         a type of messages to read
+ *         a type of storage record IDs
+ * @param <R>
+ *         a type of records to read
  */
-public abstract class SelectMessageByIdQuery<I, M extends Message>
-        extends IdAwareQuery<I>
-        implements SelectQuery<M> {
+public abstract class SelectMessageByIdQuery<I, R extends Message>
+        extends IdAwareQuery<I, R>
+        implements SelectQuery<R> {
 
     private final String messageColumnName;
     private final Descriptor messageDescriptor;
 
     protected SelectMessageByIdQuery(
-            Builder<? extends Builder, ? extends SelectMessageByIdQuery, I, M> builder) {
+            Builder<I, R, ? extends Builder, ? extends SelectMessageByIdQuery> builder) {
         super(builder);
         this.messageColumnName = builder.messageColumnName;
         this.messageDescriptor = builder.messageDescriptor;
@@ -69,12 +69,12 @@ public abstract class SelectMessageByIdQuery<I, M extends Message>
      * @see Serializer#deserialize
      */
     @Override
-    public final @Nullable M execute() throws DatabaseException {
-        try (ResultSet resultSet = query().getResults()) {
+    public final @Nullable R execute() throws DatabaseException {
+        try (var resultSet = query().getResults()) {
             if (!resultSet.next()) {
                 return null;
             }
-            M message = readMessage(resultSet);
+            var message = readMessage(resultSet);
             return message;
         } catch (SQLException e) {
             throw new DatabaseException(e);
@@ -99,24 +99,23 @@ public abstract class SelectMessageByIdQuery<I, M extends Message>
      * @throws SQLException
      *         if an error occurs during an interaction with the DB
      */
-    protected @Nullable M readMessage(ResultSet resultSet) throws SQLException {
+    protected @Nullable R readMessage(ResultSet resultSet) throws SQLException {
         checkNotNull(messageColumnName);
         checkNotNull(messageDescriptor);
-        byte[] bytes = resultSet.getBytes(messageColumnName);
+        var bytes = resultSet.getBytes(messageColumnName);
         if (bytes == null) {
             return null;
         }
 
         @SuppressWarnings("unchecked") // It's up to user to provide correct binary data for unpack.
-        M message = (M) Serializer.deserialize(bytes, messageDescriptor);
+        var message = (R) Serializer.deserialize(bytes, messageDescriptor);
         return message;
     }
 
-    protected abstract static class Builder<B extends Builder<B, Q, I, R>,
-                                            Q extends SelectMessageByIdQuery<I, R>,
-                                            I,
-                                            R extends Message>
-            extends IdAwareQuery.Builder<I, B, Q> {
+    protected abstract static class Builder<I, R extends Message,
+                                            B extends Builder<I, R, B, Q>,
+                                            Q extends SelectMessageByIdQuery<I, R>>
+            extends IdAwareQuery.Builder<I, R, B, Q> {
 
         private String messageColumnName;
         private Descriptor messageDescriptor;

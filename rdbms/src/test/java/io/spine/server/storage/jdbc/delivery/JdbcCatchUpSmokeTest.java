@@ -26,11 +26,10 @@
 
 package io.spine.server.storage.jdbc.delivery;
 
-import io.spine.base.Tests;
+import io.spine.environment.Tests;
 import io.spine.server.ServerEnvironment;
 import io.spine.server.delivery.CatchUpTest;
 import io.spine.server.storage.StorageFactory;
-import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.JdbcStorageFactory;
 import io.spine.testing.SlowTest;
 import org.junit.jupiter.api.AfterEach;
@@ -60,7 +59,7 @@ class JdbcCatchUpSmokeTest extends CatchUpTest {
     @BeforeEach
     public void setUp() {
         super.setUp();
-        DataSourceWrapper source = whichIsStoredInMemory(newUuid());
+        var source = whichIsStoredInMemory(newUuid());
         factory = JdbcStorageFactory
                 .newBuilder()
                 .setDataSource(source)
@@ -78,7 +77,7 @@ class JdbcCatchUpSmokeTest extends CatchUpTest {
         try {
             factory.close();
         } catch (Exception e) {
-            throw new IllegalStateException("Error closing the storage factory", e);
+            throw new IllegalStateException("Error closing the storage factory.", e);
         }
     }
 

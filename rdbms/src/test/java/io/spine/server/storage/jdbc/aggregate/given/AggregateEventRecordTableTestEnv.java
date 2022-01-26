@@ -28,6 +28,8 @@ package io.spine.server.storage.jdbc.aggregate.given;
 
 import io.spine.server.aggregate.Aggregate;
 import io.spine.test.storage.Project;
+import io.spine.test.storage.StgProject;
+import io.spine.test.storage.StgProjectId;
 
 public class AggregateEventRecordTableTestEnv {
 
@@ -35,8 +37,8 @@ public class AggregateEventRecordTableTestEnv {
     private AggregateEventRecordTableTestEnv() {
     }
 
-    public static class AnAggregate extends Aggregate<String, Project, Project.Builder> {
-        private AnAggregate(String id) {
+    public static class AnAggregate extends Aggregate<StgProjectId, StgProject, StgProject.Builder> {
+        private AnAggregate(StgProjectId id) {
             super(id);
         }
     }

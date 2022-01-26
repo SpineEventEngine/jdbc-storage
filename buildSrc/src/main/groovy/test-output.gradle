@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2022, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,8 @@
  *  - after all the tests are executed, a short test summary is logged; the summary shown the number
  *    of tests and their results.
  */
+
+println("`test-output.gradle` script is deprecated. Please use `Test.configureLogging()` instead.")
 
 tasks.withType(Test).each {
     it.testLogging {

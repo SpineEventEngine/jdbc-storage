@@ -24,8 +24,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import io.spine.gradle.internal.Deps
-import io.spine.gradle.internal.IncrementGuard
+import io.spine.internal.gradle.publish.IncrementGuard
+import io.spine.internal.dependency.Grpc
 
 apply<IncrementGuard>()
 
@@ -43,5 +43,5 @@ dependencies {
     implementation("com.zaxxer:HikariCP:$hikariVersion")
     testImplementation("org.hsqldb:hsqldb:$hsqldbVersion")
     testImplementation("com.h2database:h2:$h2Version")
-    testImplementation(Deps.grpc.stub)
+    testImplementation(Grpc.stub)
 }

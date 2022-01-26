@@ -28,13 +28,8 @@ package io.spine.server.storage.jdbc.given.table;
 
 import com.google.protobuf.Timestamp;
 import com.google.protobuf.util.Timestamps;
-import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.Type;
-import io.spine.server.storage.jdbc.TypeMapping;
-import io.spine.server.storage.jdbc.message.MessageTable;
-import io.spine.server.storage.jdbc.query.IdColumn;
-
-import static io.spine.server.storage.jdbc.Type.STRING_255;
+import io.spine.server.storage.MessageRecordSpec;
+import io.spine.server.storage.jdbc.JdbcStorageFactory;
 
 /**
  * Holds {@link Timestamp} records by {@code String} IDs.
@@ -43,31 +38,13 @@ public final class TimestampByString extends TimestampTable<String> {
 
     private static final String NAME = "timestamp_by_string";
 
-    public TimestampByString(DataSourceWrapper dataSource, TypeMapping typeMapping) {
-        super(NAME, IdColumn.of(TheIdColumn.INSTANCE), dataSource, typeMapping);
+    public TimestampByString(JdbcStorageFactory storageFactory) {
+        super(NAME, recordSpec(), storageFactory);
     }
 
-    public enum TheIdColumn implements MessageTable.Column<Timestamp> {
-        INSTANCE;
-
-        @Override
-        public Getter<Timestamp> getter() {
-            return Timestamps::toString;
-        }
-
-        @Override
-        public Type type() {
-            return STRING_255;
-        }
-
-        @Override
-        public boolean isPrimaryKey() {
-            return true;
-        }
-
-        @Override
-        public boolean isNullable() {
-            return false;
-        }
+    private static MessageRecordSpec<String, Timestamp> recordSpec() {
+        return new MessageRecordSpec<>(
+                String.class, Timestamp.class, Timestamps::toString
+        );
     }
 }

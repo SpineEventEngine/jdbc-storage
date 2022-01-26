@@ -26,30 +26,32 @@
 
 package io.spine.server.storage.jdbc;
 
-import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableMap;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.protobuf.Message;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import io.spine.server.ContextSpec;
-import io.spine.server.aggregate.Aggregate;
-import io.spine.server.aggregate.AggregateStorage;
-import io.spine.server.delivery.CatchUpStorage;
-import io.spine.server.delivery.InboxStorage;
-import io.spine.server.entity.Entity;
-import io.spine.server.projection.Projection;
-import io.spine.server.projection.ProjectionStorage;
+import io.spine.server.aggregate.AggregateEventRecord;
+import io.spine.server.storage.RecordSpec;
+import io.spine.server.storage.RecordStorage;
 import io.spine.server.storage.StorageFactory;
-import io.spine.server.storage.jdbc.aggregate.JdbcAggregateStorage;
-import io.spine.server.storage.jdbc.delivery.JdbcCatchUpStorage;
-import io.spine.server.storage.jdbc.delivery.JdbcInboxStorage;
+import io.spine.server.storage.jdbc.record.JdbcTableSpec;
+import io.spine.server.storage.jdbc.record.column.CustomColumns;
+import io.spine.server.storage.jdbc.aggregate.AggregateEventRecordColumns;
 import io.spine.server.storage.jdbc.delivery.JdbcSessionStorage;
-import io.spine.server.storage.jdbc.projection.JdbcProjectionStorage;
-import io.spine.server.storage.jdbc.record.JdbcRecordStorage;
+import io.spine.server.storage.jdbc.record.NewRecordStorage;
+import io.spine.server.storage.jdbc.operation.OperationFactory;
 import io.spine.server.storage.jdbc.type.DefaultJdbcColumnMapping;
 import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 
 import javax.sql.DataSource;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Creates storages based on JDBC-compliant RDBMS.
@@ -59,87 +61,32 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class JdbcStorageFactory implements StorageFactory {
 
     private final DataSourceWrapper dataSource;
-    private final JdbcColumnMapping<?> columnMapping;
+    private final JdbcColumnMapping columnMapping;
     private final TypeMapping typeMapping;
+    private final OperationFactory operations;
+
+    //TODO:2022-01-13:alex.tymchenko: move this to a package-local holder.
+    private final ImmutableMap<Class<? extends Message>, JdbcTableSpec<?, ?>> tables;
+    private final ImmutableMap<Class<? extends Message>, CustomColumns<?>> columnSpecs;
 
     private JdbcStorageFactory(Builder builder) {
         this.dataSource = checkNotNull(builder.dataSource);
         this.columnMapping = builder.columnMapping;
         this.typeMapping = checkNotNull(builder.typeMapping);
+        this.operations = OperationFactory.with(dataSource, columnMapping, typeMapping);
+        this.tables = ImmutableMap.copyOf(builder.tables);
+        this.columnSpecs = ImmutableMap.copyOf(builder.customCols);
     }
 
     @Override
-    public <I> AggregateStorage<I> createAggregateStorage(
-            ContextSpec context, Class<? extends Aggregate<I, ?, ?>> aggregateClass) {
-        JdbcAggregateStorage<I> storage =
-                JdbcAggregateStorage.<I>newBuilder()
-                        .setAggregateClass(aggregateClass)
-                        .setMultitenant(context.isMultitenant())
-                        .setDataSource(dataSource)
-                        .setTypeMapping(typeMapping)
-                        .build();
-        return storage;
+    public <I, R extends Message> RecordStorage<I, R>
+    createRecordStorage(ContextSpec context, RecordSpec<I, R, ?> spec) {
+        var result = new NewRecordStorage<>(context, spec, this);
+        return result;
     }
 
-    @Override
-    public <I> JdbcRecordStorage<I> createRecordStorage(
-            ContextSpec context, Class<? extends Entity<I, ?>> entityClass) {
-        JdbcRecordStorage<I> recordStorage =
-                JdbcRecordStorage.<I>newBuilder()
-                        .setEntityClass(entityClass)
-                        .setMultitenant(context.isMultitenant())
-                        .setDataSource(dataSource)
-                        .setColumnMapping(columnMapping)
-                        .setTypeMapping(typeMapping)
-                        .build();
-        return recordStorage;
-    }
-
-    @Override
-    public <I> ProjectionStorage<I> createProjectionStorage(
-            ContextSpec context, Class<? extends Projection<I, ?, ?>> projectionClass) {
-        JdbcRecordStorage<I> entityStorage = createRecordStorage(context, projectionClass);
-        ProjectionStorage<I> storage = JdbcProjectionStorage.<I>newBuilder()
-                .setMultitenant(context.isMultitenant())
-                .setDataSource(dataSource)
-                .setRecordStorage(entityStorage)
-                .setProjectionClass(projectionClass)
-                .setTypeMapping(typeMapping)
-                .build();
-        return storage;
-    }
-
-    @Override
-    public InboxStorage createInboxStorage(boolean multitenant) {
-        JdbcInboxStorage storage = JdbcInboxStorage
-                .newBuilder()
-                .setMultitenant(multitenant)
-                .setDataSource(dataSource)
-                .setTypeMapping(typeMapping)
-                .build();
-        return storage;
-    }
-
-    @Override
-    public CatchUpStorage createCatchUpStorage(boolean multitenant) {
-        JdbcCatchUpStorage storage = JdbcCatchUpStorage
-                .newBuilder()
-                .setMultitenant(multitenant)
-                .setDataSource(dataSource)
-                .setTypeMapping(typeMapping)
-                .build();
-        return storage;
-    }
-
-    /**
-     * Creates a new storage for work session records based on JDBC.
-     */
-    public JdbcSessionStorage createSessionStorage() {
-        return JdbcSessionStorage
-                .newBuilder()
-                .setDataSource(dataSource)
-                .setTypeMapping(typeMapping)
-                .build();
+    public JdbcSessionStorage createSessionStorage(ContextSpec context) {
+        return new JdbcSessionStorage(context, this);
     }
 
     /**
@@ -150,14 +97,44 @@ public class JdbcStorageFactory implements StorageFactory {
         dataSource.close();
     }
 
-    @VisibleForTesting
-    TypeMapping getTypeMapping() {
+    /**
+     * Returns the type mapping configured for this factory.
+     */
+    public final TypeMapping typeMapping() {
         return typeMapping;
     }
 
-    @VisibleForTesting
-    JdbcColumnMapping<?> columnMapping() {
+    /**
+     * Returns the operation factory for this storage.
+     */
+    public final OperationFactory operations() {
+        return operations;
+    }
+
+    /**
+     * Returns the column mapping set for this factory.
+     */
+    public final JdbcColumnMapping columnMapping() {
         return columnMapping;
+    }
+
+    //TODO:2021-12-23:alex.tymchenko: think of hiding this method into this package.
+    public final DataSourceWrapper dataSource() {
+        return dataSource;
+    }
+
+    public <I, R extends Message> JdbcTableSpec<I, R> tableSpecFor(RecordSpec<I, R, ?> record) {
+        var recordType = record.storedType();
+        if(!tables.containsKey(recordType)) {
+            var specs = this.columnSpecs.get(recordType);
+            @SuppressWarnings("unchecked")
+            var cast = (CustomColumns<R>) specs;
+            var spec = new JdbcTableSpec<>(record, columnMapping, cast);
+            return spec;
+        }
+        @SuppressWarnings("unchecked")
+        var result = (JdbcTableSpec<I, R>) tables.get(recordType);
+        return requireNonNull(result);
     }
 
     public static Builder newBuilder() {
@@ -170,15 +147,17 @@ public class JdbcStorageFactory implements StorageFactory {
     public static class Builder {
 
         private DataSourceWrapper dataSource;
-        private JdbcColumnMapping<?> columnMapping;
+        private JdbcColumnMapping columnMapping;
         private TypeMapping typeMapping;
+        private final Map<Class<? extends Message>, JdbcTableSpec<?, ?>> tables = new HashMap<>();
+        private final Map<Class<? extends Message>, CustomColumns<?>> customCols = new HashMap<>();
 
         private Builder() {
             // Prevent direct instantiation.
         }
 
         /**
-         * Sets the {@linkplain io.spine.server.entity.storage.ColumnMapping column mapping} to use
+         * Sets the {@linkplain io.spine.server.storage.ColumnMapping column mapping} to use
          * in the generated storages.
          *
          * <p>The default value is a {@link DefaultJdbcColumnMapping}.
@@ -186,7 +165,7 @@ public class JdbcStorageFactory implements StorageFactory {
          * @param columnMapping
          *         the column mapping to use in the generated storages
          */
-        public Builder setColumnMapping(JdbcColumnMapping<?> columnMapping) {
+        public Builder setColumnMapping(JdbcColumnMapping columnMapping) {
             this.columnMapping = columnMapping;
             return this;
         }
@@ -216,7 +195,7 @@ public class JdbcStorageFactory implements StorageFactory {
          * @see DefaultDataSourceConfigConverter#convert(DataSourceConfig)
          */
         public Builder setDataSource(DataSourceConfig dataSource) {
-            HikariConfig hikariConfig = DefaultDataSourceConfigConverter.convert(dataSource);
+            var hikariConfig = DefaultDataSourceConfigConverter.convert(dataSource);
             this.dataSource = DataSourceWrapper.wrap(new HikariDataSource(hikariConfig));
             return this;
         }
@@ -243,6 +222,28 @@ public class JdbcStorageFactory implements StorageFactory {
             return this;
         }
 
+//        //TODO:2022-01-11:alex.tymchenko: have the same configuration, but for `EntityClass`.
+//        public <I, R extends Message> Builder
+//        configureTable(Class<I> idType, Class<R> recordType, JdbcTableSpec.ColumnSpec<R>... columns) {
+//            checkNotNull(recordType);
+//            if(!tables.containsKey(recordType)) {
+//                var spec = new JdbcTableSpec<>(idType, recordType, columnMapping);
+//                tables.put(recordType, spec);
+//            }
+//
+//            @SuppressWarnings("unchecked")  /* As per the contract above. */
+//            var spec = (JdbcTableSpec<I, R>) tables.get(recordType);
+//            fn.accept(spec);
+//            return this;
+//        }
+
+        @CanIgnoreReturnValue
+        public <R extends Message>
+        Builder configureColumns(Class<R> recordType, CustomColumns<R> columns) {
+            customCols.put(recordType, columns);
+            return this;
+        }
+
         /**
          * Returns a new instance of {@code JdbcStorageFactory}.
          */
@@ -253,7 +254,20 @@ public class JdbcStorageFactory implements StorageFactory {
             if (typeMapping == null) {
                 typeMapping = PredefinedMapping.select(dataSource);
             }
+
+            configureSystemTables();
+
             return new JdbcStorageFactory(this);
         }
+
+        private void configureSystemTables() {
+//            configureColumns(InboxMessage.class, InboxColumns.instance());
+            configureColumns(AggregateEventRecord.class, AggregateEventRecordColumns.instance());
+        }
+    }
+
+    interface ConfigureTable<I, R extends Message> {
+
+        void accept(JdbcTableSpec<I, R> tableSpec);
     }
 }

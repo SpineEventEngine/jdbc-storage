@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2022, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,12 +27,11 @@
 package io.spine.internal.dependency
 
 /**
- * Commons Logging is a transitive dependency which we don't use directly.
- * We `force` it in [DependencyResolution.forceConfiguration].
- *
- * [Commons Logging](https://commons.apache.org/proper/commons-logging/)
+ * [Commons Logging](https://commons.apache.org/proper/commons-logging/) is a transitive
+ * dependency which we don't use directly. This object is used for forcing the version.
  */
 object CommonsLogging {
+    // https://commons.apache.org/proper/commons-logging/
     private const val version = "1.2"
     const val lib = "commons-logging:commons-logging:${version}"
 }

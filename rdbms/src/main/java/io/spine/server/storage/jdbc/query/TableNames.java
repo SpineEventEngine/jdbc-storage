@@ -30,11 +30,13 @@ import io.spine.server.entity.Entity;
 
 import java.sql.DatabaseMetaData;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * A utility class which provides strings valid for DB table names.
  */
 @SuppressWarnings("UtilityClass")
-class TableNames {
+public class TableNames {
 
     private TableNames() {
         // Prevent instantiation of this utility class.
@@ -53,13 +55,29 @@ class TableNames {
      *         a class of an {@linkplain Entity}
      * @return a table name from the class
      */
+    //TODO:2021-12-21:alex.tymchenko: kill?
     static String newTableName(Class<? extends Entity<?, ?>> cls) {
-        int shortPackageId = cls.getPackage()
+        checkNotNull(cls);
+        return compose(cls);
+    }
+
+    /**
+     * Composes the table name basing on the passed class.
+     *
+     * //TODO:2022-01-24:alex.tymchenko: describe the details and deal with the `hashCode()`.
+     */
+    public static String of(Class<?> cls) {
+        checkNotNull(cls);
+        return compose(cls);
+    }
+
+    private static String compose(Class<?> cls) {
+        var shortPackageId = cls.getPackage()
                                 .hashCode();
         // The minus is an invalid sign in a table name.
-        int validPackageId = Math.abs(shortPackageId);
-        String packageIdAsString = String.valueOf(validPackageId);
-        String result = cls.getSimpleName() + '_' + packageIdAsString;
+        var validPackageId = Math.abs(shortPackageId);
+        var packageIdAsString = String.valueOf(validPackageId);
+        var result = cls.getSimpleName() + '_' + packageIdAsString;
         return result;
     }
 }

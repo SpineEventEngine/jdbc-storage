@@ -74,7 +74,7 @@ public final class Parameters {
      */
     public Parameter getParameter(String identifier) {
         checkArgument(parameters.containsKey(identifier));
-        Parameter value = parameters.get(identifier);
+        var value = parameters.get(identifier);
         return value;
     }
 

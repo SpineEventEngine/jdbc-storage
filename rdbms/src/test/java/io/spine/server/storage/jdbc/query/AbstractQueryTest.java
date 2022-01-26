@@ -43,7 +43,7 @@ import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory
 import static io.spine.server.storage.jdbc.query.given.Given.storageQueryBuilder;
 import static java.sql.ResultSet.HOLD_CURSORS_OVER_COMMIT;
 
-@DisplayName("AbstractQuery should")
+@DisplayName("`AbstractQuery` should")
 class AbstractQueryTest {
 
     private final DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
@@ -59,8 +59,8 @@ class AbstractQueryTest {
     @Test
     @DisplayName("set `HOLD_CURSORS_OVER_COMMIT` for connection")
     void holdCursorsOverCommit() throws SQLException {
-        Connection connection = query.factory()
-                                     .getConnection();
+        var connection = query.factory()
+                              .getConnection();
 
         assertThat(connection.getHoldability())
                 .isEqualTo(HOLD_CURSORS_OVER_COMMIT);
@@ -69,9 +69,9 @@ class AbstractQueryTest {
     @Test
     @DisplayName("specify a `TransactionHandler` as one of the transaction listeners")
     void injectTransactionHandler() {
-        Configuration configuration = query.factory()
-                                           .getConfiguration();
-        SQLListeners listeners = configuration.getListeners();
+        var configuration = query.factory()
+                                 .getConfiguration();
+        var listeners = configuration.getListeners();
         assertThat(listeners.getListeners())
                 .contains(TransactionHandler.INSTANCE);
     }

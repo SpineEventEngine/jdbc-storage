@@ -29,75 +29,78 @@ package io.spine.server.storage.jdbc.query;
 import com.google.protobuf.Message;
 import com.google.protobuf.StringValue;
 import com.google.protobuf.Timestamp;
-import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.JdbcStorageFactory;
 import io.spine.server.storage.jdbc.given.table.TimestampByLong;
 import io.spine.server.storage.jdbc.given.table.TimestampByMessage;
 import io.spine.server.storage.jdbc.given.table.TimestampByString;
-import io.spine.server.storage.jdbc.message.MessageTable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static com.google.common.truth.Truth.assertThat;
 import static io.spine.base.Identifier.newUuid;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
 import static io.spine.server.storage.jdbc.PredefinedMapping.H2_1_4;
+import static io.spine.server.storage.jdbc.record.column.BytesColumn.bytesColumnName;
 import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.idReader;
 import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.messageReader;
 
-@DisplayName("ColumnReader should")
+@DisplayName("`ColumnReader` should")
 class ColumnReaderTest {
 
-    private DataSourceWrapper dataSource;
+    private JdbcStorageFactory factory;
 
     @BeforeEach
     void setUpDataSource() {
-        dataSource = whichIsStoredInMemory(newUuid());
+        var dataSource = whichIsStoredInMemory(newUuid());
+        factory = JdbcStorageFactory.newBuilder()
+                .setDataSource(dataSource)
+                .setTypeMapping(H2_1_4)
+                .build();
     }
 
     @Test
-    @DisplayName("read the value of an ID column of Number type")
+    @DisplayName("read the value of an ID column of `Number` type")
     void readNumberId() throws SQLException {
-        TimestampByLong table = new TimestampByLong(dataSource, H2_1_4);
+        var table = new TimestampByLong(factory);
         table.create();
 
-        Timestamp timestamp = timestamp();
+        var timestamp = timestamp();
         table.write(timestamp);
-        String columnName = table.idColumn()
-                                 .columnName();
-        ColumnReader<Long> reader = idReader(columnName, Long.class);
+        var columnName = table.idColumn()
+                              .columnName();
+        var reader = idReader(columnName, Long.class);
 
-        Long id = table.idOf(timestamp);
-        ResultSet resultSet = table.resultSetWithId(id);
+        var id = table.idOf(timestamp);
+        var resultSet = table.resultSetWithId(id);
         assertThat(resultSet.next())
                 .isTrue();
 
-        Long acquiredId = reader.readValue(resultSet);
+        var acquiredId = reader.readValue(resultSet);
         assertThat(acquiredId)
                 .isEqualTo(id);
     }
 
     @Test
-    @DisplayName("read the value of an ID column of String type")
+    @DisplayName("read the value of an ID column of `String` type")
     void readStringId() throws SQLException {
-        TimestampByString table = new TimestampByString(dataSource, H2_1_4);
+        var table = new TimestampByString(factory);
         table.create();
 
-        Timestamp timestamp = timestamp();
+        var timestamp = timestamp();
         table.write(timestamp);
-        String columnName = table.idColumn()
-                                 .columnName();
-        ColumnReader<String> reader = idReader(columnName, String.class);
+        var columnName = table.idColumn()
+                              .columnName();
+        var reader = idReader(columnName, String.class);
 
-        String id = table.idOf(timestamp);
-        ResultSet resultSet = table.resultSetWithId(id);
+        var id = table.idOf(timestamp);
+        var resultSet = table.resultSetWithId(id);
         assertThat(resultSet.next())
                 .isTrue();
 
-        String acquiredId = reader.readValue(resultSet);
+        var acquiredId = reader.readValue(resultSet);
         assertThat(acquiredId)
                 .isEqualTo(id);
     }
@@ -105,21 +108,21 @@ class ColumnReaderTest {
     @Test
     @DisplayName("read the value of an ID column of Message type")
     void readMessageId() throws SQLException {
-        TimestampByMessage table = new TimestampByMessage(dataSource, H2_1_4);
+        var table = new TimestampByMessage(factory);
         table.create();
 
-        Timestamp timestamp = timestamp();
+        var timestamp = timestamp();
         table.write(timestamp);
-        String columnName = table.idColumn()
-                                 .columnName();
-        ColumnReader<StringValue> reader = idReader(columnName, StringValue.class);
+        var columnName = table.idColumn()
+                              .columnName();
+        var reader = idReader(columnName, StringValue.class);
 
-        StringValue id = table.idOf(timestamp);
-        ResultSet resultSet = table.resultSetWithId(id);
+        var id = table.idOf(timestamp);
+        var resultSet = table.resultSetWithId(id);
         assertThat(resultSet.next())
                 .isTrue();
 
-        StringValue acquiredId = reader.readValue(resultSet);
+        var acquiredId = reader.readValue(resultSet);
         assertThat(acquiredId)
                 .isEqualTo(id);
     }
@@ -127,21 +130,19 @@ class ColumnReaderTest {
     @Test
     @DisplayName("read the value of a column storing serialized messages")
     void readSerializedMessage() throws SQLException {
-        TimestampByMessage table = new TimestampByMessage(dataSource, H2_1_4);
+        var table = new TimestampByMessage(factory);
         table.create();
 
-        Timestamp timestamp = timestamp();
+        var timestamp = timestamp();
         table.write(timestamp);
-        String columnName = MessageTable.bytesColumn()
-                                        .name();
-        ColumnReader<Message> reader = messageReader(columnName, Timestamp.getDescriptor());
+        ColumnReader<Message> reader = messageReader(bytesColumnName(), Timestamp.getDescriptor());
 
-        StringValue id = table.idOf(timestamp);
-        ResultSet resultSet = table.resultSet(id);
+        var id = table.idOf(timestamp);
+        var resultSet = table.resultSet(id);
         assertThat(resultSet.next())
                 .isTrue();
 
-        Message acquiredValue = reader.readValue(resultSet);
+        var acquiredValue = reader.readValue(resultSet);
         assertThat(acquiredValue)
                 .isEqualTo(timestamp);
     }

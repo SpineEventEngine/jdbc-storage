@@ -45,7 +45,7 @@ final class StringColumnReader extends ColumnReader<String> {
     @Override
     public String readValue(ResultSet resultSet) throws SQLException {
         checkNotNull(resultSet);
-        String result = resultSet.getString(columnName());
+        var result = resultSet.getString(columnName());
         return result;
     }
 }

@@ -26,7 +26,9 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import java.sql.ResultSet;
+import com.google.common.collect.ImmutableList;
+import com.google.protobuf.Message;
+
 import java.util.Iterator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -35,50 +37,57 @@ import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.idReader;
 /**
  * A query for all the IDs in a certain table.
  *
+ * //TODO:2021-06-18:alex.tymchenko: move this type.
+ *
  * @param <I>
  *         the type of IDs
+ * @param <R>
+ *         the type of the stored records
  */
-class StorageIndexQuery<I> extends AbstractQuery implements SelectQuery<Iterator<I>> {
+public class StorageIndexQuery<I, R extends Message>
+        extends AbstractQuery implements SelectQuery<Iterator<I>> {
 
     private final IdColumn<I> idColumn;
 
-    private StorageIndexQuery(Builder<I> builder) {
+    private StorageIndexQuery(Builder<I, R> builder) {
         super(builder);
         this.idColumn = builder.idColumn;
     }
 
     @Override
     public Iterator<I> execute() {
-        ResultSet resultSet = factory().select(pathOf(idColumn))
-                                       .distinct()
-                                       .from(table())
-                                       .getResults();
-        Class<I> columnType = idColumn.javaType();
-        ColumnReader<I> idColumnReader = idReader(idColumn.columnName(), columnType);
-        DbIterator<I> result = DbIterator.over(resultSet, idColumnReader);
-        return result;
+        var resultSet = factory().select(pathOf(idColumn))
+                                 .distinct()
+                                 .from(table())
+                                 .getResults();
+        var columnType = idColumn.javaType();
+        var idColumnReader = idReader(idColumn.columnName(), columnType);
+        var iterator = DbIterator.over(resultSet, idColumnReader);
+        var records = ImmutableList.copyOf(iterator);
+        return records.iterator();
     }
 
-    static <I> Builder<I> newBuilder() {
+    public static <I, R extends Message> Builder<I, R> newBuilder() {
         return new Builder<>();
     }
 
-    static class Builder<I> extends AbstractQuery.Builder<Builder<I>, StorageIndexQuery<I>> {
+    public static class Builder<I, R extends Message>
+            extends AbstractQuery.Builder<I, R, Builder<I, R>, StorageIndexQuery<I, R>> {
 
         private IdColumn<I> idColumn;
 
-        Builder<I> setIdColumn(IdColumn<I> idColumn) {
+        public Builder<I, R> setIdColumn(IdColumn<I> idColumn) {
             this.idColumn = checkNotNull(idColumn);
             return getThis();
         }
 
         @Override
-        protected StorageIndexQuery<I> doBuild() {
+        protected StorageIndexQuery<I, R> doBuild() {
             return new StorageIndexQuery<>(this);
         }
 
         @Override
-        protected Builder<I> getThis() {
+        protected Builder<I, R> getThis() {
             return this;
         }
     }

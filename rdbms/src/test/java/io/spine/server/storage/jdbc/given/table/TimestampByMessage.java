@@ -29,12 +29,9 @@ package io.spine.server.storage.jdbc.given.table;
 import com.google.protobuf.StringValue;
 import com.google.protobuf.Timestamp;
 import com.google.protobuf.util.Timestamps;
-import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.Type;
-import io.spine.server.storage.jdbc.TypeMapping;
-import io.spine.server.storage.jdbc.message.MessageTable;
-import io.spine.server.storage.jdbc.query.IdColumn;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import io.spine.server.storage.MessageRecordSpec;
+import io.spine.server.storage.jdbc.JdbcStorageFactory;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Holds {@link Timestamp} records by {@code StringValue} IDs.
@@ -43,39 +40,14 @@ public final class TimestampByMessage extends TimestampTable<StringValue> {
 
     private static final String NAME = "timestamp_by_message";
 
-    public TimestampByMessage(DataSourceWrapper dataSource, TypeMapping typeMapping) {
-        super(NAME, IdColumn.of(TheIdColumn.INSTANCE, StringValue.class), dataSource, typeMapping);
+    public TimestampByMessage(JdbcStorageFactory storageFactory) {
+        super(NAME, recordSpec(), storageFactory);
     }
 
-    public enum TheIdColumn implements MessageTable.Column<Timestamp> {
-        INSTANCE;
-
-        @Override
-        public Getter<Timestamp> getter() {
-            return TheIdColumn::idOf;
-        }
-
-        @Override
-        public @Nullable Type type() {
-            return null;
-        }
-
-        @Override
-        public boolean isPrimaryKey() {
-            return true;
-        }
-
-        @Override
-        public boolean isNullable() {
-            return false;
-        }
-
-        private static StringValue idOf(Timestamp timestamp) {
-            StringValue result = StringValue
-                    .newBuilder()
-                    .setValue(Timestamps.toString(timestamp))
-                    .build();
-            return result;
-        }
+    @NonNull
+    private static MessageRecordSpec<StringValue, Timestamp> recordSpec() {
+        return new MessageRecordSpec<>(
+                StringValue.class, Timestamp.class, t -> StringValue.of(Timestamps.toString(t))
+        );
     }
 }

@@ -26,6 +26,7 @@
 
 package io.spine.server.storage.jdbc.query;
 
+import com.google.protobuf.Message;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.sql.dml.SQLInsertClause;
@@ -39,12 +40,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @param <I>
  *         the ID type
  */
-public abstract class IdAwareQuery<I> extends AbstractQuery {
+public abstract class IdAwareQuery<I, R extends Message> extends AbstractQuery {
 
     private final I id;
     private final IdColumn<I> idColumn;
 
-    protected IdAwareQuery(Builder<I, ? extends Builder, ? extends IdAwareQuery> builder) {
+    protected IdAwareQuery(Builder<I, R,
+                                   ? extends Builder<I, R, ?, ?>,
+                                   ? extends IdAwareQuery<I, R>> builder) {
         super(builder);
         this.id = checkNotNull(builder.id);
         this.idColumn = checkNotNull(builder.idColumn);
@@ -59,13 +62,13 @@ public abstract class IdAwareQuery<I> extends AbstractQuery {
     }
 
     protected SQLInsertClause insertWithId() {
-        SQLInsertClause query = factory().insert(table())
-                                         .set(idPath(), normalizedId());
+        var query = factory().insert(table())
+                             .set(idPath(), normalizedId());
         return query;
     }
 
     protected SQLUpdateClause updateById() {
-        SQLUpdateClause query = factory().update(table()).where(idEquals());
+        var query = factory().update(table()).where(idEquals());
         return query;
     }
 
@@ -81,10 +84,10 @@ public abstract class IdAwareQuery<I> extends AbstractQuery {
         return pathOf(idColumn);
     }
 
-    protected abstract static class Builder<I,
-                                            B extends IdAwareQuery.Builder<I, B, Q>,
-                                            Q extends IdAwareQuery<I>>
-            extends AbstractQuery.Builder<B, Q> {
+    protected abstract static class Builder<I, R extends Message,
+                                            B extends Builder<I, R, B, Q>,
+                                            Q extends IdAwareQuery<I, R>>
+            extends AbstractQuery.Builder<I, R, B, Q> {
 
         private IdColumn<I> idColumn;
         private I id;

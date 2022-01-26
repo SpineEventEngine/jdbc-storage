@@ -29,14 +29,14 @@ package io.spine.server.storage.jdbc.given.query;
 import com.google.protobuf.Timestamp;
 import com.querydsl.sql.AbstractSQLQuery;
 import io.spine.server.storage.jdbc.query.SelectMessageByIdQuery;
+import io.spine.server.storage.jdbc.record.NewRecordTable;
 
 import java.sql.ResultSet;
 
-import static io.spine.server.storage.jdbc.message.MessageTable.bytesColumn;
+import static io.spine.server.storage.jdbc.record.column.BytesColumn.bytesColumnName;
 
 /**
- * Selects a {@link Timestamp} by ID from the
- * {@linkplain io.spine.server.storage.jdbc.message.MessageTable message table}.
+ * Selects a {@link Timestamp} by ID from the {@link NewRecordTable NewRecordTable}.
  *
  * @param <I>
  *         the type of IDs
@@ -48,13 +48,13 @@ public class SelectTimestampById<I> extends SelectMessageByIdQuery<I, Timestamp>
     }
 
     public ResultSet getResults() {
-        ResultSet results = query().getResults();
+        var results = query().getResults();
         return results;
     }
 
     @Override
     public AbstractSQLQuery<Object, ?> query() {
-        return factory().select(pathOf(bytesColumn()))
+        return factory().select(pathOf(bytesColumnName()))
                         .from(table())
                         .where(idEquals());
     }
@@ -64,10 +64,9 @@ public class SelectTimestampById<I> extends SelectMessageByIdQuery<I, Timestamp>
     }
 
     public static class Builder<I>
-            extends SelectMessageByIdQuery.Builder<Builder<I>,
-                                                   SelectTimestampById<I>,
-                                                   I,
-                                                   Timestamp> {
+            extends SelectMessageByIdQuery.Builder<I, Timestamp, Builder<I>,
+                                                   SelectTimestampById<I>
+            > {
 
         @Override
         protected Builder<I> getThis() {
@@ -76,7 +75,7 @@ public class SelectTimestampById<I> extends SelectMessageByIdQuery<I, Timestamp>
 
         @Override
         protected SelectTimestampById<I> doBuild() {
-            setMessageColumnName(bytesColumn().name());
+            setMessageColumnName(bytesColumnName());
             return new SelectTimestampById<>(this);
         }
     }

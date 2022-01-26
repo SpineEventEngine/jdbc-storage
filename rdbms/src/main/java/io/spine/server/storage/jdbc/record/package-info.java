@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2022, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,15 +25,13 @@
  */
 
 /**
- * The JDBC-based implementation of the {@link io.spine.server.storage.RecordStorage RecordStorage}.
+ * This package provides types and routines for accessing stored {@link com.google.protobuf.Message
+ * Message} records.
  */
-
 @CheckReturnValue
 @ParametersAreNonnullByDefault
-@Experimental
 package io.spine.server.storage.jdbc.record;
 
 import com.google.errorprone.annotations.CheckReturnValue;
-import io.spine.annotation.Experimental;
 
 import javax.annotation.ParametersAreNonnullByDefault;

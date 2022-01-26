@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2022, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,12 +27,15 @@
 package io.spine.internal.dependency
 
 /**
- * J2ObjC is a transitive dependency which we don't use directly.
- * We `force` it in [DependencyResolution.forceConfiguration()].
- *
- * [J2ObjC](https://developers.google.com/j2objc)
+ * [J2ObjC](https://developers.google.com/j2objc) is a transitive dependency
+ * which we don't use directly. This object is used for forcing the version.
  */
 object J2ObjC {
+    // https://github.com/google/j2objc/releases
+    // `1.3.` is the latest version available from Maven Central.
+    // https://search.maven.org/artifact/com.google.j2objc/j2objc-annotations
     private const val version = "1.3"
-    const val lib = "com.google.j2objc:j2objc-annotations:${version}"
+    const val annotations = "com.google.j2objc:j2objc-annotations:${version}"
+    @Deprecated("Please use `annotations` instead.", ReplaceWith("annotations"))
+    const val lib = annotations
 }

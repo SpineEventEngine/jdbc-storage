@@ -26,60 +26,44 @@
 
 package io.spine.server.storage.jdbc.aggregate;
 
-import io.spine.server.aggregate.AggregateEventRecord;
-import io.spine.server.aggregate.Snapshot;
-import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.aggregate.given.AggregateEventRecordTableTestEnv.AnAggregate;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
-import static com.querydsl.core.types.ExpressionUtils.path;
-import static io.spine.base.Identifier.newUuid;
-import static io.spine.base.Time.currentTime;
-import static io.spine.core.Versions.newVersion;
-import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
-import static io.spine.server.storage.jdbc.PredefinedMapping.H2_1_4;
-import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.KIND;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
-@DisplayName("AggregateEventRecordTable should")
+//TODO:2021-07-01:alex.tymchenko: kill.
+//@DisplayName("AggregateEventRecordTable should")
 class AggregateEventRecordTableTest {
 
-    @Test
-    @DisplayName("throw ISE on attempt to update event record")
-    void throwOnEventRecordUpdate() {
-        AggregateEventRecordTable<String> table =
-                new AggregateEventRecordTable<>(AnAggregate.class,
-                                                whichIsStoredInMemory(newUuid()),
-                                                H2_1_4);
-        assertThrows(IllegalStateException.class,
-                     () -> table.update(newUuid(), AggregateEventRecord.getDefaultInstance()));
-    }
-
-    @Test
-    @DisplayName("store record kind in string representation")
-    void storeRecordKind() {
-        DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
-        AggregateEventRecordTable<String> table =
-                new AggregateEventRecordTable<>(AnAggregate.class, dataSource, H2_1_4);
-        table.create();
-
-        Snapshot snapshot = Snapshot.newBuilder()
-                                    .setVersion(newVersion(5, currentTime()))
-                                    .build();
-        AggregateEventRecord record = AggregateEventRecord.newBuilder()
-                                                          .setSnapshot(snapshot)
-                                                          .build();
-        InsertAggregateRecordQuery<String> query = table.composeInsertQuery(newUuid(), record);
-        query.execute();
-
-        String expectedKind = record.getKindCase()
-                                    .toString();
-        String actualKind = query.factory()
-                                 .select(path(String.class, KIND.name()))
-                                 .from(query.table())
-                                 .fetchFirst();
-        assertEquals(expectedKind, actualKind);
-    }
+//    @Test
+//    @DisplayName("throw ISE on attempt to update event record")
+//    void throwOnEventRecordUpdate() {
+//        AggregateEventRecordTable<String> table =
+//                new AggregateEventRecordTable<>(AnAggregate.class,
+//                                                whichIsStoredInMemory(newUuid()),
+//                                                H2_1_4);
+//        assertThrows(IllegalStateException.class,
+//                     () -> table.update(newUuid(), AggregateEventRecord.getDefaultInstance()));
+//    }
+//
+//    @Test
+//    @DisplayName("store record kind in string representation")
+//    void storeRecordKind() {
+//        DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
+//        AggregateEventRecordTable<String> table =
+//                new AggregateEventRecordTable<>(AnAggregate.class, dataSource, H2_1_4);
+//        table.create();
+//
+//        Snapshot snapshot = Snapshot.newBuilder()
+//                                    .setVersion(newVersion(5, currentTime()))
+//                                    .build();
+//        AggregateEventRecord record = AggregateEventRecord.newBuilder()
+//                                                          .setSnapshot(snapshot)
+//                                                          .build();
+//        InsertAggregateRecordQuery<String> query = table.composeInsertQuery(newUuid(), record);
+//        query.execute();
+//
+//        String expectedKind = record.getKindCase()
+//                                    .toString();
+//        String actualKind = query.factory()
+//                                 .select(path(String.class, KIND.name()))
+//                                 .from(query.table())
+//                                 .fetchFirst();
+//        assertEquals(expectedKind, actualKind);
+//    }
 }

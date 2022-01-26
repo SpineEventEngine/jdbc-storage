@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2022, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,9 +26,16 @@
 
 package io.spine.internal.dependency
 
+/**
+ * The dependencies for Guava.
+ *
+ * When changing the version, also change the version used in the `build.gradle.kts`. We need
+ * to synchronize the version used in `buildSrc` and in Spine modules. Otherwise, when testing
+ * Gradle plugins, errors may occur due to version clashes.
+ */
 // https://github.com/google/guava
 object Guava {
-    private const val version = "30.1.1-jre"
+    private const val version = "31.0.1-jre"
     const val lib     = "com.google.guava:guava:${version}"
     const val testLib = "com.google.guava:guava-testlib:${version}"
 }

@@ -27,37 +27,46 @@
 package io.spine.server.storage.jdbc.query;
 
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import com.querydsl.sql.dml.SQLDeleteClause;
+import com.google.protobuf.Message;
 
 /**
- * A query that deletes all rows from a table.
+ * A query that deletes all records from a table.
+ *
+ * //TODO:2021-06-24:alex.tymchenko: move this type?
  */
-class DeleteAllQuery extends AbstractQuery implements WriteQuery {
+public class DeleteAllQuery<I, R extends Message> extends AbstractQuery implements WriteQuery {
 
-    private DeleteAllQuery(Builder builder) {
+    private DeleteAllQuery(Builder<I, R> builder) {
         super(builder);
     }
 
     @CanIgnoreReturnValue
     @Override
     public long execute() {
-        SQLDeleteClause query = factory().delete(table());
+        var query = factory().delete(table());
         return query.execute();
     }
 
-    static Builder newBuilder() {
-        return new Builder();
+    /**
+     * Creates a new {@code Builder} for this query type.
+     */
+    public static <I, R extends Message> Builder<I, R> newBuilder() {
+        return new Builder<>();
     }
 
-    static class Builder extends AbstractQuery.Builder<Builder, DeleteAllQuery> {
+    /**
+     * A builder of {@code DeleteAllQuery} instances.
+     */
+    public static class Builder<I, R extends Message>
+            extends AbstractQuery.Builder<I, R, Builder<I, R>, DeleteAllQuery<I, R>> {
 
         @Override
-        protected DeleteAllQuery doBuild() {
-            return new DeleteAllQuery(this);
+        protected DeleteAllQuery<I, R> doBuild() {
+            return new DeleteAllQuery<>(this);
         }
 
         @Override
-        protected Builder getThis() {
+        protected Builder<I, R> getThis() {
             return this;
         }
     }

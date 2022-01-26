@@ -53,7 +53,7 @@ public final class TestInboxMessage {
      * Generates a new {@link InboxMessage} with a random shard index.
      */
     public static InboxMessage generate() {
-        ShardIndex shardIndex = TestShardIndex.newIndex();
+        var shardIndex = TestShardIndex.newIndex();
         return generate(shardIndex, currentTime());
     }
 
@@ -66,9 +66,9 @@ public final class TestInboxMessage {
     public static ImmutableList<InboxMessage> generateMultiple(int totalMessages,
                                                                ShardIndex index) {
         ImmutableList.Builder<InboxMessage> builder = ImmutableList.builder();
-        for (int msgCounter = 0; msgCounter < totalMessages; msgCounter++) {
+        for (var msgCounter = 0; msgCounter < totalMessages; msgCounter++) {
 
-            InboxMessage msg = generate(index, currentTime());
+            var msg = generate(index, currentTime());
             builder.add(msg);
         }
         return builder.build();
@@ -81,9 +81,9 @@ public final class TestInboxMessage {
      * {@link InboxMessageStatus#TO_DELIVER TO_DELIVER}.
      */
     private static InboxMessage generate(ShardIndex index, Timestamp whenReceived) {
-        InboxMessage message = toDeliver("target-entity-id", TypeUrl.of(Calc.class), whenReceived);
-        InboxMessage.Builder asBuilder = message.toBuilder();
-        InboxMessageId updatedId = asBuilder
+        var message = toDeliver("target-entity-id", TypeUrl.of(Calc.class), whenReceived);
+        var asBuilder = message.toBuilder();
+        var updatedId = asBuilder
                 .getId()
                 .toBuilder()
                 .setIndex(index)

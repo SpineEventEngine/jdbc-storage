@@ -27,38 +27,146 @@
 package io.spine.server.storage.jdbc.query;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableList;
+import com.google.protobuf.Message;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.ComparablePath;
 import com.querydsl.core.types.dsl.PathBuilder;
-import io.spine.client.CompositeFilter;
-import io.spine.client.Filter;
-import io.spine.client.Filter.Operator;
-import io.spine.server.entity.storage.Column;
-import io.spine.server.entity.storage.ColumnTypeMapping;
-import io.spine.server.entity.storage.CompositeQueryParameter;
-import io.spine.server.entity.storage.QueryParameters;
+import io.spine.query.Column;
+import io.spine.query.ComparisonOperator;
+import io.spine.query.LogicalOperator;
+import io.spine.query.QueryPredicate;
+import io.spine.query.SubjectParameter;
+import io.spine.server.storage.ColumnTypeMapping;
 import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 
 import java.util.Collection;
-import java.util.Map;
+import java.util.function.BiFunction;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.querydsl.core.types.ExpressionUtils.and;
-import static com.querydsl.core.types.ExpressionUtils.or;
+import static com.querydsl.core.types.dsl.Expressions.FALSE;
 import static com.querydsl.core.types.dsl.Expressions.TRUE;
 import static com.querydsl.core.types.dsl.Expressions.comparablePath;
-import static io.spine.protobuf.TypeConverter.toObject;
 import static io.spine.util.Exceptions.newIllegalArgumentException;
 
 /**
  * A utility methods to work with {@linkplain Predicate predicates}.
  */
-public class QueryPredicates {
+public final class QueryPredicates {
 
-    /** Prevent instantiation of this utility class. */
+    /** Prevents instantiation of this utility class. */
     private QueryPredicates() {
     }
+
+//    /**
+//     * Obtains a predicate to match entity records by the specified parameters.
+//     *
+//     * @param parameters
+//     *         the query parameters to compose the predicate
+//     * @param columnMapping
+//     *         the entity column mapping
+//     * @return the predicate for columns
+//     */
+//    public static Predicate
+//    matchParameters(QueryParameters parameters, JdbcColumnMapping<?> columnMapping) {
+//        BooleanExpression result = TRUE;
+//        for (CompositeQueryParameter parameter : parameters) {
+//            result = result.and(predicateFrom(parameter, columnMapping));
+//        }
+//        return result;
+//    }
+//
+//    private static Predicate
+//    predicateFrom(CompositeQueryParameter parameter, JdbcColumnMapping<?> columnMapping) {
+//        Predicate result = TRUE;
+//        for (Map.Entry<Column, Filter> columnWithFilter : parameter.filters()
+//                                                                   .entries()) {
+//            Predicate predicate = columnMatchFilter(columnWithFilter.getKey(),
+//                                                    columnWithFilter.getValue(),
+//                                                    columnMapping);
+//            result = joinPredicates(result, predicate, parameter.operator());
+//        }
+//        return result;
+//    }
+//
+//    @SuppressWarnings("EnumSwitchStatementWhichMissesCases") // OK for the Protobuf enum switch.
+//    @VisibleForTesting
+//    static Predicate joinPredicates(Predicate left,
+//                                    Predicate right,
+//                                    CompositeFilter.CompositeOperator operator) {
+//        checkArgument(operator.getNumber() > 0, operator.name());
+//        switch (operator) {
+//            case EITHER:
+//                return or(left, right);
+//            case ALL:
+//                return and(left, right);
+//            default:
+//                throw newIllegalArgumentException("Unexpected composite operator %s.",
+//                                                  operator);
+//        }
+//    }
+//
+//    @VisibleForTesting
+//    static Predicate
+//    columnMatchFilter(Column column, Filter filter, JdbcColumnMapping<?> columnMapping) {
+//        Operator operator = filter.getOperator();
+//        checkArgument(operator.getNumber() > 0, operator.name());
+//
+//        String columnName = column.name()
+//                                  .value();
+//        ComparablePath<Comparable> columnPath = comparablePath(Comparable.class, columnName);
+//        Class<?> type = column.type();
+//        Object javaValue = toObject(filter.getValue(), type);
+//        ColumnTypeMapping<?, ?> mapping =
+//                columnMapping.of(javaValue.getClass());
+//        Object valueForStoring = mapping.applyTo(javaValue);
+//        if (valueForStoring == null) {
+//            return nullFilter(operator, columnPath);
+//        }
+//        checkIsComparable(valueForStoring, javaValue);
+//        Comparable columnValue = (Comparable) valueForStoring;
+//        return valueFilter(operator, columnPath, columnValue);
+//    }
+//
+//
+//    @SuppressWarnings("EnumSwitchStatementWhichMissesCases") // OK for the Protobuf enum switch.
+//    @VisibleForTesting
+//    static Predicate nullFilter(Operator operator,
+//                                ComparablePath<Comparable> columnPath) {
+//        switch (operator) {
+//            case EQUAL:
+//                return columnPath.isNull();
+//            case GREATER_THAN:
+//            case LESS_THAN:
+//            case GREATER_OR_EQUAL:
+//            case LESS_OR_EQUAL:
+//                throw newIllegalArgumentException(
+//                        "Operator %s not supported for the null filter value.", operator);
+//            default:
+//                throw newIllegalArgumentException("Unexpected filter operator %s.", operator);
+//        }
+//    }
+//
+//    @SuppressWarnings("EnumSwitchStatementWhichMissesCases") // OK for the Protobuf enum switch.
+//    @VisibleForTesting
+//    static Predicate valueFilter(Operator operator,
+//                                 ComparablePath<Comparable> columnPath,
+//                                 Comparable columnValue) {
+//        switch (operator) {
+//            case EQUAL:
+//                return columnPath.eq(columnValue);
+//            case GREATER_THAN:
+//                return columnPath.gt(columnValue);
+//            case LESS_THAN:
+//                return columnPath.lt(columnValue);
+//            case GREATER_OR_EQUAL:
+//                return columnPath.goe(columnValue);
+//            case LESS_OR_EQUAL:
+//                return columnPath.loe(columnValue);
+//            default:
+//                throw newIllegalArgumentException("Unexpected operator %s.", operator);
+//        }
+//    }
 
     /**
      * Creates a predicate to match an {@link IdColumn ID} to one of the specified IDs.
@@ -78,79 +186,128 @@ public class QueryPredicates {
             return TRUE;
         }
 
-        PathBuilder<Object> id = new PathBuilder<>(Object.class, column.columnName());
-        Collection<Object> normalizedIds = column.normalize(ids);
+        var id = new PathBuilder<Object>(Object.class, column.columnName());
+        var normalizedIds = column.normalize(ids);
         return id.in(normalizedIds);
     }
 
-    /**
-     * Obtains a predicate to match entity records by the specified parameters.
-     *
-     * @param parameters
-     *         the query parameters to compose the predicate
-     * @param columnMapping
-     *         the entity column mapping
-     * @return the predicate for columns
-     */
-    public static Predicate
-    matchParameters(QueryParameters parameters, JdbcColumnMapping<?> columnMapping) {
-        BooleanExpression result = TRUE;
-        for (CompositeQueryParameter parameter : parameters) {
-            result = result.and(predicateFrom(parameter, columnMapping));
-        }
-        return result;
-    }
-
-    private static Predicate
-    predicateFrom(CompositeQueryParameter parameter, JdbcColumnMapping<?> columnMapping) {
-        Predicate result = TRUE;
-        for (Map.Entry<Column, Filter> columnWithFilter : parameter.filters()
-                                                                   .entries()) {
-            Predicate predicate = columnMatchFilter(columnWithFilter.getKey(),
-                                                    columnWithFilter.getValue(),
-                                                    columnMapping);
-            result = joinPredicates(result, predicate, parameter.operator());
-        }
-        return result;
-    }
-
-    @SuppressWarnings("EnumSwitchStatementWhichMissesCases") // OK for the Protobuf enum switch.
     @VisibleForTesting
-    static Predicate joinPredicates(Predicate left,
-                                    Predicate right,
-                                    CompositeFilter.CompositeOperator operator) {
-        checkArgument(operator.getNumber() > 0, operator.name());
+    @SuppressWarnings("rawtypes")   /* To avoid the generics hell. */
+    static Predicate nullFilter(ComparisonOperator operator,
+                                ComparablePath<Comparable> columnPath) {
         switch (operator) {
-            case EITHER:
-                return or(left, right);
-            case ALL:
-                return and(left, right);
+            case EQUALS:
+                return columnPath.isNull();
+            case GREATER_THAN:
+            case LESS_THAN:
+            case GREATER_OR_EQUALS:
+            case LESS_OR_EQUALS:
+                throw newIllegalArgumentException(
+                        "Operator %s not supported for the null filter value.", operator);
             default:
-                throw newIllegalArgumentException("Unexpected composite operator %s.",
-                                                  operator);
+                throw newIllegalArgumentException("Unexpected filter operator %s.", operator);
         }
     }
 
     @VisibleForTesting
-    static Predicate
-    columnMatchFilter(Column column, Filter filter, JdbcColumnMapping<?> columnMapping) {
-        Operator operator = filter.getOperator();
-        checkArgument(operator.getNumber() > 0, operator.name());
+    @SuppressWarnings("rawtypes")   /* To avoid the generics hell. */
+    static Predicate valueFilter(ComparablePath<Comparable> columnPath,
+                                 ComparisonOperator operator,
+                                 Comparable columnValue) {
+        switch (operator) {
+            case EQUALS:
+                return columnPath.eq(columnValue);
+            case GREATER_THAN:
+                return columnPath.gt(columnValue);
+            case LESS_THAN:
+                return columnPath.lt(columnValue);
+            case GREATER_OR_EQUALS:
+                return columnPath.goe(columnValue);
+            case LESS_OR_EQUALS:
+                return columnPath.loe(columnValue);
+            default:
+                throw newIllegalArgumentException("Unexpected operator %s.", operator);
+        }
+    }
 
-        String columnName = column.name()
-                                  .value();
-        ComparablePath<Comparable> columnPath = comparablePath(Comparable.class, columnName);
-        Class<?> type = column.type();
-        Object javaValue = toObject(filter.getValue(), type);
-        ColumnTypeMapping<?, ?> mapping =
-                columnMapping.of(javaValue.getClass());
-        Object valueForStoring = mapping.applyTo(javaValue);
-        if (valueForStoring == null) {
+    @SuppressWarnings("rawtypes")   /* To avoid the generics hell. */
+    private static Predicate
+    matchParameter(SubjectParameter<?, ?, ?> parameter, JdbcColumnMapping columnMapping) {
+        var column = parameter.column();
+        var value = parameter.value();
+        var operator = parameter.operator();
+
+        var columnName = column.name()
+                               .value();
+        var columnPath = comparablePath(Comparable.class, columnName);
+
+        var typeMapping = columnMapping.of(column.type());
+        var convertedValue = typeMapping.applyTo(value);
+        if (convertedValue == null) {
             return nullFilter(operator, columnPath);
         }
-        checkIsComparable(valueForStoring, javaValue);
-        Comparable columnValue = (Comparable) valueForStoring;
-        return valueFilter(operator, columnPath, columnValue);
+        checkIsComparable(convertedValue, value);
+        var columnValue = (Comparable) convertedValue;
+        var result = valueFilter(columnPath, operator, columnValue);
+        return result;
+    }
+
+    /**
+     * Obtains a QueryDSL-specific predicate to match the records
+     * by the specified {@link QueryPredicate}.
+     *
+     * @param predicate
+     *         the query predicate to use for matching
+     * @param columnMapping
+     *         the entity column mapping
+     * @param <R>
+     *         the type of the queried records
+     * @return the QueryDSL-specific predicate for the records
+     */
+    public static <R extends Message> Predicate
+    matchPredicate(QueryPredicate<R> predicate, JdbcColumnMapping columnMapping) {
+        var operator = predicate.operator();
+
+        AssemblePredicate assembler;
+        BooleanExpression current;
+        if (operator == LogicalOperator.AND) {
+            current = TRUE;
+            assembler = BooleanExpression::and;
+        } else {
+            current = FALSE;
+            assembler = BooleanExpression::or;
+        }
+
+        current = includeSimpleParams(predicate.allParams(), current, assembler, columnMapping);
+        current = includeChildPredicates(predicate.children(), current, assembler, columnMapping);
+
+        return current;
+    }
+
+    private static BooleanExpression
+    includeSimpleParams(ImmutableList<SubjectParameter<?, ?, ?>> params,
+                        BooleanExpression initialValue,
+                        AssemblePredicate assembler,
+                        JdbcColumnMapping columnMapping) {
+        var currentValue = initialValue;
+        for (var parameter : params) {
+            var fromParam = matchParameter(parameter, columnMapping);
+            currentValue = assembler.apply(currentValue, fromParam);
+        }
+        return currentValue;
+    }
+
+    private static <R extends Message> BooleanExpression
+    includeChildPredicates(ImmutableList<QueryPredicate<R>> children,
+                           BooleanExpression initialValue,
+                           AssemblePredicate assembler,
+                           JdbcColumnMapping columnMapping) {
+        var currentValue = initialValue;
+        for (var childPredicate : children) {
+            var fromChild = matchPredicate(childPredicate, columnMapping);
+            currentValue = assembler.apply(currentValue, fromChild);
+        }
+        return currentValue;
     }
 
     /**
@@ -159,9 +316,9 @@ public class QueryPredicates {
      * <p>{@code javaValue} is passed for logging purposes only.
      */
     private static void checkIsComparable(Object storedValue, Object javaValue) {
-        Class<?> storedType = storedValue.getClass();
+        var storedType = storedValue.getClass();
         if (!Comparable.class.isAssignableFrom(storedType)) {
-            Class<?> javaType = javaValue.getClass();
+            var javaType = javaValue.getClass();
             throw newIllegalArgumentException(
                     "Received filter value of class %s which has non-Comparable storage type %s",
                     javaType.getCanonicalName(),
@@ -169,42 +326,9 @@ public class QueryPredicates {
         }
     }
 
-    @SuppressWarnings("EnumSwitchStatementWhichMissesCases") // OK for the Protobuf enum switch.
-    @VisibleForTesting
-    static Predicate nullFilter(Operator operator,
-                                ComparablePath<Comparable> columnPath) {
-        switch (operator) {
-            case EQUAL:
-                return columnPath.isNull();
-            case GREATER_THAN:
-            case LESS_THAN:
-            case GREATER_OR_EQUAL:
-            case LESS_OR_EQUAL:
-                throw newIllegalArgumentException(
-                        "Operator %s not supported for the null filter value.", operator);
-            default:
-                throw newIllegalArgumentException("Unexpected filter operator %s.", operator);
-        }
-    }
+    @FunctionalInterface
+    private interface AssemblePredicate
+            extends BiFunction<BooleanExpression, Predicate, BooleanExpression> {
 
-    @SuppressWarnings("EnumSwitchStatementWhichMissesCases") // OK for the Protobuf enum switch.
-    @VisibleForTesting
-    static Predicate valueFilter(Operator operator,
-                                 ComparablePath<Comparable> columnPath,
-                                 Comparable columnValue) {
-        switch (operator) {
-            case EQUAL:
-                return columnPath.eq(columnValue);
-            case GREATER_THAN:
-                return columnPath.gt(columnValue);
-            case LESS_THAN:
-                return columnPath.lt(columnValue);
-            case GREATER_OR_EQUAL:
-                return columnPath.goe(columnValue);
-            case LESS_OR_EQUAL:
-                return columnPath.loe(columnValue);
-            default:
-                throw newIllegalArgumentException("Unexpected operator %s.", operator);
-        }
     }
 }

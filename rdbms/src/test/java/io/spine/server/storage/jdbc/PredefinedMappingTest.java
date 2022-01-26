@@ -34,13 +34,13 @@ import static io.spine.server.storage.jdbc.GivenDataSource.whichHoldsMetadata;
 import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
 import static io.spine.server.storage.jdbc.PredefinedMapping.POSTGRESQL_10_1;
 import static io.spine.server.storage.jdbc.PredefinedMapping.select;
-import static io.spine.testing.Tests.nullRef;
+import static io.spine.testing.TestValues.nullRef;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@DisplayName("PredefinedMapping should")
+@DisplayName("`PredefinedMapping` should")
 class PredefinedMappingTest {
 
-    private final PredefinedMapping mapping = POSTGRESQL_10_1;
+    private static final PredefinedMapping mapping = POSTGRESQL_10_1;
 
     @Test
     @DisplayName("throw ISE if requested type has no mapping")
@@ -52,9 +52,9 @@ class PredefinedMappingTest {
     @Test
     @DisplayName("be selected by database product name and major version")
     void selectTypeMapping() {
-        DataSourceWrapper dataSource = whichHoldsMetadata(mapping.getDatabaseProductName(),
-                                                          mapping.getMajorVersion(),
-                                                          mapping.getMinorVersion());
+        var dataSource = whichHoldsMetadata(mapping.getDatabaseProductName(),
+                                            mapping.getMajorVersion(),
+                                            mapping.getMinorVersion());
         assertThat(select(dataSource))
                 .isEqualTo(mapping);
     }
@@ -62,10 +62,10 @@ class PredefinedMappingTest {
     @Test
     @DisplayName("not be selected if major versions are different")
     void notSelectForDifferentVersion() {
-        int newMajorVersion = mapping.getMajorVersion() + 1;
-        DataSourceWrapper dataSource = whichHoldsMetadata(mapping.getDatabaseProductName(),
-                                                          newMajorVersion,
-                                                          mapping.getMinorVersion());
+        var newMajorVersion = mapping.getMajorVersion() + 1;
+        var dataSource = whichHoldsMetadata(mapping.getDatabaseProductName(),
+                                            newMajorVersion,
+                                            mapping.getMinorVersion());
         assertThat(select(dataSource))
                 .isNotEqualTo(mapping);
     }

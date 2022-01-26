@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2022, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,6 +62,8 @@ import static java.util.stream.Collectors.toSet
  * block, the result {@code pom.xml} file is going to contain empty blocks,
  * e.g. {@code <groupId></groupId>}
  */
+
+println("`generate-pom.gradle` script is deprecated. Please use the `PomGenerator` utility instead.")
 
 // In some cases, the `base` plugin, which is by default is added by e.g. `java`, is not yet added.
 // `base` plugin defines the `build` task. This script needs it.

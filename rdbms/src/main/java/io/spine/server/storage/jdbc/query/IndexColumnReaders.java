@@ -55,7 +55,7 @@ final class IndexColumnReaders {
     @SuppressWarnings({"unchecked" /* Logically checked by if statements. */,
             "IfStatementWithTooManyBranches" /* Required to differentiate between reader types. */})
     static <I> ColumnReader<I> create(String columnName, Class<I> idType) {
-        Class<I> wrapper = Primitives.wrap(idType);
+        var wrapper = Primitives.wrap(idType);
         if (String.class.equals(idType)) {
             return (ColumnReader<I>) new StringColumnReader(columnName);
         } else if (Integer.class == wrapper) {

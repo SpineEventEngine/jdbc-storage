@@ -25,8 +25,9 @@
  */
 
 /**
- * Contains the {@linkplain io.spine.server.storage.jdbc.delivery.JdbcInboxStorage implementation}
- * of {@code InboxStorage} and other mechanisms of message delivery.
+ * Defines the storage for Delivery-related records, such as
+ * {@link io.spine.server.delivery.ShardSessionRecord ShardSessionRecord}
+ * and {@link io.spine.server.delivery.InboxMessage InboxMessage}.
  */
 
 @Experimental

@@ -54,9 +54,9 @@ final class DefaultDataSourceWrapper implements DataSourceWrapper, Logging {
     public ConnectionWrapper getConnection(boolean autoCommit) {
         checkNotClosed();
         try {
-            Connection connection = dataSource.getConnection();
+            var connection = dataSource.getConnection();
             connection.setAutoCommit(autoCommit);
-            ConnectionWrapper wrapper = ConnectionWrapper.wrap(connection);
+            var wrapper = ConnectionWrapper.wrap(connection);
             return wrapper;
         } catch (SQLException e) {
             _error().log("Failed to get connection: %s", e.getMessage());
@@ -67,9 +67,9 @@ final class DefaultDataSourceWrapper implements DataSourceWrapper, Logging {
     @Override
     public DataSourceMetaData metaData() {
         checkNotClosed();
-        try (final ConnectionWrapper connection = getConnection(true)) {
-            DatabaseMetaData metaData = connection.get()
-                                                  .getMetaData();
+        try (final var connection = getConnection(true)) {
+            var metaData = connection.get()
+                                     .getMetaData();
             return DataSourceMetaData.of(metaData);
         } catch (SQLException e) {
             throw new DatabaseException(e);

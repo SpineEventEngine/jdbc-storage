@@ -27,8 +27,8 @@
 package io.spine.server.storage.jdbc.aggregate.given;
 
 import io.spine.server.aggregate.Aggregate;
-import io.spine.test.aggregate.Project;
-import io.spine.test.aggregate.ProjectId;
+import io.spine.test.storage.StgProject;
+import io.spine.test.storage.StgProjectId;
 
 public class JdbcAggregateStorageVisibilityHandlingTestEnv {
 
@@ -36,9 +36,10 @@ public class JdbcAggregateStorageVisibilityHandlingTestEnv {
     private JdbcAggregateStorageVisibilityHandlingTestEnv() {
     }
 
-    public static class TestAggregate extends Aggregate<ProjectId, Project, Project.Builder> {
+    public static class TestAggregate
+            extends Aggregate<StgProjectId, StgProject, StgProject.Builder> {
 
-        protected TestAggregate(ProjectId id) {
+        protected TestAggregate(StgProjectId id) {
             super(id);
         }
     }

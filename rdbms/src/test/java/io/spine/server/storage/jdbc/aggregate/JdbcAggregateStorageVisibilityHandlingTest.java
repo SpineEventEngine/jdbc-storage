@@ -26,67 +26,52 @@
 
 package io.spine.server.storage.jdbc.aggregate;
 
-import io.spine.server.aggregate.Aggregate;
-import io.spine.server.aggregate.AggregateStorage;
-import io.spine.server.aggregate.AggregateStorageLifecycleFlagsHandlingTest;
-import io.spine.server.entity.LifecycleFlags;
-import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.GivenDataSource;
-import io.spine.server.storage.jdbc.aggregate.given.JdbcAggregateStorageVisibilityHandlingTestEnv.TestAggregate;
-import io.spine.test.aggregate.ProjectId;
-import io.spine.testdata.Sample;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 
-import java.util.Optional;
-
-import static io.spine.server.storage.jdbc.PredefinedMapping.H2_1_4;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-@DisplayName("JdbcAggregateStorage, when saving aggregate with lifecycle flags, should")
+//TODO:2021-07-01:alex.tymchenko: kill!
+//@DisplayName("JdbcAggregateStorage, when saving aggregate with lifecycle flags, should")
 class JdbcAggregateStorageVisibilityHandlingTest
-        extends AggregateStorageLifecycleFlagsHandlingTest {
-
-    @Override
-    protected AggregateStorage<ProjectId> getAggregateStorage(
-            Class<? extends Aggregate<ProjectId, ?, ?>> aggregateClass) {
-        DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(
-                "aggregateStorageStatusHandlingTests");
-        JdbcAggregateStorage<ProjectId> storage =
-                JdbcAggregateStorage.<ProjectId>newBuilder()
-                        .setMultitenant(false)
-                        .setAggregateClass(TestAggregate.class)
-                        .setDataSource(dataSource)
-                        .setTypeMapping(H2_1_4)
-                        .build();
-        return storage;
-    }
-
-    @SuppressWarnings("OptionalGetWithoutIsPresent") // We do check.
-    @Test
-    @DisplayName("update entity visibility")
-    void updateEntityVisibility() {
-        ProjectId id = Sample.messageOfType(ProjectId.class);
-        LifecycleFlags archived = LifecycleFlags.newBuilder()
-                                                .setArchived(true)
-                                                .build();
-        JdbcAggregateStorage<ProjectId> storage =
-                (JdbcAggregateStorage<ProjectId>) getAggregateStorage(TestAggregate.class);
-        storage.writeLifecycleFlags(id, archived);
-
-        Optional<LifecycleFlags> actualArchived = storage.readLifecycleFlags(id);
-        assertTrue(actualArchived.isPresent());
-        assertEquals(archived, actualArchived.get());
-
-        LifecycleFlags archivedAndDeleted = LifecycleFlags.newBuilder()
-                                                          .setArchived(true)
-                                                          .setDeleted(true)
-                                                          .build();
-        storage.writeLifecycleFlags(id, archivedAndDeleted);
-
-        Optional<LifecycleFlags> actualArchivedAndDeleted = storage.readLifecycleFlags(id);
-        assertTrue(actualArchivedAndDeleted.isPresent());
-        assertEquals(archivedAndDeleted, actualArchivedAndDeleted.get());
-    }
+        /*extends AggregateStorageLifecycleFlagsHandlingTest*/ {
+//
+//    @Override
+//    protected AggregateStorage<ProjectId> getAggregateStorage(
+//            Class<? extends Aggregate<ProjectId, ?, ?>> aggregateClass) {
+//        DataSourceWrapper dataSource = GivenDataSource.whichIsStoredInMemory(
+//                "aggregateStorageStatusHandlingTests");
+//        JdbcAggregateStorage<ProjectId> storage =
+//                JdbcAggregateStorage.<ProjectId>newBuilder()
+//                        .setMultitenant(false)
+//                        .setAggregateClass(TestAggregate.class)
+//                        .setDataSource(dataSource)
+//                        .setTypeMapping(H2_1_4)
+//                        .build();
+//        return storage;
+//    }
+//
+//    @SuppressWarnings("OptionalGetWithoutIsPresent") // We do check.
+//    @Test
+//    @DisplayName("update entity visibility")
+//    void updateEntityVisibility() {
+//        ProjectId id = Sample.messageOfType(ProjectId.class);
+//        LifecycleFlags archived = LifecycleFlags.newBuilder()
+//                                                .setArchived(true)
+//                                                .build();
+//        JdbcAggregateStorage<ProjectId> storage =
+//                (JdbcAggregateStorage<ProjectId>) getAggregateStorage(TestAggregate.class);
+//        storage.writeLifecycleFlags(id, archived);
+//
+//        Optional<LifecycleFlags> actualArchived = storage.readLifecycleFlags(id);
+//        assertTrue(actualArchived.isPresent());
+//        assertEquals(archived, actualArchived.get());
+//
+//        LifecycleFlags archivedAndDeleted = LifecycleFlags.newBuilder()
+//                                                          .setArchived(true)
+//                                                          .setDeleted(true)
+//                                                          .build();
+//        storage.writeLifecycleFlags(id, archivedAndDeleted);
+//
+//        Optional<LifecycleFlags> actualArchivedAndDeleted = storage.readLifecycleFlags(id);
+//        assertTrue(actualArchivedAndDeleted.isPresent());
+//        assertEquals(archivedAndDeleted, actualArchivedAndDeleted.get());
+//    }
 }

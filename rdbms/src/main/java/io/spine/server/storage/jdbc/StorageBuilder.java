@@ -105,7 +105,7 @@ public abstract class StorageBuilder<B extends StorageBuilder<B, S>, S extends S
      */
     public S build() {
         checkPreconditions();
-        S result = doBuild();
+        var result = doBuild();
         checkNotNull(result, "The build storage must not be null.");
         return result;
     }

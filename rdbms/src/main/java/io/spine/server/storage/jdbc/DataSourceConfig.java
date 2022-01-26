@@ -222,7 +222,7 @@ public class DataSourceConfig {
                 checkState(!poolName.isEmpty(), "poolName");
             }
 
-            DataSourceConfig config = new DataSourceConfig(this);
+            var config = new DataSourceConfig(this);
             return config;
         }
 

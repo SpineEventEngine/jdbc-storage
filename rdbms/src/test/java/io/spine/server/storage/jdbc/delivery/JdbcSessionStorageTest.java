@@ -31,14 +31,15 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@DisplayName("JdbcSessionStorage should")
+@DisplayName("`JdbcSessionStorage` should")
 class JdbcSessionStorageTest {
 
-    @Test
-    @DisplayName("not allow changing tenancy attribute")
-    void notAllowSingleTenant() {
-        JdbcSessionStorage.Builder builder = JdbcSessionStorage.newBuilder();
-        assertThrows(UnsupportedOperationException.class,
-                     () -> builder.setMultitenant(false));
-    }
+    //TODO:2021-12-21:alex.tymchenko: review this tested feature.
+//    @Test
+//    @DisplayName("not allow changing tenancy attribute")
+//    void notAllowSingleTenant() {
+//        var builder = JdbcSessionStorage.newBuilder();
+//        assertThrows(UnsupportedOperationException.class,
+//                     () -> builder.setMultitenant(false));
+//    }
 }

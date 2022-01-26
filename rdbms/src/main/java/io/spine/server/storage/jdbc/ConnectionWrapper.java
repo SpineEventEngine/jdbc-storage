@@ -68,7 +68,7 @@ public final class ConnectionWrapper implements AutoCloseable {
         try {
             @SuppressWarnings("JDBCPrepareStatementWithNonConstantString")
             // Preparing a statement provided by a StorageQuery.
-            PreparedStatement statement = connection.prepareStatement(sql);
+            var statement = connection.prepareStatement(sql);
             return statement;
         } catch (SQLException e) {
             throw new DatabaseException("Error executing statement " + sql, e);

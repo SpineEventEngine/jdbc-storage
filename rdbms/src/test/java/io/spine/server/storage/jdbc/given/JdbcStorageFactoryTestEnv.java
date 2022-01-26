@@ -26,15 +26,13 @@
 
 package io.spine.server.storage.jdbc.given;
 
+import io.spine.base.Identifier;
 import io.spine.server.ContextSpec;
-import io.spine.server.aggregate.Aggregate;
-import io.spine.server.entity.storage.ColumnTypeMapping;
-import io.spine.server.projection.Projection;
+import io.spine.server.storage.ColumnTypeMapping;
 import io.spine.server.storage.jdbc.DataSourceConfig;
 import io.spine.server.storage.jdbc.JdbcStorageFactory;
 import io.spine.server.storage.jdbc.Type;
 import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
-import io.spine.test.storage.Project;
 
 import static io.spine.server.storage.jdbc.GivenDataSource.prefix;
 import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
@@ -45,19 +43,21 @@ public class JdbcStorageFactoryTestEnv {
     private JdbcStorageFactoryTestEnv() {
     }
 
-    private static final DataSourceConfig CONFIG = DataSourceConfig
-            .newBuilder()
-            .setJdbcUrl(prefix("factoryTests"))
-            .setUsername("SA")
-            .setPassword("pwd")
-            .setMaxPoolSize(30)
-            .build();
-
     public static JdbcStorageFactory newFactory() {
+        var dataSource = dataSource();
         return JdbcStorageFactory.newBuilder()
-                                 .setDataSource(CONFIG)
+                                 .setDataSource(dataSource)
                                  .setTypeMapping(MYSQL_5_7)
                                  .build();
+    }
+
+    private static DataSourceConfig dataSource() {
+        return DataSourceConfig.newBuilder()
+                .setJdbcUrl(prefix("factoryTests-" + Identifier.newUuid()))
+                .setUsername("SA")
+                .setPassword("pwd")
+                .setMaxPoolSize(30)
+                .build();
     }
 
     public static ContextSpec multitenantSpec() {
@@ -68,21 +68,7 @@ public class JdbcStorageFactoryTestEnv {
         return ContextSpec.singleTenant(JdbcStorageFactoryTestEnv.class.getName());
     }
 
-    public static class TestAggregate extends Aggregate<String, Project, Project.Builder> {
-
-        private TestAggregate(String id) {
-            super(id);
-        }
-    }
-
-    public static class TestProjection extends Projection<String, Project, Project.Builder> {
-
-        private TestProjection(String id) {
-            super(id);
-        }
-    }
-
-    public static class TestColumnMapping implements JdbcColumnMapping<String> {
+    public static class TestColumnMapping implements JdbcColumnMapping {
 
         @Override
         public Type typeOf(Class<?> columnType) {

@@ -33,12 +33,12 @@ import com.google.protobuf.Timestamp;
 import com.google.protobuf.util.Timestamps;
 import io.spine.core.Version;
 import io.spine.json.Json;
-import io.spine.server.entity.storage.AbstractColumnMapping;
-import io.spine.server.entity.storage.ColumnTypeMapping;
+import io.spine.server.storage.AbstractColumnMapping;
+import io.spine.server.storage.ColumnTypeMapping;
 import io.spine.server.storage.jdbc.Type;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static io.spine.server.entity.storage.ColumnTypeMapping.identity;
+import static io.spine.server.storage.ColumnTypeMapping.identity;
 import static io.spine.server.storage.jdbc.Type.BOOLEAN;
 import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
 import static io.spine.server.storage.jdbc.Type.INT;
@@ -52,14 +52,13 @@ import static io.spine.server.storage.jdbc.Type.STRING;
  */
 public class DefaultJdbcColumnMapping
         extends AbstractColumnMapping<Object>
-        implements JdbcColumnMapping<Object> {
+        implements JdbcColumnMapping {
 
     @Override
     public Type typeOf(Class<?> columnType) {
         checkNotNull(columnType);
-        JdbcColumnTypeMapping<?, ?> typeMapping =
-                (JdbcColumnTypeMapping<?, ? >) of(columnType);
-        Type type = typeMapping.storeAs();
+        var typeMapping = (JdbcColumnTypeMapping<?, ? >) of(columnType);
+        var type = typeMapping.storeAs();
         return type;
     }
 

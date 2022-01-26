@@ -34,7 +34,7 @@ import java.sql.SQLException;
 
 import static io.spine.base.Identifier.newUuid;
 
-public class GivenDataSource {
+public final class GivenDataSource {
 
     /**
      * The URL prefix of an in-memory HyperSQL DB.
@@ -49,8 +49,10 @@ public class GivenDataSource {
     }
 
     public static DataSourceWrapper whichIsStoredInMemory(String dbName) {
-        HikariConfig config = hikariConfig(dbName);
-        DataSourceWrapper dataSource = DataSourceWrapper.wrap(new HikariDataSource(config));
+        var config = hikariConfig(dbName);
+        //TODO:2022-01-25:alex.tymchenko: remove this one later.
+        config.setMaximumPoolSize(100);
+        var dataSource = DataSourceWrapper.wrap(new HikariDataSource(config));
         return dataSource;
     }
 
@@ -62,14 +64,14 @@ public class GivenDataSource {
     }
 
     public static ThrowingHikariDataSource whichIsThrowingByCommand(String dbName) {
-        HikariConfig config = hikariConfig(dbName);
-        ThrowingHikariDataSource dataSource = new ThrowingHikariDataSource(config);
+        var config = hikariConfig(dbName);
+        var dataSource = new ThrowingHikariDataSource(config);
         return dataSource;
     }
 
     private static HikariConfig hikariConfig(String dbName) {
-        HikariConfig config = new HikariConfig();
-        String dbUrl = prefix(dbName);
+        var config = new HikariConfig();
+        var dbUrl = prefix(dbName);
         config.setJdbcUrl(dbUrl);
         // Not setting username and password is OK for in-memory database.
         return config;

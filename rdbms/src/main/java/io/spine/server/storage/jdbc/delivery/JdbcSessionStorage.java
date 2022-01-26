@@ -26,16 +26,15 @@
 
 package io.spine.server.storage.jdbc.delivery;
 
+import io.spine.server.ContextSpec;
 import io.spine.server.delivery.ShardIndex;
 import io.spine.server.delivery.ShardSessionRecord;
-import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.StorageBuilder;
-import io.spine.server.storage.jdbc.TypeMapping;
-import io.spine.server.storage.jdbc.message.JdbcMessageStorage;
+import io.spine.server.storage.MessageRecordSpec;
+import io.spine.server.storage.RecordWithColumns;
+import io.spine.server.storage.jdbc.JdbcStorageFactory;
+import io.spine.server.storage.jdbc.record.NewRecordStorage;
 
 import java.util.Iterator;
-
-import static io.spine.util.Exceptions.unsupported;
 
 /**
  * A JDBC-based storage for work session records.
@@ -45,61 +44,38 @@ import static io.spine.util.Exceptions.unsupported;
  * <p>Stores all the records in a single table regardless of target entity type, shard, etc.
  */
 public class JdbcSessionStorage
-        extends JdbcMessageStorage<ShardIndex,
-                                   ShardSessionRecord,
-                                   ShardSessionReadRequest,
-                                   ShardedWorkRegistryTable> {
+        extends NewRecordStorage<ShardIndex, ShardSessionRecord> {
 
-    private JdbcSessionStorage(Builder builder) {
-        this(builder.dataSource(), builder.typeMapping());
+    private static final MessageRecordSpec<ShardIndex, ShardSessionRecord> spec = newRecordSpec();
+
+    public JdbcSessionStorage(ContextSpec contextSpec, JdbcStorageFactory factory) {
+        super(contextSpec, spec, factory);
     }
 
-    protected JdbcSessionStorage(DataSourceWrapper dataSource, TypeMapping typeMapping) {
-        super(true, new ShardedWorkRegistryTable(dataSource, typeMapping));
+    private static MessageRecordSpec<ShardIndex, ShardSessionRecord> newRecordSpec() {
+        @SuppressWarnings("ConstantConditions") // Proto messages never return `null`s.
+        var spec = new MessageRecordSpec<>(
+                ShardIndex.class,
+                ShardSessionRecord.class,
+                ShardSessionRecord::getIndex,
+                SessionRecordColumn.definitions()
+        );
+        return spec;
+    }
+
+    @Override
+    public void write(ShardIndex id, ShardSessionRecord record) {
+        var withCols = RecordWithColumns.create(id, record, spec);
+        writeRecord(withCols);
     }
 
     /**
-     * Obtains all the session records present in the storage.
-     */
-    Iterator<ShardSessionRecord> readAll() {
-        return table().readAll();
-    }
-
-    /**
-     * Creates a new instance of {@code Builder} for {@code JdbcSessionStorage} instances.
+     * {@inheritDoc}
      *
-     * @return new instance of {@code Builder}
+     * <p>This method is exposed to this package.
      */
-    public static Builder newBuilder() {
-        return new Builder();
-    }
-
-    /**
-     * A builder for the {@code JdbcSessionStorage} instances.
-     */
-    public static final class Builder extends StorageBuilder<Builder, JdbcSessionStorage> {
-
-        /**
-         * Prevents direct instantiation.
-         */
-        private Builder() {
-            super();
-        }
-
-        @Override
-        public Builder setMultitenant(boolean multitenant) {
-            throw unsupported("`JdbcShardedWorkRegistry` is an application-wide instance " +
-                                      "and therefore is always multitenant.");
-        }
-
-        @Override
-        protected Builder getThis() {
-            return this;
-        }
-
-        @Override
-        protected JdbcSessionStorage doBuild() {
-            return new JdbcSessionStorage(this);
-        }
+    @Override
+    protected Iterator<ShardSessionRecord> readAll() {
+        return super.readAll();
     }
 }

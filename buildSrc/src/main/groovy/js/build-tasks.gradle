@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2022, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package js
 
 /**
  * This script declares common Gradle tasks required for JavaScript modules.
@@ -33,6 +32,8 @@ package js
  *
  * <p>This script doesn't configure Protobuf plugin and Spine's Protobuf JS plugin.
  */
+
+println("`build-tasks.gradle` script is deprecated. Please use `javascript` extension instead.")
 
 ext {
     JAVA_SCRIPT_TASK_GROUP = 'JavaScript'
@@ -47,8 +48,8 @@ ext {
 }
 
 apply plugin: 'base'
-apply from: deps.scripts.npmCli
-apply from: deps.scripts.updatePackageVersion
+apply from: "$rootDir" + io.spine.internal.gradle.Scripts.commonPath + "js/npm-cli.gradle"
+apply from: "$rootDir" + io.spine.internal.gradle.Scripts.commonPath + "js/update-package-version.gradle"
 
 /**
  * Compiles Protobuf sources into JavaScript.

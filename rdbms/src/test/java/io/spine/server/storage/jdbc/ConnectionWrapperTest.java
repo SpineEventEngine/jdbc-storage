@@ -37,7 +37,7 @@ import static io.spine.base.Identifier.newUuid;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@DisplayName("ConnectionWrapper should")
+@DisplayName("`ConnectionWrapper` should")
 class ConnectionWrapperTest {
 
     private final DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
@@ -45,9 +45,9 @@ class ConnectionWrapperTest {
     @Test
     @DisplayName("store and retrieve connection")
     void storeAndRetrieveConnection() {
-        Connection connection = connection();
-        ConnectionWrapper wrapper = ConnectionWrapper.wrap(connection);
-        Connection stored = wrapper.get();
+        var connection = connection();
+        var wrapper = ConnectionWrapper.wrap(connection);
+        var stored = wrapper.get();
         assertThat(stored)
                 .isSameInstanceAs(connection);
     }
@@ -55,36 +55,36 @@ class ConnectionWrapperTest {
     @Test
     @DisplayName("throw `DatabaseException` in case of `SQLException` on commit")
     void handleExceptionOnCommit() throws SQLException {
-        Connection connection = connection();
+        var connection = connection();
         // Close the connection so it can't commit.
         connection.close();
-        ConnectionWrapper wrapper = ConnectionWrapper.wrap(connection);
+        var wrapper = ConnectionWrapper.wrap(connection);
         assertThrows(DatabaseException.class, wrapper::commit);
     }
 
     @Test
     @DisplayName("throw `DatabaseException` in case of `SQLException` on rollback")
     void handleExceptionOnRollback() throws SQLException {
-        Connection connection = connection();
+        var connection = connection();
         // Close the connection so the rollback is not available.
         connection.close();
-        ConnectionWrapper wrapper = ConnectionWrapper.wrap(connection);
+        var wrapper = ConnectionWrapper.wrap(connection);
         assertThrows(DatabaseException.class, wrapper::rollback);
     }
 
     @Test
     @DisplayName("throw `DatabaseException` in case of `SQLException` on preparing statement")
     void handleExceptionOnPrepareStatement() throws SQLException {
-        Connection connection = connection();
+        var connection = connection();
         // Close the connection so the statement cannot be prepared.
         connection.close();
-        ConnectionWrapper wrapper = ConnectionWrapper.wrap(connection);
+        var wrapper = ConnectionWrapper.wrap(connection);
         assertThrows(DatabaseException.class,
                      () -> wrapper.prepareStatement("SOME SQL STATEMENT."));
     }
 
     private Connection connection() {
-        ConnectionWrapper connection = dataSource.getConnection(false);
+        var connection = dataSource.getConnection(false);
         return connection.get();
     }
 }

@@ -68,10 +68,10 @@ public interface DataSourceWrapper extends AutoCloseable {
      * @return templates for a particular JDBC implementation
      */
     default SQLTemplates templates() {
-        try (ConnectionWrapper connection = getConnection(true)) {
-            DatabaseMetaData metaData = connection.get()
-                                                  .getMetaData();
-            SQLTemplatesRegistry templatesRegistry = new SQLTemplatesRegistry();
+        try (var connection = getConnection(true)) {
+            var metaData = connection.get()
+                                     .getMetaData();
+            var templatesRegistry = new SQLTemplatesRegistry();
             return templatesRegistry.getTemplates(metaData);
         } catch (SQLException e) {
             throw new DatabaseException(e);

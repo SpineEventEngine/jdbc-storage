@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2022, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package js
 
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
@@ -31,6 +30,9 @@ import groovy.json.JsonSlurper
 /**
  * This script declares a task to update the version in in a package.json file.
  */
+
+println("`update-package-version.gradle` script is deprecated. " +
+        "Please use `javascript` extension instead.")
 
 /**
  * Updates the package.json version to the specified one.

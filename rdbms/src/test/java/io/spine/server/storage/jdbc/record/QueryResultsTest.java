@@ -26,18 +26,18 @@
 
 package io.spine.server.storage.jdbc.record;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+//import org.junit.jupiter.api.DisplayName;
+//import org.junit.jupiter.api.Test;
+//
+//import static io.spine.testing.Assertions.assertHasPrivateParameterlessCtor;
+//import static io.spine.testing.DisplayNames.HAVE_PARAMETERLESS_CTOR;
 
-import static io.spine.testing.DisplayNames.HAVE_PARAMETERLESS_CTOR;
-import static io.spine.testing.Tests.assertHasPrivateParameterlessCtor;
-
-@DisplayName("QueryResults utility should")
+//@DisplayName("`QueryResults` utility should")
 class QueryResultsTest {
 
-    @Test
-    @DisplayName(HAVE_PARAMETERLESS_CTOR)
-    void haveUtilityConstructor() {
-        assertHasPrivateParameterlessCtor(QueryResults.class);
-    }
+//    @Test
+//    @DisplayName(HAVE_PARAMETERLESS_CTOR)
+//    void haveUtilityConstructor() {
+//        assertHasPrivateParameterlessCtor(QueryResults.class);
+//    }
 }

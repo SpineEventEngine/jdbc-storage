@@ -42,7 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@DisplayName("IdColumn should")
+@DisplayName("`IdColumn` should")
 class IdColumnTest {
 
     @Test
@@ -80,8 +80,7 @@ class IdColumnTest {
     @Test
     @DisplayName("store column name")
     void storeColumnName() {
-        IdColumn<String> column =
-                IdColumn.ofEntityClass(idTableColumn(), StringIdEntity.class);
+        var column = IdColumn.ofEntityClass(idTableColumn(), StringIdEntity.class);
         assertEquals(idTableColumn().name(), column.columnName());
     }
 }

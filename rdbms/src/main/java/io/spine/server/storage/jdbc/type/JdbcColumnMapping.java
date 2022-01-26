@@ -26,13 +26,13 @@
 
 package io.spine.server.storage.jdbc.type;
 
-import io.spine.server.entity.storage.ColumnMapping;
+import io.spine.server.storage.ColumnMapping;
 import io.spine.server.storage.jdbc.Type;
 
 /**
  * The column mapping which also stores the JDBC type mapping information.
  */
-public interface JdbcColumnMapping<R> extends ColumnMapping<R> {
+public interface JdbcColumnMapping extends ColumnMapping<Object> {
 
     Type typeOf(Class<?> columnType);
 }

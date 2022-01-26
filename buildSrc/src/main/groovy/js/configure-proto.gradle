@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2022, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package js
 
 import io.spine.internal.dependency.Protobuf
 import io.spine.internal.gradle.Scripts
@@ -44,13 +43,15 @@ import io.spine.internal.gradle.Scripts
  * the NPM packages should be published.
  */
 
+println("`configure-proto.gradle` script is deprecated. Please use `javascript` extension instead.")
+
 ext {
     genProtoBaseDir = "$projectDir/generated"
     genProtoMain = "$genProtoBaseDir/main/js"
     genProtoTest = "$genProtoBaseDir/test/js"
 }
 
-apply from: Scripts.npmPublishTasks
+apply from: "$rootDir" + io.spine.internal.gradle.Scripts.commonPath + "js/npm-publish-tasks.gradle"
 
 /**
  * Configures the JS code generation.
@@ -82,8 +83,8 @@ protobuf {
 }
 
 /**
- * Configures the generation of additional features for the Proto messages via Spine Proto JS
- * plugin.
+ * Configures the generation of additional features for the Proto messages via
+ * Spine Proto JS plugin.
  */
 protoJs {
     mainGenProtoDir = genProtoMain
