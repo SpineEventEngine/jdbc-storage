@@ -40,6 +40,7 @@ import io.spine.server.entity.FieldMasks;
 import io.spine.server.storage.jdbc.record.RecordTable;
 import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.sql.ResultSet;
 import java.util.Iterator;
@@ -48,10 +49,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static com.querydsl.core.types.dsl.Expressions.comparablePath;
 import static io.spine.query.Direction.ASC;
-import static io.spine.server.storage.jdbc.record.column.BytesColumn.bytesColumnName;
 import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.messageReader;
 import static io.spine.server.storage.jdbc.query.QueryPredicates.inIds;
 import static io.spine.server.storage.jdbc.query.QueryPredicates.matchPredicate;
+import static io.spine.server.storage.jdbc.record.column.BytesColumn.bytesColumnName;
 
 /**
  * Selects multiple records from the {@link RecordTable RecordTable}
@@ -81,19 +82,15 @@ public class SelectMessagesByQuery<I, R extends Message> extends AbstractQuery
     @Override
     public Iterator<R> execute() {
         var subject = recordQuery.subject();
-        var inIds = inIds(idColumn, subject.id()
-                                           .values());
+        var inIds = inIds(idColumn, subject.id().values());
         var matchParameters = matchPredicate(subject.predicate(), columnMapping);
 
-        var query =
-                factory().select(pathOf(bytesColumnName()))
-                         .where(inIds)
-                         .where(matchParameters)
-                         .from(table());
+        var query = factory().select(pathOf(bytesColumnName()))
+                             .where(inIds)
+                             .where(matchParameters)
+                             .from(table());
         addSorting(query, recordQuery.sorting());
         setLimit(query);
-
-        //TODO:2022-01-26:alex.tymchenko: add the limit!
 
         var resultSet = query.getResults();
         var records = asIterator(resultSet);
@@ -108,15 +105,13 @@ public class SelectMessagesByQuery<I, R extends Message> extends AbstractQuery
         }
     }
 
-    @SuppressWarnings("rawtypes")   /* To avoid this hell with generics. */
-    private void addSorting(AbstractSQLQuery<Object, ?> query,
-                            ImmutableList<SortBy<?, R>> sorting) {
+    private void addSorting(AbstractSQLQuery<Object, ?> query, Iterable<SortBy<?, R>> sorting) {
         for (var sortDirective : sorting) {
             var column = sortDirective.column();
             var name = column.name().value();
             var sortingPath = comparablePath(Comparable.class, name);
             var order = sortDirective.direction() == ASC ? Order.ASC : Order.DESC;
-            var specifier = new OrderSpecifier<Comparable>(order, sortingPath);
+            var specifier = new OrderSpecifier<>(order, sortingPath);
             query.orderBy(specifier);
         }
     }
@@ -198,14 +193,17 @@ public class SelectMessagesByQuery<I, R extends Message> extends AbstractQuery
          *
          * <p>Checks that all the builder fields were set to a non-{@code null} values.
          */
-        @SuppressWarnings("MethodWithMoreThanThreeNegations") // Needed for the check.
         @Override
         protected void checkPreconditions() throws IllegalStateException {
             super.checkPreconditions();
-            checkState(idColumn != null, "`IdColumn` is not set.");
-            checkState(recordQuery != null, "`RecordQuery` is not set.");
-            checkState(columnMapping != null, "`ColumnMapping` is not set.");
-            checkState(recordDescriptor != null, "`Descriptor` is not set.");
+            ensureSet(idColumn, "IdColumn");
+            ensureSet(recordQuery, "RecordQuery");
+            ensureSet(columnMapping, "ColumnMapping");
+            ensureSet(recordDescriptor, "Descriptor");
+        }
+
+        private static void ensureSet(@Nullable Object parameter, String paramName) {
+            checkState(parameter != null, "`%s` must be set.", paramName);
         }
 
         @Override
