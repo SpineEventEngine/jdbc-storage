@@ -36,7 +36,7 @@ import org.junit.jupiter.api.DisplayName;
 
 import static io.spine.base.Identifier.newUuid;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
-import static io.spine.server.storage.jdbc.PredefinedMapping.H2_1_4;
+import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_1;
 
 //@SuppressWarnings("DuplicateStringLiteralInspection") // Common test display names.
 @DisplayName("RDBMS-backed `AggregateStorage` should")
@@ -49,7 +49,7 @@ class JdbcAggregateStorageTest extends AggregateStorageTest {
     void setUp() {
         factory = JdbcStorageFactory.newBuilder()
                 .setDataSource(whichIsStoredInMemory(newUuid()))
-                .setTypeMapping(H2_1_4)
+                .setTypeMapping(H2_2_1)
                 .build();
         ServerEnvironment
                 .when(Tests.class)

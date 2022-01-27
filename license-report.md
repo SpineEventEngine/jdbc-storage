@@ -53,21 +53,17 @@
      * **Project URL:** [https://developers.google.com/protocol-buffers/](https://developers.google.com/protocol-buffers/)
      * **License:** [3-Clause BSD License](https://opensource.org/licenses/BSD-3-Clause)
 
-1.  **Group** : com.infradna.tool. **Name** : bridge-method-annotation. **Version** : 1.13.
-     * **License:** [MIT License](http://www.opensource.org/licenses/mit-license.php)
-
 1.  **Group** : com.mysema.commons. **Name** : mysema-commons-lang. **Version** : 0.2.4.
      * **License:** [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
-1.  **Group** : com.querydsl. **Name** : querydsl-core. **Version** : 4.4.0.
+1.  **Group** : com.querydsl. **Name** : querydsl-core. **Version** : 5.0.0.
      * **Project URL:** [${project.homepage}](${project.homepage})
      * **License:** [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
-1.  **Group** : com.querydsl. **Name** : querydsl-sql. **Version** : 4.4.0.
-     * **Project URL:** [http://www.querydsl.com](http://www.querydsl.com)
+1.  **Group** : com.querydsl. **Name** : querydsl-sql. **Version** : 5.0.0.
      * **License:** [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
-1.  **Group** : com.zaxxer. **Name** : HikariCP. **Version** : 3.4.5.
+1.  **Group** : com.zaxxer. **Name** : HikariCP. **Version** : 5.0.1.
      * **Project URL:** [https://github.com/brettwooldridge/HikariCP](https://github.com/brettwooldridge/HikariCP)
      * **License:** [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -98,18 +94,6 @@
 1.  **Group** : io.perfmark. **Name** : perfmark-api. **Version** : 0.23.0.
      * **Project URL:** [https://github.com/perfmark/perfmark](https://github.com/perfmark/perfmark)
      * **License:** [Apache 2.0](https://opensource.org/licenses/Apache-2.0)
-
-1.  **Group** : javax.validation. **Name** : validation-api. **Version** : 1.1.0.Final.
-     * **Project URL:** [http://beanvalidation.org](http://beanvalidation.org)
-     * **License:** [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
-
-1.  **Group** : joda-time. **Name** : joda-time. **Version** : 1.6.
-     * **Project URL:** [http://joda-time.sourceforge.net](http://joda-time.sourceforge.net)
-     * **License:** [Apache 2](http://www.apache.org/licenses/)
-
-1.  **Group** : org.apache.servicemix.bundles. **Name** : org.apache.servicemix.bundles.javax-inject. **Version** : 1_2.
-     * **Project URL:** [http://www.apache.org/](http://www.apache.org/)
-     * **License:** [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
 1.  **Group** : org.checkerframework. **Name** : checker-compat-qual. **Version** : 2.5.5.
      * **Project URL:** [https://checkerframework.org](https://checkerframework.org)
@@ -271,12 +255,10 @@
 1.  **Group** : com.google.truth.extensions. **Name** : truth-proto-extension. **Version** : 1.1.3.
      * **License:** [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
-1.  **Group** : com.h2database. **Name** : h2. **Version** : 1.4.200.
+1.  **Group** : com.h2database. **Name** : h2. **Version** : 2.1.210.
      * **Project URL:** [https://h2database.com](https://h2database.com)
-     * **License:** [MPL 2.0 or EPL 1.0](https://h2database.com/html/license.html)
-
-1.  **Group** : com.infradna.tool. **Name** : bridge-method-annotation. **Version** : 1.13.
-     * **License:** [MIT License](http://www.opensource.org/licenses/mit-license.php)
+     * **License:** [EPL 1.0](https://opensource.org/licenses/eclipse-1.0.php)
+     * **License:** [MPL 2.0](https://www.mozilla.org/en-US/MPL/2.0/)
 
 1.  **Group** : com.mysema.commons. **Name** : mysema-commons-lang. **Version** : 0.2.4.
      * **License:** [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
@@ -285,19 +267,18 @@
      * **Project URL:** [https://checkstyle.org/](https://checkstyle.org/)
      * **License:** [LGPL-2.1+](http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt)
 
-1.  **Group** : com.querydsl. **Name** : querydsl-core. **Version** : 4.4.0.
+1.  **Group** : com.querydsl. **Name** : querydsl-core. **Version** : 5.0.0.
      * **Project URL:** [${project.homepage}](${project.homepage})
      * **License:** [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
-1.  **Group** : com.querydsl. **Name** : querydsl-sql. **Version** : 4.4.0.
-     * **Project URL:** [http://www.querydsl.com](http://www.querydsl.com)
+1.  **Group** : com.querydsl. **Name** : querydsl-sql. **Version** : 5.0.0.
      * **License:** [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
 1.  **Group** : com.squareup. **Name** : javapoet. **Version** : 1.13.0.
      * **Project URL:** [http://github.com/square/javapoet/](http://github.com/square/javapoet/)
      * **License:** [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
-1.  **Group** : com.zaxxer. **Name** : HikariCP. **Version** : 3.4.5.
+1.  **Group** : com.zaxxer. **Name** : HikariCP. **Version** : 5.0.1.
      * **Project URL:** [https://github.com/brettwooldridge/HikariCP](https://github.com/brettwooldridge/HikariCP)
      * **License:** [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -361,14 +342,6 @@
      * **Project URL:** [http://jcp.org/en/jsr/detail?id=250](http://jcp.org/en/jsr/detail?id=250)
      * **License:** [CDDL + GPLv2 with classpath exception](https://github.com/javaee/javax.annotation/blob/master/LICENSE)
 
-1.  **Group** : javax.validation. **Name** : validation-api. **Version** : 1.1.0.Final.
-     * **Project URL:** [http://beanvalidation.org](http://beanvalidation.org)
-     * **License:** [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
-
-1.  **Group** : joda-time. **Name** : joda-time. **Version** : 1.6.
-     * **Project URL:** [http://joda-time.sourceforge.net](http://joda-time.sourceforge.net)
-     * **License:** [Apache 2](http://www.apache.org/licenses/)
-
 1.  **Group** : junit. **Name** : junit. **Version** : 4.13.1.
      * **Project URL:** [http://junit.org](http://junit.org)
      * **License:** [Eclipse Public License 1.0](http://www.eclipse.org/legal/epl-v10.html)
@@ -409,10 +382,6 @@
      * **Project URL:** [http://commons.apache.org/proper/commons-lang/](http://commons.apache.org/proper/commons-lang/)
      * **License:** [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0.txt)
 
-1.  **Group** : org.apache.servicemix.bundles. **Name** : org.apache.servicemix.bundles.javax-inject. **Version** : 1_2.
-     * **Project URL:** [http://www.apache.org/](http://www.apache.org/)
-     * **License:** [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
-
 1.  **Group** : org.apiguardian. **Name** : apiguardian-api. **Version** : 1.1.2.
      * **Project URL:** [https://github.com/apiguardian-team/apiguardian](https://github.com/apiguardian-team/apiguardian)
      * **License:** [The Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
@@ -440,7 +409,7 @@
 1.  **Group** : org.hamcrest. **Name** : hamcrest-core. **Version** : 1.3.
      * **License:** [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
 
-1.  **Group** : org.hsqldb. **Name** : hsqldb. **Version** : 2.5.1.
+1.  **Group** : org.hsqldb. **Name** : hsqldb. **Version** : 2.6.1.
      * **Project URL:** [http://hsqldb.org](http://hsqldb.org)
      * **License:** [HSQLDB License, a BSD open source license](http://hsqldb.org/web/hsqlLicense.html)
 
@@ -583,4 +552,4 @@
 
 The dependencies distributed under several licenses, are used according their commercial-use-friendly license.
 
-This report was generated on **Wed Jan 26 19:09:47 EET 2022** using [Gradle-License-Report plugin](https://github.com/jk1/Gradle-License-Report) by Evgeny Naumenko, licensed under [Apache 2.0 License](https://github.com/jk1/Gradle-License-Report/blob/master/LICENSE).
+This report was generated on **Thu Jan 27 15:57:45 EET 2022** using [Gradle-License-Report plugin](https://github.com/jk1/Gradle-License-Report) by Evgeny Naumenko, licensed under [Apache 2.0 License](https://github.com/jk1/Gradle-License-Report/blob/master/LICENSE).

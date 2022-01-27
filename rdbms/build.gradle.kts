@@ -31,10 +31,10 @@ apply<IncrementGuard>()
 
 extra["artifactId"] = "jdbc-rdbms"
 
-val querydslVersion = "4.4.0"
-val hikariVersion = "3.4.5"
-val hsqldbVersion = "2.5.1"
-val h2Version = "1.4.200"
+val querydslVersion = "5.0.0"
+val hikariVersion = "5.0.1"
+val hsqldbVersion = "2.6.1"
+val h2Version = "2.1.210"
 
 dependencies {
     api("com.querydsl:querydsl-sql:$querydslVersion") {

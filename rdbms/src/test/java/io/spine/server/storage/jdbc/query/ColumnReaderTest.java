@@ -42,7 +42,7 @@ import java.sql.SQLException;
 import static com.google.common.truth.Truth.assertThat;
 import static io.spine.base.Identifier.newUuid;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
-import static io.spine.server.storage.jdbc.PredefinedMapping.H2_1_4;
+import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_1;
 import static io.spine.server.storage.jdbc.record.column.BytesColumn.bytesColumnName;
 import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.idReader;
 import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.messageReader;
@@ -57,7 +57,7 @@ class ColumnReaderTest {
         var dataSource = whichIsStoredInMemory(newUuid());
         factory = JdbcStorageFactory.newBuilder()
                 .setDataSource(dataSource)
-                .setTypeMapping(H2_1_4)
+                .setTypeMapping(H2_2_1)
                 .build();
     }
 

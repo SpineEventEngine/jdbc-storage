@@ -38,7 +38,7 @@ import java.sql.SQLException;
 
 import static io.spine.base.Identifier.newUuid;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
-import static io.spine.server.storage.jdbc.PredefinedMapping.H2_1_4;
+import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_1;
 
 public class DbIteratorTestEnv {
 
@@ -108,7 +108,7 @@ public class DbIteratorTestEnv {
     }
 
     private static TimestampByString table() {
-        var factory = inMemoryFactory(H2_1_4);
+        var factory = inMemoryFactory(H2_2_1);
         var table = new TimestampByString(factory);
         return table;
     }

@@ -45,12 +45,12 @@ import com.querydsl.sql.SQLQueryFactory;
 import io.spine.query.ColumnName;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
-import io.spine.server.storage.jdbc.record.JdbcTableSpec;
 import io.spine.server.storage.jdbc.TableColumn;
+import io.spine.server.storage.jdbc.record.JdbcTableSpec;
 
-import javax.inject.Provider;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -167,21 +167,32 @@ public abstract class AbstractQuery implements StorageQuery {
      */
     @VisibleForTesting
     static AbstractSQLQueryFactory<?> createFactory(final DataSourceWrapper dataSource) {
-        var connectionProvider = (Provider<Connection>) () -> {
-            var connection = dataSource.getConnection(false)
-                                       .get();
+        var connectionSupplier = new ConnectionSupplier(dataSource);
+        var templates = dataSource.templates();
+        var configuration = new Configuration(templates);
+        configuration.addListener(TransactionHandler.INSTANCE);
+        configuration.addListener(SQLCloseListener.DEFAULT);
+        return new SQLQueryFactory(configuration, connectionSupplier);
+    }
+
+    private static final class ConnectionSupplier implements Supplier<Connection> {
+
+        private final DataSourceWrapper dataSource;
+
+        private ConnectionSupplier(DataSourceWrapper source) {
+            dataSource = source;
+        }
+
+        @Override
+        public Connection get() {
+            var connection = dataSource.getConnection(false).get();
             try {
                 connection.setHoldability(HOLD_CURSORS_OVER_COMMIT);
                 return connection;
             } catch (SQLException e) {
                 throw new DatabaseException(e);
             }
-        };
-        var templates = dataSource.templates();
-        var configuration = new Configuration(templates);
-        configuration.addListener(TransactionHandler.INSTANCE);
-        configuration.addListener(SQLCloseListener.DEFAULT);
-        return new SQLQueryFactory(configuration, connectionProvider);
+        }
     }
 
     /**

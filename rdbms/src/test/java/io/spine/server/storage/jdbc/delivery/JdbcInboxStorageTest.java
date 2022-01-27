@@ -26,40 +26,15 @@
 
 package io.spine.server.storage.jdbc.delivery;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.UnmodifiableIterator;
-import com.google.common.testing.NullPointerTester;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import io.spine.environment.Tests;
 import io.spine.server.ServerEnvironment;
-import io.spine.server.delivery.InboxMessage;
-import io.spine.server.delivery.InboxMessageId;
-import io.spine.server.delivery.InboxMessageStatus;
-import io.spine.server.delivery.InboxStorage;
 import io.spine.server.delivery.InboxStorageTest;
-import io.spine.server.delivery.Page;
-import io.spine.server.delivery.ShardIndex;
-import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.delivery.given.TestInboxMessage;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 
-import java.util.List;
-import java.util.Optional;
-
-import static com.google.common.collect.ImmutableList.toImmutableList;
-import static io.spine.server.delivery.InboxMessageStatus.DELIVERED;
-import static io.spine.server.delivery.InboxMessageStatus.TO_DELIVER;
-import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
-import static io.spine.server.storage.jdbc.PredefinedMapping.H2_1_4;
-import static io.spine.server.storage.jdbc.delivery.given.TestInboxMessage.generateMultiple;
 import static io.spine.server.storage.jdbc.delivery.given.TestShardIndex.newIndex;
 import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.newFactory;
-import static io.spine.testing.DisplayNames.NOT_ACCEPT_NULLS;
-import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
