@@ -87,8 +87,8 @@ class JdbcStorageFactoryTest {
     }
 
     @Nested
-    @DisplayName("create record storage")
-    class CreateRecordStorage {
+    @DisplayName("create a record storage")
+    class CreateStorage {
 
         @Test
         @DisplayName("which is multitenant")

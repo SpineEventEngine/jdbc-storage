@@ -40,20 +40,21 @@ import java.util.Iterator;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A storage which stores plain messages in a single SQL {@linkplain RecordTable table}.
+ * A storage which stores Protobuf message records in a single RDBMS {@linkplain RecordTable table}
+ * accessed via JDBC connection.
  *
  * @param <I>
  *         the type of identifiers of stored records
  * @param <R>
  *         the type of stored records
  */
-public class NewRecordStorage<I, R extends Message> extends RecordStorage<I, R> {
+public class JdbcRecordStorage<I, R extends Message> extends RecordStorage<I, R> {
 
     private final RecordTable<I, R> table;
 
-    public NewRecordStorage(ContextSpec contextSpec,
-                            RecordSpec<I, R, ?> recordSpec,
-                            JdbcStorageFactory factory) {
+    public JdbcRecordStorage(ContextSpec contextSpec,
+                             RecordSpec<I, R, ?> recordSpec,
+                             JdbcStorageFactory factory) {
         super(contextSpec, recordSpec);
         var tableSpec = factory.tableSpecFor(recordSpec);
         this.table = RecordTable.by(tableSpec, factory);

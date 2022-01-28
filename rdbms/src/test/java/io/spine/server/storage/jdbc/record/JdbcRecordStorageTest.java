@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2022, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.newrecord;
+package io.spine.server.storage.jdbc.record;
 
 import io.spine.environment.Tests;
 import io.spine.server.ServerEnvironment;
@@ -36,7 +36,7 @@ import org.junit.jupiter.api.DisplayName;
 import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.newFactory;
 
 @DisplayName("`JdbcRecordStorage` should")
-class NewRecordStorageTest extends RecordStorageDelegateTest {
+class JdbcRecordStorageTest extends RecordStorageDelegateTest {
 
     @BeforeEach
     @Override

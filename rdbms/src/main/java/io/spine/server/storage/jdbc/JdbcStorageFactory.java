@@ -40,7 +40,7 @@ import io.spine.server.storage.jdbc.record.JdbcTableSpec;
 import io.spine.server.storage.jdbc.record.column.CustomColumns;
 import io.spine.server.storage.jdbc.aggregate.AggregateEventRecordColumns;
 import io.spine.server.storage.jdbc.delivery.JdbcSessionStorage;
-import io.spine.server.storage.jdbc.record.NewRecordStorage;
+import io.spine.server.storage.jdbc.record.JdbcRecordStorage;
 import io.spine.server.storage.jdbc.operation.OperationFactory;
 import io.spine.server.storage.jdbc.type.DefaultJdbcColumnMapping;
 import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
@@ -81,7 +81,7 @@ public class JdbcStorageFactory implements StorageFactory {
     @Override
     public <I, R extends Message> RecordStorage<I, R>
     createRecordStorage(ContextSpec context, RecordSpec<I, R, ?> spec) {
-        var result = new NewRecordStorage<>(context, spec, this);
+        var result = new JdbcRecordStorage<>(context, spec, this);
         return result;
     }
 

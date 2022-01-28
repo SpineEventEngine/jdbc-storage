@@ -32,7 +32,7 @@ import io.spine.server.delivery.ShardSessionRecord;
 import io.spine.server.storage.MessageRecordSpec;
 import io.spine.server.storage.RecordWithColumns;
 import io.spine.server.storage.jdbc.JdbcStorageFactory;
-import io.spine.server.storage.jdbc.record.NewRecordStorage;
+import io.spine.server.storage.jdbc.record.JdbcRecordStorage;
 
 import java.util.Iterator;
 
@@ -43,8 +43,7 @@ import java.util.Iterator;
  *
  * <p>Stores all the records in a single table regardless of target entity type, shard, etc.
  */
-public class JdbcSessionStorage
-        extends NewRecordStorage<ShardIndex, ShardSessionRecord> {
+public class JdbcSessionStorage extends JdbcRecordStorage<ShardIndex, ShardSessionRecord> {
 
     private static final MessageRecordSpec<ShardIndex, ShardSessionRecord> spec = newRecordSpec();
 
