@@ -55,7 +55,7 @@ public final class DeleteManyByIds<I, R extends Message> extends Operation<I, R>
 
     private DeleteMessagesInBulk<I, R> deleteBulk(Iterable<I> ids) {
         var query = DeleteMessagesInBulk.<I, R>newBuilder()
-                .setTableName(tableName())
+                .setTableSpec(table().spec())
                 .setIds(ids)
                 .setIdColumn(idColumn())
                 .setDataSource(dataSource())

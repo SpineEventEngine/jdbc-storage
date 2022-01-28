@@ -26,28 +26,26 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import com.querydsl.sql.Configuration;
-import com.querydsl.sql.SQLListeners;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.query.AbstractQuery.TransactionHandler;
 import io.spine.server.storage.jdbc.query.given.Given.AStorageQuery;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 
 import static com.google.common.truth.Truth.assertThat;
 import static io.spine.base.Identifier.newUuid;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
 import static io.spine.server.storage.jdbc.query.given.Given.storageQueryBuilder;
+import static io.spine.server.storage.jdbc.query.given.Given.tableSpec;
 import static java.sql.ResultSet.HOLD_CURSORS_OVER_COMMIT;
 
 @DisplayName("`AbstractQuery` should")
 class AbstractQueryTest {
 
     private final DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
-    private final AStorageQuery query = storageQueryBuilder().setTableName(newUuid())
+    private final AStorageQuery query = storageQueryBuilder().setTableSpec(tableSpec())
                                                              .setDataSource(dataSource)
                                                              .build();
 

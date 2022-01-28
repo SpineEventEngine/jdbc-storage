@@ -91,8 +91,7 @@ class ColumnReaderTest {
 
         var timestamp = timestamp();
         table.write(timestamp);
-        var columnName = table.idColumn()
-                              .columnName();
+        var columnName = table.idColumn().columnName();
         var reader = idReader(columnName, String.class);
 
         var id = table.idOf(timestamp);

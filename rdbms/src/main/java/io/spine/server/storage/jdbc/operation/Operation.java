@@ -29,9 +29,9 @@ package io.spine.server.storage.jdbc.operation;
 import com.google.protobuf.Message;
 import io.spine.annotation.SPI;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.record.RecordTable;
 import io.spine.server.storage.jdbc.query.ContainsQuery;
 import io.spine.server.storage.jdbc.query.IdColumn;
+import io.spine.server.storage.jdbc.record.RecordTable;
 
 /**
  * An I/O operation performed over the DB table.
@@ -84,19 +84,11 @@ public abstract class Operation<I, R extends Message> {
 
     protected ContainsQuery<I, R> newContainsQuery(I id) {
         ContainsQuery.Builder<I, R> builder = ContainsQuery.newBuilder();
-        var query =
-                builder.setIdColumn(idColumn())
-                       .setId(id)
-                       .setTableName(tableName())
-                       .setDataSource(dataSource())
-                       .build();
+        var query = builder.setIdColumn(idColumn())
+                           .setId(id)
+                           .setTableSpec(table().spec())
+                           .setDataSource(dataSource())
+                           .build();
         return query;
-    }
-
-    enum Type {
-        writeOne,
-        readOne,
-        writeBulk,
-        readMany
     }
 }

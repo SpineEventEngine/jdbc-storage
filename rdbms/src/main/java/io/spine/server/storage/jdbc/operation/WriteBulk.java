@@ -119,7 +119,7 @@ public class WriteBulk<I, R extends Message> extends Operation<I, R> {
     private InsertRecordsInBulk<I, R>
     newBulkInsert(ImmutableList<JdbcRecord<I, R>> records) {
         InsertRecordsInBulk.Builder<I, R> builder = InsertRecordsInBulk.newBuilder();
-        var query = builder.setTableName(tableName())
+        var query = builder.setTableSpec(table().spec())
                            .setDataSource(dataSource())
                            .setIdColumn(idColumn())
                            .setTableSpec(table().spec())
@@ -131,7 +131,7 @@ public class WriteBulk<I, R extends Message> extends Operation<I, R> {
     private UpdateRecordsInBulk<I, R>
     newBulkUpdate(ImmutableList<JdbcRecord<I, R>> records) {
         UpdateRecordsInBulk.Builder<I, R> builder = UpdateRecordsInBulk.newBuilder();
-        var query = builder.setTableName(tableName())
+        var query = builder.setTableSpec(table().spec())
                            .setDataSource(dataSource())
                            .setIdColumn(idColumn())
                            .setRecords(records)

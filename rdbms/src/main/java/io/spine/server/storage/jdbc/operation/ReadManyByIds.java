@@ -55,7 +55,7 @@ public class ReadManyByIds<I, R extends Message> extends Operation<I, R>  {
 
     private SelectMessagesByIds<I, R> newSelectMany(Iterable<I> ids) {
         SelectMessagesByIds.Builder<I, R> builder = SelectMessagesByIds.newBuilder();
-        var query = builder.setTableName(tableName())
+        var query = builder.setTableSpec(table().spec())
                            .setDataSource(dataSource())
                            .setIdColumn(idColumn())
                            .setIds(ids)

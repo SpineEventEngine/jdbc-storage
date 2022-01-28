@@ -92,7 +92,7 @@ public class WriteOne<I, R extends Message> extends Operation<I, R> {
     protected final UpdateSingleRecord<I, R> newUpdate(JdbcRecord<I, R> record) {
         var id = record.id();
         UpdateSingleRecord.Builder<I, R> builder = UpdateSingleRecord.newBuilder();
-        var query = builder.setTableName(tableName())
+        var query = builder.setTableSpec(table().spec())
                            .setDataSource(dataSource())
                            .setIdColumn(idColumn())
                            .setId(id)
@@ -104,7 +104,7 @@ public class WriteOne<I, R extends Message> extends Operation<I, R> {
     protected final InsertSingleRecord<I, R> newInsert(JdbcRecord<I, R> record) {
         var id = record.id();
         InsertSingleRecord.Builder<I, R> builder = InsertSingleRecord.newBuilder();
-        var query = builder.setTableName(tableName())
+        var query = builder.setTableSpec(table().spec())
                            .setDataSource(dataSource())
                            .setIdColumn(idColumn())
                            .setId(id)

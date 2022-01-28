@@ -32,7 +32,6 @@ import com.google.protobuf.Message;
 import io.spine.logging.Logging;
 import io.spine.protobuf.Messages;
 import io.spine.query.RecordQuery;
-import io.spine.server.storage.RecordSpec;
 import io.spine.server.storage.RecordWithColumns;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.JdbcStorageFactory;
@@ -61,8 +60,6 @@ public class RecordTable<I, R extends Message> implements Logging {
     private final Descriptor descriptor;
     private final DataSourceWrapper dataSource;
 
-    private @MonotonicNonNull String name;
-
     protected RecordTable(JdbcTableSpec<I, R> tableSpec, JdbcStorageFactory factory) {
         spec = tableSpec;
         operations = factory.operations();
@@ -73,12 +70,6 @@ public class RecordTable<I, R extends Message> implements Logging {
     private static Descriptor descriptorFrom(JdbcTableSpec<?, ? extends Message> recordSpec) {
         return Messages.defaultInstance(recordSpec.storedType())
                        .getDescriptorForType();
-    }
-
-    private static String tableName(RecordSpec<?, ?, ?> recordSpec) {
-        return recordSpec.storedType()
-                         .getSimpleName()
-                         .toLowerCase();
     }
 
     public static <I, R extends Message> RecordTable<I, R>
@@ -98,7 +89,7 @@ public class RecordTable<I, R extends Message> implements Logging {
     /**
      * Returns the table name.
      */
-    public String name() {
+    public final String name() {
         return spec.tableName();
     }
 
@@ -117,9 +108,7 @@ public class RecordTable<I, R extends Message> implements Logging {
     }
 
     public void create() {
-        operations
-                .createTable(this)
-                .execute();
+        operations.createTable(this).execute();
     }
 
     //TODO:2021-06-24:alex.tymchenko: think of introducing a separate operation for this.
@@ -130,8 +119,7 @@ public class RecordTable<I, R extends Message> implements Logging {
     }
 
     public Iterator<I> index() {
-        var result = operations.index(this)
-                               .execute();
+        var result = operations.index(this).execute();
         return result;
     }
 
@@ -189,9 +177,7 @@ public class RecordTable<I, R extends Message> implements Logging {
                 StreamSupport.stream(records.spliterator(), false)
                              .map(r -> new JdbcRecord<>(spec, r))
                              .collect(Collectors.toList());
-        operations
-                .writeBulk(this)
-                .execute(transformed);
+        operations.writeBulk(this).execute(transformed);
     }
 
     /**

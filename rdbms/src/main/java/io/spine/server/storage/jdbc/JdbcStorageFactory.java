@@ -222,21 +222,6 @@ public class JdbcStorageFactory implements StorageFactory {
             return this;
         }
 
-//        //TODO:2022-01-11:alex.tymchenko: have the same configuration, but for `EntityClass`.
-//        public <I, R extends Message> Builder
-//        configureTable(Class<I> idType, Class<R> recordType, JdbcTableSpec.ColumnSpec<R>... columns) {
-//            checkNotNull(recordType);
-//            if(!tables.containsKey(recordType)) {
-//                var spec = new JdbcTableSpec<>(idType, recordType, columnMapping);
-//                tables.put(recordType, spec);
-//            }
-//
-//            @SuppressWarnings("unchecked")  /* As per the contract above. */
-//            var spec = (JdbcTableSpec<I, R>) tables.get(recordType);
-//            fn.accept(spec);
-//            return this;
-//        }
-
         @CanIgnoreReturnValue
         public <R extends Message>
         Builder configureColumns(Class<R> recordType, CustomColumns<R> columns) {
@@ -261,13 +246,7 @@ public class JdbcStorageFactory implements StorageFactory {
         }
 
         private void configureSystemTables() {
-//            configureColumns(InboxMessage.class, InboxColumns.instance());
             configureColumns(AggregateEventRecord.class, AggregateEventRecordColumns.instance());
         }
-    }
-
-    interface ConfigureTable<I, R extends Message> {
-
-        void accept(JdbcTableSpec<I, R> tableSpec);
     }
 }

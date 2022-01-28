@@ -63,7 +63,7 @@ public class DeleteAll<I, R extends Message> extends Operation<I, R> {
 
     private DeleteAllQuery<I, R> deleteAll() {
         var query = DeleteAllQuery.<I, R>newBuilder()
-                .setTableName(tableName())
+                .setTableSpec(table().spec())
                 .setDataSource(dataSource())
                 .build();
         return query;

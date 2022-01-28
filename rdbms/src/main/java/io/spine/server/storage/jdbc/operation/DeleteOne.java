@@ -69,7 +69,7 @@ public class DeleteOne<I, R extends Message> extends Operation<I, R> {
 
     private DeleteRecordQuery<I, R> deleteQuery(I id) {
         var query = DeleteRecordQuery.<I, R>newBuilder()
-                .setTableName(tableName())
+                .setTableSpec(table().spec())
                 .setIdColumn(idColumn())
                 .setId(id)
                 .setDataSource(dataSource())

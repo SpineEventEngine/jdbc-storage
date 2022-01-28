@@ -48,10 +48,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.function.Supplier;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
-import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.sql.ResultSet.HOLD_CURSORS_OVER_COMMIT;
 
 /**
@@ -65,7 +63,7 @@ public abstract class AbstractQuery implements StorageQuery {
 
     protected AbstractQuery(Builder<?, ?, ? extends Builder<?, ?, ?, ?>,
             ? extends StorageQuery> builder) {
-        var tableName = builder.tableName;
+        var tableName = builder.tableSpec.tableName();
         this.queryFactory = createFactory(builder.dataSource);
         this.tablePath = new RelationalPathBase<>(Object.class, tableName, tableName, tableName);
         this.pathBuilder = new PathBuilder<>(Object.class, tableName);
@@ -170,7 +168,6 @@ public abstract class AbstractQuery implements StorageQuery {
 
         private DataSourceWrapper dataSource;
         private JdbcTableSpec<I, R> tableSpec;
-        private String tableName;
 
         /**
          * Creates a new instance of the {@link StorageQuery} with respect to the preconditions.
@@ -195,8 +192,8 @@ public abstract class AbstractQuery implements StorageQuery {
         /**
          * Checks the preconditions of the query construction.
          *
-         * <p>Default implementation checks that the {@linkplain #dataSource data source} is not
-         * {@code null} and {@linkplain #tableName table name} is not an empty string.
+         * <p>Default implementation checks that the {@linkplain #dataSource data source}
+         * and {@linkplain #tableSpec table spec} are both not {@code null}.
          *
          * <p>Override this method to modify these preconditions.
          *
@@ -204,8 +201,8 @@ public abstract class AbstractQuery implements StorageQuery {
          *         upon a precondition violation
          */
         protected void checkPreconditions() throws IllegalStateException {
-            checkState(dataSource != null, "Data source must not be null");
-            checkState(!isNullOrEmpty(tableName), "Table name must be a non-empty string.");
+            checkState(dataSource != null, "Data source must not be `null`.");
+            checkState(tableSpec != null, "Table spec must not be `null`.");
         }
 
         /**
@@ -225,18 +222,6 @@ public abstract class AbstractQuery implements StorageQuery {
          */
         public B setDataSource(DataSourceWrapper dataSource) {
             this.dataSource = checkNotNull(dataSource);
-            return getThis();
-        }
-
-        /**
-         * Sets the table name to use as a target for the query.
-         *
-         * @param tableName
-         *         the table name for the query
-         */
-        public B setTableName(String tableName) {
-            checkArgument(!isNullOrEmpty(tableName));
-            this.tableName = tableName;
             return getThis();
         }
 

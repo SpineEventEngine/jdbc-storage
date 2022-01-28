@@ -54,7 +54,8 @@ public abstract class SelectMessageByIdQuery<I, R extends Message>
     private final Descriptor messageDescriptor;
 
     protected SelectMessageByIdQuery(
-            Builder<I, R, ? extends Builder, ? extends SelectMessageByIdQuery> builder) {
+            Builder<I, R, ? extends Builder<I, R, ?, ?>,
+                    ? extends SelectMessageByIdQuery<I, R>> builder) {
         super(builder);
         this.messageColumnName = builder.messageColumnName;
         this.messageDescriptor = builder.messageDescriptor;

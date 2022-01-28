@@ -45,14 +45,14 @@ import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsThrowingByCommand;
 import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_1;
 import static io.spine.server.storage.jdbc.given.Column.stringIdColumn;
+import static io.spine.server.storage.jdbc.query.given.Given.selectMsgBuilder;
 import static io.spine.server.storage.jdbc.record.column.BytesColumn.bytesColumnName;
-import static io.spine.server.storage.jdbc.query.given.Given.selectMessageBuilder;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("`SelectMessageByIdQuery` should")
 class SelectMessageByIdQueryTest {
 
-    private final ASelectMessageByIdQuery.Builder<String> builder = selectMessageBuilder();
+    private final ASelectMessageByIdQuery.Builder<String, Timestamp> builder = selectMsgBuilder();
 
     @SuppressWarnings("CheckReturnValue") // Run method to close result set.
     @Test
@@ -110,12 +110,12 @@ class SelectMessageByIdQueryTest {
                 .isNull();
     }
 
-    private ASelectMessageByIdQuery<String>
+    private ASelectMessageByIdQuery<String, Timestamp>
     query(DataSourceWrapper dataSource,
           TimestampByString table,
           AbstractSQLQuery<Object, ?> underlyingQuery) {
         var query =
-                builder.setTableName(table.name())
+                builder.setTableSpec(table.spec())
                        .setQuery(underlyingQuery)
                        .setDataSource(dataSource)
                        .setId(newUuid())

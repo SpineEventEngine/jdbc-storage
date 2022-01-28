@@ -98,6 +98,20 @@ public final class JdbcTableSpec<I, R extends Message> {
         this.customColumns = columnSpecs;
     }
 
+    //TODO:2022-01-28:alex.tymchenko: consolidate the ctors.
+    public JdbcTableSpec(String tableName,
+                         RecordSpec<I, R, ?> recordSpec,
+                         JdbcColumnMapping mapping,
+                         @Nullable CustomColumns<R> columnSpecs) {
+        this.tableName = checkNotEmptyOrBlank(tableName);
+        idClass = recordSpec.idType();
+        recordClass = recordSpec.storedType();
+        sourceClass = recordSpec.sourceType();
+        this.recordSpec = recordSpec;
+        columnMapping = mapping;
+        this.customColumns = columnSpecs;
+    }
+
     @Internal
     @CanIgnoreReturnValue
     public JdbcTableSpec<I, R> with(RecordSpec<I, R, ?> recordSpec) {

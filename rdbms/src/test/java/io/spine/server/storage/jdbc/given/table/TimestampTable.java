@@ -46,8 +46,6 @@ import static io.spine.server.storage.jdbc.record.column.BytesColumn.bytesColumn
 /**
  * Holds {@link Timestamp} records by some ID.
  *
- * //TODO:2022-01-26:alex.tymchenko: why do we need this at all?
- *
  * <p>Overrides several {@link RecordTable} methods to expose them to tests.
  *
  * @param <I>
@@ -55,21 +53,21 @@ import static io.spine.server.storage.jdbc.record.column.BytesColumn.bytesColumn
  */
 abstract class TimestampTable<I> extends RecordTable<I, Timestamp> {
 
-    private final String name;
     private final MessageRecordSpec<I, Timestamp> timestampSpec;
 
     TimestampTable(String name,
                    MessageRecordSpec<I, Timestamp> recordSpec,
                    JdbcStorageFactory factory) {
-        super(fullSpecFrom(recordSpec, factory.columnMapping()), factory);
+        super(fullSpecFrom(name, recordSpec, factory.columnMapping()), factory);
         this.timestampSpec = extendRecordSpec(recordSpec);
-        this.name = name;
     }
 
     private static <I> JdbcTableSpec<I, Timestamp>
-    fullSpecFrom(MessageRecordSpec<I, Timestamp> spec, JdbcColumnMapping columnMapping) {
+    fullSpecFrom(String tableName,
+                 MessageRecordSpec<I, Timestamp> spec,
+                 JdbcColumnMapping mapping) {
         var updatedSpec = extendRecordSpec(spec);
-        var result = new JdbcTableSpec<>(updatedSpec, columnMapping, null);
+        var result = new JdbcTableSpec<>(tableName, updatedSpec, mapping, null);
         return result;
     }
 
@@ -98,14 +96,6 @@ abstract class TimestampTable<I> extends RecordTable<I, Timestamp> {
         return (RecordColumn<Timestamp, ?>) column;
     }
 
-    /**
-     * Returns the name of this table.
-     */
-    @Override
-    public String name() {
-        return name;
-    }
-
     public void write(Timestamp record) {
         var withCols = RecordWithColumns.create(record, timestampSpec);
         write(withCols);
@@ -128,7 +118,7 @@ abstract class TimestampTable<I> extends RecordTable<I, Timestamp> {
         var queryBuilder = SelectRecordId
                 .<I, Timestamp>newBuilder()
                 .setDataSource(dataSource())
-                .setTableName(name())
+                .setTableSpec(spec())
                 .setIdColumn(idColumn())
                 .setId(id);
         var query = queryBuilder.build();
@@ -143,7 +133,7 @@ abstract class TimestampTable<I> extends RecordTable<I, Timestamp> {
         var builder = SelectTimestampById
                 .<I>newBuilder()
                 .setDataSource(dataSource())
-                .setTableName(name())
+                .setTableSpec(spec())
                 .setMessageColumnName(bytesColumnName())
                 .setMessageDescriptor(Timestamp.getDescriptor())
                 .setIdColumn(idColumn())

@@ -29,8 +29,13 @@ package io.spine.server.storage.jdbc.query.given;
 import com.google.protobuf.Message;
 import com.google.protobuf.StringValue;
 import com.querydsl.sql.AbstractSQLQuery;
+import io.spine.server.storage.MessageRecordSpec;
 import io.spine.server.storage.jdbc.query.AbstractQuery;
 import io.spine.server.storage.jdbc.query.SelectMessageByIdQuery;
+import io.spine.server.storage.jdbc.record.JdbcTableSpec;
+import io.spine.server.storage.jdbc.type.DefaultJdbcColumnMapping;
+
+import static io.spine.testing.TestValues.nullRef;
 
 public class Given {
 
@@ -41,8 +46,20 @@ public class Given {
     /**
      * Returns the new builder for the test {@link SelectMessageByIdQuery} implementation.
      */
-    public static <I> ASelectMessageByIdQuery.Builder<I> selectMessageBuilder() {
+    public static <I, R extends Message>
+    ASelectMessageByIdQuery.Builder<I, R> selectMsgBuilder() {
         return new ASelectMessageByIdQuery.Builder<>();
+    }
+
+    /**
+     * Returns a test-only table specification for a table storing {@link StringValue}s under
+     * {@code String} IDs.
+     */
+    public static JdbcTableSpec<String, StringValue> tableSpec() {
+        var recordSpec = new MessageRecordSpec<>(String.class,
+                                                 StringValue.class,
+                                                 StringValue::getValue);
+        return new JdbcTableSpec<>(recordSpec, new DefaultJdbcColumnMapping(), nullRef());
     }
 
     /**
@@ -52,11 +69,12 @@ public class Given {
         return new AStorageQuery.Builder();
     }
 
-    public static class ASelectMessageByIdQuery<I> extends SelectMessageByIdQuery<I, Message> {
+    public static class ASelectMessageByIdQuery<I, R extends Message>
+            extends SelectMessageByIdQuery<I, R> {
 
         private final AbstractSQLQuery<?, ?> query;
 
-        private ASelectMessageByIdQuery(Builder<I> builder) {
+        private ASelectMessageByIdQuery(Builder<I, R> builder) {
             super(builder);
             this.query = builder.query;
         }
@@ -66,25 +84,24 @@ public class Given {
             return query;
         }
 
-        public static class Builder<I>
-                extends SelectMessageByIdQuery.Builder<I, Message, Builder<I>,
-                                                       ASelectMessageByIdQuery<I>
-                > {
+        public static class Builder<I, R extends Message>
+                extends SelectMessageByIdQuery.Builder<I, R, Builder<I, R>,
+                                                       ASelectMessageByIdQuery<I, R>> {
 
             private AbstractSQLQuery<?, ?> query;
 
-            public Builder<I> setQuery(AbstractSQLQuery<?, ?> query) {
+            public Builder<I, R> setQuery(AbstractSQLQuery<?, ?> query) {
                 this.query = query;
                 return this;
             }
 
             @Override
-            protected ASelectMessageByIdQuery<I> doBuild() {
+            protected ASelectMessageByIdQuery<I, R> doBuild() {
                 return new ASelectMessageByIdQuery<>(this);
             }
 
             @Override
-            protected Builder<I> getThis() {
+            protected Builder<I, R> getThis() {
                 return this;
             }
         }

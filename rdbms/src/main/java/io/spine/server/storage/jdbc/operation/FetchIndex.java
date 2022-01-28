@@ -49,8 +49,8 @@ public final class FetchIndex<I, R extends Message> extends Operation<I, R> {
 
     public Iterator<I> execute() {
         var query = StorageIndexQuery.<I, R>newBuilder()
+                .setTableSpec(table().spec())
                 .setDataSource(dataSource())
-                .setTableName(tableName())
                 .setIdColumn(idColumn())
                 .build();
         var result = query.execute();

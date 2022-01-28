@@ -70,7 +70,7 @@ public class ReadManyByQuery<I, R extends Message> extends Operation<I, R> {
     public Iterator<R> execute(RecordQuery<I, R> query) {
         SelectMessagesByQuery.Builder<I, R> builder = SelectMessagesByQuery.newBuilder();
         var sqlQuery = builder.setDataSource(dataSource())
-                              .setTableName(tableName())
+                              .setTableSpec(table().spec())
                               .setQuery(query)
                               .setIdColumn(idColumn())
                               .setColumnMapping(columnMapping)
