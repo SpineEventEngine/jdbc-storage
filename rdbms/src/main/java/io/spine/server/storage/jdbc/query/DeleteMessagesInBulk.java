@@ -44,20 +44,21 @@ import static java.util.stream.Collectors.toList;
  * @param <R>
  *         the type of the records to delete
  */
-public final class DeleteMessagesInBulk<I, R extends Message> extends AbstractQuery implements WriteQuery {
+public final class DeleteMessagesInBulk<I, R extends Message>
+        extends AbstractQuery<I, R>
+        implements WriteQuery {
 
     private final ImmutableList<I> ids;
-    private final IdColumn<I> idColumn;
 
     private DeleteMessagesInBulk(Builder<I, R> builder) {
         super(builder);
         this.ids = builder.ids;
-        this.idColumn = builder.idColumn;
     }
 
     @CanIgnoreReturnValue
     @Override
     public long execute() {
+        var idColumn = tableSpec().idColumn();
         var normalizedIds = ids
                 .stream()
                 .map(idColumn::normalize)
@@ -75,15 +76,9 @@ public final class DeleteMessagesInBulk<I, R extends Message> extends AbstractQu
             extends AbstractQuery.Builder<I, R, Builder<I, R>, DeleteMessagesInBulk<I, R>> {
 
         private ImmutableList<I> ids;
-        private IdColumn<I> idColumn;
 
         public Builder<I, R> setIds(Iterable<I> ids) {
             this.ids = ImmutableList.copyOf(ids);
-            return getThis();
-        }
-
-        public Builder<I, R> setIdColumn(IdColumn<I> idColumn) {
-            this.idColumn = idColumn;
             return getThis();
         }
 

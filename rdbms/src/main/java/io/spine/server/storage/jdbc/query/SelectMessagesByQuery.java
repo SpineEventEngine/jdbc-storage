@@ -63,17 +63,15 @@ import static io.spine.server.storage.jdbc.record.column.BytesColumn.bytesColumn
  * @param <R>
  *         the type of queried records
  */
-public class SelectMessagesByQuery<I, R extends Message> extends AbstractQuery
+public class SelectMessagesByQuery<I, R extends Message> extends AbstractQuery<I, R>
         implements SelectQuery<Iterator<R>> {
 
     private final RecordQuery<I, R> recordQuery;
     private final JdbcColumnMapping columnMapping;
-    private final IdColumn<I> idColumn;
     private final Descriptor descriptor;
 
     private SelectMessagesByQuery(Builder<I, R> builder) {
         super(builder);
-        this.idColumn = builder.idColumn;
         this.columnMapping = builder.columnMapping;
         this.recordQuery = builder.recordQuery;
         this.descriptor = builder.recordDescriptor;
@@ -82,6 +80,7 @@ public class SelectMessagesByQuery<I, R extends Message> extends AbstractQuery
     @Override
     public Iterator<R> execute() {
         var subject = recordQuery.subject();
+        var idColumn = tableSpec().idColumn();
         var inIds = inIds(idColumn, subject.id().values());
         var matchParameters = matchPredicate(subject.predicate(), columnMapping);
 
@@ -161,7 +160,6 @@ public class SelectMessagesByQuery<I, R extends Message> extends AbstractQuery
 
         private RecordQuery<I, R> recordQuery;
         private JdbcColumnMapping columnMapping;
-        private IdColumn<I> idColumn;
         private Descriptor recordDescriptor;
 
         private Builder() {
@@ -178,11 +176,6 @@ public class SelectMessagesByQuery<I, R extends Message> extends AbstractQuery
             return this;
         }
 
-        public Builder<I, R> setIdColumn(IdColumn<I> idColumn) {
-            this.idColumn = checkNotNull(idColumn);
-            return this;
-        }
-
         public Builder<I, R> setRecordDescriptor(Descriptor messageDescriptor) {
             this.recordDescriptor = messageDescriptor;
             return getThis();
@@ -196,7 +189,6 @@ public class SelectMessagesByQuery<I, R extends Message> extends AbstractQuery
         @Override
         protected void checkPreconditions() throws IllegalStateException {
             super.checkPreconditions();
-            ensureSet(idColumn, "IdColumn");
             ensureSet(recordQuery, "RecordQuery");
             ensureSet(columnMapping, "ColumnMapping");
             ensureSet(recordDescriptor, "Descriptor");

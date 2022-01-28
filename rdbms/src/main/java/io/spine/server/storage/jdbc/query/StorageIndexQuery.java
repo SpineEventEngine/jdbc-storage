@@ -45,17 +45,15 @@ import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.idReader;
  *         the type of the stored records
  */
 public class StorageIndexQuery<I, R extends Message>
-        extends AbstractQuery implements SelectQuery<Iterator<I>> {
-
-    private final IdColumn<I> idColumn;
+        extends AbstractQuery<I, R> implements SelectQuery<Iterator<I>> {
 
     private StorageIndexQuery(Builder<I, R> builder) {
         super(builder);
-        this.idColumn = builder.idColumn;
     }
 
     @Override
     public Iterator<I> execute() {
+        var idColumn = tableSpec().idColumn();
         var resultSet = factory().select(pathOf(idColumn))
                                  .distinct()
                                  .from(table())
@@ -73,13 +71,6 @@ public class StorageIndexQuery<I, R extends Message>
 
     public static class Builder<I, R extends Message>
             extends AbstractQuery.Builder<I, R, Builder<I, R>, StorageIndexQuery<I, R>> {
-
-        private IdColumn<I> idColumn;
-
-        public Builder<I, R> setIdColumn(IdColumn<I> idColumn) {
-            this.idColumn = checkNotNull(idColumn);
-            return getThis();
-        }
 
         @Override
         protected StorageIndexQuery<I, R> doBuild() {

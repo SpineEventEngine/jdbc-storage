@@ -72,7 +72,6 @@ public class ReadManyByQuery<I, R extends Message> extends Operation<I, R> {
         var sqlQuery = builder.setDataSource(dataSource())
                               .setTableSpec(table().spec())
                               .setQuery(query)
-                              .setIdColumn(idColumn())
                               .setColumnMapping(columnMapping)
                               .setRecordDescriptor(table().descriptor())
                               .build();

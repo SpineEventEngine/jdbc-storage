@@ -57,7 +57,6 @@ public class ReadManyByIds<I, R extends Message> extends Operation<I, R>  {
         SelectMessagesByIds.Builder<I, R> builder = SelectMessagesByIds.newBuilder();
         var query = builder.setTableSpec(table().spec())
                            .setDataSource(dataSource())
-                           .setIdColumn(idColumn())
                            .setIds(ids)
                            .setMessageDescriptor(table().descriptor())
                            .build();

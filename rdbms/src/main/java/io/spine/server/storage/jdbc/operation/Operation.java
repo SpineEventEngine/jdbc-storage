@@ -84,8 +84,7 @@ public abstract class Operation<I, R extends Message> {
 
     protected ContainsQuery<I, R> newContainsQuery(I id) {
         ContainsQuery.Builder<I, R> builder = ContainsQuery.newBuilder();
-        var query = builder.setIdColumn(idColumn())
-                           .setId(id)
+        var query = builder.setId(id)
                            .setTableSpec(table().spec())
                            .setDataSource(dataSource())
                            .build();

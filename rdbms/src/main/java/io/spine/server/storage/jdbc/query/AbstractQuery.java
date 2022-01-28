@@ -54,15 +54,22 @@ import static java.sql.ResultSet.HOLD_CURSORS_OVER_COMMIT;
 
 /**
  * The implementation base for the queries to an SQL-compliant database.
+ *
+ * @param <I>
+ *         the type of the record identifiers
+ * @param <R>
+ *         the type of the queried records
  */
-public abstract class AbstractQuery implements StorageQuery {
+public abstract class AbstractQuery<I, R extends Message> implements StorageQuery {
 
     private final AbstractSQLQueryFactory<?> queryFactory;
     private final RelationalPathBase<Object> tablePath;
     private final PathBuilder<Object> pathBuilder;
+    private final JdbcTableSpec<I, R> tableSpec;
 
-    protected AbstractQuery(Builder<?, ?, ? extends Builder<?, ?, ?, ?>,
-            ? extends StorageQuery> builder) {
+    protected AbstractQuery(Builder<I, R, ? extends Builder<I, R, ?, ?>,
+                                    ? extends StorageQuery> builder) {
+        this.tableSpec = builder.tableSpec;
         var tableName = builder.tableSpec.tableName();
         this.queryFactory = createFactory(builder.dataSource);
         this.tablePath = new RelationalPathBase<>(Object.class, tableName, tableName, tableName);
@@ -87,6 +94,10 @@ public abstract class AbstractQuery implements StorageQuery {
     @VisibleForTesting
     public AbstractSQLQueryFactory<?> factory() {
         return queryFactory;
+    }
+
+    protected JdbcTableSpec<I, R> tableSpec() {
+        return tableSpec;
     }
 
     protected PathBuilder<Object> pathOf(TableColumn column) {
@@ -164,7 +175,7 @@ public abstract class AbstractQuery implements StorageQuery {
      */
     public abstract static class Builder<I, R extends Message,
                                             B extends Builder<I, R, B, Q>,
-                                            Q extends AbstractQuery> {
+                                            Q extends AbstractQuery<I, R>> {
 
         private DataSourceWrapper dataSource;
         private JdbcTableSpec<I, R> tableSpec;

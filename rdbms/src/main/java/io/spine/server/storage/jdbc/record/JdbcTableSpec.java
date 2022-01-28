@@ -37,10 +37,10 @@ import io.spine.query.ColumnName;
 import io.spine.server.storage.RecordSpec;
 import io.spine.server.storage.RecordWithColumns;
 import io.spine.server.storage.jdbc.TableColumn;
-import io.spine.server.storage.jdbc.record.column.BytesColumn;
-import io.spine.server.storage.jdbc.record.column.CustomColumns;
 import io.spine.server.storage.jdbc.query.IdColumn;
 import io.spine.server.storage.jdbc.query.TableNames;
+import io.spine.server.storage.jdbc.record.column.BytesColumn;
+import io.spine.server.storage.jdbc.record.column.CustomColumns;
 import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -50,7 +50,6 @@ import java.util.Map;
 import java.util.function.Function;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static io.spine.server.storage.jdbc.record.column.BytesColumn.bytesColumnName;
 import static io.spine.util.Preconditions2.checkNotEmptyOrBlank;
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
@@ -76,26 +75,28 @@ import static java.util.Objects.requireNonNull;
  */
 public final class JdbcTableSpec<I, R extends Message> {
 
-    private final Class<I> idClass;
+
     private final Class<R> recordClass;
     private final Class<?> sourceClass;
     private final JdbcColumnMapping columnMapping;
+    private final IdColumn<I> idColumn;
     private final @Nullable CustomColumns<R> customColumns;
 
     private @MonotonicNonNull String tableName;
     private @MonotonicNonNull RecordSpec<I, R, ?> recordSpec;
     private @MonotonicNonNull ImmutableMap<ColumnName, TableColumn> dataColumns;
 
+
     //TODO:2022-01-25:alex.tymchenko: move the ID column here?
     public JdbcTableSpec(RecordSpec<I, R, ?> recordSpec,
                          JdbcColumnMapping mapping,
                          @Nullable CustomColumns<R> columnSpecs) {
-        idClass = recordSpec.idType();
         recordClass = recordSpec.storedType();
         sourceClass = recordSpec.sourceType();
         this.recordSpec = recordSpec;
         columnMapping = mapping;
         this.customColumns = columnSpecs;
+        this.idColumn = IdColumn.of(recordSpec, columnMapping);
     }
 
     //TODO:2022-01-28:alex.tymchenko: consolidate the ctors.
@@ -104,12 +105,12 @@ public final class JdbcTableSpec<I, R extends Message> {
                          JdbcColumnMapping mapping,
                          @Nullable CustomColumns<R> columnSpecs) {
         this.tableName = checkNotEmptyOrBlank(tableName);
-        idClass = recordSpec.idType();
         recordClass = recordSpec.storedType();
         sourceClass = recordSpec.sourceType();
         this.recordSpec = recordSpec;
         columnMapping = mapping;
         this.customColumns = columnSpecs;
+        this.idColumn = IdColumn.of(recordSpec, columnMapping);
     }
 
     @Internal
@@ -149,7 +150,7 @@ public final class JdbcTableSpec<I, R extends Message> {
     }
 
     public IdColumn<I> idColumn() {
-        return IdColumn.of(recordSpec, columnMapping);
+        return idColumn;
     }
 
     public I idFromRecord(R record) {

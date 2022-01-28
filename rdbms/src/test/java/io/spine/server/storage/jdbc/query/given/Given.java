@@ -107,7 +107,7 @@ public class Given {
         }
     }
 
-    public static class AStorageQuery extends AbstractQuery {
+    public static class AStorageQuery extends AbstractQuery<String, StringValue> {
 
         private AStorageQuery(Builder builder) {
             super(builder);

@@ -33,8 +33,15 @@ import com.google.protobuf.Message;
  * A query that deletes all records from a table.
  *
  * //TODO:2021-06-24:alex.tymchenko: move this type?
+ *
+ * @param <I>
+ *         the type of the record identifiers
+ * @param <R>
+ *         the type of the records to delete
  */
-public class DeleteAllQuery<I, R extends Message> extends AbstractQuery implements WriteQuery {
+public class DeleteAllQuery<I, R extends Message>
+        extends AbstractQuery<I, R>
+        implements WriteQuery {
 
     private DeleteAllQuery(Builder<I, R> builder) {
         super(builder);

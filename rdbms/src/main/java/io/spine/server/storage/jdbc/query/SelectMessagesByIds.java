@@ -34,8 +34,8 @@ import io.spine.server.storage.jdbc.record.RecordTable;
 
 import java.util.Iterator;
 
-import static io.spine.server.storage.jdbc.record.column.BytesColumn.bytesColumnName;
 import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.messageReader;
+import static io.spine.server.storage.jdbc.record.column.BytesColumn.bytesColumnName;
 import static java.util.stream.Collectors.toList;
 
 /**
@@ -49,17 +49,15 @@ import static java.util.stream.Collectors.toList;
  *         the record type
  */
 public final class SelectMessagesByIds<I, R extends Message>
-        extends AbstractQuery
+        extends AbstractQuery<I, R>
         implements SelectQuery<Iterator<R>> {
 
     private final ImmutableList<I> ids;
-    private final IdColumn<I> idColumn;
     private final Descriptor messageDescriptor;
 
     private SelectMessagesByIds(Builder<I, R> builder) {
         super(builder);
         this.ids = builder.ids;
-        this.idColumn = builder.idColumn;
         this.messageDescriptor = builder.messageDescriptor;
     }
 
@@ -74,6 +72,7 @@ public final class SelectMessagesByIds<I, R extends Message>
     }
 
     AbstractSQLQuery<Object, ?> query() {
+        var idColumn = tableSpec().idColumn();
         var normalizedIds = ids
                 .stream()
                 .map(idColumn::normalize)
@@ -91,16 +90,10 @@ public final class SelectMessagesByIds<I, R extends Message>
             extends AbstractQuery.Builder<I, R, Builder<I, R>, SelectMessagesByIds<I, R>> {
 
         private ImmutableList<I> ids;
-        private IdColumn<I> idColumn;
         private Descriptor messageDescriptor;
 
         public Builder<I, R> setIds(Iterable<I> ids) {
             this.ids = ImmutableList.copyOf(ids);
-            return getThis();
-        }
-
-        public Builder<I, R> setIdColumn(IdColumn<I> idColumn) {
-            this.idColumn = idColumn;
             return getThis();
         }
 

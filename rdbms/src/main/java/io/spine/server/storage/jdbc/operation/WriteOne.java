@@ -94,7 +94,6 @@ public class WriteOne<I, R extends Message> extends Operation<I, R> {
         UpdateSingleRecord.Builder<I, R> builder = UpdateSingleRecord.newBuilder();
         var query = builder.setTableSpec(table().spec())
                            .setDataSource(dataSource())
-                           .setIdColumn(idColumn())
                            .setId(id)
                            .setRecord(record)
                            .build();
@@ -106,7 +105,6 @@ public class WriteOne<I, R extends Message> extends Operation<I, R> {
         InsertSingleRecord.Builder<I, R> builder = InsertSingleRecord.newBuilder();
         var query = builder.setTableSpec(table().spec())
                            .setDataSource(dataSource())
-                           .setIdColumn(idColumn())
                            .setId(id)
                            .setRecord(record)
                            .build();

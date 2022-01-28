@@ -44,7 +44,6 @@ import static io.spine.base.Identifier.newUuid;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsThrowingByCommand;
 import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_1;
-import static io.spine.server.storage.jdbc.given.Column.stringIdColumn;
 import static io.spine.server.storage.jdbc.query.given.Given.selectMsgBuilder;
 import static io.spine.server.storage.jdbc.record.column.BytesColumn.bytesColumnName;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -114,15 +113,13 @@ class SelectMessageByIdQueryTest {
     query(DataSourceWrapper dataSource,
           TimestampByString table,
           AbstractSQLQuery<Object, ?> underlyingQuery) {
-        var query =
-                builder.setTableSpec(table.spec())
-                       .setQuery(underlyingQuery)
-                       .setDataSource(dataSource)
-                       .setId(newUuid())
-                       .setIdColumn(stringIdColumn())
-                       .setMessageColumnName(bytesColumnName())
-                       .setMessageDescriptor(Timestamp.getDescriptor())
-                       .build();
+        var query = builder.setTableSpec(table.spec())
+                           .setQuery(underlyingQuery)
+                           .setDataSource(dataSource)
+                           .setId(newUuid())
+                           .setMessageColumnName(bytesColumnName())
+                           .setMessageDescriptor(Timestamp.getDescriptor())
+                           .build();
         return query;
     }
 
@@ -137,8 +134,7 @@ class SelectMessageByIdQueryTest {
     }
 
     private static Timestamp timestamp() {
-        var timestamp = Timestamp
-                .newBuilder()
+        var timestamp = Timestamp.newBuilder()
                 .setSeconds(42)
                 .setNanos(15)
                 .build();

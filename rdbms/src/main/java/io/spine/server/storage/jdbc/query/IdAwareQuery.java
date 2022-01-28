@@ -38,19 +38,19 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * An abstract base for queries, which work with a {@link IdColumn single ID}.
  *
  * @param <I>
- *         the ID type
+ *         the type of the record identifiers
+ * @param <R>
+ *         the type of the queried records
  */
-public abstract class IdAwareQuery<I, R extends Message> extends AbstractQuery {
+public abstract class IdAwareQuery<I, R extends Message> extends AbstractQuery<I, R> {
 
     private final I id;
-    private final IdColumn<I> idColumn;
 
     protected IdAwareQuery(Builder<I, R,
                                    ? extends Builder<I, R, ?, ?>,
                                    ? extends IdAwareQuery<I, R>> builder) {
         super(builder);
         this.id = checkNotNull(builder.id);
-        this.idColumn = checkNotNull(builder.idColumn);
     }
 
     /**
@@ -73,15 +73,15 @@ public abstract class IdAwareQuery<I, R extends Message> extends AbstractQuery {
     }
 
     protected IdColumn<I> idColumn() {
-        return idColumn;
+        return tableSpec().idColumn();
     }
 
     private Object normalizedId() {
-        return idColumn.normalize(id);
+        return idColumn().normalize(id);
     }
 
     private PathBuilder<Object> idPath() {
-        return pathOf(idColumn);
+        return pathOf(idColumn());
     }
 
     protected abstract static class Builder<I, R extends Message,
@@ -89,16 +89,10 @@ public abstract class IdAwareQuery<I, R extends Message> extends AbstractQuery {
                                             Q extends IdAwareQuery<I, R>>
             extends AbstractQuery.Builder<I, R, B, Q> {
 
-        private IdColumn<I> idColumn;
         private I id;
 
         public B setId(I id) {
             this.id = id;
-            return getThis();
-        }
-
-        public B setIdColumn(IdColumn<I> idColumn) {
-            this.idColumn = idColumn;
             return getThis();
         }
     }

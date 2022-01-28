@@ -70,9 +70,8 @@ public class DeleteOne<I, R extends Message> extends Operation<I, R> {
     private DeleteRecordQuery<I, R> deleteQuery(I id) {
         var query = DeleteRecordQuery.<I, R>newBuilder()
                 .setTableSpec(table().spec())
-                .setIdColumn(idColumn())
-                .setId(id)
                 .setDataSource(dataSource())
+                .setId(id)
                 .build();
         return query;
     }

@@ -52,17 +52,15 @@ import static com.google.gson.internal.$Gson$Preconditions.checkNotNull;
  *         the type of SQL clause
  */
 abstract class WriteRecordsInBulk<I, R extends Message, C extends StoreClause<C>>
-        extends AbstractQuery
+        extends AbstractQuery<I, R>
         implements WriteMessageQuery<I, R> {
 
     private final ImmutableList<JdbcRecord<I, R>> records;
-    private final IdColumn<I> idColumn;
 
     WriteRecordsInBulk(Builder<I, R, ? extends Builder<I, R, ?, ?>,
             ? extends WriteRecordsInBulk<I, R, ?>> builder) {
         super(builder);
         this.records = builder.records;
-        this.idColumn = builder.idColumn;
     }
 
     @CanIgnoreReturnValue
@@ -100,7 +98,7 @@ abstract class WriteRecordsInBulk<I, R extends Message, C extends StoreClause<C>
 
     @Override
     public IdColumn<I> idColumn() {
-        return idColumn;
+        return tableSpec().idColumn();
     }
 
     @Override
@@ -120,15 +118,9 @@ abstract class WriteRecordsInBulk<I, R extends Message, C extends StoreClause<C>
             extends AbstractQuery.Builder<I, R, B, Q> {
 
         private ImmutableList<JdbcRecord<I, R>> records;
-        private IdColumn<I> idColumn;
 
         public B setRecords(ImmutableList<JdbcRecord<I, R>> records) {
             this.records = checkNotNull(records);
-            return getThis();
-        }
-
-        public B setIdColumn(IdColumn<I> idColumn) {
-            this.idColumn = idColumn;
             return getThis();
         }
     }
