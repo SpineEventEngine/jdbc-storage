@@ -31,7 +31,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.protobuf.Message;
-import io.spine.annotation.Internal;
 import io.spine.query.Column;
 import io.spine.query.ColumnName;
 import io.spine.server.storage.RecordSpec;
@@ -49,7 +48,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static io.spine.util.Preconditions2.checkNotEmptyOrBlank;
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
@@ -75,15 +73,12 @@ import static java.util.Objects.requireNonNull;
  */
 public final class JdbcTableSpec<I, R extends Message> {
 
-
-    private final Class<R> recordClass;
-    private final Class<?> sourceClass;
+    private final RecordSpec<I, R, ?> recordSpec;
     private final JdbcColumnMapping columnMapping;
     private final IdColumn<I> idColumn;
     private final @Nullable CustomColumns<R> customColumns;
 
     private @MonotonicNonNull String tableName;
-    private @MonotonicNonNull RecordSpec<I, R, ?> recordSpec;
     private @MonotonicNonNull ImmutableMap<ColumnName, TableColumn> dataColumns;
 
 
@@ -91,8 +86,6 @@ public final class JdbcTableSpec<I, R extends Message> {
     public JdbcTableSpec(RecordSpec<I, R, ?> recordSpec,
                          JdbcColumnMapping mapping,
                          @Nullable CustomColumns<R> columnSpecs) {
-        recordClass = recordSpec.storedType();
-        sourceClass = recordSpec.sourceType();
         this.recordSpec = recordSpec;
         columnMapping = mapping;
         this.customColumns = columnSpecs;
@@ -105,20 +98,10 @@ public final class JdbcTableSpec<I, R extends Message> {
                          JdbcColumnMapping mapping,
                          @Nullable CustomColumns<R> columnSpecs) {
         this.tableName = checkNotEmptyOrBlank(tableName);
-        recordClass = recordSpec.storedType();
-        sourceClass = recordSpec.sourceType();
         this.recordSpec = recordSpec;
         columnMapping = mapping;
         this.customColumns = columnSpecs;
         this.idColumn = IdColumn.of(recordSpec, columnMapping);
-    }
-
-    @Internal
-    @CanIgnoreReturnValue
-    public JdbcTableSpec<I, R> with(RecordSpec<I, R, ?> recordSpec) {
-        checkNotNull(recordSpec);
-        this.recordSpec = recordSpec;
-        return this;
     }
 
     public String tableName() {
@@ -135,7 +118,7 @@ public final class JdbcTableSpec<I, R extends Message> {
      * @see TableNames#of(Class) for more details
      */
     private String defaultName() {
-        return TableNames.of(sourceClass);
+        return TableNames.of(sourceType());
     }
 
     @CanIgnoreReturnValue
@@ -164,7 +147,7 @@ public final class JdbcTableSpec<I, R extends Message> {
         return dataColumns.values();
     }
 
-    public ImmutableSet<ColumnName> columnNames() {
+    ImmutableSet<ColumnName> columnNames() {
         return dataColumns.keySet();
     }
 
@@ -205,12 +188,16 @@ public final class JdbcTableSpec<I, R extends Message> {
         return column::valueIn;
     }
 
+    private Class<?> sourceType() {
+        return recordSpec.sourceType();
+    }
+
     private TableColumn requireColumn(ColumnName name) {
         var column = dataColumns.get(name);
         requireNonNull(column,
                        format("Cannot find the column with name `%s` " +
                                       "in the table specification for the record of type `%s`.",
-                              name, recordClass));
+                              name, storedType()));
         return column;
     }
 
