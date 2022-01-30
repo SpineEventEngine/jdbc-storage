@@ -38,11 +38,14 @@ import com.querydsl.sql.SQLCloseListener;
 import com.querydsl.sql.SQLListener;
 import com.querydsl.sql.SQLListenerContext;
 import com.querydsl.sql.SQLQueryFactory;
+import com.querydsl.sql.mysql.MySQLQueryFactory;
 import io.spine.query.ColumnName;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.record.JdbcTableSpec;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -62,16 +65,18 @@ import static java.sql.ResultSet.HOLD_CURSORS_OVER_COMMIT;
  */
 public abstract class AbstractQuery<I, R extends Message> implements StorageQuery {
 
-    private final AbstractSQLQueryFactory<?> queryFactory;
+    private final DataSourceWrapper dataSource;
     private final RelationalPathBase<Object> tablePath;
     private final PathBuilder<Object> pathBuilder;
     private final JdbcTableSpec<I, R> tableSpec;
+    private @MonotonicNonNull AbstractSQLQueryFactory<?> defaultFactory;
+    private @MonotonicNonNull MySQLQueryFactory mySqlFactory;
 
     protected AbstractQuery(Builder<I, R, ? extends Builder<I, R, ?, ?>,
                                     ? extends StorageQuery> builder) {
         this.tableSpec = builder.tableSpec;
         var tableName = builder.tableSpec.tableName();
-        this.queryFactory = createFactory(builder.dataSource);
+        this.dataSource = builder.dataSource;
         this.tablePath = new RelationalPathBase<>(Object.class, tableName, tableName, tableName);
         this.pathBuilder = new PathBuilder<>(Object.class, tableName);
     }
@@ -87,13 +92,31 @@ public abstract class AbstractQuery<I, R extends Message> implements StorageQuer
     }
 
     /**
-     * Obtains a {@linkplain AbstractSQLQueryFactory factory} to compose the query.
+     * Obtains a query factory suitable for the majority of DB engines.
+     *
+     * @return the query factory
+     *
+     * @see #mySqlFactory() for MySQL-specific factory
+     */
+    @VisibleForTesting
+    public synchronized AbstractSQLQueryFactory<?> factory() {
+        if(defaultFactory == null) {
+            defaultFactory = defaultFactory(dataSource);
+        }
+        return defaultFactory;
+    }
+
+    /**
+     * Obtains a MySQL-specific query factory.
      *
      * @return the query factory
      */
     @VisibleForTesting
-    public AbstractSQLQueryFactory<?> factory() {
-        return queryFactory;
+    public synchronized MySQLQueryFactory mySqlFactory() {
+        if(mySqlFactory == null) {
+            mySqlFactory = mySqlFactory(dataSource);
+        }
+        return mySqlFactory;
     }
 
     protected JdbcTableSpec<I, R> tableSpec() {
@@ -121,12 +144,16 @@ public abstract class AbstractQuery<I, R extends Message> implements StorageQuer
     }
 
     /**
-     * Creates a configured query factory.
+     * Creates a configured query factory suitable for most RDBMS engines.
      *
-     * <p>All queries produced by the factory will be
+     * <p>The returned factory does not perform any query optimizations specific to the database
+     * engine used. See {@link #mySqlFactory(DataSourceWrapper) mySqlFactory(dataSource)} for
+     * the factory which optimizes the execution for MySQL databases.
+     *
+     * <p>All queries produced by the factory are
      * {@linkplain Connection#setAutoCommit(boolean) transactional}.
      *
-     * <p>A commit or rollback for a transaction will be done automatically
+     * <p>Both commits and rollbacks of transactions are done automatically
      * by the {@linkplain TransactionHandler transaction handler}.
      *
      * <p>All {@linkplain Connection connections} will be closed automatically
@@ -138,16 +165,41 @@ public abstract class AbstractQuery<I, R extends Message> implements StorageQuer
      *
      * @param dataSource
      *         the data source to produce connections
-     * @return the query factory
+     * @return a new query factory
      */
     @VisibleForTesting
-    static AbstractSQLQueryFactory<?> createFactory(final DataSourceWrapper dataSource) {
+    static AbstractSQLQueryFactory<?> defaultFactory(DataSourceWrapper dataSource) {
         var connectionSupplier = new ConnectionSupplier(dataSource);
+        var configuration = configuration(dataSource);
+        return new SQLQueryFactory(configuration, connectionSupplier);
+    }
+
+    /**
+     * Creates a new MySQL-specific query factory.
+     *
+     * <p>Transactional settings of the returned factory are the same as for
+     * the {@linkplain #defaultFactory(DataSourceWrapper) default query factory}.
+     *
+     * <p>The created factory optimizes the inserts and updates into DB tables
+     * by leveraging {@code INSERT ... ON DUPLICATE KEY UPDATE ...} queries
+     * instead of {@code SELECT ...} with the consecutive {@code INSERT}/{@code UPDATE}.
+     *
+     * @param dataSource
+     *         the data source to produce connections
+     * @return a new query factory
+     */
+    static MySQLQueryFactory mySqlFactory(DataSourceWrapper dataSource) {
+        var connectionSupplier = new ConnectionSupplier(dataSource);
+        return new MySQLQueryFactory(configuration(dataSource), connectionSupplier);
+    }
+
+    @NonNull
+    private static Configuration configuration(DataSourceWrapper dataSource) {
         var templates = dataSource.templates();
         var configuration = new Configuration(templates);
         configuration.addListener(TransactionHandler.INSTANCE);
         configuration.addListener(SQLCloseListener.DEFAULT);
-        return new SQLQueryFactory(configuration, connectionSupplier);
+        return configuration;
     }
 
     private static final class ConnectionSupplier implements Supplier<Connection> {

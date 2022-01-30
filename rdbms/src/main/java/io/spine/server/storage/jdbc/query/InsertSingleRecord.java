@@ -55,7 +55,6 @@ public final class InsertSingleRecord<I, M extends Message> extends WriteSingleR
         return new Builder<>();
     }
 
-
     public static class Builder<I, M extends Message>
             extends WriteSingleRecord.Builder<I, M, Builder<I, M>, InsertSingleRecord<I, M>> {
 

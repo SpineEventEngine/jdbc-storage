@@ -76,11 +76,11 @@ public abstract class IdAwareQuery<I, R extends Message> extends AbstractQuery<I
         return tableSpec().idColumn();
     }
 
-    private Object normalizedId() {
+    protected Object normalizedId() {
         return idColumn().normalize(id);
     }
 
-    private PathBuilder<Object> idPath() {
+    protected PathBuilder<Object> idPath() {
         return pathOf(idColumn());
     }
 
