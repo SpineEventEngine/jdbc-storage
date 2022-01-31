@@ -189,13 +189,13 @@ public class JdbcStorageFactory implements StorageFactory {
         }
 
         /**
-         * Sets required field {@code dataSource} from {@link DataSourceConfig}.
+         * Sets the required field {@code dataSource} from {@link DataSourceConfig}.
          *
          * @see HikariConfig
-         * @see DefaultDataSourceConfigConverter#convert(DataSourceConfig)
+         * @see DataSourceConfigConverter#convert(DataSourceConfig)
          */
         public Builder setDataSource(DataSourceConfig dataSource) {
-            var hikariConfig = DefaultDataSourceConfigConverter.convert(dataSource);
+            var hikariConfig = DataSourceConfigConverter.convert(dataSource);
             this.dataSource = DataSourceWrapper.wrap(new HikariDataSource(hikariConfig));
             return this;
         }

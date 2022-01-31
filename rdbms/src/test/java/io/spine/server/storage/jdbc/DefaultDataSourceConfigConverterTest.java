@@ -40,7 +40,7 @@ class DefaultDataSourceConfigConverterTest {
     @Test
     @DisplayName(HAVE_PARAMETERLESS_CTOR)
     void haveUtilityConstructor() {
-        assertHasPrivateParameterlessCtor(DefaultDataSourceConfigConverter.class);
+        assertHasPrivateParameterlessCtor(DataSourceConfigConverter.class);
     }
 
     @Test
@@ -55,7 +55,7 @@ class DefaultDataSourceConfigConverterTest {
                 .setPassword("")
                 .build();
         tester.setDefault(DataSourceConfig.class, dataSource);
-        tester.testStaticMethods(DefaultDataSourceConfigConverter.class,
+        tester.testStaticMethods(DataSourceConfigConverter.class,
                                  NullPointerTester.Visibility.PACKAGE);
     }
 }

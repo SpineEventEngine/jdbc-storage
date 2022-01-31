@@ -36,10 +36,10 @@ import javax.sql.DataSource;
  * <p>The default implementation is:
  * <a href="https://github.com/brettwooldridge/HikariCP">HikariCP</a> connection pool.
  */
-class DefaultDataSourceConfigConverter {
+final class DataSourceConfigConverter {
 
-    private DefaultDataSourceConfigConverter() {
-        // Prevent utility class instantiation.
+    /** Prevents this utility class from instantiation. */
+    private DataSourceConfigConverter() {
     }
 
     @SuppressWarnings("MethodWithMoreThanThreeNegations") // is OK in this case
