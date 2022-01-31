@@ -26,11 +26,13 @@
 
 package io.spine.server.storage.jdbc.query;
 
+import com.google.common.hash.Hashing;
 import io.spine.server.entity.Entity;
 
 import java.sql.DatabaseMetaData;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * A utility class which provides strings valid for DB table names.
@@ -71,13 +73,20 @@ public class TableNames {
         return compose(cls);
     }
 
+    //TODO:2022-01-31:alex.tymchenko: document.
     private static String compose(Class<?> cls) {
-        var shortPackageId = cls.getPackage()
-                                .hashCode();
-        // The minus is an invalid sign in a table name.
+        var name = cls.getPackage().getName();
+        var shortPackageId = consistentHashCode(name);
         var validPackageId = Math.abs(shortPackageId);
         var packageIdAsString = String.valueOf(validPackageId);
         var result = cls.getSimpleName() + '_' + packageIdAsString;
         return result;
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    private static int consistentHashCode(String name) {
+        return Hashing.murmur3_128()
+                      .hashString(name, UTF_8)
+                      .asInt();
     }
 }
