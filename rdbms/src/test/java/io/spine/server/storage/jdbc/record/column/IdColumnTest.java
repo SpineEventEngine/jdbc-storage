@@ -27,10 +27,10 @@
 package io.spine.server.storage.jdbc.record.column;
 
 import com.google.protobuf.Message;
-import io.spine.server.storage.jdbc.query.given.IdColumnTestEnv.IntIdEntity;
-import io.spine.server.storage.jdbc.query.given.IdColumnTestEnv.LongIdEntity;
-import io.spine.server.storage.jdbc.query.given.IdColumnTestEnv.MessageIdEntity;
-import io.spine.server.storage.jdbc.query.given.IdColumnTestEnv.StringIdEntity;
+import io.spine.server.storage.jdbc.record.column.given.IdColumnTestEnv.IntIdEntity;
+import io.spine.server.storage.jdbc.record.column.given.IdColumnTestEnv.LongIdEntity;
+import io.spine.server.storage.jdbc.record.column.given.IdColumnTestEnv.MessageIdEntity;
+import io.spine.server.storage.jdbc.record.column.given.IdColumnTestEnv.StringIdEntity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
