@@ -45,7 +45,6 @@ import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsThrowingByCommand;
 import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_1;
 import static io.spine.server.storage.jdbc.query.given.Given.selectMsgBuilder;
-import static io.spine.server.storage.jdbc.record.column.BytesColumn.bytesColumnName;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("`SelectMessageByIdQuery` should")
@@ -117,7 +116,6 @@ class SelectMessageByIdQueryTest {
                            .setQuery(underlyingQuery)
                            .setDataSource(dataSource)
                            .setId(newUuid())
-                           .setMessageColumnName(bytesColumnName())
                            .build();
         return query;
     }

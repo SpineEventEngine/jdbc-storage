@@ -26,7 +26,6 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Message;
 import com.querydsl.sql.AbstractSQLQuery;
@@ -37,6 +36,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static io.spine.server.storage.jdbc.record.column.BytesColumn.bytesColumnName;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -51,14 +51,12 @@ public abstract class SelectMessageByIdQuery<I, R extends Message>
         extends IdAwareQuery<I, R>
         implements SelectQuery<R> {
 
-    private final String messageColumnName;
     private final Descriptor messageDescriptor;
 
     protected SelectMessageByIdQuery(
             Builder<I, R, ? extends Builder<I, R, ?, ?>,
                     ? extends SelectMessageByIdQuery<I, R>> builder) {
         super(builder);
-        this.messageColumnName = builder.messageColumnName;
         this.messageDescriptor = requireNonNull(builder.tableSpec()).recordDescriptor();
     }
 
@@ -102,9 +100,8 @@ public abstract class SelectMessageByIdQuery<I, R extends Message>
      *         if an error occurs during an interaction with the DB
      */
     protected @Nullable R readMessage(ResultSet resultSet) throws SQLException {
-        checkNotNull(messageColumnName);
         checkNotNull(messageDescriptor);
-        var bytes = resultSet.getBytes(messageColumnName);
+        var bytes = resultSet.getBytes(bytesColumnName());
         if (bytes == null) {
             return null;
         }
@@ -118,13 +115,5 @@ public abstract class SelectMessageByIdQuery<I, R extends Message>
                                             B extends Builder<I, R, B, Q>,
                                             Q extends SelectMessageByIdQuery<I, R>>
             extends IdAwareQuery.Builder<I, R, B, Q> {
-
-        private String messageColumnName;
-
-        @CanIgnoreReturnValue
-        public B setMessageColumnName(String messageColumnName) {
-            this.messageColumnName = messageColumnName;
-            return getThis();
-        }
     }
 }

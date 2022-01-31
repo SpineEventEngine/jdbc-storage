@@ -41,8 +41,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.sql.ResultSet;
 
-import static io.spine.server.storage.jdbc.record.column.BytesColumn.bytesColumnName;
-
 /**
  * Holds {@link Timestamp} records by some ID.
  *
@@ -133,7 +131,6 @@ abstract class TimestampTable<I> extends RecordTable<I, Timestamp> {
                 .<I>newBuilder()
                 .setDataSource(dataSource())
                 .setTableSpec(spec())
-                .setMessageColumnName(bytesColumnName())
                 .setId(id);
         var query = builder.build();
         return query;
