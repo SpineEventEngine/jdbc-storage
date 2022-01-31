@@ -28,12 +28,9 @@ package io.spine.server.storage.jdbc.given;
 
 import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.Type;
-import io.spine.server.storage.jdbc.query.IdColumn;
 import io.spine.server.storage.jdbc.type.DefaultJdbcColumnMapping;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-
-import static io.spine.server.storage.jdbc.Type.STRING_255;
 
 public final class Column {
 
@@ -41,16 +38,8 @@ public final class Column {
     private Column() {
     }
 
-    public static IdColumn<String> stringIdColumn() {
-        return IdColumn.of(stringTableColumn());
-    }
-
     public static TableColumn idTableColumn() {
         return newIdColumn(null);
-    }
-
-    public static TableColumn stringTableColumn() {
-        return newIdColumn(STRING_255);
     }
 
     @NonNull

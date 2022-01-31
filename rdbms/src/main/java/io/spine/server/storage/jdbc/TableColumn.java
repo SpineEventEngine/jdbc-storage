@@ -28,7 +28,7 @@ package io.spine.server.storage.jdbc;
 
 import io.spine.query.ColumnName;
 import io.spine.server.storage.RecordWithColumns;
-import io.spine.server.storage.jdbc.query.IdColumn;
+import io.spine.server.storage.jdbc.record.column.IdColumn;
 import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 import org.checkerframework.checker.nullness.qual.Nullable;
 

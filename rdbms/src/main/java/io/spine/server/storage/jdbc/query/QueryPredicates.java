@@ -33,12 +33,11 @@ import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.ComparablePath;
 import com.querydsl.core.types.dsl.PathBuilder;
-import io.spine.query.Column;
 import io.spine.query.ComparisonOperator;
 import io.spine.query.LogicalOperator;
 import io.spine.query.QueryPredicate;
 import io.spine.query.SubjectParameter;
-import io.spine.server.storage.ColumnTypeMapping;
+import io.spine.server.storage.jdbc.record.column.IdColumn;
 import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 
 import java.util.Collection;

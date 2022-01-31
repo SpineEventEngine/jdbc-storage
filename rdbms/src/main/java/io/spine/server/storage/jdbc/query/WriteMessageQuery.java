@@ -34,6 +34,7 @@ import io.spine.server.storage.RecordWithColumns;
 import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.record.JdbcRecord;
 import io.spine.server.storage.jdbc.record.RecordTable;
+import io.spine.server.storage.jdbc.record.column.IdColumn;
 
 import javax.annotation.Nullable;
 

@@ -38,7 +38,7 @@ import io.spine.query.ColumnName;
 import io.spine.server.storage.RecordSpec;
 import io.spine.server.storage.RecordWithColumns;
 import io.spine.server.storage.jdbc.TableColumn;
-import io.spine.server.storage.jdbc.query.IdColumn;
+import io.spine.server.storage.jdbc.record.column.IdColumn;
 import io.spine.server.storage.jdbc.query.TableNames;
 import io.spine.server.storage.jdbc.record.column.BytesColumn;
 import io.spine.server.storage.jdbc.record.column.CustomColumns;

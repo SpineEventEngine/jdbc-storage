@@ -36,8 +36,7 @@ import io.spine.server.storage.RecordWithColumns;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.JdbcStorageFactory;
 import io.spine.server.storage.jdbc.operation.OperationFactory;
-import io.spine.server.storage.jdbc.query.IdColumn;
-import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import io.spine.server.storage.jdbc.record.column.IdColumn;
 
 import java.util.Iterator;
 import java.util.stream.Collectors;

@@ -30,7 +30,7 @@ import com.google.protobuf.Message;
 import io.spine.annotation.SPI;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.query.ContainsQuery;
-import io.spine.server.storage.jdbc.query.IdColumn;
+import io.spine.server.storage.jdbc.record.column.IdColumn;
 import io.spine.server.storage.jdbc.record.RecordTable;
 
 /**

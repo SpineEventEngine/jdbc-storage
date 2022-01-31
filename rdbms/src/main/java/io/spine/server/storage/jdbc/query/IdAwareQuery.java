@@ -31,6 +31,7 @@ import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.sql.dml.SQLInsertClause;
 import com.querydsl.sql.dml.SQLUpdateClause;
+import io.spine.server.storage.jdbc.record.column.IdColumn;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
