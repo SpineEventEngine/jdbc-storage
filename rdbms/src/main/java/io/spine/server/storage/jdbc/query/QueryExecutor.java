@@ -27,18 +27,16 @@
 package io.spine.server.storage.jdbc.query;
 
 import com.google.common.flogger.FluentLogger;
-import io.spine.server.storage.jdbc.ConnectionWrapper;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
 
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 /**
  * A helper class for execution of SQL queries.
  */
 //TODO:2021-06-18:alex.tymchenko: move this type.
-public class QueryExecutor {
+public final class QueryExecutor {
 
     private final DataSourceWrapper dataSource;
     private final FluentLogger logger;
