@@ -57,116 +57,6 @@ public final class QueryPredicates {
     private QueryPredicates() {
     }
 
-//    /**
-//     * Obtains a predicate to match entity records by the specified parameters.
-//     *
-//     * @param parameters
-//     *         the query parameters to compose the predicate
-//     * @param columnMapping
-//     *         the entity column mapping
-//     * @return the predicate for columns
-//     */
-//    public static Predicate
-//    matchParameters(QueryParameters parameters, JdbcColumnMapping<?> columnMapping) {
-//        BooleanExpression result = TRUE;
-//        for (CompositeQueryParameter parameter : parameters) {
-//            result = result.and(predicateFrom(parameter, columnMapping));
-//        }
-//        return result;
-//    }
-//
-//    private static Predicate
-//    predicateFrom(CompositeQueryParameter parameter, JdbcColumnMapping<?> columnMapping) {
-//        Predicate result = TRUE;
-//        for (Map.Entry<Column, Filter> columnWithFilter : parameter.filters()
-//                                                                   .entries()) {
-//            Predicate predicate = columnMatchFilter(columnWithFilter.getKey(),
-//                                                    columnWithFilter.getValue(),
-//                                                    columnMapping);
-//            result = joinPredicates(result, predicate, parameter.operator());
-//        }
-//        return result;
-//    }
-//
-//    @SuppressWarnings("EnumSwitchStatementWhichMissesCases") // OK for the Protobuf enum switch.
-//    @VisibleForTesting
-//    static Predicate joinPredicates(Predicate left,
-//                                    Predicate right,
-//                                    CompositeFilter.CompositeOperator operator) {
-//        checkArgument(operator.getNumber() > 0, operator.name());
-//        switch (operator) {
-//            case EITHER:
-//                return or(left, right);
-//            case ALL:
-//                return and(left, right);
-//            default:
-//                throw newIllegalArgumentException("Unexpected composite operator %s.",
-//                                                  operator);
-//        }
-//    }
-//
-//    @VisibleForTesting
-//    static Predicate
-//    columnMatchFilter(Column column, Filter filter, JdbcColumnMapping<?> columnMapping) {
-//        Operator operator = filter.getOperator();
-//        checkArgument(operator.getNumber() > 0, operator.name());
-//
-//        String columnName = column.name()
-//                                  .value();
-//        ComparablePath<Comparable> columnPath = comparablePath(Comparable.class, columnName);
-//        Class<?> type = column.type();
-//        Object javaValue = toObject(filter.getValue(), type);
-//        ColumnTypeMapping<?, ?> mapping =
-//                columnMapping.of(javaValue.getClass());
-//        Object valueForStoring = mapping.applyTo(javaValue);
-//        if (valueForStoring == null) {
-//            return nullFilter(operator, columnPath);
-//        }
-//        checkIsComparable(valueForStoring, javaValue);
-//        Comparable columnValue = (Comparable) valueForStoring;
-//        return valueFilter(operator, columnPath, columnValue);
-//    }
-//
-//
-//    @SuppressWarnings("EnumSwitchStatementWhichMissesCases") // OK for the Protobuf enum switch.
-//    @VisibleForTesting
-//    static Predicate nullFilter(Operator operator,
-//                                ComparablePath<Comparable> columnPath) {
-//        switch (operator) {
-//            case EQUAL:
-//                return columnPath.isNull();
-//            case GREATER_THAN:
-//            case LESS_THAN:
-//            case GREATER_OR_EQUAL:
-//            case LESS_OR_EQUAL:
-//                throw newIllegalArgumentException(
-//                        "Operator %s not supported for the null filter value.", operator);
-//            default:
-//                throw newIllegalArgumentException("Unexpected filter operator %s.", operator);
-//        }
-//    }
-//
-//    @SuppressWarnings("EnumSwitchStatementWhichMissesCases") // OK for the Protobuf enum switch.
-//    @VisibleForTesting
-//    static Predicate valueFilter(Operator operator,
-//                                 ComparablePath<Comparable> columnPath,
-//                                 Comparable columnValue) {
-//        switch (operator) {
-//            case EQUAL:
-//                return columnPath.eq(columnValue);
-//            case GREATER_THAN:
-//                return columnPath.gt(columnValue);
-//            case LESS_THAN:
-//                return columnPath.lt(columnValue);
-//            case GREATER_OR_EQUAL:
-//                return columnPath.goe(columnValue);
-//            case LESS_OR_EQUAL:
-//                return columnPath.loe(columnValue);
-//            default:
-//                throw newIllegalArgumentException("Unexpected operator %s.", operator);
-//        }
-//    }
-
     /**
      * Creates a predicate to match an {@link IdColumn ID} to one of the specified IDs.
      *
@@ -185,7 +75,7 @@ public final class QueryPredicates {
             return TRUE;
         }
 
-        var id = new PathBuilder<Object>(Object.class, column.columnName());
+        var id = new PathBuilder<>(Object.class, column.columnName());
         var normalizedIds = column.normalize(ids);
         return id.in(normalizedIds);
     }
@@ -328,6 +218,5 @@ public final class QueryPredicates {
     @FunctionalInterface
     private interface AssemblePredicate
             extends BiFunction<BooleanExpression, Predicate, BooleanExpression> {
-
     }
 }
