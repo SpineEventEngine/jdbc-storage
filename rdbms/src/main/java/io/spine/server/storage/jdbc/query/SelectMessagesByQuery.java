@@ -40,7 +40,6 @@ import io.spine.server.entity.FieldMasks;
 import io.spine.server.storage.jdbc.record.RecordTable;
 import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.sql.ResultSet;
 import java.util.Iterator;
@@ -53,6 +52,7 @@ import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.messageRead
 import static io.spine.server.storage.jdbc.query.QueryPredicates.inIds;
 import static io.spine.server.storage.jdbc.query.QueryPredicates.matchPredicate;
 import static io.spine.server.storage.jdbc.record.column.BytesColumn.bytesColumnName;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Selects multiple records from the {@link RecordTable RecordTable}
@@ -72,9 +72,10 @@ public class SelectMessagesByQuery<I, R extends Message> extends AbstractQuery<I
 
     private SelectMessagesByQuery(Builder<I, R> builder) {
         super(builder);
-        this.columnMapping = builder.columnMapping;
         this.recordQuery = builder.recordQuery;
-        this.descriptor = builder.recordDescriptor;
+        var tableSpec = requireNonNull(builder.tableSpec());
+        this.columnMapping = tableSpec.columnMapping();
+        this.descriptor = tableSpec.recordDescriptor();
     }
 
     @Override
@@ -159,8 +160,6 @@ public class SelectMessagesByQuery<I, R extends Message> extends AbstractQuery<I
             extends AbstractQuery.Builder<I, R, Builder<I, R>, SelectMessagesByQuery<I, R>> {
 
         private RecordQuery<I, R> recordQuery;
-        private JdbcColumnMapping columnMapping;
-        private Descriptor recordDescriptor;
 
         private Builder() {
             super();
@@ -171,16 +170,6 @@ public class SelectMessagesByQuery<I, R extends Message> extends AbstractQuery<I
             return this;
         }
 
-        public Builder<I, R> setColumnMapping(JdbcColumnMapping columnMapping) {
-            this.columnMapping = checkNotNull(columnMapping);
-            return this;
-        }
-
-        public Builder<I, R> setRecordDescriptor(Descriptor messageDescriptor) {
-            this.recordDescriptor = messageDescriptor;
-            return getThis();
-        }
-
         /**
          * {@inheritDoc}
          *
@@ -189,13 +178,7 @@ public class SelectMessagesByQuery<I, R extends Message> extends AbstractQuery<I
         @Override
         protected void checkPreconditions() throws IllegalStateException {
             super.checkPreconditions();
-            ensureSet(recordQuery, "RecordQuery");
-            ensureSet(columnMapping, "ColumnMapping");
-            ensureSet(recordDescriptor, "Descriptor");
-        }
-
-        private static void ensureSet(@Nullable Object parameter, String paramName) {
-            checkState(parameter != null, "`%s` must be set.", paramName);
+            checkNotNull(recordQuery, "`RecordQuery` must be set.");
         }
 
         @Override

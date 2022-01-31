@@ -134,7 +134,6 @@ abstract class TimestampTable<I> extends RecordTable<I, Timestamp> {
                 .setDataSource(dataSource())
                 .setTableSpec(spec())
                 .setMessageColumnName(bytesColumnName())
-                .setMessageDescriptor(Timestamp.getDescriptor())
                 .setId(id);
         var query = builder.build();
         return query;

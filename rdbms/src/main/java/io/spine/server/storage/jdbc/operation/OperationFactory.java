@@ -97,7 +97,7 @@ public final class OperationFactory {
     }
 
     public <I, R extends Message> ReadManyByQuery<I, R> readManyByQuery(RecordTable<I, R> t) {
-        return new ReadManyByQuery<>(t, dataSource, columnMapping);
+        return new ReadManyByQuery<>(t, dataSource);
     }
 
     public <I, R extends Message> DeleteOne<I, R> deleteOne(RecordTable<I, R> t) {

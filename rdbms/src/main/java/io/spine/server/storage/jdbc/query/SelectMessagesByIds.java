@@ -36,6 +36,7 @@ import java.util.Iterator;
 
 import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.messageReader;
 import static io.spine.server.storage.jdbc.record.column.BytesColumn.bytesColumnName;
+import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 
 /**
@@ -58,7 +59,7 @@ public final class SelectMessagesByIds<I, R extends Message>
     private SelectMessagesByIds(Builder<I, R> builder) {
         super(builder);
         this.ids = builder.ids;
-        this.messageDescriptor = builder.messageDescriptor;
+        this.messageDescriptor = requireNonNull(builder.tableSpec()).recordDescriptor();
     }
 
     @Override
@@ -90,15 +91,9 @@ public final class SelectMessagesByIds<I, R extends Message>
             extends AbstractQuery.Builder<I, R, Builder<I, R>, SelectMessagesByIds<I, R>> {
 
         private ImmutableList<I> ids;
-        private Descriptor messageDescriptor;
 
         public Builder<I, R> setIds(Iterable<I> ids) {
             this.ids = ImmutableList.copyOf(ids);
-            return getThis();
-        }
-
-        public Builder<I, R> setMessageDescriptor(Descriptor messageDescriptor) {
-            this.messageDescriptor = messageDescriptor;
             return getThis();
         }
 

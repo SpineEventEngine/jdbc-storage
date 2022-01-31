@@ -30,7 +30,9 @@ import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Message;
+import io.spine.protobuf.Messages;
 import io.spine.query.Column;
 import io.spine.query.ColumnName;
 import io.spine.server.storage.RecordSpec;
@@ -76,6 +78,7 @@ public final class JdbcTableSpec<I, R extends Message> {
     private final RecordSpec<I, R, ?> recordSpec;
     private final JdbcColumnMapping columnMapping;
     private final IdColumn<I> idColumn;
+    private final Descriptor recordDescriptor;
     private final @Nullable CustomColumns<R> customColumns;
 
     private @MonotonicNonNull String tableName;
@@ -90,6 +93,7 @@ public final class JdbcTableSpec<I, R extends Message> {
         columnMapping = mapping;
         this.customColumns = columnSpecs;
         this.idColumn = IdColumn.of(recordSpec, columnMapping);
+        this.recordDescriptor = descriptorFrom(recordSpec.storedType());
     }
 
     //TODO:2022-01-28:alex.tymchenko: consolidate the ctors.
@@ -102,6 +106,12 @@ public final class JdbcTableSpec<I, R extends Message> {
         columnMapping = mapping;
         this.customColumns = columnSpecs;
         this.idColumn = IdColumn.of(recordSpec, columnMapping);
+        this.recordDescriptor = descriptorFrom(recordSpec.storedType());
+    }
+
+    private static Descriptor descriptorFrom(Class<? extends Message> type) {
+        return Messages.defaultInstance(type)
+                       .getDescriptorForType();
     }
 
     public String tableName() {
@@ -138,6 +148,14 @@ public final class JdbcTableSpec<I, R extends Message> {
 
     public I idFromRecord(R record) {
         return recordSpec.idFromRecord(record);
+    }
+
+    public Descriptor recordDescriptor() {
+        return recordDescriptor;
+    }
+
+    public JdbcColumnMapping columnMapping() {
+        return columnMapping;
     }
 
     public ImmutableCollection<TableColumn> dataColumns() {

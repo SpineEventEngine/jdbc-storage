@@ -45,8 +45,6 @@ import java.util.Iterator;
  */
 public class ReadManyByQuery<I, R extends Message> extends Operation<I, R> {
 
-    private final JdbcColumnMapping columnMapping;
-
     /**
      * Creates a new operation.
      *
@@ -54,14 +52,9 @@ public class ReadManyByQuery<I, R extends Message> extends Operation<I, R> {
      *         table to write the records to
      * @param dataSource
      *         the data source to use for connectivity
-     * @param columnMapping
-     *         the mapping for the columns from Java to SQL-native types
      */
-    protected ReadManyByQuery(RecordTable<I, R> table,
-                              DataSourceWrapper dataSource,
-                              JdbcColumnMapping columnMapping) {
+    protected ReadManyByQuery(RecordTable<I, R> table, DataSourceWrapper dataSource) {
         super(table, dataSource);
-        this.columnMapping = columnMapping;
     }
 
     /**
@@ -72,8 +65,6 @@ public class ReadManyByQuery<I, R extends Message> extends Operation<I, R> {
         var sqlQuery = builder.setDataSource(dataSource())
                               .setTableSpec(table().spec())
                               .setQuery(query)
-                              .setColumnMapping(columnMapping)
-                              .setRecordDescriptor(table().descriptor())
                               .build();
         var queryResult = sqlQuery.execute();
         return queryResult;

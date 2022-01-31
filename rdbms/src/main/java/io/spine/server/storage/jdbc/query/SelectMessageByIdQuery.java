@@ -37,6 +37,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.Objects.requireNonNull;
 
 /**
  * A query which obtains a {@link Message} by an ID.
@@ -58,7 +59,7 @@ public abstract class SelectMessageByIdQuery<I, R extends Message>
                     ? extends SelectMessageByIdQuery<I, R>> builder) {
         super(builder);
         this.messageColumnName = builder.messageColumnName;
-        this.messageDescriptor = builder.messageDescriptor;
+        this.messageDescriptor = requireNonNull(builder.tableSpec()).recordDescriptor();
     }
 
     /**
@@ -119,17 +120,10 @@ public abstract class SelectMessageByIdQuery<I, R extends Message>
             extends IdAwareQuery.Builder<I, R, B, Q> {
 
         private String messageColumnName;
-        private Descriptor messageDescriptor;
 
         @CanIgnoreReturnValue
         public B setMessageColumnName(String messageColumnName) {
             this.messageColumnName = messageColumnName;
-            return getThis();
-        }
-
-        @CanIgnoreReturnValue
-        public B setMessageDescriptor(Descriptor messageDescriptor) {
-            this.messageDescriptor = messageDescriptor;
             return getThis();
         }
     }

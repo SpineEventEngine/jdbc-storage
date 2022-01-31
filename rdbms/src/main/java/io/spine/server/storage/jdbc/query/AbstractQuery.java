@@ -46,6 +46,7 @@ import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.record.JdbcTableSpec;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -297,6 +298,15 @@ public abstract class AbstractQuery<I, R extends Message> implements StorageQuer
         public B setTableSpec(JdbcTableSpec<I, R> spec) {
             this.tableSpec = checkNotNull(spec);
             return getThis();
+        }
+
+        /**
+         * Returns the table specification, if previously set.
+         *
+         * <p>Otherwise, returns {@code null}.
+         */
+        public @Nullable JdbcTableSpec<I, R> tableSpec() {
+            return tableSpec;
         }
     }
 

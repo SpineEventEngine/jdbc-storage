@@ -118,7 +118,6 @@ class SelectMessageByIdQueryTest {
                            .setDataSource(dataSource)
                            .setId(newUuid())
                            .setMessageColumnName(bytesColumnName())
-                           .setMessageDescriptor(Timestamp.getDescriptor())
                            .build();
         return query;
     }
