@@ -30,6 +30,7 @@ import com.google.protobuf.Any;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Message;
+import io.spine.annotation.Internal;
 import io.spine.protobuf.AnyPacker;
 import io.spine.type.TypeUrl;
 
@@ -38,6 +39,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * A utility class for serializing/deserializing messages.
  */
+@Internal
 public final class Serializer {
 
     private Serializer() {
@@ -68,7 +70,7 @@ public final class Serializer {
      *         the descriptor of a message
      * @return a message instance
      */
-    static Message deserialize(byte[] bytes, Descriptor messageDescriptor) {
+    public static Message deserialize(byte[] bytes, Descriptor messageDescriptor) {
         checkNotNull(bytes);
         var builder = Any.newBuilder();
         var typeUrlValue = TypeUrl.from(messageDescriptor)

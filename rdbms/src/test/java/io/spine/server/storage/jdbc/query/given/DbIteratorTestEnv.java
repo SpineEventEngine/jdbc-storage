@@ -30,7 +30,7 @@ import com.google.protobuf.Timestamp;
 import io.spine.server.storage.jdbc.JdbcStorageFactory;
 import io.spine.server.storage.jdbc.PredefinedMapping;
 import io.spine.server.storage.jdbc.given.table.TimestampByString;
-import io.spine.server.storage.jdbc.query.ColumnReader;
+import io.spine.server.storage.jdbc.query.reader.ColumnReader;
 import io.spine.server.storage.jdbc.query.DbIterator;
 
 import java.sql.ResultSet;

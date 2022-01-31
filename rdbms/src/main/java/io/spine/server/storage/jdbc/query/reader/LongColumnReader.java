@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2022, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,47 +24,26 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.query;
-
-import io.spine.annotation.Internal;
+package io.spine.server.storage.jdbc.query.reader;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
- * A reader of the designated column value in the current row of the {@link ResultSet}.
- *
- * @param <R>
- *         the type of read operation result
+ * The reader for the columns which store {@link Long} entries.
  */
-@Internal
-public abstract class ColumnReader<R> {
+final class LongColumnReader extends ColumnReader<Long> {
 
-    private final String columnName;
-
-    /**
-     * Creates a new {@code ColumnReader} for the specified column.
-     *
-     * @param columnName
-     *         the name of the column to read
-     */
-    protected ColumnReader(String columnName) {
-        this.columnName = columnName;
+    LongColumnReader(String columnName) {
+        super(columnName);
     }
 
-    String columnName() {
-        return columnName;
+    @Override
+    public Long readValue(ResultSet resultSet) throws SQLException {
+        checkNotNull(resultSet);
+        Long result = resultSet.getLong(columnName());
+        return result;
     }
-
-    /**
-     * Reads the value of the designated column in the current row of the {@link ResultSet}.
-     *
-     * @param resultSet
-     *         the result set to read the column value from
-     * @return the read operation result
-     * @throws SQLException
-     *         if an error occurs during the read operation, e.g. the column doesn't exist or the
-     *         {@code ResultSet} is closed
-     */
-    public abstract R readValue(ResultSet resultSet) throws SQLException;
 }

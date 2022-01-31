@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2022, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,26 +24,13 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.query;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
- * The reader for the columns which store {@link Long} entries.
+ * Defines the readers and converters of column data obtained as read results from databases.
  */
-final class LongColumnReader extends ColumnReader<Long> {
+@CheckReturnValue
+@ParametersAreNonnullByDefault
+package io.spine.server.storage.jdbc.query.reader;
 
-    LongColumnReader(String columnName) {
-        super(columnName);
-    }
+import com.google.errorprone.annotations.CheckReturnValue;
 
-    @Override
-    public Long readValue(ResultSet resultSet) throws SQLException {
-        checkNotNull(resultSet);
-        Long result = resultSet.getLong(columnName());
-        return result;
-    }
-}
+import javax.annotation.ParametersAreNonnullByDefault;

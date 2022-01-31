@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2022, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.query;
+package io.spine.server.storage.jdbc.query.reader;
 
 import com.google.protobuf.Message;
 import com.google.protobuf.StringValue;
@@ -43,9 +43,9 @@ import static com.google.common.truth.Truth.assertThat;
 import static io.spine.base.Identifier.newUuid;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
 import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_1;
+import static io.spine.server.storage.jdbc.query.reader.ColumnReaderFactory.idReader;
+import static io.spine.server.storage.jdbc.query.reader.ColumnReaderFactory.messageReader;
 import static io.spine.server.storage.jdbc.record.column.BytesColumn.bytesColumnName;
-import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.idReader;
-import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.messageReader;
 
 @DisplayName("`ColumnReader` should")
 class ColumnReaderTest {

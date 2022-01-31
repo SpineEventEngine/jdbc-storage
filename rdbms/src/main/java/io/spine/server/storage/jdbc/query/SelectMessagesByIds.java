@@ -34,7 +34,7 @@ import io.spine.server.storage.jdbc.record.RecordTable;
 
 import java.util.Iterator;
 
-import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.messageReader;
+import static io.spine.server.storage.jdbc.query.reader.ColumnReaderFactory.messageReader;
 import static io.spine.server.storage.jdbc.record.column.BytesColumn.bytesColumnName;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;

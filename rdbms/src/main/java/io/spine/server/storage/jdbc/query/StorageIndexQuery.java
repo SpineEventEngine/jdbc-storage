@@ -32,7 +32,7 @@ import com.google.protobuf.Message;
 import java.util.Iterator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.idReader;
+import static io.spine.server.storage.jdbc.query.reader.ColumnReaderFactory.idReader;
 
 /**
  * A query for all the IDs in a certain table.

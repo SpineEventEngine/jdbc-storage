@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2022, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,26 +24,47 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.query;
+package io.spine.server.storage.jdbc.query.reader;
+
+import com.google.protobuf.Message;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static io.spine.json.Json.fromJson;
 
 /**
- * The reader for the columns which store {@link Integer} entries.
+ * The reader for the columns which store {@link Message} values in JSON format.
+ *
+ * <p>The result of the read operation is always a Protobuf {@link Message}.
+ *
+ * @param <M>
+ *         the type of the column
+ * @see io.spine.json.Json Json
  */
-final class IntegerColumnReader extends ColumnReader<Integer> {
+final class MessageColumnReader<M extends Message> extends ColumnReader<M> {
 
-    IntegerColumnReader(String columnName) {
+    private final Class<M> messageClass;
+
+    /**
+     * Creates a new {@code MessageColumnReader} instance.
+     *
+     * @param columnName
+     *         the name of the column to read
+     * @param messageClass
+     *         the type of messages stored in the column
+     */
+    MessageColumnReader(String columnName, Class<M> messageClass) {
         super(columnName);
+        this.messageClass = checkNotNull(messageClass);
     }
 
     @Override
-    public Integer readValue(ResultSet resultSet) throws SQLException {
+    public M readValue(ResultSet resultSet) throws SQLException {
         checkNotNull(resultSet);
-        Integer result = resultSet.getInt(columnName());
+        var messageJson = resultSet.getString(columnName());
+        var result = fromJson(messageJson, messageClass);
         return result;
     }
 }

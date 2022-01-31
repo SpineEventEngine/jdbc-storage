@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2022, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,47 +24,55 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.query;
+package io.spine.server.storage.jdbc.query.reader;
 
+import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Message;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static io.spine.json.Json.fromJson;
+import static io.spine.server.storage.jdbc.query.Serializer.deserialize;
 
 /**
- * The reader for the columns which store {@link Message} values in JSON format.
+ * The reader for the columns which store Protobuf messages in a serialized form.
  *
- * <p>The result of the read operation is always a Protobuf {@link Message}.
+ * <p>The result of the read operation is a deserialized {@link Message}.
  *
  * @param <M>
- *         the type of the column
- * @see io.spine.json.Json Json
+ *         the type of the messages stored in the column
  */
-final class MessageColumnReader<M extends Message> extends ColumnReader<M> {
+//TODO:2021-06-30:alex.tymchenko: move this type!
+public final class MessageBytesColumnReader<M extends Message> extends ColumnReader<M> {
 
-    private final Class<M> messageClass;
+    private final Descriptor messageDescriptor;
+
+    private MessageBytesColumnReader(String columnName, Descriptor messageDescriptor) {
+        super(columnName);
+        this.messageDescriptor = messageDescriptor;
+    }
 
     /**
-     * Creates a new {@code MessageColumnReader} instance.
+     * Creates a new instance of the {@code MessageBytesColumnReader}.
      *
      * @param columnName
      *         the name of the column to read
-     * @param messageClass
-     *         the type of messages stored in the column
+     * @param messageDescriptor
+     *         the {@code Descriptor} of the column message type
      */
-    MessageColumnReader(String columnName, Class<M> messageClass) {
-        super(columnName);
-        this.messageClass = checkNotNull(messageClass);
+    static <M extends Message> MessageBytesColumnReader<M>
+    create(String columnName, Descriptor messageDescriptor) {
+        return new MessageBytesColumnReader<>(columnName, messageDescriptor);
     }
 
     @Override
     public M readValue(ResultSet resultSet) throws SQLException {
         checkNotNull(resultSet);
-        var messageJson = resultSet.getString(columnName());
-        var result = fromJson(messageJson, messageClass);
+        var bytes = resultSet.getBytes(columnName());
+
+        @SuppressWarnings("unchecked") // It's up to user to provide correct binary data for unpack.
+        var result = (M) deserialize(bytes, messageDescriptor);
         return result;
     }
 }

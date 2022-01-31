@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2022, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,41 +24,26 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.operation;
+package io.spine.server.storage.jdbc.query.reader;
 
-import com.google.protobuf.Message;
-import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.query.SelectMessagesByIds;
-import io.spine.server.storage.jdbc.record.RecordTable;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
-import java.util.Iterator;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Reads the data from a database table by provided record identifiers.
- *
- * @param <I>
- *         the type of the identifiers of the stored records
- * @param <R>
- *         the type of the stored records
+ * The reader for the columns which store {@link Integer} entries.
  */
-public class ReadManyByIds<I, R extends Message> extends Operation<I, R>  {
+final class IntegerColumnReader extends ColumnReader<Integer> {
 
-    public ReadManyByIds(RecordTable<I, R> table, DataSourceWrapper dataSource) {
-        super(table, dataSource);
+    IntegerColumnReader(String columnName) {
+        super(columnName);
     }
 
-    public Iterator<R> execute(Iterable<I> ids) {
-        var query = newSelectMany(ids);
-        var result = query.execute();
+    @Override
+    public Integer readValue(ResultSet resultSet) throws SQLException {
+        checkNotNull(resultSet);
+        Integer result = resultSet.getInt(columnName());
         return result;
-    }
-
-    private SelectMessagesByIds<I, R> newSelectMany(Iterable<I> ids) {
-        SelectMessagesByIds.Builder<I, R> builder = SelectMessagesByIds.newBuilder();
-        var query = builder.setTableSpec(table().spec())
-                           .setDataSource(dataSource())
-                           .setIds(ids)
-                           .build();
-        return query;
     }
 }

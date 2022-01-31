@@ -65,8 +65,7 @@ public class SelectTimestampById<I> extends SelectMessageByIdQuery<I, Timestamp>
 
     public static class Builder<I>
             extends SelectMessageByIdQuery.Builder<I, Timestamp, Builder<I>,
-                                                   SelectTimestampById<I>
-            > {
+                                                   SelectTimestampById<I>> {
 
         @Override
         protected Builder<I> getThis() {
@@ -75,7 +74,6 @@ public class SelectTimestampById<I> extends SelectMessageByIdQuery<I, Timestamp>
 
         @Override
         protected SelectTimestampById<I> doBuild() {
-            setMessageColumnName(bytesColumnName());
             return new SelectTimestampById<>(this);
         }
     }
