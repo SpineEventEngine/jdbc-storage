@@ -41,14 +41,12 @@ import static io.spine.server.storage.jdbc.query.given.DbIteratorTestEnv.nonEmpt
 import static io.spine.server.storage.jdbc.query.given.DbIteratorTestEnv.sneakyResultIterator;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@SuppressWarnings({"InnerClassMayBeStatic", "ClassCanBeStatic"})
-// JUnit nested classes cannot be static.
-@DisplayName("DbIterator should")
+@DisplayName("`DbIterator` should")
 class DbIteratorTest {
 
-    @SuppressWarnings("NonExceptionNameEndsWithException") // For test name clarity.
     @Nested
     @DisplayName("throw `DatabaseException`")
+    @SuppressWarnings("NonExceptionNameEndsWithException") // For test name clarity.
     class ThrowDatabaseException {
 
         @Test
@@ -70,9 +68,9 @@ class DbIteratorTest {
         }
     }
 
-    @SuppressWarnings("CheckReturnValue") // Just check that method runs without errors.
     @Test
     @DisplayName("allow `next` without `hasNext`")
+    @SuppressWarnings({"CheckReturnValue", "ResultOfMethodCallIgnored"})
     void allowNextWithoutHasNext() {
         var iterator = nonEmptyIterator();
         iterator.next();
@@ -91,9 +89,9 @@ class DbIteratorTest {
             assertClosed(iterator);
         }
 
-        @SuppressWarnings("CheckReturnValue") // Call `hasNext` method just to close iterator.
         @Test
         @DisplayName("when no more elements are present to iterate")
+        @SuppressWarnings({"CheckReturnValue", "ResultOfMethodCallIgnored"})
         void whenNoElementsPresent() throws SQLException {
             var iterator = emptyIterator();
             iterator.hasNext();
@@ -102,17 +100,17 @@ class DbIteratorTest {
         }
     }
 
-    @SuppressWarnings("deprecation") // Use deprecated method to make sure it's not supported.
     @Test
     @DisplayName("not support removal")
+    @SuppressWarnings("deprecation") // Use deprecated method to make sure it's not supported.
     void notSupportRemoval() {
         var iterator = emptyIterator();
         assertThrows(UnsupportedOperationException.class, iterator::remove);
     }
 
-    @SuppressWarnings("CheckReturnValue") // Ignore `hasNext` method result on purpose.
     @Test
     @DisplayName("throw `NoSuchElementException` if trying to get absent element")
+    @SuppressWarnings({"CheckReturnValue", "ResultOfMethodCallIgnored"})
     void notGetAbsentElement() {
         var iterator = emptyIterator();
 
