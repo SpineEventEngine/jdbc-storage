@@ -43,6 +43,7 @@ import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 import java.util.Collection;
 import java.util.function.BiFunction;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.querydsl.core.types.dsl.Expressions.FALSE;
 import static com.querydsl.core.types.dsl.Expressions.TRUE;
 import static com.querydsl.core.types.dsl.Expressions.comparablePath;
@@ -70,7 +71,10 @@ public final class QueryPredicates {
      *         the type of IDs
      * @return the predicate for the IDs
      */
-    public static <I> Predicate inIds(IdColumn<I> column, Collection<I> ids) {
+    static <I> Predicate inIds(IdColumn<I> column, Collection<I> ids) {
+        checkNotNull(column);
+        checkNotNull(ids);
+
         if (ids.isEmpty()) {
             return TRUE;
         }
@@ -84,6 +88,8 @@ public final class QueryPredicates {
     @SuppressWarnings("rawtypes")   /* To avoid the generics hell. */
     static Predicate nullFilter(ComparisonOperator operator,
                                 ComparablePath<Comparable> columnPath) {
+        checkNotNull(operator);
+        checkNotNull(columnPath);
         switch (operator) {
             case EQUALS:
                 return columnPath.isNull();
@@ -103,6 +109,9 @@ public final class QueryPredicates {
     static Predicate valueFilter(ComparablePath<Comparable> columnPath,
                                  ComparisonOperator operator,
                                  Comparable columnValue) {
+        checkNotNull(columnPath);
+        checkNotNull(operator);
+        checkNotNull(columnValue);
         switch (operator) {
             case EQUALS:
                 return columnPath.eq(columnValue);
@@ -155,10 +164,12 @@ public final class QueryPredicates {
      */
     static <R extends Message> Predicate
     matchPredicate(QueryPredicate<R> predicate, JdbcColumnMapping columnMapping) {
-        var operator = predicate.operator();
+        checkNotNull(predicate);
+        checkNotNull(columnMapping);
 
         AssemblePredicate assembler;
         BooleanExpression current;
+        var operator = predicate.operator();
         if (operator == LogicalOperator.AND) {
             current = TRUE;
             assembler = BooleanExpression::and;

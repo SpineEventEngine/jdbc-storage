@@ -26,7 +26,16 @@
 
 package io.spine.server.storage.jdbc.query;
 
+import com.google.common.testing.NullPointerTester;
+import com.google.common.testing.NullPointerTester.Visibility;
+import com.querydsl.core.types.dsl.ComparablePath;
 import io.spine.query.ComparisonOperator;
+import io.spine.query.QueryPredicate;
+import io.spine.server.storage.jdbc.TableColumn;
+import io.spine.server.storage.jdbc.record.column.IdColumn;
+import io.spine.server.storage.jdbc.type.DefaultJdbcColumnMapping;
+import io.spine.test.storage.StgProject;
+import io.spine.testing.UtilityClassTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -39,8 +48,6 @@ import static io.spine.query.ComparisonOperator.LESS_OR_EQUALS;
 import static io.spine.query.ComparisonOperator.LESS_THAN;
 import static io.spine.server.storage.jdbc.query.QueryPredicates.nullFilter;
 import static io.spine.server.storage.jdbc.query.QueryPredicates.valueFilter;
-import static io.spine.testing.Assertions.assertHasPrivateParameterlessCtor;
-import static io.spine.testing.DisplayNames.HAVE_PARAMETERLESS_CTOR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -48,14 +55,26 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SuppressWarnings({"InnerClassMayBeStatic", "ClassCanBeStatic"
         /* JUnit nested classes cannot be static. */,
         "DuplicateStringLiteralInspection" /* Common test display names. */})
-class QueryPredicatesTest {
+class QueryPredicatesTest extends UtilityClassTest<QueryPredicates> {
 
     private static final String COLUMN_FILTER_VALUE = "test";
 
-    @Test
-    @DisplayName(HAVE_PARAMETERLESS_CTOR)
-    void haveUtilityConstructor() {
-        assertHasPrivateParameterlessCtor(QueryPredicates.class);
+    QueryPredicatesTest() {
+        super(QueryPredicates.class, Visibility.PACKAGE);
+    }
+
+    @Override
+    protected void configure(NullPointerTester tester) {
+        super.configure(tester);
+        var mapping = new DefaultJdbcColumnMapping();
+        var idColumn = IdColumn.of(new TableColumn("sample_id", String.class, mapping));
+        var predicate = StgProject.query()
+                                  .build()
+                                  .subject()
+                                  .predicate();
+        tester.setDefault(ComparablePath.class, comparablePath(String.class, ""))
+              .setDefault(IdColumn.class, idColumn)
+              .setDefault(QueryPredicate.class, predicate);
     }
 
     @Test
