@@ -37,8 +37,6 @@ import static io.spine.server.storage.jdbc.query.reader.ColumnReaderFactory.idRe
 /**
  * A query for all the IDs in a certain table.
  *
- * //TODO:2021-06-18:alex.tymchenko: move this type.
- *
  * @param <I>
  *         the type of IDs
  * @param <R>

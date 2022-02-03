@@ -34,11 +34,10 @@ import com.google.protobuf.Message;
  * @param <I>
  *         the type of identifiers of the records to delete
  */
-//TODO:2021-06-24:alex.tymchenko: move this type.
 public final class DeleteRecordQuery<I, R extends Message>
         extends IdAwareQuery<I, R> implements ModifyQuery {
 
-    DeleteRecordQuery(Builder<I, R> builder) {
+    private DeleteRecordQuery(Builder<I, R> builder) {
         super(builder);
     }
 

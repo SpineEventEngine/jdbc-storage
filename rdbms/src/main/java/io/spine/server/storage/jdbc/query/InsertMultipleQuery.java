@@ -33,8 +33,6 @@ import io.spine.server.storage.jdbc.record.RecordTable;
 /**
  * Inserts multiple records to the {@link RecordTable} in a batch.
  *
- * //TODO:2021-06-18:alex.tymchenko: move this type.
- *
  * @param <I>
  *         the record ID type
  * @param <R>

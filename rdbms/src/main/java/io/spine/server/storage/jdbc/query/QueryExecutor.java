@@ -35,7 +35,6 @@ import java.sql.SQLException;
 /**
  * A helper class for execution of SQL queries.
  */
-//TODO:2021-06-18:alex.tymchenko: move this type.
 public final class QueryExecutor {
 
     private final DataSourceWrapper dataSource;

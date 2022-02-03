@@ -33,8 +33,6 @@ import io.spine.server.storage.jdbc.record.RecordTable;
 /**
  * Updates a single record in a {@link RecordTable}.
  *
- * //TODO:2022-01-17:alex.tymchenko: move this type.
- *
  * @param <I>
  *         the record ID type
  * @param <R>

@@ -41,8 +41,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * An abstract base for queries that modify a single record to a {@link RecordTable}.
  *
- * //TODO:2022-01-17:alex.tymchenko: move this type.
- *
  * @param <I>
  *         the record ID type
  * @param <R>

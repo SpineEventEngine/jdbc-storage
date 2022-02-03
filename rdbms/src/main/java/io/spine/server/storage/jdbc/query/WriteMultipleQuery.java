@@ -43,8 +43,6 @@ import static com.google.gson.internal.$Gson$Preconditions.checkNotNull;
  * An abstract base for queries that write multiple messages
  * to a {@link RecordTable} in a batch.
  *
- * //TODO:2022-01-17:alex.tymchenko: move this type.
- *
  * @param <I>
  *         the record ID type
  * @param <R>
@@ -64,8 +62,8 @@ abstract class WriteMultipleQuery<I, R extends Message, C extends StoreClause<C>
         this.records = builder.records;
     }
 
-    @CanIgnoreReturnValue
     @Override
+    @CanIgnoreReturnValue
     public long execute() {
         if (records.isEmpty()) {
             return 0;

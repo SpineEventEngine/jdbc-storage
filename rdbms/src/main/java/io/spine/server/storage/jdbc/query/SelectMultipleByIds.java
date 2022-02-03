@@ -42,8 +42,6 @@ import static java.util.stream.Collectors.toList;
 /**
  * Selects multiple records from the {@link RecordTable} by their IDs.
  *
- * //TODO:2021-06-18:alex.tymchenko: move this type.
- *
  * @param <I>
  *         the ID type
  * @param <R>

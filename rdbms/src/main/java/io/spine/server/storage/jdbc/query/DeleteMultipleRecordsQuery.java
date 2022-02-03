@@ -36,9 +36,6 @@ import static java.util.stream.Collectors.toList;
 /**
  * Deletes multiple records by IDs from the {@link RecordTable}.
  *
- * //TODO:2022-01-10:alex.tymchenko: re-document.
- * //TODO:2022-01-10:alex.tymchenko: move this type.
- *
  * @param <I>
  *         the ID type
  * @param <R>
@@ -59,8 +56,7 @@ public final class DeleteMultipleRecordsQuery<I, R extends Message>
     @Override
     public long execute() {
         var idColumn = tableSpec().idColumn();
-        var normalizedIds = ids
-                .stream()
+        var normalizedIds = ids.stream()
                 .map(idColumn::normalize)
                 .collect(toList());
         var query = factory().delete(table())

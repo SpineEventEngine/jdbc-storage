@@ -32,8 +32,6 @@ import com.google.protobuf.Message;
 /**
  * A query that deletes all records from some table.
  *
- * //TODO:2021-06-24:alex.tymchenko: move this type?
- *
  * @param <I>
  *         the type of the record identifiers
  * @param <R>

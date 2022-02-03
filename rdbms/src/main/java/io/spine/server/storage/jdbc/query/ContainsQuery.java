@@ -33,7 +33,6 @@ import static com.querydsl.sql.SQLExpressions.count;
 /**
  * A query that checks if the table contains a record with the given ID.
  */
-//TODO:2021-06-18:alex.tymchenko: move this type.
 public final class ContainsQuery<I, R extends Message>
         extends IdAwareQuery<I, R>
         implements SelectQuery<Boolean> {
