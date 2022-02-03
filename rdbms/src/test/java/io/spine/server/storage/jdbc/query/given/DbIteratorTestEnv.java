@@ -30,8 +30,8 @@ import com.google.protobuf.Timestamp;
 import io.spine.server.storage.jdbc.JdbcStorageFactory;
 import io.spine.server.storage.jdbc.PredefinedMapping;
 import io.spine.server.storage.jdbc.given.table.TimestampByString;
-import io.spine.server.storage.jdbc.query.reader.ColumnReader;
 import io.spine.server.storage.jdbc.query.DbIterator;
+import io.spine.server.storage.jdbc.query.reader.ColumnReader;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -46,7 +46,7 @@ public class DbIteratorTestEnv {
     private DbIteratorTestEnv() {
     }
 
-    public static DbIterator emptyIterator() {
+    public static DbIterator<?> emptyIterator() {
         var resultSet = emptyResultSet();
         var iterator = anIterator(resultSet);
         return iterator;
@@ -56,19 +56,19 @@ public class DbIteratorTestEnv {
      * An iterator which produces failure on every operation except {@link DbIterator#close()}, as
      * it's using a closed {@link ResultSet}.
      */
-    public static DbIterator faultyResultIterator() throws SQLException {
+    public static DbIterator<?> faultyResultIterator() throws SQLException {
         var resultSet = closedResultSet();
         var iterator = anIterator(resultSet);
         return iterator;
     }
 
-    public static DbIterator sneakyResultIterator() {
+    public static DbIterator<?> sneakyResultIterator() {
         var resultSet = resultSetWithSingleResult();
         var iterator = throwingIterator(resultSet);
         return iterator;
     }
 
-    public static DbIterator nonEmptyIterator() {
+    public static DbIterator<?> nonEmptyIterator() {
         var resultSet = resultSetWithSingleResult();
         var iterator = anIterator(resultSet);
         return iterator;
@@ -120,7 +120,7 @@ public class DbIteratorTestEnv {
                 .build();
     }
 
-    private static DbIterator anIterator(ResultSet resultSet) {
+    private static DbIterator<?> anIterator(ResultSet resultSet) {
         var identityReader = new ColumnReader<ResultSet>("") {
             @Override
             public ResultSet readValue(ResultSet resultSet) {
@@ -131,7 +131,7 @@ public class DbIteratorTestEnv {
         return result;
     }
 
-    private static DbIterator throwingIterator(ResultSet resultSet) {
+    private static DbIterator<?> throwingIterator(ResultSet resultSet) {
         var throwingReader = new ColumnReader<ResultSet>("") {
             @Override
             public ResultSet readValue(ResultSet resultSet) throws SQLException {
