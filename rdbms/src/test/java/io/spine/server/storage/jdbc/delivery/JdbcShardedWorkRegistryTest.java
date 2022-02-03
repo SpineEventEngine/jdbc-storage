@@ -29,6 +29,7 @@ package io.spine.server.storage.jdbc.delivery;
 import com.google.common.testing.NullPointerTester;
 import io.spine.base.Identifier;
 import io.spine.server.NodeId;
+import io.spine.server.delivery.DeliveryStrategy;
 import io.spine.server.delivery.ShardIndex;
 import io.spine.server.delivery.ShardSessionRecord;
 import io.spine.server.delivery.ShardedWorkRegistry;
@@ -38,7 +39,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static io.spine.server.ContextSpec.singleTenant;
-import static io.spine.server.storage.jdbc.delivery.given.TestShardIndex.newIndex;
+import static io.spine.server.delivery.DeliveryStrategy.newIndex;
 import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.newFactory;
 import static io.spine.testing.DisplayNames.NOT_ACCEPT_NULLS;
 
