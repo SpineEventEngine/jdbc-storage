@@ -33,8 +33,6 @@ import io.spine.server.entity.Entity;
 import io.spine.server.storage.RecordSpec;
 import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.Type;
-import io.spine.server.storage.jdbc.query.Parameter;
-import io.spine.server.storage.jdbc.query.Parameters;
 import io.spine.server.storage.jdbc.record.RecordTable;
 import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 
@@ -193,13 +191,13 @@ public abstract class IdColumn<I> {
     public abstract Class<I> javaType();
 
     /**
-     * Normalizes the identifier before setting it to a {@link Parameter}.
+     * Normalizes the identifier before using it as a parameter value.
      *
      * <p>The method may perform a conversion of the ID to a type, which is more suitable
      * for storing. E.g. it may be useful to store a {@linkplain Message Protobuf Message}
      * in a JSON representation as a {@code String}.
      *
-     * <p>If an ID type is a simple type as {@code String}, {@code Integer}, etc
+     * <p>If an ID type is a simple type as {@code String}, {@code Integer}, etc.
      * the method may return the same value.
      *
      * @param id
@@ -230,22 +228,6 @@ public abstract class IdColumn<I> {
 
     public TableColumn column() {
         return column;
-    }
-
-    /**
-     * Sets an ID parameter to the given value.
-     *
-     * @param idName
-     *         the name of the ID
-     * @param id
-     *         the ID value to set
-     * @param parameters
-     *         the parameters to set the ID
-     */
-    public void setId(String idName, I id, Parameters.Builder parameters) {
-        var normalizedId = normalize(id);
-        var parameter = Parameter.of(normalizedId);
-        parameters.addParameter(idName, parameter);
     }
 
     /**
