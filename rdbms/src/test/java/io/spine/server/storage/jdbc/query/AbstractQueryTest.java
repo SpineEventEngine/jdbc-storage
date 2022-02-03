@@ -26,6 +26,7 @@
 
 package io.spine.server.storage.jdbc.query;
 
+import com.querydsl.sql.mysql.MySQLQueryFactory;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.query.AbstractQuery.TransactionHandler;
 import io.spine.server.storage.jdbc.query.given.Given.AStorageQuery;
@@ -72,5 +73,12 @@ class AbstractQueryTest {
         var listeners = configuration.getListeners();
         assertThat(listeners.getListeners())
                 .contains(TransactionHandler.INSTANCE);
+    }
+
+    @Test
+    @DisplayName("be able to provide a MySQL-specific query factory")
+    void returnMySqlSpecificFactory() {
+        var factory = query.mySqlFactory();
+        assertThat(factory).isNotNull();
     }
 }
