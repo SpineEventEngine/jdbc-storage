@@ -78,7 +78,7 @@ public final class SessionRecordColumn {
     /**
      * Prevents this type from instantiation.
      *
-     * <p>This class exists exclusively as a container of the column definitions. Thus it isn't
+     * <p>This class exists exclusively as a container of the column definitions. Thus, it isn't
      * expected to be instantiated. See the {@link RecordColumns} docs for more details on
      * this approach.
      */
