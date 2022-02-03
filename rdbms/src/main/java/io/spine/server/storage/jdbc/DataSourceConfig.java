@@ -362,7 +362,7 @@ public class DataSourceConfig {
         /**
          * See {@link #setAutoCommit(Boolean)}.
          */
-        public Boolean isAutoCommit() {
+        public @Nullable Boolean isAutoCommit() {
             return autoCommit;
         }
 
