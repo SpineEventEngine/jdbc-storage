@@ -72,6 +72,7 @@ public final class Serializer {
      */
     public static Message deserialize(byte[] bytes, Descriptor messageDescriptor) {
         checkNotNull(bytes);
+        checkNotNull(messageDescriptor);
         var builder = Any.newBuilder();
         var typeUrlValue = TypeUrl.from(messageDescriptor)
                                   .value();

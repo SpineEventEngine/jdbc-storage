@@ -26,25 +26,31 @@
 
 package io.spine.server.storage.jdbc.query;
 
+import com.google.common.testing.NullPointerTester;
+import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.StringValue;
+import com.google.protobuf.Timestamp;
+import io.spine.testing.UtilityClassTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static io.spine.base.Identifier.newUuid;
 import static io.spine.server.storage.jdbc.query.Serializer.deserialize;
 import static io.spine.server.storage.jdbc.query.Serializer.serialize;
-import static io.spine.testing.Assertions.assertHasPrivateParameterlessCtor;
-import static io.spine.testing.DisplayNames.HAVE_PARAMETERLESS_CTOR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("`Serializer` should")
-class SerializerTest {
+class SerializerTest extends UtilityClassTest<Serializer> {
 
-    @Test
-    @DisplayName(HAVE_PARAMETERLESS_CTOR)
-    void haveUtilityConstructor() {
-        assertHasPrivateParameterlessCtor(Serializer.class);
+    SerializerTest() {
+        super(Serializer.class);
+    }
+
+    @Override
+    protected void configure(NullPointerTester tester) {
+        super.configure(tester);
+        tester.setDefault(Descriptor.class, Timestamp.getDescriptor());
     }
 
     @Test
