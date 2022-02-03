@@ -48,10 +48,6 @@ import static io.spine.testing.DisplayNames.NOT_ACCEPT_NULLS;
 @DisplayName("`JdbcShardedWorkRegistry` should")
 class JdbcShardedWorkRegistryTest extends ShardedWorkRegistryTest {
 
-    private static final ShardIndex index = newIndex(1, 15);
-
-    private static final NodeId nodeId = newNode();
-
     private JdbcShardedWorkRegistry registry;
 
     @BeforeEach
@@ -75,80 +71,6 @@ class JdbcShardedWorkRegistryTest extends ShardedWorkRegistryTest {
                 .setDefault(ShardSessionRecord.class, ShardSessionRecord.getDefaultInstance())
                 .testAllPublicInstanceMethods(registry);
     }
-
-    //TODO:2022-01-21:alex.tymchenko: kill these test cases?
-//    @Test
-//    @DisplayName("pick up the shard and write a corresponding record to the storage")
-//    void pickUp() {
-//        var session = registry.pickUp(index, nodeId);
-//        assertThat(session)
-//                .isPresent();
-//        assertThat(session.get()
-//                          .shardIndex()).isEqualTo(index);
-//
-//        var record = readSingleRecord(index);
-//        assertThat(record.getIndex()).isEqualTo(index);
-//        assertThat(record.getPickedBy()).isEqualTo(nodeId);
-//    }
-
-//    @Test
-//    @DisplayName("not be able to pick up the shard if it's already picked up")
-//    void cannotPickUpIfTaken() {
-//        var session = registry.pickUp(index, nodeId);
-//        assertThat(session).isPresent();;
-//
-//        var sameIdxSameNode = registry.pickUp(index, nodeId);
-//        assertThat(sameIdxSameNode).isPresent();;
-//
-//        var sameIdxAnotherNode = registry.pickUp(index, newNode());
-//        assertThat(sameIdxAnotherNode).isEmpty();
-//
-//        var anotherIdx = newIndex(24, 100);
-//        var anotherIdxSameNode = registry.pickUp(anotherIdx, nodeId);
-//        assertThat(anotherIdxSameNode).isPresent();
-//
-//        var anotherIdxAnotherNode =
-//                registry.pickUp(anotherIdx, newNode());
-//        assertThat(anotherIdxAnotherNode).isEmpty();
-//    }
-
-//    @Test
-//    @DisplayName("complete the shard session (once picked up) and make it available for picking up")
-//    void completeSessionAndMakeItAvailable() {
-//        var optional = registry.pickUp(index, nodeId);
-//        assertThat(optional).isPresent();
-//
-//        var whenPickedFirst = readSingleRecord(index).getWhenLastPicked();
-//
-//        var session = (JdbcShardProcessingSession) optional.get();
-//        session.complete();
-//
-//        var completedRecord = readSingleRecord(index);
-//        assertThat(completedRecord.hasPickedBy()).isFalse();
-//
-//        // On some platforms (namely some Windows distributions), Java cannot obtain current time
-//        // with enough precision to compare timestamps in this test. By waiting for 1 second, we
-//        // ensure that the timestamps will not accidentally be identical.
-//        sleepUninterruptibly(Duration.ofSeconds(1));
-//
-//        var anotherNode = newNode();
-//        var anotherOptional = registry.pickUp(index, anotherNode);
-//        assertThat(anotherOptional).isPresent();
-//
-//        var secondSessionRecord = readSingleRecord(index);
-//        assertThat(secondSessionRecord.getPickedBy()).isEqualTo(anotherNode);
-//
-//        var whenPickedSecond = secondSessionRecord.getWhenLastPicked();
-//        assertThat(Timestamps.compare(whenPickedFirst, whenPickedSecond) < 0)
-//                .isTrue();
-//    }
-
-//    private ShardSessionRecord readSingleRecord(ShardIndex index) {
-//        var record = registry.find(index);
-//        assertThat(record).isPresent();
-//
-//        return record.get();
-//    }
 
     private static NodeId newNode() {
         return NodeId.newBuilder()
