@@ -49,7 +49,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
  *
  * @see Builder
  */
-public class DataSourceConfig {
+public final class DataSourceConfig {
 
     /**
      * Required parameters.
