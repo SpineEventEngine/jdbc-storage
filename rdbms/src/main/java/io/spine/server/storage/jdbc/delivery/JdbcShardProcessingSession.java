@@ -32,14 +32,23 @@ import io.spine.server.delivery.ShardSessionRecord;
 /**
  * A JDBC-specific implementation of {@link ShardProcessingSession}.
  *
- * <p>After completion just runs some pre-defined callback.
+ * <p>After completion, runs some pre-defined callback.
  */
 final class JdbcShardProcessingSession extends ShardProcessingSession {
 
     private final Runnable completionCallback;
 
-    JdbcShardProcessingSession(ShardSessionRecord record, Runnable completionCallback) {
-        super(record);
+    /**
+     * Creates a new JDBC-specific session on top of the session record
+     * and the provided completion callback.
+     *
+     * @param session
+     *         the processing session
+     * @param completionCallback
+     *         the callback to run upon the session completion
+     */
+    JdbcShardProcessingSession(ShardSessionRecord session, Runnable completionCallback) {
+        super(session);
         this.completionCallback = completionCallback;
     }
 
