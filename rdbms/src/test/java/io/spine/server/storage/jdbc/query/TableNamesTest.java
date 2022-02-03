@@ -26,47 +26,26 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import com.google.common.testing.NullPointerTester;
+import com.google.common.testing.NullPointerTester.Visibility;
 import io.spine.server.aggregate.given.repo.ProjectAggregate;
+import io.spine.testing.UtilityClassTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static io.spine.server.storage.jdbc.query.TableNames.newTableName;
-import static io.spine.testing.Assertions.assertHasPrivateParameterlessCtor;
-import static io.spine.testing.DisplayNames.HAVE_PARAMETERLESS_CTOR;
-import static io.spine.testing.DisplayNames.NOT_ACCEPT_NULLS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("`TableNames` should")
-class TableNamesTest {
+class TableNamesTest extends UtilityClassTest<TableNames> {
 
     private final Class<ProjectAggregate> entityClass = ProjectAggregate.class;
 
-    @Test
-    @DisplayName(HAVE_PARAMETERLESS_CTOR)
-    void haveUtilityConstructor() {
-        assertHasPrivateParameterlessCtor(TableNames.class);
-    }
-
-    @Test
-    @DisplayName(NOT_ACCEPT_NULLS)
-    void passNullToleranceCheck() {
-        var tester = new NullPointerTester();
-        tester.testStaticMethods(TableNames.class, NullPointerTester.Visibility.PACKAGE);
-    }
-
-    @Test
-    @DisplayName("return table name which starts with entity class name")
-    void returnTableName() {
-        var tableName = newTableName(entityClass);
-        var className = entityClass.getSimpleName();
-        assertTrue(tableName.startsWith(className));
+    protected TableNamesTest() {
+        super(TableNames.class, Visibility.PACKAGE);
     }
 
     @Test
     @DisplayName("produce same name for same class")
     void produceSameForSameClass() {
-        assertEquals(newTableName(entityClass), newTableName(entityClass));
+        assertEquals(TableNames.of(entityClass), TableNames.of(entityClass));
     }
 }
