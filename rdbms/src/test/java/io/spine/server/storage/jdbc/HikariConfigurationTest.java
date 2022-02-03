@@ -27,6 +27,8 @@
 package io.spine.server.storage.jdbc;
 
 import com.google.common.testing.NullPointerTester;
+import com.google.common.testing.NullPointerTester.Visibility;
+import io.spine.testing.UtilityClassTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -34,19 +36,16 @@ import static io.spine.testing.Assertions.assertHasPrivateParameterlessCtor;
 import static io.spine.testing.DisplayNames.HAVE_PARAMETERLESS_CTOR;
 import static io.spine.testing.DisplayNames.NOT_ACCEPT_NULLS;
 
-@DisplayName("`DefaultDataSourceConfigConverter` should")
-class DefaultDataSourceConfigConverterTest {
+@DisplayName("`HikariConfiguration` should")
+class HikariConfigurationTest extends UtilityClassTest<HikariConfiguration> {
 
-    @Test
-    @DisplayName(HAVE_PARAMETERLESS_CTOR)
-    void haveUtilityConstructor() {
-        assertHasPrivateParameterlessCtor(DataSourceConfigConverter.class);
+    HikariConfigurationTest() {
+        super(HikariConfiguration.class, Visibility.PACKAGE);
     }
 
-    @Test
-    @DisplayName(NOT_ACCEPT_NULLS)
-    void passNullToleranceCheck() {
-        var tester = new NullPointerTester();
+    @Override
+    protected void configure(NullPointerTester tester) {
+        super.configure(tester);
         var dataSource = DataSourceConfig
                 .newBuilder()
                 .setDataSourceClassName("SomeClass")
@@ -55,7 +54,5 @@ class DefaultDataSourceConfigConverterTest {
                 .setPassword("")
                 .build();
         tester.setDefault(DataSourceConfig.class, dataSource);
-        tester.testStaticMethods(DataSourceConfigConverter.class,
-                                 NullPointerTester.Visibility.PACKAGE);
     }
 }

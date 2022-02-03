@@ -36,17 +36,16 @@ import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.storage.RecordSpec;
 import io.spine.server.storage.RecordStorage;
 import io.spine.server.storage.StorageFactory;
-import io.spine.server.storage.jdbc.record.JdbcTableSpec;
-import io.spine.server.storage.jdbc.record.column.CustomColumns;
 import io.spine.server.storage.jdbc.aggregate.AggregateEventRecordColumns;
 import io.spine.server.storage.jdbc.delivery.JdbcSessionStorage;
-import io.spine.server.storage.jdbc.record.JdbcRecordStorage;
 import io.spine.server.storage.jdbc.operation.OperationFactory;
+import io.spine.server.storage.jdbc.record.JdbcRecordStorage;
+import io.spine.server.storage.jdbc.record.JdbcTableSpec;
+import io.spine.server.storage.jdbc.record.column.CustomColumns;
 import io.spine.server.storage.jdbc.type.DefaultJdbcColumnMapping;
 import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 
 import javax.sql.DataSource;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -192,10 +191,10 @@ public class JdbcStorageFactory implements StorageFactory {
          * Sets the required field {@code dataSource} from {@link DataSourceConfig}.
          *
          * @see HikariConfig
-         * @see DataSourceConfigConverter#convert(DataSourceConfig)
+         * @see HikariConfiguration#from(DataSourceConfig)
          */
         public Builder setDataSource(DataSourceConfig dataSource) {
-            var hikariConfig = DataSourceConfigConverter.convert(dataSource);
+            var hikariConfig = HikariConfiguration.from(dataSource);
             this.dataSource = DataSourceWrapper.wrap(new HikariDataSource(hikariConfig));
             return this;
         }
