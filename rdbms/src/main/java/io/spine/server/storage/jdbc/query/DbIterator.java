@@ -171,6 +171,7 @@ public abstract class DbIterator<R> implements Iterator<R>, Closeable {
      */
     @Override
     @Deprecated
+    @SuppressWarnings("DeprecatedIsStillUsed") /* Used in tests to verify the exception. */
     public final void remove() throws UnsupportedOperationException {
         throw new UnsupportedOperationException("Removing is not supported.");
     }
