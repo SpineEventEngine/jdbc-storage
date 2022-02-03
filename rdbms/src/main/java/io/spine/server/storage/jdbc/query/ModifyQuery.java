@@ -1,5 +1,5 @@
 /*
- * Copyright 2022, TeamDev. All rights reserved.
+ * Copyright 2021, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,18 +26,19 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import com.google.protobuf.Message;
-import io.spine.server.storage.jdbc.query.IdAwareQuery;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 
 /**
- * A MySQL-specific query which inserts a record in case its primary key value is unique
- * to the table contents, and updates an existing record otherwise.
+ * A query which makes changes in a data source.
  */
-//TODO:2022-01-10:alex.tymchenko: implement!
-public class InsertOnDuplicateUpdateQuery<I, R extends Message> extends IdAwareQuery<I, R> {
+public interface ModifyQuery extends StorageQuery {
 
-    protected InsertOnDuplicateUpdateQuery(
-            Builder<I, R, ? extends Builder<I, R, ?, ?>, ? extends IdAwareQuery<I, R>> builder) {
-        super(builder);
-    }
+    /**
+     * Executes a query which modifiers the underlying table, and returns
+     * the number of affected rows.
+     *
+     * @return the number of affected rows
+     */
+    @CanIgnoreReturnValue
+    long execute();
 }

@@ -28,8 +28,8 @@ package io.spine.server.storage.jdbc.operation;
 
 import com.google.protobuf.Message;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.query.InsertSingleRecord;
-import io.spine.server.storage.jdbc.query.UpdateSingleRecord;
+import io.spine.server.storage.jdbc.query.InsertOneQuery;
+import io.spine.server.storage.jdbc.query.UpdateSingleQuery;
 import io.spine.server.storage.jdbc.record.JdbcRecord;
 import io.spine.server.storage.jdbc.record.RecordTable;
 
@@ -89,9 +89,9 @@ public class WriteOne<I, R extends Message> extends Operation<I, R> {
         return result;
     }
 
-    protected final UpdateSingleRecord<I, R> newUpdate(JdbcRecord<I, R> record) {
+    protected final UpdateSingleQuery<I, R> newUpdate(JdbcRecord<I, R> record) {
         var id = record.id();
-        UpdateSingleRecord.Builder<I, R> builder = UpdateSingleRecord.newBuilder();
+        UpdateSingleQuery.Builder<I, R> builder = UpdateSingleQuery.newBuilder();
         var query = builder.setTableSpec(table().spec())
                            .setDataSource(dataSource())
                            .setId(id)
@@ -100,9 +100,9 @@ public class WriteOne<I, R extends Message> extends Operation<I, R> {
         return query;
     }
 
-    protected final InsertSingleRecord<I, R> newInsert(JdbcRecord<I, R> record) {
+    protected final InsertOneQuery<I, R> newInsert(JdbcRecord<I, R> record) {
         var id = record.id();
-        InsertSingleRecord.Builder<I, R> builder = InsertSingleRecord.newBuilder();
+        InsertOneQuery.Builder<I, R> builder = InsertOneQuery.newBuilder();
         var query = builder.setTableSpec(table().spec())
                            .setDataSource(dataSource())
                            .setId(id)

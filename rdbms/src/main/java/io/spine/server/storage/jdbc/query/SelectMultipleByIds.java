@@ -40,7 +40,7 @@ import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 
 /**
- * Selects multiple messages from the {@link RecordTable} by their IDs.
+ * Selects multiple records from the {@link RecordTable} by their IDs.
  *
  * //TODO:2021-06-18:alex.tymchenko: move this type.
  *
@@ -49,14 +49,14 @@ import static java.util.stream.Collectors.toList;
  * @param <R>
  *         the record type
  */
-public final class SelectMessagesByIds<I, R extends Message>
+public final class SelectMultipleByIds<I, R extends Message>
         extends AbstractQuery<I, R>
         implements SelectQuery<Iterator<R>> {
 
     private final ImmutableList<I> ids;
     private final Descriptor messageDescriptor;
 
-    private SelectMessagesByIds(Builder<I, R> builder) {
+    private SelectMultipleByIds(Builder<I, R> builder) {
         super(builder);
         this.ids = builder.ids;
         this.messageDescriptor = requireNonNull(builder.tableSpec()).recordDescriptor();
@@ -88,7 +88,7 @@ public final class SelectMessagesByIds<I, R extends Message>
     }
 
     public static class Builder<I, R extends Message>
-            extends AbstractQuery.Builder<I, R, Builder<I, R>, SelectMessagesByIds<I, R>> {
+            extends AbstractQuery.Builder<I, R, Builder<I, R>, SelectMultipleByIds<I, R>> {
 
         private ImmutableList<I> ids;
 
@@ -103,8 +103,8 @@ public final class SelectMessagesByIds<I, R extends Message>
         }
 
         @Override
-        protected SelectMessagesByIds<I, R> doBuild() {
-            return new SelectMessagesByIds<>(this);
+        protected SelectMultipleByIds<I, R> doBuild() {
+            return new SelectMultipleByIds<>(this);
         }
     }
 }

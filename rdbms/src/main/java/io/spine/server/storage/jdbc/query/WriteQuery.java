@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2022, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,18 +26,64 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.protobuf.Message;
+import com.querydsl.core.dml.StoreClause;
+import com.querydsl.core.types.dsl.PathBuilder;
+import io.spine.query.ColumnName;
+import io.spine.server.storage.RecordWithColumns;
+import io.spine.server.storage.jdbc.TableColumn;
+import io.spine.server.storage.jdbc.record.JdbcRecord;
+import io.spine.server.storage.jdbc.record.RecordTable;
+import io.spine.server.storage.jdbc.record.column.IdColumn;
+
+import javax.annotation.Nullable;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A query which makes changes in a data source.
+ * A common interface for {@linkplain io.spine.server.storage.jdbc.query.AbstractQuery queries}
+ * that write one or more records to the {@link RecordTable}.
  */
-public interface WriteQuery extends StorageQuery {
+interface WriteQuery<I, R extends Message> extends ModifyQuery {
 
     /**
-     * Executes a write query and return the amount of affected rows.
-     *
-     * @return the amount of affected rows
+     * Adds a value binding to the {@code query} for each {@code record} field described
+     * as a column in the specified {@code JdbcRecord}.
      */
-    @CanIgnoreReturnValue
-    long execute();
+    default void setColumnValues(StoreClause<?> query, JdbcRecord<I, R> record) {
+        checkNotNull(query);
+        checkNotNull(record);
+
+        var names = record.columns();
+        for (var name : names) {
+            var value = record.columnValue(name);
+            setColumnValue(query, name, value);
+        }
+    }
+
+    /**
+     * Adds a single value binding to the query, using the passed value for the column
+     * by the passed name.
+     */
+    default void setColumnValue(StoreClause<?> query, ColumnName column, @Nullable Object value) {
+        checkNotNull(query);
+        checkNotNull(column);
+
+        query.set(pathOf(column), value);
+    }
+
+    /**
+     * Obtains the ID column of the table this query is applied to.
+     */
+    IdColumn<I> idColumn();
+
+    /**
+     * Obtains the path of the given {@code column} respective to the processed table.
+     */
+    PathBuilder<Object> pathOf(TableColumn column);
+
+    /**
+     * Obtains the path of the given {@code column} respective to the processed table.
+     */
+    PathBuilder<Object> pathOf(ColumnName name);
 }

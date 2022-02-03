@@ -36,7 +36,7 @@ import com.google.protobuf.Message;
  */
 //TODO:2021-06-24:alex.tymchenko: move this type.
 public final class DeleteRecordQuery<I, R extends Message>
-        extends IdAwareQuery<I, R> implements WriteQuery {
+        extends IdAwareQuery<I, R> implements ModifyQuery {
 
     DeleteRecordQuery(Builder<I, R> builder) {
         super(builder);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2022, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,60 +26,46 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import com.google.common.collect.ImmutableList;
 import com.google.protobuf.Message;
-
-import java.util.Iterator;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-import static io.spine.server.storage.jdbc.query.reader.ColumnReaderFactory.idReader;
+import com.querydsl.core.dml.StoreClause;
+import io.spine.server.storage.jdbc.record.RecordTable;
 
 /**
- * A query for all the IDs in a certain table.
+ * Updates a single record in a {@link RecordTable}.
  *
- * //TODO:2021-06-18:alex.tymchenko: move this type.
+ * //TODO:2022-01-17:alex.tymchenko: move this type.
  *
  * @param <I>
- *         the type of IDs
+ *         the record ID type
  * @param <R>
- *         the type of the stored records
+ *         the record type
  */
-public class StorageIndexQuery<I, R extends Message>
-        extends AbstractQuery<I, R> implements SelectQuery<Iterator<I>> {
+public final class UpdateSingleQuery<I, R extends Message> extends WriteOneQuery<I, R> {
 
-    private StorageIndexQuery(Builder<I, R> builder) {
+    private UpdateSingleQuery(Builder<I, R> builder) {
         super(builder);
     }
 
     @Override
-    public Iterator<I> execute() {
-        var idColumn = tableSpec().idColumn();
-        var resultSet = factory().select(pathOf(idColumn))
-                                 .distinct()
-                                 .from(table())
-                                 .getResults();
-        var columnType = idColumn.javaType();
-        var idColumnReader = idReader(idColumn.columnName(), columnType);
-        var iterator = DbIterator.over(resultSet, idColumnReader);
-        var records = ImmutableList.copyOf(iterator);
-        return records.iterator();
+    protected StoreClause<?> clause() {
+        return updateById();
     }
 
-    public static <I, R extends Message> Builder<I, R> newBuilder() {
+    public static <I, M extends Message> Builder<I, M> newBuilder() {
         return new Builder<>();
     }
 
     public static class Builder<I, R extends Message>
-            extends AbstractQuery.Builder<I, R, Builder<I, R>, StorageIndexQuery<I, R>> {
-
-        @Override
-        protected StorageIndexQuery<I, R> doBuild() {
-            return new StorageIndexQuery<>(this);
-        }
+            extends WriteOneQuery.Builder<I, R, Builder<I, R>, UpdateSingleQuery<I, R>> {
 
         @Override
         protected Builder<I, R> getThis() {
             return this;
+        }
+
+        @Override
+        protected UpdateSingleQuery<I, R> doBuild() {
+            return new UpdateSingleQuery<>(this);
         }
     }
 }

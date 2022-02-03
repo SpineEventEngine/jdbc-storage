@@ -40,10 +40,10 @@ import io.spine.server.storage.jdbc.record.RecordTable;
  * @param <R>
  *         the record type
  */
-public final class InsertRecordsInBulk<I, R extends Message>
-        extends WriteRecordsInBulk<I, R, SQLInsertClause> {
+public final class InsertMultipleQuery<I, R extends Message>
+        extends WriteMultipleQuery<I, R, SQLInsertClause> {
 
-    private InsertRecordsInBulk(Builder<I, R> builder) {
+    private InsertMultipleQuery(Builder<I, R> builder) {
         super(builder);
     }
 
@@ -68,7 +68,7 @@ public final class InsertRecordsInBulk<I, R extends Message>
     }
 
     public static class Builder<I, M extends Message>
-            extends WriteRecordsInBulk.Builder<I, M, Builder<I, M>, InsertRecordsInBulk<I, M>> {
+            extends WriteMultipleQuery.Builder<I, M, Builder<I, M>, InsertMultipleQuery<I, M>> {
 
         @Override
         protected Builder<I, M> getThis() {
@@ -76,8 +76,8 @@ public final class InsertRecordsInBulk<I, R extends Message>
         }
 
         @Override
-        protected InsertRecordsInBulk<I, M> doBuild() {
-            return new InsertRecordsInBulk<>(this);
+        protected InsertMultipleQuery<I, M> doBuild() {
+            return new InsertMultipleQuery<>(this);
         }
     }
 }

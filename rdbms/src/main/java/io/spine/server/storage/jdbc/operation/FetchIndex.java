@@ -29,7 +29,7 @@ package io.spine.server.storage.jdbc.operation;
 import com.google.protobuf.Message;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.record.RecordTable;
-import io.spine.server.storage.jdbc.query.StorageIndexQuery;
+import io.spine.server.storage.jdbc.query.TableIndexQuery;
 
 import java.util.Iterator;
 
@@ -48,7 +48,7 @@ public final class FetchIndex<I, R extends Message> extends Operation<I, R> {
     }
 
     public Iterator<I> execute() {
-        var query = StorageIndexQuery.<I, R>newBuilder()
+        var query = TableIndexQuery.<I, R>newBuilder()
                 .setTableSpec(table().spec())
                 .setDataSource(dataSource())
                 .build();

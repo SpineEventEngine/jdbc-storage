@@ -28,7 +28,7 @@ package io.spine.server.storage.jdbc.operation.mysql;
 
 import com.google.protobuf.Message;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.query.MySqlInsertSingleRecord;
+import io.spine.server.storage.jdbc.query.MySqlUpsertOneQuery;
 import io.spine.server.storage.jdbc.record.JdbcRecord;
 import io.spine.server.storage.jdbc.record.RecordTable;
 import io.spine.server.storage.jdbc.operation.WriteOne;
@@ -60,7 +60,7 @@ public final class MysqlWriteOne<I, R extends Message> extends WriteOne<I, R> {
     @Override
     public void execute(JdbcRecord<I, R> record) {
         var id = record.id();
-        MySqlInsertSingleRecord.Builder<I, R> builder = MySqlInsertSingleRecord.newBuilder();
+        MySqlUpsertOneQuery.Builder<I, R> builder = MySqlUpsertOneQuery.newBuilder();
         var query = builder.setTableSpec(table().spec())
                            .setDataSource(dataSource())
                            .setId(id)

@@ -28,35 +28,38 @@ package io.spine.server.storage.jdbc.query;
 
 import com.google.protobuf.Message;
 import com.querydsl.core.dml.StoreClause;
-import io.spine.server.storage.jdbc.record.RecordTable;
 
 /**
- * Updates a single record in a {@link RecordTable}.
+ * Inserts or updates a single record in the MySQL database, by the record ID.
  *
- * //TODO:2022-01-17:alex.tymchenko: move this type.
+ * <p>This query uses a MySQL-specific {@code INSERT ... ON DUPLICATE KEY UPDATE} syntax.
+ * In case the record by the provided ID already exists in the table, this query executes the
+ * row update. Otherwise, it inserts a new table row reflecting the provided record.
  *
  * @param <I>
  *         the record ID type
  * @param <R>
  *         the record type
  */
-public final class UpdateSingleRecord<I, R extends Message> extends WriteSingleRecord<I, R> {
+public class MySqlUpsertOneQuery<I, R extends Message> extends WriteOneQuery<I, R> {
 
-    private UpdateSingleRecord(Builder<I, R> builder) {
+    private MySqlUpsertOneQuery(Builder<I, R> builder) {
         super(builder);
     }
 
     @Override
     protected StoreClause<?> clause() {
-        return updateById();
+        var result = mySqlFactory().insertOnDuplicateKeyUpdate(table())
+                                   .set(idPath(), normalizedId());
+        return result;
     }
 
-    public static <I, M extends Message> Builder<I, M> newBuilder() {
+    public static <I, R extends Message> Builder<I, R> newBuilder() {
         return new Builder<>();
     }
 
     public static class Builder<I, R extends Message>
-            extends WriteSingleRecord.Builder<I, R, Builder<I, R>, UpdateSingleRecord<I, R>> {
+            extends WriteOneQuery.Builder<I, R, Builder<I, R>, MySqlUpsertOneQuery<I, R>> {
 
         @Override
         protected Builder<I, R> getThis() {
@@ -64,8 +67,8 @@ public final class UpdateSingleRecord<I, R extends Message> extends WriteSingleR
         }
 
         @Override
-        protected UpdateSingleRecord<I, R> doBuild() {
-            return new UpdateSingleRecord<>(this);
+        protected MySqlUpsertOneQuery<I, R> doBuild() {
+            return new MySqlUpsertOneQuery<>(this);
         }
     }
 }

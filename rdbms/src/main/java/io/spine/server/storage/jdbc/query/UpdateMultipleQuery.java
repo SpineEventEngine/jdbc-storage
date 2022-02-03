@@ -31,7 +31,7 @@ import com.querydsl.sql.dml.SQLUpdateClause;
 import io.spine.server.storage.jdbc.record.RecordTable;
 
 /**
- * Updates multiple messages in the {@link RecordTable} in a bulk.
+ * Updates multiple records in a {@link RecordTable} in a single take.
  *
  * //TODO:2021-06-18:alex.tymchenko: move this type.
  *
@@ -40,10 +40,10 @@ import io.spine.server.storage.jdbc.record.RecordTable;
  * @param <R>
  *         the record type
  */
-public class UpdateRecordsInBulk<I, R extends Message>
-        extends WriteRecordsInBulk<I, R, SQLUpdateClause> {
+public class UpdateMultipleQuery<I, R extends Message>
+        extends WriteMultipleQuery<I, R, SQLUpdateClause> {
 
-    private UpdateRecordsInBulk(Builder<I, R> builder) {
+    private UpdateMultipleQuery(Builder<I, R> builder) {
         super(builder);
     }
 
@@ -68,7 +68,7 @@ public class UpdateRecordsInBulk<I, R extends Message>
     }
 
     public static class Builder<I, M extends Message>
-            extends WriteRecordsInBulk.Builder<I, M, Builder<I, M>, UpdateRecordsInBulk<I, M>> {
+            extends WriteMultipleQuery.Builder<I, M, Builder<I, M>, UpdateMultipleQuery<I, M>> {
 
         @Override
         protected Builder<I, M> getThis() {
@@ -76,8 +76,8 @@ public class UpdateRecordsInBulk<I, R extends Message>
         }
 
         @Override
-        protected UpdateRecordsInBulk<I, M> doBuild() {
-            return new UpdateRecordsInBulk<>(this);
+        protected UpdateMultipleQuery<I, M> doBuild() {
+            return new UpdateMultipleQuery<>(this);
         }
     }
 }

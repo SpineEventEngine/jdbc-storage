@@ -44,13 +44,13 @@ import static java.util.stream.Collectors.toList;
  * @param <R>
  *         the type of the records to delete
  */
-public final class DeleteMessagesInBulk<I, R extends Message>
+public final class DeleteMultipleRecordsQuery<I, R extends Message>
         extends AbstractQuery<I, R>
-        implements WriteQuery {
+        implements ModifyQuery {
 
     private final ImmutableList<I> ids;
 
-    private DeleteMessagesInBulk(Builder<I, R> builder) {
+    private DeleteMultipleRecordsQuery(Builder<I, R> builder) {
         super(builder);
         this.ids = builder.ids;
     }
@@ -73,7 +73,7 @@ public final class DeleteMessagesInBulk<I, R extends Message>
     }
 
     public static class Builder<I, R extends Message>
-            extends AbstractQuery.Builder<I, R, Builder<I, R>, DeleteMessagesInBulk<I, R>> {
+            extends AbstractQuery.Builder<I, R, Builder<I, R>, DeleteMultipleRecordsQuery<I, R>> {
 
         private ImmutableList<I> ids;
 
@@ -88,8 +88,8 @@ public final class DeleteMessagesInBulk<I, R extends Message>
         }
 
         @Override
-        protected DeleteMessagesInBulk<I, R> doBuild() {
-            return new DeleteMessagesInBulk<>(this);
+        protected DeleteMultipleRecordsQuery<I, R> doBuild() {
+            return new DeleteMultipleRecordsQuery<>(this);
         }
     }
 }

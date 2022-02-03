@@ -28,7 +28,7 @@ package io.spine.server.storage.jdbc.operation;
 
 import com.google.protobuf.Message;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.query.SelectMessagesByIds;
+import io.spine.server.storage.jdbc.query.SelectMultipleByIds;
 import io.spine.server.storage.jdbc.record.RecordTable;
 
 import java.util.Iterator;
@@ -53,8 +53,8 @@ public class ReadManyByIds<I, R extends Message> extends Operation<I, R>  {
         return result;
     }
 
-    private SelectMessagesByIds<I, R> newSelectMany(Iterable<I> ids) {
-        SelectMessagesByIds.Builder<I, R> builder = SelectMessagesByIds.newBuilder();
+    private SelectMultipleByIds<I, R> newSelectMany(Iterable<I> ids) {
+        SelectMultipleByIds.Builder<I, R> builder = SelectMultipleByIds.newBuilder();
         var query = builder.setTableSpec(table().spec())
                            .setDataSource(dataSource())
                            .setIds(ids)

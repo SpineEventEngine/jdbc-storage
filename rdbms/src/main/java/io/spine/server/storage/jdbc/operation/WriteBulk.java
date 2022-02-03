@@ -29,8 +29,8 @@ package io.spine.server.storage.jdbc.operation;
 import com.google.common.collect.ImmutableList;
 import com.google.protobuf.Message;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.query.InsertRecordsInBulk;
-import io.spine.server.storage.jdbc.query.UpdateRecordsInBulk;
+import io.spine.server.storage.jdbc.query.InsertMultipleQuery;
+import io.spine.server.storage.jdbc.query.UpdateMultipleQuery;
 import io.spine.server.storage.jdbc.record.JdbcRecord;
 import io.spine.server.storage.jdbc.record.RecordTable;
 
@@ -116,9 +116,9 @@ public class WriteBulk<I, R extends Message> extends Operation<I, R> {
         query.execute();
     }
 
-    private InsertRecordsInBulk<I, R>
+    private InsertMultipleQuery<I, R>
     newBulkInsert(ImmutableList<JdbcRecord<I, R>> records) {
-        InsertRecordsInBulk.Builder<I, R> builder = InsertRecordsInBulk.newBuilder();
+        InsertMultipleQuery.Builder<I, R> builder = InsertMultipleQuery.newBuilder();
         var query = builder.setTableSpec(table().spec())
                            .setDataSource(dataSource())
                            .setTableSpec(table().spec())
@@ -127,9 +127,9 @@ public class WriteBulk<I, R extends Message> extends Operation<I, R> {
         return query;
     }
 
-    private UpdateRecordsInBulk<I, R>
+    private UpdateMultipleQuery<I, R>
     newBulkUpdate(ImmutableList<JdbcRecord<I, R>> records) {
-        UpdateRecordsInBulk.Builder<I, R> builder = UpdateRecordsInBulk.newBuilder();
+        UpdateMultipleQuery.Builder<I, R> builder = UpdateMultipleQuery.newBuilder();
         var query = builder.setTableSpec(table().spec())
                            .setDataSource(dataSource())
                            .setRecords(records)

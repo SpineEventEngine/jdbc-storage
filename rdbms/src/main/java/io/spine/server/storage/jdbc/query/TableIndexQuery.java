@@ -1,5 +1,5 @@
 /*
- * Copyright 2022, TeamDev. All rights reserved.
+ * Copyright 2021, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,30 +26,43 @@
 
 package io.spine.server.storage.jdbc.query;
 
+import com.google.common.collect.ImmutableList;
 import com.google.protobuf.Message;
-import com.querydsl.core.dml.StoreClause;
+
+import java.util.Iterator;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static io.spine.server.storage.jdbc.query.reader.ColumnReaderFactory.idReader;
 
 /**
- * Inserts or updates a single record in the MySQL database.
+ * A query for all the IDs in a certain table.
  *
- * <p>This query uses a MySQL-specific {@code INSERT ... ON DUPLICATE KEY UPDATE} syntax.
+ * //TODO:2021-06-18:alex.tymchenko: move this type.
  *
  * @param <I>
- *         the record ID type
+ *         the type of IDs
  * @param <R>
- *         the record type
+ *         the type of the stored records
  */
-public class MySqlInsertSingleRecord<I, R extends Message> extends WriteSingleRecord<I, R> {
+public class TableIndexQuery<I, R extends Message>
+        extends AbstractQuery<I, R> implements SelectQuery<Iterator<I>> {
 
-    private MySqlInsertSingleRecord(Builder<I, R> builder) {
+    private TableIndexQuery(Builder<I, R> builder) {
         super(builder);
     }
 
     @Override
-    protected StoreClause<?> clause() {
-        var result = mySqlFactory().insertOnDuplicateKeyUpdate(table())
-                                   .set(idPath(), normalizedId());
-        return result;
+    public Iterator<I> execute() {
+        var idColumn = tableSpec().idColumn();
+        var resultSet = factory().select(pathOf(idColumn))
+                                 .distinct()
+                                 .from(table())
+                                 .getResults();
+        var columnType = idColumn.javaType();
+        var idColumnReader = idReader(idColumn.columnName(), columnType);
+        var iterator = DbIterator.over(resultSet, idColumnReader);
+        var records = ImmutableList.copyOf(iterator);
+        return records.iterator();
     }
 
     public static <I, R extends Message> Builder<I, R> newBuilder() {
@@ -57,16 +70,16 @@ public class MySqlInsertSingleRecord<I, R extends Message> extends WriteSingleRe
     }
 
     public static class Builder<I, R extends Message>
-            extends WriteSingleRecord.Builder<I, R, Builder<I, R>, MySqlInsertSingleRecord<I, R>> {
+            extends AbstractQuery.Builder<I, R, Builder<I, R>, TableIndexQuery<I, R>> {
+
+        @Override
+        protected TableIndexQuery<I, R> doBuild() {
+            return new TableIndexQuery<>(this);
+        }
 
         @Override
         protected Builder<I, R> getThis() {
             return this;
-        }
-
-        @Override
-        protected MySqlInsertSingleRecord<I, R> doBuild() {
-            return new MySqlInsertSingleRecord<>(this);
         }
     }
 }

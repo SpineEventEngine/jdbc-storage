@@ -30,7 +30,7 @@ import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.protobuf.Message;
 
 /**
- * A query that deletes all records from a table.
+ * A query that deletes all records from some table.
  *
  * //TODO:2021-06-24:alex.tymchenko: move this type?
  *
@@ -41,7 +41,7 @@ import com.google.protobuf.Message;
  */
 public class DeleteAllQuery<I, R extends Message>
         extends AbstractQuery<I, R>
-        implements WriteQuery {
+        implements ModifyQuery {
 
     private DeleteAllQuery(Builder<I, R> builder) {
         super(builder);

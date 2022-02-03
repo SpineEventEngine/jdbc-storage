@@ -26,6 +26,7 @@
 
 package io.spine.server.storage.jdbc.query;
 
+import com.google.common.collect.ImmutableList;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.protobuf.Message;
 import com.querydsl.core.dml.StoreClause;
@@ -36,11 +37,11 @@ import io.spine.server.storage.jdbc.record.JdbcRecord;
 import io.spine.server.storage.jdbc.record.RecordTable;
 import io.spine.server.storage.jdbc.record.column.IdColumn;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.gson.internal.$Gson$Preconditions.checkNotNull;
 
 /**
- * An abstract base for queries that write
- * a single record to a {@link RecordTable}.
+ * An abstract base for queries that write multiple messages
+ * to a {@link RecordTable} in a batch.
  *
  * //TODO:2022-01-17:alex.tymchenko: move this type.
  *
@@ -48,35 +49,57 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *         the record ID type
  * @param <R>
  *         the record type
+ * @param <C>
+ *         the type of SQL clause
  */
-abstract class WriteSingleRecord<I, R extends Message>
-        extends IdAwareQuery<I, R>
-        implements WriteMessageQuery<I, R> {
+abstract class WriteMultipleQuery<I, R extends Message, C extends StoreClause<C>>
+        extends AbstractQuery<I, R>
+        implements WriteQuery<I, R> {
 
-    private final JdbcRecord<I, R> record;
+    private final ImmutableList<JdbcRecord<I, R>> records;
 
-    WriteSingleRecord(
-            Builder<I, R, ? extends Builder<I, R, ?, ?>, ? extends WriteSingleRecord<I, R>> b) {
-        super(b);
-        this.record = checkNotNull(b.record);
+    WriteMultipleQuery(Builder<I, R, ? extends Builder<I, R, ?, ?>,
+            ? extends WriteMultipleQuery<I, R, ?>> builder) {
+        super(builder);
+        this.records = builder.records;
     }
 
     @CanIgnoreReturnValue
     @Override
     public long execute() {
+        if (records.isEmpty()) {
+            return 0;
+        }
         var query = clause();
-        setColumnValues(query, record);
+        records.forEach(record -> addToBatch(query, record));
         return query.execute();
     }
 
     /**
      * Obtains an SQL clause to use, basically {@code INSERT} or {@code UPDATE}.
      */
-    protected abstract StoreClause<?> clause();
+    protected abstract C clause();
+
+    private void addToBatch(C query, JdbcRecord<I, R> recordWithCols) {
+        var id = recordWithCols.id();
+        setIdClause(query, id);
+        setColumnValues(query, recordWithCols);
+        addBatch(query);
+    }
+
+    /**
+     * Sets the ID clause for the given {@code record}.
+     */
+    protected abstract void setIdClause(C query, I id);
+
+    /**
+     * Adds current state of the {@code query} to the processing batch.
+     */
+    protected abstract void addBatch(C query);
 
     @Override
     public IdColumn<I> idColumn() {
-        return super.idColumn();
+        return tableSpec().idColumn();
     }
 
     @Override
@@ -92,13 +115,13 @@ abstract class WriteSingleRecord<I, R extends Message>
     abstract static class Builder<I,
                                   R extends Message,
                                   B extends Builder<I, R, B, Q>,
-                                  Q extends WriteSingleRecord<I, R>>
-            extends IdAwareQuery.Builder<I, R, B, Q> {
+                                  Q extends WriteMultipleQuery<I, R, ?>>
+            extends AbstractQuery.Builder<I, R, B, Q> {
 
-        private JdbcRecord<I, R> record;
+        private ImmutableList<JdbcRecord<I, R>> records;
 
-        public B setRecord(JdbcRecord<I, R> record) {
-            this.record = record;
+        public B setRecords(ImmutableList<JdbcRecord<I, R>> records) {
+            this.records = checkNotNull(records);
             return getThis();
         }
     }

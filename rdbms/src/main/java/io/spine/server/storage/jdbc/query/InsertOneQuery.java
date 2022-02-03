@@ -31,7 +31,7 @@ import com.querydsl.core.dml.StoreClause;
 import io.spine.server.storage.jdbc.record.RecordTable;
 
 /**
- * Inserts a single message to the {@link RecordTable}.
+ * Inserts a single record to the {@link RecordTable}.
  *
  * //TODO:2021-06-18:alex.tymchenko: move this type.
  *
@@ -40,9 +40,9 @@ import io.spine.server.storage.jdbc.record.RecordTable;
  * @param <M>
  *         the record type
  */
-public final class InsertSingleRecord<I, M extends Message> extends WriteSingleRecord<I, M> {
+public final class InsertOneQuery<I, M extends Message> extends WriteOneQuery<I, M> {
 
-    private InsertSingleRecord(Builder<I, M> builder) {
+    private InsertOneQuery(Builder<I, M> builder) {
         super(builder);
     }
 
@@ -56,7 +56,7 @@ public final class InsertSingleRecord<I, M extends Message> extends WriteSingleR
     }
 
     public static class Builder<I, M extends Message>
-            extends WriteSingleRecord.Builder<I, M, Builder<I, M>, InsertSingleRecord<I, M>> {
+            extends WriteOneQuery.Builder<I, M, Builder<I, M>, InsertOneQuery<I, M>> {
 
         @Override
         protected Builder<I, M> getThis() {
@@ -64,8 +64,8 @@ public final class InsertSingleRecord<I, M extends Message> extends WriteSingleR
         }
 
         @Override
-        protected InsertSingleRecord<I, M> doBuild() {
-            return new InsertSingleRecord<>(this);
+        protected InsertOneQuery<I, M> doBuild() {
+            return new InsertOneQuery<>(this);
         }
     }
 }

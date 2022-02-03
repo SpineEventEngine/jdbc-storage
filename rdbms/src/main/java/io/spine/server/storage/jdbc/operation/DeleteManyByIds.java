@@ -28,7 +28,7 @@ package io.spine.server.storage.jdbc.operation;
 
 import com.google.protobuf.Message;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.query.DeleteMessagesInBulk;
+import io.spine.server.storage.jdbc.query.DeleteMultipleRecordsQuery;
 import io.spine.server.storage.jdbc.record.RecordTable;
 
 /**
@@ -53,8 +53,8 @@ public final class DeleteManyByIds<I, R extends Message> extends Operation<I, R>
         query.execute();
     }
 
-    private DeleteMessagesInBulk<I, R> deleteBulk(Iterable<I> ids) {
-        var query = DeleteMessagesInBulk.<I, R>newBuilder()
+    private DeleteMultipleRecordsQuery<I, R> deleteBulk(Iterable<I> ids) {
+        var query = DeleteMultipleRecordsQuery.<I, R>newBuilder()
                 .setTableSpec(table().spec())
                 .setDataSource(dataSource())
                 .setIds(ids)
