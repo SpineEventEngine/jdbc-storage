@@ -38,13 +38,11 @@ import static io.spine.base.Identifier.newUuid;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
 import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_1;
 
-//@SuppressWarnings("DuplicateStringLiteralInspection") // Common test display names.
 @DisplayName("RDBMS-backed `AggregateStorage` should")
 class JdbcAggregateStorageTest extends AggregateStorageTest {
 
     private JdbcStorageFactory factory;
 
-    //TODO:2021-07-01:alex.tymchenko: do we need to `setUp` and `tearDown`?
     @BeforeEach
     void setUp() {
         factory = JdbcStorageFactory.newBuilder()
@@ -63,79 +61,4 @@ class JdbcAggregateStorageTest extends AggregateStorageTest {
             factory.close();
         }
     }
-
-//    private JdbcAggregateStorage<ProjectId> storage;
-//
-//    @BeforeEach
-//    @Override
-//    public void setUpAbstractStorageTest() {
-//        super.setUpAbstractStorageTest();
-//        storage = (JdbcAggregateStorage<ProjectId>) storage();
-//    }
-//
-//    @Test
-//    @DisplayName("throw ISE when closing twice")
-//    void throwOnClosingTwice() {
-//        AggregateStorage<?> storage = storage();
-//        storage.close();
-//        assertThrows(IllegalStateException.class, storage::close);
-//    }
-//
-//    @Test
-//    @DisplayName("return history iterator with specified batch size")
-//    void returnHistoryIterator() throws SQLException {
-//        int batchSize = 10;
-//        AggregateReadRequest<ProjectId> request = new AggregateReadRequest<>(newId(), batchSize);
-//        DbIterator<AggregateEventRecord> iterator =
-//                (DbIterator<AggregateEventRecord>) storage.historyBackward(request);
-//
-//        // Use `PreparedStatement.getFetchSize()` instead of `ResultSet.getFetchSize()`,
-//        // because the result of the latter depends on a JDBC driver implementation.
-//        int fetchSize = iterator.resultSet()
-//                                .getStatement()
-//                                .getFetchSize();
-//        assertEquals(batchSize, fetchSize);
-//    }
-//
-//    @Test
-//    @DisplayName("close history iterator")
-//    void closeHistoryIterator() throws SQLException {
-//        AggregateReadRequest<ProjectId> request = newReadRequest(newId());
-//        DbIterator<AggregateEventRecord> iterator =
-//                (DbIterator<AggregateEventRecord>) storage.historyBackward(request);
-//
-//        storage.close();
-//        boolean historyIteratorClosed = iterator.resultSet()
-//                                                .isClosed();
-//        assertTrue(historyIteratorClosed);
-//    }
-//
-//    @Test
-//    @DisplayName("require non-null aggregate class")
-//    void rejectNullAggregateClass() {
-//        Class<? extends Aggregate<Object, ?, ?>> nullClass = nullRef();
-//        assertThrows(NullPointerException.class,
-//                     () -> JdbcAggregateStorage.newBuilder()
-//                                               .setAggregateClass(nullClass));
-//    }
-//
-//    @SuppressWarnings("unchecked") // It is OK for a test.
-//    @Override
-//    protected AggregateStorage<ProjectId> newStorage(Class<? extends Entity<?, ?>> aClass) {
-//        return newStorage(ProjectId.class, (Class<? extends Aggregate<ProjectId, ?, ?>>) aClass);
-//    }
-//
-//    @Override
-//    protected <I> JdbcAggregateStorage<I> newStorage(
-//            Class<? extends I> idClass,
-//            Class<? extends Aggregate<I, ?, ?>> aggregateClass) {
-//        DataSourceWrapper dataSource = whichIsStoredInMemory("aggregateStorageTests");
-//        JdbcAggregateStorage.Builder<I> builder = JdbcAggregateStorage.newBuilder();
-//        JdbcAggregateStorage<I> storage = builder.setMultitenant(false)
-//                                                 .setDataSource(dataSource)
-//                                                 .setAggregateClass(aggregateClass)
-//                                                 .setTypeMapping(H2_1_4)
-//                                                 .build();
-//        return storage;
-//    }
 }
