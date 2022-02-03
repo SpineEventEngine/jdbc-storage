@@ -30,6 +30,7 @@ import com.google.common.annotations.VisibleForTesting;
 import io.spine.annotation.Internal;
 import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.query.reader.ColumnReader;
+import io.spine.server.storage.jdbc.record.Serializer;
 
 import java.io.Closeable;
 import java.sql.Connection;

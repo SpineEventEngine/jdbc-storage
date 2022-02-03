@@ -33,7 +33,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static io.spine.server.storage.jdbc.query.Serializer.deserialize;
+import static io.spine.server.storage.jdbc.record.Serializer.deserialize;
 
 /**
  * The reader for the columns which store Protobuf messages in a serialized form.

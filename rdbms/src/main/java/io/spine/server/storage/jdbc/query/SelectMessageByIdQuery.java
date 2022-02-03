@@ -30,6 +30,7 @@ import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Message;
 import com.querydsl.sql.AbstractSQLQuery;
 import io.spine.server.storage.jdbc.DatabaseException;
+import io.spine.server.storage.jdbc.record.Serializer;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.sql.ResultSet;

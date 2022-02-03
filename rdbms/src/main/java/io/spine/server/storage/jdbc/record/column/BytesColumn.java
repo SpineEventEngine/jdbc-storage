@@ -29,12 +29,13 @@ package io.spine.server.storage.jdbc.record.column;
 import io.spine.server.storage.RecordWithColumns;
 import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.Type;
-import io.spine.server.storage.jdbc.query.Serializer;
+import io.spine.server.storage.jdbc.record.Serializer;
 import io.spine.server.storage.jdbc.record.RecordTable;
 import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
+import static io.spine.server.storage.jdbc.record.Serializer.serialize;
 
 /**
  * A column responsible for storing serialized message bytes.
@@ -78,10 +79,8 @@ public final class BytesColumn extends TableColumn {
         return BYTE_ARRAY;
     }
 
-    //TODO:2022-01-24:alex.tymchenko: do we use `Serializer` instead?
     @Override
     public @Nullable Object valueIn(RecordWithColumns<?, ?> record) {
-        return record.record()
-                     .toByteArray();
+        return serialize(record.record());
     }
 }

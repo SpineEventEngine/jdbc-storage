@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2022, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.query;
+package io.spine.server.storage.jdbc.record;
 
 import com.google.common.testing.NullPointerTester;
 import com.google.protobuf.Descriptors.Descriptor;
@@ -35,8 +35,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static io.spine.base.Identifier.newUuid;
-import static io.spine.server.storage.jdbc.query.Serializer.deserialize;
-import static io.spine.server.storage.jdbc.query.Serializer.serialize;
+import static io.spine.server.storage.jdbc.record.Serializer.deserialize;
+import static io.spine.server.storage.jdbc.record.Serializer.serialize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2022, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.query;
+package io.spine.server.storage.jdbc.record;
 
 import com.google.protobuf.Any;
 import com.google.protobuf.ByteString;
@@ -37,7 +37,7 @@ import io.spine.type.TypeUrl;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A utility class for serializing/deserializing messages.
+ * A utility class for serializing/deserializing Protobuf records.
  */
 @Internal
 public final class Serializer {
