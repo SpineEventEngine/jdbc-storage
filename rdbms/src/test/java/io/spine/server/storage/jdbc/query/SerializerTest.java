@@ -56,9 +56,7 @@ class SerializerTest extends UtilityClassTest<Serializer> {
     @Test
     @DisplayName("serialize and deserialize message")
     void serializeAndDeserializeMsg() {
-        var expected = StringValue
-                .getDefaultInstance()
-                .toBuilder()
+        var expected = StringValue.newBuilder()
                 .setValue(newUuid())
                 .build();
 
