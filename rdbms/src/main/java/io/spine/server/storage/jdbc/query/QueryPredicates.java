@@ -153,7 +153,7 @@ public final class QueryPredicates {
      *         the type of the queried records
      * @return the QueryDSL-specific predicate for the records
      */
-    public static <R extends Message> Predicate
+    static <R extends Message> Predicate
     matchPredicate(QueryPredicate<R> predicate, JdbcColumnMapping columnMapping) {
         var operator = predicate.operator();
 
