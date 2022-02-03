@@ -38,7 +38,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * A utility class which provides strings valid for DB table names.
  */
 @SuppressWarnings("UtilityClass")
-public class TableNames {
+public final class TableNames {
 
     private TableNames() {
         // Prevent instantiation of this utility class.
