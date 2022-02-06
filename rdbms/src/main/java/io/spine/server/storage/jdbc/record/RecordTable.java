@@ -30,7 +30,6 @@ import com.google.common.collect.Iterators;
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Message;
 import io.spine.logging.Logging;
-import io.spine.protobuf.Messages;
 import io.spine.query.RecordQuery;
 import io.spine.server.storage.RecordWithColumns;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
@@ -63,12 +62,7 @@ public class RecordTable<I, R extends Message> implements Logging {
         spec = tableSpec;
         operations = factory.operations();
         dataSource = factory.dataSource();
-        this.descriptor = descriptorFrom(tableSpec);
-    }
-
-    private static Descriptor descriptorFrom(JdbcTableSpec<?, ? extends Message> recordSpec) {
-        return Messages.defaultInstance(recordSpec.storedType())
-                       .getDescriptorForType();
+        this.descriptor = tableSpec.recordDescriptor();
     }
 
     public static <I, R extends Message> RecordTable<I, R>
