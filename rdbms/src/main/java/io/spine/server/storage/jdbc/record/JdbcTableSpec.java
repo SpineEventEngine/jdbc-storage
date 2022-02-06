@@ -29,7 +29,6 @@ package io.spine.server.storage.jdbc.record;
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Message;
 import io.spine.protobuf.Messages;
@@ -38,9 +37,9 @@ import io.spine.query.ColumnName;
 import io.spine.server.storage.RecordSpec;
 import io.spine.server.storage.RecordWithColumns;
 import io.spine.server.storage.jdbc.TableColumn;
-import io.spine.server.storage.jdbc.record.column.IdColumn;
 import io.spine.server.storage.jdbc.record.column.BytesColumn;
 import io.spine.server.storage.jdbc.record.column.CustomColumns;
+import io.spine.server.storage.jdbc.record.column.IdColumn;
 import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -75,27 +74,20 @@ import static java.util.Objects.requireNonNull;
 public final class JdbcTableSpec<I, R extends Message> {
 
     private final RecordSpec<I, R, ?> recordSpec;
+    private final String tableName;
     private final JdbcColumnMapping columnMapping;
     private final IdColumn<I> idColumn;
     private final Descriptor recordDescriptor;
     private final @Nullable CustomColumns<R> customColumns;
 
-    private @MonotonicNonNull String tableName;
     private @MonotonicNonNull ImmutableMap<ColumnName, TableColumn> dataColumns;
 
-
-    //TODO:2022-01-25:alex.tymchenko: move the ID column here?
     public JdbcTableSpec(RecordSpec<I, R, ?> recordSpec,
                          JdbcColumnMapping mapping,
                          @Nullable CustomColumns<R> columnSpecs) {
-        this.recordSpec = recordSpec;
-        columnMapping = mapping;
-        this.customColumns = columnSpecs;
-        this.idColumn = IdColumn.of(recordSpec, columnMapping);
-        this.recordDescriptor = descriptorFrom(recordSpec.storedType());
+        this(tableName(recordSpec), recordSpec, mapping, columnSpecs);
     }
 
-    //TODO:2022-01-28:alex.tymchenko: consolidate the ctors.
     public JdbcTableSpec(String tableName,
                          RecordSpec<I, R, ?> recordSpec,
                          JdbcColumnMapping mapping,
@@ -113,10 +105,10 @@ public final class JdbcTableSpec<I, R extends Message> {
                        .getDescriptorForType();
     }
 
+    /**
+     * Returns the name of the described table.
+     */
     public String tableName() {
-        if (tableName == null) {
-            tableName = defaultName();
-        }
         return tableName;
     }
 
@@ -124,20 +116,22 @@ public final class JdbcTableSpec<I, R extends Message> {
      * Composes the default name for the table basing on the name of the Java class
      * of the object, on top of which the stored {@link RecordWithColumns} is built.
      *
+     * @param spec
+     *         the record specification describing the type of the source Java object
+     * @param <I>
+     *         the type of the identifiers of the records stored in the table
+     * @param <R>
+     *         the type of the records stored in the table
+     * @return a table name
      * @see TableNames#of(Class) for more details
      */
-    private String defaultName() {
-        return TableNames.of(sourceType());
+    private static <I, R extends Message> String tableName(RecordSpec<I, R, ?> spec) {
+        var sourceType = spec.sourceType();
+        var result = TableNames.of(sourceType);
+        return result;
     }
 
-    @CanIgnoreReturnValue
-    public JdbcTableSpec<I, R> tableName(String value) {
-        checkNotEmptyOrBlank(value);
-        this.tableName = value;
-        return this;
-    }
-
-    public Class<R> storedType() {
+    private Class<R> storedType() {
         return recordSpec.storedType();
     }
 
@@ -203,10 +197,6 @@ public final class JdbcTableSpec<I, R extends Message> {
     Function<RecordWithColumns<I, R>, Object> transforming(ColumnName name) {
         var column = requireColumn(name);
         return column::valueIn;
-    }
-
-    private Class<?> sourceType() {
-        return recordSpec.sourceType();
     }
 
     private TableColumn requireColumn(ColumnName name) {
