@@ -26,6 +26,7 @@
 
 import io.spine.internal.gradle.publish.IncrementGuard
 import io.spine.internal.dependency.Grpc
+import io.spine.internal.dependency.Testcontainers
 
 apply<IncrementGuard>()
 
@@ -35,6 +36,7 @@ val querydslVersion = "5.0.0"
 val hikariVersion = "5.0.1"
 val hsqldbVersion = "2.6.1"
 val h2Version = "2.1.210"
+val mySqlConnectorVersion = "8.0.28"
 
 dependencies {
     api("com.querydsl:querydsl-sql:$querydslVersion") {
@@ -44,4 +46,10 @@ dependencies {
     testImplementation("org.hsqldb:hsqldb:$hsqldbVersion")
     testImplementation("com.h2database:h2:$h2Version")
     testImplementation(Grpc.stub)
+    testImplementation(Testcontainers.lib)
+    testImplementation(Testcontainers.junitJupiter)
+    testImplementation(Testcontainers.mySqlSupport) {
+        exclude(group = "org.jetbrains")
+    }
+    testImplementation("mysql:mysql-connector-java:$mySqlConnectorVersion")
 }

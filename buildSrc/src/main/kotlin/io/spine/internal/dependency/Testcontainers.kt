@@ -32,4 +32,5 @@ object Testcontainers {
 
     const val lib = "org.testcontainers:testcontainers:${version}"
     const val junitJupiter = "org.testcontainers:junit-jupiter:${version}"
+    const val mySqlSupport = "org.testcontainers:mysql:${version}"
 }
