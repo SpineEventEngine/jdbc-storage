@@ -29,7 +29,7 @@ package io.spine.server.storage.jdbc.operation;
 import com.google.protobuf.Message;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.query.InsertOneQuery;
-import io.spine.server.storage.jdbc.query.UpdateSingleQuery;
+import io.spine.server.storage.jdbc.query.UpdateOneQuery;
 import io.spine.server.storage.jdbc.record.JdbcRecord;
 import io.spine.server.storage.jdbc.record.RecordTable;
 
@@ -89,9 +89,9 @@ public class WriteOne<I, R extends Message> extends Operation<I, R> {
         return result;
     }
 
-    protected final UpdateSingleQuery<I, R> newUpdate(JdbcRecord<I, R> record) {
+    protected final UpdateOneQuery<I, R> newUpdate(JdbcRecord<I, R> record) {
         var id = record.id();
-        UpdateSingleQuery.Builder<I, R> builder = UpdateSingleQuery.newBuilder();
+        UpdateOneQuery.Builder<I, R> builder = UpdateOneQuery.newBuilder();
         var query = builder.setTableSpec(table().spec())
                            .setDataSource(dataSource())
                            .setId(id)

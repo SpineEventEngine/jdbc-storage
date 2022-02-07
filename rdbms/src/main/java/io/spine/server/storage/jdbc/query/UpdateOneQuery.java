@@ -38,9 +38,9 @@ import io.spine.server.storage.jdbc.record.RecordTable;
  * @param <R>
  *         the record type
  */
-public final class UpdateSingleQuery<I, R extends Message> extends WriteOneQuery<I, R> {
+public final class UpdateOneQuery<I, R extends Message> extends WriteOneQuery<I, R> {
 
-    private UpdateSingleQuery(Builder<I, R> builder) {
+    private UpdateOneQuery(Builder<I, R> builder) {
         super(builder);
     }
 
@@ -54,7 +54,7 @@ public final class UpdateSingleQuery<I, R extends Message> extends WriteOneQuery
     }
 
     public static class Builder<I, R extends Message>
-            extends WriteOneQuery.Builder<I, R, Builder<I, R>, UpdateSingleQuery<I, R>> {
+            extends WriteOneQuery.Builder<I, R, Builder<I, R>, UpdateOneQuery<I, R>> {
 
         @Override
         protected Builder<I, R> getThis() {
@@ -62,8 +62,8 @@ public final class UpdateSingleQuery<I, R extends Message> extends WriteOneQuery
         }
 
         @Override
-        protected UpdateSingleQuery<I, R> doBuild() {
-            return new UpdateSingleQuery<>(this);
+        protected UpdateOneQuery<I, R> doBuild() {
+            return new UpdateOneQuery<>(this);
         }
     }
 }
