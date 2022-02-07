@@ -52,8 +52,7 @@ abstract class WriteOneQuery<I, R extends Message>
 
     private final JdbcRecord<I, R> record;
 
-    WriteOneQuery(
-            Builder<I, R, ? extends Builder<I, R, ?, ?>, ? extends WriteOneQuery<I, R>> b) {
+    WriteOneQuery(Builder<I, R, ? extends Builder<I, R, ?, ?>, ? extends WriteOneQuery<I, R>> b) {
         super(b);
         this.record = checkNotNull(b.record);
     }
