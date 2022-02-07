@@ -28,6 +28,10 @@ package io.spine.server.storage.jdbc.query;
 
 import com.google.protobuf.Message;
 import com.querydsl.core.dml.StoreClause;
+import com.querydsl.core.types.Expression;
+import com.querydsl.sql.SQLExpressions;
+
+import static com.google.common.collect.Streams.stream;
 
 /**
  * Inserts or updates a single record in the MySQL database, by the record ID.
@@ -49,7 +53,12 @@ public class MySqlUpsertOneQuery<I, R extends Message> extends WriteOneQuery<I, 
 
     @Override
     protected StoreClause<?> clause() {
-        var result = mySqlFactory().insertOnDuplicateKeyUpdate(table())
+        var record = record();
+        var expressions = stream(record.columns())
+                .map((colName) ->
+                             SQLExpressions.set(pathOf(colName),record.columnValue(colName)))
+                .toArray(Expression[]::new);
+        var result = mySqlFactory().insertOnDuplicateKeyUpdate(table(), expressions)
                                    .set(idPath(), normalizedId());
         return result;
     }

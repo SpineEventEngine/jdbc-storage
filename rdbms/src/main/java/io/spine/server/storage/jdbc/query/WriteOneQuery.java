@@ -70,6 +70,13 @@ abstract class WriteOneQuery<I, R extends Message>
      */
     protected abstract StoreClause<?> clause();
 
+    /**
+     * Returns the record to write.
+     */
+    protected final JdbcRecord<I, R> record() {
+        return record;
+    }
+
     @Override
     public IdColumn<I> idColumn() {
         return super.idColumn();
