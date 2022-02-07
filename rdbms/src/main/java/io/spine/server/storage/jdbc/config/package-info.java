@@ -28,4 +28,10 @@
  * This package describes the means of configuring
  * the {@link io.spine.server.storage.jdbc.JdbcStorageFactory JdbcStorageFactory}.
  */
+@CheckReturnValue
+@ParametersAreNonnullByDefault
 package io.spine.server.storage.jdbc.config;
+
+import com.google.errorprone.annotations.CheckReturnValue;
+
+import javax.annotation.ParametersAreNonnullByDefault;
