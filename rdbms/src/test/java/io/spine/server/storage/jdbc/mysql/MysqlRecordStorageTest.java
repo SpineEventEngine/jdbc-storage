@@ -32,6 +32,7 @@ import io.spine.environment.Tests;
 import io.spine.server.ServerEnvironment;
 import io.spine.server.storage.RecordStorageDelegateTest;
 import io.spine.server.storage.jdbc.JdbcStorageFactory;
+import io.spine.testing.SlowTest;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,6 +46,7 @@ import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
 
 @DisplayName("`JdbcRecordStorage` running on top of MySQL instance should")
 @Testcontainers
+@SlowTest
 class MysqlRecordStorageTest extends RecordStorageDelegateTest {
 
     @Container
