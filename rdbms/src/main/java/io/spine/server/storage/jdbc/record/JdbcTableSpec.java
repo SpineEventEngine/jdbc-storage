@@ -236,8 +236,10 @@ public final class JdbcTableSpec<I, R extends Message> {
      * Reads and transforms the value of the column in the given record from the original Java value
      * into one suitable for storing in the database.
      *
-     * @param record the record with column
-     * @param name the name of the column which value should be obtained
+     * @param record
+     *         the record with column
+     * @param name
+     *         the name of the column which value should be obtained
      */
     @Nullable Object valueIn(RecordWithColumns<I, R> record, ColumnName name) {
         var column = requireColumn(name);
