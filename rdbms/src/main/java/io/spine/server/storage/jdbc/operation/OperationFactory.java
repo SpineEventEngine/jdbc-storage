@@ -29,12 +29,11 @@ package io.spine.server.storage.jdbc.operation;
 import com.google.protobuf.Message;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.TypeMapping;
-import io.spine.server.storage.jdbc.record.RecordTable;
 import io.spine.server.storage.jdbc.operation.mysql.MysqlWriteBulk;
 import io.spine.server.storage.jdbc.operation.mysql.MysqlWriteOne;
 import io.spine.server.storage.jdbc.operation.postgres.PostgresWriteBulk;
 import io.spine.server.storage.jdbc.operation.postgres.PostgresWriteOne;
-import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
+import io.spine.server.storage.jdbc.record.RecordTable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static io.spine.server.storage.jdbc.operation.DetectedEngine.MySQL;
@@ -47,75 +46,169 @@ public final class OperationFactory {
 
     private final DataSourceWrapper dataSource;
     private final DetectedEngine engine;
-    private final JdbcColumnMapping columnMapping;
     private final TypeMapping typeMapping;
 
-    private OperationFactory(DataSourceWrapper wrapper,
-                             JdbcColumnMapping columnMapping,
-                             TypeMapping typeMapping) {
+    private OperationFactory(DataSourceWrapper wrapper, TypeMapping typeMapping) {
         this.dataSource = wrapper;
-        this.columnMapping = columnMapping;
         this.typeMapping = typeMapping;
         var metadata = dataSource.metaData();
         engine = DetectedEngine.from(metadata);
     }
 
     /**
-     * Creates a new factory on top of the passed data source.
+     * Creates a new factory on top of the passed data source and the Java-SQL type mapping.
      */
-    public static OperationFactory with(DataSourceWrapper dataSource,
-                                        JdbcColumnMapping columnMapping,
-                                        TypeMapping typeMapping) {
+    public static OperationFactory with(DataSourceWrapper dataSource, TypeMapping mapping) {
         checkNotNull(dataSource);
-        return new OperationFactory(dataSource, columnMapping, typeMapping);
+        checkNotNull(mapping);
+        return new OperationFactory(dataSource, mapping);
     }
 
-    public <I, R extends Message> WriteOne<I, R> writeOne(RecordTable<I, R> table) {
+    /**
+     * Produces an operation which writes a single record to the table.
+     *
+     * @param t
+     *         the table to perform the operation over
+     * @param <I>
+     *         the type of the record identifiers
+     * @param <R>
+     *         the type of the records stored in the table
+     * @return a new operation
+     */
+    public <I, R extends Message> WriteOne<I, R> writeOne(RecordTable<I, R> t) {
         if (engine == MySQL) {
-            return new MysqlWriteOne<>(table, dataSource);
+            return new MysqlWriteOne<>(t, dataSource);
         }
         if (engine == Postgres) {
-            return new PostgresWriteOne<>(table, dataSource);
+            return new PostgresWriteOne<>(t, dataSource);
         }
 
-        return new WriteOne<>(table, dataSource);
+        return new WriteOne<>(t, dataSource);
     }
 
-    public <I, R extends Message> WriteBulk<I, R> writeBulk(RecordTable<I, R> table) {
+    /**
+     * Produces an operation which writes several records to the table.
+     *
+     * @param t
+     *         the table to perform the operation over
+     * @param <I>
+     *         the type of the record identifiers
+     * @param <R>
+     *         the type of the records stored in the table
+     * @return a new operation
+     */
+    public <I, R extends Message> WriteBulk<I, R> writeBulk(RecordTable<I, R> t) {
         if (engine == MySQL) {
-            return new MysqlWriteBulk<>(table, dataSource, this);
+            return new MysqlWriteBulk<>(t, dataSource, this);
         }
         if (engine == Postgres) {
-            return new PostgresWriteBulk<>(table, dataSource, this);
+            return new PostgresWriteBulk<>(t, dataSource, this);
         }
 
-        return new WriteBulk<>(table, dataSource, this);
+        return new WriteBulk<>(t, dataSource, this);
     }
 
+    /**
+     * Produces an operation which reads several records from the table by their IDs.
+     *
+     * @param t
+     *         the table to perform the operation over
+     * @param <I>
+     *         the type of the record identifiers
+     * @param <R>
+     *         the type of the records stored in the table
+     * @return a new operation
+     */
     public <I, R extends Message> ReadManyByIds<I, R> readManyByIds(RecordTable<I, R> t) {
         return new ReadManyByIds<>(t, dataSource);
     }
 
+    /**
+     * Produces an operation which reads several records from the table by executing a query.
+     *
+     * @param t
+     *         the table to perform the operation over
+     * @param <I>
+     *         the type of the record identifiers
+     * @param <R>
+     *         the type of the records stored in the table
+     * @return a new operation
+     */
     public <I, R extends Message> ReadManyByQuery<I, R> readManyByQuery(RecordTable<I, R> t) {
         return new ReadManyByQuery<>(t, dataSource);
     }
 
+    /**
+     * Produces an operation which deletes a single record from the table.
+     *
+     * @param t
+     *         the table to perform the operation over
+     * @param <I>
+     *         the type of the record identifiers
+     * @param <R>
+     *         the type of the records stored in the table
+     * @return a new operation
+     */
     public <I, R extends Message> DeleteOne<I, R> deleteOne(RecordTable<I, R> t) {
         return new DeleteOne<>(t, dataSource);
     }
 
+    /**
+     * Produces an operation which deletes all records from the table.
+     *
+     * @param t
+     *         the table to perform the operation over
+     * @param <I>
+     *         the type of the record identifiers
+     * @param <R>
+     *         the type of the records stored in the table
+     * @return a new operation
+     */
     public <I, R extends Message> DeleteAll<I, R> deleteAll(RecordTable<I, R> t) {
         return new DeleteAll<>(t, dataSource);
     }
 
+    /**
+     * Produces an operation which deletes several records from the table by their IDs.
+     *
+     * @param t
+     *         the table to perform the operation over
+     * @param <I>
+     *         the type of the record identifiers
+     * @param <R>
+     *         the type of the records stored in the table
+     * @return a new operation
+     */
     public <I, R extends Message> DeleteManyByIds<I, R> deleteManyByIds(RecordTable<I, R> t) {
         return new DeleteManyByIds<>(t, dataSource);
     }
 
+    /**
+     * Produces an operation which creates the table in the underlying database.
+     *
+     * @param t
+     *         the table to perform the operation over
+     * @param <I>
+     *         the type of the record identifiers
+     * @param <R>
+     *         the type of the records stored in the table
+     * @return a new operation
+     */
     public <I, R extends Message> CreateTable<I, R> createTable(RecordTable<I, R> t) {
         return new CreateTable<>(t, dataSource, typeMapping);
     }
 
+    /**
+     * Produces an operation reads the identifiers of the records stored in the table.
+     *
+     * @param t
+     *         the table to perform the operation over
+     * @param <I>
+     *         the type of the record identifiers
+     * @param <R>
+     *         the type of the records stored in the table
+     * @return a new operation
+     */
     public <I, R extends Message> FetchIndex<I, R> index(RecordTable<I, R> t) {
         return new FetchIndex<>(t, dataSource);
     }
