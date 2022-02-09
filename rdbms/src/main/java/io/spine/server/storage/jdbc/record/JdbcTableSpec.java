@@ -41,12 +41,10 @@ import io.spine.server.storage.jdbc.record.column.BytesColumn;
 import io.spine.server.storage.jdbc.record.column.CustomColumns;
 import io.spine.server.storage.jdbc.record.column.IdColumn;
 import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
-import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.function.Function;
 
 import static io.spine.util.Preconditions2.checkNotEmptyOrBlank;
 import static java.lang.String.format;
@@ -55,16 +53,6 @@ import static java.util.Objects.requireNonNull;
 /**
  * The specification of the JDBC-accessible database table telling how the record values should
  * be stored.
- *
- * //TODO:2022-01-13:alex.tymchenko: rename the fields from the `recordSpec`.
- *
- * //TODO:2022-01-13:alex.tymchenko: do we need the customization of type conversion here?
- *
- * //TODO:2022-01-13:alex.tymchenko: rename the table.
- *
- * //TODO:2022-01-13:alex.tymchenko: return the `TableColumn`s:
- * //TODO:2022-01-13:alex.tymchenko:  * performing type conversion;
- * //TODO:2022-01-13:alex.tymchenko:  * handling the `bytes` column.
  *
  * @param <I>
  *         the type of identifiers of the stored records
@@ -78,16 +66,54 @@ public final class JdbcTableSpec<I, R extends Message> {
     private final JdbcColumnMapping columnMapping;
     private final IdColumn<I> idColumn;
     private final Descriptor recordDescriptor;
+    private final ImmutableMap<ColumnName, TableColumn> dataColumns;
+
     private final @Nullable CustomColumns<R> customColumns;
 
-    private @MonotonicNonNull ImmutableMap<ColumnName, TableColumn> dataColumns;
-
+    /**
+     * Creates a new table specification.
+     *
+     * <p>The table name is set automatically basing on the name of the Java type of the object,
+     * from which the stored records are built.
+     *
+     * <p>Library users may choose to customize the type of table columns and the mechanism of
+     * obtaining the column values by providing the {@link CustomColumns}.
+     * If no such a customization is made, the default implementation relies onto the original
+     * record specification along with the column mapping.
+     *
+     * @param recordSpec
+     *         the original specification of the stored record
+     * @param mapping
+     *         the column mapping to use
+     * @param columnSpecs
+     *         optionally customized definitions of the columns
+     */
     public JdbcTableSpec(RecordSpec<I, R, ?> recordSpec,
                          JdbcColumnMapping mapping,
                          @Nullable CustomColumns<R> columnSpecs) {
         this(tableName(recordSpec), recordSpec, mapping, columnSpecs);
     }
 
+    /**
+     * Creates a new table specification, also setting a custom name for the table.
+     *
+     * <p>It is a responsibility of callers to select the table name which is both unique and
+     * compatible with the requirements of the underlying database engine.
+     *
+     * <p>Library users may also choose to customize the type of table columns and the mechanism of
+     * obtaining the column values by providing the {@link CustomColumns}.
+     * If no such a customization is made, the default implementation relies onto the original
+     * record specification along with the column mapping.
+     *
+     * @param tableName
+     *         the name to use for the table
+     * @param recordSpec
+     *         the original specification of the stored record
+     * @param mapping
+     *         the column mapping to use
+     * @param columnSpecs
+     *         optionally customized definitions of the columns
+     */
     public JdbcTableSpec(String tableName,
                          RecordSpec<I, R, ?> recordSpec,
                          JdbcColumnMapping mapping,
@@ -98,6 +124,7 @@ public final class JdbcTableSpec<I, R extends Message> {
         this.customColumns = columnSpecs;
         this.idColumn = IdColumn.of(recordSpec, columnMapping);
         this.recordDescriptor = descriptorFrom(recordSpec.storedType());
+        this.dataColumns = createDataColumns();
     }
 
     private static Descriptor descriptorFrom(Class<? extends Message> type) {
@@ -131,33 +158,44 @@ public final class JdbcTableSpec<I, R extends Message> {
         return result;
     }
 
-    private Class<R> storedType() {
-        return recordSpec.storedType();
-    }
-
+    /**
+     * Returns the column of this table which stores the record identifiers.
+     */
     public IdColumn<I> idColumn() {
         return idColumn;
     }
 
+    /**
+     * Returns the identifier of the record.
+     */
     public I idFromRecord(R record) {
         return recordSpec.idFromRecord(record);
     }
 
+    /**
+     * Returns the Proto descriptor of the type, records of which are stored in the table.
+     */
     public Descriptor recordDescriptor() {
         return recordDescriptor;
     }
 
+    /**
+     * Returns the column mapping used by the table.
+     */
     public JdbcColumnMapping columnMapping() {
         return columnMapping;
     }
 
+    /**
+     * Returns all table columns except for the {@linkplain #idColumn() ID column}.
+     */
     public ImmutableCollection<TableColumn> dataColumns() {
-        if (dataColumns == null) {
-            dataColumns = createDataColumns();
-        }
         return dataColumns.values();
     }
 
+    /**
+     * Returns the names of the {@linkplain #dataColumns() data columns}.
+     */
     ImmutableSet<ColumnName> columnNames() {
         return dataColumns.keySet();
     }
@@ -194,9 +232,17 @@ public final class JdbcTableSpec<I, R extends Message> {
         cols.put(bytesColumnName, bytesColumn);
     }
 
-    Function<RecordWithColumns<I, R>, Object> transforming(ColumnName name) {
+    /**
+     * Reads and transforms the value of the column in the given record from the original Java value
+     * into one suitable for storing in the database.
+     *
+     * @param record the record with column
+     * @param name the name of the column which value should be obtained
+     */
+    @Nullable Object valueIn(RecordWithColumns<I, R> record, ColumnName name) {
         var column = requireColumn(name);
-        return column::valueIn;
+        @Nullable Object result = column.valueIn(record);
+        return result;
     }
 
     private TableColumn requireColumn(ColumnName name) {
@@ -204,7 +250,7 @@ public final class JdbcTableSpec<I, R extends Message> {
         requireNonNull(column,
                        format("Cannot find the column with name `%s` " +
                                       "in the table specification for the record of type `%s`.",
-                              name, storedType()));
+                              name, recordSpec.storedType()));
         return column;
     }
 

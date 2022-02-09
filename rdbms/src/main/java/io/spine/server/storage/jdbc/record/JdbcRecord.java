@@ -60,7 +60,7 @@ public final class JdbcRecord<I, R extends Message> {
 
     @Nullable
     public Object columnValue(ColumnName name) {
-        var result = spec.transforming(name).apply(original);
+        @Nullable Object result = spec.valueIn(original, name);
         return result;
     }
 }
