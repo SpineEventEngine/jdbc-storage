@@ -31,20 +31,23 @@ import com.google.protobuf.util.Timestamps;
 import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.aggregate.AggregateEventRecordColumn;
 import io.spine.server.storage.jdbc.record.column.ColumnSpec;
-import io.spine.server.storage.jdbc.record.column.CustomColumns;
+import io.spine.server.storage.jdbc.config.CustomColumns;
 
 import static io.spine.server.storage.jdbc.record.column.ColumnSpec.columnSpec;
 
 /**
  * The columns of {@link AggregateEventRecord} customized for storing in RDBMS.
+ *
+ * <p>The {@code Timestamp} values are configured to be stored as {@code long} values
+ * obtained via {@link Timestamps#toMicros(com.google.protobuf.Timestamp)
+ * Timestamps.toMicros(Timestamp)}. This is an only option for the {@code Timestamps.MIN_VALUE}
+ * and {@code Timestamps.MAX_VALUE}, as their nanosecond representations are too large
+ * to be stored as {@code long}s.
  */
 public final class AggregateEventRecordColumns extends CustomColumns<AggregateEventRecord> {
 
     private static final ImmutableList<ColumnSpec<AggregateEventRecord, ?>> columns =
             ImmutableList.of(
-                    // This is because `Timestamps.MIN_VALUE` and `Timestamps.MAX_VALUE`
-                    // are used in Aggregate tests, and they are way too large
-                    // when converted to nanoseconds.
                     columnSpec(AggregateEventRecordColumn.created, Timestamps::toMicros)
             );
 
