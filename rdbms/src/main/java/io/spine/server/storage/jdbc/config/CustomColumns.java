@@ -24,16 +24,19 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.record.column;
+package io.spine.server.storage.jdbc.config;
 
 import com.google.common.collect.ImmutableList;
 import com.google.protobuf.Message;
 import io.spine.query.ColumnName;
+import io.spine.server.storage.jdbc.record.column.ColumnSpec;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Abstract base for the descriptions of the columns, which require some specific way
  * of storing their values in RDBMS.
+ *
+ * @see io.spine.server.storage.jdbc.JdbcStorageFactory.Builder#configureColumns(Class, CustomColumns)
  */
 public abstract class CustomColumns<R extends Message> {
 

@@ -32,7 +32,6 @@ import com.google.protobuf.Message;
 import io.spine.annotation.Internal;
 import io.spine.server.storage.RecordSpec;
 import io.spine.server.storage.jdbc.record.JdbcTableSpec;
-import io.spine.server.storage.jdbc.record.column.CustomColumns;
 import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
