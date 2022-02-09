@@ -141,9 +141,25 @@
      * **Project URL:** [http://beust.com/jcommander](http://beust.com/jcommander)
      * **License:** [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
+1.  **Group** : com.fasterxml.jackson.core. **Name** : jackson-annotations. **Version** : 2.10.3.
+     * **Project URL:** [http://github.com/FasterXML/jackson](http://github.com/FasterXML/jackson)
+     * **License:** [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
 1.  **Group** : com.github.ben-manes.caffeine. **Name** : caffeine. **Version** : 2.8.8.
      * **Project URL:** [https://github.com/ben-manes/caffeine](https://github.com/ben-manes/caffeine)
      * **License:** [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0.txt)
+
+1.  **Group** : com.github.docker-java. **Name** : docker-java-api. **Version** : 3.2.11.
+     * **Project URL:** [https://github.com/docker-java/docker-java](https://github.com/docker-java/docker-java)
+     * **License:** [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+1.  **Group** : com.github.docker-java. **Name** : docker-java-transport. **Version** : 3.2.11.
+     * **Project URL:** [https://github.com/docker-java/docker-java](https://github.com/docker-java/docker-java)
+     * **License:** [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+1.  **Group** : com.github.docker-java. **Name** : docker-java-transport-zerodep. **Version** : 3.2.11.
+     * **Project URL:** [https://github.com/docker-java/docker-java](https://github.com/docker-java/docker-java)
+     * **License:** [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
 1.  **Group** : com.github.kevinstern. **Name** : software-and-algorithms. **Version** : 1.0.
      * **Project URL:** [https://www.github.com/KevinStern/software-and-algorithms](https://www.github.com/KevinStern/software-and-algorithms)
@@ -350,7 +366,16 @@
      * **Project URL:** [https://github.com/trustin/os-maven-plugin/](https://github.com/trustin/os-maven-plugin/)
      * **License:** [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0)
 
+1.  **Group** : mysql. **Name** : mysql-connector-java. **Version** : 8.0.28.
+     * **Project URL:** [http://dev.mysql.com/doc/connector-j/en/](http://dev.mysql.com/doc/connector-j/en/)
+     * **License:** The GNU General Public License, v2 with FOSS exception
+
 1.  **Group** : net.java.dev.jna. **Name** : jna. **Version** : 5.6.0.
+     * **Project URL:** [https://github.com/java-native-access/jna](https://github.com/java-native-access/jna)
+     * **License:** [Apache License v2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
+     * **License:** [LGPL, version 2.1](http://www.gnu.org/licenses/licenses.html)
+
+1.  **Group** : net.java.dev.jna. **Name** : jna. **Version** : 5.8.0.
      * **Project URL:** [https://github.com/java-native-access/jna](https://github.com/java-native-access/jna)
      * **License:** [Apache License v2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
      * **License:** [LGPL, version 2.1](http://www.gnu.org/licenses/licenses.html)
@@ -377,6 +402,10 @@
 1.  **Group** : org.antlr. **Name** : antlr4-runtime. **Version** : 4.9.3.
      * **Project URL:** [http://www.antlr.org](http://www.antlr.org)
      * **License:** [The BSD License](http://www.antlr.org/license.html)
+
+1.  **Group** : org.apache.commons. **Name** : commons-compress. **Version** : 1.20.
+     * **Project URL:** [https://commons.apache.org/proper/commons-compress/](https://commons.apache.org/proper/commons-compress/)
+     * **License:** [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0.txt)
 
 1.  **Group** : org.apache.commons. **Name** : commons-lang3. **Version** : 3.8.1.
      * **Project URL:** [http://commons.apache.org/proper/commons-lang/](http://commons.apache.org/proper/commons-lang/)
@@ -545,11 +574,35 @@
      * **License:** [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
      * **License:** [WTFPL](http://www.wtfpl.net/)
 
+1.  **Group** : org.rnorth.duct-tape. **Name** : duct-tape. **Version** : 1.0.8.
+     * **Project URL:** [https://github.com/rnorth/${project.artifactId}](https://github.com/rnorth/${project.artifactId})
+     * **License:** [MIT](http://opensource.org/licenses/MIT)
+
 1.  **Group** : org.slf4j. **Name** : slf4j-api. **Version** : 1.7.30.
      * **Project URL:** [http://www.slf4j.org](http://www.slf4j.org)
      * **License:** [MIT License](http://www.opensource.org/licenses/mit-license.php)
 
+1.  **Group** : org.testcontainers. **Name** : database-commons. **Version** : 1.16.0.
+     * **Project URL:** [https://testcontainers.org](https://testcontainers.org)
+     * **License:** [MIT](http://opensource.org/licenses/MIT)
+
+1.  **Group** : org.testcontainers. **Name** : jdbc. **Version** : 1.16.0.
+     * **Project URL:** [https://testcontainers.org](https://testcontainers.org)
+     * **License:** [MIT](http://opensource.org/licenses/MIT)
+
+1.  **Group** : org.testcontainers. **Name** : junit-jupiter. **Version** : 1.16.0.
+     * **Project URL:** [https://testcontainers.org](https://testcontainers.org)
+     * **License:** [MIT](http://opensource.org/licenses/MIT)
+
+1.  **Group** : org.testcontainers. **Name** : mysql. **Version** : 1.16.0.
+     * **Project URL:** [https://testcontainers.org](https://testcontainers.org)
+     * **License:** [MIT](http://opensource.org/licenses/MIT)
+
+1.  **Group** : org.testcontainers. **Name** : testcontainers. **Version** : 1.16.0.
+     * **Project URL:** [https://testcontainers.org](https://testcontainers.org)
+     * **License:** [MIT](http://opensource.org/licenses/MIT)
+
 
 The dependencies distributed under several licenses, are used according their commercial-use-friendly license.
 
-This report was generated on **Thu Jan 27 15:57:45 EET 2022** using [Gradle-License-Report plugin](https://github.com/jk1/Gradle-License-Report) by Evgeny Naumenko, licensed under [Apache 2.0 License](https://github.com/jk1/Gradle-License-Report/blob/master/LICENSE).
+This report was generated on **Mon Feb 07 17:50:47 EET 2022** using [Gradle-License-Report plugin](https://github.com/jk1/Gradle-License-Report) by Evgeny Naumenko, licensed under [Apache 2.0 License](https://github.com/jk1/Gradle-License-Report/blob/master/LICENSE).
