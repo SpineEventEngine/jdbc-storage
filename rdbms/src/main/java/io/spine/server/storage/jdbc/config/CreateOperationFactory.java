@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2022, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,31 +24,22 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc;
+package io.spine.server.storage.jdbc.config;
 
-import com.google.errorprone.annotations.Immutable;
-import io.spine.type.TypeName;
+import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.TypeMapping;
+import io.spine.server.storage.jdbc.operation.OperationFactory;
 
 /**
- * A {@link Type}-to-name mapping.
+ * A function which creates an instance of {@link OperationFactory}.
  *
- * <p>A data type may have different names in different databases.
- * E.g. for binary data {@code BLOB} is used in MySQL, but in PostgreSQL it's {@code BYTEA}.
- *
- * <p>A type mapping provides a flexible way to point out
- * database-specific names of {@linkplain Type types}.
+ * @see io.spine.server.storage.jdbc.JdbcStorageFactory.Builder#useOperationFactory(CreateOperationFactory)
  */
-@Immutable
-public interface TypeMapping {
+@FunctionalInterface
+public interface CreateOperationFactory {
 
     /**
-     * Obtains the name of the specified {@link Type}.
-     *
-     * @param type
-     *         the type to get the name
-     * @return the type name
-     * @throws IllegalStateException
-     *         if the name for the specified type is not defined
+     * Creates a new factory on top of the passed data source and type mapping.
      */
-    TypeName typeNameFor(Type type);
+    OperationFactory apply(DataSourceWrapper dataSource, TypeMapping mapping);
 }

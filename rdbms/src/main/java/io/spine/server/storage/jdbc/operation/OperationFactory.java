@@ -27,6 +27,7 @@
 package io.spine.server.storage.jdbc.operation;
 
 import com.google.protobuf.Message;
+import io.spine.annotation.SPI;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.TypeMapping;
 import io.spine.server.storage.jdbc.operation.mysql.MysqlWriteBulk;
@@ -41,8 +42,12 @@ import static io.spine.server.storage.jdbc.operation.DetectedEngine.Postgres;
 
 /**
  * A factory of {@link Operation}s.
+ *
+ * <p>Descendants may extend this type in order to customize the execution of certain operations
+ * performed over the underlying database.
  */
-public final class OperationFactory {
+@SPI
+public class OperationFactory {
 
     private final DataSourceWrapper dataSource;
     private final DetectedEngine engine;

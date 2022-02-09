@@ -36,6 +36,7 @@ import io.spine.server.storage.RecordSpec;
 import io.spine.server.storage.RecordStorage;
 import io.spine.server.storage.StorageFactory;
 import io.spine.server.storage.jdbc.aggregate.AggregateEventRecordColumns;
+import io.spine.server.storage.jdbc.config.CreateOperationFactory;
 import io.spine.server.storage.jdbc.config.TableSpecs;
 import io.spine.server.storage.jdbc.delivery.JdbcSessionStorage;
 import io.spine.server.storage.jdbc.operation.OperationFactory;
@@ -44,6 +45,7 @@ import io.spine.server.storage.jdbc.record.JdbcTableSpec;
 import io.spine.server.storage.jdbc.record.column.CustomColumns;
 import io.spine.server.storage.jdbc.type.DefaultJdbcColumnMapping;
 import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import javax.sql.DataSource;
 
@@ -171,11 +173,15 @@ public class JdbcStorageFactory implements StorageFactory {
         private JdbcColumnMapping columnMapping;
         private TypeMapping typeMapping;
         private final TableSpecs.Builder tableSpecs = TableSpecs.newBuilder();
+        private CreateOperationFactory createOpFactory;
 
         /**
          * Prevents this builder from a direct instantiation.
+         *
+         * @apiNote This method is made {@code protected} for the potential descendants
+         *         of this {@code Builder} type.
          */
-        private Builder() {
+        protected Builder() {
         }
 
         /**
@@ -291,19 +297,47 @@ public class JdbcStorageFactory implements StorageFactory {
         }
 
         /**
+         * Overrides the factory of DB operations to use with the storage factory.
+         *
+         * <p>By default, the {@link OperationFactory} is used.
+         *
+         * @param fn
+         *         the function to create the operation factory
+         * @return this instance of {@code Builder}
+         */
+        @CanIgnoreReturnValue
+        public Builder useOperationFactory(CreateOperationFactory fn) {
+            this.createOpFactory = checkNotNull(fn);
+            return this;
+        }
+
+        /**
          * Returns a new instance of {@code JdbcStorageFactory}.
          */
         public JdbcStorageFactory build() {
+            configureDefaults();
+            return new JdbcStorageFactory(this);
+        }
+
+        /**
+         * Configures the default values for this storage factory.
+         *
+         * @apiNote This method is made {@code protected} for the potential descendants
+         *         of this {@code Builder} type.
+         */
+        @SuppressWarnings("WeakerAccess")
+        protected void configureDefaults() {
             if (columnMapping == null) {
                 columnMapping = new DefaultJdbcColumnMapping();
             }
             if (typeMapping == null) {
                 typeMapping = PredefinedMapping.select(dataSource);
             }
+            if(createOpFactory == null) {
+                createOpFactory = OperationFactory::new;
+            }
 
             configureSystemTables();
-
-            return new JdbcStorageFactory(this);
         }
 
         private void configureSystemTables() {
