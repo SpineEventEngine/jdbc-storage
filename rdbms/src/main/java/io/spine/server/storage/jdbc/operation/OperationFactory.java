@@ -48,20 +48,16 @@ public final class OperationFactory {
     private final DetectedEngine engine;
     private final TypeMapping typeMapping;
 
-    private OperationFactory(DataSourceWrapper wrapper, TypeMapping typeMapping) {
-        this.dataSource = wrapper;
-        this.typeMapping = typeMapping;
-        var metadata = dataSource.metaData();
-        engine = DetectedEngine.from(metadata);
-    }
-
     /**
      * Creates a new factory on top of the passed data source and the Java-SQL type mapping.
      */
-    public static OperationFactory with(DataSourceWrapper dataSource, TypeMapping mapping) {
-        checkNotNull(dataSource);
+    public OperationFactory(DataSourceWrapper wrapper, TypeMapping mapping) {
+        checkNotNull(wrapper);
         checkNotNull(mapping);
-        return new OperationFactory(dataSource, mapping);
+        this.dataSource = wrapper;
+        this.typeMapping = mapping;
+        var metadata = dataSource.metaData();
+        engine = DetectedEngine.from(metadata);
     }
 
     /**

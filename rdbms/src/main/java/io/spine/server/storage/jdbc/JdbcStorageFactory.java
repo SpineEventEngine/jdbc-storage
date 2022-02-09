@@ -66,7 +66,7 @@ public class JdbcStorageFactory implements StorageFactory {
         this.dataSource = checkNotNull(builder.dataSource);
         this.columnMapping = builder.columnMapping;
         this.typeMapping = checkNotNull(builder.typeMapping);
-        this.operations = OperationFactory.with(dataSource, typeMapping);
+        this.operations = new OperationFactory(dataSource, typeMapping);
         this.tableSpecs = builder.tableSpecs.build();
     }
 
