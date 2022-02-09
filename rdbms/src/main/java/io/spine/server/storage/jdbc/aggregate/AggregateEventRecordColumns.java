@@ -43,6 +43,8 @@ import static io.spine.server.storage.jdbc.record.column.ColumnSpec.columnSpec;
  * Timestamps.toMicros(Timestamp)}. This is an only option for the {@code Timestamps.MIN_VALUE}
  * and {@code Timestamps.MAX_VALUE}, as their nanosecond representations are too large
  * to be stored as {@code long}s.
+ *
+ * <p>This type is a singleton.
  */
 public final class AggregateEventRecordColumns extends CustomColumns<AggregateEventRecord> {
 
@@ -58,6 +60,9 @@ public final class AggregateEventRecordColumns extends CustomColumns<AggregateEv
         super(cols);
     }
 
+    /**
+     * Returns the instance of this singleton.
+     */
     public static AggregateEventRecordColumns instance() {
         return instance;
     }
