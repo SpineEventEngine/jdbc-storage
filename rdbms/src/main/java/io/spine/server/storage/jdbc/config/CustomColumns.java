@@ -28,6 +28,7 @@ package io.spine.server.storage.jdbc.config;
 
 import com.google.common.collect.ImmutableList;
 import com.google.protobuf.Message;
+import io.spine.annotation.SPI;
 import io.spine.query.ColumnName;
 import io.spine.server.storage.jdbc.record.column.ColumnSpec;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -36,20 +37,36 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * Abstract base for the descriptions of the columns, which require some specific way
  * of storing their values in RDBMS.
  *
- * @see io.spine.server.storage.jdbc.JdbcStorageFactory.Builder#configureColumns(Class, CustomColumns)
+ * <p>The library users should provide their custom column specifications for the types
+ * of the stored records, by extending this type.
+ *
+ * @see io.spine.server.storage.jdbc.JdbcStorageFactory.Builder#configureColumns(Class,
+ *         CustomColumns)
  */
+@SPI
+@SuppressWarnings("AbstractClassWithoutAbstractMethods")    /* By design. */
 public abstract class CustomColumns<R extends Message> {
 
     private final ImmutableList<ColumnSpec<R, ?>> columns;
 
+    /**
+     * Creates the instance of this type with the given column specifications.
+     */
     protected CustomColumns(ImmutableList<ColumnSpec<R, ?>> columns) {
         this.columns = columns;
     }
 
+    /**
+     * Returns the column specifications.
+     */
     public Iterable<ColumnSpec<R, ?>> columns() {
         return columns;
     }
 
+    /**
+     * Returns the specification of the column by the column name,
+     * or {@code null}, if no custom column definition was configured.
+     */
     public @Nullable ColumnSpec<R, ?> find(ColumnName name) {
         return columns.stream()
                 .filter(c -> c.name()
