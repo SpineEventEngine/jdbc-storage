@@ -30,15 +30,11 @@ import com.google.protobuf.Message;
 import io.spine.annotation.SPI;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.TypeMapping;
-import io.spine.server.storage.jdbc.operation.mysql.MysqlWriteBulk;
 import io.spine.server.storage.jdbc.operation.mysql.MysqlWriteOne;
-import io.spine.server.storage.jdbc.operation.postgres.PostgresWriteBulk;
-import io.spine.server.storage.jdbc.operation.postgres.PostgresWriteOne;
 import io.spine.server.storage.jdbc.record.RecordTable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static io.spine.server.storage.jdbc.operation.DetectedEngine.MySQL;
-import static io.spine.server.storage.jdbc.operation.DetectedEngine.Postgres;
 
 /**
  * A factory of {@link Operation}s.
@@ -80,9 +76,6 @@ public class OperationFactory {
         if (engine == MySQL) {
             return new MysqlWriteOne<>(t, dataSource);
         }
-        if (engine == Postgres) {
-            return new PostgresWriteOne<>(t, dataSource);
-        }
 
         return new WriteOne<>(t, dataSource);
     }
@@ -99,13 +92,6 @@ public class OperationFactory {
      * @return a new operation
      */
     public <I, R extends Message> WriteBulk<I, R> writeBulk(RecordTable<I, R> t) {
-        if (engine == MySQL) {
-            return new MysqlWriteBulk<>(t, dataSource, this);
-        }
-        if (engine == Postgres) {
-            return new PostgresWriteBulk<>(t, dataSource, this);
-        }
-
         return new WriteBulk<>(t, dataSource, this);
     }
 
