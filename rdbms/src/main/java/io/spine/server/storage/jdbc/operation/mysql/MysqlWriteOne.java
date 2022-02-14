@@ -28,20 +28,22 @@ package io.spine.server.storage.jdbc.operation.mysql;
 
 import com.google.protobuf.Message;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.operation.WriteOne;
 import io.spine.server.storage.jdbc.query.MySqlUpsertOneQuery;
 import io.spine.server.storage.jdbc.record.JdbcRecord;
 import io.spine.server.storage.jdbc.record.RecordTable;
-import io.spine.server.storage.jdbc.operation.WriteOne;
 
 /**
  * A MySQL-optimized operation for writing a single record into the database.
  *
- * //TODO:2021-06-24:alex.tymchenko: document once implemented.
+ * <p>Updates the table row in case the record already exists, otherwise inserts a new record
+ * into the table.
  *
  * @param <I>
  *         the type of the identifiers of the stored records
  * @param <R>
  *         the type of the stored records
+ * @see MySqlUpsertOneQuery for more details on the SQL query executed
  */
 public final class MysqlWriteOne<I, R extends Message> extends WriteOne<I, R> {
 
