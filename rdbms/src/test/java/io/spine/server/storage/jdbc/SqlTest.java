@@ -26,6 +26,7 @@
 
 package io.spine.server.storage.jdbc;
 
+import io.spine.testing.UtilityClassTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -34,12 +35,10 @@ import static io.spine.testing.DisplayNames.HAVE_PARAMETERLESS_CTOR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DisplayName("`Sql` utility should")
-class SqlTest {
+class SqlTest extends UtilityClassTest<Sql> {
 
-    @Test
-    @DisplayName(HAVE_PARAMETERLESS_CTOR)
-    void haveUtilityConstructor() {
-        assertHasPrivateParameterlessCtor(Sql.class);
+    SqlTest() {
+        super(Sql.class);
     }
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
