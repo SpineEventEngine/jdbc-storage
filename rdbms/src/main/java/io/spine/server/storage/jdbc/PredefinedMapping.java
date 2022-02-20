@@ -31,7 +31,7 @@ import com.google.errorprone.annotations.Immutable;
 import io.spine.type.TypeName;
 
 import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
-import static io.spine.server.storage.jdbc.TypeMappingBuilder.basicBuilder;
+import static io.spine.server.storage.jdbc.TypeMappingBuilder.mappingBuilder;
 
 /**
  * Predefined {@linkplain TypeMapping type mappings} for different databases.
@@ -39,9 +39,9 @@ import static io.spine.server.storage.jdbc.TypeMappingBuilder.basicBuilder;
 @Immutable
 public enum PredefinedMapping implements TypeMapping {
 
-    MYSQL_5_7("MySQL", 5, 7, basicBuilder()),
-    POSTGRESQL_10_1("PostgreSQL", 10, 1, basicBuilder().add(BYTE_ARRAY, "BYTEA")),
-    H2_2_1("H2", 2, 1, basicBuilder());
+    MYSQL_5_7("MySQL", 5, 7, mappingBuilder()),
+    POSTGRESQL_10_1("PostgreSQL", 10, 1, mappingBuilder().add(BYTE_ARRAY, "BYTEA")),
+    H2_2_1("H2", 2, 1, mappingBuilder());
 
     @SuppressWarnings("NonSerializableFieldInSerializableClass")
     private final TypeMapping typeMapping;

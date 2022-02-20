@@ -30,6 +30,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
+import static io.spine.server.storage.jdbc.TypeMappingBuilder.mappingBuilder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -42,10 +43,10 @@ class TypeMappingBuilderTest {
         var type = BYTE_ARRAY;
         var originalName = "original";
         var nameReplacement = "replacement";
-        var mapping = TypeMappingBuilder.basicBuilder()
-                                        .add(type, originalName)
-                                        .add(type, nameReplacement)
-                                        .build();
+        var mapping = mappingBuilder()
+                .add(type, originalName)
+                .add(type, nameReplacement)
+                .build();
         var resultingName = mapping.typeNameFor(type);
         assertEquals(nameReplacement, resultingName.value());
     }
@@ -53,7 +54,7 @@ class TypeMappingBuilderTest {
     @Test
     @DisplayName("not allow empty type names")
     void rejectEmptyTypeNames() {
-        var builder = TypeMappingBuilder.basicBuilder();
+        var builder = mappingBuilder();
         assertThrows(IllegalArgumentException.class, () -> builder.add(BYTE_ARRAY, ""));
     }
 

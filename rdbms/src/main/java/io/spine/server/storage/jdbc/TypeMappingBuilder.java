@@ -73,13 +73,14 @@ public class TypeMappingBuilder {
      *
      * @return the builder containing names for all types
      */
-    public static TypeMappingBuilder basicBuilder() {
-        var builder = new TypeMappingBuilder().add(BYTE_ARRAY, "BLOB")
-                                              .add(INT, "INT")
-                                              .add(LONG, "BIGINT")
-                                              .add(STRING_255, "VARCHAR(255)")
-                                              .add(STRING, "TEXT")
-                                              .add(BOOLEAN, "BOOLEAN");
+    public static TypeMappingBuilder mappingBuilder() {
+        var builder = new TypeMappingBuilder()
+                .add(BYTE_ARRAY, "BLOB")
+                .add(INT, "INT")
+                .add(LONG, "BIGINT")
+                .add(STRING_255, "VARCHAR(255)")
+                .add(STRING, "TEXT")
+                .add(BOOLEAN, "BOOLEAN");
         return builder;
     }
 
