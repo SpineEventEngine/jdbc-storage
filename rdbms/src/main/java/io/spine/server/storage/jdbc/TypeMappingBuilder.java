@@ -26,6 +26,7 @@
 
 package io.spine.server.storage.jdbc;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.annotations.Immutable;
 import io.spine.type.TypeName;
@@ -41,13 +42,23 @@ import static io.spine.server.storage.jdbc.Type.INT;
 import static io.spine.server.storage.jdbc.Type.LONG;
 import static io.spine.server.storage.jdbc.Type.STRING;
 import static io.spine.server.storage.jdbc.Type.STRING_255;
+import static java.util.Objects.requireNonNull;
 
 /**
  * A builder for {@linkplain TypeMapping type mappings}.
  */
-public class TypeMappingBuilder {
+public final class TypeMappingBuilder {
 
     private final Map<Type, TypeName> mappedTypes = new EnumMap<>(Type.class);
+
+    /**
+     * Creates a new builder.
+     *
+     * <p>Exposed just for tests. Otherwise, would be {@code private}.
+     */
+    @VisibleForTesting
+    TypeMappingBuilder() {
+    }
 
     /**
      * Obtains the basic builder for mappings.
@@ -109,10 +120,10 @@ public class TypeMappingBuilder {
      *         if not all the {@linkplain Type types} were mapped
      */
     public TypeMapping build() {
-        var typesCount = Type.values().length;
-        checkState(mappedTypes.size() == typesCount,
+        var typeCount = Type.values().length;
+        checkState(mappedTypes.size() == typeCount,
                    "A mapping should contain names for all types (%s), " +
-                   "but only (%s) types were mapped.", typesCount, mappedTypes.size());
+                           "but only (%s) types were mapped.", typeCount, mappedTypes.size());
         return new TypeMappingImpl(mappedTypes);
     }
 
@@ -133,7 +144,7 @@ public class TypeMappingBuilder {
             checkState(mappedTypes.containsKey(type),
                        "The type mapping does not define a name for %s type.", type);
             var typeName = mappedTypes.get(type);
-            return typeName;
+            return requireNonNull(typeName);
         }
     }
 }
