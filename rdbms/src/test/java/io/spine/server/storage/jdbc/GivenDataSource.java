@@ -50,16 +50,13 @@ public final class GivenDataSource {
 
     public static DataSourceWrapper whichIsStoredInMemory(String dbName) {
         var config = hikariConfig(dbName);
-        //TODO:2022-01-25:alex.tymchenko: remove this one later.
-        config.setMaximumPoolSize(100);
         var dataSource = DataSourceWrapper.wrap(new HikariDataSource(config));
         return dataSource;
     }
 
     public static DataSourceWrapper
     whichHoldsMetadata(String productName, int majorVersion, int minorVersion) {
-        DataSourceWrapper dataSource =
-                new DataSourceWithMetaData(productName, majorVersion, minorVersion);
+        var dataSource = new DataSourceWithMetaData(productName, majorVersion, minorVersion);
         return dataSource;
     }
 
