@@ -74,6 +74,7 @@ public abstract class AbstractQuery implements StorageQuery {
     private final PathBuilder<Object> pathBuilder;
     private final PathBuilder<Object> aliasedPathBuilder;
 
+    @SuppressWarnings("rawtypes")   /* To simplify the signature. */
     protected AbstractQuery(Builder<? extends Builder, ? extends StorageQuery> builder) {
         String tableName = builder.tableName;
         this.queryFactory = createFactory(builder.dataSource);
@@ -122,6 +123,7 @@ public abstract class AbstractQuery implements StorageQuery {
         return pathBuilder.get(columnName, type);
     }
 
+    @SuppressWarnings("rawtypes")   /* The exact type of `Comparable` is not known here. */
     protected <T extends Comparable> ComparablePath<T>
     comparablePathOf(TableColumn column, Class<T> type) {
         return pathBuilder.getComparable(column.name(), type);
@@ -131,11 +133,13 @@ public abstract class AbstractQuery implements StorageQuery {
         return aliasedPathBuilder.get(column.name());
     }
 
+    @SuppressWarnings("rawtypes")   /* The exact type of `Comparable` is not known here. */
     protected <T extends Comparable> ComparablePath<T>
     aliasedComparablePathOf(TableColumn column, Class<T> type) {
         return aliasedPathBuilder.getComparable(column.name(), type);
     }
 
+    @SuppressWarnings("rawtypes")   /* The exact type of `Comparable` is not known here. */
     protected OrderSpecifier<Comparable> orderBy(TableColumn column, Order order) {
         PathBuilder<Comparable> columnPath = pathBuilder.get(column.name(), Comparable.class);
         return new OrderSpecifier<>(order, columnPath);
