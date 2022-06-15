@@ -27,6 +27,7 @@
 package io.spine.server.storage.jdbc.query;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.ComparablePath;
@@ -145,12 +146,27 @@ public abstract class AbstractQuery implements StorageQuery {
         return new OrderSpecifier<>(order, columnPath);
     }
 
+    /**
+     * Appends the given query with the ordering and limit, if they are provided.
+     *
+     * <p>In case the ordering directive is not specified, the limit value is ignored.
+     * Otherwise, the limit is applied if and only if it is a positive number.
+     *
+     * @param query
+     *         query to configure
+     * @param ordering
+     *         ordering directive, {@code null}, if not set by end-users
+     * @param limit
+     *         the maximum number of records to return, {@code null}, if not specified
+     * @param <T>
+     *         the type of the query
+     * @return the same query instance
+     */
+    @CanIgnoreReturnValue
     @SuppressWarnings({"rawtypes", "unchecked" /* To avoid searching for the typed columns. */,
             "SerializableClassWithUnconstructableAncestor"})
     protected final <T extends AbstractSQLQuery<?, ?>> T
-    addOrderingAndLimit(T query,
-                        @Nullable OrderBy ordering,
-                        @Nullable Integer limit) {
+    addOrderingAndLimit(T query, @Nullable OrderBy ordering, @Nullable Integer limit) {
         if (ordering != null && !ordering.equals(OrderBy.getDefaultInstance())) {
             Order order = isAscending(ordering.getDirection())
                           ? Order.ASC
