@@ -107,11 +107,11 @@ final class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWith
     protected WriteQuery composeInsertQuery(I id, EntityRecordWithColumns record) {
         InsertEntityQuery.Builder<I> builder = InsertEntityQuery.newBuilder();
         InsertEntityQuery<I> query = builder.setDataSource(dataSource())
-                                         .setTableName(name())
-                                         .setIdColumn(idColumn())
-                                         .setColumnMapping(columnMapping)
-                                         .addRecord(id, record)
-                                         .build();
+                                            .setTableName(name())
+                                            .setIdColumn(idColumn())
+                                            .setColumnMapping(columnMapping)
+                                            .addRecord(id, record)
+                                            .build();
         return query;
     }
 
@@ -119,11 +119,11 @@ final class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWith
     protected WriteQuery composeUpdateQuery(I id, EntityRecordWithColumns record) {
         UpdateEntityQuery.Builder<I> builder = UpdateEntityQuery.newBuilder();
         UpdateEntityQuery<I> query = builder.setTableName(name())
-                                         .setDataSource(dataSource())
-                                         .setIdColumn(idColumn())
-                                         .addRecord(id, record)
-                                         .setColumnMapping(columnMapping)
-                                         .build();
+                                            .setDataSource(dataSource())
+                                            .setIdColumn(idColumn())
+                                            .addRecord(id, record)
+                                            .setColumnMapping(columnMapping)
+                                            .build();
         return query;
     }
 
@@ -200,26 +200,28 @@ final class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWith
 
     private SelectByEntityColumnsQuery.Builder<I>
     queryBuilder(EntityQuery<I> entityQuery, ResponseFormat format) {
-        SelectByEntityColumnsQuery.Builder<I> builder = SelectByEntityColumnsQuery.newBuilder();
-        builder = builder.setDataSource(dataSource())
-                .setTableName(name())
-                .setIdColumn(idColumn())
-                .setColumnMapping(columnMapping)
-                .setEntityQuery(entityQuery)
-                .setFieldMask(format.getFieldMask())
-                .setOrdering(format.getOrderBy())
-                .setLimit(format.getLimit());
+        SelectByEntityColumnsQuery.Builder<I> builder =
+                SelectByEntityColumnsQuery.<I>newBuilder()
+                                          .setDataSource(dataSource())
+                                          .setTableName(name())
+                                          .setIdColumn(idColumn())
+                                          .setColumnMapping(columnMapping)
+                                          .setEntityQuery(entityQuery)
+                                          .setFieldMask(format.getFieldMask())
+                                          .setOrdering(format.getOrderBy())
+                                          .setLimit(format.getLimit());
         return builder;
     }
 
     private Iterator<EntityRecord> executeSelectAllQuery(ResponseFormat format) {
         SelectAllQuery.Builder builder = SelectAllQuery.newBuilder();
-        SelectAllQuery query = builder.setDataSource(dataSource())
-                                      .setTableName(name())
-                                      .setFieldMask(format.getFieldMask())
-                                      .setOrdering(format.getOrderBy())
-                                      .setLimit(format.getLimit())
-                                      .build();
+        SelectAllQuery query =
+                builder.setDataSource(dataSource())
+                       .setTableName(name())
+                       .setFieldMask(format.getFieldMask())
+                       .setOrdering(format.getOrderBy())
+                       .setLimit(format.getLimit())
+                       .build();
         Iterator<EntityRecord> result = query.execute();
         return result;
     }
@@ -247,12 +249,13 @@ final class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWith
 
     private WriteQuery newInsertEntityRecordsBulkQuery(Map<I, EntityRecordWithColumns> records) {
         InsertEntityQuery.Builder<I> builder = InsertEntityQuery.newBuilder();
-        InsertEntityQuery<I> query = builder.setDataSource(dataSource())
-                                         .setTableName(name())
-                                         .setIdColumn(idColumn())
-                                         .setColumnMapping(columnMapping)
-                                         .addRecords(records)
-                                         .build();
+        InsertEntityQuery<I> query =
+                builder.setDataSource(dataSource())
+                       .setTableName(name())
+                       .setIdColumn(idColumn())
+                       .setColumnMapping(columnMapping)
+                       .addRecords(records)
+                       .build();
         return query;
     }
 
