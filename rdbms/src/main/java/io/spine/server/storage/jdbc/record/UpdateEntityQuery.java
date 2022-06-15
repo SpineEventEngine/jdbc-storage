@@ -61,11 +61,11 @@ class UpdateEntityQuery<I> extends WriteEntityQuery<I, SQLUpdateClause> {
     }
 
     static class Builder<I> extends WriteEntityQuery.Builder<Builder<I>,
-                                                             UpdateEntityQuery,
+                                                             UpdateEntityQuery<I>,
                                                              I> {
 
         @Override
-        protected UpdateEntityQuery doBuild() {
+        protected UpdateEntityQuery<I> doBuild() {
             return new UpdateEntityQuery<>(this);
         }
 

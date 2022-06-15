@@ -26,13 +26,14 @@
 
 package io.spine.server.storage.jdbc.record;
 
+import com.google.common.collect.ImmutableList;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import io.spine.base.EntityState;
-import io.spine.base.Identifier;
 import io.spine.client.CompositeFilter;
 import io.spine.client.Filter;
+import io.spine.client.OrderBy;
 import io.spine.client.ResponseFormat;
 import io.spine.client.TargetFilters;
-import io.spine.protobuf.AnyPacker;
 import io.spine.server.entity.Entity;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.storage.EntityQueries;
@@ -42,10 +43,13 @@ import io.spine.server.storage.RecordStorage;
 import io.spine.server.storage.RecordStorageTest;
 import io.spine.server.storage.given.RecordStorageTestEnv.TestCounterEntity;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.record.given.JdbcRecordStorageTestEnv;
 import io.spine.server.storage.jdbc.type.DefaultJdbcColumnMapping;
 import io.spine.test.storage.Project;
+import io.spine.test.storage.Project.Status;
 import io.spine.test.storage.ProjectId;
 import io.spine.testdata.Sample;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -53,15 +57,24 @@ import org.junit.jupiter.api.Test;
 import java.util.Iterator;
 import java.util.Optional;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.truth.Truth.assertThat;
-import static io.spine.base.Identifier.newUuid;
 import static io.spine.client.CompositeFilter.CompositeOperator.ALL;
 import static io.spine.client.Filters.gt;
 import static io.spine.client.Filters.lt;
-import static io.spine.protobuf.AnyPacker.pack;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
 import static io.spine.server.storage.jdbc.PredefinedMapping.H2_1_4;
+import static io.spine.server.storage.jdbc.record.given.JdbcRecordStorageTestEnv.asEntityRecord;
+import static io.spine.server.storage.jdbc.record.given.JdbcRecordStorageTestEnv.ascendingByStatusValue;
+import static io.spine.server.storage.jdbc.record.given.JdbcRecordStorageTestEnv.descendingByStatusValue;
+import static io.spine.server.storage.jdbc.record.given.JdbcRecordStorageTestEnv.queryAllBeforeCancelled;
+import static io.spine.server.storage.jdbc.record.given.JdbcRecordStorageTestEnv.projectId;
+import static io.spine.server.storage.jdbc.record.given.JdbcRecordStorageTestEnv.statusValueColumn;
+import static io.spine.server.storage.jdbc.record.given.JdbcRecordStorageTestEnv.unpackProjectId;
+import static io.spine.test.storage.Project.Status.CANCELLED;
+import static io.spine.test.storage.Project.Status.CREATED;
 import static io.spine.test.storage.Project.Status.DONE;
+import static io.spine.test.storage.Project.Status.STARTED;
 import static io.spine.testing.Tests.nullRef;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -71,7 +84,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
         "InnerClassMayBeStatic", "ClassCanBeStatic", /* JUnit nested classes cannot be static. */
         "DuplicateStringLiteralInspection" /* Common test display names. */
 })
-@DisplayName("JdbcRecordStorage should")
+@DisplayName("`JdbcRecordStorage` should")
 class JdbcRecordStorageTest extends RecordStorageTest<JdbcRecordStorage<ProjectId>> {
 
     @Test
@@ -103,26 +116,11 @@ class JdbcRecordStorageTest extends RecordStorageTest<JdbcRecordStorage<ProjectI
     @DisplayName("read by composite filter with column filters for same column")
     void readByCompositeFilter() {
         JdbcRecordStorage<ProjectId> storage = newStorage(TestCounterEntity.class);
-        ProjectId id = ProjectId
-                .newBuilder()
-                .setId(newUuid())
-                .build();
-        TestCounterEntity entity = new TestCounterEntity(id);
-        entity.assignStatus(DONE);
-        EntityRecord record = EntityRecord
-                .newBuilder()
-                .setEntityId(Identifier.pack(id))
-                .setState(pack(entity.state()))
-                .setVersion(entity.version())
-                .setLifecycleFlags(entity.lifecycleFlags())
-                .build();
-        EntityRecordWithColumns recordWithColumns =
-                EntityRecordWithColumns.create(record, entity, storage);
-        storage.write(id, recordWithColumns);
+        Status status = DONE;
+        ProjectId id = writeProjectWithStatus(storage, status);
 
-        String columnName = "project_status_value";
-        Filter lessThan = lt(columnName, 4);
-        Filter greaterThan = gt(columnName, 2);
+        Filter lessThan = lt(statusValueColumn(), 4);
+        Filter greaterThan = gt(statusValueColumn(), 2);
         CompositeFilter columnFilter = CompositeFilter
                 .newBuilder()
                 .addFilter(lessThan)
@@ -141,11 +139,174 @@ class JdbcRecordStorageTest extends RecordStorageTest<JdbcRecordStorage<ProjectI
                 .isTrue();
 
         EntityRecord next = resultIterator.next();
-        ProjectId nextId = AnyPacker.unpack(next.getEntityId(), ProjectId.class);
+        ProjectId nextId = unpackProjectId(next);
 
         assertThat(nextId).isEqualTo(id);
 
         close(storage);
+    }
+
+    @CanIgnoreReturnValue
+    private static ProjectId writeProjectWithStatus(JdbcRecordStorage<ProjectId> storage,
+                                                    Status status) {
+        ProjectId id = projectId();
+        TestCounterEntity entity = new TestCounterEntity(id);
+
+        entity.assignStatus(status);
+        EntityRecord record = asEntityRecord(id, entity);
+        EntityRecordWithColumns recordWithColumns =
+                EntityRecordWithColumns.create(record, entity, storage);
+        storage.write(id, recordWithColumns);
+        return id;
+    }
+
+    @Nested
+    @DisplayName("allow to order records when specifying the column for")
+    class OrderingAndLimit {
+
+        @Test
+        @DisplayName("the ascending sorting")
+        void ascending() {
+            JdbcRecordStorage<ProjectId> storage = newStorage(TestCounterEntity.class);
+            ProjectId done = writeProjectWithStatus(storage, DONE);
+            ProjectId created = writeProjectWithStatus(storage, CREATED);
+            ProjectId started = writeProjectWithStatus(storage, STARTED);
+            ProjectId cancelled = writeProjectWithStatus(storage, CANCELLED);
+
+            OrderBy ordering = ascendingByStatusValue();
+            ImmutableList<ProjectId> actualIds = readIds(storage, ordering);
+            assertThat(actualIds)
+                    .containsExactly(created, started, done, cancelled)
+                    .inOrder();
+            close(storage);
+        }
+
+        @Test
+        @DisplayName("the ascending sorting with limit")
+        void ascendingWithLimit() {
+            JdbcRecordStorage<ProjectId> storage = newStorage(TestCounterEntity.class);
+            writeProjectWithStatus(storage, DONE);
+            ProjectId created = writeProjectWithStatus(storage, CREATED);
+            writeProjectWithStatus(storage, STARTED);
+            writeProjectWithStatus(storage, CANCELLED);
+
+            OrderBy ordering = ascendingByStatusValue();
+            int returnJustOne = 1;
+            ImmutableList<ProjectId> actualIds = readIds(storage, ordering, returnJustOne);
+            assertThat(actualIds)
+                    .containsExactly(created)
+                    .inOrder();
+            close(storage);
+        }
+
+        @Test
+        @DisplayName("the ascending sorting, filtering the records by some column value")
+        void ascendingWithFiltering() {
+            JdbcRecordStorage<ProjectId> storage = newStorage(TestCounterEntity.class);
+            ProjectId done = writeProjectWithStatus(storage, DONE);
+            ProjectId created = writeProjectWithStatus(storage, CREATED);
+            ProjectId started = writeProjectWithStatus(storage, STARTED);
+            writeProjectWithStatus(storage, CANCELLED);
+
+            EntityQuery<ProjectId> query = queryAllBeforeCancelled(storage);
+            OrderBy ordering = ascendingByStatusValue();
+            ImmutableList<ProjectId> actualIds = readIds(storage, query, ordering);
+            assertThat(actualIds)
+                    .containsExactly(created, started, done)
+                    .inOrder();
+            close(storage);
+        }
+
+        @Test
+        @DisplayName("the ascending sorting with limit, filtering the records by some column value")
+        void ascendingWithFilteringAndLimit() {
+            JdbcRecordStorage<ProjectId> storage = newStorage(TestCounterEntity.class);
+            writeProjectWithStatus(storage, DONE);
+            ProjectId created = writeProjectWithStatus(storage, CREATED);
+            ProjectId started = writeProjectWithStatus(storage, STARTED);
+            writeProjectWithStatus(storage, CANCELLED);
+
+            EntityQuery<ProjectId> query = queryAllBeforeCancelled(storage);
+            OrderBy ordering = ascendingByStatusValue();
+            int returnOnlyTwo = 2;
+            ImmutableList<ProjectId> actualIds = readIds(storage, query, ordering, returnOnlyTwo);
+            assertThat(actualIds)
+                    .containsExactly(created, started)
+                    .inOrder();
+            close(storage);
+        }
+
+        @Test
+        @DisplayName("the descending sorting")
+        void descending() {
+            JdbcRecordStorage<ProjectId> storage = newStorage(TestCounterEntity.class);
+            ProjectId done = writeProjectWithStatus(storage, DONE);
+            ProjectId created = writeProjectWithStatus(storage, CREATED);
+            ProjectId started = writeProjectWithStatus(storage, STARTED);
+            ProjectId cancelled = writeProjectWithStatus(storage, CANCELLED);
+
+            OrderBy ordering = descendingByStatusValue();
+            ImmutableList<ProjectId> actualIds = readIds(storage, ordering);
+            assertThat(actualIds)
+                    .containsExactly(cancelled, done, started, created)
+                    .inOrder();
+            close(storage);
+        }
+
+        @Test
+        @DisplayName("the descending sorting, filtering the records by some column value")
+        void descendingWithFiltering() {
+            JdbcRecordStorage<ProjectId> storage = newStorage(TestCounterEntity.class);
+            ProjectId done = writeProjectWithStatus(storage, DONE);
+            ProjectId created = writeProjectWithStatus(storage, CREATED);
+            ProjectId started = writeProjectWithStatus(storage, STARTED);
+            writeProjectWithStatus(storage, CANCELLED);
+
+            EntityQuery<ProjectId> query = queryAllBeforeCancelled(storage);
+            OrderBy ordering = descendingByStatusValue();
+            ImmutableList<ProjectId> actualIds = readIds(storage, query, ordering);
+            assertThat(actualIds)
+                    .containsExactly(done, started, created)
+                    .inOrder();
+            close(storage);
+        }
+
+        @Test
+        @DisplayName("the descending sorting with limit, filtering the records by a column value")
+        void descendingWithFilteringAndLimit() {
+            JdbcRecordStorage<ProjectId> storage = newStorage(TestCounterEntity.class);
+            ProjectId done = writeProjectWithStatus(storage, DONE);
+            writeProjectWithStatus(storage, CREATED);
+            writeProjectWithStatus(storage, STARTED);
+            writeProjectWithStatus(storage, CANCELLED);
+
+            EntityQuery<ProjectId> query = queryAllBeforeCancelled(storage);
+            OrderBy ordering = descendingByStatusValue();
+            int returnJustOne = 1;
+            ImmutableList<ProjectId> actualIds = readIds(storage, query, ordering, returnJustOne);
+            assertThat(actualIds)
+                    .containsExactly(done)
+                    .inOrder();
+            close(storage);
+        }
+
+        @Test
+        @DisplayName("the descending sorting with limit")
+        void descendingWithLimit() {
+            JdbcRecordStorage<ProjectId> storage = newStorage(TestCounterEntity.class);
+            ProjectId done = writeProjectWithStatus(storage, DONE);
+            writeProjectWithStatus(storage, CREATED);
+            ProjectId started = writeProjectWithStatus(storage, STARTED);
+            ProjectId cancelled = writeProjectWithStatus(storage, CANCELLED);
+
+            OrderBy ordering = descendingByStatusValue();
+            int returnTopThree = 3;
+            ImmutableList<ProjectId> actualIds = readIds(storage, ordering, returnTopThree);
+            assertThat(actualIds)
+                    .containsExactly(cancelled, done, started)
+                    .inOrder();
+            close(storage);
+        }
     }
 
     @Nested
@@ -200,5 +361,51 @@ class JdbcRecordStorageTest extends RecordStorageTest<JdbcRecordStorage<ProjectI
     @Override
     protected Class<? extends TestCounterEntity> getTestEntityClass() {
         return TestCounterEntity.class;
+    }
+
+    private static ImmutableList<ProjectId>
+    readIds(JdbcRecordStorage<ProjectId> storage, OrderBy ordering) {
+        return readIds(storage, ordering, null);
+    }
+
+    private static ImmutableList<ProjectId> readIds(JdbcRecordStorage<ProjectId> storage,
+                                                    EntityQuery<ProjectId> query,
+                                                    OrderBy ordering) {
+        return readIds(storage, query, ordering, null);
+    }
+
+    private static ImmutableList<ProjectId>
+    readIds(JdbcRecordStorage<ProjectId> storage, OrderBy ordering, @Nullable Integer limit) {
+        ResponseFormat.Builder formatBuilder = ResponseFormat.newBuilder()
+                                                             .setOrderBy(ordering);
+        if(limit != null) {
+            formatBuilder.setLimit(limit);
+        }
+        ResponseFormat format = formatBuilder.vBuild();
+        Iterator<EntityRecord> resultIterator = storage.readAll(format);
+        ImmutableList<EntityRecord> actualRecords = ImmutableList.copyOf(resultIterator);
+        ImmutableList<ProjectId> actualIds =
+                actualRecords.stream()
+                             .map(JdbcRecordStorageTestEnv::unpackProjectId)
+                             .collect(toImmutableList());
+        return actualIds;
+    }
+
+    private static ImmutableList<ProjectId>
+    readIds(JdbcRecordStorage<ProjectId> storage, EntityQuery<ProjectId> query,
+            OrderBy ordering, @Nullable Integer limit) {
+        ResponseFormat.Builder formatBuilder = ResponseFormat.newBuilder()
+                                                             .setOrderBy(ordering);
+        if(limit != null) {
+            formatBuilder.setLimit(limit);
+        }
+        ResponseFormat format = formatBuilder.vBuild();
+        Iterator<EntityRecord> resultIterator = storage.readAllRecords(query, format);
+        ImmutableList<EntityRecord> actualRecords = ImmutableList.copyOf(resultIterator);
+        ImmutableList<ProjectId> actualIds =
+                actualRecords.stream()
+                             .map(JdbcRecordStorageTestEnv::unpackProjectId)
+                             .collect(toImmutableList());
+        return actualIds;
     }
 }

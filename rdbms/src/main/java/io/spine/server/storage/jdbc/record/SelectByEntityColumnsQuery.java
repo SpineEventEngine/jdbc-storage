@@ -30,6 +30,7 @@ import com.google.protobuf.FieldMask;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.sql.AbstractSQLQuery;
+import io.spine.client.OrderBy;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.entity.storage.EntityQuery;
 import io.spine.server.storage.jdbc.query.AbstractQuery;
@@ -37,10 +38,12 @@ import io.spine.server.storage.jdbc.query.DbIterator.DoubleColumnRecord;
 import io.spine.server.storage.jdbc.query.IdColumn;
 import io.spine.server.storage.jdbc.query.SelectQuery;
 import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.sql.ResultSet;
 import java.util.Iterator;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static io.spine.server.storage.jdbc.query.QueryPredicates.inIds;
@@ -59,6 +62,8 @@ final class SelectByEntityColumnsQuery<I> extends AbstractQuery
     private final FieldMask fieldMask;
     private final JdbcColumnMapping<?> columnMapping;
     private final IdColumn<I> idColumn;
+    private final @Nullable OrderBy ordering;
+    private final @Nullable Integer limit;
 
     private SelectByEntityColumnsQuery(Builder<I> builder) {
         super(builder);
@@ -66,17 +71,23 @@ final class SelectByEntityColumnsQuery<I> extends AbstractQuery
         this.fieldMask = builder.fieldMask;
         this.columnMapping = builder.columnMapping;
         this.idColumn = builder.idColumn;
+        this.ordering = builder.ordering;
+        if (builder.limit > 0) {
+            this.limit = builder.limit;
+        } else {
+            this.limit = null;
+        }
     }
 
     @Override
     public Iterator<DoubleColumnRecord<I, EntityRecord>> execute() {
         Predicate inIds = inIds(idColumn, entityQuery.getIds());
-        Predicate matchParameters = matchParameters(entityQuery.getParameters(),
-                                                    columnMapping);
+        Predicate matchParameters = matchParameters(entityQuery.getParameters(), columnMapping);
         AbstractSQLQuery<Tuple, ?> query = factory().select(pathOf(ID), pathOf(ENTITY))
                                                     .where(inIds)
                                                     .where(matchParameters)
                                                     .from(table());
+        query = addOrderingAndLimit(query, ordering, limit);
         ResultSet resultSet = query.getResults();
         Class<I> idType = idColumn.javaType();
         return parse(resultSet, idType, fieldMask);
@@ -93,6 +104,8 @@ final class SelectByEntityColumnsQuery<I> extends AbstractQuery
         private FieldMask fieldMask;
         private JdbcColumnMapping<?> columnMapping;
         private IdColumn<I> idColumn;
+        private OrderBy ordering;
+        private Integer limit;
 
         private Builder() {
             super();
@@ -115,6 +128,17 @@ final class SelectByEntityColumnsQuery<I> extends AbstractQuery
 
         Builder<I> setIdColumn(IdColumn<I> idColumn) {
             this.idColumn = checkNotNull(idColumn);
+            return this;
+        }
+
+        Builder<I> setOrdering(OrderBy ordering) {
+            this.ordering = checkNotNull(ordering);
+            return this;
+        }
+
+        Builder<I> setLimit(int limit) {
+            checkArgument(limit >= 0);
+            this.limit = limit;
             return this;
         }
 

@@ -32,6 +32,7 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.ComparablePath;
 import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.core.types.dsl.SimpleExpression;
+import com.querydsl.sql.AbstractSQLQuery;
 import com.querydsl.sql.AbstractSQLQueryFactory;
 import com.querydsl.sql.Configuration;
 import com.querydsl.sql.RelationalPath;
@@ -42,9 +43,11 @@ import com.querydsl.sql.SQLListener;
 import com.querydsl.sql.SQLListenerContext;
 import com.querydsl.sql.SQLQueryFactory;
 import com.querydsl.sql.SQLTemplates;
+import io.spine.client.OrderBy;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.TableColumn;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import javax.inject.Provider;
 import java.sql.Connection;
@@ -136,6 +139,29 @@ public abstract class AbstractQuery implements StorageQuery {
     protected OrderSpecifier<Comparable> orderBy(TableColumn column, Order order) {
         PathBuilder<Comparable> columnPath = pathBuilder.get(column.name(), Comparable.class);
         return new OrderSpecifier<>(order, columnPath);
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked" /* To avoid searching for the typed columns. */,
+            "SerializableClassWithUnconstructableAncestor"})
+    protected final <T extends AbstractSQLQuery<?, ?>> T
+    addOrderingAndLimit(T query,
+                        @Nullable OrderBy ordering,
+                        @Nullable Integer limit) {
+        if (ordering != null && !ordering.equals(OrderBy.getDefaultInstance())) {
+            Order order = isAscending(ordering.getDirection())
+                          ? Order.ASC
+                          : Order.DESC;
+            OrderSpecifier<?> specifier = new OrderSpecifier(order, pathOf(ordering.getColumn()));
+            query.orderBy(specifier);
+            if (limit != null && limit > 0) {
+                query.limit(limit);
+            }
+        }
+        return query;
+    }
+
+    private static boolean isAscending(OrderBy.Direction direction) {
+        return direction == OrderBy.Direction.ASCENDING;
     }
 
     /**
