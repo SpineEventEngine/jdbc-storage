@@ -1,5 +1,5 @@
 /*
- * Copyright 2020, TeamDev. All rights reserved.
+ * Copyright 2022, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,14 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/**
+ * Test environment classes for tests of the {@link io.spine.server.storage.jdbc.record} package.
+ */
 
-val spineCoreVersion by extra("1.8.1")
-val spineBaseVersion by extra("1.8.0")
-val versionToPublish by extra("1.8.1")
+@CheckReturnValue
+@ParametersAreNonnullByDefault
+package io.spine.server.storage.jdbc.record.given;
+
+import com.google.errorprone.annotations.CheckReturnValue;
+
+import javax.annotation.ParametersAreNonnullByDefault;

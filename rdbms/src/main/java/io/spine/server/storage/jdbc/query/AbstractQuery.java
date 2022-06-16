@@ -27,11 +27,13 @@
 package io.spine.server.storage.jdbc.query;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.ComparablePath;
 import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.core.types.dsl.SimpleExpression;
+import com.querydsl.sql.AbstractSQLQuery;
 import com.querydsl.sql.AbstractSQLQueryFactory;
 import com.querydsl.sql.Configuration;
 import com.querydsl.sql.RelationalPath;
@@ -42,9 +44,11 @@ import com.querydsl.sql.SQLListener;
 import com.querydsl.sql.SQLListenerContext;
 import com.querydsl.sql.SQLQueryFactory;
 import com.querydsl.sql.SQLTemplates;
+import io.spine.client.OrderBy;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.TableColumn;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import javax.inject.Provider;
 import java.sql.Connection;
@@ -54,6 +58,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static io.spine.util.Exceptions.newIllegalStateException;
 import static java.sql.ResultSet.HOLD_CURSORS_OVER_COMMIT;
 
 /**
@@ -71,6 +76,7 @@ public abstract class AbstractQuery implements StorageQuery {
     private final PathBuilder<Object> pathBuilder;
     private final PathBuilder<Object> aliasedPathBuilder;
 
+    @SuppressWarnings("rawtypes")   /* To simplify the signature. */
     protected AbstractQuery(Builder<? extends Builder, ? extends StorageQuery> builder) {
         String tableName = builder.tableName;
         this.queryFactory = createFactory(builder.dataSource);
@@ -119,6 +125,7 @@ public abstract class AbstractQuery implements StorageQuery {
         return pathBuilder.get(columnName, type);
     }
 
+    @SuppressWarnings("rawtypes")   /* The exact type of `Comparable` is not known here. */
     protected <T extends Comparable> ComparablePath<T>
     comparablePathOf(TableColumn column, Class<T> type) {
         return pathBuilder.getComparable(column.name(), type);
@@ -128,14 +135,80 @@ public abstract class AbstractQuery implements StorageQuery {
         return aliasedPathBuilder.get(column.name());
     }
 
+    @SuppressWarnings("rawtypes")   /* The exact type of `Comparable` is not known here. */
     protected <T extends Comparable> ComparablePath<T>
     aliasedComparablePathOf(TableColumn column, Class<T> type) {
         return aliasedPathBuilder.getComparable(column.name(), type);
     }
 
+    @SuppressWarnings("rawtypes")   /* The exact type of `Comparable` is not known here. */
     protected OrderSpecifier<Comparable> orderBy(TableColumn column, Order order) {
         PathBuilder<Comparable> columnPath = pathBuilder.get(column.name(), Comparable.class);
         return new OrderSpecifier<>(order, columnPath);
+    }
+
+    /**
+     * Appends the given query with the ordering and limit, if they are provided.
+     *
+     * <p>The limit value is applied if and only if a meaningful ordering directive
+     * is provided.
+     *
+     * <p>In case the ordering directive is set, and the limit value is zero or less,
+     * an {@code IllegalStateException} is thrown.
+     *
+     * <p>If only the limit value is supplied, and the ordering directive is either {@code null},
+     * or is equal to {@code OrderBy.getDefaultInstance()}, an {@code IllegalStateException}
+     * is thrown as well.
+     *
+     * @param query
+     *         query to configure
+     * @param ordering
+     *         ordering directive, {@code null}, if not set by end-users
+     * @param limit
+     *         the maximum number of records to return, {@code null}, if not specified
+     * @param <T>
+     *         the type of the query
+     * @return the same query instance
+     */
+    @CanIgnoreReturnValue
+    @SuppressWarnings({"rawtypes", "unchecked" /* To avoid searching for the typed columns. */,
+            "SerializableClassWithUnconstructableAncestor"})
+    protected final <T extends AbstractSQLQuery<?, ?>> T
+    addOrderingAndLimit(T query, @Nullable OrderBy ordering, @Nullable Integer limit) {
+        if (orderingIsSet(ordering)) {
+            Order order = isAscending(ordering.getDirection())
+                          ? Order.ASC
+                          : Order.DESC;
+            OrderSpecifier<?> specifier = new OrderSpecifier(order, pathOf(ordering.getColumn()));
+            query.orderBy(specifier);
+            addLimit(query, limit);
+        } else if (limitIsSet(limit)) {
+            throw newIllegalStateException("Limiting the query results is not possible " +
+                                                   "without providing the ordering directive.");
+        }
+        return query;
+    }
+
+    private static boolean orderingIsSet(@Nullable OrderBy ordering) {
+        return ordering != null && !ordering.equals(OrderBy.getDefaultInstance());
+    }
+
+    private static boolean limitIsSet(@Nullable Integer limit) {
+        return limit != null && limit != 0;
+    }
+
+    @SuppressWarnings("SerializableClassWithUnconstructableAncestor")
+    private static <T extends AbstractSQLQuery<?, ?>>
+    void addLimit(T query, @Nullable Integer limit) {
+        if (limitIsSet(limit)) {
+            checkState(limit > 0,
+                       "Query limit value must be positive. Provided value is `%s`.", limit);
+            query.limit(limit);
+        }
+    }
+
+    private static boolean isAscending(OrderBy.Direction direction) {
+        return direction == OrderBy.Direction.ASCENDING;
     }
 
     /**

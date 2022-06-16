@@ -28,13 +28,17 @@ package io.spine.server.storage.jdbc.record;
 
 import com.google.protobuf.FieldMask;
 import com.querydsl.sql.AbstractSQLQuery;
+import io.spine.client.OrderBy;
 import io.spine.server.entity.EntityRecord;
 import io.spine.server.storage.jdbc.query.AbstractQuery;
 import io.spine.server.storage.jdbc.query.SelectQuery;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.sql.ResultSet;
 import java.util.Iterator;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static io.spine.server.storage.jdbc.record.QueryResults.parse;
 import static io.spine.server.storage.jdbc.record.RecordTable.StandardColumn.ENTITY;
 
@@ -44,16 +48,21 @@ import static io.spine.server.storage.jdbc.record.RecordTable.StandardColumn.ENT
 final class SelectAllQuery extends AbstractQuery implements SelectQuery<Iterator<EntityRecord>> {
 
     private final FieldMask fieldMask;
+    private final @Nullable OrderBy ordering;
+    private final @Nullable Integer limit;
 
     private SelectAllQuery(Builder builder) {
         super(builder);
         this.fieldMask = builder.fieldMask;
+        this.ordering = builder.ordering;
+        this.limit = builder.limit;
     }
 
     @Override
     public Iterator<EntityRecord> execute() {
         AbstractSQLQuery<Object, ?> query = factory().select(pathOf(ENTITY))
                                                      .from(table());
+        query = addOrderingAndLimit(query, ordering, limit);
         ResultSet resultSet = query.getResults();
         Iterator<EntityRecord> iterator = parse(resultSet, fieldMask);
         return iterator;
@@ -66,9 +75,23 @@ final class SelectAllQuery extends AbstractQuery implements SelectQuery<Iterator
     static class Builder extends AbstractQuery.Builder<Builder, SelectAllQuery> {
 
         private FieldMask fieldMask;
+        private OrderBy ordering;
+        private Integer limit;
+
 
         Builder setFieldMask(FieldMask fieldMask) {
-            this.fieldMask = fieldMask;
+            this.fieldMask = checkNotNull(fieldMask);
+            return getThis();
+        }
+
+        Builder setOrdering(OrderBy ordering) {
+            this.ordering = ordering;
+            return getThis();
+        }
+
+        Builder setLimit(int limit) {
+            checkArgument(limit >= 0);
+            this.limit = limit;
             return getThis();
         }
 

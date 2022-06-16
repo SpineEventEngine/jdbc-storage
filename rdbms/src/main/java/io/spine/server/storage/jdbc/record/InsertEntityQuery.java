@@ -61,11 +61,11 @@ class InsertEntityQuery<I> extends WriteEntityQuery<I, SQLInsertClause> {
     }
 
     static class Builder<I> extends WriteEntityQuery.Builder<Builder<I>,
-                                                             InsertEntityQuery,
+                                                             InsertEntityQuery<I>,
                                                              I> {
 
         @Override
-        protected InsertEntityQuery doBuild() {
+        protected InsertEntityQuery<I> doBuild() {
             return new InsertEntityQuery<>(this);
         }
 

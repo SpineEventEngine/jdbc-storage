@@ -54,12 +54,12 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Lists.newLinkedList;
 import static com.google.common.collect.Streams.stream;
 import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
 import static io.spine.server.storage.jdbc.record.RecordTable.StandardColumn.ID;
 import static java.util.Collections.addAll;
+import static java.util.Objects.requireNonNull;
 
 /**
  * A table for storing the {@linkplain EntityRecord entity records}.
@@ -106,24 +106,24 @@ final class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWith
     @Override
     protected WriteQuery composeInsertQuery(I id, EntityRecordWithColumns record) {
         InsertEntityQuery.Builder<I> builder = InsertEntityQuery.newBuilder();
-        InsertEntityQuery query = builder.setDataSource(dataSource())
-                                         .setTableName(name())
-                                         .setIdColumn(idColumn())
-                                         .setColumnMapping(columnMapping)
-                                         .addRecord(id, record)
-                                         .build();
+        InsertEntityQuery<I> query = builder.setDataSource(dataSource())
+                                            .setTableName(name())
+                                            .setIdColumn(idColumn())
+                                            .setColumnMapping(columnMapping)
+                                            .addRecord(id, record)
+                                            .build();
         return query;
     }
 
     @Override
     protected WriteQuery composeUpdateQuery(I id, EntityRecordWithColumns record) {
         UpdateEntityQuery.Builder<I> builder = UpdateEntityQuery.newBuilder();
-        UpdateEntityQuery query = builder.setTableName(name())
-                                         .setDataSource(dataSource())
-                                         .setIdColumn(idColumn())
-                                         .addRecord(id, record)
-                                         .setColumnMapping(columnMapping)
-                                         .build();
+        UpdateEntityQuery<I> query = builder.setTableName(name())
+                                            .setDataSource(dataSource())
+                                            .setIdColumn(idColumn())
+                                            .addRecord(id, record)
+                                            .setColumnMapping(columnMapping)
+                                            .build();
         return query;
     }
 
@@ -157,9 +157,15 @@ final class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWith
      */
     Iterator<EntityRecord> readByIds(EntityQuery<I> entityQuery, FieldMask fieldMask) {
         Iterator<DoubleColumnRecord<I, EntityRecord>> response =
-                executeQuery(entityQuery, fieldMask);
+                executeQuery(entityQuery, formatWithMask(fieldMask));
         Iterator<EntityRecord> records = extractRecordsForIds(entityQuery.getIds(), response);
         return records;
+    }
+
+    private static ResponseFormat formatWithMask(FieldMask fieldMask) {
+        return ResponseFormat.newBuilder()
+                             .setFieldMask(fieldMask)
+                             .vBuild();
     }
 
     /**
@@ -171,8 +177,7 @@ final class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWith
      * {@link #readByIds(EntityQuery, FieldMask)} counterpart.
      */
     Iterator<EntityRecord> readByQuery(EntityQuery<I> entityQuery, ResponseFormat format) {
-        Iterator<DoubleColumnRecord<I, EntityRecord>> response =
-                executeQuery(entityQuery, format.getFieldMask());
+        Iterator<DoubleColumnRecord<I, EntityRecord>> response = executeQuery(entityQuery, format);
         Iterator<EntityRecord> records = extractRecords(response);
         return records;
     }
@@ -181,30 +186,42 @@ final class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWith
      * Reads all {@linkplain EntityRecord entity records} from the table.
      */
     Iterator<EntityRecord> readAll(ResponseFormat format) {
-        Iterator<EntityRecord> result = executeSelectAllQuery(format.getFieldMask());
+        Iterator<EntityRecord> result = executeSelectAllQuery(format);
         return result;
     }
 
     private Iterator<DoubleColumnRecord<I, EntityRecord>>
-    executeQuery(EntityQuery<I> entityQuery, FieldMask fieldMask) {
-        SelectByEntityColumnsQuery.Builder<I> builder = SelectByEntityColumnsQuery.newBuilder();
-        SelectByEntityColumnsQuery<I> query = builder.setDataSource(dataSource())
-                                                     .setTableName(name())
-                                                     .setIdColumn(idColumn())
-                                                     .setColumnMapping(columnMapping)
-                                                     .setEntityQuery(entityQuery)
-                                                     .setFieldMask(fieldMask)
-                                                     .build();
+    executeQuery(EntityQuery<I> entityQuery, ResponseFormat format) {
+        SelectByEntityColumnsQuery.Builder<I> builder = queryBuilder(entityQuery, format);
+        SelectByEntityColumnsQuery<I> query = builder.build();
         Iterator<DoubleColumnRecord<I, EntityRecord>> queryResult = query.execute();
         return queryResult;
     }
 
-    private Iterator<EntityRecord> executeSelectAllQuery(FieldMask fieldMask) {
+    private SelectByEntityColumnsQuery.Builder<I>
+    queryBuilder(EntityQuery<I> entityQuery, ResponseFormat format) {
+        SelectByEntityColumnsQuery.Builder<I> builder =
+                SelectByEntityColumnsQuery.<I>newBuilder()
+                                          .setDataSource(dataSource())
+                                          .setTableName(name())
+                                          .setIdColumn(idColumn())
+                                          .setColumnMapping(columnMapping)
+                                          .setEntityQuery(entityQuery)
+                                          .setFieldMask(format.getFieldMask())
+                                          .setOrdering(format.getOrderBy())
+                                          .setLimit(format.getLimit());
+        return builder;
+    }
+
+    private Iterator<EntityRecord> executeSelectAllQuery(ResponseFormat format) {
         SelectAllQuery.Builder builder = SelectAllQuery.newBuilder();
-        SelectAllQuery query = builder.setDataSource(dataSource())
-                                      .setTableName(name())
-                                      .setFieldMask(fieldMask)
-                                      .build();
+        SelectAllQuery query =
+                builder.setDataSource(dataSource())
+                       .setTableName(name())
+                       .setFieldMask(format.getFieldMask())
+                       .setOrdering(format.getOrderBy())
+                       .setLimit(format.getLimit())
+                       .build();
         Iterator<EntityRecord> result = query.execute();
         return result;
     }
@@ -232,12 +249,13 @@ final class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWith
 
     private WriteQuery newInsertEntityRecordsBulkQuery(Map<I, EntityRecordWithColumns> records) {
         InsertEntityQuery.Builder<I> builder = InsertEntityQuery.newBuilder();
-        InsertEntityQuery query = builder.setDataSource(dataSource())
-                                         .setTableName(name())
-                                         .setIdColumn(idColumn())
-                                         .setColumnMapping(columnMapping)
-                                         .addRecords(records)
-                                         .build();
+        InsertEntityQuery<I> query =
+                builder.setDataSource(dataSource())
+                       .setTableName(name())
+                       .setIdColumn(idColumn())
+                       .setColumnMapping(columnMapping)
+                       .addRecords(records)
+                       .build();
         return query;
     }
 
@@ -293,7 +311,7 @@ final class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWith
 
         @Override
         public TableColumn apply(@Nullable Column column) {
-            checkNotNull(column);
+            requireNonNull(column);
             TableColumn result = new ColumnWrapper(column, columnMapping);
             return result;
         }
