@@ -58,6 +58,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static io.spine.util.Exceptions.newIllegalStateException;
 import static java.sql.ResultSet.HOLD_CURSORS_OVER_COMMIT;
 
 /**
@@ -149,8 +150,15 @@ public abstract class AbstractQuery implements StorageQuery {
     /**
      * Appends the given query with the ordering and limit, if they are provided.
      *
-     * <p>In case the ordering directive is not specified, the limit value is ignored.
-     * Otherwise, the limit is applied if and only if it is a positive number.
+     * <p>The limit value is applied if and only if a meaningful ordering directive
+     * is provided.
+     *
+     * <p>In case the ordering directive is set, and the limit value is zero or less,
+     * an {@code IllegalStateException} is thrown.
+     *
+     * <p>If only the limit value is supplied, and the ordering directive is either {@code null},
+     * or is equal to {@code OrderBy.getDefaultInstance()}, an {@code IllegalStateException}
+     * is thrown as well.
      *
      * @param query
      *         query to configure
@@ -167,17 +175,36 @@ public abstract class AbstractQuery implements StorageQuery {
             "SerializableClassWithUnconstructableAncestor"})
     protected final <T extends AbstractSQLQuery<?, ?>> T
     addOrderingAndLimit(T query, @Nullable OrderBy ordering, @Nullable Integer limit) {
-        if (ordering != null && !ordering.equals(OrderBy.getDefaultInstance())) {
+        if (orderingIsSet(ordering)) {
             Order order = isAscending(ordering.getDirection())
                           ? Order.ASC
                           : Order.DESC;
             OrderSpecifier<?> specifier = new OrderSpecifier(order, pathOf(ordering.getColumn()));
             query.orderBy(specifier);
-            if (limit != null && limit > 0) {
-                query.limit(limit);
-            }
+            addLimit(query, limit);
+        } else if (limitIsSet(limit)) {
+            throw newIllegalStateException("Limiting the query results is not possible " +
+                                                   "without providing the ordering directive.");
         }
         return query;
+    }
+
+    private static boolean orderingIsSet(@Nullable OrderBy ordering) {
+        return ordering != null && !ordering.equals(OrderBy.getDefaultInstance());
+    }
+
+    private static boolean limitIsSet(@Nullable Integer limit) {
+        return limit != null && limit != 0;
+    }
+
+    @SuppressWarnings("SerializableClassWithUnconstructableAncestor")
+    private static <T extends AbstractSQLQuery<?, ?>>
+    void addLimit(T query, @Nullable Integer limit) {
+        if (limitIsSet(limit)) {
+            checkState(limit > 0,
+                       "Query limit value must be positive. Provided value is `%s`.", limit);
+            query.limit(limit);
+        }
     }
 
     private static boolean isAscending(OrderBy.Direction direction) {
