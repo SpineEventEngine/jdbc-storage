@@ -41,7 +41,7 @@ import org.junit.jupiter.api.Test;
 
 import static io.spine.base.Identifier.newUuid;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
-import static io.spine.server.storage.jdbc.PredefinedMapping.H2_1_4;
+import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_1;
 
 /**
  * Smoke tests on {@link Delivery} functionality running on top of JDBC-accessible storage.
@@ -63,7 +63,7 @@ class JdbcDeliverySmokeTest extends DeliveryTest {
         factory = JdbcStorageFactory
                 .newBuilder()
                 .setDataSource(source)
-                .setTypeMapping(H2_1_4)
+                .setTypeMapping(H2_2_1)
                 .build();
         ServerEnvironment
                 .when(Tests.class)

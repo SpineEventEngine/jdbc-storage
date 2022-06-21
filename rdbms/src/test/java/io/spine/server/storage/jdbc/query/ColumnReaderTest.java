@@ -44,7 +44,7 @@ import java.sql.SQLException;
 import static com.google.common.truth.Truth.assertThat;
 import static io.spine.base.Identifier.newUuid;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
-import static io.spine.server.storage.jdbc.PredefinedMapping.H2_1_4;
+import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_1;
 import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.idReader;
 import static io.spine.server.storage.jdbc.query.ColumnReaderFactory.messageReader;
 
@@ -61,7 +61,7 @@ class ColumnReaderTest {
     @Test
     @DisplayName("read the value of an ID column of Number type")
     void readNumberId() throws SQLException {
-        TimestampByLong table = new TimestampByLong(dataSource, H2_1_4);
+        TimestampByLong table = new TimestampByLong(dataSource, H2_2_1);
         table.create();
 
         Timestamp timestamp = timestamp();
@@ -83,7 +83,7 @@ class ColumnReaderTest {
     @Test
     @DisplayName("read the value of an ID column of String type")
     void readStringId() throws SQLException {
-        TimestampByString table = new TimestampByString(dataSource, H2_1_4);
+        TimestampByString table = new TimestampByString(dataSource, H2_2_1);
         table.create();
 
         Timestamp timestamp = timestamp();
@@ -105,7 +105,7 @@ class ColumnReaderTest {
     @Test
     @DisplayName("read the value of an ID column of Message type")
     void readMessageId() throws SQLException {
-        TimestampByMessage table = new TimestampByMessage(dataSource, H2_1_4);
+        TimestampByMessage table = new TimestampByMessage(dataSource, H2_2_1);
         table.create();
 
         Timestamp timestamp = timestamp();
@@ -127,7 +127,7 @@ class ColumnReaderTest {
     @Test
     @DisplayName("read the value of a column storing serialized messages")
     void readSerializedMessage() throws SQLException {
-        TimestampByMessage table = new TimestampByMessage(dataSource, H2_1_4);
+        TimestampByMessage table = new TimestampByMessage(dataSource, H2_2_1);
         table.create();
 
         Timestamp timestamp = timestamp();

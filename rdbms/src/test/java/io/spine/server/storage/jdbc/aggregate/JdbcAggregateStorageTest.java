@@ -36,7 +36,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
-import static io.spine.server.storage.jdbc.PredefinedMapping.H2_1_4;
+import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_1;
 import static io.spine.testing.Tests.nullRef;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -76,7 +76,7 @@ class JdbcAggregateStorageTest extends AggregateStorageTest {
         JdbcAggregateStorage<I> storage = builder.setMultitenant(false)
                                                  .setDataSource(dataSource)
                                                  .setAggregateClass(aggregateClass)
-                                                 .setTypeMapping(H2_1_4)
+                                                 .setTypeMapping(H2_2_1)
                                                  .build();
         return storage;
     }

@@ -63,7 +63,7 @@ import static io.spine.client.CompositeFilter.CompositeOperator.ALL;
 import static io.spine.client.Filters.gt;
 import static io.spine.client.Filters.lt;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
-import static io.spine.server.storage.jdbc.PredefinedMapping.H2_1_4;
+import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_1;
 import static io.spine.server.storage.jdbc.record.given.JdbcRecordStorageTestEnv.asEntityRecord;
 import static io.spine.server.storage.jdbc.record.given.JdbcRecordStorageTestEnv.ascendingByStatusValue;
 import static io.spine.server.storage.jdbc.record.given.JdbcRecordStorageTestEnv.descendingByStatusValue;
@@ -346,7 +346,7 @@ class JdbcRecordStorageTest extends RecordStorageTest<JdbcRecordStorage<ProjectI
                         .setEntityClass(entityClass)
                         .setMultitenant(false)
                         .setColumnMapping(new DefaultJdbcColumnMapping())
-                        .setTypeMapping(H2_1_4)
+                        .setTypeMapping(H2_2_1)
                         .build();
         return storage;
     }

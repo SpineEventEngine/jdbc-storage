@@ -52,7 +52,7 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import static io.spine.server.delivery.InboxMessageStatus.DELIVERED;
 import static io.spine.server.delivery.InboxMessageStatus.TO_DELIVER;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
-import static io.spine.server.storage.jdbc.PredefinedMapping.H2_1_4;
+import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_1;
 import static io.spine.server.storage.jdbc.delivery.given.TestInboxMessage.generateMultiple;
 import static io.spine.server.storage.jdbc.delivery.given.TestShardIndex.newIndex;
 import static io.spine.testing.DisplayNames.NOT_ACCEPT_NULLS;
@@ -74,7 +74,7 @@ class JdbcInboxStorageTest extends InboxStorageTest {
                 .newBuilder()
                 .setDataSource(dataSource)
                 .setMultitenant(false)
-                .setTypeMapping(H2_1_4)
+                .setTypeMapping(H2_2_1)
                 .build();
         super.setUp();
     }

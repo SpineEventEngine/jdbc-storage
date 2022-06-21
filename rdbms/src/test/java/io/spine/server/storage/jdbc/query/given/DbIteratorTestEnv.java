@@ -37,7 +37,7 @@ import java.sql.SQLException;
 
 import static io.spine.base.Identifier.newUuid;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
-import static io.spine.server.storage.jdbc.PredefinedMapping.H2_1_4;
+import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_1;
 
 public class DbIteratorTestEnv {
 
@@ -75,7 +75,7 @@ public class DbIteratorTestEnv {
 
     private static ResultSet emptyResultSet() {
         DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
-        TimestampByString table = new TimestampByString(dataSource, H2_1_4);
+        TimestampByString table = new TimestampByString(dataSource, H2_2_1);
         table.create();
 
         ResultSet resultSet = table.resultSet(newUuid());
@@ -84,7 +84,7 @@ public class DbIteratorTestEnv {
 
     private static ResultSet closedResultSet() throws SQLException {
         DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
-        TimestampByString table = new TimestampByString(dataSource, H2_1_4);
+        TimestampByString table = new TimestampByString(dataSource, H2_2_1);
         table.create();
 
         ResultSet resultSet = table.resultSet(newUuid());
@@ -94,7 +94,7 @@ public class DbIteratorTestEnv {
 
     private static ResultSet resultSetWithSingleResult() {
         DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
-        TimestampByString table = new TimestampByString(dataSource, H2_1_4);
+        TimestampByString table = new TimestampByString(dataSource, H2_2_1);
         table.create();
 
         Timestamp timestamp = Timestamp

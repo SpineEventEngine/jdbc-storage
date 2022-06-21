@@ -40,7 +40,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
-import static io.spine.server.storage.jdbc.PredefinedMapping.H2_1_4;
+import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_1;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -58,7 +58,7 @@ class JdbcAggregateStorageVisibilityHandlingTest
                         .setMultitenant(false)
                         .setAggregateClass(TestAggregate.class)
                         .setDataSource(dataSource)
-                        .setTypeMapping(H2_1_4)
+                        .setTypeMapping(H2_2_1)
                         .build();
         return storage;
     }
