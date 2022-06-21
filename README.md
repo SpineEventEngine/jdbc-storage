@@ -15,7 +15,7 @@ Gradle:
 
 ```kotlin
 dependencies {
-    implementation("io.spine:spine-rdbms:1.8.0")
+    implementation("io.spine:spine-rdbms:1.8.2")
 }
 ```
 
