@@ -21,11 +21,6 @@ jobs:
           java-version: 8
           distribution: zulu
 
-      # todo: This is a tempopary step. Remove it once the issue is solved.
-      - name: Analyze the dependency conflict
-        shell: bash
-        run: ./gradlew :rdbms:dependencyInsight --configuration testCompileClasspath --dependency io.spine:spine-testlib
-
       - name: Build project and run tests
         shell: bash
         run: ./gradlew build
