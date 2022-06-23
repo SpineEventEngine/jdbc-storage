@@ -21,6 +21,11 @@ jobs:
           distribution: zulu
           cache: gradle
 
+      # todo: This is a tempopary step. Remove it once the issue is solved.
+      - name: Analyze the dependency conflict
+        shell: cmd
+        run: gradlew.bat :rdbms:dependencyInsight --configuration testCompileClasspath --dependency io.spine:spine-testlib
+
       - name: Run tests with Gradle
         run: gradlew.bat build
         shell: cmd
