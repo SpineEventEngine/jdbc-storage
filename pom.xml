@@ -88,7 +88,7 @@ all modules and does not describe the project structure per-subproject.
   <dependency>
     <groupId>io.spine</groupId>
     <artifactId>spine-testlib</artifactId>
-    <version>1.8.0</version>
+    <version>1.8.2</version>
     <scope>test</scope>
   </dependency>
   <dependency>
@@ -100,7 +100,7 @@ all modules and does not describe the project structure per-subproject.
   <dependency>
     <groupId>io.spine.tools</groupId>
     <artifactId>spine-mute-logging</artifactId>
-    <version>1.8.0</version>
+    <version>1.8.2</version>
     <scope>test</scope>
   </dependency>
   <dependency>
