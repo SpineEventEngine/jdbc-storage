@@ -20,7 +20,6 @@ jobs:
         with:
           java-version: 8
           distribution: zulu
-          cache: gradle
 
       # todo: This is a tempopary step. Remove it once the issue is solved.
       - name: Analyze the dependency conflict
