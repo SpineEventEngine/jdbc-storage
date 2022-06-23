@@ -26,5 +26,5 @@
 
 
 val spineCoreVersion by extra("1.8.2")
-val spineBaseVersion by extra("1.8.0")
+val spineBaseVersion by extra("1.8.2")
 val versionToPublish by extra("1.8.2")
