@@ -1,5 +1,5 @@
 /*
- * Copyright 2020, TeamDev. All rights reserved.
+ * Copyright 2022, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth8.assertThat;
 import static com.google.common.util.concurrent.Uninterruptibles.sleepUninterruptibly;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
-import static io.spine.server.storage.jdbc.PredefinedMapping.H2_1_4;
+import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_1;
 import static io.spine.server.storage.jdbc.delivery.given.TestShardIndex.newIndex;
 import static io.spine.testing.DisplayNames.NOT_ACCEPT_NULLS;
 
@@ -69,7 +69,7 @@ class JdbcShardedWorkRegistryTest extends ShardedWorkRegistryTest {
         JdbcStorageFactory storageFactory = JdbcStorageFactory
                 .newBuilder()
                 .setDataSource(dataSource)
-                .setTypeMapping(H2_1_4)
+                .setTypeMapping(H2_2_1)
                 .build();
         registry = new JdbcShardedWorkRegistry(storageFactory);
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020, TeamDev. All rights reserved.
+ * Copyright 2022, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,6 @@
  */
 
 
-val spineCoreVersion by extra("1.8.1")
-val spineBaseVersion by extra("1.8.0")
-val versionToPublish by extra("1.8.1")
+val spineCoreVersion by extra("1.8.2")
+val spineBaseVersion by extra("1.8.2")
+val versionToPublish by extra("1.8.2")

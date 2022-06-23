@@ -1,5 +1,5 @@
 /*
- * Copyright 2020, TeamDev. All rights reserved.
+ * Copyright 2022, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,10 +31,11 @@ apply<IncrementGuard>()
 
 extra["artifactId"] = "jdbc-rdbms"
 
+// The latest version compatible with Java 8.
+val hikariVersion = "4.0.3"
 val querydslVersion = "4.4.0"
-val hikariVersion = "3.4.5"
 val hsqldbVersion = "2.5.1"
-val h2Version = "1.4.200"
+val h2Version = "2.1.214"
 
 dependencies {
     api("com.querydsl:querydsl-sql:$querydslVersion") {

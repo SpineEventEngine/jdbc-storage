@@ -1,5 +1,5 @@
 /*
- * Copyright 2020, TeamDev. All rights reserved.
+ * Copyright 2022, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ import static io.spine.base.Identifier.newUuid;
 import static io.spine.base.Time.currentTime;
 import static io.spine.core.Versions.newVersion;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
-import static io.spine.server.storage.jdbc.PredefinedMapping.H2_1_4;
+import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_1;
 import static io.spine.server.storage.jdbc.aggregate.AggregateEventRecordTable.Column.KIND;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -52,7 +52,7 @@ class AggregateEventRecordTableTest {
         AggregateEventRecordTable<String> table =
                 new AggregateEventRecordTable<>(AnAggregate.class,
                                                 whichIsStoredInMemory(newUuid()),
-                                                H2_1_4);
+                                                H2_2_1);
         assertThrows(IllegalStateException.class,
                      () -> table.update(newUuid(), AggregateEventRecord.getDefaultInstance()));
     }
@@ -62,7 +62,7 @@ class AggregateEventRecordTableTest {
     void storeRecordKind() {
         DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
         AggregateEventRecordTable<String> table =
-                new AggregateEventRecordTable<>(AnAggregate.class, dataSource, H2_1_4);
+                new AggregateEventRecordTable<>(AnAggregate.class, dataSource, H2_2_1);
         table.create();
 
         Snapshot snapshot = Snapshot.newBuilder()

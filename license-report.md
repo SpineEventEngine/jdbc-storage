@@ -1,6 +1,6 @@
 
     
-# Dependencies of `io.spine:spine-rdbms:1.8.1`
+# Dependencies of `io.spine:spine-rdbms:1.8.2`
 
 ## Runtime
 1. **Group:** com.google.android **Name:** annotations **Version:** 4.1.1.4
@@ -67,7 +67,7 @@
      * **Manifest Project URL:** [http://www.querydsl.com](http://www.querydsl.com)
      * **POM License: Apache License, Version 2.0** - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
-1. **Group:** com.zaxxer **Name:** HikariCP **Version:** 3.4.5
+1. **Group:** com.zaxxer **Name:** HikariCP **Version:** 4.0.3
      * **Manifest Project URL:** [https://github.com/brettwooldridge](https://github.com/brettwooldridge)
      * **POM Project URL:** [https://github.com/brettwooldridge/HikariCP](https://github.com/brettwooldridge/HikariCP)
      * **POM License: The Apache Software License, Version 2.0** - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
@@ -243,9 +243,10 @@
      * **POM Project URL:** [http://code.google.com/p/java-diff-utils/](http://code.google.com/p/java-diff-utils/)
      * **POM License: The Apache Software License, Version 2.0** - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
-1. **Group:** com.h2database **Name:** h2 **Version:** 1.4.200
+1. **Group:** com.h2database **Name:** h2 **Version:** 2.1.214
      * **POM Project URL:** [https://h2database.com](https://h2database.com)
-     * **POM License: MPL 2.0 or EPL 1.0** - [https://h2database.com/html/license.html](https://h2database.com/html/license.html)
+     * **POM License: EPL 1.0** - [https://opensource.org/licenses/eclipse-1.0.php](https://opensource.org/licenses/eclipse-1.0.php)
+     * **POM License: MPL 2.0** - [https://www.mozilla.org/en-US/MPL/2.0/](https://www.mozilla.org/en-US/MPL/2.0/)
 
 1. **Group:** com.infradna.tool **Name:** bridge-method-annotation **Version:** 1.13
      * **POM License: MIT License** - [http://www.opensource.org/licenses/mit-license.php](http://www.opensource.org/licenses/mit-license.php)
@@ -262,7 +263,7 @@
      * **Manifest Project URL:** [http://www.querydsl.com](http://www.querydsl.com)
      * **POM License: Apache License, Version 2.0** - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
-1. **Group:** com.zaxxer **Name:** HikariCP **Version:** 3.4.5
+1. **Group:** com.zaxxer **Name:** HikariCP **Version:** 4.0.3
      * **Manifest Project URL:** [https://github.com/brettwooldridge](https://github.com/brettwooldridge)
      * **POM Project URL:** [https://github.com/brettwooldridge/HikariCP](https://github.com/brettwooldridge/HikariCP)
      * **POM License: The Apache Software License, Version 2.0** - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
@@ -467,4 +468,4 @@
  The dependencies distributed under several licenses, are used according their commercial-use-friendly license.
 
 
-This report was generated on **Thu Jun 16 14:18:01 EEST 2022** using [Gradle-License-Report plugin](https://github.com/jk1/Gradle-License-Report) by Evgeny Naumenko, licensed under [Apache 2.0 License](https://github.com/jk1/Gradle-License-Report/blob/master/LICENSE).
+This report was generated on **Thu Jun 23 13:37:23 EEST 2022** using [Gradle-License-Report plugin](https://github.com/jk1/Gradle-License-Report) by Evgeny Naumenko, licensed under [Apache 2.0 License](https://github.com/jk1/Gradle-License-Report/blob/master/LICENSE).

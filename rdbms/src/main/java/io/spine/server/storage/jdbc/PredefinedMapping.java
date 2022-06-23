@@ -1,5 +1,5 @@
 /*
- * Copyright 2020, TeamDev. All rights reserved.
+ * Copyright 2022, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ public enum PredefinedMapping implements TypeMapping {
 
     MYSQL_5_7("MySQL", 5, 7, basicBuilder()),
     POSTGRESQL_10_1("PostgreSQL", 10, 1, basicBuilder().add(BYTE_ARRAY, "BYTEA")),
-    H2_1_4("H2", 1, 4, basicBuilder());
+    H2_2_1("H2", 2, 1, basicBuilder());
 
     @SuppressWarnings("NonSerializableFieldInSerializableClass")
     private final TypeMapping typeMapping;

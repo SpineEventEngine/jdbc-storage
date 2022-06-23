@@ -1,5 +1,5 @@
 /*
- * Copyright 2020, TeamDev. All rights reserved.
+ * Copyright 2022, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ import org.junit.jupiter.api.Test;
 
 import static io.spine.base.Identifier.newUuid;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
-import static io.spine.server.storage.jdbc.PredefinedMapping.H2_1_4;
+import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_1;
 import static io.spine.testing.Tests.nullRef;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -57,7 +57,7 @@ class JdbcProjectionStorageTest extends ProjectionStorageTest {
         @SuppressWarnings("unchecked") // Required for the tests.
                 Class<? extends Projection<ProjectId, ?, ?>> projectionClass =
                 (Class<? extends Projection<ProjectId, ?, ?>>) entityClass;
-        TypeMapping typeMapping = H2_1_4;
+        TypeMapping typeMapping = H2_2_1;
         JdbcRecordStorage<ProjectId> entityStorage =
                 JdbcRecordStorage.<ProjectId>newBuilder()
                         .setDataSource(dataSource)

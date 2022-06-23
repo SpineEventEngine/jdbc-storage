@@ -1,5 +1,5 @@
 /*
- * Copyright 2020, TeamDev. All rights reserved.
+ * Copyright 2022, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static io.spine.base.Identifier.newUuid;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichHoldsMetadata;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
-import static io.spine.server.storage.jdbc.PredefinedMapping.H2_1_4;
+import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_1;
 import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
 import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.multitenantSpec;
 import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.newFactory;
@@ -65,7 +65,7 @@ class JdbcStorageFactoryTest {
         JdbcStorageFactory factory = JdbcStorageFactory
                 .newBuilder()
                 .setDataSource(whichIsStoredInMemory(newUuid()))
-                .setTypeMapping(H2_1_4)
+                .setTypeMapping(H2_2_1)
                 .build();
 
         assertNotNull(factory);
@@ -178,7 +178,7 @@ class JdbcStorageFactoryTest {
         JdbcStorageFactory factory = JdbcStorageFactory
                 .newBuilder()
                 .setDataSource(dataSource)
-                .setTypeMapping(H2_1_4)
+                .setTypeMapping(H2_2_1)
                 .build();
         factory.close();
         assertThat(dataSource.isClosed())

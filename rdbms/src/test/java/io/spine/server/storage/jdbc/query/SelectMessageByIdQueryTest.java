@@ -1,5 +1,5 @@
 /*
- * Copyright 2020, TeamDev. All rights reserved.
+ * Copyright 2022, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static io.spine.base.Identifier.newUuid;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsThrowingByCommand;
-import static io.spine.server.storage.jdbc.PredefinedMapping.H2_1_4;
+import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_1;
 import static io.spine.server.storage.jdbc.given.Column.stringIdColumn;
 import static io.spine.server.storage.jdbc.message.MessageTable.bytesColumn;
 import static io.spine.server.storage.jdbc.query.given.Given.selectMessageBuilder;
@@ -128,7 +128,7 @@ class SelectMessageByIdQueryTest {
     }
 
     private static TimestampByString table(DataSourceWrapper dataSource) {
-        TimestampByString table = new TimestampByString(dataSource, H2_1_4);
+        TimestampByString table = new TimestampByString(dataSource, H2_2_1);
         table.create();
         return table;
     }
