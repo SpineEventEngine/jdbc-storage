@@ -26,7 +26,7 @@
 
 package io.spine.server.storage.jdbc.delivery;
 
-import io.spine.base.Tests;
+import io.spine.environment.Tests;
 import io.spine.server.ServerEnvironment;
 import io.spine.server.delivery.CatchUpTest;
 import io.spine.server.storage.StorageFactory;

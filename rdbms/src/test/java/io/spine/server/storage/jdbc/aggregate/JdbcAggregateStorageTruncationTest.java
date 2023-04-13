@@ -26,7 +26,7 @@
 
 package io.spine.server.storage.jdbc.aggregate;
 
-import io.spine.base.Tests;
+import io.spine.environment.Tests;
 import io.spine.server.ServerEnvironment;
 import io.spine.server.aggregate.AggregateStorageTruncationTest;
 import org.junit.jupiter.api.AfterAll;
