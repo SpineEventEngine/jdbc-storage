@@ -42,7 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@DisplayName("IdColumn should")
+@DisplayName("`IdColumn` should")
 class IdColumnTest {
 
     @Test
@@ -62,7 +62,7 @@ class IdColumnTest {
     }
 
     @Test
-    @DisplayName("have `varchar255` implementation")
+    @DisplayName("have `VARCHAR(512)` implementation")
     void haveStringImpl() {
         IdColumn<?> column = IdColumn.ofEntityClass(idTableColumn(), StringIdEntity.class);
         assertEquals(STRING_512, column.sqlType());
