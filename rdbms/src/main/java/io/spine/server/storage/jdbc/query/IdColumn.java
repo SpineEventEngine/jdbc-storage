@@ -70,8 +70,8 @@ public abstract class IdColumn<I> {
      *
      * <p>The column should have a valid SQL type.
      *
-     * <p>This also implies that actual ID values will be primitive and matching to the column SQL
-     * type.
+     * <p>This also implies that actual ID values will be primitive
+     * and matching to the column SQL type.
      *
      * @see #of(TableColumn, Class) for {@link Message}-type ID column creation
      * @see #ofEntityClass(TableColumn, Class) for {@link Entity} ID column creation
@@ -137,8 +137,8 @@ public abstract class IdColumn<I> {
         checkNotNull(column);
         checkNotNull(entityClass);
         checkArgument(column.type() == null,
-                      "Entity ID type is calculated at runtime and shouldn't have an SQL type " +
-                      "pre-set");
+                      "Entity ID type is calculated at runtime " +
+                              "and shouldn't have an SQL type pre-set");
         Class<?> idClass = asEntityClass(entityClass).idClass();
         if (idClass == Long.class) {
             return  (IdColumn<I>) new LongIdColumn(column);
