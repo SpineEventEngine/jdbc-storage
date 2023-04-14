@@ -41,6 +41,7 @@ import static io.spine.server.storage.jdbc.Type.INT;
 import static io.spine.server.storage.jdbc.Type.LONG;
 import static io.spine.server.storage.jdbc.Type.STRING;
 import static io.spine.server.storage.jdbc.Type.STRING_255;
+import static io.spine.server.storage.jdbc.Type.STRING_512;
 
 /**
  * A builder for {@linkplain TypeMapping type mappings}.
@@ -58,6 +59,7 @@ public class TypeMappingBuilder {
      *     <li>{@code Type.INT} - {@code INT}</li>
      *     <li>{@code Type.LONG} - {@code BIGINT}</li>
      *     <li>{@code Type.STRING_255} - {@code VARCHAR(255)}</li>
+     *     <li>{@code Type.STRING_512} - {@code VARCHAR(512)}</li>
      *     <li>{@code Type.STRING} - {@code TEXT}</li>
      *     <li>{@code Type.BOOLEAN} - {@code BOOLEAN}</li>
      * </ul>
@@ -78,6 +80,7 @@ public class TypeMappingBuilder {
                                                              .add(INT, "INT")
                                                              .add(LONG, "BIGINT")
                                                              .add(STRING_255, "VARCHAR(255)")
+                                                             .add(STRING_512, "VARCHAR(512)")
                                                              .add(STRING, "TEXT")
                                                              .add(BOOLEAN, "BOOLEAN");
         return builder;

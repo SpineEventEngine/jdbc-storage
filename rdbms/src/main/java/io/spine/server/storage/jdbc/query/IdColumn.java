@@ -43,8 +43,9 @@ import static io.spine.server.entity.model.EntityClass.asEntityClass;
 import static io.spine.server.storage.jdbc.Type.INT;
 import static io.spine.server.storage.jdbc.Type.LONG;
 import static io.spine.server.storage.jdbc.Type.STRING;
-import static io.spine.server.storage.jdbc.Type.STRING_255;
+import static io.spine.server.storage.jdbc.Type.STRING_512;
 import static io.spine.util.Exceptions.newIllegalArgumentException;
+import static java.util.Objects.requireNonNull;
 
 /**
  * A wrapper for the column which stores a primary key in a DB {@linkplain AbstractTable table}.
@@ -78,7 +79,7 @@ public abstract class IdColumn<I> {
     @SuppressWarnings("unchecked") // It's up to caller to keep the ID class and SQL type in sync.
     public static <I> IdColumn<I> of(TableColumn column) {
         checkNotNull(column);
-        Type type = checkNotNull(column.type(),
+        Type type = requireNonNull(column.type(),
                                  "Please use other suitable method overload if ID column SQL " +
                                  "type is unknown at compile time");
         switch (type) {
@@ -87,6 +88,7 @@ public abstract class IdColumn<I> {
             case LONG:
                 return (IdColumn<I>) new LongIdColumn(column);
             case STRING_255:
+            case STRING_512:
             case STRING:
                 return (IdColumn<I>) new StringIdColumn(column);
             case BOOLEAN:
@@ -285,7 +287,7 @@ public abstract class IdColumn<I> {
 
         @Override
         public Type sqlType() {
-            return column().type() == STRING ? STRING : STRING_255;
+            return column().type() == STRING ? STRING : STRING_512;
         }
 
         @Override
@@ -316,7 +318,7 @@ public abstract class IdColumn<I> {
 
         @Override
         public Type sqlType() {
-            return STRING_255;
+            return STRING_512;
         }
 
         @Override

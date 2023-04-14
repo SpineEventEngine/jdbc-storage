@@ -60,14 +60,15 @@ If there is no predefined mapping for the database, mapping for MySQL 5.7 will b
 
 #### Default Values
 
-| Type         | MySQL 5.7     | PostgreSQL 10.1 |
-| :----------: |:-------------:| :--------------:|
-| BYTE_ARRAY   | BLOB          | BYTEA           |
-| INT          | INT           | INT             |
-| LONG         | BIGINT        | BIGINT          |
-| STRING_255   | VARCHAR(255)  | VARCHAR(255)    | 
-| STRING       | TEXT          | TEXT            |
-| BOOLEAN      | BOOLEAN       | BOOLEAN         |
+|    Type    |  MySQL 5.7   | PostgreSQL 10.1 |
+|:----------:|:------------:|:---------------:|
+| BYTE_ARRAY |     BLOB     |      BYTEA      |
+|    INT     |     INT      |       INT       |
+|    LONG    |    BIGINT    |     BIGINT      |
+| STRING_255 | VARCHAR(255) |  VARCHAR(255)   | 
+| STRING_512 | VARCHAR(512) |  VARCHAR(512)   | 
+|   STRING   |     TEXT     |      TEXT       |
+|  BOOLEAN   |   BOOLEAN    |     BOOLEAN     |
 
 #### Custom Mapping
 
