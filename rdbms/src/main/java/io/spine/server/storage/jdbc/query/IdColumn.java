@@ -43,6 +43,7 @@ import static io.spine.server.entity.model.EntityClass.asEntityClass;
 import static io.spine.server.storage.jdbc.Type.INT;
 import static io.spine.server.storage.jdbc.Type.LONG;
 import static io.spine.server.storage.jdbc.Type.STRING;
+import static io.spine.server.storage.jdbc.Type.STRING_255;
 import static io.spine.server.storage.jdbc.Type.STRING_512;
 import static io.spine.util.Exceptions.newIllegalArgumentException;
 import static java.util.Objects.requireNonNull;
@@ -285,9 +286,25 @@ public abstract class IdColumn<I> {
             return id;
         }
 
+        /**
+         * Returns {@code String}-related SQL type if the wrapped column specifies one by itself.
+         *
+         * <p>Returns {@link Type#STRING_512 STRING_512} if own column SQL type is for some reason
+         * not a {@code String}-related one.
+         *
+         * @implNote It's unlikely that users choose to create a {@code StringIdColumn}
+         *         on top of a non-{@code String} column, but just in case
+         *         Spine returns the widest {@code String}-related SQL type,
+         *         so that such column values could be successfully serialized
+         *         into the native table column.
+         */
         @Override
         public Type sqlType() {
-            return column().type() == STRING ? STRING : STRING_512;
+            Type type = column().type();
+            if(type == STRING || type == STRING_255 || type == STRING_512) {
+                return type;
+            }
+            return STRING_512;
         }
 
         @Override
