@@ -42,7 +42,7 @@ import java.util.Iterator;
 
 import static io.spine.server.storage.jdbc.Type.INT;
 import static io.spine.server.storage.jdbc.Type.LONG;
-import static io.spine.server.storage.jdbc.Type.STRING_255;
+import static io.spine.server.storage.jdbc.Type.STRING_512;
 
 /**
  * A table storing shard session {@linkplain ShardSessionRecord records}.
@@ -99,7 +99,7 @@ final class ShardedWorkRegistryTable extends MessageTable<ShardIndex, ShardSessi
         OF_TOTAL_SHARDS(LONG, m -> m.getIndex()
                                     .getOfTotal()),
 
-        WORKER_ID(STRING_255, m -> {
+        WORKER_ID(STRING_512, m -> {
                 WorkerId worker = m.getWorker();
                 String result = worker.getNodeId().getValue() + '-' + worker.getValue();
                 return result;

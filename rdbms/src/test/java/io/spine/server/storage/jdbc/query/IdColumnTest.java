@@ -36,13 +36,13 @@ import org.junit.jupiter.api.Test;
 
 import static io.spine.server.storage.jdbc.Type.INT;
 import static io.spine.server.storage.jdbc.Type.LONG;
-import static io.spine.server.storage.jdbc.Type.STRING_255;
+import static io.spine.server.storage.jdbc.Type.STRING_512;
 import static io.spine.server.storage.jdbc.given.Column.idTableColumn;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@DisplayName("IdColumn should")
+@DisplayName("`IdColumn` should")
 class IdColumnTest {
 
     @Test
@@ -62,10 +62,10 @@ class IdColumnTest {
     }
 
     @Test
-    @DisplayName("have `varchar255` implementation")
+    @DisplayName("have `VARCHAR(512)` implementation")
     void haveStringImpl() {
         IdColumn<?> column = IdColumn.ofEntityClass(idTableColumn(), StringIdEntity.class);
-        assertEquals(STRING_255, column.sqlType());
+        assertEquals(STRING_512, column.sqlType());
         assertSame(String.class, column.javaType());
     }
 
@@ -73,7 +73,7 @@ class IdColumnTest {
     @DisplayName("cast message IDs to string")
     void castMessageIdsToString() {
         IdColumn<?> column = IdColumn.ofEntityClass(idTableColumn(), MessageIdEntity.class);
-        assertEquals(STRING_255, column.sqlType());
+        assertEquals(STRING_512, column.sqlType());
         assertTrue(Message.class.isAssignableFrom(column.javaType()));
     }
 

@@ -44,7 +44,9 @@ import static io.spine.server.storage.jdbc.Type.INT;
 import static io.spine.server.storage.jdbc.Type.LONG;
 import static io.spine.server.storage.jdbc.Type.STRING;
 import static io.spine.server.storage.jdbc.Type.STRING_255;
+import static io.spine.server.storage.jdbc.Type.STRING_512;
 import static io.spine.util.Exceptions.newIllegalArgumentException;
+import static java.util.Objects.requireNonNull;
 
 /**
  * A wrapper for the column which stores a primary key in a DB {@linkplain AbstractTable table}.
@@ -69,8 +71,8 @@ public abstract class IdColumn<I> {
      *
      * <p>The column should have a valid SQL type.
      *
-     * <p>This also implies that actual ID values will be primitive and matching to the column SQL
-     * type.
+     * <p>This also implies that actual ID values will be primitive
+     * and matching to the column SQL type.
      *
      * @see #of(TableColumn, Class) for {@link Message}-type ID column creation
      * @see #ofEntityClass(TableColumn, Class) for {@link Entity} ID column creation
@@ -78,7 +80,7 @@ public abstract class IdColumn<I> {
     @SuppressWarnings("unchecked") // It's up to caller to keep the ID class and SQL type in sync.
     public static <I> IdColumn<I> of(TableColumn column) {
         checkNotNull(column);
-        Type type = checkNotNull(column.type(),
+        Type type = requireNonNull(column.type(),
                                  "Please use other suitable method overload if ID column SQL " +
                                  "type is unknown at compile time");
         switch (type) {
@@ -87,6 +89,7 @@ public abstract class IdColumn<I> {
             case LONG:
                 return (IdColumn<I>) new LongIdColumn(column);
             case STRING_255:
+            case STRING_512:
             case STRING:
                 return (IdColumn<I>) new StringIdColumn(column);
             case BOOLEAN:
@@ -135,8 +138,8 @@ public abstract class IdColumn<I> {
         checkNotNull(column);
         checkNotNull(entityClass);
         checkArgument(column.type() == null,
-                      "Entity ID type is calculated at runtime and shouldn't have an SQL type " +
-                      "pre-set");
+                      "Entity ID type is calculated at runtime " +
+                              "and shouldn't have an SQL type pre-set");
         Class<?> idClass = asEntityClass(entityClass).idClass();
         if (idClass == Long.class) {
             return  (IdColumn<I>) new LongIdColumn(column);
@@ -283,9 +286,25 @@ public abstract class IdColumn<I> {
             return id;
         }
 
+        /**
+         * Returns {@code String}-related SQL type if the wrapped column specifies one by itself.
+         *
+         * <p>Returns {@link Type#STRING_512 STRING_512} if own column SQL type is for some reason
+         * not a {@code String}-related one.
+         *
+         * @implNote It's unlikely that users choose to create a {@code StringIdColumn}
+         *         on top of a non-{@code String} column, but just in case
+         *         Spine returns the widest {@code String}-related SQL type,
+         *         so that such column values could be successfully serialized
+         *         into the native table column.
+         */
         @Override
         public Type sqlType() {
-            return column().type() == STRING ? STRING : STRING_255;
+            Type type = column().type();
+            if(type == STRING || type == STRING_255 || type == STRING_512) {
+                return type;
+            }
+            return STRING_512;
         }
 
         @Override
@@ -316,7 +335,7 @@ public abstract class IdColumn<I> {
 
         @Override
         public Type sqlType() {
-            return STRING_255;
+            return STRING_512;
         }
 
         @Override

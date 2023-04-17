@@ -32,7 +32,7 @@ import io.spine.server.storage.jdbc.query.IdColumn;
 
 import javax.annotation.Nullable;
 
-import static io.spine.server.storage.jdbc.Type.STRING_255;
+import static io.spine.server.storage.jdbc.Type.STRING_512;
 
 public final class Column {
 
@@ -55,7 +55,7 @@ public final class Column {
     private enum GivenIdColumn implements TableColumn {
 
         ID(null),
-        STRING(STRING_255);
+        STRING(STRING_512);
 
         @Nullable
         private final Type type;

@@ -57,6 +57,12 @@ public enum Type {
     STRING_255,
 
     /**
+     * The type representing a {@code String}, maximum length of which
+     * doesn't exceed 512 characters.
+     */
+    STRING_512,
+
+    /**
      * The type representing a {@code String}, maximum length of which is unknown.
      */
     STRING,
