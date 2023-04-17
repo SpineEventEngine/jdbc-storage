@@ -12,7 +12,7 @@ all modules and does not describe the project structure per-subproject.
 
 <groupId>io.spine</groupId>
 <artifactId>jdbc-storage</artifactId>
-<version>1.9.0-SNAPSHOT.4</version>
+<version>1.9.0-SNAPSHOT.5</version>
 
 <inceptionYear>2015</inceptionYear>
 
@@ -34,7 +34,7 @@ all modules and does not describe the project structure per-subproject.
   <dependency>
     <groupId>com.querydsl</groupId>
     <artifactId>querydsl-sql</artifactId>
-    <version>4.4.0</version>
+    <version>5.0.0</version>
     <scope>compile</scope>
   </dependency>
   <dependency>
