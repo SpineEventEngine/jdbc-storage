@@ -33,7 +33,7 @@ extra["artifactId"] = "jdbc-rdbms"
 
 // The latest version compatible with Java 8.
 val hikariVersion = "4.0.3"
-val querydslVersion = "4.4.0"
+val querydslVersion = "5.0.0"
 val hsqldbVersion = "2.5.1"
 val h2Version = "2.1.214"
 
