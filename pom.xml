@@ -80,6 +80,12 @@ all modules and does not describe the project structure per-subproject.
     <scope>test</scope>
   </dependency>
   <dependency>
+    <groupId>com.mysql</groupId>
+    <artifactId>mysql-connector-j</artifactId>
+    <version>8.0.32</version>
+    <scope>test</scope>
+  </dependency>
+  <dependency>
     <groupId>io.grpc</groupId>
     <artifactId>grpc-stub</artifactId>
     <version>1.28.1</version>
@@ -131,6 +137,18 @@ all modules and does not describe the project structure per-subproject.
     <groupId>org.junit.jupiter</groupId>
     <artifactId>junit-jupiter-params</artifactId>
     <version>5.7.0</version>
+    <scope>test</scope>
+  </dependency>
+  <dependency>
+    <groupId>org.testcontainers</groupId>
+    <artifactId>junit-jupiter</artifactId>
+    <version>1.16.0</version>
+    <scope>test</scope>
+  </dependency>
+  <dependency>
+    <groupId>org.testcontainers</groupId>
+    <artifactId>testcontainers</artifactId>
+    <version>1.16.0</version>
     <scope>test</scope>
   </dependency>
   <dependency>
