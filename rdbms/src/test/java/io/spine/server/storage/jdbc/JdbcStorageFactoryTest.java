@@ -191,7 +191,8 @@ class JdbcStorageFactoryTest {
         DataSourceWrapper dataSource = whichHoldsMetadata(
                 MYSQL_5_7.getDatabaseProductName(),
                 MYSQL_5_7.getMajorVersion(),
-                MYSQL_5_7.getMinorVersion());
+                MYSQL_5_7.getMinorVersion(),
+                "some-mysql-driver-name");
         JdbcStorageFactory factory = JdbcStorageFactory
                 .newBuilder()
                 .setDataSource(dataSource)

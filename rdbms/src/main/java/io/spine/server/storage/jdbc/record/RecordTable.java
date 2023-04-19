@@ -95,35 +95,51 @@ final class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWith
     @Override
     protected SelectQuery<EntityRecord> composeSelectQuery(I id) {
         SelectEntityByIdQuery.Builder<I> builder = SelectEntityByIdQuery.newBuilder();
-        SelectEntityByIdQuery<I> query = builder.setTableName(name())
-                                                .setDataSource(dataSource())
-                                                .setIdColumn(idColumn())
-                                                .setId(id)
-                                                .build();
+        SelectEntityByIdQuery<I> query =
+                builder.setTableName(name())
+                       .setDataSource(dataSource())
+                       .setIdColumn(idColumn())
+                       .setId(id)
+                       .build();
         return query;
     }
 
     @Override
     protected WriteQuery composeInsertQuery(I id, EntityRecordWithColumns record) {
         InsertEntityQuery.Builder<I> builder = InsertEntityQuery.newBuilder();
-        InsertEntityQuery<I> query = builder.setDataSource(dataSource())
-                                            .setTableName(name())
-                                            .setIdColumn(idColumn())
-                                            .setColumnMapping(columnMapping)
-                                            .addRecord(id, record)
-                                            .build();
+        InsertEntityQuery<I> query =
+                builder.setDataSource(dataSource())
+                       .setTableName(name())
+                       .setIdColumn(idColumn())
+                       .setColumnMapping(columnMapping)
+                       .addRecord(id, record)
+                       .build();
         return query;
     }
 
     @Override
     protected WriteQuery composeUpdateQuery(I id, EntityRecordWithColumns record) {
         UpdateEntityQuery.Builder<I> builder = UpdateEntityQuery.newBuilder();
-        UpdateEntityQuery<I> query = builder.setTableName(name())
-                                            .setDataSource(dataSource())
-                                            .setIdColumn(idColumn())
-                                            .addRecord(id, record)
-                                            .setColumnMapping(columnMapping)
-                                            .build();
+        UpdateEntityQuery<I> query =
+                builder.setTableName(name())
+                       .setDataSource(dataSource())
+                       .setIdColumn(idColumn())
+                       .addRecord(id, record)
+                       .setColumnMapping(columnMapping)
+                       .build();
+        return query;
+    }
+
+    @Override
+    protected WriteQuery composeInsertOrUpdateQuery(I id, EntityRecordWithColumns record) {
+        InsertOrUpdateEntityQuery.Builder<I> builder = InsertOrUpdateEntityQuery.newBuilder();
+        InsertOrUpdateEntityQuery<I> query =
+                builder.setTableName(name())
+                       .setDataSource(dataSource())
+                       .setIdColumn(idColumn())
+                       .addRecord(id, record)
+                       .setColumnMapping(columnMapping)
+                       .build();
         return query;
     }
 

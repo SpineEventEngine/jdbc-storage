@@ -32,6 +32,7 @@ import com.google.common.collect.ImmutableMap;
 import io.spine.annotation.Internal;
 import io.spine.logging.Logging;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.Drivers;
 import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.Type;
 import io.spine.server.storage.jdbc.TypeMapping;
@@ -152,17 +153,18 @@ public abstract class AbstractTable<I, R, W> implements Logging {
      * <p>If the table {@linkplain #containsRecord(Object) contains} a record with the given ID,
      * the operation is treated as an {@code UPDATE}, otherwise - as an {@code INSERT}.
      *
+     * <p>In some specific cases, when the underlying database allows
+     * the corresponding optimizations, an advanced SQL syntax may be used. I.e. MySQL
+     * allows {@code INSERT ... ON DUPLICATE UPDATE} clauses, which will be used
+     * when appropriate.
+     *
      * @param id
      *         an ID to write the record under
      * @param record
      *         the record to write
      */
     public void write(I id, W record) {
-        if (containsRecord(id)) {
-            update(id, record);
-        } else {
-            insert(id, record);
-        }
+        insertOrUpdate(id, record);
     }
 
     /**
@@ -208,6 +210,28 @@ public abstract class AbstractTable<I, R, W> implements Logging {
     }
 
     /**
+     * Inserts the record with the specified ID into the table,
+     * or updates it, if is already exists.
+     *
+     * @param id
+     *         an ID of the record
+     * @param record
+     *         a record to insert or update
+     */
+    private void insertOrUpdate(I id, W record) {
+        if(Drivers.isMysqlDriver(dataSource.metaData())) {
+            WriteQuery query = composeInsertOrUpdateQuery(id, record);
+            query.execute();
+        } else {
+            if (containsRecord(id)) {
+                update(id, record);
+            } else {
+                insert(id, record);
+            }
+        }
+    }
+
+    /**
      * Retrieves the columns of this table.
      *
      * <p>When called for the first time, this method initializes the list of the columns.
@@ -245,6 +269,8 @@ public abstract class AbstractTable<I, R, W> implements Logging {
     protected abstract WriteQuery composeInsertQuery(I id, W record);
 
     protected abstract WriteQuery composeUpdateQuery(I id, W record);
+
+    protected abstract WriteQuery composeInsertOrUpdateQuery(I id, W record);
 
     protected abstract SelectQuery<R> composeSelectQuery(I id);
 

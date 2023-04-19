@@ -44,7 +44,7 @@ public abstract class IdAwareQuery<I> extends AbstractQuery {
     private final I id;
     private final IdColumn<I> idColumn;
 
-    protected IdAwareQuery(Builder<I, ? extends Builder, ? extends IdAwareQuery> builder) {
+    protected IdAwareQuery(Builder<I, ? extends Builder, ? extends IdAwareQuery<I>> builder) {
         super(builder);
         this.id = checkNotNull(builder.id);
         this.idColumn = checkNotNull(builder.idColumn);
@@ -73,16 +73,16 @@ public abstract class IdAwareQuery<I> extends AbstractQuery {
         return idColumn;
     }
 
-    private Object normalizedId() {
+    protected final Object normalizedId() {
         return idColumn.normalize(id);
     }
 
-    private PathBuilder<Object> idPath() {
+    protected final PathBuilder<Object> idPath() {
         return pathOf(idColumn);
     }
 
     protected abstract static class Builder<I,
-                                            B extends IdAwareQuery.Builder<I, B, Q>,
+                                            B extends Builder<I, B, Q>,
                                             Q extends IdAwareQuery<I>>
             extends AbstractQuery.Builder<B, Q> {
 

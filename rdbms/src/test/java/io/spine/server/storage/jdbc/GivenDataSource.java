@@ -55,9 +55,9 @@ public class GivenDataSource {
     }
 
     public static DataSourceWrapper
-    whichHoldsMetadata(String productName, int majorVersion, int minorVersion) {
+    whichHoldsMetadata(String productName, int majorVersion, int minorVersion, String driverName) {
         DataSourceWrapper dataSource =
-                new DataSourceWithMetaData(productName, majorVersion, minorVersion);
+                new DataSourceWithMetaData(productName, majorVersion, minorVersion, driverName);
         return dataSource;
     }
 
@@ -89,10 +89,16 @@ public class GivenDataSource {
         private final int majorVersion;
         private final int minorVersion;
 
-        private DataSourceWithMetaData(String productName, int majorVersion, int minorVersion) {
+        private final String driverName;
+
+        private DataSourceWithMetaData(String productName,
+                                       int majorVersion,
+                                       int minorVersion,
+                                       String driverName) {
             this.productName = productName;
             this.majorVersion = majorVersion;
             this.minorVersion = minorVersion;
+            this.driverName = driverName;
         }
 
         @Override
@@ -102,22 +108,7 @@ public class GivenDataSource {
 
         @Override
         public DataSourceMetaData metaData() throws DatabaseException {
-            return new DataSourceMetaData() {
-                @Override
-                public String productName() {
-                    return productName;
-                }
-
-                @Override
-                public int majorVersion() {
-                    return majorVersion;
-                }
-
-                @Override
-                public int minorVersion() {
-                    return minorVersion;
-                }
-            };
+            return new GivenMetaData(productName, majorVersion, minorVersion, driverName);
         }
 
         @Override
@@ -128,6 +119,43 @@ public class GivenDataSource {
         @Override
         public boolean isClosed() {
             return false;
+        }
+
+    }
+
+    private static final class GivenMetaData implements DataSourceMetaData {
+
+        private final String productName;
+        private final int majorVersion;
+        private final int minorVersion;
+        private final String driverName;
+
+        private GivenMetaData(String productName, int majorVersion, int minorVersion,
+                              String driverName) {
+            this.productName = productName;
+            this.majorVersion = majorVersion;
+            this.minorVersion = minorVersion;
+            this.driverName = driverName;
+        }
+
+        @Override
+        public String productName() {
+            return productName;
+        }
+
+        @Override
+        public int majorVersion() {
+            return majorVersion;
+        }
+
+        @Override
+        public int minorVersion() {
+            return minorVersion;
+        }
+
+        @Override
+        public String driverName() {
+            return driverName;
         }
     }
 

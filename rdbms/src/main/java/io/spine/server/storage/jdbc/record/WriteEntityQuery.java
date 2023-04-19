@@ -63,6 +63,7 @@ abstract class WriteEntityQuery<I, C extends StoreClause<C>>
     private final Map<I, EntityRecordWithColumns> records;
     private final JdbcColumnMapping<?> columnMapping;
 
+    @SuppressWarnings("rawtypes")   /* For brevity. */
     WriteEntityQuery(Builder<? extends Builder, ? extends WriteEntityQuery, I> builder) {
         super(builder);
         this.idColumn = builder.idColumn;

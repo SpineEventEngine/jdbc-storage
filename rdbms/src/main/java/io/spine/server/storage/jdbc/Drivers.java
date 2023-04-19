@@ -1,5 +1,5 @@
 /*
- * Copyright 2022, TeamDev. All rights reserved.
+ * Copyright 2023, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,31 +24,39 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import io.spine.gradle.internal.Deps
-import io.spine.gradle.internal.IncrementGuard
+package io.spine.server.storage.jdbc;
 
-apply<IncrementGuard>()
+import io.spine.annotation.Experimental;
+import io.spine.annotation.Internal;
 
-extra["artifactId"] = "jdbc-rdbms"
+import static com.google.common.base.Preconditions.checkNotNull;
 
-// The latest version compatible with Java 8.
-val hikariVersion = "4.0.3"
-val querydslVersion = "5.0.0"
-val hsqldbVersion = "2.5.1"
-val h2Version = "2.1.214"
-val mysqlConnectorVersion = "8.0.32"
-val testContainersVersion = "1.18.0"
+/**
+ * Utility for detecting JDBC drivers.
+ */
+@Internal
+public final class Drivers {
 
-dependencies {
-    api("com.querydsl:querydsl-sql:$querydslVersion") {
-        exclude(group = "com.google.guava")
+    /**
+     * Prevents this utility class from instantiation.
+     */
+    private Drivers() {
+        // Do nothing.
     }
-    implementation("com.zaxxer:HikariCP:$hikariVersion")
-    testImplementation("org.hsqldb:hsqldb:$hsqldbVersion")
-    testImplementation("com.h2database:h2:$h2Version")
-    testImplementation("com.mysql:mysql-connector-j:$mysqlConnectorVersion")
-    testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
-    testImplementation("org.testcontainers:mysql:$testContainersVersion")
-    testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
-    testImplementation(Deps.grpc.stub)
+
+    /**
+     * Tells whether the data source is accessed via MySQL JDBC driver.
+     *
+     * <p>This is an experimental method. Returning results may not be 100% accurate.
+     *
+     * @param metadata
+     *         the metadata of data source of interest
+     */
+    @Experimental
+    public static boolean isMysqlDriver(DataSourceMetaData metadata) {
+        checkNotNull(metadata);
+        boolean result = metadata.driverName()
+                                 .contains("mysql");
+        return result;
+    }
 }

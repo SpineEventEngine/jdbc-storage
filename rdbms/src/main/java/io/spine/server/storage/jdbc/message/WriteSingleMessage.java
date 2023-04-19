@@ -52,6 +52,7 @@ abstract class WriteSingleMessage<I, M extends Message>
     private final M message;
     private final ImmutableList<? extends Column<M>> columns;
 
+    @SuppressWarnings("rawtypes") /* For brevity. */
     WriteSingleMessage(Builder<I, M, ? extends Builder, ? extends WriteSingleMessage> builder) {
         super(builder);
         this.message = checkNotNull(builder.message);

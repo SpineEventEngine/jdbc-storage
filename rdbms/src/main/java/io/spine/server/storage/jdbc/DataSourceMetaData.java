@@ -53,16 +53,23 @@ public interface DataSourceMetaData {
     int minorVersion();
 
     /**
+     * Returns the name of the JDBC driver selected to connect to the database.
+     */
+    String driverName();
+
+    /**
      * Wraps a given database {@linkplain DatabaseMetaData metadata}.
      *
      * @throws DatabaseException
      *         in case something went wrong when interacting with database
      */
+    @SuppressWarnings("OverlyComplexAnonymousInnerClass")   /* Hiding the class from public. */
     static DataSourceMetaData of(DatabaseMetaData metaData) throws DatabaseException {
         try {
             String productName = metaData.getDatabaseProductName();
             int majorVersion = metaData.getDatabaseMajorVersion();
             int minorVersion = metaData.getDatabaseMinorVersion();
+            String driverName = metaData.getDriverName();
 
             return new DataSourceMetaData() {
                 @Override
@@ -78,6 +85,11 @@ public interface DataSourceMetaData {
                 @Override
                 public int minorVersion() {
                     return minorVersion;
+                }
+
+                @Override
+                public String driverName() {
+                    return driverName;
                 }
             };
         } catch (SQLException e) {

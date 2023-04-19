@@ -1,5 +1,5 @@
 /*
- * Copyright 2022, TeamDev. All rights reserved.
+ * Copyright 2023, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,31 +24,36 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import io.spine.gradle.internal.Deps
-import io.spine.gradle.internal.IncrementGuard
+package io.spine.server.storage.jdbc.query;
 
-apply<IncrementGuard>()
+import com.querydsl.core.QueryFlag;
+import com.querydsl.sql.dml.SQLInsertClause;
+import io.spine.annotation.Internal;
 
-extra["artifactId"] = "jdbc-rdbms"
+import static com.querydsl.core.types.ExpressionUtils.template;
 
-// The latest version compatible with Java 8.
-val hikariVersion = "4.0.3"
-val querydslVersion = "5.0.0"
-val hsqldbVersion = "2.5.1"
-val h2Version = "2.1.214"
-val mysqlConnectorVersion = "8.0.32"
-val testContainersVersion = "1.18.0"
+/**
+ * MySQL-specific query extensions inspired by Querydsl API.
+ */
+@Internal
+public final class MysqlExtensions {
 
-dependencies {
-    api("com.querydsl:querydsl-sql:$querydslVersion") {
-        exclude(group = "com.google.guava")
+    /**
+     * Prevents instantiation of this utility class.
+     */
+    private MysqlExtensions() {
+        // Do nothing.
     }
-    implementation("com.zaxxer:HikariCP:$hikariVersion")
-    testImplementation("org.hsqldb:hsqldb:$hsqldbVersion")
-    testImplementation("com.h2database:h2:$h2Version")
-    testImplementation("com.mysql:mysql-connector-j:$mysqlConnectorVersion")
-    testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
-    testImplementation("org.testcontainers:mysql:$testContainersVersion")
-    testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
-    testImplementation(Deps.grpc.stub)
+
+    /**
+     * Appends this clause with {@code ON DUPLICATE KEY UPDATE ...} extension.
+     *
+     * <p>Inspired by
+     * {@code com.querydsl.sql.mysql.MySQLQueryFactory.insertOnDuplicateKeyUpdate(..)};
+     */
+    public static SQLInsertClause withOnDuplicateUpdate(SQLInsertClause clause) {
+        clause.addFlag(QueryFlag.Position.END,
+                       template(String.class, " on duplicate key update {0}", clause));
+        return clause;
+    }
 }

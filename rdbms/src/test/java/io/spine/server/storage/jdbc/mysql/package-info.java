@@ -1,5 +1,5 @@
 /*
- * Copyright 2022, TeamDev. All rights reserved.
+ * Copyright 2023, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,31 +24,20 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import io.spine.gradle.internal.Deps
-import io.spine.gradle.internal.IncrementGuard
+/**
+ * This package runs the most critical tests against MySQL instance launched
+ * as a Docker image via Testcontainers library.
+ *
+ * <p>All tests in this package are slow by nature, as each test implies starting
+ * and then stopping a Docker container. Therefore, they are by default disabled
+ * when launched on CI.
+ *
+ * @see io.spine.server.storage.jdbc.mysql.MysqlTests for controlling the behaviour
+ */
+@CheckReturnValue
+@ParametersAreNonnullByDefault
+package io.spine.server.storage.jdbc.mysql;
 
-apply<IncrementGuard>()
+import com.google.errorprone.annotations.CheckReturnValue;
 
-extra["artifactId"] = "jdbc-rdbms"
-
-// The latest version compatible with Java 8.
-val hikariVersion = "4.0.3"
-val querydslVersion = "5.0.0"
-val hsqldbVersion = "2.5.1"
-val h2Version = "2.1.214"
-val mysqlConnectorVersion = "8.0.32"
-val testContainersVersion = "1.18.0"
-
-dependencies {
-    api("com.querydsl:querydsl-sql:$querydslVersion") {
-        exclude(group = "com.google.guava")
-    }
-    implementation("com.zaxxer:HikariCP:$hikariVersion")
-    testImplementation("org.hsqldb:hsqldb:$hsqldbVersion")
-    testImplementation("com.h2database:h2:$h2Version")
-    testImplementation("com.mysql:mysql-connector-j:$mysqlConnectorVersion")
-    testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
-    testImplementation("org.testcontainers:mysql:$testContainersVersion")
-    testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
-    testImplementation(Deps.grpc.stub)
-}
+import javax.annotation.ParametersAreNonnullByDefault;
