@@ -27,56 +27,45 @@
 package io.spine.server.storage.jdbc.mysql;
 
 import io.spine.server.entity.Entity;
-import io.spine.server.projection.Projection;
-import io.spine.server.projection.ProjectionStorage;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.TypeMapping;
-import io.spine.server.storage.jdbc.projection.JdbcProjectionStorage;
-import io.spine.server.storage.jdbc.projection.JdbcProjectionStorageTest;
 import io.spine.server.storage.jdbc.record.JdbcRecordStorage;
+import io.spine.server.storage.jdbc.record.JdbcRecordStorageTest;
+import io.spine.server.storage.jdbc.type.DefaultJdbcColumnMapping;
 import io.spine.test.storage.ProjectId;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.testcontainers.containers.MySQLContainer;
 
+import static io.spine.server.storage.jdbc.mysql.MysqlTests.*;
 import static io.spine.server.storage.jdbc.mysql.MysqlTests.mysqlContainer;
 import static io.spine.server.storage.jdbc.mysql.MysqlTests.mysqlMapping;
-import static io.spine.server.storage.jdbc.mysql.MysqlTests.stop;
 import static io.spine.server.storage.jdbc.mysql.MysqlTests.wrap;
 
-@DisplayName("`JdbcProjectionStorage` with MySQL should")
+@DisplayName("`JdbcRecordStorage` with MySQL should")
 @EnableConditionally
-final class MysqlProjectionStorageTest extends JdbcProjectionStorageTest {
+final class MysqlRecordStorageTest extends JdbcRecordStorageTest {
 
     private @Nullable MySQLContainer<?> mysql;
 
     @Override
-    protected ProjectionStorage<ProjectId> newStorage(Class<? extends Entity<?, ?>> entityClass) {
+    protected JdbcRecordStorage<ProjectId> newStorage(Class<? extends Entity<?, ?>> cls) {
         mysql = mysqlContainer();
         mysql.start();
 
         DataSourceWrapper dataSource = wrap(mysql);
 
-        @SuppressWarnings("unchecked") // Required for the tests.
-        Class<? extends Projection<ProjectId, ?, ?>> projectionClass =
-                (Class<? extends Projection<ProjectId, ?, ?>>) entityClass;
-        TypeMapping typeMapping = mysqlMapping();
-        JdbcRecordStorage<ProjectId> entityStorage =
+        @SuppressWarnings("unchecked") // Test invariant.
+        Class<? extends Entity<ProjectId, ?>> entityClass =
+                (Class<? extends Entity<ProjectId, ?>>) cls;
+        JdbcRecordStorage<ProjectId> storage =
                 JdbcRecordStorage.<ProjectId>newBuilder()
                                  .setDataSource(dataSource)
+                                 .setEntityClass(entityClass)
                                  .setMultitenant(false)
-                                 .setEntityClass(projectionClass)
-                                 .setTypeMapping(typeMapping)
+                                 .setColumnMapping(new DefaultJdbcColumnMapping())
+                                 .setTypeMapping(mysqlMapping())
                                  .build();
-        ProjectionStorage<ProjectId> storage =
-                JdbcProjectionStorage.<ProjectId>newBuilder()
-                                     .setRecordStorage(entityStorage)
-                                     .setDataSource(dataSource)
-                                     .setMultitenant(false)
-                                     .setProjectionClass(projectionClass)
-                                     .setTypeMapping(typeMapping)
-                                     .build();
         return storage;
     }
 

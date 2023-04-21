@@ -1,5 +1,5 @@
 /*
- * Copyright 2022, TeamDev. All rights reserved.
+ * Copyright 2023, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,31 +24,50 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.aggregate;
+package io.spine.server.storage.jdbc.mysql;
 
 import io.spine.environment.Tests;
 import io.spine.server.ServerEnvironment;
-import io.spine.server.aggregate.AggregateStorageTruncationTest;
+import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.JdbcStorageFactory;
+import io.spine.server.storage.jdbc.aggregate.JdbcAggregateStorageTruncationTest;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.testcontainers.containers.MySQLContainer;
 
-import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.newFactory;
+import static io.spine.server.storage.jdbc.mysql.MysqlTests.mysqlContainer;
+import static io.spine.server.storage.jdbc.mysql.MysqlTests.mysqlMapping;
+import static io.spine.server.storage.jdbc.mysql.MysqlTests.stop;
+import static io.spine.server.storage.jdbc.mysql.MysqlTests.wrap;
 
-@DisplayName("`JdbcAggregateStorage` after truncation should")
-public class JdbcAggregateStorageTruncationTest extends AggregateStorageTruncationTest {
+@DisplayName("`JdbcAggregateStorage` on top of MySQL, after truncation should")
+@EnableConditionally
+final class MysqlAggregateStorageTruncationTest extends JdbcAggregateStorageTruncationTest {
+
+    private @Nullable MySQLContainer<?> mysql;
 
     @BeforeEach
+    @Override
     public void prepareStorage() {
+        mysql = mysqlContainer();
+        mysql.start();
+        DataSourceWrapper dataSource = wrap(mysql);
+        JdbcStorageFactory mysqlFactory =
+                JdbcStorageFactory.newBuilder()
+                                  .setDataSource(dataSource)
+                                  .setTypeMapping(mysqlMapping())
+                                  .build();
         ServerEnvironment
                 .when(Tests.class)
-                .use(newFactory());
+                .use(mysqlFactory);
     }
 
     @AfterEach
+    @Override
     public void resetStorage() {
-        ServerEnvironment
-                .instance()
-                .reset();
+        super.resetStorage();
+        stop(mysql);
     }
 }

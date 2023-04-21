@@ -49,7 +49,7 @@ import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_1;
 import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
 import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.multitenantSpec;
 import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.newFactory;
-import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.singletenantSpec;
+import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.singleTenantSpec;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -112,7 +112,7 @@ class JdbcStorageFactoryTest {
         void singleTenant() {
             JdbcStorageFactory factory = newFactory();
             JdbcRecordStorage<ProjectId> storage =
-                    factory.createRecordStorage(singletenantSpec(), TestCounterEntity.class);
+                    factory.createRecordStorage(singleTenantSpec(), TestCounterEntity.class);
             assertFalse(storage.isMultitenant());
         }
     }
@@ -135,7 +135,7 @@ class JdbcStorageFactoryTest {
         void singleTenant() {
             JdbcStorageFactory factory = newFactory();
             AggregateStorage<String> storage =
-                    factory.createAggregateStorage(singletenantSpec(), TestAggregate.class);
+                    factory.createAggregateStorage(singleTenantSpec(), TestAggregate.class);
             assertFalse(storage.isMultitenant());
         }
     }
@@ -158,7 +158,7 @@ class JdbcStorageFactoryTest {
         void singleTenant() {
             JdbcStorageFactory factory = newFactory();
             ProjectionStorage<String> storage =
-                    factory.createProjectionStorage(singletenantSpec(), TestProjection.class);
+                    factory.createProjectionStorage(singleTenantSpec(), TestProjection.class);
             assertFalse(storage.isMultitenant());
         }
     }

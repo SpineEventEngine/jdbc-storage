@@ -85,7 +85,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
         "DuplicateStringLiteralInspection" /* Common test display names. */
 })
 @DisplayName("`JdbcRecordStorage` should")
-class JdbcRecordStorageTest extends RecordStorageTest<JdbcRecordStorage<ProjectId>> {
+public class JdbcRecordStorageTest extends RecordStorageTest<JdbcRecordStorage<ProjectId>> {
 
     @Test
     @DisplayName("clear itself")

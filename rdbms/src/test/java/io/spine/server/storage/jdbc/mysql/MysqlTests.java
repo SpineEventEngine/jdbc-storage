@@ -29,7 +29,11 @@ package io.spine.server.storage.jdbc.mysql;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.PredefinedMapping;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.testcontainers.containers.MySQLContainer;
+
+import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
 
 /**
  * Defines the common routines to use in tests against MySQL instance.
@@ -49,7 +53,12 @@ final class MysqlTests {
     private MysqlTests() {
     }
 
-    public static DataSourceWrapper wrap(MySQLContainer<?> container) {
+    /**
+     * Creates a new {@code DataSourceWrapper} around the passed instance of MySQL container.
+     *
+     * <p>The connections are pooled via HikariCP, with its default settings.
+     */
+    static DataSourceWrapper wrap(MySQLContainer<?> container) {
         HikariConfig config = new HikariConfig();
         config.setJdbcUrl(container.getJdbcUrl());
         config.setUsername(container.getUsername());
@@ -58,5 +67,29 @@ final class MysqlTests {
         HikariDataSource hikariSource = new HikariDataSource(config);
         DataSourceWrapper dataSource = DataSourceWrapper.wrap(hikariSource);
         return dataSource;
+    }
+
+    /**
+     * Returns a new instance of MySQL container.
+     */
+    static MySQLContainer<?> mysqlContainer() {
+        return new MySQLContainer<>("mysql:5.7");
+    }
+
+    /**
+     * Returns a type mapping compatible with the MySQL version
+     * run via the {@linkplain #mysqlContainer() container}.
+     */
+    static PredefinedMapping mysqlMapping() {
+        return MYSQL_5_7;
+    }
+
+    /**
+     * Stops the container, if it is not {@code null}.
+     */
+    static void stop(@Nullable MySQLContainer<?> container) {
+        if (null != container) {
+            container.stop();
+        }
     }
 }

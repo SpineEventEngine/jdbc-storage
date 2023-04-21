@@ -48,7 +48,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SuppressWarnings("DuplicateStringLiteralInspection") // Common test display names.
 @DisplayName("JdbcProjectionStorage should")
-class JdbcProjectionStorageTest extends ProjectionStorageTest {
+public class JdbcProjectionStorageTest extends ProjectionStorageTest {
 
     @Override
     protected ProjectionStorage<ProjectId> newStorage(Class<? extends Entity<?, ?>> entityClass) {

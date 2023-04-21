@@ -26,15 +26,10 @@
 
 package io.spine.server.storage.jdbc.mysql;
 
-import io.spine.server.entity.Entity;
-import io.spine.server.projection.Projection;
-import io.spine.server.projection.ProjectionStorage;
+import io.spine.server.aggregate.Aggregate;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.TypeMapping;
-import io.spine.server.storage.jdbc.projection.JdbcProjectionStorage;
-import io.spine.server.storage.jdbc.projection.JdbcProjectionStorageTest;
-import io.spine.server.storage.jdbc.record.JdbcRecordStorage;
-import io.spine.test.storage.ProjectId;
+import io.spine.server.storage.jdbc.aggregate.JdbcAggregateStorage;
+import io.spine.server.storage.jdbc.aggregate.JdbcAggregateStorageTest;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -45,38 +40,26 @@ import static io.spine.server.storage.jdbc.mysql.MysqlTests.mysqlMapping;
 import static io.spine.server.storage.jdbc.mysql.MysqlTests.stop;
 import static io.spine.server.storage.jdbc.mysql.MysqlTests.wrap;
 
-@DisplayName("`JdbcProjectionStorage` with MySQL should")
+@DisplayName("`JdbcAggregateStorage` with MySQL should")
 @EnableConditionally
-final class MysqlProjectionStorageTest extends JdbcProjectionStorageTest {
+final class MysqlAggregateStorageTest extends JdbcAggregateStorageTest {
 
     private @Nullable MySQLContainer<?> mysql;
 
     @Override
-    protected ProjectionStorage<ProjectId> newStorage(Class<? extends Entity<?, ?>> entityClass) {
+    protected <I> JdbcAggregateStorage<I>
+    newStorage(Class<? extends I> idClass, Class<? extends Aggregate<I, ?, ?>> aggregateClass) {
         mysql = mysqlContainer();
         mysql.start();
-
         DataSourceWrapper dataSource = wrap(mysql);
 
-        @SuppressWarnings("unchecked") // Required for the tests.
-        Class<? extends Projection<ProjectId, ?, ?>> projectionClass =
-                (Class<? extends Projection<ProjectId, ?, ?>>) entityClass;
-        TypeMapping typeMapping = mysqlMapping();
-        JdbcRecordStorage<ProjectId> entityStorage =
-                JdbcRecordStorage.<ProjectId>newBuilder()
-                                 .setDataSource(dataSource)
-                                 .setMultitenant(false)
-                                 .setEntityClass(projectionClass)
-                                 .setTypeMapping(typeMapping)
-                                 .build();
-        ProjectionStorage<ProjectId> storage =
-                JdbcProjectionStorage.<ProjectId>newBuilder()
-                                     .setRecordStorage(entityStorage)
-                                     .setDataSource(dataSource)
-                                     .setMultitenant(false)
-                                     .setProjectionClass(projectionClass)
-                                     .setTypeMapping(typeMapping)
-                                     .build();
+        JdbcAggregateStorage.Builder<I> builder = JdbcAggregateStorage.newBuilder();
+        JdbcAggregateStorage<I> storage =
+                builder.setMultitenant(false)
+                       .setDataSource(dataSource)
+                       .setAggregateClass(aggregateClass)
+                       .setTypeMapping(mysqlMapping())
+                       .build();
         return storage;
     }
 
