@@ -138,7 +138,7 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     @SuppressWarnings("TryFinallyCanBeTryWithResources")    /* For better readability. */
     private void doTruncate(int snapshotIndex, @Nullable Timestamp date) {
         DbIterator<DoubleColumnRecord<I, Integer>> records =
-                selectVersionsToPersist(snapshotIndex, date);
+                selectVersionsToRetain(snapshotIndex, date);
         try {
             stream(records)
                     .forEach(record -> mainTable.deletePriorRecords(record.first(),
@@ -149,7 +149,7 @@ public class JdbcAggregateStorage<I> extends AggregateStorage<I> {
     }
 
     private DbIterator<DoubleColumnRecord<I, Integer>>
-    selectVersionsToPersist(int snapshotIndex, @Nullable Timestamp date) {
+    selectVersionsToRetain(int snapshotIndex, @Nullable Timestamp date) {
         SelectVersionBySnapshot<I> query =
                 mainTable.composeSelectVersionQuery(snapshotIndex, date);
         DbIterator<DoubleColumnRecord<I, Integer>> iterator = query.execute();
