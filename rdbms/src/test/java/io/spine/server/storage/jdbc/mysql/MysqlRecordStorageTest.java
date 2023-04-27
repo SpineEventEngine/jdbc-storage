@@ -37,9 +37,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.testcontainers.containers.MySQLContainer;
 
-import static io.spine.server.storage.jdbc.mysql.MysqlTests.*;
 import static io.spine.server.storage.jdbc.mysql.MysqlTests.mysqlContainer;
 import static io.spine.server.storage.jdbc.mysql.MysqlTests.mysqlMapping;
+import static io.spine.server.storage.jdbc.mysql.MysqlTests.stop;
 import static io.spine.server.storage.jdbc.mysql.MysqlTests.wrap;
 
 @DisplayName("`JdbcRecordStorage` with MySQL should")

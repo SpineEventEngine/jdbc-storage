@@ -26,11 +26,9 @@
 
 package io.spine.server.storage.jdbc.mysql;
 
-import io.spine.server.delivery.InboxStorage;
 import io.spine.server.delivery.ShardedWorkRegistry;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.JdbcStorageFactory;
-import io.spine.server.storage.jdbc.delivery.JdbcInboxStorage;
 import io.spine.server.storage.jdbc.delivery.JdbcShardedWorkRegistry;
 import io.spine.server.storage.jdbc.delivery.JdbcShardedWorkRegistryTest;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -38,7 +36,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.testcontainers.containers.MySQLContainer;
 
-import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_1;
 import static io.spine.server.storage.jdbc.mysql.MysqlTests.mysqlContainer;
 import static io.spine.server.storage.jdbc.mysql.MysqlTests.mysqlMapping;
 import static io.spine.server.storage.jdbc.mysql.MysqlTests.stop;

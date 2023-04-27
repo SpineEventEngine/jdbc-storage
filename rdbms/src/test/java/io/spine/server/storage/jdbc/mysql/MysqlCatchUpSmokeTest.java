@@ -40,9 +40,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.testcontainers.containers.MySQLContainer;
 
-import static io.spine.base.Identifier.newUuid;
-import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
-import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_1;
 import static io.spine.server.storage.jdbc.mysql.MysqlTests.mysqlContainer;
 import static io.spine.server.storage.jdbc.mysql.MysqlTests.mysqlMapping;
 import static io.spine.server.storage.jdbc.mysql.MysqlTests.stop;
