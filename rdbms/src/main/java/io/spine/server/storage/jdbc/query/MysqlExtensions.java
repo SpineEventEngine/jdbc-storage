@@ -51,18 +51,6 @@ public final class MysqlExtensions {
     }
 
     /**
-     * Appends this clause with {@code ON DUPLICATE KEY UPDATE ...} extension.
-     *
-     * <p>Inspired by
-     * {@code com.querydsl.sql.mysql.MySQLQueryFactory.insertOnDuplicateKeyUpdate(..)};
-     */
-    public static SQLInsertClause withOnDuplicateUpdate(SQLInsertClause clause) {
-        clause.addFlag(QueryFlag.Position.END,
-                       template(String.class, " on duplicate key update {0}", clause));
-        return clause;
-    }
-
-    /**
      * Appends this clause with {@code ON DUPLICATE KEY UPDATE ...} extension,
      * taking into account multiple passed expression clauses, each corresponding
      * to setting certain column value.

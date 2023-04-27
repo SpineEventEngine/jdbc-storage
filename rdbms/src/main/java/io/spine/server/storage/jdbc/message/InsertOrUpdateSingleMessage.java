@@ -26,10 +26,14 @@
 
 package io.spine.server.storage.jdbc.message;
 
+import com.google.common.collect.ImmutableList;
 import com.google.protobuf.Message;
 import com.querydsl.core.dml.StoreClause;
+import com.querydsl.core.types.Expression;
+import com.querydsl.sql.SQLExpressions;
 import com.querydsl.sql.dml.SQLInsertClause;
-import io.spine.server.storage.jdbc.query.MysqlExtensions;
+
+import static io.spine.server.storage.jdbc.query.MysqlExtensions.withOnDuplicateUpdate;
 
 final class InsertOrUpdateSingleMessage<I, M extends Message> extends WriteSingleMessage<I, M>  {
 
@@ -40,9 +44,41 @@ final class InsertOrUpdateSingleMessage<I, M extends Message> extends WriteSingl
     @Override
     protected StoreClause<?> clause() {
         SQLInsertClause original = factory().insert(table());
-        SQLInsertClause optimized = MysqlExtensions.withOnDuplicateUpdate(original);
-        SQLInsertClause result =  optimized.set(idPath(), normalizedId());
+        SQLInsertClause result =  original.set(idPath(), normalizedId());
         return result;
+    }
+
+    /**
+     * Extends the query with {@code ON DUPLICATE KEY UPDATE ...} clause,
+     * and sets the corresponding values for the columns to update.
+     */
+    @Override
+    protected void extendClause(StoreClause<?> query, M message) {
+        SQLInsertClause insert = (SQLInsertClause) query;
+
+        ImmutableList.Builder<Expression<?>> expBuilder = ImmutableList.builder();
+        addIdExpression(expBuilder);
+        populateColumnExpressions(message, expBuilder);
+        ImmutableList<Expression<?>> expressions = expBuilder.build();
+
+        withOnDuplicateUpdate(insert, expressions);
+    }
+
+    private void addIdExpression(ImmutableList.Builder<Expression<?>> expBuilder) {
+        Expression<Object> setId = SQLExpressions.set(idPath(), normalizedId());
+        expBuilder.add(setId);
+    }
+
+    private void populateColumnExpressions(M message, ImmutableList.Builder<Expression<?>> expBuilder) {
+        for (MessageTable.Column<M> column : columns()) {
+            if(isIdColumn(column)) {
+                continue;
+            }
+            Object columnValue = column.getter()
+                                       .apply(message);
+            Expression<Object> setColumn = SQLExpressions.set(pathOf(column), columnValue);
+            expBuilder.add(setColumn);
+        }
     }
 
     static <I, M extends Message> Builder<I, M> newBuilder() {

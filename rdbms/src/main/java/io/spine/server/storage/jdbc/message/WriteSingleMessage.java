@@ -63,8 +63,17 @@ abstract class WriteSingleMessage<I, M extends Message>
     @Override
     public long execute() {
         StoreClause<?> query = clause();
+        extendClause(query, message);
         setColumnValues(query, message);
         return query.execute();
+    }
+
+    /**
+     * Extends the query with the flags required to optimize the execution.
+     */
+    @SuppressWarnings("NoopMethodInAbstractClass")  /* Default behaviour is to do nothing. */
+    protected void extendClause(StoreClause<?> clause, M message) {
+       // Do nothing.
     }
 
     /**
