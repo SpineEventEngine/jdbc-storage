@@ -56,6 +56,7 @@ public final class Drivers {
     public static boolean isMysqlDriver(DataSourceMetaData metadata) {
         checkNotNull(metadata);
         boolean result = metadata.driverName()
+                                 .toLowerCase()
                                  .contains("mysql");
         return result;
     }
