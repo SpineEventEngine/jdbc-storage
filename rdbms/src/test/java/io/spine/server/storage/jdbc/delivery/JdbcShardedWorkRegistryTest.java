@@ -55,7 +55,7 @@ import static io.spine.server.storage.jdbc.delivery.given.TestShardIndex.newInde
 import static io.spine.testing.DisplayNames.NOT_ACCEPT_NULLS;
 
 @DisplayName("`JdbcShardedWorkRegistry` should")
-class JdbcShardedWorkRegistryTest extends ShardedWorkRegistryTest {
+public class JdbcShardedWorkRegistryTest extends ShardedWorkRegistryTest {
 
     private static final ShardIndex index = newIndex(1, 15);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022, TeamDev. All rights reserved.
+ * Copyright 2023, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,47 +24,49 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.delivery;
+package io.spine.server.storage.jdbc.mysql;
 
+import io.spine.base.Time;
 import io.spine.environment.Tests;
 import io.spine.server.ServerEnvironment;
-import io.spine.server.delivery.CatchUpTest;
 import io.spine.server.storage.StorageFactory;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.JdbcStorageFactory;
+import io.spine.server.storage.jdbc.delivery.JdbcCatchUpSmokeTest;
 import io.spine.testing.SlowTest;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.testcontainers.containers.MySQLContainer;
 
 import static io.spine.base.Identifier.newUuid;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
 import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_1;
+import static io.spine.server.storage.jdbc.mysql.MysqlTests.mysqlContainer;
+import static io.spine.server.storage.jdbc.mysql.MysqlTests.mysqlMapping;
+import static io.spine.server.storage.jdbc.mysql.MysqlTests.stop;
+import static io.spine.server.storage.jdbc.mysql.MysqlTests.wrap;
 
-/**
- * Smoke tests on {@link io.spine.server.delivery.CatchUp CatchUp} functionality running
- * on top of JDBC-accessible storage.
- *
- * <p>The tests are extremely slow, so only a tiny portion of the original {@link CatchUpTest}
- * is launched.
- */
 @SlowTest
-@DisplayName("JDBC-backed `CatchUp` should ")
-public class JdbcCatchUpSmokeTest extends CatchUpTest {
+@DisplayName("JDBC-backed `CatchUp` on MySQL should")
+@EnableConditionally
+final class MysqlCatchUpSmokeTest extends JdbcCatchUpSmokeTest {
 
+    private @Nullable MySQLContainer<?> mysql;
     private StorageFactory factory;
 
     @Override
     @BeforeEach
     public void setUp() {
-        super.setUp();
-        DataSourceWrapper source = whichIsStoredInMemory(newUuid());
+        mysql = mysqlContainer();
+        mysql.start();
+        DataSourceWrapper dataSource = wrap(mysql);
+
         factory = JdbcStorageFactory
                 .newBuilder()
-                .setDataSource(source)
-                .setTypeMapping(H2_2_1)
+                .setDataSource(dataSource)
+                .setTypeMapping(mysqlMapping())
                 .build();
         ServerEnvironment
                 .when(Tests.class)
@@ -74,32 +76,13 @@ public class JdbcCatchUpSmokeTest extends CatchUpTest {
     @AfterEach
     @Override
     public void tearDown() {
-        super.tearDown();
+        Time.resetProvider();
         try {
             factory.close();
         } catch (Exception e) {
-            throw new IllegalStateException("Error closing the storage factory", e);
+            throw new IllegalStateException("Error closing the MySQL-based storage factory", e);
+        } finally {
+            stop(mysql);
         }
-    }
-
-    @Test
-    @Disabled
-    @Override
-    public void withNanosByIds() throws InterruptedException {
-        super.withNanosByIds();
-    }
-
-    @Test
-    @Disabled
-    @Override
-    public void withMillisByIds() throws InterruptedException {
-        super.withMillisByIds();
-    }
-
-    @Test
-    @Disabled
-    @Override
-    public void withMillisAllInOrder() throws InterruptedException {
-        super.withMillisAllInOrder();
     }
 }

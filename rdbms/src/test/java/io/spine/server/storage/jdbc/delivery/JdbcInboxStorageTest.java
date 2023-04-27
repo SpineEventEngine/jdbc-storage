@@ -62,7 +62,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @DisplayName("JdbcInboxStorage should")
-class JdbcInboxStorageTest extends InboxStorageTest {
+public class JdbcInboxStorageTest extends InboxStorageTest {
 
     private JdbcInboxStorage storage;
 
