@@ -122,7 +122,7 @@ public class JdbcShardedWorkRegistryTest extends ShardedWorkRegistryTest {
         assertThat(anotherIdxSameNode.hasSession()).isTrue();
 
         PickUpOutcome anotherIdxAnotherNode = registry.pickUp(anotherIdx, newNode());
-        assertThat(sameIdxAnotherNode.hasAlreadyPicked()).isTrue();
+        assertThat(anotherIdxAnotherNode.hasAlreadyPicked()).isTrue();
     }
 
     @Test
