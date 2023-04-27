@@ -26,9 +26,14 @@
 
 package io.spine.server.storage.jdbc.query;
 
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.querydsl.core.QueryFlag;
+import com.querydsl.core.types.Expression;
+import com.querydsl.core.types.TemplateExpression;
 import com.querydsl.sql.dml.SQLInsertClause;
 import io.spine.annotation.Internal;
+
+import java.util.List;
 
 import static com.querydsl.core.types.ExpressionUtils.template;
 
@@ -55,5 +60,26 @@ public final class MysqlExtensions {
         clause.addFlag(QueryFlag.Position.END,
                        template(String.class, " on duplicate key update {0}", clause));
         return clause;
+    }
+
+    /**
+     * Appends this clause with {@code ON DUPLICATE KEY UPDATE ...} extension,
+     * taking into account multiple passed expression clauses, each corresponding
+     * to setting certain column value.
+     *
+     * <p>Inspired by
+     * {@code com.querydsl.sql.mysql.MySQLQueryFactory.insertOnDuplicateKeyUpdate(..)};
+     */
+    @CanIgnoreReturnValue
+    public static SQLInsertClause withOnDuplicateUpdate(SQLInsertClause insert,
+                                                        List<Expression<?>> clauses) {
+        StringBuilder flag = new StringBuilder(" on duplicate key update ");
+        for (int i = 0; i < clauses.size(); i++) {
+            flag.append(i > 0 ? ", " : "").append('{').append(i).append('}');
+        }
+        String stringifiedFlag = flag.toString();
+        TemplateExpression<String> template = template(String.class, stringifiedFlag, clauses);
+        insert.addFlag(QueryFlag.Position.END, template);
+        return insert;
     }
 }

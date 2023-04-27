@@ -26,11 +26,20 @@
 
 package io.spine.server.storage.jdbc.record;
 
+import com.google.common.collect.ImmutableList;
+import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.dsl.PathBuilder;
+import com.querydsl.sql.SQLExpressions;
 import com.querydsl.sql.dml.SQLInsertClause;
+import io.spine.server.entity.storage.EntityRecordWithColumns;
 import io.spine.server.storage.jdbc.query.IdColumn;
+import io.spine.server.storage.jdbc.query.Parameters;
+
+import java.util.Set;
 
 import static io.spine.server.storage.jdbc.query.MysqlExtensions.withOnDuplicateUpdate;
+import static io.spine.server.storage.jdbc.query.Serializer.serialize;
+import static io.spine.server.storage.jdbc.record.RecordTable.StandardColumn.ENTITY;
 
 final class InsertOrUpdateEntityQuery<I> extends WriteEntityQuery<I, SQLInsertClause> {
 
@@ -56,8 +65,49 @@ final class InsertOrUpdateEntityQuery<I> extends WriteEntityQuery<I, SQLInsertCl
     @Override
     protected SQLInsertClause createClause() {
         SQLInsertClause clause = factory().insert(table());
-        SQLInsertClause result = withOnDuplicateUpdate(clause);
-        return result;
+        return clause;
+    }
+
+    /**
+     * Extends the query with {@code ON DUPLICATE KEY UPDATE ...} clause,
+     * and sets the corresponding values for the columns to update.
+     */
+    @Override
+    protected void extendClause(SQLInsertClause clause, I id, EntityRecordWithColumns record) {
+        ImmutableList.Builder<Expression<?>> expBuilder = ImmutableList.builder();
+        addEntityExpression(record, expBuilder);
+        addColumnExpressions(record, expBuilder);
+        addIdExpression(id, expBuilder);
+        ImmutableList<Expression<?>> expressions = expBuilder.build();
+        withOnDuplicateUpdate(clause, expressions);
+    }
+
+    private void addIdExpression(I id, ImmutableList.Builder<Expression<?>> expBuilder) {
+        IdColumn<I> idColumn = idColumn();
+        Object normalizedId = idColumn.normalize(id);
+        PathBuilder<Object> idPath = pathOf(idColumn);
+        Expression<Object> setId = SQLExpressions.set(idPath, normalizedId);
+        expBuilder.add(setId);
+    }
+
+    private void addEntityExpression(EntityRecordWithColumns record,
+                           ImmutableList.Builder<Expression<?>> expBuilder) {
+        byte[] serializedRecord = serialize(record.record());
+        Expression<Object> setEntity = SQLExpressions.set(pathOf(ENTITY), serializedRecord);
+        expBuilder.add(setEntity);
+    }
+
+    private void addColumnExpressions(EntityRecordWithColumns record,
+                                      ImmutableList.Builder<Expression<?>> expBuilder) {
+        Parameters parameters = createParametersFromColumns(record);
+        Set<String> identifiers = parameters.getIdentifiers();
+        for (String identifier : identifiers) {
+            Object parameterValue = parameters.getParameter(identifier)
+                                              .getValue();
+            Expression<Object> setParameter =
+                    SQLExpressions.set(pathOf(identifier), parameterValue);
+            expBuilder.add(setParameter);
+        }
     }
 
     @SuppressWarnings("ClassNameSameAsAncestorName") /* By design. */
