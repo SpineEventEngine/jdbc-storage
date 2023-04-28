@@ -51,6 +51,7 @@ final class MysqlTests {
      * Prevents instantiation of this utility.
      */
     private MysqlTests() {
+        // Do nothing.
     }
 
     /**
