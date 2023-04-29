@@ -29,6 +29,7 @@ package io.spine.server.storage.jdbc.mysql;
 import io.spine.base.Time;
 import io.spine.environment.Tests;
 import io.spine.server.ServerEnvironment;
+import io.spine.server.delivery.Delivery;
 import io.spine.server.storage.StorageFactory;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.JdbcStorageFactory;
@@ -44,6 +45,7 @@ import static io.spine.server.storage.jdbc.mysql.MysqlTests.mysqlContainer;
 import static io.spine.server.storage.jdbc.mysql.MysqlTests.mysqlMapping;
 import static io.spine.server.storage.jdbc.mysql.MysqlTests.stop;
 import static io.spine.server.storage.jdbc.mysql.MysqlTests.wrap;
+import static java.util.Objects.requireNonNull;
 
 @SlowTest
 @DisplayName("JDBC-backed `CatchUp` on MySQL should")
@@ -53,9 +55,14 @@ final class MysqlCatchUpSmokeTest extends JdbcCatchUpSmokeTest {
     private @Nullable MySQLContainer<?> mysql;
     private StorageFactory factory;
 
+    private @Nullable Delivery originalDelivery;
+
     @Override
     @BeforeEach
+    @SuppressWarnings("resource")   /* It's fine for tests. */
     public void setUp() {
+        this.originalDelivery = ServerEnvironment.instance().delivery();
+
         mysql = mysqlContainer();
         mysql.start();
         DataSourceWrapper dataSource = wrap(mysql);
@@ -73,13 +80,19 @@ final class MysqlCatchUpSmokeTest extends JdbcCatchUpSmokeTest {
     @AfterEach
     @Override
     public void tearDown() {
+        restoreDelivery();
         Time.resetProvider();
         try {
             factory.close();
         } catch (Exception e) {
-            throw new IllegalStateException("Error closing the MySQL-based storage factory", e);
+            throw new IllegalStateException("Error closing the MySQL-based storage factory.", e);
         } finally {
             stop(mysql);
         }
+    }
+
+    private void restoreDelivery() {
+        requireNonNull(originalDelivery);
+        ServerEnvironment.when(Tests.class).use(this.originalDelivery);
     }
 }
