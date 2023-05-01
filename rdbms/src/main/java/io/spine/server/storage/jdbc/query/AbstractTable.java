@@ -268,12 +268,25 @@ public abstract class AbstractTable<I, R, W> implements Logging {
         return dataSource;
     }
 
+    /**
+     * Returns a query to insert the passed record under the passed ID.
+     */
     protected abstract WriteQuery composeInsertQuery(I id, W record);
 
+    /**
+     * Returns a query to update the record with the passed ID.
+     */
     protected abstract WriteQuery composeUpdateQuery(I id, W record);
 
+    /**
+     * Returns a query which inserts the record under the passed ID,
+     * or updates the record if it already exists.
+     */
     protected abstract WriteQuery composeInsertOrUpdateQuery(I id, W record);
 
+    /**
+     * Returns a query to select a record by ID.
+     */
     protected abstract SelectQuery<R> composeSelectQuery(I id);
 
     private String composeCreateTableSql() {
