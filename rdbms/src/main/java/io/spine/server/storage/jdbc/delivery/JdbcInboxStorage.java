@@ -26,6 +26,8 @@
 
 package io.spine.server.storage.jdbc.delivery;
 
+import com.google.common.collect.ImmutableList;
+import com.google.protobuf.Timestamp;
 import io.spine.server.delivery.InboxMessage;
 import io.spine.server.delivery.InboxMessageId;
 import io.spine.server.delivery.InboxReadRequest;
@@ -35,11 +37,12 @@ import io.spine.server.delivery.ShardIndex;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.StorageBuilder;
 import io.spine.server.storage.jdbc.message.JdbcMessageStorage;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-import java.util.Iterator;
 import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static io.spine.util.Preconditions2.checkPositive;
 
 /**
  * A JDBC-based implementation of the {@link InboxStorage}.
@@ -59,22 +62,29 @@ public class JdbcInboxStorage
     }
 
     /**
-     * Reads the contents of the {@code Inbox} filtering by the provided shard index.
+     * Reads the contents of the storage by the given shard index and returns the first page
+     * of the results.
      *
-     * @implNote There is no effective way to paginate relational tables via JDBC —
-     *         especially if the actual content of the table is constantly changing, like in
-     *         the table storing {@code InboxMessage}s.
-     *         This method reads all the content for the shard into memory and emulates the
-     *         actual pagination.
-     *         See the <a href="https://github.com/SpineEventEngine/jdbc-storage/issues/136">
-     *         respective issue</a>.
+     * <p>Older items go first.
+     *
+     * @param index
+     *         the shard index to return the results for
+     * @param pageSize
+     *         the maximum number of the elements per page
+     * @return the first page of the results
      */
     @Override
     public Page<InboxMessage> readAll(ShardIndex index, int pageSize) {
         checkNotNull(index);
-        checkNotClosed();
-        Iterator<InboxMessage> iterator = table().readAll(index);
-        return new InboxPage(iterator, pageSize);
+        checkPositive(pageSize);
+        Page<InboxMessage> page = new InboxPage(sinceWhen -> readAll(index, sinceWhen, pageSize));
+        return page;
+    }
+
+    private ImmutableList<InboxMessage>
+    readAll(ShardIndex index, @Nullable Timestamp sinceWhen, int pageSize) {
+        ImmutableList<InboxMessage> result = table().readAll(index, sinceWhen, pageSize);
+        return result;
     }
 
     @Override

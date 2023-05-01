@@ -29,6 +29,7 @@ package io.spine.server.storage.jdbc.delivery;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterators;
 import com.google.protobuf.Descriptors.Descriptor;
+import com.google.protobuf.Timestamp;
 import com.google.protobuf.util.Timestamps;
 import io.spine.server.delivery.InboxMessage;
 import io.spine.server.delivery.InboxMessageId;
@@ -79,10 +80,13 @@ final class InboxTable extends MessageTable<InboxMessageId, InboxMessage> {
      *
      * <p>The messages are ordered from oldest to newest.
      */
-    Iterator<InboxMessage> readAll(ShardIndex index) {
-        SelectInboxMessagesByShardIndex query = composeSelectByShardIndexQuery(index);
+    ImmutableList<InboxMessage>
+    readAll(ShardIndex index, @Nullable Timestamp sinceWhen, int pageSize) {
+        SelectInboxMessagesByShardIndex query =
+                composeSelectByShardIndexQuery(index, sinceWhen, pageSize);
         Iterator<InboxMessage> iterator = query.execute();
-        return iterator;
+        ImmutableList<InboxMessage> result = ImmutableList.copyOf(iterator);
+        return result;
     }
 
     /**
@@ -104,13 +108,19 @@ final class InboxTable extends MessageTable<InboxMessageId, InboxMessage> {
         return Optional.ofNullable(first);
     }
 
-    private SelectInboxMessagesByShardIndex composeSelectByShardIndexQuery(ShardIndex index) {
+    private SelectInboxMessagesByShardIndex
+    composeSelectByShardIndexQuery(ShardIndex index, @Nullable Timestamp sinceWhen, int pageSize) {
         SelectInboxMessagesByShardIndex.Builder builder =
-                SelectInboxMessagesByShardIndex.newBuilder();
-        SelectInboxMessagesByShardIndex query = builder.setTableName(name())
-                                                       .setDataSource(dataSource())
-                                                       .setShardIndex(index)
-                                                       .build();
+                SelectInboxMessagesByShardIndex
+                        .newBuilder()
+                        .setTableName(name())
+                        .setDataSource(dataSource())
+                        .setShardIndex(index);
+        if (sinceWhen != null) {
+            builder.setSinceWhen(sinceWhen);
+        }
+        builder.setPageSize(pageSize);
+        SelectInboxMessagesByShardIndex query = builder.build();
         return query;
     }
 
