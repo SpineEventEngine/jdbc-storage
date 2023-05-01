@@ -79,6 +79,7 @@ import static java.util.Objects.requireNonNull;
  * @see TableColumn
  */
 @Internal
+@SuppressWarnings("ClassWithTooManyMethods")    /* This is OK for such a central concept. */
 public abstract class AbstractTable<I, R, W> implements Logging {
 
     private final String name;
