@@ -55,7 +55,7 @@ final class MysqlRecordStorageTest extends JdbcRecordStorageTest {
 
         DataSourceWrapper dataSource = wrap(mysql);
 
-        @SuppressWarnings("unchecked") // Test invariant.
+        @SuppressWarnings("unchecked" /* Test invariant. */)
         Class<? extends Entity<ProjectId, ?>> entityClass =
                 (Class<? extends Entity<ProjectId, ?>>) cls;
         JdbcRecordStorage<ProjectId> storage =
