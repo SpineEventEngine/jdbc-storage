@@ -41,6 +41,15 @@ import static io.spine.server.storage.jdbc.query.MysqlExtensions.withOnDuplicate
 import static io.spine.server.storage.jdbc.query.Serializer.serialize;
 import static io.spine.server.storage.jdbc.record.RecordTable.StandardColumn.ENTITY;
 
+/**
+ * An optimized query which inserts a record corresponding to a single entity
+ * into the table, or updates if one already exists.
+ *
+ * <p>This query uses {@code INSERT ... ON DUPLICATE KEY UPDATE ...} clause.
+ *
+ * @param <I>
+ *         the type of entity identifiers
+ */
 final class InsertOrUpdateEntityQuery<I> extends WriteEntityQuery<I, SQLInsertClause> {
 
     private InsertOrUpdateEntityQuery(Builder<I> builder) {
@@ -52,6 +61,9 @@ final class InsertOrUpdateEntityQuery<I> extends WriteEntityQuery<I, SQLInsertCl
         clause.addBatch();
     }
 
+    /**
+     * Returns a new builder for this query.
+     */
     static <I> Builder<I> newBuilder() {
         return new Builder<>();
     }
@@ -110,7 +122,13 @@ final class InsertOrUpdateEntityQuery<I> extends WriteEntityQuery<I, SQLInsertCl
         }
     }
 
-    @SuppressWarnings("ClassNameSameAsAncestorName") /* By design. */
+    /**
+     * A builder of {@code InsertOrUpdateEntityQuery} instances.
+     *
+     * @param <I>
+     *         the type of entity identifiers
+     */
+    @SuppressWarnings("ClassNameSameAsAncestorName" /* By design. */)
     static class Builder<I>
             extends WriteEntityQuery.Builder<Builder<I>, InsertOrUpdateEntityQuery<I>, I> {
 
@@ -120,7 +138,7 @@ final class InsertOrUpdateEntityQuery<I> extends WriteEntityQuery<I, SQLInsertCl
         }
 
         @Override
-        protected InsertOrUpdateEntityQuery.Builder<I> getThis() {
+        protected Builder<I> getThis() {
             return this;
         }
     }
