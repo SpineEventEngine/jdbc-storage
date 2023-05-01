@@ -73,7 +73,7 @@ import static java.util.Objects.requireNonNull;
  * @param <I>
  *         a type of ID of the records stored in the table
  * @param <R>
- *         a result type of a read operation by a single ID
+ *         a result type of read operation by a single ID
  * @param <W>
  *         a type of stored records
  * @see TableColumn
