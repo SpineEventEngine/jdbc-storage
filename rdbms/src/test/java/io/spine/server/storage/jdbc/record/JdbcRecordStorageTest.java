@@ -322,10 +322,11 @@ public class JdbcRecordStorageTest extends RecordStorageTest<JdbcRecordStorage<P
                                                 .setEntityClass(nullEntityCls));
         }
 
-        @SuppressWarnings({"CheckReturnValue", "ResultOfMethodCallIgnored"})
-        // Method called to throw exception.
+
         @Test
         @DisplayName("column mapping")
+        @SuppressWarnings({"CheckReturnValue",
+                "ResultOfMethodCallIgnored" /* Method called to throw exception. */})
         void columnMapping() {
             DefaultJdbcColumnMapping columnMapping = nullRef();
             assertThrows(NullPointerException.class,
