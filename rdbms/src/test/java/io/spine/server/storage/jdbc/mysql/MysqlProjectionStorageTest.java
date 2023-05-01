@@ -58,7 +58,7 @@ final class MysqlProjectionStorageTest extends JdbcProjectionStorageTest {
 
         DataSourceWrapper dataSource = wrap(mysql);
 
-        @SuppressWarnings("unchecked") // Required for the tests.
+        @SuppressWarnings("unchecked" /* Required for the tests. */)
         Class<? extends Projection<ProjectId, ?, ?>> projectionClass =
                 (Class<? extends Projection<ProjectId, ?, ?>>) entityClass;
         TypeMapping typeMapping = mysqlMapping();
