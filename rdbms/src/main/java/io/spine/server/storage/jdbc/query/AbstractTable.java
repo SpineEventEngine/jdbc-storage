@@ -54,6 +54,7 @@ import static io.spine.server.storage.jdbc.Sql.Query.DEFAULT;
 import static io.spine.server.storage.jdbc.Sql.Query.NOT;
 import static io.spine.server.storage.jdbc.Sql.Query.NULL;
 import static io.spine.server.storage.jdbc.Sql.Query.PRIMARY_KEY;
+import static java.util.Objects.requireNonNull;
 
 /**
  * A representation of an SQL table.
@@ -332,7 +333,7 @@ public abstract class AbstractTable<I, R, W> implements Logging {
         if (isIdColumn) {
             return idColumn.sqlType();
         }
-        return checkNotNull(column.type());
+        return requireNonNull(column.type());
     }
 
     /**
