@@ -33,6 +33,9 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import static org.junit.jupiter.api.extension.ConditionEvaluationResult.disabled;
 import static org.junit.jupiter.api.extension.ConditionEvaluationResult.enabled;
 
+/**
+ * Tells whether the MySQL-based tests are {@linkplain MysqlTests#enabled enabled}.
+ */
 public final class RunMysqlTestCondition implements ExecutionCondition {
 
     @Override
