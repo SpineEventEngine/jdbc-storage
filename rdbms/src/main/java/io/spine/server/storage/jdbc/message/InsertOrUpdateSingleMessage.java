@@ -35,7 +35,18 @@ import com.querydsl.sql.dml.SQLInsertClause;
 
 import static io.spine.server.storage.jdbc.query.MysqlExtensions.withOnDuplicateUpdate;
 
-final class InsertOrUpdateSingleMessage<I, M extends Message> extends WriteSingleMessage<I, M>  {
+/**
+ * An optimized query which inserts a record corresponding to a single Proto message
+ * into the table, or updates if one already exists.
+ *
+ * <p>This query uses {@code INSERT ... ON DUPLICATE KEY UPDATE ...} clause.
+ *
+ * @param <I>
+ *         the type of table identifiers
+ * @param <M>
+ *         the type of messages to insert or update
+ */
+final class InsertOrUpdateSingleMessage<I, M extends Message> extends WriteSingleMessage<I, M> {
 
     private InsertOrUpdateSingleMessage(Builder<I, M> builder) {
         super(builder);
@@ -44,7 +55,7 @@ final class InsertOrUpdateSingleMessage<I, M extends Message> extends WriteSingl
     @Override
     protected StoreClause<?> clause() {
         SQLInsertClause original = factory().insert(table());
-        SQLInsertClause result =  original.set(idPath(), normalizedId());
+        SQLInsertClause result = original.set(idPath(), normalizedId());
         return result;
     }
 
@@ -69,9 +80,10 @@ final class InsertOrUpdateSingleMessage<I, M extends Message> extends WriteSingl
         expBuilder.add(setId);
     }
 
-    private void populateColumnExpressions(M message, ImmutableList.Builder<Expression<?>> expBuilder) {
+    private void populateColumnExpressions(M message,
+                                           ImmutableList.Builder<Expression<?>> expBuilder) {
         for (MessageTable.Column<M> column : columns()) {
-            if(isIdColumn(column)) {
+            if (isIdColumn(column)) {
                 continue;
             }
             Object columnValue = column.getter()
@@ -81,14 +93,25 @@ final class InsertOrUpdateSingleMessage<I, M extends Message> extends WriteSingl
         }
     }
 
+    /**
+     * Returns a new builder for this query.
+     */
     static <I, M extends Message> Builder<I, M> newBuilder() {
         return new Builder<>();
     }
 
+    /**
+     * A builder of {@code InsertOrUpdateSingleMessage} queries.
+     *
+     * @param <I>
+     *         the type of table identifiers
+     * @param <M>
+     *         the type of messages to insert or update
+     */
     static class Builder<I, M extends Message>
             extends WriteSingleMessage.Builder<I,
                                                M,
-                                               InsertOrUpdateSingleMessage.Builder<I, M>,
+                                               Builder<I, M>,
                                                InsertOrUpdateSingleMessage<I, M>> {
 
         @Override
