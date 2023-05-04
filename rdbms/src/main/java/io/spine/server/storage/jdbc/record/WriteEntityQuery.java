@@ -90,9 +90,9 @@ abstract class WriteEntityQuery<I, C extends StoreClause<C>>
     /**
      * Extends the query with the flags required to optimize the execution.
      */
-    @SuppressWarnings("NoopMethodInAbstractClass")  /* Default behaviour is to do nothing. */
+    @SuppressWarnings("NoopMethodInAbstractClass" /* Default behaviour is to do nothing. */)
     protected void extendClause(C clause, I id, EntityRecordWithColumns record) {
-        // do nothing by default.
+        // Do nothing by default.
     }
 
     /**
