@@ -208,6 +208,7 @@ final class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWith
 
     private Iterator<DoubleColumnRecord<I, EntityRecord>>
     executeQuery(EntityQuery<I> entityQuery, ResponseFormat format) {
+        ensureColumnsPresent(format.getOrderBy());
         SelectByEntityColumnsQuery.Builder<I> builder = queryBuilder(entityQuery, format);
         SelectByEntityColumnsQuery<I> query = builder.build();
         Iterator<DoubleColumnRecord<I, EntityRecord>> queryResult = query.execute();
@@ -230,6 +231,7 @@ final class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWith
     }
 
     private Iterator<EntityRecord> executeSelectAllQuery(ResponseFormat format) {
+        ensureColumnsPresent(format.getOrderBy());
         SelectAllQuery.Builder builder = SelectAllQuery.newBuilder();
         SelectAllQuery query =
                 builder.setDataSource(dataSource())
@@ -336,7 +338,7 @@ final class RecordTable<I> extends EntityTable<I, EntityRecord, EntityRecordWith
     /**
      * A wrapper type for {@link Column}.
      *
-     * <p>Serves for accessing entity columns trough the {@link TableColumn} interface.
+     * <p>Serves for accessing entity columns through the {@link TableColumn} interface.
      *
      * @see StandardColumn
      */

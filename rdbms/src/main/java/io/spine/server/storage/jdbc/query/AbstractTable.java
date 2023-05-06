@@ -30,6 +30,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.spine.annotation.Internal;
+import io.spine.client.OrderBy;
 import io.spine.logging.Logging;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.Drivers;
@@ -54,6 +55,7 @@ import static io.spine.server.storage.jdbc.Sql.Query.DEFAULT;
 import static io.spine.server.storage.jdbc.Sql.Query.NOT;
 import static io.spine.server.storage.jdbc.Sql.Query.NULL;
 import static io.spine.server.storage.jdbc.Sql.Query.PRIMARY_KEY;
+import static io.spine.util.Exceptions.newIllegalStateException;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -378,5 +380,33 @@ public abstract class AbstractTable<I, R, W> implements Logging {
                                              .setDataSource(dataSource)
                                              .build();
         query.execute();
+    }
+
+    /**
+     * Checks that the column specified via the ordering directive
+     * is present in this table.
+     *
+     * <p>Throws an {@code IllegalStateException} if there is no such column.
+     *
+     * <p>In case an empty ordering is passed, this method does nothing.
+     *
+     * @throws IllegalStateException
+     *         if this table has no column specified
+     *         in the ordering directive
+     */
+    protected void ensureColumnsPresent(OrderBy ordering) {
+        if(OrderBy.getDefaultInstance().equals(ordering)) {
+            return;
+        }
+        String columnName = ordering.getColumn();
+        boolean present = columns().stream()
+                                   .anyMatch(c -> c.name()
+                                                   .equals(columnName));
+        if(!present) {
+            throw newIllegalStateException(
+                    "The column `%s` specified in `ORDER BY` directive" +
+                            " is not found in the table `%s`.",
+                    columnName, name());
+        }
     }
 }
