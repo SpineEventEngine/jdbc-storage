@@ -33,7 +33,6 @@ import io.spine.annotation.Internal;
 import io.spine.client.OrderBy;
 import io.spine.logging.Logging;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.Drivers;
 import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.Type;
 import io.spine.server.storage.jdbc.TypeMapping;
@@ -46,6 +45,7 @@ import java.util.List;
 import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static io.spine.server.storage.jdbc.Drivers.isMysqlDriver;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.COMMA;
@@ -223,7 +223,7 @@ public abstract class AbstractTable<I, R, W> implements Logging {
      *         a record to insert or update
      */
     private void insertOrUpdate(I id, W record) {
-        if(Drivers.isMysqlDriver(dataSource.metaData())) {
+        if(isMysqlDriver(dataSource.metaData())) {
             WriteQuery query = composeInsertOrUpdateQuery(id, record);
             query.execute();
         } else {
