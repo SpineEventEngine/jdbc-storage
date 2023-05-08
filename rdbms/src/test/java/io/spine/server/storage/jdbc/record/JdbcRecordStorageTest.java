@@ -309,8 +309,6 @@ public class JdbcRecordStorageTest extends RecordStorageTest<JdbcRecordStorage<P
             close(storage);
         }
 
-
-        // allow to order records when specifying the column for
         @Test
         @DisplayName("any sorting, but if the column name is wrong, throw ISE")
         void throwIfWrongOrderBy() {
