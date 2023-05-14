@@ -27,14 +27,19 @@
 package io.spine.server.storage.jdbc.delivery;
 
 import com.google.protobuf.Descriptors.Descriptor;
+import com.google.protobuf.Timestamp;
+import com.google.protobuf.util.Timestamps;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.sql.AbstractSQLQuery;
 import io.spine.server.delivery.InboxMessage;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.querydsl.core.types.Order.ASC;
 import static io.spine.server.storage.jdbc.delivery.InboxTable.Column.SHARD_INDEX;
 import static io.spine.server.storage.jdbc.delivery.InboxTable.Column.WHEN_RECEIVED;
 import static io.spine.server.storage.jdbc.message.MessageTable.bytesColumn;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Selects messages from the {@link InboxTable} that belong to a shard at a given
@@ -44,17 +49,30 @@ import static io.spine.server.storage.jdbc.message.MessageTable.bytesColumn;
  */
 final class SelectInboxMessagesByShardIndex extends SelectByShardIndexQuery<InboxMessage> {
 
+    private final @Nullable Timestamp sinceWhen;
+    private final int pageSize;
+
     private SelectInboxMessagesByShardIndex(Builder builder) {
         super(builder);
+        this.sinceWhen = builder.sinceWhen;
+        this.pageSize = builder.pageSize;
     }
 
     @Override
+    @SuppressWarnings("rawtypes")    /* For simplicity. */
     protected AbstractSQLQuery<Object, ?> query() {
         OrderSpecifier<Comparable> byTime = orderBy(WHEN_RECEIVED, ASC);
-        return factory().select(pathOf(bytesColumn()))
-                        .from(table())
-                        .where(pathOf(SHARD_INDEX).eq(shardIndex()))
-                        .orderBy(byTime);
+        AbstractSQLQuery<Object, ?> partial =
+                factory().select(pathOf(bytesColumn()))
+                         .from(table())
+                         .where(pathOf(SHARD_INDEX).eq(shardIndex()));
+        if (sinceWhen != null) {
+            partial.where(comparablePathOf(WHEN_RECEIVED, Long.class)
+                                  .gt(Timestamps.toNanos(sinceWhen)));
+        }
+        AbstractSQLQuery<Object, ?> result = partial.orderBy(byTime)
+                                                    .limit(pageSize);
+        return result;
     }
 
     @Override
@@ -69,6 +87,10 @@ final class SelectInboxMessagesByShardIndex extends SelectByShardIndexQuery<Inbo
     static class Builder
             extends SelectByShardIndexQuery.Builder<Builder, SelectInboxMessagesByShardIndex> {
 
+        private @Nullable Timestamp sinceWhen;
+
+        private int pageSize;
+
         @Override
         protected Builder getThis() {
             return this;
@@ -77,6 +99,27 @@ final class SelectInboxMessagesByShardIndex extends SelectByShardIndexQuery<Inbo
         @Override
         protected SelectInboxMessagesByShardIndex doBuild() {
             return new SelectInboxMessagesByShardIndex(this);
+        }
+
+        /**
+         * Sets the point in time, since which the messages should be selected
+         * according to their {@linkplain InboxTable.Column#WHEN_RECEIVED "when received"} time.
+         *
+         * <p>This value is exclusive, meaning all returned messages will have
+         * their receiving time greater than the value specified.
+         */
+        void setSinceWhen(Timestamp sinceWhen) {
+            this.sinceWhen = requireNonNull(sinceWhen);
+        }
+
+        /**
+         * Specifies the page size for the returning list of messages.
+         *
+         * <p>The specified value must be positive.
+         */
+        void setPageSize(int size) {
+            checkArgument(size > 0);
+            this.pageSize = size;
         }
     }
 }

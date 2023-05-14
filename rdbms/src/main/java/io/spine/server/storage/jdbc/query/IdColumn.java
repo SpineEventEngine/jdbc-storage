@@ -110,7 +110,7 @@ public abstract class IdColumn<I> {
         checkNotNull(messageClass);
         checkArgument(column.type() == null,
                       "Message-type IDs follow the predefined conversion rules of `IdColumn` " +
-                      "and shouldn't have an SQL type set on their own");
+                      "and must not have an SQL type set on their own.");
         return new MessageIdColumn<>(column, messageClass);
     }
 

@@ -114,7 +114,7 @@ final class SelectVersionBySnapshot<I>
     }
 
     private BooleanExpression versionPredicate() {
-        BooleanExpression result = aliasedPathOf(VERSION).in(newerThanSnapshot());
+        BooleanExpression result = aliasedPathOf(VERSION).eq(newerThanSnapshot());
         if (date != null) {
             return result.or(aliasedPathOf(VERSION).in(newerThanDate()));
         }
@@ -122,14 +122,15 @@ final class SelectVersionBySnapshot<I>
     }
 
     private SQLQuery<Object> newerThanSnapshot() {
+        @SuppressWarnings("rawtypes")   /* To keep the call to parent API simple. */
         OrderSpecifier<Comparable> byVersion = orderBy(VERSION, DESC);
-        int snapshotCount = snapshotIndex + 1;
         SQLQuery<Object> query = select(pathOf(VERSION))
                 .from(table())
                 .where(pathOf(ID).eq(aliasedPathOf(ID)))
                 .where(pathOf(KIND.name(), String.class).eq("SNAPSHOT"))
                 .orderBy(byVersion)
-                .limit(snapshotCount);
+                .limit(1)
+                .offset(snapshotIndex);
         return query;
     }
 

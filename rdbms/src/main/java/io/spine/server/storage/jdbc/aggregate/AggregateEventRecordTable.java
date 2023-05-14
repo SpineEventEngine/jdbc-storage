@@ -132,7 +132,21 @@ class AggregateEventRecordTable<I> extends EntityTable<I,
      */
     @Override
     protected WriteQuery composeUpdateQuery(I id, AggregateEventRecord record) {
-        String errMsg = "AggregateEventRecord is immutable and should not be updated.";
+        String errMsg = "`AggregateEventRecord` is immutable and should not be updated.";
+        throw newIllegalStateException(errMsg);
+    }
+
+    /**
+     * Always throws an {@link IllegalStateException}, because {@link AggregateEventRecord}
+     * is immutable, and so updating it is not an option.
+     *
+     * @throws IllegalStateException
+     *         always
+     */
+    @Override
+    protected WriteQuery composeInsertOrUpdateQuery(I id, AggregateEventRecord record) {
+        String errMsg = "`AggregateEventRecord` is immutable, " +
+                "insert-or-update operation is not applicable.";
         throw newIllegalStateException(errMsg);
     }
 

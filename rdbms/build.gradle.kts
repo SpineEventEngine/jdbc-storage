@@ -33,9 +33,11 @@ extra["artifactId"] = "jdbc-rdbms"
 
 // The latest version compatible with Java 8.
 val hikariVersion = "4.0.3"
-val querydslVersion = "4.4.0"
+val querydslVersion = "5.0.0"
 val hsqldbVersion = "2.5.1"
 val h2Version = "2.1.214"
+val mysqlConnectorVersion = "8.0.32"
+val testContainersVersion = "1.18.0"
 
 dependencies {
     api("com.querydsl:querydsl-sql:$querydslVersion") {
@@ -44,5 +46,9 @@ dependencies {
     implementation("com.zaxxer:HikariCP:$hikariVersion")
     testImplementation("org.hsqldb:hsqldb:$hsqldbVersion")
     testImplementation("com.h2database:h2:$h2Version")
+    testImplementation("com.mysql:mysql-connector-j:$mysqlConnectorVersion")
+    testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
+    testImplementation("org.testcontainers:mysql:$testContainersVersion")
+    testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
     testImplementation(Deps.grpc.stub)
 }

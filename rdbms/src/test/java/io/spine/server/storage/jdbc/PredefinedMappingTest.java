@@ -37,16 +37,18 @@ import static io.spine.server.storage.jdbc.PredefinedMapping.select;
 import static io.spine.testing.Tests.nullRef;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@DisplayName("PredefinedMapping should")
+@DisplayName("`PredefinedMapping` should")
 class PredefinedMappingTest {
 
-    private final PredefinedMapping mapping = POSTGRESQL_10_1;
+    private static final PredefinedMapping mapping = POSTGRESQL_10_1;
+    private static final String driverName = "some-driver-name";
 
     @Test
     @DisplayName("throw ISE if requested type has no mapping")
+    @SuppressWarnings("ResultOfMethodCallIgnored")  /* Expecting the exception. */
     void throwOnNoMapping() {
-        Type notMappedType = nullRef();
-        assertThrows(IllegalStateException.class, () -> MYSQL_5_7.typeNameFor(notMappedType));
+        Type unmappedType = nullRef();
+        assertThrows(IllegalStateException.class, () -> MYSQL_5_7.typeNameFor(unmappedType));
     }
 
     @Test
@@ -54,7 +56,8 @@ class PredefinedMappingTest {
     void selectTypeMapping() {
         DataSourceWrapper dataSource = whichHoldsMetadata(mapping.getDatabaseProductName(),
                                                           mapping.getMajorVersion(),
-                                                          mapping.getMinorVersion());
+                                                          mapping.getMinorVersion(),
+                                                          driverName);
         assertThat(select(dataSource))
                 .isEqualTo(mapping);
     }
@@ -65,7 +68,8 @@ class PredefinedMappingTest {
         int newMajorVersion = mapping.getMajorVersion() + 1;
         DataSourceWrapper dataSource = whichHoldsMetadata(mapping.getDatabaseProductName(),
                                                           newMajorVersion,
-                                                          mapping.getMinorVersion());
+                                                          mapping.getMinorVersion(),
+                                                          driverName);
         assertThat(select(dataSource))
                 .isNotEqualTo(mapping);
     }

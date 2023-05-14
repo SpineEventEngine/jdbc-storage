@@ -62,6 +62,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static io.spine.client.CompositeFilter.CompositeOperator.ALL;
 import static io.spine.client.Filters.gt;
 import static io.spine.client.Filters.lt;
+import static io.spine.client.OrderBy.Direction.ASCENDING;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
 import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_1;
 import static io.spine.server.storage.jdbc.record.given.JdbcRecordStorageTestEnv.asEntityRecord;
@@ -85,7 +86,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
         "DuplicateStringLiteralInspection" /* Common test display names. */
 })
 @DisplayName("`JdbcRecordStorage` should")
-class JdbcRecordStorageTest extends RecordStorageTest<JdbcRecordStorage<ProjectId>> {
+public class JdbcRecordStorageTest extends RecordStorageTest<JdbcRecordStorage<ProjectId>> {
 
     @Test
     @DisplayName("clear itself")
@@ -307,6 +308,19 @@ class JdbcRecordStorageTest extends RecordStorageTest<JdbcRecordStorage<ProjectI
                     .inOrder();
             close(storage);
         }
+
+        @Test
+        @DisplayName("any sorting, but if the column name is wrong, throw ISE")
+        void throwIfWrongOrderBy() {
+            JdbcRecordStorage<ProjectId> storage = newStorage(TestCounterEntity.class);
+            OrderBy ordering = OrderBy.newBuilder()
+                                .setColumn("I-am-not-in-this-table")
+                                .setDirection(ASCENDING)
+                                .vBuild();
+            assertThrows(IllegalStateException.class,
+                         () -> readIds(storage, ordering, 42));
+            close(storage);
+        }
     }
 
     @Nested
@@ -322,10 +336,11 @@ class JdbcRecordStorageTest extends RecordStorageTest<JdbcRecordStorage<ProjectI
                                                 .setEntityClass(nullEntityCls));
         }
 
-        @SuppressWarnings({"CheckReturnValue", "ResultOfMethodCallIgnored"})
-        // Method called to throw exception.
+
         @Test
         @DisplayName("column mapping")
+        @SuppressWarnings({"CheckReturnValue",
+                "ResultOfMethodCallIgnored" /* Method called to throw exception. */})
         void columnMapping() {
             DefaultJdbcColumnMapping columnMapping = nullRef();
             assertThrows(NullPointerException.class,

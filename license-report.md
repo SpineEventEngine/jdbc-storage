@@ -1,6 +1,6 @@
 
     
-# Dependencies of `io.spine:spine-rdbms:1.9.0-SNAPSHOT.4`
+# Dependencies of `io.spine:spine-rdbms:1.9.0-SNAPSHOT.5`
 
 ## Runtime
 1. **Group:** com.google.android **Name:** annotations **Version:** 4.1.1.4
@@ -52,19 +52,14 @@
      * **Manifest Project URL:** [https://developers.google.com/protocol-buffers/](https://developers.google.com/protocol-buffers/)
      * **POM License: 3-Clause BSD License** - [https://opensource.org/licenses/BSD-3-Clause](https://opensource.org/licenses/BSD-3-Clause)
 
-1. **Group:** com.infradna.tool **Name:** bridge-method-annotation **Version:** 1.13
-     * **POM License: MIT License** - [http://www.opensource.org/licenses/mit-license.php](http://www.opensource.org/licenses/mit-license.php)
-
 1. **Group:** com.mysema.commons **Name:** mysema-commons-lang **Version:** 0.2.4
      * **POM License: The Apache Software License, Version 2.0** - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
-1. **Group:** com.querydsl **Name:** querydsl-core **Version:** 4.4.0
-     * **Manifest Project URL:** [http://www.querydsl.com](http://www.querydsl.com)
+1. **Group:** com.querydsl **Name:** querydsl-core **Version:** 5.0.0
      * **POM Project URL:** [${project.homepage}](${project.homepage})
      * **POM License: Apache License, Version 2.0** - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
-1. **Group:** com.querydsl **Name:** querydsl-sql **Version:** 4.4.0
-     * **Manifest Project URL:** [http://www.querydsl.com](http://www.querydsl.com)
+1. **Group:** com.querydsl **Name:** querydsl-sql **Version:** 5.0.0
      * **POM License: Apache License, Version 2.0** - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
 1. **Group:** com.zaxxer **Name:** HikariCP **Version:** 4.0.3
@@ -100,19 +95,6 @@
      * **POM Project URL:** [https://github.com/perfmark/perfmark](https://github.com/perfmark/perfmark)
      * **POM License: Apache 2.0** - [https://opensource.org/licenses/Apache-2.0](https://opensource.org/licenses/Apache-2.0)
 
-1. **Group:** javax.validation **Name:** validation-api **Version:** 1.1.0.Final
-     * **POM Project URL:** [http://beanvalidation.org](http://beanvalidation.org)
-     * **POM License: The Apache Software License, Version 2.0** - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
-
-1. **Group:** joda-time **Name:** joda-time **Version:** 1.6
-     * **Manifest License:** Apache 2.0 (Not packaged)
-     * **POM Project URL:** [http://joda-time.sourceforge.net](http://joda-time.sourceforge.net)
-     * **POM License: Apache 2** - [http://www.apache.org/licenses/](http://www.apache.org/licenses/)
-
-1. **Group:** org.apache.servicemix.bundles **Name:** org.apache.servicemix.bundles.javax-inject **Version:** 1_2
-     * **Manifest Project URL:** [http://www.apache.org/](http://www.apache.org/)
-     * **POM License: The Apache Software License, Version 2.0** - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
-
 1. **Group:** org.checkerframework **Name:** checker-compat-qual **Version:** 2.5.5
      * **POM Project URL:** [https://checkerframework.org](https://checkerframework.org)
      * **POM License: GNU General Public License, version 2 (GPL2), with the classpath exception** - [http://www.gnu.org/software/classpath/license.html](http://www.gnu.org/software/classpath/license.html)
@@ -136,9 +118,25 @@
      * **POM Project URL:** [http://jcommander.org](http://jcommander.org)
      * **POM License: Apache 2.0** - [http://www.apache.org/licenses/LICENSE-2.0](http://www.apache.org/licenses/LICENSE-2.0)
 
+1. **Group:** com.fasterxml.jackson.core **Name:** jackson-annotations **Version:** 2.10.3
+     * **Project URL:** [http://github.com/FasterXML/jackson](http://github.com/FasterXML/jackson)
+     * **POM License: The Apache Software License, Version 2.0** - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
 1. **Group:** com.github.ben-manes.caffeine **Name:** caffeine **Version:** 2.8.0
      * **POM Project URL:** [https://github.com/ben-manes/caffeine](https://github.com/ben-manes/caffeine)
      * **POM License: Apache License, Version 2.0** - [https://www.apache.org/licenses/LICENSE-2.0.txt](https://www.apache.org/licenses/LICENSE-2.0.txt)
+
+1. **Group:** com.github.docker-java **Name:** docker-java-api **Version:** 3.3.0
+     * **POM Project URL:** [https://github.com/docker-java/docker-java](https://github.com/docker-java/docker-java)
+     * **POM License: The Apache Software License, Version 2.0** - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+1. **Group:** com.github.docker-java **Name:** docker-java-transport **Version:** 3.3.0
+     * **POM Project URL:** [https://github.com/docker-java/docker-java](https://github.com/docker-java/docker-java)
+     * **POM License: The Apache Software License, Version 2.0** - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+1. **Group:** com.github.docker-java **Name:** docker-java-transport-zerodep **Version:** 3.3.0
+     * **POM Project URL:** [https://github.com/docker-java/docker-java](https://github.com/docker-java/docker-java)
+     * **POM License: The Apache Software License, Version 2.0** - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
 1. **Group:** com.github.kevinstern **Name:** software-and-algorithms **Version:** 1.0
      * **POM Project URL:** [https://www.github.com/KevinStern/software-and-algorithms](https://www.github.com/KevinStern/software-and-algorithms)
@@ -248,19 +246,18 @@
      * **POM License: EPL 1.0** - [https://opensource.org/licenses/eclipse-1.0.php](https://opensource.org/licenses/eclipse-1.0.php)
      * **POM License: MPL 2.0** - [https://www.mozilla.org/en-US/MPL/2.0/](https://www.mozilla.org/en-US/MPL/2.0/)
 
-1. **Group:** com.infradna.tool **Name:** bridge-method-annotation **Version:** 1.13
-     * **POM License: MIT License** - [http://www.opensource.org/licenses/mit-license.php](http://www.opensource.org/licenses/mit-license.php)
-
 1. **Group:** com.mysema.commons **Name:** mysema-commons-lang **Version:** 0.2.4
      * **POM License: The Apache Software License, Version 2.0** - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
-1. **Group:** com.querydsl **Name:** querydsl-core **Version:** 4.4.0
-     * **Manifest Project URL:** [http://www.querydsl.com](http://www.querydsl.com)
+1. **Group:** com.mysql **Name:** mysql-connector-j **Version:** 8.0.32
+     * **POM Project URL:** [http://dev.mysql.com/doc/connector-j/en/](http://dev.mysql.com/doc/connector-j/en/)
+     * **POM License: The GNU General Public License, v2 with Universal FOSS Exception, v1.0**
+
+1. **Group:** com.querydsl **Name:** querydsl-core **Version:** 5.0.0
      * **POM Project URL:** [${project.homepage}](${project.homepage})
      * **POM License: Apache License, Version 2.0** - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
-1. **Group:** com.querydsl **Name:** querydsl-sql **Version:** 4.4.0
-     * **Manifest Project URL:** [http://www.querydsl.com](http://www.querydsl.com)
+1. **Group:** com.querydsl **Name:** querydsl-sql **Version:** 5.0.0
      * **POM License: Apache License, Version 2.0** - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
 1. **Group:** com.zaxxer **Name:** HikariCP **Version:** 4.0.3
@@ -300,15 +297,6 @@
      * **POM Project URL:** [https://github.com/perfmark/perfmark](https://github.com/perfmark/perfmark)
      * **POM License: Apache 2.0** - [https://opensource.org/licenses/Apache-2.0](https://opensource.org/licenses/Apache-2.0)
 
-1. **Group:** javax.validation **Name:** validation-api **Version:** 1.1.0.Final
-     * **POM Project URL:** [http://beanvalidation.org](http://beanvalidation.org)
-     * **POM License: The Apache Software License, Version 2.0** - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
-
-1. **Group:** joda-time **Name:** joda-time **Version:** 1.6
-     * **Manifest License:** Apache 2.0 (Not packaged)
-     * **POM Project URL:** [http://joda-time.sourceforge.net](http://joda-time.sourceforge.net)
-     * **POM License: Apache 2** - [http://www.apache.org/licenses/](http://www.apache.org/licenses/)
-
 1. **Group:** junit **Name:** junit **Version:** 4.13.1
      * **POM Project URL:** [http://junit.org](http://junit.org)
      * **POM License: Eclipse Public License 1.0** - [http://www.eclipse.org/legal/epl-v10.html](http://www.eclipse.org/legal/epl-v10.html)
@@ -316,6 +304,11 @@
 1. **Group:** net.java.dev.javacc **Name:** javacc **Version:** 5.0
      * **POM Project URL:** [https://javacc.dev.java.net/](https://javacc.dev.java.net/)
      * **POM License: Berkeley Software Distribution (BSD) License** - [http://www.opensource.org/licenses/bsd-license.html](http://www.opensource.org/licenses/bsd-license.html)
+
+1. **Group:** net.java.dev.jna **Name:** jna **Version:** 5.12.1
+     * **POM Project URL:** [https://github.com/java-native-access/jna](https://github.com/java-native-access/jna)
+     * **POM License: Apache-2.0** - [https://www.apache.org/licenses/LICENSE-2.0.txt](https://www.apache.org/licenses/LICENSE-2.0.txt)
+     * **POM License: LGPL-2.1-or-later** - [https://www.gnu.org/licenses/old-licenses/lgpl-2.1](https://www.gnu.org/licenses/old-licenses/lgpl-2.1)
 
 1. **Group:** net.sourceforge.pmd **Name:** pmd-core **Version:** 6.24.0
      * **POM License: BSD-style** - [http://pmd.sourceforge.net/license.html](http://pmd.sourceforge.net/license.html)
@@ -331,13 +324,13 @@
      * **Manifest Project URL:** [http://www.antlr.org](http://www.antlr.org)
      * **POM License: The BSD License** - [http://www.antlr.org/license.html](http://www.antlr.org/license.html)
 
+1. **Group:** org.apache.commons **Name:** commons-compress **Version:** 1.22
+     * **Project URL:** [https://commons.apache.org/proper/commons-compress/](https://commons.apache.org/proper/commons-compress/)
+     * **POM License: Apache License, Version 2.0** - [https://www.apache.org/licenses/LICENSE-2.0.txt](https://www.apache.org/licenses/LICENSE-2.0.txt)
+
 1. **Group:** org.apache.commons **Name:** commons-lang3 **Version:** 3.8.1
      * **Project URL:** [http://commons.apache.org/proper/commons-lang/](http://commons.apache.org/proper/commons-lang/)
      * **POM License: Apache License, Version 2.0** - [https://www.apache.org/licenses/LICENSE-2.0.txt](https://www.apache.org/licenses/LICENSE-2.0.txt)
-
-1. **Group:** org.apache.servicemix.bundles **Name:** org.apache.servicemix.bundles.javax-inject **Version:** 1_2
-     * **Manifest Project URL:** [http://www.apache.org/](http://www.apache.org/)
-     * **POM License: The Apache Software License, Version 2.0** - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
 1. **Group:** org.apiguardian **Name:** apiguardian-api **Version:** 1.1.0
      * **POM Project URL:** [https://github.com/apiguardian-team/apiguardian](https://github.com/apiguardian-team/apiguardian)
@@ -381,6 +374,10 @@
 
 1. **Group:** org.jacoco **Name:** org.jacoco.report **Version:** 0.8.5
      * **POM License: Eclipse Public License 2.0** - [https://www.eclipse.org/legal/epl-2.0/](https://www.eclipse.org/legal/epl-2.0/)
+
+1. **Group:** org.jetbrains **Name:** annotations **Version:** 17.0.0
+     * **POM Project URL:** [https://github.com/JetBrains/java-annotations](https://github.com/JetBrains/java-annotations)
+     * **POM License: The Apache Software License, Version 2.0** - [https://www.apache.org/licenses/LICENSE-2.0.txt](https://www.apache.org/licenses/LICENSE-2.0.txt)
 
 1. **Group:** org.junit **Name:** junit-bom **Version:** 5.7.0 **No license information found**
 1. **Group:** org.junit.jupiter **Name:** junit-jupiter-api **Version:** 5.7.0
@@ -454,9 +451,33 @@
      * **POM Project URL:** [http://pcollections.org](http://pcollections.org)
      * **POM License: The MIT License** - [http://www.opensource.org/licenses/mit-license.php](http://www.opensource.org/licenses/mit-license.php)
 
+1. **Group:** org.rnorth.duct-tape **Name:** duct-tape **Version:** 1.0.8
+     * **POM Project URL:** [https://github.com/rnorth/${project.artifactId}](https://github.com/rnorth/${project.artifactId})
+     * **POM License: MIT** - [http://opensource.org/licenses/MIT](http://opensource.org/licenses/MIT)
+
 1. **Group:** org.slf4j **Name:** slf4j-api **Version:** 1.7.30
      * **POM Project URL:** [http://www.slf4j.org](http://www.slf4j.org)
      * **POM License: MIT License** - [http://www.opensource.org/licenses/mit-license.php](http://www.opensource.org/licenses/mit-license.php)
+
+1. **Group:** org.testcontainers **Name:** database-commons **Version:** 1.18.0
+     * **POM Project URL:** [https://testcontainers.org](https://testcontainers.org)
+     * **POM License: MIT** - [http://opensource.org/licenses/MIT](http://opensource.org/licenses/MIT)
+
+1. **Group:** org.testcontainers **Name:** jdbc **Version:** 1.18.0
+     * **POM Project URL:** [https://testcontainers.org](https://testcontainers.org)
+     * **POM License: MIT** - [http://opensource.org/licenses/MIT](http://opensource.org/licenses/MIT)
+
+1. **Group:** org.testcontainers **Name:** junit-jupiter **Version:** 1.18.0
+     * **POM Project URL:** [https://testcontainers.org](https://testcontainers.org)
+     * **POM License: MIT** - [http://opensource.org/licenses/MIT](http://opensource.org/licenses/MIT)
+
+1. **Group:** org.testcontainers **Name:** mysql **Version:** 1.18.0
+     * **POM Project URL:** [https://testcontainers.org](https://testcontainers.org)
+     * **POM License: MIT** - [http://opensource.org/licenses/MIT](http://opensource.org/licenses/MIT)
+
+1. **Group:** org.testcontainers **Name:** testcontainers **Version:** 1.18.0
+     * **POM Project URL:** [https://testcontainers.org](https://testcontainers.org)
+     * **POM License: MIT** - [http://opensource.org/licenses/MIT](http://opensource.org/licenses/MIT)
 
 1. **Group:** org.threeten **Name:** threeten-extra **Version:** 1.5.0
      * **Manifest Project URL:** [https://www.threeten.org](https://www.threeten.org)
@@ -468,4 +489,4 @@
  The dependencies distributed under several licenses, are used according their commercial-use-friendly license.
 
 
-This report was generated on **Fri Apr 14 14:37:44 WEST 2023** using [Gradle-License-Report plugin](https://github.com/jk1/Gradle-License-Report) by Evgeny Naumenko, licensed under [Apache 2.0 License](https://github.com/jk1/Gradle-License-Report/blob/master/LICENSE).
+This report was generated on **Fri Apr 28 11:03:25 WEST 2023** using [Gradle-License-Report plugin](https://github.com/jk1/Gradle-License-Report) by Evgeny Naumenko, licensed under [Apache 2.0 License](https://github.com/jk1/Gradle-License-Report/blob/master/LICENSE).

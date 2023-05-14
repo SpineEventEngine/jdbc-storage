@@ -45,7 +45,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("JdbcAggregateStorage, when saving aggregate with lifecycle flags, should")
-class JdbcAggregateStorageVisibilityHandlingTest
+public class JdbcAggregateStorageVisibilityHandlingTest
         extends AggregateStorageLifecycleFlagsHandlingTest {
 
     @Override
@@ -55,22 +55,23 @@ class JdbcAggregateStorageVisibilityHandlingTest
                 "aggregateStorageStatusHandlingTests");
         JdbcAggregateStorage<ProjectId> storage =
                 JdbcAggregateStorage.<ProjectId>newBuilder()
-                        .setMultitenant(false)
-                        .setAggregateClass(TestAggregate.class)
-                        .setDataSource(dataSource)
-                        .setTypeMapping(H2_2_1)
-                        .build();
+                                    .setMultitenant(false)
+                                    .setAggregateClass(TestAggregate.class)
+                                    .setDataSource(dataSource)
+                                    .setTypeMapping(H2_2_1)
+                                    .build();
         return storage;
     }
 
-    @SuppressWarnings("OptionalGetWithoutIsPresent") // We do check.
     @Test
     @DisplayName("update entity visibility")
+    @SuppressWarnings("OptionalGetWithoutIsPresent") /* We do check. */
     void updateEntityVisibility() {
         ProjectId id = Sample.messageOfType(ProjectId.class);
-        LifecycleFlags archived = LifecycleFlags.newBuilder()
-                                                .setArchived(true)
-                                                .build();
+        LifecycleFlags archived =
+                LifecycleFlags.newBuilder()
+                              .setArchived(true)
+                              .build();
         JdbcAggregateStorage<ProjectId> storage =
                 (JdbcAggregateStorage<ProjectId>) getAggregateStorage(TestAggregate.class);
         storage.writeLifecycleFlags(id, archived);
@@ -79,10 +80,11 @@ class JdbcAggregateStorageVisibilityHandlingTest
         assertTrue(actualArchived.isPresent());
         assertEquals(archived, actualArchived.get());
 
-        LifecycleFlags archivedAndDeleted = LifecycleFlags.newBuilder()
-                                                          .setArchived(true)
-                                                          .setDeleted(true)
-                                                          .build();
+        LifecycleFlags archivedAndDeleted =
+                LifecycleFlags.newBuilder()
+                              .setArchived(true)
+                              .setDeleted(true)
+                              .build();
         storage.writeLifecycleFlags(id, archivedAndDeleted);
 
         Optional<LifecycleFlags> actualArchivedAndDeleted = storage.readLifecycleFlags(id);

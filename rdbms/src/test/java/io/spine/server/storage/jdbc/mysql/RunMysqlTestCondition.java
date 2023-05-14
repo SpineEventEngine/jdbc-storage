@@ -1,5 +1,5 @@
 /*
- * Copyright 2022, TeamDev. All rights reserved.
+ * Copyright 2023, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,27 +24,26 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.delivery;
+package io.spine.server.storage.jdbc.mysql;
 
-import io.spine.server.delivery.ShardProcessingSession;
-import io.spine.server.delivery.ShardSessionRecord;
+import org.junit.jupiter.api.extension.ConditionEvaluationResult;
+import org.junit.jupiter.api.extension.ExecutionCondition;
+import org.junit.jupiter.api.extension.ExtensionContext;
+
+import static org.junit.jupiter.api.extension.ConditionEvaluationResult.disabled;
+import static org.junit.jupiter.api.extension.ConditionEvaluationResult.enabled;
 
 /**
- * A JDBC-specific implementation of {@link ShardProcessingSession}.
- *
- * <p>After completion just runs some pre-defined callback.
+ * Tells whether the MySQL-based tests are {@linkplain MysqlTests#enabled enabled}.
  */
-final class JdbcShardProcessingSession extends ShardProcessingSession {
-
-    private final Runnable completionCallback;
-
-    JdbcShardProcessingSession(ShardSessionRecord record, Runnable completionCallback) {
-        super(record);
-        this.completionCallback = completionCallback;
-    }
+public final class RunMysqlTestCondition implements ExecutionCondition {
 
     @Override
-    protected void complete() {
-        completionCallback.run();
+    public ConditionEvaluationResult evaluateExecutionCondition(ExtensionContext context) {
+        if(MysqlTests.enabled) {
+            return enabled("MySQL-based tests are enabled as per `MysqlTests.enabled` flag.");
+        } else {
+            return disabled("MySQL-based tests are DISABLED as per `MysqlTests.enabled` flag.");
+        }
     }
 }

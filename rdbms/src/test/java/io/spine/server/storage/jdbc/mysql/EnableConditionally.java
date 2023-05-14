@@ -1,5 +1,5 @@
 /*
- * Copyright 2022, TeamDev. All rights reserved.
+ * Copyright 2023, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,19 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+package io.spine.server.storage.jdbc.mysql;
 
-val spineCoreVersion by extra("1.9.0-SNAPSHOT.12")
-val spineBaseVersion by extra("1.9.0-SNAPSHOT.5")
-val versionToPublish by extra("1.9.0-SNAPSHOT.5")
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
+/**
+ * Marks the MySQL-based tests as enabled or disabled
+ * depending on {@link RunMysqlTestCondition}.
+ */
+@Retention(RetentionPolicy.RUNTIME)
+@ExtendWith(RunMysqlTestCondition.class)
+public @interface EnableConditionally {
+
+}

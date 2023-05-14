@@ -1,5 +1,5 @@
 /*
- * Copyright 2022, TeamDev. All rights reserved.
+ * Copyright 2023, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,40 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+package io.spine.server.storage.jdbc;
 
-val spineCoreVersion by extra("1.9.0-SNAPSHOT.12")
-val spineBaseVersion by extra("1.9.0-SNAPSHOT.5")
-val versionToPublish by extra("1.9.0-SNAPSHOT.5")
+import io.spine.annotation.Experimental;
+import io.spine.annotation.Internal;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
+/**
+ * Utility for detecting JDBC drivers.
+ */
+@Internal
+public final class Drivers {
+
+    /**
+     * Prevents this utility class from instantiation.
+     */
+    private Drivers() {
+        // Do nothing.
+    }
+
+    /**
+     * Tells whether the data source is accessed via MySQL JDBC driver.
+     *
+     * <p>This is an experimental method. Returning results may not be 100% accurate.
+     *
+     * @param metadata
+     *         the metadata of data source of interest
+     */
+    @Experimental
+    public static boolean isMysqlDriver(DataSourceMetaData metadata) {
+        checkNotNull(metadata);
+        boolean result = metadata.driverName()
+                                 .toLowerCase()
+                                 .contains("mysql");
+        return result;
+    }
+}

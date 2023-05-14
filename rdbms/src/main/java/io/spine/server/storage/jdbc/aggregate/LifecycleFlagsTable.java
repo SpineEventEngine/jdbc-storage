@@ -41,11 +41,12 @@ import java.util.List;
 
 import static io.spine.server.storage.jdbc.Type.BOOLEAN;
 import static io.spine.server.storage.jdbc.aggregate.LifecycleFlagsTable.Column.ID;
+import static io.spine.util.Exceptions.newIllegalStateException;
 
 /**
  * A table for storing the {@link LifecycleFlags} of an {@link Aggregate}.
  */
-class LifecycleFlagsTable<I> extends EntityTable<I, LifecycleFlags, LifecycleFlags> {
+final class LifecycleFlagsTable<I> extends EntityTable<I, LifecycleFlags, LifecycleFlags> {
 
     private static final String TABLE_NAME_POSTFIX = "_visibility";
 
@@ -58,6 +59,15 @@ class LifecycleFlagsTable<I> extends EntityTable<I, LifecycleFlags, LifecycleFla
     @Override
     protected List<? extends TableColumn> tableColumns() {
         return ImmutableList.copyOf(Column.values());
+    }
+
+    @Override
+    public void write(I id, LifecycleFlags record) {
+        if (containsRecord(id)) {
+            update(id, record);
+        } else {
+            insert(id, record);
+        }
     }
 
     @Override
@@ -93,6 +103,20 @@ class LifecycleFlagsTable<I> extends EntityTable<I, LifecycleFlags, LifecycleFla
                                   .setIdColumn(idColumn())
                                   .build();
         return query;
+    }
+
+    /**
+     * Always throws an {@code IllegalStateException}, as this table does not provide
+     * such a behaviour.
+     *
+     * @throws IllegalStateException
+     *         always
+     */
+    @Override
+    protected WriteQuery composeInsertOrUpdateQuery(I id, LifecycleFlags record) {
+        String errMsg = "`LifecycleFlagsTable` does not provide insert-or-update behaviour." +
+                " Use `if(contains(..) { update(...); } else { insert(...);}` instead.";
+        throw newIllegalStateException(errMsg);
     }
 
     /**

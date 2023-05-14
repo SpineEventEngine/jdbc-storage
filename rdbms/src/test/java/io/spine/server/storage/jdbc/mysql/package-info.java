@@ -1,5 +1,5 @@
 /*
- * Copyright 2022, TeamDev. All rights reserved.
+ * Copyright 2023, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,20 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/**
+ * This package runs the most critical tests against MySQL instance launched
+ * as a Docker image via Testcontainers library.
+ *
+ * <p>All tests in this package are slow by nature, as each test implies starting
+ * and then stopping a Docker container. Therefore, they are by default disabled
+ * when launched on CI.
+ *
+ * @see io.spine.server.storage.jdbc.mysql.MysqlTests for controlling the behaviour
+ */
+@CheckReturnValue
+@ParametersAreNonnullByDefault
+package io.spine.server.storage.jdbc.mysql;
 
-val spineCoreVersion by extra("1.9.0-SNAPSHOT.12")
-val spineBaseVersion by extra("1.9.0-SNAPSHOT.5")
-val versionToPublish by extra("1.9.0-SNAPSHOT.5")
+import com.google.errorprone.annotations.CheckReturnValue;
+
+import javax.annotation.ParametersAreNonnullByDefault;

@@ -63,6 +63,7 @@ abstract class WriteEntityQuery<I, C extends StoreClause<C>>
     private final Map<I, EntityRecordWithColumns> records;
     private final JdbcColumnMapping<?> columnMapping;
 
+    @SuppressWarnings("rawtypes")   /* For brevity. */
     WriteEntityQuery(Builder<? extends Builder, ? extends WriteEntityQuery, I> builder) {
         super(builder);
         this.idColumn = builder.idColumn;
@@ -75,6 +76,8 @@ abstract class WriteEntityQuery<I, C extends StoreClause<C>>
         C clause = createClause();
         for (I id : records.keySet()) {
             EntityRecordWithColumns record = records.get(id);
+            extendClause(clause, id, record);
+
             setEntityColumns(clause, record);
 
             clause.set(pathOf(ENTITY), serialize(record.record()));
@@ -82,6 +85,21 @@ abstract class WriteEntityQuery<I, C extends StoreClause<C>>
             addBatch(clause);
         }
         return clause.execute();
+    }
+
+    /**
+     * Extends the query with the flags required to optimize the execution.
+     */
+    @SuppressWarnings("NoopMethodInAbstractClass" /* Default behaviour is to do nothing. */)
+    protected void extendClause(C clause, I id, EntityRecordWithColumns record) {
+        // Do nothing by default.
+    }
+
+    /**
+     * Returns an ID column of the table being target for this query.
+     */
+    protected IdColumn<I> idColumn() {
+        return idColumn;
     }
 
     /**
@@ -115,7 +133,7 @@ abstract class WriteEntityQuery<I, C extends StoreClause<C>>
      */
     protected abstract C createClause();
 
-    private void setEntityColumns(C clause, EntityRecordWithColumns record) {
+    void setEntityColumns(C clause, EntityRecordWithColumns record) {
         Parameters parameters = createParametersFromColumns(record);
         Set<String> identifiers = parameters.getIdentifiers();
         for (String identifier : identifiers) {
@@ -133,7 +151,7 @@ abstract class WriteEntityQuery<I, C extends StoreClause<C>>
      *         the record to extract entity column values
      * @return query parameters from entity columns
      */
-    private Parameters createParametersFromColumns(EntityRecordWithColumns record) {
+    protected final Parameters createParametersFromColumns(EntityRecordWithColumns record) {
         Parameters.Builder parameters = Parameters.newBuilder();
         record.columnNames()
               .forEach(columnName -> {

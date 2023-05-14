@@ -176,81 +176,103 @@ public abstract class MessageTable<I, M extends Message> extends AbstractTable<I
     @Override
     protected InsertSingleMessage<I, M> composeInsertQuery(I id, M record) {
         InsertSingleMessage.Builder<I, M> builder = InsertSingleMessage.newBuilder();
-        InsertSingleMessage<I, M> query = builder.setTableName(name())
-                                                 .setDataSource(dataSource())
-                                                 .setIdColumn(idColumn())
-                                                 .setId(id)
-                                                 .setMessage(record)
-                                                 .setColumns(tableColumns())
-                                                 .build();
+        InsertSingleMessage<I, M> query =
+                builder.setTableName(name())
+                       .setDataSource(dataSource())
+                       .setIdColumn(idColumn())
+                       .setId(id)
+                       .setMessage(record)
+                       .setColumns(tableColumns())
+                       .build();
         return query;
     }
 
     @Override
     protected UpdateSingleMessage<I, M> composeUpdateQuery(I id, M record) {
         UpdateSingleMessage.Builder<I, M> builder = UpdateSingleMessage.newBuilder();
-        UpdateSingleMessage<I, M> query = builder.setTableName(name())
-                                                 .setDataSource(dataSource())
-                                                 .setIdColumn(idColumn())
-                                                 .setId(id)
-                                                 .setMessage(record)
-                                                 .setColumns(tableColumns())
-                                                 .build();
+        UpdateSingleMessage<I, M> query =
+                builder.setTableName(name())
+                       .setDataSource(dataSource())
+                       .setIdColumn(idColumn())
+                       .setId(id)
+                       .setMessage(record)
+                       .setColumns(tableColumns())
+                       .build();
         return query;
+    }
+
+    @Override
+    protected InsertOrUpdateSingleMessage<I, M> composeInsertOrUpdateQuery(I id, M record) {
+        InsertOrUpdateSingleMessage.Builder<I, M> builder = InsertOrUpdateSingleMessage.newBuilder();
+        InsertOrUpdateSingleMessage<I, M> query =
+                builder.setTableName(name())
+                       .setDataSource(dataSource())
+                       .setIdColumn(idColumn())
+                       .setId(id)
+                       .setMessage(record)
+                       .setColumns(tableColumns())
+                       .build();
+        return query;
+
     }
 
     @Override
     protected SelectSingleMessage<I, M> composeSelectQuery(I id) {
         SelectSingleMessage.Builder<I, M> builder = SelectSingleMessage.newBuilder();
-        SelectSingleMessage<I, M> query = builder.setTableName(name())
-                                                 .setDataSource(dataSource())
-                                                 .setIdColumn(idColumn())
-                                                 .setId(id)
-                                                 .setMessageDescriptor(messageDescriptor())
-                                                 .doBuild();
+        SelectSingleMessage<I, M> query =
+                builder.setTableName(name())
+                       .setDataSource(dataSource())
+                       .setIdColumn(idColumn())
+                       .setId(id)
+                       .setMessageDescriptor(messageDescriptor())
+                       .doBuild();
         return query;
     }
 
     private SelectMessagesInBulk<I, M> composeSelectMessagesInBulkQuery(Iterable<I> ids) {
         SelectMessagesInBulk.Builder<I, M> builder = SelectMessagesInBulk.newBuilder();
-        SelectMessagesInBulk<I, M> query = builder.setTableName(name())
-                                                  .setDataSource(dataSource())
-                                                  .setIdColumn(idColumn())
-                                                  .setIds(ids)
-                                                  .setMessageDescriptor(messageDescriptor())
-                                                  .build();
+        SelectMessagesInBulk<I, M> query =
+                builder.setTableName(name())
+                       .setDataSource(dataSource())
+                       .setIdColumn(idColumn())
+                       .setIds(ids)
+                       .setMessageDescriptor(messageDescriptor())
+                       .build();
         return query;
     }
 
     private InsertMessagesInBulk<I, M> composeInsertMessagesInBulkQuery(Map<I, M> records) {
         InsertMessagesInBulk.Builder<I, M> builder = InsertMessagesInBulk.newBuilder();
-        InsertMessagesInBulk<I, M> query = builder.setTableName(name())
-                                                  .setDataSource(dataSource())
-                                                  .setIdColumn(idColumn())
-                                                  .setColumns(tableColumns())
-                                                  .setRecords(records)
-                                                  .build();
+        InsertMessagesInBulk<I, M> query =
+                builder.setTableName(name())
+                       .setDataSource(dataSource())
+                       .setIdColumn(idColumn())
+                       .setColumns(tableColumns())
+                       .setRecords(records)
+                       .build();
         return query;
     }
 
     private UpdateMessagesInBulk<I, M> composeUpdateMessagesInBulkQuery(Map<I, M> records) {
         UpdateMessagesInBulk.Builder<I, M> builder = UpdateMessagesInBulk.newBuilder();
-        UpdateMessagesInBulk<I, M> query = builder.setTableName(name())
-                                                  .setDataSource(dataSource())
-                                                  .setIdColumn(idColumn())
-                                                  .setColumns(tableColumns())
-                                                  .setRecords(records)
-                                                  .build();
+        UpdateMessagesInBulk<I, M> query =
+                builder.setTableName(name())
+                       .setDataSource(dataSource())
+                       .setIdColumn(idColumn())
+                       .setColumns(tableColumns())
+                       .setRecords(records)
+                       .build();
         return query;
     }
 
     private DeleteMessagesInBulk<I> composeDeleteMessagesInBulkQuery(List<I> ids) {
         DeleteMessagesInBulk.Builder<I> builder = DeleteMessagesInBulk.newBuilder();
-        DeleteMessagesInBulk<I> query = builder.setTableName(name())
-                                               .setDataSource(dataSource())
-                                               .setIdColumn(idColumn())
-                                               .setIds(ids)
-                                               .build();
+        DeleteMessagesInBulk<I> query =
+                builder.setTableName(name())
+                       .setDataSource(dataSource())
+                       .setIdColumn(idColumn())
+                       .setIds(ids)
+                       .build();
         return query;
     }
 

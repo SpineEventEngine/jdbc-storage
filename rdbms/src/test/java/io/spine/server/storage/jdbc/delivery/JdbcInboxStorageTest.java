@@ -49,6 +49,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.Truth8.assertThat;
 import static io.spine.server.delivery.InboxMessageStatus.DELIVERED;
 import static io.spine.server.delivery.InboxMessageStatus.TO_DELIVER;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
@@ -57,12 +59,9 @@ import static io.spine.server.storage.jdbc.delivery.given.TestInboxMessage.gener
 import static io.spine.server.storage.jdbc.delivery.given.TestShardIndex.newIndex;
 import static io.spine.testing.DisplayNames.NOT_ACCEPT_NULLS;
 import static java.util.stream.Collectors.toList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
-@DisplayName("JdbcInboxStorage should")
-class JdbcInboxStorageTest extends InboxStorageTest {
+@DisplayName("`JdbcInboxStorage` should")
+public class JdbcInboxStorageTest extends InboxStorageTest {
 
     private JdbcInboxStorage storage;
 
@@ -104,10 +103,10 @@ class JdbcInboxStorageTest extends InboxStorageTest {
 
         InboxReadRequest request = new InboxReadRequest(message.getId());
         Optional<InboxMessage> result = storage.read(request);
-        assertTrue(result.isPresent());
+        assertThat(result).isPresent();
 
         InboxMessage actualMessage = result.get();
-        assertEquals(message, actualMessage);
+        assertThat(message).isEqualTo(actualMessage);
     }
 
     @Test
@@ -167,7 +166,7 @@ class JdbcInboxStorageTest extends InboxStorageTest {
 
         ImmutableList<InboxMessage> nonDelivered = readAllAndCompare(storage, index, messages);
         nonDelivered.iterator()
-                    .forEachRemaining((m) -> assertEquals(TO_DELIVER, m.getStatus()));
+                    .forEachRemaining((m) -> assertThat(m.getStatus()).isEqualTo(TO_DELIVER));
 
         // Leave the first one in `TO_DELIVER` status and mark the rest as `DELIVERED`.
         UnmodifiableIterator<InboxMessage> iterator = messages.iterator();
@@ -185,8 +184,8 @@ class JdbcInboxStorageTest extends InboxStorageTest {
         // Check that both `TO_DELIVER` message and those marked `DELIVERED` are stored as expected.
         ImmutableList<InboxMessage> readResult = storage.readAll(index, Integer.MAX_VALUE)
                                                         .contents();
-        assertTrue(readResult.contains(remainingNonDelivered));
-        assertTrue(readResult.containsAll(originalMarkedDelivered));
+        assertThat(readResult).contains(remainingNonDelivered);
+        assertThat(readResult).containsAtLeastElementsIn(originalMarkedDelivered);
     }
 
     private void markDelivered(ImmutableList<InboxMessage> messages) {
@@ -202,19 +201,19 @@ class JdbcInboxStorageTest extends InboxStorageTest {
     private static ImmutableList<InboxMessage>
     readAllAndCompare(InboxStorage storage, ShardIndex idx, ImmutableList<InboxMessage> expected) {
         Page<InboxMessage> page = storage.readAll(idx, Integer.MAX_VALUE);
-        assertEquals(expected.size(), page.size());
+        assertThat(page.size()).isEqualTo(expected.size());
 
         ImmutableList<InboxMessage> contents = page.contents();
-        assertEquals(ImmutableSet.copyOf(expected), ImmutableSet.copyOf(contents));
+        assertThat(ImmutableSet.copyOf(contents)).isEqualTo(ImmutableSet.copyOf(expected));
         return contents;
     }
 
     private static void checkEmpty(InboxStorage storage, ShardIndex index) {
         Page<InboxMessage> emptyPage = storage.readAll(index, Integer.MAX_VALUE);
-        assertEquals(0, emptyPage.size());
-        assertTrue(emptyPage.contents()
-                            .isEmpty());
-        assertFalse(emptyPage.next()
-                             .isPresent());
+        assertThat(emptyPage.size()).isEqualTo(0);
+        assertThat(emptyPage.contents())
+                .isEmpty();
+        assertThat(emptyPage.next())
+                .isEmpty();
     }
 }

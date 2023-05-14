@@ -28,6 +28,7 @@ package io.spine.server.storage.jdbc;
 
 import com.querydsl.sql.SQLTemplates;
 import io.spine.logging.Logging;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -44,6 +45,13 @@ final class DefaultDataSourceWrapper implements DataSourceWrapper, Logging {
     private final DataSource dataSource;
     private final SQLTemplates templates;
     private boolean isClosed;
+
+    /**
+     * Lazily-initialized metadata for the underlying {@code DataSource}.
+     *
+     * <p>This field is initialized upon the first invocation of {@link #metaData() metaData()}.
+     */
+    private @MonotonicNonNull DataSourceMetaData metaData;
 
     DefaultDataSourceWrapper(DataSource dataSource) {
         this.dataSource = dataSource;
@@ -65,7 +73,14 @@ final class DefaultDataSourceWrapper implements DataSourceWrapper, Logging {
     }
 
     @Override
-    public DataSourceMetaData metaData() {
+    public synchronized DataSourceMetaData metaData() {
+        if(metaData == null) {
+            metaData = fetchMetaData();
+        }
+        return metaData;
+    }
+
+    private DataSourceMetaData fetchMetaData() {
         checkNotClosed();
         try (final ConnectionWrapper connection = getConnection(true)) {
             DatabaseMetaData metaData = connection.get()

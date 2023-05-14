@@ -30,6 +30,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.spine.annotation.Internal;
+import io.spine.client.OrderBy;
 import io.spine.logging.Logging;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.TableColumn;
@@ -44,6 +45,7 @@ import java.util.List;
 import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static io.spine.server.storage.jdbc.Drivers.isMysqlDriver;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_OPEN;
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.COMMA;
@@ -53,6 +55,8 @@ import static io.spine.server.storage.jdbc.Sql.Query.DEFAULT;
 import static io.spine.server.storage.jdbc.Sql.Query.NOT;
 import static io.spine.server.storage.jdbc.Sql.Query.NULL;
 import static io.spine.server.storage.jdbc.Sql.Query.PRIMARY_KEY;
+import static io.spine.util.Exceptions.newIllegalStateException;
+import static java.util.Objects.requireNonNull;
 
 /**
  * A representation of an SQL table.
@@ -71,12 +75,13 @@ import static io.spine.server.storage.jdbc.Sql.Query.PRIMARY_KEY;
  * @param <I>
  *         a type of ID of the records stored in the table
  * @param <R>
- *         a result type of a read operation by a single ID
+ *         a result type of read operation by a single ID
  * @param <W>
  *         a type of stored records
  * @see TableColumn
  */
 @Internal
+@SuppressWarnings("ClassWithTooManyMethods")    /* This is OK for such a central concept. */
 public abstract class AbstractTable<I, R, W> implements Logging {
 
     private final String name;
@@ -152,17 +157,18 @@ public abstract class AbstractTable<I, R, W> implements Logging {
      * <p>If the table {@linkplain #containsRecord(Object) contains} a record with the given ID,
      * the operation is treated as an {@code UPDATE}, otherwise - as an {@code INSERT}.
      *
+     * <p>In some specific cases, when the underlying database allows
+     * the corresponding optimizations, an advanced SQL syntax may be used. I.e. MySQL
+     * allows {@code INSERT ... ON DUPLICATE UPDATE} clauses, which will be used
+     * when appropriate.
+     *
      * @param id
      *         an ID to write the record under
      * @param record
      *         the record to write
      */
     public void write(I id, W record) {
-        if (containsRecord(id)) {
-            update(id, record);
-        } else {
-            insert(id, record);
-        }
+        insertOrUpdate(id, record);
     }
 
     /**
@@ -208,6 +214,28 @@ public abstract class AbstractTable<I, R, W> implements Logging {
     }
 
     /**
+     * Inserts the record with the specified ID into the table,
+     * or updates it, if is already exists.
+     *
+     * @param id
+     *         an ID of the record
+     * @param record
+     *         a record to insert or update
+     */
+    private void insertOrUpdate(I id, W record) {
+        if(isMysqlDriver(dataSource.metaData())) {
+            WriteQuery query = composeInsertOrUpdateQuery(id, record);
+            query.execute();
+        } else {
+            if (containsRecord(id)) {
+                update(id, record);
+            } else {
+                insert(id, record);
+            }
+        }
+    }
+
+    /**
      * Retrieves the columns of this table.
      *
      * <p>When called for the first time, this method initializes the list of the columns.
@@ -242,10 +270,25 @@ public abstract class AbstractTable<I, R, W> implements Logging {
         return dataSource;
     }
 
+    /**
+     * Returns a query to insert the passed record under the passed ID.
+     */
     protected abstract WriteQuery composeInsertQuery(I id, W record);
 
+    /**
+     * Returns a query to update the record with the passed ID.
+     */
     protected abstract WriteQuery composeUpdateQuery(I id, W record);
 
+    /**
+     * Returns a query which inserts the record under the passed ID,
+     * or updates the record if it already exists.
+     */
+    protected abstract WriteQuery composeInsertOrUpdateQuery(I id, W record);
+
+    /**
+     * Returns a query to select a record by ID.
+     */
     protected abstract SelectQuery<R> composeSelectQuery(I id);
 
     private String composeCreateTableSql() {
@@ -306,7 +349,7 @@ public abstract class AbstractTable<I, R, W> implements Logging {
         if (isIdColumn) {
             return idColumn.sqlType();
         }
-        return checkNotNull(column.type());
+        return requireNonNull(column.type());
     }
 
     /**
@@ -337,5 +380,33 @@ public abstract class AbstractTable<I, R, W> implements Logging {
                                              .setDataSource(dataSource)
                                              .build();
         query.execute();
+    }
+
+    /**
+     * Checks that the column specified via the ordering directive
+     * is present in this table.
+     *
+     * <p>Throws an {@code IllegalStateException} if there is no such column.
+     *
+     * <p>In case an empty ordering is passed, this method does nothing.
+     *
+     * @throws IllegalStateException
+     *         if this table has no column specified
+     *         in the ordering directive
+     */
+    protected void ensureColumnsPresent(OrderBy ordering) {
+        if(OrderBy.getDefaultInstance().equals(ordering)) {
+            return;
+        }
+        String columnName = ordering.getColumn();
+        boolean present = columns().stream()
+                                   .anyMatch(c -> c.name()
+                                                   .equals(columnName));
+        if(!present) {
+            throw newIllegalStateException(
+                    "The column `%s` specified in `ORDER BY` directive" +
+                            " is not found in the table `%s`.",
+                    columnName, name());
+        }
     }
 }

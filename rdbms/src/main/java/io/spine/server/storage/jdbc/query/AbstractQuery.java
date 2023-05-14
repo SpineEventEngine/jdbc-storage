@@ -50,9 +50,9 @@ import io.spine.server.storage.jdbc.DatabaseException;
 import io.spine.server.storage.jdbc.TableColumn;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import javax.inject.Provider;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -233,7 +233,7 @@ public abstract class AbstractQuery implements StorageQuery {
      */
     @VisibleForTesting
     static AbstractSQLQueryFactory<?> createFactory(final DataSourceWrapper dataSource) {
-        Provider<Connection> connectionProvider = () -> {
+        Supplier<Connection> connectionProvider = () -> {
             Connection connection = dataSource.getConnection(false)
                                               .get();
             try {

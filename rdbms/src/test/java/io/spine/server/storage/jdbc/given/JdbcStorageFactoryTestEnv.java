@@ -64,7 +64,7 @@ public class JdbcStorageFactoryTestEnv {
         return ContextSpec.multitenant(JdbcStorageFactoryTestEnv.class.getName());
     }
 
-    public static ContextSpec singletenantSpec() {
+    public static ContextSpec singleTenantSpec() {
         return ContextSpec.singleTenant(JdbcStorageFactoryTestEnv.class.getName());
     }
 
