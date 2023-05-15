@@ -26,5 +26,5 @@
 
 
 val spineCoreVersion by extra("1.9.0-SNAPSHOT.12")
-val spineBaseVersion by extra("1.9.0-SNAPSHOT.5")
+val spineBaseVersion by extra("1.9.0-SNAPSHOT.6")
 val versionToPublish by extra("1.9.0-SNAPSHOT.5")
