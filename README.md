@@ -15,7 +15,7 @@ Gradle:
 
 ```kotlin
 dependencies {
-    implementation("io.spine:spine-rdbms:1.8.2")
+    implementation("io.spine:spine-rdbms:1.9.0")
 }
 ```
 
@@ -29,7 +29,7 @@ For the details on setting up the server environment please refer to
 
 To support working with different JDBC drivers, the library uses [Querydsl](http://www.querydsl.com/)
 internally. So the list of supported drivers depends on `Querydsl` and can be found
-[here](http://www.querydsl.com/static/querydsl/4.1.3/reference/html_single/#d0e1067).
+[here](http://querydsl.com/static/querydsl/5.0.0/reference/html_single/).
 
 To use a particular JDBC implementation, you need to configure `JdbcStorageFactory` with
 the corresponding JDBC connection string.
