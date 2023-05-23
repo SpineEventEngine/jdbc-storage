@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>JdbcMessageStorage</title>
+    <link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">
+    <script>var pathToRoot = "../../../";</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async="async"></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/jetbrains-mono.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/clipboard.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer="defer"></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer="defer"></script>
+<link href="../../../images/logo-icon.svg">
+<link href="../../../styles/custom-styles.css" rel="Stylesheet">
+</head>
+<body>
+<div class="navigation-wrapper" id="navigation-wrapper">
+    <div id="leftToggler"><span class="icon-toggler"></span></div>
+    <div class="library-name">
+            <a href="../../../index.html">
+                    <span>rdbms</span>
+            </a>
+    </div>
+    <div>
+1.9.0    </div>
+    <div class="pull-right d-flex">
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":rdbms:dokkaHtml/main">jvm</button>
+        </div>
+        <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
+        <div id="searchBar"></div>
+    </div>
+</div>
+<div id="container">
+    <div id="leftColumn">
+        <div id="sideMenu"></div>
+    </div>
+    <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageIds="rdbms::io.spine.server.storage.jdbc.message/JdbcMessageStorage///PointingToDeclaration//1236667435">
+  <div class="breadcrumbs"><a href="../../../index.html">rdbms</a><span class="delimiter">/</span><a href="../index.html">io.spine.server.storage.jdbc.message</a><span class="delimiter">/</span><span class="current">JdbcMessageStorage</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Jdbc</span><wbr></wbr><span>Message</span><wbr></wbr><span><span>Storage</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">public </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="index.html">JdbcMessageStorage</a><span class="token operator">&lt;</span>I<span class="token punctuation">, </span>M<span class="token keyword"> extends </span>Message<span class="token punctuation">, </span>R<span class="token keyword"> extends </span>ReadRequest&lt;I&gt;<span class="token punctuation">, </span>T<span class="token keyword"> extends </span><a href="../-message-table/index.html">MessageTable</a><span class="token operator">&lt;</span><a href="index.html">I</a><span class="token punctuation">, </span><a href="index.html">M</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><p class="paragraph">A storage which stores plain messages in a single SQL <a href="../-message-table/index.html">table</a>.</p><h4 class="">Parameters</h4><div class="table"><div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span><span>&lt;I&gt;</span></span></u></div></span></div><div><div class="title"><p class="paragraph">the record ID type</p></div></div></div></div><div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span><span>&lt;M&gt;</span></span></u></div></span></div><div><div class="title"><p class="paragraph">the stored message type</p></div></div></div></div><div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span><span>&lt;R&gt;</span></span></u></div></span></div><div><div class="title"><p class="paragraph">the read request type</p></div></div></div></div><div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span><span>&lt;T&gt;</span></span></u></div></span></div><div><div class="title"><p class="paragraph">the type of used <a href="../-message-table/index.html">MessageTable</a></p></div></div></div></div></div><h4 class="">Inheritors</h4><div class="table"><div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../../io.spine.server.storage.jdbc.delivery/-jdbc-catch-up-storage/index.html">JdbcCatchUpStorage</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../../io.spine.server.storage.jdbc.delivery/-jdbc-inbox-storage/index.html">JdbcInboxStorage</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../../io.spine.server.storage.jdbc.delivery/-jdbc-session-storage/index.html">JdbcSessionStorage</a></div></span></div><div></div></div></div></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,FUNCTION,PROPERTY">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="">Constructors</h2>
+        <div class="table"><a data-name="-924319765%2FConstructors%2F1236667435" anchor-label="JdbcMessageStorage" id="-924319765%2FConstructors%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-togglable="CONSTRUCTOR" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-jdbc-message-storage.html"><span>Jdbc</span><wbr></wbr><span>Message</span><wbr></wbr><span><span>Storage</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-924319765%2FConstructors%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">protected </span><span class="token keyword"></span>void <a href="-jdbc-message-storage.html"><span class="token function">JdbcMessageStorage</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword"></span>boolean multitenant<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword"></span><a href="index.html">T</a> table</span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="-297752741%2FFunctions%2F1236667435" anchor-label="index" id="-297752741%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="--index--.html"><span><span>index</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-297752741%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Iterator.html">Iterator</a><span class="token operator">&lt;</span><a href="index.html">I</a><span class="token operator">&gt;</span> <a href="--index--.html"><span class="token function">index</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief ">Always throws an <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/UnsupportedOperationException.html">UnsupportedOperationException</a>.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-3380327%2FFunctions%2F1236667435" anchor-label="read" id="-3380327%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="read.html"><span><span>read</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-3380327%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Optional.html">Optional</a><span class="token operator">&lt;</span><a href="index.html">M</a><span class="token operator">&gt;</span> <a href="read.html"><span class="token function">read</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword"></span><a href="index.html">R</a> request</span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-822662581%2FFunctions%2F1236667435" anchor-label="removeAll" id="-822662581%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="remove-all.html"><span>remove</span><wbr></wbr><span><span>All</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-822662581%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span>void <a href="remove-all.html"><span class="token function">removeAll</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword"></span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Iterable.html">Iterable</a><span class="token operator">&lt;</span><a href="index.html">M</a><span class="token operator">&gt;</span> messages</span></span><span class="token punctuation">)</span></div><div class="brief ">Removes the given messages from the storage.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1762764767%2FFunctions%2F1236667435" anchor-label="table" id="1762764767%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="table.html"><span><span>table</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1762764767%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">protected </span><span class="token keyword"></span><a href="index.html">T</a> <a href="table.html"><span class="token function">table</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1879662350%2FFunctions%2F1236667435" anchor-label="write" id="-1879662350%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="write.html"><span><span>write</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1879662350%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span>void <a href="write.html"><span class="token function">write</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword"></span><a href="index.html">M</a> message</span></span><span class="token punctuation">)</span></div><div class="brief ">Writes a single message to the storage.</div><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span>void <a href="write.html"><span class="token function">write</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword"></span><a href="index.html">I</a> id<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword"></span><a href="index.html">M</a> record</span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-853734736%2FFunctions%2F1236667435" anchor-label="writeAll" id="-853734736%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="write-all.html"><span>write</span><wbr></wbr><span><span>All</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-853734736%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span>void <a href="write-all.html"><span class="token function">writeAll</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword"></span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Iterable.html">Iterable</a><span class="token operator">&lt;</span><a href="index.html">M</a><span class="token operator">&gt;</span> messages</span></span><span class="token punctuation">)</span></div><div class="brief ">Writes the given messages to the storage.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>Copyright 2023, TeamDev</span><span
+                class="pull-right"><span>Generated by </span><a
+                href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>Builder</title>
+    <link href="../../../../images/logo-icon.svg" rel="icon" type="image/svg">
+    <script>var pathToRoot = "../../../../";</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="../../../../scripts/sourceset_dependencies.js" async="async"></script>
+<link href="../../../../styles/style.css" rel="Stylesheet">
+<link href="../../../../styles/jetbrains-mono.css" rel="Stylesheet">
+<link href="../../../../styles/main.css" rel="Stylesheet">
+<link href="../../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../../styles/logo-styles.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../../scripts/clipboard.js" async="async"></script>
+<script type="text/javascript" src="../../../../scripts/navigation-loader.js" async="async"></script>
+<script type="text/javascript" src="../../../../scripts/platform-content-handler.js" async="async"></script>
+<script type="text/javascript" src="../../../../scripts/main.js" defer="defer"></script>
+<script type="text/javascript" src="../../../../scripts/prism.js" async="async"></script>
+<script type="text/javascript" src="../../../../scripts/symbol-parameters-wrapper_deferred.js" defer="defer"></script>
+<link href="../../../../images/logo-icon.svg">
+<link href="../../../../styles/custom-styles.css" rel="Stylesheet">
+</head>
+<body>
+<div class="navigation-wrapper" id="navigation-wrapper">
+    <div id="leftToggler"><span class="icon-toggler"></span></div>
+    <div class="library-name">
+            <a href="../../../../index.html">
+                    <span>rdbms</span>
+            </a>
+    </div>
+    <div>
+1.9.0    </div>
+    <div class="pull-right d-flex">
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":rdbms:dokkaHtml/main">jvm</button>
+        </div>
+        <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
+        <div id="searchBar"></div>
+    </div>
+</div>
+<div id="container">
+    <div id="leftColumn">
+        <div id="sideMenu"></div>
+    </div>
+    <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageIds="rdbms::io.spine.server.storage.jdbc.delivery/SelectAllShardSessions.Builder///PointingToDeclaration//1236667435">
+  <div class="breadcrumbs"><a href="../../../../index.html">rdbms</a><span class="delimiter">/</span><a href="../../index.html">io.spine.server.storage.jdbc.delivery</a><span class="delimiter">/</span><a href="../index.html">SelectAllShardSessions</a><span class="delimiter">/</span><span class="current">Builder</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Builder</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">public </span><span class="token keyword">class </span><a href="index.html">Builder</a><span class="token keyword"> extends </span><a href="../../../io.spine.server.storage.jdbc.query/-abstract-query/-builder/index.html">AbstractQuery.Builder</a><span class="token operator">&lt;</span><a href="../../../io.spine.server.storage.jdbc.query/-abstract-query/-builder/index.html">B</a><span class="token punctuation">, </span><a href="../../../io.spine.server.storage.jdbc.query/-abstract-query/-builder/index.html">Q</a><span class="token operator">&gt;</span></div><p class="paragraph">Builder of <code class="lang-kotlin">SelectAllShardSessions</code> query.</p></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,FUNCTION,PROPERTY">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="2029028371%2FFunctions%2F1236667435" anchor-label="doBuild" id="2029028371%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="do-build.html"><span>do</span><wbr></wbr><span><span>Build</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2029028371%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">protected </span><span class="token keyword"></span><a href="../index.html">SelectAllShardSessions</a> <a href="do-build.html"><span class="token function">doBuild</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief ">Builds a new instance of the query.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1915869502%2FFunctions%2F1236667435" anchor-label="getThis" id="-1915869502%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-this.html"><span>get</span><wbr></wbr><span><span>This</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1915869502%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">protected </span><span class="token keyword"></span><a href="index.html">SelectAllShardSessions.Builder</a> <a href="get-this.html"><span class="token function">getThis</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief ">Obtains typed reference to <code class="lang-kotlin">this</code>.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="">Inherited functions</h2>
+        <div class="table"><a data-name="-266191174%2FFunctions%2F1236667435" anchor-label="build" id="-266191174%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../../io.spine.server.storage.jdbc.query/-abstract-query/-builder/build.html"><span><span>build</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-266191174%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword">final </span><span class="token keyword"></span><a href="../../../io.spine.server.storage.jdbc.query/-abstract-query/-builder/index.html">Q</a> <a href="../../../io.spine.server.storage.jdbc.query/-abstract-query/-builder/build.html"><span class="token function">build</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief ">Creates a new instance of the <a href="../../../io.spine.server.storage.jdbc.query/-storage-query/index.html">StorageQuery</a> with respect to the preconditions.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2011918881%2FFunctions%2F1236667435" anchor-label="checkPreconditions" id="-2011918881%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../../io.spine.server.storage.jdbc.query/-abstract-query/-builder/check-preconditions.html"><span>check</span><wbr></wbr><span><span>Preconditions</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2011918881%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">protected </span><span class="token keyword"></span>void <a href="../../../io.spine.server.storage.jdbc.query/-abstract-query/-builder/check-preconditions.html"><span class="token function">checkPreconditions</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief ">Checks the preconditions of the query construction.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-40070085%2FFunctions%2F1236667435" anchor-label="setDataSource" id="-40070085%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../../io.spine.server.storage.jdbc.query/-abstract-query/-builder/set-data-source.html"><span>set</span><wbr></wbr><span>Data</span><wbr></wbr><span><span>Source</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-40070085%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span><a href="../../../io.spine.server.storage.jdbc.query/-abstract-query/-builder/index.html">B</a> <a href="../../../io.spine.server.storage.jdbc.query/-abstract-query/-builder/set-data-source.html"><span class="token function">setDataSource</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword"></span><a href="../../../io.spine.server.storage.jdbc/-data-source-wrapper/index.html">DataSourceWrapper</a> dataSource</span></span><span class="token punctuation">)</span></div><div class="brief ">Sets the <a href="../../../io.spine.server.storage.jdbc/-data-source-wrapper/index.html">data source</a> to be used for query execution.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1301815722%2FFunctions%2F1236667435" anchor-label="setTableName" id="-1301815722%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../../io.spine.server.storage.jdbc.query/-abstract-query/-builder/set-table-name.html"><span>set</span><wbr></wbr><span>Table</span><wbr></wbr><span><span>Name</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1301815722%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span><a href="../../../io.spine.server.storage.jdbc.query/-abstract-query/-builder/index.html">B</a> <a href="../../../io.spine.server.storage.jdbc.query/-abstract-query/-builder/set-table-name.html"><span class="token function">setTableName</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword"></span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html">String</a> tableName</span></span><span class="token punctuation">)</span></div><div class="brief ">Sets the table name to use as a target for the query.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>Copyright 2023, TeamDev</span><span
+                class="pull-right"><span>Generated by </span><a
+                href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+    </div>
+</div>
+</body>
+</html>

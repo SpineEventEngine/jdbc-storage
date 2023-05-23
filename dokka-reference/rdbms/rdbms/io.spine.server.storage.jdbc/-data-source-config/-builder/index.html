@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>Builder</title>
+    <link href="../../../../images/logo-icon.svg" rel="icon" type="image/svg">
+    <script>var pathToRoot = "../../../../";</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="../../../../scripts/sourceset_dependencies.js" async="async"></script>
+<link href="../../../../styles/style.css" rel="Stylesheet">
+<link href="../../../../styles/jetbrains-mono.css" rel="Stylesheet">
+<link href="../../../../styles/main.css" rel="Stylesheet">
+<link href="../../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../../styles/logo-styles.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../../scripts/clipboard.js" async="async"></script>
+<script type="text/javascript" src="../../../../scripts/navigation-loader.js" async="async"></script>
+<script type="text/javascript" src="../../../../scripts/platform-content-handler.js" async="async"></script>
+<script type="text/javascript" src="../../../../scripts/main.js" defer="defer"></script>
+<script type="text/javascript" src="../../../../scripts/prism.js" async="async"></script>
+<script type="text/javascript" src="../../../../scripts/symbol-parameters-wrapper_deferred.js" defer="defer"></script>
+<link href="../../../../images/logo-icon.svg">
+<link href="../../../../styles/custom-styles.css" rel="Stylesheet">
+</head>
+<body>
+<div class="navigation-wrapper" id="navigation-wrapper">
+    <div id="leftToggler"><span class="icon-toggler"></span></div>
+    <div class="library-name">
+            <a href="../../../../index.html">
+                    <span>rdbms</span>
+            </a>
+    </div>
+    <div>
+1.9.0    </div>
+    <div class="pull-right d-flex">
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":rdbms:dokkaHtml/main">jvm</button>
+        </div>
+        <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
+        <div id="searchBar"></div>
+    </div>
+</div>
+<div id="container">
+    <div id="leftColumn">
+        <div id="sideMenu"></div>
+    </div>
+    <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageIds="rdbms::io.spine.server.storage.jdbc/DataSourceConfig.Builder///PointingToDeclaration//1236667435">
+  <div class="breadcrumbs"><a href="../../../../index.html">rdbms</a><span class="delimiter">/</span><a href="../../index.html">io.spine.server.storage.jdbc</a><span class="delimiter">/</span><a href="../index.html">DataSourceConfig</a><span class="delimiter">/</span><span class="current">Builder</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Builder</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">public </span><span class="token keyword">class </span><a href="index.html">Builder</a></div><p class="paragraph">The builder for <a href="../index.html">DataSourceConfig</a>.</p></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,FUNCTION,PROPERTY">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="">Constructors</h2>
+        <div class="table"><a data-name="-522748905%2FConstructors%2F1236667435" anchor-label="DataSourceConfig.Builder" id="-522748905%2FConstructors%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-togglable="CONSTRUCTOR" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-data-source-config.-builder.html"><span>Data</span><wbr></wbr><span>Source</span><wbr></wbr><span>Config.</span><wbr></wbr><span>Builder</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-522748905%2FConstructors%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span>void <a href="-data-source-config.-builder.html"><span class="token function">DataSourceConfig.Builder</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="">Properties</h2>
+        <div class="table"><a data-name="1678413143%2FProperties%2F1236667435" anchor-label="connectionTestQuery" id="1678413143%2FProperties%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#1678413143%2FProperties%2F1236667435"><span>connection</span><wbr></wbr><span>Test</span><wbr></wbr><span><span>Query</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1678413143%2FProperties%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html">String</a> <a href="index.html#1678413143%2FProperties%2F1236667435">connectionTestQuery</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="485543340%2FProperties%2F1236667435" anchor-label="connectionTimeout" id="485543340%2FProperties%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#485543340%2FProperties%2F1236667435"><span>connection</span><wbr></wbr><span><span>Timeout</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="485543340%2FProperties%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Long.html">Long</a> <a href="index.html#485543340%2FProperties%2F1236667435">connectionTimeout</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1906322673%2FProperties%2F1236667435" anchor-label="dataSourceClassName" id="1906322673%2FProperties%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#1906322673%2FProperties%2F1236667435"><span>data</span><wbr></wbr><span>Source</span><wbr></wbr><span>Class</span><wbr></wbr><span><span>Name</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1906322673%2FProperties%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html">String</a> <a href="index.html#1906322673%2FProperties%2F1236667435">dataSourceClassName</a></div><div class="brief ">Required parameters.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1332575198%2FProperties%2F1236667435" anchor-label="idleTimeout" id="-1332575198%2FProperties%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-1332575198%2FProperties%2F1236667435"><span>idle</span><wbr></wbr><span><span>Timeout</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1332575198%2FProperties%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Long.html">Long</a> <a href="index.html#-1332575198%2FProperties%2F1236667435">idleTimeout</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-359096965%2FProperties%2F1236667435" anchor-label="jdbcUrl" id="-359096965%2FProperties%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-359096965%2FProperties%2F1236667435"><span>jdbc</span><wbr></wbr><span><span>Url</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-359096965%2FProperties%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html">String</a> <a href="index.html#-359096965%2FProperties%2F1236667435">jdbcUrl</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1463134782%2FProperties%2F1236667435" anchor-label="maxLifetime" id="-1463134782%2FProperties%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-1463134782%2FProperties%2F1236667435"><span>max</span><wbr></wbr><span><span>Lifetime</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1463134782%2FProperties%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Long.html">Long</a> <a href="index.html#-1463134782%2FProperties%2F1236667435">maxLifetime</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="671344078%2FProperties%2F1236667435" anchor-label="maxPoolSize" id="671344078%2FProperties%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#671344078%2FProperties%2F1236667435"><span>max</span><wbr></wbr><span>Pool</span><wbr></wbr><span><span>Size</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="671344078%2FProperties%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Integer.html">Integer</a> <a href="index.html#671344078%2FProperties%2F1236667435">maxPoolSize</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1961340944%2FProperties%2F1236667435" anchor-label="password" id="1961340944%2FProperties%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#1961340944%2FProperties%2F1236667435"><span><span>password</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1961340944%2FProperties%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html">String</a> <a href="index.html#1961340944%2FProperties%2F1236667435">password</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1455858844%2FProperties%2F1236667435" anchor-label="poolName" id="-1455858844%2FProperties%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-1455858844%2FProperties%2F1236667435"><span>pool</span><wbr></wbr><span><span>Name</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1455858844%2FProperties%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html">String</a> <a href="index.html#-1455858844%2FProperties%2F1236667435">poolName</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1675507147%2FProperties%2F1236667435" anchor-label="username" id="-1675507147%2FProperties%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-1675507147%2FProperties%2F1236667435"><span><span>username</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1675507147%2FProperties%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html">String</a> <a href="index.html#-1675507147%2FProperties%2F1236667435">username</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="-848110271%2FFunctions%2F1236667435" anchor-label="build" id="-848110271%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="build.html"><span><span>build</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-848110271%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span><a href="../index.html">DataSourceConfig</a> <a href="build.html"><span class="token function">build</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief ">Builds a config.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1667440937%2FFunctions%2F1236667435" anchor-label="getConnectionTestQuery" id="1667440937%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-connection-test-query.html"><span>get</span><wbr></wbr><span>Connection</span><wbr></wbr><span>Test</span><wbr></wbr><span><span>Query</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1667440937%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html">String</a> <a href="get-connection-test-query.html"><span class="token function">getConnectionTestQuery</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief ">See <a href="set-connection-test-query.html">setConnectionTestQuery</a>.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-895472130%2FFunctions%2F1236667435" anchor-label="getConnectionTimeout" id="-895472130%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-connection-timeout.html"><span>get</span><wbr></wbr><span>Connection</span><wbr></wbr><span><span>Timeout</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-895472130%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Long.html">Long</a> <a href="get-connection-timeout.html"><span class="token function">getConnectionTimeout</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief ">See <a href="set-connection-timeout.html">setConnectionTimeout</a>.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1895350467%2FFunctions%2F1236667435" anchor-label="getDataSourceClassName" id="1895350467%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-data-source-class-name.html"><span>get</span><wbr></wbr><span>Data</span><wbr></wbr><span>Source</span><wbr></wbr><span>Class</span><wbr></wbr><span><span>Name</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1895350467%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html">String</a> <a href="get-data-source-class-name.html"><span class="token function">getDataSourceClassName</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief ">See <a href="set-data-source-class-name.html">setDataSourceClassName</a>.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1407383052%2FFunctions%2F1236667435" anchor-label="getIdleTimeout" id="-1407383052%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-idle-timeout.html"><span>get</span><wbr></wbr><span>Idle</span><wbr></wbr><span><span>Timeout</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1407383052%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Long.html">Long</a> <a href="get-idle-timeout.html"><span class="token function">getIdleTimeout</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief ">See <a href="set-idle-timeout.html">setIdleTimeout</a>.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="635624525%2FFunctions%2F1236667435" anchor-label="getJdbcUrl" id="635624525%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-jdbc-url.html"><span>get</span><wbr></wbr><span>Jdbc</span><wbr></wbr><span><span>Url</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="635624525%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html">String</a> <a href="get-jdbc-url.html"><span class="token function">getJdbcUrl</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief ">See <a href="set-jdbc-url.html">setJdbcUrl</a>.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1537942636%2FFunctions%2F1236667435" anchor-label="getMaxLifetime" id="-1537942636%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-max-lifetime.html"><span>get</span><wbr></wbr><span>Max</span><wbr></wbr><span><span>Lifetime</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1537942636%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Long.html">Long</a> <a href="get-max-lifetime.html"><span class="token function">getMaxLifetime</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief ">See <a href="set-max-lifetime.html">setMaxLifetime</a>.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="596536224%2FFunctions%2F1236667435" anchor-label="getMaxPoolSize" id="596536224%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-max-pool-size.html"><span>get</span><wbr></wbr><span>Max</span><wbr></wbr><span>Pool</span><wbr></wbr><span><span>Size</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="596536224%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Integer.html">Integer</a> <a href="get-max-pool-size.html"><span class="token function">getMaxPoolSize</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief ">See <a href="set-max-pool-size.html">setMaxPoolSize</a>.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1562031234%2FFunctions%2F1236667435" anchor-label="getPassword" id="-1562031234%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-password.html"><span>get</span><wbr></wbr><span><span>Password</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1562031234%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html">String</a> <a href="get-password.html"><span class="token function">getPassword</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief ">See <a href="set-password.html">setPassword</a>.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-684263726%2FFunctions%2F1236667435" anchor-label="getPoolName" id="-684263726%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-pool-name.html"><span>get</span><wbr></wbr><span>Pool</span><wbr></wbr><span><span>Name</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-684263726%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html">String</a> <a href="get-pool-name.html"><span class="token function">getPoolName</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief ">See <a href="set-pool-name.html">setPoolName</a>.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-903912029%2FFunctions%2F1236667435" anchor-label="getUsername" id="-903912029%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-username.html"><span>get</span><wbr></wbr><span><span>Username</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-903912029%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html">String</a> <a href="get-username.html"><span class="token function">getUsername</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief ">See <a href="set-username.html">setUsername</a>.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1363013819%2FFunctions%2F1236667435" anchor-label="isAutoCommit" id="1363013819%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="is-auto-commit.html"><span>is</span><wbr></wbr><span>Auto</span><wbr></wbr><span><span>Commit</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1363013819%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Boolean.html">Boolean</a> <a href="is-auto-commit.html"><span class="token function">isAutoCommit</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief ">See <a href="set-auto-commit.html">setAutoCommit</a>.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="960417511%2FFunctions%2F1236667435" anchor-label="setAutoCommit" id="960417511%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="set-auto-commit.html"><span>set</span><wbr></wbr><span>Auto</span><wbr></wbr><span><span>Commit</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="960417511%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span><a href="index.html">DataSourceConfig.Builder</a> <a href="set-auto-commit.html"><span class="token function">setAutoCommit</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword"></span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Boolean.html">Boolean</a> autoCommit</span></span><span class="token punctuation">)</span></div><div class="brief ">Sets the default auto-commit behavior of all connections.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2040886224%2FFunctions%2F1236667435" anchor-label="setConnectionTestQuery" id="-2040886224%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="set-connection-test-query.html"><span>set</span><wbr></wbr><span>Connection</span><wbr></wbr><span>Test</span><wbr></wbr><span><span>Query</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2040886224%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span><a href="index.html">DataSourceConfig.Builder</a> <a href="set-connection-test-query.html"><span class="token function">setConnectionTestQuery</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword"></span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html">String</a> connectionTestQuery</span></span><span class="token punctuation">)</span></div><div class="brief ">If your driver supports JDBC4 it is strongly recommended <strong>not setting</strong> this property.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="416299130%2FFunctions%2F1236667435" anchor-label="setConnectionTimeout" id="416299130%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="set-connection-timeout.html"><span>set</span><wbr></wbr><span>Connection</span><wbr></wbr><span><span>Timeout</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="416299130%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span><a href="index.html">DataSourceConfig.Builder</a> <a href="set-connection-timeout.html"><span class="token function">setConnectionTimeout</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword"></span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Long.html">Long</a> connectionTimeout</span></span><span class="token punctuation">)</span></div><div class="brief ">Sets the maximum number of milliseconds to wait for a connection from the pool.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-788416566%2FFunctions%2F1236667435" anchor-label="setDataSourceClassName" id="-788416566%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="set-data-source-class-name.html"><span>set</span><wbr></wbr><span>Data</span><wbr></wbr><span>Source</span><wbr></wbr><span>Class</span><wbr></wbr><span><span>Name</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-788416566%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span><a href="index.html">DataSourceConfig.Builder</a> <a href="set-data-source-class-name.html"><span class="token function">setDataSourceClassName</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword"></span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html">String</a> dataSourceClassName</span></span><span class="token punctuation">)</span></div><div class="brief ">Sets the name of the class implementing <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.sql/javax/sql/DataSource.html">DataSource</a> provided by the JDBC driver.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1807440144%2FFunctions%2F1236667435" anchor-label="setIdleTimeout" id="-1807440144%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="set-idle-timeout.html"><span>set</span><wbr></wbr><span>Idle</span><wbr></wbr><span><span>Timeout</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1807440144%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span><a href="index.html">DataSourceConfig.Builder</a> <a href="set-idle-timeout.html"><span class="token function">setIdleTimeout</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword"></span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Long.html">Long</a> idleTimeout</span></span><span class="token punctuation">)</span></div><div class="brief ">Sets the maximum amount of time that a connection is allowed to sit idle in the pool.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1749896876%2FFunctions%2F1236667435" anchor-label="setJdbcUrl" id="-1749896876%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="set-jdbc-url.html"><span>set</span><wbr></wbr><span>Jdbc</span><wbr></wbr><span><span>Url</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1749896876%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span><a href="index.html">DataSourceConfig.Builder</a> <a href="set-jdbc-url.html"><span class="token function">setJdbcUrl</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword"></span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html">String</a> jdbcUrl</span></span><span class="token punctuation">)</span></div><div class="brief ">This property directs the connection pool to use <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.sql/java/sql/DriverManager.html">DriverManager</a>-based configuration.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1424154480%2FFunctions%2F1236667435" anchor-label="setMaxLifetime" id="-1424154480%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="set-max-lifetime.html"><span>set</span><wbr></wbr><span>Max</span><wbr></wbr><span><span>Lifetime</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1424154480%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span><a href="index.html">DataSourceConfig.Builder</a> <a href="set-max-lifetime.html"><span class="token function">setMaxLifetime</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword"></span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Long.html">Long</a> maxLifetime</span></span><span class="token punctuation">)</span></div><div class="brief ">Sets the maximum lifetime of a connection in the pool.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2019612116%2FFunctions%2F1236667435" anchor-label="setMaxPoolSize" id="-2019612116%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="set-max-pool-size.html"><span>set</span><wbr></wbr><span>Max</span><wbr></wbr><span>Pool</span><wbr></wbr><span><span>Size</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2019612116%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span><a href="index.html">DataSourceConfig.Builder</a> <a href="set-max-pool-size.html"><span class="token function">setMaxPoolSize</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword"></span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Integer.html">Integer</a> maxPoolSize</span></span><span class="token punctuation">)</span></div><div class="brief ">Sets the maximum size that the pool is allowed to reach, including both idle and in-use connections.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-467896851%2FFunctions%2F1236667435" anchor-label="setPassword" id="-467896851%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="set-password.html"><span>set</span><wbr></wbr><span><span>Password</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-467896851%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span><a href="index.html">DataSourceConfig.Builder</a> <a href="set-password.html"><span class="token function">setPassword</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword"></span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html">String</a> password</span></span><span class="token punctuation">)</span></div><div class="brief ">Sets the default authentication password used for obtaining Connections from the underlying driver.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1165293889%2FFunctions%2F1236667435" anchor-label="setPoolName" id="1165293889%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="set-pool-name.html"><span>set</span><wbr></wbr><span>Pool</span><wbr></wbr><span><span>Name</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1165293889%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span><a href="index.html">DataSourceConfig.Builder</a> <a href="set-pool-name.html"><span class="token function">setPoolName</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword"></span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html">String</a> poolName</span></span><span class="token punctuation">)</span></div><div class="brief ">Sets a name of the connection pool and appears mainly in logging and JMX management consoles to identify pools and pool configurations.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1081058834%2FFunctions%2F1236667435" anchor-label="setUsername" id="1081058834%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="set-username.html"><span>set</span><wbr></wbr><span><span>Username</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1081058834%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span><a href="index.html">DataSourceConfig.Builder</a> <a href="set-username.html"><span class="token function">setUsername</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword"></span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html">String</a> username</span></span><span class="token punctuation">)</span></div><div class="brief ">This property sets the default authentication username used for obtaining Connections from the underlying driver.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>Copyright 2023, TeamDev</span><span
+                class="pull-right"><span>Generated by </span><a
+                href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>CatchUpTable</title>
+    <link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">
+    <script>var pathToRoot = "../../../";</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async="async"></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/jetbrains-mono.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/clipboard.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer="defer"></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer="defer"></script>
+<link href="../../../images/logo-icon.svg">
+<link href="../../../styles/custom-styles.css" rel="Stylesheet">
+</head>
+<body>
+<div class="navigation-wrapper" id="navigation-wrapper">
+    <div id="leftToggler"><span class="icon-toggler"></span></div>
+    <div class="library-name">
+            <a href="../../../index.html">
+                    <span>rdbms</span>
+            </a>
+    </div>
+    <div>
+1.9.0    </div>
+    <div class="pull-right d-flex">
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":rdbms:dokkaHtml/main">jvm</button>
+        </div>
+        <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
+        <div id="searchBar"></div>
+    </div>
+</div>
+<div id="container">
+    <div id="leftColumn">
+        <div id="sideMenu"></div>
+    </div>
+    <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageIds="rdbms::io.spine.server.storage.jdbc.delivery/CatchUpTable///PointingToDeclaration//1236667435">
+  <div class="breadcrumbs"><a href="../../../index.html">rdbms</a><span class="delimiter">/</span><a href="../index.html">io.spine.server.storage.jdbc.delivery</a><span class="delimiter">/</span><span class="current">CatchUpTable</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Catch</span><wbr></wbr><span>Up</span><wbr></wbr><span><span>Table</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">public </span><span class="token keyword">class </span><a href="index.html">CatchUpTable</a><span class="token keyword"> extends </span><a href="../../io.spine.server.storage.jdbc.message/-message-table/index.html">MessageTable</a><span class="token operator">&lt;</span><a href="../../io.spine.server.storage.jdbc.message/-message-table/index.html">I</a><span class="token punctuation">, </span><a href="../../io.spine.server.storage.jdbc.message/-message-table/index.html">M</a><span class="token operator">&gt;</span></div><p class="paragraph">A table in the DB responsible for storing the statuses of the ongoing catch-up processes.</p></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,FUNCTION,PROPERTY">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="-1967834485%2FFunctions%2F1236667435" anchor-label="messageDescriptor" id="-1967834485%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="message-descriptor.html"><span>message</span><wbr></wbr><span><span>Descriptor</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1967834485%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">protected </span><span class="token keyword"></span>Descriptor <a href="message-descriptor.html"><span class="token function">messageDescriptor</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief ">Obtains a <code class="lang-kotlin">Descriptor</code> of the stored message type.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="749495957%2FFunctions%2F1236667435" anchor-label="messageSpecificColumns" id="749495957%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="message-specific-columns.html"><span>message</span><wbr></wbr><span>Specific</span><wbr></wbr><span><span>Columns</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="749495957%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">protected </span><span class="token keyword"></span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Iterable.html">Iterable</a><span class="token operator">&lt;</span><span class="token keyword">? extends </span><a href="../../io.spine.server.storage.jdbc.message/-message-table/-column/index.html">MessageTable.Column</a><span class="token operator">&lt;</span>CatchUp<span class="token operator">&gt;</span><span class="token operator">&gt;</span> <a href="message-specific-columns.html"><span class="token function">messageSpecificColumns</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief ">Obtains columns specific to a concrete subtype of the <code class="lang-kotlin">MessageTable</code>.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1346184234%2FFunctions%2F1236667435" anchor-label="readAll" id="-1346184234%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="read-all.html"><span>read</span><wbr></wbr><span><span>All</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1346184234%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Iterable.html">Iterable</a><span class="token operator">&lt;</span>CatchUp<span class="token operator">&gt;</span> <a href="read-all.html"><span class="token function">readAll</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief ">Reads all <code class="lang-kotlin">CatchUp</code> statuses.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="">Inherited functions</h2>
+        <div class="table"><a data-name="6532788%2FFunctions%2F1236667435" anchor-label="bytesColumn" id="6532788%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../io.spine.server.storage.jdbc.message/-message-table/bytes-column.html"><span>bytes</span><wbr></wbr><span><span>Column</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="6532788%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword">static </span><a href="../../io.spine.server.storage.jdbc.message/-message-table/-bytes-column/index.html">MessageTable.BytesColumn</a><span class="token operator">&lt;</span><a href="../../io.spine.server.storage.jdbc.message/-message-table/bytes-column.html">M</a><span class="token operator">&gt;</span> <a href="../../io.spine.server.storage.jdbc.message/-message-table/bytes-column.html"><span class="token function">bytesColumn</span></a><span class="token operator">&lt;</span>M<span class="token keyword"> extends </span>Message<span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief ">Obtains a column responsible for storing serialized message bytes.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="601771299%2FFunctions%2F1236667435" anchor-label="columnDefaults" id="601771299%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../io.spine.server.storage.jdbc.query/-abstract-table/column-defaults.html"><span>column</span><wbr></wbr><span><span>Defaults</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="601771299%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">protected </span><span class="token keyword"></span>ImmutableMap&lt;String, Object&gt; <a href="../../io.spine.server.storage.jdbc.query/-abstract-table/column-defaults.html"><span class="token function">columnDefaults</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief ">Obtains the map of column defaults for this table.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="536569788%2FFunctions%2F1236667435" anchor-label="composeInsertOrUpdateQuery" id="536569788%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../io.spine.server.storage.jdbc.message/-message-table/compose-insert-or-update-query.html"><span>compose</span><wbr></wbr><span>Insert</span><wbr></wbr><span>Or</span><wbr></wbr><span>Update</span><wbr></wbr><span><span>Query</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="536569788%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">protected </span><span class="token keyword"></span><span data-unresolved-link="io.spine.server.storage.jdbc.message/InsertOrUpdateSingleMessage///PointingToDeclaration/">InsertOrUpdateSingleMessage</span><span class="token operator">&lt;</span><a href="../../io.spine.server.storage.jdbc.message/-message-table/index.html">I</a><span class="token punctuation">, </span><a href="../../io.spine.server.storage.jdbc.message/-message-table/index.html">M</a><span class="token operator">&gt;</span> <a href="../../io.spine.server.storage.jdbc.message/-message-table/compose-insert-or-update-query.html"><span class="token function">composeInsertOrUpdateQuery</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword"></span><a href="../../io.spine.server.storage.jdbc.message/-message-table/index.html">I</a> id<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword"></span><a href="../../io.spine.server.storage.jdbc.message/-message-table/index.html">M</a> record</span></span><span class="token punctuation">)</span></div><div class="symbol monospace block"><span class="token keyword">protected </span><span class="token keyword">abstract </span><span class="token keyword"></span><a href="../../io.spine.server.storage.jdbc.query/-write-query/index.html">WriteQuery</a> <a href="../../io.spine.server.storage.jdbc.query/-abstract-table/compose-insert-or-update-query.html"><span class="token function">composeInsertOrUpdateQuery</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword"></span><a href="../../io.spine.server.storage.jdbc.query/-abstract-table/index.html">I</a> id<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword"></span><a href="../../io.spine.server.storage.jdbc.query/-abstract-table/index.html">W</a> record</span></span><span class="token punctuation">)</span></div><div class="brief ">Returns a query which inserts the record under the passed ID, or updates the record if it already exists.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="401168444%2FFunctions%2F1236667435" anchor-label="composeInsertQuery" id="401168444%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../io.spine.server.storage.jdbc.message/-message-table/compose-insert-query.html"><span>compose</span><wbr></wbr><span>Insert</span><wbr></wbr><span><span>Query</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="401168444%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">protected </span><span class="token keyword"></span><span data-unresolved-link="io.spine.server.storage.jdbc.message/InsertSingleMessage///PointingToDeclaration/">InsertSingleMessage</span><span class="token operator">&lt;</span><a href="../../io.spine.server.storage.jdbc.message/-message-table/index.html">I</a><span class="token punctuation">, </span><a href="../../io.spine.server.storage.jdbc.message/-message-table/index.html">M</a><span class="token operator">&gt;</span> <a href="../../io.spine.server.storage.jdbc.message/-message-table/compose-insert-query.html"><span class="token function">composeInsertQuery</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword"></span><a href="../../io.spine.server.storage.jdbc.message/-message-table/index.html">I</a> id<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword"></span><a href="../../io.spine.server.storage.jdbc.message/-message-table/index.html">M</a> record</span></span><span class="token punctuation">)</span></div><div class="symbol monospace block"><span class="token keyword">protected </span><span class="token keyword">abstract </span><span class="token keyword"></span><a href="../../io.spine.server.storage.jdbc.query/-write-query/index.html">WriteQuery</a> <a href="../../io.spine.server.storage.jdbc.query/-abstract-table/compose-insert-query.html"><span class="token function">composeInsertQuery</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword"></span><a href="../../io.spine.server.storage.jdbc.query/-abstract-table/index.html">I</a> id<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword"></span><a href="../../io.spine.server.storage.jdbc.query/-abstract-table/index.html">W</a> record</span></span><span class="token punctuation">)</span></div><div class="brief ">Returns a query to insert the passed record under the passed ID.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="92539494%2FFunctions%2F1236667435" anchor-label="composeSelectQuery" id="92539494%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../io.spine.server.storage.jdbc.message/-message-table/compose-select-query.html"><span>compose</span><wbr></wbr><span>Select</span><wbr></wbr><span><span>Query</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="92539494%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">protected </span><span class="token keyword"></span><span data-unresolved-link="io.spine.server.storage.jdbc.message/SelectSingleMessage///PointingToDeclaration/">SelectSingleMessage</span><span class="token operator">&lt;</span><a href="../../io.spine.server.storage.jdbc.message/-message-table/index.html">I</a><span class="token punctuation">, </span><a href="../../io.spine.server.storage.jdbc.message/-message-table/index.html">M</a><span class="token operator">&gt;</span> <a href="../../io.spine.server.storage.jdbc.message/-message-table/compose-select-query.html"><span class="token function">composeSelectQuery</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword"></span><a href="../../io.spine.server.storage.jdbc.message/-message-table/index.html">I</a> id</span></span><span class="token punctuation">)</span></div><div class="symbol monospace block"><span class="token keyword">protected </span><span class="token keyword">abstract </span><span class="token keyword"></span><a href="../../io.spine.server.storage.jdbc.query/-select-query/index.html">SelectQuery</a><span class="token operator">&lt;</span><a href="../../io.spine.server.storage.jdbc.query/-abstract-table/index.html">R</a><span class="token operator">&gt;</span> <a href="../../io.spine.server.storage.jdbc.query/-abstract-table/compose-select-query.html"><span class="token function">composeSelectQuery</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword"></span><a href="../../io.spine.server.storage.jdbc.query/-abstract-table/index.html">I</a> id</span></span><span class="token punctuation">)</span></div><div class="brief ">Returns a query to select a record by ID.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1661594052%2FFunctions%2F1236667435" anchor-label="composeUpdateQuery" id="-1661594052%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../io.spine.server.storage.jdbc.message/-message-table/compose-update-query.html"><span>compose</span><wbr></wbr><span>Update</span><wbr></wbr><span><span>Query</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1661594052%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">protected </span><span class="token keyword"></span><span data-unresolved-link="io.spine.server.storage.jdbc.message/UpdateSingleMessage///PointingToDeclaration/">UpdateSingleMessage</span><span class="token operator">&lt;</span><a href="../../io.spine.server.storage.jdbc.message/-message-table/index.html">I</a><span class="token punctuation">, </span><a href="../../io.spine.server.storage.jdbc.message/-message-table/index.html">M</a><span class="token operator">&gt;</span> <a href="../../io.spine.server.storage.jdbc.message/-message-table/compose-update-query.html"><span class="token function">composeUpdateQuery</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword"></span><a href="../../io.spine.server.storage.jdbc.message/-message-table/index.html">I</a> id<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword"></span><a href="../../io.spine.server.storage.jdbc.message/-message-table/index.html">M</a> record</span></span><span class="token punctuation">)</span></div><div class="symbol monospace block"><span class="token keyword">protected </span><span class="token keyword">abstract </span><span class="token keyword"></span><a href="../../io.spine.server.storage.jdbc.query/-write-query/index.html">WriteQuery</a> <a href="../../io.spine.server.storage.jdbc.query/-abstract-table/compose-update-query.html"><span class="token function">composeUpdateQuery</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword"></span><a href="../../io.spine.server.storage.jdbc.query/-abstract-table/index.html">I</a> id<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword"></span><a href="../../io.spine.server.storage.jdbc.query/-abstract-table/index.html">W</a> record</span></span><span class="token punctuation">)</span></div><div class="brief ">Returns a query to update the record with the passed ID.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1922642014%2FFunctions%2F1236667435" anchor-label="containsRecord" id="1922642014%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../io.spine.server.storage.jdbc.query/-abstract-table/contains-record.html"><span>contains</span><wbr></wbr><span><span>Record</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1922642014%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">protected </span><span class="token keyword"></span>boolean <a href="../../io.spine.server.storage.jdbc.query/-abstract-table/contains-record.html"><span class="token function">containsRecord</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword"></span><a href="../../io.spine.server.storage.jdbc.query/-abstract-table/index.html">I</a> id</span></span><span class="token punctuation">)</span></div><div class="brief ">Checks if the table contains a record with given ID.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="465743983%2FFunctions%2F1236667435" anchor-label="create" id="465743983%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../io.spine.server.storage.jdbc.query/-abstract-table/create.html"><span><span>create</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="465743983%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span>void <a href="../../io.spine.server.storage.jdbc.query/-abstract-table/create.html"><span class="token function">create</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief ">Creates current table in the database if it does not exist yet.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-252271066%2FFunctions%2F1236667435" anchor-label="dataSource" id="-252271066%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../io.spine.server.storage.jdbc.query/-abstract-table/data-source.html"><span>data</span><wbr></wbr><span><span>Source</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-252271066%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">protected </span><span class="token keyword"></span><a href="../../io.spine.server.storage.jdbc/-data-source-wrapper/index.html">DataSourceWrapper</a> <a href="../../io.spine.server.storage.jdbc.query/-abstract-table/data-source.html"><span class="token function">dataSource</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1803394823%2FFunctions%2F1236667435" anchor-label="delete" id="-1803394823%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../io.spine.server.storage.jdbc.query/-abstract-table/delete.html"><span><span>delete</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1803394823%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span>boolean <a href="../../io.spine.server.storage.jdbc.query/-abstract-table/delete.html"><span class="token function">delete</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword"></span><a href="../../io.spine.server.storage.jdbc.query/-abstract-table/index.html">I</a> id</span></span><span class="token punctuation">)</span></div><div class="brief ">Deletes a row in the table corresponding to the given ID.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-488170599%2FFunctions%2F1236667435" anchor-label="deleteAll" id="-488170599%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../io.spine.server.storage.jdbc.query/-abstract-table/delete-all.html"><span>delete</span><wbr></wbr><span><span>All</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-488170599%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span>void <a href="../../io.spine.server.storage.jdbc.query/-abstract-table/delete-all.html"><span class="token function">deleteAll</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief ">Deletes all the records from the table.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="724444590%2FFunctions%2F1236667435" anchor-label="ensureColumnsPresent" id="724444590%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../io.spine.server.storage.jdbc.query/-abstract-table/ensure-columns-present.html"><span>ensure</span><wbr></wbr><span>Columns</span><wbr></wbr><span><span>Present</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="724444590%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">protected </span><span class="token keyword"></span>void <a href="../../io.spine.server.storage.jdbc.query/-abstract-table/ensure-columns-present.html"><span class="token function">ensureColumnsPresent</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword"></span>OrderBy ordering</span></span><span class="token punctuation">)</span></div><div class="brief ">Checks that the column specified via the ordering directive is present in this table.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="94055226%2FFunctions%2F1236667435" anchor-label="idColumn" id="94055226%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../io.spine.server.storage.jdbc.query/-abstract-table/id-column.html"><span>id</span><wbr></wbr><span><span>Column</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="94055226%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">protected </span><span class="token keyword"></span><a href="../../io.spine.server.storage.jdbc.query/-id-column/index.html">IdColumn</a><span class="token operator">&lt;</span><a href="../../io.spine.server.storage.jdbc.query/-abstract-table/index.html">I</a><span class="token operator">&gt;</span> <a href="../../io.spine.server.storage.jdbc.query/-abstract-table/id-column.html"><span class="token function">idColumn</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1537996354%2FFunctions%2F1236667435" anchor-label="idOf" id="1537996354%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../io.spine.server.storage.jdbc.message/-message-table/id-of.html"><span>id</span><wbr></wbr><span><span>Of</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1537996354%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">protected </span><span class="token keyword"></span><a href="../../io.spine.server.storage.jdbc.message/-message-table/index.html">I</a> <a href="../../io.spine.server.storage.jdbc.message/-message-table/id-of.html"><span class="token function">idOf</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword"></span><a href="../../io.spine.server.storage.jdbc.message/-message-table/index.html">M</a> record</span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1133128899%2FFunctions%2F1236667435" anchor-label="index" id="-1133128899%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../io.spine.server.storage.jdbc.query/-abstract-table/--index--.html"><span><span>index</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1133128899%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Iterator.html">Iterator</a><span class="token operator">&lt;</span><a href="../../io.spine.server.storage.jdbc.query/-abstract-table/index.html">I</a><span class="token operator">&gt;</span> <a href="../../io.spine.server.storage.jdbc.query/-abstract-table/--index--.html"><span class="token function">index</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief ">Retrieves the table index.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="457775091%2FFunctions%2F1236667435" anchor-label="insert" id="457775091%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../io.spine.server.storage.jdbc.query/-abstract-table/insert.html"><span><span>insert</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="457775091%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span>void <a href="../../io.spine.server.storage.jdbc.query/-abstract-table/insert.html"><span class="token function">insert</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword"></span><a href="../../io.spine.server.storage.jdbc.query/-abstract-table/index.html">I</a> id<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword"></span><a href="../../io.spine.server.storage.jdbc.query/-abstract-table/index.html">W</a> record</span></span><span class="token punctuation">)</span></div><div class="brief ">Inserts the record into the table using the specified ID.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-870508224%2FFunctions%2F1236667435" anchor-label="name" id="-870508224%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../io.spine.server.storage.jdbc.query/-abstract-table/name.html"><span><span>name</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-870508224%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">protected </span><span class="token keyword"></span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html">String</a> <a href="../../io.spine.server.storage.jdbc.query/-abstract-table/name.html"><span class="token function">name</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-235695708%2FFunctions%2F1236667435" anchor-label="read" id="-235695708%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../io.spine.server.storage.jdbc.query/-abstract-table/read.html"><span><span>read</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-235695708%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span><a href="../../io.spine.server.storage.jdbc.query/-abstract-table/index.html">R</a> <a href="../../io.spine.server.storage.jdbc.query/-abstract-table/read.html"><span class="token function">read</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword"></span><a href="../../io.spine.server.storage.jdbc.query/-abstract-table/index.html">I</a> id</span></span><span class="token punctuation">)</span></div><div class="brief ">Reads a record with the given ID from the table.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="299139373%2FFunctions%2F1236667435" anchor-label="readAll" id="299139373%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../io.spine.server.storage.jdbc.message/-message-table/read-all.html"><span>read</span><wbr></wbr><span><span>All</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="299139373%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">protected </span><span class="token keyword"></span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Iterator.html">Iterator</a><span class="token operator">&lt;</span><a href="../../io.spine.server.storage.jdbc.message/-message-table/index.html">M</a><span class="token operator">&gt;</span> <a href="../../io.spine.server.storage.jdbc.message/-message-table/read-all.html"><span class="token function">readAll</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword"></span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Iterable.html">Iterable</a><span class="token operator">&lt;</span><a href="../../io.spine.server.storage.jdbc.message/-message-table/index.html">I</a><span class="token operator">&gt;</span> ids</span></span><span class="token punctuation">)</span></div><div class="brief ">Obtains multiple messages from the table by IDs.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1183807997%2FFunctions%2F1236667435" anchor-label="removeAll" id="-1183807997%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../io.spine.server.storage.jdbc.message/-message-table/remove-all.html"><span>remove</span><wbr></wbr><span><span>All</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1183807997%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">protected </span><span class="token keyword"></span>void <a href="../../io.spine.server.storage.jdbc.message/-message-table/remove-all.html"><span class="token function">removeAll</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword"></span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Iterable.html">Iterable</a><span class="token operator">&lt;</span><a href="../../io.spine.server.storage.jdbc.message/-message-table/index.html">M</a><span class="token operator">&gt;</span> records</span></span><span class="token punctuation">)</span></div><div class="brief ">Removes multiple records from the table in a bulk.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1647057030%2FFunctions%2F1236667435" anchor-label="tableColumns" id="1647057030%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../io.spine.server.storage.jdbc.message/-message-table/table-columns.html"><span>table</span><wbr></wbr><span><span>Columns</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1647057030%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">protected </span><span class="token keyword"></span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/List.html">List</a><span class="token operator">&lt;</span><span class="token keyword">? extends </span><a href="../../io.spine.server.storage.jdbc.message/-message-table/-column/index.html">MessageTable.Column</a><span class="token operator">&lt;</span><a href="../../io.spine.server.storage.jdbc.message/-message-table/index.html">M</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span> <a href="../../io.spine.server.storage.jdbc.message/-message-table/table-columns.html"><span class="token function">tableColumns</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="symbol monospace block"><span class="token keyword">protected </span><span class="token keyword">abstract </span><span class="token keyword"></span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/List.html">List</a><span class="token operator">&lt;</span><span class="token keyword">? extends </span><a href="../../io.spine.server.storage.jdbc/-table-column/index.html">TableColumn</a><span class="token operator">&gt;</span> <a href="../../io.spine.server.storage.jdbc.query/-abstract-table/table-columns.html"><span class="token function">tableColumns</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1000986115%2FFunctions%2F1236667435" anchor-label="update" id="1000986115%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../io.spine.server.storage.jdbc.query/-abstract-table/update.html"><span><span>update</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1000986115%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span>void <a href="../../io.spine.server.storage.jdbc.query/-abstract-table/update.html"><span class="token function">update</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword"></span><a href="../../io.spine.server.storage.jdbc.query/-abstract-table/index.html">I</a> id<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword"></span><a href="../../io.spine.server.storage.jdbc.query/-abstract-table/index.html">W</a> record</span></span><span class="token punctuation">)</span></div><div class="brief ">Updates the record with the specified ID for the table.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1854227896%2FFunctions%2F1236667435" anchor-label="write" id="-1854227896%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../io.spine.server.storage.jdbc.message/-message-table/write.html"><span><span>write</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1854227896%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">protected </span><span class="token keyword"></span>void <a href="../../io.spine.server.storage.jdbc.message/-message-table/write.html"><span class="token function">write</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword"></span><a href="../../io.spine.server.storage.jdbc.message/-message-table/index.html">M</a> record</span></span><span class="token punctuation">)</span></div><div class="brief ">Writes a single message to the storage.</div><div class="symbol monospace block"><span class="token keyword">public </span><span class="token keyword"></span>void <a href="../../io.spine.server.storage.jdbc.query/-abstract-table/write.html"><span class="token function">write</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword"></span><a href="../../io.spine.server.storage.jdbc.query/-abstract-table/index.html">I</a> id<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword"></span><a href="../../io.spine.server.storage.jdbc.query/-abstract-table/index.html">W</a> record</span></span><span class="token punctuation">)</span></div><div class="brief ">Performs a write operation on the table.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-726837256%2FFunctions%2F1236667435" anchor-label="writeAll" id="-726837256%2FFunctions%2F1236667435" data-filterable-set=":rdbms:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":rdbms:dokkaHtml/main" data-filterable-set=":rdbms:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../io.spine.server.storage.jdbc.message/-message-table/write-all.html"><span>write</span><wbr></wbr><span><span>All</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-726837256%2FFunctions%2F1236667435"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rdbms:dokkaHtml/main"><div class="symbol monospace block"><span class="token keyword">protected </span><span class="token keyword"></span>void <a href="../../io.spine.server.storage.jdbc.message/-message-table/write-all.html"><span class="token function">writeAll</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword"></span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Iterable.html">Iterable</a><span class="token operator">&lt;</span><a href="../../io.spine.server.storage.jdbc.message/-message-table/index.html">M</a><span class="token operator">&gt;</span> records</span></span><span class="token punctuation">)</span></div><div class="brief ">Writes multiple records to the storage in a batch.</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>Copyright 2023, TeamDev</span><span
+                class="pull-right"><span>Generated by </span><a
+                href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+    </div>
+</div>
+</body>
+</html>
