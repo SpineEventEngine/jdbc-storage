@@ -41,7 +41,7 @@ import java.util.Collection;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Lists.newLinkedList;
-import static io.spine.json.Json.toCompactJson;
+import static io.spine.type.Json.toCompactJson;
 import static io.spine.server.entity.model.EntityClass.asEntityClass;
 import static io.spine.server.storage.jdbc.Type.INT;
 import static io.spine.server.storage.jdbc.Type.LONG;
@@ -173,7 +173,7 @@ public abstract class IdColumn<I> {
             return  (IdColumn<I>) new StringIdColumn(column);
         } else if (Message.class.isAssignableFrom(idClass)) {
             var messageClass = (Class<? extends Message>) idClass;
-            return  (IdColumn<I>) new MessageIdColumn(column, messageClass);
+            return  (IdColumn<I>) new MessageIdColumn<>(column, messageClass);
         } else {
             throw newIllegalArgumentException("Unexpected entity ID class `%s`.", idClass.getName());
         }
@@ -318,7 +318,7 @@ public abstract class IdColumn<I> {
          * {@inheritDoc}
          *
          * <p>Converts the given {@link Message} ID into its
-         * {@linkplain io.spine.json.Json#toCompactJson JSON representation}.
+         * {@linkplain io.spine.type.Json#toCompactJson JSON representation}.
          */
         @Override
         public String normalize(M id) {

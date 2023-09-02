@@ -31,7 +31,7 @@ import com.google.protobuf.Message;
 import io.spine.client.ArchivedColumn;
 import io.spine.client.DeletedColumn;
 import io.spine.client.VersionColumn;
-import io.spine.logging.Logging;
+import io.spine.logging.WithLogging;
 import io.spine.query.Column;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.TableColumn;
@@ -60,7 +60,7 @@ import static java.util.Objects.requireNonNull;
  * @param <R>
  *         the type of the stored records
  */
-public class CreateTable<I, R extends Message> extends Operation<I, R> implements Logging {
+public class CreateTable<I, R extends Message> extends Operation<I, R> implements WithLogging {
 
     private final TypeMapping typeMapping;
 

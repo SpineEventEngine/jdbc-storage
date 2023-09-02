@@ -37,7 +37,7 @@ import io.spine.server.storage.jdbc.record.JdbcRecord;
 import io.spine.server.storage.jdbc.record.RecordTable;
 import io.spine.server.storage.jdbc.record.column.IdColumn;
 
-import static com.google.gson.internal.$Gson$Preconditions.checkNotNull;
+import static java.util.Objects.requireNonNull;
 
 /**
  * An abstract base for queries that write multiple messages
@@ -119,7 +119,7 @@ abstract class WriteMultipleQuery<I, R extends Message, C extends StoreClause<C>
         private ImmutableList<JdbcRecord<I, R>> records;
 
         public B setRecords(ImmutableList<JdbcRecord<I, R>> records) {
-            this.records = checkNotNull(records);
+            this.records = requireNonNull(records);
             return getThis();
         }
     }

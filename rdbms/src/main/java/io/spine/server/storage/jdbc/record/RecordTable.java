@@ -29,7 +29,7 @@ package io.spine.server.storage.jdbc.record;
 import com.google.common.collect.Iterators;
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Message;
-import io.spine.logging.Logging;
+import io.spine.logging.WithLogging;
 import io.spine.query.RecordQuery;
 import io.spine.server.storage.RecordWithColumns;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
@@ -51,7 +51,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @param <R>
  *         the type of stored records
  */
-public class RecordTable<I, R extends Message> implements Logging {
+public class RecordTable<I, R extends Message> implements WithLogging {
 
     private final JdbcTableSpec<I, R> spec;
     private final OperationFactory operations;

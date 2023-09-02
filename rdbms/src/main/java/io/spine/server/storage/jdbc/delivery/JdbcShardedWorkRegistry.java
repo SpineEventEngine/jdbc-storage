@@ -27,7 +27,7 @@
 package io.spine.server.storage.jdbc.delivery;
 
 import com.google.protobuf.Duration;
-import io.spine.logging.Logging;
+import io.spine.logging.WithLogging;
 import io.spine.server.ContextSpec;
 import io.spine.server.NodeId;
 import io.spine.server.delivery.AbstractWorkRegistry;
@@ -49,7 +49,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * <p>Represents an SQL table of {@linkplain ShardSessionRecord session records} with the
  * appropriate accessor methods.
  */
-public class JdbcShardedWorkRegistry extends AbstractWorkRegistry implements Logging {
+public class JdbcShardedWorkRegistry extends AbstractWorkRegistry implements WithLogging {
 
     private final JdbcSessionStorage storage;
 

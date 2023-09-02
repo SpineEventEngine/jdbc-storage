@@ -26,8 +26,7 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import io.spine.logging.Logging;
-import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.logging.WithLogging;
 import io.spine.server.storage.jdbc.DatabaseException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,7 +36,7 @@ import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("`QueryExecutor` should")
-class QueryExecutorTest implements Logging {
+class QueryExecutorTest implements WithLogging {
 
     @Test
     @DisplayName("handle SQL exception on query execution")

@@ -32,10 +32,10 @@ import com.google.protobuf.Message;
 import com.google.protobuf.Timestamp;
 import com.google.protobuf.util.Timestamps;
 import io.spine.core.Version;
-import io.spine.json.Json;
 import io.spine.server.storage.AbstractColumnMapping;
 import io.spine.server.storage.ColumnTypeMapping;
 import io.spine.server.storage.jdbc.Type;
+import io.spine.type.Json;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static io.spine.server.storage.ColumnTypeMapping.identity;

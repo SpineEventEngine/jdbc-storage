@@ -37,8 +37,8 @@ import io.spine.query.ColumnName;
 import io.spine.server.storage.RecordSpec;
 import io.spine.server.storage.RecordWithColumns;
 import io.spine.server.storage.jdbc.TableColumn;
-import io.spine.server.storage.jdbc.record.column.BytesColumn;
 import io.spine.server.storage.jdbc.config.CustomColumns;
+import io.spine.server.storage.jdbc.record.column.BytesColumn;
 import io.spine.server.storage.jdbc.record.column.IdColumn;
 import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -51,8 +51,8 @@ import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 
 /**
- * The specification of the JDBC-accessible database table telling how the record values should
- * be stored.
+ * The specification of the JDBC-accessible database table
+ * telling how the record values should be stored.
  *
  * @param <I>
  *         the type of identifiers of the stored records
@@ -128,7 +128,7 @@ public final class JdbcTableSpec<I, R extends Message> {
     }
 
     private static Descriptor descriptorFrom(Class<? extends Message> type) {
-        return Messages.defaultInstance(type)
+        return Messages.getDefaultInstance(type)
                        .getDescriptorForType();
     }
 

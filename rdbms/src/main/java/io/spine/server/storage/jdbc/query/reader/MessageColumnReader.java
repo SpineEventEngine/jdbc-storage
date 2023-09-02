@@ -32,7 +32,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static io.spine.json.Json.fromJson;
+import static io.spine.type.Json.fromJson;
 
 /**
  * The reader for the columns which store {@link Message} values in JSON format.
@@ -41,7 +41,7 @@ import static io.spine.json.Json.fromJson;
  *
  * @param <M>
  *         the type of the column
- * @see io.spine.json.Json Json
+ * @see io.spine.type.Json Json
  */
 final class MessageColumnReader<M extends Message> extends ColumnReader<M> {
 
@@ -64,7 +64,7 @@ final class MessageColumnReader<M extends Message> extends ColumnReader<M> {
     public M readValue(ResultSet resultSet) throws SQLException {
         checkNotNull(resultSet);
         var messageJson = resultSet.getString(columnName());
-        var result = fromJson(messageJson, messageClass);
+        var result = fromJson(messageClass, messageJson);
         return result;
     }
 }
