@@ -1,5 +1,5 @@
 /*
- * Copyright 2022, TeamDev. All rights reserved.
+ * Copyright 2023, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,16 +24,17 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.internal.gradle.publish
+package io.spine.internal.dependency
 
 /**
- * Default artifact task names.
+ * The dependency on the Hamcrest, which is transitive for us.
  *
- * These tasks, if not present on a project already, are created by the [Publish] plugin.
- * Their output is published as project's artifacts.
+ * If you need assertions in Java, please use Google [Truth] instead.
+ * For Kotlin, please use [Kotest].
  */
-internal enum class ArtifactTaskName {
-    sourceJar,
-    testOutputJar,
-    javadocJar;
+@Suppress("unused", "ConstPropertyName")
+object Hamcrest {
+    // https://github.com/hamcrest/JavaHamcrest/releases
+    private const val version = "2.2"
+    const val core = "org.hamcrest:hamcrest-core:${version}"
 }

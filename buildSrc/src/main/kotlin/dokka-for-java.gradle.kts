@@ -1,5 +1,5 @@
 /*
- * Copyright 2022, TeamDev. All rights reserved.
+ * Copyright 2023, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,10 +24,17 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.internal.dependency
+import org.jetbrains.dokka.gradle.DokkaTask
 
-// https://github.com/google/auto
-object AutoCommon {
-    private const val version = "1.2.1"
-    const val lib = "com.google.auto:auto-common:${version}"
+plugins {
+    id("org.jetbrains.dokka") // Cannot use `Dokka` dependency object here yet.
+}
+
+dependencies {
+    useDokkaForKotlinAsJava()
+    useDokkaWithSpineExtensions()
+}
+
+tasks.withType<DokkaTask>().configureEach {
+    configureForJava()
 }

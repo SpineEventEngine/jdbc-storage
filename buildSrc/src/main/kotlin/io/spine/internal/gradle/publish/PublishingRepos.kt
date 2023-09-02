@@ -1,5 +1,5 @@
 /*
- * Copyright 2022, TeamDev. All rights reserved.
+ * Copyright 2023, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,20 +33,7 @@ import io.spine.internal.gradle.Repository
  */
 object PublishingRepos {
 
-    @Suppress("HttpUrlsUsage") // HTTPS is not supported by this repository.
-    val mavenTeamDev = Repository(
-        name = "maven.teamdev.com",
-        releases = "http://maven.teamdev.com/repository/spine",
-        snapshots = "http://maven.teamdev.com/repository/spine-snapshots",
-        credentialsFile = "credentials.properties"
-    )
-
-    val cloudRepo = Repository(
-        name = "CloudRepo",
-        releases = "https://spine.mycloudrepo.io/public/repositories/releases",
-        snapshots = "https://spine.mycloudrepo.io/public/repositories/snapshots",
-        credentialsFile = "cloudrepo.properties"
-    )
+    val cloudRepo = CloudRepo.destination
 
     val cloudArtifactRegistry = CloudArtifactRegistry.repository
 
@@ -55,4 +42,3 @@ object PublishingRepos {
      */
     fun gitHub(repoName: String): Repository = GitHubPackages.repository(repoName)
 }
-

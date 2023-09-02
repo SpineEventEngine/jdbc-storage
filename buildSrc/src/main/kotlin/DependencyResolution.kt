@@ -1,5 +1,5 @@
 /*
- * Copyright 2022, TeamDev. All rights reserved.
+ * Copyright 2023, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,29 +24,37 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.internal.gradle
-
 import io.spine.internal.dependency.AnimalSniffer
+import io.spine.internal.dependency.Asm
 import io.spine.internal.dependency.AutoCommon
 import io.spine.internal.dependency.AutoService
 import io.spine.internal.dependency.AutoValue
 import io.spine.internal.dependency.CheckerFramework
 import io.spine.internal.dependency.CommonsCli
 import io.spine.internal.dependency.CommonsLogging
+import io.spine.internal.dependency.Dokka
 import io.spine.internal.dependency.ErrorProne
 import io.spine.internal.dependency.FindBugs
+import io.spine.internal.dependency.Flogger
 import io.spine.internal.dependency.Gson
 import io.spine.internal.dependency.Guava
+import io.spine.internal.dependency.Hamcrest
 import io.spine.internal.dependency.J2ObjC
 import io.spine.internal.dependency.JUnit
+import io.spine.internal.dependency.Jackson
+import io.spine.internal.dependency.JavaDiffUtils
+import io.spine.internal.dependency.Kotest
 import io.spine.internal.dependency.Kotlin
 import io.spine.internal.dependency.Okio
+import io.spine.internal.dependency.OpenTest4J
 import io.spine.internal.dependency.Plexus
 import io.spine.internal.dependency.Protobuf
+import io.spine.internal.dependency.Slf4J
 import io.spine.internal.dependency.Truth
+import org.gradle.api.NamedDomainObjectContainer
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.artifacts.ResolutionStrategy
-import org.gradle.api.artifacts.dsl.RepositoryHandler
 
 /**
  * The function to be used in `buildscript` when a fully-qualified call must be made.
@@ -59,7 +67,7 @@ fun doForceVersions(configurations: ConfigurationContainer) {
 /**
  * Forces dependencies used in the project.
  */
-fun ConfigurationContainer.forceVersions() {
+fun NamedDomainObjectContainer<Configuration>.forceVersions() {
     all {
         resolutionStrategy {
             failOnVersionConflict()
@@ -78,17 +86,20 @@ private fun ResolutionStrategy.forceProductionDependencies() {
         AutoCommon.lib,
         AutoService.annotations,
         CheckerFramework.annotations,
+        Dokka.BasePlugin.lib,
         ErrorProne.annotations,
         ErrorProne.core,
-        Guava.lib,
         FindBugs.annotations,
+        Flogger.Runtime.systemBackend,
+        Flogger.lib,
+        Guava.lib,
         Kotlin.reflect,
         Kotlin.stdLib,
         Kotlin.stdLibCommon,
         Kotlin.stdLibJdk8,
-        Protobuf.libs,
         Protobuf.GradlePlugin.lib,
-        io.spine.internal.dependency.Slf4J.lib
+        Protobuf.libs,
+        Slf4J.lib
     )
 }
 
@@ -96,10 +107,12 @@ private fun ResolutionStrategy.forceTestDependencies() {
     force(
         Guava.testLib,
         JUnit.api,
-        JUnit.platformCommons,
-        JUnit.platformLauncher,
+        JUnit.bom,
+        JUnit.Platform.commons,
+        JUnit.Platform.launcher,
         JUnit.legacy,
-        Truth.libs
+        Truth.libs,
+        Kotest.assertions,
     )
 }
 
@@ -108,18 +121,33 @@ private fun ResolutionStrategy.forceTestDependencies() {
  */
 private fun ResolutionStrategy.forceTransitiveDependencies() {
     force(
+        Asm.lib,
         AutoValue.annotations,
-        Gson.lib,
-        J2ObjC.annotations,
-        Plexus.utils,
-        Okio.lib,
         CommonsCli.lib,
-        CheckerFramework.compatQual,
-        CommonsLogging.lib
+        CommonsLogging.lib,
+        Gson.lib,
+        Hamcrest.core,
+        J2ObjC.annotations,
+        JUnit.Platform.engine,
+        JUnit.Platform.suiteApi,
+        JUnit.runner,
+        Jackson.annotations,
+        Jackson.bom,
+        Jackson.core,
+        Jackson.databind,
+        Jackson.dataformatXml,
+        Jackson.dataformatYaml,
+        Jackson.moduleKotlin,
+        JavaDiffUtils.lib,
+        Kotlin.jetbrainsAnnotations,
+        Okio.lib,
+        OpenTest4J.lib,
+        Plexus.utils,
     )
 }
 
-fun ConfigurationContainer.excludeProtobufLite() {
+@Suppress("unused")
+fun NamedDomainObjectContainer<Configuration>.excludeProtobufLite() {
 
     fun excludeProtoLite(configurationName: String) {
         named(configurationName).get().exclude(
@@ -132,31 +160,4 @@ fun ConfigurationContainer.excludeProtobufLite() {
 
     excludeProtoLite("runtimeOnly")
     excludeProtoLite("testRuntimeOnly")
-}
-
-@Suppress("unused")
-object DependencyResolution {
-    @Deprecated(
-        "Please use `configurations.forceVersions()`.",
-        ReplaceWith("configurations.forceVersions()")
-    )
-    fun forceConfiguration(configurations: ConfigurationContainer) {
-        configurations.forceVersions()
-    }
-
-    @Deprecated(
-        "Please use `configurations.excludeProtobufLite()`.",
-        ReplaceWith("configurations.excludeProtobufLite()")
-    )
-    fun excludeProtobufLite(configurations: ConfigurationContainer) {
-        configurations.excludeProtobufLite()
-    }
-
-    @Deprecated(
-        "Please use `applyStandard(repositories)` instead.",
-        replaceWith = ReplaceWith("applyStandard(repositories)")
-    )
-    fun defaultRepositories(repositories: RepositoryHandler) {
-        repositories.applyStandard()
-    }
 }

@@ -28,9 +28,12 @@ package io.spine.internal.dependency
 
 // https://www.testcontainers.org/
 object Testcontainers {
-    const val version = "1.16.0"
+    const val version = "1.19.0"
+    private const val group = "org.testcontainers"
 
-    const val lib = "org.testcontainers:testcontainers:${version}"
-    const val junitJupiter = "org.testcontainers:junit-jupiter:${version}"
+    const val lib = "$group:testcontainers:$version"
+    const val junitJupiter = "$group:junit-jupiter:$version"
+
     const val mySqlSupport = "org.testcontainers:mysql:${version}"
+    const val gcloud = "$group:gcloud:$version"
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022, TeamDev. All rights reserved.
+ * Copyright 2023, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,11 +24,20 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.internal.gradle.publish
+package io.spine.internal.gradle.git
 
 /**
- * Popular names of Gradle configurations.
+ * Branch names.
  */
-internal object ConfigurationName {
-    const val archives = "archives"
+object Branch {
+
+    /**
+     * The default branch.
+     */
+    const val master = "master"
+
+    /**
+     * The branch used for publishing documentation to GitHub Pages.
+     */
+    const val documentation = "gh-pages"
 }
