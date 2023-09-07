@@ -29,7 +29,6 @@ package io.spine.server.storage.jdbc.delivery;
 import com.google.common.testing.NullPointerTester;
 import io.spine.base.Identifier;
 import io.spine.server.NodeId;
-import io.spine.server.delivery.DeliveryStrategy;
 import io.spine.server.delivery.ShardIndex;
 import io.spine.server.delivery.ShardSessionRecord;
 import io.spine.server.delivery.ShardedWorkRegistry;
@@ -71,8 +70,9 @@ class JdbcShardedWorkRegistryTest extends ShardedWorkRegistryTest {
     }
 
     private static NodeId newNode() {
-        return NodeId.newBuilder()
-                     .setValue(Identifier.newUuid())
-                     .vBuild();
+        return NodeId
+                .newBuilder()
+                .setValue(Identifier.newUuid())
+                .build();
     }
 }
