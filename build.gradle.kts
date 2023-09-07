@@ -74,56 +74,13 @@ buildscript {
     }
 }
 
-//@Suppress("RemoveRedundantQualifierName") // Cannot use imported things here.
-//buildscript {
-//    apply(from = "$rootDir/version.gradle.kts")
-//    io.spine.internal.gradle.doApplyStandard(repositories)
-//    io.spine.internal.gradle.doForceVersions(configurations)
-//
-//    val mcJavaVersion: String by extra
-//    val spineBaseVersion: String by extra
-//
-//    dependencies {
-//        classpath("io.spine.tools:spine-mc-java:$mcJavaVersion")
-//    }
-//
-//    configurations.all {
-//        resolutionStrategy {
-//            force(
-//                io.spine.internal.dependency.Kotlin.stdLib,
-//                io.spine.internal.dependency.Kotlin.stdLibCommon,
-//                "io.spine:spine-base:$spineBaseVersion"
-//            )
-//        }
-//    }
-//}
-
-//plugins {
-//    `java-library`
-//    kotlin("jvm")
-//    idea
-//    id(io.spine.internal.dependency.Protobuf.GradlePlugin.id)
-//    id(io.spine.internal.dependency.ErrorProne.GradlePlugin.id)
-//
-//}
-//
-//val credentialsPropertyFile: String by extra("credentials.properties")
-//val projectsToPublish: List<String> by extra(listOf("rdbms"))
-//
-//spinePublishing {
-//    targetRepositories.addAll(setOf(
-//        PublishingRepos.cloudRepo
-//    ))
-//    projectsToPublish.add("rdbms")
-//}
-
 plugins {
     `java-library`
     kotlin("jvm")
     idea
     protobuf
     errorprone
-//    `gradle-doctor`
+    `gradle-doctor`
 }
 
 object BuildSettings {
