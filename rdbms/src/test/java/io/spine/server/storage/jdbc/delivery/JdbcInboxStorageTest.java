@@ -35,7 +35,7 @@ import org.junit.jupiter.api.DisplayName;
 
 import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.newFactory;
 
-@DisplayName("`JdbcInboxStorage` should")
+@DisplayName("JDBC-based `InboxStorage` should")
 class JdbcInboxStorageTest extends InboxStorageTest {
 
     @BeforeEach
