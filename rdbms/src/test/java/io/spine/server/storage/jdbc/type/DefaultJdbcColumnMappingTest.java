@@ -30,9 +30,7 @@ import com.google.common.testing.NullPointerTester;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.Message;
 import com.google.protobuf.Timestamp;
-import io.spine.core.Version;
 import io.spine.core.Versions;
-import io.spine.server.storage.jdbc.Type;
 import io.spine.test.storage.StgProject;
 import io.spine.test.storage.StgProject.Status;
 import io.spine.test.storage.StgProjectId;
@@ -42,9 +40,9 @@ import org.junit.jupiter.api.Test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.protobuf.util.Timestamps.toNanos;
-import static io.spine.json.Json.toCompactJson;
 import static io.spine.server.storage.jdbc.Type.STRING;
 import static io.spine.testing.DisplayNames.NOT_ACCEPT_NULLS;
+import static io.spine.type.Json.toCompactJson;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("`DefaultJdbcColumnMapping` should")
