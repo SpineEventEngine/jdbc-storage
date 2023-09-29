@@ -92,11 +92,11 @@ public class TableColumn {
 
     public @Nullable Object valueIn(RecordWithColumns<?, ?> record) {
         var columnName = ColumnName.of(name());
-        @Nullable Object result;
+        @Nullable Object result = null;
         if (adaptValue != null) {
             var value = record.columnValue(columnName);
             result = adaptValue.apply(value);
-        } else {
+        } else if (record.hasColumn(columnName)) {
             result = record.columnValue(columnName, mapping);
         }
         return result;
