@@ -28,6 +28,8 @@ package io.spine.server.storage.jdbc.operation;
 
 import io.spine.server.storage.jdbc.DataSourceMetaData;
 
+import java.util.Locale;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -66,7 +68,7 @@ enum DetectedEngine {
     static DetectedEngine from(DataSourceMetaData metaData) {
         checkNotNull(metaData);
         var productName = metaData.productName()
-                                  .toLowerCase();
+                                  .toLowerCase(Locale.getDefault());
         if (productName.contains("mysql")) {
             return MySQL;
         }
