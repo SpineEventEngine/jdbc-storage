@@ -37,6 +37,11 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  *
  * <p>Adapts the values held in a {@link RecordWithColumns} according
  * to a certain {@linkplain JdbcTableSpec table specification}.
+ *
+ * @param <I>
+ *         type or record identifiers
+ * @param <R>
+ *         type of the record to insert
  */
 public final class JdbcRecord<I, R extends Message> {
 
