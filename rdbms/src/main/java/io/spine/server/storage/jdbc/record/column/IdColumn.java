@@ -236,10 +236,16 @@ public abstract class IdColumn<I> {
         return result;
     }
 
+    /**
+     * Returns the {@code String} value of the column name.
+     */
     public String columnName() {
-        return column.name();
+        return column().name();
     }
 
+    /**
+     * Returns the table column corresponding to this ID column.
+     */
     public TableColumn column() {
         return column;
     }
