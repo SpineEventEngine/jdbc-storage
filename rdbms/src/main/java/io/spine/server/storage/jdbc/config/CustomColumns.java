@@ -34,12 +34,14 @@ import io.spine.server.storage.jdbc.record.column.ColumnSpec;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
- * Abstract base for the descriptions of the columns, which require some specific way
+ * Abstract base for the descriptions of record columns, which require some specific way
  * of storing their values in RDBMS.
  *
  * <p>The library users should provide their custom column specifications for the types
  * of the stored records, by extending this type.
  *
+ * @param <R>
+ *         type of the record, which columns are described by this type
  * @see io.spine.server.storage.jdbc.JdbcStorageFactory.Builder#configureColumns(Class,
  *         CustomColumns)
  */
