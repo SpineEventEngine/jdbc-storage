@@ -30,7 +30,6 @@ import com.google.protobuf.Message;
 import com.querydsl.core.dml.StoreClause;
 import com.querydsl.core.types.dsl.PathBuilder;
 import io.spine.query.ColumnName;
-import io.spine.server.storage.RecordWithColumns;
 import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.record.JdbcRecord;
 import io.spine.server.storage.jdbc.record.RecordTable;
@@ -43,6 +42,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * A common interface for {@linkplain io.spine.server.storage.jdbc.query.AbstractQuery queries}
  * that write one or more records to the {@link RecordTable}.
+ *
+ * @param <I>
+ *         type of record identifiers
+ * @param <R>
+ *         type of records to write
  */
 interface WriteQuery<I, R extends Message> extends ModifyQuery {
 
