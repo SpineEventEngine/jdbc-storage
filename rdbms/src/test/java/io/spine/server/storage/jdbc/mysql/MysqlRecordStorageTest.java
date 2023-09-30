@@ -31,34 +31,32 @@ import com.zaxxer.hikari.HikariDataSource;
 import io.spine.environment.Tests;
 import io.spine.server.ServerEnvironment;
 import io.spine.server.storage.RecordStorageDelegateTest;
-import io.spine.server.storage.jdbc.JdbcStorageFactory;
 import io.spine.testing.SlowTest;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
 
-import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
+import static io.spine.server.storage.jdbc.mysql.MysqlTests.mysqlContainer;
+import static io.spine.server.storage.jdbc.mysql.MysqlTests.stop;
 
 @DisplayName("`JdbcRecordStorage` running on top of MySQL instance should")
-@Testcontainers
 @SlowTest
+@EnableConditionally
 class MysqlRecordStorageTest extends RecordStorageDelegateTest {
 
     @Container
-    private final MySQLContainer<?> server = new MySQLContainer<>(
-            DockerImageName.parse("mysql:5.7.34")
-    );
+    private @Nullable MySQLContainer<?> mysql;
 
     @BeforeEach
     @Override
     protected void setUpAbstractStorageTest() {
-        server.start();
-        var factory = factoryConnectingTo(server);
+        mysql = mysqlContainer();
+        mysql.start();
+        var factory = MysqlTests.factoryConnectingTo(mysql);
         ServerEnvironment.when(Tests.class)
                          .useStorageFactory((env) -> factory);
         super.setUpAbstractStorageTest();
@@ -66,21 +64,13 @@ class MysqlRecordStorageTest extends RecordStorageDelegateTest {
 
     @AfterEach
     void stopServer() {
-        server.stop();
+        stop(mysql);
     }
 
     @AfterAll
     static void tearDownClass() {
-        ServerEnvironment.instance().reset();
-    }
-
-    private static JdbcStorageFactory factoryConnectingTo(MySQLContainer<?> server) {
-        var dataSource = dataSource(server);
-        var factory = JdbcStorageFactory.newBuilder()
-                .setDataSource(dataSource)
-                .setTypeMapping(MYSQL_5_7)
-                .build();
-        return factory;
+        ServerEnvironment.instance()
+                         .reset();
     }
 
     private static HikariDataSource dataSource(MySQLContainer<?> server) {
