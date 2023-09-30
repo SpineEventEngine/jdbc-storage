@@ -85,7 +85,7 @@ public abstract class IdColumn<I> {
         checkNotNull(column);
         var type = requireNonNull(column.type(),
                                   "Please use other suitable method overload if ID column SQL " +
-                                 "type is unknown at compile time");
+                                          "type is unknown at compile time");
         switch (type) {
             case INT:
                 return (IdColumn<I>) new IntIdColumn(column);
@@ -103,24 +103,35 @@ public abstract class IdColumn<I> {
         }
     }
 
-    //TODO:2021-06-18:alex.tymchenko: document this one!
+    /**
+     * Creates a new ID column for the passed record specification.
+     *
+     * @param spec
+     *         specification of the record to store
+     * @param mapping
+     *         column type mapping
+     * @param <I>
+     *         the type of identifiers stored in the created column
+     */
     @SuppressWarnings({
             "unchecked", // ID runtime type is checked with if statements.
             "IfStatementWithTooManyBranches", // OK for a factory method.
             "ChainOfInstanceofChecks"         // which depends on the built object target type.
     })
     public static <I> IdColumn<I> of(RecordSpec<I, ?, ?> spec, JdbcColumnMapping mapping) {
+        checkNotNull(spec);
+        checkNotNull(mapping);
         var idType = spec.idType();
         var column = new TableColumn(ID_COLUMN_NAME, idType, mapping);
         if (idType == Long.class) {
-            return  (IdColumn<I>) new LongIdColumn(column);
+            return (IdColumn<I>) new LongIdColumn(column);
         } else if (idType == Integer.class) {
-            return  (IdColumn<I>) new IntIdColumn(column);
+            return (IdColumn<I>) new IntIdColumn(column);
         } else if (idType == String.class) {
-            return  (IdColumn<I>) new StringIdColumn(column);
+            return (IdColumn<I>) new StringIdColumn(column);
         } else if (Message.class.isAssignableFrom(idType)) {
             var messageClass = (Class<? extends Message>) idType;
-            return  (IdColumn<I>) new MessageIdColumn<>(column, messageClass);
+            return (IdColumn<I>) new MessageIdColumn<>(column, messageClass);
         } else {
             throw newIllegalArgumentException("Unexpected entity ID class %s", idType.getName());
         }
@@ -136,7 +147,7 @@ public abstract class IdColumn<I> {
         checkNotNull(messageClass);
         checkArgument(column.type() == null,
                       "Message-type IDs follow the predefined conversion rules of `IdColumn` " +
-                      "and shouldn't have an SQL type set on their own");
+                              "and shouldn't have an SQL type set on their own");
         return new MessageIdColumn<>(column, messageClass);
     }
 
@@ -165,19 +176,20 @@ public abstract class IdColumn<I> {
         checkNotNull(entityClass);
         checkArgument(column.type() == null,
                       "Entity ID type is calculated at runtime and shouldn't have an SQL type " +
-                      "pre-set");
+                              "pre-set");
         var idClass = asEntityClass(entityClass).idClass();
         if (idClass == Long.class) {
-            return  (IdColumn<I>) new LongIdColumn(column);
+            return (IdColumn<I>) new LongIdColumn(column);
         } else if (idClass == Integer.class) {
-            return  (IdColumn<I>) new IntIdColumn(column);
+            return (IdColumn<I>) new IntIdColumn(column);
         } else if (idClass == String.class) {
-            return  (IdColumn<I>) new StringIdColumn(column);
+            return (IdColumn<I>) new StringIdColumn(column);
         } else if (Message.class.isAssignableFrom(idClass)) {
             var messageClass = (Class<? extends Message>) idClass;
-            return  (IdColumn<I>) new MessageIdColumn<>(column, messageClass);
+            return (IdColumn<I>) new MessageIdColumn<>(column, messageClass);
         } else {
-            throw newIllegalArgumentException("Unexpected entity ID class `%s`.", idClass.getName());
+            throw newIllegalArgumentException("Unexpected entity ID class `%s`.",
+                                              idClass.getName());
         }
     }
 
