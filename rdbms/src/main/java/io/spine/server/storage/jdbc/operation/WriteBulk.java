@@ -43,8 +43,10 @@ import static java.util.stream.Collectors.toList;
 /**
  * Writes several records to the database in a bulk.
  *
- * <p>This is a generic version of the operation, which performs an additional {@code SELECT} lookup
- * before either executing an {@code UPDATE} query or an {@code INSERT} query.
+ * <p>This is a generic version of the operation, which performs
+ * an additional {@code SELECT} lookup before either
+ * executing an {@code UPDATE} query,
+ * or an {@code INSERT} query.
  *
  * @param <I>
  *         the type of the identifiers of the stored records
