@@ -59,6 +59,7 @@ import static java.util.Objects.requireNonNull;
 public abstract class IdColumn<I> {
 
     public static final String ID_COLUMN_NAME = "ID";
+
     /**
      * The underlying {@link TableColumn storage field}.
      */
