@@ -37,6 +37,7 @@ import com.querydsl.sql.AbstractSQLQuery;
 import io.spine.query.RecordQuery;
 import io.spine.query.SortBy;
 import io.spine.server.entity.FieldMasks;
+import io.spine.server.storage.FieldMaskApplier;
 import io.spine.server.storage.jdbc.query.reader.MessageBytesColumnReader;
 import io.spine.server.storage.jdbc.record.RecordTable;
 import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
@@ -47,6 +48,7 @@ import java.util.Iterator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.collect.Iterators.transform;
 import static com.querydsl.core.types.dsl.Expressions.comparablePath;
 import static io.spine.query.Direction.ASC;
 import static io.spine.server.storage.jdbc.query.reader.ColumnReaderFactory.messageReader;
@@ -129,7 +131,8 @@ public class SelectMessagesByQuery<I, R extends Message> extends AbstractQuery<I
         var mask = recordQuery.mask();
         Iterator<R> result;
         if (!mask.equals(FieldMask.getDefaultInstance())) {
-            result = Iterators.transform(records, record -> FieldMasks.applyMask(mask, record));
+            var masker = new FieldMaskApplier<R>(mask);
+            result = transform(records, masker::apply);
         } else {
             result = records;
         }
