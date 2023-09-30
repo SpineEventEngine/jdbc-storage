@@ -292,6 +292,7 @@ public class JdbcStorageFactory implements StorageFactory {
          *         the type of the stored record
          * @return this instance of {@code Builder}
          */
+        // TODO:alex.tymchenko:2023-09-30: Use this feature.
         @CanIgnoreReturnValue
         public <R extends Message>
         Builder setTableName(Class<R> recordType, String name) {
