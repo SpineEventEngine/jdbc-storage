@@ -349,5 +349,4 @@ public abstract class IdColumn<I> {
             return cls;
         }
     }
-
 }
