@@ -43,10 +43,6 @@ import static io.spine.server.storage.jdbc.record.Serializer.serialize;
  * <p>This column is present in any {@link RecordTable
  * RecordTable} and serves for convenient record
  * {@link Serializer deserialization}.
- *
- * //TODO:2021-12-21:alex.tymchenko: review this paragraph.
- * <p>The column getter can be applied to an arbitrary message and is parameterized only to
- * enable usage along with message-specific table message-specific columns.
  */
 public final class BytesColumn extends TableColumn {
 
