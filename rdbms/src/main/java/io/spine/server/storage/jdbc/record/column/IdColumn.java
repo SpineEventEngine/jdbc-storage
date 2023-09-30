@@ -91,6 +91,7 @@ public abstract class IdColumn<I> {
                 return (IdColumn<I>) new IntIdColumn(column);
             case LONG:
                 return (IdColumn<I>) new LongIdColumn(column);
+            case STRING_512:
             case STRING_255:
             case STRING:
                 return (IdColumn<I>) new StringIdColumn(column);
