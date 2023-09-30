@@ -245,7 +245,7 @@ public abstract class IdColumn<I> {
     }
 
     /**
-     * Helps to work with columns which contain {@code long} {@link Entity} IDs.
+     * An ID column storing {@code Long}s.
      */
     private static class LongIdColumn extends IdColumn<Long> {
 
@@ -270,7 +270,7 @@ public abstract class IdColumn<I> {
     }
 
     /**
-     * Helps to work with columns which contain {@code integer} {@link Entity} IDs.
+     * An ID column containing only {@code Integer}s.
      */
     private static class IntIdColumn extends IdColumn<Integer> {
 
@@ -295,7 +295,7 @@ public abstract class IdColumn<I> {
     }
 
     /**
-     * Helps to work with columns which contain {@code String} {@link Entity} IDs.
+     * An ID column which stores {@code String}s.
      */
     private static class StringIdColumn extends IdColumn<String> {
 
