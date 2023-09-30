@@ -32,7 +32,9 @@ import com.google.protobuf.Message;
  * A query for deleting one or many items by an ID.
  *
  * @param <I>
- *         the type of identifiers of the records to delete
+ *         type of identifier of the record to delete
+ * @param <R>
+ *         type of the record to delete
  */
 public final class DeleteRecordQuery<I, R extends Message>
         extends IdAwareQuery<I, R> implements ModifyQuery {
@@ -52,8 +54,9 @@ public final class DeleteRecordQuery<I, R extends Message>
      * Creates a new instance of the {@code Builder} for this type.
      *
      * @param <I>
-     *         the type of identifiers of the records to delete
-     * @return a new {@code Builder} instance
+     *         type of identifier of the record to delete
+     * @param <R>
+     *         type of the record to delete
      */
     public static <I, R extends Message> Builder<I, R> newBuilder() {
         return new Builder<>();
