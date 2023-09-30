@@ -65,6 +65,7 @@ import static java.sql.ResultSet.HOLD_CURSORS_OVER_COMMIT;
  * @param <R>
  *         the type of the queried records
  */
+@SuppressWarnings("AbstractClassWithoutAbstractMethods" /* To prevent direct instantiation.*/)
 public abstract class AbstractQuery<I, R extends Message> implements StorageQuery {
 
     private final DataSourceWrapper dataSource;
@@ -226,10 +227,20 @@ public abstract class AbstractQuery<I, R extends Message> implements StorageQuer
 
     /**
      * An abstract builder for {@linkplain StorageQuery queries}.
+     *
+     * @param <I>
+     *         type of identifiers of the queried records
+     * @param <R>
+     *         type of the queried records
+     * @param <B>
+     *         type of the builder, for return type covariance
+     * @param <Q>
+     *         type of the query built by the builder
      */
-    public abstract static class Builder<I, R extends Message,
-                                            B extends Builder<I, R, B, Q>,
-                                            Q extends AbstractQuery<I, R>> {
+    public abstract static class Builder<I,
+                                         R extends Message,
+                                         B extends Builder<I, R, B, Q>,
+                                         Q extends AbstractQuery<I, R>> {
 
         private DataSourceWrapper dataSource;
         private JdbcTableSpec<I, R> tableSpec;
