@@ -62,6 +62,21 @@ import static java.util.Objects.requireNonNull;
  */
 public class CreateTable<I, R extends Message> extends Operation<I, R> implements WithLogging {
 
+    /**
+     * A map of the Spine common Entity Columns to their default values.
+     *
+     * <p>Some write operations may not include these columns. Though, they are required for
+     * the framework to work properly. Hence, the tables which include them should make these
+     * values {@code DEFAULT} for these columns.
+     *
+     * <p>The map stores the names of the Entity Columns as a string keys for simplicity and
+     * the default values of the Columns as the map values.
+     */
+    private static final ImmutableMap<String, Object> COLUMN_DEFAULTS =
+            ImmutableMap.of(archivedColumnName(), false,
+                            deletedColumnName(), false,
+                            versionColumnName(), 0);
+
     private final TypeMapping typeMapping;
 
     /**
@@ -165,21 +180,6 @@ public class CreateTable<I, R extends Message> extends Operation<I, R> implement
 
         return name;
     }
-
-    /**
-     * A map of the Spine common Entity Columns to their default values.
-     *
-     * <p>Some write operations may not include these columns. Though, they are required for
-     * the framework to work properly. Hence, the tables which include them should make these
-     * values {@code DEFAULT} for these columns.
-     *
-     * <p>The map stores the names of the Entity Columns as a string keys for simplicity and
-     * the default values of the Columns as the map values.
-     */
-    private static final ImmutableMap<String, Object> COLUMN_DEFAULTS =
-            ImmutableMap.of(archivedColumnName(), false,
-                            deletedColumnName(), false,
-                            versionColumnName(), 0);
 
     private static String versionColumnName() {
         return rawNameOf(VersionColumn.instance());
