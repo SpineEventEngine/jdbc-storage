@@ -319,6 +319,12 @@ public abstract class IdColumn<I> {
         }
     }
 
+    /**
+     * An ID column, which stores Proto messages of type {@code M}.
+     *
+     * @param <M>
+     *         type of the stored values
+     */
     private static class MessageIdColumn<M extends Message> extends IdColumn<M> {
 
         private final Class<M> cls;
