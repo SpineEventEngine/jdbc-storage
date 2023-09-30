@@ -101,7 +101,8 @@ public class RecordTable<I, R extends Message> implements WithLogging {
     }
 
     public void create() {
-        operations.createTable(this).execute();
+        operations.createTable(this)
+                  .execute();
     }
 
     //TODO:2021-06-24:alex.tymchenko: think of introducing a separate operation for this.
@@ -112,11 +113,20 @@ public class RecordTable<I, R extends Message> implements WithLogging {
     }
 
     public Iterator<I> index() {
-        var result = operations.index(this).execute();
+        var result = operations.index(this)
+                               .execute();
         return result;
     }
 
-    //TODO:2021-06-18:alex.tymchenko: Postgres `UPSERT`, MySQL `INSERT..ON DUPLICATE UPDATE`.
+    /**
+     * Writes the record into this table.
+     *
+     * <p>This operation may be adjusted to the underlying RDBMS engine,
+     * including usage of RDBMS-specific SQL expressions.
+     *
+     * @param record
+     *         record to write
+     */
     public void write(RecordWithColumns<I, R> record) {
         var operation = operations.writeOne(this);
         var wrapped = new JdbcRecord<>(spec, record);
@@ -168,9 +178,10 @@ public class RecordTable<I, R extends Message> implements WithLogging {
     public void writeAll(Iterable<? extends RecordWithColumns<I, R>> records) {
         Iterable<JdbcRecord<I, R>> transformed =
                 StreamSupport.stream(records.spliterator(), false)
-                             .map(r -> new JdbcRecord<>(spec, r))
-                             .collect(Collectors.toList());
-        operations.writeBulk(this).execute(transformed);
+                        .map(r -> new JdbcRecord<>(spec, r))
+                        .collect(Collectors.toList());
+        operations.writeBulk(this)
+                  .execute(transformed);
     }
 
     /**
