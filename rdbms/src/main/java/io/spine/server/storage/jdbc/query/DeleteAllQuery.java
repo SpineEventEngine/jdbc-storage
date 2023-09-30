@@ -54,6 +54,11 @@ public class DeleteAllQuery<I, R extends Message>
 
     /**
      * Creates a new {@code Builder} for this query type.
+     *
+     * @param <I>
+     *         the type of the record identifiers
+     * @param <R>
+     *         the type of the records to delete
      */
     public static <I, R extends Message> Builder<I, R> newBuilder() {
         return new Builder<>();
