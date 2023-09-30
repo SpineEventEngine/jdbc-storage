@@ -30,6 +30,7 @@ import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.protobuf.Message;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import io.spine.annotation.Internal;
 import io.spine.server.ContextSpec;
 import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.storage.RecordSpec;
@@ -131,7 +132,10 @@ public class JdbcStorageFactory implements StorageFactory {
         return columnMapping;
     }
 
-    //TODO:2021-12-23:alex.tymchenko: think of hiding this method into this package.
+    /**
+     * Returns the original data source, on top of which this factory was created.
+     */
+    @Internal
     public final DataSourceWrapper dataSource() {
         return dataSource;
     }
