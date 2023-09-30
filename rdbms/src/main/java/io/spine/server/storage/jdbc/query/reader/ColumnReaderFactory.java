@@ -69,7 +69,7 @@ public final class ColumnReaderFactory {
      *         the compile-time type of the messages stored in the column
      * @return the {@code ColumnReader} for the given column
      */
-    public static <M extends Message> MessageBytesColumnReader<M>
+    public static <M extends Message> ColumnReader<M>
     messageReader(String columnName, Descriptor messageDescriptor) {
         return MessageBytesColumnReader.create(columnName, messageDescriptor);
     }

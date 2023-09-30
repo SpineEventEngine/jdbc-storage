@@ -27,7 +27,6 @@
 package io.spine.server.storage.jdbc.query;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterators;
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.FieldMask;
 import com.google.protobuf.Message;
@@ -36,9 +35,8 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.sql.AbstractSQLQuery;
 import io.spine.query.RecordQuery;
 import io.spine.query.SortBy;
-import io.spine.server.entity.FieldMasks;
 import io.spine.server.storage.FieldMaskApplier;
-import io.spine.server.storage.jdbc.query.reader.MessageBytesColumnReader;
+import io.spine.server.storage.jdbc.query.reader.ColumnReaderFactory;
 import io.spine.server.storage.jdbc.record.RecordTable;
 import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -47,11 +45,9 @@ import java.sql.ResultSet;
 import java.util.Iterator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.Iterators.transform;
 import static com.querydsl.core.types.dsl.Expressions.comparablePath;
 import static io.spine.query.Direction.ASC;
-import static io.spine.server.storage.jdbc.query.reader.ColumnReaderFactory.messageReader;
 import static io.spine.server.storage.jdbc.query.QueryPredicates.inIds;
 import static io.spine.server.storage.jdbc.query.QueryPredicates.matchPredicate;
 import static io.spine.server.storage.jdbc.record.column.BytesColumn.bytesColumnName;
@@ -120,7 +116,7 @@ public class SelectMessagesByQuery<I, R extends Message> extends AbstractQuery<I
     }
 
     private Iterator<R> asIterator(ResultSet resultSet) {
-        MessageBytesColumnReader<R> messageReader = messageReader(bytesColumnName(), descriptor);
+        var messageReader = ColumnReaderFactory.<R>messageReader(bytesColumnName(), descriptor);
         var records = DbIterator.over(resultSet, messageReader);
         var result = ImmutableList.copyOf(records);
         return result.iterator();

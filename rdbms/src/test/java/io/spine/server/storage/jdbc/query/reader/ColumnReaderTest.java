@@ -26,7 +26,6 @@
 
 package io.spine.server.storage.jdbc.query.reader;
 
-import com.google.protobuf.Message;
 import com.google.protobuf.StringValue;
 import com.google.protobuf.Timestamp;
 import io.spine.server.storage.jdbc.JdbcStorageFactory;
@@ -134,7 +133,7 @@ class ColumnReaderTest {
 
         var timestamp = timestamp();
         table.write(timestamp);
-        ColumnReader<Message> reader = messageReader(bytesColumnName(), Timestamp.getDescriptor());
+        var reader = messageReader(bytesColumnName(), Timestamp.getDescriptor());
 
         var id = table.idOf(timestamp);
         var resultSet = table.resultSet(id);

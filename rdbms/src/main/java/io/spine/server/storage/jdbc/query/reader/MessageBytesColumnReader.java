@@ -43,8 +43,7 @@ import static io.spine.server.storage.jdbc.record.Serializer.deserialize;
  * @param <M>
  *         the type of the messages stored in the column
  */
-//TODO:2021-06-30:alex.tymchenko: move this type!
-public final class MessageBytesColumnReader<M extends Message> extends ColumnReader<M> {
+final class MessageBytesColumnReader<M extends Message> extends ColumnReader<M> {
 
     private final Descriptor messageDescriptor;
 
@@ -61,7 +60,7 @@ public final class MessageBytesColumnReader<M extends Message> extends ColumnRea
      * @param messageDescriptor
      *         the {@code Descriptor} of the column message type
      */
-    static <M extends Message> MessageBytesColumnReader<M>
+    static <M extends Message> ColumnReader<M>
     create(String columnName, Descriptor messageDescriptor) {
         return new MessageBytesColumnReader<>(columnName, messageDescriptor);
     }
