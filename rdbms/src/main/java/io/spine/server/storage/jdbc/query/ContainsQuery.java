@@ -32,6 +32,11 @@ import static com.querydsl.sql.SQLExpressions.count;
 
 /**
  * A query that checks if the table contains a record with the given ID.
+ *
+ * @param <I>
+ *         type of identifiers of the queried records
+ * @param <R>
+ *         type of queried records
  */
 public final class ContainsQuery<I, R extends Message>
         extends IdAwareQuery<I, R>
@@ -53,6 +58,14 @@ public final class ContainsQuery<I, R extends Message>
         return recordsCount > 0;
     }
 
+    /**
+     * Creates a new builder for this query.
+     *
+     * @param <I>
+     *         type of identifiers of the queried records
+     * @param <R>
+     *         type of queried records
+     */
     public static <I, R extends Message> Builder<I, R> newBuilder() {
         return new Builder<>();
     }
