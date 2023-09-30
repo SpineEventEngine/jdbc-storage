@@ -170,8 +170,7 @@ public abstract class AbstractQuery<I, R extends Message> implements StorageQuer
      *         the data source to produce connections
      * @return a new query factory
      */
-    @VisibleForTesting
-    static AbstractSQLQueryFactory<?> defaultFactory(DataSourceWrapper dataSource) {
+    private static AbstractSQLQueryFactory<?> defaultFactory(DataSourceWrapper dataSource) {
         var connectionSupplier = new ConnectionSupplier(dataSource);
         var configuration = configuration(dataSource);
         return new SQLQueryFactory(configuration, connectionSupplier);
