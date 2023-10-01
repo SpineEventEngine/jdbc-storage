@@ -103,15 +103,7 @@ public final class Sql {
     }
 
     /**
-     * Set of SQL keywords representing 5 aggregating functions:
-     *
-     * <ul>
-     *      <li>MIN
-     *      <li>MAX
-     *      <li>COUNT
-     *      <li>AVG
-     *      <li>SUM
-     * </ul>
+     * Set of SQL keywords representing aggregating functions.
      */
     public enum Function {
 
