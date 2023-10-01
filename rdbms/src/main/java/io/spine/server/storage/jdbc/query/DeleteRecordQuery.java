@@ -67,6 +67,8 @@ public final class DeleteRecordQuery<I, R extends Message>
      *
      * @param <I>
      *         the type of identifiers of the records to delete
+     * @param <R>
+     *         type of the record to delete
      */
     public static class Builder<I, R extends Message>
             extends IdAwareQuery.Builder<I, R, Builder<I, R>, DeleteRecordQuery<I, R>> {
