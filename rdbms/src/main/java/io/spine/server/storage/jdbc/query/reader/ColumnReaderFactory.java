@@ -73,8 +73,4 @@ public final class ColumnReaderFactory {
     messageReader(String columnName, Descriptor messageDescriptor) {
         return MessageBytesColumnReader.create(columnName, messageDescriptor);
     }
-
-    public static ColumnReader<Integer> intReader(String columnName) {
-        return new IntegerColumnReader(columnName);
-    }
 }
