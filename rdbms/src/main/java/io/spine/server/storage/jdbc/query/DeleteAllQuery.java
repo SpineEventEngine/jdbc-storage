@@ -66,6 +66,11 @@ public class DeleteAllQuery<I, R extends Message>
 
     /**
      * A builder of {@code DeleteAllQuery} instances.
+     *
+     * @param <I>
+     *         the type of the record identifiers
+     * @param <R>
+     *         the type of the records to delete
      */
     public static class Builder<I, R extends Message>
             extends AbstractQuery.Builder<I, R, Builder<I, R>, DeleteAllQuery<I, R>> {
