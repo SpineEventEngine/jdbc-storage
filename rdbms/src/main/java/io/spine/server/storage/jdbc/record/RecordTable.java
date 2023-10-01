@@ -65,6 +65,19 @@ public class RecordTable<I, R extends Message> implements WithLogging {
         this.descriptor = tableSpec.recordDescriptor();
     }
 
+    /**
+     * Creates a new instance of record table by the passed specifications.
+     *
+     * @param spec
+     *         table specifications to use
+     * @param factory
+     *         storage factory to obtain the connection settings from
+     * @param <I>
+     *         the type of identifiers of stored records
+     * @param <R>
+     *         the type of stored records
+     * @return a new instance of this type
+     */
     public static <I, R extends Message> RecordTable<I, R>
     by(JdbcTableSpec<I, R> spec, JdbcStorageFactory factory) {
         checkNotNull(spec);
@@ -100,18 +113,28 @@ public class RecordTable<I, R extends Message> implements WithLogging {
         return spec;
     }
 
+    /**
+     * Creates a table in the underlying storage.
+     */
     public void create() {
         operations.createTable(this)
                   .execute();
     }
 
-    //TODO:2021-06-24:alex.tymchenko: think of introducing a separate operation for this.
+    /**
+     * Reads the identifiers of the records which match the passed query,
+     * and returns an iterator over the results.
+     */
     public Iterator<I> index(RecordQuery<I, R> query) {
         var records = read(query);
         var ids = Iterators.transform(records, spec::idFromRecord);
         return ids;
     }
 
+    /**
+     * Returns a new iterator over the identifiers of the records,
+     * stored in the underlying table.
+     */
     public Iterator<I> index() {
         var result = operations.index(this)
                                .execute();
@@ -121,7 +144,8 @@ public class RecordTable<I, R extends Message> implements WithLogging {
     /**
      * Writes the record into this table.
      *
-     * <p>This operation may be adjusted to the underlying RDBMS engine,
+     * <p>This operation may be internally adjusted by the framework
+     * to the underlying RDBMS engine,
      * including usage of RDBMS-specific SQL expressions.
      *
      * @param record
@@ -133,48 +157,40 @@ public class RecordTable<I, R extends Message> implements WithLogging {
         operation.execute(wrapped);
     }
 
-//    /**
-//     * Inserts the record into the table using the specified ID.
-//     *
-//     * @param record
-//     *         a record to insert
-//     */
-    //TODO:2021-06-24:alex.tymchenko: do we need these methods?
-//    public void insert(RecordWithColumns<I, R> record) {
-//        WriteOperation<I, R> operation = operationFactory.insertOne(this);
-//        operation.execute(record);
-//        WriteQuery query = newInsert(record);
-//        query.execute();
-//    }
-//
-//    /**
-//     * Updates the record with the specified ID for the table.
-//     *
-//     * @param record
-//     *         a new state of the record
-//     */
-//    private void update(RecordWithColumns<I, R> record) {
-//        WriteQuery query = newUpdateQuery(record);
-//        query.execute();
-//    }
-
+    /**
+     * Reads records matching the passed query,
+     * and returns an iterator over the results.
+     */
     public Iterator<R> read(RecordQuery<I, R> query) {
         var result = operations.readManyByQuery(this)
                                .execute(query);
         return result;
     }
 
+    /**
+     * Deletes the record with the specified identifier
+     * from the underlying storage.
+     *
+     * <p>Returns {@code true}, if there was a record deleted,
+     * {@code false} otherwise.
+     */
     public boolean delete(I id) {
         var result = operations.deleteOne(this)
                                .execute(id);
         return result;
     }
 
+    /**
+     * Deletes multiple records by the passed identifiers.
+     */
     public void deleteMany(Iterable<I> ids) {
         operations.deleteManyByIds(this)
                   .execute(ids);
     }
 
+    /**
+     * Writes multiple records to the underlying storage.
+     */
     public void writeAll(Iterable<? extends RecordWithColumns<I, R>> records) {
         Iterable<JdbcRecord<I, R>> transformed =
                 StreamSupport.stream(records.spliterator(), false)
@@ -185,16 +201,8 @@ public class RecordTable<I, R extends Message> implements WithLogging {
     }
 
     /**
-     * Obtains multiple messages from the table by IDs.
-     *
-     * <p>The non-existent IDs are ignored.
+     * Returns the data source, on top of which this table is created.
      */
-    protected Iterator<R> readAll(Iterable<I> ids) {
-        var result = operations.readManyByIds(this)
-                               .execute(ids);
-        return result;
-    }
-
     protected final DataSourceWrapper dataSource() {
         return dataSource;
     }
