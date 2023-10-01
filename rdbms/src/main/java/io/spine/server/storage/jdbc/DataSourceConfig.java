@@ -174,7 +174,7 @@ public final class DataSourceConfig {
     /**
      * The builder for {@link DataSourceConfig}.
      */
-    public static class Builder {
+    public static final class Builder {
 
         /**
          * Required parameters.
