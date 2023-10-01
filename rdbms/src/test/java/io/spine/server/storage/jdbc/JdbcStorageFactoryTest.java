@@ -41,6 +41,7 @@ import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_1;
 import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
 import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.multitenantSpec;
 import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.newFactory;
+import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.newInboxStorage;
 import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.singletenantSpec;
 import static io.spine.server.storage.jdbc.given.TestRecordSpec.stgProjectSpec;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -135,5 +136,16 @@ class JdbcStorageFactoryTest {
                 .setDataSource(dataSource)
                 .build();
         assertEquals(MYSQL_5_7, factory.typeMapping());
+    }
+
+    @Test
+    @DisplayName("set a custom name for a table per record type")
+    void customizeTableName() {
+        var dataSource = whichIsStoredInMemory(newUuid());
+        var customName = "FooBarInboxTable";
+        var storage = newInboxStorage(dataSource, customName);
+        var actualName = storage.tableName();
+        assertThat(actualName)
+                .isEqualTo(customName);
     }
 }

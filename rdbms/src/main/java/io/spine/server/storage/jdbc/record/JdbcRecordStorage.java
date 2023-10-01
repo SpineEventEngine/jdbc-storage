@@ -26,8 +26,10 @@
 
 package io.spine.server.storage.jdbc.record;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.protobuf.Message;
+import io.spine.annotation.Internal;
 import io.spine.query.RecordQuery;
 import io.spine.server.ContextSpec;
 import io.spine.server.storage.RecordSpec;
@@ -115,5 +117,14 @@ public class JdbcRecordStorage<I, R extends Message> extends RecordStorage<I, R>
     @Override
     public void write(I id, R record) {
         writeRecord(RecordWithColumns.of(id, record));
+    }
+
+    /**
+     * Returns a name of the table used to store records.
+     */
+    @Internal
+    @VisibleForTesting
+    public String tableName() {
+        return table.name();
     }
 }

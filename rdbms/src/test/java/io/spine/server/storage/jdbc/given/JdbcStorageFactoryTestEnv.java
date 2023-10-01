@@ -28,13 +28,21 @@ package io.spine.server.storage.jdbc.given;
 
 import io.spine.base.Identifier;
 import io.spine.server.ContextSpec;
+import io.spine.server.delivery.Delivery;
+import io.spine.server.delivery.InboxColumn;
+import io.spine.server.delivery.InboxMessage;
+import io.spine.server.delivery.InboxMessageId;
 import io.spine.server.storage.ColumnTypeMapping;
+import io.spine.server.storage.MessageRecordSpec;
 import io.spine.server.storage.jdbc.DataSourceConfig;
+import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.JdbcStorageFactory;
 import io.spine.server.storage.jdbc.Type;
+import io.spine.server.storage.jdbc.record.JdbcRecordStorage;
 import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 
 import static io.spine.server.storage.jdbc.GivenDataSource.prefix;
+import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_1;
 import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
 
 public class JdbcStorageFactoryTestEnv {
@@ -66,6 +74,25 @@ public class JdbcStorageFactoryTestEnv {
 
     public static ContextSpec singletenantSpec() {
         return ContextSpec.singleTenant(JdbcStorageFactoryTestEnv.class.getName());
+    }
+
+    public static JdbcRecordStorage<InboxMessageId, InboxMessage>
+    newInboxStorage(DataSourceWrapper dataSource, String tableName) {
+        var factory = JdbcStorageFactory
+                .newBuilder()
+                .setDataSource(dataSource)
+                .setTypeMapping(H2_2_1)
+                .setTableName(InboxMessage.class, tableName)
+                .build();
+        var contextSpec = Delivery.contextSpec(false);
+        var inboxMessageSpec = new MessageRecordSpec<>(
+                InboxMessageId.class,
+                InboxMessage.class,
+                InboxMessage::getId,
+                InboxColumn.definitions());
+        var storage = (JdbcRecordStorage<InboxMessageId, InboxMessage>)
+                factory.createRecordStorage(contextSpec, inboxMessageSpec);
+        return storage;
     }
 
     public static class TestColumnMapping implements JdbcColumnMapping {
