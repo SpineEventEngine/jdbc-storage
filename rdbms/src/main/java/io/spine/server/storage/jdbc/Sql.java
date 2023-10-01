@@ -120,12 +120,7 @@ public final class Sql {
     }
 
     /**
-     * Set of punctuation signs used in SQL:
-     *
-     * <ul>
-     *     <li>Operators: equal, not equal, comparison operators;
-     *     <li>Punctuation: comma, brackets, semicolon.
-     * </ul>
+     * Set of punctuation signs and other building blocks used in SQL.
      */
     public enum BuildingBlock {
 
