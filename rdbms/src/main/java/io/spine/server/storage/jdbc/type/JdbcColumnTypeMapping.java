@@ -42,6 +42,7 @@ public final class JdbcColumnTypeMapping<T, R> implements ColumnTypeMapping<T, R
     private final ColumnTypeMapping<T, R> mapping;
     private final Type type;
 
+    @SuppressWarnings("WeakerAccess" /* Part of the public API. */)
     public JdbcColumnTypeMapping(ColumnTypeMapping<T, R> mapping, Type type) {
         this.mapping = mapping;
         this.type = type;
@@ -56,6 +57,10 @@ public final class JdbcColumnTypeMapping<T, R> implements ColumnTypeMapping<T, R
         }
     }
 
+    /**
+     * Returns the type to use for this column's values when storing them in the RDBMS.
+     */
+    @SuppressWarnings("WeakerAccess" /* Part of the public API. */)
     public Type storeAs() {
         return type;
     }
