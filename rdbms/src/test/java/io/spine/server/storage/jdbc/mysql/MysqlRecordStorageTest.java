@@ -72,15 +72,4 @@ class MysqlRecordStorageTest extends RecordStorageDelegateTest {
         ServerEnvironment.instance()
                          .reset();
     }
-
-    private static HikariDataSource dataSource(MySQLContainer<?> server) {
-        var hikariConfig = new HikariConfig();
-        hikariConfig.setJdbcUrl(server.getJdbcUrl());
-        hikariConfig.setUsername(server.getUsername());
-        hikariConfig.setPassword(server.getPassword());
-        hikariConfig.setDriverClassName(server.getDriverClassName());
-
-        var dataSource = new HikariDataSource(hikariConfig);
-        return dataSource;
-    }
 }
