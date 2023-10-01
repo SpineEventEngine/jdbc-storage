@@ -54,6 +54,5 @@ public final class FetchIndex<I, R extends Message> extends Operation<I, R> {
                 .build();
         var result = query.execute();
         return result;
-
     }
 }
