@@ -30,7 +30,8 @@ import io.spine.server.storage.ColumnTypeMapping;
 import io.spine.server.storage.jdbc.Type;
 
 /**
- * A single column type mapping which also stores the RDBMS type of the column.
+ * Type mapping of a single column,
+ * which is also aware of the RDBMS type of the column.
  *
  * @param <T>
  *         the type of the original column values
@@ -58,7 +59,8 @@ public final class JdbcColumnTypeMapping<T, R> implements ColumnTypeMapping<T, R
     }
 
     /**
-     * Returns the type to use for this column's values when storing them in the RDBMS.
+     * Returns the generic RDBMS-level column type to use
+     * when storing this column's values.
      */
     @SuppressWarnings("WeakerAccess" /* Part of the public API. */)
     public Type storeAs() {

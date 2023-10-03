@@ -30,9 +30,23 @@ import io.spine.server.storage.ColumnMapping;
 import io.spine.server.storage.jdbc.Type;
 
 /**
- * The column mapping which also stores the JDBC type mapping information.
+ * Scheme of relations between Java types of the values stored in record columns,
+ * and storage-specific types.
+ *
+ * <p>As this mapping is specific to RDBMS, it also defines the RDBMS-level types
+ * for the columns.
  */
 public interface JdbcColumnMapping extends ColumnMapping<Object> {
 
+    /**
+     * Returns an RDBMS-specific type for the particular type of values
+     * stored in a column.
+     *
+     * <p>This method differs from {@link #of(Class) of(Class)},
+     * as it returns not a persistence strategy for a column,
+     * but a type to use with RDBMS. Different implementations
+     * may even choose to return different types,
+     * depending on the version of underlying DB engine.
+     */
     Type typeOf(Class<?> columnType);
 }
