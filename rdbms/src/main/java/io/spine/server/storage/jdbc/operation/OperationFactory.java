@@ -41,6 +41,15 @@ import static io.spine.server.storage.jdbc.operation.DetectedEngine.MySQL;
  *
  * <p>Descendants may extend this type in order to customize the execution of certain operations
  * performed over the underlying database.
+ *
+ * <p>End-users may choose to use their own operation implementations
+ * by extending this type, returning appropriate operation implementations,
+ * and using this custom operation factory
+ * {@linkplain io.spine.server.storage.jdbc.JdbcStorageFactory.Builder#useOperationFactory(io.spine.server.storage.jdbc.config.CreateOperationFactory)
+ *  to build a JdbcStorageFactory}.
+ *
+ *  <p>Also, all query types are made {@code public} and marked as {@code SPI} elements,
+ *  since they may also be involved into customizing the actual SQL queries.
  */
 public class OperationFactory {
 

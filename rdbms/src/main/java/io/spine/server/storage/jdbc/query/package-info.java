@@ -27,18 +27,14 @@
 /**
  * This package contains the API for working with queries and common queries for different storages.
  *
- * <p>The package is {@linkplain io.spine.annotation.Internal internal} to Spine code and should not
- * be used outside of the library.
+ * @see io.spine.server.storage.jdbc.operation.OperationFactory on SPI usage
  */
-
-@Internal
-@Experimental
+@SPI
 @CheckReturnValue
 @ParametersAreNonnullByDefault
 package io.spine.server.storage.jdbc.query;
 
 import com.google.errorprone.annotations.CheckReturnValue;
-import io.spine.annotation.Experimental;
-import io.spine.annotation.Internal;
+import io.spine.annotation.SPI;
 
 import javax.annotation.ParametersAreNonnullByDefault;
