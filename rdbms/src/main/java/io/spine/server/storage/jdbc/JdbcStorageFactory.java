@@ -38,12 +38,12 @@ import io.spine.server.storage.RecordStorage;
 import io.spine.server.storage.StorageFactory;
 import io.spine.server.storage.jdbc.aggregate.AggregateEventRecordColumns;
 import io.spine.server.storage.jdbc.config.CreateOperationFactory;
+import io.spine.server.storage.jdbc.config.CustomColumns;
 import io.spine.server.storage.jdbc.config.TableSpecs;
 import io.spine.server.storage.jdbc.delivery.JdbcSessionStorage;
 import io.spine.server.storage.jdbc.operation.OperationFactory;
 import io.spine.server.storage.jdbc.record.JdbcRecordStorage;
 import io.spine.server.storage.jdbc.record.JdbcTableSpec;
-import io.spine.server.storage.jdbc.config.CustomColumns;
 import io.spine.server.storage.jdbc.type.DefaultJdbcColumnMapping;
 import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 
@@ -68,7 +68,7 @@ public class JdbcStorageFactory implements StorageFactory {
         this.dataSource = checkNotNull(builder.dataSource);
         this.columnMapping = builder.columnMapping;
         this.typeMapping = checkNotNull(builder.typeMapping);
-        this.operations = new OperationFactory(dataSource, typeMapping);
+        this.operations = builder.createOpFactory.apply(dataSource, typeMapping);
         this.tableSpecs = builder.tableSpecs.build();
     }
 
