@@ -68,4 +68,12 @@ public final class JdbcRecord<I, R extends Message> {
         @Nullable Object result = spec.valueIn(original, name);
         return result;
     }
+
+    /**
+     * Returns the original record-with-columns,
+     * on top of which this {@code JdbcRecord} is created.
+     */
+    public RecordWithColumns<I, R> original() {
+        return original;
+    }
 }
