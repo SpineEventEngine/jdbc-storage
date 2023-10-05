@@ -27,6 +27,7 @@
 package io.spine.server.storage.jdbc.operation.mysql;
 
 import com.google.protobuf.Message;
+import io.spine.annotation.SPI;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.operation.WriteOne;
 import io.spine.server.storage.jdbc.query.MySqlUpsertOneQuery;
@@ -45,7 +46,8 @@ import io.spine.server.storage.jdbc.record.RecordTable;
  *         the type of the stored records
  * @see MySqlUpsertOneQuery for more details on the SQL query executed
  */
-public final class MysqlWriteOne<I, R extends Message> extends WriteOne<I, R> {
+@SPI
+public class MysqlWriteOne<I, R extends Message> extends WriteOne<I, R> {
 
     /**
      * Creates a new operation.

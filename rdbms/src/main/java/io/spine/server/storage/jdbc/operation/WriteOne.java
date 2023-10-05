@@ -27,6 +27,7 @@
 package io.spine.server.storage.jdbc.operation;
 
 import com.google.protobuf.Message;
+import io.spine.annotation.SPI;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.query.InsertOneQuery;
 import io.spine.server.storage.jdbc.query.UpdateOneQuery;
@@ -46,6 +47,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @param <R>
  *         the type of the stored records
  */
+@SPI
 public class WriteOne<I, R extends Message> extends Operation<I, R> {
 
     /**

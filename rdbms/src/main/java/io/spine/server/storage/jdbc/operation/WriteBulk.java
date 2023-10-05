@@ -28,6 +28,7 @@ package io.spine.server.storage.jdbc.operation;
 
 import com.google.common.collect.ImmutableList;
 import com.google.protobuf.Message;
+import io.spine.annotation.SPI;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.query.InsertMultipleQuery;
 import io.spine.server.storage.jdbc.query.UpdateMultipleQuery;
@@ -53,6 +54,7 @@ import static java.util.stream.Collectors.toList;
  * @param <R>
  *         the type of the stored records
  */
+@SPI
 //TODO:2021-12-23:alex.tymchenko: think of having an abstract base and three impls instead.
 public class WriteBulk<I, R extends Message> extends Operation<I, R> {
 

@@ -28,6 +28,7 @@ package io.spine.server.storage.jdbc.operation;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.protobuf.Message;
+import io.spine.annotation.SPI;
 import io.spine.client.ArchivedColumn;
 import io.spine.client.DeletedColumn;
 import io.spine.client.VersionColumn;
@@ -60,6 +61,7 @@ import static java.util.Objects.requireNonNull;
  * @param <R>
  *         the type of the stored records
  */
+@SPI
 public class CreateTable<I, R extends Message> extends Operation<I, R> implements WithLogging {
 
     /**
