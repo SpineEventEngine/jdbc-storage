@@ -47,7 +47,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @param <R>
  *         the type of the stored records
  */
-@SPI
 public class WriteOne<I, R extends Message> extends Operation<I, R> {
 
     /**

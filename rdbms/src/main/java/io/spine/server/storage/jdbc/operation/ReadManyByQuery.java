@@ -44,7 +44,6 @@ import java.util.Iterator;
  * @param <R>
  *         the type of the stored records
  */
-@SPI
 public class ReadManyByQuery<I, R extends Message> extends Operation<I, R> {
 
     /**

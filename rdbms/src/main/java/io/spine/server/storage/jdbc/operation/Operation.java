@@ -41,7 +41,6 @@ import io.spine.server.storage.jdbc.record.RecordTable;
  * @param <R>
  *         the type of the stored records
  */
-@SPI
 public abstract class Operation<I, R extends Message> {
 
     private final RecordTable<I, R> table;

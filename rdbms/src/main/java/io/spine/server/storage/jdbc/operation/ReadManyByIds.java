@@ -42,7 +42,6 @@ import java.util.Iterator;
  * @param <R>
  *         the type of the stored records
  */
-@SPI
 public class ReadManyByIds<I, R extends Message> extends Operation<I, R>  {
 
     public ReadManyByIds(RecordTable<I, R> table, DataSourceWrapper dataSource) {

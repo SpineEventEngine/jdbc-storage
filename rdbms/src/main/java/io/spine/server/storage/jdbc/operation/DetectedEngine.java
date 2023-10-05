@@ -39,7 +39,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * <p>This list isn't expected to be complete. However, it may get bigger as far as
  * the Spine routines are getting some known optimizations on other DB engines.
  */
-enum DetectedEngine {
+public enum DetectedEngine {
 
     /**
      * MySQL of all versions.

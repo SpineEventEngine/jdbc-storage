@@ -40,7 +40,6 @@ import io.spine.server.storage.jdbc.query.DeleteRecordQuery;
  * @param <R>
  *         the type of the stored records
  */
-@SPI
 public class DeleteOne<I, R extends Message> extends Operation<I, R> {
 
     /**

@@ -42,7 +42,6 @@ import static io.spine.server.storage.jdbc.operation.DetectedEngine.MySQL;
  * <p>Descendants may extend this type in order to customize the execution of certain operations
  * performed over the underlying database.
  */
-@SPI
 public class OperationFactory {
 
     private final DataSourceWrapper dataSource;
@@ -198,5 +197,28 @@ public class OperationFactory {
      */
     public <I, R extends Message> FetchIndex<I, R> index(RecordTable<I, R> t) {
         return new FetchIndex<>(t, dataSource);
+    }
+
+    /**
+     * Returns the detected storage engine.
+     */
+    protected DetectedEngine engine() {
+        return engine;
+    }
+
+    /**
+     * Returns the data source, against which the created operations
+     * are to be performed.
+     */
+    protected final DataSourceWrapper dataSource() {
+        return dataSource;
+    }
+
+    /**
+     * Returns the Java-SQL type mapping to use within
+     * the operations created by this factory.
+     */
+    protected final TypeMapping typeMapping() {
+        return typeMapping;
     }
 }

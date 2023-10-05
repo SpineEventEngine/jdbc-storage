@@ -61,7 +61,6 @@ import static java.util.Objects.requireNonNull;
  * @param <R>
  *         the type of the stored records
  */
-@SPI
 public class CreateTable<I, R extends Message> extends Operation<I, R> implements WithLogging {
 
     /**

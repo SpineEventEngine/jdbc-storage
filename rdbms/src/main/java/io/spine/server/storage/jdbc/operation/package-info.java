@@ -27,11 +27,20 @@
 /**
  * This package describes the I/O operations performed
  * over the {@linkplain io.spine.server.storage.jdbc.record.RecordTable DB tables}.
+ *
+ * <p>End-users may choose to use their own operation implementations
+ * by extending {@link io.spine.server.storage.jdbc.operation.OperationFactory OperationFactory},
+ * returning appropriate operation implementations,
+ * and using this custom operation factory
+ * {@linkplain io.spine.server.storage.jdbc.JdbcStorageFactory.Builder#useOperationFactory(io.spine.server.storage.jdbc.config.CreateOperationFactory)
+ *  to build a JdbcStorageFactory}.
  */
+@SPI
 @CheckReturnValue
 @ParametersAreNonnullByDefault
 package io.spine.server.storage.jdbc.operation;
 
 import com.google.errorprone.annotations.CheckReturnValue;
+import io.spine.annotation.SPI;
 
 import javax.annotation.ParametersAreNonnullByDefault;
