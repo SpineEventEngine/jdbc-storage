@@ -84,15 +84,22 @@ public class JdbcStorageFactoryTestEnv {
                 .setTypeMapping(H2_2_1)
                 .setTableName(InboxMessage.class, tableName)
                 .build();
-        var contextSpec = Delivery.contextSpec(false);
+        var storage = (JdbcRecordStorage<InboxMessageId, InboxMessage>)
+                factory.createRecordStorage(deliveryContextSpec(), inboxMessageSpec());
+        return storage;
+    }
+
+    public static ContextSpec deliveryContextSpec() {
+        return Delivery.contextSpec(false);
+    }
+
+    public static MessageRecordSpec<InboxMessageId, InboxMessage> inboxMessageSpec() {
         var inboxMessageSpec = new MessageRecordSpec<>(
                 InboxMessageId.class,
                 InboxMessage.class,
                 InboxMessage::getId,
                 InboxColumn.definitions());
-        var storage = (JdbcRecordStorage<InboxMessageId, InboxMessage>)
-                factory.createRecordStorage(contextSpec, inboxMessageSpec);
-        return storage;
+        return inboxMessageSpec;
     }
 
     public static class TestColumnMapping implements JdbcColumnMapping {
