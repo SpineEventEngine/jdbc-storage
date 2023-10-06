@@ -37,7 +37,7 @@ import io.spine.server.storage.jdbc.type.DefaultJdbcColumnMapping;
 
 import static io.spine.testing.TestValues.nullRef;
 
-public class Given {
+public final class Given {
 
     /** Prevents instantiation of this utility class. */
     private Given() {
@@ -69,7 +69,7 @@ public class Given {
         return new AStorageQuery.Builder();
     }
 
-    public static class ASelectMessageByIdQuery<I, R extends Message>
+    public static final class ASelectMessageByIdQuery<I, R extends Message>
             extends SelectMessageByIdQuery<I, R> {
 
         private final AbstractSQLQuery<?, ?> query;
@@ -107,7 +107,7 @@ public class Given {
         }
     }
 
-    public static class AStorageQuery extends AbstractQuery<String, StringValue> {
+    public static final class AStorageQuery extends AbstractQuery<String, StringValue> {
 
         private AStorageQuery(Builder builder) {
             super(builder);
