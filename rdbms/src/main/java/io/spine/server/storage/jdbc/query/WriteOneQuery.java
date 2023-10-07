@@ -29,12 +29,14 @@ package io.spine.server.storage.jdbc.query;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.protobuf.Message;
 import com.querydsl.core.dml.StoreClause;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.PathBuilder;
+import com.querydsl.sql.dml.SQLInsertClause;
+import com.querydsl.sql.dml.SQLUpdateClause;
 import io.spine.query.ColumnName;
 import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.record.JdbcRecord;
 import io.spine.server.storage.jdbc.record.RecordTable;
-import io.spine.server.storage.jdbc.record.column.IdColumn;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -47,7 +49,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *         the record type
  */
 abstract class WriteOneQuery<I, R extends Message>
-        extends IdAwareQuery<I, R>
+//        extends IdAwareQuery<I, R>
+        extends AbstractQuery<I, R>
         implements WriteQuery<I, R> {
 
     private final JdbcRecord<I, R> record;
@@ -77,9 +80,36 @@ abstract class WriteOneQuery<I, R extends Message>
         return record;
     }
 
-    @Override
-    public IdColumn<I> idColumn() {
-        return super.idColumn();
+//    @Override
+//    public IdColumn<I> idColumn() {
+//        return super.idColumn();
+//    }
+
+    protected SQLInsertClause insertWithId() {
+        var query = factory().insert(table())
+                             .set(idPath(), normalizedId());
+        return query;
+    }
+
+    protected PathBuilder<Object> idPath() {
+        return pathOf(idColumn());
+    }
+
+    protected Object normalizedId() {
+        return idColumn().normalize(recordId());
+    }
+
+    protected Predicate idEquals() {
+        return idPath().eq(normalizedId());
+    }
+
+    protected SQLUpdateClause updateById() {
+        var query = factory().update(table()).where(idEquals());
+        return query;
+    }
+
+    private I recordId() {
+        return record().id();
     }
 
     @Override
@@ -96,7 +126,7 @@ abstract class WriteOneQuery<I, R extends Message>
                                   R extends Message,
                                   B extends Builder<I, R, B, Q>,
                                   Q extends WriteOneQuery<I, R>>
-            extends IdAwareQuery.Builder<I, R, B, Q> {
+            extends AbstractQuery.Builder<I, R, B, Q> {
 
         private JdbcRecord<I, R> record;
 

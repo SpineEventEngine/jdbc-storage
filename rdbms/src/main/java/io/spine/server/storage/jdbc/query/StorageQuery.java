@@ -26,8 +26,29 @@
 
 package io.spine.server.storage.jdbc.query;
 
+import com.google.protobuf.Message;
+import io.spine.server.storage.jdbc.record.JdbcTableSpec;
+import io.spine.server.storage.jdbc.record.column.IdColumn;
+
 /**
- * A marker interface for an SQL query.
+ * An interface for an SQL query.
+ *
+ * @param <I>
+ *         the type of the record identifiers
+ * @param <R>
+ *         the type of the queried records
  */
-public interface StorageQuery {
+public interface StorageQuery<I, R extends Message> {
+
+    /**
+     * Returns the specification of the table, to which this query is directed.
+     */
+    JdbcTableSpec<I, R> tableSpec();
+
+    /**
+     * Obtains the ID column of the table this query is applied to.
+     */
+    default IdColumn<I> idColumn() {
+        return tableSpec().idColumn();
+    }
 }

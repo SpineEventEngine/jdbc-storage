@@ -27,7 +27,6 @@
 package io.spine.server.storage.jdbc.operation;
 
 import com.google.protobuf.Message;
-import io.spine.annotation.SPI;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.query.InsertOneQuery;
 import io.spine.server.storage.jdbc.query.UpdateOneQuery;
@@ -91,22 +90,18 @@ public class WriteOne<I, R extends Message> extends Operation<I, R> {
     }
 
     protected final UpdateOneQuery<I, R> newUpdate(JdbcRecord<I, R> record) {
-        var id = record.id();
         UpdateOneQuery.Builder<I, R> builder = UpdateOneQuery.newBuilder();
         var query = builder.setTableSpec(table().spec())
                            .setDataSource(dataSource())
-                           .setId(id)
                            .setRecord(record)
                            .build();
         return query;
     }
 
     protected final InsertOneQuery<I, R> newInsert(JdbcRecord<I, R> record) {
-        var id = record.id();
         InsertOneQuery.Builder<I, R> builder = InsertOneQuery.newBuilder();
         var query = builder.setTableSpec(table().spec())
                            .setDataSource(dataSource())
-                           .setId(id)
                            .setRecord(record)
                            .build();
         return query;

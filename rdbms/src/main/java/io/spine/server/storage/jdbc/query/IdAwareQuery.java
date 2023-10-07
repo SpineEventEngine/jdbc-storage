@@ -62,21 +62,6 @@ public abstract class IdAwareQuery<I, R extends Message> extends AbstractQuery<I
         return idPath().eq(normalizedId());
     }
 
-    protected SQLInsertClause insertWithId() {
-        var query = factory().insert(table())
-                             .set(idPath(), normalizedId());
-        return query;
-    }
-
-    protected SQLUpdateClause updateById() {
-        var query = factory().update(table()).where(idEquals());
-        return query;
-    }
-
-    protected IdColumn<I> idColumn() {
-        return tableSpec().idColumn();
-    }
-
     protected Object normalizedId() {
         return idColumn().normalize(id);
     }

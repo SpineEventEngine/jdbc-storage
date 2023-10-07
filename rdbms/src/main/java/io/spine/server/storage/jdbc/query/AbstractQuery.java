@@ -66,7 +66,7 @@ import static java.sql.ResultSet.HOLD_CURSORS_OVER_COMMIT;
  *         the type of the queried records
  */
 @SuppressWarnings("AbstractClassWithoutAbstractMethods" /* To prevent direct instantiation.*/)
-public abstract class AbstractQuery<I, R extends Message> implements StorageQuery {
+public abstract class AbstractQuery<I, R extends Message> implements StorageQuery<I, R> {
 
     private final DataSourceWrapper dataSource;
     private final RelationalPathBase<Object> tablePath;
@@ -76,7 +76,7 @@ public abstract class AbstractQuery<I, R extends Message> implements StorageQuer
     private @MonotonicNonNull MySQLQueryFactory mySqlFactory;
 
     protected AbstractQuery(Builder<I, R, ? extends Builder<I, R, ?, ?>,
-                                    ? extends StorageQuery> builder) {
+                                    ? extends StorageQuery<I, R>> builder) {
         this.tableSpec = builder.tableSpec;
         var tableName = builder.tableSpec.tableName();
         this.dataSource = builder.dataSource;
@@ -122,7 +122,8 @@ public abstract class AbstractQuery<I, R extends Message> implements StorageQuer
         return mySqlFactory;
     }
 
-    protected JdbcTableSpec<I, R> tableSpec() {
+    @Override
+    public JdbcTableSpec<I, R> tableSpec() {
         return tableSpec;
     }
 

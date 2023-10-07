@@ -38,7 +38,7 @@ import io.spine.server.storage.jdbc.record.RecordTable;
  * @param <R>
  *         the record type
  */
-public final class InsertMultipleQuery<I, R extends Message>
+public class InsertMultipleQuery<I, R extends Message>
         extends WriteMultipleQuery<I, R, SQLInsertClause> {
 
     private InsertMultipleQuery(Builder<I, R> builder) {

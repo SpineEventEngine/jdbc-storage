@@ -63,11 +63,9 @@ public class MysqlWriteOne<I, R extends Message> extends WriteOne<I, R> {
 
     @Override
     public void execute(JdbcRecord<I, R> record) {
-        var id = record.id();
         MySqlUpsertOneQuery.Builder<I, R> builder = MySqlUpsertOneQuery.newBuilder();
         var query = builder.setTableSpec(table().spec())
                            .setDataSource(dataSource())
-                           .setId(id)
                            .setRecord(record)
                            .build();
         query.execute();

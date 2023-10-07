@@ -39,7 +39,7 @@ import com.google.protobuf.Message;
  */
 public class DeleteAllQuery<I, R extends Message>
         extends AbstractQuery<I, R>
-        implements ModifyQuery {
+        implements ModifyQuery<I, R> {
 
     private DeleteAllQuery(Builder<I, R> builder) {
         super(builder);

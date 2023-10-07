@@ -27,11 +27,17 @@
 package io.spine.server.storage.jdbc.query;
 
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.protobuf.Message;
 
 /**
  * A query which makes changes in a data source.
+ *
+ * @param <I>
+ *         the type of the record identifiers
+ * @param <R>
+ *         the type of the queried records
  */
-public interface ModifyQuery extends StorageQuery {
+public interface ModifyQuery<I, R extends Message> extends StorageQuery<I, R> {
 
     /**
      * Executes a query which modifiers the underlying table, and returns

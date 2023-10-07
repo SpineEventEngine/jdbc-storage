@@ -37,7 +37,7 @@ import com.google.protobuf.Message;
  *         type of the record to delete
  */
 public final class DeleteRecordQuery<I, R extends Message>
-        extends IdAwareQuery<I, R> implements ModifyQuery {
+        extends IdAwareQuery<I, R> implements ModifyQuery<I, R> {
 
     private DeleteRecordQuery(Builder<I, R> builder) {
         super(builder);

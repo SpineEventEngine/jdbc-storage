@@ -48,7 +48,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @param <R>
  *         type of records to write
  */
-interface WriteQuery<I, R extends Message> extends ModifyQuery {
+interface WriteQuery<I, R extends Message> extends ModifyQuery<I, R> {
 
     /**
      * Adds a value binding to the {@code query} for each {@code record} field described
@@ -75,11 +75,6 @@ interface WriteQuery<I, R extends Message> extends ModifyQuery {
 
         query.set(pathOf(column), value);
     }
-
-    /**
-     * Obtains the ID column of the table this query is applied to.
-     */
-    IdColumn<I> idColumn();
 
     /**
      * Obtains the path of the given {@code column} respective to the processed table.

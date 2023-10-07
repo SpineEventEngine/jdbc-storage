@@ -35,7 +35,6 @@ import io.spine.query.ColumnName;
 import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.record.JdbcRecord;
 import io.spine.server.storage.jdbc.record.RecordTable;
-import io.spine.server.storage.jdbc.record.column.IdColumn;
 
 import static java.util.Objects.requireNonNull;
 
@@ -94,11 +93,6 @@ abstract class WriteMultipleQuery<I, R extends Message, C extends StoreClause<C>
      * Adds current state of the {@code query} to the processing batch.
      */
     protected abstract void addBatch(C query);
-
-    @Override
-    public IdColumn<I> idColumn() {
-        return tableSpec().idColumn();
-    }
 
     @Override
     public PathBuilder<Object> pathOf(TableColumn column) {
