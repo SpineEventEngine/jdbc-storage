@@ -65,6 +65,7 @@ public class UpdateMultipleQuery<I, R extends Message>
         return new Builder<>();
     }
 
+    @SuppressWarnings("ClassNameSameAsAncestorName" /* For simplicity. */)
     public static class Builder<I, M extends Message>
             extends WriteMultipleQuery.Builder<I, M, Builder<I, M>, UpdateMultipleQuery<I, M>> {
 

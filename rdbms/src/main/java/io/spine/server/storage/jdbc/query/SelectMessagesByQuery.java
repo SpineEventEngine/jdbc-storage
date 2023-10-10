@@ -156,6 +156,7 @@ public class SelectMessagesByQuery<I, R extends Message> extends AbstractQuery<I
      * @param <R>
      *         the type of queried records
      */
+    @SuppressWarnings("ClassNameSameAsAncestorName" /* For simplicity. */)
     public static class Builder<I, R extends Message>
             extends AbstractQuery.Builder<I, R, Builder<I, R>, SelectMessagesByQuery<I, R>> {
 

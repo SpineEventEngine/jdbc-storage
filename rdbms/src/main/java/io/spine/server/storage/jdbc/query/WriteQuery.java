@@ -28,12 +28,9 @@ package io.spine.server.storage.jdbc.query;
 
 import com.google.protobuf.Message;
 import com.querydsl.core.dml.StoreClause;
-import com.querydsl.core.types.dsl.PathBuilder;
 import io.spine.query.ColumnName;
-import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.record.JdbcRecord;
 import io.spine.server.storage.jdbc.record.RecordTable;
-import io.spine.server.storage.jdbc.record.column.IdColumn;
 
 import javax.annotation.Nullable;
 
@@ -48,6 +45,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @param <R>
  *         type of records to write
  */
+@SuppressWarnings("WeakerAccess" /* Available to SPI users. */)
 public abstract class WriteQuery<I, R extends Message> extends ModifyQuery<I, R> {
 
     protected WriteQuery(
@@ -62,7 +60,6 @@ public abstract class WriteQuery<I, R extends Message> extends ModifyQuery<I, R>
     protected void setColumnValues(StoreClause<?> query, JdbcRecord<I, R> record) {
         checkNotNull(query);
         checkNotNull(record);
-
         var names = record.columns();
         for (var name : names) {
             var value = record.columnValue(name);
@@ -77,17 +74,6 @@ public abstract class WriteQuery<I, R extends Message> extends ModifyQuery<I, R>
     protected void setColumnValue(StoreClause<?> query, ColumnName column, @Nullable Object value) {
         checkNotNull(query);
         checkNotNull(column);
-
         query.set(pathOf(column), value);
     }
-
-//    /**
-//     * Obtains the path of the given {@code column} respective to the processed table.
-//     */
-//    PathBuilder<Object> pathOf(TableColumn column);
-//
-//    /**
-//     * Obtains the path of the given {@code column} respective to the processed table.
-//     */
-//    PathBuilder<Object> pathOf(ColumnName name);
 }

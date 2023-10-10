@@ -85,6 +85,7 @@ public final class SelectMultipleByIds<I, R extends Message>
         return new Builder<>();
     }
 
+    @SuppressWarnings("ClassNameSameAsAncestorName" /* For simplicity. */)
     public static class Builder<I, R extends Message>
             extends AbstractQuery.Builder<I, R, Builder<I, R>, SelectMultipleByIds<I, R>> {
 

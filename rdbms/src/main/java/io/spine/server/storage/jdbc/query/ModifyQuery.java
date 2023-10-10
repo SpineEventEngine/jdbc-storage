@@ -39,6 +39,7 @@ import com.google.protobuf.Message;
  */
 public abstract class ModifyQuery<I, R extends Message> extends AbstractQuery<I, R> {
 
+    @SuppressWarnings("WeakerAccess" /* Available to SPI users. */)
     protected ModifyQuery(
             Builder<I, R, ? extends Builder<I, R, ?, ?>, ? extends StorageQuery<I, R>> builder) {
         super(builder);

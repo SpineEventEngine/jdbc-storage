@@ -110,7 +110,8 @@ abstract class WriteOneQuery<I, R extends Message> extends WriteQuery<I, R> {
         return super.pathOf(name);
     }
 
-    abstract static class Builder<I,
+    @SuppressWarnings("ClassNameSameAsAncestorName" /* For simplicity. */)
+    public abstract static class Builder<I,
                                   R extends Message,
                                   B extends Builder<I, R, B, Q>,
                                   Q extends WriteOneQuery<I, R>>

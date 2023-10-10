@@ -67,6 +67,7 @@ public class TableIndexQuery<I, R extends Message>
         return new Builder<>();
     }
 
+    @SuppressWarnings("ClassNameSameAsAncestorName" /* For simplicity. */)
     public static class Builder<I, R extends Message>
             extends AbstractQuery.Builder<I, R, Builder<I, R>, TableIndexQuery<I, R>> {
 

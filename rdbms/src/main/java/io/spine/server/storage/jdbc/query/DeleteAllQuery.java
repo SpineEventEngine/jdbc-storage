@@ -70,6 +70,7 @@ public class DeleteAllQuery<I, R extends Message> extends ModifyQuery<I, R> {
      * @param <R>
      *         the type of the records to delete
      */
+    @SuppressWarnings("ClassNameSameAsAncestorName" /* For simplicity. */)
     public static class Builder<I, R extends Message>
             extends AbstractQuery.Builder<I, R, Builder<I, R>, DeleteAllQuery<I, R>> {
 

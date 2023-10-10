@@ -85,7 +85,7 @@ public final class QueryPredicates {
     }
 
     @VisibleForTesting
-    @SuppressWarnings("rawtypes")   /* To avoid the generics hell. */
+    @SuppressWarnings("rawtypes")   /* To avoid the hell in generics. */
     static Predicate nullFilter(ComparisonOperator operator,
                                 ComparablePath<Comparable> columnPath) {
         checkNotNull(operator);
@@ -105,7 +105,7 @@ public final class QueryPredicates {
     }
 
     @VisibleForTesting
-    @SuppressWarnings("rawtypes")   /* To avoid the generics hell. */
+    @SuppressWarnings("rawtypes")   /* To avoid the hell in generics. */
     static Predicate valueFilter(ComparablePath<Comparable> columnPath,
                                  ComparisonOperator operator,
                                  Comparable columnValue) {
@@ -128,7 +128,7 @@ public final class QueryPredicates {
         }
     }
 
-    @SuppressWarnings("rawtypes")   /* To avoid the generics hell. */
+    @SuppressWarnings("rawtypes")   /* To avoid the hell in generics. */
     private static Predicate
     matchParameter(SubjectParameter<?, ?, ?> parameter, JdbcColumnMapping columnMapping) {
         var column = parameter.column();

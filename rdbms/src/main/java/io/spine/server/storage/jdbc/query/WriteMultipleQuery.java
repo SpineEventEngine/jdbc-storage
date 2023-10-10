@@ -90,10 +90,11 @@ abstract class WriteMultipleQuery<I, R extends Message, C extends StoreClause<C>
      */
     protected abstract void addBatch(C query);
 
-    abstract static class Builder<I,
-                                  R extends Message,
-                                  B extends Builder<I, R, B, Q>,
-                                  Q extends WriteMultipleQuery<I, R, ?>>
+    @SuppressWarnings("ClassNameSameAsAncestorName" /* For simplicity. */)
+    public abstract static class Builder<I,
+                                         R extends Message,
+                                         B extends Builder<I, R, B, Q>,
+                                         Q extends WriteMultipleQuery<I, R, ?>>
             extends AbstractQuery.Builder<I, R, B, Q> {
 
         private ImmutableList<JdbcRecord<I, R>> records;

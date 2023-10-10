@@ -70,6 +70,7 @@ public final class ContainsQuery<I, R extends Message>
         return new Builder<>();
     }
 
+    @SuppressWarnings("ClassNameSameAsAncestorName" /* For simplicity. */)
     public static class Builder<I, R extends Message>
             extends ReadByIdQuery.Builder<I, R, Builder<I, R>, ContainsQuery<I, R>> {
 

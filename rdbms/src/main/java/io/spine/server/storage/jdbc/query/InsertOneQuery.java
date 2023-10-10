@@ -53,6 +53,7 @@ public final class InsertOneQuery<I, M extends Message> extends WriteOneQuery<I,
         return new Builder<>();
     }
 
+    @SuppressWarnings("ClassNameSameAsAncestorName" /* For simplicity. */)
     public static class Builder<I, M extends Message>
             extends WriteOneQuery.Builder<I, M, Builder<I, M>, InsertOneQuery<I, M>> {
 

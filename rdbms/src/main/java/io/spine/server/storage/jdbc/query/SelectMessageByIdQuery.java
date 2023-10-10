@@ -112,6 +112,7 @@ public abstract class SelectMessageByIdQuery<I, R extends Message>
         return message;
     }
 
+    @SuppressWarnings("ClassNameSameAsAncestorName" /* For simplicity. */)
     protected abstract static class Builder<I, R extends Message,
                                             B extends Builder<I, R, B, Q>,
                                             Q extends SelectMessageByIdQuery<I, R>>

@@ -66,6 +66,7 @@ public class DeleteMultipleRecordsQuery<I, R extends Message> extends ModifyQuer
         return new Builder<>();
     }
 
+    @SuppressWarnings("ClassNameSameAsAncestorName" /* For simplicity. */)
     public static class Builder<I, R extends Message>
             extends AbstractQuery.Builder<I, R, Builder<I, R>, DeleteMultipleRecordsQuery<I, R>> {
 
