@@ -39,7 +39,7 @@ import static com.querydsl.sql.SQLExpressions.count;
  *         type of queried records
  */
 public final class ContainsQuery<I, R extends Message>
-        extends IdAwareQuery<I, R>
+        extends ReadByIdQuery<I, R>
         implements SelectQuery<Boolean> {
 
     private ContainsQuery(Builder<I, R> builder) {
@@ -71,7 +71,7 @@ public final class ContainsQuery<I, R extends Message>
     }
 
     public static class Builder<I, R extends Message>
-            extends IdAwareQuery.Builder<I, R, Builder<I, R>, ContainsQuery<I, R>> {
+            extends ReadByIdQuery.Builder<I, R, Builder<I, R>, ContainsQuery<I, R>> {
 
         @Override
         protected ContainsQuery<I, R> doBuild() {

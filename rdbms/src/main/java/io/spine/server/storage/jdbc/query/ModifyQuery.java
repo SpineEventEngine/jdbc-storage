@@ -37,7 +37,12 @@ import com.google.protobuf.Message;
  * @param <R>
  *         the type of the queried records
  */
-public interface ModifyQuery<I, R extends Message> extends StorageQuery<I, R> {
+public abstract class ModifyQuery<I, R extends Message> extends AbstractQuery<I, R> {
+
+    protected ModifyQuery(
+            Builder<I, R, ? extends Builder<I, R, ?, ?>, ? extends StorageQuery<I, R>> builder) {
+        super(builder);
+    }
 
     /**
      * Executes a query which modifiers the underlying table, and returns
@@ -46,5 +51,5 @@ public interface ModifyQuery<I, R extends Message> extends StorageQuery<I, R> {
      * @return the number of affected rows
      */
     @CanIgnoreReturnValue
-    long execute();
+    public abstract long execute();
 }

@@ -48,13 +48,18 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @param <R>
  *         type of records to write
  */
-interface WriteQuery<I, R extends Message> extends ModifyQuery<I, R> {
+public abstract class WriteQuery<I, R extends Message> extends ModifyQuery<I, R> {
+
+    protected WriteQuery(
+            Builder<I, R, ? extends Builder<I, R, ?, ?>, ? extends StorageQuery<I, R>> builder) {
+        super(builder);
+    }
 
     /**
      * Adds a value binding to the {@code query} for each {@code record} field described
      * as a column in the specified {@code JdbcRecord}.
      */
-    default void setColumnValues(StoreClause<?> query, JdbcRecord<I, R> record) {
+    protected void setColumnValues(StoreClause<?> query, JdbcRecord<I, R> record) {
         checkNotNull(query);
         checkNotNull(record);
 
@@ -69,20 +74,20 @@ interface WriteQuery<I, R extends Message> extends ModifyQuery<I, R> {
      * Adds a single value binding to the query, using the passed value for the column
      * by the passed name.
      */
-    default void setColumnValue(StoreClause<?> query, ColumnName column, @Nullable Object value) {
+    protected void setColumnValue(StoreClause<?> query, ColumnName column, @Nullable Object value) {
         checkNotNull(query);
         checkNotNull(column);
 
         query.set(pathOf(column), value);
     }
 
-    /**
-     * Obtains the path of the given {@code column} respective to the processed table.
-     */
-    PathBuilder<Object> pathOf(TableColumn column);
-
-    /**
-     * Obtains the path of the given {@code column} respective to the processed table.
-     */
-    PathBuilder<Object> pathOf(ColumnName name);
+//    /**
+//     * Obtains the path of the given {@code column} respective to the processed table.
+//     */
+//    PathBuilder<Object> pathOf(TableColumn column);
+//
+//    /**
+//     * Obtains the path of the given {@code column} respective to the processed table.
+//     */
+//    PathBuilder<Object> pathOf(ColumnName name);
 }

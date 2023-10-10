@@ -28,7 +28,7 @@ package io.spine.server.storage.jdbc.given.query;
 
 import com.google.protobuf.Message;
 import com.querydsl.sql.AbstractSQLQuery;
-import io.spine.server.storage.jdbc.query.IdAwareQuery;
+import io.spine.server.storage.jdbc.query.ReadByIdQuery;
 import io.spine.server.storage.jdbc.record.RecordTable;
 
 import java.sql.ResultSet;
@@ -36,10 +36,8 @@ import java.sql.ResultSet;
 /**
  * A test query for selecting a {@code Message} ID from the {@link RecordTable}.
  *
- * //TODO:2022-01-18:alex.tymchenko: move this type.
- *
- * <p>Although selecting a record ID by ID is hardly a viable case in real life, it's sometimes
- * necessary in tests.
+ * <p>Although selecting a record ID by ID is hardly a viable case in real life,
+ * it's sometimes necessary in tests.
  *
  * <p>The query result is returned as a {@link ResultSet}.
  *
@@ -48,7 +46,7 @@ import java.sql.ResultSet;
  * @param <R>
  *         the record type
  */
-public final class SelectRecordId<I, R extends Message> extends IdAwareQuery<I, R> {
+public final class SelectRecordId<I, R extends Message> extends ReadByIdQuery<I, R> {
 
     private SelectRecordId(Builder<I, R> builder) {
         super(builder);
@@ -70,7 +68,7 @@ public final class SelectRecordId<I, R extends Message> extends IdAwareQuery<I, 
     }
 
     public static class Builder<I, R extends Message>
-            extends IdAwareQuery.Builder<I, R, Builder<I, R>, SelectRecordId<I, R>> {
+            extends ReadByIdQuery.Builder<I, R, Builder<I, R>, SelectRecordId<I, R>> {
 
         @Override
         protected Builder<I, R> getThis() {

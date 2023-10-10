@@ -41,9 +41,7 @@ import static java.util.stream.Collectors.toList;
  * @param <R>
  *         the type of the records to delete
  */
-public class DeleteMultipleRecordsQuery<I, R extends Message>
-        extends AbstractQuery<I, R>
-        implements ModifyQuery<I, R> {
+public class DeleteMultipleRecordsQuery<I, R extends Message> extends ModifyQuery<I, R> {
 
     private final ImmutableList<I> ids;
 

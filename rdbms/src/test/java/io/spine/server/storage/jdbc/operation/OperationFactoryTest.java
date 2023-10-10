@@ -155,7 +155,6 @@ final class OperationFactoryTest {
                     .<InboxMessageId, InboxMessage>newBuilder()
                     .setTableSpec(castTable.spec())
                     .setDataSource(dataSource())
-                    .setId(modifiedId)
                     .setRecord(castRecord)
                     .build();
             query.execute();

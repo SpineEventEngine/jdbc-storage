@@ -127,24 +127,49 @@ public abstract class AbstractQuery<I, R extends Message> implements StorageQuer
         return tableSpec;
     }
 
+    /**
+     * Returns a path builder for a column passed as an RDBMS-level column.
+     */
     protected PathBuilder<Object> pathOf(TableColumn column) {
         return pathOf(column.name());
     }
 
+    /**
+     * Returns a path builder for the column storing identifiers.
+     */
     protected PathBuilder<Object> pathOf(IdColumn<?> idColumn) {
         return pathOf(idColumn.columnName());
     }
 
+    /**
+     * Returns the path builder for the column by the given name.
+     */
     protected PathBuilder<Object> pathOf(ColumnName column) {
         return pathOf(column.value());
     }
 
+    /**
+     * Returns the path builder for the column by the given name.
+     *
+     * <p>Uses a wildcard column type.
+     */
     protected PathBuilder<Object> pathOf(String columnName) {
         return pathBuilder.get(columnName);
     }
 
+    /**
+     * Returns the path builder for the column by the given name
+     * with the respect to column value type.
+     *
+     * @param <T> the type of column values
+     */
     protected <T> PathBuilder<T> pathOf(String columnName, Class<T> type) {
         return pathBuilder.get(columnName, type);
+    }
+
+    @SuppressWarnings("WeakerAccess" /* Available to SPI users. */)
+    protected PathBuilder<Object> idPath() {
+        return pathOf(idColumn());
     }
 
     /**
@@ -205,6 +230,9 @@ public abstract class AbstractQuery<I, R extends Message> implements StorageQuer
         return configuration;
     }
 
+    /**
+     * Obtains a connection to the underlying data source.
+     */
     private static final class ConnectionSupplier implements Supplier<Connection> {
 
         private final DataSourceWrapper dataSource;
@@ -215,7 +243,9 @@ public abstract class AbstractQuery<I, R extends Message> implements StorageQuer
 
         @Override
         public Connection get() {
-            var connection = dataSource.getConnection(false).get();
+            var connection = dataSource
+                    .getConnection(false)
+                    .get();
             try {
                 connection.setHoldability(HOLD_CURSORS_OVER_COMMIT);
                 return connection;
@@ -326,7 +356,7 @@ public abstract class AbstractQuery<I, R extends Message> implements StorageQuer
      * A handler for a transactional query.
      *
      * <p>{@linkplain Connection#commit() Commits} a transaction, that was successfully executed
-     * or {@linkplain Connection#rollback() rollbacks} it otherwise.
+     * or {@linkplain Connection#rollback() performs a rollback} for it otherwise.
      */
     @VisibleForTesting
     static class TransactionHandler extends SQLBaseListener {

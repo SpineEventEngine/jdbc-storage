@@ -37,9 +37,7 @@ import com.google.protobuf.Message;
  * @param <R>
  *         the type of the records to delete
  */
-public class DeleteAllQuery<I, R extends Message>
-        extends AbstractQuery<I, R>
-        implements ModifyQuery<I, R> {
+public class DeleteAllQuery<I, R extends Message> extends ModifyQuery<I, R> {
 
     private DeleteAllQuery(Builder<I, R> builder) {
         super(builder);

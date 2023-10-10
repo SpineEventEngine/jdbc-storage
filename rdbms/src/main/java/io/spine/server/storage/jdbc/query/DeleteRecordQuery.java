@@ -36,17 +36,20 @@ import com.google.protobuf.Message;
  * @param <R>
  *         type of the record to delete
  */
-public final class DeleteRecordQuery<I, R extends Message>
-        extends IdAwareQuery<I, R> implements ModifyQuery<I, R> {
+public final class DeleteRecordQuery<I, R extends Message> extends ModifyQuery<I, R> {
+
+    private final I id;
 
     private DeleteRecordQuery(Builder<I, R> builder) {
         super(builder);
+        this.id = builder.id;
     }
 
     @Override
     public long execute() {
+        Object normalizedId = idColumn().normalize(id);
         var query = factory().delete(table())
-                             .where(idEquals());
+                             .where(idPath().eq(normalizedId));
         return query.execute();
     }
 
@@ -70,8 +73,11 @@ public final class DeleteRecordQuery<I, R extends Message>
      * @param <R>
      *         type of the record to delete
      */
+    @SuppressWarnings("ClassNameSameAsAncestorName" /* For simplicity. */)
     public static class Builder<I, R extends Message>
-            extends IdAwareQuery.Builder<I, R, Builder<I, R>, DeleteRecordQuery<I, R>> {
+            extends AbstractQuery.Builder<I, R, Builder<I, R>, DeleteRecordQuery<I, R>> {
+
+        private I id;
 
         @Override
         protected DeleteRecordQuery<I, R> doBuild() {
@@ -81,6 +87,11 @@ public final class DeleteRecordQuery<I, R extends Message>
         @Override
         protected Builder<I, R> getThis() {
             return this;
+        }
+
+        public Builder<I, R> setId(I id) {
+            this.id = id;
+            return getThis();
         }
     }
 }

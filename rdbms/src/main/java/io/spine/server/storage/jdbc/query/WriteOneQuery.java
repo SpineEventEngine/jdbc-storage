@@ -48,10 +48,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @param <R>
  *         the record type
  */
-abstract class WriteOneQuery<I, R extends Message>
-//        extends IdAwareQuery<I, R>
-        extends AbstractQuery<I, R>
-        implements WriteQuery<I, R> {
+abstract class WriteOneQuery<I, R extends Message> extends WriteQuery<I, R> {
 
     private final JdbcRecord<I, R> record;
 
@@ -80,19 +77,10 @@ abstract class WriteOneQuery<I, R extends Message>
         return record;
     }
 
-//    @Override
-//    public IdColumn<I> idColumn() {
-//        return super.idColumn();
-//    }
-
     protected SQLInsertClause insertWithId() {
         var query = factory().insert(table())
                              .set(idPath(), normalizedId());
         return query;
-    }
-
-    protected PathBuilder<Object> idPath() {
-        return pathOf(idColumn());
     }
 
     protected Object normalizedId() {

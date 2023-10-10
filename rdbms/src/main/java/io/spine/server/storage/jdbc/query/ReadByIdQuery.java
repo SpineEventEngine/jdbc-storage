@@ -28,28 +28,24 @@ package io.spine.server.storage.jdbc.query;
 
 import com.google.protobuf.Message;
 import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.dsl.PathBuilder;
-import com.querydsl.sql.dml.SQLInsertClause;
-import com.querydsl.sql.dml.SQLUpdateClause;
 import io.spine.server.storage.jdbc.record.column.IdColumn;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * An abstract base for queries, which work with a {@link IdColumn single ID}.
+ * An abstract base for queries, which access a single record by its ID.
  *
  * @param <I>
- *         the type of the record identifiers
+ *         the type of the record identifier
  * @param <R>
- *         the type of the queried records
+ *         the type of the queried record
  */
-public abstract class IdAwareQuery<I, R extends Message> extends AbstractQuery<I, R> {
+public abstract class ReadByIdQuery<I, R extends Message> extends AbstractQuery<I, R> {
 
     private final I id;
 
-    protected IdAwareQuery(Builder<I, R,
-                                   ? extends Builder<I, R, ?, ?>,
-                                   ? extends IdAwareQuery<I, R>> builder) {
+    protected ReadByIdQuery(
+            Builder<I, R, ? extends Builder<I, R, ?, ?>, ? extends ReadByIdQuery<I, R>> builder) {
         super(builder);
         this.id = checkNotNull(builder.id);
     }
@@ -62,17 +58,15 @@ public abstract class IdAwareQuery<I, R extends Message> extends AbstractQuery<I
         return idPath().eq(normalizedId());
     }
 
-    protected Object normalizedId() {
+    private Object normalizedId() {
         return idColumn().normalize(id);
     }
 
-    protected PathBuilder<Object> idPath() {
-        return pathOf(idColumn());
-    }
-
-    protected abstract static class Builder<I, R extends Message,
+    @SuppressWarnings("ClassNameSameAsAncestorName" /* For simplicity. */)
+    protected abstract static class Builder<I,
+                                            R extends Message,
                                             B extends Builder<I, R, B, Q>,
-                                            Q extends IdAwareQuery<I, R>>
+                                            Q extends ReadByIdQuery<I, R>>
             extends AbstractQuery.Builder<I, R, B, Q> {
 
         private I id;

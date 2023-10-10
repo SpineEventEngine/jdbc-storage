@@ -30,9 +30,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.protobuf.Message;
 import com.querydsl.core.dml.StoreClause;
-import com.querydsl.core.types.dsl.PathBuilder;
-import io.spine.query.ColumnName;
-import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.record.JdbcRecord;
 import io.spine.server.storage.jdbc.record.RecordTable;
 
@@ -50,8 +47,7 @@ import static java.util.Objects.requireNonNull;
  *         the type of SQL clause
  */
 abstract class WriteMultipleQuery<I, R extends Message, C extends StoreClause<C>>
-        extends AbstractQuery<I, R>
-        implements WriteQuery<I, R> {
+        extends WriteQuery<I, R> {
 
     private final ImmutableList<JdbcRecord<I, R>> records;
 
@@ -93,16 +89,6 @@ abstract class WriteMultipleQuery<I, R extends Message, C extends StoreClause<C>
      * Adds current state of the {@code query} to the processing batch.
      */
     protected abstract void addBatch(C query);
-
-    @Override
-    public PathBuilder<Object> pathOf(TableColumn column) {
-        return super.pathOf(column);
-    }
-
-    @Override
-    public PathBuilder<Object> pathOf(ColumnName name) {
-        return super.pathOf(name);
-    }
 
     abstract static class Builder<I,
                                   R extends Message,

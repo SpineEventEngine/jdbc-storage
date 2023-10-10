@@ -49,7 +49,7 @@ import static java.util.Objects.requireNonNull;
  *         a type of records to read
  */
 public abstract class SelectMessageByIdQuery<I, R extends Message>
-        extends IdAwareQuery<I, R>
+        extends ReadByIdQuery<I, R>
         implements SelectQuery<R> {
 
     private final Descriptor messageDescriptor;
@@ -115,6 +115,6 @@ public abstract class SelectMessageByIdQuery<I, R extends Message>
     protected abstract static class Builder<I, R extends Message,
                                             B extends Builder<I, R, B, Q>,
                                             Q extends SelectMessageByIdQuery<I, R>>
-            extends IdAwareQuery.Builder<I, R, B, Q> {
+            extends ReadByIdQuery.Builder<I, R, B, Q> {
     }
 }
