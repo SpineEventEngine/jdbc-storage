@@ -78,7 +78,7 @@ public final class JdbcTableSpec<I, R extends Message> {
      *
      * <p>Library users may choose to customize the type of table columns and the mechanism of
      * obtaining the column values by providing the {@link CustomColumns}.
-     * If no such a customization is made, the default implementation relies onto the original
+     * If no such a customization is made, the default implementation relies upon the original
      * record specification along with the column mapping.
      *
      * @param recordSpec
