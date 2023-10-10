@@ -308,7 +308,6 @@ public class JdbcStorageFactory implements StorageFactory {
          *         the function to create the operation factory
          * @return this instance of {@code Builder}
          */
-        // TODO:alex.tymchenko:2023-10-03: cover this one with tests.
         @CanIgnoreReturnValue
         public Builder useOperationFactory(CreateOperationFactory fn) {
             this.createOpFactory = checkNotNull(fn);
