@@ -27,7 +27,6 @@
 package io.spine.server.storage.jdbc.operation;
 
 import com.google.protobuf.Message;
-import io.spine.annotation.SPI;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.query.SelectMultipleByIds;
 import io.spine.server.storage.jdbc.record.RecordTable;
@@ -44,6 +43,7 @@ import java.util.Iterator;
  */
 public class ReadManyByIds<I, R extends Message> extends Operation<I, R>  {
 
+    @SuppressWarnings("WeakerAccess" /* Available to SPI users. */)
     public ReadManyByIds(RecordTable<I, R> table, DataSourceWrapper dataSource) {
         super(table, dataSource);
     }

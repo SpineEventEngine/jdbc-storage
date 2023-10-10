@@ -27,12 +27,10 @@
 package io.spine.server.storage.jdbc.operation;
 
 import com.google.protobuf.Message;
-import io.spine.annotation.SPI;
 import io.spine.query.RecordQuery;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.query.SelectMessagesByQuery;
 import io.spine.server.storage.jdbc.record.RecordTable;
-import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 
 import java.util.Iterator;
 
@@ -54,7 +52,8 @@ public class ReadManyByQuery<I, R extends Message> extends Operation<I, R> {
      * @param dataSource
      *         the data source to use for connectivity
      */
-    protected ReadManyByQuery(RecordTable<I, R> table, DataSourceWrapper dataSource) {
+    @SuppressWarnings("WeakerAccess" /* Available to SPI users. */)
+    public ReadManyByQuery(RecordTable<I, R> table, DataSourceWrapper dataSource) {
         super(table, dataSource);
     }
 

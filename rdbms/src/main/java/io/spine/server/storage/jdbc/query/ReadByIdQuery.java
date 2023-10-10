@@ -28,7 +28,6 @@ package io.spine.server.storage.jdbc.query;
 
 import com.google.protobuf.Message;
 import com.querydsl.core.types.Predicate;
-import io.spine.server.storage.jdbc.record.column.IdColumn;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

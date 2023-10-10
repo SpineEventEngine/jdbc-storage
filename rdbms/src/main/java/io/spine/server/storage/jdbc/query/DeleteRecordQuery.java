@@ -47,7 +47,7 @@ public final class DeleteRecordQuery<I, R extends Message> extends ModifyQuery<I
 
     @Override
     public long execute() {
-        Object normalizedId = idColumn().normalize(id);
+        var normalizedId = idColumn().normalize(id);
         var query = factory().delete(table())
                              .where(idPath().eq(normalizedId));
         return query.execute();

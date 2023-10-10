@@ -60,7 +60,6 @@ public final class TableNames {
         return result;
     }
 
-    @SuppressWarnings("UnstableApiUsage")
     private static int consistentHashCode(String value) {
         return Hashing.murmur3_128()
                       .hashString(value, UTF_8)

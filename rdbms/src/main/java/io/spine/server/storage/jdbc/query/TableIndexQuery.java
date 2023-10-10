@@ -31,7 +31,6 @@ import com.google.protobuf.Message;
 
 import java.util.Iterator;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static io.spine.server.storage.jdbc.query.reader.ColumnReaderFactory.idReader;
 
 /**

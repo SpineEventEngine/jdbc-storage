@@ -28,7 +28,6 @@ package io.spine.server.storage.jdbc.operation;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.protobuf.Message;
-import io.spine.annotation.SPI;
 import io.spine.client.ArchivedColumn;
 import io.spine.client.DeletedColumn;
 import io.spine.client.VersionColumn;
@@ -37,8 +36,8 @@ import io.spine.query.Column;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.TypeMapping;
-import io.spine.server.storage.jdbc.record.RecordTable;
 import io.spine.server.storage.jdbc.query.QueryExecutor;
+import io.spine.server.storage.jdbc.record.RecordTable;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import static io.spine.server.storage.jdbc.Sql.BuildingBlock.BRACKET_CLOSE;
@@ -90,7 +89,8 @@ public class CreateTable<I, R extends Message> extends Operation<I, R> implement
      * @param mapping
      *         the mapping of generic SQL types to the types used in a particular storage engine
      */
-    protected CreateTable(RecordTable<I, R> table, DataSourceWrapper ds, TypeMapping mapping) {
+    @SuppressWarnings("WeakerAccess" /* Available to SPI users. */)
+    public CreateTable(RecordTable<I, R> table, DataSourceWrapper ds, TypeMapping mapping) {
         super(table, ds);
         this.typeMapping = mapping;
     }

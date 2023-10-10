@@ -27,10 +27,9 @@
 package io.spine.server.storage.jdbc.operation;
 
 import com.google.protobuf.Message;
-import io.spine.annotation.SPI;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.record.RecordTable;
 import io.spine.server.storage.jdbc.query.TableIndexQuery;
+import io.spine.server.storage.jdbc.record.RecordTable;
 
 import java.util.Iterator;
 

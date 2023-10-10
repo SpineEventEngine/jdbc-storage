@@ -48,6 +48,7 @@ public final class Sql {
      */
     public enum Query {
 
+        @SuppressWarnings("DuplicateStringLiteralInspection" /*  Doubles in tests as `expected`. */)
         CREATE_TABLE("CREATE TABLE"),
         CREATE_IF_MISSING("CREATE TABLE IF NOT EXISTS"),
         DROP_TABLE("DROP TABLE"),

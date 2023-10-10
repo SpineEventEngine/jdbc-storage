@@ -27,7 +27,6 @@
 package io.spine.server.storage.jdbc.operation;
 
 import com.google.protobuf.Message;
-import io.spine.annotation.SPI;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.query.DeleteMultipleRecordsQuery;
 import io.spine.server.storage.jdbc.record.RecordTable;
@@ -42,6 +41,8 @@ import io.spine.server.storage.jdbc.record.RecordTable;
  */
 public final class DeleteManyByIds<I, R extends Message> extends Operation<I, R> {
 
+
+    @SuppressWarnings("WeakerAccess" /* Available to SPI users. */)
     public DeleteManyByIds(RecordTable<I, R> table, DataSourceWrapper dataSource) {
         super(table, dataSource);
     }

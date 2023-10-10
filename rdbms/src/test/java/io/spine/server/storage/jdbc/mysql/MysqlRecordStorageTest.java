@@ -26,8 +26,6 @@
 
 package io.spine.server.storage.jdbc.mysql;
 
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
 import io.spine.environment.Tests;
 import io.spine.server.ServerEnvironment;
 import io.spine.server.storage.RecordStorageDelegateTest;

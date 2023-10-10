@@ -28,7 +28,6 @@ package io.spine.server.storage.jdbc.operation;
 
 import com.google.common.collect.ImmutableList;
 import com.google.protobuf.Message;
-import io.spine.annotation.SPI;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.query.InsertMultipleQuery;
 import io.spine.server.storage.jdbc.query.UpdateMultipleQuery;
@@ -69,9 +68,10 @@ public class WriteBulk<I, R extends Message> extends Operation<I, R> {
      * @param operations
      *         the factory to instantiate auxiliary operations
      */
-    protected WriteBulk(RecordTable<I, R> table,
-                        DataSourceWrapper dataSource,
-                        OperationFactory operations) {
+    @SuppressWarnings("WeakerAccess" /* Available to SPI users. */)
+    public WriteBulk(RecordTable<I, R> table,
+                     DataSourceWrapper dataSource,
+                     OperationFactory operations) {
         super(table, dataSource);
         this.operations = operations;
     }

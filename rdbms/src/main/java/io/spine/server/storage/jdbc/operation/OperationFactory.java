@@ -27,7 +27,6 @@
 package io.spine.server.storage.jdbc.operation;
 
 import com.google.protobuf.Message;
-import io.spine.annotation.SPI;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.TypeMapping;
 import io.spine.server.storage.jdbc.operation.mysql.MysqlWriteOne;
