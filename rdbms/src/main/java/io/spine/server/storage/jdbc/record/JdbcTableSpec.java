@@ -85,13 +85,13 @@ public final class JdbcTableSpec<I, R extends Message> {
      *         the original specification of the stored record
      * @param mapping
      *         the column mapping to use
-     * @param columnSpecs
+     * @param customColumns
      *         optionally customized definitions of the columns
      */
     public JdbcTableSpec(RecordSpec<I, R, ?> recordSpec,
                          JdbcColumnMapping mapping,
-                         @Nullable CustomColumns<R> columnSpecs) {
-        this(tableName(recordSpec), recordSpec, mapping, columnSpecs);
+                         @Nullable CustomColumns<R> customColumns) {
+        this(tableName(recordSpec), recordSpec, mapping, customColumns);
     }
 
     /**
@@ -102,7 +102,7 @@ public final class JdbcTableSpec<I, R extends Message> {
      *
      * <p>Library users may also choose to customize the type of table columns and the mechanism of
      * obtaining the column values by providing the {@link CustomColumns}.
-     * If no such a customization is made, the default implementation relies onto the original
+     * If no such a customization is made, the default implementation relies upon the original
      * record specification along with the column mapping.
      *
      * @param tableName
@@ -111,17 +111,17 @@ public final class JdbcTableSpec<I, R extends Message> {
      *         the original specification of the stored record
      * @param mapping
      *         the column mapping to use
-     * @param columnSpecs
+     * @param customColumns
      *         optionally customized definitions of the columns
      */
     public JdbcTableSpec(String tableName,
                          RecordSpec<I, R, ?> recordSpec,
                          JdbcColumnMapping mapping,
-                         @Nullable CustomColumns<R> columnSpecs) {
+                         @Nullable CustomColumns<R> customColumns) {
         this.tableName = checkNotEmptyOrBlank(tableName);
         this.recordSpec = recordSpec;
         columnMapping = mapping;
-        this.customColumns = columnSpecs;
+        this.customColumns = customColumns;
         this.idColumn = IdColumn.of(recordSpec, columnMapping);
         this.recordDescriptor = descriptorFrom(recordSpec.storedType());
         this.dataColumns = createDataColumns();
@@ -256,4 +256,10 @@ public final class JdbcTableSpec<I, R extends Message> {
         return column;
     }
 
+    /**
+     * Returns the original specification of the stored record.
+     */
+    RecordSpec<I, R, ?> recordSpec() {
+        return recordSpec;
+    }
 }

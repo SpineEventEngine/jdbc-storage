@@ -28,9 +28,15 @@ package io.spine.server.storage.jdbc.record;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.protobuf.Message;
+import io.spine.annotation.Internal;
 import io.spine.query.ColumnName;
 import io.spine.server.storage.RecordWithColumns;
 import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static io.spine.util.Exceptions.newIllegalArgumentException;
 
 /**
  * A record to insert into an RDBMS-backed table.
@@ -48,6 +54,7 @@ public final class JdbcRecord<I, R extends Message> {
     private final RecordWithColumns<I, R> original;
     private final JdbcTableSpec<I, R> spec;
     private final ImmutableSet<ColumnName> columnNames;
+    private final Map<ColumnName, Object> customValues = new HashMap<>();
 
     public JdbcRecord(JdbcTableSpec<I, R> spec, RecordWithColumns<I, R> original) {
         this.spec = spec;
@@ -65,6 +72,9 @@ public final class JdbcRecord<I, R extends Message> {
 
     @Nullable
     public Object columnValue(ColumnName name) {
+        if (customValues.containsKey(name)) {
+            return customValues.get(name);
+        }
         @Nullable Object result = spec.valueIn(original, name);
         return result;
     }
@@ -75,5 +85,27 @@ public final class JdbcRecord<I, R extends Message> {
      */
     public RecordWithColumns<I, R> original() {
         return original;
+    }
+
+    /**
+     * Allows to override the value of the column for this record.
+     *
+     * <p>It is only possible to do so for the column which is already
+     * {@linkplain #columns() defined} for this record.
+     * Otherwise, an {@code IllegalArgumentException} is thrown.
+     *
+     * @apiNote This method is internal to framework.
+     */
+    @Internal
+    public void overrideColumnValue(ColumnName name, Object value) {
+        if (!customValues.containsKey(name)) {
+            throw newIllegalArgumentException(
+                    "Column with the name `%s` " +
+                            "not found for `JdbcRecord` of type `%s`.",
+                    name.value(), spec.recordSpec()
+                                      .sourceType()
+            );
+        }
+        customValues.put(name, value);
     }
 }
