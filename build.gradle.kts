@@ -61,9 +61,8 @@ buildscript {
                     spine.toolBase,
                     spine.server,
                     io.spine.internal.dependency.Spine.Logging.lib,
-                    io.spine.internal.dependency.Spine.Logging.backend,
-                    io.spine.internal.dependency.Spine.Logging.floggerApi,
                     io.spine.internal.dependency.Validation.runtime,
+                    io.spine.internal.dependency.Grpc.api,
                 )
             }
         }
@@ -112,6 +111,8 @@ allprojects {
     apply(from = "$rootDir/version.gradle.kts")
     group = "io.spine"
     version = extra["versionToPublish"]!!
+
+    forceConfigurations()
 }
 
 subprojects {
@@ -123,7 +124,6 @@ subprojects {
     setupKotlin(javaVersion)
 
     defineDependencies()
-    forceConfigurations()
 
     val generated = "$projectDir/generated"
     applyGeneratedDirectories(generated)
@@ -336,8 +336,7 @@ fun Subproject.forceConfigurations() {
                     Validation.runtime,
                     Spine.time,
                     Spine.Logging.lib,
-                    Spine.Logging.backend,
-                    Spine.Logging.floggerApi,
+                    Spine.Logging.middleware,
                     Spine.baseTypes,
                     Spine.change,
                     Spine.testlib,
