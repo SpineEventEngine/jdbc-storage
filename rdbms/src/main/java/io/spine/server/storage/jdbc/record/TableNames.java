@@ -27,6 +27,7 @@
 package io.spine.server.storage.jdbc.record;
 
 import com.google.common.hash.Hashing;
+import com.google.protobuf.Message;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -49,7 +50,7 @@ public final class TableNames {
      *
      * <p>{@code cls.getSimpleName() + `_` + (consistent hash code of the class package)}
      */
-    public static String of(Class<?> cls) {
+    public static String of(Class<? extends Message> cls) {
         checkNotNull(cls);
         var name = cls.getPackage()
                       .getName();

@@ -27,25 +27,31 @@
 package io.spine.server.storage.jdbc.record;
 
 import com.google.common.testing.NullPointerTester.Visibility;
-import io.spine.server.aggregate.given.repo.ProjectAggregate;
+import io.spine.test.storage.StgProject;
 import io.spine.testing.UtilityClassTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DisplayName("`TableNames` should")
-class TableNamesTest extends UtilityClassTest<TableNames> {
+final class TableNamesTest extends UtilityClassTest<TableNames> {
 
-    private final Class<ProjectAggregate> entityClass = ProjectAggregate.class;
-
-    protected TableNamesTest() {
+    TableNamesTest() {
         super(TableNames.class, Visibility.PACKAGE);
     }
 
     @Test
     @DisplayName("produce same name for same class")
     void produceSameForSameClass() {
-        assertEquals(TableNames.of(entityClass), TableNames.of(entityClass));
+        assertEquals(TableNames.of(StgProject.class), TableNames.of(StgProject.class));
+    }
+
+    @Test
+    @DisplayName("start with the simple name of type corresponding to the stored record")
+    void reflectRecordName() {
+        var actual = TableNames.of(StgProject.class);
+        assertThat(actual).startsWith(StgProject.class.getSimpleName());
     }
 }
