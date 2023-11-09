@@ -29,7 +29,7 @@ package io.spine.server.storage.jdbc.given.table;
 import com.google.protobuf.StringValue;
 import com.google.protobuf.Timestamp;
 import com.google.protobuf.util.Timestamps;
-import io.spine.server.storage.MessageRecordSpec;
+import io.spine.server.storage.RecordSpec;
 import io.spine.server.storage.jdbc.JdbcStorageFactory;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -45,8 +45,8 @@ public final class TimestampByMessage extends TimestampTable<StringValue> {
     }
 
     @NonNull
-    private static MessageRecordSpec<StringValue, Timestamp> recordSpec() {
-        return new MessageRecordSpec<>(
+    private static RecordSpec<StringValue, Timestamp> recordSpec() {
+        return new RecordSpec<>(
                 StringValue.class, Timestamp.class, t -> StringValue.of(Timestamps.toString(t))
         );
     }

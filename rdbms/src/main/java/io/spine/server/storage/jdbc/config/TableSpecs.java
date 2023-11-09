@@ -80,7 +80,7 @@ public final class TableSpecs {
      * @return a new table specification
      */
     public <I, R extends Message> JdbcTableSpec<I, R>
-    specFor(RecordSpec<I, R, ?> spec, JdbcColumnMapping mapping) {
+    specFor(RecordSpec<I, R> spec, JdbcColumnMapping mapping) {
         var recordType = spec.sourceType();
         if (!tables.containsKey(recordType)) {
             var tableSpec = newTableSpec(spec, mapping);
@@ -92,8 +92,9 @@ public final class TableSpecs {
     }
 
     private <I, R extends Message> JdbcTableSpec<I, R>
-    newTableSpec(RecordSpec<I, R, ?> spec, JdbcColumnMapping mapping) {
-        var recordType = spec.storedType();
+    newTableSpec(RecordSpec<I, R> spec, JdbcColumnMapping mapping) {
+        // TODO:alex.tymchenko:2023-11-09: double-check the table name!
+        var recordType = spec.recordType();
         @Nullable CustomColumns<R> customCols = findColumns(recordType);
         @Nullable String customName = findName(recordType);
 

@@ -28,7 +28,7 @@ package io.spine.server.storage.jdbc.given.table;
 
 import com.google.protobuf.Timestamp;
 import com.google.protobuf.util.Timestamps;
-import io.spine.server.storage.MessageRecordSpec;
+import io.spine.server.storage.RecordSpec;
 import io.spine.server.storage.jdbc.JdbcStorageFactory;
 
 /**
@@ -42,8 +42,8 @@ public final class TimestampByString extends TimestampTable<String> {
         super(NAME, recordSpec(), storageFactory);
     }
 
-    private static MessageRecordSpec<String, Timestamp> recordSpec() {
-        return new MessageRecordSpec<>(
+    private static RecordSpec<String, Timestamp> recordSpec() {
+        return new RecordSpec<>(
                 String.class, Timestamp.class, Timestamps::toString
         );
     }

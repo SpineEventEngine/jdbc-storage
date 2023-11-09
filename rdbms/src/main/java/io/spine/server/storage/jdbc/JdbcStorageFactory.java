@@ -87,7 +87,7 @@ public class JdbcStorageFactory implements StorageFactory {
      */
     @Override
     public <I, R extends Message> RecordStorage<I, R>
-    createRecordStorage(ContextSpec context, RecordSpec<I, R, ?> spec) {
+    createRecordStorage(ContextSpec context, RecordSpec<I, R> spec) {
         var result = new JdbcRecordStorage<>(context, spec, this);
         return result;
     }
@@ -155,7 +155,7 @@ public class JdbcStorageFactory implements StorageFactory {
      *         type of the described record
      * @return a new instance of table specification
      */
-    public <I, R extends Message> JdbcTableSpec<I, R> tableSpecFor(RecordSpec<I, R, ?> spec) {
+    public <I, R extends Message> JdbcTableSpec<I, R> tableSpecFor(RecordSpec<I, R> spec) {
         var tableSpec = tableSpecs.specFor(spec, columnMapping);
         return tableSpec;
     }

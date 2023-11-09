@@ -55,7 +55,7 @@ public class JdbcRecordStorage<I, R extends Message> extends RecordStorage<I, R>
     private final RecordTable<I, R> table;
 
     public JdbcRecordStorage(ContextSpec contextSpec,
-                             RecordSpec<I, R, ?> recordSpec,
+                             RecordSpec<I, R> recordSpec,
                              JdbcStorageFactory factory) {
         super(contextSpec, recordSpec);
         var tableSpec = factory.tableSpecFor(recordSpec);
@@ -115,9 +115,8 @@ public class JdbcRecordStorage<I, R extends Message> extends RecordStorage<I, R>
     }
 
     @Override
-    @SuppressWarnings("unchecked" /* Ensured by the nature of this storage.*/)
     public void write(I id, R record) {
-        var spec = (RecordSpec<I, R, R>) recordSpec();
+        var spec = (RecordSpec<I, R>) recordSpec();
         writeRecord(RecordWithColumns.create(id, record, spec));
     }
 

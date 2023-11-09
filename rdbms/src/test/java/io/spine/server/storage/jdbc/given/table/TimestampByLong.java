@@ -27,7 +27,7 @@
 package io.spine.server.storage.jdbc.given.table;
 
 import com.google.protobuf.Timestamp;
-import io.spine.server.storage.MessageRecordSpec;
+import io.spine.server.storage.RecordSpec;
 import io.spine.server.storage.jdbc.JdbcStorageFactory;
 
 /**
@@ -42,8 +42,8 @@ public final class TimestampByLong extends TimestampTable<Long> {
     }
 
     @SuppressWarnings("ProtoTimestampGetSecondsGetNano")    // As intended.
-    private static MessageRecordSpec<Long, Timestamp> recordSpec() {
-        return new MessageRecordSpec<>(
+    private static RecordSpec<Long, Timestamp> recordSpec() {
+        return new RecordSpec<>(
                 Long.class, Timestamp.class, (t) -> t.getSeconds() + t.getNanos()
         );
     }

@@ -29,7 +29,7 @@ package io.spine.server.storage.jdbc.given.table;
 import com.google.common.collect.ImmutableSet;
 import com.google.protobuf.Timestamp;
 import io.spine.query.RecordColumn;
-import io.spine.server.storage.MessageRecordSpec;
+import io.spine.server.storage.RecordSpec;
 import io.spine.server.storage.RecordWithColumns;
 import io.spine.server.storage.jdbc.JdbcStorageFactory;
 import io.spine.server.storage.jdbc.given.query.SelectRecordId;
@@ -51,10 +51,10 @@ import java.sql.ResultSet;
  */
 abstract class TimestampTable<I> extends RecordTable<I, Timestamp> {
 
-    private final MessageRecordSpec<I, Timestamp> timestampSpec;
+    private final RecordSpec<I, Timestamp> timestampSpec;
 
     TimestampTable(String name,
-                   MessageRecordSpec<I, Timestamp> recordSpec,
+                   RecordSpec<I, Timestamp> recordSpec,
                    JdbcStorageFactory factory) {
         super(fullSpecFrom(name, recordSpec, factory.columnMapping()), factory);
         this.timestampSpec = extendRecordSpec(recordSpec);
@@ -62,15 +62,14 @@ abstract class TimestampTable<I> extends RecordTable<I, Timestamp> {
 
     private static <I> JdbcTableSpec<I, Timestamp>
     fullSpecFrom(String tableName,
-                 MessageRecordSpec<I, Timestamp> spec,
+                 RecordSpec<I, Timestamp> spec,
                  JdbcColumnMapping mapping) {
         var updatedSpec = extendRecordSpec(spec);
         var result = new JdbcTableSpec<>(tableName, updatedSpec, mapping, null);
         return result;
     }
 
-    @NonNull
-    private static <I> MessageRecordSpec<I, Timestamp> extendRecordSpec(MessageRecordSpec<I, Timestamp> spec) {
+    private static <I> RecordSpec<I, Timestamp> extendRecordSpec(RecordSpec<I, Timestamp> spec) {
         var secondsColumn = new RecordColumn<>("SECONDS", Long.class, Timestamp::getSeconds);
         var nanosColumn = new RecordColumn<>("NANOS", Integer.class, Timestamp::getNanos);
 
@@ -83,13 +82,15 @@ abstract class TimestampTable<I> extends RecordTable<I, Timestamp> {
         }
         var idType = spec.idType();
         var allCols = builder.build();
-        var updatedSpec = new MessageRecordSpec<>(idType, Timestamp.class,
-                                                  spec::idFromRecord,
-                                                  allCols);
+
+        @SuppressWarnings("Immutable" /* Re-using the same lambda as previously. */)
+        var updatedSpec = new RecordSpec<>(idType, Timestamp.class,
+                                           spec::idValueIn,
+                                           allCols);
         return updatedSpec;
     }
 
-    @SuppressWarnings("unchecked")  // As per the contract of `MessageRecordSpec`.
+    @SuppressWarnings("unchecked")  // As per the contract of `RecordSpec`.
     private static RecordColumn<Timestamp, ?> asRecordColumn(io.spine.query.Column<?, ?> column) {
         return (RecordColumn<Timestamp, ?>) column;
     }

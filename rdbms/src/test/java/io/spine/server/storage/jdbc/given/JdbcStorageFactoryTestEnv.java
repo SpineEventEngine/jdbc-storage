@@ -33,7 +33,7 @@ import io.spine.server.delivery.InboxColumn;
 import io.spine.server.delivery.InboxMessage;
 import io.spine.server.delivery.InboxMessageId;
 import io.spine.server.storage.ColumnTypeMapping;
-import io.spine.server.storage.MessageRecordSpec;
+import io.spine.server.storage.RecordSpec;
 import io.spine.server.storage.jdbc.DataSourceConfig;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.JdbcStorageFactory;
@@ -45,7 +45,7 @@ import static io.spine.server.storage.jdbc.GivenDataSource.prefix;
 import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_1;
 import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
 
-public class JdbcStorageFactoryTestEnv {
+public final class JdbcStorageFactoryTestEnv {
 
     /** Prevents instantiation of this utility class. */
     private JdbcStorageFactoryTestEnv() {
@@ -72,7 +72,7 @@ public class JdbcStorageFactoryTestEnv {
         return ContextSpec.multitenant(JdbcStorageFactoryTestEnv.class.getName());
     }
 
-    public static ContextSpec singletenantSpec() {
+    public static ContextSpec singleTenantSpec() {
         return ContextSpec.singleTenant(JdbcStorageFactoryTestEnv.class.getName());
     }
 
@@ -93,8 +93,8 @@ public class JdbcStorageFactoryTestEnv {
         return Delivery.contextSpec(false);
     }
 
-    public static MessageRecordSpec<InboxMessageId, InboxMessage> inboxMessageSpec() {
-        var inboxMessageSpec = new MessageRecordSpec<>(
+    public static RecordSpec<InboxMessageId, InboxMessage> inboxMessageSpec() {
+        var inboxMessageSpec = new RecordSpec<>(
                 InboxMessageId.class,
                 InboxMessage.class,
                 InboxMessage::getId,

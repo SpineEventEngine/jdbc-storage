@@ -27,16 +27,12 @@
 package io.spine.server.storage.jdbc.record;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.protobuf.Message;
 import io.spine.annotation.Internal;
 import io.spine.query.ColumnName;
 import io.spine.server.storage.RecordWithColumns;
 import org.checkerframework.checker.nullness.qual.Nullable;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import static io.spine.util.Exceptions.newIllegalArgumentException;
 
 /**
  * A record to insert into an RDBMS-backed table.
@@ -54,11 +50,10 @@ public final class JdbcRecord<I, R extends Message> {
     private final RecordWithColumns<I, R> original;
     private final JdbcTableSpec<I, R> spec;
     private final ImmutableSet<ColumnName> columnNames;
-    private final Map<ColumnName, Object> customValues = new HashMap<>();
 
-    public JdbcRecord(JdbcTableSpec<I, R> spec, RecordWithColumns<I, R> original) {
+    public JdbcRecord(JdbcTableSpec<I, R> spec, RecordWithColumns<I, R> recordWithCols) {
         this.spec = spec;
-        this.original = original;
+        this.original = recordWithCols;
         this.columnNames = spec.columnNames();
     }
 
@@ -72,9 +67,6 @@ public final class JdbcRecord<I, R extends Message> {
 
     @Nullable
     public Object columnValue(ColumnName name) {
-        if (customValues.containsKey(name)) {
-            return customValues.get(name);
-        }
         @Nullable Object result = spec.valueIn(original, name);
         return result;
     }
@@ -88,24 +80,17 @@ public final class JdbcRecord<I, R extends Message> {
     }
 
     /**
-     * Allows to override the value of the column for this record.
+     * Returns a new instance of {@code JdbcRecord} around the specified {@code newRecord},
+     * while leaving the other properties unchanged.
      *
-     * <p>It is only possible to do so for the column which is already
-     * {@linkplain #columns() defined} for this record.
-     * Otherwise, an {@code IllegalArgumentException} is thrown.
-     *
-     * @apiNote This method is internal to framework.
+     * @param newRecord
+     *         the new record with columns
+     * @return a new {@code JdbcRecord} instance with the specified newRecord
      */
     @Internal
-    public void overrideColumnValue(ColumnName name, Object value) {
-        if (!customValues.containsKey(name)) {
-            throw newIllegalArgumentException(
-                    "Column with the name `%s` " +
-                            "not found for `JdbcRecord` of type `%s`.",
-                    name.value(), spec.recordSpec()
-                                      .sourceType()
-            );
-        }
-        customValues.put(name, value);
+    @CanIgnoreReturnValue
+    public JdbcRecord<I, R> copyWithRecord(R newRecord) {
+        var withCols = RecordWithColumns.create(newRecord, spec.recordSpec());
+        return new JdbcRecord<>(spec, withCols);
     }
 }

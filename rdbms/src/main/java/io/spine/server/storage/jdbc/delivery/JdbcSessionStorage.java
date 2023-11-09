@@ -29,7 +29,7 @@ package io.spine.server.storage.jdbc.delivery;
 import io.spine.server.ContextSpec;
 import io.spine.server.delivery.ShardIndex;
 import io.spine.server.delivery.ShardSessionRecord;
-import io.spine.server.storage.MessageRecordSpec;
+import io.spine.server.storage.RecordSpec;
 import io.spine.server.storage.RecordWithColumns;
 import io.spine.server.storage.jdbc.JdbcStorageFactory;
 import io.spine.server.storage.jdbc.record.JdbcRecordStorage;
@@ -45,15 +45,15 @@ import java.util.Iterator;
  */
 public class JdbcSessionStorage extends JdbcRecordStorage<ShardIndex, ShardSessionRecord> {
 
-    private static final MessageRecordSpec<ShardIndex, ShardSessionRecord> spec = newRecordSpec();
+    private static final RecordSpec<ShardIndex, ShardSessionRecord> spec = newRecordSpec();
 
     public JdbcSessionStorage(ContextSpec contextSpec, JdbcStorageFactory factory) {
         super(contextSpec, spec, factory);
     }
 
-    private static MessageRecordSpec<ShardIndex, ShardSessionRecord> newRecordSpec() {
+    private static RecordSpec<ShardIndex, ShardSessionRecord> newRecordSpec() {
         @SuppressWarnings("ConstantConditions") // Proto messages never return `null`s.
-        var spec = new MessageRecordSpec<>(
+        var spec = new RecordSpec<>(
                 ShardIndex.class,
                 ShardSessionRecord.class,
                 ShardSessionRecord::getIndex,

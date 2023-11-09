@@ -26,6 +26,7 @@
 
 package io.spine.server.storage.jdbc;
 
+import io.spine.annotation.Internal;
 import io.spine.query.ColumnName;
 import io.spine.server.storage.RecordWithColumns;
 import io.spine.server.storage.jdbc.record.column.IdColumn;
@@ -33,6 +34,8 @@ import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.function.Function;
+
+import static io.spine.util.Exceptions.newIllegalArgumentException;
 
 /**
  * A representation of a table column in RDBMS.
@@ -92,12 +95,21 @@ public class TableColumn {
 
     public @Nullable Object valueIn(RecordWithColumns<?, ?> record) {
         var columnName = ColumnName.of(name());
-        @Nullable Object result = null;
+        if(!record.hasColumn(columnName)) {
+            throw newIllegalArgumentException(
+                    "Cannot find the column `%s` in record-with-columns of type `%s`.",
+                    name(), record.record().getClass()
+                    );
+        }
+        var value = record.columnValue(columnName, mapping);
+        @Nullable Object result = adaptValue(value);
+        return result;
+    }
+
+    private @Nullable Object adaptValue(Object original) {
+        @Nullable Object result = original;
         if (adaptValue != null) {
-            var value = record.columnValue(columnName);
-            result = adaptValue.apply(value);
-        } else if (record.hasColumn(columnName)) {
-            result = record.columnValue(columnName, mapping);
+            result = adaptValue.apply(original);
         }
         return result;
     }

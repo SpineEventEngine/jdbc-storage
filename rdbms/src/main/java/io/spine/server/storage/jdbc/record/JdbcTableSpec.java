@@ -61,7 +61,7 @@ import static java.util.Objects.requireNonNull;
  */
 public final class JdbcTableSpec<I, R extends Message> {
 
-    private final RecordSpec<I, R, ?> recordSpec;
+    private final RecordSpec<I, R> recordSpec;
     private final String tableName;
     private final JdbcColumnMapping columnMapping;
     private final IdColumn<I> idColumn;
@@ -88,7 +88,7 @@ public final class JdbcTableSpec<I, R extends Message> {
      * @param customColumns
      *         optionally customized definitions of the columns
      */
-    public JdbcTableSpec(RecordSpec<I, R, ?> recordSpec,
+    public JdbcTableSpec(RecordSpec<I, R> recordSpec,
                          JdbcColumnMapping mapping,
                          @Nullable CustomColumns<R> customColumns) {
         this(tableName(recordSpec), recordSpec, mapping, customColumns);
@@ -115,7 +115,7 @@ public final class JdbcTableSpec<I, R extends Message> {
      *         optionally customized definitions of the columns
      */
     public JdbcTableSpec(String tableName,
-                         RecordSpec<I, R, ?> recordSpec,
+                         RecordSpec<I, R> recordSpec,
                          JdbcColumnMapping mapping,
                          @Nullable CustomColumns<R> customColumns) {
         this.tableName = checkNotEmptyOrBlank(tableName);
@@ -123,7 +123,8 @@ public final class JdbcTableSpec<I, R extends Message> {
         columnMapping = mapping;
         this.customColumns = customColumns;
         this.idColumn = IdColumn.of(recordSpec, columnMapping);
-        this.recordDescriptor = descriptorFrom(recordSpec.storedType());
+        // TODO:alex.tymchenko:2023-11-09: double-check!
+        this.recordDescriptor = descriptorFrom(recordSpec.recordType());
         this.dataColumns = createDataColumns();
     }
 
@@ -152,7 +153,7 @@ public final class JdbcTableSpec<I, R extends Message> {
      * @return a table name
      * @see TableNames#of(Class) for more details
      */
-    private static <I, R extends Message> String tableName(RecordSpec<I, R, ?> spec) {
+    private static <I, R extends Message> String tableName(RecordSpec<I, R> spec) {
         var sourceType = spec.sourceType();
         var result = TableNames.of(sourceType);
         return result;
@@ -169,7 +170,7 @@ public final class JdbcTableSpec<I, R extends Message> {
      * Returns the identifier of the record.
      */
     public I idFromRecord(R record) {
-        return recordSpec.idFromRecord(record);
+        return recordSpec.idValueIn(record);
     }
 
     /**
@@ -217,11 +218,12 @@ public final class JdbcTableSpec<I, R extends Message> {
                          ? customColumns.find(name)
                          : null;
         TableColumn nativeColumn;
+        var columnType = column.type();
         if (customSpec != null) {
-            nativeColumn = new TableColumn(
-                    name.value(), column.type(), columnMapping, customSpec.transformFn());
+            var transformFn = customSpec.transformFn();
+            nativeColumn = new TableColumn(name.value(), columnType, columnMapping, transformFn);
         } else {
-            nativeColumn = new TableColumn(name.value(), column.type(), columnMapping);
+            nativeColumn = new TableColumn(name.value(), columnType, columnMapping);
         }
         return nativeColumn;
     }
@@ -251,15 +253,16 @@ public final class JdbcTableSpec<I, R extends Message> {
         var column = dataColumns.get(name);
         requireNonNull(column,
                        format("Cannot find the column with name `%s` " +
-                                      "in the table specification for the record of type `%s`.",
-                              name, recordSpec.storedType()));
+                                      "in the table specification for the record of type `%s` " +
+                                      "which columns are sourced from type `%s`.",
+                              name, recordSpec.recordType(), recordSpec.sourceType()));
         return column;
     }
 
     /**
      * Returns the original specification of the stored record.
      */
-    RecordSpec<I, R, ?> recordSpec() {
+    RecordSpec<I, R> recordSpec() {
         return recordSpec;
     }
 }

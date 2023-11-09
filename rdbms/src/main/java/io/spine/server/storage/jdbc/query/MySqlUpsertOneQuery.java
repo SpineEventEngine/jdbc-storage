@@ -56,7 +56,7 @@ public class MySqlUpsertOneQuery<I, R extends Message> extends WriteOneQuery<I, 
         var record = record();
         var expressions = stream(record.columns())
                 .map((colName) ->
-                             SQLExpressions.set(pathOf(colName),record.columnValue(colName)))
+                             SQLExpressions.set(pathOf(colName), record.columnValue(colName)))
                 .toArray(Expression[]::new);
         var result = mySqlFactory().insertOnDuplicateKeyUpdate(table(), expressions)
                                    .set(idPath(), normalizedId());

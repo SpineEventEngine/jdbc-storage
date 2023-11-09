@@ -118,7 +118,7 @@ public abstract class IdColumn<I> {
             "IfStatementWithTooManyBranches", // OK for a factory method.
             "ChainOfInstanceofChecks"         // which depends on the built object target type.
     })
-    public static <I> IdColumn<I> of(RecordSpec<I, ?, ?> spec, JdbcColumnMapping mapping) {
+    public static <I> IdColumn<I> of(RecordSpec<I, ?> spec, JdbcColumnMapping mapping) {
         checkNotNull(spec);
         checkNotNull(mapping);
         var idType = spec.idType();

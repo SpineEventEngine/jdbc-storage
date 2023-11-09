@@ -35,6 +35,7 @@ import org.junit.jupiter.api.Test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static io.spine.base.Identifier.newUuid;
+import static io.spine.server.storage.given.GivenStorageProject.messageSpec;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichHoldsMetadata;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
 import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_1;
@@ -42,8 +43,7 @@ import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
 import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.multitenantSpec;
 import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.newFactory;
 import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.newInboxStorage;
-import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.singletenantSpec;
-import static io.spine.server.storage.jdbc.given.TestRecordSpec.stgProjectSpec;
+import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.singleTenantSpec;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -96,7 +96,7 @@ class JdbcStorageFactoryTest {
         void multitenant() {
             var factory = newFactory();
             var storage =
-                    factory.createRecordStorage(multitenantSpec(), stgProjectSpec());
+                    factory.createRecordStorage(multitenantSpec(), messageSpec());
             assertTrue(storage.isMultitenant());
         }
 
@@ -105,7 +105,7 @@ class JdbcStorageFactoryTest {
         void singleTenant() {
             var factory = newFactory();
             var storage =
-                    factory.createRecordStorage(singletenantSpec(), stgProjectSpec());
+                    factory.createRecordStorage(singleTenantSpec(), messageSpec());
             assertFalse(storage.isMultitenant());
         }
     }

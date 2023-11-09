@@ -29,7 +29,7 @@ package io.spine.server.storage.jdbc.query.given;
 import com.google.protobuf.Message;
 import com.google.protobuf.StringValue;
 import com.querydsl.sql.AbstractSQLQuery;
-import io.spine.server.storage.MessageRecordSpec;
+import io.spine.server.storage.RecordSpec;
 import io.spine.server.storage.jdbc.query.AbstractQuery;
 import io.spine.server.storage.jdbc.query.SelectMessageByIdQuery;
 import io.spine.server.storage.jdbc.record.JdbcTableSpec;
@@ -56,9 +56,9 @@ public final class Given {
      * {@code String} IDs.
      */
     public static JdbcTableSpec<String, StringValue> tableSpec() {
-        var recordSpec = new MessageRecordSpec<>(String.class,
-                                                 StringValue.class,
-                                                 StringValue::getValue);
+        var recordSpec = new RecordSpec<>(String.class,
+                                          StringValue.class,
+                                          StringValue::getValue);
         return new JdbcTableSpec<>(recordSpec, new DefaultJdbcColumnMapping(), nullRef());
     }
 

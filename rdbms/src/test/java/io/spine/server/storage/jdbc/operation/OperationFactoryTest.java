@@ -36,24 +36,26 @@ import io.spine.server.delivery.InboxLabel;
 import io.spine.server.delivery.InboxMessage;
 import io.spine.server.delivery.InboxMessageId;
 import io.spine.server.delivery.InboxMessageMixin;
-import io.spine.server.delivery.InboxMessageStatus;
 import io.spine.server.delivery.InboxSignalId;
+import io.spine.server.storage.Storage;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.JdbcStorageFactory;
 import io.spine.server.storage.jdbc.TypeMapping;
 import io.spine.server.storage.jdbc.query.InsertOneQuery;
 import io.spine.server.storage.jdbc.record.JdbcRecord;
-import io.spine.server.storage.jdbc.record.JdbcRecordStorage;
 import io.spine.server.storage.jdbc.record.RecordTable;
 import io.spine.test.storage.StgProject;
 import io.spine.type.TypeUrl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.shaded.com.google.common.collect.ImmutableList;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.Truth8.assertThat;
 import static io.spine.base.Identifier.newUuid;
 import static io.spine.base.Time.currentTime;
+import static io.spine.server.delivery.InboxLabel.CATCH_UP;
+import static io.spine.server.delivery.InboxLabel.HANDLE_COMMAND;
+import static io.spine.server.delivery.InboxMessageStatus.DELIVERED;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
 import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.deliveryContextSpec;
 import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.inboxMessageSpec;
@@ -61,7 +63,7 @@ import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.inbox
 @DisplayName("With `OperationFactory` it should be possible")
 final class OperationFactoryTest {
 
-    private static final String MAGIC_ID = "2128506";
+    private static final InboxLabel OVERRIDDEN_LABEL = CATCH_UP;
 
     @Test
     @DisplayName("use custom operation instead of a default one")
@@ -69,16 +71,16 @@ final class OperationFactoryTest {
         var factory = imStorageFactoryBuilder()
                 .useOperationFactory(TestOperationFactory::new)
                 .build();
-        var storage = (JdbcRecordStorage<InboxMessageId, InboxMessage>)
+        Storage<InboxMessageId, InboxMessage> storage =
                 factory.createRecordStorage(deliveryContextSpec(), inboxMessageSpec());
 
-        var message = randomInboxMessage();
+        var message = randomHandleCommandMessage();
         storage.write(message.getId(), message);
-        var allIds = ImmutableList.copyOf(storage.index());
-        assertThat(allIds.size()).isEqualTo(1);
-        var actual = allIds.get(0);
-        assertThat(actual.getUuid())
-                .contains(MAGIC_ID);
+        var actual = storage.read(message.getId());
+        assertThat(actual)
+                .isPresent();
+        assertThat(actual.get().getLabel())
+                .isEqualTo(OVERRIDDEN_LABEL);
     }
 
     private static JdbcStorageFactory.Builder imStorageFactoryBuilder() {
@@ -99,18 +101,18 @@ final class OperationFactoryTest {
         }
     }
 
-    private static InboxMessage randomInboxMessage() {
+    private static InboxMessage randomHandleCommandMessage() {
         var index = DeliveryStrategy.newIndex(0, 1);
         var id = InboxMessageMixin.generateIdWith(index);
         var signalId = InboxSignalId.newBuilder()
                 .setValue("some-command-id");
         var result = InboxMessage.newBuilder()
                 .setId(id)
-                .setStatus(InboxMessageStatus.DELIVERED)
+                .setStatus(DELIVERED)
                 .setCommand(Command.getDefaultInstance())
                 .setInboxId(randomInboxId())
                 .setSignalId(signalId)
-                .setLabel(InboxLabel.HANDLE_COMMAND)
+                .setLabel(HANDLE_COMMAND)
                 .setWhenReceived(currentTime())
                 .setVersion(42)
                 .build();
@@ -135,7 +137,7 @@ final class OperationFactoryTest {
 
         @Override
         public void execute(JdbcRecord<I, R> record) {
-            if(record.id() instanceof InboxMessageId) {
+            if(record.original().record() instanceof InboxMessage) {
                 modifyAndWrite(record);
             } else {
                 super.execute(record);
@@ -144,18 +146,21 @@ final class OperationFactoryTest {
 
         @SuppressWarnings("unchecked")
         private void modifyAndWrite(JdbcRecord<I, R> record) {
-            var castId = (InboxMessageId) record.id();
-            var modifiedId = castId.toBuilder()
-                    .setUuid(MAGIC_ID)
-                    .build();
             var castRecord = (JdbcRecord<InboxMessageId, InboxMessage>) record;
+            var originalMessage = castRecord.original()
+                                            .record();
+            var modifiedMessage = originalMessage
+                    .toBuilder()
+                    .setLabel(OVERRIDDEN_LABEL)
+                    .build();
+            var modifiedRecord = castRecord.copyWithRecord(
+                    modifiedMessage);
             var castTable = (RecordTable<InboxMessageId, InboxMessage>) table();
-
             var query = InsertOneQuery
                     .<InboxMessageId, InboxMessage>newBuilder()
                     .setTableSpec(castTable.spec())
                     .setDataSource(dataSource())
-                    .setRecord(castRecord)
+                    .setRecord(modifiedRecord)
                     .build();
             query.execute();
         }
