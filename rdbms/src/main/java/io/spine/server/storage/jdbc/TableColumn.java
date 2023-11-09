@@ -26,10 +26,8 @@
 
 package io.spine.server.storage.jdbc;
 
-import io.spine.annotation.Internal;
 import io.spine.query.ColumnName;
 import io.spine.server.storage.RecordWithColumns;
-import io.spine.server.storage.jdbc.record.column.IdColumn;
 import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -75,13 +73,6 @@ public class TableColumn {
      */
     public @Nullable Type type() {
         return mapping.typeOf(type);
-    }
-
-    /**
-     * Returns {@code true} is this column is a primary key of the table, {@code false} otherwise.
-     */
-    public boolean isPrimaryKey() {
-        return IdColumn.ID_COLUMN_NAME.equals(name);
     }
 
     /**
