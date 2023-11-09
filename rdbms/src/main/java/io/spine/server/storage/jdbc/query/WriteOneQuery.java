@@ -48,7 +48,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @param <R>
  *         the record type
  */
-abstract class WriteOneQuery<I, R extends Message> extends WriteQuery<I, R> {
+public abstract class WriteOneQuery<I, R extends Message> extends WriteQuery<I, R> {
 
     private final JdbcRecord<I, R> record;
 
