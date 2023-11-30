@@ -79,7 +79,7 @@ plugins {
     idea
     protobuf
     errorprone
-    `gradle-doctor`
+//    `gradle-doctor`
 }
 
 object BuildSettings {
