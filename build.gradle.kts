@@ -56,13 +56,16 @@ buildscript {
         all {
             resolutionStrategy {
                 val spine = io.spine.internal.dependency.Spine
+                val logging = io.spine.internal.dependency.Spine.Logging
+                val validation = io.spine.internal.dependency.Validation
+                val gRpc = io.spine.internal.dependency.Grpc
                 force(
                     spine.base,
                     spine.toolBase,
                     spine.server,
-                    io.spine.internal.dependency.Spine.Logging.lib,
-                    io.spine.internal.dependency.Validation.runtime,
-                    io.spine.internal.dependency.Grpc.api,
+                    logging.lib,
+                    validation.runtime,
+                    gRpc.api,
                 )
             }
         }
@@ -79,7 +82,7 @@ plugins {
     idea
     protobuf
     errorprone
-//    `gradle-doctor`
+    `gradle-doctor`
 }
 
 object BuildSettings {
@@ -349,7 +352,9 @@ fun Subproject.forceConfigurations() {
                     Grpc.context,
                     Grpc.stub,
                     Grpc.protobuf,
-                    Grpc.protobufLite
+                    Grpc.protobufLite,
+
+                    Dokka.KotlinAsJavaPlugin.lib
                 )
             }
         }
