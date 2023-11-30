@@ -123,7 +123,6 @@ public final class JdbcTableSpec<I, R extends Message> {
         columnMapping = mapping;
         this.customColumns = customColumns;
         this.idColumn = IdColumn.of(recordSpec, columnMapping);
-        // TODO:alex.tymchenko:2023-11-09: double-check!
         this.recordDescriptor = descriptorFrom(recordSpec.recordType());
         this.dataColumns = createDataColumns();
     }
