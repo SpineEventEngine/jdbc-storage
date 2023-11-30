@@ -46,7 +46,7 @@ final class MysqlTests {
      *
      * <p>By default, i.e. when run on CI, the tests are disabled due to their slow nature.
      */
-    static final boolean enabled = true;
+    static final boolean enabled = false;
 
     /**
      * Prevents instantiation of this utility.
