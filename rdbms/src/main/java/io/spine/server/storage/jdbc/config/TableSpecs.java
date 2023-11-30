@@ -93,7 +93,6 @@ public final class TableSpecs {
 
     private <I, R extends Message> JdbcTableSpec<I, R>
     newTableSpec(RecordSpec<I, R> spec, JdbcColumnMapping mapping) {
-        // TODO:alex.tymchenko:2023-11-09: double-check the table name!
         var recordType = spec.recordType();
         @Nullable CustomColumns<R> customCols = findColumns(recordType);
         @Nullable String customName = findName(recordType);
