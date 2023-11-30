@@ -26,6 +26,7 @@
 
 package io.spine.server.storage.jdbc;
 
+import io.spine.annotation.Internal;
 import io.spine.query.ColumnName;
 import io.spine.server.storage.RecordWithColumns;
 import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
@@ -38,6 +39,7 @@ import static io.spine.util.Exceptions.newIllegalArgumentException;
 /**
  * A representation of a table column in RDBMS.
  */
+@Internal
 public class TableColumn {
 
     private final String name;
