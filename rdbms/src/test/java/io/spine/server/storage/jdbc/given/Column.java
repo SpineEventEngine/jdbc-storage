@@ -47,11 +47,6 @@ public final class Column {
         return new TableColumn("ID", String.class, new DefaultJdbcColumnMapping()) {
 
             @Override
-            public boolean isPrimaryKey() {
-                return true;
-            }
-
-            @Override
             public Type type() {
                 return type;
             }
