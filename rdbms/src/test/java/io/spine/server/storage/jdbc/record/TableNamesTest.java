@@ -49,9 +49,10 @@ final class TableNamesTest extends UtilityClassTest<TableNames> {
     }
 
     @Test
-    @DisplayName("start with the simple name of type corresponding to the stored record")
+    @DisplayName("reflect the Proto package of the stored `Message` along with the Message name")
     void reflectRecordName() {
         var actual = TableNames.of(StgProject.class);
-        assertThat(actual).startsWith(StgProject.class.getSimpleName());
+        assertThat(actual).
+                isEqualTo("spine_test_storage_StgProject");
     }
 }

@@ -26,11 +26,12 @@
 
 package io.spine.server.storage.jdbc.record;
 
-import com.google.common.hash.Hashing;
 import com.google.protobuf.Message;
+import io.spine.protobuf.Messages;
+
+import java.util.regex.Pattern;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * A utility class which provides strings valid for DB table names.
@@ -38,32 +39,33 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 @SuppressWarnings("UtilityClass")
 public final class TableNames {
 
+    private static final String TABLE_NAME_DELIMITER = "_";
+    private static final Pattern PACKAGE_DOT = Pattern.compile("\\.");
+
     private TableNames() {
         // Prevent instantiation of this utility class.
     }
 
     /**
-     * Composes the table name basing on the passed class.
+     * Composes the table name basing on the passed type of Proto message to store in the table.
      *
-     * <p>In order to provide uniqueness, the name of the table is composed
-     * according to the following pattern:
+     * <p>Result consists of the Proto package of the message concatenated with the simple name
+     * of the type. {@code _} symbol is used for joining the parts, and for the replacement
+     * of prohibited {@code .} symbols in the name of the package.
      *
-     * <p>{@code cls.getSimpleName() + `_` + (consistent hash code of the class package)}
+     * <p>For instance, for {@code google.protobuf.Timestamp}, the table name would be
+     * {@code google_protobuf_Timestamp}.
      */
     public static String of(Class<? extends Message> cls) {
         checkNotNull(cls);
-        var name = cls.getPackage()
-                      .getName();
-        var shortPackageId = consistentHashCode(name);
-        var validPackageId = Math.abs(shortPackageId);
-        var packageIdAsString = String.valueOf(validPackageId);
-        var result = cls.getSimpleName() + '_' + packageIdAsString;
+        var protoPackage =
+                Messages.getDefaultInstance(cls)
+                        .getDescriptorForType()
+                        .getFile()
+                        .getPackage();
+        var preparedPackage = PACKAGE_DOT.matcher(protoPackage)
+                                         .replaceAll(TABLE_NAME_DELIMITER);
+        var result = preparedPackage + TABLE_NAME_DELIMITER + cls.getSimpleName();
         return result;
-    }
-
-    private static int consistentHashCode(String value) {
-        return Hashing.murmur3_128()
-                      .hashString(value, UTF_8)
-                      .asInt();
     }
 }
