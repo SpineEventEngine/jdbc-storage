@@ -354,7 +354,7 @@ public abstract class IdColumn<I> {
 
         @Override
         public Type sqlType() {
-            return STRING_255;
+            return STRING_512;
         }
 
         @Override

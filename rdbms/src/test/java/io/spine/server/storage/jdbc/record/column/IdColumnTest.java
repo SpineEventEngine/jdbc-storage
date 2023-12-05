@@ -36,7 +36,7 @@ import org.junit.jupiter.api.Test;
 
 import static io.spine.server.storage.jdbc.Type.INT;
 import static io.spine.server.storage.jdbc.Type.LONG;
-import static io.spine.server.storage.jdbc.Type.STRING_255;
+import static io.spine.server.storage.jdbc.Type.STRING_512;
 import static io.spine.server.storage.jdbc.record.column.given.IdColumnTestEnv.Column.idTableColumn;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -46,7 +46,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class IdColumnTest {
 
     @Test
-    @DisplayName("have `bigint` implementation")
+    @DisplayName("allow `LONG` SQL type")
     void haveBigintImpl() {
         IdColumn<?> column = IdColumn.ofEntityClass(idTableColumn(), LongIdEntity.class);
         assertEquals(LONG, column.sqlType());
@@ -54,7 +54,7 @@ class IdColumnTest {
     }
 
     @Test
-    @DisplayName("have `int` implementation")
+    @DisplayName("allow `INT` SQL type")
     void haveIntImpl() {
         IdColumn<?> column = IdColumn.ofEntityClass(idTableColumn(), IntIdEntity.class);
         assertEquals(INT, column.sqlType());
@@ -62,10 +62,10 @@ class IdColumnTest {
     }
 
     @Test
-    @DisplayName("have `varchar255` implementation")
+    @DisplayName("allow `VARCHAR_512` SQL type")
     void haveStringImpl() {
         IdColumn<?> column = IdColumn.ofEntityClass(idTableColumn(), StringIdEntity.class);
-        assertEquals(STRING_255, column.sqlType());
+        assertEquals(STRING_512, column.sqlType());
         assertSame(String.class, column.javaType());
     }
 
@@ -73,7 +73,7 @@ class IdColumnTest {
     @DisplayName("cast message IDs to string")
     void castMessageIdsToString() {
         IdColumn<?> column = IdColumn.ofEntityClass(idTableColumn(), MessageIdEntity.class);
-        assertEquals(STRING_255, column.sqlType());
+        assertEquals(STRING_512, column.sqlType());
         assertTrue(Message.class.isAssignableFrom(column.javaType()));
     }
 
