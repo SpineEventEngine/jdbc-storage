@@ -38,6 +38,9 @@ import io.spine.server.storage.ColumnTypeMapping;
 import io.spine.server.storage.jdbc.Type;
 import io.spine.type.Json;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 import static io.spine.server.storage.ColumnTypeMapping.identity;
 import static io.spine.server.storage.jdbc.Type.BOOLEAN;
@@ -56,19 +59,58 @@ public class DefaultJdbcColumnMapping
         extends AbstractColumnMapping<Object>
         implements JdbcColumnMapping {
 
+    private static final Map<Class<?>, ColumnTypeMapping<?, ?>> defaults
+            = ImmutableMap.of(Timestamp.class, ofTimestamp(),
+                              Version.class, ofVersion());
+
     @Override
     public Type typeOf(Class<?> columnType) {
         checkNotNull(columnType);
-        var typeMapping = (JdbcColumnTypeMapping<?, ? >) of(columnType);
+        var typeMapping = (JdbcColumnTypeMapping<?, ?>) of(columnType);
         var type = typeMapping.storeAs();
         return type;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>Merges the default column mapping rules with those provided by SPI users.
+     * In case there are duplicate mappings for some column type, the value provided
+     * by SPI users is used.
+     *
+     * @apiNote This method is made {@code final}, as it is designed
+     *         to use {@code ImmutableMap.Builder}, which does not allow to override values.
+     *         Therefore, it is not possible for SPI users to provide their own mapping rules
+     *         for types such as {@code Timestamp}, for which this class already has
+     *         a default mapping. SPI users should override
+     *         {@link #customMapping() DefaultJdbcColumnMapping.customMapping()} instead.
+     */
     @Override
-    protected void
+    protected final void
     setupCustomMapping(ImmutableMap.Builder<Class<?>, ColumnTypeMapping<?, ?>> builder) {
-        builder.put(Timestamp.class, ofTimestamp());
-        builder.put(Version.class, ofVersion());
+        Map<Class<?>, ColumnTypeMapping<?, ?>> merged = new HashMap<>();
+        var custom = customMapping();
+        merged.putAll(defaults);
+        merged.putAll(custom);
+        builder.putAll(merged);
+    }
+
+    /**
+     * Returns the custom column mapping rules.
+     *
+     * <p>This method is designed for SPI users in order to be able to re-define
+     * and-or append their custom mapping. As by default, {@code DefaultJdbcColumnMapping}
+     * provides rules for {@link Timestamp} and {@link Version}, SPI users may
+     * choose to either override these defaults by returning their own mapping for these types,
+     * or supply even more mapping rules.
+     *
+     * <p>By default, this method returns an empty map.
+     *
+     * @return custom column mappings, per Java class of column
+     */
+    @SPI
+    protected ImmutableMap<Class<?>, ColumnTypeMapping<?, ?>> customMapping() {
+        return ImmutableMap.of();
     }
 
     @Override
@@ -121,11 +163,17 @@ public class DefaultJdbcColumnMapping
         return identity();
     }
 
-    private static JdbcColumnTypeMapping<Timestamp, Long> ofTimestamp() {
+    /**
+     * Returns the default mapping from {@link Timestamp} to {@link Long}.
+     */
+    protected static JdbcColumnTypeMapping<Timestamp, Long> ofTimestamp() {
         return new JdbcColumnTypeMapping<>(Timestamps::toNanos, LONG);
     }
 
-    private static JdbcColumnTypeMapping<Version, Integer> ofVersion() {
+    /**
+     * Returns the default mapping from {@link Version} to {@link Integer}.
+     */
+    protected static JdbcColumnTypeMapping<Version, Integer> ofVersion() {
         return new JdbcColumnTypeMapping<>(Version::getNumber, INT);
     }
 }
