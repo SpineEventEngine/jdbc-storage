@@ -28,10 +28,14 @@ package io.spine.server.storage.jdbc.record.column.given;
 
 import com.google.protobuf.Timestamp;
 import io.spine.server.entity.AbstractEntity;
+import io.spine.server.storage.jdbc.TableColumn;
+import io.spine.server.storage.jdbc.Type;
+import io.spine.server.storage.jdbc.type.DefaultJdbcColumnMapping;
 import io.spine.server.test.shared.IntIdAggregate;
 import io.spine.server.test.shared.LongIdAggregate;
 import io.spine.server.test.shared.StringProjection;
 import io.spine.server.test.shared.TimestampIdAggregate;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class IdColumnTestEnv {
 
@@ -60,6 +64,27 @@ public class IdColumnTestEnv {
     public static class MessageIdEntity extends AbstractEntity<Timestamp, TimestampIdAggregate> {
         protected MessageIdEntity(Timestamp id) {
             super(id);
+        }
+    }
+
+    public static final class Column {
+
+        /** Prevents instantiation of this test env class. */
+        private Column() {
+        }
+
+        public static TableColumn idTableColumn() {
+            return newIdColumn(null);
+        }
+
+        private static TableColumn newIdColumn(final @Nullable Type type) {
+            return new TableColumn("ID", String.class, new DefaultJdbcColumnMapping()) {
+
+                @Override
+                public Type type() {
+                    return type;
+                }
+            };
         }
     }
 }
