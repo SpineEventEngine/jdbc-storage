@@ -41,7 +41,7 @@ import static io.spine.server.storage.jdbc.record.column.BytesColumn.bytesColumn
  * @param <I>
  *         the type of IDs
  */
-public class SelectTimestampById<I> extends SelectMessageByIdQuery<I, Timestamp> {
+public final class SelectTimestampById<I> extends SelectMessageByIdQuery<I, Timestamp> {
 
     private SelectTimestampById(Builder<I> builder) {
         super(builder);
