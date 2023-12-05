@@ -40,7 +40,7 @@ import static io.spine.base.Identifier.newUuid;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
 import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_1;
 
-public class DbIteratorTestEnv {
+public final class DbIteratorTestEnv {
 
     /** Prevents instantiation of this utility class. */
     private DbIteratorTestEnv() {
