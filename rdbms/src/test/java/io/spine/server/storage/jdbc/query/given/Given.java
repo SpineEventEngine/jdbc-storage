@@ -33,9 +33,8 @@ import io.spine.server.storage.RecordSpec;
 import io.spine.server.storage.jdbc.query.AbstractQuery;
 import io.spine.server.storage.jdbc.query.SelectMessageByIdQuery;
 import io.spine.server.storage.jdbc.record.JdbcTableSpec;
-import io.spine.server.storage.jdbc.type.DefaultJdbcColumnMapping;
-
-import static io.spine.testing.TestValues.nullRef;
+import io.spine.server.storage.jdbc.record.TableNames;
+import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 
 public final class Given {
 
@@ -59,7 +58,8 @@ public final class Given {
         var recordSpec = new RecordSpec<>(String.class,
                                           StringValue.class,
                                           StringValue::getValue);
-        return new JdbcTableSpec<>(recordSpec, new DefaultJdbcColumnMapping(), nullRef());
+        return new JdbcTableSpec<>(TableNames.of(recordSpec.sourceType()),
+                                   recordSpec, new JdbcColumnMapping());
     }
 
     /**
@@ -86,7 +86,7 @@ public final class Given {
 
         public static class Builder<I, R extends Message>
                 extends SelectMessageByIdQuery.Builder<I, R, Builder<I, R>,
-                                                       ASelectMessageByIdQuery<I, R>> {
+                ASelectMessageByIdQuery<I, R>> {
 
             private AbstractSQLQuery<?, ?> query;
 

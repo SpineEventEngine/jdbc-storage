@@ -102,7 +102,7 @@ public final class JdbcStorageFactoryTestEnv {
         return inboxMessageSpec;
     }
 
-    public static class TestColumnMapping implements JdbcColumnMapping {
+    public static class TestColumnMapping extends JdbcColumnMapping {
 
         @Override
         public Type typeOf(Class<?> columnType) {

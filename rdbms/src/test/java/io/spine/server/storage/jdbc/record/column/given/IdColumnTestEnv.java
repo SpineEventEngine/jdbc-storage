@@ -30,7 +30,7 @@ import com.google.protobuf.Timestamp;
 import io.spine.server.entity.AbstractEntity;
 import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.Type;
-import io.spine.server.storage.jdbc.type.DefaultJdbcColumnMapping;
+import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 import io.spine.server.test.shared.IntIdAggregate;
 import io.spine.server.test.shared.LongIdAggregate;
 import io.spine.server.test.shared.StringProjection;
@@ -78,7 +78,7 @@ public class IdColumnTestEnv {
         }
 
         private static TableColumn newIdColumn(final @Nullable Type type) {
-            return new TableColumn("ID", String.class, new DefaultJdbcColumnMapping()) {
+            return new TableColumn("ID", String.class, new JdbcColumnMapping()) {
 
                 @Override
                 public Type type() {

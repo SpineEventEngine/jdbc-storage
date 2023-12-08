@@ -32,19 +32,15 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import io.spine.annotation.Internal;
 import io.spine.server.ContextSpec;
-import io.spine.server.aggregate.AggregateEventRecord;
 import io.spine.server.storage.RecordSpec;
 import io.spine.server.storage.RecordStorage;
 import io.spine.server.storage.StorageFactory;
-import io.spine.server.storage.jdbc.aggregate.AggregateEventRecordColumns;
 import io.spine.server.storage.jdbc.config.CreateOperationFactory;
-import io.spine.server.storage.jdbc.config.CustomColumns;
 import io.spine.server.storage.jdbc.config.TableSpecs;
 import io.spine.server.storage.jdbc.delivery.JdbcSessionStorage;
 import io.spine.server.storage.jdbc.operation.OperationFactory;
 import io.spine.server.storage.jdbc.record.JdbcRecordStorage;
 import io.spine.server.storage.jdbc.record.JdbcTableSpec;
-import io.spine.server.storage.jdbc.type.DefaultJdbcColumnMapping;
 import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 
 import javax.sql.DataSource;
@@ -141,10 +137,10 @@ public class JdbcStorageFactory implements StorageFactory {
     }
 
     /**
-     * Provides the DB table specification for the passed record specification.
+     * Returns the DB table specification for the passed record specification.
      *
-     * <p>Takes into account the {@linkplain Builder#configureColumns(Class, CustomColumns)
-     * custom columns} and the {@linkplain Builder#setTableName(Class, String) custom table name}
+     * <p>Takes into account the {@linkplain Builder#setCustomMapping(Class, JdbcColumnMapping)
+     * custom mapping} and the {@linkplain Builder#setTableName(Class, String) custom table name}
      * set for the records of target type.
      *
      * @param spec
@@ -191,7 +187,7 @@ public class JdbcStorageFactory implements StorageFactory {
          * Sets the {@linkplain io.spine.server.storage.ColumnMapping column mapping} to use
          * in the generated storages.
          *
-         * <p>The default value is a {@link DefaultJdbcColumnMapping}.
+         * <p>The default value is a {@link JdbcColumnMapping}.
          *
          * @param columnMapping
          *         the column mapping to use in the generated storages
@@ -254,26 +250,6 @@ public class JdbcStorageFactory implements StorageFactory {
         }
 
         /**
-         * Configures the custom columns for the table storing the records of the specified type.
-         *
-         * <p>Previously configured values, if any, are replaced with this call.
-         *
-         * @param recordType
-         *         the type of the stored record
-         * @param columns
-         *         the custom columns
-         * @param <R>
-         *         the type of the stored record
-         * @return this instance of {@code Builder}
-         */
-        @CanIgnoreReturnValue
-        public <R extends Message>
-        Builder configureColumns(Class<R> recordType, CustomColumns<R> columns) {
-            tableSpecs.setColumns(recordType, columns);
-            return this;
-        }
-
-        /**
          * Sets the custom DB table name for the table storing the records of the specified type.
          *
          * <p>The name previously set, if any, is replaced with this call.
@@ -281,7 +257,7 @@ public class JdbcStorageFactory implements StorageFactory {
          * <p>The name cannot be blank.
          *
          * <p>In case no custom name is defined,
-         * a {@linkplain  io.spine.server.storage.jdbc.record.TableNames#of(Class) default name}
+         * a {@linkplain io.spine.server.storage.jdbc.record.TableNames#of(Class) default name}
          * is used.
          *
          * @param recordType
@@ -296,6 +272,29 @@ public class JdbcStorageFactory implements StorageFactory {
         public <R extends Message>
         Builder setTableName(Class<R> recordType, String name) {
             tableSpecs.setTableName(recordType, name);
+            return this;
+        }
+
+        /**
+         * Sets the custom column mapping for the table storing the records of the specified type.
+         *
+         * <p>The mapping previously set, if any, is replaced with this call.
+         *
+         * <p>In case no custom mapping is defined for some table,
+         * a {@linkplain #setColumnMapping(JdbcColumnMapping) a factory-wide value} is used.
+         *
+         * @param recordType
+         *         the type of the stored record
+         * @param mapping
+         *         the custom mapping
+         * @param <R>
+         *         the type of the stored record
+         * @return this instance of {@code Builder}
+         */
+        @CanIgnoreReturnValue
+        public <R extends Message>
+        Builder setCustomMapping(Class<R> recordType, JdbcColumnMapping mapping) {
+            tableSpecs.setMapping(recordType, mapping);
             return this;
         }
 
@@ -331,7 +330,7 @@ public class JdbcStorageFactory implements StorageFactory {
         @SuppressWarnings("WeakerAccess")
         protected void configureDefaults() {
             if (columnMapping == null) {
-                columnMapping = new DefaultJdbcColumnMapping();
+                columnMapping = new JdbcColumnMapping();
             }
             if (typeMapping == null) {
                 typeMapping = PredefinedMapping.select(dataSource);
@@ -339,12 +338,6 @@ public class JdbcStorageFactory implements StorageFactory {
             if(createOpFactory == null) {
                 createOpFactory = OperationFactory::new;
             }
-
-            configureSystemTables();
-        }
-
-        private void configureSystemTables() {
-            configureColumns(AggregateEventRecord.class, AggregateEventRecordColumns.instance());
         }
     }
 }

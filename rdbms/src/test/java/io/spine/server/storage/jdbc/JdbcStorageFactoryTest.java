@@ -27,7 +27,6 @@
 package io.spine.server.storage.jdbc;
 
 import io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.TestColumnMapping;
-import io.spine.server.storage.jdbc.type.DefaultJdbcColumnMapping;
 import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -67,7 +66,7 @@ class JdbcStorageFactoryTest {
     @Test
     @DisplayName("allow to set custom column mapping")
     void setColumnMapping() {
-        JdbcColumnMapping columnMapping = new TestColumnMapping();
+        var columnMapping = new TestColumnMapping();
         var factory = JdbcStorageFactory
                 .newBuilder()
                 .setDataSource(whichIsStoredInMemory(newUuid()))
@@ -84,7 +83,7 @@ class JdbcStorageFactoryTest {
         var factory = newFactory();
         var columnMapping = factory.columnMapping();
 
-        assertThat(columnMapping).isInstanceOf(DefaultJdbcColumnMapping.class);
+        assertThat(columnMapping).isInstanceOf(JdbcColumnMapping.class);
     }
 
     @Nested

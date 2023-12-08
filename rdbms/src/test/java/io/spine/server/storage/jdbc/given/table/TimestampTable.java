@@ -37,7 +37,6 @@ import io.spine.server.storage.jdbc.given.query.SelectTimestampById;
 import io.spine.server.storage.jdbc.record.JdbcTableSpec;
 import io.spine.server.storage.jdbc.record.RecordTable;
 import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.sql.ResultSet;
 
@@ -61,11 +60,9 @@ abstract class TimestampTable<I> extends RecordTable<I, Timestamp> {
     }
 
     private static <I> JdbcTableSpec<I, Timestamp>
-    fullSpecFrom(String tableName,
-                 RecordSpec<I, Timestamp> spec,
-                 JdbcColumnMapping mapping) {
+    fullSpecFrom(String tableName, RecordSpec<I, Timestamp> spec, JdbcColumnMapping mapping) {
         var updatedSpec = extendRecordSpec(spec);
-        var result = new JdbcTableSpec<>(tableName, updatedSpec, mapping, null);
+        var result = new JdbcTableSpec<>(tableName, updatedSpec, mapping);
         return result;
     }
 

@@ -48,7 +48,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @DisplayName("`DefaultJdbcColumnMapping` should")
 class DefaultJdbcColumnMappingTest {
 
-    private final DefaultJdbcColumnMapping mapping = new DefaultJdbcColumnMapping();
+    private final JdbcColumnMapping mapping = new JdbcColumnMapping();
 
     @Test
     @DisplayName(NOT_ACCEPT_NULLS)

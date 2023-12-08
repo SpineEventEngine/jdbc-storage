@@ -37,7 +37,6 @@ import io.spine.query.ColumnName;
 import io.spine.server.storage.RecordSpec;
 import io.spine.server.storage.RecordWithColumns;
 import io.spine.server.storage.jdbc.TableColumn;
-import io.spine.server.storage.jdbc.config.CustomColumns;
 import io.spine.server.storage.jdbc.record.column.BytesColumn;
 import io.spine.server.storage.jdbc.record.column.IdColumn;
 import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
@@ -68,42 +67,11 @@ public final class JdbcTableSpec<I, R extends Message> {
     private final Descriptor recordDescriptor;
     private final ImmutableMap<ColumnName, TableColumn> dataColumns;
 
-    private final @Nullable CustomColumns<R> customColumns;
-
-    /**
-     * Creates a new table specification.
-     *
-     * <p>The table name is set automatically basing on the name of the Java type of the object,
-     * from which the stored records are built.
-     *
-     * <p>Library users may choose to customize the type of table columns and the mechanism of
-     * obtaining the column values by providing the {@link CustomColumns}.
-     * If no such a customization is made, the default implementation relies upon the original
-     * record specification along with the column mapping.
-     *
-     * @param recordSpec
-     *         the original specification of the stored record
-     * @param mapping
-     *         the column mapping to use
-     * @param customColumns
-     *         optionally customized definitions of the columns
-     */
-    public JdbcTableSpec(RecordSpec<I, R> recordSpec,
-                         JdbcColumnMapping mapping,
-                         @Nullable CustomColumns<R> customColumns) {
-        this(tableName(recordSpec), recordSpec, mapping, customColumns);
-    }
-
     /**
      * Creates a new table specification, also setting a custom name for the table.
      *
      * <p>It is a responsibility of callers to select the table name which is both unique and
      * compatible with the requirements of the underlying database engine.
-     *
-     * <p>Library users may also choose to customize the type of table columns and the mechanism of
-     * obtaining the column values by providing the {@link CustomColumns}.
-     * If no such a customization is made, the default implementation relies upon the original
-     * record specification along with the column mapping.
      *
      * @param tableName
      *         the name to use for the table
@@ -111,17 +79,11 @@ public final class JdbcTableSpec<I, R extends Message> {
      *         the original specification of the stored record
      * @param mapping
      *         the column mapping to use
-     * @param customColumns
-     *         optionally customized definitions of the columns
      */
-    public JdbcTableSpec(String tableName,
-                         RecordSpec<I, R> recordSpec,
-                         JdbcColumnMapping mapping,
-                         @Nullable CustomColumns<R> customColumns) {
+    public JdbcTableSpec(String tableName, RecordSpec<I, R> recordSpec, JdbcColumnMapping mapping) {
         this.tableName = checkNotEmptyOrBlank(tableName);
         this.recordSpec = recordSpec;
         columnMapping = mapping;
-        this.customColumns = customColumns;
         this.idColumn = IdColumn.of(recordSpec, columnMapping);
         this.recordDescriptor = descriptorFrom(recordSpec.recordType());
         this.dataColumns = createDataColumns();
@@ -137,25 +99,6 @@ public final class JdbcTableSpec<I, R extends Message> {
      */
     public String tableName() {
         return tableName;
-    }
-
-    /**
-     * Composes the default name for the table basing on the name of the Java class
-     * of the object, on top of which the stored {@link RecordWithColumns} is built.
-     *
-     * @param spec
-     *         the record specification describing the type of the source Java object
-     * @param <I>
-     *         the type of the identifiers of the records stored in the table
-     * @param <R>
-     *         the type of the records stored in the table
-     * @return a table name
-     * @see TableNames#of(Class) for more details
-     */
-    private static <I, R extends Message> String tableName(RecordSpec<I, R> spec) {
-        var sourceType = spec.sourceType();
-        var result = TableNames.of(sourceType);
-        return result;
     }
 
     /**
@@ -213,17 +156,7 @@ public final class JdbcTableSpec<I, R extends Message> {
 
     private TableColumn toNativeColumn(Column<?, ?> column) {
         var name = column.name();
-        var customSpec = customColumns != null
-                         ? customColumns.find(name)
-                         : null;
-        TableColumn nativeColumn;
-        var columnType = column.type();
-        if (customSpec != null) {
-            var transformFn = customSpec.transformFn();
-            nativeColumn = new TableColumn(name.value(), columnType, columnMapping, transformFn);
-        } else {
-            nativeColumn = new TableColumn(name.value(), columnType, columnMapping);
-        }
+        var nativeColumn = new TableColumn(name.value(), column.type(), columnMapping);
         return nativeColumn;
     }
 

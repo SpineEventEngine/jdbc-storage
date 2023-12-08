@@ -32,6 +32,7 @@ import com.google.protobuf.Message;
 import io.spine.annotation.Internal;
 import io.spine.server.storage.RecordSpec;
 import io.spine.server.storage.jdbc.record.JdbcTableSpec;
+import io.spine.server.storage.jdbc.record.TableNames;
 import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -49,30 +50,35 @@ import static java.util.Objects.requireNonNull;
 @Internal
 public final class TableSpecs {
 
-    /**
-     * Values of settings per the type of the records served by the configured storage.
-     */
-    private final ImmutableMap<Class<? extends Message>, CustomColumns<?>> columns;
     private final ImmutableMap<Class<? extends Message>, String> names;
     private final Map<Class<? extends Message>, JdbcTableSpec<?, ?>> tables = new HashMap<>();
+
+    private final ImmutableMap<Class<? extends Message>, JdbcColumnMapping> columnMappings;
 
     /**
      * Creates the settings instance on top of the passed builder.
      */
     private TableSpecs(Builder builder) {
-        this.columns = ImmutableMap.copyOf(builder.columns);
         this.names = ImmutableMap.copyOf(builder.names);
+        this.columnMappings = ImmutableMap.copyOf(builder.mappings);
     }
 
     /**
      * Provides the table specification based upon the original record specification,
-     * JDBC column mapping, and the user-defined configuration previously made with
-     * this instance of {@code TableSpecs}.
+     * and the user-defined configuration previously made with
+     * this instance of {@code TableSpecs}, such as table name and custom column mapping.
+     *
+     * <p>In case no custom table name was specified,
+     * a {@linkplain io.spine.server.storage.jdbc.record.TableNames#of(Class)
+     * default one} is used.
+     *
+     * <p>If no custom column mapping was set previously,
+     * the default mapping passed to this method is used.
      *
      * @param spec
      *         the original record specification
-     * @param mapping
-     *         the column mapping
+     * @param defaultMapping
+     *         the column mapping to use if no custom mapping is specified for the table
      * @param <I>
      *         type of the identifiers of the records to store in the table
      * @param <R>
@@ -80,10 +86,10 @@ public final class TableSpecs {
      * @return a new table specification
      */
     public <I, R extends Message> JdbcTableSpec<I, R>
-    specFor(RecordSpec<I, R> spec, JdbcColumnMapping mapping) {
+    specFor(RecordSpec<I, R> spec, JdbcColumnMapping defaultMapping) {
         var recordType = spec.sourceType();
         if (!tables.containsKey(recordType)) {
-            var tableSpec = newTableSpec(spec, mapping);
+            var tableSpec = newTableSpec(spec, defaultMapping);
             tables.put(recordType, tableSpec);
         }
         @SuppressWarnings("unchecked")
@@ -92,38 +98,38 @@ public final class TableSpecs {
     }
 
     private <I, R extends Message> JdbcTableSpec<I, R>
-    newTableSpec(RecordSpec<I, R> spec, JdbcColumnMapping mapping) {
+    newTableSpec(RecordSpec<I, R> spec, JdbcColumnMapping defaultMapping) {
         var recordType = spec.recordType();
-        @Nullable CustomColumns<R> customCols = findColumns(recordType);
         @Nullable String customName = findName(recordType);
+        @Nullable JdbcColumnMapping customMapping = findMapping(recordType);
 
         JdbcTableSpec<I, R> tableSpec;
-        if (customName != null) {
-            tableSpec = new JdbcTableSpec<>(customName, spec, mapping, customCols);
-        } else {
-            tableSpec = new JdbcTableSpec<>(spec, mapping, customCols);
-        }
+        var tableName = customName == null
+                        ? TableNames.of(spec.sourceType())
+                        : customName;
+
+        var mapping = customMapping == null
+                      ? defaultMapping
+                      : customMapping;
+
+        tableSpec = new JdbcTableSpec<>(tableName, spec, mapping);
         return tableSpec;
     }
 
-    @Nullable
-    private <R extends Message> String findName(Class<R> recordType) {
+    private <R extends Message> @Nullable String findName(Class<R> recordType) {
         @Nullable String customName = null;
-        if(names.containsKey(recordType)) {
+        if (names.containsKey(recordType)) {
             customName = names.get(recordType);
         }
         return customName;
     }
 
-    @Nullable
-    @SuppressWarnings("unchecked")
-    private <R extends Message> CustomColumns<R> findColumns(Class<R> recordType) {
-        @Nullable CustomColumns<R> customCols = null;
-        if(columns.containsKey(recordType)) {
-            var raw  = columns.get(recordType);
-            customCols = (CustomColumns<R>) raw;
+    private <R extends Message> @Nullable JdbcColumnMapping findMapping(Class<R> recordType) {
+        @Nullable JdbcColumnMapping value = null;
+        if (columnMappings.containsKey(recordType)) {
+            value = columnMappings.get(recordType);
         }
-        return customCols;
+        return value;
     }
 
     /**
@@ -138,32 +144,11 @@ public final class TableSpecs {
      */
     public static final class Builder {
 
-        private final Map<Class<? extends Message>, CustomColumns<?>> columns = new HashMap<>();
         private final Map<Class<? extends Message>, String> names = new HashMap<>();
 
-        private Builder() {
-        }
+        private final Map<Class<? extends Message>, JdbcColumnMapping> mappings = new HashMap<>();
 
-        /**
-         * Sets the custom columns for the table storing the records of the specified type.
-         *
-         * <p>Previously set values, if any, are replaced with this call.
-         *
-         * @param recordType
-         *         the type of the stored record
-         * @param columns
-         *         the custom columns
-         * @param <R>
-         *         the type of the stored record
-         * @return this instance of {@code Builder}
-         */
-        @CanIgnoreReturnValue
-        public <R extends Message>
-        Builder setColumns(Class<R> recordType, CustomColumns<R> columns) {
-            checkNotNull(recordType);
-            checkNotNull(columns);
-            this.columns.put(recordType, columns);
-            return this;
+        private Builder() {
         }
 
         /**
@@ -191,6 +176,33 @@ public final class TableSpecs {
             checkNotNull(recordType);
             checkNotEmptyOrBlank(name);
             this.names.put(recordType, name);
+            return this;
+        }
+
+        /**
+         * Sets the column type mapping rules for the table, in which the records of the specified
+         * type are stored.
+         *
+         * <p>This mapping ruleset will override
+         * the {@linkplain io.spine.server.storage.jdbc.JdbcStorageFactory#columnMapping()
+         * factory-wide} setting for this particular table.
+         *
+         * <p>Previously set mapping value, if any, is replaced with this call.
+         *
+         * @param recordType
+         *         the type of the stored record
+         * @param mapping
+         *         the custom set of type mapping rules
+         * @param <R>
+         *         the type of the stored record
+         * @return this instance of {@code Builder}
+         */
+        @CanIgnoreReturnValue
+        public <R extends Message>
+        Builder setMapping(Class<R> recordType, JdbcColumnMapping mapping) {
+            checkNotNull(recordType);
+            checkNotNull(mapping);
+            this.mappings.put(recordType, mapping);
             return this;
         }
 

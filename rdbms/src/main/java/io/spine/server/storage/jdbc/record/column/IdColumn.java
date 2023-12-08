@@ -44,7 +44,6 @@ import static com.google.common.collect.Lists.newLinkedList;
 import static io.spine.server.entity.model.EntityClass.asEntityClass;
 import static io.spine.server.storage.jdbc.Type.INT;
 import static io.spine.server.storage.jdbc.Type.LONG;
-import static io.spine.server.storage.jdbc.Type.STRING_255;
 import static io.spine.server.storage.jdbc.Type.STRING_512;
 import static io.spine.type.Json.toCompactJson;
 import static io.spine.util.Exceptions.newIllegalArgumentException;
