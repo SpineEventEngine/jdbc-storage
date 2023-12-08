@@ -32,8 +32,6 @@ import io.spine.server.storage.RecordWithColumns;
 import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import java.util.function.Function;
-
 import static io.spine.util.Exceptions.newIllegalArgumentException;
 
 /**
@@ -45,21 +43,11 @@ public class TableColumn {
     private final String name;
     private final JdbcColumnMapping mapping;
     private final Class<?> type;
-    private final @Nullable Function<@Nullable Object, @Nullable Object> adaptValue;
 
     public TableColumn(String name, Class<?> type, JdbcColumnMapping mapping) {
         this.name = name;
         this.type = type;
         this.mapping = mapping;
-        this.adaptValue = null;
-    }
-
-    public TableColumn(String name, Class<?> valueType, JdbcColumnMapping mapping,
-                       Function<@Nullable Object, @Nullable Object> adaptValue) {
-        this.name = name;
-        this.type = valueType;
-        this.mapping = mapping;
-        this.adaptValue = adaptValue;
     }
 
     /**
@@ -94,16 +82,7 @@ public class TableColumn {
                     name(), record.record().getClass()
                     );
         }
-        var value = record.columnValue(columnName, mapping);
-        @Nullable Object result = adaptValue(value);
-        return result;
-    }
-
-    private @Nullable Object adaptValue(Object original) {
-        @Nullable Object result = original;
-        if (adaptValue != null) {
-            result = adaptValue.apply(original);
-        }
+        var result = record.columnValue(columnName, mapping);
         return result;
     }
 }
