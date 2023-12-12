@@ -210,7 +210,7 @@ public class OperationFactory {
     /**
      * Returns the detected storage engine.
      */
-    protected DetectedEngine engine() {
+    protected final DetectedEngine engine() {
         return engine;
     }
 
