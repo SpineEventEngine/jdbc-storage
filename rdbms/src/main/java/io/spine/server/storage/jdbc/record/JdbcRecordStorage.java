@@ -126,6 +126,15 @@ public class JdbcRecordStorage<I, R extends Message> extends RecordStorage<I, R>
     @Internal
     @VisibleForTesting
     public String tableName() {
-        return table.name();
+        return table().name();
+    }
+
+    /**
+     * Returns an underlying record table.
+     */
+    @Internal
+    @VisibleForTesting
+    public RecordTable<I, R> table() {
+        return table;
     }
 }
