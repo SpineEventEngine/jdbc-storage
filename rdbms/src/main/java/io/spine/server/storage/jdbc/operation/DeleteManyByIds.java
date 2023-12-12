@@ -39,7 +39,7 @@ import io.spine.server.storage.jdbc.record.RecordTable;
  * @param <R>
  *         the type of the stored records
  */
-public final class DeleteManyByIds<I, R extends Message> extends Operation<I, R> {
+public class DeleteManyByIds<I, R extends Message> extends Operation<I, R> {
 
 
     @SuppressWarnings("WeakerAccess" /* Available to SPI users. */)
