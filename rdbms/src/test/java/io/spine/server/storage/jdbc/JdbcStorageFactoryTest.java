@@ -26,7 +26,11 @@
 
 package io.spine.server.storage.jdbc;
 
+import io.spine.server.delivery.InboxMessage;
+import io.spine.server.delivery.InboxMessageId;
+import io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.InboxMessageColumnMapping;
 import io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.TestColumnMapping;
+import io.spine.server.storage.jdbc.record.JdbcRecordStorage;
 import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -39,6 +43,8 @@ import static io.spine.server.storage.jdbc.GivenDataSource.whichHoldsMetadata;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
 import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_1;
 import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
+import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.deliveryContextSpec;
+import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.inboxMessageSpec;
 import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.multitenantSpec;
 import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.newFactory;
 import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.newInboxStorage;
@@ -75,6 +81,31 @@ class JdbcStorageFactoryTest {
         var mappingFromFactory = factory.columnMapping();
 
         assertThat(mappingFromFactory).isEqualTo(columnMapping);
+    }
+
+    @Test
+    @DisplayName("override column mapping for a specific table per its record type")
+    void customizeColumnMappingForTable() {
+        var factoryWideMapping = new TestColumnMapping();
+        var inboxRecordMapping = new InboxMessageColumnMapping();
+        var factory = JdbcStorageFactory
+                .newBuilder()
+                .setDataSource(whichIsStoredInMemory(newUuid()))
+                .setColumnMapping(factoryWideMapping)
+                .setCustomMapping(InboxMessage.class, inboxRecordMapping)
+                .build();
+
+        var actualFactoryWideMapping = factory.columnMapping();
+        assertThat(actualFactoryWideMapping)
+                .isEqualTo(factoryWideMapping);
+
+        var storage = (JdbcRecordStorage<InboxMessageId, InboxMessage>)
+                factory.createRecordStorage(deliveryContextSpec(), inboxMessageSpec());
+        var actualInboxMapping = storage.table()
+                                        .spec()
+                                        .columnMapping();
+        assertThat(actualInboxMapping)
+                .isEqualTo(inboxRecordMapping);
     }
 
     @Test

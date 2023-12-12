@@ -26,12 +26,14 @@
 
 package io.spine.server.storage.jdbc.given;
 
+import com.google.common.collect.ImmutableMap;
 import io.spine.base.Identifier;
 import io.spine.server.ContextSpec;
 import io.spine.server.delivery.Delivery;
 import io.spine.server.delivery.InboxColumn;
 import io.spine.server.delivery.InboxMessage;
 import io.spine.server.delivery.InboxMessageId;
+import io.spine.server.delivery.InboxSignalId;
 import io.spine.server.storage.ColumnTypeMapping;
 import io.spine.server.storage.RecordSpec;
 import io.spine.server.storage.jdbc.DataSourceConfig;
@@ -40,10 +42,12 @@ import io.spine.server.storage.jdbc.JdbcStorageFactory;
 import io.spine.server.storage.jdbc.Type;
 import io.spine.server.storage.jdbc.record.JdbcRecordStorage;
 import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
+import io.spine.server.storage.jdbc.type.JdbcColumnTypeMapping;
 
 import static io.spine.server.storage.jdbc.GivenDataSource.prefix;
 import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_1;
 import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
+import static io.spine.server.storage.jdbc.Type.LONG;
 
 public final class JdbcStorageFactoryTestEnv {
 
@@ -117,6 +121,23 @@ public final class JdbcStorageFactoryTestEnv {
         @Override
         public ColumnTypeMapping<?, ? extends String> ofNull() {
             return o -> "the-null";
+        }
+    }
+
+    /**
+     * A test-only custom type mapping for the record table storing {@code InboxMessage}s.
+     */
+    public static class InboxMessageColumnMapping extends JdbcColumnMapping {
+
+        @Override
+        protected ImmutableMap<Class<?>, JdbcColumnTypeMapping<?, ?>> customRules() {
+            var signalMapping =
+                    new JdbcColumnTypeMapping<InboxSignalId, Long>(
+                            (signalId) -> (long) signalId.hashCode(),
+                            LONG);
+            return ImmutableMap.of(
+                    InboxSignalId.class, signalMapping
+            );
         }
     }
 }
