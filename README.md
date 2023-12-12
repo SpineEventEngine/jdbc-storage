@@ -49,7 +49,7 @@ JdbcStorageFactory.newBuilder()
                   .build();
 ```
 
-### SQL Type Mapping
+### SQL type mapping
 
 The framework provides a `TypeMapping` to configure the SQL types, which fit the target storage.
 The mapping defines correspondence of `Type` to a name for a particular database. 
@@ -58,7 +58,7 @@ The mapping defines correspondence of `Type` to a name for a particular database
 The type mapping is selected automatically basing on the JDBC connection string.
 If there is no predefined mapping for the database, mapping for MySQL 5.7 will be used as the default.
 
-#### Default Values
+#### Default values
 
 | Type         | MySQL 5.7     | PostgreSQL 10.1 |
 | :----------: |:-------------:| :--------------:|
@@ -83,4 +83,51 @@ TypeMapping mapping = TypeMappingBuilder.basicBuilder()
                                         .build();
 JdbcStorageFactory.newBuilder()
                   .setTypeMapping(mapping)
-``` 
+```
+
+## Features available since 2.x
+
+### RDBMS tables
+
+#### Naming and structure
+
+Each Entity registered within application's Bounded Contexts has a corresponding RDBMS table.
+Additionally, the framework has some system Entities and other types (such as `InboxMessage`)
+which are also stored in their tables.
+
+For each type of stored records, the framework automatically creates an RDMBS table, 
+if it does not exist.
+
+The name of the table is composed according to the following scheme:
+
+```
+(Package of Proto message + message name) -> replace `.` with `_` -> result 
+```
+
+E.g. a table name for an Entity, which has a state declared by `bar.acme.Project` would be
+"bar_acme_Project".
+
+Each table created has the following structure:
+
+* `ID` — the identifier of the record (Entity, or a standalone message). Primary key.
+* `bytes` — stores the serialized Proto message (Entity state, or a standalone message value).
+* Columns defined either
+     * via `Entity`'s `(column)` option;
+     * or according to the columns declaration for a standalone message,
+       annotated with `@RecordColumns` (e.g. `io.spine.server.event.store.EventColumn`).
+
+:warning: The framework does **not** declare any table indexes, nor verifies the table structure
+for existing tables.
+
+- Indexes
+
+- Customization
+
+
+### Queries
+
+- Default behaviour
+
+- Special support for MySQL
+
+- Customization
