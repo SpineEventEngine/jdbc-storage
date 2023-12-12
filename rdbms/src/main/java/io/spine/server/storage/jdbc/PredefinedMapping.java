@@ -30,6 +30,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.errorprone.annotations.Immutable;
 import io.spine.type.TypeName;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
 import static io.spine.server.storage.jdbc.TypeMappingBuilder.mappingBuilder;
 
@@ -73,7 +74,8 @@ public enum PredefinedMapping implements TypeMapping {
      * @return the type mapping for the used database or {@linkplain PredefinedMapping#MYSQL_5_7
      *         mapping for MySQL 5.7} if there is no standard mapping for the database
      */
-    static TypeMapping select(DataSourceWrapper dataSource) {
+    public static TypeMapping select(DataSourceWrapper dataSource) {
+        checkNotNull(dataSource);
         var metaData = dataSource.metaData();
         for (var mapping : values()) {
             var nameMatch = metaData.productName()
