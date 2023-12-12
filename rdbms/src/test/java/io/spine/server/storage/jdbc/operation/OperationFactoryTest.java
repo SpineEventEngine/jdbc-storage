@@ -29,12 +29,19 @@ package io.spine.server.storage.jdbc.operation;
 import io.spine.server.delivery.InboxMessage;
 import io.spine.server.delivery.InboxMessageId;
 import io.spine.server.storage.Storage;
+import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.GivenDataSource;
+import io.spine.server.storage.jdbc.PredefinedMapping;
+import io.spine.server.storage.jdbc.TypeMapping;
+import io.spine.server.storage.jdbc.operation.given.OperationFactoryTestEnv;
+import io.spine.server.storage.jdbc.operation.given.OperationFactoryTestEnv.OverridingAllOpFactory;
 import io.spine.server.storage.jdbc.operation.given.OperationFactoryTestEnv.TestOperationFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth8.assertThat;
+import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
 import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.deliveryContextSpec;
 import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.inboxMessageSpec;
 import static io.spine.server.storage.jdbc.operation.given.OperationFactoryTestEnv.OVERRIDDEN_LABEL;
@@ -64,5 +71,24 @@ final class OperationFactoryTest {
         assertThat(actual.get()
                          .getLabel())
                 .isEqualTo(OVERRIDDEN_LABEL);
+    }
+
+    /**
+     * This test instantiates the {@linkplain OverridingAllOpFactory custom operation factory},
+     * which overrides every available operation,
+     * and uses the descendants of the framework-provided operations,
+     * to ensure they are extensible.
+     *
+     * @see OverridingAllOpFactory
+     */
+    @Test
+    @DisplayName("extend existing operations, " +
+            "and use them in corresponding methods in `OperationFactory`")
+    void useOperationsByExtending() {
+        var dataSource = whichIsStoredInMemory(OperationFactoryTestEnv.class.getName());
+        var typeMapping = PredefinedMapping.select(dataSource);
+        var factory = new OverridingAllOpFactory(dataSource, typeMapping);
+        assertThat(factory)
+                .isNotNull();
     }
 }
