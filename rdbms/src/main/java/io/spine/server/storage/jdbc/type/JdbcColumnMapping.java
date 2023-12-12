@@ -119,7 +119,7 @@ public class JdbcColumnMapping extends AbstractColumnMapping<Object> {
      * @return custom column mappings, per Java class of column
      */
     @SPI
-    protected ImmutableMap<Class<?>, ColumnTypeMapping<?, ?>> customRules() {
+    protected ImmutableMap<Class<?>, JdbcColumnTypeMapping<?, ?>> customRules() {
         return ImmutableMap.of();
     }
 
