@@ -28,6 +28,7 @@ package io.spine.server.storage.jdbc.operation;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.protobuf.Message;
+import io.spine.annotation.Internal;
 import io.spine.client.ArchivedColumn;
 import io.spine.client.DeletedColumn;
 import io.spine.client.VersionColumn;
@@ -104,8 +105,12 @@ public class CreateTable<I, R extends Message> extends Operation<I, R> implement
         queryExecutor.execute(createTableSql);
     }
 
+    /**
+     * Composes an SQL statement for this operation.
+     */
+    @Internal
     //TODO:2021-07-01:alex.tymchenko: introduce `required` attribute for `io.spine.query.Column`.
-    private String sqlStatement() {
+    public String sqlStatement() {
         var sql = beginStatement();
 
         var primaryKeyColumnName = addId(sql);

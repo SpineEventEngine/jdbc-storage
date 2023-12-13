@@ -54,13 +54,49 @@ public class JdbcRecordStorage<I, R extends Message> extends RecordStorage<I, R>
 
     private final RecordTable<I, R> table;
 
+    /**
+     * Creates a new record storage, and performs the creation of RDBMS table,
+     * in case such a table does not exist.
+     *
+     * @param contextSpec
+     *         specification of Bounded Context, in scope of which this storage exists
+     * @param recordSpec
+     *         specification of stored records
+     * @param factory
+     *         storage factory, in which scope this storage acts
+     */
     public JdbcRecordStorage(ContextSpec contextSpec,
                              RecordSpec<I, R> recordSpec,
                              JdbcStorageFactory factory) {
+        this(contextSpec, recordSpec, factory, true);
+    }
+
+    /**
+     * Creates a new record storage, and when asked, performs the creation of RDBMS table
+     * if such a table does not exist.
+     *
+     * <p>This constructor is internal to the framework.
+     *
+     * @param contextSpec
+     *         specification of Bounded Context, in scope of which this storage exists
+     * @param recordSpec
+     *         specification of stored records
+     * @param factory
+     *         storage factory, in which scope this storage acts
+     * @param createTable
+     *         whether to create the RDBMS table right away
+     */
+    @Internal
+    public JdbcRecordStorage(ContextSpec contextSpec,
+                             RecordSpec<I, R> recordSpec,
+                             JdbcStorageFactory factory,
+                             boolean createTable) {
         super(contextSpec, recordSpec);
         var tableSpec = factory.tableSpecFor(recordSpec);
         this.table = RecordTable.by(tableSpec, factory);
-        this.table.create();
+        if (createTable) {
+            this.table.create();
+        }
     }
 
     @Override
@@ -136,5 +172,13 @@ public class JdbcRecordStorage<I, R extends Message> extends RecordStorage<I, R>
     @VisibleForTesting
     public RecordTable<I, R> table() {
         return table;
+    }
+
+    /**
+     * Returns an SQL expression to use when creating this table in the underlying RDBMS storage.
+     */
+    @Internal
+    public String tableCreationSql() {
+        return table.creationSql();
     }
 }

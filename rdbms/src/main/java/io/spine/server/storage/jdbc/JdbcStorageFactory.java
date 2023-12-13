@@ -31,7 +31,9 @@ import com.google.protobuf.Message;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import io.spine.annotation.Internal;
+import io.spine.base.EntityState;
 import io.spine.server.ContextSpec;
+import io.spine.server.entity.storage.SpecScanner;
 import io.spine.server.storage.RecordSpec;
 import io.spine.server.storage.RecordStorage;
 import io.spine.server.storage.StorageFactory;
@@ -85,6 +87,34 @@ public class JdbcStorageFactory implements StorageFactory {
     public <I, R extends Message> RecordStorage<I, R>
     createRecordStorage(ContextSpec context, RecordSpec<I, R> spec) {
         var result = new JdbcRecordStorage<>(context, spec, this);
+        return result;
+    }
+
+    /**
+     * Returns an SQL statement which would allow to manually create an RDMBS table
+     * corresponding to some Entity registered in a certain Bounded Context.
+     *
+     * @param contextSpec
+     *         specification of the Bounded Context, in which Entity is registered
+     * @param idType
+     *         type of Entity identifier
+     * @param entityStateType
+     *         type Entity state
+     * @param <I>
+     *         Entity ID type
+     * @param <S>
+     *         Entity state type
+     * @return SQL statement to create the corresponding table
+     */
+    public <I, S extends EntityState<I>>
+    String tableCreationSql(ContextSpec contextSpec, Class<I> idType, Class<S> entityStateType) {
+        checkNotNull(contextSpec);
+        checkNotNull(idType);
+        checkNotNull(entityStateType);
+
+        var recordSpec = SpecScanner.scan(idType, entityStateType);
+        var storage = new JdbcRecordStorage<>(contextSpec, recordSpec, this);
+        var result = storage.tableCreationSql();
         return result;
     }
 

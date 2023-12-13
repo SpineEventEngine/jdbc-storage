@@ -26,12 +26,15 @@
 
 package io.spine.server.storage.jdbc;
 
+import io.spine.server.ContextSpec;
 import io.spine.server.delivery.InboxMessage;
 import io.spine.server.delivery.InboxMessageId;
 import io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.InboxMessageColumnMapping;
 import io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.TestColumnMapping;
 import io.spine.server.storage.jdbc.record.JdbcRecordStorage;
 import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
+import io.spine.test.storage.StgProject;
+import io.spine.test.storage.StgProjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -106,6 +109,19 @@ class JdbcStorageFactoryTest {
                                         .columnMapping();
         assertThat(actualInboxMapping)
                 .isEqualTo(inboxRecordMapping);
+    }
+
+    @Test
+    @DisplayName("print SQL to create an RDBMS table for a certain entity")
+    void printTableCreationSql() {
+        var factory = JdbcStorageFactory
+                .newBuilder()
+                .setDataSource(whichIsStoredInMemory(newUuid()))
+                .build();
+        var createTableSql = factory.tableCreationSql(
+                ContextSpec.singleTenant("SQLs"), StgProjectId.class, StgProject.class);
+        assertThat(createTableSql)
+                .isNotEmpty();
     }
 
     @Test
