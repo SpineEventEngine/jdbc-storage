@@ -116,10 +116,21 @@ Each table created has the following structure:
      * or according to the columns declaration for a standalone message,
        annotated with `@RecordColumns` (e.g. `io.spine.server.event.store.EventColumn`).
 
-:warning: The framework does **not** declare any table indexes, nor verifies the table structure
-for existing tables.
+:warning: The framework does **not** verify the table structure for existing tables.
 
-- Indexes
+#### Indexes
+
+For both read-side and even write-side data structures, Spine end-users should
+expect them to be queried via SQL. Most of the entity state records are always queried by their IDs,
+but the records with `(column)`-annotated fields may also be queried by their values.
+
+This library is generally agnostic to a particular RDBMS engine, and as of now, provides
+no automatic detection of dialect- or engine-specific table optimizations. 
+Therefore, **no table indexes are automatically generated**.
+
+Prior to production use, it is recommended to launch the Spine-based application 
+in a load-testing mode on top of the RDBMS of choice, analyze the usage scenarios,
+and manually create indexes which suit the scenarios best.
 
 - Customization
 
