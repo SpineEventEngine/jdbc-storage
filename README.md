@@ -126,8 +126,7 @@ In this case, it is important to understand that the framework will **not** be u
 the structure of existing tables in the underlying storage.
 
 To handle such a scenario, developers should invoke a utility method on top of `JdbcStorageFactory`,
-which prints out the SQL statement for the respective table creation. 
-
+which prints out the SQL statement for the respective table _creation_: 
 
 ```java
 
@@ -146,9 +145,12 @@ var factory = JdbcStorageFactory
 // Receive the `CREATE TABLE` expression for this record.
 var createTableSql = 
         factory.tableCreationSql(boundedContextSpec, ProjectId.class, Project.class);
-        
 
 ```
+
+Then, by using the obtained `CREATE TABLE` expression, manually compose and execute
+the SQL expression for altering the table, taking the specific features
+of the underlying DB engine into account.
 
 #### Indexes
 
