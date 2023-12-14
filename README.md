@@ -101,7 +101,7 @@ if it does not exist.
 The name of the table is composed according to the following scheme:
 
 ```
-(Package of Proto message + message name) -> replace `.` with `_` -> result 
+(Package of Proto message + message name) -> (replace `.` with `_`) -> result 
 ```
 
 E.g. a table name for an Entity, which has a state declared by `bar.acme.Project` would be
@@ -117,6 +117,38 @@ Each table created has the following structure:
        annotated with `@RecordColumns` (e.g. `io.spine.server.event.store.EventColumn`).
 
 :warning: The framework does **not** verify the table structure for existing tables.
+
+#### Adding new `(column)`
+
+In scope of development cycle, there may arise a need to modify the declaration of
+Proto messages stored as records, by marking more fields with `(column)` option.
+In this case, it is important to understand that the framework will **not** be updating
+the structure of existing tables in the underlying storage.
+
+To handle such a scenario, developers should invoke a utility method on top of `JdbcStorageFactory`,
+which prints out the SQL statement for the respective table creation. 
+
+
+```java
+
+// A projection, which state is stored as a record for `Project` Proto message.
+public static final class MyProjection
+        extends Projection<ProjectId, Project, Project.Builder> {
+    // ...
+}
+
+var boundedContextSpec = // ...
+var factory = JdbcStorageFactory
+                .newBuilder()
+                // ...
+                .build();
+
+// Receive the `CREATE TABLE` expression for this record.
+var createTableSql = 
+        factory.tableCreationSql(boundedContextSpec, ProjectId.class, Project.class);
+        
+
+```
 
 #### Indexes
 
