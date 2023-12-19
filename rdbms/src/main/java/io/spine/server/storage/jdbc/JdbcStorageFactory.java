@@ -33,6 +33,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import io.spine.annotation.Internal;
 import io.spine.base.EntityState;
 import io.spine.server.ContextSpec;
+import io.spine.server.entity.Entity;
 import io.spine.server.entity.storage.SpecScanner;
 import io.spine.server.storage.RecordSpec;
 import io.spine.server.storage.RecordStorage;
@@ -96,24 +97,21 @@ public class JdbcStorageFactory implements StorageFactory {
      *
      * @param contextSpec
      *         specification of the Bounded Context, in which Entity is registered
-     * @param idType
-     *         type of Entity identifier
-     * @param entityStateType
-     *         type Entity state
+     * @param entityClass
+     *         type of Entity
      * @param <I>
      *         Entity ID type
      * @param <S>
      *         Entity state type
      * @return SQL statement to create the corresponding table
      */
-    public <I, S extends EntityState<I>>
-    String tableCreationSql(ContextSpec contextSpec, Class<I> idType, Class<S> entityStateType) {
+    public <I, S extends EntityState<I>, E extends Entity<I, S>>
+    String tableCreationSql(ContextSpec contextSpec, Class<E> entityClass) {
         checkNotNull(contextSpec);
-        checkNotNull(idType);
-        checkNotNull(entityStateType);
+        checkNotNull(entityClass);
 
-        var recordSpec = SpecScanner.scan(idType, entityStateType);
-        var storage = new JdbcRecordStorage<>(contextSpec, recordSpec, this);
+        var recordSpec = SpecScanner.scan(entityClass);
+        var storage = new JdbcRecordStorage<>(contextSpec, recordSpec, this, false);
         var result = storage.tableCreationSql();
         return result;
     }

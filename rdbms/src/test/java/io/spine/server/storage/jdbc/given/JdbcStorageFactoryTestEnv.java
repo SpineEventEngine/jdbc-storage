@@ -34,6 +34,7 @@ import io.spine.server.delivery.InboxColumn;
 import io.spine.server.delivery.InboxMessage;
 import io.spine.server.delivery.InboxMessageId;
 import io.spine.server.delivery.InboxSignalId;
+import io.spine.server.projection.Projection;
 import io.spine.server.storage.ColumnTypeMapping;
 import io.spine.server.storage.RecordSpec;
 import io.spine.server.storage.jdbc.DataSourceConfig;
@@ -43,6 +44,8 @@ import io.spine.server.storage.jdbc.Type;
 import io.spine.server.storage.jdbc.record.JdbcRecordStorage;
 import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 import io.spine.server.storage.jdbc.type.JdbcColumnTypeMapping;
+import io.spine.test.storage.StgProject;
+import io.spine.test.storage.StgProjectId;
 
 import static io.spine.server.storage.jdbc.GivenDataSource.prefix;
 import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_1;
@@ -139,5 +142,12 @@ public final class JdbcStorageFactoryTestEnv {
                     InboxSignalId.class, signalMapping
             );
         }
+    }
+
+    /**
+     * A test-only projection for testing the JDBC storage factory features.
+     */
+    public static class StgProjectProjection
+            extends Projection<StgProjectId, StgProject, StgProject.Builder> {
     }
 }
