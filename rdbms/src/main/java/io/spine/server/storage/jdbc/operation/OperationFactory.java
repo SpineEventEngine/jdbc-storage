@@ -148,21 +148,6 @@ public class OperationFactory {
     }
 
     /**
-     * Produces an operation which deletes all records from the table.
-     *
-     * @param t
-     *         the table to perform the operation over
-     * @param <I>
-     *         the type of the record identifiers
-     * @param <R>
-     *         the type of the records stored in the table
-     * @return a new operation
-     */
-    public <I, R extends Message> DeleteAll<I, R> deleteAll(RecordTable<I, R> t) {
-        return new DeleteAll<>(t, dataSource);
-    }
-
-    /**
      * Produces an operation which deletes several records from the table by their IDs.
      *
      * @param t

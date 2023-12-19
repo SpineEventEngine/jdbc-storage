@@ -41,7 +41,6 @@ import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.JdbcStorageFactory;
 import io.spine.server.storage.jdbc.TypeMapping;
 import io.spine.server.storage.jdbc.operation.CreateTable;
-import io.spine.server.storage.jdbc.operation.DeleteAll;
 import io.spine.server.storage.jdbc.operation.DeleteManyByIds;
 import io.spine.server.storage.jdbc.operation.DeleteOne;
 import io.spine.server.storage.jdbc.operation.FetchIndex;
@@ -213,11 +212,6 @@ public final class OperationFactoryTestEnv {
         @Override
         public <I, R extends Message> DeleteOne<I, R> deleteOne(RecordTable<I, R> table) {
             return new DeleteOne<>(table, dataSource()) {};
-        }
-
-        @Override
-        public <I, R extends Message> DeleteAll<I, R> deleteAll(RecordTable<I, R> table) {
-            return new DeleteAll<>(table, dataSource()) {};
         }
 
         @Override
