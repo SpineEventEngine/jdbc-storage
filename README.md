@@ -152,8 +152,7 @@ To handle such a scenario, developers should invoke a utility method on top of `
 which prints out the SQL statement for the respective table _creation_: 
 
 ```java
-
-// A projection, which state is stored as a record for `Project` Proto message.
+// A projection, which state is the `Project` Proto message.
 public static final class MyProjection
         extends Projection<ProjectId, Project, Project.Builder> {
     // ...
@@ -169,7 +168,6 @@ var factory = JdbcStorageFactory
 // storing the records for the given projection.
 var createTableSql = 
         factory.tableCreationSql(boundedContextSpec, MyProjection.class);
-
 ```
 
 Then, by using the obtained `CREATE TABLE` expression, manually compose and execute
@@ -197,7 +195,7 @@ It is available as a part of `JdbcStorageFactory.Builder` API.
 
 It is possible to configure several aspects:
 
-* name of RDBMS table per type of stored records:
+* name of RDBMS table, per type of stored records:
 
 ```java
 
@@ -217,6 +215,46 @@ var factory = JdbcStorageFactory
         
         // It also works for "system" tables:
         .setTableName(InboxMessage.class, "custom_inbox_messages")
+        .build();
+```
+
+* column type mapping, per type of stored records:
+
+
+
+```java
+// A projection, which state is the `Project` Proto message, 
+// stored as a record in the corresponding table.
+public static final class MyProjection
+        extends Projection<ProjectId, Project, Project.Builder> { ... }
+
+// ...
+
+// Sample mapping for `Project`-typed records 
+// stored in the corresponding RDBMS table.
+public static class ProjectRecordMapping extends JdbcColumnMapping {
+
+    // Convert `Timestamp`-typed column values into `Long`s by taking only seconds,
+    // and dropping nanos.
+    @Override
+    protected ImmutableMap<Class<?>, JdbcColumnTypeMapping<?, ?>> customRules() {
+        var timestampMapping =
+                new JdbcColumnTypeMapping<Timestamp, Long>(
+                        (value) -> (long) value.getSeconds(),
+                        LONG);
+        return ImmutableMap.of(
+                Timestamp.class, timestampMapping
+        );
+    }
+}
+
+//...
+
+var projectRecordMapping = new ProjectRecordMapping();
+var factory = JdbcStorageFactory
+        .newBuilder()
+        .setCustomMapping(Project.class, projectRecordMapping)
+        // ...
         .build();
 ```
 
