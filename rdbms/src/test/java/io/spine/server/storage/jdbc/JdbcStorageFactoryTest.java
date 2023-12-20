@@ -88,31 +88,6 @@ class JdbcStorageFactoryTest {
     }
 
     @Test
-    @DisplayName("override column mapping for a specific table per its record type")
-    void customizeColumnMappingForTable() {
-        var factoryWideMapping = new TestColumnMapping();
-        var inboxRecordMapping = new InboxMessageColumnMapping();
-        var factory = JdbcStorageFactory
-                .newBuilder()
-                .setDataSource(whichIsStoredInMemory(newUuid()))
-                .setColumnMapping(factoryWideMapping)
-                .setCustomMapping(InboxMessage.class, inboxRecordMapping)
-                .build();
-
-        var actualFactoryWideMapping = factory.columnMapping();
-        assertThat(actualFactoryWideMapping)
-                .isEqualTo(factoryWideMapping);
-
-        var storage = (JdbcRecordStorage<InboxMessageId, InboxMessage>)
-                factory.createRecordStorage(deliveryContextSpec(), inboxMessageSpec());
-        var actualInboxMapping = storage.table()
-                                        .spec()
-                                        .columnMapping();
-        assertThat(actualInboxMapping)
-                .isEqualTo(inboxRecordMapping);
-    }
-
-    @Test
     @DisplayName("allow to print SQL to create an RDBMS table for a certain entity")
     void printTableCreationSql() {
         var factory = JdbcStorageFactory
@@ -136,6 +111,61 @@ class JdbcStorageFactoryTest {
         var columnMapping = factory.columnMapping();
 
         assertThat(columnMapping).isInstanceOf(JdbcColumnMapping.class);
+    }
+
+    @Test
+    @DisplayName("select mapping based on the given data source")
+    void selectMapping() {
+        var dataSource = whichHoldsMetadata(
+                MYSQL_5_7.getDatabaseProductName(),
+                MYSQL_5_7.getMajorVersion(),
+                MYSQL_5_7.getMinorVersion());
+        var factory = JdbcStorageFactory
+                .newBuilder()
+                .setDataSource(dataSource)
+                .build();
+        assertEquals(MYSQL_5_7, factory.typeMapping());
+    }
+
+    @Nested
+    @DisplayName("override")
+    class OverridingDefaultsPerType {
+
+        @Test
+        @DisplayName("a name for a table per record type")
+        void tableName() {
+            var dataSource = whichIsStoredInMemory(newUuid());
+            var customName = "FooBarInboxTable";
+            var storage = newInboxStorage(dataSource, customName);
+            var actualName = storage.tableName();
+            assertThat(actualName)
+                    .isEqualTo(customName);
+        }
+
+        @Test
+        @DisplayName("column mapping for a specific table per its record type")
+        void columnMapping() {
+            var factoryWideMapping = new TestColumnMapping();
+            var inboxRecordMapping = new InboxMessageColumnMapping();
+            var factory = JdbcStorageFactory
+                    .newBuilder()
+                    .setDataSource(whichIsStoredInMemory(newUuid()))
+                    .setColumnMapping(factoryWideMapping)
+                    .setCustomMapping(InboxMessage.class, inboxRecordMapping)
+                    .build();
+
+            var actualFactoryWideMapping = factory.columnMapping();
+            assertThat(actualFactoryWideMapping)
+                    .isEqualTo(factoryWideMapping);
+
+            var storage = (JdbcRecordStorage<InboxMessageId, InboxMessage>)
+                    factory.createRecordStorage(deliveryContextSpec(), inboxMessageSpec());
+            var actualInboxMapping = storage.table()
+                                            .spec()
+                                            .columnMapping();
+            assertThat(actualInboxMapping)
+                    .isEqualTo(inboxRecordMapping);
+        }
     }
 
     @Nested
@@ -173,30 +203,5 @@ class JdbcStorageFactoryTest {
         factory.close();
         assertThat(dataSource.isClosed())
                 .isTrue();
-    }
-
-    @Test
-    @DisplayName("select mapping based on the given data source")
-    void selectMapping() {
-        var dataSource = whichHoldsMetadata(
-                MYSQL_5_7.getDatabaseProductName(),
-                MYSQL_5_7.getMajorVersion(),
-                MYSQL_5_7.getMinorVersion());
-        var factory = JdbcStorageFactory
-                .newBuilder()
-                .setDataSource(dataSource)
-                .build();
-        assertEquals(MYSQL_5_7, factory.typeMapping());
-    }
-
-    @Test
-    @DisplayName("set a custom name for a table per record type")
-    void customizeTableName() {
-        var dataSource = whichIsStoredInMemory(newUuid());
-        var customName = "FooBarInboxTable";
-        var storage = newInboxStorage(dataSource, customName);
-        var actualName = storage.tableName();
-        assertThat(actualName)
-                .isEqualTo(customName);
     }
 }
