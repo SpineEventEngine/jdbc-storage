@@ -40,13 +40,30 @@ This is a responsibility of a developer.
 Here is an example of specifying the connection string:
 
 ```java
-HikariConfig config = new HikariConfig();
+var config = new HikariConfig();
 config.setJdbcUrl("jdbc:mysql://localhost:3306/DbName");
         
-DataSource dataSource = new HikariDataSource(config);
-JdbcStorageFactory.newBuilder()
+var dataSource = new HikariDataSource(config);
+var factory = JdbcStorageFactory.newBuilder()
                   .setDataSource(dataSource)
                   .build();
+```
+
+Once built, the instance of `JdbcStorageFactory` should be plugged
+into the current `ServerEnvironment`:
+
+```java
+var testingFactory = ...; 
+var defaultFactory = ...;  
+        
+// Plug them into the environment.
+ServerEnvironment
+        
+        // To use in tests:
+        .when(Tests.class).useStorageFactory((env) -> testingFactory)
+        
+        // And in all other cases:
+        .when(DefaultMode.class).useStorageFactory((env) -> defaultFactory)
 ```
 
 ### SQL type mapping
@@ -56,33 +73,39 @@ The mapping defines correspondence of `Type` to a name for a particular database
 `Type` is an abstraction for a data type in a database. 
 
 The type mapping is selected automatically basing on the JDBC connection string.
-If there is no predefined mapping for the database, mapping for MySQL 5.7 will be used as the default.
+If there is no predefined mapping for the database, 
+mapping for MySQL 5.7 will be used as the default.
 
 #### Default values
 
-| Type         | MySQL 5.7     | PostgreSQL 10.1 |
-| :----------: |:-------------:| :--------------:|
-| BYTE_ARRAY   | BLOB          | BYTEA           |
-| INT          | INT           | INT             |
-| LONG         | BIGINT        | BIGINT          |
-| STRING_255   | VARCHAR(255)  | VARCHAR(255)    | 
-| STRING       | TEXT          | TEXT            |
-| BOOLEAN      | BOOLEAN       | BOOLEAN         |
+|    Type    |  MySQL 5.7   | PostgreSQL 10.1 |
+|:----------:|:------------:|:---------------:|
+| BYTE_ARRAY |     BLOB     |      BYTEA      |
+|    INT     |     INT      |       INT       |
+|    LONG    |    BIGINT    |     BIGINT      |
+| STRING_255 | VARCHAR(255) |  VARCHAR(255)   |
+| STRING_512 | VARCHAR(512) |  VARCHAR(512)   |
+|   STRING   |     TEXT     |      TEXT       |
+|  BOOLEAN   |   BOOLEAN    |     BOOLEAN     |
 
 #### Custom Mapping
 
 If the automatically selected mapping doesn't match your requirements, a custom mapping can be
-specified during creation of `JdbcStorageFactory`. There is the builder for this purpose - 
-`TypeMappingBuilder.basicBuilder()`. This builder contains mappings for all types
-(equal to MySQL 5.7 mapping). So only required types should be overridden:
+specified during creation of `JdbcStorageFactory`.  
+The library exposes `TypeMappingBuilder.mappingBuilder()` shortcut, returning a builder
+already containing the mappings for all data types, as per MySQL 5.7 mapping scheme.
+The designed usage scenario is to override the values for required keys:
 
 ```java
-TypeMapping mapping = TypeMappingBuilder.basicBuilder()
-                                        .add(Type.INT, "INT4")
-                                        .add(Type.LONG, "INT8")
-                                        .build();
-JdbcStorageFactory.newBuilder()
+var mapping = TypeMappingBuilder.mappingBuilder()
+                   // Setting custom values for `INT` and `LONG`:
+                  .add(Type.INT, "INT4")
+                  .add(Type.LONG, "INT8")
+                  .build();
+var factory = JdbcStorageFactory.newBuilder()
                   .setTypeMapping(mapping)
+                  //...
+                  .build()
 ```
 
 ## Features available since 2.x
@@ -142,9 +165,10 @@ var factory = JdbcStorageFactory
                 // ...
                 .build();
 
-// Receive the `CREATE TABLE` expression for this record.
+// Receive the `CREATE TABLE` expression for the table
+// storing the records for the given projection.
 var createTableSql = 
-        factory.tableCreationSql(boundedContextSpec, ProjectId.class, Project.class);
+        factory.tableCreationSql(boundedContextSpec, MyProjection.class);
 
 ```
 
@@ -166,7 +190,35 @@ Prior to production use, it is recommended to launch the Spine-based application
 in a load-testing mode on top of the RDBMS of choice, analyze the usage scenarios,
 and manually create indexes which suit the scenarios best.
 
-- Customization
+#### Customization
+
+The library provides an API to customize the RDBMS tables used by storage instances.
+It is available as a part of `JdbcStorageFactory.Builder` API.
+
+It is possible to configure several aspects:
+
+* name of RDBMS table per type of stored records:
+
+```java
+
+// A projection, using `TaskView` Proto message as a state type.
+public final class TaskProjection
+    extends Projection<TaskId, TaskView, TaskView.Builder> { ... }
+
+var factory = JdbcStorageFactory
+        .newBuilder()
+        
+        // ...
+        
+        // Uses the record type to set the name for its table:
+        .setTableName(TaskView.class, "my_favourite_tasks")
+        
+        // ...
+        
+        // It also works for "system" tables:
+        .setTableName(InboxMessage.class, "custom_inbox_messages")
+        .build();
+```
 
 
 ### Queries

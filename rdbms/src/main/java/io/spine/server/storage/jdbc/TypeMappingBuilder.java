@@ -79,9 +79,10 @@ public final class TypeMappingBuilder {
      * {@linkplain TypeMappingBuilder#add(Type, String) overridden} as follows:
      *
      * <pre>{@code
-     * TypeMapping mapping = basicBuilder().add(Type.INT, "INT4")
-     *                                     .add(Type.LONG, "INT8")
-     *                                     .build();
+     * TypeMapping mapping = mappingBuilder()
+     *                          .add(Type.INT, "INT4")
+     *                          .add(Type.LONG, "INT8")
+     *                          .build();
      * }</pre>
      *
      * @return the builder containing names for all types
