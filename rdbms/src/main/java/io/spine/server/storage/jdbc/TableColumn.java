@@ -65,15 +65,6 @@ public class TableColumn {
         return mapping.typeOf(type);
     }
 
-    /**
-     * Returns {@code true} if this column may contain {@code NULL} values, {@code false} otherwise.
-     *
-     * <p>By default, returns {@code false}.
-     */
-    public boolean isNullable() {
-        return false;
-    }
-
     public @Nullable Object valueIn(RecordWithColumns<?, ?> record) {
         var columnName = ColumnName.of(name());
         if(!record.hasColumn(columnName)) {
