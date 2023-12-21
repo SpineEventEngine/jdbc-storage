@@ -29,7 +29,10 @@ package io.spine.server.storage.jdbc.operation;
 import io.spine.server.delivery.InboxMessage;
 import io.spine.server.delivery.InboxMessageId;
 import io.spine.server.storage.Storage;
+import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.PredefinedMapping;
+import io.spine.server.storage.jdbc.TypeMapping;
+import io.spine.server.storage.jdbc.engine.PredefinedEngine;
 import io.spine.server.storage.jdbc.operation.given.OperationFactoryTestEnv;
 import io.spine.server.storage.jdbc.operation.given.OperationFactoryTestEnv.OverridingAllOpFactory;
 import io.spine.server.storage.jdbc.operation.given.OperationFactoryTestEnv.TestOperationFactory;
@@ -44,6 +47,7 @@ import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.inbox
 import static io.spine.server.storage.jdbc.operation.given.OperationFactoryTestEnv.OVERRIDDEN_LABEL;
 import static io.spine.server.storage.jdbc.operation.given.OperationFactoryTestEnv.imStorageFactoryBuilder;
 import static io.spine.server.storage.jdbc.operation.given.OperationFactoryTestEnv.randomHandleCommandMessage;
+import static org.junit.jupiter.api.Assertions.fail;
 
 @DisplayName("With `OperationFactory` it should be possible")
 final class OperationFactoryTest {
@@ -82,10 +86,37 @@ final class OperationFactoryTest {
     @DisplayName("extend existing operations, " +
             "and use them in corresponding methods in `OperationFactory`")
     void useOperationsByExtending() {
-        var dataSource = whichIsStoredInMemory(OperationFactoryTestEnv.class.getName());
+        var dataSource = inMemoryDataSource();
         var typeMapping = PredefinedMapping.select(dataSource);
         var factory = new OverridingAllOpFactory(dataSource, typeMapping);
         assertThat(factory)
                 .isNotNull();
+    }
+
+    @Test
+    @DisplayName("override a hard-coded RDBMS engine via `protected` ctor of `OperationFactory`")
+    void customizeEngine() {
+        var dataSource = inMemoryDataSource();
+        var typeMapping = PredefinedMapping.select(dataSource);
+        var postgres = PredefinedEngine.Postgres;
+        var postgresFactory = new OperationFactory(dataSource, typeMapping, postgres);
+        assertThat(postgresFactory.engine())
+                .isEqualTo(postgres);
+
+        try {
+            var constructor = OperationFactory.class
+                    .getDeclaredConstructor(DataSourceWrapper.class,
+                                            TypeMapping.class,
+                                            PredefinedEngine.class);
+            assertThat(constructor)
+                    .isNotNull();
+        } catch (NoSuchMethodException e) {
+            fail("No expected `protected OperationFactory(" +
+                         "DataSourceWrapper, TypeMapping, DetectedEngine)` ctor was found.");
+        }
+    }
+
+    private static DataSourceWrapper inMemoryDataSource() {
+        return whichIsStoredInMemory(OperationFactoryTestEnv.class.getName());
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2023, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,22 +24,23 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.server.storage.jdbc.operation;
+package io.spine.server.storage.jdbc.engine;
 
 import io.spine.server.storage.jdbc.DataSourceMetaData;
+import io.spine.server.storage.jdbc.operation.Operation;
 
 import java.util.Locale;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * The DB engines which make difference in terms of providing specific
- * {@link Operation} implementations.
+ * The DB engines known to this library,
+ * which make difference in terms of providing specific {@link Operation} implementations.
  *
  * <p>This list isn't expected to be complete. However, it may get bigger as far as
  * the Spine routines are getting some known optimizations on other DB engines.
  */
-public enum DetectedEngine {
+public enum PredefinedEngine implements DetectedEngine {
 
     /**
      * MySQL of all versions.
@@ -65,7 +66,7 @@ public enum DetectedEngine {
      *
      * @implNote This implementation is inspired by {@link com.querydsl.sql.SQLTemplatesRegistry}.
      */
-    static DetectedEngine from(DataSourceMetaData metaData) {
+    public static PredefinedEngine from(DataSourceMetaData metaData) {
         checkNotNull(metaData);
         var productName = metaData.productName()
                                   .toLowerCase(Locale.getDefault());
@@ -76,5 +77,15 @@ public enum DetectedEngine {
             return Postgres;
         }
         return Generic;
+    }
+
+    /**
+     * Returns a generic name for each of predefined engines.
+     *
+     * <p>Version is not included.
+     */
+    @Override
+    public String id() {
+        return this.name();
     }
 }

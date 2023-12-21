@@ -29,11 +29,13 @@ package io.spine.server.storage.jdbc.operation;
 import com.google.protobuf.Message;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.TypeMapping;
+import io.spine.server.storage.jdbc.engine.DetectedEngine;
+import io.spine.server.storage.jdbc.engine.PredefinedEngine;
 import io.spine.server.storage.jdbc.operation.mysql.MysqlWriteOne;
 import io.spine.server.storage.jdbc.record.RecordTable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static io.spine.server.storage.jdbc.operation.DetectedEngine.MySQL;
+import static io.spine.server.storage.jdbc.engine.PredefinedEngine.MySQL;
 
 /**
  * A factory of {@link Operation}s.
@@ -60,12 +62,28 @@ public class OperationFactory {
      * Creates a new factory on top of the passed data source and the Java-SQL type mapping.
      */
     public OperationFactory(DataSourceWrapper wrapper, TypeMapping mapping) {
+        this(wrapper, mapping, detectedEngine(wrapper));
+    }
+
+    private static PredefinedEngine detectedEngine(DataSourceWrapper wrapper) {
+        var metadata = wrapper.metaData();
+        var result = PredefinedEngine.from(metadata);
+        return result;
+    }
+
+    /**
+     * Creates a new factory on top of the passed data source and the Java-SQL type mapping.
+     */
+    protected OperationFactory(DataSourceWrapper wrapper,
+                               TypeMapping mapping,
+                               DetectedEngine engine) {
         checkNotNull(wrapper);
         checkNotNull(mapping);
+        checkNotNull(engine);
         this.dataSource = wrapper;
         this.typeMapping = mapping;
-        var metadata = dataSource.metaData();
-        engine = DetectedEngine.from(metadata);
+        this.engine = engine;
+
     }
 
     /**
