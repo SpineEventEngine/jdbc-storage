@@ -109,7 +109,6 @@ public class CreateTable<I, R extends Message> extends Operation<I, R> implement
      * Composes an SQL statement for this operation.
      */
     @Internal
-    //TODO:2021-07-01:alex.tymchenko: introduce `required` attribute for `io.spine.query.Column`.
     public String sqlStatement() {
         var sql = beginStatement();
 

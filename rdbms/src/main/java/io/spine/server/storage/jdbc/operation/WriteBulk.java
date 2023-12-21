@@ -53,7 +53,6 @@ import static java.util.stream.Collectors.toList;
  * @param <R>
  *         the type of the stored records
  */
-//TODO:2021-12-23:alex.tymchenko: think of having an abstract base and three impls instead.
 public class WriteBulk<I, R extends Message> extends Operation<I, R> {
 
     private final OperationFactory operations;
