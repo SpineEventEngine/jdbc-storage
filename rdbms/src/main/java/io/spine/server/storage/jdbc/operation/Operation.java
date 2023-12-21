@@ -66,13 +66,6 @@ public abstract class Operation<I, R extends Message> {
     }
 
     /**
-     * Returns the definition of the table column containing record identifiers.
-     */
-    protected final IdColumn<I> idColumn() {
-        return table().idColumn();
-    }
-
-    /**
      * Returns the definition of the data source to use.
      */
     public final DataSourceWrapper dataSource() {
