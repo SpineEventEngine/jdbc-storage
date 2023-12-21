@@ -26,7 +26,6 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import com.querydsl.sql.mysql.MySQLQueryFactory;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.query.AbstractQuery.TransactionHandler;
 import io.spine.server.storage.jdbc.query.given.Given.AStorageQuery;
