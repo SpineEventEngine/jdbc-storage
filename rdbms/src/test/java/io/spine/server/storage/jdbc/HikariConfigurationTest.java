@@ -30,11 +30,6 @@ import com.google.common.testing.NullPointerTester;
 import com.google.common.testing.NullPointerTester.Visibility;
 import io.spine.testing.UtilityClassTest;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
-import static io.spine.testing.Assertions.assertHasPrivateParameterlessCtor;
-import static io.spine.testing.DisplayNames.HAVE_PARAMETERLESS_CTOR;
-import static io.spine.testing.DisplayNames.NOT_ACCEPT_NULLS;
 
 @DisplayName("`HikariConfiguration` should")
 class HikariConfigurationTest extends UtilityClassTest<HikariConfiguration> {

@@ -30,8 +30,6 @@ import io.spine.testing.UtilityClassTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static io.spine.testing.Assertions.assertHasPrivateParameterlessCtor;
-import static io.spine.testing.DisplayNames.HAVE_PARAMETERLESS_CTOR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DisplayName("`Sql` utility should")
