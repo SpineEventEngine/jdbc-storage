@@ -31,13 +31,14 @@ import io.spine.server.storage.jdbc.record.column.given.IdColumnTestEnv.IntIdEnt
 import io.spine.server.storage.jdbc.record.column.given.IdColumnTestEnv.LongIdEntity;
 import io.spine.server.storage.jdbc.record.column.given.IdColumnTestEnv.MessageIdEntity;
 import io.spine.server.storage.jdbc.record.column.given.IdColumnTestEnv.StringIdEntity;
+import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static io.spine.server.entity.storage.SpecScanner.scan;
 import static io.spine.server.storage.jdbc.Type.INT;
 import static io.spine.server.storage.jdbc.Type.LONG;
 import static io.spine.server.storage.jdbc.Type.STRING_512;
-import static io.spine.server.storage.jdbc.record.column.given.IdColumnTestEnv.Column.idTableColumn;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -45,10 +46,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @DisplayName("`IdColumn` should")
 class IdColumnTest {
 
+    private static final JdbcColumnMapping mapping = new JdbcColumnMapping();
+
     @Test
     @DisplayName("allow `LONG` SQL type")
     void haveBigintImpl() {
-        IdColumn<?> column = IdColumn.ofEntityClass(idTableColumn(), LongIdEntity.class);
+        IdColumn<?> column = IdColumn.of(scan(LongIdEntity.class), mapping);
         assertEquals(LONG, column.sqlType());
         assertSame(Long.class, column.javaType());
     }
@@ -56,7 +59,7 @@ class IdColumnTest {
     @Test
     @DisplayName("allow `INT` SQL type")
     void haveIntImpl() {
-        IdColumn<?> column = IdColumn.ofEntityClass(idTableColumn(), IntIdEntity.class);
+        IdColumn<?> column = IdColumn.of(scan(IntIdEntity.class), mapping);
         assertEquals(INT, column.sqlType());
         assertSame(Integer.class, column.javaType());
     }
@@ -64,7 +67,7 @@ class IdColumnTest {
     @Test
     @DisplayName("allow `VARCHAR_512` SQL type")
     void haveStringImpl() {
-        IdColumn<?> column = IdColumn.ofEntityClass(idTableColumn(), StringIdEntity.class);
+        IdColumn<?> column = IdColumn.of(scan(StringIdEntity.class), mapping);
         assertEquals(STRING_512, column.sqlType());
         assertSame(String.class, column.javaType());
     }
@@ -72,15 +75,8 @@ class IdColumnTest {
     @Test
     @DisplayName("cast message IDs to string")
     void castMessageIdsToString() {
-        IdColumn<?> column = IdColumn.ofEntityClass(idTableColumn(), MessageIdEntity.class);
+        IdColumn<?> column = IdColumn.of(scan(MessageIdEntity.class), mapping);
         assertEquals(STRING_512, column.sqlType());
         assertTrue(Message.class.isAssignableFrom(column.javaType()));
-    }
-
-    @Test
-    @DisplayName("store column name")
-    void storeColumnName() {
-        var column = IdColumn.ofEntityClass(idTableColumn(), StringIdEntity.class);
-        assertEquals(idTableColumn().name(), column.columnName());
     }
 }

@@ -31,10 +31,11 @@ import com.google.common.testing.NullPointerTester.Visibility;
 import com.querydsl.core.types.dsl.ComparablePath;
 import io.spine.query.ComparisonOperator;
 import io.spine.query.QueryPredicate;
-import io.spine.server.storage.jdbc.TableColumn;
+import io.spine.server.entity.storage.SpecScanner;
 import io.spine.server.storage.jdbc.record.column.IdColumn;
 import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 import io.spine.test.storage.StgProject;
+import io.spine.test.storage.StgProjectId;
 import io.spine.testing.UtilityClassTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -67,7 +68,8 @@ class QueryPredicatesTest extends UtilityClassTest<QueryPredicates> {
     protected void configure(NullPointerTester tester) {
         super.configure(tester);
         var mapping = new JdbcColumnMapping();
-        var idColumn = IdColumn.of(new TableColumn("sample_id", String.class, mapping));
+        var idColumn = IdColumn.of(SpecScanner.scan(StgProjectId.class, StgProject.class),
+                                   mapping);
         var predicate = StgProject.query()
                                   .build()
                                   .subject()

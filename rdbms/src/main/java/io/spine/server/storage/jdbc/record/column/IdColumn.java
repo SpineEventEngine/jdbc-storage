@@ -28,8 +28,6 @@ package io.spine.server.storage.jdbc.record.column;
 
 import com.google.protobuf.Message;
 import io.spine.annotation.Internal;
-import io.spine.server.aggregate.Aggregate;
-import io.spine.server.entity.Entity;
 import io.spine.server.storage.RecordSpec;
 import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.Type;
@@ -38,16 +36,13 @@ import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 
 import java.util.Collection;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Lists.newLinkedList;
-import static io.spine.server.entity.model.EntityClass.asEntityClass;
 import static io.spine.server.storage.jdbc.Type.INT;
 import static io.spine.server.storage.jdbc.Type.LONG;
 import static io.spine.server.storage.jdbc.Type.STRING_512;
 import static io.spine.type.Json.toCompactJson;
 import static io.spine.util.Exceptions.newIllegalArgumentException;
-import static java.util.Objects.requireNonNull;
 
 /**
  * A wrapper for the column which stores a primary key in a DB {@linkplain RecordTable table}.
@@ -67,40 +62,6 @@ public abstract class IdColumn<I> {
 
     private IdColumn(TableColumn column) {
         this.column = column;
-    }
-
-    /**
-     * Wraps a given ID {@code column} of a primitive type.
-     *
-     * <p>The column should have a valid SQL type.
-     *
-     * <p>This also implies that actual ID values will be primitive and matching to the column SQL
-     * type.
-     *
-     * @see #of(TableColumn, Class) for {@link Message}-type ID column creation
-     * @see #ofEntityClass(TableColumn, Class) for {@link Entity} ID column creation
-     */
-    @SuppressWarnings("unchecked") // It's up to caller to keep the ID class and SQL type in sync.
-    public static <I> IdColumn<I> of(TableColumn column) {
-        checkNotNull(column);
-        var type = requireNonNull(column.type(),
-                                  "Please use other suitable method overload if ID column SQL " +
-                                          "type is unknown at compile time");
-        switch (type) {
-            case INT:
-                return (IdColumn<I>) new IntIdColumn(column);
-            case LONG:
-                return (IdColumn<I>) new LongIdColumn(column);
-            case STRING_512:
-            case STRING_255:
-            case STRING:
-                return (IdColumn<I>) new StringIdColumn(column);
-            case BOOLEAN:
-            case BYTE_ARRAY:
-            default:
-                throw newIllegalArgumentException("Unexpected ID column SQL type: %s",
-                                                  type);
-        }
     }
 
     /**
@@ -134,62 +95,6 @@ public abstract class IdColumn<I> {
             return (IdColumn<I>) new MessageIdColumn<>(column, messageClass);
         } else {
             throw newIllegalArgumentException("Unexpected entity ID class %s", idType.getName());
-        }
-    }
-
-    /**
-     * Wraps a given ID {@code column} of {@link Message} type.
-     *
-     * <p>The column should have an SQL type set to {@code null}.
-     */
-    public static <I extends Message> IdColumn<I> of(TableColumn column, Class<I> messageClass) {
-        checkNotNull(column);
-        checkNotNull(messageClass);
-        checkArgument(column.type() == null,
-                      "Message-type IDs follow the predefined conversion rules of `IdColumn` " +
-                              "and shouldn't have an SQL type set on their own");
-        return new MessageIdColumn<>(column, messageClass);
-    }
-
-    /**
-     * Wraps a given {@link Entity} ID column.
-     *
-     * <p>The column should have an SQL type set to {@code null}.
-     *
-     * <p>The column type is calculated at runtime according to the generic parameters of the
-     * {@code Entity} {@linkplain io.spine.server.entity.model.EntityClass class}.
-     *
-     * @param entityClass
-     *         a class of an {@link Entity} or an {@link Aggregate}
-     * @param <I>
-     *         the type of {@link Entity} IDs
-     * @return a new helper instance
-     */
-    @SuppressWarnings({
-            "unchecked", // ID runtime type is checked with if statements.
-            "IfStatementWithTooManyBranches", // OK for a factory method
-            "ChainOfInstanceofChecks"         // which depends on the built object target type.
-    })
-    public static <I> IdColumn<I>
-    ofEntityClass(TableColumn column, Class<? extends Entity<I, ?>> entityClass) {
-        checkNotNull(column);
-        checkNotNull(entityClass);
-        checkArgument(column.type() == null,
-                      "Entity ID type is calculated at runtime and shouldn't have an SQL type " +
-                              "pre-set");
-        var idClass = asEntityClass(entityClass).idClass();
-        if (idClass == Long.class) {
-            return (IdColumn<I>) new LongIdColumn(column);
-        } else if (idClass == Integer.class) {
-            return (IdColumn<I>) new IntIdColumn(column);
-        } else if (idClass == String.class) {
-            return (IdColumn<I>) new StringIdColumn(column);
-        } else if (Message.class.isAssignableFrom(idClass)) {
-            var messageClass = (Class<? extends Message>) idClass;
-            return (IdColumn<I>) new MessageIdColumn<>(column, messageClass);
-        } else {
-            throw newIllegalArgumentException("Unexpected entity ID class `%s`.",
-                                              idClass.getName());
         }
     }
 
