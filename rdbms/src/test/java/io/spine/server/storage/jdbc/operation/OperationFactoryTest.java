@@ -32,6 +32,7 @@ import io.spine.server.storage.Storage;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.PredefinedMapping;
 import io.spine.server.storage.jdbc.TypeMapping;
+import io.spine.server.storage.jdbc.engine.DetectedEngine;
 import io.spine.server.storage.jdbc.engine.PredefinedEngine;
 import io.spine.server.storage.jdbc.operation.given.OperationFactoryTestEnv;
 import io.spine.server.storage.jdbc.operation.given.OperationFactoryTestEnv.OverridingAllOpFactory;
@@ -107,7 +108,7 @@ final class OperationFactoryTest {
             var constructor = OperationFactory.class
                     .getDeclaredConstructor(DataSourceWrapper.class,
                                             TypeMapping.class,
-                                            PredefinedEngine.class);
+                                            DetectedEngine.class);
             assertThat(constructor)
                     .isNotNull();
         } catch (NoSuchMethodException e) {
