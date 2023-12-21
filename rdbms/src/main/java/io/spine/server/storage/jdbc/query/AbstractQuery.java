@@ -157,16 +157,6 @@ public abstract class AbstractQuery<I, R extends Message> implements StorageQuer
         return pathBuilder.get(columnName);
     }
 
-    /**
-     * Returns the path builder for the column by the given name
-     * with the respect to column value type.
-     *
-     * @param <T> the type of column values
-     */
-    protected <T> PathBuilder<T> pathOf(String columnName, Class<T> type) {
-        return pathBuilder.get(columnName, type);
-    }
-
     @SuppressWarnings("WeakerAccess" /* Available to SPI users. */)
     protected PathBuilder<Object> idPath() {
         return pathOf(idColumn());
