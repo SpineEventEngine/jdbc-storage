@@ -67,7 +67,7 @@ class SelectMessageByIdQueryTest {
         var query = query(dataSource, table, underlyingQuery);
 
         var results = underlyingQuery.getResults();
-        query.execute();
+        var ignored = query.execute();
         assertThat(results.isClosed())
                 .isTrue();
     }
