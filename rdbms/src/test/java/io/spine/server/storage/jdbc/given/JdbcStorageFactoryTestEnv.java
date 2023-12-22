@@ -101,6 +101,7 @@ public final class JdbcStorageFactoryTestEnv {
     }
 
     public static RecordSpec<InboxMessageId, InboxMessage> inboxMessageSpec() {
+        @SuppressWarnings("DataFlowIssue" /* Proto getters never return `null`s. */)
         var inboxMessageSpec = new RecordSpec<>(
                 InboxMessageId.class,
                 InboxMessage.class,
