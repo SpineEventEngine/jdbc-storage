@@ -188,7 +188,7 @@ public class SelectMessagesByQuery<I, R extends Message> extends AbstractQuery<I
         }
 
         @Override
-        protected SelectMessagesByQuery.Builder<I, R> getThis() {
+        protected Builder<I, R> getThis() {
             return this;
         }
     }
