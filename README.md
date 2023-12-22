@@ -11,7 +11,18 @@ See [gcloud-java](https://github.com/SpineEventEngine/gcloud-java/) for Google C
   
 ### Artifacts
 
-Gradle:
+This library is intended to be used together with other Spine Event Engine libraries,
+as a Storage port connecting the application to RDBMS system of choice.
+
+For the details on setting up the server environment please refer to
+[Spine Bootstrap Gradle plugin](https://github.com/SpineEventEngine/bootstrap/) and
+[Spine `core` modules](https://github.com/SpineEventEngine/core-java/) documentation.
+
+#### Stable version
+
+Stable version requires Java 8+.
+
+Use the following dependency in your Gradle build scripts:
 
 ```kotlin
 dependencies {
@@ -19,11 +30,22 @@ dependencies {
 }
 ```
 
-This artifact should be used as a part of the Spine server application.
- 
-For the details on setting up the server environment please refer to 
-[Spine Bootstrap Gradle plugin](https://github.com/SpineEventEngine/bootstrap/) and 
-[Spine `core` modules](https://github.com/SpineEventEngine/core-java/) documentation. 
+#### 2.x
+
+Version 2.x is still in development, but as of now, it fully supports all major features
+brought by Spine 2.x family.
+
+It requires Java 11+.
+
+Use the following dependency in your Gradle build scripts:
+
+```kotlin
+dependencies {
+    implementation("io.spine:spine-rdbms:2.0.0-SNAPSHOT.92")
+}
+```
+
+:warning: The exact snapshot version for version 2.x is listed in `version.gradle.kts`.
 
 ### Configuration
 
