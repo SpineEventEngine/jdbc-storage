@@ -92,7 +92,7 @@ public class JdbcStorageFactory implements StorageFactory {
     }
 
     /**
-     * Returns an SQL statement which would allow to manually create an RDMBS table
+     * Returns an SQL statement which would allow to manually create an RDBMS table
      * corresponding to some Entity registered in a certain Bounded Context.
      *
      * @param contextSpec
