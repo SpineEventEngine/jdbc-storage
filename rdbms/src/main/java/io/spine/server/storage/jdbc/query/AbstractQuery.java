@@ -206,7 +206,9 @@ public abstract class AbstractQuery<I, R extends Message> implements StorageQuer
      *         the data source to produce connections
      * @return a new query factory
      */
-    static MySQLQueryFactory mySqlFactory(DataSourceWrapper dataSource) {
+    @SuppressWarnings("WeakerAccess" /* Exposed to SPI users. */)
+    protected static MySQLQueryFactory mySqlFactory(DataSourceWrapper dataSource) {
+        checkNotNull(dataSource);
         var connectionSupplier = new ConnectionSupplier(dataSource);
         return new MySQLQueryFactory(configuration(dataSource), connectionSupplier);
     }
