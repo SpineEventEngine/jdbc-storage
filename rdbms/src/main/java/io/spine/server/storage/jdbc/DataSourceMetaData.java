@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2023, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,9 +60,9 @@ public interface DataSourceMetaData {
      */
     static DataSourceMetaData of(DatabaseMetaData metaData) throws DatabaseException {
         try {
-            String productName = metaData.getDatabaseProductName();
-            int majorVersion = metaData.getDatabaseMajorVersion();
-            int minorVersion = metaData.getDatabaseMinorVersion();
+            var productName = metaData.getDatabaseProductName();
+            var majorVersion = metaData.getDatabaseMajorVersion();
+            var minorVersion = metaData.getDatabaseMinorVersion();
 
             return new DataSourceMetaData() {
                 @Override

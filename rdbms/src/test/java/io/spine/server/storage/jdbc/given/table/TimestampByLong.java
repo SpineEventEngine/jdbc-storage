@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2023, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,13 +27,8 @@
 package io.spine.server.storage.jdbc.given.table;
 
 import com.google.protobuf.Timestamp;
-import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.Type;
-import io.spine.server.storage.jdbc.TypeMapping;
-import io.spine.server.storage.jdbc.message.MessageTable;
-import io.spine.server.storage.jdbc.query.IdColumn;
-
-import static io.spine.server.storage.jdbc.Type.LONG;
+import io.spine.server.storage.RecordSpec;
+import io.spine.server.storage.jdbc.JdbcStorageFactory;
 
 /**
  * Holds {@link Timestamp} records by {@code Long} IDs.
@@ -42,36 +37,14 @@ public final class TimestampByLong extends TimestampTable<Long> {
 
     private static final String NAME = "timestamp_by_long";
 
-    public TimestampByLong(DataSourceWrapper dataSource, TypeMapping typeMapping) {
-        super(NAME, IdColumn.of(TheIdColumn.INSTANCE), dataSource, typeMapping);
+    public TimestampByLong(JdbcStorageFactory storageFactory) {
+        super(NAME, recordSpec(), storageFactory);
     }
 
-    public enum TheIdColumn implements MessageTable.Column<Timestamp> {
-        INSTANCE;
-
-        @Override
-        public Getter<Timestamp> getter() {
-            return TheIdColumn::idOf;
-        }
-
-        @Override
-        public Type type() {
-            return LONG;
-        }
-
-        @Override
-        public boolean isPrimaryKey() {
-            return true;
-        }
-
-        @Override
-        public boolean isNullable() {
-            return false;
-        }
-
-        private static Long idOf(Timestamp timestamp) {
-            long result = timestamp.getSeconds() + timestamp.getNanos();
-            return result;
-        }
+    @SuppressWarnings("ProtoTimestampGetSecondsGetNano")    // As intended.
+    private static RecordSpec<Long, Timestamp> recordSpec() {
+        return new RecordSpec<>(
+                Long.class, Timestamp.class, (t) -> t.getSeconds() + t.getNanos()
+        );
     }
 }

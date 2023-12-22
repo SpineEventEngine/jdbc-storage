@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2023, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,7 +68,7 @@ public final class ConnectionWrapper implements AutoCloseable {
         try {
             @SuppressWarnings("JDBCPrepareStatementWithNonConstantString")
             // Preparing a statement provided by a StorageQuery.
-            PreparedStatement statement = connection.prepareStatement(sql);
+            var statement = connection.prepareStatement(sql);
             return statement;
         } catch (SQLException e) {
             throw new DatabaseException("Error executing statement " + sql, e);

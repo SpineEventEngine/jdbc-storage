@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2023, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,6 +48,7 @@ public final class Sql {
      */
     public enum Query {
 
+        @SuppressWarnings("DuplicateStringLiteralInspection" /*  Doubles in tests as `expected`. */)
         CREATE_TABLE("CREATE TABLE"),
         CREATE_IF_MISSING("CREATE TABLE IF NOT EXISTS"),
         DROP_TABLE("DROP TABLE"),
@@ -103,15 +104,7 @@ public final class Sql {
     }
 
     /**
-     * Set of SQL keywords representing 5 aggregating functions:
-     *
-     * <ul>
-     *      <li>MIN
-     *      <li>MAX
-     *      <li>COUNT
-     *      <li>AVG
-     *      <li>SUM
-     * </ul>
+     * Set of SQL keywords representing aggregating functions.
      */
     public enum Function {
 
@@ -128,12 +121,7 @@ public final class Sql {
     }
 
     /**
-     * Set of punctuation signs used in SQL:
-     *
-     * <ul>
-     *     <li>Operators: equal, not equal, comparison operators;
-     *     <li>Punctuation: comma, brackets, semicolon.
-     * </ul>
+     * Set of punctuation signs and other building blocks used in SQL.
      */
     public enum BuildingBlock {
 

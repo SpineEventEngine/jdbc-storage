@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2023, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,16 +25,19 @@
  */
 
 /**
- * Contains the {@linkplain io.spine.server.storage.jdbc.delivery.JdbcInboxStorage implementation}
- * of {@code InboxStorage} and other mechanisms of message delivery.
+ * Defines the storage for Delivery-related records, such as
+ * {@link io.spine.server.delivery.ShardSessionRecord ShardSessionRecord}
+ * and {@link io.spine.server.delivery.InboxMessage InboxMessage}.
  */
 
 @Experimental
+@SPI
 @CheckReturnValue
 @ParametersAreNonnullByDefault
 package io.spine.server.storage.jdbc.delivery;
 
 import com.google.errorprone.annotations.CheckReturnValue;
 import io.spine.annotation.Experimental;
+import io.spine.annotation.SPI;
 
 import javax.annotation.ParametersAreNonnullByDefault;

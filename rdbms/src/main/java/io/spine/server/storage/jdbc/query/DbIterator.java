@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2023, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,8 @@ package io.spine.server.storage.jdbc.query;
 import com.google.common.annotations.VisibleForTesting;
 import io.spine.annotation.Internal;
 import io.spine.server.storage.jdbc.DatabaseException;
+import io.spine.server.storage.jdbc.query.reader.ColumnReader;
+import io.spine.server.storage.jdbc.record.Serializer;
 
 import java.io.Closeable;
 import java.sql.Connection;
@@ -117,7 +119,7 @@ public abstract class DbIterator<R> implements Iterator<R>, Closeable {
             return memoizedHasNext;
         }
         try {
-            boolean hasNextElem = resultSet.next();
+            var hasNextElem = resultSet.next();
             if (!hasNextElem) {
                 close();
             }
@@ -169,6 +171,7 @@ public abstract class DbIterator<R> implements Iterator<R>, Closeable {
      */
     @Override
     @Deprecated
+    @SuppressWarnings("DeprecatedIsStillUsed") /* Used in tests to verify the exception. */
     public final void remove() throws UnsupportedOperationException {
         throw new UnsupportedOperationException("Removing is not supported.");
     }
@@ -189,13 +192,13 @@ public abstract class DbIterator<R> implements Iterator<R>, Closeable {
                 // Get statement before closing the result set, because PostgreSQL doesn't allow
                 // to retrieve a statement if a result set is closed.
                 // The same strategy to obtain the connection is also safer.
-                Statement statement = resultSet.getStatement();
+                var statement = resultSet.getStatement();
                 resultSet.close();
-                boolean statementClosed = statement == null || statement.isClosed();
+                var statementClosed = statement == null || statement.isClosed();
                 if (!statementClosed) {
-                    Connection connection = statement.getConnection();
+                    var connection = statement.getConnection();
                     statement.close();
-                    boolean connectionClosed = connection == null || connection.isClosed();
+                    var connectionClosed = connection == null || connection.isClosed();
                     if (!connectionClosed) {
                         connection.close();
                     }
@@ -235,7 +238,7 @@ public abstract class DbIterator<R> implements Iterator<R>, Closeable {
 
         @Override
         protected R readResult() throws SQLException {
-            R result = columnReader.readValue(resultSet());
+            var result = columnReader.readValue(resultSet());
             return result;
         }
     }
@@ -275,9 +278,9 @@ public abstract class DbIterator<R> implements Iterator<R>, Closeable {
 
         @Override
         protected DoubleColumnRecord<A, B> readResult() throws SQLException {
-            A value1 = firstColumnReader.readValue(resultSet());
-            B value2 = secondColumnReader.readValue(resultSet());
-            DoubleColumnRecord<A, B> result = DoubleColumnRecord.of(value1, value2);
+            var value1 = firstColumnReader.readValue(resultSet());
+            var value2 = secondColumnReader.readValue(resultSet());
+            var result = DoubleColumnRecord.of(value1, value2);
             return result;
         }
     }

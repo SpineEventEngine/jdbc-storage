@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2023, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,6 @@ import io.spine.annotation.Internal;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
 /**
@@ -68,10 +67,10 @@ public interface DataSourceWrapper extends AutoCloseable {
      * @return templates for a particular JDBC implementation
      */
     default SQLTemplates templates() {
-        try (ConnectionWrapper connection = getConnection(true)) {
-            DatabaseMetaData metaData = connection.get()
-                                                  .getMetaData();
-            SQLTemplatesRegistry templatesRegistry = new SQLTemplatesRegistry();
+        try (var connection = getConnection(true)) {
+            var metaData = connection.get()
+                                     .getMetaData();
+            var templatesRegistry = new SQLTemplatesRegistry();
             return templatesRegistry.getTemplates(metaData);
         } catch (SQLException e) {
             throw new DatabaseException(e);

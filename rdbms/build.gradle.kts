@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2023, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,17 +24,19 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import io.spine.gradle.internal.Deps
-import io.spine.gradle.internal.IncrementGuard
+import io.spine.internal.gradle.publish.IncrementGuard
+import io.spine.internal.dependency.Grpc
+import io.spine.internal.dependency.Testcontainers
 
 apply<IncrementGuard>()
 
 extra["artifactId"] = "jdbc-rdbms"
 
-val querydslVersion = "4.4.0"
-val hikariVersion = "3.4.5"
-val hsqldbVersion = "2.5.1"
-val h2Version = "1.4.200"
+val querydslVersion = "5.0.0"
+val hikariVersion = "5.0.1"
+val hsqldbVersion = "2.6.1"
+val h2Version = "2.1.210"
+val mySqlConnectorVersion = "8.0.28"
 
 dependencies {
     api("com.querydsl:querydsl-sql:$querydslVersion") {
@@ -43,5 +45,11 @@ dependencies {
     implementation("com.zaxxer:HikariCP:$hikariVersion")
     testImplementation("org.hsqldb:hsqldb:$hsqldbVersion")
     testImplementation("com.h2database:h2:$h2Version")
-    testImplementation(Deps.grpc.stub)
+    testImplementation(Grpc.stub)
+    testImplementation(Testcontainers.lib)
+    testImplementation(Testcontainers.junitJupiter)
+    testImplementation(Testcontainers.mySqlSupport) {
+        exclude(group = "org.jetbrains")
+    }
+    testImplementation("mysql:mysql-connector-java:$mySqlConnectorVersion")
 }

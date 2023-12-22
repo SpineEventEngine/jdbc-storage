@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2023, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ import io.spine.type.TypeName;
  * E.g. for binary data {@code BLOB} is used in MySQL, but in PostgreSQL it's {@code BYTEA}.
  *
  * <p>A type mapping provides a flexible way to point out
- * database specific names of {@linkplain Type types}.
+ * database-specific names of {@linkplain Type types}.
  */
 @Immutable
 public interface TypeMapping {

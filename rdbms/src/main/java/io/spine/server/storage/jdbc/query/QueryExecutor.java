@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2023, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,23 +26,23 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import com.google.common.flogger.FluentLogger;
-import io.spine.server.storage.jdbc.ConnectionWrapper;
+import io.spine.logging.Logger;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.DatabaseException;
 
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
+
+import static java.lang.String.format;
 
 /**
  * A helper class for execution of SQL queries.
  */
-class QueryExecutor {
+public final class QueryExecutor {
 
     private final DataSourceWrapper dataSource;
-    private final FluentLogger logger;
+    private final Logger<?> logger;
 
-    QueryExecutor(DataSourceWrapper dataSource, FluentLogger logger) {
+    public QueryExecutor(DataSourceWrapper dataSource, Logger<?> logger) {
         this.dataSource = dataSource;
         this.logger = logger;
     }
@@ -50,13 +50,15 @@ class QueryExecutor {
     /**
      * Executes the given SQL query and ignores the result.
      */
-    void execute(String query) {
-        try (ConnectionWrapper connection = dataSource.getConnection(true);
-             PreparedStatement statement = connection.prepareStatement(query)) {
+    public void execute(String query) {
+        try (var connection = dataSource.getConnection(true);
+             var statement = connection.prepareStatement(query)
+        ) {
             statement.execute();
         } catch (SQLException e) {
-            logger.atSevere()
-                  .log("Error executing statement %s: %s", query, e.getMessage());
+            logger.atError()
+                  .withCause(e)
+                  .log(() -> format("Error executing statement `%s`.", query));
             throw new DatabaseException(e);
         }
     }

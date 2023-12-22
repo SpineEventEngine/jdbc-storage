@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2023, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,31 +26,54 @@
 
 package io.spine.server.storage.jdbc;
 
-import io.spine.server.storage.StorageField;
+import io.spine.annotation.Internal;
+import io.spine.query.ColumnName;
+import io.spine.server.storage.RecordWithColumns;
+import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import static io.spine.util.Exceptions.newIllegalArgumentException;
+
 /**
- * An interface for the database table columns representation.
- *
- * <p>It's recommended to implement this interface in an {@code enum}, since it's API is sharpened
- * to be overridden with the {@code enum} default methods.
+ * A representation of a table column in RDBMS.
  */
-public interface TableColumn extends StorageField {
+@Internal
+public class TableColumn {
+
+    private final String name;
+    private final JdbcColumnMapping mapping;
+    private final Class<?> type;
+
+    public TableColumn(String name, Class<?> type, JdbcColumnMapping mapping) {
+        this.name = name;
+        this.type = type;
+        this.mapping = mapping;
+    }
 
     /**
-     * Returns the {@link Type} of the column
-     * or {@code null} if the type is unknown at the compile time.
+     * The column name.
      */
-    @Nullable
-    Type type();
+    public String name() {
+        return name;
+    }
 
     /**
-     * Returns {@code true} is this column is a primary key of the table, {@code false} otherwise.
+     * Returns the {@linkplain Type SQL type} of the column,
+     * or {@code null} if the type is unknown at compile-time.
      */
-    boolean isPrimaryKey();
+    public @Nullable Type type() {
+        return mapping.typeOf(type);
+    }
 
-    /**
-     * Returns {@code true} if this column may contain {@code NULL} values, {@code false} otherwise.
-     */
-    boolean isNullable();
+    public @Nullable Object valueIn(RecordWithColumns<?, ?> record) {
+        var columnName = ColumnName.of(name());
+        if(!record.hasColumn(columnName)) {
+            throw newIllegalArgumentException(
+                    "Cannot find the column `%s` in record-with-columns of type `%s`.",
+                    name(), record.record().getClass()
+                    );
+        }
+        var result = record.columnValue(columnName, mapping);
+        return result;
+    }
 }

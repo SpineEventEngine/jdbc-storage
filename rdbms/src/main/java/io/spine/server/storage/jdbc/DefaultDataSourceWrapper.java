@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2023, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,19 +27,18 @@
 package io.spine.server.storage.jdbc;
 
 import com.querydsl.sql.SQLTemplates;
-import io.spine.logging.Logging;
+import io.spine.logging.WithLogging;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkState;
+import static java.lang.String.format;
 
 /**
  * A default implementation of the {@link DataSourceWrapper}.
  */
-final class DefaultDataSourceWrapper implements DataSourceWrapper, Logging {
+final class DefaultDataSourceWrapper implements DataSourceWrapper, WithLogging {
 
     private final DataSource dataSource;
     private final SQLTemplates templates;
@@ -54,12 +53,14 @@ final class DefaultDataSourceWrapper implements DataSourceWrapper, Logging {
     public ConnectionWrapper getConnection(boolean autoCommit) {
         checkNotClosed();
         try {
-            Connection connection = dataSource.getConnection();
+            var connection = dataSource.getConnection();
             connection.setAutoCommit(autoCommit);
-            ConnectionWrapper wrapper = ConnectionWrapper.wrap(connection);
+            var wrapper = ConnectionWrapper.wrap(connection);
             return wrapper;
         } catch (SQLException e) {
-            _error().log("Failed to get connection: %s", e.getMessage());
+            logger().atError()
+                    .withCause(e)
+                    .log(() -> "Failed to obtain a connection.");
             throw new DatabaseException(e);
         }
     }
@@ -67,9 +68,9 @@ final class DefaultDataSourceWrapper implements DataSourceWrapper, Logging {
     @Override
     public DataSourceMetaData metaData() {
         checkNotClosed();
-        try (final ConnectionWrapper connection = getConnection(true)) {
-            DatabaseMetaData metaData = connection.get()
-                                                  .getMetaData();
+        try (final var connection = getConnection(true)) {
+            var metaData = connection.get()
+                                     .getMetaData();
             return DataSourceMetaData.of(metaData);
         } catch (SQLException e) {
             throw new DatabaseException(e);
@@ -96,13 +97,17 @@ final class DefaultDataSourceWrapper implements DataSourceWrapper, Logging {
             try {
                 ((AutoCloseable) dataSource).close();
             } catch (Exception e) {
-                _error().log("Error occurred while closing DataSource: %s", e.getMessage());
+                logger().atError()
+                        .withCause(e)
+                        .log(() -> "Error occurred while closing DataSource.");
                 throw new DatabaseException(e);
             }
             return;
         }
-        _warn().log("Close method is not implemented in %s", dataSource.getClass()
-                                                                       .getCanonicalName());
+        var dataSourceCls = dataSource.getClass();
+        logger().atWarning()
+                .log(() -> format("Close method is not implemented in `%s`.",
+                                  dataSourceCls.getCanonicalName()));
     }
 
     @Override

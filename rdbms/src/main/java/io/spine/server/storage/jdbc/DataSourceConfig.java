@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2023, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
  *
  * @see Builder
  */
-public class DataSourceConfig {
+public final class DataSourceConfig {
 
     /**
      * Required parameters.
@@ -174,7 +174,7 @@ public class DataSourceConfig {
     /**
      * The builder for {@link DataSourceConfig}.
      */
-    public static class Builder {
+    public static final class Builder {
 
         /**
          * Required parameters.
@@ -222,7 +222,7 @@ public class DataSourceConfig {
                 checkState(!poolName.isEmpty(), "poolName");
             }
 
-            DataSourceConfig config = new DataSourceConfig(this);
+            var config = new DataSourceConfig(this);
             return config;
         }
 
@@ -362,7 +362,7 @@ public class DataSourceConfig {
         /**
          * See {@link #setAutoCommit(Boolean)}.
          */
-        public Boolean isAutoCommit() {
+        public @Nullable Boolean isAutoCommit() {
             return autoCommit;
         }
 

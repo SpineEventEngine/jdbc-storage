@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2023, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,16 +26,23 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import com.querydsl.sql.AbstractSQLQuery;
+import com.google.protobuf.Message;
 
 import static com.querydsl.sql.SQLExpressions.count;
 
 /**
  * A query that checks if the table contains a record with the given ID.
+ *
+ * @param <I>
+ *         type of identifiers of the queried records
+ * @param <R>
+ *         type of queried records
  */
-final class ContainsQuery<I> extends IdAwareQuery<I> implements SelectQuery<Boolean> {
+public final class ContainsQuery<I, R extends Message>
+        extends ReadByIdQuery<I, R>
+        implements SelectQuery<Boolean> {
 
-    private ContainsQuery(Builder<I> builder) {
+    private ContainsQuery(Builder<I, R> builder) {
         super(builder);
     }
 
@@ -44,26 +51,36 @@ final class ContainsQuery<I> extends IdAwareQuery<I> implements SelectQuery<Bool
      */
     @Override
     public Boolean execute() {
-        AbstractSQLQuery<Long, ?> query = factory().select(count())
-                                                   .from(table())
-                                                   .where(idEquals());
+        var query = factory().select(count())
+                             .from(table())
+                             .where(idEquals());
         long recordsCount = query.fetchOne();
         return recordsCount > 0;
     }
 
-    static <I> Builder<I> newBuilder() {
+    /**
+     * Creates a new builder for this query.
+     *
+     * @param <I>
+     *         type of identifiers of the queried records
+     * @param <R>
+     *         type of queried records
+     */
+    public static <I, R extends Message> Builder<I, R> newBuilder() {
         return new Builder<>();
     }
 
-    static class Builder<I> extends IdAwareQuery.Builder<I, Builder<I>, ContainsQuery<I>> {
+    @SuppressWarnings("ClassNameSameAsAncestorName" /* For simplicity. */)
+    public static class Builder<I, R extends Message>
+            extends ReadByIdQuery.Builder<I, R, Builder<I, R>, ContainsQuery<I, R>> {
 
         @Override
-        protected ContainsQuery<I> doBuild() {
+        protected ContainsQuery<I, R> doBuild() {
             return new ContainsQuery<>(this);
         }
 
         @Override
-        protected Builder<I> getThis() {
+        protected Builder<I, R> getThis() {
             return this;
         }
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2023, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,11 +27,16 @@
 package io.spine.server.storage.jdbc.query.given;
 
 import com.google.protobuf.Message;
+import com.google.protobuf.StringValue;
 import com.querydsl.sql.AbstractSQLQuery;
+import io.spine.server.storage.RecordSpec;
 import io.spine.server.storage.jdbc.query.AbstractQuery;
 import io.spine.server.storage.jdbc.query.SelectMessageByIdQuery;
+import io.spine.server.storage.jdbc.record.JdbcTableSpec;
+import io.spine.server.storage.jdbc.record.TableNames;
+import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 
-public class Given {
+public final class Given {
 
     /** Prevents instantiation of this utility class. */
     private Given() {
@@ -40,8 +45,21 @@ public class Given {
     /**
      * Returns the new builder for the test {@link SelectMessageByIdQuery} implementation.
      */
-    public static <I> ASelectMessageByIdQuery.Builder<I> selectMessageBuilder() {
+    public static <I, R extends Message>
+    ASelectMessageByIdQuery.Builder<I, R> selectMsgBuilder() {
         return new ASelectMessageByIdQuery.Builder<>();
+    }
+
+    /**
+     * Returns a test-only table specification for a table storing {@link StringValue}s under
+     * {@code String} IDs.
+     */
+    public static JdbcTableSpec<String, StringValue> tableSpec() {
+        var recordSpec = new RecordSpec<>(String.class,
+                                          StringValue.class,
+                                          StringValue::getValue);
+        return new JdbcTableSpec<>(TableNames.of(recordSpec.sourceType()),
+                                   recordSpec, new JdbcColumnMapping());
     }
 
     /**
@@ -51,11 +69,12 @@ public class Given {
         return new AStorageQuery.Builder();
     }
 
-    public static class ASelectMessageByIdQuery<I> extends SelectMessageByIdQuery<I, Message> {
+    public static final class ASelectMessageByIdQuery<I, R extends Message>
+            extends SelectMessageByIdQuery<I, R> {
 
         private final AbstractSQLQuery<?, ?> query;
 
-        private ASelectMessageByIdQuery(Builder<I> builder) {
+        private ASelectMessageByIdQuery(Builder<I, R> builder) {
             super(builder);
             this.query = builder.query;
         }
@@ -65,38 +84,37 @@ public class Given {
             return query;
         }
 
-        public static class Builder<I>
-                extends SelectMessageByIdQuery.Builder<Builder<I>,
-                                                       ASelectMessageByIdQuery<I>,
-                                                       I,
-                                                       Message> {
+        public static class Builder<I, R extends Message>
+                extends SelectMessageByIdQuery.Builder<I, R, Builder<I, R>,
+                ASelectMessageByIdQuery<I, R>> {
 
             private AbstractSQLQuery<?, ?> query;
 
-            public Builder<I> setQuery(AbstractSQLQuery<?, ?> query) {
+            public Builder<I, R> setQuery(AbstractSQLQuery<?, ?> query) {
                 this.query = query;
                 return this;
             }
 
             @Override
-            protected ASelectMessageByIdQuery<I> doBuild() {
+            protected ASelectMessageByIdQuery<I, R> doBuild() {
                 return new ASelectMessageByIdQuery<>(this);
             }
 
             @Override
-            protected Builder<I> getThis() {
+            protected Builder<I, R> getThis() {
                 return this;
             }
         }
     }
 
-    public static class AStorageQuery extends AbstractQuery {
+    public static final class AStorageQuery extends AbstractQuery<String, StringValue> {
 
         private AStorageQuery(Builder builder) {
             super(builder);
         }
 
-        public static class Builder extends AbstractQuery.Builder<Builder, AStorageQuery> {
+        public static class Builder
+                extends AbstractQuery.Builder<String, StringValue, Builder, AStorageQuery> {
 
             @Override
             protected AStorageQuery doBuild() {

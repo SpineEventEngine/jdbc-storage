@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2023, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,38 +26,72 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import com.querydsl.sql.dml.SQLDeleteClause;
+import com.google.protobuf.Message;
 
 /**
  * A query for deleting one or many items by an ID.
+ *
+ * @param <I>
+ *         type of identifier of the record to delete
+ * @param <R>
+ *         type of the record to delete
  */
-final class DeleteRecordQuery<I> extends IdAwareQuery<I> implements WriteQuery {
+public final class DeleteRecordQuery<I, R extends Message> extends ModifyQuery<I, R> {
 
-    DeleteRecordQuery(Builder<I> builder) {
+    private final I id;
+
+    private DeleteRecordQuery(Builder<I, R> builder) {
         super(builder);
+        this.id = builder.id;
     }
 
     @Override
     public long execute() {
-        SQLDeleteClause query = factory().delete(table())
-                                         .where(idEquals());
+        var normalizedId = idColumn().normalize(id);
+        var query = factory().delete(table())
+                             .where(idPath().eq(normalizedId));
         return query.execute();
     }
 
-    static <I> Builder<I> newBuilder() {
+    /**
+     * Creates a new instance of the {@code Builder} for this type.
+     *
+     * @param <I>
+     *         type of identifier of the record to delete
+     * @param <R>
+     *         type of the record to delete
+     */
+    public static <I, R extends Message> Builder<I, R> newBuilder() {
         return new Builder<>();
     }
 
-    static class Builder<I> extends IdAwareQuery.Builder<I, Builder<I>, DeleteRecordQuery<I>> {
+    /**
+     * A builder of {@code DeleteRecordQuery}.
+     *
+     * @param <I>
+     *         the type of identifiers of the records to delete
+     * @param <R>
+     *         type of the record to delete
+     */
+    @SuppressWarnings("ClassNameSameAsAncestorName" /* For simplicity. */)
+    public static class Builder<I, R extends Message>
+            extends AbstractQuery.Builder<I, R, Builder<I, R>, DeleteRecordQuery<I, R>> {
+
+        private I id;
 
         @Override
-        protected DeleteRecordQuery<I> doBuild() {
+        protected DeleteRecordQuery<I, R> doBuild() {
             return new DeleteRecordQuery<>(this);
         }
 
         @Override
-        protected Builder<I> getThis() {
+        protected Builder<I, R> getThis() {
             return this;
+        }
+
+        public Builder<I, R> setId(I id) {
+            this.id = id;
+            return getThis();
         }
     }
 }

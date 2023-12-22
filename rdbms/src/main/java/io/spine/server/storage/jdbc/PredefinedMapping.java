@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2023, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,8 +30,9 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.errorprone.annotations.Immutable;
 import io.spine.type.TypeName;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
-import static io.spine.server.storage.jdbc.TypeMappingBuilder.basicBuilder;
+import static io.spine.server.storage.jdbc.TypeMappingBuilder.mappingBuilder;
 
 /**
  * Predefined {@linkplain TypeMapping type mappings} for different databases.
@@ -39,9 +40,9 @@ import static io.spine.server.storage.jdbc.TypeMappingBuilder.basicBuilder;
 @Immutable
 public enum PredefinedMapping implements TypeMapping {
 
-    MYSQL_5_7("MySQL", 5, 7, basicBuilder()),
-    POSTGRESQL_10_1("PostgreSQL", 10, 1, basicBuilder().add(BYTE_ARRAY, "BYTEA")),
-    H2_1_4("H2", 1, 4, basicBuilder());
+    MYSQL_5_7("MySQL", 5, 7, mappingBuilder()),
+    POSTGRESQL_10_1("PostgreSQL", 10, 1, mappingBuilder().add(BYTE_ARRAY, "BYTEA")),
+    H2_2_1("H2", 2, 1, mappingBuilder());
 
     @SuppressWarnings("NonSerializableFieldInSerializableClass")
     private final TypeMapping typeMapping;
@@ -73,12 +74,13 @@ public enum PredefinedMapping implements TypeMapping {
      * @return the type mapping for the used database or {@linkplain PredefinedMapping#MYSQL_5_7
      *         mapping for MySQL 5.7} if there is no standard mapping for the database
      */
-    static TypeMapping select(DataSourceWrapper dataSource) {
-        DataSourceMetaData metaData = dataSource.metaData();
-        for (PredefinedMapping mapping : values()) {
-            boolean nameMatch = metaData.productName()
-                                        .equals(mapping.databaseProductName);
-            boolean versionMatch =
+    public static TypeMapping select(DataSourceWrapper dataSource) {
+        checkNotNull(dataSource);
+        var metaData = dataSource.metaData();
+        for (var mapping : values()) {
+            var nameMatch = metaData.productName()
+                                    .equals(mapping.databaseProductName);
+            var versionMatch =
                     metaData.majorVersion() == mapping.majorVersion
                     && metaData.minorVersion() == mapping.minorVersion;
             if (nameMatch && versionMatch) {

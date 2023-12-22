@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2023, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,104 +26,39 @@
 
 package io.spine.server.storage.jdbc.aggregate;
 
-import io.spine.server.aggregate.Aggregate;
-import io.spine.server.aggregate.AggregateEventRecord;
-import io.spine.server.aggregate.AggregateReadRequest;
-import io.spine.server.aggregate.AggregateStorage;
+import io.spine.environment.Tests;
+import io.spine.server.ServerEnvironment;
 import io.spine.server.aggregate.AggregateStorageTest;
-import io.spine.server.entity.Entity;
-import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.query.DbIterator;
-import io.spine.test.aggregate.ProjectId;
+import io.spine.server.storage.jdbc.JdbcStorageFactory;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 
-import java.sql.SQLException;
-
+import static io.spine.base.Identifier.newUuid;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
-import static io.spine.server.storage.jdbc.PredefinedMapping.H2_1_4;
-import static io.spine.testing.Tests.nullRef;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_1;
 
-@SuppressWarnings("DuplicateStringLiteralInspection") // Common test display names.
-@DisplayName("JdbcAggregateStorage should")
+@DisplayName("RDBMS-backed `AggregateStorage` should")
 class JdbcAggregateStorageTest extends AggregateStorageTest {
 
-    private JdbcAggregateStorage<ProjectId> storage;
+    private JdbcStorageFactory factory;
 
     @BeforeEach
-    @Override
-    public void setUpAbstractStorageTest() {
-        super.setUpAbstractStorageTest();
-        storage = (JdbcAggregateStorage<ProjectId>) storage();
+    void setUp() {
+        factory = JdbcStorageFactory.newBuilder()
+                .setDataSource(whichIsStoredInMemory(newUuid()))
+                .setTypeMapping(H2_2_1)
+                .build();
+        ServerEnvironment
+                .when(Tests.class)
+                .use(factory);
     }
 
-    @Test
-    @DisplayName("throw ISE when closing twice")
-    void throwOnClosingTwice() {
-        AggregateStorage<?> storage = storage();
-        storage.close();
-        assertThrows(IllegalStateException.class, storage::close);
-    }
-
-    @Test
-    @DisplayName("return history iterator with specified batch size")
-    void returnHistoryIterator() throws SQLException {
-        int batchSize = 10;
-        AggregateReadRequest<ProjectId> request = new AggregateReadRequest<>(newId(), batchSize);
-        DbIterator<AggregateEventRecord> iterator =
-                (DbIterator<AggregateEventRecord>) storage.historyBackward(request);
-
-        // Use `PreparedStatement.getFetchSize()` instead of `ResultSet.getFetchSize()`,
-        // because the result of the latter depends on a JDBC driver implementation.
-        int fetchSize = iterator.resultSet()
-                                .getStatement()
-                                .getFetchSize();
-        assertEquals(batchSize, fetchSize);
-    }
-
-    @Test
-    @DisplayName("close history iterator")
-    void closeHistoryIterator() throws SQLException {
-        AggregateReadRequest<ProjectId> request = newReadRequest(newId());
-        DbIterator<AggregateEventRecord> iterator =
-                (DbIterator<AggregateEventRecord>) storage.historyBackward(request);
-
-        storage.close();
-        boolean historyIteratorClosed = iterator.resultSet()
-                                                .isClosed();
-        assertTrue(historyIteratorClosed);
-    }
-
-    @Test
-    @DisplayName("require non-null aggregate class")
-    void rejectNullAggregateClass() {
-        Class<? extends Aggregate<Object, ?, ?>> nullClass = nullRef();
-        assertThrows(NullPointerException.class,
-                     () -> JdbcAggregateStorage.newBuilder()
-                                               .setAggregateClass(nullClass));
-    }
-
-    @SuppressWarnings("unchecked") // It is OK for a test.
-    @Override
-    protected AggregateStorage<ProjectId> newStorage(Class<? extends Entity<?, ?>> aClass) {
-        return newStorage(ProjectId.class, (Class<? extends Aggregate<ProjectId, ?, ?>>) aClass);
-    }
-
-    @Override
-    protected <I> JdbcAggregateStorage<I> newStorage(
-            Class<? extends I> idClass,
-            Class<? extends Aggregate<I, ?, ?>> aggregateClass) {
-        DataSourceWrapper dataSource = whichIsStoredInMemory("aggregateStorageTests");
-        JdbcAggregateStorage.Builder<I> builder = JdbcAggregateStorage.newBuilder();
-        JdbcAggregateStorage<I> storage = builder.setMultitenant(false)
-                                                 .setDataSource(dataSource)
-                                                 .setAggregateClass(aggregateClass)
-                                                 .setTypeMapping(H2_1_4)
-                                                 .build();
-        return storage;
+    @AfterEach
+    void tearDown() {
+        ServerEnvironment.instance().reset();
+        if(factory != null) {
+            factory.close();
+        }
     }
 }

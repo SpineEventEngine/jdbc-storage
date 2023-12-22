@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2023, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,13 +34,11 @@ import java.sql.SQLException;
 
 import static io.spine.base.Identifier.newUuid;
 
-public class GivenDataSource {
+public final class GivenDataSource {
 
     /**
      * The URL prefix of an in-memory HyperSQL DB.
      */
-    //TODO:2017-09-13:dmytro.grankin: Enable flexible configuration of drivers.
-    // See the details: https://github.com/SpineEventEngine/jdbc-storage/issues/37
     private static final String HSQL_IN_MEMORY_DB_URL_PREFIX = "jdbc:h2:mem:";
 
     private static final String UNSUPPORTED = "Operation unsupported.";
@@ -49,27 +47,26 @@ public class GivenDataSource {
     }
 
     public static DataSourceWrapper whichIsStoredInMemory(String dbName) {
-        HikariConfig config = hikariConfig(dbName);
-        DataSourceWrapper dataSource = DataSourceWrapper.wrap(new HikariDataSource(config));
+        var config = hikariConfig(dbName);
+        var dataSource = DataSourceWrapper.wrap(new HikariDataSource(config));
         return dataSource;
     }
 
     public static DataSourceWrapper
     whichHoldsMetadata(String productName, int majorVersion, int minorVersion) {
-        DataSourceWrapper dataSource =
-                new DataSourceWithMetaData(productName, majorVersion, minorVersion);
+        var dataSource = new DataSourceWithMetaData(productName, majorVersion, minorVersion);
         return dataSource;
     }
 
     public static ThrowingHikariDataSource whichIsThrowingByCommand(String dbName) {
-        HikariConfig config = hikariConfig(dbName);
-        ThrowingHikariDataSource dataSource = new ThrowingHikariDataSource(config);
+        var config = hikariConfig(dbName);
+        var dataSource = new ThrowingHikariDataSource(config);
         return dataSource;
     }
 
     private static HikariConfig hikariConfig(String dbName) {
-        HikariConfig config = new HikariConfig();
-        String dbUrl = prefix(dbName);
+        var config = new HikariConfig();
+        var dbUrl = prefix(dbName);
         config.setJdbcUrl(dbUrl);
         // Not setting username and password is OK for in-memory database.
         return config;

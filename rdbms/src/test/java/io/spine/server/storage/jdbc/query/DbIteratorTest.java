@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2023, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.NoSuchElementException;
 
@@ -42,27 +41,25 @@ import static io.spine.server.storage.jdbc.query.given.DbIteratorTestEnv.nonEmpt
 import static io.spine.server.storage.jdbc.query.given.DbIteratorTestEnv.sneakyResultIterator;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@SuppressWarnings({"InnerClassMayBeStatic", "ClassCanBeStatic"})
-// JUnit nested classes cannot be static.
-@DisplayName("DbIterator should")
+@DisplayName("`DbIterator` should")
 class DbIteratorTest {
 
-    @SuppressWarnings("NonExceptionNameEndsWithException") // For test name clarity.
     @Nested
-    @DisplayName("throw DatabaseException")
+    @DisplayName("throw `DatabaseException`")
+    @SuppressWarnings("NonExceptionNameEndsWithException") // For test name clarity.
     class ThrowDatabaseException {
 
         @Test
         @DisplayName("on `hasNext` check failure")
         void onNextCheckFailure() throws SQLException {
-            DbIterator iterator = faultyResultIterator();
+            var iterator = faultyResultIterator();
             assertThrows(DatabaseException.class, iterator::hasNext);
         }
 
         @Test
         @DisplayName("on read failure")
         void onReadFailure() {
-            DbIterator iterator = sneakyResultIterator();
+            var iterator = sneakyResultIterator();
             assertThrows(DatabaseException.class, () -> {
                 if (iterator.hasNext()) {
                     iterator.next();
@@ -71,51 +68,51 @@ class DbIteratorTest {
         }
     }
 
-    @SuppressWarnings("CheckReturnValue") // Just check that method runs without errors.
     @Test
     @DisplayName("allow `next` without `hasNext`")
+    @SuppressWarnings({"CheckReturnValue", "ResultOfMethodCallIgnored"})
     void allowNextWithoutHasNext() {
-        DbIterator iterator = nonEmptyIterator();
+        var iterator = nonEmptyIterator();
         iterator.next();
     }
 
     @Nested
-    @DisplayName("close ResultSet")
+    @DisplayName("close `ResultSet`")
     class CloseResultSet {
 
         @Test
         @DisplayName("when told to do so")
         void whenTold() throws SQLException {
-            DbIterator iterator = nonEmptyIterator();
+            var iterator = nonEmptyIterator();
             iterator.close();
 
             assertClosed(iterator);
         }
 
-        @SuppressWarnings("CheckReturnValue") // Call `hasNext` method just to close iterator.
         @Test
         @DisplayName("when no more elements are present to iterate")
+        @SuppressWarnings({"CheckReturnValue", "ResultOfMethodCallIgnored"})
         void whenNoElementsPresent() throws SQLException {
-            DbIterator iterator = emptyIterator();
+            var iterator = emptyIterator();
             iterator.hasNext();
 
             assertClosed(iterator);
         }
     }
 
-    @SuppressWarnings("deprecation") // Use deprecated method to make sure it's not supported.
     @Test
     @DisplayName("not support removal")
+    @SuppressWarnings("deprecation") // Use deprecated method to make sure it's not supported.
     void notSupportRemoval() {
-        DbIterator iterator = emptyIterator();
+        var iterator = emptyIterator();
         assertThrows(UnsupportedOperationException.class, iterator::remove);
     }
 
-    @SuppressWarnings("CheckReturnValue") // Ignore `hasNext` method result on purpose.
     @Test
-    @DisplayName("throw NoSuchElementException if trying to get absent element")
+    @DisplayName("throw `NoSuchElementException` if trying to get absent element")
+    @SuppressWarnings({"CheckReturnValue", "ResultOfMethodCallIgnored"})
     void notGetAbsentElement() {
-        DbIterator iterator = emptyIterator();
+        var iterator = emptyIterator();
 
         // Ignore that the element is absent.
         iterator.hasNext();
@@ -126,9 +123,9 @@ class DbIteratorTest {
     @Test
     @DisplayName("do nothing on close if result set is already closed")
     void doNothingIfAlreadyClosed() throws SQLException {
-        DbIterator iterator = emptyIterator();
+        var iterator = emptyIterator();
 
-        ResultSet resultSet = iterator.resultSet();
+        var resultSet = iterator.resultSet();
         resultSet.close();
         assertThat(resultSet.isClosed())
                 .isTrue();
@@ -138,7 +135,7 @@ class DbIteratorTest {
     }
 
     private static void assertClosed(DbIterator<?> iterator) throws SQLException {
-        ResultSet resultSet = iterator.resultSet();
+        var resultSet = iterator.resultSet();
         assertThat(resultSet.isClosed())
                 .isTrue();
     }

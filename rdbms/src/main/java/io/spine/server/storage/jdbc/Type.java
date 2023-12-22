@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2023, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,6 +55,12 @@ public enum Type {
      * doesn't exceed 255 characters.
      */
     STRING_255,
+
+    /**
+     * The type representing a {@code String}, maximum length of which
+     * doesn't exceed 512 characters.
+     */
+    STRING_512,
 
     /**
      * The type representing a {@code String}, maximum length of which is unknown.

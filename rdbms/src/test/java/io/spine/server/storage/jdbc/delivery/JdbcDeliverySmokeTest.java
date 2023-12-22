@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2023, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,11 +26,10 @@
 
 package io.spine.server.storage.jdbc.delivery;
 
-import io.spine.base.Tests;
+import io.spine.environment.Tests;
 import io.spine.server.ServerEnvironment;
 import io.spine.server.delivery.DeliveryTest;
 import io.spine.server.storage.StorageFactory;
-import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.JdbcStorageFactory;
 import io.spine.testing.SlowTest;
 import org.junit.jupiter.api.AfterEach;
@@ -41,7 +40,7 @@ import org.junit.jupiter.api.Test;
 
 import static io.spine.base.Identifier.newUuid;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
-import static io.spine.server.storage.jdbc.PredefinedMapping.H2_1_4;
+import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_1;
 
 /**
  * Smoke tests on {@link Delivery} functionality running on top of JDBC-accessible storage.
@@ -59,11 +58,11 @@ class JdbcDeliverySmokeTest extends DeliveryTest {
     @BeforeEach
     public void setUp() {
         super.setUp();
-        DataSourceWrapper source = whichIsStoredInMemory(newUuid());
+        var source = whichIsStoredInMemory(newUuid());
         factory = JdbcStorageFactory
                 .newBuilder()
                 .setDataSource(source)
-                .setTypeMapping(H2_1_4)
+                .setTypeMapping(H2_2_1)
                 .build();
         ServerEnvironment
                 .when(Tests.class)

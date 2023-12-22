@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2023, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,46 +26,48 @@
 
 package io.spine.server.storage.jdbc;
 
-import io.spine.server.aggregate.AggregateStorage;
-import io.spine.server.delivery.InboxStorage;
-import io.spine.server.projection.ProjectionStorage;
-import io.spine.server.storage.given.RecordStorageTestEnv.TestCounterEntity;
-import io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.TestAggregate;
+import io.spine.server.ContextSpec;
+import io.spine.server.delivery.InboxMessage;
+import io.spine.server.delivery.InboxMessageId;
+import io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.InboxMessageColumnMapping;
+import io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.StgProjectProjection;
 import io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.TestColumnMapping;
-import io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.TestProjection;
 import io.spine.server.storage.jdbc.record.JdbcRecordStorage;
-import io.spine.server.storage.jdbc.type.DefaultJdbcColumnMapping;
+import io.spine.server.storage.jdbc.record.TableNames;
 import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
-import io.spine.test.storage.ProjectId;
+import io.spine.test.storage.StgProject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static io.spine.base.Identifier.newUuid;
+import static io.spine.server.storage.given.GivenStorageProject.messageSpec;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichHoldsMetadata;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
-import static io.spine.server.storage.jdbc.PredefinedMapping.H2_1_4;
+import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_1;
 import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
+import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.deliveryContextSpec;
+import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.inboxMessageSpec;
 import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.multitenantSpec;
 import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.newFactory;
-import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.singletenantSpec;
+import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.newInboxStorage;
+import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.singleTenantSpec;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SuppressWarnings("DuplicateStringLiteralInspection") // Common test display names.
-@DisplayName("JdbcStorageFactory should")
+@DisplayName("`JdbcStorageFactory` should")
 class JdbcStorageFactoryTest {
 
     @Test
     @DisplayName("allow to use custom data source")
     void allowCustomDataSource() {
-        JdbcStorageFactory factory = JdbcStorageFactory
+        var factory = JdbcStorageFactory
                 .newBuilder()
                 .setDataSource(whichIsStoredInMemory(newUuid()))
-                .setTypeMapping(H2_1_4)
+                .setTypeMapping(H2_2_1)
                 .build();
 
         assertNotNull(factory);
@@ -74,128 +76,132 @@ class JdbcStorageFactoryTest {
     @Test
     @DisplayName("allow to set custom column mapping")
     void setColumnMapping() {
-        JdbcColumnMapping<String> columnMapping = new TestColumnMapping();
-        JdbcStorageFactory factory = JdbcStorageFactory
+        var columnMapping = new TestColumnMapping();
+        var factory = JdbcStorageFactory
                 .newBuilder()
                 .setDataSource(whichIsStoredInMemory(newUuid()))
                 .setColumnMapping(columnMapping)
                 .build();
-        JdbcColumnMapping<?> mappingFromFactory = factory.columnMapping();
+        var mappingFromFactory = factory.columnMapping();
 
         assertThat(mappingFromFactory).isEqualTo(columnMapping);
     }
 
     @Test
+    @DisplayName("allow to print SQL to create an RDBMS table for a certain entity")
+    void printTableCreationSql() {
+        var factory = JdbcStorageFactory
+                .newBuilder()
+                .setDataSource(whichIsStoredInMemory(newUuid()))
+                .build();
+        var createTableSql = factory.tableCreationSql(ContextSpec.singleTenant("SQLs"),
+                                                      StgProjectProjection.class);
+        assertThat(createTableSql)
+                .isNotEmpty();
+        assertThat(createTableSql)
+                .contains(Sql.Query.CREATE_TABLE.toString());
+        assertThat(createTableSql)
+                .contains(TableNames.of(StgProject.class));
+    }
+
+    @Test
     @DisplayName("have `DefaultJdbcColumnMapping` by default")
     void haveDefaultColumnMapping() {
-        JdbcStorageFactory factory = newFactory();
-        JdbcColumnMapping<?> columnMapping = factory.columnMapping();
+        var factory = newFactory();
+        var columnMapping = factory.columnMapping();
 
-        assertThat(columnMapping).isInstanceOf(DefaultJdbcColumnMapping.class);
-    }
-
-    @Nested
-    @DisplayName("create record storage")
-    class CreateRecordStorage {
-
-        @Test
-        @DisplayName("which is multitenant")
-        void multitenant() {
-            JdbcStorageFactory factory = newFactory();
-            JdbcRecordStorage<ProjectId> storage =
-                    factory.createRecordStorage(multitenantSpec(), TestCounterEntity.class);
-            assertTrue(storage.isMultitenant());
-        }
-
-        @Test
-        @DisplayName("which is single tenant")
-        void singleTenant() {
-            JdbcStorageFactory factory = newFactory();
-            JdbcRecordStorage<ProjectId> storage =
-                    factory.createRecordStorage(singletenantSpec(), TestCounterEntity.class);
-            assertFalse(storage.isMultitenant());
-        }
-    }
-
-    @Nested
-    @DisplayName("create aggregate storage")
-    class CreateAggregateStorage {
-
-        @Test
-        @DisplayName("which is multitenant")
-        void multitenant() {
-            JdbcStorageFactory factory = newFactory();
-            AggregateStorage<String> storage =
-                    factory.createAggregateStorage(multitenantSpec(), TestAggregate.class);
-            assertTrue(storage.isMultitenant());
-        }
-
-        @Test
-        @DisplayName("which is single tenant")
-        void singleTenant() {
-            JdbcStorageFactory factory = newFactory();
-            AggregateStorage<String> storage =
-                    factory.createAggregateStorage(singletenantSpec(), TestAggregate.class);
-            assertFalse(storage.isMultitenant());
-        }
-    }
-
-    @Nested
-    @DisplayName("create projection storage")
-    class CreateProjectionStorage {
-
-        @Test
-        @DisplayName("which is multitenant")
-        void multitenant() {
-            JdbcStorageFactory factory = newFactory();
-            ProjectionStorage<String> storage =
-                    factory.createProjectionStorage(multitenantSpec(), TestProjection.class);
-            assertTrue(storage.isMultitenant());
-        }
-
-        @Test
-        @DisplayName("which is single tenant")
-        void singleTenant() {
-            JdbcStorageFactory factory = newFactory();
-            ProjectionStorage<String> storage =
-                    factory.createProjectionStorage(singletenantSpec(), TestProjection.class);
-            assertFalse(storage.isMultitenant());
-        }
-    }
-
-    @Test
-    @DisplayName("create inbox storage")
-    void createInboxStorage() {
-        JdbcStorageFactory factory = newFactory();
-        InboxStorage inboxStorage = factory.createInboxStorage(false);
-        assertFalse(inboxStorage.isMultitenant());
-    }
-
-    @Test
-    @DisplayName("close datastore on close")
-    void closeDatastoreOnClose() {
-        DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
-        JdbcStorageFactory factory = JdbcStorageFactory
-                .newBuilder()
-                .setDataSource(dataSource)
-                .setTypeMapping(H2_1_4)
-                .build();
-        factory.close();
-        assertThat(dataSource.isClosed())
-                .isTrue();
+        assertThat(columnMapping).isInstanceOf(JdbcColumnMapping.class);
     }
 
     @Test
     @DisplayName("select mapping based on the given data source")
     void selectMapping() {
-        DataSourceWrapper dataSource = whichHoldsMetadata(
+        var dataSource = whichHoldsMetadata(
                 MYSQL_5_7.getDatabaseProductName(),
                 MYSQL_5_7.getMajorVersion(),
                 MYSQL_5_7.getMinorVersion());
-        JdbcStorageFactory factory = JdbcStorageFactory
+        var factory = JdbcStorageFactory
                 .newBuilder()
                 .setDataSource(dataSource)
                 .build();
-        assertEquals(MYSQL_5_7, factory.getTypeMapping());
+        assertEquals(MYSQL_5_7, factory.typeMapping());
+    }
+
+    @Nested
+    @DisplayName("override")
+    class OverridingDefaultsPerType {
+
+        @Test
+        @DisplayName("a name for a table per record type")
+        void tableName() {
+            var dataSource = whichIsStoredInMemory(newUuid());
+            var customName = "FooBarInboxTable";
+            var storage = newInboxStorage(dataSource, customName);
+            var actualName = storage.tableName();
+            assertThat(actualName)
+                    .isEqualTo(customName);
+        }
+
+        @Test
+        @DisplayName("column mapping for a specific table per its record type")
+        void columnMapping() {
+            var factoryWideMapping = new TestColumnMapping();
+            var inboxRecordMapping = new InboxMessageColumnMapping();
+            var factory = JdbcStorageFactory
+                    .newBuilder()
+                    .setDataSource(whichIsStoredInMemory(newUuid()))
+                    .setColumnMapping(factoryWideMapping)
+                    .setCustomMapping(InboxMessage.class, inboxRecordMapping)
+                    .build();
+
+            var actualFactoryWideMapping = factory.columnMapping();
+            assertThat(actualFactoryWideMapping)
+                    .isEqualTo(factoryWideMapping);
+
+            var storage = (JdbcRecordStorage<InboxMessageId, InboxMessage>)
+                    factory.createRecordStorage(deliveryContextSpec(), inboxMessageSpec());
+            var actualInboxMapping = storage.table()
+                                            .spec()
+                                            .columnMapping();
+            assertThat(actualInboxMapping)
+                    .isEqualTo(inboxRecordMapping);
+        }
+    }
+
+    @Nested
+    @DisplayName("create a record storage")
+    class CreateStorage {
+
+        @Test
+        @DisplayName("which is multitenant")
+        void multitenant() {
+            var factory = newFactory();
+            var storage =
+                    factory.createRecordStorage(multitenantSpec(), messageSpec());
+            assertTrue(storage.isMultitenant());
+        }
+
+        @Test
+        @DisplayName("which is single tenant")
+        void singleTenant() {
+            var factory = newFactory();
+            var storage =
+                    factory.createRecordStorage(singleTenantSpec(), messageSpec());
+            assertFalse(storage.isMultitenant());
+        }
+    }
+
+    @Test
+    @DisplayName("close datastore on close")
+    void closeDatastoreOnClose() {
+        var dataSource = whichIsStoredInMemory(newUuid());
+        var factory = JdbcStorageFactory
+                .newBuilder()
+                .setDataSource(dataSource)
+                .setTypeMapping(H2_2_1)
+                .build();
+        factory.close();
+        assertThat(dataSource.isClosed())
+                .isTrue();
     }
 }

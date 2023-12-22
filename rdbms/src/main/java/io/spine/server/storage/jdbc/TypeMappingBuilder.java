@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2023, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@
 
 package io.spine.server.storage.jdbc;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.annotations.Immutable;
 import io.spine.type.TypeName;
@@ -41,13 +42,24 @@ import static io.spine.server.storage.jdbc.Type.INT;
 import static io.spine.server.storage.jdbc.Type.LONG;
 import static io.spine.server.storage.jdbc.Type.STRING;
 import static io.spine.server.storage.jdbc.Type.STRING_255;
+import static io.spine.server.storage.jdbc.Type.STRING_512;
+import static java.util.Objects.requireNonNull;
 
 /**
  * A builder for {@linkplain TypeMapping type mappings}.
  */
-public class TypeMappingBuilder {
+public final class TypeMappingBuilder {
 
     private final Map<Type, TypeName> mappedTypes = new EnumMap<>(Type.class);
+
+    /**
+     * Creates a new builder.
+     *
+     * <p>Exposed just for tests. Otherwise, would be {@code private}.
+     */
+    @VisibleForTesting
+    TypeMappingBuilder() {
+    }
 
     /**
      * Obtains the basic builder for mappings.
@@ -58,6 +70,7 @@ public class TypeMappingBuilder {
      *     <li>{@code Type.INT} - {@code INT}</li>
      *     <li>{@code Type.LONG} - {@code BIGINT}</li>
      *     <li>{@code Type.STRING_255} - {@code VARCHAR(255)}</li>
+     *     <li>{@code Type.STRING_512} - {@code VARCHAR(512)}</li>
      *     <li>{@code Type.STRING} - {@code TEXT}</li>
      *     <li>{@code Type.BOOLEAN} - {@code BOOLEAN}</li>
      * </ul>
@@ -66,20 +79,23 @@ public class TypeMappingBuilder {
      * {@linkplain TypeMappingBuilder#add(Type, String) overridden} as follows:
      *
      * <pre>{@code
-     * TypeMapping mapping = basicBuilder().add(Type.INT, "INT4")
-     *                                     .add(Type.LONG, "INT8")
-     *                                     .build();
+     * TypeMapping mapping = mappingBuilder()
+     *                          .add(Type.INT, "INT4")
+     *                          .add(Type.LONG, "INT8")
+     *                          .build();
      * }</pre>
      *
      * @return the builder containing names for all types
      */
-    public static TypeMappingBuilder basicBuilder() {
-        TypeMappingBuilder builder = new TypeMappingBuilder().add(BYTE_ARRAY, "BLOB")
-                                                             .add(INT, "INT")
-                                                             .add(LONG, "BIGINT")
-                                                             .add(STRING_255, "VARCHAR(255)")
-                                                             .add(STRING, "TEXT")
-                                                             .add(BOOLEAN, "BOOLEAN");
+    public static TypeMappingBuilder mappingBuilder() {
+        var builder = new TypeMappingBuilder()
+                .add(BYTE_ARRAY, "BLOB")
+                .add(INT, "INT")
+                .add(LONG, "BIGINT")
+                .add(STRING_255, "VARCHAR(255)")
+                .add(STRING_512, "VARCHAR(512)")
+                .add(STRING, "TEXT")
+                .add(BOOLEAN, "BOOLEAN");
         return builder;
     }
 
@@ -108,10 +124,10 @@ public class TypeMappingBuilder {
      *         if not all the {@linkplain Type types} were mapped
      */
     public TypeMapping build() {
-        int typesCount = Type.values().length;
-        checkState(mappedTypes.size() == typesCount,
+        var typeCount = Type.values().length;
+        checkState(mappedTypes.size() == typeCount,
                    "A mapping should contain names for all types (%s), " +
-                   "but only (%s) types were mapped.", typesCount, mappedTypes.size());
+                           "but only (%s) types were mapped.", typeCount, mappedTypes.size());
         return new TypeMappingImpl(mappedTypes);
     }
 
@@ -131,8 +147,8 @@ public class TypeMappingBuilder {
         public TypeName typeNameFor(Type type) {
             checkState(mappedTypes.containsKey(type),
                        "The type mapping does not define a name for %s type.", type);
-            TypeName typeName = mappedTypes.get(type);
-            return typeName;
+            var typeName = mappedTypes.get(type);
+            return requireNonNull(typeName);
         }
     }
 }

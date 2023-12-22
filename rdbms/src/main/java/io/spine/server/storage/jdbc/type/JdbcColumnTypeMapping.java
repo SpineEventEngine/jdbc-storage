@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2023, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,17 +26,24 @@
 
 package io.spine.server.storage.jdbc.type;
 
-import io.spine.server.entity.storage.ColumnTypeMapping;
+import io.spine.server.storage.ColumnTypeMapping;
 import io.spine.server.storage.jdbc.Type;
 
 /**
- * A single column type mapping which also stores the JDBC type of the column.
+ * Type mapping of a single column,
+ * which is also aware of the RDBMS type of the column.
+ *
+ * @param <T>
+ *         the type of the original column values
+ * @param <R>
+ *         the type of the values to store in RDBMS
  */
 public final class JdbcColumnTypeMapping<T, R> implements ColumnTypeMapping<T, R> {
 
     private final ColumnTypeMapping<T, R> mapping;
     private final Type type;
 
+    @SuppressWarnings("WeakerAccess" /* Part of the public API. */)
     public JdbcColumnTypeMapping(ColumnTypeMapping<T, R> mapping, Type type) {
         this.mapping = mapping;
         this.type = type;
@@ -44,9 +51,18 @@ public final class JdbcColumnTypeMapping<T, R> implements ColumnTypeMapping<T, R
 
     @Override
     public R apply(T t) {
-        return mapping.apply(t);
+        try {
+            return mapping.apply(t);
+        } catch (RuntimeException e) {
+            throw new IllegalStateException("Error converting the column value.", e);
+        }
     }
 
+    /**
+     * Returns the generic RDBMS-level column type to use
+     * when storing this column's values.
+     */
+    @SuppressWarnings("WeakerAccess" /* Part of the public API. */)
     public Type storeAs() {
         return type;
     }

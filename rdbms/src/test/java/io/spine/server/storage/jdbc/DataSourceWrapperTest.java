@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2023, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,8 +26,7 @@
 
 package io.spine.server.storage.jdbc;
 
-import io.spine.server.storage.jdbc.GivenDataSource.ThrowingHikariDataSource;
-import io.spine.testing.logging.MuteLogging;
+import io.spine.testing.logging.mute.MuteLogging;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -35,18 +34,18 @@ import static com.google.common.truth.Truth.assertThat;
 import static io.spine.base.Identifier.newUuid;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsThrowingByCommand;
-import static io.spine.server.storage.jdbc.PredefinedMapping.H2_1_4;
+import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_1;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@DisplayName("DataSourceWrapper should")
+@DisplayName("`DataSourceWrapper` should")
 class DataSourceWrapperTest {
 
     @Test
     @MuteLogging
     @DisplayName("throw `DatabaseException` if failing to close")
     void throwIfFailToClose() {
-        ThrowingHikariDataSource dataSource = whichIsThrowingByCommand(newUuid());
-        DataSourceWrapper wrapper = DataSourceWrapper.wrap(dataSource);
+        var dataSource = whichIsThrowingByCommand(newUuid());
+        var wrapper = DataSourceWrapper.wrap(dataSource);
         dataSource.setThrowOnClose(true);
         assertThrows(DatabaseException.class, wrapper::close);
     }
@@ -54,23 +53,23 @@ class DataSourceWrapperTest {
     @Test
     @DisplayName("provide database metadata")
     void returnMetaData() {
-        DataSourceWrapper dataSourceWrapper = whichIsStoredInMemory(newUuid());
-        DataSourceMetaData metaData = dataSourceWrapper.metaData();
+        var dataSourceWrapper = whichIsStoredInMemory(newUuid());
+        var metaData = dataSourceWrapper.metaData();
 
         assertThat(metaData.productName())
-                .isEqualTo(H2_1_4.getDatabaseProductName());
+                .isEqualTo(H2_2_1.getDatabaseProductName());
         assertThat(metaData.majorVersion())
-                .isEqualTo(H2_1_4.getMajorVersion());
+                .isEqualTo(H2_2_1.getMajorVersion());
         assertThat(metaData.minorVersion())
-                .isEqualTo(H2_1_4.getMinorVersion());
+                .isEqualTo(H2_2_1.getMinorVersion());
     }
 
     @Test
     @MuteLogging
     @DisplayName("throw `DatabaseException` if failed to obtain a metadata")
     void throwOnGetMetaDataError() {
-        ThrowingHikariDataSource dataSource = whichIsThrowingByCommand(newUuid());
-        DataSourceWrapper wrapper = DataSourceWrapper.wrap(dataSource);
+        var dataSource = whichIsThrowingByCommand(newUuid());
+        var wrapper = DataSourceWrapper.wrap(dataSource);
         dataSource.setThrowOnGetConnection(true);
 
         assertThrows(DatabaseException.class, wrapper::metaData);
@@ -79,7 +78,7 @@ class DataSourceWrapperTest {
     @Test
     @DisplayName("throw ISE if obtaining metadata when already closed")
     void throwIseIfAlreadyClosed() {
-        DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
+        var dataSource = whichIsStoredInMemory(newUuid());
         dataSource.close();
 
         assertThrows(IllegalStateException.class, dataSource::metaData);

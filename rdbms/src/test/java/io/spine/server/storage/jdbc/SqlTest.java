@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2023, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,50 +26,47 @@
 
 package io.spine.server.storage.jdbc;
 
+import io.spine.testing.UtilityClassTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static io.spine.testing.DisplayNames.HAVE_PARAMETERLESS_CTOR;
-import static io.spine.testing.Tests.assertHasPrivateParameterlessCtor;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@DisplayName("Sql utility should")
-class SqlTest {
+@DisplayName("`Sql` utility should")
+class SqlTest extends UtilityClassTest<Sql> {
 
-    @Test
-    @DisplayName(HAVE_PARAMETERLESS_CTOR)
-    void haveUtilityConstructor() {
-        assertHasPrivateParameterlessCtor(Sql.class);
+    SqlTest() {
+        super(Sql.class);
     }
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     @Test
     @DisplayName("provide valid SQL tokens")
     void provideValidSqlTokens() {
-        String createTableExpected = "CREATE TABLE";
-        String createTableActual = Sql.Query.CREATE_TABLE.toString()
-                                                         .trim();
+        var createTableExpected = "CREATE TABLE";
+        var createTableActual = Sql.Query.CREATE_TABLE.toString()
+                                                      .trim();
         assertEquals(createTableExpected, createTableActual);
 
-        String countExpected = "COUNT";
-        String countActual = Sql.Function.COUNT.toString()
-                                               .trim();
+        var countExpected = "COUNT";
+        var countActual = Sql.Function.COUNT.toString()
+                                            .trim();
         assertEquals(countExpected, countActual);
     }
 
     @Test
     @DisplayName("provide tokens wrapped into whitespace")
     void provideTokensWithWhitespaces() {
-        String sumExpected = " SUM ";
-        String sumActual = Sql.Function.SUM.toString();
+        var sumExpected = " SUM ";
+        var sumActual = Sql.Function.SUM.toString();
         assertEquals(sumExpected, sumActual);
 
-        String primaryKeyExpected = " PRIMARY KEY ";
-        String primaryKeyActual = Sql.Query.PRIMARY_KEY.toString();
+        var primaryKeyExpected = " PRIMARY KEY ";
+        var primaryKeyActual = Sql.Query.PRIMARY_KEY.toString();
         assertEquals(primaryKeyExpected, primaryKeyActual);
 
-        String commaExpected = " , ";
-        String commaActual = Sql.BuildingBlock.COMMA.toString();
+        var commaExpected = " , ";
+        var commaActual = Sql.BuildingBlock.COMMA.toString();
         assertEquals(commaExpected, commaActual);
     }
 }

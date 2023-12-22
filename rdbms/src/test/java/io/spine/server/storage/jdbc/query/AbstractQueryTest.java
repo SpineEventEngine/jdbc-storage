@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2023, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,28 +26,26 @@
 
 package io.spine.server.storage.jdbc.query;
 
-import com.querydsl.sql.Configuration;
-import com.querydsl.sql.SQLListeners;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.query.AbstractQuery.TransactionHandler;
 import io.spine.server.storage.jdbc.query.given.Given.AStorageQuery;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 
 import static com.google.common.truth.Truth.assertThat;
 import static io.spine.base.Identifier.newUuid;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
 import static io.spine.server.storage.jdbc.query.given.Given.storageQueryBuilder;
+import static io.spine.server.storage.jdbc.query.given.Given.tableSpec;
 import static java.sql.ResultSet.HOLD_CURSORS_OVER_COMMIT;
 
-@DisplayName("AbstractQuery should")
+@DisplayName("`AbstractQuery` should")
 class AbstractQueryTest {
 
     private final DataSourceWrapper dataSource = whichIsStoredInMemory(newUuid());
-    private final AStorageQuery query = storageQueryBuilder().setTableName(newUuid())
+    private final AStorageQuery query = storageQueryBuilder().setTableSpec(tableSpec())
                                                              .setDataSource(dataSource)
                                                              .build();
 
@@ -59,8 +57,8 @@ class AbstractQueryTest {
     @Test
     @DisplayName("set `HOLD_CURSORS_OVER_COMMIT` for connection")
     void holdCursorsOverCommit() throws SQLException {
-        Connection connection = query.factory()
-                                     .getConnection();
+        var connection = query.factory()
+                              .getConnection();
 
         assertThat(connection.getHoldability())
                 .isEqualTo(HOLD_CURSORS_OVER_COMMIT);
@@ -69,10 +67,17 @@ class AbstractQueryTest {
     @Test
     @DisplayName("specify a `TransactionHandler` as one of the transaction listeners")
     void injectTransactionHandler() {
-        Configuration configuration = query.factory()
-                                           .getConfiguration();
-        SQLListeners listeners = configuration.getListeners();
+        var configuration = query.factory()
+                                 .getConfiguration();
+        var listeners = configuration.getListeners();
         assertThat(listeners.getListeners())
                 .contains(TransactionHandler.INSTANCE);
+    }
+
+    @Test
+    @DisplayName("be able to provide a MySQL-specific query factory")
+    void returnMySqlSpecificFactory() {
+        var factory = query.mySqlFactory();
+        assertThat(factory).isNotNull();
     }
 }

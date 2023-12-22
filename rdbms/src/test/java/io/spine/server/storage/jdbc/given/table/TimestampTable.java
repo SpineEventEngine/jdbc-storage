@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, TeamDev. All rights reserved.
+ * Copyright 2023, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,79 +27,97 @@
 package io.spine.server.storage.jdbc.given.table;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Timestamp;
-import io.spine.server.storage.jdbc.DataSourceWrapper;
-import io.spine.server.storage.jdbc.Type;
-import io.spine.server.storage.jdbc.TypeMapping;
-import io.spine.server.storage.jdbc.given.query.SelectMessageId;
+import io.spine.query.RecordColumn;
+import io.spine.server.storage.RecordSpec;
+import io.spine.server.storage.RecordWithColumns;
+import io.spine.server.storage.jdbc.JdbcStorageFactory;
+import io.spine.server.storage.jdbc.given.query.SelectRecordId;
 import io.spine.server.storage.jdbc.given.query.SelectTimestampById;
-import io.spine.server.storage.jdbc.message.MessageTable;
-import io.spine.server.storage.jdbc.query.IdColumn;
+import io.spine.server.storage.jdbc.record.JdbcTableSpec;
+import io.spine.server.storage.jdbc.record.RecordTable;
+import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 
 import java.sql.ResultSet;
-
-import static io.spine.server.storage.jdbc.Type.INT;
-import static io.spine.server.storage.jdbc.Type.LONG;
 
 /**
  * Holds {@link Timestamp} records by some ID.
  *
- * <p>Overrides several {@link MessageTable} methods to expose them to tests.
+ * <p>Overrides several {@link RecordTable} methods to expose them to tests.
  *
  * @param <I>
  *         the ID type
  */
-abstract class TimestampTable<I> extends MessageTable<I, Timestamp> {
+abstract class TimestampTable<I> extends RecordTable<I, Timestamp> {
+
+    private final RecordSpec<I, Timestamp> timestampSpec;
 
     TimestampTable(String name,
-                   IdColumn<I> idColumn,
-                   DataSourceWrapper dataSource,
-                   TypeMapping typeMapping) {
-        super(name, idColumn, dataSource, typeMapping);
+                   RecordSpec<I, Timestamp> recordSpec,
+                   JdbcStorageFactory factory) {
+        super(fullSpecFrom(name, recordSpec, factory.columnMapping()), factory);
+        this.timestampSpec = extendRecordSpec(recordSpec);
     }
 
-    @Override
+    private static <I> JdbcTableSpec<I, Timestamp>
+    fullSpecFrom(String tableName, RecordSpec<I, Timestamp> spec, JdbcColumnMapping mapping) {
+        var updatedSpec = extendRecordSpec(spec);
+        var result = new JdbcTableSpec<>(tableName, updatedSpec, mapping);
+        return result;
+    }
+
+    private static <I> RecordSpec<I, Timestamp> extendRecordSpec(RecordSpec<I, Timestamp> spec) {
+        var secondsColumn = new RecordColumn<>("SECONDS", Long.class, Timestamp::getSeconds);
+        var nanosColumn = new RecordColumn<>("NANOS", Integer.class, Timestamp::getNanos);
+
+        var builder = ImmutableSet.<RecordColumn<Timestamp, ?>>builder();
+        builder.add(secondsColumn)
+               .add(nanosColumn);
+        for (var column : spec.columns()) {
+            var cast = asRecordColumn(column);
+            builder.add(cast);
+        }
+        var idType = spec.idType();
+        var allCols = builder.build();
+
+        @SuppressWarnings("Immutable" /* Re-using the same lambda as previously. */)
+        var updatedSpec = new RecordSpec<>(idType, Timestamp.class,
+                                           spec::idValueIn,
+                                           allCols);
+        return updatedSpec;
+    }
+
+    @SuppressWarnings("unchecked")  // As per the contract of `RecordSpec`.
+    private static RecordColumn<Timestamp, ?> asRecordColumn(io.spine.query.Column<?, ?> column) {
+        return (RecordColumn<Timestamp, ?>) column;
+    }
+
     public void write(Timestamp record) {
-        super.write(record);
+        var withCols = RecordWithColumns.create(record, timestampSpec);
+        write(withCols);
+    }
+
+    public I idOf(Timestamp record) {
+        return spec().idFromRecord(record);
     }
 
     public ResultSet resultSet(I id) {
-        SelectTimestampById<I> query = composeSelectTimestampById(id);
-        ResultSet resultSet = query.getResults();
+        var query = composeSelectTimestampById(id);
+        var resultSet = query.getResults();
         return resultSet;
-    }
-
-    @Override
-    public I idOf(Timestamp record) {
-        return super.idOf(record);
-    }
-
-    @Override
-    protected Descriptor messageDescriptor() {
-        return Timestamp.getDescriptor();
-    }
-
-    @SuppressWarnings("unchecked") // Ensured by class descendants.
-    @Override
-    protected Iterable<? extends MessageTable.Column<Timestamp>> messageSpecificColumns() {
-        MessageTable.Column<Timestamp> idColumn =
-                (MessageTable.Column<Timestamp>) idColumn().column();
-        return ImmutableSet.of(idColumn, Column.SECONDS, Column.NANOS);
     }
 
     /**
      * Reads a given ID back from the database as a {@link ResultSet}.
      */
     public ResultSet resultSetWithId(I id) {
-        SelectMessageId.Builder<I, Timestamp> queryBuilder = SelectMessageId
+        var queryBuilder = SelectRecordId
                 .<I, Timestamp>newBuilder()
                 .setDataSource(dataSource())
-                .setTableName(name())
-                .setIdColumn(idColumn())
+                .setTableSpec(spec())
                 .setId(id);
-        SelectMessageId<I, Timestamp> query = queryBuilder.build();
-        ResultSet resultSet = query.getResults();
+        var query = queryBuilder.build();
+        var resultSet = query.getResults();
         return resultSet;
     }
 
@@ -107,48 +125,12 @@ abstract class TimestampTable<I> extends MessageTable<I, Timestamp> {
      * Composes a "select-timestamp-by-ID" query.
      */
     public SelectTimestampById<I> composeSelectTimestampById(I id) {
-        SelectTimestampById.Builder<I> builder = SelectTimestampById
+        var builder = SelectTimestampById
                 .<I>newBuilder()
                 .setDataSource(dataSource())
-                .setTableName(name())
-                .setMessageColumnName(bytesColumn().name())
-                .setMessageDescriptor(Timestamp.getDescriptor())
-                .setIdColumn(idColumn())
+                .setTableSpec(spec())
                 .setId(id);
-        SelectTimestampById<I> query = builder.build();
+        var query = builder.build();
         return query;
-    }
-
-    public enum Column implements MessageTable.Column<Timestamp> {
-        SECONDS(LONG, Timestamp::getSeconds),
-        NANOS(INT, Timestamp::getNanos);
-
-        private final Type type;
-        private final Getter<Timestamp> getter;
-
-        Column(Type type, Getter<Timestamp> getter) {
-            this.type = type;
-            this.getter = getter;
-        }
-
-        @Override
-        public Getter<Timestamp> getter() {
-            return getter;
-        }
-
-        @Override
-        public Type type() {
-            return type;
-        }
-
-        @Override
-        public boolean isPrimaryKey() {
-            return false;
-        }
-
-        @Override
-        public boolean isNullable() {
-            return false;
-        }
     }
 }
