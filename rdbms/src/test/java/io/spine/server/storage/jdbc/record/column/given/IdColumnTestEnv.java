@@ -33,7 +33,7 @@ import io.spine.server.test.shared.LongIdAggregate;
 import io.spine.server.test.shared.StringProjection;
 import io.spine.server.test.shared.TimestampIdAggregate;
 
-public class IdColumnTestEnv {
+public final class IdColumnTestEnv {
 
     /** Prevents instantiation of this utility class. */
     private IdColumnTestEnv() {
