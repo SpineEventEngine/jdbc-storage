@@ -79,14 +79,6 @@ final class MysqlTests {
     }
 
     /**
-     * Returns a type mapping compatible with the MySQL version
-     * run via the {@linkplain #mysqlContainer() container}.
-     */
-    static PredefinedMapping mysqlMapping() {
-        return MYSQL_5_7;
-    }
-
-    /**
      * Stops the container, if it is not {@code null}.
      */
     static void stop(@Nullable MySQLContainer<?> container) {
@@ -102,5 +94,13 @@ final class MysqlTests {
                 .setTypeMapping(mysqlMapping())
                 .build();
         return factory;
+    }
+
+    /**
+     * Returns a type mapping compatible with the MySQL version
+     * run via the {@linkplain #mysqlContainer() container}.
+     */
+    private static PredefinedMapping mysqlMapping() {
+        return MYSQL_5_7;
     }
 }
