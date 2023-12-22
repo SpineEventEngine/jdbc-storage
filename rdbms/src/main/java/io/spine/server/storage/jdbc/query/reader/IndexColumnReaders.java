@@ -52,8 +52,8 @@ final class IndexColumnReaders {
      *         the compile-time type of the IDs
      * @return a new instance of the {@code ColumnReader}
      */
-    @SuppressWarnings({"unchecked" /* Logically checked by if statements. */,
-            "IfStatementWithTooManyBranches" /* Required to differentiate between reader types. */})
+    @SuppressWarnings({"unchecked", "rawtypes" /* Logically checked by if statements. */,
+            "IfStatementWithTooManyBranches" /* Required to distinguish reader types. */})
     static <I> ColumnReader<I> create(String columnName, Class<I> idType) {
         var wrapper = Primitives.wrap(idType);
         if (String.class.equals(idType)) {
