@@ -70,14 +70,4 @@ public abstract class Operation<I, R extends Message> {
     public final DataSourceWrapper dataSource() {
         return dataSource;
     }
-
-
-    protected ContainsQuery<I, R> newContainsQuery(I id) {
-        ContainsQuery.Builder<I, R> builder = ContainsQuery.newBuilder();
-        var query = builder.setId(id)
-                           .setTableSpec(table().spec())
-                           .setDataSource(dataSource())
-                           .build();
-        return query;
-    }
 }

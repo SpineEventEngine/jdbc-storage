@@ -28,6 +28,7 @@ package io.spine.server.storage.jdbc.operation;
 
 import com.google.protobuf.Message;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
+import io.spine.server.storage.jdbc.query.ContainsQuery;
 import io.spine.server.storage.jdbc.query.InsertOneQuery;
 import io.spine.server.storage.jdbc.query.UpdateOneQuery;
 import io.spine.server.storage.jdbc.record.JdbcRecord;
@@ -103,6 +104,15 @@ public class WriteOne<I, R extends Message> extends Operation<I, R> {
         var query = builder.setTableSpec(table().spec())
                            .setDataSource(dataSource())
                            .setRecord(record)
+                           .build();
+        return query;
+    }
+
+    protected ContainsQuery<I, R> newContainsQuery(I id) {
+        ContainsQuery.Builder<I, R> builder = ContainsQuery.newBuilder();
+        var query = builder.setId(id)
+                           .setTableSpec(table().spec())
+                           .setDataSource(dataSource())
                            .build();
         return query;
     }
