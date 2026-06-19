@@ -30,39 +30,22 @@ import io.spine.environment.Tests;
 import io.spine.server.ServerEnvironment;
 import io.spine.server.aggregate.AggregateStorageTest;
 import io.spine.testing.SlowTest;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.testcontainers.containers.MySQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-
-import static io.spine.server.storage.jdbc.mysql.MysqlTests.mysqlContainer;
-import static io.spine.server.storage.jdbc.mysql.MysqlTests.stop;
 
 @DisplayName("`AggregateRecordStorage` running on top of MySQL instance should")
 @SlowTest
 @EnableConditionally
 final class MysqlAggregateStorageTest extends AggregateStorageTest {
 
-    @Container
-    private @Nullable MySQLContainer<?> mysql;
-
     @BeforeEach
     @Override
     public void setUpAbstractStorageTest() {
-        mysql = mysqlContainer();
-        mysql.start();
-        var factory = MysqlTests.factoryConnectingTo(mysql);
+        var factory = MysqlTests.newFactory();
         ServerEnvironment.when(Tests.class)
                          .useStorageFactory((env) -> factory);
         super.setUpAbstractStorageTest();
-    }
-
-    @AfterEach
-    void stopServer() {
-        stop(mysql);
     }
 
     @AfterAll
