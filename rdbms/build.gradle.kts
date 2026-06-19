@@ -27,6 +27,7 @@
 import io.spine.dependency.lib.Grpc
 import io.spine.dependency.lib.Hikari
 import io.spine.dependency.lib.QueryDsl
+import io.spine.dependency.lib.Slf4J
 import io.spine.dependency.local.CoreJvm
 import io.spine.dependency.test.H2
 import io.spine.dependency.test.HsqlDb
@@ -77,6 +78,8 @@ dependencies {
         exclude(group = "org.jetbrains")
     }
     testImplementation(MySql.connector)
+
+    testRuntimeOnly(Slf4J.simple)
 }
 
 /**
