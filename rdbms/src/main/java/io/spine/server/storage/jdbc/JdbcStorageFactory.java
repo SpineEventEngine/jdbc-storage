@@ -128,6 +128,16 @@ public class JdbcStorageFactory implements StorageFactory {
     }
 
     /**
+     * Tells whether this storage factory is open for creating new storages.
+     *
+     * <p>The factory is open as long as its underlying {@link DataSourceWrapper} is not closed.
+     */
+    @Override
+    public boolean isOpen() {
+        return !dataSource.isClosed();
+    }
+
+    /**
      * Closes used {@link DataSourceWrapper}.
      */
     @Override

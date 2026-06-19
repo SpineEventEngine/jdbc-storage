@@ -32,6 +32,7 @@ import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.JdbcStorageFactory;
 import io.spine.server.storage.jdbc.PredefinedMapping;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.testcontainers.DockerClientFactory;
 import org.testcontainers.containers.MySQLContainer;
 
 import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
@@ -44,9 +45,12 @@ final class MysqlTests {
     /**
      * Controls whether ALL tests in this package are enabled.
      *
-     * <p>By default, i.e. when run on CI, the tests are disabled due to their slow nature.
+     * <p>The MySQL-based tests need a running Docker daemon to start the database container.
+     * They are therefore enabled only when Docker is available, and are skipped otherwise so
+     * that the build stays green in environments without Docker (e.g. local machines or CI
+     * agents that do not provide Docker).
      */
-    static final boolean enabled = false;
+    static final boolean enabled = DockerClientFactory.instance().isDockerAvailable();
 
     /**
      * Prevents instantiation of this utility.

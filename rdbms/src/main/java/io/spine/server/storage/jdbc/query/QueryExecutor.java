@@ -40,9 +40,9 @@ import static java.lang.String.format;
 public final class QueryExecutor {
 
     private final DataSourceWrapper dataSource;
-    private final Logger<?> logger;
+    private final Logger logger;
 
-    public QueryExecutor(DataSourceWrapper dataSource, Logger<?> logger) {
+    public QueryExecutor(DataSourceWrapper dataSource, Logger logger) {
         this.dataSource = dataSource;
         this.logger = logger;
     }

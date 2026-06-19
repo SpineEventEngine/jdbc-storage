@@ -34,7 +34,7 @@ import io.spine.server.delivery.InboxColumn;
 import io.spine.server.delivery.InboxMessage;
 import io.spine.server.delivery.InboxMessageId;
 import io.spine.server.delivery.InboxSignalId;
-import io.spine.server.projection.Projection;
+import io.spine.server.aggregate.Aggregate;
 import io.spine.server.storage.ColumnTypeMapping;
 import io.spine.server.storage.RecordSpec;
 import io.spine.server.storage.jdbc.DataSourceConfig;
@@ -146,9 +146,9 @@ public final class JdbcStorageFactoryTestEnv {
     }
 
     /**
-     * A test-only projection for testing the JDBC storage factory features.
+     * A test-only aggregate for testing the JDBC storage factory features.
      */
-    public static class StgProjectProjection
-            extends Projection<StgProjectId, StgProject, StgProject.Builder> {
+    public static class StgProjectAggregate
+            extends Aggregate<StgProjectId, StgProject, StgProject.Builder> {
     }
 }
