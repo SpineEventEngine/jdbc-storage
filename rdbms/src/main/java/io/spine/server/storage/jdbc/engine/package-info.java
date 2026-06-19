@@ -28,12 +28,10 @@
  * This package describes the RDBMS engine,
  * and its detection on top of the provided data source.
  */
-@SPI
 @CheckReturnValue
 @ParametersAreNonnullByDefault
 package io.spine.server.storage.jdbc.engine;
 
 import com.google.errorprone.annotations.CheckReturnValue;
-import io.spine.annotation.SPI;
 
 import javax.annotation.ParametersAreNonnullByDefault;

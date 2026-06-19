@@ -28,12 +28,10 @@
  * This package provides types and routines for accessing stored {@link com.google.protobuf.Message
  * Message} records.
  */
-@SPI
 @CheckReturnValue
 @ParametersAreNonnullByDefault
 package io.spine.server.storage.jdbc.record;
 
 import com.google.errorprone.annotations.CheckReturnValue;
-import io.spine.annotation.SPI;
 
 import javax.annotation.ParametersAreNonnullByDefault;
