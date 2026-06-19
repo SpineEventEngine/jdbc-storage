@@ -88,86 +88,100 @@ class JdbcDeliverySmokeTest extends DeliveryTest {
     }
 
     @Test
-    @Disabled
+    @Disabled(SmokeTesting.DISABLED_REASON)
     @Override
     public void markDelivered() {
+        super.markDelivered();
     }
 
     @Test
-    @Disabled
+    @Disabled(SmokeTesting.DISABLED_REASON)
     @Override
     public void singleTarget_singleShard_manyThreads() {
+        super.singleTarget_singleShard_manyThreads();
     }
 
     @Test
-    @Disabled
+    @Disabled(SmokeTesting.DISABLED_REASON)
     @Override
     public void manyTargets_singleShard_manyThreads() {
+        super.manyTargets_singleShard_manyThreads();
     }
 
     @Test
-    @Disabled
+    @Disabled(SmokeTesting.DISABLED_REASON)
     @Override
     public void singleTarget_manyShards_manyThreads() {
+        super.singleTarget_manyShards_manyThreads();
     }
 
     @Test
-    @Disabled
+    @Disabled(SmokeTesting.DISABLED_REASON)
     @Override
     public void singleTarget_manyShards_singleThread() {
+        super.singleTarget_manyShards_singleThread();
     }
 
     @Test
-    @Disabled
+    @Disabled(SmokeTesting.DISABLED_REASON)
     @Override
     public void singleTarget_singleShard_singleThread() {
+        super.singleTarget_singleShard_singleThread();
     }
 
     @Test
-    @Disabled
+    @Disabled(SmokeTesting.DISABLED_REASON)
     @Override
     public void manyTargets_singleShard_singleThread() {
+        super.manyTargets_singleShard_singleThread();
     }
 
     @Test
-    @Disabled
+    @Disabled(SmokeTesting.DISABLED_REASON)
     @Override
     public void manyTargets_manyShards_singleThread() {
+        super.manyTargets_manyShards_singleThread();
     }
 
     @Test
-    @Disabled
+    @Disabled(SmokeTesting.DISABLED_REASON)
     @Override
     public void withCustomStrategy() {
+        super.withCustomStrategy();
     }
 
     @Test
-    @Disabled
+    @Disabled(SmokeTesting.DISABLED_REASON)
     @Override
     public void calculateStats() {
+        super.calculateStats();
     }
 
     @Test
-    @Disabled
+    @Disabled(SmokeTesting.DISABLED_REASON)
     @Override
     public void returnOptionalEmptyIfPicked() {
+        super.returnOptionalEmptyIfPicked();
     }
 
     @Test
-    @Disabled
+    @Disabled(SmokeTesting.DISABLED_REASON)
     @Override
     public void notifyDeliveryMonitorOfDeliveryCompletion() {
+        super.notifyDeliveryMonitorOfDeliveryCompletion();
     }
 
     @Test
-    @Disabled
+    @Disabled(SmokeTesting.DISABLED_REASON)
     @Override
     public void deliverInBatch() {
+        super.deliverInBatch();
     }
 
     @Test
-    @Disabled
+    @Disabled(SmokeTesting.DISABLED_REASON)
     @Override
-    public void deliverMessagesInOrderOfEmission() {
+    public void deliverMessagesInOrderOfEmission() throws InterruptedException {
+        super.deliverMessagesInOrderOfEmission();
     }
 }

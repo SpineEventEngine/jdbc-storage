@@ -82,21 +82,21 @@ class JdbcCatchUpSmokeTest extends CatchUpTest {
     }
 
     @Test
-    @Disabled
+    @Disabled(SmokeTesting.DISABLED_REASON)
     @Override
     public void withNanosByIds() throws InterruptedException {
         super.withNanosByIds();
     }
 
     @Test
-    @Disabled
+    @Disabled(SmokeTesting.DISABLED_REASON)
     @Override
     public void withMillisByIds() throws InterruptedException {
         super.withMillisByIds();
     }
 
     @Test
-    @Disabled
+    @Disabled(SmokeTesting.DISABLED_REASON)
     @Override
     public void withMillisAllInOrder() throws InterruptedException {
         super.withMillisAllInOrder();
