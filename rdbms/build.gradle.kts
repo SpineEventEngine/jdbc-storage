@@ -83,12 +83,14 @@ dependencies {
 }
 
 /**
- * Gives the test JVM more heap than Gradle's 512&nbsp;MB default.
+ * Hardens the resource-heavy storage test suite.
  *
- * The storage test suite is resource-heavy: each test class spins up a bounded context and a
- * JDBC connection pool. The default worker heap is tight for running the whole suite in a single
- * JVM, and the extra headroom keeps the worker stable through the entire run.
+ * Each test class spins up a bounded context and a JDBC connection pool. Run in a single JVM,
+ * the full suite accumulates enough resources (pooled connections, executor threads, contexts)
+ * to crash the test worker before it finishes. We enlarge the worker heap and recycle the worker
+ * every few classes to release those resources.
  */
 tasks.withType<Test>().configureEach {
     maxHeapSize = "2g"
+    setForkEvery(10)
 }
