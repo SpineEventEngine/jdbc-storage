@@ -32,6 +32,7 @@ import io.spine.dependency.test.H2
 import io.spine.dependency.test.HsqlDb
 import io.spine.dependency.test.MySql
 import io.spine.dependency.test.Testcontainers
+import org.gradle.api.tasks.testing.Test
 
 plugins {
     module
@@ -76,4 +77,15 @@ dependencies {
         exclude(group = "org.jetbrains")
     }
     testImplementation(MySql.connector)
+}
+
+/**
+ * Gives the test JVM more heap than Gradle's 512&nbsp;MB default.
+ *
+ * The storage test suite is resource-heavy: each test class spins up a bounded context and a
+ * JDBC connection pool. The default worker heap is tight for running the whole suite in a single
+ * JVM, and the extra headroom keeps the worker stable through the entire run.
+ */
+tasks.withType<Test>().configureEach {
+    maxHeapSize = "2g"
 }
