@@ -27,15 +27,14 @@
 package io.spine.dependency.test
 
 /**
- * MySQL Connector/J — the official JDBC driver for MySQL.
+ * The H2 Database Engine — a fast, in-memory/embedded SQL database used for exercising
+ * the JDBC storage in tests.
  *
- * Used by the MySQL-based storage tests. Note the modern `com.mysql:mysql-connector-j`
- * coordinates, which superseded the legacy `mysql:mysql-connector-java` artifact.
- *
- * @see <a href="https://github.com/mysql/mysql-connector-j">MySQL Connector/J at GitHub</a>
+ * @see <a href="https://github.com/h2database/h2database">H2 Database Engine at GitHub</a>
+ * @see <a href="https://h2database.com/">H2 Database Engine site</a>
  */
 @Suppress("unused", "ConstPropertyName")
-object MySql {
-    private const val version = "9.7.0"
-    const val connector = "com.mysql:mysql-connector-j:$version"
+object H2 {
+    private const val version = "2.1.210"
+    const val lib = "com.h2database:h2:$version"
 }

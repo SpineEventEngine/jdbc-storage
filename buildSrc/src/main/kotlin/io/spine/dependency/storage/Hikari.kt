@@ -35,6 +35,6 @@ package io.spine.dependency.lib
  */
 @Suppress("unused", "ConstPropertyName")
 object Hikari {
-    private const val version = "7.1.0"
+    private const val version = "5.0.1"
     const val lib = "com.zaxxer:HikariCP:$version"
 }
