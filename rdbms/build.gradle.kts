@@ -24,9 +24,9 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import io.spine.internal.gradle.publish.IncrementGuard
-import io.spine.internal.dependency.Grpc
-import io.spine.internal.dependency.Testcontainers
+import io.spine.gradle.publish.IncrementGuard
+import io.spine.dependency.Grpc
+import io.spine.dependency.Testcontainers
 
 apply<IncrementGuard>()
 

@@ -27,24 +27,24 @@
 @file:Suppress("RemoveRedundantQualifierName")
 
 import Build_gradle.Subproject
-import io.spine.internal.dependency.*
-import io.spine.internal.gradle.VersionWriter
-import io.spine.internal.gradle.checkstyle.CheckStyleConfig
-import io.spine.internal.gradle.github.pages.updateGitHubPages
-import io.spine.internal.gradle.javac.configureErrorProne
-import io.spine.internal.gradle.javac.configureJavac
-import io.spine.internal.gradle.javadoc.JavadocConfig
-import io.spine.internal.gradle.kotlin.applyJvmToolchain
-import io.spine.internal.gradle.kotlin.setFreeCompilerArgs
-import io.spine.internal.gradle.publish.IncrementGuard
-import io.spine.internal.gradle.publish.PublishingRepos
-import io.spine.internal.gradle.publish.spinePublishing
-import io.spine.internal.gradle.report.coverage.JacocoConfig
-import io.spine.internal.gradle.report.license.LicenseReporter
-import io.spine.internal.gradle.report.pom.PomGenerator
-import io.spine.internal.gradle.standardToSpineSdk
-import io.spine.internal.gradle.testing.configureLogging
-import io.spine.internal.gradle.testing.registerTestTasks
+import io.spine.dependency.*
+import io.spine.gradle.VersionWriter
+import io.spine.gradle.checkstyle.CheckStyleConfig
+import io.spine.gradle.github.pages.updateGitHubPages
+import io.spine.gradle.javac.configureErrorProne
+import io.spine.gradle.javac.configureJavac
+import io.spine.gradle.javadoc.JavadocConfig
+import io.spine.gradle.kotlin.applyJvmToolchain
+import io.spine.gradle.kotlin.setFreeCompilerArgs
+import io.spine.gradle.publish.IncrementGuard
+import io.spine.gradle.publish.PublishingRepos
+import io.spine.gradle.publish.spinePublishing
+import io.spine.gradle.report.coverage.KoverConfig
+import io.spine.gradle.report.license.LicenseReporter
+import io.spine.gradle.report.pom.PomGenerator
+import io.spine.gradle.standardToSpineSdk
+import io.spine.gradle.testing.configureLogging
+import io.spine.gradle.testing.registerTestTasks
 import org.gradle.jvm.tasks.Jar
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -55,24 +55,19 @@ buildscript {
     configurations {
         all {
             resolutionStrategy {
-                val spine = io.spine.internal.dependency.Spine
-                val logging = io.spine.internal.dependency.Spine.Logging
-                val validation = io.spine.internal.dependency.Validation
-                val gRpc = io.spine.internal.dependency.Grpc
                 force(
-                    spine.base,
-                    spine.toolBase,
-                    spine.server,
-                    logging.lib,
-                    validation.runtime,
-                    gRpc.api,
+                    io.spine.dependency.local.Base.lib,
+                    io.spine.dependency.local.ToolBase.lib,
+                    io.spine.dependency.local.CoreJvm.server,
+                    io.spine.dependency.local.Logging.lib,
+                    io.spine.dependency.local.Validation.runtime,
                 )
             }
         }
     }
 
     dependencies {
-        classpath(io.spine.internal.dependency.Spine.McJava.pluginLib)
+        classpath(io.spine.dependency.local.CoreJvmCompiler.pluginLib)
     }
 }
 
@@ -83,10 +78,6 @@ plugins {
     protobuf
     errorprone
     `gradle-doctor`
-}
-
-object BuildSettings {
-    const val JAVA_VERSION = 11
 }
 
 repositories.standardToSpineSdk()
@@ -136,7 +127,7 @@ subprojects {
 }
 
 
-JacocoConfig.applyTo(project)
+KoverConfig.applyTo(project)
 PomGenerator.applyTo(project)
 LicenseReporter.mergeAllReports(project)
 
