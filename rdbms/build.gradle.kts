@@ -1,11 +1,11 @@
 /*
- * Copyright 2023, TeamDev. All rights reserved.
+ * Copyright 2026, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * https://www.apache.org/licenses/LICENSE-2.0
  *
  * Redistribution and use in source and/or binary forms, with or without
  * modification, must retain the above copyright notice and the following
@@ -24,32 +24,56 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import io.spine.gradle.publish.IncrementGuard
-import io.spine.dependency.Grpc
-import io.spine.dependency.Testcontainers
+import io.spine.dependency.lib.Grpc
+import io.spine.dependency.lib.Hikari
+import io.spine.dependency.lib.QueryDsl
+import io.spine.dependency.local.CoreJvm
+import io.spine.dependency.test.H2
+import io.spine.dependency.test.HsqlDb
+import io.spine.dependency.test.MySql
+import io.spine.dependency.test.Testcontainers
 
-apply<IncrementGuard>()
-
-extra["artifactId"] = "jdbc-rdbms"
-
-val querydslVersion = "5.0.0"
-val hikariVersion = "5.0.1"
-val hsqldbVersion = "2.6.1"
-val h2Version = "2.1.210"
-val mySqlConnectorVersion = "8.0.28"
+plugins {
+    module
+    id("io.spine.core-jvm")
+}
 
 dependencies {
-    api("com.querydsl:querydsl-sql:$querydslVersion") {
+    implementation(CoreJvm.server)
+
+    api(QueryDsl.sql) {
         exclude(group = "com.google.guava")
     }
-    implementation("com.zaxxer:HikariCP:$hikariVersion")
-    testImplementation("org.hsqldb:hsqldb:$hsqldbVersion")
-    testImplementation("com.h2database:h2:$h2Version")
+    implementation(Hikari.lib)
+
+    testImplementation(CoreJvm.serverTestLib)
+
+    // The test fixtures of `spine-server` provide the shared test message types
+    // (e.g. `io.spine.test.storage.StgProject`) used by the storage tests.
+    //
+    // The capability is requested explicitly because `spine-server` publishes its
+    // test fixtures under the `io.spine:server-test-fixtures` capability (derived from
+    // the `server` module name), which does not match the name the `testFixtures(...)`
+    // helper would expect for the `spine-`-prefixed artifact.
+    testImplementation(CoreJvm.server) {
+        capabilities {
+            requireCapability("io.spine:server-test-fixtures")
+        }
+    }
+
+    // `EntityRecordStorageTest` is a concrete contract test published in the `tests`-classified
+    // JAR of `spine-server` (it is not part of the `server-test-fixtures` set, unlike the other
+    // storage-contract bases). It is consumed here so that `JdbcEntityRecordStorageTest` can
+    // reuse it against the JDBC-backed storage.
+    testImplementation("${CoreJvm.server}:test")
+
     testImplementation(Grpc.stub)
+    testImplementation(HsqlDb.lib)
+    testImplementation(H2.lib)
     testImplementation(Testcontainers.lib)
     testImplementation(Testcontainers.junitJupiter)
-    testImplementation(Testcontainers.mySqlSupport) {
+    testImplementation(Testcontainers.mySql) {
         exclude(group = "org.jetbrains")
     }
-    testImplementation("mysql:mysql-connector-java:$mySqlConnectorVersion")
+    testImplementation(MySql.connector)
 }
