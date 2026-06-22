@@ -31,6 +31,7 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.Message;
 import com.google.protobuf.Timestamp;
 import com.google.protobuf.util.Timestamps;
+import io.spine.annotation.Experimental;
 import io.spine.annotation.SPI;
 import io.spine.core.Version;
 import io.spine.server.storage.AbstractColumnMapping;
@@ -57,6 +58,7 @@ import static io.spine.server.storage.jdbc.Type.STRING;
  *
  * <p>Users may extend this type to add own custom mapping for some of the stored types.
  */
+@Experimental
 @SPI
 public class JdbcColumnMapping extends AbstractColumnMapping<Object> {
 

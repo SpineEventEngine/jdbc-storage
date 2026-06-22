@@ -30,6 +30,7 @@ import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.protobuf.Message;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import io.spine.annotation.Experimental;
 import io.spine.annotation.Internal;
 import io.spine.base.EntityState;
 import io.spine.server.ContextSpec;
@@ -55,6 +56,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @see DataSourceConfig
  */
+@Experimental
 public class JdbcStorageFactory implements StorageFactory {
 
     private final DataSourceWrapper dataSource;

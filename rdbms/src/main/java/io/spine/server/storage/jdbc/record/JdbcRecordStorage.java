@@ -30,6 +30,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.protobuf.Message;
 import io.spine.annotation.Internal;
+import io.spine.annotation.SPI;
 import io.spine.query.RecordQuery;
 import io.spine.server.ContextSpec;
 import io.spine.server.storage.RecordSpec;
@@ -50,6 +51,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @param <R>
  *         the type of stored records
  */
+@SPI
 public class JdbcRecordStorage<I, R extends Message> extends RecordStorage<I, R> {
 
     private final RecordTable<I, R> table;
