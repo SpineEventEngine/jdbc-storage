@@ -35,7 +35,7 @@ dependencies {
 Version 2.x is still in development, but as of now, it fully supports all major features
 brought by Spine 2.x family.
 
-It requires Java 11+.
+It requires Java 17+.
 
 Use the following dependency in your Gradle build scripts:
 
