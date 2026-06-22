@@ -40,13 +40,13 @@ import static io.spine.server.storage.jdbc.TypeMappingBuilder.mappingBuilder;
 @Immutable
 public enum PredefinedMapping implements TypeMapping {
 
-    // Must match `io.spine.dependency.test.MySql.version`.
+    // Must match `io.spine.dependency.storage.MySql.version`.
     MYSQL_5_7("MySQL", 5, 7, mappingBuilder()),
 
     //
     POSTGRESQL_10_1("PostgreSQL", 10, 1, mappingBuilder().add(BYTE_ARRAY, "BYTEA")),
 
-    // Must match `io.spine.dependency.test.H2Version` version.
+    // Must match `io.spine.dependency.storage.H2Version` version.
     H2_2_1("H2", 2, 1, mappingBuilder());
 
     @SuppressWarnings("NonSerializableFieldInSerializableClass")
