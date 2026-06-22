@@ -4,7 +4,8 @@ The framework provides a `TypeMapping` to configure the SQL types, which fit the
 The mapping defines correspondence of `Type` to a name for a particular database.
 `Type` is an abstraction for a data type in a database.
 
-The type mapping is selected automatically basing on the JDBC connection string.
+The type mapping is selected automatically based on the database product name and version,
+as reported by the JDBC driver's `DatabaseMetaData`.
 If there is no predefined mapping for the database,
 mapping for MySQL 9.7 will be used as the default.
 

@@ -279,7 +279,7 @@ public class JdbcStorageFactory implements StorageFactory {
          * and the database version.
          *
          * <p>If there is no mapping for the database,
-         * {@linkplain PredefinedMapping#MYSQL_9_7 mapping for MySQL 5.7} is used.
+         * {@linkplain PredefinedMapping#MYSQL_9_7 mapping for MySQL 9.7} is used.
          *
          * @param typeMapping
          *         the custom type mapping
