@@ -55,6 +55,11 @@
 # Gradle build files
 **/build/**
 
+# The `io.spine.dependency.build` package holds source code (dependency
+# definitions), not Gradle output. Keep it tracked despite the rule above.
+!/buildSrc/src/main/kotlin/io/spine/dependency/build/
+!/buildSrc/src/main/kotlin/io/spine/dependency/build/**
+
 # Build files produced by the IDE
 **/out/**
 
@@ -99,3 +104,4 @@ hs_err_pid*
 
 .packages
 pubspec.lock
+/buildSrc/.kotlin/**

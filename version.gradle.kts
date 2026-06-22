@@ -1,11 +1,11 @@
 /*
- * Copyright 2023, TeamDev. All rights reserved.
+ * Copyright 2026, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * https://www.apache.org/licenses/LICENSE-2.0
  *
  * Redistribution and use in source and/or binary forms, with or without
  * modification, must retain the above copyright notice and the following
@@ -24,8 +24,10 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-val spineBaseVersion: String by extra("2.0.0-SNAPSHOT.77")
-val spineCoreVersion: String by extra("2.0.0-SNAPSHOT.92")
-val mcJavaVersion: String by extra("2.0.0-SNAPSHOT.83")
-val versionToPublish: String by extra("2.0.0-SNAPSHOT.92")
-
+/**
+ * The version of this library.
+ *
+ * The versions of Spine-based dependencies are defined under the
+ * `io.spine.dependency.local` package of `buildSrc` (e.g. `CoreJvm`, `Base`).
+ */
+val versionToPublish: String by extra("2.0.0-SNAPSHOT.100")

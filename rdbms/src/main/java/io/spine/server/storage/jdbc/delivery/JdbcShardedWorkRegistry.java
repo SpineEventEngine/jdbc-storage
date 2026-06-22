@@ -27,6 +27,8 @@
 package io.spine.server.storage.jdbc.delivery;
 
 import com.google.protobuf.Duration;
+import io.spine.annotation.Experimental;
+import io.spine.annotation.SPI;
 import io.spine.logging.WithLogging;
 import io.spine.server.ContextSpec;
 import io.spine.server.NodeId;
@@ -52,6 +54,8 @@ import static io.spine.util.Exceptions.newIllegalStateException;
  * <p>Represents an SQL table of {@linkplain ShardSessionRecord session records} with the
  * appropriate accessor methods.
  */
+@Experimental
+@SPI
 public class JdbcShardedWorkRegistry extends AbstractWorkRegistry implements WithLogging {
 
     private final JdbcSessionStorage storage;

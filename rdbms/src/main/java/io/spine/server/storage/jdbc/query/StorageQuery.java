@@ -27,6 +27,7 @@
 package io.spine.server.storage.jdbc.query;
 
 import com.google.protobuf.Message;
+import io.spine.annotation.SPI;
 import io.spine.server.storage.jdbc.record.JdbcTableSpec;
 import io.spine.server.storage.jdbc.record.column.IdColumn;
 
@@ -38,6 +39,7 @@ import io.spine.server.storage.jdbc.record.column.IdColumn;
  * @param <R>
  *         the type of the queried records
  */
+@SPI
 public interface StorageQuery<I, R extends Message> {
 
     /**

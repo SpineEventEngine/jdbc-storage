@@ -29,12 +29,10 @@
  *
  * @see io.spine.server.storage.jdbc.operation.OperationFactory on SPI usage
  */
-@SPI
 @CheckReturnValue
 @ParametersAreNonnullByDefault
 package io.spine.server.storage.jdbc.query;
 
 import com.google.errorprone.annotations.CheckReturnValue;
-import io.spine.annotation.SPI;
 
 import javax.annotation.ParametersAreNonnullByDefault;

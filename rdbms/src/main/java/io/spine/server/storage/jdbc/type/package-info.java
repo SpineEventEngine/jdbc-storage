@@ -27,12 +27,10 @@
 /**
  * The classes related to the type mapping in JDBC.
  */
-@Experimental
 @CheckReturnValue
 @ParametersAreNonnullByDefault
 package io.spine.server.storage.jdbc.type;
 
 import com.google.errorprone.annotations.CheckReturnValue;
-import io.spine.annotation.Experimental;
 
 import javax.annotation.ParametersAreNonnullByDefault;

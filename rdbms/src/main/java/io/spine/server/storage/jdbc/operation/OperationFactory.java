@@ -27,6 +27,7 @@
 package io.spine.server.storage.jdbc.operation;
 
 import com.google.protobuf.Message;
+import io.spine.annotation.SPI;
 import io.spine.server.storage.jdbc.DataSourceWrapper;
 import io.spine.server.storage.jdbc.TypeMapping;
 import io.spine.server.storage.jdbc.engine.DetectedEngine;
@@ -52,6 +53,7 @@ import static io.spine.server.storage.jdbc.engine.PredefinedEngine.MySQL;
  *  <p>Also, all query types are made {@code public} and marked as {@code SPI} elements,
  *  since they may also be involved into customizing the actual SQL queries.
  */
+@SPI
 public class OperationFactory {
 
     private final DataSourceWrapper dataSource;

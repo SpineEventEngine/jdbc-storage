@@ -30,7 +30,7 @@ import io.spine.server.ContextSpec;
 import io.spine.server.delivery.InboxMessage;
 import io.spine.server.delivery.InboxMessageId;
 import io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.InboxMessageColumnMapping;
-import io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.StgProjectProjection;
+import io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.StgProjectAggregate;
 import io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.TestColumnMapping;
 import io.spine.server.storage.jdbc.record.JdbcRecordStorage;
 import io.spine.server.storage.jdbc.record.TableNames;
@@ -95,7 +95,7 @@ class JdbcStorageFactoryTest {
                 .setDataSource(whichIsStoredInMemory(newUuid()))
                 .build();
         var createTableSql = factory.tableCreationSql(ContextSpec.singleTenant("SQLs"),
-                                                      StgProjectProjection.class);
+                                                      StgProjectAggregate.class);
         assertThat(createTableSql)
                 .isNotEmpty();
         assertThat(createTableSql)

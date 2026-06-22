@@ -26,12 +26,15 @@
 
 package io.spine.server.storage.jdbc.engine;
 
+import io.spine.annotation.SPI;
+
 /**
  * An RDBMS engine detected by this library
  * in terms of executing operations over the database tables.
  *
  * @see io.spine.server.storage.jdbc.operation.OperationFactory
  */
+@SPI
 public interface DetectedEngine {
 
     /**
