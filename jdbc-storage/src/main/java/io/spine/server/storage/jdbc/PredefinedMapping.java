@@ -54,26 +54,6 @@ public enum PredefinedMapping implements TypeMapping {
     // Must match `io.spine.dependency.storage.H2Version` version.
     H2_2_1("H2", 2, 1, mappingBuilder());
 
-    /**
-     * SQL type names specific to PostgreSQL, which differ from the
-     * {@linkplain TypeMappingBuilder default mapping}.
-     */
-    static final class PostgreSql {
-
-        /** The single-precision (4-byte) floating-point type. */
-        static final String REAL = "REAL";
-
-        /**
-         * The double-precision (8-byte) floating-point type.
-         *
-         * <p>Used because PostgreSQL does not recognize a bare {@code DOUBLE}.
-         */
-        static final String DOUBLE_PRECISION = "DOUBLE PRECISION";
-
-        private PostgreSql() {
-        }
-    }
-
     private final TypeMapping typeMapping;
     private final String databaseProductName;
     private final int majorVersion;
@@ -132,5 +112,25 @@ public enum PredefinedMapping implements TypeMapping {
     @VisibleForTesting
     int getMinorVersion() {
         return minorVersion;
+    }
+
+    /**
+     * SQL type names specific to PostgreSQL, which differ from the
+     * {@linkplain TypeMappingBuilder default mapping}.
+     */
+    static final class PostgreSql {
+
+        /** The single-precision (4-byte) floating-point type. */
+        static final String REAL = "REAL";
+
+        /**
+         * The double-precision (8-byte) floating-point type.
+         *
+         * <p>Used because PostgreSQL does not recognize a bare {@code DOUBLE}.
+         */
+        static final String DOUBLE_PRECISION = "DOUBLE PRECISION";
+
+        private PostgreSql() {
+        }
     }
 }
