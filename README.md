@@ -24,7 +24,7 @@ Use the following dependency in your Gradle build scripts:
 
 ```kotlin
 dependencies {
-    implementation("io.spine:jdbc-rdbms:1.9.0")
+    implementation("io.spine:spine-rdbms:1.9.0")
 }
 ```
 
