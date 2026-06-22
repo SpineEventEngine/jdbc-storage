@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichHoldsMetadata;
-import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
+import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_9_7;
 import static io.spine.server.storage.jdbc.PredefinedMapping.POSTGRESQL_10_1;
 import static io.spine.server.storage.jdbc.PredefinedMapping.select;
 import static io.spine.testing.TestValues.nullRef;
@@ -46,7 +46,7 @@ class PredefinedMappingTest {
     @DisplayName("throw ISE if requested type has no mapping")
     void throwOnNoMapping() {
         Type notMappedType = nullRef();
-        assertThrows(IllegalStateException.class, () -> MYSQL_5_7.typeNameFor(notMappedType));
+        assertThrows(IllegalStateException.class, () -> MYSQL_9_7.typeNameFor(notMappedType));
     }
 
     @Test

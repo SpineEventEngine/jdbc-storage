@@ -1,11 +1,11 @@
 /*
- * Copyright 2023, TeamDev. All rights reserved.
+ * Copyright 2026, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * https://www.apache.org/licenses/LICENSE-2.0
  *
  * Redistribution and use in source and/or binary forms, with or without
  * modification, must retain the above copyright notice and the following
@@ -41,7 +41,7 @@ import static io.spine.server.storage.jdbc.TypeMappingBuilder.mappingBuilder;
 public enum PredefinedMapping implements TypeMapping {
 
     // Must match `io.spine.dependency.storage.MySql.version`.
-    MYSQL_5_7("MySQL", 5, 7, mappingBuilder()),
+    MYSQL_9_7("MySQL", 9, 7, mappingBuilder()),
 
     //
     POSTGRESQL_10_1("PostgreSQL", 10, 1, mappingBuilder().add(BYTE_ARRAY, "BYTEA")),
@@ -76,7 +76,7 @@ public enum PredefinedMapping implements TypeMapping {
      *
      * @param dataSource
      *         the data source to test suitability
-     * @return the type mapping for the used database or {@linkplain PredefinedMapping#MYSQL_5_7
+     * @return the type mapping for the used database or {@linkplain PredefinedMapping#MYSQL_9_7
      *         mapping for MySQL 5.7} if there is no standard mapping for the database
      */
     public static TypeMapping select(DataSourceWrapper dataSource) {
@@ -92,7 +92,7 @@ public enum PredefinedMapping implements TypeMapping {
                 return mapping;
             }
         }
-        return MYSQL_5_7;
+        return MYSQL_9_7;
     }
 
     @VisibleForTesting

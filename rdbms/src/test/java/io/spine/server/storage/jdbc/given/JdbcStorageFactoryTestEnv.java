@@ -49,7 +49,7 @@ import io.spine.test.storage.StgProjectId;
 
 import static io.spine.server.storage.jdbc.GivenDataSource.prefix;
 import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_1;
-import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
+import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_9_7;
 import static io.spine.server.storage.jdbc.Type.LONG;
 
 public final class JdbcStorageFactoryTestEnv {
@@ -62,7 +62,7 @@ public final class JdbcStorageFactoryTestEnv {
         var dataSource = dataSource();
         return JdbcStorageFactory.newBuilder()
                                  .setDataSource(dataSource)
-                                 .setTypeMapping(MYSQL_5_7)
+                                 .setTypeMapping(MYSQL_9_7)
                                  .build();
     }
 
