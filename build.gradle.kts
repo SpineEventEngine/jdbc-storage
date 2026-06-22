@@ -98,9 +98,9 @@ apply<BomsPlugin>()
 repositories.standardToSpineSdk()
 
 spinePublishing {
-    artifactPrefix = "jdbc-"
+    artifactPrefix = "spine-"
     modules = setOf(
-        "rdbms"
+        "jdbc-storage"
     )
     destinations = with(PublishingRepos) {
         setOf(
