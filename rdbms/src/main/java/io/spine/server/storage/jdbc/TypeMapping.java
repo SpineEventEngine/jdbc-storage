@@ -33,7 +33,7 @@ import io.spine.type.TypeName;
  * A {@link Type}-to-name mapping.
  *
  * <p>A data type may have different names in different databases.
- * E.g. for binary data {@code BLOB} is used in MySQL, but in PostgreSQL it's {@code BYTEA}.
+ * E.g., for binary data {@code BLOB} is used in MySQL, but in PostgreSQL it's {@code BYTEA}.
  *
  * <p>A type mapping provides a flexible way to point out
  * database-specific names of {@linkplain Type types}.
