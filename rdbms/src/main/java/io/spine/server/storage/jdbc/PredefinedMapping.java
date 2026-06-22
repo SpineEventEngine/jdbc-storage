@@ -32,6 +32,8 @@ import io.spine.type.TypeName;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
+import static io.spine.server.storage.jdbc.Type.DOUBLE;
+import static io.spine.server.storage.jdbc.Type.FLOAT;
 import static io.spine.server.storage.jdbc.TypeMappingBuilder.mappingBuilder;
 
 /**
@@ -43,13 +45,35 @@ public enum PredefinedMapping implements TypeMapping {
     // Must match `io.spine.dependency.storage.MySql.version`.
     MYSQL_9_7("MySQL", 9, 7, mappingBuilder()),
 
-    //
-    POSTGRESQL_10_1("PostgreSQL", 10, 1, mappingBuilder().add(BYTE_ARRAY, "BYTEA")),
+    // PostgreSQL has no bare `DOUBLE` type, and its `FLOAT` is double-precision;
+    // map to the single-/double-precision types matching Java `float`/`double`.
+    POSTGRESQL_10_1("PostgreSQL", 10, 1, mappingBuilder().add(BYTE_ARRAY, "BYTEA")
+                                                         .add(FLOAT, PostgreSql.REAL)
+                                                         .add(DOUBLE, PostgreSql.DOUBLE_PRECISION)),
 
     // Must match `io.spine.dependency.storage.H2Version` version.
     H2_2_1("H2", 2, 1, mappingBuilder());
 
-    @SuppressWarnings("NonSerializableFieldInSerializableClass")
+    /**
+     * SQL type names specific to PostgreSQL, which differ from the
+     * {@linkplain TypeMappingBuilder default mapping}.
+     */
+    static final class PostgreSql {
+
+        /** The single-precision (4-byte) floating-point type. */
+        static final String REAL = "REAL";
+
+        /**
+         * The double-precision (8-byte) floating-point type.
+         *
+         * <p>Used because PostgreSQL does not recognize a bare {@code DOUBLE}.
+         */
+        static final String DOUBLE_PRECISION = "DOUBLE PRECISION";
+
+        private PostgreSql() {
+        }
+    }
+
     private final TypeMapping typeMapping;
     private final String databaseProductName;
     private final int majorVersion;
@@ -77,7 +101,7 @@ public enum PredefinedMapping implements TypeMapping {
      * @param dataSource
      *         the data source to test suitability
      * @return the type mapping for the used database or {@linkplain PredefinedMapping#MYSQL_9_7
-     *         mapping for MySQL 5.7} if there is no standard mapping for the database
+     *         mapping for MySQL 9.7} if there is no standard mapping for the database
      */
     public static TypeMapping select(DataSourceWrapper dataSource) {
         checkNotNull(dataSource);

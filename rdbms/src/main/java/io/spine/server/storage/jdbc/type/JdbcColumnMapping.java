@@ -46,6 +46,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static io.spine.server.storage.ColumnTypeMapping.identity;
 import static io.spine.server.storage.jdbc.Type.BOOLEAN;
 import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
+import static io.spine.server.storage.jdbc.Type.DOUBLE;
+import static io.spine.server.storage.jdbc.Type.FLOAT;
 import static io.spine.server.storage.jdbc.Type.INT;
 import static io.spine.server.storage.jdbc.Type.LONG;
 import static io.spine.server.storage.jdbc.Type.STRING;
@@ -142,12 +144,12 @@ public class JdbcColumnMapping extends AbstractColumnMapping<Object> {
 
     @Override
     protected ColumnTypeMapping<Float, Float> ofFloat() {
-        throw unsupportedType(Float.class);
+        return new JdbcColumnTypeMapping<>(identity(), FLOAT);
     }
 
     @Override
     protected ColumnTypeMapping<Double, Double> ofDouble() {
-        throw unsupportedType(Double.class);
+        return new JdbcColumnTypeMapping<>(identity(), DOUBLE);
     }
 
     @Override

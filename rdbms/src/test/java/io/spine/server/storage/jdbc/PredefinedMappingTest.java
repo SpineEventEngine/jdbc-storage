@@ -33,7 +33,11 @@ import static com.google.common.truth.Truth.assertThat;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichHoldsMetadata;
 import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_9_7;
 import static io.spine.server.storage.jdbc.PredefinedMapping.POSTGRESQL_10_1;
+import static io.spine.server.storage.jdbc.PredefinedMapping.PostgreSql.DOUBLE_PRECISION;
+import static io.spine.server.storage.jdbc.PredefinedMapping.PostgreSql.REAL;
 import static io.spine.server.storage.jdbc.PredefinedMapping.select;
+import static io.spine.server.storage.jdbc.Type.DOUBLE;
+import static io.spine.server.storage.jdbc.Type.FLOAT;
 import static io.spine.testing.TestValues.nullRef;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -68,5 +72,19 @@ class PredefinedMappingTest {
                                             mapping.getMinorVersion());
         assertThat(select(dataSource))
                 .isNotEqualTo(mapping);
+    }
+
+    @Test
+    @DisplayName("map `FLOAT` and `DOUBLE` to default SQL type names")
+    void mapFloatingPointTypes() {
+        assertThat(MYSQL_9_7.typeNameFor(FLOAT).value()).isEqualTo("FLOAT");
+        assertThat(MYSQL_9_7.typeNameFor(DOUBLE).value()).isEqualTo("DOUBLE");
+    }
+
+    @Test
+    @DisplayName("map `FLOAT` and `DOUBLE` to PostgreSQL-specific SQL type names")
+    void mapFloatingPointTypesForPostgres() {
+        assertThat(POSTGRESQL_10_1.typeNameFor(FLOAT).value()).isEqualTo(REAL);
+        assertThat(POSTGRESQL_10_1.typeNameFor(DOUBLE).value()).isEqualTo(DOUBLE_PRECISION);
     }
 }
