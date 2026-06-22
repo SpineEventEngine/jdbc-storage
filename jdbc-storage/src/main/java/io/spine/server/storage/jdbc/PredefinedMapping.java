@@ -42,7 +42,7 @@ import static io.spine.server.storage.jdbc.TypeMappingBuilder.mappingBuilder;
 @Immutable
 public enum PredefinedMapping implements TypeMapping {
 
-    // Must match `io.spine.dependency.storage.MySql.version`.
+    // Must match `io.spine.dependency.test.MySql.version`.
     MYSQL_9_7("MySQL", 9, 7, mappingBuilder()),
 
     // PostgreSQL has no bare `DOUBLE` type, and its `FLOAT` is double-precision;
@@ -51,7 +51,7 @@ public enum PredefinedMapping implements TypeMapping {
                                                          .add(FLOAT, PostgreSql.REAL)
                                                          .add(DOUBLE, PostgreSql.DOUBLE_PRECISION)),
 
-    // Must match `io.spine.dependency.storage.H2Version` version.
+    // Must match `io.spine.dependency.test.H2.version`.
     H2_2_1("H2", 2, 1, mappingBuilder());
 
     private final TypeMapping typeMapping;
