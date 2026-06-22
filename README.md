@@ -96,11 +96,11 @@ The mapping defines correspondence of `Type` to a name for a particular database
 
 The type mapping is selected automatically basing on the JDBC connection string.
 If there is no predefined mapping for the database, 
-mapping for MySQL 5.7 will be used as the default.
+mapping for MySQL 9.7 will be used as the default.
 
 #### Default values
 
-|    Type    |  MySQL 5.7   | PostgreSQL 10.1 |
+|    Type    |  MySQL 9.7   | PostgreSQL 10.1 |
 |:----------:|:------------:|:---------------:|
 | BYTE_ARRAY |     BLOB     |      BYTEA      |
 |    INT     |     INT      |       INT       |
