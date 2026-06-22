@@ -10,15 +10,17 @@ mapping for MySQL 9.7 will be used as the default.
 
 ## Default values
 
-|    Type    |  MySQL 9.7   | PostgreSQL 10.1 |
-|:----------:|:------------:|:---------------:|
-| BYTE_ARRAY |     BLOB     |      BYTEA      |
-|    INT     |     INT      |       INT       |
-|    LONG    |    BIGINT    |     BIGINT      |
-| STRING_255 | VARCHAR(255) |  VARCHAR(255)   |
-| STRING_512 | VARCHAR(512) |  VARCHAR(512)   |
-|   STRING   |     TEXT     |      TEXT       |
-|  BOOLEAN   |   BOOLEAN    |     BOOLEAN     |
+|    Type    |  MySQL 9.7   | PostgreSQL 10.1  |
+|:----------:|:------------:|:----------------:|
+| BYTE_ARRAY |     BLOB     |      BYTEA       |
+|    INT     |     INT      |       INT        |
+|    LONG    |    BIGINT    |      BIGINT      |
+|   FLOAT    |    FLOAT     |       REAL       |
+|   DOUBLE   |    DOUBLE    | DOUBLE PRECISION |
+| STRING_255 | VARCHAR(255) |   VARCHAR(255)   |
+| STRING_512 | VARCHAR(512) |   VARCHAR(512)   |
+|   STRING   |     TEXT     |       TEXT       |
+|  BOOLEAN   |   BOOLEAN    |     BOOLEAN      |
 
 ## Custom mapping
 
