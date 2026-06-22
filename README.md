@@ -39,7 +39,7 @@ Use the following dependency in your Gradle build scripts:
 
 ```kotlin
 dependencies {
-    implementation("io.spine:jdbc-rdbms:2.0.0-SNAPSHOT.101")
+    implementation("io.spine:jdbc-rdbms:$version")
 }
 ```
 
