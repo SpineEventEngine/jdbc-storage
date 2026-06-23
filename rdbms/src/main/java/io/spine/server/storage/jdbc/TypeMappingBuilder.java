@@ -38,6 +38,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static io.spine.server.storage.jdbc.Type.BOOLEAN;
 import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
+import static io.spine.server.storage.jdbc.Type.DOUBLE;
+import static io.spine.server.storage.jdbc.Type.FLOAT;
 import static io.spine.server.storage.jdbc.Type.INT;
 import static io.spine.server.storage.jdbc.Type.LONG;
 import static io.spine.server.storage.jdbc.Type.STRING;
@@ -69,6 +71,8 @@ public final class TypeMappingBuilder {
      *     <li>{@code Type.BYTE_ARRAY} - {@code BLOB}</li>
      *     <li>{@code Type.INT} - {@code INT}</li>
      *     <li>{@code Type.LONG} - {@code BIGINT}</li>
+     *     <li>{@code Type.FLOAT} - {@code FLOAT}</li>
+     *     <li>{@code Type.DOUBLE} - {@code DOUBLE}</li>
      *     <li>{@code Type.STRING_255} - {@code VARCHAR(255)}</li>
      *     <li>{@code Type.STRING_512} - {@code VARCHAR(512)}</li>
      *     <li>{@code Type.STRING} - {@code TEXT}</li>
@@ -92,6 +96,8 @@ public final class TypeMappingBuilder {
                 .add(BYTE_ARRAY, "BLOB")
                 .add(INT, "INT")
                 .add(LONG, "BIGINT")
+                .add(FLOAT, "FLOAT")
+                .add(DOUBLE, "DOUBLE")
                 .add(STRING_255, "VARCHAR(255)")
                 .add(STRING_512, "VARCHAR(512)")
                 .add(STRING, "TEXT")

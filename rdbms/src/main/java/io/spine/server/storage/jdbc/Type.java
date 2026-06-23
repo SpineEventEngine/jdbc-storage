@@ -51,6 +51,16 @@ public enum Type {
     LONG,
 
     /**
+     * The type representing a {@code float} value.
+     */
+    FLOAT,
+
+    /**
+     * The type representing a {@code double} value.
+     */
+    DOUBLE,
+
+    /**
      * The type representing a {@code String}, maximum length of which
      * doesn't exceed 255 characters.
      */

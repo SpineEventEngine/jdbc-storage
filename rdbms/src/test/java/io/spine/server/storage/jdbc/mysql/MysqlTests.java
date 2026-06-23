@@ -39,7 +39,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_5_7;
+import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_9_7;
 
 /**
  * Defines the common routines to use in tests against MySQL instance.
@@ -181,6 +181,6 @@ final class MysqlTests {
      * run via the {@linkplain #sharedContainer() container}.
      */
     private static PredefinedMapping mysqlMapping() {
-        return MYSQL_5_7;
+        return MYSQL_9_7;
     }
 }

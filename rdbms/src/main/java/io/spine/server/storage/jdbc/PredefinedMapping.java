@@ -1,11 +1,11 @@
 /*
- * Copyright 2023, TeamDev. All rights reserved.
+ * Copyright 2026, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * https://www.apache.org/licenses/LICENSE-2.0
  *
  * Redistribution and use in source and/or binary forms, with or without
  * modification, must retain the above copyright notice and the following
@@ -32,6 +32,8 @@ import io.spine.type.TypeName;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
+import static io.spine.server.storage.jdbc.Type.DOUBLE;
+import static io.spine.server.storage.jdbc.Type.FLOAT;
 import static io.spine.server.storage.jdbc.TypeMappingBuilder.mappingBuilder;
 
 /**
@@ -40,16 +42,18 @@ import static io.spine.server.storage.jdbc.TypeMappingBuilder.mappingBuilder;
 @Immutable
 public enum PredefinedMapping implements TypeMapping {
 
-    // Must match `io.spine.dependency.test.MySql.version`.
-    MYSQL_5_7("MySQL", 5, 7, mappingBuilder()),
+    // Must match `io.spine.dependency.storage.MySql.version`.
+    MYSQL_9_7("MySQL", 9, 7, mappingBuilder()),
 
-    //
-    POSTGRESQL_10_1("PostgreSQL", 10, 1, mappingBuilder().add(BYTE_ARRAY, "BYTEA")),
+    // PostgreSQL has no bare `DOUBLE` type, and its `FLOAT` is double-precision;
+    // map to the single-/double-precision types matching Java `float`/`double`.
+    POSTGRESQL_10_1("PostgreSQL", 10, 1, mappingBuilder().add(BYTE_ARRAY, "BYTEA")
+                                                         .add(FLOAT, PostgreSql.REAL)
+                                                         .add(DOUBLE, PostgreSql.DOUBLE_PRECISION)),
 
-    // Must match `io.spine.dependency.test.H2Version` version.
+    // Must match `io.spine.dependency.storage.H2.version`.
     H2_2_1("H2", 2, 1, mappingBuilder());
 
-    @SuppressWarnings("NonSerializableFieldInSerializableClass")
     private final TypeMapping typeMapping;
     private final String databaseProductName;
     private final int majorVersion;
@@ -76,8 +80,8 @@ public enum PredefinedMapping implements TypeMapping {
      *
      * @param dataSource
      *         the data source to test suitability
-     * @return the type mapping for the used database or {@linkplain PredefinedMapping#MYSQL_5_7
-     *         mapping for MySQL 5.7} if there is no standard mapping for the database
+     * @return the type mapping for the used database or {@linkplain PredefinedMapping#MYSQL_9_7
+     *         mapping for MySQL 9.7} if there is no standard mapping for the database
      */
     public static TypeMapping select(DataSourceWrapper dataSource) {
         checkNotNull(dataSource);
@@ -92,7 +96,7 @@ public enum PredefinedMapping implements TypeMapping {
                 return mapping;
             }
         }
-        return MYSQL_5_7;
+        return MYSQL_9_7;
     }
 
     @VisibleForTesting
@@ -108,5 +112,25 @@ public enum PredefinedMapping implements TypeMapping {
     @VisibleForTesting
     int getMinorVersion() {
         return minorVersion;
+    }
+
+    /**
+     * SQL type names specific to PostgreSQL, which differ from the
+     * {@linkplain TypeMappingBuilder default mapping}.
+     */
+    static final class PostgreSql {
+
+        /** The single-precision (4-byte) floating-point type. */
+        static final String REAL = "REAL";
+
+        /**
+         * The double-precision (8-byte) floating-point type.
+         *
+         * <p>Used because PostgreSQL does not recognize a bare {@code DOUBLE}.
+         */
+        static final String DOUBLE_PRECISION = "DOUBLE PRECISION";
+
+        private PostgreSql() {
+        }
     }
 }

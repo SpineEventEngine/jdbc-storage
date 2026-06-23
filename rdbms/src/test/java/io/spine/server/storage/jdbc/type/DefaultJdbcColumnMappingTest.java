@@ -40,10 +40,11 @@ import org.junit.jupiter.api.Test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.protobuf.util.Timestamps.toNanos;
+import static io.spine.server.storage.jdbc.Type.DOUBLE;
+import static io.spine.server.storage.jdbc.Type.FLOAT;
 import static io.spine.server.storage.jdbc.Type.STRING;
 import static io.spine.testing.DisplayNames.NOT_ACCEPT_NULLS;
 import static io.spine.type.Json.toCompactJson;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("`DefaultJdbcColumnMapping` should")
 class DefaultJdbcColumnMappingTest {
@@ -91,6 +92,20 @@ class DefaultJdbcColumnMappingTest {
         }
 
         @Test
+        @DisplayName("`float` column values")
+        void floatColumns() {
+            var num = 42.5f;
+            assertConverts(num, num);
+        }
+
+        @Test
+        @DisplayName("`double` column values")
+        void doubleColumns() {
+            var num = 42.5d;
+            assertConverts(num, num);
+        }
+
+        @Test
         @DisplayName("`boolean` column values")
         void booleanColumns() {
             var theBoolean = false;
@@ -107,19 +122,19 @@ class DefaultJdbcColumnMappingTest {
     }
 
     @Nested
-    @DisplayName("throw `IAE` because of unsupported type")
-    class ThrowUnsupportedType {
+    @DisplayName("obtain the 'store as' type")
+    class ObtainStoreAsType {
 
         @Test
         @DisplayName("for `float` columns")
         void forFloatColumns() {
-            assertThrows(IllegalArgumentException.class, mapping::ofFloat);
+            assertThat(mapping.typeOf(Float.class)).isEqualTo(FLOAT);
         }
 
         @Test
         @DisplayName("for `double` columns")
         void forDoubleColumns() {
-            assertThrows(IllegalArgumentException.class, mapping::ofDouble);
+            assertThat(mapping.typeOf(Double.class)).isEqualTo(DOUBLE);
         }
     }
 

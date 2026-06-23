@@ -26,8 +26,5 @@
 
 /**
  * The version of this library.
- *
- * The versions of Spine-based dependencies are defined under the
- * `io.spine.dependency.local` package of `buildSrc` (e.g. `CoreJvm`, `Base`).
  */
-val versionToPublish: String by extra("2.0.0-SNAPSHOT.100")
+val versionToPublish: String by extra("2.0.0-SNAPSHOT.101")

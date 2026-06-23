@@ -24,7 +24,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.dependency.test
+package io.spine.dependency.storage
 
 /**
  * HyperSQL DataBase (HSQLDB) — a relational database engine written in Java, used in its

@@ -1,6 +1,6 @@
 
 
-# Dependencies of `io.spine:jdbc-rdbms:2.0.0-SNAPSHOT.100`
+# Dependencies of `io.spine:spine-rdbms:2.0.0-SNAPSHOT.101`
 
 ## Runtime
 1.  **Group** : com.google.android. **Name** : annotations. **Version** : 4.1.1.4.
@@ -390,7 +390,7 @@
 1.  **Group** : com.mysema.commons. **Name** : mysema-commons-lang. **Version** : 0.2.4.
      * **License:** [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
-1.  **Group** : com.mysql. **Name** : mysql-connector-j. **Version** : 8.4.0.
+1.  **Group** : com.mysql. **Name** : mysql-connector-j. **Version** : 9.7.0.
      * **Project URL:** [http://dev.mysql.com/doc/connector-j/en/](http://dev.mysql.com/doc/connector-j/en/)
      * **License:** The GNU General Public License, v2 with Universal FOSS Exception, v1.0
 
@@ -1131,6 +1131,6 @@
 
 The dependencies distributed under several licenses, are used according their commercial-use-friendly license.
 
-This report was generated on **Fri Jun 19 23:10:12 WEST 2026** using 
+This report was generated on **Tue Jun 23 15:38:16 WEST 2026** using 
 [Gradle-License-Report plugin](https://github.com/jk1/Gradle-License-Report) by Evgeny Naumenko, licensed under 
 [Apache 2.0 License](https://github.com/jk1/Gradle-License-Report/blob/master/LICENSE).
