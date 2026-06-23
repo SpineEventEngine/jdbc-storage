@@ -39,7 +39,7 @@ Use the following dependency in your Gradle build scripts:
 
 ```kotlin
 dependencies {
-    implementation("io.spine:spine-jdbc-storage:$version")
+    implementation("io.spine:jdbc-rdbms:$version")
 }
 ```
 

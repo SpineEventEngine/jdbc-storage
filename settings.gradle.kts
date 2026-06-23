@@ -33,4 +33,4 @@ pluginManagement {
     }
 }
 
-include(":jdbc-storage")
+include(":rdbms")
