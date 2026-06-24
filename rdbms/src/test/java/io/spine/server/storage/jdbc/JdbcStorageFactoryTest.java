@@ -45,7 +45,7 @@ import static io.spine.base.Identifier.newUuid;
 import static io.spine.server.storage.given.GivenStorageProject.messageSpec;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichHoldsMetadata;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
-import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_1;
+import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_4;
 import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_9_7;
 import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.deliveryContextSpec;
 import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.inboxMessageSpec;
@@ -67,7 +67,7 @@ class JdbcStorageFactoryTest {
         var factory = JdbcStorageFactory
                 .newBuilder()
                 .setDataSource(whichIsStoredInMemory(newUuid()))
-                .setTypeMapping(H2_2_1)
+                .setTypeMapping(H2_2_4)
                 .build();
 
         assertNotNull(factory);
@@ -198,7 +198,7 @@ class JdbcStorageFactoryTest {
         var factory = JdbcStorageFactory
                 .newBuilder()
                 .setDataSource(dataSource)
-                .setTypeMapping(H2_2_1)
+                .setTypeMapping(H2_2_4)
                 .build();
         factory.close();
         assertThat(dataSource.isClosed())

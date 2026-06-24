@@ -40,7 +40,7 @@ import org.junit.jupiter.api.Test;
 import static com.google.common.truth.Truth.assertThat;
 import static io.spine.base.Identifier.newUuid;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
-import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_1;
+import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_4;
 import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.singleTenantSpec;
 
 /**
@@ -105,7 +105,7 @@ class CreateTableTest {
     private static JdbcStorageFactory h2Factory() {
         return JdbcStorageFactory.newBuilder()
                 .setDataSource(whichIsStoredInMemory(newUuid()))
-                .setTypeMapping(H2_2_1)
+                .setTypeMapping(H2_2_4)
                 .build();
     }
 

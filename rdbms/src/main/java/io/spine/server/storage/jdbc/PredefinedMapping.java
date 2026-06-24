@@ -52,7 +52,7 @@ public enum PredefinedMapping implements TypeMapping {
                                                          .add(DOUBLE, PostgreSql.DOUBLE_PRECISION)),
 
     // Must match `io.spine.dependency.storage.H2.version`.
-    H2_2_1("H2", 2, 1, mappingBuilder());
+    H2_2_4("H2", 2, 4, mappingBuilder());
 
     private final TypeMapping typeMapping;
     private final String databaseProductName;
