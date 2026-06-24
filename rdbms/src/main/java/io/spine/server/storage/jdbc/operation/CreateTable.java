@@ -162,7 +162,7 @@ public class CreateTable<I, R extends Message> extends Operation<I, R> implement
         var name = column.name();
         var type = column.type();
         requireNonNull(type,
-                       () -> format("The name of `%s` column is required at the table creation.",
+                       () -> format("The type of the `%s` column is required at the table creation.",
                                     name));
         var typeName = typeMapping.typeNameFor(type);
         sql.append(templates.quoteIdentifier(name))
