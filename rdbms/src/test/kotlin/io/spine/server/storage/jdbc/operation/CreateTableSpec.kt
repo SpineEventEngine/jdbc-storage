@@ -48,8 +48,6 @@ import org.junit.jupiter.api.Test
 /**
  * Tests that [CreateTable] escapes column and table names, so that records with columns
  * named after reserved SQL keywords can be stored.
- *
- * See [issue #172](https://github.com/SpineEventEngine/jdbc-storage/issues/172).
  */
 @DisplayName("`CreateTable` should")
 internal class CreateTableSpec {
