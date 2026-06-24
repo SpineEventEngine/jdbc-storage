@@ -161,9 +161,9 @@ public class CreateTable<I, R extends Message> extends Operation<I, R> implement
     private void addColumn(StringBuilder sql, TableColumn column, SQLTemplates templates) {
         var name = column.name();
         var type = column.type();
-        requireNonNull(type,
-                       () -> format("The type of the `%s` column is required at the table creation.",
-                                    name));
+        requireNonNull(type, () ->
+                format("The type of the `%s` column is required at the table creation.", name)
+        );
         var typeName = typeMapping.typeNameFor(type);
         sql.append(templates.quoteIdentifier(name))
            .append(' ')
