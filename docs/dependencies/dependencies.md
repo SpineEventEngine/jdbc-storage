@@ -1,6 +1,6 @@
 
 
-# Dependencies of `io.spine:spine-rdbms:2.0.0-SNAPSHOT.101`
+# Dependencies of `io.spine:spine-rdbms:2.0.0-SNAPSHOT.102`
 
 ## Runtime
 1.  **Group** : com.google.android. **Name** : annotations. **Version** : 4.1.1.4.
@@ -382,7 +382,7 @@
 1.  **Group** : com.google.truth.extensions. **Name** : truth-proto-extension. **Version** : 1.4.5.
      * **License:** [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
-1.  **Group** : com.h2database. **Name** : h2. **Version** : 2.1.210.
+1.  **Group** : com.h2database. **Name** : h2. **Version** : 2.4.240.
      * **Project URL:** [https://h2database.com](https://h2database.com)
      * **License:** [EPL 1.0](https://opensource.org/licenses/eclipse-1.0.php)
      * **License:** [MPL 2.0](https://www.mozilla.org/en-US/MPL/2.0/)
@@ -1131,6 +1131,6 @@
 
 The dependencies distributed under several licenses, are used according their commercial-use-friendly license.
 
-This report was generated on **Tue Jun 23 15:38:16 WEST 2026** using 
+This report was generated on **Wed Jun 24 18:56:02 WEST 2026** using 
 [Gradle-License-Report plugin](https://github.com/jk1/Gradle-License-Report) by Evgeny Naumenko, licensed under 
 [Apache 2.0 License](https://github.com/jk1/Gradle-License-Report/blob/master/LICENSE).

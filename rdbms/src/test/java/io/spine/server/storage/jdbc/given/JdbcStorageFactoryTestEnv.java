@@ -48,7 +48,7 @@ import io.spine.test.storage.StgProject;
 import io.spine.test.storage.StgProjectId;
 
 import static io.spine.server.storage.jdbc.GivenDataSource.prefix;
-import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_1;
+import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_4;
 import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_9_7;
 import static io.spine.server.storage.jdbc.Type.LONG;
 
@@ -88,7 +88,7 @@ public final class JdbcStorageFactoryTestEnv {
         var factory = JdbcStorageFactory
                 .newBuilder()
                 .setDataSource(dataSource)
-                .setTypeMapping(H2_2_1)
+                .setTypeMapping(H2_2_4)
                 .setTableName(InboxMessage.class, tableName)
                 .build();
         var storage = (JdbcRecordStorage<InboxMessageId, InboxMessage>)

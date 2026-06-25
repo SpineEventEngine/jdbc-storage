@@ -40,7 +40,7 @@ import org.junit.jupiter.api.Test;
 
 import static io.spine.base.Identifier.newUuid;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
-import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_1;
+import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_4;
 
 /**
  * Smoke tests on {@link io.spine.server.delivery.CatchUp CatchUp} functionality running
@@ -63,7 +63,7 @@ class JdbcCatchUpSmokeTest extends CatchUpTest {
         factory = JdbcStorageFactory
                 .newBuilder()
                 .setDataSource(source)
-                .setTypeMapping(H2_2_1)
+                .setTypeMapping(H2_2_4)
                 .build();
         ServerEnvironment
                 .when(Tests.class)

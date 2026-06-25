@@ -28,6 +28,7 @@ package io.spine.server.storage.jdbc.operation;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.protobuf.Message;
+import com.querydsl.sql.SQLTemplates;
 import io.spine.annotation.Internal;
 import io.spine.client.ArchivedColumn;
 import io.spine.client.DeletedColumn;
@@ -107,15 +108,22 @@ public class CreateTable<I, R extends Message> extends Operation<I, R> implement
 
     /**
      * Composes an SQL statement for this operation.
+     *
+     * <p>Table and column names are {@linkplain SQLTemplates#quoteIdentifier(String) quoted}
+     * according to the dialect of the underlying database. This is the same quoting that QueryDSL
+     * applies when serializing the read and write queries, so a name which is a reserved SQL
+     * keyword (e.g. {@code group}) is escaped consistently across the table creation and
+     * all the subsequent operations over the table.
      */
     @Internal
     public String sqlStatement() {
-        var sql = beginStatement();
+        var templates = dataSource().templates();
+        var sql = beginStatement(templates);
 
-        var primaryKeyColumnName = addId(sql);
+        var primaryKeyColumnName = addId(sql, templates);
         var columns = table().spec().dataColumns();
         for (var column : columns) {
-            addColumn(sql, column);
+            addColumn(sql, column, templates);
         }
         declarePrimaryKey(sql, primaryKeyColumnName);
 
@@ -130,8 +138,8 @@ public class CreateTable<I, R extends Message> extends Operation<I, R> implement
     }
 
     @NonNull
-    private StringBuilder beginStatement() {
-        var tableName = tableName();
+    private StringBuilder beginStatement(SQLTemplates templates) {
+        var tableName = templates.quoteIdentifier(tableName());
         var capacity = CREATE_IF_MISSING.toString().length() +
                 tableName.length() +
                 BRACKET_OPEN.toString().length();
@@ -150,14 +158,14 @@ public class CreateTable<I, R extends Message> extends Operation<I, R> implement
            .append(BRACKET_CLOSE);
     }
 
-    private void addColumn(StringBuilder sql, TableColumn column) {
+    private void addColumn(StringBuilder sql, TableColumn column, SQLTemplates templates) {
         var name = column.name();
         var type = column.type();
-        requireNonNull(type,
-                       () -> format("The name of `%s` column is required at the table creation.",
-                                    name));
+        requireNonNull(type, () ->
+                format("The type of the `%s` column is required at the table creation.", name)
+        );
         var typeName = typeMapping.typeNameFor(type);
-        sql.append(name)
+        sql.append(templates.quoteIdentifier(name))
            .append(' ')
            .append(typeName);
         if (COLUMN_DEFAULTS.containsKey(name)) {
@@ -170,10 +178,10 @@ public class CreateTable<I, R extends Message> extends Operation<I, R> implement
         sql.append(COMMA);
     }
 
-    private String addId(StringBuilder sql) {
+    private String addId(StringBuilder sql, SQLTemplates templates) {
         var idColumn = table().idColumn();
 
-        var name = idColumn.columnName();
+        var name = templates.quoteIdentifier(idColumn.columnName());
         var sqlType = idColumn.sqlType();
         var typeName = typeMapping.typeNameFor(sqlType);
         sql.append(name)
