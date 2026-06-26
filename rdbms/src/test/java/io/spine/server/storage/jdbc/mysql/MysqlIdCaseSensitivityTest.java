@@ -41,9 +41,10 @@ import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.singl
  * Verifies that identifiers are stored case-sensitively on MySQL.
  *
  * <p>MySQL compares non-binary string types case-insensitively by default. Entity identifiers
- * are stored in a {@code VARCHAR} column, so without an explicit binary collation two identifiers
- * differing only by case — such as a username {@code "name"} versus {@code "Name"} — would map to
- * the same row, and commands addressed to one entity would reach the other.
+ * are stored in a {@code VARCHAR} column, so without an explicit binary collation two
+ * identifiers differing only by case — such as a username {@code "name"} versus
+ * {@code "Name"} — would map to the same row, and commands addressed to one entity would
+ * reach the other.
  *
  * @see io.spine.server.storage.jdbc.PredefinedMapping#MYSQL_9_7
  */
