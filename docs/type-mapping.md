@@ -49,6 +49,29 @@ the `VARCHAR(512)` primary key stays within InnoDB's index-length limit.
 PostgreSQL and H2 compare string data case-sensitively by default and therefore need no such
 collation.
 
+### Migrating existing tables
+
+The framework never changes the structure of a table that already exists, so a table created
+before this change keeps its original, case-insensitive collation — only newly created tables
+get the binary collation automatically. Re-collate the character columns of each existing table
+by hand. The simplest way is to convert the whole table:
+
+```sql
+ALTER TABLE `<table>` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
+```
+
+This re-collates every `VARCHAR`/`TEXT` column — the `ID` and all string columns — to the binary
+collation. For a table already stored as `utf8mb4` the character set is unchanged, so only the
+collation metadata and the affected indexes are rebuilt. To re-collate a single column instead:
+
+```sql
+ALTER TABLE `<table>` MODIFY `ID` VARCHAR(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL;
+```
+
+> ⚠️ Re-collating prevents *future* collisions but cannot undo past ones. If `"name"` and
+> `"Name"` were both written while the column was case-insensitive, the table already holds a
+> single merged row and the overwritten record is gone — audit such tables before migrating.
+
 ## Custom mapping
 
 If the automatically selected mapping doesn't match your requirements, a custom mapping can be
