@@ -24,7 +24,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.dependency.lib
+package io.spine.dependency.storage
 
 /**
  * HikariCP — a fast, lightweight JDBC connection pool.

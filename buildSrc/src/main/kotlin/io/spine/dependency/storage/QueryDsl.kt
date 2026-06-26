@@ -24,7 +24,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.dependency.lib
+package io.spine.dependency.storage
 
 /**
  * QueryDSL — a framework for constructing type-safe SQL-like queries in Java.
