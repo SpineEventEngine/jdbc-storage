@@ -60,7 +60,7 @@
 1.  **Group** : com.querydsl. **Name** : querydsl-sql. **Version** : 5.1.0.
      * **License:** [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
-1.  **Group** : com.zaxxer. **Name** : HikariCP. **Version** : 5.0.1.
+1.  **Group** : com.zaxxer. **Name** : HikariCP. **Version** : 7.1.0.
      * **Project URL:** [https://github.com/brettwooldridge/HikariCP](https://github.com/brettwooldridge/HikariCP)
      * **License:** [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -429,7 +429,7 @@
      * **Project URL:** [https://github.com/square/kotlinpoet](https://github.com/square/kotlinpoet)
      * **License:** [The Apache Software License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0.txt)
 
-1.  **Group** : com.zaxxer. **Name** : HikariCP. **Version** : 5.0.1.
+1.  **Group** : com.zaxxer. **Name** : HikariCP. **Version** : 7.1.0.
      * **Project URL:** [https://github.com/brettwooldridge/HikariCP](https://github.com/brettwooldridge/HikariCP)
      * **License:** [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -1071,7 +1071,7 @@
      * **Project URL:** [https://github.com/hrldcpr/pcollections](https://github.com/hrldcpr/pcollections)
      * **License:** [The MIT License](https://opensource.org/licenses/mit-license.php)
 
-1.  **Group** : org.postgresql. **Name** : postgresql. **Version** : 42.7.4.
+1.  **Group** : org.postgresql. **Name** : postgresql. **Version** : 42.7.11.
      * **Project URL:** [https://jdbc.postgresql.org](https://jdbc.postgresql.org)
      * **License:** [BSD-2-Clause](https://jdbc.postgresql.org/about/license.html)
 
