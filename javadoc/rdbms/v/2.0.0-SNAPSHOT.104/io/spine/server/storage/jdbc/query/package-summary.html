@@ -1,0 +1,276 @@
+<!DOCTYPE HTML>
+<!-- NewPage -->
+<html lang="en"><head>
+    <title>Package io.spine.server.storage.jdbc.query </title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="dc.created" content="2020-03-25">
+    <link rel="stylesheet" type="text/css" href="../../../../../../stylesheet.css" title="Style">
+    <link rel="stylesheet" type="text/css" href="../../../../../../dokka-javadoc-stylesheet.css" title="Style">
+    <link rel="stylesheet" type="text/css" href="../../../../../../jquery/jquery-ui.css" title="Style">
+    <script type="text/javascript" src="../../../../../../jquery/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="../../../../../../jquery/jquery-migrate-3.4.0.min.js"></script>
+    <script type="text/javascript" src="../../../../../../jquery/jquery-ui.js"></script>
+
+    <script type="text/javascript" src="../../../../../../search.js"></script>
+    <script async type="text/javascript" src="../../../../../../module-search-index.js"></script>
+    <script async type="text/javascript" src="../../../../../../package-search-index.js"></script>
+    <script async type="text/javascript" src="../../../../../../type-search-index.js"></script>
+    <script async type="text/javascript" src="../../../../../../member-search-index.js"></script>
+    <script async type="text/javascript" src="../../../../../../tag-search-index.js"></script>
+</head><body>
+<script type="text/javascript">
+var pathtoroot = "../../../../../../";
+</script>
+<noscript>
+    <div>JavaScript is disabled on your browser.</div>
+</noscript><header role="banner">
+    <nav role="navigation">
+        <div class="fixedNav">
+            <!-- ========= START OF TOP NAVBAR ======= -->
+            <div class="topNav"><a id="navbar.top">
+                <!--   -->
+            </a>
+                <div class="skipNav"><a href="#skip.navbar.top" title="Skip navigation links">Skip navigation links</a>
+                </div>
+                <a id="navbar.top.firstrow">
+                    <!--   -->
+                </a>
+                <ul class="navList" title="Navigation">
+    <li><a href="../../../../../../index.html">Overview</a></li>
+    
+    <li class="navBarCell1Rev">Package</li>
+    
+    <li>Class</li>
+    
+    <li><a href="package-tree.html">Tree</a></li>
+    
+    <li><a href="../../../../../../deprecated.html">Deprecated</a></li>
+    <li><a href="../../../../../../index-files/index-1.html">Index</a></li>
+    <li>Help</li>
+</ul></div>
+            <div class="subNav">
+<ul class="navList" id="allclasses_navbar_top" style="display: block;">
+    <li><a href="../../../../../../allclasses.html">All&nbsp;Classes</a></li>
+</ul>
+
+<ul class="navListSearch">
+<li><label for="search">SEARCH:</label>
+<input type="text" id="search" value="search" class="ui-autocomplete-input" autocomplete="off" placeholder="Search">
+<input type="reset" id="reset" value="reset">
+</li>
+</ul>
+<div>
+<script type="text/javascript"><!--
+  allClassesLink = document.getElementById("allclasses_navbar_top");
+  if(window==top) {
+    allClassesLink.style.display = "block";
+  }
+  else {
+    allClassesLink.style.display = "none";
+  }
+  //-->
+</script>
+<noscript>
+<div>JavaScript is disabled on your browser.</div>
+</noscript>
+</div>
+<a id="skip.navbar.top">
+<!--   -->
+</a></div><!-- ========= END OF TOP NAVBAR ========= -->
+        </div>
+        <div class="navPadding">&nbsp;</div>
+        <script type="text/javascript"><!--
+        $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
+        //-->
+        </script>
+    </nav>
+</header>
+<main role="main">
+    <div class="header">
+        <h1 title="Package" class="title">Package io.spine.server.storage.jdbc.query </h1>
+    </div>
+        <div class="header">
+            <div class="subtitle">
+                <div class="block"><p>This package contains the API for working with queries and common queries for different storages.</p></div>
+            </div>
+            <p>See: <a href="#overview_description">Description</a></p>
+        </div>
+    <div class="contentContainer">
+        
+            <ul class="blockList">
+                
+                <li class="blockList">
+                    
+                    
+                    
+                    
+                    
+    <div class="typeSummary">
+
+<table>
+<caption><span>Class Summary</span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Class</th>
+<th class="colLast" scope="col">Description</th>
+</tr>
+<tbody>
+
+    <tr class="altColor"><th class="colFirst" scope="row"><a href=UpdateOneQuery.Builder.html>Builder</a></th><td class="colLast"></td></tr>
+
+    <tr class="rowColor"><th class="colFirst" scope="row"><a href=UpdateOneQuery.html>UpdateOneQuery</a></th><td class="colLast">Updates a single record in a <a href=../record/RecordTable.html>RecordTable</a>.</td></tr>
+
+    <tr class="altColor"><th class="colFirst" scope="row"><a href=SelectMultipleByIds.Builder.html>Builder</a></th><td class="colLast"></td></tr>
+
+    <tr class="rowColor"><th class="colFirst" scope="row"><a href=SelectMultipleByIds.html>SelectMultipleByIds</a></th><td class="colLast">Selects multiple records from the <a href=../record/RecordTable.html>RecordTable</a> by their IDs.</td></tr>
+
+    <tr class="altColor"><th class="colFirst" scope="row"><a href=ContainsQuery.Builder.html>Builder</a></th><td class="colLast"></td></tr>
+
+    <tr class="rowColor"><th class="colFirst" scope="row"><a href=ContainsQuery.html>ContainsQuery</a></th><td class="colLast">A query that checks if the table contains a record with the given ID.</td></tr>
+
+    <tr class="altColor"><th class="colFirst" scope="row"><a href=QueryExecutor.html>QueryExecutor</a></th><td class="colLast">A helper class for execution of SQL queries.</td></tr>
+
+    <tr class="rowColor"><th class="colFirst" scope="row"><a href=SelectMessagesByQuery.Builder.html>Builder</a></th><td class="colLast">A builder of <code>SelectMessagesByQuery</code>.</td></tr>
+
+    <tr class="altColor"><th class="colFirst" scope="row"><a href=SelectMessagesByQuery.html>SelectMessagesByQuery</a></th><td class="colLast">Selects multiple records from the <a href=../record/RecordTable.html>RecordTable</a> by the passed RecordQuery.</td></tr>
+
+    <tr class="rowColor"><th class="colFirst" scope="row"><a href=InsertMultipleQuery.Builder.html>Builder</a></th><td class="colLast"></td></tr>
+
+    <tr class="altColor"><th class="colFirst" scope="row"><a href=InsertMultipleQuery.html>InsertMultipleQuery</a></th><td class="colLast">Inserts multiple records to the <a href=../record/RecordTable.html>RecordTable</a> in a batch.</td></tr>
+
+    <tr class="rowColor"><th class="colFirst" scope="row"><a href=DeleteRecordQuery.Builder.html>Builder</a></th><td class="colLast">A builder of <code>DeleteRecordQuery</code>.</td></tr>
+
+    <tr class="altColor"><th class="colFirst" scope="row"><a href=DeleteRecordQuery.html>DeleteRecordQuery</a></th><td class="colLast">A query for deleting one or many items by an ID.</td></tr>
+
+    <tr class="rowColor"><th class="colFirst" scope="row"><a href=UpdateMultipleQuery.Builder.html>Builder</a></th><td class="colLast"></td></tr>
+
+    <tr class="altColor"><th class="colFirst" scope="row"><a href=UpdateMultipleQuery.html>UpdateMultipleQuery</a></th><td class="colLast">Updates multiple records in a <a href=../record/RecordTable.html>RecordTable</a> in a single take.</td></tr>
+
+    <tr class="rowColor"><th class="colFirst" scope="row"><a href=SelectMessageByIdQuery.Builder.html>Builder</a></th><td class="colLast"></td></tr>
+
+    <tr class="altColor"><th class="colFirst" scope="row"><a href=SelectMessageByIdQuery.html>SelectMessageByIdQuery</a></th><td class="colLast">A query which obtains a Message by an ID.</td></tr>
+
+    <tr class="rowColor"><th class="colFirst" scope="row"><a href=InsertOneQuery.Builder.html>Builder</a></th><td class="colLast"></td></tr>
+
+    <tr class="altColor"><th class="colFirst" scope="row"><a href=InsertOneQuery.html>InsertOneQuery</a></th><td class="colLast">Inserts a single record to the <a href=../record/RecordTable.html>RecordTable</a>.</td></tr>
+
+    <tr class="rowColor"><th class="colFirst" scope="row"><a href=ModifyQuery.html>ModifyQuery</a></th><td class="colLast">A query which makes changes in a data source.</td></tr>
+
+    <tr class="altColor"><th class="colFirst" scope="row"><a href=MySqlUpsertOneQuery.Builder.html>Builder</a></th><td class="colLast"></td></tr>
+
+    <tr class="rowColor"><th class="colFirst" scope="row"><a href=MySqlUpsertOneQuery.html>MySqlUpsertOneQuery</a></th><td class="colLast">Inserts or updates a single record in the MySQL database, by the record ID.</td></tr>
+
+    <tr class="altColor"><th class="colFirst" scope="row"><a href=TableIndexQuery.Builder.html>Builder</a></th><td class="colLast"></td></tr>
+
+    <tr class="rowColor"><th class="colFirst" scope="row"><a href=TableIndexQuery.html>TableIndexQuery</a></th><td class="colLast">A query for all the IDs in a certain table.</td></tr>
+
+    <tr class="altColor"><th class="colFirst" scope="row"><a href=WriteQuery.html>WriteQuery</a></th><td class="colLast">A common interface for <a href=AbstractQuery.html>queries</a> that write one or more records to the <a href=../record/RecordTable.html>RecordTable</a>.</td></tr>
+
+    <tr class="rowColor"><th class="colFirst" scope="row"><a href=WriteOneQuery.Builder.html>Builder</a></th><td class="colLast"></td></tr>
+
+    <tr class="altColor"><th class="colFirst" scope="row"><a href=WriteOneQuery.html>WriteOneQuery</a></th><td class="colLast">An abstract base for queries that modify a single record to a <a href=../record/RecordTable.html>RecordTable</a>.</td></tr>
+
+    <tr class="rowColor"><th class="colFirst" scope="row"><a href=AbstractQuery.Builder.html>Builder</a></th><td class="colLast">An abstract builder for <a href=StorageQuery.html>queries</a>.</td></tr>
+
+    <tr class="altColor"><th class="colFirst" scope="row"><a href=AbstractQuery.html>AbstractQuery</a></th><td class="colLast">The implementation base for the queries to an SQL-compliant database.</td></tr>
+
+    <tr class="rowColor"><th class="colFirst" scope="row"><a href=QueryPredicates.html>QueryPredicates</a></th><td class="colLast">A utility methods to work with predicates.</td></tr>
+
+    <tr class="altColor"><th class="colFirst" scope="row"><a href=DeleteMultipleRecordsQuery.Builder.html>Builder</a></th><td class="colLast"></td></tr>
+
+    <tr class="rowColor"><th class="colFirst" scope="row"><a href=DeleteMultipleRecordsQuery.html>DeleteMultipleRecordsQuery</a></th><td class="colLast">Deletes multiple records by IDs from the <a href=../record/RecordTable.html>RecordTable</a>.</td></tr>
+
+    <tr class="altColor"><th class="colFirst" scope="row"><a href=ReadByIdQuery.Builder.html>Builder</a></th><td class="colLast"></td></tr>
+
+    <tr class="rowColor"><th class="colFirst" scope="row"><a href=ReadByIdQuery.html>ReadByIdQuery</a></th><td class="colLast">An abstract base for queries, which access a single record by its ID.</td></tr>
+</tbody>
+</table>
+
+    </div>
+
+                </li>
+                
+                <li class="blockList">
+                    
+                    
+                    
+                    
+                    
+    <div class="typeSummary">
+
+<table>
+<caption><span>Interface Summary</span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Interface</th>
+<th class="colLast" scope="col">Description</th>
+</tr>
+<tbody>
+
+    <tr class="altColor"><th class="colFirst" scope="row"><a href=SelectQuery.html>SelectQuery</a></th><td class="colLast">An interface for <code>SELECT</code> queries.</td></tr>
+
+    <tr class="rowColor"><th class="colFirst" scope="row"><a href=StorageQuery.html>StorageQuery</a></th><td class="colLast">An interface for an SQL query.</td></tr>
+</tbody>
+</table>
+
+    </div>
+
+                </li>
+                
+            </ul>
+        
+    </div>
+</main>
+<footer role="contentinfo">
+    <nav role="navigation">
+        <!-- ======= START OF BOTTOM NAVBAR ====== -->
+        <div class="bottomNav"><a id="navbar.bottom">
+            <!--   -->
+        </a>
+            <div class="skipNav"><a href="#skip.navbar.bottom" title="Skip navigation links">Skip navigation links</a>
+            </div>
+            <a id="navbar.bottom.firstrow">
+                <!--   -->
+            </a>
+            <ul class="navList" title="Navigation">
+    <li><a href="../../../../../../index.html">Overview</a></li>
+    
+    <li class="navBarCell1Rev">Package</li>
+    
+    <li>Class</li>
+    
+    <li><a href="package-tree.html">Tree</a></li>
+    
+    <li><a href="../../../../../../deprecated.html">Deprecated</a></li>
+    <li><a href="../../../../../../index-files/index-1.html">Index</a></li>
+    <li>Help</li>
+</ul></div>
+        <a id="skip.navbar.bottom">
+            <!--   -->
+        </a>
+        <div class="subNav">
+<ul class="navList" id="allclasses_navbar_top" style="display: block;">
+    <li><a href="../../../../../../allclasses.html">All&nbsp;Classes</a></li>
+</ul>
+<div>
+<script type="text/javascript"><!--
+  allClassesLink = document.getElementById("allclasses_navbar_top");
+  if(window==top) {
+    allClassesLink.style.display = "block";
+  }
+  else {
+    allClassesLink.style.display = "none";
+  }
+  //-->
+</script>
+<noscript>
+<div>JavaScript is disabled on your browser.</div>
+</noscript>
+</div>
+<a id="skip.navbar.top">
+<!--   -->
+</a></div><!-- ======== END OF BOTTOM NAVBAR ======= -->
+    </nav>
+</footer><ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content" id="ui-id-1" tabindex="0"
+    style="display: none;"></ul>
+<span role="status" aria-live="assertive" aria-relevant="additions" class="ui-helper-hidden-accessible"></span>
+</body>
+</html>
