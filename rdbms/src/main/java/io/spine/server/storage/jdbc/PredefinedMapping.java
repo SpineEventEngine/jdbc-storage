@@ -63,6 +63,16 @@ public enum PredefinedMapping implements TypeMapping {
     // Must match `io.spine.dependency.storage.H2.version`.
     H2_2_4("H2", 2, 4, mappingBuilder());
 
+    /**
+     * A portable mapping used by {@link #select(DataSourceWrapper) select} for a database it does
+     * not recognize.
+     *
+     * <p>It exposes the {@linkplain TypeMappingBuilder#mappingBuilder() default} type names with
+     * no dialect-specific clauses — in particular, without the {@linkplain MySql MySQL binary
+     * collation} — so that table creation does not emit DDL an unidentified engine cannot parse.
+     */
+    private static final TypeMapping GENERIC_MAPPING = mappingBuilder().build();
+
     private final TypeMapping typeMapping;
     private final String databaseProductName;
     private final int majorVersion;
@@ -89,8 +99,9 @@ public enum PredefinedMapping implements TypeMapping {
      *
      * @param dataSource
      *         the data source to test suitability
-     * @return the type mapping for the used database or {@linkplain PredefinedMapping#MYSQL_9_7
-     *         mapping for MySQL 9.7} if there is no standard mapping for the database
+     * @return the type mapping for the used database; for an unlisted version of MySQL the
+     *         {@linkplain #MYSQL_9_7 MySQL mapping} is used, and for any other unrecognized
+     *         database the {@linkplain #GENERIC_MAPPING generic mapping} with portable type names
      */
     public static TypeMapping select(DataSourceWrapper dataSource) {
         checkNotNull(dataSource);
@@ -105,7 +116,14 @@ public enum PredefinedMapping implements TypeMapping {
                 return mapping;
             }
         }
-        return MYSQL_9_7;
+        // No exact product-and-version match. A MySQL server of another version still uses the
+        // MySQL mapping, since its binary collation (see `MySql`) is valid across MySQL versions.
+        // Any other, unrecognized database falls back to a generic mapping, whose portable type
+        // names carry no dialect-specific clauses; emitting the MySQL collation to an engine that
+        // cannot parse it would break table creation.
+        var isMysql = metaData.productName()
+                              .equals(MYSQL_9_7.databaseProductName);
+        return isMysql ? MYSQL_9_7 : GENERIC_MAPPING;
     }
 
     @VisibleForTesting

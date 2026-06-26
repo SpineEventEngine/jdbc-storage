@@ -112,4 +112,23 @@ class PredefinedMappingTest {
             assertThat(caseSensitiveDb.typeNameFor(STRING).value()).isEqualTo("TEXT");
         }
     }
+
+    @Test
+    @DisplayName("keep the MySQL mapping for a MySQL server of an unlisted version")
+    void selectMysqlMappingForOtherMysqlVersion() {
+        var mysqlOtherVersion = whichHoldsMetadata(MYSQL_9_7.getDatabaseProductName(), 8, 0);
+        // The binary collation is valid across MySQL versions, so the fix still applies.
+        assertThat(select(mysqlOtherVersion)).isEqualTo(MYSQL_9_7);
+    }
+
+    @Test
+    @DisplayName("fall back to portable type names for an unrecognized database")
+    void fallBackToPortableTypesForUnknownDatabase() {
+        var unknownDb = whichHoldsMetadata("AcmeDB", 1, 0);
+        var fallback = select(unknownDb);
+        // The MySQL-only collation must not leak into the DDL for a database that cannot parse it.
+        assertThat(fallback).isNotEqualTo(MYSQL_9_7);
+        assertThat(fallback.typeNameFor(STRING_512).value()).isEqualTo("VARCHAR(512)");
+        assertThat(fallback.typeNameFor(STRING).value()).isEqualTo("TEXT");
+    }
 }
