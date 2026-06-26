@@ -24,42 +24,17 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.dependency.test
+package io.spine.dependency.storage
 
 /**
- * Testcontainers for Java — provides throwaway, lightweight instances of databases and other
- * services running in Docker containers.
+ * The PostgreSQL JDBC driver (pgJDBC).
  *
- * The MySQL- and PostgreSQL-based storage tests use it to run against a real database server.
+ * Used by the PostgreSQL-based storage tests to connect to a real PostgreSQL server.
  *
- * The [mySql], [postgresql], and [junitJupiter] modules are released together with the
- * [core][lib] artifact. The version below is the latest one for which all modules are published.
- *
- * @see <a href="https://github.com/testcontainers/testcontainers-java">
- *     Testcontainers for Java at GitHub</a>
+ * @see <a href="https://github.com/pgjdbc/pgjdbc">PostgreSQL JDBC Driver at GitHub</a>
  */
 @Suppress("unused", "ConstPropertyName")
-object Testcontainers {
-    private const val version = "1.21.4"
-    private const val group = "org.testcontainers"
-
-    /**
-     * The core Testcontainers library.
-     */
-    const val lib = "$group:testcontainers:$version"
-
-    /**
-     * The JUnit 5 (Jupiter) integration.
-     */
-    const val junitJupiter = "$group:junit-jupiter:$version"
-
-    /**
-     * The MySQL container support.
-     */
-    const val mySql = "$group:mysql:$version"
-
-    /**
-     * The PostgreSQL container support.
-     */
-    const val postgresql = "$group:postgresql:$version"
+object PostgreSql {
+    private const val version = "42.7.4"
+    const val connector = "org.postgresql:postgresql:$version"
 }

@@ -24,42 +24,13 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.dependency.test
-
 /**
- * Testcontainers for Java — provides throwaway, lightweight instances of databases and other
- * services running in Docker containers.
- *
- * The MySQL- and PostgreSQL-based storage tests use it to run against a real database server.
- *
- * The [mySql], [postgresql], and [junitJupiter] modules are released together with the
- * [core][lib] artifact. The version below is the latest one for which all modules are published.
- *
- * @see <a href="https://github.com/testcontainers/testcontainers-java">
- *     Testcontainers for Java at GitHub</a>
+ * Describes the test cases, which run against a real PostgreSQL database instance.
  */
-@Suppress("unused", "ConstPropertyName")
-object Testcontainers {
-    private const val version = "1.21.4"
-    private const val group = "org.testcontainers"
+@CheckReturnValue
+@ParametersAreNonnullByDefault
+package io.spine.server.storage.jdbc.postgres;
 
-    /**
-     * The core Testcontainers library.
-     */
-    const val lib = "$group:testcontainers:$version"
+import com.google.errorprone.annotations.CheckReturnValue;
 
-    /**
-     * The JUnit 5 (Jupiter) integration.
-     */
-    const val junitJupiter = "$group:junit-jupiter:$version"
-
-    /**
-     * The MySQL container support.
-     */
-    const val mySql = "$group:mysql:$version"
-
-    /**
-     * The PostgreSQL container support.
-     */
-    const val postgresql = "$group:postgresql:$version"
-}
+import javax.annotation.ParametersAreNonnullByDefault;
