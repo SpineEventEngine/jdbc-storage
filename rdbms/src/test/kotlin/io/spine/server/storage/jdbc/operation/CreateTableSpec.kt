@@ -36,6 +36,7 @@ import io.spine.server.storage.Storage
 import io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory
 import io.spine.server.storage.jdbc.JdbcStorageFactory
 import io.spine.server.storage.jdbc.PredefinedMapping.H2_2_4
+import io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_9_7
 import io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.singleTenantSpec
 import io.spine.server.storage.jdbc.record.RecordTable
 import io.spine.test.storage.StgProject
@@ -46,8 +47,9 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
 /**
- * Tests that [CreateTable] escapes column and table names, so that records with columns
- * named after reserved SQL keywords can be stored.
+ * Tests that [CreateTable] composes a valid `CREATE TABLE` statement: it escapes column and
+ * table names so records with columns named after reserved SQL keywords can be stored, and it
+ * applies a binary collation to MySQL string columns so identifiers stay case-sensitive.
  */
 @DisplayName("`CreateTable` should")
 internal class CreateTableSpec {
@@ -62,6 +64,21 @@ internal class CreateTableSpec {
 
         // H2 quotes the reserved identifiers with the double quote character.
         sql shouldContain "\"group\""
+    }
+
+    @Test
+    fun `apply a binary collation to MySQL string columns to keep IDs case-sensitive`() {
+        val factory = mysqlFactory()
+        val tableSpec = factory.tableSpecFor(specWithGroupColumn())
+        val table = RecordTable.by(tableSpec, factory)
+
+        val sql = table.creationSql()
+
+        // The ID column is stored as `VARCHAR(512)`, and the `group` column as `TEXT`; both
+        // must carry the binary collation, otherwise MySQL compares them case-insensitively
+        // and distinct identifiers like `"name"` and `"Name"` collide.
+        sql shouldContain "VARCHAR(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin"
+        sql shouldContain "TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin"
     }
 
     @Test
@@ -100,6 +117,18 @@ internal class CreateTableSpec {
             JdbcStorageFactory.newBuilder()
                 .setDataSource(whichIsStoredInMemory(newUuid()))
                 .setTypeMapping(H2_2_4)
+                .build()
+
+        /**
+         * A factory configured with the [MYSQL_9_7] type mapping over an in-memory data source.
+         *
+         * The data source merely backs the SQL composition (no `CREATE TABLE` is executed), so
+         * the resulting DDL carries MySQL type names while staying free of a running MySQL server.
+         */
+        private fun mysqlFactory(): JdbcStorageFactory =
+            JdbcStorageFactory.newBuilder()
+                .setDataSource(whichIsStoredInMemory(newUuid()))
+                .setTypeMapping(MYSQL_9_7)
                 .build()
 
         private fun specWithGroupColumn(): RecordSpec<StgProjectId, StgProject> =

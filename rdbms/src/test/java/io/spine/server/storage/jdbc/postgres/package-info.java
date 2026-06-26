@@ -24,17 +24,13 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.dependency.storage
-
 /**
- * HikariCP — a fast, lightweight JDBC connection pool.
- *
- * The JDBC storage uses it to pool database connections.
- *
- * @see <a href="https://github.com/brettwooldridge/HikariCP">HikariCP at GitHub</a>
+ * Describes the test cases, which run against a real PostgreSQL database instance.
  */
-@Suppress("unused", "ConstPropertyName")
-object Hikari {
-    private const val version = "7.1.0"
-    const val lib = "com.zaxxer:HikariCP:$version"
-}
+@CheckReturnValue
+@ParametersAreNonnullByDefault
+package io.spine.server.storage.jdbc.postgres;
+
+import com.google.errorprone.annotations.CheckReturnValue;
+
+import javax.annotation.ParametersAreNonnullByDefault;

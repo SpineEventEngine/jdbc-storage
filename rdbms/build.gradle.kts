@@ -25,15 +25,15 @@
  */
 
 import io.spine.dependency.lib.Grpc
-import io.spine.dependency.lib.Hikari
-import io.spine.dependency.lib.QueryDsl
 import io.spine.dependency.lib.Slf4J
 import io.spine.dependency.local.CoreJvm
 import io.spine.dependency.storage.H2
+import io.spine.dependency.storage.Hikari
 import io.spine.dependency.storage.HsqlDb
 import io.spine.dependency.storage.MySql
+import io.spine.dependency.storage.PostgreSql
+import io.spine.dependency.storage.QueryDsl
 import io.spine.dependency.test.Testcontainers
-import org.gradle.api.tasks.testing.Test
 
 plugins {
     module
@@ -78,6 +78,10 @@ dependencies {
         exclude(group = "org.jetbrains")
     }
     testImplementation(MySql.connector)
+    testImplementation(Testcontainers.postgresql) {
+        exclude(group = "org.jetbrains")
+    }
+    testImplementation(PostgreSql.connector)
 
     testRuntimeOnly(Slf4J.simple)
 }

@@ -27,14 +27,14 @@
 package io.spine.dependency.storage
 
 /**
- * HikariCP — a fast, lightweight JDBC connection pool.
+ * The PostgreSQL JDBC driver (pgJDBC).
  *
- * The JDBC storage uses it to pool database connections.
+ * Used by the PostgreSQL-based storage tests to connect to a real PostgreSQL server.
  *
- * @see <a href="https://github.com/brettwooldridge/HikariCP">HikariCP at GitHub</a>
+ * @see <a href="https://github.com/pgjdbc/pgjdbc">PostgreSQL JDBC Driver at GitHub</a>
  */
 @Suppress("unused", "ConstPropertyName")
-object Hikari {
-    private const val version = "7.1.0"
-    const val lib = "com.zaxxer:HikariCP:$version"
+object PostgreSql {
+    private const val version = "42.7.11"
+    const val connector = "org.postgresql:postgresql:$version"
 }

@@ -24,17 +24,30 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.dependency.storage
+package io.spine.gradle.publish
 
-/**
- * HikariCP — a fast, lightweight JDBC connection pool.
- *
- * The JDBC storage uses it to pool database connections.
- *
- * @see <a href="https://github.com/brettwooldridge/HikariCP">HikariCP at GitHub</a>
- */
-@Suppress("unused", "ConstPropertyName")
-object Hikari {
-    private const val version = "7.1.0"
-    const val lib = "com.zaxxer:HikariCP:$version"
+import com.fasterxml.jackson.dataformat.xml.XmlMapper
+import io.kotest.matchers.collections.shouldContainExactly
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Test
+
+@DisplayName("`MavenMetadata` should")
+internal class MavenMetadataSpec {
+
+    /**
+     * Round-trips through the same [XmlMapper] used in production, asserting the version list
+     * survives. This guards the `var` properties of [MavenMetadata] and [Versioning]: a `val`
+     * (or `internal`-mangled setter) would leave the list empty after deserialization, silently
+     * disabling the "already published" check.
+     */
+    @Test
+    fun `survive a Jackson round-trip, keeping its versions`() {
+        val versions = listOf("2.0.0-SNAPSHOT.79", "2.0.0-SNAPSHOT.80", "2.0.0-SNAPSHOT.81")
+        val mapper = XmlMapper()
+
+        val xml = mapper.writeValueAsString(MavenMetadata(Versioning(versions)))
+        val parsed = mapper.readValue(xml, MavenMetadata::class.java)
+
+        parsed.versioning.versions shouldContainExactly versions
+    }
 }

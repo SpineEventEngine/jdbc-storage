@@ -24,17 +24,24 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.dependency.storage
+package io.spine.server.storage.jdbc;
 
 /**
- * HikariCP — a fast, lightweight JDBC connection pool.
- *
- * The JDBC storage uses it to pool database connections.
- *
- * @see <a href="https://github.com/brettwooldridge/HikariCP">HikariCP at GitHub</a>
+ * SQL type names specific to PostgreSQL, which differ from the
+ * {@linkplain TypeMappingBuilder default mapping}.
  */
-@Suppress("unused", "ConstPropertyName")
-object Hikari {
-    private const val version = "7.1.0"
-    const val lib = "com.zaxxer:HikariCP:$version"
+final class PostgreSqlTypeNames {
+
+    /** The single-precision (4-byte) floating-point type. */
+    static final String REAL = "REAL";
+
+    /**
+     * The double-precision (8-byte) floating-point type.
+     *
+     * <p>Used because PostgreSQL does not recognize a bare {@code DOUBLE}.
+     */
+    static final String DOUBLE_PRECISION = "DOUBLE PRECISION";
+
+    private PostgreSqlTypeNames() {
+    }
 }

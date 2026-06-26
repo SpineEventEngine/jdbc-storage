@@ -23,6 +23,8 @@ E.g. a table name for an Entity, which has a state declared by `bar.acme.Project
 Each table created has the following structure:
 
 * `ID` — the identifier of the record (Entity, or a standalone message). Primary key.
+  On MySQL, string identifiers use a binary collation so that they are matched case-sensitively;
+  see [Case sensitivity on MySQL](type-mapping.md#case-sensitivity-on-mysql).
 * `bytes` — stores the serialized Proto message (Entity state, or a standalone message value).
 * Columns defined either
      * via `Entity`'s `(column)` option;

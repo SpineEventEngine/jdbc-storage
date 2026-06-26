@@ -1,6 +1,6 @@
 
 
-# Dependencies of `io.spine:spine-rdbms:2.0.0-SNAPSHOT.103`
+# Dependencies of `io.spine:spine-rdbms:2.0.0-SNAPSHOT.104`
 
 ## Runtime
 1.  **Group** : com.google.android. **Name** : annotations. **Version** : 4.1.1.4.
@@ -60,7 +60,7 @@
 1.  **Group** : com.querydsl. **Name** : querydsl-sql. **Version** : 5.1.0.
      * **License:** [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
-1.  **Group** : com.zaxxer. **Name** : HikariCP. **Version** : 5.0.1.
+1.  **Group** : com.zaxxer. **Name** : HikariCP. **Version** : 7.1.0.
      * **Project URL:** [https://github.com/brettwooldridge/HikariCP](https://github.com/brettwooldridge/HikariCP)
      * **License:** [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -429,7 +429,7 @@
      * **Project URL:** [https://github.com/square/kotlinpoet](https://github.com/square/kotlinpoet)
      * **License:** [The Apache Software License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0.txt)
 
-1.  **Group** : com.zaxxer. **Name** : HikariCP. **Version** : 5.0.1.
+1.  **Group** : com.zaxxer. **Name** : HikariCP. **Version** : 7.1.0.
      * **Project URL:** [https://github.com/brettwooldridge/HikariCP](https://github.com/brettwooldridge/HikariCP)
      * **License:** [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -1071,6 +1071,10 @@
      * **Project URL:** [https://github.com/hrldcpr/pcollections](https://github.com/hrldcpr/pcollections)
      * **License:** [The MIT License](https://opensource.org/licenses/mit-license.php)
 
+1.  **Group** : org.postgresql. **Name** : postgresql. **Version** : 42.7.11.
+     * **Project URL:** [https://jdbc.postgresql.org](https://jdbc.postgresql.org)
+     * **License:** [BSD-2-Clause](https://jdbc.postgresql.org/about/license.html)
+
 1.  **Group** : org.reflections. **Name** : reflections. **Version** : 0.10.2.
      * **Project URL:** [http://github.com/ronmamo/reflections](http://github.com/ronmamo/reflections)
      * **License:** [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
@@ -1112,6 +1116,10 @@
      * **Project URL:** [https://java.testcontainers.org](https://java.testcontainers.org)
      * **License:** [MIT](http://opensource.org/licenses/MIT)
 
+1.  **Group** : org.testcontainers. **Name** : postgresql. **Version** : 1.21.4.
+     * **Project URL:** [https://java.testcontainers.org](https://java.testcontainers.org)
+     * **License:** [MIT](http://opensource.org/licenses/MIT)
+
 1.  **Group** : org.testcontainers. **Name** : testcontainers. **Version** : 1.21.4.
      * **Project URL:** [https://java.testcontainers.org](https://java.testcontainers.org)
      * **License:** [MIT](http://opensource.org/licenses/MIT)
@@ -1131,6 +1139,6 @@
 
 The dependencies distributed under several licenses, are used according their commercial-use-friendly license.
 
-This report was generated on **Fri Jun 26 17:45:33 WEST 2026** using 
+This report was generated on **Fri Jun 26 20:14:50 WEST 2026** using 
 [Gradle-License-Report plugin](https://github.com/jk1/Gradle-License-Report) by Evgeny Naumenko, licensed under 
 [Apache 2.0 License](https://github.com/jk1/Gradle-License-Report/blob/master/LICENSE).

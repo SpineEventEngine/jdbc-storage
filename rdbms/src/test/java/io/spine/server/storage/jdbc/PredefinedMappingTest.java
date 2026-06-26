@@ -1,11 +1,11 @@
 /*
- * Copyright 2023, TeamDev. All rights reserved.
+ * Copyright 2026, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * https://www.apache.org/licenses/LICENSE-2.0
  *
  * Redistribution and use in source and/or binary forms, with or without
  * modification, must retain the above copyright notice and the following
@@ -31,13 +31,17 @@ import org.junit.jupiter.api.Test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichHoldsMetadata;
+import static io.spine.server.storage.jdbc.PostgreSqlTypeNames.DOUBLE_PRECISION;
+import static io.spine.server.storage.jdbc.PostgreSqlTypeNames.REAL;
+import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_4;
 import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_9_7;
 import static io.spine.server.storage.jdbc.PredefinedMapping.POSTGRESQL_10_1;
-import static io.spine.server.storage.jdbc.PredefinedMapping.PostgreSql.DOUBLE_PRECISION;
-import static io.spine.server.storage.jdbc.PredefinedMapping.PostgreSql.REAL;
 import static io.spine.server.storage.jdbc.PredefinedMapping.select;
 import static io.spine.server.storage.jdbc.Type.DOUBLE;
 import static io.spine.server.storage.jdbc.Type.FLOAT;
+import static io.spine.server.storage.jdbc.Type.STRING;
+import static io.spine.server.storage.jdbc.Type.STRING_255;
+import static io.spine.server.storage.jdbc.Type.STRING_512;
 import static io.spine.testing.TestValues.nullRef;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -64,14 +68,16 @@ class PredefinedMappingTest {
     }
 
     @Test
-    @DisplayName("not be selected if major versions are different")
-    void notSelectForDifferentVersion() {
+    @DisplayName("select a product's mapping for an unlisted version of that product")
+    void selectByProductNameForUnlistedVersion() {
         var newMajorVersion = mapping.getMajorVersion() + 1;
         var dataSource = whichHoldsMetadata(mapping.getDatabaseProductName(),
                                             newMajorVersion,
                                             mapping.getMinorVersion());
+        // A recognized product at an unlisted version uses that product's dialect mapping,
+        // rather than the generic fallback meant for unknown databases.
         assertThat(select(dataSource))
-                .isNotEqualTo(mapping);
+                .isEqualTo(mapping);
     }
 
     @Test
@@ -86,5 +92,45 @@ class PredefinedMappingTest {
     void mapFloatingPointTypesForPostgres() {
         assertThat(POSTGRESQL_10_1.typeNameFor(FLOAT).value()).isEqualTo(REAL);
         assertThat(POSTGRESQL_10_1.typeNameFor(DOUBLE).value()).isEqualTo(DOUBLE_PRECISION);
+    }
+
+    @Test
+    @DisplayName("map `String` types to case-sensitive binary collations for MySQL")
+    void mapStringTypesForMysqlToBinaryCollation() {
+        assertThat(MYSQL_9_7.typeNameFor(STRING_255).value())
+                .isEqualTo("VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin");
+        assertThat(MYSQL_9_7.typeNameFor(STRING_512).value())
+                .isEqualTo("VARCHAR(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin");
+        assertThat(MYSQL_9_7.typeNameFor(STRING).value())
+                .isEqualTo("TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin");
+    }
+
+    @Test
+    @DisplayName("not apply the MySQL binary collation to other databases")
+    void keepStringTypesPlainForOtherDatabases() {
+        for (var caseSensitiveDb : new PredefinedMapping[]{POSTGRESQL_10_1, H2_2_4}) {
+            assertThat(caseSensitiveDb.typeNameFor(STRING_255).value()).isEqualTo("VARCHAR(255)");
+            assertThat(caseSensitiveDb.typeNameFor(STRING_512).value()).isEqualTo("VARCHAR(512)");
+            assertThat(caseSensitiveDb.typeNameFor(STRING).value()).isEqualTo("TEXT");
+        }
+    }
+
+    @Test
+    @DisplayName("keep the MySQL mapping for a MySQL server of an unlisted version")
+    void selectMysqlMappingForOtherMysqlVersion() {
+        var mysqlOtherVersion = whichHoldsMetadata(MYSQL_9_7.getDatabaseProductName(), 8, 0);
+        // The binary collation is valid across MySQL versions, so the fix still applies.
+        assertThat(select(mysqlOtherVersion)).isEqualTo(MYSQL_9_7);
+    }
+
+    @Test
+    @DisplayName("fall back to portable type names for an unrecognized database")
+    void fallBackToPortableTypesForUnknownDatabase() {
+        var unknownDb = whichHoldsMetadata("AcmeDB", 1, 0);
+        var fallback = select(unknownDb);
+        // The MySQL-only collation must not leak into the DDL for a database that cannot parse it.
+        assertThat(fallback).isNotEqualTo(MYSQL_9_7);
+        assertThat(fallback.typeNameFor(STRING_512).value()).isEqualTo("VARCHAR(512)");
+        assertThat(fallback.typeNameFor(STRING).value()).isEqualTo("TEXT");
     }
 }

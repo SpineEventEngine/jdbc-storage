@@ -34,6 +34,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
 import static io.spine.server.storage.jdbc.Type.DOUBLE;
 import static io.spine.server.storage.jdbc.Type.FLOAT;
+import static io.spine.server.storage.jdbc.Type.STRING;
+import static io.spine.server.storage.jdbc.Type.STRING_255;
+import static io.spine.server.storage.jdbc.Type.STRING_512;
 import static io.spine.server.storage.jdbc.TypeMappingBuilder.mappingBuilder;
 
 /**
@@ -43,16 +46,34 @@ import static io.spine.server.storage.jdbc.TypeMappingBuilder.mappingBuilder;
 public enum PredefinedMapping implements TypeMapping {
 
     // Must match `io.spine.dependency.storage.MySql.version`.
-    MYSQL_9_7("MySQL", 9, 7, mappingBuilder()),
+    //
+    // MySQL compares non-binary string types case- and accent-insensitively by default, so
+    // distinct identifiers like `"name"` and `"Name"` would collide. All character-based column
+    // types therefore carry an explicit binary collation; see `MySqlTypeNames`.
+    MYSQL_9_7("MySQL", 9, 7,
+              mappingBuilder().add(STRING_255, MySqlTypeNames.VARCHAR_255)
+                              .add(STRING_512, MySqlTypeNames.VARCHAR_512)
+                              .add(STRING, MySqlTypeNames.TEXT)),
 
     // PostgreSQL has no bare `DOUBLE` type, and its `FLOAT` is double-precision;
     // map to the single-/double-precision types matching Java `float`/`double`.
-    POSTGRESQL_10_1("PostgreSQL", 10, 1, mappingBuilder().add(BYTE_ARRAY, "BYTEA")
-                                                         .add(FLOAT, PostgreSql.REAL)
-                                                         .add(DOUBLE, PostgreSql.DOUBLE_PRECISION)),
+    POSTGRESQL_10_1("PostgreSQL", 10, 1,
+                    mappingBuilder().add(BYTE_ARRAY, "BYTEA")
+                                    .add(FLOAT, PostgreSqlTypeNames.REAL)
+                                    .add(DOUBLE, PostgreSqlTypeNames.DOUBLE_PRECISION)),
 
     // Must match `io.spine.dependency.storage.H2.version`.
     H2_2_4("H2", 2, 4, mappingBuilder());
+
+    /**
+     * A portable mapping used by {@link #select(DataSourceWrapper) select} for a database it does
+     * not recognize.
+     *
+     * <p>It exposes the {@linkplain TypeMappingBuilder#mappingBuilder() default} type names with
+     * no dialect-specific clauses — in particular, without the {@linkplain MySqlTypeNames MySQL
+     * binary collation} — so that table creation does not emit DDL an unknown engine cannot parse.
+     */
+    private static final TypeMapping GENERIC_MAPPING = mappingBuilder().build();
 
     private final TypeMapping typeMapping;
     private final String databaseProductName;
@@ -80,23 +101,32 @@ public enum PredefinedMapping implements TypeMapping {
      *
      * @param dataSource
      *         the data source to test suitability
-     * @return the type mapping for the used database or {@linkplain PredefinedMapping#MYSQL_9_7
-     *         mapping for MySQL 9.7} if there is no standard mapping for the database
+     * @return the type mapping for the used database; a recognized product reported at an
+     *         unlisted version still uses that product's mapping, and an unrecognized database
+     *         uses the {@linkplain #GENERIC_MAPPING generic mapping} with portable type names
      */
     public static TypeMapping select(DataSourceWrapper dataSource) {
         checkNotNull(dataSource);
         var metaData = dataSource.metaData();
+        PredefinedMapping sameProduct = null;
         for (var mapping : values()) {
-            var nameMatch = metaData.productName()
-                                    .equals(mapping.databaseProductName);
+            if (!metaData.productName().equals(mapping.databaseProductName)) {
+                continue;
+            }
             var versionMatch =
                     metaData.majorVersion() == mapping.majorVersion
                     && metaData.minorVersion() == mapping.minorVersion;
-            if (nameMatch && versionMatch) {
+            if (versionMatch) {
                 return mapping;
             }
+            sameProduct = mapping;
         }
-        return MYSQL_9_7;
+        // A recognized product reported at an unlisted version still uses that product's mapping,
+        // as its dialect-specific type names (the MySQL binary collation, the PostgreSQL
+        // `BYTEA`/`DOUBLE PRECISION`) apply across that product's versions. An unrecognized
+        // database falls back to a generic mapping, whose portable type names carry no
+        // dialect-specific clauses an unknown engine might not parse.
+        return sameProduct != null ? sameProduct : GENERIC_MAPPING;
     }
 
     @VisibleForTesting
@@ -112,25 +142,5 @@ public enum PredefinedMapping implements TypeMapping {
     @VisibleForTesting
     int getMinorVersion() {
         return minorVersion;
-    }
-
-    /**
-     * SQL type names specific to PostgreSQL, which differ from the
-     * {@linkplain TypeMappingBuilder default mapping}.
-     */
-    static final class PostgreSql {
-
-        /** The single-precision (4-byte) floating-point type. */
-        static final String REAL = "REAL";
-
-        /**
-         * The double-precision (8-byte) floating-point type.
-         *
-         * <p>Used because PostgreSQL does not recognize a bare {@code DOUBLE}.
-         */
-        static final String DOUBLE_PRECISION = "DOUBLE PRECISION";
-
-        private PostgreSql() {
-        }
     }
 }
