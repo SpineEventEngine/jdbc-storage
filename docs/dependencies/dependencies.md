@@ -1071,6 +1071,10 @@
      * **Project URL:** [https://github.com/hrldcpr/pcollections](https://github.com/hrldcpr/pcollections)
      * **License:** [The MIT License](https://opensource.org/licenses/mit-license.php)
 
+1.  **Group** : org.postgresql. **Name** : postgresql. **Version** : 42.7.4.
+     * **Project URL:** [https://jdbc.postgresql.org](https://jdbc.postgresql.org)
+     * **License:** [BSD-2-Clause](https://jdbc.postgresql.org/about/license.html)
+
 1.  **Group** : org.reflections. **Name** : reflections. **Version** : 0.10.2.
      * **Project URL:** [http://github.com/ronmamo/reflections](http://github.com/ronmamo/reflections)
      * **License:** [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
@@ -1112,6 +1116,10 @@
      * **Project URL:** [https://java.testcontainers.org](https://java.testcontainers.org)
      * **License:** [MIT](http://opensource.org/licenses/MIT)
 
+1.  **Group** : org.testcontainers. **Name** : postgresql. **Version** : 1.21.4.
+     * **Project URL:** [https://java.testcontainers.org](https://java.testcontainers.org)
+     * **License:** [MIT](http://opensource.org/licenses/MIT)
+
 1.  **Group** : org.testcontainers. **Name** : testcontainers. **Version** : 1.21.4.
      * **Project URL:** [https://java.testcontainers.org](https://java.testcontainers.org)
      * **License:** [MIT](http://opensource.org/licenses/MIT)
@@ -1131,6 +1139,6 @@
 
 The dependencies distributed under several licenses, are used according their commercial-use-friendly license.
 
-This report was generated on **Fri Jun 26 18:56:11 WEST 2026** using 
+This report was generated on **Fri Jun 26 20:14:50 WEST 2026** using 
 [Gradle-License-Report plugin](https://github.com/jk1/Gradle-License-Report) by Evgeny Naumenko, licensed under 
 [Apache 2.0 License](https://github.com/jk1/Gradle-License-Report/blob/master/LICENSE).
