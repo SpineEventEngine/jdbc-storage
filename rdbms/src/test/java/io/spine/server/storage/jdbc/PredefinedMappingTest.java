@@ -31,11 +31,11 @@ import org.junit.jupiter.api.Test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static io.spine.server.storage.jdbc.GivenDataSource.whichHoldsMetadata;
+import static io.spine.server.storage.jdbc.PostgreSqlTypeNames.DOUBLE_PRECISION;
+import static io.spine.server.storage.jdbc.PostgreSqlTypeNames.REAL;
 import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_4;
 import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_9_7;
 import static io.spine.server.storage.jdbc.PredefinedMapping.POSTGRESQL_10_1;
-import static io.spine.server.storage.jdbc.PredefinedMapping.PostgreSql.DOUBLE_PRECISION;
-import static io.spine.server.storage.jdbc.PredefinedMapping.PostgreSql.REAL;
 import static io.spine.server.storage.jdbc.PredefinedMapping.select;
 import static io.spine.server.storage.jdbc.Type.DOUBLE;
 import static io.spine.server.storage.jdbc.Type.FLOAT;
@@ -68,14 +68,16 @@ class PredefinedMappingTest {
     }
 
     @Test
-    @DisplayName("not be selected if major versions are different")
-    void notSelectForDifferentVersion() {
+    @DisplayName("select a product's mapping for an unlisted version of that product")
+    void selectByProductNameForUnlistedVersion() {
         var newMajorVersion = mapping.getMajorVersion() + 1;
         var dataSource = whichHoldsMetadata(mapping.getDatabaseProductName(),
                                             newMajorVersion,
                                             mapping.getMinorVersion());
+        // A recognized product at an unlisted version uses that product's dialect mapping,
+        // rather than the generic fallback meant for unknown databases.
         assertThat(select(dataSource))
-                .isNotEqualTo(mapping);
+                .isEqualTo(mapping);
     }
 
     @Test

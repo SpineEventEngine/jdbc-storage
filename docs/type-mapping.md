@@ -6,9 +6,10 @@ The mapping defines correspondence of `Type` to a name for a particular database
 
 The type mapping is selected automatically based on the database product name and version,
 as reported by the JDBC driver's `DatabaseMetaData`.
-If there is no exact match, a MySQL server of another version still uses the MySQL 9.7 mapping
-(its binary collation applies across MySQL versions), while any other unrecognized database falls
-back to a neutral mapping with portable type names and no dialect-specific clauses.
+If there is no exact match, a recognized database (MySQL, PostgreSQL, or H2) reported at another
+version still uses that product's mapping — its dialect-specific type names apply across versions.
+Only an unrecognized database falls back to a neutral mapping with portable type names and no
+dialect-specific clauses.
 
 ## Default values
 

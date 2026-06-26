@@ -49,16 +49,18 @@ public enum PredefinedMapping implements TypeMapping {
     //
     // MySQL compares non-binary string types case- and accent-insensitively by default, so
     // distinct identifiers like `"name"` and `"Name"` would collide. All character-based column
-    // types therefore carry an explicit binary collation; see the `MySql` helper below.
-    MYSQL_9_7("MySQL", 9, 7, mappingBuilder().add(STRING_255, MySql.VARCHAR_255)
-                                             .add(STRING_512, MySql.VARCHAR_512)
-                                             .add(STRING, MySql.TEXT)),
+    // types therefore carry an explicit binary collation; see `MySqlTypeNames`.
+    MYSQL_9_7("MySQL", 9, 7,
+              mappingBuilder().add(STRING_255, MySqlTypeNames.VARCHAR_255)
+                              .add(STRING_512, MySqlTypeNames.VARCHAR_512)
+                              .add(STRING, MySqlTypeNames.TEXT)),
 
     // PostgreSQL has no bare `DOUBLE` type, and its `FLOAT` is double-precision;
     // map to the single-/double-precision types matching Java `float`/`double`.
-    POSTGRESQL_10_1("PostgreSQL", 10, 1, mappingBuilder().add(BYTE_ARRAY, "BYTEA")
-                                                         .add(FLOAT, PostgreSql.REAL)
-                                                         .add(DOUBLE, PostgreSql.DOUBLE_PRECISION)),
+    POSTGRESQL_10_1("PostgreSQL", 10, 1,
+                    mappingBuilder().add(BYTE_ARRAY, "BYTEA")
+                                    .add(FLOAT, PostgreSqlTypeNames.REAL)
+                                    .add(DOUBLE, PostgreSqlTypeNames.DOUBLE_PRECISION)),
 
     // Must match `io.spine.dependency.storage.H2.version`.
     H2_2_4("H2", 2, 4, mappingBuilder());
@@ -68,8 +70,8 @@ public enum PredefinedMapping implements TypeMapping {
      * not recognize.
      *
      * <p>It exposes the {@linkplain TypeMappingBuilder#mappingBuilder() default} type names with
-     * no dialect-specific clauses — in particular, without the {@linkplain MySql MySQL binary
-     * collation} — so that table creation does not emit DDL an unidentified engine cannot parse.
+     * no dialect-specific clauses — in particular, without the {@linkplain MySqlTypeNames MySQL
+     * binary collation} — so that table creation does not emit DDL an unknown engine cannot parse.
      */
     private static final TypeMapping GENERIC_MAPPING = mappingBuilder().build();
 
@@ -99,31 +101,32 @@ public enum PredefinedMapping implements TypeMapping {
      *
      * @param dataSource
      *         the data source to test suitability
-     * @return the type mapping for the used database; for an unlisted version of MySQL the
-     *         {@linkplain #MYSQL_9_7 MySQL mapping} is used, and for any other unrecognized
-     *         database the {@linkplain #GENERIC_MAPPING generic mapping} with portable type names
+     * @return the type mapping for the used database; a recognized product reported at an
+     *         unlisted version still uses that product's mapping, and an unrecognized database
+     *         uses the {@linkplain #GENERIC_MAPPING generic mapping} with portable type names
      */
     public static TypeMapping select(DataSourceWrapper dataSource) {
         checkNotNull(dataSource);
         var metaData = dataSource.metaData();
+        PredefinedMapping sameProduct = null;
         for (var mapping : values()) {
-            var nameMatch = metaData.productName()
-                                    .equals(mapping.databaseProductName);
+            if (!metaData.productName().equals(mapping.databaseProductName)) {
+                continue;
+            }
             var versionMatch =
                     metaData.majorVersion() == mapping.majorVersion
                     && metaData.minorVersion() == mapping.minorVersion;
-            if (nameMatch && versionMatch) {
+            if (versionMatch) {
                 return mapping;
             }
+            sameProduct = mapping;
         }
-        // No exact product-and-version match. A MySQL server of another version still uses the
-        // MySQL mapping, since its binary collation (see `MySql`) is valid across MySQL versions.
-        // Any other, unrecognized database falls back to a generic mapping, whose portable type
-        // names carry no dialect-specific clauses; emitting the MySQL collation to an engine that
-        // cannot parse it would break table creation.
-        var isMysql = metaData.productName()
-                              .equals(MYSQL_9_7.databaseProductName);
-        return isMysql ? MYSQL_9_7 : GENERIC_MAPPING;
+        // A recognized product reported at an unlisted version still uses that product's mapping,
+        // as its dialect-specific type names (the MySQL binary collation, the PostgreSQL
+        // `BYTEA`/`DOUBLE PRECISION`) apply across that product's versions. An unrecognized
+        // database falls back to a generic mapping, whose portable type names carry no
+        // dialect-specific clauses an unknown engine might not parse.
+        return sameProduct != null ? sameProduct : GENERIC_MAPPING;
     }
 
     @VisibleForTesting
@@ -139,59 +142,5 @@ public enum PredefinedMapping implements TypeMapping {
     @VisibleForTesting
     int getMinorVersion() {
         return minorVersion;
-    }
-
-    /**
-     * SQL type names specific to MySQL, which differ from the
-     * {@linkplain TypeMappingBuilder default mapping}.
-     */
-    static final class MySql {
-
-        /**
-         * The character set and binary collation appended to every character-based column type.
-         *
-         * <p>By default, MySQL uses a case- and accent-insensitive collation for non-binary
-         * string types, so {@code 'name'} and {@code 'Name'} compare as equal. Entity
-         * identifiers and {@code String} columns must be matched exactly; otherwise distinct
-         * identifiers collide and commands for one entity get routed to another. A binary
-         * collation restores exact, case-sensitive matching.
-         *
-         * <p>{@code utf8mb4} (rather than the deprecated {@code utf8}/{@code utf8mb3}) is used to
-         * keep the full Unicode range available. The collation does not change the stored byte
-         * width, so the {@code VARCHAR(512)} primary key stays within InnoDB index limits.
-         */
-        private static final String BINARY = "CHARACTER SET utf8mb4 COLLATE utf8mb4_bin";
-
-        /** {@code VARCHAR(255)} with a {@linkplain #BINARY binary collation}. */
-        static final String VARCHAR_255 = "VARCHAR(255) " + BINARY;
-
-        /** {@code VARCHAR(512)} with a {@linkplain #BINARY binary collation}. */
-        static final String VARCHAR_512 = "VARCHAR(512) " + BINARY;
-
-        /** {@code TEXT} with a {@linkplain #BINARY binary collation}. */
-        static final String TEXT = "TEXT " + BINARY;
-
-        private MySql() {
-        }
-    }
-
-    /**
-     * SQL type names specific to PostgreSQL, which differ from the
-     * {@linkplain TypeMappingBuilder default mapping}.
-     */
-    static final class PostgreSql {
-
-        /** The single-precision (4-byte) floating-point type. */
-        static final String REAL = "REAL";
-
-        /**
-         * The double-precision (8-byte) floating-point type.
-         *
-         * <p>Used because PostgreSQL does not recognize a bare {@code DOUBLE}.
-         */
-        static final String DOUBLE_PRECISION = "DOUBLE PRECISION";
-
-        private PostgreSql() {
-        }
     }
 }
