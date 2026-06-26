@@ -1,11 +1,11 @@
 /*
- * Copyright 2023, TeamDev. All rights reserved.
+ * Copyright 2026, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * https://www.apache.org/licenses/LICENSE-2.0
  *
  * Redistribution and use in source and/or binary forms, with or without
  * modification, must retain the above copyright notice and the following
@@ -49,7 +49,6 @@ import io.spine.test.storage.StgProjectId;
 
 import static io.spine.server.storage.jdbc.GivenDataSource.prefix;
 import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_4;
-import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_9_7;
 import static io.spine.server.storage.jdbc.Type.LONG;
 
 public final class JdbcStorageFactoryTestEnv {
@@ -62,7 +61,10 @@ public final class JdbcStorageFactoryTestEnv {
         var dataSource = dataSource();
         return JdbcStorageFactory.newBuilder()
                                  .setDataSource(dataSource)
-                                 .setTypeMapping(MYSQL_9_7)
+                                 // The data source is an in-memory H2 database, so the H2 mapping
+                                 // must be used. The MySQL mapping emits a MySQL-specific binary
+                                 // collation for string columns, which H2 cannot parse.
+                                 .setTypeMapping(H2_2_4)
                                  .build();
     }
 

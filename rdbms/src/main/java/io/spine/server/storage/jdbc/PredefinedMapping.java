@@ -34,6 +34,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
 import static io.spine.server.storage.jdbc.Type.DOUBLE;
 import static io.spine.server.storage.jdbc.Type.FLOAT;
+import static io.spine.server.storage.jdbc.Type.STRING;
+import static io.spine.server.storage.jdbc.Type.STRING_255;
+import static io.spine.server.storage.jdbc.Type.STRING_512;
 import static io.spine.server.storage.jdbc.TypeMappingBuilder.mappingBuilder;
 
 /**
@@ -43,7 +46,13 @@ import static io.spine.server.storage.jdbc.TypeMappingBuilder.mappingBuilder;
 public enum PredefinedMapping implements TypeMapping {
 
     // Must match `io.spine.dependency.storage.MySql.version`.
-    MYSQL_9_7("MySQL", 9, 7, mappingBuilder()),
+    //
+    // MySQL compares non-binary string types case- and accent-insensitively by default, so
+    // distinct identifiers like `"name"` and `"Name"` would collide. All character-based column
+    // types therefore carry an explicit binary collation; see the `MySql` helper below.
+    MYSQL_9_7("MySQL", 9, 7, mappingBuilder().add(STRING_255, MySql.VARCHAR_255)
+                                             .add(STRING_512, MySql.VARCHAR_512)
+                                             .add(STRING, MySql.TEXT)),
 
     // PostgreSQL has no bare `DOUBLE` type, and its `FLOAT` is double-precision;
     // map to the single-/double-precision types matching Java `float`/`double`.
@@ -112,6 +121,40 @@ public enum PredefinedMapping implements TypeMapping {
     @VisibleForTesting
     int getMinorVersion() {
         return minorVersion;
+    }
+
+    /**
+     * SQL type names specific to MySQL, which differ from the
+     * {@linkplain TypeMappingBuilder default mapping}.
+     */
+    static final class MySql {
+
+        /**
+         * The character set and binary collation appended to every character-based column type.
+         *
+         * <p>By default, MySQL uses a case- and accent-insensitive collation for non-binary
+         * string types, so {@code 'name'} and {@code 'Name'} compare as equal. Entity
+         * identifiers and {@code String} columns must be matched exactly; otherwise distinct
+         * identifiers collide and commands for one entity get routed to another. A binary
+         * collation restores exact, case-sensitive matching.
+         *
+         * <p>{@code utf8mb4} (rather than the deprecated {@code utf8}/{@code utf8mb3}) is used to
+         * keep the full Unicode range available. The collation does not change the stored byte
+         * width, so the {@code VARCHAR(512)} primary key stays within InnoDB index limits.
+         */
+        private static final String BINARY = "CHARACTER SET utf8mb4 COLLATE utf8mb4_bin";
+
+        /** {@code VARCHAR(255)} with a {@linkplain #BINARY binary collation}. */
+        static final String VARCHAR_255 = "VARCHAR(255) " + BINARY;
+
+        /** {@code VARCHAR(512)} with a {@linkplain #BINARY binary collation}. */
+        static final String VARCHAR_512 = "VARCHAR(512) " + BINARY;
+
+        /** {@code TEXT} with a {@linkplain #BINARY binary collation}. */
+        static final String TEXT = "TEXT " + BINARY;
+
+        private MySql() {
+        }
     }
 
     /**
