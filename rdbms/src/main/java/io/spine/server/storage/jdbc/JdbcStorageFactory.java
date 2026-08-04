@@ -39,6 +39,7 @@ import io.spine.server.entity.storage.SpecScanner;
 import io.spine.server.storage.RecordSpec;
 import io.spine.server.storage.RecordStorage;
 import io.spine.server.storage.StorageFactory;
+import io.spine.server.storage.StorageGroup;
 import io.spine.server.storage.jdbc.config.CreateOperationFactory;
 import io.spine.server.storage.jdbc.config.TableSpecs;
 import io.spine.server.storage.jdbc.delivery.JdbcSessionStorage;
@@ -46,6 +47,7 @@ import io.spine.server.storage.jdbc.operation.OperationFactory;
 import io.spine.server.storage.jdbc.record.JdbcRecordStorage;
 import io.spine.server.storage.jdbc.record.JdbcTableSpec;
 import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
+import org.jspecify.annotations.Nullable;
 
 import javax.sql.DataSource;
 
@@ -88,7 +90,7 @@ public class JdbcStorageFactory implements StorageFactory {
      */
     @Override
     public <I, R extends Message> RecordStorage<I, R>
-    createRecordStorage(ContextSpec context, RecordSpec<I, R> spec) {
+    createRecordStorage(ContextSpec context, RecordSpec<I, R> spec, @Nullable StorageGroup group) {
         var result = new JdbcRecordStorage<>(context, spec, this);
         return result;
     }

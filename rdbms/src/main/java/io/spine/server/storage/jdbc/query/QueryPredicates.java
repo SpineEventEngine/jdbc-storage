@@ -90,18 +90,12 @@ public final class QueryPredicates {
                                 ComparablePath<Comparable> columnPath) {
         checkNotNull(operator);
         checkNotNull(columnPath);
-        switch (operator) {
-            case EQUALS:
-                return columnPath.isNull();
-            case GREATER_THAN:
-            case LESS_THAN:
-            case GREATER_OR_EQUALS:
-            case LESS_OR_EQUALS:
-                throw newIllegalArgumentException(
-                        "Operator %s not supported for the null filter value.", operator);
-            default:
-                throw newIllegalArgumentException("Unexpected filter operator %s.", operator);
-        }
+        return switch (operator) {
+            case EQUALS -> columnPath.isNull();
+            case GREATER_THAN, LESS_THAN, GREATER_OR_EQUALS, LESS_OR_EQUALS ->
+                    throw newIllegalArgumentException(
+                            "Operator %s not supported for the null filter value.", operator);
+        };
     }
 
     @VisibleForTesting
@@ -112,23 +106,19 @@ public final class QueryPredicates {
         checkNotNull(columnPath);
         checkNotNull(operator);
         checkNotNull(columnValue);
-        switch (operator) {
-            case EQUALS:
-                return columnPath.eq(columnValue);
-            case GREATER_THAN:
-                return columnPath.gt(columnValue);
-            case LESS_THAN:
-                return columnPath.lt(columnValue);
-            case GREATER_OR_EQUALS:
-                return columnPath.goe(columnValue);
-            case LESS_OR_EQUALS:
-                return columnPath.loe(columnValue);
-            default:
-                throw newIllegalArgumentException("Unexpected operator %s.", operator);
-        }
+        return switch (operator) {
+            case EQUALS -> columnPath.eq(columnValue);
+            case GREATER_THAN -> columnPath.gt(columnValue);
+            case LESS_THAN -> columnPath.lt(columnValue);
+            case GREATER_OR_EQUALS -> columnPath.goe(columnValue);
+            case LESS_OR_EQUALS -> columnPath.loe(columnValue);
+        };
     }
 
-    @SuppressWarnings("rawtypes")   /* To avoid the hell in generics. */
+    @SuppressWarnings({
+            "rawtypes"  /* To avoid the hell in generics. */,
+            "ConstantValue" /* `convertedValue` could be `null`. */
+    })
     private static Predicate
     matchParameter(SubjectParameter<?, ?, ?> parameter, JdbcColumnMapping columnMapping) {
         var column = parameter.column();

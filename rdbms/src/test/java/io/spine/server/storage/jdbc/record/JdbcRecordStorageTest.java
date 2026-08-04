@@ -28,7 +28,7 @@ package io.spine.server.storage.jdbc.record;
 
 import io.spine.environment.Tests;
 import io.spine.server.ServerEnvironment;
-import io.spine.server.storage.RecordStorageDelegateTest;
+import io.spine.server.storage.DelegatingRecordStorageTest;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -36,7 +36,7 @@ import org.junit.jupiter.api.DisplayName;
 import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.newFactory;
 
 @DisplayName("`JdbcRecordStorage` should")
-class JdbcRecordStorageTest extends RecordStorageDelegateTest {
+class JdbcRecordStorageTest extends DelegatingRecordStorageTest {
 
     @BeforeEach
     @Override
