@@ -32,10 +32,10 @@ import com.querydsl.core.types.dsl.ComparablePath;
 import io.spine.query.ComparisonOperator;
 import io.spine.query.QueryPredicate;
 import io.spine.server.entity.storage.SpecScanner;
+import io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.StgProjectAggregate;
 import io.spine.server.storage.jdbc.record.column.IdColumn;
 import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 import io.spine.test.storage.StgProject;
-import io.spine.test.storage.StgProjectId;
 import io.spine.testing.UtilityClassTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -68,7 +68,7 @@ class QueryPredicatesTest extends UtilityClassTest<QueryPredicates> {
     protected void configure(NullPointerTester tester) {
         super.configure(tester);
         var mapping = new JdbcColumnMapping();
-        var idColumn = IdColumn.of(SpecScanner.scan(StgProjectId.class, StgProject.class),
+        var idColumn = IdColumn.of(SpecScanner.scan(StgProjectAggregate.class),
                                    mapping);
         var predicate = StgProject.query()
                                   .build()
@@ -118,6 +118,12 @@ class QueryPredicatesTest extends UtilityClassTest<QueryPredicates> {
             assertThrows(IllegalArgumentException.class,
                          () -> runNullFilterCreationFor(LESS_OR_EQUALS));
         }
+
+        @SuppressWarnings("ResultOfMethodCallIgnored") // Method called to throw exception.
+        private static void runNullFilterCreationFor(ComparisonOperator operator) {
+            var path = comparablePath(Comparable.class, "");
+            nullFilter(operator, path);
+        }
     }
 
     @Nested
@@ -165,9 +171,4 @@ class QueryPredicatesTest extends UtilityClassTest<QueryPredicates> {
         }
     }
 
-    @SuppressWarnings("ResultOfMethodCallIgnored") // Method called to throw exception.
-    private static void runNullFilterCreationFor(ComparisonOperator operator) {
-        var path = comparablePath(Comparable.class, "");
-        nullFilter(operator, path);
-    }
 }
