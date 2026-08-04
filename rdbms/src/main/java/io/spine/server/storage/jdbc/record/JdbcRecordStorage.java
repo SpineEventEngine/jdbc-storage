@@ -154,7 +154,7 @@ public class JdbcRecordStorage<I, R extends Message> extends RecordStorage<I, R>
 
     @Override
     public void write(I id, R record) {
-        var spec = (RecordSpec<I, R>) recordSpec();
+        var spec = recordSpec();
         writeRecord(RecordWithColumns.create(id, record, spec));
     }
 
