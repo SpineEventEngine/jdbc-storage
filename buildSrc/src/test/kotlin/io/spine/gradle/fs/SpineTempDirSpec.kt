@@ -24,22 +24,31 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.dependency.test
+package io.spine.gradle.fs
 
-/**
- * Code coverage library for Java.
- *
- * @see <a href="https://www.eclemma.org/jacoco/">Releases</a>
- */
-@Suppress("ConstPropertyName")
-object Jacoco {
-    const val version = "0.8.15"
+import io.kotest.matchers.shouldBe
+import java.nio.file.Path
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Test
 
-    /**
-     * The Maven coordinates of the standalone JaCoCo agent JAR (the `runtime`
-     * classifier), attached via `-javaagent:` to forked JVMs — Gradle TestKit
-     * workers and the Spine Compiler process — so their execution is credited
-     * to coverage.
-     */
-    const val agent = "org.jacoco:org.jacoco.agent:$version:runtime"
+@DisplayName("`SpineTempDir` should")
+class SpineTempDirSpec {
+
+    @Test
+    fun `place its per-JVM directory under the package-named namespace`() {
+        val namespace = Path.of(
+            System.getProperty("java.io.tmpdir"),
+            LazyTempPath::class.java.packageName
+        )
+
+        SpineTempDir.path.parent shouldBe namespace
+    }
+
+    @Test
+    fun `create the directory on access`() {
+        val directory = SpineTempDir.path.toFile()
+
+        directory.exists() shouldBe true
+        directory.isDirectory shouldBe true
+    }
 }

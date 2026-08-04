@@ -24,19 +24,46 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.gradle.git
+package io.spine.gradle.fs
 
-/**
- * Contains information about a Git user.
- *
- * Determines the author and committer fields of a commit.
- *
- * @constructor throws an [IllegalArgumentException] if the name or the email
- *              is an empty string.
- */
-data class UserInfo(val name: String, val email: String) {
-    init {
-        require(name.isNotBlank()) { "Name cannot be an empty string." }
-        require(email.isNotBlank()) { "Email cannot be an empty string." }
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldContain
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Test
+
+@DisplayName("`LazyTempPath` should")
+class LazyTempPathSpec {
+
+    @Test
+    fun `create the directory on the first use`() {
+        val directory = LazyTempPath("created").toFile()
+
+        directory.exists() shouldBe true
+        directory.isDirectory shouldBe true
+    }
+
+    @Test
+    fun `create the directory under the system temporary directory`() {
+        val path = LazyTempPath("under-tmp").toString()
+
+        path shouldContain systemTempDir()
+    }
+
+    @Test
+    fun `create the directory under a folder named after its package`() {
+        val path = LazyTempPath("under-base").toString()
+
+        path shouldContain LazyTempPath::class.java.packageName
+    }
+
+    @Test
+    fun `place all instances under the same base directory`() {
+        val first = LazyTempPath("first").toFile()
+        val second = LazyTempPath("second").toFile()
+
+        first.parentFile shouldBe second.parentFile
+        first.parentFile.toString() shouldBe SpineTempDir.path.toString()
     }
 }
+
+private fun systemTempDir(): String = System.getProperty("java.io.tmpdir")
