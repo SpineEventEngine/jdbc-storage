@@ -33,6 +33,45 @@ Each table created has the following structure:
 
 :warning: The framework does **not** verify the table structure for existing tables.
 
+## Grouped tables
+
+Several storages of a Bounded Context may hold records of the same type.
+For example, the per-entity histories introduced with Spine 2.x:
+
+* the event journal of an entity type (`EntityEventStorage`) stores `Event`s —
+  just as the journals of all other entity types, and the event log
+  of the Bounded Context;
+* the state history of an entity type (`EntityStateHistoryStorage`) stores
+  `EntityRecord`s — just as the latest-state storage of the same entity type.
+
+To keep such storages apart, the framework passes a `StorageGroup` when creating them,
+named after the state type of the served entity. This library allocates a separate table
+per the combination of the record specification and the group.
+
+The name of a grouped table is composed of the group name and the simple name
+of the stored record type:
+
+```
+(group name + record type name) -> (replace `.` with `_`, join with `_`) -> result
+```
+
+E.g. for an Entity with the state declared by `bar.acme.Project`, the tables are:
+
+| Storage                  | Table                           |
+|--------------------------|---------------------------------|
+| Latest state (ungrouped) | `bar_acme_Project`              |
+| Event journal            | `bar_acme_Project_Event`        |
+| State history            | `bar_acme_Project_EntityRecord` |
+
+Grouped tables have the same structure as the ungrouped ones: the `ID` and `bytes`
+columns, plus the columns declared for the stored record type — for both histories,
+these are `entity_id`, `created`, and `version`.
+
+:warning: Group names are the fully-qualified names of Proto types, so the names
+of grouped tables run longer than the ungrouped ones. Mind the identifier length
+limits of the underlying DB engine — e.g., 64 characters on MySQL —
+when naming the Proto packages of entity states.
+
 ## Adding new `(column)`
 
 In scope of development cycle, there may arise a need to modify the declaration of
@@ -51,8 +90,7 @@ public static final class MyProjection
 }
 
 var boundedContextSpec = // ...
-var factory = JdbcStorageFactory
-                .newBuilder()
+var factory = JdbcStorageFactory.newBuilder()
                 // ...
                 .build();
 
@@ -95,9 +133,7 @@ It is possible to configure several aspects:
 public final class TaskProjection
     extends Projection<TaskId, TaskView, TaskView.Builder> { ... }
 
-var factory = JdbcStorageFactory
-        .newBuilder()
-
+var factory = JdbcStorageFactory.newBuilder()
         // ...
 
         // Uses the record type to set the name for its table:
@@ -109,6 +145,11 @@ var factory = JdbcStorageFactory
         .setTableName(InboxMessage.class, "custom_inbox_messages")
         .build();
 ```
+
+:warning: Custom table names apply only to the storages outside any `StorageGroup`.
+The [grouped tables](#grouped-tables) — such as the per-entity histories — are always
+named after the group and the record type: the custom names are registered per record type,
+which cannot tell apart the storages of one group from another.
 
 * column type mapping, per type of stored records:
 

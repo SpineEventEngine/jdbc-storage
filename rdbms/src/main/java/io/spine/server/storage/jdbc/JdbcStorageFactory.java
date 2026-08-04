@@ -1,11 +1,11 @@
 /*
- * Copyright 2023, TeamDev. All rights reserved.
+ * Copyright 2026, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * https://www.apache.org/licenses/LICENSE-2.0
  *
  * Redistribution and use in source and/or binary forms, with or without
  * modification, must retain the above copyright notice and the following
@@ -78,10 +78,19 @@ public class JdbcStorageFactory implements StorageFactory {
     /**
      * Creates a new storage for records.
      *
+     * <p>The records are stored in an RDBMS table, the identity of which is composed
+     * of the passed record specification and the group. In particular, the storages
+     * belonging to distinct groups are allocated their own tables, even if they store
+     * records of the same type.
+     *
      * @param context
      *         the bounded context within which the storage is being configured
      * @param spec
      *         the record specification for the stored record
+     * @param group
+     *         the group telling this storage apart from the other storages
+     *         holding records of the same type,
+     *         or {@code null} if the storage belongs to no particular group
      * @param <I>
      *         type of the record identifiers
      * @param <R>
@@ -91,7 +100,7 @@ public class JdbcStorageFactory implements StorageFactory {
     @Override
     public <I, R extends Message> RecordStorage<I, R>
     createRecordStorage(ContextSpec context, RecordSpec<I, R> spec, @Nullable StorageGroup group) {
-        var result = new JdbcRecordStorage<>(context, spec, this);
+        var result = new JdbcRecordStorage<>(context, spec, this, group);
         return result;
     }
 
@@ -179,7 +188,8 @@ public class JdbcStorageFactory implements StorageFactory {
     }
 
     /**
-     * Returns the DB table specification for the passed record specification.
+     * Returns the DB table specification for the passed record specification,
+     * for a storage belonging to no {@link StorageGroup}.
      *
      * <p>Takes into account the {@linkplain Builder#setCustomMapping(Class, JdbcColumnMapping)
      * custom mapping} and the {@linkplain Builder#setTableName(Class, String) custom table name}
@@ -191,10 +201,38 @@ public class JdbcStorageFactory implements StorageFactory {
      *         type of the identifiers of the described record
      * @param <R>
      *         type of the described record
-     * @return a new instance of table specification
+     * @return the table specification
      */
     public <I, R extends Message> JdbcTableSpec<I, R> tableSpecFor(RecordSpec<I, R> spec) {
-        var tableSpec = tableSpecs.specFor(spec, columnMapping);
+        return tableSpecFor(spec, null);
+    }
+
+    /**
+     * Returns the DB table specification for the passed record specification
+     * and the storage group.
+     *
+     * <p>Takes into account the {@linkplain Builder#setCustomMapping(Class, JdbcColumnMapping)
+     * custom mapping} set for the records of target type.
+     *
+     * <p>For the storages belonging to no group, the
+     * {@linkplain Builder#setTableName(Class, String) custom table name} is applied as well.
+     * The tables of grouped storages are always named after the group and the record type;
+     * see {@link io.spine.server.storage.jdbc.record.TableNames#of(Class, StorageGroup)
+     * TableNames.of(Class, StorageGroup)}.
+     *
+     * @param spec
+     *         record specification
+     * @param group
+     *         the group to which the storage belongs, or {@code null} if it belongs to none
+     * @param <I>
+     *         type of the identifiers of the described record
+     * @param <R>
+     *         type of the described record
+     * @return the table specification
+     */
+    public <I, R extends Message> JdbcTableSpec<I, R>
+    tableSpecFor(RecordSpec<I, R> spec, @Nullable StorageGroup group) {
+        var tableSpec = tableSpecs.specFor(spec, group, columnMapping);
         return tableSpec;
     }
 
@@ -301,6 +339,12 @@ public class JdbcStorageFactory implements StorageFactory {
          * <p>In case no custom name is defined,
          * a {@linkplain io.spine.server.storage.jdbc.record.TableNames#of(Class) default name}
          * is used.
+         *
+         * <p>The custom name applies only to the storages belonging to no
+         * {@link io.spine.server.storage.StorageGroup StorageGroup}. The tables of grouped
+         * storages — such as the per-entity histories — are always named after the group
+         * and the record type, as a single per-record-type name cannot tell
+         * the storages of different groups apart.
          *
          * @param recordType
          *         the type of the stored record
