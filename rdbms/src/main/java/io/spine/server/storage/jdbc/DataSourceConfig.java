@@ -26,7 +26,7 @@
 
 package io.spine.server.storage.jdbc;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import javax.sql.DataSource;
 import java.sql.Connection;

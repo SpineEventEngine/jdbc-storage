@@ -40,7 +40,7 @@ import io.spine.server.storage.jdbc.TableColumn;
 import io.spine.server.storage.jdbc.record.column.BytesColumn;
 import io.spine.server.storage.jdbc.record.column.IdColumn;
 import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

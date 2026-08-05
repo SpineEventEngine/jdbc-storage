@@ -32,7 +32,7 @@ import io.spine.server.storage.jdbc.Type;
 import io.spine.server.storage.jdbc.record.RecordTable;
 import io.spine.server.storage.jdbc.record.Serializer;
 import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import static io.spine.server.storage.jdbc.Type.BYTE_ARRAY;
 import static io.spine.server.storage.jdbc.record.Serializer.serialize;

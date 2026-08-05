@@ -32,7 +32,7 @@ import com.google.protobuf.Message;
 import io.spine.annotation.Internal;
 import io.spine.query.ColumnName;
 import io.spine.server.storage.RecordWithColumns;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A record to insert into an RDBMS-backed table.
