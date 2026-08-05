@@ -332,6 +332,9 @@ public class JdbcStorageFactory implements StorageFactory {
         /**
          * Sets the custom DB table name for the table storing the records of the specified type.
          *
+         * <p>For an Entity, pass the type of its state; for a standalone stored record,
+         * such as {@code InboxMessage}, the type of the record itself.
+         *
          * <p>The name previously set, if any, is replaced with this call.
          *
          * <p>The name cannot be blank.
@@ -343,11 +346,11 @@ public class JdbcStorageFactory implements StorageFactory {
          * <p>The custom name applies only to the storages belonging to no
          * {@link io.spine.server.storage.StorageGroup StorageGroup}. The tables of grouped
          * storages — such as the per-entity histories — are always named after the group
-         * and the record type, as a single per-record-type name cannot tell
-         * the storages of different groups apart.
+         * and the record type; a custom name set for an entity state type names
+         * the latest-state table alone, never the history tables of that entity.
          *
          * @param recordType
-         *         the type of the stored record
+         *         the type of the stored record — for an Entity, its state type
          * @param name
          *         the table name
          * @param <R>
@@ -364,13 +367,21 @@ public class JdbcStorageFactory implements StorageFactory {
         /**
          * Sets the custom column mapping for the table storing the records of the specified type.
          *
+         * <p>For an Entity, pass the type of its state; for a standalone stored record,
+         * such as {@code InboxMessage}, the type of the record itself.
+         *
          * <p>The mapping previously set, if any, is replaced with this call.
          *
          * <p>In case no custom mapping is defined for some table,
          * a {@linkplain #setColumnMapping(JdbcColumnMapping) a factory-wide value} is used.
          *
+         * <p>Unlike a {@linkplain #setTableName(Class, String) custom table name},
+         * a custom mapping set for an entity state type also applies to the tables of
+         * the {@linkplain io.spine.server.storage.StorageGroup grouped} storages serving
+         * that entity, such as its state history.
+         *
          * @param recordType
-         *         the type of the stored record
+         *         the type of the stored record — for an Entity, its state type
          * @param mapping
          *         the custom mapping
          * @param <R>

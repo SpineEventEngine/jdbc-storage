@@ -80,16 +80,20 @@ public final class TableSpecs {
      * tolerates concurrent invocations, as some storages are created lazily
      * on worker threads.
      *
+     * <p>Custom table names and custom column mappings are looked up by
+     * the source type of the record specification — for an entity storage,
+     * the entity state type; for a standalone record, the record type itself.
+     *
      * <p>For the storages belonging to no group, in case no custom table name
      * was specified, a {@linkplain io.spine.server.storage.jdbc.record.TableNames#of(Class)
      * default one} is used.
      *
      * <p>The tables of grouped storages are always named after
      * the {@linkplain io.spine.server.storage.jdbc.record.TableNames#of(Class, StorageGroup)
-     * group and the record type}. Custom table names do not apply to them: such names
-     * are registered per record type, which cannot tell apart the storages
-     * of one group from another — e.g., the event journals of all entity types
-     * store records of the same {@code Event} type.
+     * group and the record type}. Custom table names do not apply to them:
+     * the event journals of all entity types share one source type, {@code Event},
+     * and the state history of an entity shares its source type with
+     * the latest-state storage, so a custom name would collide the tables.
      *
      * <p>If no custom column mapping was set previously,
      * the default mapping passed to this method is used.
@@ -119,7 +123,7 @@ public final class TableSpecs {
     newTableSpec(RecordSpec<I, R> spec,
                  @Nullable StorageGroup group,
                  JdbcColumnMapping defaultMapping) {
-        @Nullable JdbcColumnMapping customMapping = findMapping(spec.recordType());
+        @Nullable JdbcColumnMapping customMapping = findMapping(spec.sourceType());
         var mapping = customMapping == null
                       ? defaultMapping
                       : customMapping;
@@ -131,7 +135,7 @@ public final class TableSpecs {
         if (group != null) {
             return TableNames.of(spec.recordType(), group);
         }
-        @Nullable String customName = findName(spec.recordType());
+        @Nullable String customName = findName(spec.sourceType());
         return customName == null
                ? TableNames.of(spec.sourceType())
                : customName;
@@ -159,18 +163,18 @@ public final class TableSpecs {
         }
     }
 
-    private <R extends Message> @Nullable String findName(Class<R> recordType) {
+    private @Nullable String findName(Class<? extends Message> sourceType) {
         @Nullable String customName = null;
-        if (names.containsKey(recordType)) {
-            customName = names.get(recordType);
+        if (names.containsKey(sourceType)) {
+            customName = names.get(sourceType);
         }
         return customName;
     }
 
-    private <R extends Message> @Nullable JdbcColumnMapping findMapping(Class<R> recordType) {
+    private @Nullable JdbcColumnMapping findMapping(Class<? extends Message> sourceType) {
         @Nullable JdbcColumnMapping value = null;
-        if (columnMappings.containsKey(recordType)) {
-            value = columnMappings.get(recordType);
+        if (columnMappings.containsKey(sourceType)) {
+            value = columnMappings.get(sourceType);
         }
         return value;
     }

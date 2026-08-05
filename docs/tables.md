@@ -136,20 +136,21 @@ public final class TaskProjection
 var factory = JdbcStorageFactory.newBuilder()
         // ...
 
-        // Uses the record type to set the name for its table:
+        // Uses the state type of an Entity to set the name for its table:
         .setTableName(TaskView.class, "my_favourite_tasks")
 
         // ...
 
-        // It also works for "system" tables:
+        // It also works for "system" tables, keyed by the type of the stored record:
         .setTableName(InboxMessage.class, "custom_inbox_messages")
         .build();
 ```
 
 :warning: Custom table names apply only to the storages outside any `StorageGroup`.
 The [grouped tables](#grouped-tables) — such as the per-entity histories — are always
-named after the group and the record type: the custom names are registered per record type,
-which cannot tell apart the storages of one group from another.
+named after the group and the record type. A custom name set for an entity state type
+names the latest-state table alone; honoring it for the state history of the same
+entity would collide the two tables.
 
 * column type mapping, per type of stored records:
 

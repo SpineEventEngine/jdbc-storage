@@ -30,6 +30,8 @@ import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeSameInstanceAs
+import io.kotest.matchers.types.shouldNotBeSameInstanceAs
 import io.spine.base.Identifier
 import io.spine.core.Event
 import io.spine.core.EventId
@@ -42,11 +44,13 @@ import io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory
 import io.spine.server.storage.jdbc.JdbcStorageFactory
 import io.spine.server.storage.jdbc.PredefinedMapping.H2_2_4
 import io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.StgProjectAggregate
+import io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.TestColumnMapping
 import io.spine.server.storage.jdbc.record.given.HistoryStorageTestEnv
 import io.spine.server.storage.jdbc.record.given.HistoryStorageTestEnv.StgTaskEntity
 import io.spine.server.storage.jdbc.record.given.HistoryStorageTestEnv.h2Factory
 import io.spine.server.storage.jdbc.record.given.HistoryStorageTestEnv.journalSpec
 import io.spine.server.storage.jdbc.record.given.HistoryStorageTestEnv.stateHistorySpec
+import io.spine.test.storage.StgProject
 import io.spine.test.storage.StgProjectId
 import io.spine.test.storage.event.StgProjectCreated
 import io.spine.test.storage.stgProjectId
@@ -165,6 +169,7 @@ internal class GroupedTableAllocationSpec {
             .setDataSource(whichIsStoredInMemory(Identifier.newUuid()))
             .setTypeMapping(H2_2_4)
             .setTableName(Event::class.java, "custom_event_log")
+            .setTableName(StgProject::class.java, "my_projects")
             .build()
 
         val ungroupedEvents = RecordSpec(
@@ -172,10 +177,36 @@ internal class GroupedTableAllocationSpec {
             Event::class.java
         ) { event -> event.id }
         val eventLog = factory.tableSpecFor(ungroupedEvents)
+        val latestState = factory.tableSpecFor(SpecScanner.scan(StgProjectAggregate::class.java))
         val journal = factory.tableSpecFor(journalSpec(), projectGroup)
+        val stateHistory = factory.tableSpecFor(stateHistorySpec(), projectGroup)
 
         eventLog.tableName() shouldBe "custom_event_log"
+        // The name of an entity table is customized by the entity state type.
+        latestState.tableName() shouldBe "my_projects"
+        // The grouped tables of the same entity keep their generated names.
         journal.tableName() shouldBe "spine_test_storage_StgProject_Event"
+        stateHistory.tableName() shouldBe "spine_test_storage_StgProject_EntityRecord"
+    }
+
+    @Test
+    fun `look up a custom column mapping by the entity state type, serving grouped tables too`() {
+        factory.close()
+        val custom = TestColumnMapping()
+        factory = JdbcStorageFactory.newBuilder()
+            .setDataSource(whichIsStoredInMemory(Identifier.newUuid()))
+            .setTypeMapping(H2_2_4)
+            .setCustomMapping(StgProject::class.java, custom)
+            .build()
+
+        val latestState = factory.tableSpecFor(SpecScanner.scan(StgProjectAggregate::class.java))
+        val stateHistory = factory.tableSpecFor(stateHistorySpec(), projectGroup)
+        val journal = factory.tableSpecFor(journalSpec(), projectGroup)
+
+        latestState.columnMapping() shouldBeSameInstanceAs custom
+        stateHistory.columnMapping() shouldBeSameInstanceAs custom
+        // The journal stores `Event`s, the source type of which is not customized.
+        journal.columnMapping() shouldNotBeSameInstanceAs custom
     }
 
     private fun newEvent(): Event {
