@@ -1,11 +1,11 @@
 /*
- * Copyright 2023, TeamDev. All rights reserved.
+ * Copyright 2026, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * https://www.apache.org/licenses/LICENSE-2.0
  *
  * Redistribution and use in source and/or binary forms, with or without
  * modification, must retain the above copyright notice and the following
@@ -77,11 +77,11 @@ public class WriteOne<I, R extends Message> extends Operation<I, R> {
     }
 
     /**
-     * Checks if the table contains a record with given ID.
+     * Checks if the table contains a record with the given ID.
      *
      * @param id
      *         an ID to check
-     * @return {@code true} if there is a record with such ID in the table,
+     * @return {@code true} if there is a record with such an ID in the table,
      *         {@code false} otherwise
      */
     protected final boolean containsRecord(I id) {

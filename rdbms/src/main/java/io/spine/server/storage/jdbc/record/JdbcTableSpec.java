@@ -1,11 +1,11 @@
 /*
- * Copyright 2023, TeamDev. All rights reserved.
+ * Copyright 2026, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * https://www.apache.org/licenses/LICENSE-2.0
  *
  * Redistribution and use in source and/or binary forms, with or without
  * modification, must retain the above copyright notice and the following
@@ -70,7 +70,7 @@ public final class JdbcTableSpec<I, R extends Message> {
     /**
      * Creates a new table specification, also setting a custom name for the table.
      *
-     * <p>It is a responsibility of callers to select the table name which is both unique and
+     * <p>It is a responsibility of callers to select the table name that is both unique and
      * compatible with the requirements of the underlying database engine.
      *
      * @param tableName
@@ -173,7 +173,7 @@ public final class JdbcTableSpec<I, R extends Message> {
      * @param record
      *         the record with column
      * @param name
-     *         the name of the column which value should be obtained
+     *         the name of the column whose value should be obtained
      */
     @Nullable Object valueIn(RecordWithColumns<I, R> record, ColumnName name) {
         var column = requireColumn(name);

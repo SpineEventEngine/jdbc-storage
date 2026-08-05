@@ -70,7 +70,7 @@ internal object HistoryStorageTestEnv {
      *
      * The framework composes the journal specification privately. The tests re-create it
      * to reach the table specifications of grouped storages via
-     * [JdbcStorageFactory.tableSpecFor], expecting the equally-composed specifications
+     * [JdbcStorageFactory.tableSpecFor], expecting the equally composed specifications
      * to resolve to the same tables.
      */
     fun journalSpec(): RecordSpec<EventId, Event> = RecordSpec(

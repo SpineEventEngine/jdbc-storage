@@ -1,11 +1,11 @@
 /*
- * Copyright 2023, TeamDev. All rights reserved.
+ * Copyright 2026, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * https://www.apache.org/licenses/LICENSE-2.0
  *
  * Redistribution and use in source and/or binary forms, with or without
  * modification, must retain the above copyright notice and the following
@@ -71,7 +71,7 @@ public class CreateTable<I, R extends Message> extends Operation<I, R> implement
      * the framework to work properly. Hence, the tables which include them should make these
      * values {@code DEFAULT} for these columns.
      *
-     * <p>The map stores the names of the Entity Columns as a string keys for simplicity and
+     * <p>The map stores the names of the Entity Columns as string keys for simplicity and
      * the default values of the Columns as the map values.
      */
     private static final ImmutableMap<String, Object> COLUMN_DEFAULTS =

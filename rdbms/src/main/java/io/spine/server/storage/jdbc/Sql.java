@@ -1,11 +1,11 @@
 /*
- * Copyright 2023, TeamDev. All rights reserved.
+ * Copyright 2026, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * https://www.apache.org/licenses/LICENSE-2.0
  *
  * Redistribution and use in source and/or binary forms, with or without
  * modification, must retain the above copyright notice and the following
@@ -33,7 +33,8 @@ package io.spine.server.storage.jdbc;
  * build SQL expressions.
  *
  * <p>All the {@code enum} values have a valid token string representation, i.e.
- * {@link Enum#toString() toString()} method returns a valid SQL token wrapped into the whitespaces.
+ * the {@link Enum#toString() toString()} method returns a valid SQL token wrapped
+ * into the whitespaces.
  */
 @SuppressWarnings({"UtilityClass", "PMD.MissingStaticMethodInNonInstantiatableClass"})
 public final class Sql {

@@ -4,11 +4,11 @@
 
 ## Naming and structure
 
-Each Entity registered within application's Bounded Contexts has a corresponding RDBMS table.
+Each Entity registered within the application's Bounded Contexts has a corresponding RDBMS table.
 Additionally, the framework has some system Entities and other types (such as `InboxMessage`)
-which are also stored in their tables.
+that are also stored in their tables.
 
-For each type of stored records, the framework automatically creates an RDMBS table,
+For each type of stored records, the framework automatically creates an RDBMS table,
 if it does not exist.
 
 The name of the table is composed according to the following scheme:
@@ -17,7 +17,7 @@ The name of the table is composed according to the following scheme:
 (Package of Proto message + message name) -> (replace `.` with `_`) -> result
 ```
 
-E.g. a table name for an Entity, which has a state declared by `bar.acme.Project` would be
+E.g. a table name for an Entity that has a state declared by `bar.acme.Project` would be
 "bar_acme_Project".
 
 Each table created has the following structure:
@@ -69,15 +69,15 @@ these are `entity_id`, `created`, and `version`.
 
 A grouped table can also be given a custom name; see [Customization](#customization).
 
-:warning: Group names are the fully-qualified names of Proto types, so the names
+:warning: Group names are the fully qualified names of Proto types, so the names
 of grouped tables run longer than the ungrouped ones. Mind the identifier length
 limits of the underlying DB engine — e.g., 64 characters on MySQL —
 when naming the Proto packages of entity states.
 
 ## Adding new `(column)`
 
-In scope of development cycle, there may arise a need to modify the declaration of
-Proto messages stored as records, by marking more fields with `(column)` option.
+In the scope of the development cycle, there may arise a need to modify the declaration of
+Proto messages stored as records, by marking more fields with the `(column)` option.
 In this case, it is important to understand that the framework will **not** be updating
 the structure of existing tables in the underlying storage.
 
@@ -118,12 +118,12 @@ Therefore, **no table indexes are automatically generated**.
 
 Prior to production use, it is recommended to launch the Spine-based application
 in a load-testing mode on top of the RDBMS of choice, analyze the usage scenarios,
-and manually create indexes which suit the scenarios best.
+and manually create indexes that suit the scenarios best.
 
 ## Customization
 
 The library provides an API to customize the RDBMS tables used by storage instances.
-It is available as a part of `JdbcStorageFactory.Builder` API.
+It is available as a part of the `JdbcStorageFactory.Builder` API.
 
 It is possible to configure several aspects:
 

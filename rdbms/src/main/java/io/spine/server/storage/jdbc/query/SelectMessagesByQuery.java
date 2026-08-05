@@ -1,11 +1,11 @@
 /*
- * Copyright 2023, TeamDev. All rights reserved.
+ * Copyright 2026, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * https://www.apache.org/licenses/LICENSE-2.0
  *
  * Redistribution and use in source and/or binary forms, with or without
  * modification, must retain the above copyright notice and the following
@@ -140,8 +140,8 @@ public class SelectMessagesByQuery<I, R extends Message> extends AbstractQuery<I
      *
      * @param <I>
      *         the type of identifiers of the queried records
-     * @param <R>the
-     *         type of queried records
+     * @param <R>
+     *         the type of queried records
      * @return a new {@code Builder} instance
      */
     public static <I, R extends Message> Builder<I, R> newBuilder() {
@@ -174,7 +174,7 @@ public class SelectMessagesByQuery<I, R extends Message> extends AbstractQuery<I
         /**
          * {@inheritDoc}
          *
-         * <p>Checks that all the builder fields were set to a non-{@code null} values.
+         * <p>Checks that all the builder fields were set to non-{@code null} values.
          */
         @Override
         protected void checkPreconditions() throws IllegalStateException {

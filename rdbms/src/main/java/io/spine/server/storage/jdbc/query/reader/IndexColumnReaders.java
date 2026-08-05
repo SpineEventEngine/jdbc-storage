@@ -1,11 +1,11 @@
 /*
- * Copyright 2023, TeamDev. All rights reserved.
+ * Copyright 2026, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * https://www.apache.org/licenses/LICENSE-2.0
  *
  * Redistribution and use in source and/or binary forms, with or without
  * modification, must retain the above copyright notice and the following
@@ -32,7 +32,7 @@ import com.google.protobuf.Message;
 import static io.spine.util.Exceptions.newIllegalArgumentException;
 
 /**
- * A helper class that allows to distinguish between the different {@link ColumnReader} types for
+ * A helper class that allows distinguishing between the different {@link ColumnReader} types for
  * the different ID columns.
  */
 final class IndexColumnReaders {
@@ -47,7 +47,7 @@ final class IndexColumnReaders {
      * @param columnName
      *         the name of the ID column
      * @param idType
-     *         the type of the IDs stored in column
+     *         the type of the IDs stored in the column
      * @param <I>
      *         the compile-time type of the IDs
      * @return a new instance of the {@code ColumnReader}

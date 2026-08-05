@@ -1,11 +1,11 @@
 /*
- * Copyright 2023, TeamDev. All rights reserved.
+ * Copyright 2026, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * https://www.apache.org/licenses/LICENSE-2.0
  *
  * Redistribution and use in source and/or binary forms, with or without
  * modification, must retain the above copyright notice and the following
@@ -50,7 +50,7 @@ import static com.querydsl.core.types.dsl.Expressions.comparablePath;
 import static io.spine.util.Exceptions.newIllegalArgumentException;
 
 /**
- * A utility methods to work with {@linkplain Predicate predicates}.
+ * Utility methods to work with {@linkplain Predicate predicates}.
  */
 public final class QueryPredicates {
 
@@ -64,7 +64,7 @@ public final class QueryPredicates {
      * <p>If there are no IDs, the resulting predicate will return {@code true} always.
      *
      * @param column
-     *         the {@link IdColumn} describing ID to match against
+     *         the {@link IdColumn} describing the ID to match against
      * @param ids
      *         the IDs to match
      * @param <I>

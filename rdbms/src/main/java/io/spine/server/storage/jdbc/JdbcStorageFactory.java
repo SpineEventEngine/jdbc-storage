@@ -105,7 +105,7 @@ public class JdbcStorageFactory implements StorageFactory {
     }
 
     /**
-     * Returns an SQL statement which would allow to manually create an RDBMS table
+     * Returns an SQL statement that would allow manually creating an RDBMS table
      * corresponding to some Entity registered in a certain Bounded Context.
      *
      * @param contextSpec
@@ -151,7 +151,7 @@ public class JdbcStorageFactory implements StorageFactory {
     }
 
     /**
-     * Closes used {@link DataSourceWrapper}.
+     * Closes the used {@link DataSourceWrapper}.
      */
     @Override
     public void close() {
@@ -279,7 +279,7 @@ public class JdbcStorageFactory implements StorageFactory {
         }
 
         /**
-         * Sets required field {@code dataSource}.
+         * Sets the required field {@code dataSource}.
          */
         public Builder setDataSource(DataSourceWrapper dataSource) {
             this.dataSource = dataSource;
@@ -287,7 +287,7 @@ public class JdbcStorageFactory implements StorageFactory {
         }
 
         /**
-         * Sets required field {@code dataSource} from the wrapped {@link DataSource}.
+         * Sets the required field {@code dataSource} from the wrapped {@link DataSource}.
          *
          * @see DataSourceWrapper#wrap(DataSource)
          */
@@ -315,7 +315,7 @@ public class JdbcStorageFactory implements StorageFactory {
          * to build a custom mapping.
          *
          * <p>If the mapping was not specified, it is
-         * {@linkplain PredefinedMapping#select(DataSourceWrapper) selected} basing on
+         * {@linkplain PredefinedMapping#select(DataSourceWrapper) selected} based on
          * the {@linkplain java.sql.DatabaseMetaData#getDatabaseProductName() database product name}
          * and the database version.
          *
@@ -391,7 +391,7 @@ public class JdbcStorageFactory implements StorageFactory {
          * {@linkplain io.spine.server.storage.jdbc.record.TableNames#of(Class, StorageGroup)
          * named after the group and the record type}.
          *
-         * <p>It is a responsibility of callers to select a name which does not collide
+         * <p>It is a responsibility of callers to select a name that does not collide
          * with the names of other tables, including the generated ones.
          *
          * @param stateType
@@ -422,7 +422,7 @@ public class JdbcStorageFactory implements StorageFactory {
          * <p>The mapping previously set, if any, is replaced with this call.
          *
          * <p>In case no custom mapping is defined for some table,
-         * a {@linkplain #setColumnMapping(JdbcColumnMapping) a factory-wide value} is used.
+         * {@linkplain #setColumnMapping(JdbcColumnMapping) a factory-wide value} is used.
          *
          * <p>Unlike a {@linkplain #setTableName(Class, String) custom table name},
          * a custom mapping set for an entity state type also applies to the tables of

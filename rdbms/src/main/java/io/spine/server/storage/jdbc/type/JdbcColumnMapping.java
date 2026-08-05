@@ -1,11 +1,11 @@
 /*
- * Copyright 2023, TeamDev. All rights reserved.
+ * Copyright 2026, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * https://www.apache.org/licenses/LICENSE-2.0
  *
  * Redistribution and use in source and/or binary forms, with or without
  * modification, must retain the above copyright notice and the following
@@ -58,7 +58,7 @@ import static io.spine.server.storage.jdbc.Type.STRING;
  *
  * <p>Also defines the RDBMS-level types for the table columns.
  *
- * <p>Users may extend this type to add own custom mapping for some of the stored types.
+ * <p>Users may extend this type to add their own custom mapping for some of the stored types.
  */
 @Experimental
 @SPI
@@ -76,7 +76,7 @@ public class JdbcColumnMapping extends AbstractColumnMapping<Object> {
      * as it returns not a persistence strategy for a column,
      * but a type to use with RDBMS. Different implementations
      * may even choose to return different types,
-     * depending on the version of underlying DB engine.
+     * depending on the version of the underlying DB engine.
      */
     public Type typeOf(Class<?> columnType) {
         checkNotNull(columnType);
@@ -93,7 +93,7 @@ public class JdbcColumnMapping extends AbstractColumnMapping<Object> {
      * by SPI users is used.
      *
      * @apiNote This method is made {@code final}, as it is designed
-     *         to use {@code ImmutableMap.Builder}, which does not allow to override values.
+     *         to use {@code ImmutableMap.Builder}, which does not allow overriding values.
      *         Therefore, it is not possible for SPI users to provide their own mapping rules
      *         for types such as {@code Timestamp}, for which this class already has
      *         a default mapping. SPI users should override

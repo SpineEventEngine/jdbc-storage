@@ -60,7 +60,7 @@ public class JdbcRecordStorage<I, R extends Message> extends RecordStorage<I, R>
 
     /**
      * Creates a new record storage for the records belonging to no storage group,
-     * and performs the creation of RDBMS table, in case such a table does not exist.
+     * and performs the creation of an RDBMS table, in case such a table does not exist.
      *
      * @param contextSpec
      *         specification of Bounded Context, in scope of which this storage exists
@@ -76,7 +76,7 @@ public class JdbcRecordStorage<I, R extends Message> extends RecordStorage<I, R>
     }
 
     /**
-     * Creates a new record storage, and performs the creation of RDBMS table,
+     * Creates a new record storage, and performs the creation of an RDBMS table,
      * in case such a table does not exist.
      *
      * <p>The passed storage group, if any, participates in the identity of the table,
@@ -101,7 +101,7 @@ public class JdbcRecordStorage<I, R extends Message> extends RecordStorage<I, R>
 
     /**
      * Creates a new record storage for the records belonging to no storage group, and
-     * when asked, performs the creation of RDBMS table if such a table does not exist.
+     * when asked, performs the creation of an RDBMS table if such a table does not exist.
      *
      * <p>This constructor is internal to the framework.
      *
@@ -123,7 +123,7 @@ public class JdbcRecordStorage<I, R extends Message> extends RecordStorage<I, R>
     }
 
     /**
-     * Creates a new record storage, and when asked, performs the creation of RDBMS table
+     * Creates a new record storage, and when asked, performs the creation of an RDBMS table
      * if such a table does not exist.
      *
      * <p>The passed storage group, if any, participates in the identity of the table,
