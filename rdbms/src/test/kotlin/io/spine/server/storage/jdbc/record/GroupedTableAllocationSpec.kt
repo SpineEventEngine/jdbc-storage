@@ -36,6 +36,7 @@ import io.spine.base.Identifier
 import io.spine.core.Event
 import io.spine.core.EventId
 import io.spine.query.RecordQuery
+import io.spine.server.entity.EntityRecord
 import io.spine.server.entity.EntityStateKey
 import io.spine.server.entity.storage.SpecScanner
 import io.spine.server.storage.RecordSpec
@@ -187,6 +188,40 @@ internal class GroupedTableAllocationSpec {
         // The grouped tables of the same entity keep their generated names.
         journal.tableName() shouldBe "spine_test_storage_StgProject_Event"
         stateHistory.tableName() shouldBe "spine_test_storage_StgProject_EntityRecord"
+    }
+
+    @Test
+    fun `name a grouped table by the state and the record types of its storage`() {
+        factory.close()
+        factory = JdbcStorageFactory.newBuilder()
+            .setDataSource(whichIsStoredInMemory(Identifier.newUuid()))
+            .setTypeMapping(H2_2_4)
+            .setTableName(StgProject::class.java, Event::class.java, "project_journal")
+            .setTableName(StgProject::class.java, EntityRecord::class.java, "project_state_history")
+            .build()
+
+        val journal = factory.tableSpecFor(journalSpec(), projectGroup)
+        val stateHistory = factory.tableSpecFor(stateHistorySpec(), projectGroup)
+        val latestState = factory.tableSpecFor(SpecScanner.scan(StgProjectAggregate::class.java))
+        val taskJournal = factory.tableSpecFor(journalSpec(), taskGroup)
+
+        journal.tableName() shouldBe "project_journal"
+        stateHistory.tableName() shouldBe "project_state_history"
+        // The registration addresses the grouped tables only...
+        latestState.tableName() shouldBe "spine_test_storage_StgProject"
+        // ...of the specified entity type alone.
+        taskJournal.tableName() shouldBe "spine_test_storage_StgTask_Event"
+
+        // The custom-named journal is fully operational.
+        val storage = factory.createEntityEventStorage(
+            HistoryStorageTestEnv.context(),
+            StgProjectAggregate::class.java
+        )
+        val event = newEvent()
+        storage.write(event)
+        storage.historyBackward(producerOf(event), batchSize = 1)
+            .asSequence()
+            .toList() shouldContainExactly listOf(event)
     }
 
     @Test

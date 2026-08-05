@@ -30,12 +30,14 @@ import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.protobuf.Message;
 import io.spine.annotation.Internal;
+import io.spine.base.EntityState;
 import io.spine.server.storage.RecordSpec;
 import io.spine.server.storage.StorageGroup;
 import io.spine.server.storage.jdbc.record.JdbcTableSpec;
 import io.spine.server.storage.jdbc.record.TableNames;
 import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import io.spine.type.TypeName;
+import org.jspecify.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -58,6 +60,7 @@ import static io.spine.util.Preconditions2.checkNotEmptyOrBlank;
 public final class TableSpecs {
 
     private final ImmutableMap<Class<? extends Message>, String> names;
+    private final ImmutableMap<GroupedTable, String> groupedNames;
     private final Map<SpecKey, JdbcTableSpec<?, ?>> tables = new ConcurrentHashMap<>();
 
     private final ImmutableMap<Class<? extends Message>, JdbcColumnMapping> columnMappings;
@@ -67,6 +70,7 @@ public final class TableSpecs {
      */
     private TableSpecs(Builder builder) {
         this.names = ImmutableMap.copyOf(builder.names);
+        this.groupedNames = ImmutableMap.copyOf(builder.groupedNames);
         this.columnMappings = ImmutableMap.copyOf(builder.mappings);
     }
 
@@ -88,12 +92,15 @@ public final class TableSpecs {
      * was specified, a {@linkplain io.spine.server.storage.jdbc.record.TableNames#of(Class)
      * default one} is used.
      *
-     * <p>The tables of grouped storages are always named after
-     * the {@linkplain io.spine.server.storage.jdbc.record.TableNames#of(Class, StorageGroup)
-     * group and the record type}. Custom table names do not apply to them:
+     * <p>The tables of grouped storages take the custom names registered with
+     * {@link Builder#setTableName(Class, Class, String)}, addressed by the group
+     * and the record type. The single-type custom names do not apply to them:
      * the event journals of all entity types share one source type, {@code Event},
      * and the state history of an entity shares its source type with
-     * the latest-state storage, so a custom name would collide the tables.
+     * the latest-state storage, so such a name would collide the tables.
+     * In case no custom name is registered for a grouped table, it is named after
+     * the {@linkplain io.spine.server.storage.jdbc.record.TableNames#of(Class, StorageGroup)
+     * group and the record type}.
      *
      * <p>If no custom column mapping was set previously,
      * the default mapping passed to this method is used.
@@ -123,7 +130,7 @@ public final class TableSpecs {
     newTableSpec(RecordSpec<I, R> spec,
                  @Nullable StorageGroup group,
                  JdbcColumnMapping defaultMapping) {
-        @Nullable JdbcColumnMapping customMapping = findMapping(spec.sourceType());
+        var customMapping = findMapping(spec.sourceType());
         var mapping = customMapping == null
                       ? defaultMapping
                       : customMapping;
@@ -133,9 +140,12 @@ public final class TableSpecs {
 
     private String tableName(RecordSpec<?, ?> spec, @Nullable StorageGroup group) {
         if (group != null) {
-            return TableNames.of(spec.recordType(), group);
+            var customName = groupedNames.get(new GroupedTable(group.getName(), spec.recordType()));
+            return customName == null
+                   ? TableNames.of(spec.recordType(), group)
+                   : customName;
         }
-        @Nullable String customName = findName(spec.sourceType());
+        var customName = findName(spec.sourceType());
         return customName == null
                ? TableNames.of(spec.sourceType())
                : customName;
@@ -163,8 +173,26 @@ public final class TableSpecs {
         }
     }
 
+    /**
+     * The identity of a grouped table, as addressed by the custom-name registration:
+     * the name of the storage group, and the type of the stored records.
+     *
+     * @param group
+     *         the name of the storage group
+     * @param recordType
+     *         the type of the stored records
+     */
+    private record GroupedTable(String group, Class<? extends Message> recordType) {
+
+        private static GroupedTable of(Class<? extends EntityState<?>> stateType,
+                                       Class<? extends Message> recordType) {
+            var groupName = TypeName.of(stateType).value();
+            return new GroupedTable(groupName, recordType);
+        }
+    }
+
     private @Nullable String findName(Class<? extends Message> sourceType) {
-        @Nullable String customName = null;
+        String customName = null;
         if (names.containsKey(sourceType)) {
             customName = names.get(sourceType);
         }
@@ -172,7 +200,7 @@ public final class TableSpecs {
     }
 
     private @Nullable JdbcColumnMapping findMapping(Class<? extends Message> sourceType) {
-        @Nullable JdbcColumnMapping value = null;
+        JdbcColumnMapping value = null;
         if (columnMappings.containsKey(sourceType)) {
             value = columnMappings.get(sourceType);
         }
@@ -192,6 +220,8 @@ public final class TableSpecs {
     public static final class Builder {
 
         private final Map<Class<? extends Message>, String> names = new HashMap<>();
+
+        private final Map<GroupedTable, String> groupedNames = new HashMap<>();
 
         private final Map<Class<? extends Message>, JdbcColumnMapping> mappings = new HashMap<>();
 
@@ -223,6 +253,40 @@ public final class TableSpecs {
             checkNotNull(recordType);
             checkNotEmptyOrBlank(name);
             this.names.put(recordType, name);
+            return this;
+        }
+
+        /**
+         * Sets the custom DB table name for the grouped table which serves the entities
+         * with the specified state type, storing the records of the specified type.
+         *
+         * <p>The grouped table is addressed by the storage group — named by the framework
+         * after the entity state type — paired with the type of the stored records.
+         *
+         * <p>The name previously set for the same grouped table, if any,
+         * is replaced with this call.
+         *
+         * <p>The name cannot be blank.
+         *
+         * @param stateType
+         *         the type of the state of the entity served by the grouped storage
+         * @param recordType
+         *         the type of the records stored by the grouped storage
+         * @param name
+         *         the table name
+         * @param <S>
+         *         the type of the entity state
+         * @param <R>
+         *         the type of the stored record
+         * @return this instance of {@code Builder}
+         */
+        @CanIgnoreReturnValue
+        public <S extends EntityState<?>, R extends Message>
+        Builder setTableName(Class<S> stateType, Class<R> recordType, String name) {
+            checkNotNull(stateType);
+            checkNotNull(recordType);
+            checkNotEmptyOrBlank(name);
+            this.groupedNames.put(GroupedTable.of(stateType, recordType), name);
             return this;
         }
 

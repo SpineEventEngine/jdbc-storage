@@ -67,6 +67,8 @@ Grouped tables have the same structure as the ungrouped ones: the `ID` and `byte
 columns, plus the columns declared for the stored record type — for both histories,
 these are `entity_id`, `created`, and `version`.
 
+A grouped table can also be given a custom name; see [Customization](#customization).
+
 :warning: Group names are the fully-qualified names of Proto types, so the names
 of grouped tables run longer than the ungrouped ones. Mind the identifier length
 limits of the underlying DB engine — e.g., 64 characters on MySQL —
@@ -146,11 +148,24 @@ var factory = JdbcStorageFactory.newBuilder()
         .build();
 ```
 
-:warning: Custom table names apply only to the storages outside any `StorageGroup`.
-The [grouped tables](#grouped-tables) — such as the per-entity histories — are always
-named after the group and the record type. A custom name set for an entity state type
-names the latest-state table alone; honoring it for the state history of the same
-entity would collide the two tables.
+:warning: The single-type `setTableName(...)` applies only to the storages outside any
+`StorageGroup`: a name set for an entity state type names the latest-state table alone;
+honoring it for the state history of the same entity would collide the two tables.
+
+To name the [grouped tables](#grouped-tables) of an entity — its per-entity histories —
+address them by the entity state type paired with the type of the stored records:
+
+```java
+var factory = JdbcStorageFactory.newBuilder()
+        // ...
+
+        // The event journal of the `Project` entities:
+        .setTableName(Project.class, Event.class, "project_journal")
+
+        // The state history of the `Project` entities:
+        .setTableName(Project.class, EntityRecord.class, "project_state_history")
+        .build();
+```
 
 * column type mapping, per type of stored records:
 

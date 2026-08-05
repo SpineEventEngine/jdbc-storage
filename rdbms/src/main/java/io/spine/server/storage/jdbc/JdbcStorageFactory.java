@@ -216,9 +216,10 @@ public class JdbcStorageFactory implements StorageFactory {
      *
      * <p>For the storages belonging to no group, the
      * {@linkplain Builder#setTableName(Class, String) custom table name} is applied as well.
-     * The tables of grouped storages are always named after the group and the record type;
-     * see {@link io.spine.server.storage.jdbc.record.TableNames#of(Class, StorageGroup)
-     * TableNames.of(Class, StorageGroup)}.
+     * The tables of grouped storages take the custom names registered with
+     * {@link Builder#setTableName(Class, Class, String)}; without one, they are named
+     * after the {@linkplain io.spine.server.storage.jdbc.record.TableNames#of(Class,
+     * StorageGroup) group and the record type}.
      *
      * @param spec
      *         record specification
@@ -344,10 +345,10 @@ public class JdbcStorageFactory implements StorageFactory {
          * is used.
          *
          * <p>The custom name applies only to the storages belonging to no
-         * {@link io.spine.server.storage.StorageGroup StorageGroup}. The tables of grouped
-         * storages — such as the per-entity histories — are always named after the group
-         * and the record type; a custom name set for an entity state type names
-         * the latest-state table alone, never the history tables of that entity.
+         * {@link io.spine.server.storage.StorageGroup StorageGroup}. A custom name set
+         * for an entity state type names the latest-state table alone, never the history
+         * tables of that entity; use {@link #setTableName(Class, Class, String)} to name
+         * the grouped tables.
          *
          * @param recordType
          *         the type of the stored record — for an Entity, its state type
@@ -361,6 +362,54 @@ public class JdbcStorageFactory implements StorageFactory {
         public <R extends Message>
         Builder setTableName(Class<R> recordType, String name) {
             tableSpecs.setTableName(recordType, name);
+            return this;
+        }
+
+        /**
+         * Sets the custom DB table name for the table of a
+         * {@linkplain io.spine.server.storage.StorageGroup grouped} storage serving
+         * the entities with the specified state type — such as a per-entity history.
+         *
+         * <p>A grouped table is addressed by the storage group — named by the framework
+         * after the entity state type — paired with the type of the stored records.
+         * For instance, for the entities with the {@code Project} state:
+         *
+         * <pre>
+         * // The event journal of the `Project` entities:
+         * builder.setTableName(Project.class, Event.class, "project_journal");
+         *
+         * // The state history of the `Project` entities:
+         * builder.setTableName(Project.class, EntityRecord.class, "project_state_history");
+         * </pre>
+         *
+         * <p>The name previously set for the same grouped table, if any,
+         * is replaced with this call.
+         *
+         * <p>The name cannot be blank.
+         *
+         * <p>In case no custom name is defined, a grouped table is
+         * {@linkplain io.spine.server.storage.jdbc.record.TableNames#of(Class, StorageGroup)
+         * named after the group and the record type}.
+         *
+         * <p>It is a responsibility of callers to select a name which does not collide
+         * with the names of other tables, including the generated ones.
+         *
+         * @param stateType
+         *         the type of the state of the entity served by the grouped storage
+         * @param recordType
+         *         the type of the records stored by the grouped storage
+         * @param name
+         *         the table name
+         * @param <S>
+         *         the type of the entity state
+         * @param <R>
+         *         the type of the stored record
+         * @return this instance of {@code Builder}
+         */
+        @CanIgnoreReturnValue
+        public <S extends EntityState<?>, R extends Message>
+        Builder setTableName(Class<S> stateType, Class<R> recordType, String name) {
+            tableSpecs.setTableName(stateType, recordType, name);
             return this;
         }
 

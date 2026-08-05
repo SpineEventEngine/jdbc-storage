@@ -36,9 +36,13 @@ Substantive half (this change):
   (e.g. `spine_test_storage_StgProject_Event`). Naming settled with
   the product owner on 2026-08-04 (generic rule over semantic suffixes).
 - `TableSpecs`: cache keyed by `SpecKey(sourceType, recordType, groupName)`
-  in a `ConcurrentHashMap` (`computeIfAbsent`). Grouped specs ignore custom
-  table names (registered per record type — cannot discriminate groups);
-  custom column mappings still apply.
+  in a `ConcurrentHashMap` (`computeIfAbsent`). Custom names and mappings are
+  looked up by the *source* type (Codex review of #181: for an entity, that is
+  the state type users register — `recordType()` is `EntityRecord`; the miss
+  predates the branch, present since CoreJvm `.380`). Grouped tables take
+  custom names via the `setTableName(stateType, recordType, name)` overload,
+  keyed by `(group name, record type)`; the single-type names never apply to
+  them. Custom mappings (source-type-keyed) serve grouped tables too.
 - `JdbcStorageFactory.createRecordStorage` threads the group into
   `JdbcRecordStorage`; new `tableSpecFor(spec, group)` overload.
 - `JdbcRecordStorage`: group-accepting constructors; legacy ones delegate
@@ -54,7 +58,6 @@ contract), `JdbcEntityEventStorageSpec`, `JdbcEntityStateHistoryStorageSpec`
 
 ## Follow-ups (out of scope)
 
-- Group-aware `setTableName` overload, if users ask for custom history names.
 - Grouped-DDL export via `tableCreationSql` (currently latest-state only).
 
 ## Status
