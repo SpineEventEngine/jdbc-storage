@@ -1,0 +1,33 @@
+$dokka.format:javadoc-v1
+$dokka.linkExtension:html
+$dokka.location:io.spine.server.storage.jdbc.query/AbstractQuery.Builder///PointingToDeclaration/io/spine/server/storage/jdbc/query/AbstractQuery.Builder.html
+$dokka.location:io.spine.server.storage.jdbc.query/ContainsQuery.Builder///PointingToDeclaration/io/spine/server/storage/jdbc/query/ContainsQuery.Builder.html
+$dokka.location:io.spine.server.storage.jdbc.query/DeleteMultipleRecordsQuery.Builder///PointingToDeclaration/io/spine/server/storage/jdbc/query/DeleteMultipleRecordsQuery.Builder.html
+$dokka.location:io.spine.server.storage.jdbc.query/DeleteRecordQuery.Builder///PointingToDeclaration/io/spine/server/storage/jdbc/query/DeleteRecordQuery.Builder.html
+$dokka.location:io.spine.server.storage.jdbc.query/InsertMultipleQuery.Builder///PointingToDeclaration/io/spine/server/storage/jdbc/query/InsertMultipleQuery.Builder.html
+$dokka.location:io.spine.server.storage.jdbc.query/InsertOneQuery.Builder///PointingToDeclaration/io/spine/server/storage/jdbc/query/InsertOneQuery.Builder.html
+$dokka.location:io.spine.server.storage.jdbc.query/MySqlUpsertOneQuery.Builder///PointingToDeclaration/io/spine/server/storage/jdbc/query/MySqlUpsertOneQuery.Builder.html
+$dokka.location:io.spine.server.storage.jdbc.query/ReadByIdQuery.Builder///PointingToDeclaration/io/spine/server/storage/jdbc/query/ReadByIdQuery.Builder.html
+$dokka.location:io.spine.server.storage.jdbc.query/SelectMessageByIdQuery.Builder///PointingToDeclaration/io/spine/server/storage/jdbc/query/SelectMessageByIdQuery.Builder.html
+$dokka.location:io.spine.server.storage.jdbc.query/SelectMessagesByQuery.Builder///PointingToDeclaration/io/spine/server/storage/jdbc/query/SelectMessagesByQuery.Builder.html
+$dokka.location:io.spine.server.storage.jdbc.query/SelectMultipleByIds.Builder///PointingToDeclaration/io/spine/server/storage/jdbc/query/SelectMultipleByIds.Builder.html
+$dokka.location:io.spine.server.storage.jdbc.query/TableIndexQuery.Builder///PointingToDeclaration/io/spine/server/storage/jdbc/query/TableIndexQuery.Builder.html
+$dokka.location:io.spine.server.storage.jdbc.query/UpdateMultipleQuery.Builder///PointingToDeclaration/io/spine/server/storage/jdbc/query/UpdateMultipleQuery.Builder.html
+$dokka.location:io.spine.server.storage.jdbc.query/UpdateOneQuery.Builder///PointingToDeclaration/io/spine/server/storage/jdbc/query/UpdateOneQuery.Builder.html
+$dokka.location:io.spine.server.storage.jdbc.query/WriteOneQuery.Builder///PointingToDeclaration/io/spine/server/storage/jdbc/query/WriteOneQuery.Builder.html
+$dokka.location:io.spine.server.storage.jdbc/DataSourceConfig.Builder///PointingToDeclaration/io/spine/server/storage/jdbc/DataSourceConfig.Builder.html
+$dokka.location:io.spine.server.storage.jdbc/JdbcStorageFactory.Builder///PointingToDeclaration/io/spine/server/storage/jdbc/JdbcStorageFactory.Builder.html
+$dokka.location:io.spine.server.storage.jdbc/Sql.BuildingBlock///PointingToDeclaration/io/spine/server/storage/jdbc/Sql.BuildingBlock.html
+$dokka.location:io.spine.server.storage.jdbc/Sql.Function///PointingToDeclaration/io/spine/server/storage/jdbc/Sql.Function.html
+$dokka.location:io.spine.server.storage.jdbc/Sql.Query///PointingToDeclaration/io/spine/server/storage/jdbc/Sql.Query.html
+io.spine.server.storage.jdbc
+io.spine.server.storage.jdbc.config
+io.spine.server.storage.jdbc.delivery
+io.spine.server.storage.jdbc.engine
+io.spine.server.storage.jdbc.operation
+io.spine.server.storage.jdbc.operation.mysql
+io.spine.server.storage.jdbc.query
+io.spine.server.storage.jdbc.query.reader
+io.spine.server.storage.jdbc.record
+io.spine.server.storage.jdbc.record.column
+io.spine.server.storage.jdbc.type
