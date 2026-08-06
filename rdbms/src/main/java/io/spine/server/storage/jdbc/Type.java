@@ -1,11 +1,11 @@
 /*
- * Copyright 2023, TeamDev. All rights reserved.
+ * Copyright 2026, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * https://www.apache.org/licenses/LICENSE-2.0
  *
  * Redistribution and use in source and/or binary forms, with or without
  * modification, must retain the above copyright notice and the following
@@ -61,19 +61,19 @@ public enum Type {
     DOUBLE,
 
     /**
-     * The type representing a {@code String}, maximum length of which
+     * The type representing a {@code String}, the maximum length of which
      * doesn't exceed 255 characters.
      */
     STRING_255,
 
     /**
-     * The type representing a {@code String}, maximum length of which
+     * The type representing a {@code String}, the maximum length of which
      * doesn't exceed 512 characters.
      */
     STRING_512,
 
     /**
-     * The type representing a {@code String}, maximum length of which is unknown.
+     * The type representing a {@code String}, the maximum length of which is unknown.
      */
     STRING,
 

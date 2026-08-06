@@ -28,7 +28,7 @@ package io.spine.server.storage.jdbc.mysql;
 
 import io.spine.environment.Tests;
 import io.spine.server.ServerEnvironment;
-import io.spine.server.storage.RecordStorageDelegateTest;
+import io.spine.server.storage.DelegatingRecordStorageTest;
 import io.spine.testing.SlowTest;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,7 +37,7 @@ import org.junit.jupiter.api.DisplayName;
 @DisplayName("`JdbcRecordStorage` running on top of MySQL instance should")
 @SlowTest
 @EnableConditionally
-class MysqlRecordStorageTest extends RecordStorageDelegateTest {
+class MysqlRecordStorageTest extends DelegatingRecordStorageTest {
 
     @BeforeEach
     @Override

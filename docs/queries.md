@@ -4,25 +4,25 @@
 
 ## Defaults
 
-All operations against RDBMS tables which this library holds,
-are created through `OperationFactory`. List of operations is available
-via `io.spine.server.storage.jdbc.operation` package.
+All operations against RDBMS tables that this library holds
+are created through `OperationFactory`. The list of operations is available
+via the `io.spine.server.storage.jdbc.operation` package.
 
 Each operation creates a corresponding query. Their default implementations are available
-in `io.spine.server.storage.jdbc.query` package. Most of the queries use a vanilla SQL syntax
+in the `io.spine.server.storage.jdbc.query` package. Most of the queries use a vanilla SQL syntax
 compatible with the majority of modern RDBMS engines. However, in its generic form,
-`WriteOne` operation executes two queries: one to understand whether the record already exists,
+the `WriteOne` operation executes two queries: one to understand whether the record already exists,
 and the second one to either `INSERT` or `UPDATE` the record by its ID.
 
-Special support is provided for queries targeting MySQL. In particular, when MySQL engine
-is detected from the provided data source, `WriteOne` is substituted by `MySqlWriteOne` operation,
-which in turn utilizes an `INSERT ... ON DUPLICATE KEY UPDATE` syntax specific to this engine.
-It allows to significantly enhance the performance for most typical scenarios, such as updating
-an Entity state.
+Special support is provided for queries targeting MySQL. In particular, when the MySQL engine
+is detected from the provided data source, `WriteOne` is substituted by the `MySqlWriteOne`
+operation, which in turn utilizes an `INSERT ... ON DUPLICATE KEY UPDATE` syntax specific
+to this engine. It allows significantly enhancing the performance for most typical scenarios,
+such as updating an Entity state.
 
 ## RDBMS engine detection
 
-By default, RDBMS engine is detected from the predefined list of engines.
+By default, the RDBMS engine is detected from the predefined list of engines.
 See `io.spine.server.storage.jdbc.engine.PredefinedEngine` for more detail.
 
 It is also possible to customize the engine, see more on that below.

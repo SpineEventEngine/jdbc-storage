@@ -1,7 +1,7 @@
 # SQL type mapping
 
 The framework provides a `TypeMapping` to configure the SQL types, which fit the target storage.
-The mapping defines correspondence of `Type` to a name for a particular database.
+The mapping defines the correspondence of `Type` to a name for a particular database.
 `Type` is an abstraction for a data type in a database.
 
 The type mapping is selected automatically based on the database product name and version,
@@ -78,7 +78,7 @@ ALTER TABLE `<table>` MODIFY `ID` VARCHAR(512) CHARACTER SET utf8mb4 COLLATE utf
 
 If the automatically selected mapping doesn't match your requirements, a custom mapping can be
 specified during creation of `JdbcStorageFactory`.
-The library exposes `TypeMappingBuilder.mappingBuilder()` shortcut, returning a builder
+The library exposes the `TypeMappingBuilder.mappingBuilder()` shortcut, returning a builder
 already containing default names for all data types.
 The designed usage scenario is to override the values for required keys:
 

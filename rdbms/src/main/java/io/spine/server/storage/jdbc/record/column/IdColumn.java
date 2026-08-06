@@ -1,11 +1,11 @@
 /*
- * Copyright 2023, TeamDev. All rights reserved.
+ * Copyright 2026, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * https://www.apache.org/licenses/LICENSE-2.0
  *
  * Redistribution and use in source and/or binary forms, with or without
  * modification, must retain the above copyright notice and the following
@@ -116,7 +116,7 @@ public abstract class IdColumn<I> {
      * for storing. E.g. it may be useful to store a {@linkplain Message Protobuf Message}
      * in a JSON representation as a {@code String}.
      *
-     * <p>If an ID type is a simple type as {@code String}, {@code Integer}, etc.
+     * <p>If an ID type is a simple type as {@code String}, {@code Integer}, etc.,
      * the method may return the same value.
      *
      * @param id

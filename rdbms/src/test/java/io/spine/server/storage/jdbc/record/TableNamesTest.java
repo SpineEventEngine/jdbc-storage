@@ -1,11 +1,11 @@
 /*
- * Copyright 2023, TeamDev. All rights reserved.
+ * Copyright 2026, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * https://www.apache.org/licenses/LICENSE-2.0
  *
  * Redistribution and use in source and/or binary forms, with or without
  * modification, must retain the above copyright notice and the following
@@ -26,7 +26,10 @@
 
 package io.spine.server.storage.jdbc.record;
 
+import com.google.common.testing.NullPointerTester;
 import com.google.common.testing.NullPointerTester.Visibility;
+import io.spine.core.Event;
+import io.spine.server.storage.StorageGroup;
 import io.spine.test.storage.StgProject;
 import io.spine.testing.UtilityClassTest;
 import org.junit.jupiter.api.DisplayName;
@@ -42,6 +45,12 @@ final class TableNamesTest extends UtilityClassTest<TableNames> {
         super(TableNames.class, Visibility.PACKAGE);
     }
 
+    @Override
+    protected void configure(NullPointerTester tester) {
+        super.configure(tester);
+        tester.setDefault(StorageGroup.class, new StorageGroup("spine.test.storage.StgProject"));
+    }
+
     @Test
     @DisplayName("produce same name for same class")
     void produceSameForSameClass() {
@@ -54,5 +63,14 @@ final class TableNamesTest extends UtilityClassTest<TableNames> {
         var actual = TableNames.of(StgProject.class);
         assertThat(actual).
                 isEqualTo("spine_test_storage_StgProject");
+    }
+
+    @Test
+    @DisplayName("compose the name of a grouped table from the group and the record type")
+    void composeGroupedName() {
+        var group = new StorageGroup("spine.test.storage.StgProject");
+        var actual = TableNames.of(Event.class, group);
+        assertThat(actual)
+                .isEqualTo("spine_test_storage_StgProject_Event");
     }
 }

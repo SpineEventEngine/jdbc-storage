@@ -1,11 +1,11 @@
 /*
- * Copyright 2023, TeamDev. All rights reserved.
+ * Copyright 2026, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * https://www.apache.org/licenses/LICENSE-2.0
  *
  * Redistribution and use in source and/or binary forms, with or without
  * modification, must retain the above copyright notice and the following
@@ -39,6 +39,7 @@ import io.spine.server.entity.storage.SpecScanner;
 import io.spine.server.storage.RecordSpec;
 import io.spine.server.storage.RecordStorage;
 import io.spine.server.storage.StorageFactory;
+import io.spine.server.storage.StorageGroup;
 import io.spine.server.storage.jdbc.config.CreateOperationFactory;
 import io.spine.server.storage.jdbc.config.TableSpecs;
 import io.spine.server.storage.jdbc.delivery.JdbcSessionStorage;
@@ -46,6 +47,7 @@ import io.spine.server.storage.jdbc.operation.OperationFactory;
 import io.spine.server.storage.jdbc.record.JdbcRecordStorage;
 import io.spine.server.storage.jdbc.record.JdbcTableSpec;
 import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
+import org.jspecify.annotations.Nullable;
 
 import javax.sql.DataSource;
 
@@ -76,10 +78,19 @@ public class JdbcStorageFactory implements StorageFactory {
     /**
      * Creates a new storage for records.
      *
+     * <p>The records are stored in an RDBMS table, the identity of which is composed
+     * of the passed record specification and the group. In particular, the storages
+     * belonging to distinct groups are allocated their own tables, even if they store
+     * records of the same type.
+     *
      * @param context
      *         the bounded context within which the storage is being configured
      * @param spec
      *         the record specification for the stored record
+     * @param group
+     *         the group telling this storage apart from the other storages
+     *         holding records of the same type,
+     *         or {@code null} if the storage belongs to no particular group
      * @param <I>
      *         type of the record identifiers
      * @param <R>
@@ -88,13 +99,13 @@ public class JdbcStorageFactory implements StorageFactory {
      */
     @Override
     public <I, R extends Message> RecordStorage<I, R>
-    createRecordStorage(ContextSpec context, RecordSpec<I, R> spec) {
-        var result = new JdbcRecordStorage<>(context, spec, this);
+    createRecordStorage(ContextSpec context, RecordSpec<I, R> spec, @Nullable StorageGroup group) {
+        var result = new JdbcRecordStorage<>(context, spec, this, group);
         return result;
     }
 
     /**
-     * Returns an SQL statement which would allow to manually create an RDBMS table
+     * Returns an SQL statement that would allow manually creating an RDBMS table
      * corresponding to some Entity registered in a certain Bounded Context.
      *
      * @param contextSpec
@@ -140,7 +151,7 @@ public class JdbcStorageFactory implements StorageFactory {
     }
 
     /**
-     * Closes used {@link DataSourceWrapper}.
+     * Closes the used {@link DataSourceWrapper}.
      */
     @Override
     public void close() {
@@ -177,7 +188,8 @@ public class JdbcStorageFactory implements StorageFactory {
     }
 
     /**
-     * Returns the DB table specification for the passed record specification.
+     * Returns the DB table specification for the passed record specification,
+     * for a storage belonging to no {@link StorageGroup}.
      *
      * <p>Takes into account the {@linkplain Builder#setCustomMapping(Class, JdbcColumnMapping)
      * custom mapping} and the {@linkplain Builder#setTableName(Class, String) custom table name}
@@ -189,10 +201,39 @@ public class JdbcStorageFactory implements StorageFactory {
      *         type of the identifiers of the described record
      * @param <R>
      *         type of the described record
-     * @return a new instance of table specification
+     * @return the table specification
      */
     public <I, R extends Message> JdbcTableSpec<I, R> tableSpecFor(RecordSpec<I, R> spec) {
-        var tableSpec = tableSpecs.specFor(spec, columnMapping);
+        return tableSpecFor(spec, null);
+    }
+
+    /**
+     * Returns the DB table specification for the passed record specification
+     * and the storage group.
+     *
+     * <p>Takes into account the {@linkplain Builder#setCustomMapping(Class, JdbcColumnMapping)
+     * custom mapping} set for the records of target type.
+     *
+     * <p>For the storages belonging to no group, the
+     * {@linkplain Builder#setTableName(Class, String) custom table name} is applied as well.
+     * The tables of grouped storages take the custom names registered with
+     * {@link Builder#setTableName(Class, Class, String)}; without one, they are named
+     * after the {@linkplain io.spine.server.storage.jdbc.record.TableNames#of(Class,
+     * StorageGroup) group and the record type}.
+     *
+     * @param spec
+     *         record specification
+     * @param group
+     *         the group to which the storage belongs, or {@code null} if it belongs to none
+     * @param <I>
+     *         type of the identifiers of the described record
+     * @param <R>
+     *         type of the described record
+     * @return the table specification
+     */
+    public <I, R extends Message> JdbcTableSpec<I, R>
+    tableSpecFor(RecordSpec<I, R> spec, @Nullable StorageGroup group) {
+        var tableSpec = tableSpecs.specFor(spec, group, columnMapping);
         return tableSpec;
     }
 
@@ -238,7 +279,7 @@ public class JdbcStorageFactory implements StorageFactory {
         }
 
         /**
-         * Sets required field {@code dataSource}.
+         * Sets the required field {@code dataSource}.
          */
         public Builder setDataSource(DataSourceWrapper dataSource) {
             this.dataSource = dataSource;
@@ -246,7 +287,7 @@ public class JdbcStorageFactory implements StorageFactory {
         }
 
         /**
-         * Sets required field {@code dataSource} from the wrapped {@link DataSource}.
+         * Sets the required field {@code dataSource} from the wrapped {@link DataSource}.
          *
          * @see DataSourceWrapper#wrap(DataSource)
          */
@@ -274,7 +315,7 @@ public class JdbcStorageFactory implements StorageFactory {
          * to build a custom mapping.
          *
          * <p>If the mapping was not specified, it is
-         * {@linkplain PredefinedMapping#select(DataSourceWrapper) selected} basing on
+         * {@linkplain PredefinedMapping#select(DataSourceWrapper) selected} based on
          * the {@linkplain java.sql.DatabaseMetaData#getDatabaseProductName() database product name}
          * and the database version.
          *
@@ -292,6 +333,9 @@ public class JdbcStorageFactory implements StorageFactory {
         /**
          * Sets the custom DB table name for the table storing the records of the specified type.
          *
+         * <p>For an Entity, pass the type of its state; for a standalone stored record,
+         * such as {@code InboxMessage}, the type of the record itself.
+         *
          * <p>The name previously set, if any, is replaced with this call.
          *
          * <p>The name cannot be blank.
@@ -300,8 +344,14 @@ public class JdbcStorageFactory implements StorageFactory {
          * a {@linkplain io.spine.server.storage.jdbc.record.TableNames#of(Class) default name}
          * is used.
          *
+         * <p>The custom name applies only to the storages belonging to no
+         * {@link io.spine.server.storage.StorageGroup StorageGroup}. A custom name set
+         * for an entity state type names the latest-state table alone, never the history
+         * tables of that entity; use {@link #setTableName(Class, Class, String)} to name
+         * the grouped tables.
+         *
          * @param recordType
-         *         the type of the stored record
+         *         the type of the stored record — for an Entity, its state type
          * @param name
          *         the table name
          * @param <R>
@@ -316,15 +366,71 @@ public class JdbcStorageFactory implements StorageFactory {
         }
 
         /**
+         * Sets the custom DB table name for the table of a
+         * {@linkplain io.spine.server.storage.StorageGroup grouped} storage serving
+         * the entities with the specified state type — such as a per-entity history.
+         *
+         * <p>A grouped table is addressed by the storage group — named by the framework
+         * after the entity state type — paired with the type of the stored records.
+         * For instance, for the entities with the {@code Project} state:
+         *
+         * <pre>
+         * // The event journal of the `Project` entities:
+         * builder.setTableName(Project.class, Event.class, "project_journal");
+         *
+         * // The state history of the `Project` entities:
+         * builder.setTableName(Project.class, EntityRecord.class, "project_state_history");
+         * </pre>
+         *
+         * <p>The name previously set for the same grouped table, if any,
+         * is replaced with this call.
+         *
+         * <p>The name cannot be blank.
+         *
+         * <p>In case no custom name is defined, a grouped table is
+         * {@linkplain io.spine.server.storage.jdbc.record.TableNames#of(Class, StorageGroup)
+         * named after the group and the record type}.
+         *
+         * <p>It is a responsibility of callers to select a name that does not collide
+         * with the names of other tables, including the generated ones.
+         *
+         * @param stateType
+         *         the type of the state of the entity served by the grouped storage
+         * @param recordType
+         *         the type of the records stored by the grouped storage
+         * @param name
+         *         the table name
+         * @param <S>
+         *         the type of the entity state
+         * @param <R>
+         *         the type of the stored record
+         * @return this instance of {@code Builder}
+         */
+        @CanIgnoreReturnValue
+        public <S extends EntityState<?>, R extends Message>
+        Builder setTableName(Class<S> stateType, Class<R> recordType, String name) {
+            tableSpecs.setTableName(stateType, recordType, name);
+            return this;
+        }
+
+        /**
          * Sets the custom column mapping for the table storing the records of the specified type.
+         *
+         * <p>For an Entity, pass the type of its state; for a standalone stored record,
+         * such as {@code InboxMessage}, the type of the record itself.
          *
          * <p>The mapping previously set, if any, is replaced with this call.
          *
          * <p>In case no custom mapping is defined for some table,
-         * a {@linkplain #setColumnMapping(JdbcColumnMapping) a factory-wide value} is used.
+         * {@linkplain #setColumnMapping(JdbcColumnMapping) a factory-wide value} is used.
+         *
+         * <p>Unlike a {@linkplain #setTableName(Class, String) custom table name},
+         * a custom mapping set for an entity state type also applies to the tables of
+         * the {@linkplain io.spine.server.storage.StorageGroup grouped} storages serving
+         * that entity, such as its state history.
          *
          * @param recordType
-         *         the type of the stored record
+         *         the type of the stored record — for an Entity, its state type
          * @param mapping
          *         the custom mapping
          * @param <R>

@@ -1,11 +1,11 @@
 /*
- * Copyright 2023, TeamDev. All rights reserved.
+ * Copyright 2026, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * https://www.apache.org/licenses/LICENSE-2.0
  *
  * Redistribution and use in source and/or binary forms, with or without
  * modification, must retain the above copyright notice and the following
@@ -50,7 +50,7 @@ import static com.querydsl.core.types.dsl.Expressions.comparablePath;
 import static io.spine.util.Exceptions.newIllegalArgumentException;
 
 /**
- * A utility methods to work with {@linkplain Predicate predicates}.
+ * Utility methods to work with {@linkplain Predicate predicates}.
  */
 public final class QueryPredicates {
 
@@ -64,7 +64,7 @@ public final class QueryPredicates {
      * <p>If there are no IDs, the resulting predicate will return {@code true} always.
      *
      * @param column
-     *         the {@link IdColumn} describing ID to match against
+     *         the {@link IdColumn} describing the ID to match against
      * @param ids
      *         the IDs to match
      * @param <I>
@@ -90,18 +90,12 @@ public final class QueryPredicates {
                                 ComparablePath<Comparable> columnPath) {
         checkNotNull(operator);
         checkNotNull(columnPath);
-        switch (operator) {
-            case EQUALS:
-                return columnPath.isNull();
-            case GREATER_THAN:
-            case LESS_THAN:
-            case GREATER_OR_EQUALS:
-            case LESS_OR_EQUALS:
-                throw newIllegalArgumentException(
-                        "Operator %s not supported for the null filter value.", operator);
-            default:
-                throw newIllegalArgumentException("Unexpected filter operator %s.", operator);
-        }
+        return switch (operator) {
+            case EQUALS -> columnPath.isNull();
+            case GREATER_THAN, LESS_THAN, GREATER_OR_EQUALS, LESS_OR_EQUALS ->
+                    throw newIllegalArgumentException(
+                            "Operator %s not supported for the null filter value.", operator);
+        };
     }
 
     @VisibleForTesting
@@ -112,23 +106,19 @@ public final class QueryPredicates {
         checkNotNull(columnPath);
         checkNotNull(operator);
         checkNotNull(columnValue);
-        switch (operator) {
-            case EQUALS:
-                return columnPath.eq(columnValue);
-            case GREATER_THAN:
-                return columnPath.gt(columnValue);
-            case LESS_THAN:
-                return columnPath.lt(columnValue);
-            case GREATER_OR_EQUALS:
-                return columnPath.goe(columnValue);
-            case LESS_OR_EQUALS:
-                return columnPath.loe(columnValue);
-            default:
-                throw newIllegalArgumentException("Unexpected operator %s.", operator);
-        }
+        return switch (operator) {
+            case EQUALS -> columnPath.eq(columnValue);
+            case GREATER_THAN -> columnPath.gt(columnValue);
+            case LESS_THAN -> columnPath.lt(columnValue);
+            case GREATER_OR_EQUALS -> columnPath.goe(columnValue);
+            case LESS_OR_EQUALS -> columnPath.loe(columnValue);
+        };
     }
 
-    @SuppressWarnings("rawtypes")   /* To avoid the hell in generics. */
+    @SuppressWarnings({
+            "rawtypes"  /* To avoid the hell in generics. */,
+            "ConstantValue" /* `convertedValue` could be `null`. */
+    })
     private static Predicate
     matchParameter(SubjectParameter<?, ?, ?> parameter, JdbcColumnMapping columnMapping) {
         var column = parameter.column();

@@ -1,11 +1,11 @@
 /*
- * Copyright 2023, TeamDev. All rights reserved.
+ * Copyright 2026, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * https://www.apache.org/licenses/LICENSE-2.0
  *
  * Redistribution and use in source and/or binary forms, with or without
  * modification, must retain the above copyright notice and the following
@@ -26,7 +26,7 @@
 
 package io.spine.server.storage.jdbc;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -281,8 +281,8 @@ public final class DataSourceConfig {
          * {@code driverClassName} property, but try it first without.
          *
          * <p><b>NOTE:</b> if this property is used, you may still use {@link DataSource} properties
-         * to configure your driver and is in fact recommended over driver parameters specified in
-         * the URL itself.
+         * to configure your driver, and doing so is in fact recommended over driver parameters
+         * specified in the URL itself.
          *
          * <p>Examples of JDBC URL (HyperSQL DB):
          *
@@ -444,7 +444,7 @@ public final class DataSourceConfig {
          * <p>When a connection reaches this timeout it is retired from the pool,
          * subject to a maximum variation of +30 seconds.
          *
-         * <p>An in-use connection is never retired, only when it is closed will it is removed then.
+         * <p>An in-use connection is never retired; only when it is closed will it be removed.
          *
          * <p><b>NOTE:</b> It is strongly recommended to set this value,
          * and it should be at least 30 seconds less than any database-level connection timeout.
@@ -470,7 +470,7 @@ public final class DataSourceConfig {
         }
 
         /**
-         * If your driver supports JDBC4 it is strongly recommended <b>not setting</b>
+         * If your driver supports JDBC4 it is strongly recommended <b>not to set</b>
          * this property.
          * It is for "legacy" databases that do not support the JDBC4
          * {@link Connection#isValid(int)} API.

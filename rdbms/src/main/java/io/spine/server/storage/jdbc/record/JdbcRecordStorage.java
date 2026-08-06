@@ -1,11 +1,11 @@
 /*
- * Copyright 2023, TeamDev. All rights reserved.
+ * Copyright 2026, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * https://www.apache.org/licenses/LICENSE-2.0
  *
  * Redistribution and use in source and/or binary forms, with or without
  * modification, must retain the above copyright notice and the following
@@ -36,7 +36,9 @@ import io.spine.server.ContextSpec;
 import io.spine.server.storage.RecordSpec;
 import io.spine.server.storage.RecordStorage;
 import io.spine.server.storage.RecordWithColumns;
+import io.spine.server.storage.StorageGroup;
 import io.spine.server.storage.jdbc.JdbcStorageFactory;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Iterator;
 
@@ -57,8 +59,8 @@ public class JdbcRecordStorage<I, R extends Message> extends RecordStorage<I, R>
     private final RecordTable<I, R> table;
 
     /**
-     * Creates a new record storage, and performs the creation of RDBMS table,
-     * in case such a table does not exist.
+     * Creates a new record storage for the records belonging to no storage group,
+     * and performs the creation of an RDBMS table, in case such a table does not exist.
      *
      * @param contextSpec
      *         specification of Bounded Context, in scope of which this storage exists
@@ -74,8 +76,32 @@ public class JdbcRecordStorage<I, R extends Message> extends RecordStorage<I, R>
     }
 
     /**
-     * Creates a new record storage, and when asked, performs the creation of RDBMS table
-     * if such a table does not exist.
+     * Creates a new record storage, and performs the creation of an RDBMS table,
+     * in case such a table does not exist.
+     *
+     * <p>The passed storage group, if any, participates in the identity of the table,
+     * telling this storage apart from the other storages of records of the same type.
+     *
+     * @param contextSpec
+     *         specification of Bounded Context, in scope of which this storage exists
+     * @param recordSpec
+     *         specification of stored records
+     * @param factory
+     *         storage factory, in which scope this storage acts
+     * @param group
+     *         the group to which this storage belongs,
+     *         or {@code null} if it belongs to no group
+     */
+    public JdbcRecordStorage(ContextSpec contextSpec,
+                             RecordSpec<I, R> recordSpec,
+                             JdbcStorageFactory factory,
+                             @Nullable StorageGroup group) {
+        this(contextSpec, recordSpec, factory, group, true);
+    }
+
+    /**
+     * Creates a new record storage for the records belonging to no storage group, and
+     * when asked, performs the creation of an RDBMS table if such a table does not exist.
      *
      * <p>This constructor is internal to the framework.
      *
@@ -93,8 +119,38 @@ public class JdbcRecordStorage<I, R extends Message> extends RecordStorage<I, R>
                              RecordSpec<I, R> recordSpec,
                              JdbcStorageFactory factory,
                              boolean createTable) {
+        this(contextSpec, recordSpec, factory, null, createTable);
+    }
+
+    /**
+     * Creates a new record storage, and when asked, performs the creation of an RDBMS table
+     * if such a table does not exist.
+     *
+     * <p>The passed storage group, if any, participates in the identity of the table,
+     * telling this storage apart from the other storages of records of the same type.
+     *
+     * <p>This constructor is internal to the framework.
+     *
+     * @param contextSpec
+     *         specification of Bounded Context, in scope of which this storage exists
+     * @param recordSpec
+     *         specification of stored records
+     * @param factory
+     *         storage factory, in which scope this storage acts
+     * @param group
+     *         the group to which this storage belongs,
+     *         or {@code null} if it belongs to no group
+     * @param createTable
+     *         whether to create the RDBMS table right away
+     */
+    @Internal
+    public JdbcRecordStorage(ContextSpec contextSpec,
+                             RecordSpec<I, R> recordSpec,
+                             JdbcStorageFactory factory,
+                             @Nullable StorageGroup group,
+                             boolean createTable) {
         super(contextSpec, recordSpec);
-        var tableSpec = factory.tableSpecFor(recordSpec);
+        var tableSpec = factory.tableSpecFor(recordSpec, group);
         this.table = RecordTable.by(tableSpec, factory);
         if (createTable) {
             this.table.create();
@@ -154,7 +210,7 @@ public class JdbcRecordStorage<I, R extends Message> extends RecordStorage<I, R>
 
     @Override
     public void write(I id, R record) {
-        var spec = (RecordSpec<I, R>) recordSpec();
+        var spec = recordSpec();
         writeRecord(RecordWithColumns.create(id, record, spec));
     }
 

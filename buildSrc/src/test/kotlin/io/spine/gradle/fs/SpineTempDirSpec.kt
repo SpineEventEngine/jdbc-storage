@@ -1,11 +1,11 @@
 /*
- * Copyright 2023, TeamDev. All rights reserved.
+ * Copyright 2026, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * https://www.apache.org/licenses/LICENSE-2.0
  *
  * Redistribution and use in source and/or binary forms, with or without
  * modification, must retain the above copyright notice and the following
@@ -24,14 +24,31 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/**
- * The JDBC-based implementation of the
- * {@link io.spine.server.aggregate.AggregateStorage AggregateStorage}.
- */
-@CheckReturnValue
-@ParametersAreNonnullByDefault
-package io.spine.server.storage.jdbc.aggregate;
+package io.spine.gradle.fs
 
-import com.google.errorprone.annotations.CheckReturnValue;
+import io.kotest.matchers.shouldBe
+import java.nio.file.Path
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Test
 
-import javax.annotation.ParametersAreNonnullByDefault;
+@DisplayName("`SpineTempDir` should")
+class SpineTempDirSpec {
+
+    @Test
+    fun `place its per-JVM directory under the package-named namespace`() {
+        val namespace = Path.of(
+            System.getProperty("java.io.tmpdir"),
+            LazyTempPath::class.java.packageName
+        )
+
+        SpineTempDir.path.parent shouldBe namespace
+    }
+
+    @Test
+    fun `create the directory on access`() {
+        val directory = SpineTempDir.path.toFile()
+
+        directory.exists() shouldBe true
+        directory.isDirectory shouldBe true
+    }
+}

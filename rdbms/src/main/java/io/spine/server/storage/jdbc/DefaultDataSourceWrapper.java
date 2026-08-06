@@ -93,9 +93,9 @@ final class DefaultDataSourceWrapper implements DataSourceWrapper, WithLogging {
     public void close() {
         checkNotClosed();
         isClosed = true;
-        if (dataSource instanceof AutoCloseable) {
+        if (dataSource instanceof AutoCloseable autoCloseable) {
             try {
-                ((AutoCloseable) dataSource).close();
+                autoCloseable.close();
             } catch (Exception e) {
                 logger().atError()
                         .withCause(e)

@@ -1,11 +1,11 @@
 /*
- * Copyright 2023, TeamDev. All rights reserved.
+ * Copyright 2026, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * https://www.apache.org/licenses/LICENSE-2.0
  *
  * Redistribution and use in source and/or binary forms, with or without
  * modification, must retain the above copyright notice and the following
@@ -51,7 +51,7 @@ import static io.spine.server.storage.jdbc.engine.PredefinedEngine.MySQL;
  *  to build a JdbcStorageFactory}.
  *
  *  <p>Also, all query types are made {@code public} and marked as {@code SPI} elements,
- *  since they may also be involved into customizing the actual SQL queries.
+ *  since they may also be involved in customizing the actual SQL queries.
  */
 @SPI
 public class OperationFactory {
@@ -89,7 +89,7 @@ public class OperationFactory {
     }
 
     /**
-     * Produces an operation which writes a single record to the table.
+     * Produces an operation that writes a single record to the table.
      *
      * @param t
      *         the table to perform the operation over
@@ -108,7 +108,7 @@ public class OperationFactory {
     }
 
     /**
-     * Produces an operation which writes several records to the table.
+     * Produces an operation that writes several records to the table.
      *
      * @param t
      *         the table to perform the operation over
@@ -123,7 +123,7 @@ public class OperationFactory {
     }
 
     /**
-     * Produces an operation which reads several records from the table by their IDs.
+     * Produces an operation that reads several records from the table by their IDs.
      *
      * @param t
      *         the table to perform the operation over
@@ -138,7 +138,7 @@ public class OperationFactory {
     }
 
     /**
-     * Produces an operation which reads several records from the table by executing a query.
+     * Produces an operation that reads several records from the table by executing a query.
      *
      * @param t
      *         the table to perform the operation over
@@ -153,7 +153,7 @@ public class OperationFactory {
     }
 
     /**
-     * Produces an operation which deletes a single record from the table.
+     * Produces an operation that deletes a single record from the table.
      *
      * @param t
      *         the table to perform the operation over
@@ -168,7 +168,7 @@ public class OperationFactory {
     }
 
     /**
-     * Produces an operation which deletes several records from the table by their IDs.
+     * Produces an operation that deletes several records from the table by their IDs.
      *
      * @param t
      *         the table to perform the operation over
@@ -183,7 +183,7 @@ public class OperationFactory {
     }
 
     /**
-     * Produces an operation which creates the table in the underlying database.
+     * Produces an operation that creates the table in the underlying database.
      *
      * @param t
      *         the table to perform the operation over
@@ -198,7 +198,7 @@ public class OperationFactory {
     }
 
     /**
-     * Produces an operation reads the identifiers of the records stored in the table.
+     * Produces an operation that reads the identifiers of the records stored in the table.
      *
      * @param t
      *         the table to perform the operation over

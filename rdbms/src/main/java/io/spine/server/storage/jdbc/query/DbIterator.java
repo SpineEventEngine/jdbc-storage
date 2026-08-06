@@ -1,11 +1,11 @@
 /*
- * Copyright 2023, TeamDev. All rights reserved.
+ * Copyright 2026, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * https://www.apache.org/licenses/LICENSE-2.0
  *
  * Redistribution and use in source and/or binary forms, with or without
  * modification, must retain the above copyright notice and the following
@@ -50,7 +50,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * <p>Uses {@link Serializer} to deserialize records.
  *
- * <p><b>NOTE:</b> {@code remove} operation is not supported.
+ * <p><b>NOTE:</b> the {@code remove} operation is not supported.
  *
  * @param <R>
  *         the type of storage records
@@ -179,7 +179,7 @@ public abstract class DbIterator<R> implements Iterator<R>, Closeable {
     /**
      * Closes {@link #resultSet} and the related {@link Statement} and {@link Connection}.
      *
-     * <p>This method should be called either manually or called by {@link #hasNext()}.
+     * <p>This method should be called either manually or by {@link #hasNext()}.
      *
      * @throws DatabaseException
      *         if {@code SQLException} occurred
@@ -190,7 +190,7 @@ public abstract class DbIterator<R> implements Iterator<R>, Closeable {
             if (!resultSet.isClosed()) {
 
                 // Get statement before closing the result set, because PostgreSQL doesn't allow
-                // to retrieve a statement if a result set is closed.
+                // retrieving a statement if a result set is closed.
                 // The same strategy to obtain the connection is also safer.
                 var statement = resultSet.getStatement();
                 resultSet.close();

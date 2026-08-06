@@ -1,11 +1,11 @@
 /*
- * Copyright 2023, TeamDev. All rights reserved.
+ * Copyright 2026, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * https://www.apache.org/licenses/LICENSE-2.0
  *
  * Redistribution and use in source and/or binary forms, with or without
  * modification, must retain the above copyright notice and the following
@@ -35,9 +35,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * The DB engines known to this library,
- * which make difference in terms of providing specific {@link Operation} implementations.
+ * which make a difference in terms of providing specific {@link Operation} implementations.
  *
- * <p>This list isn't expected to be complete. However, it may get bigger as far as
+ * <p>This list isn't expected to be complete. However, it may get bigger as
  * the Spine routines are getting some known optimizations on other DB engines.
  */
 public enum PredefinedEngine implements DetectedEngine {
@@ -80,7 +80,7 @@ public enum PredefinedEngine implements DetectedEngine {
     }
 
     /**
-     * Returns a generic name for each of predefined engines.
+     * Returns a generic name for each of the predefined engines.
      *
      * <p>Version is not included.
      */
