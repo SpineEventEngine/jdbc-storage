@@ -91,7 +91,7 @@ var mapping = TypeMappingBuilder.mappingBuilder()
 var factory = JdbcStorageFactory.newBuilder()
                   .setTypeMapping(mapping)
                   //...
-                  .build()
+                  .build();
 ```
 
 The names returned by `mappingBuilder()` are the plain defaults shared by all databases; the
