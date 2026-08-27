@@ -166,30 +166,30 @@ public final class TableSpecs {
     public <I, R extends Message> JdbcTableSpec<I, R>
     specFor(RecordSpec<I, R> spec, @Nullable StorageGroup group, JdbcColumnMapping defaultMapping) {
         var key = SpecKey.of(spec, group);
+        var tableName = tableName(spec, group);
+        claim(tableName, key);
         var tableSpec = tables.computeIfAbsent(
-                key, k -> newTableSpec(k, spec, group, defaultMapping));
+                key, k -> newTableSpec(spec, tableName, defaultMapping));
         @SuppressWarnings("unchecked")
         var result = (JdbcTableSpec<I, R>) tableSpec;
         return result;
     }
 
     private <I, R extends Message> JdbcTableSpec<I, R>
-    newTableSpec(SpecKey key,
-                 RecordSpec<I, R> spec,
-                 @Nullable StorageGroup group,
-                 JdbcColumnMapping defaultMapping) {
+    newTableSpec(RecordSpec<I, R> spec, String tableName, JdbcColumnMapping defaultMapping) {
         var customMapping = findMapping(spec.sourceType());
         var mapping = customMapping == null
                       ? defaultMapping
                       : customMapping;
-        var tableName = tableName(spec, group);
-        claim(tableName, key);
         return new JdbcTableSpec<>(tableName, spec, mapping);
     }
 
     /**
      * Claims the effective table name for the storage with the given key,
      * ensuring no other storage has claimed it before.
+     *
+     * <p>Claiming is idempotent: a storage resolving its table repeatedly
+     * re-claims the name it already holds.
      *
      * @throws IllegalStateException
      *         if the name is already claimed by a storage with a different key
