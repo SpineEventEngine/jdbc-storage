@@ -103,9 +103,16 @@ clashing storages is created, and fails with an `IllegalStateException` naming b
 claimants. To resolve the clash, rename one of the contexts, or assign a distinct
 table name via `setTableName(...)`; see [Customization](#customization).
 
-The names are compared truncated to 63 bytes — PostgreSQL's identifier limit,
-the strictest among the supported engines — so two long names differing only past
-that limit are treated as clashing, too.
+The names are compared as the least discriminating of the supported engines would see
+them, so two names are also treated as clashing when they differ only:
+
+* past the 63rd byte — PostgreSQL truncates identifiers there silently; or
+* in case — MySQL may run with a case-insensitive `lower_case_table_names` setting,
+  which maps `Billing_Event` and `billing_Event` onto one table.
+
+The second rule is deliberately conservative: PostgreSQL and H2 could keep such names
+apart, but a Bounded Context layout that relies on letter case alone would not survive
+a move to MySQL.
 
 ## Adding new `(column)`
 

@@ -42,6 +42,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -65,8 +66,10 @@ import static java.lang.String.format;
  * This instance tracks the names claimed by the created specifications, and creating
  * a specification whose table name is already claimed by a different storage fails
  * with an {@link IllegalStateException} naming both claimants. The names are compared
- * truncated to {@value #MAX_IDENTIFIER_BYTES} bytes — the identifier limit that
- * PostgreSQL applies silently — so the names differing only past that limit are
+ * as the least discriminating of the supported engines would see them — truncated to
+ * {@value #MAX_IDENTIFIER_BYTES} bytes, which PostgreSQL does silently, and case-insensitively,
+ * since MySQL may run with a case-insensitive {@code lower_case_table_names} setting.
+ * The names differing only past the length limit, or only in case, are therefore
  * treated as clashing, too.
  */
 @Internal
@@ -200,20 +203,25 @@ public final class TableSpecs {
                             "Rename one of the storage groups — " +
                             "such as the Bounded Context — or assign " +
                             "a distinct table name via `setTableName(..)`.",
-                    previous, key, effective));
+                    previous, key, tableName));
         }
     }
 
     /**
-     * Returns the name as seen by the strictest supported database engine:
-     * truncated to {@value #MAX_IDENTIFIER_BYTES} bytes, if longer.
+     * Returns the name as seen by the least discriminating of the supported
+     * database engines.
+     *
+     * <p>The name is truncated to {@value #MAX_IDENTIFIER_BYTES} bytes, which
+     * PostgreSQL does silently, and then lowercased, since MySQL running with
+     * a case-insensitive {@code lower_case_table_names} setting maps the names
+     * differing only in case onto one table.
      */
     private static String effectiveName(String name) {
         var bytes = name.getBytes(StandardCharsets.UTF_8);
-        if (bytes.length <= MAX_IDENTIFIER_BYTES) {
-            return name;
-        }
-        return new String(bytes, 0, MAX_IDENTIFIER_BYTES, StandardCharsets.UTF_8);
+        var truncated = bytes.length <= MAX_IDENTIFIER_BYTES
+                        ? name
+                        : new String(bytes, 0, MAX_IDENTIFIER_BYTES, StandardCharsets.UTF_8);
+        return truncated.toLowerCase(Locale.ROOT);
     }
 
     private String tableName(RecordSpec<?, ?> spec, @Nullable StorageGroup group) {

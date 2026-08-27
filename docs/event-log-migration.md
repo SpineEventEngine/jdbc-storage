@@ -32,11 +32,19 @@ The rows of `spine_core_Event` carry no explicit context marker. The `type` colu
 holding the qualified Proto type name of the event — is the discriminator: each
 event type belongs to the domain of exactly one context.
 
+> [!IMPORTANT]
+> Quote the table names in every migration statement. The library creates its tables
+> with quoted identifiers, so the mixed-case names — `Billing_Event`,
+> `spine_core_Event` — are stored exactly as shown throughout this page. An unquoted
+> reference is folded to `billing_event` by PostgreSQL and to `BILLING_EVENT` by H2,
+> and the statement then fails with a table-not-found error. PostgreSQL and H2 quote
+> with double quotes, as in the statements below; MySQL uses backticks.
+
 For each context, insert the rows of its event types into the per-context table:
 
 ```sql
-INSERT INTO Billing_Event
-    SELECT * FROM spine_core_Event
+INSERT INTO "Billing_Event"
+    SELECT * FROM "spine_core_Event"
     WHERE type IN (
         'acme.billing.InvoiceIssued',
         'acme.billing.PaymentReceived'
@@ -53,9 +61,9 @@ After the copy, verify the counts:
 
 ```sql
 SELECT
-    (SELECT COUNT(*) FROM spine_core_Event) AS shared,
-    (SELECT COUNT(*) FROM Billing_Event) +
-    (SELECT COUNT(*) FROM Shipping_Event) AS split;
+    (SELECT COUNT(*) FROM "spine_core_Event") AS shared,
+    (SELECT COUNT(*) FROM "Billing_Event") +
+    (SELECT COUNT(*) FROM "Shipping_Event") AS split;
 ```
 
 Keep `spine_core_Event` as an archive until the migrated deployment is verified;

@@ -89,6 +89,19 @@ internal class TableNameCollisionSpec {
     }
 
     @Test
+    fun `reject two contexts whose names differ only in case`() {
+        h2Factory().use { factory ->
+            factory.createEventStore(ContextSpec.singleTenant("Billing"))
+
+            // MySQL may run with a case-insensitive `lower_case_table_names`,
+            // mapping the two names onto one table.
+            shouldThrow<IllegalStateException> {
+                factory.createEventStore(ContextSpec.singleTenant("billing"))
+            }
+        }
+    }
+
+    @Test
     fun `compare the names truncated to the strictest identifier limit`() {
         h2Factory().use { factory ->
             val prefix = "A".repeat(63)
