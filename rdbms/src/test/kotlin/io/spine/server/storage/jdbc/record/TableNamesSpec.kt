@@ -1,5 +1,5 @@
 /*
- * Copyright 2025, TeamDev. All rights reserved.
+ * Copyright 2026, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,17 +24,36 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.dependency.local
+package io.spine.server.storage.jdbc.record
+
+import io.kotest.matchers.shouldBe
+import io.spine.core.Event
+import io.spine.server.storage.StorageGroup
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Test
 
 /**
- * Spine Model Compiler Gradle API.
- *
- * @see <a href="https://github.com/SpineEventEngine/model-compiler">spine-model-compiler</a>
+ * Supplements the Java-based [TableNamesTest] with the cases of composing
+ * table names from free-form group values, such as Bounded Context names.
  */
-@Suppress("ConstPropertyName")
-object ModelCompiler {
-    const val version = "2.0.0-SNAPSHOT.200"
-    const val group = Spine.toolsGroup
-    const val artifact = "spine-model-compiler"
-    const val lib = "$group:$artifact:$version"
+@DisplayName("`TableNames` should")
+internal class TableNamesSpec {
+
+    @Test
+    fun `keep the name derived from a dotted Proto type as it is today`() {
+        TableNames.of(Event::class.java) shouldBe "spine_core_Event"
+    }
+
+    @Test
+    fun `compose a grouped name from the group name and the record type`() {
+        TableNames.of(Event::class.java, StorageGroup("Billing")) shouldBe "Billing_Event"
+    }
+
+    @Test
+    fun `replace the characters prohibited in table names`() {
+        TableNames.of(Event::class.java, StorageGroup("Billing Dept")) shouldBe
+                "Billing_Dept_Event"
+        TableNames.of(Event::class.java, StorageGroup("Context-1")) shouldBe
+                "Context_1_Event"
+    }
 }

@@ -45,7 +45,7 @@ import static io.spine.type.Json.toCompactJson;
 import static io.spine.util.Exceptions.newIllegalArgumentException;
 
 /**
- * A wrapper for the column which stores a primary key in a DB {@linkplain RecordTable table}.
+ * A wrapper for the column that stores a primary key in a DB {@linkplain RecordTable table}.
  *
  * @param <I>
  *         the ID type
@@ -77,7 +77,7 @@ public abstract class IdColumn<I> {
     @SuppressWarnings({
             "unchecked", // ID runtime type is checked with if statements.
             "IfStatementWithTooManyBranches", // OK for a factory method.
-            "ChainOfInstanceofChecks"         // which depends on the built object target type.
+            "ChainOfInstanceofChecks"         // Depends on the built object target type.
     })
     public static <I> IdColumn<I> of(RecordSpec<I, ?> spec, JdbcColumnMapping mapping) {
         checkNotNull(spec);
@@ -206,7 +206,7 @@ public abstract class IdColumn<I> {
     }
 
     /**
-     * An ID column which stores {@code String}s.
+     * An ID column that stores {@code String}s.
      */
     private static class StringIdColumn extends IdColumn<String> {
 

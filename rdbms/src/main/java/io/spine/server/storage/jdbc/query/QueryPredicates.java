@@ -210,7 +210,7 @@ public final class QueryPredicates {
         if (!Comparable.class.isAssignableFrom(storedType)) {
             var javaType = javaValue.getClass();
             throw newIllegalArgumentException(
-                    "Received filter value of class %s which has non-Comparable storage type %s",
+                    "Received filter value of class %s that has non-Comparable storage type %s",
                     javaType.getCanonicalName(),
                     storedType.getCanonicalName());
         }

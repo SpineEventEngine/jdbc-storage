@@ -31,6 +31,7 @@ import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.protobuf.Message;
 import io.spine.annotation.Internal;
 import io.spine.base.EntityState;
+import io.spine.core.BoundedContextName;
 import io.spine.server.storage.RecordSpec;
 import io.spine.server.storage.StorageGroup;
 import io.spine.server.storage.jdbc.record.JdbcTableSpec;
@@ -39,12 +40,15 @@ import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
 import io.spine.type.TypeName;
 import org.jspecify.annotations.Nullable;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static io.spine.util.Preconditions2.checkNotEmptyOrBlank;
+import static java.lang.String.format;
 
 /**
  * The set of custom database table settings as configured by the library users,
@@ -55,14 +59,56 @@ import static io.spine.util.Preconditions2.checkNotEmptyOrBlank;
  * specFor(..)}. Each table is identified by the combination of the source type
  * and the record type of the record specification, along with the name of
  * the {@link StorageGroup}, if any.
+ *
+ * <p>Composing a table name is not injective: distinct names — e.g. those of
+ * the Bounded Contexts {@code Sales.EU} and {@code Sales_EU} — may resolve to one
+ * table name once the {@linkplain TableNames prohibited characters are replaced}.
+ * This instance tracks the names claimed by the created specifications, and creating
+ * a specification whose table name is already claimed by a different storage fails
+ * with an {@link IllegalStateException} naming both claimants. The names are compared
+ * as the least discriminating of the supported engines would see them — truncated to
+ * {@value #MAX_IDENTIFIER_BYTES} bytes, which PostgreSQL does silently, and
+ * case-insensitively, since ordinary names are emitted unquoted — folded to lower case
+ * by PostgreSQL and to upper case by H2 — and MySQL may run with a case-insensitive
+ * {@code lower_case_table_names} setting. The names differing only past the length
+ * limit, or only in case, are therefore treated as clashing, too.
  */
 @Internal
 public final class TableSpecs {
 
+    /**
+     * The strictest identifier length limit among the supported database engines,
+     * in bytes: PostgreSQL truncates longer identifiers silently.
+     */
+    private static final int MAX_IDENTIFIER_BYTES = 63;
+
+    /**
+     * The custom table names registered for the storages belonging to no group,
+     * per the source type of their record specifications.
+     */
     private final ImmutableMap<Class<? extends Message>, String> names;
+
+    /**
+     * The custom table names registered for the grouped storages,
+     * per the identity of a grouped table.
+     */
     private final ImmutableMap<GroupedTable, String> groupedNames;
+
+    /**
+     * The cache of the created table specifications, per the identity of a table.
+     */
     private final Map<SpecKey, JdbcTableSpec<?, ?>> tables = new ConcurrentHashMap<>();
 
+    /**
+     * The effective table names claimed by the created specifications,
+     * to the keys of their claimants.
+     */
+    private final Map<String, SpecKey> claimedNames = new ConcurrentHashMap<>();
+
+    /**
+     * The custom column mappings overriding the factory-wide default,
+     * per the source type of the record specifications.
+     */
     private final ImmutableMap<Class<? extends Message>, JdbcColumnMapping> columnMappings;
 
     /**
@@ -120,22 +166,85 @@ public final class TableSpecs {
     public <I, R extends Message> JdbcTableSpec<I, R>
     specFor(RecordSpec<I, R> spec, @Nullable StorageGroup group, JdbcColumnMapping defaultMapping) {
         var key = SpecKey.of(spec, group);
-        var tableSpec = tables.computeIfAbsent(key, k -> newTableSpec(spec, group, defaultMapping));
+        var tableName = tableName(spec, group);
+        claim(tableName, key);
+        var tableSpec = tables.computeIfAbsent(
+                key, k -> newTableSpec(spec, tableName, defaultMapping));
         @SuppressWarnings("unchecked")
         var result = (JdbcTableSpec<I, R>) tableSpec;
         return result;
     }
 
     private <I, R extends Message> JdbcTableSpec<I, R>
-    newTableSpec(RecordSpec<I, R> spec,
-                 @Nullable StorageGroup group,
-                 JdbcColumnMapping defaultMapping) {
+    newTableSpec(RecordSpec<I, R> spec, String tableName, JdbcColumnMapping defaultMapping) {
         var customMapping = findMapping(spec.sourceType());
         var mapping = customMapping == null
                       ? defaultMapping
                       : customMapping;
-        var tableName = tableName(spec, group);
         return new JdbcTableSpec<>(tableName, spec, mapping);
+    }
+
+    /**
+     * Claims the effective table name for the storage with the given key,
+     * ensuring no other storage has claimed it before.
+     *
+     * <p>Claiming is idempotent: a storage resolving its table repeatedly
+     * re-claims the name it already holds.
+     *
+     * @throws IllegalStateException
+     *         if the name is already claimed by a storage with a different key
+     */
+    private void claim(String tableName, SpecKey key) {
+        var effective = effectiveName(tableName);
+        var previous = claimedNames.putIfAbsent(effective, key);
+        if (previous != null && !previous.equals(key)) {
+            throw new IllegalStateException(format(
+                    "The storages identified by `%s` and `%s` " +
+                            "would share the DB table `%s`. " +
+                            "Rename one of the storage groups — " +
+                            "such as the Bounded Context — or assign " +
+                            "a distinct table name via `setTableName(..)`.",
+                    previous, key, tableName));
+        }
+    }
+
+    /**
+     * Returns the name as seen by the least discriminating of the supported
+     * database engines.
+     *
+     * <p>The name is clipped to the last whole character within
+     * {@value #MAX_IDENTIFIER_BYTES} bytes — the way PostgreSQL silently
+     * truncates identifiers — and then lowercased: ordinary names are emitted
+     * unquoted and get case-folded by PostgreSQL and H2, and MySQL running with
+     * a case-insensitive {@code lower_case_table_names} setting maps the names
+     * differing only in case onto one table even when quoted.
+     */
+    private static String effectiveName(String name) {
+        var bytes = name.getBytes(StandardCharsets.UTF_8);
+        if (bytes.length <= MAX_IDENTIFIER_BYTES) {
+            return name.toLowerCase(Locale.ROOT);
+        }
+        var limit = MAX_IDENTIFIER_BYTES;
+        while (limit > 0 && isContinuationByte(bytes[limit])) {
+            limit--;
+        }
+        var clipped = new String(bytes, 0, limit, StandardCharsets.UTF_8);
+        return clipped.toLowerCase(Locale.ROOT);
+    }
+
+    /**
+     * Tells whether the given byte continues a multi-byte UTF-8 sequence,
+     * as opposed to starting a character.
+     *
+     * <p>A continuation byte matches the bit pattern {@code 10xxxxxx}. Masking
+     * the value with {@code 0xC0}, which is {@code 11000000}, keeps its two highest
+     * bits; they equal {@code 0x80}, which is {@code 10000000}, for a continuation
+     * byte alone. A byte starting a character has {@code 0xxxxxxx} if the character
+     * is single-byte, and {@code 11xxxxxx} otherwise.
+     */
+    @SuppressWarnings("MagicNumber") /* The UTF-8 mask and pattern, explained above. */
+    private static boolean isContinuationByte(byte value) {
+        return (value & 0xC0) == 0x80;
     }
 
     private String tableName(RecordSpec<?, ?> spec, @Nullable StorageGroup group) {
@@ -257,7 +366,7 @@ public final class TableSpecs {
         }
 
         /**
-         * Sets the custom DB table name for the grouped table which serves the entities
+         * Sets the custom DB table name for the grouped table that serves the entities
          * with the specified state type, storing the records of the specified type.
          *
          * <p>The grouped table is addressed by the storage group — named by the framework
@@ -287,6 +396,43 @@ public final class TableSpecs {
             checkNotNull(recordType);
             checkNotEmptyOrBlank(name);
             this.groupedNames.put(GroupedTable.of(stateType, recordType), name);
+            return this;
+        }
+
+        /**
+         * Sets the custom DB table name for the grouped table that serves
+         * the Bounded Context with the given name, storing the records of
+         * the specified type — such as the event store of the context.
+         *
+         * <p>The grouped table is addressed by the storage group — named by
+         * the framework after the context, taking its name verbatim (see
+         * {@link StorageGroup#of(BoundedContextName)}) — paired with the type
+         * of the stored records. To address the table of a System context, spell
+         * its name directly, e.g. {@code BoundedContextNames.newName("Billing_System")}.
+         *
+         * <p>The name previously set for the same grouped table, if any,
+         * is replaced with this call.
+         *
+         * <p>The name cannot be blank.
+         *
+         * @param context
+         *         the name of the Bounded Context served by the grouped storage
+         * @param recordType
+         *         the type of the records stored by the grouped storage
+         * @param name
+         *         the table name
+         * @param <R>
+         *         the type of the stored record
+         * @return this instance of {@code Builder}
+         */
+        @CanIgnoreReturnValue
+        public <R extends Message>
+        Builder setTableName(BoundedContextName context, Class<R> recordType, String name) {
+            checkNotNull(context);
+            checkNotNull(recordType);
+            checkNotEmptyOrBlank(name);
+            var group = StorageGroup.of(context);
+            this.groupedNames.put(new GroupedTable(group.getName(), recordType), name);
             return this;
         }
 

@@ -24,43 +24,37 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.spine.dependency.boms
+package io.spine.server.storage.jdbc
 
-import io.spine.dependency.DependencyWithBom
-import io.spine.dependency.kotlinx.Coroutines
-import io.spine.dependency.lib.JacksonV2
-import io.spine.dependency.lib.Kotlin
-import io.spine.dependency.lib.Grpc
-import io.spine.dependency.test.JUnit
+import com.zaxxer.hikari.HikariConfig
+import com.zaxxer.hikari.HikariDataSource
+import io.kotest.matchers.shouldBe
+import io.spine.base.Identifier.newUuid
+import io.spine.server.ContextSpec
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Test
 
 /**
- * The collection of references to BOMs applied by [BomsPlugin].
- *
- * @see <a href="https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html#Bill_of_Materials_.28BOM.29_POMs">
- * Maven Bill of Materials</a>
+ * Supplements the Java-based [JdbcStorageFactoryTest] with the configuration
+ * path taking a plain JDBC [javax.sql.DataSource] — the entry point shown
+ * in `docs/configuration.md`.
  */
-object Boms {
+@DisplayName("`JdbcStorageFactory` should")
+internal class JdbcStorageFactorySpec {
 
-    /**
-     * The base production BOMs.
-     */
-    val core: List<DependencyWithBom> = listOf(
-        Kotlin,
-        Coroutines
-    )
+    @Test
+    fun `accept a plain JDBC data source and report its openness`() {
+        val config = HikariConfig()
+        config.jdbcUrl = "jdbc:h2:mem:${newUuid()}"
+        val factory = JdbcStorageFactory.newBuilder()
+            .setDataSource(HikariDataSource(config))
+            .setTypeMapping(PredefinedMapping.H2_2_4)
+            .build()
 
-    /**
-     * The BOMs for testing dependencies.
-     */
-    val testing: List<DependencyWithBom> = listOf(
-        JUnit
-    )
+        factory.isOpen shouldBe true
+        factory.createEventStore(ContextSpec.singleTenant("Billing"))
+        factory.close()
 
-    /**
-     * Technology-based BOMs.
-     */
-    object Optional {
-        val jackson = JacksonV2.bom
-        val grpc = Grpc.bom
+        factory.isOpen shouldBe false
     }
 }

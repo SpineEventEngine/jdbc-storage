@@ -35,13 +35,22 @@ import java.util.regex.Pattern;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A utility class which provides strings valid for DB table names.
+ * A utility class that provides strings valid for DB table names.
  */
 @SuppressWarnings("UtilityClass")
 public final class TableNames {
 
     private static final String TABLE_NAME_DELIMITER = "_";
-    private static final Pattern PACKAGE_DOT = Pattern.compile("\\.");
+
+    /**
+     * Matches every character prohibited in a table name.
+     *
+     * <p>Names are derived from Proto packages, storage group names, and Bounded Context
+     * names. The latter are free-form strings, so any character outside the Latin
+     * letters, digits, and the underscore — dots of qualified names, spaces, dashes,
+     * and the like — is replaced when a table name is composed.
+     */
+    private static final Pattern PROHIBITED_CHARS = Pattern.compile("[^A-Za-z0-9_]");
 
     private TableNames() {
         // Prevent instantiation of this utility class.
@@ -50,12 +59,16 @@ public final class TableNames {
     /**
      * Composes the table name basing on the passed type of Proto message to store in the table.
      *
-     * <p>Result consists of the Proto package of the message concatenated with the simple name
+     * <p>The result consists of the Proto package of the message concatenated with the simple name
      * of the type. {@code _} symbol is used for joining the parts, and for the replacement
-     * of prohibited {@code .} symbols in the name of the package.
+     * of the characters prohibited in table names, such as the {@code .} symbols
+     * in the name of the package.
      *
      * <p>For instance, for {@code google.protobuf.Timestamp}, the table name would be
      * {@code google_protobuf_Timestamp}.
+     *
+     * <p>The replacement may map distinct names to one table name. Such a clash is
+     * detected when the table specifications are composed and reported as an error.
      */
     public static String of(Class<? extends Message> cls) {
         checkNotNull(cls);
@@ -64,34 +77,48 @@ public final class TableNames {
                         .getDescriptorForType()
                         .getFile()
                         .getPackage();
-        var preparedPackage = PACKAGE_DOT.matcher(protoPackage)
-                                         .replaceAll(TABLE_NAME_DELIMITER);
+        var preparedPackage = sanitize(protoPackage);
         var result = preparedPackage + TABLE_NAME_DELIMITER + cls.getSimpleName();
         return result;
     }
 
     /**
-     * Composes the name for the table storing the records of a storage which belongs
+     * Composes the name for the table storing the records of a storage that belongs
      * to a {@link StorageGroup}.
      *
-     * <p>Several storages of a Bounded Context may hold records of the same type — e.g.,
-     * the event journals of distinct entity types all store {@code Event}s. The group,
-     * named by the framework after the state type of the served entity, is what tells
-     * such storages apart. Therefore, the table name is composed of the group name
-     * and the simple name of the stored record type, so that each {@code (group, record type)}
-     * pair maps to its own table. {@code _} symbol is used for joining the parts,
-     * and for the replacement of prohibited {@code .} symbols in the group name.
+     * <p>Several storages may hold records of the same type — e.g., the event journals
+     * of distinct entity types all store {@code Event}s, and so do the event stores of
+     * distinct Bounded Contexts. The group — named by the framework after the state type
+     * of the served entity, or after the context — is what tells such storages apart.
+     * Therefore, the table name is composed of the group name and the simple name of
+     * the stored record type, so that each {@code (group, record type)} pair maps to
+     * its own table. {@code _} symbol is used for joining the parts, and for
+     * the replacement of the characters prohibited in table names, such as
+     * the {@code .} symbols in a group named after a qualified Proto type.
      *
      * <p>For instance, for the event journal of an entity with the state type
-     * {@code spine.test.storage.StgProject}, storing {@code spine.core.Event} records,
-     * the table name would be {@code spine_test_storage_StgProject_Event}.
+     * {@code spine.test.storage.StgProject}, storing {@code spine.core.Event}
+     * records, the table name would be {@code spine_test_storage_StgProject_Event}.
+     * For the event store of a Bounded Context named {@code Billing}, the table
+     * name would be {@code Billing_Event}.
+     *
+     * <p>The replacement may map distinct group names to one table name. Such a clash
+     * is detected when the table specifications are composed and reported as an error.
      */
     public static String of(Class<? extends Message> recordType, StorageGroup group) {
         checkNotNull(recordType);
         checkNotNull(group);
-        var preparedGroup = PACKAGE_DOT.matcher(group.getName())
-                                       .replaceAll(TABLE_NAME_DELIMITER);
+        var preparedGroup = sanitize(group.getName());
         var result = preparedGroup + TABLE_NAME_DELIMITER + recordType.getSimpleName();
         return result;
+    }
+
+    /**
+     * Replaces every {@linkplain #PROHIBITED_CHARS character prohibited in table names}
+     * with the {@code _} symbol.
+     */
+    private static String sanitize(String value) {
+        return PROHIBITED_CHARS.matcher(value)
+                               .replaceAll(TABLE_NAME_DELIMITER);
     }
 }

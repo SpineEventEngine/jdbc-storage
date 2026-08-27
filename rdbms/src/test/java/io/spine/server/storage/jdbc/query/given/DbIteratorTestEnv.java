@@ -53,7 +53,7 @@ public final class DbIteratorTestEnv {
     }
 
     /**
-     * An iterator which produces failure on every operation except {@link DbIterator#close()}, as
+     * An iterator that produces failure on every operation except {@link DbIterator#close()}, as
      * it's using a closed {@link ResultSet}.
      */
     public static DbIterator<?> faultyResultIterator() throws SQLException {

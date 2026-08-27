@@ -470,7 +470,7 @@ public final class DataSourceConfig {
         }
 
         /**
-         * If your driver supports JDBC4 it is strongly recommended <b>not to set</b>
+         * If your driver supports JDBC4, it is strongly recommended <b>not to set</b>
          * this property.
          * It is for "legacy" databases that do not support the JDBC4
          * {@link Connection#isValid(int)} API.

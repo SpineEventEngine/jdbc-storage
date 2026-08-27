@@ -62,7 +62,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class JdbcStorageFactoryTest {
 
     @Test
-    @DisplayName("allow to use custom data source")
+    @DisplayName("allow using a custom data source")
     void allowCustomDataSource() {
         var factory = JdbcStorageFactory
                 .newBuilder()
@@ -74,7 +74,7 @@ class JdbcStorageFactoryTest {
     }
 
     @Test
-    @DisplayName("allow to set custom column mapping")
+    @DisplayName("allow setting a custom column mapping")
     void setColumnMapping() {
         var columnMapping = new TestColumnMapping();
         var factory = JdbcStorageFactory
@@ -88,7 +88,7 @@ class JdbcStorageFactoryTest {
     }
 
     @Test
-    @DisplayName("allow to print SQL to create an RDBMS table for a certain entity")
+    @DisplayName("allow printing SQL to create an RDBMS table for a certain entity")
     void printTableCreationSql() {
         var factory = JdbcStorageFactory
                 .newBuilder()
@@ -173,7 +173,7 @@ class JdbcStorageFactoryTest {
     class CreateStorage {
 
         @Test
-        @DisplayName("which is multitenant")
+        @DisplayName("that is multitenant")
         void multitenant() {
             var factory = newFactory();
             var storage =
@@ -182,7 +182,7 @@ class JdbcStorageFactoryTest {
         }
 
         @Test
-        @DisplayName("which is single tenant")
+        @DisplayName("that is single tenant")
         void singleTenant() {
             var factory = newFactory();
             var storage =

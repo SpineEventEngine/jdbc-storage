@@ -26,7 +26,7 @@
 
 /**
  * This package defines {@link io.spine.server.storage.jdbc.operation.Operation Operation}s
- * which have some optimizations when running against MySQL databases.
+ * that have some optimizations when running against MySQL databases.
  */
 @CheckReturnValue
 @ParametersAreNonnullByDefault

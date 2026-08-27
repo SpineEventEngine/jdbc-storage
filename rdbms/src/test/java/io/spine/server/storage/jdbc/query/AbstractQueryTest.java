@@ -51,7 +51,7 @@ class AbstractQueryTest {
 
     /**
      * A commit is executed after a query execution, but a {@code ResultSet} should be used after
-     * this, hence the result set should not be closed. This test verifies that the correct
+     * this; hence the result set should not be closed. This test verifies that the correct
      * holdability was set, assuming that the JDBC implementation does the rest correctly.
      */
     @Test
