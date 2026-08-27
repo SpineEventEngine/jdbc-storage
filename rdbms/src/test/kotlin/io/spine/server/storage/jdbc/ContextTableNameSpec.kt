@@ -40,7 +40,7 @@ import org.junit.jupiter.api.Test
 
 /**
  * Tests the custom naming of the event table of a Bounded Context via
- * [JdbcStorageFactory.Builder.setTableName].
+ * `JdbcStorageFactory.Builder.setTableName(BoundedContextName, Class, String)`.
  */
 @DisplayName("`JdbcStorageFactory` should")
 internal class ContextTableNameSpec {

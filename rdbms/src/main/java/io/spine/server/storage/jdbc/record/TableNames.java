@@ -83,7 +83,7 @@ public final class TableNames {
     }
 
     /**
-     * Composes the name for the table storing the records of a storage which belongs
+     * Composes the name for the table storing the records of a storage that belongs
      * to a {@link StorageGroup}.
      *
      * <p>Several storages may hold records of the same type — e.g., the event journals
@@ -97,10 +97,10 @@ public final class TableNames {
      * the {@code .} symbols in a group named after a qualified Proto type.
      *
      * <p>For instance, for the event journal of an entity with the state type
-     * {@code spine.test.storage.StgProject}, storing {@code spine.core.Event} records,
-     * the table name would be {@code spine_test_storage_StgProject_Event}. For the
-     * event store of a Bounded Context named {@code Billing}, the table name would be
-     * {@code Billing_Event}.
+     * {@code spine.test.storage.StgProject}, storing {@code spine.core.Event}
+     * records, the table name would be {@code spine_test_storage_StgProject_Event}.
+     * For the event store of a Bounded Context named {@code Billing}, the table
+     * name would be {@code Billing_Event}.
      *
      * <p>The replacement may map distinct group names to one table name. Such a clash
      * is detected when the table specifications are composed and reported as an error.

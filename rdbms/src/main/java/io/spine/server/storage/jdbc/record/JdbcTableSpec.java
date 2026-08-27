@@ -102,7 +102,7 @@ public final class JdbcTableSpec<I, R extends Message> {
     }
 
     /**
-     * Returns the column of this table which stores the record identifiers.
+     * Returns the column of this table that stores the record identifiers.
      */
     public IdColumn<I> idColumn() {
         return idColumn;
@@ -186,7 +186,7 @@ public final class JdbcTableSpec<I, R extends Message> {
         requireNonNull(column,
                        format("Cannot find the column with name `%s` " +
                                       "in the table specification for the record of type `%s` " +
-                                      "which columns are sourced from type `%s`.",
+                                      "whose columns are sourced from type `%s`.",
                               name, recordSpec.recordType(), recordSpec.sourceType()));
         return column;
     }

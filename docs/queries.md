@@ -32,7 +32,7 @@ It is also possible to customize the engine, see more on that below.
 ### Operations
 
 As `OperationFactory` is a port, it is possible to customize its default behaviour
-by providing a custom implementation. In scope of such a custom descendant, it is also
+by providing a custom implementation. In the scope of such a custom descendant, it is also
 possible to use a custom operation (by choosing an existing operation
 from `io.spine.server.storage.jdbc.operation` as a supertype) and a custom query
 (by extending a query implementation from `io.spine.server.storage.jdbc.query`):

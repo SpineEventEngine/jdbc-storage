@@ -80,8 +80,7 @@ passes a `StorageGroup` named after the context, taking its name verbatim. The e
 log of each context therefore lands in its own table. E.g., for an application with
 the contexts named `Billing` and `Shipping`, the tables are `Billing_Event` and
 `Shipping_Event`. A System context configured to persist its events — see
-`SystemSettings.persistEvents()` — gets its own table as well, e.g.
-`Billing_System_Event`.
+`SystemSettings.persistEvents()` — gets its own table as well, e.g. `Billing_System_Event`.
 
 Applications upgrading from the library versions that kept a single
 `spine_core_Event` table shared by all contexts should migrate the stored events;

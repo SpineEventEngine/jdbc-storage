@@ -36,7 +36,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static io.spine.server.storage.jdbc.record.Serializer.deserialize;
 
 /**
- * The reader for the columns which store Protobuf messages in a serialized form.
+ * The reader for the columns that store Protobuf messages in a serialized form.
  *
  * <p>The result of the read operation is a deserialized {@link Message}.
  *

@@ -31,7 +31,7 @@ import com.google.protobuf.Message;
 import io.spine.annotation.Internal;
 
 /**
- * The factory which creates {@link ColumnReader} instances.
+ * The factory that creates {@link ColumnReader} instances.
  */
 @Internal
 public final class ColumnReaderFactory {

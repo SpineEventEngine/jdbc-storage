@@ -32,7 +32,7 @@ import java.sql.SQLException;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * The reader for the columns which store {@link Long} entries.
+ * The reader for the columns that store {@link Long} entries.
  */
 final class LongColumnReader extends ColumnReader<Long> {
 

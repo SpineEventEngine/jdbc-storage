@@ -75,7 +75,7 @@ internal class CreateTableSpec {
         val sql = table.creationSql()
 
         // The ID column is stored as `VARCHAR(512)`, and the `group` column as `TEXT`; both
-        // must carry the binary collation, otherwise MySQL compares them case-insensitively
+        // must carry the binary collation; otherwise MySQL compares them case-insensitively
         // and distinct identifiers like `"name"` and `"Name"` collide.
         sql shouldContain "VARCHAR(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin"
         sql shouldContain "TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin"

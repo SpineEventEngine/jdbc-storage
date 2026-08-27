@@ -45,7 +45,7 @@ import java.util.Iterator;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A storage which stores Protobuf message records in a single RDBMS {@linkplain RecordTable table}
+ * A storage that stores Protobuf message records in a single RDBMS {@linkplain RecordTable table}
  * accessed via JDBC connection.
  *
  * @param <I>
@@ -63,7 +63,7 @@ public class JdbcRecordStorage<I, R extends Message> extends RecordStorage<I, R>
      * and performs the creation of an RDBMS table, in case such a table does not exist.
      *
      * @param contextSpec
-     *         specification of Bounded Context, in scope of which this storage exists
+     *         specification of Bounded Context, in the scope of which this storage exists
      * @param recordSpec
      *         specification of stored records
      * @param factory
@@ -83,7 +83,7 @@ public class JdbcRecordStorage<I, R extends Message> extends RecordStorage<I, R>
      * telling this storage apart from the other storages of records of the same type.
      *
      * @param contextSpec
-     *         specification of Bounded Context, in scope of which this storage exists
+     *         specification of Bounded Context, in the scope of which this storage exists
      * @param recordSpec
      *         specification of stored records
      * @param factory
@@ -106,7 +106,7 @@ public class JdbcRecordStorage<I, R extends Message> extends RecordStorage<I, R>
      * <p>This constructor is internal to the framework.
      *
      * @param contextSpec
-     *         specification of Bounded Context, in scope of which this storage exists
+     *         specification of Bounded Context, in the scope of which this storage exists
      * @param recordSpec
      *         specification of stored records
      * @param factory
@@ -132,7 +132,7 @@ public class JdbcRecordStorage<I, R extends Message> extends RecordStorage<I, R>
      * <p>This constructor is internal to the framework.
      *
      * @param contextSpec
-     *         specification of Bounded Context, in scope of which this storage exists
+     *         specification of Bounded Context, in the scope of which this storage exists
      * @param recordSpec
      *         specification of stored records
      * @param factory

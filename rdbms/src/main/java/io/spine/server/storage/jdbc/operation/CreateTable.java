@@ -68,7 +68,7 @@ public class CreateTable<I, R extends Message> extends Operation<I, R> implement
      * A map of the Spine common Entity Columns to their default values.
      *
      * <p>Some write operations may not include these columns. Though, they are required for
-     * the framework to work properly. Hence, the tables which include them should make these
+     * the framework to work properly. Hence, the tables that include them should make these
      * values {@code DEFAULT} for these columns.
      *
      * <p>The map stores the names of the Entity Columns as string keys for simplicity and
@@ -111,7 +111,7 @@ public class CreateTable<I, R extends Message> extends Operation<I, R> implement
      *
      * <p>Table and column names are {@linkplain SQLTemplates#quoteIdentifier(String) quoted}
      * according to the dialect of the underlying database. This is the same quoting that QueryDSL
-     * applies when serializing the read and write queries, so a name which is a reserved SQL
+     * applies when serializing the read and write queries, so a name that is a reserved SQL
      * keyword (e.g. {@code group}) is escaped consistently across the table creation and
      * all the subsequent operations over the table.
      */

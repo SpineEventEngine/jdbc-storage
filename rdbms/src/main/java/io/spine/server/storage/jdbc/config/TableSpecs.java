@@ -65,7 +65,7 @@ import static java.lang.String.format;
  * This instance tracks the names claimed by the created specifications, and creating
  * a specification whose table name is already claimed by a different storage fails
  * with an {@link IllegalStateException} naming both claimants. The names are compared
- * truncated to {@value #MAX_IDENTIFIER_BYTES} bytes — the identifier limit which
+ * truncated to {@value #MAX_IDENTIFIER_BYTES} bytes — the identifier limit that
  * PostgreSQL applies silently — so the names differing only past that limit are
  * treated as clashing, too.
  */
@@ -335,7 +335,7 @@ public final class TableSpecs {
         }
 
         /**
-         * Sets the custom DB table name for the grouped table which serves the entities
+         * Sets the custom DB table name for the grouped table that serves the entities
          * with the specified state type, storing the records of the specified type.
          *
          * <p>The grouped table is addressed by the storage group — named by the framework
@@ -369,16 +369,15 @@ public final class TableSpecs {
         }
 
         /**
-         * Sets the custom DB table name for the grouped table which serves
+         * Sets the custom DB table name for the grouped table that serves
          * the Bounded Context with the given name, storing the records of
          * the specified type — such as the event store of the context.
          *
          * <p>The grouped table is addressed by the storage group — named by
          * the framework after the context, taking its name verbatim (see
          * {@link StorageGroup#of(BoundedContextName)}) — paired with the type
-         * of the stored records. To address the table of a System context,
-         * spell its name directly, e.g.
-         * {@code BoundedContextNames.newName("Billing_System")}.
+         * of the stored records. To address the table of a System context, spell
+         * its name directly, e.g. {@code BoundedContextNames.newName("Billing_System")}.
          *
          * <p>The name previously set for the same grouped table, if any,
          * is replaced with this call.

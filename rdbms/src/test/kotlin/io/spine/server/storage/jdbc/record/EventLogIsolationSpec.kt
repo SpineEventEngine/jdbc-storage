@@ -49,12 +49,12 @@ import org.junit.jupiter.api.Test
  * Tests that the event stores of distinct Bounded Contexts served by one
  * [JdbcStorageFactory] land in distinct DB tables.
  *
- * Since core-jvm groups the event store storage by the Bounded Context,
+ * Since core-jvm groups the storage of an event store by the Bounded Context,
  * the storages of the two contexts below arrive at the factory with
  * distinct groups, and each `read` observes only the events appended
  * to its own context.
  */
-@DisplayName("Event logs of Bounded Contexts should")
+@DisplayName("`JdbcStorageFactory`, when serving distinct Bounded Contexts, should")
 internal class EventLogIsolationSpec {
 
     private lateinit var factory: JdbcStorageFactory

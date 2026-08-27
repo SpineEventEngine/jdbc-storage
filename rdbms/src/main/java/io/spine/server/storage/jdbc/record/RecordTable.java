@@ -131,7 +131,7 @@ public class RecordTable<I, R extends Message> implements WithLogging {
     }
 
     /**
-     * Reads the identifiers of the records which match the passed query,
+     * Reads the identifiers of the records that match the passed query,
      * and returns an iterator over the results.
      */
     public Iterator<I> index(RecordQuery<I, R> query) {

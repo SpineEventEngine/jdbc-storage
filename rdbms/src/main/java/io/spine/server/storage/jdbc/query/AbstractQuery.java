@@ -167,7 +167,7 @@ public abstract class AbstractQuery<I, R extends Message> implements StorageQuer
      *
      * <p>The returned factory does not perform any query optimizations specific to the database
      * engine used. See {@link #mySqlFactory(DataSourceWrapper) mySqlFactory(dataSource)} for
-     * the factory which optimizes the execution for MySQL databases.
+     * the factory that optimizes the execution for MySQL databases.
      *
      * <p>All queries produced by the factory are
      * {@linkplain Connection#setAutoCommit(boolean) transactional}.

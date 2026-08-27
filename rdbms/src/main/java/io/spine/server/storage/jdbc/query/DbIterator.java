@@ -73,7 +73,7 @@ public abstract class DbIterator<R> implements Iterator<R>, Closeable {
      * @param resultSet
      *         the results of a DB query to iterate over
      * @param columnReader
-     *         the column reader which extracts the required column values from the result set
+     *         the column reader that extracts the required column values from the result set
      * @param <R>
      *         the type of storage records
      * @return a new instance of {@code DbIterator}
@@ -229,7 +229,7 @@ public abstract class DbIterator<R> implements Iterator<R>, Closeable {
          * @param resultSet
          *         the SQL query results to iterate over
          * @param columnReader
-         *         the column reader which extracts column values from the {@code ResultSet}
+         *         the column reader that extracts column values from the {@code ResultSet}
          */
         private SingleColumnIterator(ResultSet resultSet, ColumnReader<R> columnReader) {
             super(resultSet);

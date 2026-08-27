@@ -32,7 +32,7 @@ import java.sql.SQLException;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * The reader for the columns which store strings.
+ * The reader for the columns that store strings.
  *
  * <p>The read result will also be a {@code String}.
  */

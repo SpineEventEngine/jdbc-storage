@@ -41,7 +41,7 @@ import static io.spine.server.storage.jdbc.record.column.BytesColumn.bytesColumn
 import static java.util.Objects.requireNonNull;
 
 /**
- * A query which obtains a {@link Message} by an ID.
+ * A query that obtains a {@link Message} by an ID.
  *
  * @param <I>
  *         a type of storage record IDs

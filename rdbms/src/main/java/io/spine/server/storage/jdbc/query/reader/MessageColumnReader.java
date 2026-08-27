@@ -35,7 +35,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static io.spine.type.Json.fromJson;
 
 /**
- * The reader for the columns which store {@link Message} values in JSON format.
+ * The reader for the columns that store {@link Message} values in JSON format.
  *
  * <p>The result of the read operation is always a Protobuf {@link Message}.
  *

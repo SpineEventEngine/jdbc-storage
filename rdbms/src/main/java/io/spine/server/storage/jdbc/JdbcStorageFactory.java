@@ -69,7 +69,8 @@ public class JdbcStorageFactory implements StorageFactory {
 
     /**
      * The factory-wide mapping of record columns to the columns of the DB tables,
-     * unless overridden per table via {@link Builder#setCustomMapping}.
+     * unless overridden per table via
+     * {@linkplain Builder#setCustomMapping(Class, JdbcColumnMapping) a custom mapping}.
      */
     private final JdbcColumnMapping columnMapping;
 
@@ -413,7 +414,7 @@ public class JdbcStorageFactory implements StorageFactory {
          * {@linkplain io.spine.server.storage.jdbc.record.TableNames#of(Class, StorageGroup)
          * named after the group and the record type}.
          *
-         * <p>It is a responsibility of callers to select a name that does not collide
+         * <p>It is the responsibility of callers to select a name that does not collide
          * with the names of other tables, including the generated ones.
          *
          * @param stateType
@@ -436,7 +437,7 @@ public class JdbcStorageFactory implements StorageFactory {
         }
 
         /**
-         * Sets the custom DB table name for the grouped table which serves
+         * Sets the custom DB table name for the grouped table that serves
          * the Bounded Context with the given name, storing the records of
          * the specified type — such as the event store of the context.
          *
@@ -446,7 +447,8 @@ public class JdbcStorageFactory implements StorageFactory {
          *
          * <pre>
          * // The event store of the `Billing` Bounded Context:
-         * builder.setTableName(BoundedContextNames.newName("Billing"), Event.class, "billing_events");
+         * builder.setTableName(
+         *         BoundedContextNames.newName("Billing"), Event.class, "billing_events");
          * </pre>
          *
          * <p>To address the table of a System context, spell its name directly,
