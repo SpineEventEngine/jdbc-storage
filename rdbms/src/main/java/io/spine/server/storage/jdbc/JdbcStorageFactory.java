@@ -33,6 +33,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import io.spine.annotation.Experimental;
 import io.spine.annotation.Internal;
 import io.spine.base.EntityState;
+import io.spine.core.BoundedContextName;
 import io.spine.server.ContextSpec;
 import io.spine.server.entity.Entity;
 import io.spine.server.entity.storage.SpecScanner;
@@ -61,10 +62,31 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Experimental
 public class JdbcStorageFactory implements StorageFactory {
 
+    /**
+     * The wrapper over the JDBC data source against which the created storages operate.
+     */
     private final DataSourceWrapper dataSource;
+
+    /**
+     * The factory-wide mapping of record columns to the columns of the DB tables,
+     * unless overridden per table via {@link Builder#setCustomMapping}.
+     */
     private final JdbcColumnMapping columnMapping;
+
+    /**
+     * The mapping of the generic SQL types to the dialect of the underlying DB engine.
+     */
     private final TypeMapping typeMapping;
+
+    /**
+     * The factory of the low-level DB operations performed by the created storages.
+     */
     private final OperationFactory operations;
+
+    /**
+     * The per-table settings made by the library user, along with the registry
+     * of the table specifications created by this factory.
+     */
     private final TableSpecs tableSpecs;
 
     private JdbcStorageFactory(Builder builder) {
@@ -212,7 +234,7 @@ public class JdbcStorageFactory implements StorageFactory {
      * and the storage group.
      *
      * <p>Takes into account the {@linkplain Builder#setCustomMapping(Class, JdbcColumnMapping)
-     * custom mapping} set for the records of target type.
+     * custom mapping} set for the records of the target type.
      *
      * <p>For the storages belonging to no group, the
      * {@linkplain Builder#setTableName(Class, String) custom table name} is applied as well.
@@ -410,6 +432,50 @@ public class JdbcStorageFactory implements StorageFactory {
         public <S extends EntityState<?>, R extends Message>
         Builder setTableName(Class<S> stateType, Class<R> recordType, String name) {
             tableSpecs.setTableName(stateType, recordType, name);
+            return this;
+        }
+
+        /**
+         * Sets the custom DB table name for the grouped table which serves
+         * the Bounded Context with the given name, storing the records of
+         * the specified type — such as the event store of the context.
+         *
+         * <p>A grouped table is addressed by the storage group — named by
+         * the framework after the context, taking its name verbatim — paired
+         * with the type of the stored records. For instance:
+         *
+         * <pre>
+         * // The event store of the `Billing` Bounded Context:
+         * builder.setTableName(BoundedContextNames.newName("Billing"), Event.class, "billing_events");
+         * </pre>
+         *
+         * <p>To address the table of a System context, spell its name directly,
+         * e.g. {@code BoundedContextNames.newName("Billing_System")}.
+         *
+         * <p>The name previously set for the same grouped table, if any,
+         * is replaced with this call. The single-type
+         * {@linkplain #setTableName(Class, String) custom names} never apply
+         * to grouped tables.
+         *
+         * <p>The name cannot be blank.
+         *
+         * <p>It is the responsibility of callers to select a name that does not collide
+         * with the names of other tables, including the generated ones.
+         *
+         * @param context
+         *         the name of the Bounded Context served by the grouped storage
+         * @param recordType
+         *         the type of the records stored by the grouped storage
+         * @param name
+         *         the table name
+         * @param <R>
+         *         the type of the stored record
+         * @return this instance of {@code Builder}
+         */
+        @CanIgnoreReturnValue
+        public <R extends Message>
+        Builder setTableName(BoundedContextName context, Class<R> recordType, String name) {
+            tableSpecs.setTableName(context, recordType, name);
             return this;
         }
 
