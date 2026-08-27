@@ -235,7 +235,14 @@ public final class TableSpecs {
     /**
      * Tells whether the given byte continues a multi-byte UTF-8 sequence,
      * as opposed to starting a character.
+     *
+     * <p>A continuation byte matches the bit pattern {@code 10xxxxxx}. Masking
+     * the value with {@code 0xC0}, which is {@code 11000000}, keeps its two highest
+     * bits; they equal {@code 0x80}, which is {@code 10000000}, for a continuation
+     * byte alone. A byte starting a character has {@code 0xxxxxxx} if the character
+     * is single-byte, and {@code 11xxxxxx} otherwise.
      */
+    @SuppressWarnings("MagicNumber") /* The UTF-8 mask and pattern, explained above. */
     private static boolean isContinuationByte(byte value) {
         return (value & 0xC0) == 0x80;
     }
