@@ -28,6 +28,7 @@ package io.spine.server.storage.jdbc.record
 
 import io.kotest.matchers.collections.shouldContainExactly
 import io.spine.base.Identifier
+import io.spine.base.Identifier.newUuid
 import io.spine.core.Event
 import io.spine.core.EventId
 import io.spine.grpc.StreamObservers.memoizingObserver
@@ -94,7 +95,7 @@ internal class EventLogIsolationSpec {
 
     private fun newEvent(): Event {
         val producer = stgProjectId {
-            id = "event-log-isolation"
+            id = newUuid()
         }
         val eventFactory = TestEventFactory.newInstance(
             Identifier.pack(producer),

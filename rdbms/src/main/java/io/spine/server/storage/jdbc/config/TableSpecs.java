@@ -211,17 +211,31 @@ public final class TableSpecs {
      * Returns the name as seen by the least discriminating of the supported
      * database engines.
      *
-     * <p>The name is truncated to {@value #MAX_IDENTIFIER_BYTES} bytes, which
-     * PostgreSQL does silently, and then lowercased, since MySQL running with
+     * <p>The name is clipped to the last whole character within
+     * {@value #MAX_IDENTIFIER_BYTES} bytes — the way PostgreSQL silently
+     * truncates identifiers — and then lowercased, since MySQL running with
      * a case-insensitive {@code lower_case_table_names} setting maps the names
      * differing only in case onto one table.
      */
     private static String effectiveName(String name) {
         var bytes = name.getBytes(StandardCharsets.UTF_8);
-        var truncated = bytes.length <= MAX_IDENTIFIER_BYTES
-                        ? name
-                        : new String(bytes, 0, MAX_IDENTIFIER_BYTES, StandardCharsets.UTF_8);
-        return truncated.toLowerCase(Locale.ROOT);
+        if (bytes.length <= MAX_IDENTIFIER_BYTES) {
+            return name.toLowerCase(Locale.ROOT);
+        }
+        var limit = MAX_IDENTIFIER_BYTES;
+        while (limit > 0 && isContinuationByte(bytes[limit])) {
+            limit--;
+        }
+        var clipped = new String(bytes, 0, limit, StandardCharsets.UTF_8);
+        return clipped.toLowerCase(Locale.ROOT);
+    }
+
+    /**
+     * Tells whether the given byte continues a multi-byte UTF-8 sequence,
+     * as opposed to starting a character.
+     */
+    private static boolean isContinuationByte(byte value) {
+        return (value & 0xC0) == 0x80;
     }
 
     private String tableName(RecordSpec<?, ?> spec, @Nullable StorageGroup group) {

@@ -112,4 +112,26 @@ internal class TableNameCollisionSpec {
             }
         }
     }
+
+    @Test
+    fun `clip the compared names at a whole-character boundary`() {
+        // A 62-byte prefix followed by a three-byte character crosses the 63-byte
+        // limit mid-character. PostgreSQL clips such an identifier to the last
+        // whole character — the bare prefix — so the two custom names below
+        // denote one table there.
+        val prefix = "A".repeat(62)
+        val factory = JdbcStorageFactory.newBuilder()
+            .setDataSource(whichIsStoredInMemory(newUuid()))
+            .setTypeMapping(H2_2_4)
+            .setTableName(newName("First"), Event::class.java, prefix + "€")
+            .setTableName(newName("Second"), Event::class.java, prefix)
+            .build()
+        factory.use {
+            it.createEventStore(ContextSpec.singleTenant("First"))
+
+            shouldThrow<IllegalStateException> {
+                it.createEventStore(ContextSpec.singleTenant("Second"))
+            }
+        }
+    }
 }
