@@ -107,12 +107,10 @@ The names are compared as the least discriminating of the supported engines woul
 them, so two names are also treated as clashing when they differ only:
 
 * past the 63rd byte — PostgreSQL truncates identifiers there silently; or
-* in case — MySQL may run with a case-insensitive `lower_case_table_names` setting,
-  which maps `Billing_Event` and `billing_Event` onto one table.
-
-The second rule is deliberately conservative: PostgreSQL and H2 could keep such names
-apart, but a Bounded Context layout that relies on letter case alone would not survive
-a move to MySQL.
+* in case — ordinary names are emitted unquoted, so PostgreSQL and H2 fold them
+  (to lower and upper case respectively), and MySQL may run with a case-insensitive
+  `lower_case_table_names` setting; either way, `Billing_Event` and `billing_Event`
+  denote one table. A Bounded Context layout must not rely on letter case alone.
 
 ## Adding new `(column)`
 

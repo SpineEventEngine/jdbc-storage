@@ -33,18 +33,21 @@ holding the qualified Proto type name of the event — is the discriminator: eac
 event type belongs to the domain of exactly one context.
 
 > [!IMPORTANT]
-> Quote the table names in every migration statement. The library creates its tables
-> with quoted identifiers, so the mixed-case names — `Billing_Event`,
-> `spine_core_Event` — are stored exactly as shown throughout this page. An unquoted
-> reference is folded to `billing_event` by PostgreSQL and to `BILLING_EVENT` by H2,
-> and the statement then fails with a table-not-found error. PostgreSQL and H2 quote
-> with double quotes, as in the statements below; MySQL uses backticks.
+> Reference the table names unquoted, exactly as the statements below do. The library
+> emits ordinary identifiers — Latin letters, digits, and `_` — without quotes, so
+> the engine folds the stored name: `Billing_Event` is stored as `BILLING_EVENT` by
+> H2 and as `billing_event` by PostgreSQL, while MySQL keeps it as written (subject
+> to `lower_case_table_names`). An unquoted reference folds the same way and matches;
+> a quoted `"Billing_Event"` would look for a verbatim mixed-case name that does not
+> exist. The exception is a custom name set via `setTableName(...)` that contains
+> other characters or matches a reserved SQL word: such a name is created quoted,
+> stored verbatim, and must be referenced quoted.
 
 For each context, insert the rows of its event types into the per-context table:
 
 ```sql
-INSERT INTO "Billing_Event"
-    SELECT * FROM "spine_core_Event"
+INSERT INTO Billing_Event
+    SELECT * FROM spine_core_Event
     WHERE type IN (
         'acme.billing.InvoiceIssued',
         'acme.billing.PaymentReceived'
@@ -61,9 +64,9 @@ After the copy, verify the counts:
 
 ```sql
 SELECT
-    (SELECT COUNT(*) FROM "spine_core_Event") AS shared,
-    (SELECT COUNT(*) FROM "Billing_Event") +
-    (SELECT COUNT(*) FROM "Shipping_Event") AS split;
+    (SELECT COUNT(*) FROM spine_core_Event) AS shared,
+    (SELECT COUNT(*) FROM Billing_Event) +
+    (SELECT COUNT(*) FROM Shipping_Event) AS split;
 ```
 
 Keep `spine_core_Event` as an archive until the migrated deployment is verified;

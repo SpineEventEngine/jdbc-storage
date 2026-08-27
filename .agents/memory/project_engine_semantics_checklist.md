@@ -10,10 +10,15 @@ users are expected to run, walk this checklist against every supported engine
 (MySQL, PostgreSQL, H2) — their semantics differ in ways that pass review one
 engine at a time:
 
-1. **Quoting and folding.** This library creates tables with *quoted*
-   identifiers, so mixed-case names are stored verbatim. Unquoted SQL folds:
-   PostgreSQL to lowercase, H2 to uppercase. Any SQL shown in the docs must
-   quote table names (double quotes on PostgreSQL/H2, backticks on MySQL).
+1. **Quoting and folding.** Quoting is *conditional*: `CreateTable` passes names
+   through Querydsl's `SQLTemplates.quoteIdentifier(..)`, which quotes only when
+   the dialect requires it (reserved word, illegal characters) — `useQuotes` is
+   off on the `SQLTemplatesRegistry` path this library uses. An ordinary name is
+   emitted unquoted and folded by the engine: `Billing_Event` is stored as
+   `BILLING_EVENT` on H2 and `billing_event` on PostgreSQL (verified against H2's
+   `INFORMATION_SCHEMA`; pinned by `CreatedTableNameSpec`). Documented SQL must
+   reference ordinary names unquoted, so they fold the same way; only a
+   requires-quotes name is stored verbatim and must be referenced quoted.
 2. **Case sensitivity of names.** MySQL may run with a case-insensitive
    `lower_case_table_names` setting: names differing only in case map onto one
    table. Never rely on letter case to distinguish tables; `TableSpecs`
@@ -35,5 +40,9 @@ the logic itself — the same class of issue as the earlier MySQL collation
 work (#173). Catching these at writing time is cheaper than in review.
 
 **How to apply:** Before proposing name-handling code or documented SQL, state
-explicitly which engines were checked against items 1–5. User-facing rules
-live in `docs/tables.md` ("Name clashes") and `docs/type-mapping.md`.
+explicitly which engines were checked against items 1–5. Verify quoting claims
+*empirically* (create a table, read `INFORMATION_SCHEMA`) — spotting a
+`quoteIdentifier(..)` call is not enough; the call is conditional, and a bot
+review on PR #182 mis-asserted verbatim storage from exactly that shortcut.
+User-facing rules live in `docs/tables.md` ("Name clashes") and
+`docs/type-mapping.md`.

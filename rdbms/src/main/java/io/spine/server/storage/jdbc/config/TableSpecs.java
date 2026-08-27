@@ -67,10 +67,11 @@ import static java.lang.String.format;
  * a specification whose table name is already claimed by a different storage fails
  * with an {@link IllegalStateException} naming both claimants. The names are compared
  * as the least discriminating of the supported engines would see them — truncated to
- * {@value #MAX_IDENTIFIER_BYTES} bytes, which PostgreSQL does silently, and case-insensitively,
- * since MySQL may run with a case-insensitive {@code lower_case_table_names} setting.
- * The names differing only past the length limit, or only in case, are therefore
- * treated as clashing, too.
+ * {@value #MAX_IDENTIFIER_BYTES} bytes, which PostgreSQL does silently, and
+ * case-insensitively, since ordinary names are emitted unquoted — folded to lower case
+ * by PostgreSQL and to upper case by H2 — and MySQL may run with a case-insensitive
+ * {@code lower_case_table_names} setting. The names differing only past the length
+ * limit, or only in case, are therefore treated as clashing, too.
  */
 @Internal
 public final class TableSpecs {
@@ -213,9 +214,10 @@ public final class TableSpecs {
      *
      * <p>The name is clipped to the last whole character within
      * {@value #MAX_IDENTIFIER_BYTES} bytes — the way PostgreSQL silently
-     * truncates identifiers — and then lowercased, since MySQL running with
+     * truncates identifiers — and then lowercased: ordinary names are emitted
+     * unquoted and get case-folded by PostgreSQL and H2, and MySQL running with
      * a case-insensitive {@code lower_case_table_names} setting maps the names
-     * differing only in case onto one table.
+     * differing only in case onto one table even when quoted.
      */
     private static String effectiveName(String name) {
         var bytes = name.getBytes(StandardCharsets.UTF_8);

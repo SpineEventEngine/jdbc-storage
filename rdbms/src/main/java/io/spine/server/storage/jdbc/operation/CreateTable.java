@@ -109,10 +109,13 @@ public class CreateTable<I, R extends Message> extends Operation<I, R> implement
     /**
      * Composes an SQL statement for this operation.
      *
-     * <p>Table and column names are {@linkplain SQLTemplates#quoteIdentifier(String) quoted}
-     * according to the dialect of the underlying database. This is the same quoting that QueryDSL
-     * applies when serializing the read and write queries, so a name that is a reserved SQL
-     * keyword (e.g. {@code group}) is escaped consistently across the table creation and
+     * <p>Table and column names are passed through
+     * {@link SQLTemplates#quoteIdentifier(String)}, which quotes a name only when
+     * the dialect requires it — a reserved SQL keyword (e.g. {@code group}), or
+     * characters illegal in a plain identifier. An ordinary name is emitted unquoted
+     * and thus case-folded by the engines that fold unquoted identifiers. This is
+     * the same treatment QueryDSL applies when serializing the read and write
+     * queries, so every name is escaped consistently across the table creation and
      * all the subsequent operations over the table.
      */
     @Internal
