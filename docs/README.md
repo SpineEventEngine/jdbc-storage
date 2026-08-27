@@ -12,6 +12,8 @@ see the [project README](../README.md).
   and how to customize the mapping.
 * [RDBMS tables](tables.md) — table naming and structure, adding new columns,
   indexes, and customization. *(Available since 2.x.)*
+* [Migrating the event log](event-log-migration.md) — moving the stored events from
+  the table shared by all Bounded Contexts to the per-context tables.
 * [Queries](queries.md) — default queries, RDBMS engine detection,
   and customization. *(Available since 2.x.)*
 

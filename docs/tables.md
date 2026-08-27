@@ -14,8 +14,11 @@ if it does not exist.
 The name of the table is composed according to the following scheme:
 
 ```
-(Package of Proto message + message name) -> (replace `.` with `_`) -> result
+(Package of Proto message + message name) -> (replace prohibited characters with `_`) -> result
 ```
+
+Every character other than Latin letters, digits, and the underscore is prohibited
+in a table name and gets replaced — for a Proto package, these are the `.` symbols.
 
 E.g. a table name for an Entity that has a state declared by `bar.acme.Project` would be
 "bar_acme_Project".
@@ -31,7 +34,8 @@ Each table created has the following structure:
      * or according to the columns declaration for a standalone message,
        annotated with `@RecordColumns` (e.g. `io.spine.server.event.store.EventColumn`).
 
-:warning: The framework does **not** verify the table structure for existing tables.
+> [!WARNING]
+> The framework does **not** verify the table structure for existing tables.
 
 ## Grouped tables
 
@@ -52,7 +56,7 @@ The name of a grouped table is composed of the group name and the simple name
 of the stored record type:
 
 ```
-(group name + record type name) -> (replace `.` with `_`, join with `_`) -> result
+(group name + record type name) -> (replace prohibited characters with `_`, join with `_`) -> result
 ```
 
 E.g. for an Entity with the state declared by `bar.acme.Project`, the tables are:
@@ -69,10 +73,40 @@ these are `entity_id`, `created`, and `version`.
 
 A grouped table can also be given a custom name; see [Customization](#customization).
 
-:warning: Group names are the fully qualified names of Proto types, so the names
-of grouped tables run longer than the ungrouped ones. Mind the identifier length
-limits of the underlying DB engine — e.g., 64 characters on MySQL —
-when naming the Proto packages of entity states.
+### The event log of a Bounded Context
+
+The event store of each Bounded Context is a grouped storage, too: the framework
+passes a `StorageGroup` named after the context, taking its name verbatim. The event
+log of each context therefore lands in its own table. E.g., for an application with
+the contexts named `Billing` and `Shipping`, the tables are `Billing_Event` and
+`Shipping_Event`. A System context configured to persist its events — see
+`SystemSettings.persistEvents()` — gets its own table as well, e.g.
+`Billing_System_Event`.
+
+Applications upgrading from the library versions that kept a single
+`spine_core_Event` table shared by all contexts should migrate the stored events;
+see [Migrating the event log](event-log-migration.md).
+
+> [!WARNING]
+> Group names are the fully qualified names of Proto types or the names of
+> Bounded Contexts, so the names of grouped tables run longer than the ungrouped ones.
+> Mind the identifier length limits of the underlying DB engine when naming the Proto
+> packages of entity states and the contexts. The limits differ per engine in both
+> the value and the unit: e.g., MySQL rejects identifiers longer than 64 characters,
+> while PostgreSQL silently truncates them to 63 bytes.
+
+## Name clashes
+
+Replacing the prohibited characters may map distinct names to one table name: e.g.,
+the Bounded Contexts named `Sales.EU` and `Sales_EU` would both resolve to the
+`Sales_EU_Event` table. The factory detects such a clash when the second of the
+clashing storages is created, and fails with an `IllegalStateException` naming both
+claimants. To resolve the clash, rename one of the contexts, or assign a distinct
+table name via `setTableName(...)`; see [Customization](#customization).
+
+The names are compared truncated to 63 bytes — PostgreSQL's identifier limit,
+the strictest among the supported engines — so two long names differing only past
+that limit are treated as clashing, too.
 
 ## Adding new `(column)`
 
@@ -148,9 +182,12 @@ var factory = JdbcStorageFactory.newBuilder()
         .build();
 ```
 
-:warning: The single-type `setTableName(...)` applies only to the storages outside any
-`StorageGroup`: a name set for an entity state type names the latest-state table alone;
-honoring it for the state history of the same entity would collide the two tables.
+> [!WARNING]
+> The single-type `setTableName(...)` applies only to the storages outside any
+> `StorageGroup`: a name set for an entity state type names the latest-state table alone;
+> honoring it for the state history of the same entity would collide the two tables.
+> In particular, a name set for `Event.class` does not apply to
+> [the event log of a context](#the-event-log-of-a-bounded-context), which is grouped.
 
 To name the [grouped tables](#grouped-tables) of an entity — its per-entity histories —
 address them by the entity state type paired with the type of the stored records:
@@ -166,6 +203,21 @@ var factory = JdbcStorageFactory.newBuilder()
         .setTableName(Project.class, EntityRecord.class, "project_state_history")
         .build();
 ```
+
+The event log of a Bounded Context is addressed by the context name paired with
+the type of the stored records:
+
+```java
+var factory = JdbcStorageFactory.newBuilder()
+        // ...
+
+        // The event log of the `Billing` Bounded Context:
+        .setTableName(BoundedContextNames.newName("Billing"), Event.class, "billing_events")
+        .build();
+```
+
+To address the table of a System context, spell its name directly:
+`BoundedContextNames.newName("Billing_System")`.
 
 * column type mapping, per type of stored records:
 

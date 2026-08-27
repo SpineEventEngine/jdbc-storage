@@ -15,7 +15,12 @@ Unplanned but required: the root `build.gradle.kts` is adapted to the updated
 `coreJvmCompiler.gradlePlugin`, dropped monolithic `ToolBase.lib`), mirroring
 core-jvm's script on the same `config` version.
 
-Remaining: § 4 migration/release notes placement per repo convention.
+§ 4 done: `docs/tables.md` updated (sanitized naming, the event-log-of-a-context
+section, name clashes, the context-addressed `setTableName` example), and the new
+`docs/event-log-migration.md` covers moving the stored events; both linked from
+`docs/README.md`.
+
+All planned work is complete; `pre-pr` and the PR remain.
 
 ## Background
 
