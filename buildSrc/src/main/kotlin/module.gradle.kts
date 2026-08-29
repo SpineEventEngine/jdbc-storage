@@ -31,6 +31,11 @@ import io.spine.dependency.lib.Guava
 import io.spine.dependency.lib.Jackson
 import io.spine.dependency.lib.Kotlin
 import io.spine.dependency.lib.KotlinPoet
+import io.spine.dependency.kotlinx.AtomicFu
+import io.spine.dependency.kotlinx.Coroutines
+import io.spine.dependency.lib.Caffeine
+import io.spine.dependency.lib.JacksonV2
+import io.spine.dependency.lib.Protobuf
 import io.spine.dependency.local.Base
 import io.spine.dependency.local.BaseTypes
 import io.spine.dependency.local.Change
@@ -169,7 +174,17 @@ fun Module.forceConfigurations() {
                 Jackson.DataFormat.forceArtifacts(project, this@all, this@resolutionStrategy)
                 Jackson.DataType.forceArtifacts(project, this@all, this@resolutionStrategy)
 
+                JacksonV2.Core.forceArtifacts(project, this@all, this@resolutionStrategy)
+                JacksonV2.DataType.forceArtifacts(project, this@all, this@resolutionStrategy)
+                JacksonV2.DataFormat.forceArtifacts(project, this@all, this@resolutionStrategy)
+                JacksonV2.Module.forceArtifacts(project, this@all, this@resolutionStrategy)
                 force(
+                    JacksonV2.bom,
+                    Jackson.bom,
+                    Coroutines.bom,
+                    AtomicFu.lib,
+                    Protobuf.javaLib,
+                    Caffeine.lib,
                     Base.annotations,
                     Base.environment,
                     Base.format,
