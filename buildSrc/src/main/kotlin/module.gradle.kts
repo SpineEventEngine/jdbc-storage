@@ -165,11 +165,6 @@ fun Module.forceConfigurations() {
                 Grpc.forceArtifacts(project, this@all, this@resolutionStrategy)
                 force(Grpc.ProtocPlugin.artifact)
 
-                // Substitute the legacy artifact coordinates with the new `ToolBase.lib` alias.
-                dependencySubstitution {
-                    substitute(module("io.spine.tools:spine-tool-base")).using(module(ToolBase.lib))
-                }
-
                 Jackson.forceArtifacts(project, this@all, this@resolutionStrategy)
                 Jackson.DataFormat.forceArtifacts(project, this@all, this@resolutionStrategy)
                 Jackson.DataType.forceArtifacts(project, this@all, this@resolutionStrategy)
@@ -180,7 +175,6 @@ fun Module.forceConfigurations() {
                 JacksonV2.Module.forceArtifacts(project, this@all, this@resolutionStrategy)
                 force(
                     JacksonV2.bom,
-                    Jackson.bom,
                     Coroutines.bom,
                     AtomicFu.lib,
                     Protobuf.javaLib,
@@ -216,7 +210,6 @@ fun Module.forceConfigurations() {
                     ToolBase.intellijPlatform,
                     ToolBase.intellijPlatformJava,
                     ToolBase.jvmTools,
-                    ToolBase.lib,
                     ToolBase.pluginBase,
                     ToolBase.protobufSetupPlugins,
                     ToolBase.psiJava,
