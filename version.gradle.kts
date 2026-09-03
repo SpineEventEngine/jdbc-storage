@@ -27,4 +27,4 @@
 /**
  * The version of this library.
  */
-val versionToPublish: String by extra("2.0.0-SNAPSHOT.120")
+extra.set("versionToPublish", "2.0.0-SNAPSHOT.121")
