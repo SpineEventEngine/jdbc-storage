@@ -1,6 +1,6 @@
 
 
-# Dependencies of `io.spine:spine-rdbms:2.0.0-SNAPSHOT.121`
+# Dependencies of `io.spine:spine-rdbms:2.0.0-SNAPSHOT.123`
 
 ## Runtime
 1.  **Group** : com.google.android. **Name** : annotations. **Version** : 4.1.1.4.
@@ -1187,6 +1187,6 @@
 
 The dependencies distributed under several licenses, are used according their commercial-use-friendly license.
 
-This report was generated on **Sun Aug 30 00:07:45 WEST 2026** using 
+This report was generated on **Fri Oct 02 19:08:05 WEST 2026** using 
 [Gradle-License-Report plugin](https://github.com/jk1/Gradle-License-Report) by Evgeny Naumenko, licensed under 
 [Apache 2.0 License](https://github.com/jk1/Gradle-License-Report/blob/master/LICENSE).
