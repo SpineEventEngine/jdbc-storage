@@ -29,9 +29,9 @@ package io.spine.server.storage.jdbc.postgres;
 import io.spine.testing.SlowTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.postgresql.PostgreSQLContainer;
 
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -57,8 +57,8 @@ import static io.spine.server.storage.jdbc.Type.STRING_512;
 final class PostgresIdCaseSensitivityTest {
 
     @Container
-    private static final PostgreSQLContainer<?> postgres =
-            new PostgreSQLContainer<>("postgres:16-alpine");
+    private static final PostgreSQLContainer postgres =
+            new PostgreSQLContainer("postgres:16-alpine");
 
     @Test
     @DisplayName("compare identifier columns case-sensitively without an explicit collation")
