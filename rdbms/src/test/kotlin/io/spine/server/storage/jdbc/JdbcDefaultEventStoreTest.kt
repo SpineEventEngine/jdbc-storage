@@ -48,7 +48,7 @@ import org.junit.jupiter.api.DisplayName
 internal class JdbcDefaultEventStoreTest : DefaultEventStoreTest() {
 
     init {
-        ServerEnvironment.`when`(Tests::class.java).use(freshFactory())
+        ServerEnvironment.under(Tests::class.java).use(freshFactory())
     }
 
     companion object {
