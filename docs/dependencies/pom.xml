@@ -38,13 +38,13 @@ all modules and does not describe the project structure per-subproject.
   <dependency>
     <groupId>io.spine</groupId>
     <artifactId>spine-server</artifactId>
-    <version>2.0.0-SNAPSHOT.551</version>
+    <version>2.0.0-SNAPSHOT.552</version>
     <scope>compile</scope>
   </dependency>
   <dependency>
     <groupId>io.spine</groupId>
     <artifactId>spine-time</artifactId>
-    <version>2.0.0-SNAPSHOT.250</version>
+    <version>2.0.0-SNAPSHOT.251</version>
     <scope>compile</scope>
   </dependency>
   <dependency>
@@ -116,7 +116,7 @@ all modules and does not describe the project structure per-subproject.
   <dependency>
     <groupId>io.spine.tools</groupId>
     <artifactId>server-testlib</artifactId>
-    <version>2.0.0-SNAPSHOT.551</version>
+    <version>2.0.0-SNAPSHOT.552</version>
     <scope>test</scope>
   </dependency>
   <dependency>
@@ -234,17 +234,17 @@ all modules and does not describe the project structure per-subproject.
   <dependency>
     <groupId>io.spine.tools</groupId>
     <artifactId>core-jvm-gradle-plugin</artifactId>
-    <version>2.0.0-SNAPSHOT.092</version>
+    <version>2.0.0-SNAPSHOT.093</version>
   </dependency>
   <dependency>
     <groupId>io.spine.tools</groupId>
     <artifactId>core-jvm-plugins</artifactId>
-    <version>2.0.0-SNAPSHOT.092</version>
+    <version>2.0.0-SNAPSHOT.093</version>
   </dependency>
   <dependency>
     <groupId>io.spine.tools</groupId>
-    <artifactId>spine-dokka-extensions</artifactId>
-    <version>2.0.0-SNAPSHOT.7</version>
+    <artifactId>dokka-extensions</artifactId>
+    <version>2.0.0-SNAPSHOT.9</version>
   </dependency>
   <dependency>
     <groupId>io.spine.tools</groupId>
