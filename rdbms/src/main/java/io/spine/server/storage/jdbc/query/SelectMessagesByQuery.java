@@ -28,24 +28,20 @@ package io.spine.server.storage.jdbc.query;
 
 import com.google.common.collect.ImmutableList;
 import com.google.protobuf.Descriptors.Descriptor;
-import com.google.protobuf.FieldMask;
 import com.google.protobuf.Message;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.sql.AbstractSQLQuery;
 import io.spine.query.RecordQuery;
 import io.spine.query.SortBy;
-import io.spine.server.storage.FieldMaskApplier;
 import io.spine.server.storage.jdbc.query.reader.ColumnReaderFactory;
 import io.spine.server.storage.jdbc.record.RecordTable;
 import io.spine.server.storage.jdbc.type.JdbcColumnMapping;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.sql.ResultSet;
 import java.util.Iterator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.collect.Iterators.transform;
 import static com.querydsl.core.types.dsl.Expressions.comparablePath;
 import static io.spine.query.Direction.ASC;
 import static io.spine.server.storage.jdbc.query.QueryPredicates.inIds;
@@ -93,8 +89,7 @@ public class SelectMessagesByQuery<I, R extends Message> extends AbstractQuery<I
 
         var resultSet = query.getResults();
         var records = asIterator(resultSet);
-        var maskedRecords = maskFields(records);
-        return maskedRecords;
+        return records;
     }
 
     private void setLimit(AbstractSQLQuery<Object, ? extends AbstractSQLQuery<Object, ?>> query) {
@@ -120,19 +115,6 @@ public class SelectMessagesByQuery<I, R extends Message> extends AbstractQuery<I
         var records = DbIterator.over(resultSet, messageReader);
         var result = ImmutableList.copyOf(records);
         return result.iterator();
-    }
-
-    @NonNull
-    private Iterator<R> maskFields(Iterator<R> records) {
-        var mask = recordQuery.mask();
-        Iterator<R> result;
-        if (!mask.equals(FieldMask.getDefaultInstance())) {
-            var masker = new FieldMaskApplier<R>(mask);
-            result = transform(records, masker::apply);
-        } else {
-            result = records;
-        }
-        return result;
     }
 
     /**
