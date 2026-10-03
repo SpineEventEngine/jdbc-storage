@@ -88,3 +88,6 @@ executed against Docker, not skipped).
   main checkout, not the worktree; the PR was created via `gh api` with the
   user's consent.
 - 2026-10-03 — scope extended: latest `config`, CodeMatters copyright profile.
+- 2026-10-03 — `docs/configuration.md` now uses `ServerEnvironment.under(..)`,
+  with one statement per environment type. The old chained example never
+  compiled, because `TypeConfigurator` has no `when`/`under`.
