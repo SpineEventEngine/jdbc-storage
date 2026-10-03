@@ -1,27 +1,15 @@
 /*
- * Copyright 2023, TeamDev. All rights reserved.
+ * Copyright 2026 CodeMatters, Lda.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * https://www.apache.org/licenses/LICENSE-2.0
  *
- * Redistribution and use in source and/or binary forms, with or without
- * modification, must retain the above copyright notice and the following
- * disclaimer.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Unless required by applicable law or agreed to in writing, software distributed under
+ * the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
  */
 
 package io.spine.server.storage.jdbc.mysql;
@@ -33,7 +21,7 @@ import io.spine.server.storage.jdbc.JdbcStorageFactory;
 import io.spine.server.storage.jdbc.PredefinedMapping;
 import org.jspecify.annotations.Nullable;
 import org.testcontainers.DockerClientFactory;
-import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.mysql.MySQLContainer;
 
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -62,7 +50,7 @@ final class MysqlTests {
      * start a single instance lazily and {@linkplain #dropAllTables(MySQLContainer) wipe its
      * schema} before each test to keep the tests isolated from one another.
      */
-    private static @Nullable MySQLContainer<?> serverContainer;
+    private static @Nullable MySQLContainer serverContainer;
 
     /**
      * The factory handed to the previous test.
@@ -111,9 +99,9 @@ final class MysqlTests {
     /**
      * Returns the MySQL container shared by all the tests, starting it on the first call.
      */
-    private static MySQLContainer<?> sharedContainer() {
+    private static MySQLContainer sharedContainer() {
         if (serverContainer == null) {
-            MySQLContainer<?> container = new MySQLContainer<>(IMAGE);
+            MySQLContainer container = new MySQLContainer(IMAGE);
             // Allow the MySQL 8 `caching_sha2_password` handshake over a non-TLS test connection.
             container.withUrlParam("allowPublicKeyRetrieval", "true");
             // Reuse the container across Gradle runs when the user opts in via
@@ -139,7 +127,7 @@ final class MysqlTests {
     /**
      * Removes all the tables from the container's database, giving each test a clean schema.
      */
-    private static void dropAllTables(MySQLContainer<?> container) {
+    private static void dropAllTables(MySQLContainer container) {
         try (var connection = DriverManager.getConnection(container.getJdbcUrl(),
                                                           container.getUsername(),
                                                           container.getPassword());
@@ -165,7 +153,7 @@ final class MysqlTests {
      *
      * <p>The connections are pooled via HikariCP, with its default settings.
      */
-    private static DataSourceWrapper wrap(MySQLContainer<?> container) {
+    private static DataSourceWrapper wrap(MySQLContainer container) {
         var config = new HikariConfig();
         config.setJdbcUrl(container.getJdbcUrl());
         config.setUsername(container.getUsername());

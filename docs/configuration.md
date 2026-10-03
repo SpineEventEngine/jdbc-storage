@@ -30,11 +30,11 @@ var testingFactory = ...;
 var defaultFactory = ...;
 
 // Plug them into the environment.
-ServerEnvironment
+// To use in tests:
+ServerEnvironment.under(Tests.class)
+                 .useStorageFactory((env) -> testingFactory);
 
-        // To use in tests:
-        .when(Tests.class).useStorageFactory((env) -> testingFactory)
-
-        // And in all other cases:
-        .when(DefaultMode.class).useStorageFactory((env) -> defaultFactory)
+// And in all other cases:
+ServerEnvironment.under(DefaultMode.class)
+                 .useStorageFactory((env) -> defaultFactory);
 ```
