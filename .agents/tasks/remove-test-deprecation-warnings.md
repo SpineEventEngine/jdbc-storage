@@ -57,6 +57,24 @@ executed against Docker, not skipped).
       `max_allowed_packet` 1 MiB → 64 MiB, perf-schema history sizes).
       Charset, collation, `sql_mode`, `lower_case_table_names`, isolation equal.
 
+### Scope extension (user request, PR #184)
+
+- [x] `./config/pull` → `config@94a9e08b`. Accept config's baseline,
+      including the local Spine stack (core-jvm `.551` → `.552`, Base `.442`,
+      Logging `.425`, Time `.251`, ToolBase `.423`, CoreJvmCompiler `.093`).
+      All new versions are published.
+- [x] Make CodeMatters the default IDEA copyright profile
+      (`.idea/copyright/profiles_settings.xml`).
+- [x] Re-stamp the PR's own source files with the CodeMatters notice. Leave
+      config-distributed files to config.
+- [x] Rebuild (`./gradlew build dokkaGenerate`): green. 346 tests, 0 failures,
+      and the DB suites ran. One adaptation was needed: config's Jackson 3.2.3
+      conflicted with the toolchain plugins' 3.2.2 under
+      `failOnVersionConflict()`, so the root `buildscript` now forces each
+      Jackson 3 module, not only the BOM.
+- PostgreSQL JDBC is already at 42.7.13, newer than the requested 42.7.12.
+  Dependabot's closed #180 edited the generated report, not `PostgreSql.kt`.
+
 ## Log
 
 - 2026-10-02 — drafted from a fully specified user prompt; executing.
@@ -66,3 +84,7 @@ executed against Docker, not skipped).
 - 2026-10-02 — out of scope, flagged: `docs/configuration.md` still shows
   `ServerEnvironment.when(..)` in a user-facing snippet.
 - 2026-10-02 — verified; awaiting the user's review. Nothing committed.
+- 2026-10-02 — PR #184 opened; `/pre-pr` PASS. The PR gate hook resolves the
+  main checkout, not the worktree; the PR was created via `gh api` with the
+  user's consent.
+- 2026-10-03 — scope extended: latest `config`, CodeMatters copyright profile.
