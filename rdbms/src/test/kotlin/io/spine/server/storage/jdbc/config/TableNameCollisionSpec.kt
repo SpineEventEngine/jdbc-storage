@@ -35,7 +35,7 @@ import io.spine.core.Event
 import io.spine.server.ContextSpec
 import io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory
 import io.spine.server.storage.jdbc.JdbcStorageFactory
-import io.spine.server.storage.jdbc.PredefinedMapping.H2_2_4
+import io.spine.server.storage.jdbc.PredefinedMapping.H2_2_5
 import io.spine.server.storage.jdbc.record.given.HistoryStorageTestEnv.h2Factory
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -76,7 +76,7 @@ internal class TableNameCollisionSpec {
     fun `reject a custom name clashing with a derived one`() {
         val factory = JdbcStorageFactory.newBuilder()
             .setDataSource(whichIsStoredInMemory(newUuid()))
-            .setTypeMapping(H2_2_4)
+            .setTypeMapping(H2_2_5)
             .setTableName(newName("Billing"), Event::class.java, "Shipping_Event")
             .build()
         factory.use {
@@ -122,7 +122,7 @@ internal class TableNameCollisionSpec {
         val prefix = "A".repeat(62)
         val factory = JdbcStorageFactory.newBuilder()
             .setDataSource(whichIsStoredInMemory(newUuid()))
-            .setTypeMapping(H2_2_4)
+            .setTypeMapping(H2_2_5)
             .setTableName(newName("First"), Event::class.java, prefix + "€")
             .setTableName(newName("Second"), Event::class.java, prefix)
             .build()

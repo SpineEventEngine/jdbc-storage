@@ -43,7 +43,7 @@ import io.spine.server.storage.RecordSpec
 import io.spine.server.storage.StorageGroup
 import io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory
 import io.spine.server.storage.jdbc.JdbcStorageFactory
-import io.spine.server.storage.jdbc.PredefinedMapping.H2_2_4
+import io.spine.server.storage.jdbc.PredefinedMapping.H2_2_5
 import io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.StgProjectAggregate
 import io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.TestColumnMapping
 import io.spine.server.storage.jdbc.record.given.HistoryStorageTestEnv
@@ -168,7 +168,7 @@ internal class GroupedTableAllocationSpec {
         factory.close()
         factory = JdbcStorageFactory.newBuilder()
             .setDataSource(whichIsStoredInMemory(Identifier.newUuid()))
-            .setTypeMapping(H2_2_4)
+            .setTypeMapping(H2_2_5)
             .setTableName(Event::class.java, "custom_event_log")
             .setTableName(StgProject::class.java, "my_projects")
             .build()
@@ -195,7 +195,7 @@ internal class GroupedTableAllocationSpec {
         factory.close()
         factory = JdbcStorageFactory.newBuilder()
             .setDataSource(whichIsStoredInMemory(Identifier.newUuid()))
-            .setTypeMapping(H2_2_4)
+            .setTypeMapping(H2_2_5)
             .setTableName(StgProject::class.java, Event::class.java, "project_journal")
             .setTableName(StgProject::class.java, EntityRecord::class.java, "project_state_history")
             .build()
@@ -230,7 +230,7 @@ internal class GroupedTableAllocationSpec {
         val custom = TestColumnMapping()
         factory = JdbcStorageFactory.newBuilder()
             .setDataSource(whichIsStoredInMemory(Identifier.newUuid()))
-            .setTypeMapping(H2_2_4)
+            .setTypeMapping(H2_2_5)
             .setCustomMapping(StgProject::class.java, custom)
             .build()
 

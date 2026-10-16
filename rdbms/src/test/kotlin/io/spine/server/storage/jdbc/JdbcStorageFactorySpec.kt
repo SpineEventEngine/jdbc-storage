@@ -48,7 +48,7 @@ internal class JdbcStorageFactorySpec {
         config.jdbcUrl = "jdbc:h2:mem:${newUuid()}"
         val factory = JdbcStorageFactory.newBuilder()
             .setDataSource(HikariDataSource(config))
-            .setTypeMapping(PredefinedMapping.H2_2_4)
+            .setTypeMapping(PredefinedMapping.H2_2_5)
             .build()
 
         factory.isOpen shouldBe true

@@ -39,7 +39,7 @@ import io.spine.server.entity.storage.EntityStateHistoryColumns
 import io.spine.server.storage.RecordSpec
 import io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory
 import io.spine.server.storage.jdbc.JdbcStorageFactory
-import io.spine.server.storage.jdbc.PredefinedMapping.H2_2_4
+import io.spine.server.storage.jdbc.PredefinedMapping.H2_2_5
 import io.spine.test.storage.StgProject
 import io.spine.test.storage.StgTask
 import io.spine.test.storage.StgTaskId
@@ -56,7 +56,7 @@ internal object HistoryStorageTestEnv {
     fun h2Factory(): JdbcStorageFactory =
         JdbcStorageFactory.newBuilder()
             .setDataSource(whichIsStoredInMemory(newUuid()))
-            .setTypeMapping(H2_2_4)
+            .setTypeMapping(H2_2_5)
             .build()
 
     /**

@@ -63,7 +63,7 @@ public enum PredefinedMapping implements TypeMapping {
                                     .add(DOUBLE, PostgreSqlTypeNames.DOUBLE_PRECISION)),
 
     // Must match `io.spine.dependency.storage.H2.version`.
-    H2_2_4("H2", 2, 4, mappingBuilder());
+    H2_2_5("H2", 2, 5, mappingBuilder());
 
     /**
      * A portable mapping used by {@link #select(DataSourceWrapper) select} for a database it does
