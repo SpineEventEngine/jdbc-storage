@@ -48,7 +48,7 @@ import io.spine.test.storage.StgProject;
 import io.spine.test.storage.StgProjectId;
 
 import static io.spine.server.storage.jdbc.GivenDataSource.prefix;
-import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_4;
+import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_5;
 import static io.spine.server.storage.jdbc.Type.LONG;
 
 public final class JdbcStorageFactoryTestEnv {
@@ -64,7 +64,7 @@ public final class JdbcStorageFactoryTestEnv {
                                  // The data source is an in-memory H2 database, so the H2 mapping
                                  // must be used. The MySQL mapping emits a MySQL-specific binary
                                  // collation for string columns, which H2 cannot parse.
-                                 .setTypeMapping(H2_2_4)
+                                 .setTypeMapping(H2_2_5)
                                  .build();
     }
 
@@ -90,7 +90,7 @@ public final class JdbcStorageFactoryTestEnv {
         var factory = JdbcStorageFactory
                 .newBuilder()
                 .setDataSource(dataSource)
-                .setTypeMapping(H2_2_4)
+                .setTypeMapping(H2_2_5)
                 .setTableName(InboxMessage.class, tableName)
                 .build();
         var storage = (JdbcRecordStorage<InboxMessageId, InboxMessage>)

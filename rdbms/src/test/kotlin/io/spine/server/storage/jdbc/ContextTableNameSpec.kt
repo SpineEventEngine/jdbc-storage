@@ -34,7 +34,7 @@ import io.spine.core.EventId
 import io.spine.server.storage.RecordSpec
 import io.spine.server.storage.StorageGroup
 import io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory
-import io.spine.server.storage.jdbc.PredefinedMapping.H2_2_4
+import io.spine.server.storage.jdbc.PredefinedMapping.H2_2_5
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
@@ -72,7 +72,7 @@ internal class ContextTableNameSpec {
     ): JdbcStorageFactory {
         val builder = JdbcStorageFactory.newBuilder()
             .setDataSource(whichIsStoredInMemory(newUuid()))
-            .setTypeMapping(H2_2_4)
+            .setTypeMapping(H2_2_5)
         configure(builder)
         return builder.build()
     }

@@ -35,7 +35,7 @@ import io.spine.server.storage.RecordSpec
 import io.spine.server.storage.Storage
 import io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory
 import io.spine.server.storage.jdbc.JdbcStorageFactory
-import io.spine.server.storage.jdbc.PredefinedMapping.H2_2_4
+import io.spine.server.storage.jdbc.PredefinedMapping.H2_2_5
 import io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_9_7
 import io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.singleTenantSpec
 import io.spine.server.storage.jdbc.record.RecordTable
@@ -116,7 +116,7 @@ internal class CreateTableSpec {
         private fun h2Factory(): JdbcStorageFactory =
             JdbcStorageFactory.newBuilder()
                 .setDataSource(whichIsStoredInMemory(newUuid()))
-                .setTypeMapping(H2_2_4)
+                .setTypeMapping(H2_2_5)
                 .build()
 
         /**
