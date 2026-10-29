@@ -25,6 +25,7 @@ import org.testcontainers.mysql.MySQLContainer;
 
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 
 import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_9_7;
@@ -50,7 +51,7 @@ final class MysqlTests {
      * start a single instance lazily and {@linkplain #dropAllTables(MySQLContainer) wipe its
      * schema} before each test to keep the tests isolated from one another.
      */
-    private static @Nullable MySQLContainer serverContainer;
+    private static @Nullable MySQLContainer serverContainer = null;
 
     /**
      * The factory handed to the previous test.
@@ -59,7 +60,7 @@ final class MysqlTests {
      * instance field. We keep it here and close its connection pool when the next test asks for a
      * factory — by that point the previous test has already been torn down.
      */
-    private static @Nullable JdbcStorageFactory previousFactory;
+    private static @Nullable JdbcStorageFactory previousFactory = null;
 
     /**
      * Controls whether ALL tests in this package are enabled.
@@ -69,7 +70,8 @@ final class MysqlTests {
      * that the build stays green in environments without Docker (e.g. local machines or CI
      * agents that do not provide Docker).
      */
-    static final boolean enabled = DockerClientFactory.instance().isDockerAvailable();
+    static final boolean enabled = DockerClientFactory.instance()
+                                                      .isDockerAvailable();
 
     /**
      * Prevents instantiation of this utility.
@@ -99,9 +101,9 @@ final class MysqlTests {
     /**
      * Returns the MySQL container shared by all the tests, starting it on the first call.
      */
-    private static MySQLContainer sharedContainer() {
+    private static synchronized MySQLContainer sharedContainer() {
         if (serverContainer == null) {
-            MySQLContainer container = new MySQLContainer(IMAGE);
+            var container = new MySQLContainer(IMAGE);
             // Allow the MySQL 8 `caching_sha2_password` handshake over a non-TLS test connection.
             container.withUrlParam("allowPublicKeyRetrieval", "true");
             // Reuse the container across Gradle runs when the user opts in via
@@ -127,17 +129,15 @@ final class MysqlTests {
     /**
      * Removes all the tables from the container's database, giving each test a clean schema.
      */
+    @SuppressWarnings("JDBCExecuteWithNonConstantString" /* safe because the query is
+                parameterized by a table name */)
     private static void dropAllTables(MySQLContainer container) {
         try (var connection = DriverManager.getConnection(container.getJdbcUrl(),
                                                           container.getUsername(),
                                                           container.getPassword());
-             var statement = connection.createStatement()) {
-            var tables = new ArrayList<String>();
-            try (var tableNames = statement.executeQuery("SHOW TABLES")) {
-                while (tableNames.next()) {
-                    tables.add(tableNames.getString(1));
-                }
-            }
+             var statement = connection.createStatement()
+        ) {
+            var tables = collectTableNames(statement);
             statement.execute("SET FOREIGN_KEY_CHECKS = 0");
             for (var table : tables) {
                 statement.execute("DROP TABLE IF EXISTS `" + table + '`');
@@ -146,6 +146,17 @@ final class MysqlTests {
         } catch (SQLException e) {
             throw new IllegalStateException("Unable to reset the MySQL test schema.", e);
         }
+    }
+
+    private static ArrayList<String> collectTableNames(Statement statement) throws
+                                                                            SQLException {
+        var tables = new ArrayList<String>();
+        try (var tableNames = statement.executeQuery("SHOW TABLES")) {
+            while (tableNames.next()) {
+                tables.add(tableNames.getString(1));
+            }
+        }
+        return tables;
     }
 
     /**
