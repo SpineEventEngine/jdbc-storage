@@ -14,8 +14,9 @@ Merge only after #1699 merges and core-jvm `2.0.0-SNAPSHOT.610` is published.
    `buildSrc`. Then to `.610` from Maven Local.
 2. `JdbcCatchUpStorageTest extends CatchUpStorageTest`, on the H2 factory the other
    delivery tests use, next to `JdbcInboxStorageTest`.
-3. `MysqlCatchUpStorageTest`, on the shared MySQL container of `MysqlTests`. Run locally
-   only: `@EnableConditionally` (Docker present) and skipped when `CI` is set.
+3. `MysqlCatchUpStorageTest`, on the shared MySQL container of `MysqlTests`. Like the other
+   MySQL tests, it runs wherever Docker is present (`@EnableConditionally`), CI included.
+   The "local only" rule of #1699's review applies to `core-jvm`, not to this repository.
 4. Keep `JdbcCatchUpSmokeTest` green.
 5. On MySQL: create the old job table (`MessageStorage<CatchUpId, CatchUp>`, `.600`), then
    write a job through the new `CatchUpStorage` (`.610`). Record the table names and
@@ -26,7 +27,7 @@ Merge only after #1699 merges and core-jvm `2.0.0-SNAPSHOT.610` is published.
 - [x] 1. `.600`: no compile breaks; `:rdbms:test` 344 tests, 0 failures. `.610` (Maven Local,
   core-jvm `12adf4eb446`): no compile breaks either. The `local/` pins of #1699 equal master's.
 - [x] 2, 3. Both classes implement the abstract `newStorage()`. 8/8 cases pass on H2 and on
-  MySQL 8.0. With `CI=true`, the MySQL suite is skipped (8/8 skipped).
+  MySQL 8.0, also with `CI=true`.
 - [x] 4. `JdbcCatchUpSmokeTest` green. A one-off run with `@Disabled` deactivated passed all 5.
 - [x] 5. Old and new storages share `spine_server_catchup_CatchUp`. With the old table kept, with
   or without its rows, reads fail on `archived` and writes on `deleted`. After `DROP TABLE`,

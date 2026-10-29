@@ -18,20 +18,16 @@ import io.spine.server.delivery.CatchUpStorage;
 import io.spine.server.delivery.CatchUpStorageTest;
 import io.spine.testing.SlowTest;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 
 /**
  * Runs the {@link CatchUpStorageTest} suite against a MySQL instance.
  *
- * <p>The suite checks that the catch-up jobs can be queried by their columns on a real RDBMS.
- * It is meant to be run locally only. Unlike the other tests of this package, it is skipped
- * on CI, which GitHub Actions marks with the {@code CI} environment variable.
+ * <p>The suite checks that the catch-up jobs can be queried by their columns
+ * on a MySQL server.
  */
 @DisplayName("`CatchUpStorage` running on top of MySQL instance should")
 @SlowTest
 @EnableConditionally
-@DisabledIfEnvironmentVariable(named = "CI", matches = "true",
-                               disabledReason = "The suite is meant to be run locally only.")
 class MysqlCatchUpStorageTest extends CatchUpStorageTest {
 
     @Override
