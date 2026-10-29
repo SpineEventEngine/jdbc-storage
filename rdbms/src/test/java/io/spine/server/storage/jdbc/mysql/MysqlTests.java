@@ -32,17 +32,23 @@ import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_9_7;
 
 /**
  * Defines the common routines to use in tests against MySQL instance.
+ *
+ * <p>The class is public for {@code MysqlServerVersionSpec}, which must reside in the package
+ * of {@link PredefinedMapping} to read the version of a mapping.
  */
-final class MysqlTests {
+public final class MysqlTests {
 
     /**
      * The Docker image of the MySQL server used in the tests.
      *
-     * <p>The {@code 8.0} image is published for {@code arm64} in addition to {@code amd64}, so the
-     * container boots natively on Apple Silicon. The previously used {@code mysql:5.7} ships only
-     * for {@code amd64} and therefore runs under slow emulation there.
+     * <p>It is the LTS release the {@linkplain PredefinedMapping#MYSQL_9_7 mapping} is made for;
+     * {@code MysqlServerVersionSpec} checks that the two match. The tag pins the release instead
+     * of following {@code lts}, which moves to the next LTS release on its own.
+     *
+     * <p>The image is published for {@code arm64} in addition to {@code amd64}, so the container
+     * boots natively on Apple Silicon.
      */
-    private static final String IMAGE = "mysql:8.0";
+    private static final String IMAGE = "mysql:9.7";
 
     /**
      * A single MySQL container shared by all the tests in this package.
@@ -86,7 +92,7 @@ final class MysqlTests {
      * <p>Closes the connection pool used by the previous test, wipes the database schema so that
      * the test starts with a clean slate, and returns a freshly built factory.
      */
-    static synchronized JdbcStorageFactory newFactory() {
+    public static synchronized JdbcStorageFactory newFactory() {
         closePreviousFactory();
         var container = sharedContainer();
         dropAllTables(container);
@@ -104,7 +110,7 @@ final class MysqlTests {
     private static synchronized MySQLContainer sharedContainer() {
         if (serverContainer == null) {
             var container = new MySQLContainer(IMAGE);
-            // Allow the MySQL 8 `caching_sha2_password` handshake over a non-TLS test connection.
+            // Allow the `caching_sha2_password` handshake over a non-TLS test connection.
             container.withUrlParam("allowPublicKeyRetrieval", "true");
             // Reuse the container across Gradle runs when the user opts in via
             // `~/.testcontainers.properties` (`testcontainers.reuse.enable=true`).
