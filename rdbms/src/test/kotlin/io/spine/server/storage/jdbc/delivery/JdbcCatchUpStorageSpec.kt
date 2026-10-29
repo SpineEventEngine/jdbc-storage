@@ -12,29 +12,27 @@
  * and limitations under the License.
  */
 
-package io.spine.server.storage.jdbc.delivery;
+package io.spine.server.storage.jdbc.delivery
 
-import io.spine.server.delivery.CatchUpStorage;
-import io.spine.server.delivery.CatchUpStorageTest;
-import io.spine.server.storage.jdbc.JdbcStorageFactory;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.DisplayName;
-
-import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.newFactory;
+import io.spine.server.delivery.CatchUpStorage
+import io.spine.server.delivery.CatchUpStorageTest
+import io.spine.server.storage.jdbc.JdbcStorageFactory
+import io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.newFactory
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.DisplayName
 
 @DisplayName("JDBC-based `CatchUpStorage` should")
-class JdbcCatchUpStorageTest extends CatchUpStorageTest {
+internal class JdbcCatchUpStorageSpec : CatchUpStorageTest() {
 
-    private JdbcStorageFactory factory;
+    private lateinit var factory: JdbcStorageFactory
 
-    @Override
-    protected CatchUpStorage newStorage() {
-        factory = newFactory();
-        return factory.createCatchUpStorage(false);
+    override fun newStorage(): CatchUpStorage {
+        factory = newFactory()
+        return factory.createCatchUpStorage(false)
     }
 
     @AfterEach
-    void closeFactory() {
-        factory.close();
+    fun closeFactory() {
+        factory.close()
     }
 }

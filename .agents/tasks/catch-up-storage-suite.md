@@ -12,9 +12,9 @@ Merge only after #1699 merges and core-jvm `2.0.0-SNAPSHOT.610` is published.
 
 1. Move to core-jvm `.600` (newest published), aligning every `local/` pin with core-jvm's
    `buildSrc`. Then to `.610` from Maven Local.
-2. `JdbcCatchUpStorageTest extends CatchUpStorageTest`, on the H2 factory the other
-   delivery tests use, next to `JdbcInboxStorageTest`.
-3. `MysqlCatchUpStorageTest`, on the shared MySQL container of `MysqlTests`. Like the other
+2. `JdbcCatchUpStorageSpec : CatchUpStorageTest()`, in Kotlin, on the H2 factory the other
+   delivery tests use, in the package of `JdbcInboxStorageTest`.
+3. `MysqlCatchUpStorageSpec`, in Kotlin, on the shared MySQL container of `MysqlTests`. Like the other
    MySQL tests, it runs wherever Docker is present (`@EnableConditionally`), CI included.
    The "local only" rule of #1699's review applies to `core-jvm`, not to this repository.
 4. Keep `JdbcCatchUpSmokeTest` green.

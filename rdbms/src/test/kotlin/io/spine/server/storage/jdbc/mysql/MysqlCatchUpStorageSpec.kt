@@ -12,27 +12,25 @@
  * and limitations under the License.
  */
 
-package io.spine.server.storage.jdbc.mysql;
+package io.spine.server.storage.jdbc.mysql
 
-import io.spine.server.delivery.CatchUpStorage;
-import io.spine.server.delivery.CatchUpStorageTest;
-import io.spine.testing.SlowTest;
-import org.junit.jupiter.api.DisplayName;
+import io.spine.server.delivery.CatchUpStorage
+import io.spine.server.delivery.CatchUpStorageTest
+import io.spine.testing.SlowTest
+import org.junit.jupiter.api.DisplayName
 
 /**
- * Runs the {@link CatchUpStorageTest} suite against a MySQL instance.
+ * Runs the [CatchUpStorageTest] suite against a MySQL instance.
  *
- * <p>The suite checks that the catch-up jobs can be queried by their columns
+ * The suite checks that the catch-up jobs can be queried by their columns
  * on a MySQL server.
  */
 @DisplayName("`CatchUpStorage` running on top of MySQL instance should")
 @SlowTest
 @EnableConditionally
-class MysqlCatchUpStorageTest extends CatchUpStorageTest {
+internal class MysqlCatchUpStorageSpec : CatchUpStorageTest() {
 
-    @Override
-    protected CatchUpStorage newStorage() {
-        return MysqlTests.newFactory()
-                         .createCatchUpStorage(false);
-    }
+    override fun newStorage(): CatchUpStorage =
+        MysqlTests.newFactory()
+            .createCatchUpStorage(false)
 }
