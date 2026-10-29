@@ -38,3 +38,5 @@ Merge only after #1699 merges and core-jvm `2.0.0-SNAPSHOT.610` is published.
 - [x] The MySQL tests run on `mysql:9.7`; the suite passes there too (also the upgrade check).
 - [x] `PostgresCatchUpStorageSpec` runs the suite on `postgres:16-alpine` through the shared
   container of `PostgresTests`: 8/8. Before, no storage suite ran on PostgreSQL.
+- [x] `PostgresRecordStorageSpec` runs `DelegatingRecordStorageTest` on PostgreSQL, as
+  `MysqlRecordStorageTest` does on MySQL: 42 tests each, 0 failures.
