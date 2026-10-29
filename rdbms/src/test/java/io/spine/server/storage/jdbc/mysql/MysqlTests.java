@@ -27,6 +27,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.List;
 
 import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_9_7;
 
@@ -154,7 +155,7 @@ public final class MysqlTests {
         }
     }
 
-    private static ArrayList<String> collectTableNames(Statement statement) throws
+    private static List<String> collectTableNames(Statement statement) throws
                                                                             SQLException {
         var tables = new ArrayList<String>();
         try (var tableNames = statement.executeQuery("SHOW TABLES")) {
