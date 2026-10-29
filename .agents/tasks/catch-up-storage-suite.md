@@ -35,3 +35,6 @@ Merge only after #1699 merges and core-jvm `2.0.0-SNAPSHOT.610` is published.
   the core-jvm session (shared notes, `jdbc-catch-up-table-upgrade.md`).
 - [x] PR #187, opened after #1699 merged and `.610` was published.
 - [x] `docs/catch-up-migration.md` tells users to drop the old job table on the upgrade.
+- [x] The MySQL tests run on `mysql:9.7`; the suite passes there too (also the upgrade check).
+- [x] `PostgresCatchUpStorageSpec` runs the suite on `postgres:16-alpine` through the shared
+  container of `PostgresTests`: 8/8. Before, no storage suite ran on PostgreSQL.
