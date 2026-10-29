@@ -14,6 +14,9 @@ see the [project README](../README.md).
   indexes, and customization. *(Available since 2.x.)*
 * [Migrating the event log](event-log-migration.md) — moving the stored events from
   the table shared by all Bounded Contexts to the per-context tables.
+* [Migrating the catch-up jobs](catch-up-migration.md) — dropping the table of
+  the catch-up jobs, which `core-jvm` `2.0.0-SNAPSHOT.610` stores with three
+  new columns.
 * [Queries](queries.md) — default queries, RDBMS engine detection,
   and customization. *(Available since 2.x.)*
 

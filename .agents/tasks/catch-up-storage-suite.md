@@ -33,4 +33,5 @@ Merge only after #1699 merges and core-jvm `2.0.0-SNAPSHOT.610` is published.
   or without its rows, reads fail on `archived` and writes on `deleted`. After `DROP TABLE`,
   everything works. The new table adds `deleted`, `archived` and `version`. Report sent to
   the core-jvm session (shared notes, `jdbc-catch-up-table-upgrade.md`).
-- [ ] Commit, then a PR once #1699 merges and `.610` is published.
+- [x] PR #187, opened after #1699 merged and `.610` was published.
+- [x] `docs/catch-up-migration.md` tells users to drop the old job table on the upgrade.
