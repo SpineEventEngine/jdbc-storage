@@ -60,12 +60,12 @@ public final class JdbcStorageFactoryTestEnv {
     public static JdbcStorageFactory newFactory() {
         var dataSource = dataSource();
         return JdbcStorageFactory.newBuilder()
-                                 .setDataSource(dataSource)
-                                 // The data source is an in-memory H2 database, so the H2 mapping
-                                 // must be used. The MySQL mapping emits a MySQL-specific binary
-                                 // collation for string columns, which H2 cannot parse.
-                                 .setTypeMapping(H2_2_5)
-                                 .build();
+                .setDataSource(dataSource)
+                // The data source is an in-memory H2 database, so the H2 mapping
+                // must be used. The MySQL mapping emits a MySQL-specific binary
+                // collation for string columns, which H2 cannot parse.
+                .setTypeMapping(H2_2_5)
+                .build();
     }
 
     private static DataSourceConfig dataSource() {
@@ -103,7 +103,6 @@ public final class JdbcStorageFactoryTestEnv {
     }
 
     public static RecordSpec<InboxMessageId, InboxMessage> inboxMessageSpec() {
-        @SuppressWarnings("DataFlowIssue" /* Proto getters never return `null`s. */)
         var inboxMessageSpec = new RecordSpec<>(
                 InboxMessageId.class,
                 InboxMessage.class,
