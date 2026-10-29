@@ -36,6 +36,8 @@ Each table created has the following structure:
 
 > [!WARNING]
 > The framework does **not** verify the table structure for existing tables.
+> When an upgrade adds columns to a table, drop or alter the table by hand; see
+> [Migrating the catch-up jobs](catch-up-migration.md) for an example.
 
 ## Grouped tables
 

@@ -25,23 +25,31 @@ import org.testcontainers.mysql.MySQLContainer;
 
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.List;
 
 import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_9_7;
 
 /**
  * Defines the common routines to use in tests against MySQL instance.
+ *
+ * <p>The class is public for {@code MysqlServerVersionSpec}, which must reside in the package
+ * of {@link PredefinedMapping} to read the version of a mapping.
  */
-final class MysqlTests {
+public final class MysqlTests {
 
     /**
      * The Docker image of the MySQL server used in the tests.
      *
-     * <p>The {@code 8.0} image is published for {@code arm64} in addition to {@code amd64}, so the
-     * container boots natively on Apple Silicon. The previously used {@code mysql:5.7} ships only
-     * for {@code amd64} and therefore runs under slow emulation there.
+     * <p>It is the LTS release the {@linkplain PredefinedMapping#MYSQL_9_7 mapping} is made for;
+     * {@code MysqlServerVersionSpec} checks that the two match. The tag pins the release instead
+     * of following {@code lts}, which moves to the next LTS release on its own.
+     *
+     * <p>The image is published for {@code arm64} in addition to {@code amd64}, so the container
+     * boots natively on Apple Silicon.
      */
-    private static final String IMAGE = "mysql:8.0";
+    private static final String IMAGE = "mysql:9.7";
 
     /**
      * A single MySQL container shared by all the tests in this package.
@@ -50,7 +58,7 @@ final class MysqlTests {
      * start a single instance lazily and {@linkplain #dropAllTables(MySQLContainer) wipe its
      * schema} before each test to keep the tests isolated from one another.
      */
-    private static @Nullable MySQLContainer serverContainer;
+    private static @Nullable MySQLContainer serverContainer = null;
 
     /**
      * The factory handed to the previous test.
@@ -59,7 +67,7 @@ final class MysqlTests {
      * instance field. We keep it here and close its connection pool when the next test asks for a
      * factory — by that point the previous test has already been torn down.
      */
-    private static @Nullable JdbcStorageFactory previousFactory;
+    private static @Nullable JdbcStorageFactory previousFactory = null;
 
     /**
      * Controls whether ALL tests in this package are enabled.
@@ -69,7 +77,8 @@ final class MysqlTests {
      * that the build stays green in environments without Docker (e.g. local machines or CI
      * agents that do not provide Docker).
      */
-    static final boolean enabled = DockerClientFactory.instance().isDockerAvailable();
+    static final boolean enabled = DockerClientFactory.instance()
+                                                      .isDockerAvailable();
 
     /**
      * Prevents instantiation of this utility.
@@ -84,7 +93,7 @@ final class MysqlTests {
      * <p>Closes the connection pool used by the previous test, wipes the database schema so that
      * the test starts with a clean slate, and returns a freshly built factory.
      */
-    static synchronized JdbcStorageFactory newFactory() {
+    public static synchronized JdbcStorageFactory newFactory() {
         closePreviousFactory();
         var container = sharedContainer();
         dropAllTables(container);
@@ -99,10 +108,10 @@ final class MysqlTests {
     /**
      * Returns the MySQL container shared by all the tests, starting it on the first call.
      */
-    private static MySQLContainer sharedContainer() {
+    private static synchronized MySQLContainer sharedContainer() {
         if (serverContainer == null) {
-            MySQLContainer container = new MySQLContainer(IMAGE);
-            // Allow the MySQL 8 `caching_sha2_password` handshake over a non-TLS test connection.
+            var container = new MySQLContainer(IMAGE);
+            // Allow the `caching_sha2_password` handshake over a non-TLS test connection.
             container.withUrlParam("allowPublicKeyRetrieval", "true");
             // Reuse the container across Gradle runs when the user opts in via
             // `~/.testcontainers.properties` (`testcontainers.reuse.enable=true`).
@@ -127,17 +136,15 @@ final class MysqlTests {
     /**
      * Removes all the tables from the container's database, giving each test a clean schema.
      */
+    @SuppressWarnings("JDBCExecuteWithNonConstantString" /* safe because the query is
+                parameterized by a table name */)
     private static void dropAllTables(MySQLContainer container) {
         try (var connection = DriverManager.getConnection(container.getJdbcUrl(),
                                                           container.getUsername(),
                                                           container.getPassword());
-             var statement = connection.createStatement()) {
-            var tables = new ArrayList<String>();
-            try (var tableNames = statement.executeQuery("SHOW TABLES")) {
-                while (tableNames.next()) {
-                    tables.add(tableNames.getString(1));
-                }
-            }
+             var statement = connection.createStatement()
+        ) {
+            var tables = collectTableNames(statement);
             statement.execute("SET FOREIGN_KEY_CHECKS = 0");
             for (var table : tables) {
                 statement.execute("DROP TABLE IF EXISTS `" + table + '`');
@@ -146,6 +153,16 @@ final class MysqlTests {
         } catch (SQLException e) {
             throw new IllegalStateException("Unable to reset the MySQL test schema.", e);
         }
+    }
+
+    private static List<String> collectTableNames(Statement statement) throws SQLException {
+        var tables = new ArrayList<String>();
+        try (var tableNames = statement.executeQuery("SHOW TABLES")) {
+            while (tableNames.next()) {
+                tables.add(tableNames.getString(1));
+            }
+        }
+        return tables;
     }
 
     /**

@@ -13,7 +13,7 @@ dialect-specific clauses.
 
 ## Default values
 
-|    Type    |          MySQL 9.7          | PostgreSQL 10.1  |
+|    Type    |          MySQL 9.7          | PostgreSQL 18    |
 |:----------:|:---------------------------:|:----------------:|
 | BYTE_ARRAY |            BLOB             |      BYTEA       |
 |    INT     |             INT             |       INT        |
