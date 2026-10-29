@@ -155,8 +155,7 @@ public final class MysqlTests {
         }
     }
 
-    private static List<String> collectTableNames(Statement statement) throws
-                                                                            SQLException {
+    private static List<String> collectTableNames(Statement statement) throws SQLException {
         var tables = new ArrayList<String>();
         try (var tableNames = statement.executeQuery("SHOW TABLES")) {
             while (tableNames.next()) {
