@@ -25,12 +25,12 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 import static com.google.common.truth.Truth.assertThat;
-import static io.spine.server.storage.jdbc.PredefinedMapping.POSTGRESQL_10_1;
+import static io.spine.server.storage.jdbc.PredefinedMapping.POSTGRESQL_18;
 import static io.spine.server.storage.jdbc.Type.STRING_512;
 
 /**
  * Verifies that PostgreSQL keeps identifiers that differ only by case distinct, using the exact
- * SQL type that the {@linkplain io.spine.server.storage.jdbc.PredefinedMapping#POSTGRESQL_10_1
+ * SQL type that the {@linkplain io.spine.server.storage.jdbc.PredefinedMapping#POSTGRESQL_18
  * predefined PostgreSQL mapping} produces for identifier columns.
  *
  * <p>Unlike MySQL — whose default non-binary collation is case-insensitive — PostgreSQL compares
@@ -46,13 +46,13 @@ final class PostgresIdCaseSensitivityTest {
 
     @Container
     private static final PostgreSQLContainer postgres =
-            new PostgreSQLContainer("postgres:16-alpine");
+            new PostgreSQLContainer(PostgresTests.IMAGE);
 
     @Test
     @DisplayName("compare identifier columns case-sensitively without an explicit collation")
     void keepCaseDistinctIdentifiersDistinct() throws SQLException {
         // The SQL type the PostgreSQL mapping produces for identifier columns.
-        var idType = POSTGRESQL_10_1.typeNameFor(STRING_512).value();
+        var idType = POSTGRESQL_18.typeNameFor(STRING_512).value();
 
         try (var connection = DriverManager.getConnection(
                 postgres.getJdbcUrl(), postgres.getUsername(), postgres.getPassword());

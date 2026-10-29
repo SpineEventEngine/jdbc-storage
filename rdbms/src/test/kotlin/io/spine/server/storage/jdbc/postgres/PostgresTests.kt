@@ -18,7 +18,7 @@ import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import io.spine.server.storage.jdbc.DataSourceWrapper
 import io.spine.server.storage.jdbc.JdbcStorageFactory
-import io.spine.server.storage.jdbc.PredefinedMapping.POSTGRESQL_10_1
+import io.spine.server.storage.jdbc.PredefinedMapping.POSTGRESQL_18
 import java.sql.DriverManager
 import org.testcontainers.postgresql.PostgreSQLContainer
 
@@ -33,8 +33,15 @@ internal object PostgresTests {
 
     /**
      * The Docker image of the PostgreSQL server used in the tests.
+     *
+     * It is the major release the [mapping][POSTGRESQL_18] is made for;
+     * `PostgresServerVersionSpec` checks that the two match. The tag follows the patch
+     * releases of that major one. The image is published for `arm64` in addition to `amd64`,
+     * so the container boots natively on Apple Silicon.
+     *
+     * Every PostgreSQL test of this module uses this image.
      */
-    private const val IMAGE = "postgres:16-alpine"
+    const val IMAGE = "postgres:18-alpine"
 
     /**
      * A single PostgreSQL container shared by all the tests in this package.
@@ -73,7 +80,7 @@ internal object PostgresTests {
         dropAllTables()
         val factory = JdbcStorageFactory.newBuilder()
             .setDataSource(dataSource())
-            .setTypeMapping(POSTGRESQL_10_1)
+            .setTypeMapping(POSTGRESQL_18)
             .build()
         previousFactory = factory
         return factory

@@ -46,12 +46,16 @@ public enum PredefinedMapping implements TypeMapping {
                               .add(STRING_512, MySqlTypeNames.VARCHAR_512)
                               .add(STRING, MySqlTypeNames.TEXT)),
 
+    // The version is the major one of the PostgreSQL server release. Since version 10, the minor
+    // version of PostgreSQL counts its patch releases, so the mapping matches any minor version.
+    // Must match the Docker image of `PostgresTests`, as `PostgresServerVersionSpec` checks.
+    //
     // PostgreSQL has no bare `DOUBLE` type, and its `FLOAT` is double-precision;
     // map to the single-/double-precision types matching Java `float`/`double`.
-    POSTGRESQL_10_1("PostgreSQL", 10, 1,
-                    mappingBuilder().add(BYTE_ARRAY, "BYTEA")
-                                    .add(FLOAT, PostgreSqlTypeNames.REAL)
-                                    .add(DOUBLE, PostgreSqlTypeNames.DOUBLE_PRECISION)),
+    POSTGRESQL_18("PostgreSQL", 18,
+                  mappingBuilder().add(BYTE_ARRAY, "BYTEA")
+                                  .add(FLOAT, PostgreSqlTypeNames.REAL)
+                                  .add(DOUBLE, PostgreSqlTypeNames.DOUBLE_PRECISION)),
 
     // Must match `io.spine.dependency.storage.H2.version`.
     H2_2_5("H2", 2, 5, mappingBuilder());
@@ -66,17 +70,33 @@ public enum PredefinedMapping implements TypeMapping {
      */
     private static final TypeMapping GENERIC_MAPPING = mappingBuilder().build();
 
+    /**
+     * The minor version of a mapping that matches any minor version of its major one.
+     */
+    private static final int ANY_MINOR_VERSION = -1;
+
     private final TypeMapping typeMapping;
     private final String databaseProductName;
     private final int majorVersion;
     private final int minorVersion;
 
-    PredefinedMapping(String databaseProductName, int majorVersion,
-                      int minorVersion, TypeMappingBuilder typeMappingBuilder) {
+    PredefinedMapping(String databaseProductName,
+                      int majorVersion,
+                      int minorVersion,
+                      TypeMappingBuilder typeMappingBuilder) {
         this.databaseProductName = databaseProductName;
         this.majorVersion = majorVersion;
         this.minorVersion = minorVersion;
         this.typeMapping = typeMappingBuilder.build();
+    }
+
+    /**
+     * Creates a mapping that matches any minor version of the given major one.
+     */
+    PredefinedMapping(String databaseProductName,
+                      int majorVersion,
+                      TypeMappingBuilder typeMappingBuilder) {
+        this(databaseProductName, majorVersion, ANY_MINOR_VERSION, typeMappingBuilder);
     }
 
     @Override
@@ -104,10 +124,7 @@ public enum PredefinedMapping implements TypeMapping {
             if (!metaData.productName().equals(mapping.databaseProductName)) {
                 continue;
             }
-            var versionMatch =
-                    metaData.majorVersion() == mapping.majorVersion
-                    && metaData.minorVersion() == mapping.minorVersion;
-            if (versionMatch) {
+            if (mapping.matchesVersionOf(metaData)) {
                 return mapping;
             }
             sameProduct = mapping;
@@ -120,6 +137,20 @@ public enum PredefinedMapping implements TypeMapping {
         return sameProduct != null ? sameProduct : GENERIC_MAPPING;
     }
 
+    /**
+     * Tells whether this mapping is made for the database version described
+     * by the given metadata.
+     *
+     * <p>The database product name is not compared.
+     */
+    @VisibleForTesting
+    boolean matchesVersionOf(DataSourceMetaData metaData) {
+        var majorMatches = metaData.majorVersion() == majorVersion;
+        var minorMatches = minorVersion == ANY_MINOR_VERSION
+                || metaData.minorVersion() == minorVersion;
+        return majorMatches && minorMatches;
+    }
+
     @VisibleForTesting
     String getDatabaseProductName() {
         return databaseProductName;
@@ -130,6 +161,10 @@ public enum PredefinedMapping implements TypeMapping {
         return majorVersion;
     }
 
+    /**
+     * Returns the minor version of the database, or {@link #ANY_MINOR_VERSION}
+     * if the mapping matches any minor version of its major one.
+     */
     @VisibleForTesting
     int getMinorVersion() {
         return minorVersion;

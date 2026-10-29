@@ -1,27 +1,15 @@
 /*
- * Copyright 2026, TeamDev. All rights reserved.
+ * Copyright 2026 CodeMatters, Lda.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License at
  *
  * https://www.apache.org/licenses/LICENSE-2.0
  *
- * Redistribution and use in source and/or binary forms, with or without
- * modification, must retain the above copyright notice and the following
- * disclaimer.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Unless required by applicable law or agreed to in writing, software distributed under
+ * the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
  */
 
 package io.spine.server.storage.jdbc;
@@ -35,7 +23,7 @@ import static io.spine.server.storage.jdbc.PostgreSqlTypeNames.DOUBLE_PRECISION;
 import static io.spine.server.storage.jdbc.PostgreSqlTypeNames.REAL;
 import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_5;
 import static io.spine.server.storage.jdbc.PredefinedMapping.MYSQL_9_7;
-import static io.spine.server.storage.jdbc.PredefinedMapping.POSTGRESQL_10_1;
+import static io.spine.server.storage.jdbc.PredefinedMapping.POSTGRESQL_18;
 import static io.spine.server.storage.jdbc.PredefinedMapping.select;
 import static io.spine.server.storage.jdbc.Type.DOUBLE;
 import static io.spine.server.storage.jdbc.Type.FLOAT;
@@ -48,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @DisplayName("`PredefinedMapping` should")
 class PredefinedMappingTest {
 
-    private static final PredefinedMapping mapping = POSTGRESQL_10_1;
+    private static final PredefinedMapping mapping = POSTGRESQL_18;
 
     @Test
     @DisplayName("throw ISE if requested type has no mapping")
@@ -60,9 +48,10 @@ class PredefinedMappingTest {
     @Test
     @DisplayName("be selected by database product name and major version")
     void selectTypeMapping() {
+        // A patch release of the major version the mapping is made for.
         var dataSource = whichHoldsMetadata(mapping.getDatabaseProductName(),
                                             mapping.getMajorVersion(),
-                                            mapping.getMinorVersion());
+                                            6);
         assertThat(select(dataSource))
                 .isEqualTo(mapping);
     }
@@ -73,7 +62,7 @@ class PredefinedMappingTest {
         var newMajorVersion = mapping.getMajorVersion() + 1;
         var dataSource = whichHoldsMetadata(mapping.getDatabaseProductName(),
                                             newMajorVersion,
-                                            mapping.getMinorVersion());
+                                            0);
         // A recognized product at an unlisted version uses that product's dialect mapping,
         // rather than the generic fallback meant for unknown databases.
         assertThat(select(dataSource))
@@ -90,8 +79,8 @@ class PredefinedMappingTest {
     @Test
     @DisplayName("map `FLOAT` and `DOUBLE` to PostgreSQL-specific SQL type names")
     void mapFloatingPointTypesForPostgres() {
-        assertThat(POSTGRESQL_10_1.typeNameFor(FLOAT).value()).isEqualTo(REAL);
-        assertThat(POSTGRESQL_10_1.typeNameFor(DOUBLE).value()).isEqualTo(DOUBLE_PRECISION);
+        assertThat(POSTGRESQL_18.typeNameFor(FLOAT).value()).isEqualTo(REAL);
+        assertThat(POSTGRESQL_18.typeNameFor(DOUBLE).value()).isEqualTo(DOUBLE_PRECISION);
     }
 
     @Test
@@ -108,7 +97,7 @@ class PredefinedMappingTest {
     @Test
     @DisplayName("not apply the MySQL binary collation to other databases")
     void keepStringTypesPlainForOtherDatabases() {
-        for (var caseSensitiveDb : new PredefinedMapping[]{POSTGRESQL_10_1, H2_2_5}) {
+        for (var caseSensitiveDb : new PredefinedMapping[]{POSTGRESQL_18, H2_2_5}) {
             assertThat(caseSensitiveDb.typeNameFor(STRING_255).value()).isEqualTo("VARCHAR(255)");
             assertThat(caseSensitiveDb.typeNameFor(STRING_512).value()).isEqualTo("VARCHAR(512)");
             assertThat(caseSensitiveDb.typeNameFor(STRING).value()).isEqualTo("TEXT");

@@ -36,7 +36,11 @@ Merge only after #1699 merges and core-jvm `2.0.0-SNAPSHOT.610` is published.
 - [x] PR #187, opened after #1699 merged and `.610` was published.
 - [x] `docs/catch-up-migration.md` tells users to drop the old job table on the upgrade.
 - [x] The MySQL tests run on `mysql:9.7`; the suite passes there too (also the upgrade check).
-- [x] `PostgresCatchUpStorageSpec` runs the suite on `postgres:16-alpine` through the shared
-  container of `PostgresTests`: 8/8. Before, no storage suite ran on PostgreSQL.
+- [x] `PostgresCatchUpStorageSpec` runs the suite on PostgreSQL through the shared container
+  of `PostgresTests`: 8/8. Before, no storage suite ran on PostgreSQL.
 - [x] `PostgresRecordStorageSpec` runs `DelegatingRecordStorageTest` on PostgreSQL, as
   `MysqlRecordStorageTest` does on MySQL: 42 tests each, 0 failures.
+- [x] The PostgreSQL tests run on `postgres:18-alpine` (18.6), one image for all of them.
+  `POSTGRESQL_10_1` (from 2017) is renamed to `POSTGRESQL_18`, which matches any minor
+  version, as PostgreSQL counts its patch releases with it. `PostgresServerVersionSpec`
+  fails on 16 with `expected:<18> but was:<16>`.
