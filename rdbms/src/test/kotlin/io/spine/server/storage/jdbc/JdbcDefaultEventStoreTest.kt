@@ -14,52 +14,27 @@
 
 package io.spine.server.storage.jdbc
 
-import io.spine.environment.Tests
-import io.spine.server.ServerEnvironment
 import io.spine.server.event.store.DefaultEventStoreTest
+import io.spine.server.storage.StorageFactory
 import io.spine.server.storage.jdbc.record.given.HistoryStorageTestEnv.h2Factory
-import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.DisplayName
 
 /**
- * Runs the [DefaultEventStoreTest] contract against [JdbcStorageFactory]
+ * Runs the [DefaultEventStoreTest] contract against a [JdbcStorageFactory]
  * over an in-memory H2 database.
  *
- * The base suite builds a Bounded Context in its `@BeforeEach`, which runs
- * before any `@BeforeEach` of this class could. JUnit creates a new test
- * instance per test method, so the constructor of this class is the only
- * seam ahead of the base setup: it points the test server environment to
- * a fresh storage factory — and thus a fresh database — for every test,
- * keeping the persistent event tables from leaking between the tests.
+ * The application the base suite builds closes the factory after the test.
  */
 @DisplayName("JDBC-backed `EventStore` should")
 internal class JdbcDefaultEventStoreTest : DefaultEventStoreTest() {
 
-    init {
-        ServerEnvironment.under(Tests::class.java).use(freshFactory())
-    }
+    private var factory: JdbcStorageFactory? = null
 
-    companion object {
-
-        private val factories = mutableListOf<JdbcStorageFactory>()
-
-        /**
-         * Creates a new factory over a fresh in-memory H2 database,
-         * remembering it for the after-all cleanup.
-         */
-        private fun freshFactory(): JdbcStorageFactory =
-            h2Factory().also { factories.add(it) }
-
-        /**
-         * Detaches the storage configuration from the test server environment
-         * and closes the factories created for the test methods.
-         */
-        @AfterAll
-        @JvmStatic
-        fun resetEnvironment() {
-            ServerEnvironment.instance().reset()
-            factories.forEach(JdbcStorageFactory::close)
-            factories.clear()
+    override fun storageFactory(): StorageFactory {
+        val existing = factory
+        if (existing != null) {
+            return existing
         }
+        return h2Factory().also { factory = it }
     }
 }

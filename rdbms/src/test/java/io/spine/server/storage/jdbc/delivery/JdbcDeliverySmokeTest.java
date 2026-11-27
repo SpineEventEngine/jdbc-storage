@@ -14,14 +14,10 @@
 
 package io.spine.server.storage.jdbc.delivery;
 
-import io.spine.environment.Tests;
-import io.spine.server.ServerEnvironment;
 import io.spine.server.delivery.DeliveryTest;
 import io.spine.server.storage.StorageFactory;
 import io.spine.server.storage.jdbc.JdbcStorageFactory;
 import io.spine.testing.SlowTest;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -42,30 +38,20 @@ class JdbcDeliverySmokeTest extends DeliveryTest {
 
     private StorageFactory factory;
 
+    /**
+     * The application the base suite builds closes this factory.
+     */
     @Override
-    @BeforeEach
-    public void setUp() {
-        super.setUp();
-        var source = whichIsStoredInMemory(newUuid());
-        factory = JdbcStorageFactory
-                .newBuilder()
-                .setDataSource(source)
-                .setTypeMapping(H2_2_5)
-                .build();
-        ServerEnvironment
-                .under(Tests.class)
-                .use(factory);
-    }
-
-    @AfterEach
-    @Override
-    public void tearDown() {
-        super.tearDown();
-        try {
-            factory.close();
-        } catch (Exception e) {
-            throw new IllegalStateException("Cannot close the storage factory", e);
+    public StorageFactory storageFactory() {
+        if (factory == null) {
+            var source = whichIsStoredInMemory(newUuid());
+            factory = JdbcStorageFactory
+                    .newBuilder()
+                    .setDataSource(source)
+                    .setTypeMapping(H2_2_5)
+                    .build();
         }
+        return factory;
     }
 
     @Test

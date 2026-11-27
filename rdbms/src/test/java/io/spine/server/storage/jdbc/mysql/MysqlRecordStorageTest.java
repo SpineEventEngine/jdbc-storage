@@ -14,31 +14,44 @@
 
 package io.spine.server.storage.jdbc.mysql;
 
-import io.spine.environment.Tests;
-import io.spine.server.ServerEnvironment;
 import io.spine.server.storage.DelegatingRecordStorageTest;
+import io.spine.server.storage.StorageFactory;
 import io.spine.testing.SlowTest;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 
+/**
+ * Runs the {@link DelegatingRecordStorageTest} contract against MySQL.
+ */
 @DisplayName("`JdbcRecordStorage` running on top of MySQL instance should")
 @SlowTest
 @EnableConditionally
 class MysqlRecordStorageTest extends DelegatingRecordStorageTest {
 
-    @BeforeEach
+    private StorageFactory factory;
+
     @Override
-    protected void setUpAbstractStorageTest() {
-        var factory = MysqlTests.newFactory();
-        ServerEnvironment.under(Tests.class)
-                         .useStorageFactory((env) -> factory);
-        super.setUpAbstractStorageTest();
+    protected StorageFactory storageFactory() {
+        if (factory == null) {
+            factory = MysqlTests.newFactory();
+        }
+        return factory;
     }
 
-    @AfterAll
-    static void tearDownClass() {
-        ServerEnvironment.instance()
-                         .reset();
+    /**
+     * Closes the factory after the storage.
+     *
+     * <p>The base suite closes the storage and leaves the factory open.
+     */
+    @Override
+    protected void tearDownAbstractStorageTest() {
+        super.tearDownAbstractStorageTest();
+        if (factory == null) {
+            return;
+        }
+        try {
+            factory.close();
+        } catch (RuntimeException e) {
+            throw new IllegalStateException("Cannot close the storage factory.", e);
+        }
     }
 }
