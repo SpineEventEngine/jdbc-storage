@@ -35,12 +35,14 @@ Maven Central.
 ## Plan
 
 - [x] `./config/pull` to `config@ca4febc0`. Local pins only moved up.
-- [ ] Give dependency resolution the same retry budget the upload step uses,
+- [x] Give dependency resolution the same retry budget the upload step uses,
       via `gradle.properties`, so `:publicationState` survives a brief `429`.
-- [ ] Drop the Compiler CLI `.069` override. `config` now falls back to `.085`.
-- [ ] Bump `version.gradle.kts` once and refresh dependency reports.
-- [ ] Verify `:buildSrc:check` and that the project configures. Publishing
-      itself needs registry secrets.
+- [x] Drop the Compiler CLI `.069` override. `config` now falls back to `.085`.
+- [x] Bump `version.gradle.kts` once and refresh dependency reports.
+- [x] Adapt tests to the instance `ServerEnvironment` that came with core-jvm `.781`.
+- [x] `./gradlew build dokkaGenerate` on JDK 17: 413 tests, 289 succeeded,
+      0 failed, 124 skipped (no Docker). Gradle reports the retry properties
+      as 5 attempts and a 5000 ms initial backoff.
 
 ## Log
 
