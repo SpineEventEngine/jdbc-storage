@@ -40,6 +40,9 @@ Maven Central.
 - [x] Drop the Compiler CLI `.069` override. `config` now falls back to `.085`.
 - [x] Bump `version.gradle.kts` once and refresh dependency reports.
 - [x] Adapt tests to the instance `ServerEnvironment` that came with core-jvm `.781`.
+- [x] Move to core-jvm `.801` (core-jvm#1742) and Base `.466`. The delivery smoke
+      tests override `newStorageFactory()` with a new H2 factory per call, and the
+      temporary `FactoryLeftOpen` wrapper is gone.
 - [x] `./gradlew build dokkaGenerate` on JDK 17: 413 tests, 289 succeeded,
       0 failed, 124 skipped (no Docker). Gradle reports the retry properties
       as 5 attempts and a 5000 ms initial backoff.
