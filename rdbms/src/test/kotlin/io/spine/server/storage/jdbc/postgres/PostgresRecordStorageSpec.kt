@@ -18,6 +18,7 @@ import io.spine.server.storage.DelegatingRecordStorageTest
 import io.spine.server.storage.StorageFactory
 import io.spine.server.storage.jdbc.JdbcStorageFactory
 import io.spine.testing.SlowTest
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.DisplayName
 import org.testcontainers.junit.jupiter.Testcontainers
 
@@ -43,7 +44,9 @@ internal class PostgresRecordStorageSpec : DelegatingRecordStorageTest() {
      * Closes the factory after the storage.
      *
      * The base suite closes the storage and leaves the factory open.
+     * The annotation is repeated: JUnit does not inherit it onto an override.
      */
+    @AfterEach
     override fun tearDownAbstractStorageTest() {
         super.tearDownAbstractStorageTest()
         factory?.close()

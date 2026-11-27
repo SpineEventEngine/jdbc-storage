@@ -16,6 +16,7 @@ package io.spine.server.storage.jdbc.delivery;
 
 import io.spine.server.delivery.InboxStorageTest;
 import io.spine.server.storage.StorageFactory;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 
 import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.newFactory;
@@ -41,7 +42,9 @@ class JdbcInboxStorageTest extends InboxStorageTest {
      * Closes the factory after the storage.
      *
      * <p>The base suite closes the storage and leaves the factory open.
+     * The annotation is repeated: JUnit does not inherit it onto an override.
      */
+    @AfterEach
     @Override
     protected void tearDownAbstractStorageTest() {
         super.tearDownAbstractStorageTest();

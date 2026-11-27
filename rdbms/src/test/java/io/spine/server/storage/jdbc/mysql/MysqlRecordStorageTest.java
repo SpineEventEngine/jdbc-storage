@@ -17,6 +17,7 @@ package io.spine.server.storage.jdbc.mysql;
 import io.spine.server.storage.DelegatingRecordStorageTest;
 import io.spine.server.storage.StorageFactory;
 import io.spine.testing.SlowTest;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 
 /**
@@ -41,7 +42,9 @@ class MysqlRecordStorageTest extends DelegatingRecordStorageTest {
      * Closes the factory after the storage.
      *
      * <p>The base suite closes the storage and leaves the factory open.
+     * The annotation is repeated: JUnit does not inherit it onto an override.
      */
+    @AfterEach
     @Override
     protected void tearDownAbstractStorageTest() {
         super.tearDownAbstractStorageTest();
