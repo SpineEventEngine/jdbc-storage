@@ -18,6 +18,7 @@ import io.spine.server.delivery.DeliveryTest;
 import io.spine.server.storage.StorageFactory;
 import io.spine.server.storage.jdbc.JdbcStorageFactory;
 import io.spine.testing.SlowTest;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,10 +37,12 @@ import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_5;
 @DisplayName("JDBC-backed `Delivery` should ")
 class JdbcDeliverySmokeTest extends DeliveryTest {
 
-    private StorageFactory factory;
+    private JdbcStorageFactory factory;
 
     /**
-     * The application the base suite builds closes this factory.
+     * A factory the suite can still use after a black box closes its application.
+     *
+     * <p>{@link #tearDown()} closes the real factory once the suite tear-down is done.
      */
     @Override
     public StorageFactory storageFactory() {
@@ -51,7 +54,17 @@ class JdbcDeliverySmokeTest extends DeliveryTest {
                     .setTypeMapping(H2_2_5)
                     .build();
         }
-        return factory;
+        return new FactoryLeftOpen(factory);
+    }
+
+    @AfterEach
+    @Override
+    public void tearDown() {
+        super.tearDown();
+        if (factory != null) {
+            factory.close();
+            factory = null;
+        }
     }
 
     @Test
