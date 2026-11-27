@@ -14,28 +14,47 @@
 
 package io.spine.server.storage.jdbc.record;
 
-import io.spine.environment.Tests;
-import io.spine.server.ServerEnvironment;
 import io.spine.server.storage.EntityRecordStorageTest;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeEach;
+import io.spine.server.storage.StorageFactory;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 
 import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.newFactory;
 
+/**
+ * Runs the {@link EntityRecordStorageTest} contract against a JDBC factory
+ * over an in-memory H2 database.
+ */
 @DisplayName("`EntityRecordStorage` with JDBC-backed storage should")
 class JdbcEntityRecordStorageTest extends EntityRecordStorageTest {
 
-    @BeforeEach
+    private StorageFactory factory;
+
     @Override
-    protected void setUpAbstractStorageTest() {
-        ServerEnvironment.under(Tests.class)
-                         .useStorageFactory((env) -> newFactory());
-        super.setUpAbstractStorageTest();
+    protected StorageFactory storageFactory() {
+        if (factory == null) {
+            factory = newFactory();
+        }
+        return factory;
     }
 
-    @AfterAll
-    static void tearDownClass() {
-        ServerEnvironment.instance().reset();
+    /**
+     * Closes the factory after the storage.
+     *
+     * <p>The base suite closes the storage and leaves the factory open.
+     * The annotation is repeated: JUnit does not inherit it onto an override.
+     */
+    @AfterEach
+    @Override
+    protected void tearDownAbstractStorageTest() {
+        super.tearDownAbstractStorageTest();
+        if (factory == null) {
+            return;
+        }
+        try {
+            factory.close();
+        } catch (RuntimeException e) {
+            throw new IllegalStateException("Cannot close the storage factory.", e);
+        }
     }
 }

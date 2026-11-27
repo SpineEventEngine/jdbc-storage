@@ -14,21 +14,14 @@
 
 package io.spine.server.storage.jdbc.delivery;
 
-import io.spine.environment.Tests;
-import io.spine.server.ServerEnvironment;
 import io.spine.server.delivery.CatchUpTest;
 import io.spine.server.storage.StorageFactory;
-import io.spine.server.storage.jdbc.JdbcStorageFactory;
 import io.spine.testing.SlowTest;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static io.spine.base.Identifier.newUuid;
-import static io.spine.server.storage.jdbc.GivenDataSource.whichIsStoredInMemory;
-import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_5;
+import static io.spine.server.storage.jdbc.given.JdbcStorageFactoryTestEnv.newFactory;
 
 /**
  * Smoke tests on {@link io.spine.server.delivery.CatchUp CatchUp} functionality running
@@ -41,32 +34,14 @@ import static io.spine.server.storage.jdbc.PredefinedMapping.H2_2_5;
 @DisplayName("JDBC-backed `CatchUp` should ")
 class JdbcCatchUpSmokeTest extends CatchUpTest {
 
-    private StorageFactory factory;
-
+    /**
+     * Creates a new JDBC storage factory over an in-memory H2 database of its own.
+     *
+     * <p>The base suite closes every factory it obtains here.
+     */
     @Override
-    @BeforeEach
-    public void setUp() {
-        super.setUp();
-        var source = whichIsStoredInMemory(newUuid());
-        factory = JdbcStorageFactory
-                .newBuilder()
-                .setDataSource(source)
-                .setTypeMapping(H2_2_5)
-                .build();
-        ServerEnvironment
-                .under(Tests.class)
-                .use(factory);
-    }
-
-    @AfterEach
-    @Override
-    public void tearDown() {
-        super.tearDown();
-        try {
-            factory.close();
-        } catch (Exception e) {
-            throw new IllegalStateException("Error closing the storage factory.", e);
-        }
+    protected StorageFactory newStorageFactory() {
+        return newFactory();
     }
 
     @Test
